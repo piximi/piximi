@@ -1,23 +1,23 @@
-import {Classifier, Image, Partition} from "@piximi/types";
+import {Project, Image, Partition} from "@piximi/types";
 import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {createImageAction} from "@piximi/store";
 import {UploadImageDialog} from "./UploadImageDialog";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     createImage: (checksum: string, data: string, identifier: string) => {
-      const payload: Image = {
+      const image: Image = {
         categoryIdentifier: "00000000-0000-0000-0000-000000000000",
         checksum: checksum,
         data: data,
@@ -31,6 +31,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
           visibleChannels: []
         }
       };
+
+      const payload = {image: image};
 
       const action = createImageAction(payload);
 

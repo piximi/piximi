@@ -2,9 +2,8 @@ import * as React from "react";
 import * as MaterialUI from "@material-ui/core";
 import {SaveAnnotationsAndPredictionsDialog} from "../../../../SaveAnnotationsAndPredictionsDialog/";
 import {SaveWeightsDialog} from "../../../../SaveWeightsDialog/";
-import {ConnectedSaveClassifierDialog} from "../../../../SaveClassifierDialog/ConnectedSaveClassifierDialog";
+import {ConnectedSaveClassifierDialog} from "../../../../SaveClassifierDialog";
 import {useDialog} from "@piximi/hooks";
-import {Paper} from "@material-ui/core";
 
 type Props = {
   anchorEl: any;

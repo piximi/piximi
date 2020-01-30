@@ -1,14 +1,14 @@
 import {connect} from "react-redux";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 import {SaveClassifierDialog} from "./SaveClassifierDialog";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    classifier: state.classifier
+    project: state.project
   };
 };
 

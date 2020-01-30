@@ -1,0 +1,1 @@
+export {ValidationPercentage} from "./ValidationPercentage";

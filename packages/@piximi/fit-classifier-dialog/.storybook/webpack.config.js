@@ -3,7 +3,10 @@ module.exports = {
   module: {
     rules: [
       {
-        include: path.resolve(__dirname, "../src"),
+        include: path.resolve(
+          __dirname,
+          "../src/FitClassifierDialog/FitClassifierDialog"
+        ),
         loader: "awesome-typescript-loader",
         test: /\.tsx?$/
       }

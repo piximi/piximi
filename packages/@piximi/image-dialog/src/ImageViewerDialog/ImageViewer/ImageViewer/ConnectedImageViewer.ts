@@ -5,23 +5,23 @@ import {
   updateImageContrastAction
 } from "@piximi/store";
 import {Dispatch} from "redux";
-import {Classifier, Image} from "@piximi/types";
+import {Project, Image} from "@piximi/types";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    saveEdits: (identifier: string, brightness: number, contrast: number) => {
+    saveEdits: (image: Image, brightness: number, contrast: number) => {
       const brightnessPayload = {
-        identifier: identifier,
+        image: image,
         brightness: brightness
       };
 
@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
       dispatch(brightnessAction);
 
       const contrastPayload = {
-        identifier: identifier,
+        image: image,
         contrast: contrast
       };
 
@@ -45,7 +45,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     ) => {
       for (let image of images) {
         const brightnessPayload = {
-          identifier: image.identifier,
+          image: image,
           brightness: brightness
         };
 
@@ -54,7 +54,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
         dispatch(brightnessAction);
 
         const contrastPayload = {
-          identifier: image.identifier,
+          image: image,
           contrast: contrast
         };
 

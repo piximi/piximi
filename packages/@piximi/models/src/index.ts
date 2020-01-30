@@ -1,2 +1,8 @@
-export {createModel, getArgs} from "./network";
-export {createPredictionSet, createTrainAndTestSet} from "./data";
+export {
+  compile,
+  evaluate,
+  fit,
+  generate,
+  open,
+  predict
+} from "./classification";

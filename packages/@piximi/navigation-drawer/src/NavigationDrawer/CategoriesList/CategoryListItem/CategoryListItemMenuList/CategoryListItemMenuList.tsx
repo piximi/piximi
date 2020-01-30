@@ -76,7 +76,7 @@ export const CategoryListItemMenuList = (
             />
 
             <ConnectedChangeCategoryVisibilityMenuItem
-              categoryProp={category}
+              category={category}
               closeMenu={closeMenu}
             />
             {known && (

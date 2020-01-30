@@ -1,0 +1,268 @@
+[
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.25,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.25,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.25,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.25,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 1,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.35,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [96, 96, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [96, 96, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [96, 96, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [96, 96, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.35,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [128, 128, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.35,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [160, 160, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.35,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [192, 192, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.35,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.5,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 0.75,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1.3,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  },
+  {
+    "model": "MobileNet",
+    "version": 2,
+    "depthMultiplier": 1.4,
+    "url": "https://tfhub.dev/google/tfjs-model/imagenet/MobileNet/classification/3/default/1",
+    "inputShape": [224, 224, 3]
+  }
+]

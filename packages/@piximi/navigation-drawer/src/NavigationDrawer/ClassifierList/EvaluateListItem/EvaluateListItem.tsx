@@ -5,13 +5,13 @@ import {useTranslation} from "react-i18next";
 import {useDialog} from "@piximi/hooks";
 import {ConnectedEvaluateClassifierDialog} from "@piximi/evaluate-classifier-dialog";
 
-type EvaluateListItemProbs = {
+type EvaluateListItemProps = {
   datasetInitialized: boolean;
   setDatasetInitialized: (datasetInitialized: boolean) => void;
 };
 
-export const EvaluateListItem = (probs: EvaluateListItemProbs) => {
-  const {datasetInitialized, setDatasetInitialized} = probs;
+export const EvaluateListItem = (props: EvaluateListItemProps) => {
+  const {datasetInitialized, setDatasetInitialized} = props;
 
   const {openedDialog, openDialog, closeDialog} = useDialog();
 
@@ -23,7 +23,7 @@ export const EvaluateListItem = (probs: EvaluateListItemProbs) => {
 
   return (
     <React.Fragment>
-      <ListItem button dense onClick={evaluate}>
+      <ListItem button dense disabled onClick={evaluate}>
         <ListItemIcon>
           <BarChartIcon />
         </ListItemIcon>
@@ -31,13 +31,7 @@ export const EvaluateListItem = (probs: EvaluateListItemProbs) => {
         <ListItemText primary={translation("Evaluate")} />
       </ListItem>
 
-      <ConnectedEvaluateClassifierDialog
-        closeDialog={closeDialog}
-        openedDialog={openedDialog}
-        openedDrawer={true}
-        datasetInitialized={datasetInitialized}
-        setDatasetInitialized={setDatasetInitialized}
-      />
+      <ConnectedEvaluateClassifierDialog />
     </React.Fragment>
   );
 };

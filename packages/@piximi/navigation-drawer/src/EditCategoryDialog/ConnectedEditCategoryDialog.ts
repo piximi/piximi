@@ -3,31 +3,31 @@ import {
   updateCategoryColorAction,
   updateCategoryDescriptionAction
 } from "@piximi/store";
-import {Classifier} from "@piximi/types";
+import {Category, Project} from "@piximi/types";
 import {Dispatch} from "redux";
 import {EditCategoryDialog} from "./EditCategoryDialog";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    categories: state.classifier.categories
+    project: state.project.categories
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    updateColor: (identifier: string, color: string) => {
-      const payload = {identifier: identifier, color: color};
+    updateColor: (category: Category, color: string) => {
+      const payload = {category: category, color: color};
 
       const action = updateCategoryColorAction(payload);
 
       dispatch(action);
     },
-    updateDescription: (identifier: string, description: string) => {
-      const payload = {identifier: identifier, description: description};
+    updateDescription: (category: Category, description: string) => {
+      const payload = {category: category, description: description};
 
       const action = updateCategoryDescriptionAction(payload);
 

@@ -8,12 +8,13 @@ import {useDrawer} from "@piximi/hooks";
 import {makeStyles} from "@material-ui/styles";
 import {ConnectedGalleryDialogImageList} from "../GalleryDialogImageList";
 import {NavigationDrawer} from "@piximi/navigation-drawer";
+import {Category, Image} from "@piximi/types";
 
 // @ts-ignore
 const useStyles = makeStyles(styles);
 
 type Props = {
-  updateImageCategory: any;
+  updateImageCategory: (image: Image, category: Category) => void;
 };
 
 export const GalleryDialog = (props: Props) => {

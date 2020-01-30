@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "typescript": "^3.7.3"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "./dist/index.js",
+  "name": "@piximi/image",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "types": "./dist/index.d.ts",
+  "version": "0.0.0"
+}

@@ -2,24 +2,24 @@ import {connect} from "react-redux";
 import {DeleteImageDialog} from "./DeleteImageDialog";
 import {deleteImageAction} from "@piximi/store";
 import {Dispatch} from "redux";
-import {Classifier} from "@piximi/types";
+import {Image, Project} from "@piximi/types";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    deleteImages: (identifiers: string[]) => {
-      for (let identifier of identifiers) {
+    deleteImages: (images: Array<Image>) => {
+      for (const image of images) {
         const payload = {
-          identifier: identifier
+          image: image
         };
 
         const action = deleteImageAction(payload);

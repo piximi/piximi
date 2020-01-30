@@ -6,12 +6,12 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@material-ui/core": "^4.7.2",
+    "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@material-ui/styles": "^4.7.1",
+    "@material-ui/styles": "^4.9.0",
+    "@piximi/gallery-dialog": "*",
     "@types/react-dom": "^16.9.4",
     "@types/string-hash": "^1.1.1",
-    "@piximi/gallery-dialog": "*",
     "cli-table": "^0.3.1",
     "d3": "^5.14.2",
     "filtrex": "^2.0.0",
@@ -23,6 +23,7 @@
     "react-i18next": "^11.2.6",
     "react-virtualized": "^9.21.2",
     "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
     "string-hash": "^1.1.3",
     "uuid": "^3.3.3"
   },

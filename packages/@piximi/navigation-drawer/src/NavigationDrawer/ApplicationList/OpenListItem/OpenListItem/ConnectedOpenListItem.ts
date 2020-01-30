@@ -1,17 +1,17 @@
 import {connect} from "react-redux";
 import {createCategoryAction, createImageAction} from "@piximi/store";
 import {Dispatch} from "redux";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 import {OpenListItem} from "./OpenListItem";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images,
-    categories: state.classifier.categories
+    images: state.project.images,
+    categories: state.project.categories
   };
 };
 

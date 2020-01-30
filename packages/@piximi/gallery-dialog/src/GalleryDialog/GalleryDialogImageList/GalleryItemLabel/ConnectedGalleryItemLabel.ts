@@ -1,14 +1,14 @@
 import {connect} from "react-redux";
 import {GalleryItemLabel} from "./GalleryItemLabel";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    categories: state.classifier.categories
+    categories: state.project.categories
   };
 };
 

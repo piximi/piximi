@@ -3,10 +3,10 @@ import {createImagesAction} from "@piximi/store";
 import * as uuid from "uuid";
 import {ImportImagesButton} from "./ImportImagesButton";
 import {Dispatch} from "redux";
-import {Classifier, Image, Partition} from "@piximi/types";
+import {Project, Image, Partition} from "@piximi/types";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 type imageProps = {
@@ -16,7 +16,7 @@ type imageProps = {
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 

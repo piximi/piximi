@@ -1,15 +1,15 @@
 import {connect} from "react-redux";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 import {EvaluateListItem} from "./EvaluateListItem";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    categories: state.classifier.categories,
-    images: state.classifier.images
+    categories: state.project.categories,
+    images: state.project.images
   };
 };
 

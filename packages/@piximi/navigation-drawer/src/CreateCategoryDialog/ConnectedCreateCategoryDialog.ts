@@ -2,18 +2,18 @@ import {connect} from "react-redux";
 import {createCategoryAction} from "@piximi/store";
 import uuidv4 from "uuid";
 import {Dispatch} from "redux";
-import {Category, Classifier} from "@piximi/types";
+import {Category, Project} from "@piximi/types";
 import {CreateCategoryDialog} from "./CreateCategoryDialog";
 
 let index = 0;
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    categories: state.classifier.categories
+    categories: state.project.categories
   };
 };
 

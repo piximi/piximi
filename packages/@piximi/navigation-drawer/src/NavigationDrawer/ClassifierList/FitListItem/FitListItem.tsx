@@ -34,9 +34,6 @@ export const FitListItem = (props: FitListItemProps) => {
       <ConnectedFitClassifierDialog
         closeDialog={closeDialog}
         openedDialog={openedDialog}
-        openedDrawer={true}
-        datasetInitialized={datasetInitialized}
-        setDatasetInitialized={setDatasetInitialized}
       />
     </React.Fragment>
   );

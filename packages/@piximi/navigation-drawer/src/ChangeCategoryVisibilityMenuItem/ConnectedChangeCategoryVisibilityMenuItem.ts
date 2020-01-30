@@ -1,26 +1,24 @@
 import {connect} from "react-redux";
 import {updateCategoryVisibilityAction} from "@piximi/store";
 import {ChangeCategoryVisibilityMenuItem} from "./ChangeCategoryVisibilityMenuItem";
-import {Classifier} from "@piximi/types";
+import {Category, Project} from "@piximi/types";
 import {Dispatch} from "redux";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    classifier: state.classifier
+    project: state.project
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    makeCategoryInvisible: (
-      categoryIdentifier: string,
-      visibility: boolean
-    ) => {
-      const payload = {identifier: categoryIdentifier, visible: visibility};
+    makeCategoryInvisible: (category: Category, visible: boolean) => {
+      const payload = {category: category, visible: visible};
+
       const action = updateCategoryVisibilityAction(payload);
 
       dispatch(action);

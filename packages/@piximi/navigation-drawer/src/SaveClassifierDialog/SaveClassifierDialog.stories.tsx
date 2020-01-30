@@ -1,9 +1,9 @@
 import * as React from "react";
 import {storiesOf} from "@storybook/react";
 import {SaveClassifierDialog} from "./SaveClassifierDialog";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 
-const classifier: Classifier = {
+const classifier: Project = {
   categories: [],
   images: [],
   name: "example"

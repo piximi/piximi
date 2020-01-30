@@ -1,24 +1,15 @@
 {
-  "files": [
-    "dist",
-    "src"
-  ],
-  "main": "./dist/index.js",
-  "name": "@piximi/models",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "tsc --build ./tsconfig.json",
-    "clean": "rm -rf ./dist ./tsconfig.tsbuildinfo"
-  },
-  "types": "./dist/index.d.ts",
-  "version": "0.0.0",
   "dependencies": {
-    "@material-ui/core": "^4.7.2",
+    "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@material-ui/styles": "^4.7.1",
+    "@material-ui/styles": "^4.9.0",
+    "@piximi/types": "*",
+    "@tensorflow/tfjs": "^1.5.1",
+    "axios": "^0.19.0",
+    "buffer": "^5.4.3",
+    "canvas": "^2.6.1",
     "i18next": "^19.0.2",
+    "image-js": "^0.21.8",
     "lodash": "^4.17.15",
     "react": "^16.12.0",
     "react-color": "^2.17.3",
@@ -28,11 +19,34 @@
     "redux-logger": "^3.0.6"
   },
   "devDependencies": {
+    "@tensorflow/tfjs-node": "^1.5.1",
     "@types/jest": "^24.0.23",
     "@types/lodash": "^4.14.149",
     "@types/react-color": "^3.0.1",
     "@types/redux-logger": "^3.0.7",
+    "canvas": "^2.6.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    }
+  },
+  "main": "./dist/index.js",
+  "name": "@piximi/models",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --build ./tsconfig.json",
+    "clean": "rm -rf ./dist ./tsconfig.tsbuildinfo",
+    "test": "yarn build && jest"
+  },
+  "types": "./dist/index.d.ts",
+  "version": "0.0.0"
 }

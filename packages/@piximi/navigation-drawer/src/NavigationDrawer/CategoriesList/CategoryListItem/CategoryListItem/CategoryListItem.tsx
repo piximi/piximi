@@ -40,7 +40,7 @@ type CategoryListItemProps = {
   category: Category;
   key: string;
   index: number;
-  toggleVisibility: (identifier: string) => void;
+  toggleVisibility: (category: Category) => void;
 };
 
 export const CategoryListItem = (props: CategoryListItemProps) => {
@@ -51,7 +51,7 @@ export const CategoryListItem = (props: CategoryListItemProps) => {
   const [animateOnDrop, setAnimateOnDrop] = React.useState<Partial<boolean>>();
 
   const onToggleVisibilityClick = () => {
-    toggleVisibility(category.identifier);
+    toggleVisibility(category);
   };
 
   const className =

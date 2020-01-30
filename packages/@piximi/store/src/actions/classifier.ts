@@ -1,62 +1,92 @@
+import {
+  Category,
+  CompileOptions,
+  FitOptions,
+  Image,
+  Loss,
+  Metric,
+  Optimizer,
+  ValidationOptions
+} from "@piximi/types";
 import {createAction} from "@reduxjs/toolkit";
-import {Category} from "@piximi/types";
+import {History, LayersModel, Scalar, Tensor} from "@tensorflow/tfjs";
+import {Dataset} from "@tensorflow/tfjs-data";
 
-export const createCategoryAction = createAction<{}>("create-category");
+export const compileAction = createAction<{
+  opened: LayersModel;
+  options: CompileOptions;
+}>("CLASSIFIER_COMPILE");
 
-export const createClassifierAction = createAction<{}>("create-classifier");
+export const compiledAction = createAction<{
+  compiled: LayersModel;
+}>("CLASSIFIER_COMPILED");
 
-export const openClassifierAction = createAction<{}>("open-classifier");
+export const evaluateAction = createAction<{
+  fitted: LayersModel;
+  data: Dataset<{xs: Tensor; ys: Tensor}>;
+}>("CLASSIFIER_EVALUATE");
 
-export const createImageAction = createAction<{}>("create-image");
+export const evaluatedAction = createAction<{
+  evaluations: Scalar | Array<Scalar>;
+}>("CLASSIFIER_EVALUATED");
 
-export const createImagesAction = createAction<{}>("create-images");
+export const fitAction = createAction<{
+  compiled: LayersModel;
+  data: Dataset<{xs: Tensor; ys: Tensor}>;
+  validationData: Dataset<{xs: Tensor; ys: Tensor}>;
+  options: FitOptions;
+}>("CLASSIFIER_FIT");
 
-export const createImagesScoreAction = createAction<{}>("create-images-score");
+export const fittedAction = createAction<{
+  fitted: LayersModel;
+  status: History;
+}>("CLASSIFIER_FITTED");
 
-export const deleteCategoryAction = createAction<{}>("delete-category");
+export const generateAction = createAction<{}>("CLASSIFIER_GENERATE");
 
-export const deleteImageAction = createAction<{}>("delete-image");
+export const generatedAction = createAction<{
+  data: Dataset<{xs: Tensor; ys: Tensor}>;
+}>("CLASSIFIER_GENERATED");
 
-export const toggleCategoryVisibilityAction = createAction<{}>(
-  "toggle-category-visibility"
-);
+export const openAction = createAction<{
+  pathname: string;
+  classes: number;
+  units: number;
+}>("CLASSIFIER_OPEN");
 
-export const updateCategoryColorAction = createAction<{}>(
-  "update-category-color"
-);
+export const openedAction = createAction<{
+  opened: LayersModel;
+}>("CLASSIFIER_OPENED");
 
-export const updateCategoryDescriptionAction = createAction<{}>(
-  "update-category-description"
-);
+export const predictAction = createAction<{
+  compiled: LayersModel;
+  data: Dataset<{xs: Tensor; ys: Tensor}>;
+}>("CLASSIFIER_PREDICT");
 
-export const updateCategoryVisibilityAction = createAction<{}>(
-  "update-category-visibility"
-);
+export const predictedAction = createAction<{
+  predictions: Tensor;
+}>("CLASSIFIER_PREDICTED");
 
-export const updateClassifierNameAction = createAction<{}>(
-  "update-classifier-name"
-);
+export const updateLearningRateAction = createAction<{
+  learningRate: number;
+}>("CLASSIFIER_UPDATE_LEARNING_RATE");
 
-export const updateImageBrightnessAction = createAction<{}>(
-  "update-image-brightness"
-);
+export const updateLossFunctionAction = createAction<{
+  lossFunction: Loss;
+}>("CLASSIFIER_UPDATE_LOSS_FUNCTION");
 
-export const updateImageCategoryAction = createAction<{}>(
-  "update-image-category"
-);
+export const updateMetricsAction = createAction<{
+  metrics: Array<Metric>;
+}>("CLASSIFIER_UPDATE_METRICS");
 
-export const updateImagesCategoryAction = createAction<{}>(
-  "update-images-category"
-);
+export const updateOptimizationFunctionAction = createAction<{
+  optimizationFunction: Optimizer;
+}>("CLASSIFIER_UPDATE_OPTIMIZATION_FUNCTION");
 
-export const updateImageContrastAction = createAction<{}>(
-  "update-image-contrast"
-);
+export const updateValidationPercentageAction = createAction<{
+  validationPercentage: number;
+}>("CLASSIFIER_UPDATE_VALIDATION_PERCENTAGE");
 
-export const updateImageVisibilityAction = createAction<{}>(
-  "update-image-visibility"
-);
+export const saveAction = createAction<{}>("CLASSIFIER_SAVE");
 
-export const updateImagesPartitionAction = createAction<{}>(
-  "update-images-partition"
-);
+export const savedAction = createAction<{}>("CLASSIFIER_SAVED");

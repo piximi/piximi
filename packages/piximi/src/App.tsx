@@ -3,11 +3,7 @@ import {ConnectedGalleryDialog} from "@piximi/gallery-dialog";
 import {createMuiTheme} from "@material-ui/core/styles";
 import {ThemeProvider} from "@material-ui/styles";
 
-const theme = createMuiTheme({
-  palette: {
-    type: "light"
-  }
-});
+const theme = createMuiTheme();
 
 const App = () => {
   return (

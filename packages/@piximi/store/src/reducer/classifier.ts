@@ -1,220 +1,165 @@
+import {ClassifierState, Loss, Metric, Optimizer} from "@piximi/types";
 import {createReducer} from "@reduxjs/toolkit";
 
-import {
-  createCategoryAction,
-  createClassifierAction,
-  openClassifierAction,
-  createImageAction,
-  createImagesAction,
-  createImagesScoreAction,
-  deleteCategoryAction,
-  deleteImageAction,
-  toggleCategoryVisibilityAction,
-  updateCategoryColorAction,
-  updateCategoryDescriptionAction,
-  updateCategoryVisibilityAction,
-  updateClassifierNameAction,
-  updateImageBrightnessAction,
-  updateImageCategoryAction,
-  updateImagesCategoryAction,
-  updateImageContrastAction,
-  updateImageVisibilityAction,
-  updateImagesPartitionAction
-} from "../actions";
+import * as actions from "../actions";
 
-import {Category, Classifier, Image} from "@piximi/types";
-
-const findCategoryIndex = (
-  categories: Category[],
-  identifier: string
-): number => {
-  return categories.findIndex(
-    (category: Category) => category.identifier === identifier
-  );
+const state: ClassifierState = {
+  compiling: false,
+  evaluating: false,
+  fitOptions: {
+    epochs: 1,
+    initialEpoch: 0
+  },
+  fitting: false,
+  generating: false,
+  learningRate: 0.01,
+  lossFunction: Loss.CategoricalCrossentropy,
+  metrics: [Metric.CategoricalAccuracy],
+  opening: false,
+  optimizationFunction: Optimizer.SGD,
+  predicting: false,
+  saving: false,
+  validationPercentage: 0.25
 };
 
-const findImageIndex = (images: Image[], identifier: string): number => {
-  return images.findIndex((image: Image) => image.identifier === identifier);
-};
-
-const initialState: Classifier = {
-  categories: [],
-  images: [],
-  name: "Untitled classifier"
-};
-
-const unknownCategory: Category = {
-  description: "Unknown",
-  identifier: "00000000-0000-0000-0000-000000000000",
-  index: 0,
-  visualization: {
-    color: "rgb(233, 165, 177)",
-    visible: true
-  }
-};
-
-initialState.categories.push(unknownCategory);
-
-export const classifierReducer = createReducer(initialState, {
-  [createCategoryAction.toString()]: (state, action) => {
-    const {category} = action.payload;
-
-    state.categories.push(category);
+export const reducer = createReducer(state, {
+  [actions.compileAction.toString()]: (state) => {
+    return {
+      ...state,
+      compiling: true
+    };
   },
-  [createClassifierAction.toString()]: (state, action) => {
-    const {name} = action.payload;
+  [actions.compiledAction.toString()]: (state, action) => {
+    const {compiled} = action.payload;
 
-    state.categories = [];
-
-    state.categories.push(unknownCategory);
-
-    state.images = [];
-
-    state.name = name;
+    return {
+      ...state,
+      compiled: compiled,
+      compiling: false
+    };
   },
-  [openClassifierAction.toString()]: (state, action) => {
-    const {categories, images, name} = action.payload;
-
-    state.categories = categories;
-
-    state.images = images;
-
-    state.name = name;
+  [actions.evaluateAction.toString()]: (state) => {
+    return {
+      ...state,
+      evaluating: true
+    };
   },
-  [createImageAction.toString()]: (state, action) => {
-    const {image} = action.payload;
+  [actions.evaluatedAction.toString()]: (state, action) => {
+    const {evaluations} = action.payload;
 
-    state.images.push(image);
+    return {
+      ...state,
+      evaluating: false,
+      evaluations: evaluations
+    };
   },
-  [createImagesAction.toString()]: (state, action) => {
-    const {images} = action.payload;
-
-    images.forEach((image: Image) => state.images.push(image));
+  [actions.fitAction.toString()]: (state) => {
+    return {
+      ...state,
+      fitting: true
+    };
   },
-  [createImagesScoreAction.toString()]: (state, action) => {
-    const {identifiers, scores} = action.payload;
-    for (let i = 0; i < identifiers.length; i++) {
-      const index: number = findImageIndex(state.images, identifiers[i]);
-      const image: Image = state.images[index];
-      image.scores = scores[i];
-    }
+  [actions.fittedAction.toString()]: (state, action) => {
+    const {fitted, history} = action.payload;
+
+    return {
+      ...state,
+      fitted: fitted,
+      fitting: false,
+      history: history
+    };
   },
-  [deleteCategoryAction.toString()]: (state, action) => {
-    const {identifier} = action.payload;
-
-    state.categories = state.categories.filter((category: Category) => {
-      return category.identifier !== identifier;
-    });
-
-    state.images = state.images.map((image: Image) => {
-      if (image.categoryIdentifier === identifier) {
-        image.categoryIdentifier = "00000000-0000-0000-0000-000000000000";
-      }
-
-      return image;
-    });
+  [actions.generateAction.toString()]: (state) => {
+    return {
+      ...state,
+      generating: true
+    };
   },
-  [deleteImageAction.toString()]: (state, action) => {
-    const {identifier} = action.payload;
+  [actions.generatedAction.toString()]: (state, action) => {
+    const {data, validationData} = action.payload;
 
-    state.images = state.images.filter(
-      (image: Image) => image.identifier !== identifier
-    );
+    return {
+      ...state,
+      data: data,
+      generating: false,
+      validationData: validationData
+    };
   },
-  [toggleCategoryVisibilityAction.toString()]: (state, action) => {
-    const {identifier} = action.payload;
-
-    const index: number = findCategoryIndex(state.categories, identifier);
-
-    const category: Category = state.categories[index];
-
-    category.visualization.visible = !category.visualization.visible;
+  [actions.openAction.toString()]: (state) => {
+    return {
+      ...state,
+      opening: true
+    };
   },
-  [updateCategoryColorAction.toString()]: (state, action) => {
-    const {identifier, color} = action.payload;
+  [actions.openedAction.toString()]: (state, action) => {
+    const {opened} = action.payload;
 
-    const index: number = findCategoryIndex(state.categories, identifier);
-
-    const category: Category = state.categories[index];
-
-    category.visualization.color = color;
+    return {
+      ...state,
+      opened: opened,
+      opening: false
+    };
   },
-  [updateCategoryDescriptionAction.toString()]: (state, action) => {
-    const {identifier, description} = action.payload;
-
-    const index: number = findCategoryIndex(state.categories, identifier);
-
-    const category: Category = state.categories[index];
-
-    category.description = description;
+  [actions.predictAction.toString()]: (state) => {
+    return {
+      ...state,
+      predicting: true
+    };
   },
-  [updateCategoryVisibilityAction.toString()]: (state, action) => {
-    const {identifier, visible} = action.payload;
+  [actions.predictedAction.toString()]: (state, action) => {
+    const {predictions} = action.payload;
 
-    const index: number = findCategoryIndex(state.categories, identifier);
-
-    const category: Category = state.categories[index];
-
-    category.visualization.visible = visible;
+    return {
+      ...state,
+      predicting: false,
+      predictions: predictions
+    };
   },
-  [updateClassifierNameAction.toString()]: (state, action) => {
-    const {name} = action.payload;
-
-    state.name = name;
+  [actions.saveAction.toString()]: (state) => {
+    return {
+      ...state,
+      saving: true
+    };
   },
-  [updateImageBrightnessAction.toString()]: (state, action) => {
-    const {identifier, brightness} = action.payload;
+  [actions.savedAction.toString()]: (state, action) => {},
+  [actions.updateLearningRateAction.toString()]: (state, action) => {
+    const {learningRate} = action.payload;
 
-    const index: number = findImageIndex(state.images, identifier);
-
-    const image: Image = state.images[index];
-
-    image.visualization.brightness = brightness;
+    return {
+      ...state,
+      learningRate: learningRate
+    };
   },
-  [updateImageCategoryAction.toString()]: (state, action) => {
-    const {identifier, categoryIdentifier} = action.payload;
+  [actions.updateLossFunctionAction.toString()]: (state, action) => {
+    const {lossFunction} = action.payload;
 
-    const index: number = findImageIndex(state.images, identifier);
-
-    const image: Image = state.images[index];
-
-    image.categoryIdentifier = categoryIdentifier;
+    return {
+      ...state,
+      lossFunction: lossFunction
+    };
   },
-  [updateImagesCategoryAction.toString()]: (state, action) => {
-    const {identifiers, categoryIdentifier} = action.payload;
+  [actions.updateMetricsAction.toString()]: (state, action) => {
+    const {metrics} = action.payload;
 
-    identifiers.forEach((identifier: string) => {
-      const index: number = findImageIndex(state.images, identifier);
-      const image: Image = state.images[index];
-      image.categoryIdentifier = categoryIdentifier;
-    });
+    return {
+      ...state,
+      metrics: metrics
+    };
   },
-  [updateImageContrastAction.toString()]: (state, action) => {
-    const {identifier, contrast} = action.payload;
+  [actions.updateOptimizationFunctionAction.toString()]: (state, action) => {
+    const {optimizationFunction} = action.payload;
 
-    const index: number = findImageIndex(state.images, identifier);
-
-    const image: Image = state.images[index];
-
-    image.visualization.contrast = contrast;
+    return {
+      ...state,
+      optimizationFunction: optimizationFunction
+    };
   },
-  [updateImageVisibilityAction.toString()]: (state, action) => {
-    const {identifiers, visible} = action.payload;
+  [actions.updateValidationPercentageAction.toString()]: (state, action) => {
+    const {validationPercentage} = action.payload;
 
-    for (let i = 0; i < identifiers.length; i++) {
-      const index: number = findImageIndex(state.images, identifiers[i]);
-
-      const image: Image = state.images[index];
-
-      image.visualization.visible = visible;
-    }
-  },
-  [updateImagesPartitionAction.toString()]: (state, action) => {
-    const {partitions} = action.payload;
-
-    state.images.forEach((image: Image) => {
-      image.partition = partitions[0];
-      partitions.splice(0, 1);
-    });
+    return {
+      ...state,
+      validationPercentage: validationPercentage
+    };
   }
 });

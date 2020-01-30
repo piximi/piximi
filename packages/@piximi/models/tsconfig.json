@@ -4,16 +4,10 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "exclude": [
-    "./src/setupTests.ts",
-    "./src/**/*.stories.tsx",
-    "./src/**/*.test.tsx"
-  ],
+  "exclude": ["src/setupTests.ts", "src/**/*.stories.tsx", "src/**/*.test.tsx"],
   "extends": "../../../tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
-    {
-      "path": "../store"
-    },
     {
       "path": "../types"
     }

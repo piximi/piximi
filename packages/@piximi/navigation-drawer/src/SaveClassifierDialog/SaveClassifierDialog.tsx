@@ -7,24 +7,24 @@ import {
   AlertDialogTitle,
   FilenameTextField
 } from "@piximi/components";
-import {Classifier} from "@piximi/types";
+import {Project} from "@piximi/types";
 
 type SaveClassifierDialogProps = {
-  classifier: Classifier;
+  project: Project;
   open: boolean;
   onClose: () => void;
 };
 
 export const SaveClassifierDialog = (props: SaveClassifierDialogProps) => {
-  const {classifier, open, onClose} = props;
+  const {project, open, onClose} = props;
 
-  const [filename, setFilename] = React.useState<string>(classifier.name);
+  const [filename, setFilename] = React.useState<string>(project.name);
 
   const onAcceptance = () => {
     const parts = {
-      categories: classifier.categories,
-      images: classifier.images,
-      name: classifier.name,
+      categories: project.categories,
+      images: project.images,
+      name: project.name,
       version: "0.1.0"
     };
 

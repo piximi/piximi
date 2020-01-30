@@ -1,27 +1,29 @@
 import {connect} from "react-redux";
-import {createClassifierAction} from "@piximi/store";
-import {Classifier} from "@piximi/types";
-import * as uuid from "uuid";
+import {createProjectAction} from "@piximi/store";
+import {Project} from "@piximi/types";
 import {Dispatch} from "redux";
 import {NewClassifierDialog} from "./NewClassifierDialog";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
-  return state.classifier;
+  return state.project;
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     openClassifier: (name: string) => {
       const classifier = {
-        identifier: uuid.v4(),
+        categories: [],
+        images: [],
         name: name
       };
 
-      const action = createClassifierAction(classifier);
+      const payload = {project: classifier};
+
+      const action = createProjectAction(payload);
 
       dispatch(action);
     }

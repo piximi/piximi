@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@tensorflow/tfjs": "^1.4.0"
+  },
   "devDependencies": {
     "typescript": "^3.7.3"
   },
@@ -10,7 +13,7 @@
   "main": "./dist/index.js",
   "name": "@piximi/types",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p ./tsconfig.json",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "types": "./dist/index.d.ts",

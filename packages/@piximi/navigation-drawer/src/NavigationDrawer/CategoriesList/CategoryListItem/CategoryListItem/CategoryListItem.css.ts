@@ -1,6 +1,6 @@
 import {keyframes} from "styled-components";
 import Color from "color";
-import {createStyles} from "@material-ui/styles";
+import {createStyles} from "@material-ui/core/styles";
 
 export const styles = () =>
   createStyles({

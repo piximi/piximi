@@ -2,24 +2,24 @@ import {connect} from "react-redux";
 import {GalleryItem} from "./GalleryItem";
 import {updateImageCategoryAction} from "@piximi/store";
 import {Dispatch} from "redux";
-import {Classifier} from "@piximi/types";
+import {Category, Image, Project} from "@piximi/types";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    updateImageCategory: (identifier: string, categoryIdentifier: string) => {
+    updateImageCategory: (image: Image, category: Category) => {
       const payload = {
-        categoryIdentifier: categoryIdentifier,
-        identifier: identifier
+        image: image,
+        category: category
       };
 
       const action = updateImageCategoryAction(payload);

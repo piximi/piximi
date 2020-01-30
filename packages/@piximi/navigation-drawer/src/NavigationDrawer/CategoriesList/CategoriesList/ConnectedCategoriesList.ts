@@ -3,31 +3,31 @@ import {
   toggleCategoryVisibilityAction,
   updateCategoryVisibilityAction
 } from "@piximi/store";
-import {Classifier} from "@piximi/types";
+import {Category, Project} from "@piximi/types";
 import {Dispatch} from "redux";
 import {CategoriesList} from "./CategoriesList";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    categories: state.classifier.categories
+    categories: state.project.categories
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    toggleVisibility: (identifier: string) => {
-      const payload = {identifier: identifier};
+    toggleVisibility: (category: Category) => {
+      const payload = {category: category};
 
       const action = toggleCategoryVisibilityAction(payload);
 
       dispatch(action);
     },
-    updateVisibility: (identifier: string, visible: boolean) => {
-      const payload = {identifier: identifier, visible: visible};
+    updateVisibility: (category: Category, visible: boolean) => {
+      const payload = {category: category, visible: visible};
 
       const action = updateCategoryVisibilityAction(payload);
 

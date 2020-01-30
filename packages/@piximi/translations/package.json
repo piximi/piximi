@@ -15,9 +15,9 @@
   "types": "./dist/index.d.ts",
   "version": "0.0.0",
   "dependencies": {
-    "@material-ui/core": "^4.7.2",
+    "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@material-ui/styles": "^4.7.1",
+    "@material-ui/styles": "^4.9.0",
     "i18next": "^19.0.2",
     "react": "^16.12.0",
     "react-color": "^2.17.3",

@@ -32,8 +32,8 @@ export const colors = [
 
 type EditCategoryDialogProps = {
   category: Category;
-  updateColor: (identifier: string, color: string) => void;
-  updateDescription: (identifier: string, description: string) => void;
+  updateColor: (category: Category, color: string) => void;
+  updateDescription: (category: Category, description: string) => void;
   onClose: () => void;
   open: boolean;
 };
@@ -50,9 +50,9 @@ export const EditCategoryDialog = (props: EditCategoryDialogProps) => {
   );
 
   const onAcceptance = () => {
-    updateColor(category.identifier, color);
+    updateColor(category, color);
 
-    updateDescription(category.identifier, description);
+    updateDescription(category, description);
 
     onClose();
   };

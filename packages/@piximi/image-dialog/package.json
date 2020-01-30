@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@material-ui/core": "^4.7.2",
+    "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@material-ui/styles": "^4.7.1",
+    "@material-ui/styles": "^4.9.0",
     "@piximi/store": "*",
     "@piximi/types": "*",
     "i18next": "^19.0.2",

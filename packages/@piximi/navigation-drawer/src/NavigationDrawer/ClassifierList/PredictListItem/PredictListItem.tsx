@@ -7,30 +7,9 @@ import {createPredictionSet} from "./dataset";
 import * as tensorflow from "@tensorflow/tfjs";
 
 type PredictListItemProbs = {
-  createImageScore: (identifiers: string[], scores: Score[][]) => void;
+  createImageScore: (images: Array<Image>, scores: Array<Array<Score>>) => void;
   categories: Category[];
   images: Image[];
-};
-
-const createScores = (predictions: any, categories: Category[]) => {
-  var scores: Score[][] = [];
-  const lables: Category[] = categories.filter((category: Category) => {
-    return category.identifier !== "00000000-0000-0000-0000-000000000000";
-  });
-  for (let i = 0; i < predictions.length; i++) {
-    var imageScore: Score[] = [];
-    var prediction: number[] = predictions[i].dataSync();
-    for (let j = 0; j < lables.length; j++) {
-      var categoryIdentifier = lables[j].identifier;
-      var score: Score = {
-        categoryIdentifier: categoryIdentifier,
-        probability: prediction[j]
-      };
-      imageScore.push(score);
-    }
-    scores.push(imageScore);
-  }
-  return scores;
 };
 
 export const PredictListItem = (probs: PredictListItemProbs) => {
@@ -38,25 +17,11 @@ export const PredictListItem = (probs: PredictListItemProbs) => {
 
   const {t: translation} = useTranslation();
 
-  const predict = async () => {
-    const model = await tensorflow.loadLayersModel("indexeddb://mobilenet");
-
-    const predictionSet = await createPredictionSet(images);
-
-    var predictions: any = [];
-    for (let i: number = 0; i < predictionSet.identifiers.length; i++) {
-      var prediction = await model.predict(predictionSet.data[i]);
-      predictions.push(prediction);
-    }
-
-    const scores: Score[][] = createScores(predictions, categories);
-
-    createImageScore(predictionSet.identifiers, scores);
-  };
+  const predict = async () => {};
 
   return (
     <React.Fragment>
-      <ListItem button dense onClick={predict}>
+      <ListItem button dense disabled onClick={predict}>
         <ListItemIcon>
           <LabelImportantIcon />
         </ListItemIcon>

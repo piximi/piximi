@@ -10,7 +10,7 @@ export {HelpListItem} from "./MiscellaneousList";
 export {MiscellaneousList} from "./MiscellaneousList";
 export {NavigationDrawer} from "./NavigationDrawer";
 export {NavigationDrawerAppBar} from "./NavigationDrawerAppBar";
-export {NewClassifierListItem} from "./ApplicationList";
+export {NewProjectListItem} from "./ApplicationList";
 export {OpenListItem} from "./ApplicationList";
 export {SaveListItem} from "./ApplicationList";
 export {SaveMenuList} from "./ApplicationList";

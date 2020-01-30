@@ -12,7 +12,7 @@ import {Category} from "@piximi/types";
 
 type DeleteCategoryDialogProps = {
   category: Category;
-  deleteCategory: (identifier: string) => void;
+  deleteCategory: (category: Category) => void;
   open: boolean;
   onClose: () => void;
 };
@@ -21,7 +21,7 @@ export const DeleteCategoryDialog = (props: DeleteCategoryDialogProps) => {
   const {category, deleteCategory, open, onClose} = props;
 
   const onDeleteCategoryClick = () => {
-    deleteCategory(category.identifier);
+    deleteCategory(category);
   };
 
   const dialogTitle = `Delete ${category.description}?`;

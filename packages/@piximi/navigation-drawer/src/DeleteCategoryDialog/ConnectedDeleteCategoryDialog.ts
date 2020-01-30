@@ -1,24 +1,24 @@
 import {connect} from "react-redux";
 import {DeleteCategoryDialog} from "./DeleteCategoryDialog";
 import {deleteCategoryAction} from "@piximi/store";
-import {Classifier} from "@piximi/types";
+import {Category, Project} from "@piximi/types";
 import {Dispatch} from "redux";
 
 type State = {
-  classifier: Classifier;
+  project: Project;
 };
 
 const mapStateToProps = (state: State) => {
   return {
-    images: state.classifier.images
+    images: state.project.images
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    deleteCategory: (identifier: string) => {
+    deleteCategory: (category: Category) => {
       const payload = {
-        identifier: identifier
+        category: category
       };
 
       const action = deleteCategoryAction(payload);
