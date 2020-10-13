@@ -36,6 +36,7 @@ import { Slider } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 import { Category, Photo } from "./store";
 import { TransitionProps } from "@material-ui/core/transitions";
+import * as THREE from "three";
 
 type SliderWithInputFieldProps = {
   icon: ReactElement;
@@ -100,27 +101,17 @@ const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
   );
 };
 
-type ImageMeshProps = {
-  brightness: number;
-  contrast: number;
-  photo?: Photo;
-};
+const ImageMesh = ({ photo }: { photo: Photo }) => {
+  const ref = React.useRef();
 
-const ImageMesh = ({ photo }: ImageMeshProps) => {
-  let src = "";
-
-  if (photo) {
-    src = photo.src;
-  }
-
-  const texture: Texture = useTexture(src) as Texture;
+  const texture = React.useMemo(() => {
+    return new THREE.TextureLoader().load(photo.src);
+  }, [photo]);
 
   return (
-    <mesh>
+    <mesh ref={ref}>
       <Box args={[1, 1, 1]}>
-        <meshStandardMaterial attach="material" map={texture} />
-        {/*  <texture attach="map" image={texture}/>*/}
-        {/*</meshStandardMaterial>*/}
+        <meshBasicMaterial attach="material" map={texture} />
       </Box>
     </mesh>
   );
@@ -131,7 +122,7 @@ type ImageDialogProps = {
   onClose: () => void;
   onOpenCreateCategoryDialog: () => void;
   open: boolean;
-  photo?: Photo;
+  photo: Photo;
   TransitionComponent?: React.ComponentType<
     TransitionProps & { children?: React.ReactElement<any, any> }
   >;
@@ -206,29 +197,24 @@ export const ImageDialog = ({
           </>
         </CollapsibleList>
       </Drawer>
+
       <DialogContent className={classes.imageDialogContent}>
         <Container fixed maxWidth="sm">
           <Canvas
-            //camera={{fov: 80, near:0.1, far:5000, position: [0, 0, 1000] }}
             colorManagement={false}
             onCreated={({ gl }) => {
-              gl.setClearColor("black");
+              gl.setClearColor("pink");
             }}
           >
             <PerspectiveCamera makeDefault position={[0, 0, 2]} />
-            {/*<TransformControls mode={"translate"}>*/}
+
             <React.Suspense fallback={null}>
-              {photo ? (
-                <ImageMesh brightness={0.0} contrast={1.0} photo={photo} />
-              ) : (
-                <React.Fragment />
-              )}
+              <ImageMesh photo={photo} />
             </React.Suspense>
-            {/*</TransformControls>*/}
-            <OrbitControls enableRotate={false} />
           </Canvas>
         </Container>
       </DialogContent>
+
       <Drawer
         anchor="right"
         className={classes.drawer}

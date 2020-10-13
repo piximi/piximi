@@ -129,7 +129,7 @@ const Application = () => {
    */
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
-  const [openedImage, setOpenedImage] = React.useState<Photo>();
+  const [openedImage, setOpenedImage] = React.useState<Photo>(state.photos[0]);
 
   const onOpenImageDialog = (photo: Photo) => {
     setOpenedImage(photo);
