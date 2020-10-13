@@ -44,7 +44,9 @@ export const useStyles = makeStyles((theme) => ({
   gridTileBarIconButton: {
     color: "white",
   },
-  imageDialogAppBar: {},
+  imageDialogAppBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   imageDialogContent: {
     paddingBottom: theme.spacing(12),
     paddingTop: theme.spacing(12),
@@ -67,4 +69,10 @@ export const useStyles = makeStyles((theme) => ({
   },
   media: {},
   settingsDialogAppBar: {},
+  slider: {
+    padding: theme.spacing(3),
+  },
+  sliderInput: {
+    width: 42,
+  },
 }));

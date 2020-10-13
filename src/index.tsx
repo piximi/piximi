@@ -1,7 +1,6 @@
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
-import Collapse from "@material-ui/core/Collapse";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Dialog from "@material-ui/core/Dialog";
@@ -32,8 +31,6 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FeedbackIcon from "@material-ui/icons/Feedback";
 import FolderOpenIcon from "@material-ui/icons/FolderOpen";
 import HelpIcon from "@material-ui/icons/Help";
@@ -44,130 +41,23 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import React, { useMemo } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import {
-  configureStore,
-  createAction,
-  createReducer,
-  PayloadAction,
-} from "@reduxjs/toolkit";
 
 import * as serviceWorker from "./serviceWorker";
 import state from "./index.json";
 import { useStyles } from "./index.css";
 import clsx from "clsx";
 import {
-  usePopupState,
-  bindTrigger,
   bindMenu,
+  bindTrigger,
+  usePopupState,
 } from "material-ui-popup-state/hooks";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { Provider } from "react-redux";
-import { v4 } from "uuid";
-import { Canvas, useFrame } from "react-three-fiber";
-import {
-  Box,
-  OrbitControls,
-  PerspectiveCamera,
-  useTexture,
-} from "@react-three/drei";
-import { Texture } from "three";
-// import {ShaderMaterial} from "three";
-
-type Category = {
-  color: string;
-  id: string;
-  name: string;
-};
-
-type Photo = {
-  category?: string;
-  id: string;
-  name: string;
-  src: string;
-};
-
-type State = {
-  categories: Array<Category>;
-  photos: Array<Photo>;
-};
-
-const createCategoryAction = createAction<{ name: string }>("create-category");
-
-const deleteCategoryAction = createAction<{ id: string }>("delete-category");
-
-const updateCategoryNameAction = createAction<{
-  category: string;
-  name: string;
-}>("update-category-name");
-
-const updatePhotoCategoryAction = createAction<{
-  photo: string;
-  category: string;
-}>("update-photo-category");
-
-const reducer = createReducer(state, {
-  [createCategoryAction.type]: (
-    state: State,
-    action: PayloadAction<Category>
-  ) => {
-    const category: Category = {
-      color: "",
-      id: v4().toString(),
-      name: action.payload.name,
-    };
-
-    state.categories.push(category);
-  },
-  [deleteCategoryAction.type]: (
-    state: State,
-    action: PayloadAction<{ id: string }>
-  ) => {
-    return state.categories.filter((category: Category) => {
-      return category.id !== action.payload.id;
-    });
-  },
-  [updateCategoryNameAction.type]: (
-    state: State,
-    action: PayloadAction<{ category: string; name: string }>
-  ) => {},
-  [updatePhotoCategoryAction.type]: (
-    state: State,
-    action: PayloadAction<{ photo: string; category: string }>
-  ) => {},
-});
-
-const store = configureStore({ reducer: reducer });
-
-type CollapsibleListProps = {
-  children: any;
-  primary: string;
-};
-
-const CollapsibleList = ({ children, primary }: CollapsibleListProps) => {
-  const [collapsed, setCollapsed] = React.useState(true);
-
-  const onClick = () => {
-    setCollapsed(!collapsed);
-  };
-
-  return (
-    <List dense>
-      <ListItem button dense onClick={onClick}>
-        <ListItemIcon>
-          {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </ListItemIcon>
-        <ListItemText primary={primary} />
-      </ListItem>
-      <Collapse in={collapsed} timeout="auto" unmountOnExit>
-        <List component="div" dense disablePadding>
-          {children}
-        </List>
-      </Collapse>
-    </List>
-  );
-};
+import { ImageDialog } from "./ImageDialog";
+import { CollapsibleList } from "./CollapsibleList";
+import { Category, Photo, store } from "./store";
 
 const Application = () => {
   /*
@@ -341,79 +231,6 @@ const Application = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    );
-  };
-
-  const ImageDialog = ({ photo }: { photo?: Photo }) => {
-    return (
-      <Dialog
-        fullScreen
-        onClose={onCloseImageDialog}
-        open={openImageDialog}
-        TransitionComponent={DialogTransition}
-      >
-        <AppBar className={classes.imageDialogAppBar}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={onCloseImageDialog}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <DialogContent className={classes.imageDialogContent}>
-          <Canvas
-            //camera={{fov: 80, near:0.1, far:5000, position: [0, 0, 1000] }}
-            colorManagement={false}
-            onCreated={({ gl }) => {
-              gl.setClearColor("black");
-            }}
-          >
-            <PerspectiveCamera makeDefault position={[0, 0, 2]} />
-            {/*<TransformControls mode={"translate"}>*/}
-            <React.Suspense fallback={null}>
-              {photo ? (
-                <ImageMesh brightness={0.0} contrast={1.0} photo={photo} />
-              ) : (
-                <React.Fragment />
-              )}
-            </React.Suspense>
-            {/*</TransformControls>*/}
-            <OrbitControls enableRotate={false} />
-          </Canvas>
-        </DialogContent>
-      </Dialog>
-    );
-  };
-
-  type ImageMeshProps = {
-    brightness: number;
-    contrast: number;
-    photo?: Photo;
-  };
-
-  const ImageMesh = ({ brightness, contrast, photo }: ImageMeshProps) => {
-    const [imageURL, setImageURL] = React.useState("");
-    const [aspectRatio, setAspectRatio] = React.useState(1);
-
-    let src = "";
-
-    if (photo) {
-      src = photo.src;
-    }
-
-    const texture: Texture = useTexture(src) as Texture;
-
-    return (
-      <mesh>
-        <Box args={[aspectRatio, 1]}>
-          <meshStandardMaterial attach="material" map={texture} />
-          {/*  <texture attach="map" image={texture}/>*/}
-          {/*</meshStandardMaterial>*/}
-        </Box>
-      </mesh>
     );
   };
 
@@ -746,7 +563,14 @@ const Application = () => {
 
       <CategoryMenu />
       <CreateCategoryDialog />
-      <ImageDialog photo={openedImage} />
+      <ImageDialog
+        categoryMenuState={categoryMenuState}
+        onClose={onCloseImageDialog}
+        onOpenCreateCategoryDialog={onOpenCreateCategoryDialog}
+        open={openImageDialog}
+        photo={openedImage}
+        TransitionComponent={DialogTransition}
+      />
       <NewClassifierDialog />
       <OpenMenu />
       <PhotoCategoryMenu />
