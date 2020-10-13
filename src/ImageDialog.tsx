@@ -102,9 +102,7 @@ const ImageMesh = ({ photo }: { photo: Photo }) => {
 };
 
 type ImageDialogProps = {
-  categoryMenuState: any;
   onClose: () => void;
-  onOpenCreateCategoryDialog: () => void;
   open: boolean;
   photo: Photo;
   TransitionComponent?: React.ComponentType<
@@ -113,9 +111,7 @@ type ImageDialogProps = {
 };
 
 export const ImageDialog = ({
-  categoryMenuState,
   onClose,
-  onOpenCreateCategoryDialog,
   open,
   photo,
   TransitionComponent,

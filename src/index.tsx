@@ -523,9 +523,7 @@ const Application = () => {
       </main>
 
       <ImageDialog
-        categoryMenuState={categoryMenuState}
         onClose={onCloseImageDialog}
-        onOpenCreateCategoryDialog={onOpenCreateCategoryDialog}
         open={openImageDialog}
         photo={openedImage}
         TransitionComponent={DialogTransition}
