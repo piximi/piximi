@@ -44,7 +44,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import React from "react";
+import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import {
   configureStore,
@@ -65,6 +65,15 @@ import {
 import { TransitionProps } from "@material-ui/core/transitions";
 import { Provider } from "react-redux";
 import { v4 } from "uuid";
+import { Canvas, useFrame } from "react-three-fiber";
+import {
+  Box,
+  OrbitControls,
+  PerspectiveCamera,
+  useTexture,
+} from "@react-three/drei";
+import { Texture } from "three";
+// import {ShaderMaterial} from "three";
 
 type Category = {
   color: string;
@@ -226,6 +235,22 @@ const Application = () => {
   };
 
   /*
+   * Image dialog
+   */
+  const [openImageDialog, setOpenImageDialog] = React.useState(false);
+
+  const [openedImage, setOpenedImage] = React.useState<Photo>();
+
+  const onOpenImageDialog = (photo: Photo) => {
+    setOpenedImage(photo);
+    setOpenImageDialog(true);
+  };
+
+  const onCloseImageDialog = () => {
+    setOpenImageDialog(false);
+  };
+
+  /*
    * Settings dialog
    */
   const [openSettingsDialog, setOpenSettingsDialog] = React.useState(false);
@@ -316,6 +341,79 @@ const Application = () => {
           </Button>
         </DialogActions>
       </Dialog>
+    );
+  };
+
+  const ImageDialog = ({ photo }: { photo?: Photo }) => {
+    return (
+      <Dialog
+        fullScreen
+        onClose={onCloseImageDialog}
+        open={openImageDialog}
+        TransitionComponent={DialogTransition}
+      >
+        <AppBar className={classes.imageDialogAppBar}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={onCloseImageDialog}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <DialogContent className={classes.imageDialogContent}>
+          <Canvas
+            //camera={{fov: 80, near:0.1, far:5000, position: [0, 0, 1000] }}
+            colorManagement={false}
+            onCreated={({ gl }) => {
+              gl.setClearColor("black");
+            }}
+          >
+            <PerspectiveCamera makeDefault position={[0, 0, 2]} />
+            {/*<TransformControls mode={"translate"}>*/}
+            <React.Suspense fallback={null}>
+              {photo ? (
+                <ImageMesh brightness={0.0} contrast={1.0} photo={photo} />
+              ) : (
+                <React.Fragment />
+              )}
+            </React.Suspense>
+            {/*</TransformControls>*/}
+            <OrbitControls enableRotate={false} />
+          </Canvas>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  type ImageMeshProps = {
+    brightness: number;
+    contrast: number;
+    photo?: Photo;
+  };
+
+  const ImageMesh = ({ brightness, contrast, photo }: ImageMeshProps) => {
+    const [imageURL, setImageURL] = React.useState("");
+    const [aspectRatio, setAspectRatio] = React.useState(1);
+
+    let src = "";
+
+    if (photo) {
+      src = photo.src;
+    }
+
+    const texture: Texture = useTexture(src) as Texture;
+
+    return (
+      <mesh>
+        <Box args={[aspectRatio, 1]}>
+          <meshStandardMaterial attach="material" map={texture} />
+          {/*  <texture attach="map" image={texture}/>*/}
+          {/*</meshStandardMaterial>*/}
+        </Box>
+      </mesh>
     );
   };
 
@@ -620,7 +718,10 @@ const Application = () => {
         <Container className={classes.container} maxWidth="md">
           <GridList className={classes.gridList} cols={4}>
             {state.photos.map((photo: Photo) => (
-              <GridListTile key={photo.id}>
+              <GridListTile
+                key={photo.id}
+                onClick={() => onOpenImageDialog(photo)}
+              >
                 <img alt="" src={photo.src} />
 
                 <GridListTileBar
@@ -645,6 +746,7 @@ const Application = () => {
 
       <CategoryMenu />
       <CreateCategoryDialog />
+      <ImageDialog photo={openedImage} />
       <NewClassifierDialog />
       <OpenMenu />
       <PhotoCategoryMenu />

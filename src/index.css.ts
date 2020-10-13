@@ -44,6 +44,11 @@ export const useStyles = makeStyles((theme) => ({
   gridTileBarIconButton: {
     color: "white",
   },
+  imageDialogAppBar: {},
+  imageDialogContent: {
+    paddingBottom: theme.spacing(12),
+    paddingTop: theme.spacing(12),
+  },
   main: {
     flexGrow: 1,
     marginLeft: -theme.spacing(30),
