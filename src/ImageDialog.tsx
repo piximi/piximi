@@ -37,6 +37,7 @@ import Input from "@material-ui/core/Input";
 import { Category, Photo } from "./store";
 import { TransitionProps } from "@material-ui/core/transitions";
 import * as THREE from "three";
+import { CategoriesList } from "./CategoriesList";
 
 type SliderWithInputFieldProps = {
   icon: ReactElement;
@@ -160,42 +161,7 @@ export const ImageDialog = ({
       >
         <div className={classes.drawerHeader} />
         <Divider />
-        <CollapsibleList primary="Categories">
-          <>
-            {state.categories.map((category: Category) => {
-              return (
-                <ListItem dense key={category.id}>
-                  <ListItemIcon>
-                    <Checkbox
-                      checked
-                      checkedIcon={<LabelIcon />}
-                      disableRipple
-                      edge="start"
-                      icon={<LabelOutlinedIcon />}
-                      tabIndex={-1}
-                    />
-                  </ListItemIcon>
-
-                  <ListItemText id={category.id} primary={category.name} />
-
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" {...bindTrigger(categoryMenuState)}>
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              );
-            })}
-
-            <ListItem button onClick={onOpenCreateCategoryDialog}>
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Create category" />
-            </ListItem>
-          </>
-        </CollapsibleList>
+        <CategoriesList categories={state.categories} />
       </Drawer>
 
       <DialogContent className={classes.imageDialogContent}>

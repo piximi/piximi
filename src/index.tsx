@@ -1,6 +1,5 @@
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
-import Checkbox from "@material-ui/core/Checkbox";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Dialog from "@material-ui/core/Dialog";
@@ -16,7 +15,6 @@ import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -34,10 +32,8 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import FeedbackIcon from "@material-ui/icons/Feedback";
 import FolderOpenIcon from "@material-ui/icons/FolderOpen";
 import HelpIcon from "@material-ui/icons/Help";
-import LabelIcon from "@material-ui/icons/Label";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import MenuIcon from "@material-ui/icons/Menu";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 
@@ -58,6 +54,7 @@ import { Provider } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { CollapsibleList } from "./CollapsibleList";
 import { Category, Photo, store } from "./store";
+import { CategoriesList } from "./CategoriesList";
 
 const Application = () => {
   /*
@@ -437,43 +434,7 @@ const Application = () => {
 
         <Divider />
 
-        <CollapsibleList primary="Categories">
-          <>
-            {state.categories.map((category: Category) => {
-              return (
-                <ListItem dense key={category.id}>
-                  <ListItemIcon>
-                    <Checkbox
-                      checked
-                      checkedIcon={<LabelIcon />}
-                      disableRipple
-                      edge="start"
-                      icon={<LabelOutlinedIcon />}
-                      tabIndex={-1}
-                    />
-                  </ListItemIcon>
-
-                  <ListItemText id={category.id} primary={category.name} />
-
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" {...bindTrigger(categoryMenuState)}>
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              );
-            })}
-
-            <ListItem button onClick={onOpenCreateCategoryDialog}>
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Create category" />
-            </ListItem>
-          </>
-        </CollapsibleList>
-
+        <CategoriesList categories={state.categories} />
         <Divider />
 
         <CollapsibleList primary="Classifier">
@@ -561,8 +522,6 @@ const Application = () => {
         </Container>
       </main>
 
-      <CategoryMenu />
-      <CreateCategoryDialog />
       <ImageDialog
         categoryMenuState={categoryMenuState}
         onClose={onCloseImageDialog}
