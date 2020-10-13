@@ -6,37 +6,20 @@ import CloseIcon from "@material-ui/icons/Close";
 import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import state from "./index.json";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import Checkbox from "@material-ui/core/Checkbox";
-import LabelIcon from "@material-ui/icons/Label";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import { bindTrigger } from "material-ui-popup-state/hooks";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import AddIcon from "@material-ui/icons/Add";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
 import { Canvas } from "react-three-fiber";
-import {
-  Box,
-  OrbitControls,
-  PerspectiveCamera,
-  useTexture,
-} from "@react-three/drei";
+import { Box, PerspectiveCamera } from "@react-three/drei";
 import React, { ReactElement } from "react";
 import { VolumeUp } from "@material-ui/icons";
-import { Texture } from "three";
-import { CollapsibleList } from "./CollapsibleList";
+import * as THREE from "three";
 import { useStyles } from "./index.css";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { Slider } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
-import { Category, Photo } from "./store";
+import { Photo } from "./store";
 import { TransitionProps } from "@material-ui/core/transitions";
-import * as THREE from "three";
 import { CategoriesList } from "./CategoriesList";
 
 type SliderWithInputFieldProps = {
