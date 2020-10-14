@@ -56,6 +56,15 @@ import { CollapsibleList } from "./CollapsibleList";
 import { Category, Photo, store } from "./store";
 import { CategoriesList } from "./CategoriesList";
 
+const DialogTransition = React.forwardRef(
+  (
+    props: TransitionProps & { children?: React.ReactElement },
+    ref: React.Ref<unknown>
+  ) => {
+    return <Slide direction="right" ref={ref} {...props} />;
+  }
+);
+
 const Application = () => {
   /*
    * Drawer
@@ -149,15 +158,6 @@ const Application = () => {
   const onCloseSettingsDialog = () => {
     setOpenSettingsDialog(false);
   };
-
-  const DialogTransition = React.forwardRef(
-    (
-      props: TransitionProps & { children?: React.ReactElement },
-      ref: React.Ref<unknown>
-    ) => {
-      return <Slide direction="right" ref={ref} {...props} />;
-    }
-  );
 
   const classes = useStyles();
 
