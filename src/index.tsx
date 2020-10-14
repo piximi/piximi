@@ -115,22 +115,6 @@ const Application = () => {
   });
 
   /*
-   * Create category dialog
-   */
-  const [
-    openCreateCategoryDialog,
-    setOpenCreateCategoryDialog,
-  ] = React.useState(false);
-
-  const onOpenCreateCategoryDialog = () => {
-    setOpenCreateCategoryDialog(true);
-  };
-
-  const onCloseCreateCategoryDialog = () => {
-    setOpenCreateCategoryDialog(false);
-  };
-
-  /*
    * Image dialog
    */
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
@@ -162,74 +146,6 @@ const Application = () => {
   const classes = useStyles();
 
   const theme = useTheme();
-
-  const CategoryMenu = () => {
-    return (
-      <Menu
-        anchorOrigin={{
-          horizontal: "center",
-          vertical: "bottom",
-        }}
-        getContentAnchorEl={null}
-        transformOrigin={{
-          horizontal: "center",
-          vertical: "top",
-        }}
-        {...bindMenu(categoryMenuState)}
-      >
-        <MenuList dense variant="menu">
-          <MenuItem onClick={categoryMenuState.close}>
-            <Typography variant="inherit">Hide other categories</Typography>
-          </MenuItem>
-
-          <MenuItem onClick={categoryMenuState.close}>
-            <Typography variant="inherit">Hide category</Typography>
-          </MenuItem>
-
-          <Divider />
-
-          <MenuItem onClick={categoryMenuState.close}>
-            <Typography variant="inherit">Update category</Typography>
-          </MenuItem>
-
-          <MenuItem onClick={categoryMenuState.close}>
-            <Typography variant="inherit">Delete category</Typography>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-    );
-  };
-
-  const CreateCategoryDialog = () => {
-    return (
-      <Dialog
-        fullWidth
-        onClose={onCloseCreateCategoryDialog}
-        open={openCreateCategoryDialog}
-      >
-        <DialogTitle>Create category</DialogTitle>
-
-        <DialogContent>
-          <TextField
-            autoFocus
-            fullWidth
-            id="name"
-            label="Name"
-            margin="dense"
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={onCloseCreateCategoryDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={onCloseCreateCategoryDialog} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
 
   const NewClassifierDialog = () => {
     return (
