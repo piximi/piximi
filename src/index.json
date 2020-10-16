@@ -16,42 +16,43 @@
       "name": "Unknown"
     }
   ],
-  "photos": [
+  "images": [
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "6aab03f4-eae5-4eb4-82a0-236068a07c56",
       "name": "foo",
       "src": "https://picsum.photos/seed/1/512/512"
     },
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "1103d28a-ac3d-4980-af54-7d8375dbf791",
       "name": "foo",
       "src": "https://picsum.photos/seed/2/512/512"
     },
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "ca874261-0300-414d-95d7-7ceb2e5de52f",
       "name": "foo",
       "src": "https://picsum.photos/seed/3/512/512"
     },
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "c9a26b6b-1226-4e54-9f9e-d3e710cd7308",
       "name": "foo",
       "src": "https://picsum.photos/seed/4/512/512"
     },
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "589a5fc5-a01a-4346-8a70-1f89f0abcb95",
       "name": "foo",
       "src": "https://picsum.photos/seed/5/512/512"
     },
     {
-      "category": "00000000-0000-0000-0000-000000000000",
+      "categoryId": "00000000-0000-0000-0000-000000000000",
       "id": "6593fa38-bb6b-46d7-92d2-98a80c695312",
       "name": "foo",
       "src": "https://picsum.photos/seed/6/512/512"
     }
-  ]
+  ],
+  "name": "Untitled project"
 }

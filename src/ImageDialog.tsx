@@ -18,7 +18,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { Slider } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
-import { Photo } from "./store";
+import { Image } from "./store";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { CategoriesList } from "./CategoriesList";
 
@@ -85,7 +85,7 @@ const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
   );
 };
 
-const ImageMesh = ({ photo }: { photo: Photo }) => {
+const ImageMesh = ({ photo }: { photo: Image }) => {
   const ref = React.useRef();
 
   const texture = React.useMemo(() => {
@@ -104,7 +104,7 @@ const ImageMesh = ({ photo }: { photo: Photo }) => {
 type ImageDialogProps = {
   onClose: () => void;
   open: boolean;
-  photo: Photo;
+  photo: Image;
   TransitionComponent?: React.ComponentType<
     TransitionProps & { children?: React.ReactElement<any, any> }
   >;

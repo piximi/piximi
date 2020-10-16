@@ -53,7 +53,7 @@ import { TransitionProps } from "@material-ui/core/transitions";
 import { Provider } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { CollapsibleList } from "./CollapsibleList";
-import { Category, Photo, store } from "./store";
+import { Category, Image, store } from "./store";
 import { CategoriesList } from "./CategoriesList";
 
 const DialogTransition = React.forwardRef(
@@ -119,9 +119,9 @@ const Application = () => {
    */
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
-  const [openedImage, setOpenedImage] = React.useState<Photo>(state.photos[0]);
+  const [openedImage, setOpenedImage] = React.useState<Image>(state.images[0]);
 
-  const onOpenImageDialog = (photo: Photo) => {
+  const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
     setOpenImageDialog(true);
   };
@@ -411,7 +411,7 @@ const Application = () => {
       <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
         <Container className={classes.container} maxWidth="md">
           <GridList className={classes.gridList} cols={4}>
-            {state.photos.map((photo: Photo) => (
+            {state.images.map((photo: Image) => (
               <GridListTile
                 key={photo.id}
                 onClick={() => onOpenImageDialog(photo)}
