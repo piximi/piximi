@@ -140,7 +140,7 @@ export const ImageDialog = ({
       >
         <div className={classes.drawerHeader} />
         <Divider />
-        <CategoriesList categories={state.categories} />
+        <CategoriesList />
       </Drawer>
 
       <DialogContent className={classes.imageDialogContent}>

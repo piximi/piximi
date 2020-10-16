@@ -1,11 +1,6 @@
 import AppBar from "@material-ui/core/AppBar";
-import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import GridList from "@material-ui/core/GridList";
@@ -16,17 +11,12 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuList from "@material-ui/core/MenuList";
 import Slide from "@material-ui/core/Slide";
-import TextField from "@material-ui/core/TextField";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useTheme from "@material-ui/core/styles/useTheme";
 
 import AddIcon from "@material-ui/icons/Add";
-import CloseIcon from "@material-ui/icons/Close";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import FeedbackIcon from "@material-ui/icons/Feedback";
@@ -43,17 +33,18 @@ import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { useStyles } from "./index.css";
 import clsx from "clsx";
-import {
-  bindMenu,
-  bindTrigger,
-  usePopupState,
-} from "material-ui-popup-state/hooks";
+import { bindTrigger, usePopupState } from "material-ui-popup-state/hooks";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { Provider, useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { CollapsibleList } from "./CollapsibleList";
-import { Category, Image, State, store } from "./store";
+import { Image, State, store } from "./store";
 import { CategoriesList } from "./CategoriesList";
+import { SettingsDialog } from "./SettingsDialog";
+import { NewClassifierDialog } from "./NewClassifierDialog";
+import { OpenMenu } from "./OpenMenu";
+import { SaveMenu } from "./SaveMenu";
+import { ImageCategoryMenu } from "./ImageCategoryMenu";
 
 const DialogTransition = React.forwardRef(
   (
@@ -148,143 +139,6 @@ const Application = () => {
   const classes = useStyles();
 
   const theme = useTheme();
-
-  const NewClassifierDialog = () => {
-    return (
-      <Dialog
-        fullWidth
-        onClose={onCloseNewClassifierDialog}
-        open={openNewClassifierDialog}
-      >
-        <DialogTitle>New classifier</DialogTitle>
-
-        <DialogContent>
-          <TextField
-            autoFocus
-            fullWidth
-            id="name"
-            label="Name"
-            margin="dense"
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={onCloseNewClassifierDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={onCloseNewClassifierDialog} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
-
-  const OpenMenu = () => {
-    return (
-      <Menu
-        anchorOrigin={{
-          horizontal: "center",
-          vertical: "bottom",
-        }}
-        getContentAnchorEl={null}
-        transformOrigin={{
-          horizontal: "center",
-          vertical: "top",
-        }}
-        {...bindMenu(openMenuState)}
-      >
-        <MenuList dense variant="menu">
-          <MenuItem onClick={openMenuState.close}>Open classifier</MenuItem>
-
-          <Divider />
-
-          <MenuItem onClick={openMenuState.close}>
-            Open example classifier
-          </MenuItem>
-
-          <MenuItem onClick={openMenuState.close}>Open weights</MenuItem>
-        </MenuList>
-      </Menu>
-    );
-  };
-
-  const PhotoCategoryMenu = () => {
-    return (
-      <Menu
-        anchorOrigin={{
-          horizontal: "center",
-          vertical: "bottom",
-        }}
-        getContentAnchorEl={null}
-        transformOrigin={{
-          horizontal: "center",
-          vertical: "top",
-        }}
-        {...bindMenu(photoCategoryMenuState)}
-      >
-        <MenuList dense variant="menu">
-          {categories.map((category: Category) => (
-            <MenuItem key={category.id} onClick={photoCategoryMenuState.close}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </MenuList>
-      </Menu>
-    );
-  };
-
-  const SaveMenu = () => {
-    return (
-      <Menu
-        anchorOrigin={{
-          horizontal: "center",
-          vertical: "bottom",
-        }}
-        getContentAnchorEl={null}
-        transformOrigin={{
-          horizontal: "center",
-          vertical: "top",
-        }}
-        {...bindMenu(saveMenuState)}
-      >
-        <MenuList dense variant="menu">
-          <MenuItem onClick={saveMenuState.close}>Save classifier</MenuItem>
-
-          <Divider />
-
-          <MenuItem onClick={saveMenuState.close}>
-            Open example classifier
-          </MenuItem>
-
-          <MenuItem onClick={saveMenuState.close}>Open weights</MenuItem>
-        </MenuList>
-      </Menu>
-    );
-  };
-
-  const SettingsDialog = () => {
-    return (
-      <Dialog
-        fullScreen
-        onClose={onCloseSettingsDialog}
-        open={openSettingsDialog}
-        TransitionComponent={DialogTransition}
-      >
-        <AppBar className={classes.settingsDialogAppBar}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={onCloseSettingsDialog}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-      </Dialog>
-    );
-  };
 
   return (
     <React.Fragment>
@@ -447,11 +301,17 @@ const Application = () => {
         photo={openedImage}
         TransitionComponent={DialogTransition}
       />
-      <NewClassifierDialog />
-      <OpenMenu />
-      <PhotoCategoryMenu />
-      <SaveMenu />
-      <SettingsDialog />
+      <NewClassifierDialog
+        onClose={onCloseNewClassifierDialog}
+        open={openNewClassifierDialog}
+      />
+      <OpenMenu menu={openMenuState} />
+      <ImageCategoryMenu menu={photoCategoryMenuState} />
+      <SaveMenu menu={saveMenuState} />
+      <SettingsDialog
+        onClose={onCloseSettingsDialog}
+        open={openSettingsDialog}
+      />
     </React.Fragment>
   );
 };
