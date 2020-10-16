@@ -1,6 +1,6 @@
 import { CollapsibleList } from "./CollapsibleList";
 import state from "./index.json";
-import { Category } from "./store";
+import { Category, State } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -23,12 +23,13 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import { CreateCategoryDialog } from "./CreateCategoryDialog";
+import { useSelector } from "react-redux";
 
-export const CategoriesList = ({
-  categories,
-}: {
-  categories: Array<Category>;
-}) => {
+export const CategoriesList = () => {
+  const categories = useSelector((state: State) => {
+    return state.project.categories;
+  });
+
   const categoryMenu = usePopupState({
     popupId: "category-menu",
     variant: "popover",
@@ -51,7 +52,7 @@ export const CategoriesList = ({
     <>
       <CollapsibleList primary="Categories">
         <>
-          {state.categories.map((category: Category) => {
+          {categories.map((category: Category) => {
             return (
               <ListItem dense key={category.id}>
                 <ListItemIcon>

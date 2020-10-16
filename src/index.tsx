@@ -41,7 +41,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import * as serviceWorker from "./serviceWorker";
-import state from "./index.json";
 import { useStyles } from "./index.css";
 import clsx from "clsx";
 import {
@@ -50,10 +49,10 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { CollapsibleList } from "./CollapsibleList";
-import { Category, Image, store } from "./store";
+import { Category, Image, State, store } from "./store";
 import { CategoriesList } from "./CategoriesList";
 
 const DialogTransition = React.forwardRef(
@@ -66,6 +65,14 @@ const DialogTransition = React.forwardRef(
 );
 
 const Application = () => {
+  const categories = useSelector((state: State) => {
+    return state.project.categories;
+  });
+
+  const images = useSelector((state: State) => {
+    return state.project.images;
+  });
+
   /*
    * Drawer
    */
@@ -94,11 +101,6 @@ const Application = () => {
     setOpenNewClassifierDialog(false);
   };
 
-  const categoryMenuState = usePopupState({
-    popupId: "category-menu",
-    variant: "popover",
-  });
-
   const openMenuState = usePopupState({
     popupId: "open-menu",
     variant: "popover",
@@ -119,7 +121,7 @@ const Application = () => {
    */
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
-  const [openedImage, setOpenedImage] = React.useState<Image>(state.images[0]);
+  const [openedImage, setOpenedImage] = React.useState<Image>(images[0]);
 
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
@@ -222,7 +224,7 @@ const Application = () => {
         {...bindMenu(photoCategoryMenuState)}
       >
         <MenuList dense variant="menu">
-          {state.categories.map((category: Category) => (
+          {categories.map((category: Category) => (
             <MenuItem key={category.id} onClick={photoCategoryMenuState.close}>
               {category.name}
             </MenuItem>
@@ -350,7 +352,8 @@ const Application = () => {
 
         <Divider />
 
-        <CategoriesList categories={state.categories} />
+        <CategoriesList />
+
         <Divider />
 
         <CollapsibleList primary="Classifier">
@@ -411,7 +414,7 @@ const Application = () => {
       <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
         <Container className={classes.container} maxWidth="md">
           <GridList className={classes.gridList} cols={4}>
-            {state.images.map((photo: Image) => (
+            {images.map((photo: Image) => (
               <GridListTile
                 key={photo.id}
                 onClick={() => onOpenImageDialog(photo)}

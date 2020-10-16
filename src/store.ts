@@ -25,11 +25,11 @@ export type Project = {
   images: Array<Image>;
 };
 
-type State = {
-  project?: Project;
+export type State = {
+  project: Project;
 };
 
-const state: State = {
+const initialState: State = {
   project: {
     categories: [
       {
@@ -108,38 +108,19 @@ export const updatePhotoCategoryAction = createAction<{
   categoryId: string;
 }>("update-photo-category");
 
-const reducer = createReducer(
-  {},
-  {
-    [createCategoryAction.type]: (
-      state: State,
-      action: PayloadAction<{ name: string }>
-    ) => {
-      const category: Category = {
-        color: "#00FFFF",
-        id: v4().toString(),
-        name: action.payload.name,
-      };
+const reducer = createReducer(initialState, {
+  [createCategoryAction.type]: (
+    state: State,
+    action: PayloadAction<{ name: string }>
+  ) => {
+    const category: Category = {
+      color: "#00FFFF",
+      id: v4().toString(),
+      name: action.payload.name,
+    };
 
-      state.project?.categories.push(category);
-    },
-    [deleteCategoryAction.type]: (
-      state: State,
-      action: PayloadAction<{ id: string }>
-    ) => {
-      return state.project?.categories.filter((category: Category) => {
-        return category.id !== action.payload.id;
-      });
-    },
-    [updateCategoryNameAction.type]: (
-      state: State,
-      action: PayloadAction<{ category: string; name: string }>
-    ) => {},
-    [updatePhotoCategoryAction.type]: (
-      state: State,
-      action: PayloadAction<{ photo: string; category: string }>
-    ) => {},
-  }
-);
+    state.project.categories.push(category);
+  },
+});
 
 export const store = configureStore({ reducer: reducer });
