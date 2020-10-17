@@ -46,7 +46,9 @@ export const ClassifierSettingsDialog = ({
       </AppBar>
 
       <DialogContent>
-        <Container className={classes.container} maxWidth="md"></Container>
+        <Container className={classes.container} maxWidth="md">
+          foo
+        </Container>
       </DialogContent>
     </Dialog>
   );
