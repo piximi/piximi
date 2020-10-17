@@ -1,5 +1,4 @@
 import { CollapsibleList } from "./CollapsibleList";
-import state from "./index.json";
 import { Category, State } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";

@@ -5,7 +5,6 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
-import state from "./index.json";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
 import { Canvas } from "react-three-fiber";
