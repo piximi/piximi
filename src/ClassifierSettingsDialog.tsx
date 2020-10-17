@@ -7,6 +7,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import { TransitionProps } from "@material-ui/core/transitions";
 import Slide from "@material-ui/core/Slide";
 import { useStyles } from "./index.css";
+import Container from "@material-ui/core/Container";
+import DialogContent from "@material-ui/core/DialogContent";
 
 type ClassifierSettingsDialogProps = {
   onClose: () => void;
@@ -42,6 +44,10 @@ export const ClassifierSettingsDialog = ({
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      <DialogContent>
+        <Container className={classes.container} maxWidth="md"></Container>
+      </DialogContent>
     </Dialog>
   );
 };
