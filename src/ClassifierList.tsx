@@ -6,33 +6,64 @@ import ListItemText from "@material-ui/core/ListItemText";
 import FolderOpenIcon from "@material-ui/icons/FolderOpen";
 import SaveIcon from "@material-ui/icons/Save";
 import React from "react";
+import List from "@material-ui/core/List";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Collapse from "@material-ui/core/Collapse";
+import { ListItemSecondaryAction } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 export const ClassifierList = () => {
+  const [collapsed, setCollapsed] = React.useState(true);
+
+  const onClick = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
-    <CollapsibleList primary="Classifier">
-      <ListItem button disabled>
+    <List dense>
+      <ListItem button dense onClick={onClick}>
         <ListItemIcon>
-          <AddIcon />
+          {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </ListItemIcon>
 
-        <ListItemText primary="Fit" />
+        <ListItemText primary="Classifier" />
+
+        <ListItemSecondaryAction>
+          <IconButton edge="end">
+            <SettingsIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
       </ListItem>
 
-      <ListItem button disabled>
-        <ListItemIcon>
-          <FolderOpenIcon />
-        </ListItemIcon>
+      <Collapse in={collapsed} timeout="auto" unmountOnExit>
+        <List component="div" dense disablePadding>
+          <ListItem button disabled>
+            <ListItemIcon>
+              <AddIcon />
+            </ListItemIcon>
 
-        <ListItemText primary="Evaluate" />
-      </ListItem>
+            <ListItemText primary="Fit" />
+          </ListItem>
 
-      <ListItem button disabled>
-        <ListItemIcon>
-          <SaveIcon />
-        </ListItemIcon>
+          <ListItem button disabled>
+            <ListItemIcon>
+              <FolderOpenIcon />
+            </ListItemIcon>
 
-        <ListItemText primary="Predict" />
-      </ListItem>
-    </CollapsibleList>
+            <ListItemText primary="Evaluate" />
+          </ListItem>
+
+          <ListItem button disabled>
+            <ListItemIcon>
+              <SaveIcon />
+            </ListItemIcon>
+
+            <ListItemText primary="Predict" />
+          </ListItem>
+        </List>
+      </Collapse>
+    </List>
   );
 };

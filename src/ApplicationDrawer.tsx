@@ -12,12 +12,12 @@ import { useStyles } from "./index.css";
 import useTheme from "@material-ui/core/styles/useTheme";
 
 type ApplicationDrawerProps = {
-  onClose: () => void;
+  onCloseDrawer: () => void;
   openDrawer: boolean;
 };
 
 export const ApplicationDrawer = ({
-  onClose,
+  onCloseDrawer,
   openDrawer,
 }: ApplicationDrawerProps) => {
   const classes = useStyles();
@@ -33,7 +33,7 @@ export const ApplicationDrawer = ({
       variant="persistent"
     >
       <div className={classes.drawerHeader}>
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onCloseDrawer}>
           {theme.direction === "ltr" ? (
             <ChevronLeftIcon />
           ) : (

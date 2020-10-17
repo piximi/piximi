@@ -28,8 +28,10 @@ export const CollapsibleList = ({
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </ListItemIcon>
+
         <ListItemText primary={primary} />
       </ListItem>
+
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
         <List component="div" dense disablePadding>
           {children}
