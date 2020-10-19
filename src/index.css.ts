@@ -16,6 +16,9 @@ export const useStyles = makeStyles((theme) => ({
     width: `calc(100% - ${theme.spacing(30)}px)`,
   },
   card: {},
+  classifierSettingsDialogContent: {
+    marginTop: theme.spacing(8),
+  },
   container: {
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),

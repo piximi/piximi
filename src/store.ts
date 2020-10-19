@@ -5,21 +5,25 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { v4 } from "uuid";
-import MenuItem from "@material-ui/core/MenuItem";
-import TextField from "@material-ui/core/TextField";
-import React from "react";
 
 export enum LossFunction {
-  AD = "Absolute Difference",
-  MSE = "Mean Squared Error (MSE)",
+  AbsoluteDifference = "Absolute difference",
+  CosineDistance = "Cosine distance",
+  Hinge = "Hinge",
+  Huber = "Huber",
+  Log = "Log",
+  MeanSquaredError = "Mean squared error (MSE)",
+  SigmoidCrossEntropy = "Sigmoid cross entropy",
+  SoftmaxCrossEntropy = "Softmax cross entropy",
 }
 
 export enum OptimizationAlgorithm {
   Adadelta = "Adadelta",
   Adam = "Adam",
   Adamax = "Adamax",
+  Momentum = "Momentum",
   RMSProp = "RMSProp",
-  SGD = "SGD",
+  StochasticGradientDescent = "Stochastic gradient descent (SGD)",
 }
 
 export type Category = {
@@ -29,6 +33,8 @@ export type Category = {
 };
 
 export type Classifier = {
+  batchSize: number;
+  epochs: number;
   learningRate: number;
   lossFunction: LossFunction;
   optimizationAlgorithm: OptimizationAlgorithm;
@@ -72,8 +78,10 @@ const initialState: State = {
       },
     ],
     classifier: {
+      batchSize: 32,
+      epochs: 1,
       learningRate: 0.01,
-      lossFunction: LossFunction.MSE,
+      lossFunction: LossFunction.MeanSquaredError,
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     },
     images: [
@@ -131,6 +139,14 @@ export const updateCategoryNameAction = createAction<{
   name: string;
 }>("update-category-name");
 
+export const updateClassifierBatchSizeAction = createAction<{
+  batchSize: number;
+}>("update-classifier-batch-size");
+
+export const updateClassifierEpochsAction = createAction<{
+  epochs: number;
+}>("update-classifier-epochs");
+
 export const updateClassifierLearningRateAction = createAction<{
   learningRate: number;
 }>("update-classifier-learning-rate");
@@ -160,6 +176,18 @@ const reducer = createReducer(initialState, {
     };
 
     state.project.categories.push(category);
+  },
+  [updateClassifierBatchSizeAction.type]: (
+    state: State,
+    action: PayloadAction<{ batchSize: number }>
+  ) => {
+    state.project.classifier.batchSize = action.payload.batchSize;
+  },
+  [updateClassifierEpochsAction.type]: (
+    state: State,
+    action: PayloadAction<{ epochs: number }>
+  ) => {
+    state.project.classifier.epochs = action.payload.epochs;
   },
   [updateClassifierLearningRateAction.type]: (
     state: State,

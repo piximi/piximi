@@ -17,8 +17,18 @@ import {
   LossFunction,
   OptimizationAlgorithm,
   State,
+  updateClassifierBatchSizeAction,
+  updateClassifierEpochsAction,
   updateClassifierLearningRateAction,
+  updateClassifierLossFunctionAction,
+  updateClassifierOptimizationAlgorithmAction,
 } from "./store";
+
+const enumKeys = <O extends object, K extends keyof O = keyof O>(
+  obj: O
+): K[] => {
+  return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
+};
 
 type ClassifierSettingsDialogProps = {
   onClose: () => void;
@@ -39,23 +49,58 @@ export const ClassifierSettingsDialog = ({
   open,
 }: ClassifierSettingsDialogProps) => {
   const dispatch = useDispatch();
+
   const classifier = useSelector((state: State) => {
     return state.project.classifier;
   });
 
   const classes = useStyles();
 
+  const onBatchSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    dispatch(
+      updateClassifierBatchSizeAction({
+        batchSize: parseFloat(event.target.value as string),
+      })
+    );
+  };
+
+  const onEpochsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    dispatch(
+      updateClassifierEpochsAction({
+        epochs: parseFloat(event.target.value as string),
+      })
+    );
+  };
+
   const onLearningRateChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    updateClassifierLearningRateAction({
-      learningRate: parseFloat(event.target.value as string),
-    });
+    dispatch(
+      updateClassifierLearningRateAction({
+        learningRate: parseFloat(event.target.value as string),
+      })
+    );
   };
 
-  const onLossFunctionChange = () => {};
+  const onLossFunctionChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    dispatch(
+      updateClassifierLossFunctionAction({
+        lossFunction: event.target.value as LossFunction,
+      })
+    );
+  };
 
-  const onOptimizationAlgorithmChange = () => {};
+  const onOptimizationAlgorithmChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    dispatch(
+      updateClassifierOptimizationAlgorithmAction({
+        optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
+      })
+    );
+  };
 
   return (
     <Dialog
@@ -72,60 +117,87 @@ export const ClassifierSettingsDialog = ({
         </Toolbar>
       </AppBar>
 
-      <DialogContent>
+      <DialogContent className={classes.classifierSettingsDialogContent}>
         <Container className={classes.container} maxWidth="md">
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <TextField
                 select
-                label="Optimization Algorithm"
+                label="Optimization algorithm"
                 id="optimization-algorithm"
                 value={classifier.optimizationAlgorithm}
                 fullWidth
-                helperText="Select an optimization algorithm"
+                helperText="&nbsp;"
                 onChange={onOptimizationAlgorithmChange}
               >
-                <MenuItem value={OptimizationAlgorithm.Adadelta}>
-                  Adadelta
-                </MenuItem>
-                <MenuItem value={OptimizationAlgorithm.Adam}>Adam</MenuItem>
-                <MenuItem value={OptimizationAlgorithm.Adamax}>Adamax</MenuItem>
-                <MenuItem value={OptimizationAlgorithm.RMSProp}>
-                  RMSProp
-                </MenuItem>
-                <MenuItem value={OptimizationAlgorithm.SGD}>
-                  Stochastic Gradient Descent (SGD)
-                </MenuItem>
+                {enumKeys(OptimizationAlgorithm).map((k) => {
+                  return (
+                    <MenuItem value={OptimizationAlgorithm[k]}>
+                      {OptimizationAlgorithm[k]}
+                    </MenuItem>
+                  );
+                })}
               </TextField>
             </Grid>
+
             <Grid item xs={6}>
               <TextField
                 type="number"
-                label="Learning Rate"
+                label="Learning rate"
                 id="learning-rate"
                 value={classifier.learningRate}
                 fullWidth
-                helperText="Select a learning rate"
+                helperText="&nbsp;"
                 onChange={onLearningRateChange}
-              ></TextField>
+              />
             </Grid>
           </Grid>
+
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <TextField
                 select
-                label="Loss Function"
+                label="Loss function"
                 id="loss-function"
                 value={classifier.lossFunction}
                 fullWidth
-                helperText="Select a loss function"
+                helperText="&nbsp;"
                 onChange={onLossFunctionChange}
               >
-                <MenuItem value={LossFunction.AD}>Absolute Difference</MenuItem>
-                <MenuItem value={LossFunction.MSE}>
-                  Mean Squared Error (MSE)
-                </MenuItem>
+                {enumKeys(LossFunction).map((k) => {
+                  return (
+                    <MenuItem value={LossFunction[k]}>
+                      {LossFunction[k]}
+                    </MenuItem>
+                  );
+                })}
               </TextField>
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={3}>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                helperText="&nbsp;"
+                id="batch-size"
+                label="Batch size"
+                onChange={onBatchSizeChange}
+                type="number"
+                value={classifier.batchSize}
+              />
+            </Grid>
+
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                helperText="&nbsp;"
+                id="epochs"
+                label="Epochs"
+                onChange={onEpochsChange}
+                type="number"
+                value={classifier.epochs}
+              />
             </Grid>
           </Grid>
         </Container>
