@@ -122,13 +122,13 @@ export const ClassifierSettingsDialog = ({
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <TextField
-                select
-                label="Optimization algorithm"
-                id="optimization-algorithm"
-                value={classifier.optimizationAlgorithm}
                 fullWidth
                 helperText="&nbsp;"
+                id="optimization-algorithm"
+                label="Optimization algorithm"
                 onChange={onOptimizationAlgorithmChange}
+                select
+                value={classifier.optimizationAlgorithm}
               >
                 {enumKeys(OptimizationAlgorithm).map((k) => {
                   return (
@@ -142,13 +142,13 @@ export const ClassifierSettingsDialog = ({
 
             <Grid item xs={6}>
               <TextField
-                type="number"
-                label="Learning rate"
-                id="learning-rate"
-                value={classifier.learningRate}
                 fullWidth
                 helperText="&nbsp;"
+                id="learning-rate"
+                label="Learning rate"
                 onChange={onLearningRateChange}
+                type="number"
+                value={classifier.learningRate}
               />
             </Grid>
           </Grid>
@@ -156,13 +156,13 @@ export const ClassifierSettingsDialog = ({
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <TextField
-                select
-                label="Loss function"
-                id="loss-function"
-                value={classifier.lossFunction}
                 fullWidth
                 helperText="&nbsp;"
+                id="loss-function"
+                label="Loss function"
                 onChange={onLossFunctionChange}
+                select
+                value={classifier.lossFunction}
               >
                 {enumKeys(LossFunction).map((k) => {
                   return (
