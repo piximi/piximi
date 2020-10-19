@@ -5,11 +5,33 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { v4 } from "uuid";
+import MenuItem from "@material-ui/core/MenuItem";
+import TextField from "@material-ui/core/TextField";
+import React from "react";
+
+export enum LossFunction {
+  AD = "Absolute Difference",
+  MSE = "Mean Squared Error (MSE)",
+}
+
+export enum OptimizationAlgorithm {
+  Adadelta = "Adadelta",
+  Adam = "Adam",
+  Adamax = "Adamax",
+  RMSProp = "RMSProp",
+  SGD = "SGD",
+}
 
 export type Category = {
   color: string;
   id: string;
   name: string;
+};
+
+export type Classifier = {
+  learningRate: number;
+  lossFunction: LossFunction;
+  optimizationAlgorithm: OptimizationAlgorithm;
 };
 
 export type Image = {
@@ -21,6 +43,7 @@ export type Image = {
 
 export type Project = {
   categories: Array<Category>;
+  classifier: Classifier;
   name: string;
   images: Array<Image>;
 };
@@ -48,6 +71,11 @@ const initialState: State = {
         name: "Unknown",
       },
     ],
+    classifier: {
+      learningRate: 0.01,
+      lossFunction: LossFunction.MSE,
+      optimizationAlgorithm: OptimizationAlgorithm.Adam,
+    },
     images: [
       {
         categoryId: "00000000-0000-0000-0000-000000000000",
@@ -103,6 +131,18 @@ export const updateCategoryNameAction = createAction<{
   name: string;
 }>("update-category-name");
 
+export const updateClassifierLearningRateAction = createAction<{
+  learningRate: number;
+}>("update-classifier-learning-rate");
+
+export const updateClassifierLossFunctionAction = createAction<{
+  lossFunction: LossFunction;
+}>("update-classifier-loss-function");
+
+export const updateClassifierOptimizationAlgorithmAction = createAction<{
+  optimizationAlgorithm: OptimizationAlgorithm;
+}>("update-classifier-optimization-algorithm");
+
 export const updatePhotoCategoryAction = createAction<{
   id: string;
   categoryId: string;
@@ -120,6 +160,25 @@ const reducer = createReducer(initialState, {
     };
 
     state.project.categories.push(category);
+  },
+  [updateClassifierLearningRateAction.type]: (
+    state: State,
+    action: PayloadAction<{ learningRate: number }>
+  ) => {
+    state.project.classifier.learningRate = action.payload.learningRate;
+  },
+  [updateClassifierLossFunctionAction.type]: (
+    state: State,
+    action: PayloadAction<{ lossFunction: LossFunction }>
+  ) => {
+    state.project.classifier.lossFunction = action.payload.lossFunction;
+  },
+  [updateClassifierOptimizationAlgorithmAction.type]: (
+    state: State,
+    action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
+  ) => {
+    state.project.classifier.optimizationAlgorithm =
+      action.payload.optimizationAlgorithm;
   },
 });
 
