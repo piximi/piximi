@@ -2,18 +2,38 @@ import React from "react";
 import Menu from "@material-ui/core/Menu";
 import { bindMenu, PopupState } from "material-ui-popup-state/hooks";
 import MenuList from "@material-ui/core/MenuList";
-import { Category, State } from "./store";
+import { Category, State, updateImageCategoryAction } from "./store";
 import MenuItem from "@material-ui/core/MenuItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Image } from "./store";
 
 type ImageCategoryMenuProps = {
-  menu: PopupState;
+  anchorEl: HTMLElement;
+  image: Image;
+  onClose: () => void;
 };
 
-export const ImageCategoryMenu = ({ menu }: ImageCategoryMenuProps) => {
+export const ImageCategoryMenu = ({
+  anchorEl,
+  image,
+  onClose,
+}: ImageCategoryMenuProps) => {
   const categories = useSelector((state: State) => {
     return state.project.categories;
   });
+
+  const dispatch = useDispatch();
+
+  const onClick = (
+    event: React.MouseEvent<HTMLLIElement>,
+    categoryId: string
+  ) => {
+    onClose();
+
+    dispatch(
+      updateImageCategoryAction({ id: image.id, categoryId: categoryId })
+    );
+  };
 
   return (
     <Menu
@@ -26,11 +46,15 @@ export const ImageCategoryMenu = ({ menu }: ImageCategoryMenuProps) => {
         horizontal: "center",
         vertical: "top",
       }}
-      {...bindMenu(menu)}
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
     >
       <MenuList dense variant="menu">
         {categories.map((category: Category) => (
-          <MenuItem key={category.id} onClick={menu.close}>
+          <MenuItem
+            key={category.id}
+            onClick={(event) => onClick(event, category.id)}
+          >
             {category.name}
           </MenuItem>
         ))}

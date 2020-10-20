@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { v4 } from "uuid";
+import { findIndex } from "underscore";
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
@@ -159,10 +160,10 @@ export const updateClassifierOptimizationAlgorithmAction = createAction<{
   optimizationAlgorithm: OptimizationAlgorithm;
 }>("update-classifier-optimization-algorithm");
 
-export const updatePhotoCategoryAction = createAction<{
+export const updateImageCategoryAction = createAction<{
   id: string;
   categoryId: string;
-}>("update-photo-category");
+}>("update-image-category");
 
 const reducer = createReducer(initialState, {
   [createCategoryAction.type]: (
@@ -207,6 +208,18 @@ const reducer = createReducer(initialState, {
   ) => {
     state.project.classifier.optimizationAlgorithm =
       action.payload.optimizationAlgorithm;
+  },
+  [updateImageCategoryAction.type]: (
+    state: State,
+    action: PayloadAction<{ id: string; categoryId: string }>
+  ) => {
+    const index = findIndex(state.project.images, (image: Image) => {
+      return image.id === action.payload.id;
+    });
+
+    if (index >= 0) {
+      state.project.images[index].categoryId = action.payload.categoryId;
+    }
   },
 });
 

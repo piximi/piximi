@@ -37,19 +37,33 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const [openedImage, setOpenedImage] = React.useState<Image>(images[0]);
 
+  const [selectedImage, setSelectedImage] = React.useState();
+
+  const [
+    categoryMenuAnchorEl,
+    setCategoryMenuAnchorEl,
+  ] = React.useState<null | HTMLElement>(null);
+
+  const onOpenCategoryMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    image: Image
+  ) => {
+    setSelectedImage(image);
+    setCategoryMenuAnchorEl(event.currentTarget);
+  };
+
+  const onCloseCategoryMenu = () => {
+    setCategoryMenuAnchorEl(null);
+  };
+
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
-    setOpenImageDialog(true);
+    // setOpenImageDialog(true);
   };
 
   const onCloseImageDialog = () => {
     setOpenImageDialog(false);
   };
-
-  const photoCategoryMenuState = usePopupState({
-    popupId: "photo-category-menu",
-    variant: "popover",
-  });
 
   const classes = useStyles();
 
@@ -70,7 +84,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                     <IconButton
                       className={classes.gridTileBarIconButton}
                       disableRipple
-                      {...bindTrigger(photoCategoryMenuState)}
+                      onClick={(event) => onOpenCategoryMenu(event, photo)}
                     >
                       <LabelOutlinedIcon />
                     </IconButton>
@@ -92,7 +106,11 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
         photo={openedImage}
       />
 
-      <ImageCategoryMenu menu={photoCategoryMenuState} />
+      <ImageCategoryMenu
+        anchorEl={categoryMenuAnchorEl as HTMLElement}
+        image={selectedImage}
+        onClose={onCloseCategoryMenu}
+      />
     </React.Fragment>
   );
 };
