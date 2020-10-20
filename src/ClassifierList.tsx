@@ -1,25 +1,41 @@
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import AddIcon from "@material-ui/icons/Add";
+import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import ListItemText from "@material-ui/core/ListItemText";
-import FolderOpenIcon from "@material-ui/icons/FolderOpen";
-import SaveIcon from "@material-ui/icons/Save";
+import BarChartIcon from "@material-ui/icons/BarChart";
+import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
 import List from "@material-ui/core/List";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
-import { ListItemSecondaryAction } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { ClassifierSettingsDialog } from "./ClassifierSettingsDialog";
 import Tooltip from "@material-ui/core/Tooltip";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import Snackbar from "@material-ui/core/Snackbar";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import { LinearProgress } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import { useStyles } from "./index.css";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(true);
 
   const onCollapseClick = () => {
     setCollapsed(!collapsed);
+  };
+
+  const [openFitSnackbar, setOpenFitSnackbar] = React.useState(false);
+
+  const onOpenFitSnackbar = () => {
+    setOpenFitSnackbar(true);
+  };
+
+  const onCloseFitSnackbar = () => {
+    setOpenFitSnackbar(false);
   };
 
   const [
@@ -34,6 +50,8 @@ export const ClassifierList = () => {
   const onCloseClassifierSettingsDialog = () => {
     setOpenClassifierSettingsDialog(false);
   };
+
+  const classes = useStyles();
 
   return (
     <React.Fragment>
@@ -56,9 +74,9 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <ListItem button disabled>
+            <ListItem button onClick={onOpenFitSnackbar}>
               <ListItemIcon>
-                <AddIcon />
+                <ScatterPlotIcon />
               </ListItemIcon>
 
               <ListItemText primary="Fit" />
@@ -66,7 +84,7 @@ export const ClassifierList = () => {
 
             <ListItem button disabled>
               <ListItemIcon>
-                <FolderOpenIcon />
+                <BarChartIcon />
               </ListItemIcon>
 
               <ListItemText primary="Evaluate" />
@@ -74,7 +92,7 @@ export const ClassifierList = () => {
 
             <ListItem button disabled>
               <ListItemIcon>
-                <SaveIcon />
+                <LabelImportantIcon />
               </ListItemIcon>
 
               <ListItemText primary="Predict" />
@@ -87,6 +105,28 @@ export const ClassifierList = () => {
         onClose={onCloseClassifierSettingsDialog}
         open={openClassifierSettingsDialog}
       />
+
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        onClose={onCloseFitSnackbar}
+        open={openFitSnackbar}
+      >
+        <Alert
+          className={classes.alert}
+          onClose={onCloseFitSnackbar}
+          severity="info"
+        >
+          <AlertTitle>Training…</AlertTitle>
+          <Grid container>
+            <Grid item xs={12}>
+              <LinearProgress className={classes.progress} />
+            </Grid>
+          </Grid>
+        </Alert>
+      </Snackbar>
     </React.Fragment>
   );
 };

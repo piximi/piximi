@@ -23,6 +23,9 @@ import {
   updateClassifierLossFunctionAction,
   updateClassifierOptimizationAlgorithmAction,
 } from "./store";
+import Typography from "@material-ui/core/Typography";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O
@@ -119,6 +122,21 @@ export const ClassifierSettingsDialog = ({
 
       <DialogContent className={classes.classifierSettingsDialogContent}>
         <Container className={classes.container} maxWidth="md">
+          <Tabs
+            centered
+            indicatorColor="primary"
+            onChange={() => {}}
+            textColor="primary"
+            value={0}
+            variant="fullWidth"
+          >
+            <Tab label="Preprocessing" />
+            <Tab label="Training" />
+            <Tab label="Architecture" />
+          </Tabs>
+          <Grid container spacing={3}>
+            <Grid item xs={12}></Grid>
+          </Grid>
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <TextField

@@ -1,6 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 export const useStyles = makeStyles((theme) => ({
+  alert: {
+    width: theme.spacing(64),
+  },
   appBar: {
     transition: theme.transitions.create(["margin", "width"], {
       duration: theme.transitions.duration.leavingScreen,
@@ -71,6 +74,9 @@ export const useStyles = makeStyles((theme) => ({
     }),
   },
   media: {},
+  progress: {
+    width: "100%",
+  },
   settingsDialogAppBar: {},
   slider: {
     padding: theme.spacing(3),
