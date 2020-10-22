@@ -57,10 +57,14 @@ export const CategoriesList = () => {
                 <ListItemIcon>
                   <Checkbox
                     checked
-                    checkedIcon={<LabelIcon />}
+                    checkedIcon={
+                      <LabelIcon style={{ color: category.color }} />
+                    }
                     disableRipple
                     edge="start"
-                    icon={<LabelOutlinedIcon />}
+                    icon={
+                      <LabelOutlinedIcon style={{ color: category.color }} />
+                    }
                     tabIndex={-1}
                   />
                 </ListItemIcon>

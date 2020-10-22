@@ -63,17 +63,17 @@ const initialState: State = {
   project: {
     categories: [
       {
-        color: "",
+        color: "rgb(0, 255, 255)",
         id: "91fdbc1f-b654-4150-9fe3-53d28c4287c4",
         name: "Cell membrane",
       },
       {
-        color: "",
+        color: "rgb(255, 0, 255)",
         id: "8039cf80-6ad6-4c57-8001-871765905c5b",
         name: "Nucleus",
       },
       {
-        color: "",
+        color: "rgb(255, 255, 0)",
         id: "00000000-0000-0000-0000-000000000000",
         name: "Unknown",
       },

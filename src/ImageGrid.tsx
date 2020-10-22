@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import Container from "@material-ui/core/Container";
 import GridList from "@material-ui/core/GridList";
-import { Image, State } from "./store";
+import { Category, Image, State } from "./store";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
+import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
@@ -28,6 +28,9 @@ const DialogTransition = React.forwardRef(
 );
 
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
+  const categories = useSelector((state: State) => {
+    return state.project.categories;
+  });
   const images = useSelector((state: State) => {
     return state.project.images;
   });
@@ -57,7 +60,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
-    setOpenImageDialog(true);
+    // setOpenImageDialog(true);
   };
 
   const onCloseImageDialog = () => {
@@ -65,6 +68,13 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
   };
 
   const classes = useStyles();
+
+  const imageCategory = (image: Image) => {
+    const index = categories.findIndex((category: Category) => {
+      return image.categoryId === category.id;
+    });
+    return categories[index];
+  };
 
   return (
     <React.Fragment>
@@ -85,7 +95,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                       disableRipple
                       onClick={(event) => onOpenCategoryMenu(event, photo)}
                     >
-                      <LabelOutlinedIcon />
+                      <LabelIcon
+                        style={{ color: imageCategory(photo).color }}
+                      />
                     </IconButton>
                   }
                   actionPosition="left"
