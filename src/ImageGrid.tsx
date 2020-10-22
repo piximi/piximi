@@ -5,7 +5,6 @@ import { Image, State } from "./store";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
-import { bindTrigger, usePopupState } from "material-ui-popup-state/hooks";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import React from "react";
 import { useStyles } from "./index.css";
@@ -58,7 +57,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
-    // setOpenImageDialog(true);
+    setOpenImageDialog(true);
   };
 
   const onCloseImageDialog = () => {
@@ -103,7 +102,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
         TransitionComponent={DialogTransition}
         onClose={onCloseImageDialog}
         open={openImageDialog}
-        photo={openedImage}
+        image={openedImage}
       />
 
       <ImageCategoryMenu

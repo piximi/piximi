@@ -1,6 +1,5 @@
 import React from "react";
 import Menu from "@material-ui/core/Menu";
-import { bindMenu, PopupState } from "material-ui-popup-state/hooks";
 import MenuList from "@material-ui/core/MenuList";
 import { Category, State, updateImageCategoryAction } from "./store";
 import MenuItem from "@material-ui/core/MenuItem";
