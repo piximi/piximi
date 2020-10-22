@@ -47,7 +47,9 @@ export const ImageDialog = ({
       <CategoriesDrawer />
 
       <DialogContent className={classes.imageDialogContent}>
-        <Container fixed maxWidth="sm"></Container>
+        <Container fixed maxWidth="sm">
+          <div />
+        </Container>
       </DialogContent>
 
       <ImageProcessingDrawer />
