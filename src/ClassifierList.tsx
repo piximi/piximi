@@ -20,8 +20,11 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { LinearProgress } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./index.css";
+import { useDispatch } from "react-redux";
+import { fitClassifierAction } from "./store";
 
 export const ClassifierList = () => {
+  const dispatch = useDispatch();
   const [collapsed, setCollapsed] = React.useState(true);
 
   const onCollapseClick = () => {
@@ -51,6 +54,11 @@ export const ClassifierList = () => {
     setOpenClassifierSettingsDialog(false);
   };
 
+  const onFitClick = () => {
+    onOpenFitSnackbar();
+    dispatch(fitClassifierAction());
+  };
+
   const classes = useStyles();
 
   return (
@@ -74,7 +82,7 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <ListItem button onClick={onOpenFitSnackbar}>
+            <ListItem button onClick={onFitClick}>
               <ListItemIcon>
                 <ScatterPlotIcon />
               </ListItemIcon>

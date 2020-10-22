@@ -17,6 +17,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@react-three/drei": "^2.1.1-beta.3",
     "@reduxjs/toolkit": "^1.4.0",
+    "@tensorflow/tfjs": "^2.6.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",

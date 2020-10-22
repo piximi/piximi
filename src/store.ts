@@ -6,25 +6,31 @@ import {
 } from "@reduxjs/toolkit";
 import { v4 } from "uuid";
 import { findIndex } from "underscore";
+import * as tensorflow from "@tensorflow/tfjs";
 
 export enum LossFunction {
-  AbsoluteDifference = "Absolute difference",
-  CosineDistance = "Cosine distance",
-  Hinge = "Hinge",
-  Huber = "Huber",
-  Log = "Log",
-  MeanSquaredError = "Mean squared error (MSE)",
-  SigmoidCrossEntropy = "Sigmoid cross entropy",
-  SoftmaxCrossEntropy = "Softmax cross entropy",
+  absoluteDifference = "Absolute difference",
+  cosineDistance = "Cosine distance",
+  hingeLoss = "Hinge",
+  huberLoss = "Huber",
+  logLoss = "Log",
+  meanSquaredError = "Mean squared error (MSE)",
+  sigmoidCrossEntropy = "Sigmoid cross-entropy",
+  categoricalCrossentropy = "Categorical cross-entropy",
 }
 
 export enum OptimizationAlgorithm {
-  Adadelta = "Adadelta",
-  Adam = "Adam",
-  Adamax = "Adamax",
-  Momentum = "Momentum",
-  RMSProp = "RMSProp",
-  StochasticGradientDescent = "Stochastic gradient descent (SGD)",
+  adadelta = "Adadelta",
+  adam = "Adam",
+  adamax = "Adamax",
+  momentum = "Momentum",
+  rmsprop = "RMSProp",
+  sgd = "Stochastic gradient descent (SGD)",
+}
+
+function lookupValue(inputEnum: any, value: string) {
+  let keys = Object.keys(inputEnum).filter((x) => inputEnum[x] === value);
+  return keys[0];
 }
 
 export type Category = {
@@ -56,7 +62,50 @@ export type Project = {
 };
 
 export type State = {
+  predictions?: any;
   project: Project;
+};
+
+export const fit = (state: State, action: PayloadAction) => {
+  // Define a model for linear regression.
+  const modelUrl =
+    "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_035_224/classification/3/default/1";
+
+  const model = tensorflow
+    .loadGraphModel(modelUrl, { fromTFHub: true })
+    .then((graph) => {
+      console.log(graph);
+    });
+
+  // Prepare the model for training: Specify the loss and the optimizer.
+
+  console.log("Setting up params");
+  console.log(
+    lookupValue(LossFunction, state.project.classifier.lossFunction) as string
+  );
+  console.log(
+    lookupValue(
+      OptimizationAlgorithm,
+      state.project.classifier.optimizationAlgorithm
+    ) as string
+  );
+
+  // model.compile({
+  //   loss: lookupValue(LossFunction, state.project.classifier.lossFunction) as string,
+  //   optimizer: lookupValue(OptimizationAlgorithm, state.project.classifier.optimizationAlgorithm) as string,
+  // });
+  //
+  // // Generate some synthetic data for training.
+  // const xs = tensorflow.randomNormal([32, 224, 224, 3]);
+  // const ys = tensorflow.oneHot(tensorflow.randomUniform([32, 1], 0, 2, "int32"), 3);
+  //
+  // // Train the model using the data.
+  // const predictions = model.fit(xs, ys).then(() => {
+  //   // Use the model to do inference on a data point the model hasn't seen before:
+  //   model.predict(tensorflow.randomNormal([1, 224, 224, 3]));
+  //   console.log("I made a classifier and trained it");
+  // });
+  // state.predictions = predictions;
 };
 
 const initialState: State = {
@@ -82,8 +131,8 @@ const initialState: State = {
       batchSize: 32,
       epochs: 1,
       learningRate: 0.01,
-      lossFunction: LossFunction.MeanSquaredError,
-      optimizationAlgorithm: OptimizationAlgorithm.Adam,
+      lossFunction: LossFunction.meanSquaredError,
+      optimizationAlgorithm: OptimizationAlgorithm.adam,
     },
     images: [
       {
@@ -135,6 +184,8 @@ export const deleteCategoryAction = createAction<{ id: string }>(
   "delete-category"
 );
 
+export const fitClassifierAction = createAction("fit-classifier");
+
 export const updateCategoryNameAction = createAction<{
   id: string;
   name: string;
@@ -177,6 +228,9 @@ const reducer = createReducer(initialState, {
     };
 
     state.project.categories.push(category);
+  },
+  [fitClassifierAction.type]: (state: State, action: PayloadAction) => {
+    fit(state, action);
   },
   [updateClassifierBatchSizeAction.type]: (
     state: State,
