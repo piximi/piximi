@@ -9,23 +9,24 @@ import { findIndex } from "underscore";
 import * as tensorflow from "@tensorflow/tfjs";
 
 export enum LossFunction {
-  absoluteDifference = "Absolute difference",
-  cosineDistance = "Cosine distance",
-  hingeLoss = "Hinge",
-  huberLoss = "Huber",
-  logLoss = "Log",
-  meanSquaredError = "Mean squared error (MSE)",
-  sigmoidCrossEntropy = "Sigmoid cross-entropy",
-  categoricalCrossentropy = "Categorical cross-entropy",
+  AbsoluteDifference = "Absolute difference",
+  CosineDistance = "Cosine distance",
+  Hinge = "Hinge",
+  Huber = "Huber",
+  Log = "Log",
+  MeanSquaredError = "Mean squared error (MSE)",
+  SigmoidCrossEntropy = "Sigmoid cross-entropy",
+  SoftmaxCrossEntropy = "Softmax cross-entropy",
 }
 
 export enum OptimizationAlgorithm {
-  adadelta = "Adadelta",
-  adam = "Adam",
-  adamax = "Adamax",
-  momentum = "Momentum",
-  rmsprop = "RMSProp",
-  sgd = "Stochastic gradient descent (SGD)",
+  Adadelta = "Adadelta",
+  Adagrad = "Adagrad",
+  Adam = "Adam",
+  Adamax = "Adamax",
+  Momentum = "Momentum",
+  RMSProp = "RMSProp",
+  StochasticGradientDescent = "Stochastic gradient descent (SGD)",
 }
 
 function lookupValue(inputEnum: any, value: string) {
@@ -131,8 +132,8 @@ const initialState: State = {
       batchSize: 32,
       epochs: 1,
       learningRate: 0.01,
-      lossFunction: LossFunction.meanSquaredError,
-      optimizationAlgorithm: OptimizationAlgorithm.adam,
+      lossFunction: LossFunction.MeanSquaredError,
+      optimizationAlgorithm: OptimizationAlgorithm.Adam,
     },
     images: [
       {
