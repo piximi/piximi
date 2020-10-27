@@ -7,6 +7,7 @@ import {
 import { v4 } from "uuid";
 import { findIndex } from "underscore";
 import * as tensorflow from "@tensorflow/tfjs";
+import { create } from "domain";
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
@@ -187,6 +188,12 @@ export const deleteCategoryAction = createAction<{ id: string }>(
 
 export const fitClassifierAction = createAction("fit-classifier");
 
+export const updateCategoryAction = createAction<{
+  id: string;
+  name: string;
+  color: string;
+}>("update-category");
+
 export const updateCategoryNameAction = createAction<{
   id: string;
   name: string;
@@ -232,6 +239,16 @@ const reducer = createReducer(initialState, {
   },
   [fitClassifierAction.type]: (state: State, action: PayloadAction) => {
     fit(state, action);
+  },
+  [updateCategoryAction.type]: (
+    state: State,
+    action: PayloadAction<{ id: string; name: string; color: string }>
+  ) => {
+    const index = findIndex(state.project.categories, (category: Category) => {
+      return category.id === action.payload.id;
+    });
+    state.project.categories[index].name = action.payload.name;
+    state.project.categories[index].color = action.payload.color;
   },
   [updateClassifierBatchSizeAction.type]: (
     state: State,

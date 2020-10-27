@@ -26,6 +26,15 @@ export const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),
   },
+  createCategoryDialogContent: {
+    paddingLeft: "0 !important",
+  },
+  createCategoryDialogGrid: {
+    margin: theme.spacing(1),
+  },
+  createCategoryDialogItem: {
+    // paddingLeft: "0 !important",
+  },
   drawer: {
     flexShrink: 0,
     width: theme.spacing(30),
