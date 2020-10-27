@@ -15,7 +15,7 @@ import {
 } from "material-ui-popup-state/hooks";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import AddIcon from "@material-ui/icons/Add";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -28,11 +28,6 @@ import { EditCategoryDialog } from "./EditCategoryDialog";
 export const CategoriesList = () => {
   const categories = useSelector((state: State) => {
     return state.project.categories;
-  });
-
-  const categoryMenu = usePopupState({
-    popupId: "category-menu",
-    variant: "popover",
   });
 
   const [
@@ -48,6 +43,37 @@ export const CategoriesList = () => {
     setOpenCreateCategoryDialog(false);
   };
 
+  return (
+    <React.Fragment>
+      <CollapsibleList primary="Categories">
+        <React.Fragment>
+          {categories.map((category: Category) => {
+            return <CategoryListItem category={category} />;
+          })}
+
+          <ListItem button onClick={onOpenCreateCategoryDialog}>
+            <ListItemIcon>
+              <AddIcon />
+            </ListItemIcon>
+
+            <ListItemText primary="Create category" />
+          </ListItem>
+        </React.Fragment>
+      </CollapsibleList>
+
+      <CreateCategoryDialog
+        onClose={onCloseCreateCategoryDialog}
+        open={openCreateCategoryDialog}
+      />
+    </React.Fragment>
+  );
+};
+
+type CategoryListItemProps = {
+  category: Category;
+};
+
+const CategoryListItem = ({ category }: CategoryListItemProps) => {
   const [openEditCategoryDialog, setOpenEditCategoryDialog] = React.useState(
     false
   );
@@ -58,7 +84,7 @@ export const CategoriesList = () => {
   ] = React.useState<null | Category>(null);
 
   const onOpenEditCategoryDialog = () => {
-    categoryMenu.close();
+    onCloseCategoryMenu();
     setOpenEditCategoryDialog(true);
     setCategoryMenuAnchorEl(null);
   };
@@ -85,100 +111,67 @@ export const CategoriesList = () => {
   };
 
   return (
-    <>
-      <CollapsibleList primary="Categories">
-        <>
-          {categories.map((category: Category) => {
-            return (
-              <ListItem dense key={category.id} id={category.id}>
-                <ListItemIcon>
-                  <Checkbox
-                    checked
-                    checkedIcon={
-                      <LabelIcon style={{ color: category.color }} />
-                    }
-                    disableRipple
-                    edge="start"
-                    icon={
-                      <LabelOutlinedIcon style={{ color: category.color }} />
-                    }
-                    tabIndex={-1}
-                  />
-                </ListItemIcon>
+    <React.Fragment>
+      <ListItem dense key={category.id} id={category.id}>
+        <ListItemIcon>
+          <Checkbox
+            checked
+            checkedIcon={<LabelIcon style={{ color: category.color }} />}
+            disableRipple
+            edge="start"
+            icon={<LabelOutlinedIcon style={{ color: category.color }} />}
+            tabIndex={-1}
+          />
+        </ListItemIcon>
 
-                <ListItemText id={category.id} primary={category.name} />
+        <ListItemText id={category.id} primary={category.name} />
 
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-                      onOpenCategoryMenu(event, category)
-                    }
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
+        <ListItemSecondaryAction>
+          <IconButton
+            edge="end"
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+              onOpenCategoryMenu(event, category)
+            }
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
 
-                <Menu
-                  anchorOrigin={{
-                    horizontal: "center",
-                    vertical: "bottom",
-                  }}
-                  getContentAnchorEl={null}
-                  transformOrigin={{
-                    horizontal: "center",
-                    vertical: "top",
-                  }}
-                  anchorEl={categoryMenuAnchorEl}
-                  open={Boolean(categoryMenuAnchorEl)}
-                  onClose={onCloseCategoryMenu}
-                >
-                  <MenuList dense variant="menu">
-                    <MenuItem onClick={categoryMenu.close}>
-                      <Typography variant="inherit">
-                        Hide other categories
-                      </Typography>
-                    </MenuItem>
+      <Menu
+        anchorEl={categoryMenuAnchorEl}
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+        getContentAnchorEl={null}
+        onClose={onCloseCategoryMenu}
+        open={Boolean(categoryMenuAnchorEl)}
+        transformOrigin={{ horizontal: "center", vertical: "top" }}
+      >
+        <MenuList dense variant="menu">
+          <MenuItem onClick={onCloseCategoryMenu}>
+            <Typography variant="inherit">Hide other categories</Typography>
+          </MenuItem>
 
-                    <MenuItem onClick={categoryMenu.close}>
-                      <Typography variant="inherit">Hide category</Typography>
-                    </MenuItem>
+          <MenuItem onClick={onCloseCategoryMenu}>
+            <Typography variant="inherit">Hide category</Typography>
+          </MenuItem>
 
-                    <Divider />
+          <Divider />
 
-                    <MenuItem onClick={onOpenCategoryMenu}>
-                      <Typography variant="inherit">Edit category</Typography>
-                    </MenuItem>
+          <MenuItem onClick={onOpenEditCategoryDialog}>
+            <Typography variant="inherit">Edit category</Typography>
+          </MenuItem>
 
-                    <MenuItem onClick={categoryMenu.close}>
-                      <Typography variant="inherit">Delete category</Typography>
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
+          <MenuItem onClick={onCloseCategoryMenu}>
+            <Typography variant="inherit">Delete category</Typography>
+          </MenuItem>
+        </MenuList>
+      </Menu>
 
-                <EditCategoryDialog
-                  category={category}
-                  onClose={onCloseEditCategoryDialog}
-                  open={openEditCategoryDialog}
-                />
-              </ListItem>
-            );
-          })}
-
-          <ListItem button onClick={onOpenCreateCategoryDialog}>
-            <ListItemIcon>
-              <AddIcon />
-            </ListItemIcon>
-
-            <ListItemText primary="Create category" />
-          </ListItem>
-        </>
-      </CollapsibleList>
-
-      <CreateCategoryDialog
-        onClose={onCloseCreateCategoryDialog}
-        open={openCreateCategoryDialog}
+      <EditCategoryDialog
+        category={category}
+        onClose={onCloseEditCategoryDialog}
+        open={openEditCategoryDialog}
       />
-    </>
+    </React.Fragment>
   );
 };
