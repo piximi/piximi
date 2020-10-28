@@ -8,6 +8,7 @@ import { v4 } from "uuid";
 import { findIndex } from "underscore";
 import * as tensorflow from "@tensorflow/tfjs";
 import { create } from "domain";
+import { act } from "react-dom/test-utils";
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
@@ -182,6 +183,8 @@ export const createCategoryAction = createAction<{ name: string }>(
   "create-category"
 );
 
+export const createImageAction = createAction<{ src: string }>("create-image");
+
 export const deleteCategoryAction = createAction<{ id: string }>(
   "delete-category"
 );
@@ -236,6 +239,19 @@ const reducer = createReducer(initialState, {
     };
 
     state.project.categories.push(category);
+  },
+  [createImageAction.type]: (
+    state: State,
+    action: PayloadAction<{ src: string }>
+  ) => {
+    const image: Image = {
+      id: v4(),
+      name: "",
+      src: action.payload.src,
+      categoryId: "00000000-0000-0000-0000-000000000000",
+    };
+
+    state.project.images.push(image);
   },
   [fitClassifierAction.type]: (state: State, action: PayloadAction) => {
     fit(state, action);

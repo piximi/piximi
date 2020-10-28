@@ -49,6 +49,9 @@ export const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: theme.spacing(30),
   },
+  fileInput: {
+    display: "none",
+  },
   gridList: {
     transform: "translateZ(0)",
   },
