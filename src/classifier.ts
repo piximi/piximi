@@ -655,3 +655,7 @@ export function* watchGenerateActionSaga() {
 export function* watchOpenActionSaga() {
   yield takeEvery("CLASSIFIER_OPEN", openSaga);
 }
+
+/*
+ * Reducers
+ */
