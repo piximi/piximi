@@ -10,8 +10,17 @@ import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { Scalar } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import { createAction } from "@reduxjs/toolkit";
+import { createAction, createReducer } from "@reduxjs/toolkit";
 import { put, select, takeEvery } from "redux-saga/effects";
+import createSagaMiddleware from "redux-saga";
+import {
+  configureStore,
+  EnhancedStore,
+  Middleware,
+  StoreEnhancer,
+} from "@reduxjs/toolkit";
+import logger from "redux-logger";
+import { all, fork } from "redux-saga/effects";
 
 export type ClassifierState = {
   compiled?: LayersModel;
@@ -305,34 +314,44 @@ export const compileAction = createAction<{
   opened: LayersModel;
   options: CompileOptions;
 }>("CLASSIFIER_COMPILE");
+
 export const compiledAction = createAction<{ compiled: LayersModel }>(
   "CLASSIFIER_COMPILED"
 );
+
 export const createCategoryAction = createAction<{ category: Category }>(
   "PROJECT_CREATE_CATEGORY"
 );
+
 export const createImageAction = createAction<{ image: Image }>(
   "PROJECT_CREATE_IMAGE"
 );
+
 export const createImagesAction = createAction<{ images: Array<Image> }>(
   "PROJECT_CREATE_IMAGES"
 );
+
 export const createProjectAction = createAction<{ project: Project }>(
   "PROJECT_CREATE_PROJECT"
 );
+
 export const deleteCategoryAction = createAction<{ category: Category }>(
   "PROJECT_DELETE_CATEGORY"
 );
+
 export const deleteImageAction = createAction<{ image: Image }>(
   "PROJECT_DELETE_IMAGE"
 );
+
 export const evaluateAction = createAction<{
   fitted: LayersModel;
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
 }>("CLASSIFIER_EVALUATE");
+
 export const evaluatedAction = createAction<{
   evaluations: Scalar | Array<Scalar>;
 }>("CLASSIFIER_EVALUATED");
+
 export const fitAction = createAction<{
   compiled: LayersModel;
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
@@ -340,32 +359,41 @@ export const fitAction = createAction<{
   options: FitOptions;
   callback?: any;
 }>("CLASSIFIER_FIT");
+
 export const fittedAction = createAction<{
   fitted: LayersModel;
   status: History;
 }>("CLASSIFIER_FITTED");
+
 export const generateAction = createAction<{}>("CLASSIFIER_GENERATE");
+
 export const generatedAction = createAction<{
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
 }>("CLASSIFIER_GENERATED");
+
 export const openAction = createAction<{
   pathname: string;
   classes: number;
   units: number;
 }>("CLASSIFIER_OPEN");
+
 export const openProjectAction = createAction<{ project: Project }>(
   "PROJECT_OPEN_PROJECT"
 );
+
 export const openedAction = createAction<{ opened: LayersModel }>(
   "CLASSIFIER_OPENED"
 );
+
 export const predictAction = createAction<{
   compiled: LayersModel;
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
 }>("CLASSIFIER_PREDICT");
+
 export const predictedAction = createAction<{ predictions: Tensor }>(
   "CLASSIFIER_PREDICTED"
 );
+
 export const saveAction = createAction<{}>("CLASSIFIER_SAVE");
 export const savedAction = createAction<{}>("CLASSIFIER_SAVED");
 export const toggleCategoryVisibilityAction = createAction<{
@@ -656,6 +684,237 @@ export function* watchOpenActionSaga() {
   yield takeEvery("CLASSIFIER_OPEN", openSaga);
 }
 
+export function* root() {
+  const effects = [
+    fork(watchCompileActionSaga),
+    fork(watchFitActionSaga),
+    fork(watchGenerateActionSaga),
+    fork(watchOpenActionSaga),
+  ];
+
+  yield all(effects);
+}
+
 /*
  * Reducers
  */
+
+const classifierState: ClassifierState = {
+  compiling: false,
+  evaluating: false,
+  fitOptions: {
+    epochs: 1,
+    batchSize: 32,
+    initialEpoch: 0,
+  },
+  fitting: false,
+  generating: false,
+  learningRate: 0.01,
+  lossFunction: LossFunction.SoftmaxCrossEntropy,
+  lossHistory: [],
+  metrics: [Metric.CategoricalAccuracy],
+  opening: false,
+  optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
+  predicting: false,
+  saving: false,
+  trainingPercentage: 0.5,
+  validationLossHistory: [],
+  validationPercentage: 0.25,
+};
+
+export const classifierReducer = createReducer(classifierState, {
+  [compileAction.type]: (state) => {
+    return {
+      ...state,
+      compiling: true,
+    };
+  },
+  [compiledAction.type]: (state, action) => {
+    const { compiled } = action.payload;
+
+    return {
+      ...state,
+      compiled: compiled,
+      compiling: false,
+    };
+  },
+  [evaluateAction.type]: (state) => {
+    return {
+      ...state,
+      evaluating: true,
+    };
+  },
+  [evaluatedAction.type]: (state, action) => {
+    const { evaluations } = action.payload;
+
+    return {
+      ...state,
+      evaluating: false,
+      evaluations: evaluations,
+    };
+  },
+  [fitAction.type]: (state) => {
+    return {
+      ...state,
+      fitting: true,
+    };
+  },
+  [fittedAction.type]: (state, action) => {
+    const { fitted, history } = action.payload;
+
+    return {
+      ...state,
+      fitted: fitted,
+      fitting: false,
+      history: history,
+    };
+  },
+  [generateAction.type]: (state) => {
+    return {
+      ...state,
+      generating: true,
+    };
+  },
+  [generatedAction.type]: (state, action) => {
+    const { data, validationData } = action.payload;
+
+    return {
+      ...state,
+      data: data,
+      generating: false,
+      validationData: validationData,
+    };
+  },
+  [openAction.type]: (state) => {
+    return {
+      ...state,
+      opening: true,
+    };
+  },
+  [openedAction.type]: (state, action) => {
+    const { opened } = action.payload;
+
+    return {
+      ...state,
+      opened: opened,
+      opening: false,
+    };
+  },
+  [predictAction.type]: (state) => {
+    return {
+      ...state,
+      predicting: true,
+    };
+  },
+  [predictedAction.type]: (state, action) => {
+    const { predictions } = action.payload;
+
+    return {
+      ...state,
+      predicting: false,
+      predictions: predictions,
+    };
+  },
+  [saveAction.type]: (state) => {
+    return {
+      ...state,
+      saving: true,
+    };
+  },
+  [savedAction.type]: (state, action) => {},
+  [updateBatchSizeAction.type]: (state, action) => {
+    const { batchSize } = action.payload;
+    state.fitOptions.batchSize = batchSize;
+  },
+  [updateEpochsAction.type]: (state, action) => {
+    const { epochs } = action.payload;
+    state.fitOptions.epochs = epochs;
+  },
+  [updateLearningRateAction.type]: (state, action) => {
+    const { learningRate } = action.payload;
+
+    return {
+      ...state,
+      learningRate: learningRate,
+    };
+  },
+  [updateLossFunctionAction.type]: (state, action) => {
+    const { lossFunction } = action.payload;
+
+    return {
+      ...state,
+      lossFunction: lossFunction,
+    };
+  },
+  [updateLossHistoryAction.type]: (state, action) => {
+    const { batch, loss } = action.payload;
+
+    return {
+      ...state,
+      lossHistory: [...state.lossHistory!, { x: batch, y: loss }],
+    };
+  },
+  [updateMetricsAction.type]: (state, action) => {
+    const { metrics } = action.payload;
+
+    return {
+      ...state,
+      metrics: metrics,
+    };
+  },
+  [updateOptimizationFunctionAction.type]: (state, action) => {
+    const { optimizationFunction } = action.payload;
+
+    return {
+      ...state,
+      optimizationFunction: optimizationFunction,
+    };
+  },
+  [updateTrainingPercentageAction.type]: (state, action) => {
+    const { trainingPercentage: trainingPercentage } = action.payload;
+
+    return {
+      ...state,
+      trainingPercentage: trainingPercentage,
+    };
+  },
+  [updateValidationLossHistoryAction.type]: (state, action) => {
+    const { batch, loss } = action.payload;
+
+    return {
+      ...state,
+      validationLossHistory: [
+        ...state.validationLossHistory!,
+        { x: batch, y: loss },
+      ],
+    };
+  },
+  [updateValidationPercentageAction.type]: (state, action) => {
+    const { validationPercentage } = action.payload;
+
+    return {
+      ...state,
+      validationPercentage: validationPercentage,
+    };
+  },
+});
+
+const saga = createSagaMiddleware();
+
+const enhancers: StoreEnhancer[] = [];
+
+const middleware: Middleware[] = [logger, saga];
+
+const preloadedState = {};
+
+const options = {
+  devTools: true,
+  enhancers: enhancers,
+  middleware: middleware,
+  preloadedState: preloadedState,
+  reducer: classifierReducer,
+};
+
+export const store: EnhancedStore = configureStore(options);
+
+saga.run(root);
