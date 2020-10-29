@@ -6,9 +6,6 @@ import {
 } from "@reduxjs/toolkit";
 import { v4 } from "uuid";
 import { findIndex } from "underscore";
-import * as tensorflow from "@tensorflow/tfjs";
-import { create } from "domain";
-import { act } from "react-dom/test-utils";
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
@@ -29,11 +26,6 @@ export enum OptimizationAlgorithm {
   Momentum = "Momentum",
   RMSProp = "RMSProp",
   StochasticGradientDescent = "Stochastic gradient descent (SGD)",
-}
-
-function lookupValue(inputEnum: any, value: string) {
-  let keys = Object.keys(inputEnum).filter((x) => inputEnum[x] === value);
-  return keys[0];
 }
 
 export type Category = {
@@ -69,47 +61,7 @@ export type State = {
   project: Project;
 };
 
-export const fit = (state: State, action: PayloadAction) => {
-  // Define a model for linear regression.
-  const modelUrl =
-    "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_035_224/classification/3/default/1";
-
-  const model = tensorflow
-    .loadGraphModel(modelUrl, { fromTFHub: true })
-    .then((graph) => {
-      console.log(graph);
-    });
-
-  // Prepare the model for training: Specify the loss and the optimizer.
-
-  console.log("Setting up params");
-  console.log(
-    lookupValue(LossFunction, state.project.classifier.lossFunction) as string
-  );
-  console.log(
-    lookupValue(
-      OptimizationAlgorithm,
-      state.project.classifier.optimizationAlgorithm
-    ) as string
-  );
-
-  // model.compile({
-  //   loss: lookupValue(LossFunction, state.project.classifier.lossFunction) as string,
-  //   optimizer: lookupValue(OptimizationAlgorithm, state.project.classifier.optimizationAlgorithm) as string,
-  // });
-  //
-  // // Generate some synthetic data for training.
-  // const xs = tensorflow.randomNormal([32, 224, 224, 3]);
-  // const ys = tensorflow.oneHot(tensorflow.randomUniform([32, 1], 0, 2, "int32"), 3);
-  //
-  // // Train the model using the data.
-  // const predictions = model.fit(xs, ys).then(() => {
-  //   // Use the model to do inference on a data point the model hasn't seen before:
-  //   model.predict(tensorflow.randomNormal([1, 224, 224, 3]));
-  //   console.log("I made a classifier and trained it");
-  // });
-  // state.predictions = predictions;
-};
+export const fit = (state: State, action: PayloadAction) => {};
 
 const initialState: State = {
   project: {

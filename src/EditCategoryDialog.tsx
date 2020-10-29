@@ -10,13 +10,9 @@ import { Category, updateCategoryAction } from "./store";
 
 type EditCategoryDialogProps = {
   category: Category;
-  // updateColor: (identifier: string, color: string) => void;
   onClose: () => void;
   open: boolean;
 };
-
-// export const EditCategoryDialog = (props: EditCategoryDialogProps) => {
-//     const {category, updateColor, updateDescription, onClose, open} = props;
 
 export const EditCategoryDialog = ({
   category,
@@ -25,7 +21,6 @@ export const EditCategoryDialog = ({
 }: EditCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const [color, setColor] = useState<string>(category.color);
   const [name, setName] = useState<string>(category.name);
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +29,11 @@ export const EditCategoryDialog = ({
 
   const onEdit = () => {
     dispatch(
-      updateCategoryAction({ id: category.id, name: name, color: color })
+      updateCategoryAction({
+        id: category.id,
+        name: name,
+        color: category.color,
+      })
     );
 
     onClose();

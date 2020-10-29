@@ -1,5 +1,5 @@
 import { CollapsibleList } from "./CollapsibleList";
-import { Category, Image, State } from "./store";
+import { Category, State } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -8,14 +8,9 @@ import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  bindMenu,
-  bindTrigger,
-  usePopupState,
-} from "material-ui-popup-state/hooks";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import AddIcon from "@material-ui/icons/Add";
-import React, { useCallback, useState } from "react";
+import React from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -78,11 +73,6 @@ const CategoryListItem = ({ category }: CategoryListItemProps) => {
     false
   );
 
-  const [
-    selectedCategory,
-    setSelectedCategory,
-  ] = React.useState<null | Category>(null);
-
   const onOpenEditCategoryDialog = () => {
     onCloseCategoryMenu();
     setOpenEditCategoryDialog(true);
@@ -98,7 +88,6 @@ const CategoryListItem = ({ category }: CategoryListItemProps) => {
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category
   ) => {
-    setSelectedCategory(category);
     setCategoryMenuAnchorEl(event.currentTarget);
   };
 
