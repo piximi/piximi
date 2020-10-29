@@ -12,17 +12,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  LossFunction,
-  OptimizationAlgorithm,
-  ProjectState,
-  updateClassifierBatchSizeAction,
-  updateClassifierEpochsAction,
-  updateClassifierLearningRateAction,
-  updateClassifierLossFunctionAction,
-  updateClassifierOptimizationAlgorithmAction,
-} from "./store";
+import { useSelector } from "react-redux";
+import { LossFunction, OptimizationAlgorithm, Project } from "./store";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 
@@ -50,58 +41,56 @@ export const ClassifierSettingsDialog = ({
   onClose,
   open,
 }: ClassifierSettingsDialogProps) => {
-  const dispatch = useDispatch();
-
-  const classifier = useSelector((state: ProjectState) => {
-    return state.project.classifier;
+  const classifier = useSelector((state: Project) => {
+    return state.classifier;
   });
 
   const classes = useStyles();
 
   const onBatchSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    dispatch(
-      updateClassifierBatchSizeAction({
-        batchSize: parseFloat(event.target.value as string),
-      })
-    );
+    // dispatch(
+    //   updateClassifierBatchSizeAction({
+    //     batchSize: parseFloat(event.target.value as string),
+    //   })
+    // );
   };
 
   const onEpochsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    dispatch(
-      updateClassifierEpochsAction({
-        epochs: parseFloat(event.target.value as string),
-      })
-    );
+    // dispatch(
+    //   updateClassifierEpochsAction({
+    //     epochs: parseFloat(event.target.value as string),
+    //   })
+    // );
   };
 
   const onLearningRateChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    dispatch(
-      updateClassifierLearningRateAction({
-        learningRate: parseFloat(event.target.value as string),
-      })
-    );
+    // dispatch(
+    //   updateClassifierLearningRateAction({
+    //     learningRate: parseFloat(event.target.value as string),
+    //   })
+    // );
   };
 
   const onLossFunctionChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    dispatch(
-      updateClassifierLossFunctionAction({
-        lossFunction: event.target.value as LossFunction,
-      })
-    );
+    // dispatch(
+    //   updateClassifierLossFunctionAction({
+    //     lossFunction: event.target.value as LossFunction,
+    //   })
+    // );
   };
 
   const onOptimizationAlgorithmChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    dispatch(
-      updateClassifierOptimizationAlgorithmAction({
-        optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
-      })
-    );
+    // dispatch(
+    //   updateClassifierOptimizationAlgorithmAction({
+    //     optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
+    //   })
+    // );
   };
 
   return (
