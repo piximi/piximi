@@ -30,7 +30,7 @@ export const CategoriesList = () => {
       <CollapsibleList primary="Categories">
         <React.Fragment>
           {categories.map((category: Category) => {
-            return <CategoryListItem category={category} />;
+            return <CategoryListItem category={category} key={category.id} />;
           })}
 
           <ListItem button onClick={onOpenCreateCategoryDialog}>

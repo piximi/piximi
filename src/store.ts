@@ -949,7 +949,7 @@ export const classifierReducer = createReducer(classifierState, {
     };
   },
   [updateTrainingPercentageAction.type]: (state, action) => {
-    const { trainingPercentage: trainingPercentage } = action.payload;
+    const { trainingPercentage } = action.payload;
 
     return {
       ...state,

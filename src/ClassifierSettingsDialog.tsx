@@ -152,7 +152,7 @@ export const ClassifierSettingsDialog = ({
               >
                 {enumKeys(OptimizationAlgorithm).map((k) => {
                   return (
-                    <MenuItem value={OptimizationAlgorithm[k]}>
+                    <MenuItem key={k} value={OptimizationAlgorithm[k]}>
                       {OptimizationAlgorithm[k]}
                     </MenuItem>
                   );
@@ -186,7 +186,7 @@ export const ClassifierSettingsDialog = ({
               >
                 {enumKeys(LossFunction).map((k) => {
                   return (
-                    <MenuItem value={LossFunction[k]}>
+                    <MenuItem key={k} value={LossFunction[k]}>
                       {LossFunction[k]}
                     </MenuItem>
                   );
