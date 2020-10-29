@@ -520,9 +520,9 @@ export const updateLossHistoryAction = createAction<{
 export const updateMetricsAction = createAction<{ metrics: Array<Metric> }>(
   "CLASSIFIER_UPDATE_METRICS"
 );
-export const updateOptimizationFunctionAction = createAction<{
+export const updateOptimizationAlgorithmAction = createAction<{
   optimizationAlgorithm: OptimizationAlgorithm;
-}>("CLASSIFIER_UPDATE_OPTIMIZATION_FUNCTION");
+}>("CLASSIFIER_UPDATE_OPTIMIZATION_ALGORITHM");
 
 export const updateProjectNameAction = createAction<{ name: string }>(
   "PROJECT_UPDATE_NAME"
@@ -940,7 +940,7 @@ export const classifierReducer = createReducer(classifierState, {
       metrics: metrics,
     };
   },
-  [updateOptimizationFunctionAction.type]: (state, action) => {
+  [updateOptimizationAlgorithmAction.type]: (state, action) => {
     const { optimizationFunction } = action.payload;
 
     return {

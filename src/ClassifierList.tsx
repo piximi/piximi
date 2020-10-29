@@ -20,8 +20,12 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { LinearProgress } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./index.css";
+import { useDispatch } from "react-redux";
+import { fitAction, openAction } from "./store";
 
 export const ClassifierList = () => {
+  const dispatch = useDispatch();
+
   const [collapsed, setCollapsed] = React.useState(true);
 
   const onCollapseClick = () => {
@@ -32,6 +36,11 @@ export const ClassifierList = () => {
 
   const onOpenFitSnackbar = () => {
     setOpenFitSnackbar(true);
+
+    const pathname =
+      "https://storage.googleapis.com/tfjs-models/savedmodel/mobilenet_v2_1.0_224/model.json";
+
+    dispatch(openAction({ pathname: pathname, classes: 10, units: 100 }));
   };
 
   const onCloseFitSnackbar = () => {

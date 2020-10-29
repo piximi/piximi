@@ -12,8 +12,18 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
-import { useSelector } from "react-redux";
-import { LossFunction, OptimizationAlgorithm, Project } from "./store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  compileOptionsSelector,
+  fitOptionsSelector,
+  LossFunction,
+  OptimizationAlgorithm,
+  updateBatchSizeAction,
+  updateEpochsAction,
+  updateLearningRateAction,
+  updateLossFunctionAction,
+  updateOptimizationAlgorithmAction,
+} from "./store";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 
@@ -41,56 +51,58 @@ export const ClassifierSettingsDialog = ({
   onClose,
   open,
 }: ClassifierSettingsDialogProps) => {
-  const classifier = useSelector((state: Project) => {
-    return state.classifier;
-  });
+  const dispatch = useDispatch();
+
+  const compileOptions = useSelector(compileOptionsSelector);
+
+  const fitOptions = useSelector(fitOptionsSelector);
 
   const classes = useStyles();
 
   const onBatchSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    // dispatch(
-    //   updateClassifierBatchSizeAction({
-    //     batchSize: parseFloat(event.target.value as string),
-    //   })
-    // );
+    dispatch(
+      updateBatchSizeAction({
+        batchSize: parseFloat(event.target.value as string),
+      })
+    );
   };
 
   const onEpochsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    // dispatch(
-    //   updateClassifierEpochsAction({
-    //     epochs: parseFloat(event.target.value as string),
-    //   })
-    // );
+    dispatch(
+      updateEpochsAction({
+        epochs: parseFloat(event.target.value as string),
+      })
+    );
   };
 
   const onLearningRateChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    // dispatch(
-    //   updateClassifierLearningRateAction({
-    //     learningRate: parseFloat(event.target.value as string),
-    //   })
-    // );
+    dispatch(
+      updateLearningRateAction({
+        learningRate: parseFloat(event.target.value as string),
+      })
+    );
   };
 
   const onLossFunctionChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    // dispatch(
-    //   updateClassifierLossFunctionAction({
-    //     lossFunction: event.target.value as LossFunction,
-    //   })
-    // );
+    dispatch(
+      updateLossFunctionAction({
+        lossFunction: event.target.value as LossFunction,
+      })
+    );
   };
 
   const onOptimizationAlgorithmChange = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    // dispatch(
-    //   updateClassifierOptimizationAlgorithmAction({
-    //     optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
-    //   })
-    // );
+    dispatch(
+      updateOptimizationAlgorithmAction({
+        optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
+      })
+    );
   };
 
   return (
@@ -123,7 +135,9 @@ export const ClassifierSettingsDialog = ({
             <Tab label="Architecture" />
           </Tabs>
           <Grid container spacing={3}>
-            <Grid item xs={12}></Grid>
+            <Grid item xs={12}>
+              <React.Fragment />
+            </Grid>
           </Grid>
           <Grid container spacing={3}>
             <Grid item xs={6}>
@@ -134,7 +148,7 @@ export const ClassifierSettingsDialog = ({
                 label="Optimization algorithm"
                 onChange={onOptimizationAlgorithmChange}
                 select
-                value={classifier.optimizationAlgorithm}
+                value={compileOptions.optimizationAlgorithm}
               >
                 {enumKeys(OptimizationAlgorithm).map((k) => {
                   return (
@@ -154,7 +168,7 @@ export const ClassifierSettingsDialog = ({
                 label="Learning rate"
                 onChange={onLearningRateChange}
                 type="number"
-                value={classifier.learningRate}
+                value={compileOptions.learningRate}
               />
             </Grid>
           </Grid>
@@ -168,7 +182,7 @@ export const ClassifierSettingsDialog = ({
                 label="Loss function"
                 onChange={onLossFunctionChange}
                 select
-                value={classifier.lossFunction}
+                value={compileOptions.lossFunction}
               >
                 {enumKeys(LossFunction).map((k) => {
                   return (
@@ -190,7 +204,7 @@ export const ClassifierSettingsDialog = ({
                 label="Batch size"
                 onChange={onBatchSizeChange}
                 type="number"
-                value={classifier.batchSize}
+                value={fitOptions.batchSize}
               />
             </Grid>
 
@@ -202,7 +216,7 @@ export const ClassifierSettingsDialog = ({
                 label="Epochs"
                 onChange={onEpochsChange}
                 type="number"
-                value={classifier.epochs}
+                value={fitOptions.epochs}
               />
             </Grid>
           </Grid>
