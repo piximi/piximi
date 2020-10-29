@@ -395,78 +395,99 @@ export const predictedAction = createAction<{ predictions: Tensor }>(
 );
 
 export const saveAction = createAction<{}>("CLASSIFIER_SAVE");
+
 export const savedAction = createAction<{}>("CLASSIFIER_SAVED");
+
 export const toggleCategoryVisibilityAction = createAction<{
   category: Category;
 }>("PROJECT_TOGGLE_CATEGORY_VISIBILITY");
+
 export const updateBatchSizeAction = createAction<{ batchSize: number }>(
   "CLASSIFIER_UPDATE_BATCH_SIZE"
 );
+
 export const updateCategoryColorAction = createAction<{
   category: Category;
   color: string;
 }>("PROJECT_UPDATE_CATEGORY_COLOR");
+
 export const updateCategoryDescriptionAction = createAction<{
   category: Category;
   description: string;
 }>("PROJECT_UPDATE_CATEGORY_DESCRIPTION");
+
 export const updateCategoryVisibilityAction = createAction<{
   category: Category;
   visible: boolean;
 }>("PROJECT_UPDATE_CATEGORY_VISIBILITY");
+
 export const updateEpochsAction = createAction<{ epochs: number }>(
   "CLASSIFIER_UPDATE_EPOCHS"
 );
+
 export const updateImageBrightnessAction = createAction<{
   image: Image;
   brightness: number;
 }>("PROJECT_UPDATE_IMAGE_BRIGHTNESS");
+
 export const updateImageCategoryAction = createAction<{
   image: Image;
   category: Category;
 }>("PROJECT_UPDATE_IMAGE_CATEGORY");
+
 export const updateImageContrastAction = createAction<{
   image: Image;
   contrast: number;
 }>("PROJECT_UPDATE_IMAGE_CONTRAST");
+
 export const updateImagesCategoryAction = createAction<{
   images: Array<Image>;
   category: Category;
 }>("PROJECT_UPDATE_IMAGES_CATEGORY");
+
 export const updateImagesPartitionsAction = createAction<{
   trainingPercentage: Number;
   validationPercentage: Number;
 }>("PROJECT_UPDATE_IMAGES_PARTITIONS");
+
 export const updateImagesVisibilityAction = createAction<{
   images: Array<Image>;
   visible: boolean;
 }>("PROJECT_UPDATE_IMAGES_VISIBILITY");
+
 export const updateLearningRateAction = createAction<{ learningRate: number }>(
   "CLASSIFIER_UPDATE_LEARNING_RATE"
 );
+
 export const updateLossFunctionAction = createAction<{
   lossFunction: LossFunction;
 }>("CLASSIFIER_UPDATE_LOSS_FUNCTION");
+
 export const updateLossHistoryAction = createAction<{
   batch: number;
   loss: number;
 }>("CLASSIFIER_UPDATE_LOSS_HISTORY");
+
 export const updateMetricsAction = createAction<{ metrics: Array<Metric> }>(
   "CLASSIFIER_UPDATE_METRICS"
 );
 export const updateOptimizationFunctionAction = createAction<{
   optimizationAlgorithm: OptimizationAlgorithm;
 }>("CLASSIFIER_UPDATE_OPTIMIZATION_FUNCTION");
+
 export const updateProjectNameAction = createAction<{ name: string }>(
   "PROJECT_UPDATE_NAME"
 );
+
 export const updateTrainingPercentageAction = createAction<{
   trainingPercentage: number;
 }>("CLASSIFIER_UPDATE_TRAINING_PERCENTAGE");
+
 export const updateValidationLossHistoryAction = createAction<{
   batch: number;
   loss: number;
 }>("CLASSIFIER_UPDATE_VALIDATION_LOSS_HISTORY");
+
 export const updateValidationPercentageAction = createAction<{
   validationPercentage: number;
 }>("CLASSIFIER_UPDATE_VALIDATION_PERCENTAGE");
