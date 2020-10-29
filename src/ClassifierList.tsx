@@ -21,7 +21,7 @@ import { LinearProgress } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./index.css";
 import { useDispatch } from "react-redux";
-import { fitAction, openAction } from "./store";
+import { openAction } from "./store";
 
 export const ClassifierList = () => {
   const dispatch = useDispatch();
