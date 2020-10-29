@@ -1,7 +1,7 @@
 import React from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
-import { Category, State, updateImageCategoryAction } from "./store";
+import { Category, ProjectState, updateImageCategoryAction } from "./store";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "./store";
@@ -17,7 +17,7 @@ export const ImageCategoryMenu = ({
   image,
   onClose,
 }: ImageCategoryMenuProps) => {
-  const categories = useSelector((state: State) => {
+  const categories = useSelector((state: ProjectState) => {
     return state.project.categories;
   });
 

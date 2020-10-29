@@ -56,26 +56,15 @@ export type Project = {
   images: Array<Image>;
 };
 
-export type State = {
-  predictions?: any;
+export type ProjectState = {
   project: Project;
 };
 
-export const fit = (state: State, action: PayloadAction) => {};
+export const fit = (state: ProjectState, action: PayloadAction) => {};
 
-const initialState: State = {
+const initialState: ProjectState = {
   project: {
     categories: [
-      {
-        color: "rgb(0, 255, 255)",
-        id: "91fdbc1f-b654-4150-9fe3-53d28c4287c4",
-        name: "Cell membrane",
-      },
-      {
-        color: "rgb(255, 0, 255)",
-        id: "8039cf80-6ad6-4c57-8001-871765905c5b",
-        name: "Nucleus",
-      },
       {
         color: "rgb(255, 255, 0)",
         id: "00000000-0000-0000-0000-000000000000",
@@ -89,44 +78,7 @@ const initialState: State = {
       lossFunction: LossFunction.MeanSquaredError,
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     },
-    images: [
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "6aab03f4-eae5-4eb4-82a0-236068a07c56",
-        name: "foo",
-        src: "https://picsum.photos/seed/1/512/512",
-      },
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "1103d28a-ac3d-4980-af54-7d8375dbf791",
-        name: "foo",
-        src: "https://picsum.photos/seed/2/512/512",
-      },
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "ca874261-0300-414d-95d7-7ceb2e5de52f",
-        name: "foo",
-        src: "https://picsum.photos/seed/3/512/512",
-      },
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "c9a26b6b-1226-4e54-9f9e-d3e710cd7308",
-        name: "foo",
-        src: "https://picsum.photos/seed/4/512/512",
-      },
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "589a5fc5-a01a-4346-8a70-1f89f0abcb95",
-        name: "foo",
-        src: "https://picsum.photos/seed/5/512/512",
-      },
-      {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: "6593fa38-bb6b-46d7-92d2-98a80c695312",
-        name: "foo",
-        src: "https://picsum.photos/seed/6/512/512",
-      },
-    ],
+    images: [],
     name: "Untitled project",
   },
 };
@@ -137,10 +89,6 @@ export const createCategoryAction = createAction<{ name: string }>(
 
 export const createImageAction = createAction<{ src: string }>("create-image");
 
-export const deleteCategoryAction = createAction<{ id: string }>(
-  "delete-category"
-);
-
 export const fitClassifierAction = createAction("fit-classifier");
 
 export const updateCategoryAction = createAction<{
@@ -148,11 +96,6 @@ export const updateCategoryAction = createAction<{
   name: string;
   color: string;
 }>("update-category");
-
-export const updateCategoryNameAction = createAction<{
-  id: string;
-  name: string;
-}>("update-category-name");
 
 export const updateClassifierBatchSizeAction = createAction<{
   batchSize: number;
@@ -181,7 +124,7 @@ export const updateImageCategoryAction = createAction<{
 
 const reducer = createReducer(initialState, {
   [createCategoryAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ name: string }>
   ) => {
     const category: Category = {
@@ -193,7 +136,7 @@ const reducer = createReducer(initialState, {
     state.project.categories.push(category);
   },
   [createImageAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ src: string }>
   ) => {
     const image: Image = {
@@ -205,11 +148,12 @@ const reducer = createReducer(initialState, {
 
     state.project.images.push(image);
   },
-  [fitClassifierAction.type]: (state: State, action: PayloadAction) => {
-    fit(state, action);
-  },
+  [fitClassifierAction.type]: (
+    state: ProjectState,
+    action: PayloadAction
+  ) => {},
   [updateCategoryAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ id: string; name: string; color: string }>
   ) => {
     const index = findIndex(state.project.categories, (category: Category) => {
@@ -219,38 +163,38 @@ const reducer = createReducer(initialState, {
     state.project.categories[index].color = action.payload.color;
   },
   [updateClassifierBatchSizeAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ batchSize: number }>
   ) => {
     state.project.classifier.batchSize = action.payload.batchSize;
   },
   [updateClassifierEpochsAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ epochs: number }>
   ) => {
     state.project.classifier.epochs = action.payload.epochs;
   },
   [updateClassifierLearningRateAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ learningRate: number }>
   ) => {
     state.project.classifier.learningRate = action.payload.learningRate;
   },
   [updateClassifierLossFunctionAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ lossFunction: LossFunction }>
   ) => {
     state.project.classifier.lossFunction = action.payload.lossFunction;
   },
   [updateClassifierOptimizationAlgorithmAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
   ) => {
     state.project.classifier.optimizationAlgorithm =
       action.payload.optimizationAlgorithm;
   },
   [updateImageCategoryAction.type]: (
-    state: State,
+    state: ProjectState,
     action: PayloadAction<{ id: string; categoryId: string }>
   ) => {
     const index = findIndex(state.project.images, (image: Image) => {

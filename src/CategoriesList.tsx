@@ -1,5 +1,5 @@
 import { CollapsibleList } from "./CollapsibleList";
-import { Category, State } from "./store";
+import { Category, ProjectState } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -21,7 +21,7 @@ import { useSelector } from "react-redux";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 
 export const CategoriesList = () => {
-  const categories = useSelector((state: State) => {
+  const categories = useSelector((state: ProjectState) => {
     return state.project.categories;
   });
 

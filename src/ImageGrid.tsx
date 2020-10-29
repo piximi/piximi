@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Container from "@material-ui/core/Container";
 import GridList from "@material-ui/core/GridList";
-import { Category, Image, State } from "./store";
+import { Category, Image, ProjectState } from "./store";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
@@ -28,10 +28,10 @@ const DialogTransition = React.forwardRef(
 );
 
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
-  const categories = useSelector((state: State) => {
+  const categories = useSelector((state: ProjectState) => {
     return state.project.categories;
   });
-  const images = useSelector((state: State) => {
+  const images = useSelector((state: ProjectState) => {
     return state.project.images;
   });
 

@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   LossFunction,
   OptimizationAlgorithm,
-  State,
+  ProjectState,
   updateClassifierBatchSizeAction,
   updateClassifierEpochsAction,
   updateClassifierLearningRateAction,
@@ -52,7 +52,7 @@ export const ClassifierSettingsDialog = ({
 }: ClassifierSettingsDialogProps) => {
   const dispatch = useDispatch();
 
-  const classifier = useSelector((state: State) => {
+  const classifier = useSelector((state: ProjectState) => {
     return state.project.classifier;
   });
 
