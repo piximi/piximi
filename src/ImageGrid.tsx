@@ -11,21 +11,10 @@ import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
-import { TransitionProps } from "@material-ui/core/transitions";
-import Slide from "@material-ui/core/Slide";
 
 type ImageGridProps = {
   openDrawer: boolean;
 };
-
-const DialogTransition = React.forwardRef(
-  (
-    props: TransitionProps & { children?: React.ReactElement },
-    ref: React.Ref<unknown>
-  ) => {
-    return <Slide direction="right" ref={ref} {...props} />;
-  }
-);
 
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
   const categories = useSelector(categoriesSelector);
@@ -108,7 +97,6 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
       </main>
 
       <ImageDialog
-        TransitionComponent={DialogTransition}
         onClose={onCloseImageDialog}
         open={openImageDialog}
         image={openedImage}

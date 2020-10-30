@@ -3,7 +3,6 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import ListItemText from "@material-ui/core/ListItemText";
 import BarChartIcon from "@material-ui/icons/BarChart";
-import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
 import List from "@material-ui/core/List";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
@@ -13,38 +12,14 @@ import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { ClassifierSettingsDialog } from "./ClassifierSettingsDialog";
 import Tooltip from "@material-ui/core/Tooltip";
-import Alert from "@material-ui/lab/Alert";
-import AlertTitle from "@material-ui/lab/AlertTitle";
-import Snackbar from "@material-ui/core/Snackbar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import { LinearProgress } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import { useStyles } from "./index.css";
-import { useDispatch } from "react-redux";
-import { openAction } from "./store";
+import { FitListItem } from "./FitListItem";
 
 export const ClassifierList = () => {
-  const dispatch = useDispatch();
-
   const [collapsed, setCollapsed] = React.useState(true);
 
   const onCollapseClick = () => {
     setCollapsed(!collapsed);
-  };
-
-  const [openFitSnackbar, setOpenFitSnackbar] = React.useState(false);
-
-  const onOpenFitSnackbar = () => {
-    setOpenFitSnackbar(true);
-
-    const pathname =
-      "https://storage.googleapis.com/tfjs-models/savedmodel/mobilenet_v2_1.0_224/model.json";
-
-    dispatch(openAction({ pathname: pathname, classes: 10, units: 100 }));
-  };
-
-  const onCloseFitSnackbar = () => {
-    setOpenFitSnackbar(false);
   };
 
   const [
@@ -59,12 +34,6 @@ export const ClassifierList = () => {
   const onCloseClassifierSettingsDialog = () => {
     setOpenClassifierSettingsDialog(false);
   };
-
-  const onFitClick = () => {
-    onOpenFitSnackbar();
-  };
-
-  const classes = useStyles();
 
   return (
     <React.Fragment>
@@ -87,13 +56,7 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <ListItem button onClick={onFitClick}>
-              <ListItemIcon>
-                <ScatterPlotIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Fit" />
-            </ListItem>
+            <FitListItem />
 
             <ListItem button disabled>
               <ListItemIcon>
@@ -118,28 +81,6 @@ export const ClassifierList = () => {
         onClose={onCloseClassifierSettingsDialog}
         open={openClassifierSettingsDialog}
       />
-
-      <Snackbar
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        onClose={onCloseFitSnackbar}
-        open={openFitSnackbar}
-      >
-        <Alert
-          className={classes.alert}
-          onClose={onCloseFitSnackbar}
-          severity="info"
-        >
-          <AlertTitle>Training…</AlertTitle>
-          <Grid container>
-            <Grid item xs={12}>
-              <LinearProgress className={classes.progress} />
-            </Grid>
-          </Grid>
-        </Alert>
-      </Snackbar>
     </React.Fragment>
   );
 };

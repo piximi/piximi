@@ -38,15 +38,6 @@ type ClassifierSettingsDialogProps = {
   open: boolean;
 };
 
-const DialogTransition = React.forwardRef(
-  (
-    props: TransitionProps & { children?: React.ReactElement },
-    ref: React.Ref<unknown>
-  ) => {
-    return <Slide direction="right" ref={ref} {...props} />;
-  }
-);
-
 export const ClassifierSettingsDialog = ({
   onClose,
   open,
@@ -106,12 +97,7 @@ export const ClassifierSettingsDialog = ({
   };
 
   return (
-    <Dialog
-      fullScreen
-      onClose={onClose}
-      open={open}
-      TransitionComponent={DialogTransition}
-    >
+    <Dialog fullScreen onClose={onClose} open={open}>
       <AppBar className={classes.settingsDialogAppBar}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose}>

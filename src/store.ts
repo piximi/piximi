@@ -29,6 +29,20 @@ export enum LossFunction {
   SoftmaxCrossEntropy = "Softmax cross-entropy",
 }
 
+export enum Metric {
+  BinaryAccuracy = "Binary accuracy",
+  BinaryCrossEntropy = "Binary cros-sentropy",
+  CategoricalAccuracy = "Categorical accuracy",
+  CategoricalCrossentropy = "Categorical cross-entropy",
+  CosineProximity = "Cosine proximity",
+  MeanAbsoluteError = "Mean absolute error (MAE)",
+  MeanAbsolutePercentageError = "Mean absolute percentage error",
+  MeanSquaredError = "Mean squared error",
+  Precision = "Precision",
+  Recall = "Recall",
+  SparseCategoricalAccuracy = "Sparse categorical accuracy",
+}
+
 export enum OptimizationAlgorithm {
   Adadelta = "Adadelta",
   Adagrad = "Adagrad",
@@ -46,28 +60,6 @@ export type Category = {
 };
 
 export type Classifier = {
-  batchSize: number;
-  epochs: number;
-  learningRate: number;
-  lossFunction: LossFunction;
-  optimizationAlgorithm: OptimizationAlgorithm;
-};
-
-export type Image = {
-  categoryId?: string;
-  id: string;
-  name: string;
-  src: string;
-};
-
-export type Project = {
-  categories: Array<Category>;
-  classifier: Classifier;
-  name: string;
-  images: Array<Image>;
-};
-
-export type ClassifierState = {
   compiled?: LayersModel;
   compiling: boolean;
   data?: Dataset<{ xs: Tensor; ys: Tensor }>;
@@ -98,20 +90,6 @@ export type ClassifierState = {
   validationPercentage: number;
 };
 
-export enum Metric {
-  BinaryAccuracy = "Binary accuracy",
-  BinaryCrossEntropy = "Binary cros-sentropy",
-  CategoricalAccuracy = "Categorical accuracy",
-  CategoricalCrossentropy = "Categorical cross-entropy",
-  CosineProximity = "Cosine proximity",
-  MeanAbsoluteError = "Mean absolute error (MAE)",
-  MeanAbsolutePercentageError = "Mean absolute percentage error",
-  MeanSquaredError = "Mean squared error",
-  Precision = "Precision",
-  Recall = "Recall",
-  SparseCategoricalAccuracy = "Sparse categorical accuracy",
-}
-
 export type CompileOptions = {
   learningRate: number;
   lossFunction:
@@ -126,6 +104,19 @@ export type FitOptions = {
   epochs: number;
   batchSize: number;
   initialEpoch: number;
+};
+
+export type Image = {
+  categoryId?: string;
+  id: string;
+  name: string;
+  src: string;
+};
+
+export type Project = {
+  categories: Array<Category>;
+  name: string;
+  images: Array<Image>;
 };
 
 export const compile = (
@@ -222,11 +213,11 @@ export const fit = async (
 };
 
 export const open = async (
-  pathname: string,
+  modelUrl: string,
   classes: number,
   units: number
 ): Promise<tensorflow.LayersModel> => {
-  const backbone = await tensorflow.loadLayersModel(pathname);
+  const backbone = await tensorflow.loadLayersModel(modelUrl);
 
   const truncated = tensorflow.model({
     inputs: backbone.inputs,
@@ -365,10 +356,12 @@ export const compiledAction = createAction<{ compiled: LayersModel }>(
 );
 
 export const createCategoryAction = createAction<{ name: string }>(
-  "create-category"
+  "PROJECT_CREATE_CATEGORY"
 );
 
-export const createImageAction = createAction<{ src: string }>("create-image");
+export const createImageAction = createAction<{ src: string }>(
+  "PROJECT_CREATE_IMAGE"
+);
 
 export const createImagesAction = createAction<{ images: Array<Image> }>(
   "PROJECT_CREATE_IMAGES"
@@ -576,7 +569,7 @@ export const categorizedImagesSelector = ({
 export const compileOptionsSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): CompileOptions => {
   return {
     learningRate: classifier.learningRate,
@@ -589,7 +582,7 @@ export const compileOptionsSelector = ({
 export const compiledSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): LayersModel => {
   return classifier.compiled!;
 };
@@ -597,7 +590,7 @@ export const compiledSelector = ({
 export const dataSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): Dataset<{ xs: Tensor; ys: Tensor }> => {
   return classifier.data!;
 };
@@ -605,7 +598,7 @@ export const dataSelector = ({
 export const fitOptionsSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): FitOptions => {
   return classifier.fitOptions;
 };
@@ -613,7 +606,7 @@ export const fitOptionsSelector = ({
 export const fittedSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): LayersModel => {
   return classifier.fitted!;
 };
@@ -621,7 +614,7 @@ export const fittedSelector = ({
 export const generatorOptionsSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): { validationPercentage: number } => {
   return { validationPercentage: classifier.validationPercentage };
 };
@@ -637,7 +630,7 @@ export const imagesSelector = ({
 export const lossHistorySelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): Array<{ x: number; y: number }> => {
   return classifier.lossHistory!;
 };
@@ -645,15 +638,23 @@ export const lossHistorySelector = ({
 export const openedSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): LayersModel => {
   return classifier.opened!;
+};
+
+export const openingSelector = ({
+  classifier,
+}: {
+  classifier: Classifier;
+}): boolean => {
+  return classifier.opening;
 };
 
 export const trainingPercentageSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): number => {
   return classifier.trainingPercentage;
 };
@@ -661,7 +662,7 @@ export const trainingPercentageSelector = ({
 export const validationDataSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): Dataset<{ xs: Tensor; ys: Tensor }> => {
   return classifier.validationData!;
 };
@@ -669,7 +670,7 @@ export const validationDataSelector = ({
 export const validationLossHistorySelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): Array<{ x: number; y: number }> => {
   return classifier.validationLossHistory!;
 };
@@ -677,7 +678,7 @@ export const validationLossHistorySelector = ({
 export const validationPercentageSelector = ({
   classifier,
 }: {
-  classifier: ClassifierState;
+  classifier: Classifier;
 }): number => {
   return classifier.validationPercentage;
 };
@@ -777,7 +778,7 @@ export function* root() {
  * Reducers
  */
 
-const classifierState: ClassifierState = {
+const classifierState: Classifier = {
   compiling: false,
   evaluating: false,
   fitOptions: {
@@ -985,13 +986,6 @@ const initialProjectState: Project = {
       name: "Unknown",
     },
   ],
-  classifier: {
-    batchSize: 32,
-    epochs: 1,
-    learningRate: 0.01,
-    lossFunction: LossFunction.MeanSquaredError,
-    optimizationAlgorithm: OptimizationAlgorithm.Adam,
-  },
   images: [],
   name: "Untitled project",
 };

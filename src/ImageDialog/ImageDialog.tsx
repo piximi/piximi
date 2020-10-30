@@ -21,21 +21,11 @@ type ImageDialogProps = {
   >;
 };
 
-export const ImageDialog = ({
-  onClose,
-  open,
-  image,
-  TransitionComponent,
-}: ImageDialogProps) => {
+export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
   const classes = useStyles();
 
   return (
-    <Dialog
-      fullScreen
-      onClose={onClose}
-      open={open}
-      TransitionComponent={TransitionComponent}
-    >
+    <Dialog fullScreen onClose={onClose} open={open}>
       <AppBar className={classes.imageDialogAppBar} position="fixed">
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose}>
