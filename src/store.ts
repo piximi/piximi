@@ -355,9 +355,10 @@ export const compiledAction = createAction<{ compiled: LayersModel }>(
   "CLASSIFIER_COMPILED"
 );
 
-export const createCategoryAction = createAction<{ name: string }>(
-  "PROJECT_CREATE_CATEGORY"
-);
+export const createCategoryAction = createAction<{
+  name: string;
+  color: string;
+}>("PROJECT_CREATE_CATEGORY");
 
 export const createImageAction = createAction<{ src: string }>(
   "PROJECT_CREATE_IMAGE"
@@ -993,10 +994,10 @@ const initialProjectState: Project = {
 const projectReducer = createReducer(initialProjectState, {
   [createCategoryAction.type]: (
     state: Project,
-    action: PayloadAction<{ name: string }>
+    action: PayloadAction<{ name: string; color: string }>
   ) => {
     const category: Category = {
-      color: "#00FFFF",
+      color: action.payload.color,
       id: v4().toString(),
       name: action.payload.name,
     };

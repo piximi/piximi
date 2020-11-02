@@ -7,6 +7,9 @@ import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Category, updateCategoryAction } from "./store";
+import Grid from "@material-ui/core/Grid";
+import { ColorIcon } from "./ColorIcon";
+import { useStyles } from "./index.css";
 
 type EditCategoryDialogProps = {
   category: Category;
@@ -21,6 +24,14 @@ export const EditCategoryDialog = ({
 }: EditCategoryDialogProps) => {
   const dispatch = useDispatch();
 
+  const classes = useStyles();
+
+  const [color, setColor] = useState<string>(category.color);
+
+  const onColorChange = (color: any) => {
+    setColor(color.hex);
+  };
+
   const [name, setName] = useState<string>(category.name);
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +43,7 @@ export const EditCategoryDialog = ({
       updateCategoryAction({
         id: category.id,
         name: name,
-        color: category.color,
+        color: color,
       })
     );
 
@@ -44,15 +55,24 @@ export const EditCategoryDialog = ({
       <DialogTitle>Edit category</DialogTitle>
 
       <DialogContent>
-        <TextField
-          autoFocus
-          fullWidth
-          id="name"
-          label="Name"
-          margin="dense"
-          onChange={onNameChange}
-          value={name}
-        />
+        <div>
+          <Grid container spacing={1} xs={12}>
+            <Grid item xs={2} className={classes.createCategoryDialogItem}>
+              <ColorIcon color={color} onColorChange={onColorChange} />
+            </Grid>
+            <Grid item xs={10}>
+              <TextField
+                autoFocus
+                fullWidth
+                id="name"
+                label="Name"
+                margin="dense"
+                onChange={onNameChange}
+                value={name}
+              />
+            </Grid>
+          </Grid>
+        </div>
       </DialogContent>
 
       <DialogActions>

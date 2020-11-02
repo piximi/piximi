@@ -31,8 +31,7 @@ export const CreateCategoryDialog = ({
   };
 
   const onCreate = () => {
-    dispatch(createCategoryAction({ name: name }));
-
+    dispatch(createCategoryAction({ name: name, color: color }));
     onClose();
   };
 
@@ -41,13 +40,6 @@ export const CreateCategoryDialog = ({
   const onColorChange = (color: any) => {
     setColor(color.hex);
   };
-
-  const colors = [
-    "rgb(193,	 53,	19)", // r, 60s
-    "rgb(248,	 52,  35)", // r, 70s
-    "rgb(251,	  0,	66)", // r, 80s
-    "rgb(159,	 40,	20)", // r, 90s
-  ];
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
@@ -58,8 +50,7 @@ export const CreateCategoryDialog = ({
           <Grid container spacing={1}>
             <Grid item xs={2} className={classes.createCategoryDialogItem}>
               <ColorIcon
-                color={color}
-                colors={colors}
+                // color={color}
                 onColorChange={onColorChange}
               />
             </Grid>

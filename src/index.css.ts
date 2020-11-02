@@ -22,6 +22,9 @@ export const useStyles = makeStyles((theme) => ({
   classifierSettingsDialogContent: {
     marginTop: theme.spacing(8),
   },
+  colorPicker: {
+    margin: "16px",
+  },
   container: {
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),
