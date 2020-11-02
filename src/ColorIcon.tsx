@@ -2,32 +2,22 @@ import { Label } from "@material-ui/icons";
 import * as React from "react";
 import { Avatar, IconButton } from "@material-ui/core";
 import Popover from "@material-ui/core/Popover";
-import { CirclePicker } from "react-color";
+import { CirclePicker, ColorResult } from "react-color";
 import { useStyles } from "./index.css";
-import { useCallback, useState } from "react";
+import { COLORS } from "./store";
 
 type ColorIconButtonProps = {
-  color?: string;
+  color: string;
   onColorChange: (color: any) => void;
 };
 
 export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
-  if (!color) {
-    const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    // const color = (props.color !== "#00e676") ? props.color : '#'+(Math.floor(Math.random()*16777215).toString(16));
-  }
-
-  //const color = props.color;
-
-  // const color = props.color
   const classes = useStyles();
 
   const [
     colorMenuAnchorEl,
     setColorMenuAnchorEl,
   ] = React.useState<null | HTMLButtonElement>(null);
-
-  const [openColorDialog, setOpenColorDialog] = React.useState(false);
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
@@ -39,7 +29,8 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
     setColorMenuAnchorEl(null);
   };
 
-  const handleColorChange = (color: any) => {
+  const onChange = (color: ColorResult) => {
+    console.info(color);
     onColorChange(color);
     onCloseColorPicker();
   };
@@ -66,7 +57,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
         }}
       >
         <div className={classes.colorPicker}>
-          <CirclePicker color={color} onChange={handleColorChange} />
+          <CirclePicker colors={COLORS} onChange={onChange} />
         </div>
       </Popover>
     </React.Fragment>

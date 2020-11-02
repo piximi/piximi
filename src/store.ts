@@ -1,22 +1,43 @@
 import * as tensorflow from "@tensorflow/tfjs";
-import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { History, LayersModel, Scalar, Tensor } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
-import { Scalar } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import { createAction, createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { put, select, takeEvery } from "redux-saga/effects";
-import createSagaMiddleware from "redux-saga";
 import {
   configureStore,
+  createAction,
+  createReducer,
   EnhancedStore,
   Middleware,
+  PayloadAction,
   StoreEnhancer,
 } from "@reduxjs/toolkit";
+import { all, fork, put, select, takeEvery } from "redux-saga/effects";
+import createSagaMiddleware from "redux-saga";
 import logger from "redux-logger";
-import { all, fork } from "redux-saga/effects";
 import { v4 } from "uuid";
 import { findIndex } from "underscore";
 import { combineReducers } from "redux";
+
+export const COLORS = [
+  "#f44336",
+  "#e91e63",
+  "#9c27b0",
+  "#673ab7",
+  "#3f51b5",
+  "#2196f3",
+  "#03a9f4",
+  "#00bcd4",
+  "#009688",
+  "#4caf50",
+  "#8bc34a",
+  "#cddc39",
+  "#ffeb3b",
+  "#ffc107",
+  "#ff9800",
+  "#ff5722",
+  "#795548",
+  "#607d8b",
+];
 
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
