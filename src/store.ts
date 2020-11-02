@@ -453,7 +453,6 @@ export const predictedAction = createAction<{ predictions: Tensor }>(
 );
 
 export const saveAction = createAction<{}>("CLASSIFIER_SAVE");
-
 export const savedAction = createAction<{}>("CLASSIFIER_SAVED");
 
 export const toggleCategoryVisibilityAction = createAction<{
@@ -588,6 +587,14 @@ export const categorizedImagesSelector = ({
   });
 };
 
+export const classifierSelector = ({
+  classifier,
+}: {
+  classifier: Classifier;
+}): Classifier => {
+  return classifier;
+};
+
 export const compileOptionsSelector = ({
   classifier,
 }: {
@@ -671,6 +678,10 @@ export const openingSelector = ({
   classifier: Classifier;
 }): boolean => {
   return classifier.opening;
+};
+
+export const projectSelector = ({ project }: { project: Project }): Project => {
+  return project;
 };
 
 export const trainingPercentageSelector = ({
