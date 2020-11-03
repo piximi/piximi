@@ -4,12 +4,40 @@ import { bindMenu, PopupState } from "material-ui-popup-state/hooks";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
+import { useStyles } from "./index.css";
+import { createImageAction } from "./store";
+import { useDispatch } from "react-redux";
 
 type OpenMenuProps = {
   menu: PopupState;
 };
 
 export const OpenMenu = ({ menu }: OpenMenuProps) => {
+  const dispatch = useDispatch();
+
+  const classes = useStyles();
+
+  const onOpenProject = (event: React.ChangeEvent<HTMLInputElement>) => {
+    menu.close();
+    event.persist();
+    console.log(event.currentTarget.files);
+    if (event.currentTarget.files) {
+      const blob = event.currentTarget.files[0];
+
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        if (event.target) {
+          const src = event.target.result;
+
+          dispatch(createImageAction({ src: src as string }));
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    }
+  };
+
   return (
     <Menu
       anchorOrigin={{
@@ -24,13 +52,25 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
       {...bindMenu(menu)}
     >
       <MenuList dense variant="menu">
-        <MenuItem onClick={menu.close}>Open classifier</MenuItem>
+        <React.Fragment>
+          <input
+            accept="application/json"
+            className={classes.fileInput}
+            type="file"
+            id="open-project"
+            onChange={onOpenProject}
+          />
+
+          <label htmlFor="open-project">
+            <MenuItem onClick={menu.close}>Open project</MenuItem>
+          </label>
+        </React.Fragment>
 
         <Divider />
 
-        <MenuItem onClick={menu.close}>Open example classifier</MenuItem>
+        <MenuItem onClick={menu.close}>Open example project</MenuItem>
 
-        <MenuItem onClick={menu.close}>Open weights</MenuItem>
+        <MenuItem onClick={menu.close}>Open classifier</MenuItem>
       </MenuList>
     </Menu>
   );

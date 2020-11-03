@@ -435,6 +435,10 @@ export const openAction = createAction<{
   units: number;
 }>("CLASSIFIER_OPEN");
 
+export const openClassifierAction = createAction<{ classifier: Classifier }>(
+  "OPEN_PROJECT_CLASSIFIER"
+);
+
 export const openProjectAction = createAction<{ project: Project }>(
   "PROJECT_OPEN_PROJECT"
 );
