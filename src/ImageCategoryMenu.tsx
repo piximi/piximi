@@ -4,7 +4,7 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { updateImageCategoryAction } from "./store/actions";
-import { createdCategoriesSelector } from "./store/selectors";
+import { categoriesSelector } from "./store/selectors";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
 
@@ -19,7 +19,7 @@ export const ImageCategoryMenu = ({
   image,
   onClose,
 }: ImageCategoryMenuProps) => {
-  const categories = useSelector(createdCategoriesSelector);
+  const categories = useSelector(categoriesSelector);
 
   const dispatch = useDispatch();
 
