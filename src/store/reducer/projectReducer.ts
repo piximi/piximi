@@ -4,6 +4,7 @@ import {
   createImageAction,
   createProjectAction,
   updateCategoryAction,
+  updateCategoryVisibilityAction,
   updateImageCategoryAction,
 } from "../actions";
 import { v4 } from "uuid";
@@ -18,6 +19,7 @@ const initialState: Project = {
       color: "rgb(255, 255, 0)",
       id: "00000000-0000-0000-0000-000000000000",
       name: "Unknown",
+      visible: true,
     },
   ],
   images: [],
@@ -33,6 +35,7 @@ export const projectReducer = createReducer(initialState, {
       color: action.payload.color,
       id: v4().toString(),
       name: action.payload.name,
+      visible: true,
     };
 
     state.categories.push(category);
@@ -68,6 +71,16 @@ export const projectReducer = createReducer(initialState, {
     state.categories[index].name = action.payload.name;
     state.categories[index].color = action.payload.color;
   },
+  [updateCategoryVisibilityAction.type]: (
+    state: Project,
+    action: PayloadAction<{ id: string; visible: boolean }>
+  ) => {
+    const index = findIndex(state.categories, (category: Category) => {
+      return category.id === action.payload.id;
+    });
+    state.categories[index].visible = action.payload.visible;
+  },
+
   [updateImageCategoryAction.type]: (
     state: Project,
     action: PayloadAction<{ id: string; categoryId: string }>

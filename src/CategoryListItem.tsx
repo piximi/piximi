@@ -15,12 +15,20 @@ import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { Category } from "./types/Category";
+import {
+  updateBatchSizeAction,
+  updateCategoryAction,
+  updateCategoryVisibilityAction,
+} from "./store/actions";
+import { useDispatch } from "react-redux";
 
 type CategoryListItemProps = {
   category: Category;
 };
 
 export const CategoryListItem = ({ category }: CategoryListItemProps) => {
+  const dispatch = useDispatch();
+
   const [openEditCategoryDialog, setOpenEditCategoryDialog] = React.useState(
     false
   );
@@ -51,6 +59,22 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     setOpenEditCategoryDialog(false);
   };
 
+  // const [categoryVisible, setCategoryVisible] = React.useState(true);
+
+  const onToggleCategory = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    category: Category
+  ) => {
+    console.log("detected change");
+    const visible = !category.visible;
+    dispatch(
+      updateCategoryVisibilityAction({
+        id: category.id,
+        visible: visible,
+      })
+    );
+  };
+
   return (
     <React.Fragment>
       <ListItem dense key={category.id} id={category.id}>
@@ -62,6 +86,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             edge="start"
             icon={<LabelOutlinedIcon style={{ color: category.color }} />}
             tabIndex={-1}
+            onChange={(event) => onToggleCategory(event, category)}
           />
         </ListItemIcon>
 

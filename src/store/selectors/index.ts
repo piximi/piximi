@@ -114,6 +114,19 @@ export const imagesSelector = ({
   return project.images;
 };
 
+export const visibleImagesSelector = ({
+  project,
+}: {
+  project: Project;
+}): Array<Image> => {
+  return project.images.filter((image: Image) => {
+    const category = project.categories.find((c: Category) => {
+      return c.id === image.categoryId;
+    });
+    return category ? category.visible : true;
+  });
+};
+
 export const lossHistorySelector = ({
   classifier,
 }: {

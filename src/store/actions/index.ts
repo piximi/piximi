@@ -118,6 +118,11 @@ export const updateCategoryAction = createAction<{
   color: string;
 }>("update-category");
 
+export const updateCategoryVisibilityAction = createAction<{
+  id: string;
+  visible: boolean;
+}>("update-category-visibility");
+
 export const updateCategoryColorAction = createAction<{
   category: Category;
   color: string;
@@ -128,10 +133,10 @@ export const updateCategoryDescriptionAction = createAction<{
   description: string;
 }>("PROJECT_UPDATE_CATEGORY_DESCRIPTION");
 
-export const updateCategoryVisibilityAction = createAction<{
-  category: Category;
-  visible: boolean;
-}>("PROJECT_UPDATE_CATEGORY_VISIBILITY");
+// export const updateCategoryVisibilityAction = createAction<{
+//   category: Category;
+//   visible: boolean;
+// }>("PROJECT_UPDATE_CATEGORY_VISIBILITY");
 
 export const updateEpochsAction = createAction<{ epochs: number }>(
   "CLASSIFIER_UPDATE_EPOCHS"
