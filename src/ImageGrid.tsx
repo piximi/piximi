@@ -59,6 +59,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     const index = categories.findIndex((category: Category) => {
       return image.categoryId === category.id;
     });
+
     return categories[index];
   };
 
@@ -67,22 +68,26 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
       <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
         <Container className={classes.container} maxWidth="md">
           <GridList className={classes.gridList} cols={4}>
-            {images.map((photo: Image) => (
+            {images.map((image: Image) => (
               <GridListTile
-                key={photo.id}
-                onClick={() => onOpenImageDialog(photo)}
+                key={image.id}
+                onClick={() => onOpenImageDialog(image)}
               >
-                <img alt="" src={photo.src} />
+                <img alt="" src={image.src} />
 
                 <GridListTileBar
                   actionIcon={
                     <IconButton
                       className={classes.gridTileBarIconButton}
                       disableRipple
-                      onClick={(event) => onOpenCategoryMenu(event, photo)}
+                      onClick={(event) => onOpenCategoryMenu(event, image)}
                     >
                       <LabelIcon
-                        style={{ color: imageCategory(photo).color }}
+                        style={{
+                          color: imageCategory(image)
+                            ? imageCategory(image).color
+                            : "#AAAAAA",
+                        }}
                       />
                     </IconButton>
                   }

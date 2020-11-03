@@ -322,7 +322,7 @@ export const generator = (
       const image = images[index];
 
       const ys = categories.findIndex((category: Category) => {
-        if (category.id !== "00000000-0000-0000-0000-00000000000") {
+        if (category.id !== "00000000--0000-0000-00000000000") {
           return category.id === image.categoryId;
         }
       });
@@ -1053,6 +1053,14 @@ const projectReducer = createReducer(initialProjectState, {
     };
 
     state.images.push(image);
+  },
+  [createProjectAction.type]: (
+    state: Project,
+    action: PayloadAction<{ project: Project }>
+  ) => {
+    state.categories = action.payload.project.categories;
+    state.name = action.payload.project.name;
+    state.images = action.payload.project.images;
   },
   [updateCategoryAction.type]: (
     state: Project,

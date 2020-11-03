@@ -5,7 +5,7 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import { useStyles } from "./index.css";
-import { createImageAction } from "./store";
+import { createProjectAction } from "./store";
 import { useDispatch } from "react-redux";
 
 type OpenMenuProps = {
@@ -18,9 +18,14 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
   const classes = useStyles();
 
   const onOpenProject = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.info("onOpenProject");
+
     menu.close();
+
     event.persist();
+
     console.log(event.currentTarget.files);
+
     if (event.currentTarget.files) {
       const blob = event.currentTarget.files[0];
 
@@ -30,48 +35,52 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
         if (event.target) {
           const src = event.target.result;
 
-          dispatch(createImageAction({ src: src as string }));
+          dispatch(
+            createProjectAction({ project: JSON.parse(src as string).project })
+          );
         }
       };
 
-      reader.readAsDataURL(blob);
+      reader.readAsText(blob);
     }
   };
 
   return (
-    <Menu
-      anchorOrigin={{
-        horizontal: "center",
-        vertical: "bottom",
-      }}
-      getContentAnchorEl={null}
-      transformOrigin={{
-        horizontal: "center",
-        vertical: "top",
-      }}
-      {...bindMenu(menu)}
-    >
-      <MenuList dense variant="menu">
-        <React.Fragment>
-          <input
-            accept="application/json"
-            className={classes.fileInput}
-            type="file"
-            id="open-project"
-            onChange={onOpenProject}
-          />
+    <React.Fragment>
+      <input
+        accept="application/json"
+        className={classes.fileInput}
+        type="file"
+        id="open-project"
+        onChange={onOpenProject}
+      />
 
-          <label htmlFor="open-project">
-            <MenuItem onClick={menu.close}>Open project</MenuItem>
-          </label>
-        </React.Fragment>
+      <Menu
+        anchorOrigin={{
+          horizontal: "center",
+          vertical: "bottom",
+        }}
+        getContentAnchorEl={null}
+        transformOrigin={{
+          horizontal: "center",
+          vertical: "top",
+        }}
+        {...bindMenu(menu)}
+      >
+        <MenuList dense variant="menu">
+          <React.Fragment>
+            <label htmlFor="open-project">
+              <MenuItem onClick={menu.close}>Open project</MenuItem>
+            </label>
+          </React.Fragment>
 
-        <Divider />
+          <Divider />
 
-        <MenuItem onClick={menu.close}>Open example project</MenuItem>
+          <MenuItem onClick={menu.close}>Open example project</MenuItem>
 
-        <MenuItem onClick={menu.close}>Open classifier</MenuItem>
-      </MenuList>
-    </Menu>
+          <MenuItem onClick={menu.close}>Open classifier</MenuItem>
+        </MenuList>
+      </Menu>
+    </React.Fragment>
   );
 };
