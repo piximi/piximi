@@ -6,9 +6,9 @@ import {
   validationPercentageSelector,
 } from "../selectors";
 import { generatedAction, updateImagesPartitionsAction } from "../actions";
-import { generate } from "../../store";
 import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
+import { generate } from "../coroutines/generate";
 
 export function* generateSaga() {
   const images: Array<Image> = yield select(categorizedImagesSelector);

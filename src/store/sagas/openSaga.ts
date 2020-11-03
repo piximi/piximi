@@ -1,6 +1,6 @@
 import { put } from "redux-saga/effects";
 import { openedAction } from "../actions";
-import { open } from "../../store";
+import { open } from "../coroutines/open";
 
 export function* openSaga(action: any) {
   const { pathname, classes, units } = action.payload;

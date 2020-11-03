@@ -6,7 +6,7 @@ import {
   validationDataSelector,
 } from "../selectors";
 import { fittedAction } from "../actions";
-import { fit } from "../../store";
+import { fit } from "../coroutines/fit";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;

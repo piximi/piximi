@@ -1,7 +1,7 @@
 import { put, select } from "redux-saga/effects";
 import { openedSelector } from "../selectors";
 import { compiledAction } from "../actions";
-import { compile } from "../../store";
+import { compile } from "../coroutines/compile";
 
 export function* compileSaga(action: any) {
   const { options } = action.payload;
