@@ -10,7 +10,7 @@ import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
-import { categoriesSelector, imagesSelector } from "./store/selectors";
+import { createdCategoriesSelector, imagesSelector } from "./store/selectors";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
 
@@ -19,7 +19,7 @@ type ImageGridProps = {
 };
 
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(createdCategoriesSelector);
 
   const images = useSelector(imagesSelector);
 

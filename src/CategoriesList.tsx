@@ -13,11 +13,11 @@ import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { categoriesSelector } from "./store/selectors";
+import { createdCategoriesSelector } from "./store/selectors";
 import { Category } from "./types/Category";
 
 export const CategoriesList = () => {
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(createdCategoriesSelector);
 
   const [
     openCreateCategoryDialog,

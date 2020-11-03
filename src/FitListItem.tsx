@@ -15,7 +15,7 @@ import {
   updateValidationLossHistoryAction,
 } from "./store/actions";
 import {
-  categoriesSelector,
+  createdCategoriesSelector,
   categorizedImagesSelector,
   compiledSelector,
   compileOptionsSelector,
@@ -29,7 +29,7 @@ import {
 export const FitListItem = () => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(createdCategoriesSelector);
   const compileOptions = useSelector(compileOptionsSelector);
   const compiled = useSelector(compiledSelector);
   const data = useSelector(dataSelector);
