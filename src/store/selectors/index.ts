@@ -7,6 +7,7 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { FitOptions } from "../../types/FitOptions";
 import { Image } from "../../types/Image";
 import { Project } from "../../types/Project";
+
 export const categoriesCountSelector = ({
   project,
 }: {
@@ -14,6 +15,7 @@ export const categoriesCountSelector = ({
 }): number => {
   return project.categories.length - 1;
 };
+
 export const categoriesSelector = ({
   project,
 }: {
@@ -21,6 +23,7 @@ export const categoriesSelector = ({
 }): Array<Category> => {
   return project.categories;
 };
+
 export const createdCategoriesSelector = ({
   project,
 }: {
@@ -31,6 +34,7 @@ export const createdCategoriesSelector = ({
   });
   return sortBy(categories, "name");
 };
+
 export const categorizedImagesSelector = ({
   project,
 }: {
@@ -40,6 +44,7 @@ export const categorizedImagesSelector = ({
     return image.categoryId !== "00000000-0000-0000-0000-00000000000";
   });
 };
+
 export const classifierSelector = ({
   classifier,
 }: {
@@ -47,6 +52,7 @@ export const classifierSelector = ({
 }): Classifier => {
   return classifier;
 };
+
 export const compileOptionsSelector = ({
   classifier,
 }: {
@@ -59,6 +65,7 @@ export const compileOptionsSelector = ({
     optimizationAlgorithm: classifier.optimizationAlgorithm,
   };
 };
+
 export const compiledSelector = ({
   classifier,
 }: {
@@ -66,6 +73,7 @@ export const compiledSelector = ({
 }): LayersModel => {
   return classifier.compiled!;
 };
+
 export const dataSelector = ({
   classifier,
 }: {
@@ -73,6 +81,7 @@ export const dataSelector = ({
 }): Dataset<{ xs: Tensor; ys: Tensor }> => {
   return classifier.data!;
 };
+
 export const fitOptionsSelector = ({
   classifier,
 }: {
@@ -80,6 +89,7 @@ export const fitOptionsSelector = ({
 }): FitOptions => {
   return classifier.fitOptions;
 };
+
 export const fittedSelector = ({
   classifier,
 }: {
@@ -87,6 +97,7 @@ export const fittedSelector = ({
 }): LayersModel => {
   return classifier.fitted!;
 };
+
 export const generatorOptionsSelector = ({
   classifier,
 }: {
@@ -94,6 +105,7 @@ export const generatorOptionsSelector = ({
 }): { validationPercentage: number } => {
   return { validationPercentage: classifier.validationPercentage };
 };
+
 export const imagesSelector = ({
   project,
 }: {
@@ -101,6 +113,7 @@ export const imagesSelector = ({
 }): Array<Image> => {
   return project.images;
 };
+
 export const lossHistorySelector = ({
   classifier,
 }: {
@@ -108,6 +121,7 @@ export const lossHistorySelector = ({
 }): Array<{ x: number; y: number }> => {
   return classifier.lossHistory!;
 };
+
 export const openedSelector = ({
   classifier,
 }: {
@@ -115,6 +129,7 @@ export const openedSelector = ({
 }): LayersModel => {
   return classifier.opened!;
 };
+
 export const openingSelector = ({
   classifier,
 }: {
@@ -122,9 +137,11 @@ export const openingSelector = ({
 }): boolean => {
   return classifier.opening;
 };
+
 export const projectSelector = ({ project }: { project: Project }): Project => {
   return project;
 };
+
 export const trainingPercentageSelector = ({
   classifier,
 }: {
@@ -132,6 +149,7 @@ export const trainingPercentageSelector = ({
 }): number => {
   return classifier.trainingPercentage;
 };
+
 export const validationDataSelector = ({
   classifier,
 }: {
@@ -139,6 +157,7 @@ export const validationDataSelector = ({
 }): Dataset<{ xs: Tensor; ys: Tensor }> => {
   return classifier.validationData!;
 };
+
 export const validationLossHistorySelector = ({
   classifier,
 }: {
@@ -146,6 +165,7 @@ export const validationLossHistorySelector = ({
 }): Array<{ x: number; y: number }> => {
   return classifier.validationLossHistory!;
 };
+
 export const validationPercentageSelector = ({
   classifier,
 }: {
