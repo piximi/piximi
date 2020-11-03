@@ -15,7 +15,7 @@ import { all, fork, put, select, takeEvery } from "redux-saga/effects";
 import createSagaMiddleware from "redux-saga";
 import logger from "redux-logger";
 import { v4 } from "uuid";
-import { findIndex } from "underscore";
+import { findIndex, sortBy } from "underscore";
 import { combineReducers } from "redux";
 
 export const COLORS = [
@@ -576,9 +576,10 @@ export const categoriesSelector = ({
 }: {
   project: Project;
 }): Array<Category> => {
-  return project.categories.filter((category: Category) => {
-    return category.id !== "00000000-0000-0000-0000-00000000000";
+  const categories = project.categories.filter((category: Category) => {
+    return category.id !== "00000000-0000-0000-0000-000000000000";
   });
+  return sortBy(categories, "name");
 };
 
 export const categorizedImagesSelector = ({
