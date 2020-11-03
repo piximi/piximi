@@ -4,7 +4,9 @@ import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import { Dataset } from "@tensorflow/tfjs-data";
-import { Tensor } from "@tensorflow/tfjs";
+import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { CompileOptions } from "../../types/CompileOptions";
+import { FitOptions } from "../../types/FitOptions";
 
 const initialState: Classifier = {
   compiling: false,
@@ -33,13 +35,32 @@ const classifierSlice = createSlice({
   name: "model",
   initialState: initialState,
   reducers: {
-    compileClassifierAction(state) {
+    compileClassifierAction(
+      state,
+      action: PayloadAction<{ opened: LayersModel; options: CompileOptions }>
+    ) {
       state.compiling = true;
     },
-    fitClassifierAction(state) {
+    fitClassifierAction(
+      state,
+      action: PayloadAction<{
+        callback?: any;
+        compiled: LayersModel;
+        data: Dataset<{ xs: Tensor; ys: Tensor }>;
+        options: FitOptions;
+        validationData: Dataset<{ xs: Tensor; ys: Tensor }>;
+      }>
+    ) {
       state.fitting = true;
     },
-    openClassifierAction(state) {
+    openClassifierAction(
+      state,
+      action: PayloadAction<{
+        pathname: string;
+        classes: number;
+        units: number;
+      }>
+    ) {
       state.opening = true;
     },
     preprocessClassifierAction(state) {
@@ -55,7 +76,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierCompiledAction(
       state,
-      action: PayloadAction<{ compiled: any }>
+      action: PayloadAction<{ compiled: LayersModel }>
     ) {
       const { compiled } = action.payload;
 
@@ -73,7 +94,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierFittedAction(
       state,
-      action: PayloadAction<{ fitted: any; history: any }>
+      action: PayloadAction<{ fitted: LayersModel; history: History }>
     ) {
       const { fitted, history } = action.payload;
 
@@ -101,7 +122,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierLossHistoryAction(
       state,
-      action: PayloadAction<{ batch: any; loss: any }>
+      action: PayloadAction<{ batch: number; loss: number }>
     ) {
       const { batch, loss } = action.payload;
 
@@ -109,7 +130,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierMetricsAction(
       state,
-      action: PayloadAction<{ metrics: any }>
+      action: PayloadAction<{ metrics: Array<Metric> }>
     ) {
       const { metrics } = action.payload;
 
@@ -117,7 +138,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierOpenedAction(
       state,
-      action: PayloadAction<{ opened: any }>
+      action: PayloadAction<{ opened: LayersModel }>
     ) {
       const { opened } = action.payload;
 
@@ -148,7 +169,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierTrainingPercentageAction(
       state,
-      action: PayloadAction<{ trainingPercentage: any }>
+      action: PayloadAction<{ trainingPercentage: number }>
     ) {
       const { trainingPercentage } = action.payload;
 
@@ -159,7 +180,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierValidationLossHistoryAction(
       state,
-      action: PayloadAction<{ batch: any; loss: any }>
+      action: PayloadAction<{ batch: number; loss: number }>
     ) {
       const { batch, loss } = action.payload;
 
@@ -173,7 +194,7 @@ const classifierSlice = createSlice({
     },
     updateClassifierValidationPercentageAction(
       state,
-      action: PayloadAction<{ validationPercentage: any }>
+      action: PayloadAction<{ validationPercentage: number }>
     ) {
       const { validationPercentage } = action.payload;
 
@@ -206,4 +227,4 @@ export const {
   updateClassifierValidationPercentageAction,
 } = classifierSlice.actions;
 
-export const reducer = classifierSlice.reducer;
+export const classifierReducer = classifierSlice.reducer;
