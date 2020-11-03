@@ -4,9 +4,9 @@ import {
   dataSelector,
   fitOptionsSelector,
   validationDataSelector,
-} from "../selectors";
-import { fittedAction } from "../actions";
-import { fit } from "../coroutines/fit";
+} from "../../selectors";
+import { fittedModelAction } from "../../actions";
+import { fit } from "../../coroutines/model/fit";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;
@@ -27,5 +27,5 @@ export function* fitSaga(action: any) {
     callback
   );
 
-  yield put(fittedAction({ fitted: fitted, status: status }));
+  yield put(fittedModelAction({ fitted: fitted, status: status }));
 }

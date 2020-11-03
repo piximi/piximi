@@ -2,8 +2,8 @@ import { generate } from "@piximi/models";
 import { Category, Image, Partition } from "@piximi/types";
 import { put, takeEvery } from "redux-saga/effects";
 
-import { generateAction, generatedAction } from "../actions";
-import { generateSaga, watchGenerateActionSaga } from "./generateSaga";
+import { preprocessModelAction, preprocessedModelAction } from "../../actions";
+import { preprocessSaga, watchGenerateActionSaga } from "./preprocessSaga";
 
 const categories: Array<Category> = [
   {
@@ -62,7 +62,7 @@ describe("generateSaga", () => {
     const saga = watchGenerateActionSaga();
 
     expect(saga.next().value).toEqual(
-      takeEvery("CLASSIFIER_GENERATE", generateSaga)
+      takeEvery("CLASSIFIER_GENERATE", preprocessSaga)
     );
 
     expect(saga.next().done).toBeTruthy();
@@ -71,7 +71,7 @@ describe("generateSaga", () => {
   it("executes the `generate` function", async () => {
     const { data, validationData } = await generate(images, categories);
 
-    const generator = generateSaga();
+    const generator = preprocessSaga();
 
     await generator.next();
 

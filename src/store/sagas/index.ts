@@ -1,1 +1,1 @@
-export { root } from "./root";
+export { rootSaga } from "./rootSaga";

@@ -4,13 +4,16 @@ import {
   categorizedImagesSelector,
   trainingPercentageSelector,
   validationPercentageSelector,
-} from "../selectors";
-import { generatedAction, updateImagesPartitionsAction } from "../actions";
-import { Category } from "../../types/Category";
-import { Image } from "../../types/Image";
-import { generate } from "../coroutines/generate";
+} from "../../selectors";
+import {
+  preprocessedModelAction,
+  updateImagesPartitionsAction,
+} from "../../actions";
+import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
+import { preprocess } from "../../coroutines/model";
 
-export function* generateSaga() {
+export function* preprocessSaga() {
   const images: Array<Image> = yield select(categorizedImagesSelector);
 
   const categories: Array<Category> = yield select(categoriesSelector);
@@ -25,7 +28,7 @@ export function* generateSaga() {
     })
   );
 
-  const { data } = yield generate(images, categories);
+  const { data } = yield preprocess(images, categories);
 
-  yield put(generatedAction({ data: data }));
+  yield put(preprocessedModelAction({ data: data }));
 }

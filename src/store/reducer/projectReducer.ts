@@ -1,7 +1,7 @@
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
 import {
-  createCategoryAction,
-  createImageAction,
+  createProjectCategoryAction,
+  createProjectImageAction,
   createProjectAction,
   updateCategoryAction,
   updateImageCategoryAction,
@@ -25,7 +25,7 @@ const initialState: Project = {
 };
 
 export const projectReducer = createReducer(initialState, {
-  [createCategoryAction.type]: (
+  [createProjectCategoryAction.type]: (
     state: Project,
     action: PayloadAction<{ name: string; color: string }>
   ) => {
@@ -37,7 +37,7 @@ export const projectReducer = createReducer(initialState, {
 
     state.categories.push(category);
   },
-  [createImageAction.type]: (
+  [createProjectImageAction.type]: (
     state: Project,
     action: PayloadAction<{ src: string }>
   ) => {

@@ -11,25 +11,25 @@ import { FitOptions } from "../../types/FitOptions";
 import { Image } from "../../types/Image";
 import { Project } from "../../types/Project";
 
-export const compileAction = createAction<{
+export const compileModelAction = createAction<{
   opened: LayersModel;
   options: CompileOptions;
 }>("CLASSIFIER_COMPILE");
 
-export const compiledAction = createAction<{ compiled: LayersModel }>(
+export const compiledModelAction = createAction<{ compiled: LayersModel }>(
   "CLASSIFIER_COMPILED"
 );
 
-export const createCategoryAction = createAction<{
+export const createProjectCategoryAction = createAction<{
   name: string;
   color: string;
 }>("PROJECT_CREATE_CATEGORY");
 
-export const createImageAction = createAction<{ src: string }>(
+export const createProjectImageAction = createAction<{ src: string }>(
   "PROJECT_CREATE_IMAGE"
 );
 
-export const createImagesAction = createAction<{ images: Array<Image> }>(
+export const createProjectImagesAction = createAction<{ images: Array<Image> }>(
   "PROJECT_CREATE_IMAGES"
 );
 
@@ -37,24 +37,15 @@ export const createProjectAction = createAction<{ project: Project }>(
   "PROJECT_CREATE_PROJECT"
 );
 
-export const deleteCategoryAction = createAction<{ category: Category }>(
+export const deleteProjectCategoryAction = createAction<{ category: Category }>(
   "PROJECT_DELETE_CATEGORY"
 );
 
-export const deleteImageAction = createAction<{ image: Image }>(
+export const deleteProjectImageAction = createAction<{ image: Image }>(
   "PROJECT_DELETE_IMAGE"
 );
 
-export const evaluateAction = createAction<{
-  fitted: LayersModel;
-  data: Dataset<{ xs: Tensor; ys: Tensor }>;
-}>("CLASSIFIER_EVALUATE");
-
-export const evaluatedAction = createAction<{
-  evaluations: Scalar | Array<Scalar>;
-}>("CLASSIFIER_EVALUATED");
-
-export const fitAction = createAction<{
+export const fitModelAction = createAction<{
   compiled: LayersModel;
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
   validationData: Dataset<{ xs: Tensor; ys: Tensor }>;
@@ -62,18 +53,18 @@ export const fitAction = createAction<{
   callback?: any;
 }>("CLASSIFIER_FIT");
 
-export const fittedAction = createAction<{
+export const fittedModelAction = createAction<{
   fitted: LayersModel;
   status: History;
 }>("CLASSIFIER_FITTED");
 
-export const generateAction = createAction<{}>("CLASSIFIER_GENERATE");
+export const preprocessModelAction = createAction<{}>("CLASSIFIER_GENERATE");
 
-export const generatedAction = createAction<{
+export const preprocessedModelAction = createAction<{
   data: Dataset<{ xs: Tensor; ys: Tensor }>;
 }>("CLASSIFIER_GENERATED");
 
-export const openAction = createAction<{
+export const openModelAction = createAction<{
   pathname: string;
   classes: number;
   units: number;
@@ -87,22 +78,9 @@ export const openProjectAction = createAction<{ project: Project }>(
   "PROJECT_OPEN_PROJECT"
 );
 
-export const openedAction = createAction<{ opened: LayersModel }>(
+export const openedModelAction = createAction<{ opened: LayersModel }>(
   "CLASSIFIER_OPENED"
 );
-
-export const predictAction = createAction<{
-  compiled: LayersModel;
-  data: Dataset<{ xs: Tensor; ys: Tensor }>;
-}>("CLASSIFIER_PREDICT");
-
-export const predictedAction = createAction<{ predictions: Tensor }>(
-  "CLASSIFIER_PREDICTED"
-);
-
-export const saveAction = createAction<{}>("CLASSIFIER_SAVE");
-
-export const savedAction = createAction<{}>("CLASSIFIER_SAVED");
 
 export const toggleCategoryVisibilityAction = createAction<{
   category: Category;

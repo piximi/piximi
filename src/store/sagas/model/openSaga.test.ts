@@ -1,7 +1,7 @@
 import { put, takeEvery } from "redux-saga/effects";
 import { open } from "@piximi/models";
 
-import { openAction, openedAction } from "../actions";
+import { openModelAction, openedModelAction } from "../../actions";
 import { openSaga, watchOpenActionSaga } from "./openSaga";
 
 describe("open", () => {
@@ -20,13 +20,13 @@ describe("open", () => {
     const opened = await open(pathname, 10, 100);
 
     const generator = openSaga(
-      openAction({ pathname: pathname, classes: 10, units: 100 })
+      openModelAction({ pathname: pathname, classes: 10, units: 100 })
     );
 
     const _ = await generator.next();
 
     expect(generator.next(opened).value).toEqual(
-      put(openedAction({ opened: opened }))
+      put(openedModelAction({ opened: opened }))
     );
 
     expect(generator.next().done).toBeTruthy();

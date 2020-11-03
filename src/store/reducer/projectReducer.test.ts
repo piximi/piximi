@@ -1,8 +1,3 @@
-import { Category, Image, Partition, Project } from "@piximi/types";
-
-import * as actions from "../actions";
-import * as project from "./project";
-
 const unknownCategory: Category = {
   description: "Unknown",
   identifier: "00000000-0000-0000-0000-000000000000",

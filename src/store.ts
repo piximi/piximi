@@ -1,14 +1,3 @@
-import {
-  configureStore,
-  EnhancedStore,
-  Middleware,
-  StoreEnhancer,
-} from "@reduxjs/toolkit";
-import createSagaMiddleware from "redux-saga";
-import logger from "redux-logger";
-import { root } from "./store/sagas";
-import { reducer } from "./store/reducer";
-
 export const COLORS = [
   "#f44336",
   "#e91e63",
@@ -29,35 +18,3 @@ export const COLORS = [
   "#795548",
   "#607d8b",
 ];
-
-/*
- * Sagas
- */
-
-/*
- * Reducers
- */
-
-/*
- * Store
- */
-
-const saga = createSagaMiddleware();
-
-const enhancers: StoreEnhancer[] = [];
-
-const middleware: Middleware[] = [logger, saga];
-
-const preloadedState = {};
-
-const options = {
-  devTools: true,
-  enhancers: enhancers,
-  middleware: middleware,
-  preloadedState: preloadedState,
-  reducer: reducer,
-};
-
-export const store: EnhancedStore = configureStore(options);
-
-saga.run(root);

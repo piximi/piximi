@@ -1,11 +1,11 @@
 import { put } from "redux-saga/effects";
-import { openedAction } from "../actions";
-import { open } from "../coroutines/open";
+import { openedModelAction } from "../../actions";
+import { open } from "../../coroutines/model";
 
 export function* openSaga(action: any) {
   const { pathname, classes, units } = action.payload;
 
   const opened = yield open(pathname, classes, units);
 
-  yield put(openedAction({ opened: opened }));
+  yield put(openedModelAction({ opened: opened }));
 }

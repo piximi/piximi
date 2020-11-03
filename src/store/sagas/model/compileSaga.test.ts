@@ -2,7 +2,7 @@ import { compile, open } from "@piximi/models";
 import { Loss, Metric, Optimizer } from "@piximi/types";
 import { put, takeEvery } from "redux-saga/effects";
 
-import { compileAction, compiledAction } from "../actions";
+import { compileModelAction, compiledModelAction } from "../../actions";
 import { compileSaga, watchCompileActionSaga } from "./compileSaga";
 
 describe("compile", () => {
@@ -32,13 +32,13 @@ describe("compile", () => {
     const compiled = await compile(opened, options);
 
     const generator = compileSaga(
-      compileAction({ opened: opened, options: options })
+      compileModelAction({ opened: opened, options: options })
     );
 
     await generator.next();
 
     expect(generator.next(compiled).value).toEqual(
-      put(compiledAction({ compiled: compiled }))
+      put(compiledModelAction({ compiled: compiled }))
     );
 
     expect(generator.next().done).toBeTruthy();

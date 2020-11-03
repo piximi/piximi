@@ -6,11 +6,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
 import {
-  compileAction,
-  fitAction,
-  generateAction,
-  generatedAction,
-  openAction,
+  compileModelAction,
+  fitModelAction,
+  preprocessModelAction,
+  preprocessedModelAction,
+  openModelAction,
   updateLossHistoryAction,
   updateValidationLossHistoryAction,
 } from "./store/actions";
@@ -60,7 +60,7 @@ export const FitListItem = () => {
     // dispatch(openAction({ pathname: pathname, classes: 10, units: 100 }));
     // dispatch(compileAction({ opened: opened, options: compileOptions}));
     dispatch(
-      generateAction({
+      preprocessModelAction({
         images: images,
         categories: categories,
         options: { validationPercentage: validationPercentage },

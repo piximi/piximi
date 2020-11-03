@@ -1,7 +1,7 @@
 import { put, select } from "redux-saga/effects";
-import { openedSelector } from "../selectors";
-import { compiledAction } from "../actions";
-import { compile } from "../coroutines/compile";
+import { openedSelector } from "../../selectors";
+import { compiledModelAction } from "../../actions";
+import { compile } from "../../coroutines/model/compile";
 
 export function* compileSaga(action: any) {
   const { options } = action.payload;
@@ -10,5 +10,5 @@ export function* compileSaga(action: any) {
 
   const compiled = yield compile(opened, options);
 
-  yield put(compiledAction({ compiled: compiled }));
+  yield put(compiledModelAction({ compiled: compiled }));
 }

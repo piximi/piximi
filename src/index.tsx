@@ -5,10 +5,10 @@ import ReactDOM from "react-dom";
 
 import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
-import { store } from "./store";
 import { ImageGrid } from "./ImageGrid";
 import { ApplicationDrawer } from "./ApplicationDrawer";
 import { ApplicationAppBar } from "./ApplicationAppBar";
+import { productionStore } from "./store/stores";
 
 const Application = () => {
   const [openDrawer, setOpenDrawer] = React.useState(true);
@@ -39,7 +39,7 @@ const Application = () => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <Provider store={productionStore}>
       <Application />
     </Provider>
   </React.StrictMode>,

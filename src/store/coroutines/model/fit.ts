@@ -1,6 +1,6 @@
 import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
-import { FitOptions } from "../../types/FitOptions";
+import { FitOptions } from "../../../types/FitOptions";
 
 export const fit = async (
   compiled: LayersModel,

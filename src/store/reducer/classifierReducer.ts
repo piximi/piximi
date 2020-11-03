@@ -1,19 +1,13 @@
 import { createReducer } from "@reduxjs/toolkit";
 import {
-  compileAction,
-  compiledAction,
-  evaluateAction,
-  evaluatedAction,
-  fitAction,
-  fittedAction,
-  generateAction,
-  generatedAction,
-  openAction,
-  openedAction,
-  predictAction,
-  predictedAction,
-  saveAction,
-  savedAction,
+  compileModelAction,
+  compiledModelAction,
+  fitModelAction,
+  fittedModelAction,
+  preprocessModelAction,
+  preprocessedModelAction,
+  openModelAction,
+  openedModelAction,
   updateBatchSizeAction,
   updateEpochsAction,
   updateLearningRateAction,
@@ -54,13 +48,13 @@ const initialState: Classifier = {
 };
 
 export const classifierReducer = createReducer(initialState, {
-  [compileAction.type]: (state) => {
+  [compileModelAction.type]: (state) => {
     return {
       ...state,
       compiling: true,
     };
   },
-  [compiledAction.type]: (state, action) => {
+  [compiledModelAction.type]: (state, action) => {
     const { compiled } = action.payload;
 
     return {
@@ -69,28 +63,13 @@ export const classifierReducer = createReducer(initialState, {
       compiling: false,
     };
   },
-  [evaluateAction.type]: (state) => {
-    return {
-      ...state,
-      evaluating: true,
-    };
-  },
-  [evaluatedAction.type]: (state, action) => {
-    const { evaluations } = action.payload;
-
-    return {
-      ...state,
-      evaluating: false,
-      evaluations: evaluations,
-    };
-  },
-  [fitAction.type]: (state) => {
+  [fitModelAction.type]: (state) => {
     return {
       ...state,
       fitting: true,
     };
   },
-  [fittedAction.type]: (state, action) => {
+  [fittedModelAction.type]: (state, action) => {
     const { fitted, history } = action.payload;
 
     return {
@@ -100,13 +79,13 @@ export const classifierReducer = createReducer(initialState, {
       history: history,
     };
   },
-  [generateAction.type]: (state) => {
+  [preprocessModelAction.type]: (state) => {
     return {
       ...state,
       generating: true,
     };
   },
-  [generatedAction.type]: (state, action) => {
+  [preprocessedModelAction.type]: (state, action) => {
     const { data, validationData } = action.payload;
 
     return {
@@ -116,13 +95,13 @@ export const classifierReducer = createReducer(initialState, {
       validationData: validationData,
     };
   },
-  [openAction.type]: (state) => {
+  [openModelAction.type]: (state) => {
     return {
       ...state,
       opening: true,
     };
   },
-  [openedAction.type]: (state, action) => {
+  [openedModelAction.type]: (state, action) => {
     const { opened } = action.payload;
 
     return {
@@ -131,28 +110,6 @@ export const classifierReducer = createReducer(initialState, {
       opening: false,
     };
   },
-  [predictAction.type]: (state) => {
-    return {
-      ...state,
-      predicting: true,
-    };
-  },
-  [predictedAction.type]: (state, action) => {
-    const { predictions } = action.payload;
-
-    return {
-      ...state,
-      predicting: false,
-      predictions: predictions,
-    };
-  },
-  [saveAction.type]: (state) => {
-    return {
-      ...state,
-      saving: true,
-    };
-  },
-  [savedAction.type]: (state, action) => {},
   [updateBatchSizeAction.type]: (state, action) => {
     const { batchSize } = action.payload;
     state.fitOptions.batchSize = batchSize;

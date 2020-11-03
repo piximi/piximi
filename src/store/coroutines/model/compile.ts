@@ -1,7 +1,7 @@
 import * as tensorflow from "@tensorflow/tfjs";
-import { CompileOptions } from "../../types/CompileOptions";
-import { LossFunction } from "../../types/LossFunction";
-import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { CompileOptions } from "../../../types/CompileOptions";
+import { LossFunction } from "../../../types/LossFunction";
+import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
 
 export const compile = (
   opened: tensorflow.LayersModel,

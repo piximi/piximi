@@ -11,7 +11,7 @@ import {
 } from "@piximi/types";
 import { put, takeEvery } from "redux-saga/effects";
 
-import { fitAction, fittedAction } from "../actions";
+import { fitModelAction, fittedModelAction } from "../../actions";
 import { fitSaga, watchFitActionSaga } from "./fitSaga";
 
 jest.setTimeout(50000);
@@ -112,12 +112,12 @@ describe("fit", () => {
       options: options,
     };
 
-    const generator = fitSaga(fitAction(payload));
+    const generator = fitSaga(fitModelAction(payload));
 
     await generator.next();
 
     expect(generator.next({ fitted: fitted, status: status }).value).toEqual(
-      put(fittedAction({ fitted: fitted, status: status }))
+      put(fittedModelAction({ fitted: fitted, status: status }))
     );
 
     expect(generator.next().done).toBeTruthy();
