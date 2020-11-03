@@ -1,14 +1,14 @@
-import { generate } from "@piximi/models";
-import { put, select, takeEvery } from "redux-saga/effects";
-import { Category, Image } from "@piximi/types";
-import { generatedAction, updateImagesPartitionsAction } from "../actions";
+import { put, select } from "redux-saga/effects";
 import {
   categoriesSelector,
   categorizedImagesSelector,
-  generatorOptionsSelector,
   trainingPercentageSelector,
   validationPercentageSelector,
 } from "../selectors";
+import { generatedAction, updateImagesPartitionsAction } from "../actions";
+import { generate } from "../../store";
+import { Category } from "../../types/Category";
+import { Image } from "../../types/Image";
 
 export function* generateSaga() {
   const images: Array<Image> = yield select(categorizedImagesSelector);
@@ -25,11 +25,7 @@ export function* generateSaga() {
     })
   );
 
-  const { data, validationData } = yield generate(images, categories);
+  const { data } = yield generate(images, categories);
 
-  yield put(generatedAction({ data: data, validationData: validationData }));
-}
-
-export function* watchGenerateActionSaga() {
-  yield takeEvery("CLASSIFIER_GENERATE", generateSaga);
+  yield put(generatedAction({ data: data }));
 }

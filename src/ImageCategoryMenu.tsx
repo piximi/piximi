@@ -1,12 +1,12 @@
 import React from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
-import { Category } from "./store";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
-import { Image } from "./store";
 import { updateImageCategoryAction } from "./store/actions";
 import { categoriesSelector } from "./store/selectors";
+import { Category } from "./types/Category";
+import { Image } from "./types/Image";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;

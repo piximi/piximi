@@ -1,9 +1,36 @@
-import { ClassifierState, Loss, Metric, Optimizer } from "@piximi/types";
 import { createReducer } from "@reduxjs/toolkit";
+import {
+  compileAction,
+  compiledAction,
+  evaluateAction,
+  evaluatedAction,
+  fitAction,
+  fittedAction,
+  generateAction,
+  generatedAction,
+  openAction,
+  openedAction,
+  predictAction,
+  predictedAction,
+  saveAction,
+  savedAction,
+  updateBatchSizeAction,
+  updateEpochsAction,
+  updateLearningRateAction,
+  updateLossFunctionAction,
+  updateLossHistoryAction,
+  updateMetricsAction,
+  updateOptimizationAlgorithmAction,
+  updateTrainingPercentageAction,
+  updateValidationLossHistoryAction,
+  updateValidationPercentageAction,
+} from "../actions";
+import { LossFunction } from "../../types/LossFunction";
+import { Metric } from "../../types/Metric";
+import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { Classifier } from "../../types/Classifier";
 
-import * as actions from "../actions";
-
-const state: ClassifierState = {
+const initialState: Classifier = {
   compiling: false,
   evaluating: false,
   fitOptions: {
@@ -14,11 +41,11 @@ const state: ClassifierState = {
   fitting: false,
   generating: false,
   learningRate: 0.01,
-  lossFunction: Loss.CategoricalCrossentropy,
+  lossFunction: LossFunction.SoftmaxCrossEntropy,
   lossHistory: [],
   metrics: [Metric.CategoricalAccuracy],
   opening: false,
-  optimizationFunction: Optimizer.SGD,
+  optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
   predicting: false,
   saving: false,
   trainingPercentage: 0.5,
@@ -26,14 +53,14 @@ const state: ClassifierState = {
   validationPercentage: 0.25,
 };
 
-export const reducer = createReducer(state, {
-  [actions.compileAction.toString()]: (state) => {
+export const classifierReducer = createReducer(initialState, {
+  [compileAction.type]: (state) => {
     return {
       ...state,
       compiling: true,
     };
   },
-  [actions.compiledAction.toString()]: (state, action) => {
+  [compiledAction.type]: (state, action) => {
     const { compiled } = action.payload;
 
     return {
@@ -42,13 +69,13 @@ export const reducer = createReducer(state, {
       compiling: false,
     };
   },
-  [actions.evaluateAction.toString()]: (state) => {
+  [evaluateAction.type]: (state) => {
     return {
       ...state,
       evaluating: true,
     };
   },
-  [actions.evaluatedAction.toString()]: (state, action) => {
+  [evaluatedAction.type]: (state, action) => {
     const { evaluations } = action.payload;
 
     return {
@@ -57,13 +84,13 @@ export const reducer = createReducer(state, {
       evaluations: evaluations,
     };
   },
-  [actions.fitAction.toString()]: (state) => {
+  [fitAction.type]: (state) => {
     return {
       ...state,
       fitting: true,
     };
   },
-  [actions.fittedAction.toString()]: (state, action) => {
+  [fittedAction.type]: (state, action) => {
     const { fitted, history } = action.payload;
 
     return {
@@ -73,13 +100,13 @@ export const reducer = createReducer(state, {
       history: history,
     };
   },
-  [actions.generateAction.toString()]: (state) => {
+  [generateAction.type]: (state) => {
     return {
       ...state,
       generating: true,
     };
   },
-  [actions.generatedAction.toString()]: (state, action) => {
+  [generatedAction.type]: (state, action) => {
     const { data, validationData } = action.payload;
 
     return {
@@ -89,13 +116,13 @@ export const reducer = createReducer(state, {
       validationData: validationData,
     };
   },
-  [actions.openAction.toString()]: (state) => {
+  [openAction.type]: (state) => {
     return {
       ...state,
       opening: true,
     };
   },
-  [actions.openedAction.toString()]: (state, action) => {
+  [openedAction.type]: (state, action) => {
     const { opened } = action.payload;
 
     return {
@@ -104,13 +131,13 @@ export const reducer = createReducer(state, {
       opening: false,
     };
   },
-  [actions.predictAction.toString()]: (state) => {
+  [predictAction.type]: (state) => {
     return {
       ...state,
       predicting: true,
     };
   },
-  [actions.predictedAction.toString()]: (state, action) => {
+  [predictedAction.type]: (state, action) => {
     const { predictions } = action.payload;
 
     return {
@@ -119,22 +146,22 @@ export const reducer = createReducer(state, {
       predictions: predictions,
     };
   },
-  [actions.saveAction.toString()]: (state) => {
+  [saveAction.type]: (state) => {
     return {
       ...state,
       saving: true,
     };
   },
-  [actions.savedAction.toString()]: (state, action) => {},
-  [actions.updateBatchSizeAction.toString()]: (state, action) => {
+  [savedAction.type]: (state, action) => {},
+  [updateBatchSizeAction.type]: (state, action) => {
     const { batchSize } = action.payload;
     state.fitOptions.batchSize = batchSize;
   },
-  [actions.updateEpochsAction.toString()]: (state, action) => {
+  [updateEpochsAction.type]: (state, action) => {
     const { epochs } = action.payload;
     state.fitOptions.epochs = epochs;
   },
-  [actions.updateLearningRateAction.toString()]: (state, action) => {
+  [updateLearningRateAction.type]: (state, action) => {
     const { learningRate } = action.payload;
 
     return {
@@ -142,7 +169,7 @@ export const reducer = createReducer(state, {
       learningRate: learningRate,
     };
   },
-  [actions.updateLossFunctionAction.toString()]: (state, action) => {
+  [updateLossFunctionAction.type]: (state, action) => {
     const { lossFunction } = action.payload;
 
     return {
@@ -150,15 +177,15 @@ export const reducer = createReducer(state, {
       lossFunction: lossFunction,
     };
   },
-  [actions.updateLossHistoryAction.toString()]: (state, action) => {
+  [updateLossHistoryAction.type]: (state, action) => {
     const { batch, loss } = action.payload;
 
     return {
       ...state,
-      lossHistory: [...state.lossHistory, { x: batch, y: loss }],
+      lossHistory: [...state.lossHistory!, { x: batch, y: loss }],
     };
   },
-  [actions.updateMetricsAction.toString()]: (state, action) => {
+  [updateMetricsAction.type]: (state, action) => {
     const { metrics } = action.payload;
 
     return {
@@ -166,7 +193,7 @@ export const reducer = createReducer(state, {
       metrics: metrics,
     };
   },
-  [actions.updateOptimizationFunctionAction.toString()]: (state, action) => {
+  [updateOptimizationAlgorithmAction.type]: (state, action) => {
     const { optimizationFunction } = action.payload;
 
     return {
@@ -174,26 +201,26 @@ export const reducer = createReducer(state, {
       optimizationFunction: optimizationFunction,
     };
   },
-  [actions.updateTrainingPercentageAction.toString()]: (state, action) => {
-    const { trainingPercentage: trainingPercentage } = action.payload;
+  [updateTrainingPercentageAction.type]: (state, action) => {
+    const { trainingPercentage } = action.payload;
 
     return {
       ...state,
       trainingPercentage: trainingPercentage,
     };
   },
-  [actions.updateValidationLossHistoryAction.toString()]: (state, action) => {
+  [updateValidationLossHistoryAction.type]: (state, action) => {
     const { batch, loss } = action.payload;
 
     return {
       ...state,
       validationLossHistory: [
-        ...state.validationLossHistory,
+        ...state.validationLossHistory!,
         { x: batch, y: loss },
       ],
     };
   },
-  [actions.updateValidationPercentageAction.toString()]: (state, action) => {
+  [updateValidationPercentageAction.type]: (state, action) => {
     const { validationPercentage } = action.payload;
 
     return {

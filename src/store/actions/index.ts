@@ -1,17 +1,15 @@
 import { createAction } from "@reduxjs/toolkit";
 import { History, LayersModel, Scalar, Tensor } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
-import {
-  Category,
-  Classifier,
-  CompileOptions,
-  FitOptions,
-  Image,
-  LossFunction,
-  Metric,
-  OptimizationAlgorithm,
-  Project,
-} from "../../store";
+import { LossFunction } from "../../types/LossFunction";
+import { Metric } from "../../types/Metric";
+import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { Category } from "../../types/Category";
+import { Classifier } from "../../types/Classifier";
+import { CompileOptions } from "../../types/CompileOptions";
+import { FitOptions } from "../../types/FitOptions";
+import { Image } from "../../types/Image";
+import { Project } from "../../types/Project";
 
 export const compileAction = createAction<{
   opened: LayersModel;

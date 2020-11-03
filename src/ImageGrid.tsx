@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import Container from "@material-ui/core/Container";
 import GridList from "@material-ui/core/GridList";
-import { Category, Image } from "./store";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
@@ -12,6 +11,8 @@ import { useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 import { categoriesSelector, imagesSelector } from "./store/selectors";
+import { Category } from "./types/Category";
+import { Image } from "./types/Image";
 
 type ImageGridProps = {
   openDrawer: boolean;

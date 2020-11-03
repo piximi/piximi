@@ -1,8 +1,8 @@
 import { Box, PerspectiveCamera } from "@react-three/drei";
 import React from "react";
 import * as THREE from "three";
-import { Image } from "../store";
 import { Canvas } from "react-three-fiber";
+import { Image } from "../types/Image";
 
 type ImageCanvasProps = {
   image: Image;

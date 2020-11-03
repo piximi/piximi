@@ -1,6 +1,5 @@
 import Dialog from "@material-ui/core/Dialog";
 import React from "react";
-import { Image } from "../store";
 import { TransitionProps } from "@material-ui/core/transitions";
 import { CategoriesDrawer } from "./CategoriesDrawer";
 import { ImageProcessingDrawer } from "./ImageProcessingDrawer";
@@ -11,6 +10,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import { Image } from "../types/Image";
 
 type ImageDialogProps = {
   onClose: () => void;

@@ -1,5 +1,4 @@
 import React from "react";
-import { Category } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -15,6 +14,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import { EditCategoryDialog } from "./EditCategoryDialog";
+import { Category } from "./types/Category";
 
 type CategoryListItemProps = {
   category: Category;

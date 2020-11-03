@@ -1,13 +1,12 @@
-import { fit } from "@piximi/models";
-import { put, select, takeEvery } from "redux-saga/effects";
-
-import { fittedAction } from "../actions";
+import { put, select } from "redux-saga/effects";
 import {
   compiledSelector,
   dataSelector,
   fitOptionsSelector,
   validationDataSelector,
 } from "../selectors";
+import { fittedAction } from "../actions";
+import { fit } from "../../store";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;
@@ -29,8 +28,4 @@ export function* fitSaga(action: any) {
   );
 
   yield put(fittedAction({ fitted: fitted, status: status }));
-}
-
-export function* watchFitActionSaga() {
-  yield takeEvery("CLASSIFIER_FIT", fitSaga);
 }
