@@ -11,19 +11,17 @@ import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import { useDispatch, useSelector } from "react-redux";
+import { LossFunction, OptimizationAlgorithm } from "./store";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 import {
-  compileOptionsSelector,
-  fitOptionsSelector,
-  LossFunction,
-  OptimizationAlgorithm,
   updateBatchSizeAction,
   updateEpochsAction,
   updateLearningRateAction,
   updateLossFunctionAction,
   updateOptimizationAlgorithmAction,
-} from "./store";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+} from "./store/actions";
+import { compileOptionsSelector, fitOptionsSelector } from "./store/selectors";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O

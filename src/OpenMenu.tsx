@@ -5,8 +5,8 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import { useStyles } from "./index.css";
-import { createProjectAction } from "./store";
 import { useDispatch } from "react-redux";
+import { createProjectAction } from "./store/actions";
 
 type OpenMenuProps = {
   menu: PopupState;

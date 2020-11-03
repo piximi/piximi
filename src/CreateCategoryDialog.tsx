@@ -6,12 +6,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { COLORS, createCategoryAction } from "./store";
+import { COLORS } from "./store";
 import { ColorIcon } from "./ColorIcon";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./index.css";
 import { ColorResult } from "react-color";
 import { sample } from "underscore";
+import { createCategoryAction } from "./store/actions";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;

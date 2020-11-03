@@ -8,7 +8,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { useStyles } from "./index.css";
 import { useDispatch } from "react-redux";
-import { createImageAction } from "./store";
+import { createImageAction } from "./store/actions";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement;

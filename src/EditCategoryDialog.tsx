@@ -6,10 +6,11 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Category, updateCategoryAction } from "./store";
+import { Category } from "./store";
 import Grid from "@material-ui/core/Grid";
 import { ColorIcon } from "./ColorIcon";
 import { useStyles } from "./index.css";
+import { updateCategoryAction } from "./store/actions";
 
 type EditCategoryDialogProps = {
   category: Category;

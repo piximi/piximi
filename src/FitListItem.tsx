@@ -4,24 +4,27 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
+import {
+  compileAction,
+  fitAction,
+  generateAction,
+  generatedAction,
+  openAction,
+  updateLossHistoryAction,
+  updateValidationLossHistoryAction,
+} from "./store/actions";
 import {
   categoriesSelector,
   categorizedImagesSelector,
-  compileAction,
   compiledSelector,
   compileOptionsSelector,
   dataSelector,
-  fitAction,
   fitOptionsSelector,
-  generateAction,
-  openAction,
   openedSelector,
-  updateLossHistoryAction,
-  updateValidationLossHistoryAction,
   validationDataSelector,
   validationPercentageSelector,
-} from "./store";
-import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
+} from "./store/selectors";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();
@@ -56,7 +59,13 @@ export const FitListItem = () => {
 
     // dispatch(openAction({ pathname: pathname, classes: 10, units: 100 }));
     // dispatch(compileAction({ opened: opened, options: compileOptions}));
-    // dispatch(generateAction({ images: images, categories: categories, options: { validationPercentage: validationPercentage }}));
+    dispatch(
+      generateAction({
+        images: images,
+        categories: categories,
+        options: { validationPercentage: validationPercentage },
+      })
+    );
     // dispatch(fitAction({compiled: compiled, data: data, validationData: validationData, options: fitOptions, callback: callback}));
 
     setOpenOpenClassifierSnackbar(true);

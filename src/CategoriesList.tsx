@@ -1,5 +1,5 @@
 import { CollapsibleList } from "./CollapsibleList";
-import { categoriesSelector, Category } from "./store";
+import { Category } from "./store";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -14,6 +14,7 @@ import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import { categoriesSelector } from "./store/selectors";
 
 export const CategoriesList = () => {
   const categories = useSelector(categoriesSelector);
