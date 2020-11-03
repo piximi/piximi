@@ -10,7 +10,11 @@ import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
-import { categoriesSelector, imagesSelector } from "./store/selectors";
+import {
+  categoriesSelector,
+  imagesSelector,
+  visibleImagesSelector,
+} from "./store/selectors";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
 
@@ -21,7 +25,7 @@ type ImageGridProps = {
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
   const categories = useSelector(categoriesSelector);
 
-  const images = useSelector(imagesSelector);
+  const images = useSelector(visibleImagesSelector);
 
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 

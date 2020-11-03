@@ -6,7 +6,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
 import {
-  categoriesSelector,
+  createdCategoriesSelector,
   categorizedImagesSelector,
   compiledSelector,
   compileOptionsSelector,
@@ -21,7 +21,7 @@ import { classifierSlice } from "./store/slices";
 export const FitListItem = () => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(createdCategoriesSelector);
   const compileOptions = useSelector(compileOptionsSelector);
   const compiled = useSelector(compiledSelector);
   const data = useSelector(dataSelector);
