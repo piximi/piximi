@@ -31,17 +31,17 @@ const initialState: Classifier = {
   validationPercentage: 0.25,
 };
 
-const classifierSlice = createSlice({
-  name: "model",
+export const classifierSlice = createSlice({
+  name: "classifier",
   initialState: initialState,
   reducers: {
-    compileClassifierAction(
+    compile(
       state,
       action: PayloadAction<{ opened: LayersModel; options: CompileOptions }>
     ) {
       state.compiling = true;
     },
-    fitClassifierAction(
+    fit(
       state,
       action: PayloadAction<{
         callback?: any;
@@ -53,7 +53,7 @@ const classifierSlice = createSlice({
     ) {
       state.fitting = true;
     },
-    openClassifierAction(
+    open(
       state,
       action: PayloadAction<{
         pathname: string;
@@ -63,56 +63,44 @@ const classifierSlice = createSlice({
     ) {
       state.opening = true;
     },
-    preprocessClassifierAction(state) {
+    preprocess(state) {
       state.generating = true;
     },
-    updateClassifierBatchSizeAction(
-      state,
-      action: PayloadAction<{ batchSize: number }>
-    ) {
+    updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
 
       state.fitOptions.batchSize = batchSize;
     },
-    updateClassifierCompiledAction(
-      state,
-      action: PayloadAction<{ compiled: LayersModel }>
-    ) {
+    updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
       state.compiled = compiled;
 
       state.compiling = false;
     },
-    updateClassifierEpochsAction(
-      state,
-      action: PayloadAction<{ epochs: number }>
-    ) {
+    updateEpochs(state, action: PayloadAction<{ epochs: number }>) {
       const { epochs } = action.payload;
 
       state.fitOptions.epochs = epochs;
     },
-    updateClassifierFittedAction(
+    updateFitted(
       state,
-      action: PayloadAction<{ fitted: LayersModel; history: History }>
+      action: PayloadAction<{ fitted: LayersModel; status: History }>
     ) {
-      const { fitted, history } = action.payload;
+      const { fitted, status } = action.payload;
 
       state.compiling = false;
 
       state.fitted = fitted;
 
-      state.history = history;
+      state.history = status;
     },
-    updateClassifierLearningRateAction(
-      state,
-      action: PayloadAction<{ learningRate: number }>
-    ) {
+    updateLearningRate(state, action: PayloadAction<{ learningRate: number }>) {
       const { learningRate } = action.payload;
 
       state.learningRate = learningRate;
     },
-    updateClassifierLossFunctionAction(
+    updateLossFunction(
       state,
       action: PayloadAction<{ lossFunction: LossFunction }>
     ) {
@@ -120,7 +108,7 @@ const classifierSlice = createSlice({
 
       state.lossFunction = lossFunction;
     },
-    updateClassifierLossHistoryAction(
+    updateLossHistory(
       state,
       action: PayloadAction<{ batch: number; loss: number }>
     ) {
@@ -128,25 +116,19 @@ const classifierSlice = createSlice({
 
       state.lossHistory = [...state.lossHistory!, { x: batch, y: loss }];
     },
-    updateClassifierMetricsAction(
-      state,
-      action: PayloadAction<{ metrics: Array<Metric> }>
-    ) {
+    updateMetrics(state, action: PayloadAction<{ metrics: Array<Metric> }>) {
       const { metrics } = action.payload;
 
       state.metrics = metrics;
     },
-    updateClassifierOpenedAction(
-      state,
-      action: PayloadAction<{ opened: LayersModel }>
-    ) {
+    updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
       const { opened } = action.payload;
 
       state.opened = opened;
 
       state.opening = false;
     },
-    updateClassifierOptimizationAlgorithmAction(
+    updateOptimizationAlgorithm(
       state,
       action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
     ) {
@@ -154,11 +136,11 @@ const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = optimizationAlgorithm;
     },
-    updateClassifierPreprocessedAction(
+    updatePreprocessed(
       state,
       action: PayloadAction<{
         data: Dataset<{ xs: Tensor; ys: Tensor }>;
-        validationData: Dataset<{ xs: Tensor; ys: Tensor }>;
+        validationData?: Dataset<{ xs: Tensor; ys: Tensor }>;
       }>
     ) {
       const { data, validationData } = action.payload;
@@ -167,64 +149,32 @@ const classifierSlice = createSlice({
       state.generating = false;
       state.validationData = validationData;
     },
-    updateClassifierTrainingPercentageAction(
+    updateTrainingPercentage(
       state,
       action: PayloadAction<{ trainingPercentage: number }>
     ) {
       const { trainingPercentage } = action.payload;
 
-      state = {
-        ...state,
-        trainingPercentage: trainingPercentage,
-      };
+      state.trainingPercentage = trainingPercentage;
     },
-    updateClassifierValidationLossHistoryAction(
+    updateValidationLossHistory(
       state,
       action: PayloadAction<{ batch: number; loss: number }>
     ) {
       const { batch, loss } = action.payload;
 
-      state = {
-        ...state,
-        validationLossHistory: [
-          ...state.validationLossHistory!,
-          { x: batch, y: loss },
-        ],
-      };
+      state.validationLossHistory = [
+        ...state.validationLossHistory!,
+        { x: batch, y: loss },
+      ];
     },
-    updateClassifierValidationPercentageAction(
+    updateValidationPercentage(
       state,
       action: PayloadAction<{ validationPercentage: number }>
     ) {
       const { validationPercentage } = action.payload;
 
-      state = {
-        ...state,
-        validationPercentage: validationPercentage,
-      };
+      state.validationPercentage = validationPercentage;
     },
   },
 });
-
-export const {
-  compileClassifierAction,
-  fitClassifierAction,
-  openClassifierAction,
-  preprocessClassifierAction,
-  updateClassifierBatchSizeAction,
-  updateClassifierCompiledAction,
-  updateClassifierEpochsAction,
-  updateClassifierFittedAction,
-  updateClassifierLearningRateAction,
-  updateClassifierLossFunctionAction,
-  updateClassifierLossHistoryAction,
-  updateClassifierMetricsAction,
-  updateClassifierOpenedAction,
-  updateClassifierOptimizationAlgorithmAction,
-  updateClassifierPreprocessedAction,
-  updateClassifierTrainingPercentageAction,
-  updateClassifierValidationLossHistoryAction,
-  updateClassifierValidationPercentageAction,
-} = classifierSlice.actions;
-
-export const classifierReducer = classifierSlice.reducer;

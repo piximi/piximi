@@ -6,15 +6,6 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
 import {
-  compileModelAction,
-  fitModelAction,
-  preprocessModelAction,
-  preprocessedModelAction,
-  openModelAction,
-  updateLossHistoryAction,
-  updateValidationLossHistoryAction,
-} from "./store/actions";
-import {
   categoriesSelector,
   categorizedImagesSelector,
   compiledSelector,
@@ -25,6 +16,7 @@ import {
   validationDataSelector,
   validationPercentageSelector,
 } from "./store/selectors";
+import { classifierSlice } from "./store/slices";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();
@@ -45,10 +37,18 @@ export const FitListItem = () => {
   ] = React.useState(false);
 
   const callback = (batch: number, logs: any) => {
-    dispatch(updateLossHistoryAction({ batch: batch, loss: logs.loss }));
+    dispatch(
+      classifierSlice.actions.updateLossHistory({
+        batch: batch,
+        loss: logs.loss,
+      })
+    );
     if (logs.val_loss) {
       dispatch(
-        updateValidationLossHistoryAction({ batch: batch, loss: logs.val_loss })
+        classifierSlice.actions.updateValidationLossHistory({
+          batch: batch,
+          loss: logs.val_loss,
+        })
       );
     }
   };
@@ -57,15 +57,21 @@ export const FitListItem = () => {
     const pathname =
       "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
 
-    // dispatch(openAction({ pathname: pathname, classes: 10, units: 100 }));
-    // dispatch(compileAction({ opened: opened, options: compileOptions}));
     dispatch(
-      preprocessModelAction({
-        images: images,
-        categories: categories,
-        options: { validationPercentage: validationPercentage },
+      classifierSlice.actions.open({
+        pathname: pathname,
+        classes: 10,
+        units: 100,
       })
     );
+    // dispatch(compileAction({ opened: opened, options: compileOptions}));
+    // dispatch(
+    //   preprocessModelAction({
+    //     images: images,
+    //     categories: categories,
+    //     options: { validationPercentage: validationPercentage },
+    //   })
+    // );
     // dispatch(fitAction({compiled: compiled, data: data, validationData: validationData, options: fitOptions, callback: callback}));
 
     setOpenOpenClassifierSnackbar(true);

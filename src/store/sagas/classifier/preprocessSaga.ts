@@ -5,13 +5,11 @@ import {
   trainingPercentageSelector,
   validationPercentageSelector,
 } from "../../selectors";
-import {
-  preprocessedModelAction,
-  updateImagesPartitionsAction,
-} from "../../actions";
+import { updateImagesPartitionsAction } from "../../actions";
 import { Category } from "../../../types/Category";
 import { Image } from "../../../types/Image";
 import { preprocess } from "../../coroutines/model";
+import { classifierSlice } from "../../slices";
 
 export function* preprocessSaga() {
   const images: Array<Image> = yield select(categorizedImagesSelector);
@@ -30,5 +28,5 @@ export function* preprocessSaga() {
 
   const { data } = yield preprocess(images, categories);
 
-  yield put(preprocessedModelAction({ data: data }));
+  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 }

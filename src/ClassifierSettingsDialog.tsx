@@ -13,16 +13,10 @@ import TextField from "@material-ui/core/TextField";
 import { useDispatch, useSelector } from "react-redux";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import {
-  updateBatchSizeAction,
-  updateEpochsAction,
-  updateLearningRateAction,
-  updateLossFunctionAction,
-  updateOptimizationAlgorithmAction,
-} from "./store/actions";
 import { compileOptionsSelector, fitOptionsSelector } from "./store/selectors";
 import { LossFunction } from "./types/LossFunction";
 import { OptimizationAlgorithm } from "./types/OptimizationAlgorithm";
+import { classifierSlice } from "./store/slices";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O
@@ -49,7 +43,7 @@ export const ClassifierSettingsDialog = ({
 
   const onBatchSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     dispatch(
-      updateBatchSizeAction({
+      classifierSlice.actions.updateBatchSize({
         batchSize: parseFloat(event.target.value as string),
       })
     );
@@ -57,7 +51,7 @@ export const ClassifierSettingsDialog = ({
 
   const onEpochsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     dispatch(
-      updateEpochsAction({
+      classifierSlice.actions.updateEpochs({
         epochs: parseFloat(event.target.value as string),
       })
     );
@@ -67,7 +61,7 @@ export const ClassifierSettingsDialog = ({
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     dispatch(
-      updateLearningRateAction({
+      classifierSlice.actions.updateLearningRate({
         learningRate: parseFloat(event.target.value as string),
       })
     );
@@ -77,7 +71,7 @@ export const ClassifierSettingsDialog = ({
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     dispatch(
-      updateLossFunctionAction({
+      classifierSlice.actions.updateLossFunction({
         lossFunction: event.target.value as LossFunction,
       })
     );
@@ -87,7 +81,7 @@ export const ClassifierSettingsDialog = ({
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     dispatch(
-      updateOptimizationAlgorithmAction({
+      classifierSlice.actions.updateOptimizationAlgorithm({
         optimizationAlgorithm: event.target.value as OptimizationAlgorithm,
       })
     );

@@ -5,8 +5,8 @@ import {
   fitOptionsSelector,
   validationDataSelector,
 } from "../../selectors";
-import { fittedModelAction } from "../../actions";
-import { fit } from "../../coroutines/model/fit";
+import { fit } from "../../coroutines/model";
+import { classifierSlice } from "../../slices";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;
@@ -27,5 +27,7 @@ export function* fitSaga(action: any) {
     callback
   );
 
-  yield put(fittedModelAction({ fitted: fitted, status: status }));
+  yield put(
+    classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
+  );
 }

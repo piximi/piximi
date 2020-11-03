@@ -1,16 +1,18 @@
-import { compile, open } from "@piximi/models";
-import { Loss, Metric, Optimizer } from "@piximi/types";
 import { put, takeEvery } from "redux-saga/effects";
-
-import { compileModelAction, compiledModelAction } from "../../actions";
-import { compileSaga, watchCompileActionSaga } from "./compileSaga";
+import { compileSaga } from "./compileSaga";
+import { watchCompileActionSaga } from "./watchCompileActionSaga";
+import { Metric } from "../../../types/Metric";
+import { LossFunction } from "../../../types/LossFunction";
+import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
+import { compile, open } from "../../coroutines/model";
+import { classifierSlice } from "../../slices";
 
 describe("compile", () => {
-  it("dispatches 'compileAction'", () => {
+  it("dispatches 'compile' action", () => {
     const saga = watchCompileActionSaga();
 
     expect(saga.next().value).toEqual(
-      takeEvery("CLASSIFIER_COMPILE", compileSaga)
+      takeEvery(classifierSlice.actions.compile.type, compileSaga)
     );
 
     expect(saga.next().done).toBeTruthy();
@@ -24,21 +26,21 @@ describe("compile", () => {
 
     const options = {
       learningRate: 0.01,
-      lossFunction: Loss.CategoricalCrossentropy,
+      lossFunction: LossFunction.SoftmaxCrossEntropy,
       metrics: [Metric.CategoricalAccuracy],
-      optimizationFunction: Optimizer.SGD,
+      optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
     };
 
     const compiled = await compile(opened, options);
 
     const generator = compileSaga(
-      compileModelAction({ opened: opened, options: options })
+      classifierSlice.actions.compile({ opened: opened, options: options })
     );
 
     await generator.next();
 
     expect(generator.next(compiled).value).toEqual(
-      put(compiledModelAction({ compiled: compiled }))
+      put(classifierSlice.actions.updateCompiled({ compiled: compiled }))
     );
 
     expect(generator.next().done).toBeTruthy();
