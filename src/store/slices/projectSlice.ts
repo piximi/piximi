@@ -58,6 +58,21 @@ export const projectSlice = createSlice({
 
       state.images = action.payload.project.images;
     },
+    deleteCategoryAction(
+      state: Project,
+      action: PayloadAction<{ id: string }>
+    ) {
+      state.categories = filter(state.categories, (category: Category) => {
+        return category.id !== action.payload.id;
+      });
+
+      state.images = state.images.map((image: Image) => {
+        if (image.categoryId === action.payload.id) {
+          image.categoryId = "00000000-0000-0000-0000-000000000000";
+        }
+        return image;
+      });
+    },
     updateCategoryAction(
       state: Project,
       action: PayloadAction<{ id: string; name: string; color: string }>

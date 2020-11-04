@@ -17,6 +17,7 @@ import { EditCategoryDialog } from "./EditCategoryDialog";
 import { Category } from "./types/Category";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "./store/slices";
+import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
 type CategoryListItemProps = {
   category: Category;
@@ -29,9 +30,20 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     false
   );
 
+  const [
+    openDeleteCategoryDialog,
+    setOpenDeleteCategoryDialog,
+  ] = React.useState(false);
+
   const onOpenEditCategoryDialog = () => {
     onCloseCategoryMenu();
     setOpenEditCategoryDialog(true);
+    setCategoryMenuAnchorEl(null);
+  };
+
+  const onOpenDeleteCategoryDialog = () => {
+    onCloseCategoryMenu();
+    setOpenDeleteCategoryDialog(true);
     setCategoryMenuAnchorEl(null);
   };
 
@@ -53,6 +65,10 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
 
   const onCloseEditCategoryDialog = () => {
     setOpenEditCategoryDialog(false);
+  };
+
+  const onCloseDeleteCategoryDialog = () => {
+    setOpenDeleteCategoryDialog(false);
   };
 
   const onToggleCategory = (category: Category) => {
@@ -129,7 +145,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             <Typography variant="inherit">Edit category</Typography>
           </MenuItem>
 
-          <MenuItem onClick={onCloseCategoryMenu}>
+          <MenuItem onClick={onOpenDeleteCategoryDialog}>
             <Typography variant="inherit">Delete category</Typography>
           </MenuItem>
         </MenuList>
@@ -139,6 +155,11 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
         category={category}
         onClose={onCloseEditCategoryDialog}
         open={openEditCategoryDialog}
+      />
+      <DeleteCategoryDialog
+        category={category}
+        onClose={onCloseDeleteCategoryDialog}
+        open={openDeleteCategoryDialog}
       />
     </React.Fragment>
   );
