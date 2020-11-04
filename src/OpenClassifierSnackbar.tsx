@@ -6,7 +6,7 @@ import { LinearProgress } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
-import { openingSelector } from "./store/selectors/openingSelector";
+import { openingSelector } from "./store/selectors";
 
 type OpenClassifierSnackbar = {
   onClose: () => void;

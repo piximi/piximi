@@ -18,6 +18,7 @@ import { OptimizationAlgorithm } from "./types/OptimizationAlgorithm";
 import { classifierSlice } from "./store/slices";
 import { compileOptionsSelector } from "./store/selectors/compileOptionsSelector";
 import { fitOptionsSelector } from "./store/selectors/fitOptionsSelector";
+import { openedSelector } from "./store/selectors";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O
@@ -40,6 +41,8 @@ export const ClassifierSettingsDialog = ({
 
   const fitOptions = useSelector(fitOptionsSelector);
 
+  const opened = useSelector(openedSelector);
+
   const classes = useStyles();
 
   const onBatchSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -48,6 +51,16 @@ export const ClassifierSettingsDialog = ({
         batchSize: parseFloat(event.target.value as string),
       })
     );
+  };
+
+  const onCompile = () => {
+    const payload = { opened: opened, options: compileOptions };
+
+    dispatch(classifierSlice.actions.compile(payload));
+
+    console.info("compiled");
+
+    onClose();
   };
 
   const onEpochsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -92,7 +105,7 @@ export const ClassifierSettingsDialog = ({
     <Dialog fullScreen onClose={onClose} open={open}>
       <AppBar className={classes.settingsDialogAppBar}>
         <Toolbar>
-          <IconButton edge="start" color="inherit" onClick={onClose}>
+          <IconButton edge="start" color="inherit" onClick={onCompile}>
             <CloseIcon />
           </IconButton>
         </Toolbar>

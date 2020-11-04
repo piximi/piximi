@@ -1,10 +1,10 @@
 import { put, select } from "redux-saga/effects";
 import { fit } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
-import { compiledSelector } from "../../selectors/compiledSelector";
-import { dataSelector } from "../../selectors/dataSelector";
-import { fitOptionsSelector } from "../../selectors/fitOptionsSelector";
-import { validationDataSelector } from "../../selectors/validationDataSelector";
+import { compiledSelector } from "../../selectors";
+import { dataSelector } from "../../selectors";
+import { fitOptionsSelector } from "../../selectors";
+import { validationDataSelector } from "../../selectors";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;
@@ -25,7 +25,7 @@ export function* fitSaga(action: any) {
     callback
   );
 
-  yield put(
-    classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
-  );
+  const payload = { fitted: fitted, status: status };
+
+  yield put(classifierSlice.actions.updateFitted(payload));
 }

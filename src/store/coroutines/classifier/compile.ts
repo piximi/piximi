@@ -2,6 +2,7 @@ import * as tensorflow from "@tensorflow/tfjs";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { LossFunction } from "../../../types/LossFunction";
 import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
+import { Metric } from "../../../types/Metric";
 
 export const compile = (
   opened: tensorflow.LayersModel,
@@ -13,6 +14,9 @@ export const compile = (
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {
         return "absoluteDifference";
+      }
+      case LossFunction.CategoricalCrossEntropy: {
+        return "categoricalCrossentropy";
       }
       case LossFunction.CosineDistance: {
         return "cosineDistance";
@@ -32,13 +36,39 @@ export const compile = (
       case LossFunction.SigmoidCrossEntropy: {
         return "sigmoidCrossEntropy";
       }
-      case LossFunction.SoftmaxCrossEntropy: {
-        return "softmaxCrossEntropy";
-      }
       default: {
         return "softmaxCrossEntropy";
       }
     }
+  };
+
+  const metrics = () => {
+    return options.metrics.map((metric: Metric) => {
+      switch (metric) {
+        case Metric.BinaryAccuracy:
+          return "binaryAccuracy";
+        case Metric.BinaryCrossEntropy:
+          return "binaryCrossentropy";
+        case Metric.CategoricalAccuracy:
+          return "categoricalAccuracy";
+        case Metric.CategoricalCrossEntropy:
+          return "categoricalCrossentropy";
+        case Metric.CosineProximity:
+          return "categoricalCrossentropy";
+        case Metric.MeanAbsoluteError:
+          return "meanAbsoluteError";
+        case Metric.MeanAbsolutePercentageError:
+          return "meanAbsolutePercentageError";
+        case Metric.MeanSquaredError:
+          return "meanSquaredError";
+        case Metric.Precision:
+          return "precision";
+        case Metric.Recall:
+          return "recall";
+        case Metric.SparseCategoricalAccuracy:
+          return "sparseCategoricalAccuracy";
+      }
+    });
   };
 
   const optimizer = (): tensorflow.Optimizer => {
@@ -68,9 +98,9 @@ export const compile = (
   };
 
   compiled.compile({
-    optimizer: optimizer(),
-    metrics: options.metrics,
     loss: loss(),
+    metrics: metrics(),
+    optimizer: optimizer(),
   });
 
   return compiled;

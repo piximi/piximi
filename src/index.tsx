@@ -1,6 +1,6 @@
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 
 import * as serviceWorker from "./serviceWorker";
@@ -9,8 +9,12 @@ import { ImageGrid } from "./ImageGrid";
 import { ApplicationDrawer } from "./ApplicationDrawer";
 import { ApplicationAppBar } from "./ApplicationAppBar";
 import { productionStore } from "./store/stores";
+import { classifierSlice } from "./store/slices";
+import { useDispatch } from "react-redux";
 
 const Application = () => {
+  const dispatch = useDispatch();
+
   const [openDrawer, setOpenDrawer] = React.useState(true);
 
   const onOpenDrawer = () => {
@@ -20,6 +24,19 @@ const Application = () => {
   const onCloseDrawer = () => {
     setOpenDrawer(false);
   };
+
+  useEffect(() => {
+    const pathname =
+      "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+
+    dispatch(
+      classifierSlice.actions.open({
+        pathname: pathname,
+        classes: 10,
+        units: 100,
+      })
+    );
+  });
 
   return (
     <React.Fragment>

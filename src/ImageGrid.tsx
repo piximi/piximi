@@ -12,9 +12,8 @@ import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
-import { categoriesSelector } from "./store/selectors/categoriesSelector";
-import { imagesSelector } from "./store/selectors/imagesSelector";
-import { visibleImagesSelector } from "./store/selectors/visibleImagesSelector";
+import { categoriesSelector } from "./store/selectors";
+import { visibleImagesSelector } from "./store/selectors";
 
 type ImageGridProps = {
   openDrawer: boolean;

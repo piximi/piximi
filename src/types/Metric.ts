@@ -2,7 +2,7 @@ export enum Metric {
   BinaryAccuracy = "Binary accuracy",
   BinaryCrossEntropy = "Binary cros-sentropy",
   CategoricalAccuracy = "Categorical accuracy",
-  CategoricalCrossentropy = "Categorical cross-entropy",
+  CategoricalCrossEntropy = "Categorical cross-entropy",
   CosineProximity = "Cosine proximity",
   MeanAbsoluteError = "Mean absolute error (MAE)",
   MeanAbsolutePercentageError = "Mean absolute percentage error",

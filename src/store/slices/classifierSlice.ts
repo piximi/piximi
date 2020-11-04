@@ -19,7 +19,7 @@ const initialState: Classifier = {
   fitting: false,
   generating: false,
   learningRate: 0.01,
-  lossFunction: LossFunction.SoftmaxCrossEntropy,
+  lossFunction: LossFunction.CategoricalCrossEntropy,
   lossHistory: [],
   metrics: [Metric.CategoricalAccuracy],
   opening: false,

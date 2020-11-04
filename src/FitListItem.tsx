@@ -2,7 +2,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
 import { classifierSlice } from "./store/slices";
@@ -51,6 +51,14 @@ export const FitListItem = () => {
     }
   };
 
+  useCallback(() => {
+    console.info("useCallback");
+
+    const payload = { opened: opened, options: compileOptions };
+
+    dispatch(classifierSlice.actions.compile(payload));
+  }, [compileOptions, dispatch, opened]);
+
   const onOpenClassifierSnackbar = () => {
     const pathname =
       "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
@@ -62,7 +70,7 @@ export const FitListItem = () => {
         units: 100,
       })
     );
-    // dispatch(compileAction({ opened: opened, options: compileOptions}));
+
     // dispatch(
     //   preprocessModelAction({
     //     images: images,
