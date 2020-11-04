@@ -55,25 +55,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     setOpenEditCategoryDialog(false);
   };
 
-  // const [categoryVisible, setCategoryVisible] = React.useState(true);
-
-  const onToggleCategory = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    category: Category
-  ) => {
-    const visible = !category.visible;
-    dispatch(
-      projectSlice.actions.updateCategoryVisibilityAction({
-        id: category.id,
-        visible: visible,
-      })
-    );
-  };
-
-  const onMenuToggleCategory = (
-    event: React.MouseEvent<HTMLElement>,
-    category: Category
-  ) => {
+  const onToggleCategory = (category: Category) => {
     onCloseCategoryMenu();
     const visible = !category.visible;
     dispatch(
@@ -95,7 +77,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             edge="start"
             icon={<LabelOutlinedIcon style={{ color: category.color }} />}
             tabIndex={-1}
-            onChange={(event) => onToggleCategory(event, category)}
+            onChange={() => onToggleCategory(category)}
           />
         </ListItemIcon>
 
@@ -126,11 +108,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             <Typography variant="inherit">Hide other categories</Typography>
           </MenuItem>
 
-          <MenuItem
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onMenuToggleCategory(event, category)
-            }
-          >
+          <MenuItem onClick={() => onToggleCategory(category)}>
             <Typography variant="inherit">
               {category.visible ? "Hide" : "Show"} category
             </Typography>
