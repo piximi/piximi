@@ -1,1 +1,1 @@
-export { compile, fit, open, preprocess } from "./model";
+export { compile, fit, open, preprocess } from "./classifier";

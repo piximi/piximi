@@ -1,7 +1,7 @@
 import { put, select } from "redux-saga/effects";
-import { openedSelector } from "../../selectors";
-import { compile } from "../../coroutines/model";
+import { compile } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
+import { openedSelector } from "../../selectors/openedSelector";
 
 export function* compileSaga(action: any) {
   const { options } = action.payload;

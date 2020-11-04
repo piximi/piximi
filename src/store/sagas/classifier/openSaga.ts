@@ -1,5 +1,5 @@
 import { put } from "redux-saga/effects";
-import { open } from "../../coroutines/model";
+import { open } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 
 export function* openSaga(action: any) {

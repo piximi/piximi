@@ -10,13 +10,11 @@ import { useStyles } from "./index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "./ImageDialog";
 import { ImageCategoryMenu } from "./ImageCategoryMenu";
-import {
-  categoriesSelector,
-  imagesSelector,
-  visibleImagesSelector,
-} from "./store/selectors";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
+import { categoriesSelector } from "./store/selectors/categoriesSelector";
+import { imagesSelector } from "./store/selectors/imagesSelector";
+import { visibleImagesSelector } from "./store/selectors/visibleImagesSelector";
 
 type ImageGridProps = {
   openDrawer: boolean;

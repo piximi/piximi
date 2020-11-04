@@ -1,12 +1,10 @@
 import { put, select } from "redux-saga/effects";
-import {
-  compiledSelector,
-  dataSelector,
-  fitOptionsSelector,
-  validationDataSelector,
-} from "../../selectors";
-import { fit } from "../../coroutines/model";
+import { fit } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
+import { compiledSelector } from "../../selectors/compiledSelector";
+import { dataSelector } from "../../selectors/dataSelector";
+import { fitOptionsSelector } from "../../selectors/fitOptionsSelector";
+import { validationDataSelector } from "../../selectors/validationDataSelector";
 
 export function* fitSaga(action: any) {
   const { callback } = action.payload;

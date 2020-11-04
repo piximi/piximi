@@ -13,10 +13,11 @@ import TextField from "@material-ui/core/TextField";
 import { useDispatch, useSelector } from "react-redux";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import { compileOptionsSelector, fitOptionsSelector } from "./store/selectors";
 import { LossFunction } from "./types/LossFunction";
 import { OptimizationAlgorithm } from "./types/OptimizationAlgorithm";
 import { classifierSlice } from "./store/slices";
+import { compileOptionsSelector } from "./store/selectors/compileOptionsSelector";
+import { fitOptionsSelector } from "./store/selectors/fitOptionsSelector";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O

@@ -3,10 +3,10 @@ import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
-import { categoriesSelector } from "./store/selectors";
 import { Category } from "./types/Category";
 import { Image } from "./types/Image";
 import { projectSlice } from "./store/slices";
+import { categoriesSelector } from "./store/selectors/categoriesSelector";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;

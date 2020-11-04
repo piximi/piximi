@@ -1,12 +1,10 @@
 import { put, select } from "redux-saga/effects";
-import {
-  createdCategoriesSelector,
-  categorizedImagesSelector,
-} from "../../selectors";
 import { Category } from "../../../types/Category";
 import { Image } from "../../../types/Image";
-import { preprocess } from "../../coroutines/model";
+import { preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
+import { createdCategoriesSelector } from "../../selectors/createdCategoriesSelector";
+import { categorizedImagesSelector } from "../../selectors/categorizedImagesSelector";
 
 export function* preprocessSaga() {
   const images: Array<Image> = yield select(categorizedImagesSelector);

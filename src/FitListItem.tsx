@@ -5,18 +5,16 @@ import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
-import {
-  createdCategoriesSelector,
-  categorizedImagesSelector,
-  compiledSelector,
-  compileOptionsSelector,
-  dataSelector,
-  fitOptionsSelector,
-  openedSelector,
-  validationDataSelector,
-  validationPercentageSelector,
-} from "./store/selectors";
 import { classifierSlice } from "./store/slices";
+import { createdCategoriesSelector } from "./store/selectors/createdCategoriesSelector";
+import { categorizedImagesSelector } from "./store/selectors/categorizedImagesSelector";
+import { compileOptionsSelector } from "./store/selectors/compileOptionsSelector";
+import { compiledSelector } from "./store/selectors/compiledSelector";
+import { dataSelector } from "./store/selectors/dataSelector";
+import { fitOptionsSelector } from "./store/selectors/fitOptionsSelector";
+import { openedSelector } from "./store/selectors/openedSelector";
+import { validationDataSelector } from "./store/selectors/validationDataSelector";
+import { validationPercentageSelector } from "./store/selectors/validationPercentageSelector";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();
