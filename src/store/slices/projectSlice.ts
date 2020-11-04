@@ -8,7 +8,7 @@ import { findIndex, filter } from "underscore";
 const initialState: Project = {
   categories: [
     {
-      color: "rgb(255, 255, 0)",
+      color: "#AAAAAA",
       id: "00000000-0000-0000-0000-000000000000",
       name: "Unknown",
       visible: true,

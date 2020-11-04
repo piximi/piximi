@@ -50,6 +50,7 @@ export const ImageCategoryMenu = ({
       }}
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
+      onClose={onClose}
     >
       <MenuList dense variant="menu">
         {categories.map((category: Category) => (
