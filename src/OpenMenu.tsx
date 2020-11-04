@@ -6,7 +6,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import { useStyles } from "./index.css";
 import { useDispatch } from "react-redux";
-import { createProjectAction } from "./store/actions";
+import { projectSlice } from "./store/slices";
 
 type OpenMenuProps = {
   menu: PopupState;
@@ -36,7 +36,9 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
           const src = event.target.result;
 
           dispatch(
-            createProjectAction({ project: JSON.parse(src as string).project })
+            projectSlice.actions.createProjectAction({
+              project: JSON.parse(src as string).project,
+            })
           );
         }
       };

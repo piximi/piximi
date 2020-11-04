@@ -9,8 +9,8 @@ import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import { ColorIcon } from "./ColorIcon";
 import { useStyles } from "./index.css";
-import { updateCategoryAction } from "./store/actions";
 import { Category } from "./types/Category";
+import { projectSlice } from "./store/slices";
 
 type EditCategoryDialogProps = {
   category: Category;
@@ -41,7 +41,7 @@ export const EditCategoryDialog = ({
 
   const onEdit = () => {
     dispatch(
-      updateCategoryAction({
+      projectSlice.actions.updateCategoryAction({
         id: category.id,
         name: name,
         color: color,

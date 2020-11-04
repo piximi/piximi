@@ -1,10 +1,9 @@
-import { projectReducer } from "./projectReducer";
 import { combineReducers } from "redux";
-import { classifierSlice } from "../slices";
+import { classifierSlice, projectSlice } from "../slices";
 
 const reducers = {
   classifier: classifierSlice.reducer,
-  project: projectReducer,
+  project: projectSlice.reducer,
 };
 
 export const reducer = combineReducers(reducers);

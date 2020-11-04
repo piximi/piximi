@@ -15,12 +15,8 @@ import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { Category } from "./types/Category";
-import {
-  updateBatchSizeAction,
-  updateCategoryAction,
-  updateCategoryVisibilityAction,
-} from "./store/actions";
 import { useDispatch } from "react-redux";
+import { projectSlice } from "./store/slices";
 
 type CategoryListItemProps = {
   category: Category;
@@ -68,7 +64,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     console.log("detected change");
     const visible = !category.visible;
     dispatch(
-      updateCategoryVisibilityAction({
+      projectSlice.actions.updateCategoryVisibilityAction({
         id: category.id,
         visible: visible,
       })
