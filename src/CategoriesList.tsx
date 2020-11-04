@@ -7,17 +7,14 @@ import React from "react";
 import { CreateCategoryDialog } from "./CreateCategoryDialog";
 import { useSelector } from "react-redux";
 import { CategoryListItem } from "./CategoryListItem";
-import Checkbox from "@material-ui/core/Checkbox";
-import LabelIcon from "@material-ui/icons/Label";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { Category } from "./types/Category";
 import { createdCategoriesSelector } from "./store/selectors/createdCategoriesSelector";
+import { unknownCategorySelector } from "./store/selectors/unknownCategorySelector";
 
 export const CategoriesList = () => {
   const categories = useSelector(createdCategoriesSelector);
+
+  const unknownCategory = useSelector(unknownCategorySelector);
 
   const [
     openCreateCategoryDialog,
@@ -39,34 +36,10 @@ export const CategoriesList = () => {
           {categories.map((category: Category) => {
             return <CategoryListItem category={category} key={category.id} />;
           })}
-
-          <ListItem
-            dense
-            key="00000000-0000-0000-0000-000000000000"
-            id="00000000-0000-0000-0000-000000000000"
-          >
-            <ListItemIcon>
-              <Checkbox
-                checked
-                checkedIcon={<LabelIcon style={{ color: "#AAAAAA" }} />}
-                disableRipple
-                edge="start"
-                icon={<LabelOutlinedIcon style={{ color: "#AAAAAA" }} />}
-                tabIndex={-1}
-              />
-            </ListItemIcon>
-
-            <ListItemText
-              id="00000000-0000-0000-0000-000000000000"
-              primary="Unknown"
-            />
-
-            <ListItemSecondaryAction>
-              <IconButton edge="end">
-                <MoreHorizIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
+          <CategoryListItem
+            category={unknownCategory}
+            key={unknownCategory.id}
+          />
         </React.Fragment>
         <ListItem button onClick={onOpenCreateCategoryDialog}>
           <ListItemIcon>

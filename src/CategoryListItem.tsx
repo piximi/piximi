@@ -123,15 +123,17 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             </Typography>
           </MenuItem>
 
-          <Divider />
-
-          <MenuItem onClick={onOpenEditCategoryDialog}>
-            <Typography variant="inherit">Edit category</Typography>
-          </MenuItem>
-
-          <MenuItem onClick={onCloseCategoryMenu}>
-            <Typography variant="inherit">Delete category</Typography>
-          </MenuItem>
+          {category.id !== "00000000-0000-0000-0000-000000000000" && (
+            <div>
+              <Divider />
+              <MenuItem onClick={onOpenEditCategoryDialog}>
+                <Typography variant="inherit">Edit category</Typography>
+              </MenuItem>
+              <MenuItem onClick={onCloseCategoryMenu}>
+                <Typography variant="inherit">Delete category</Typography>
+              </MenuItem>
+            </div>
+          )}
         </MenuList>
       </Menu>
 
