@@ -55,13 +55,8 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     setOpenEditCategoryDialog(false);
   };
 
-  // const [categoryVisible, setCategoryVisible] = React.useState(true);
-
-  const onToggleCategory = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    category: Category
-  ) => {
-    console.log("detected change");
+  const onToggleCategory = (category: Category) => {
+    onCloseCategoryMenu();
     const visible = !category.visible;
     dispatch(
       projectSlice.actions.updateCategoryVisibilityAction({
@@ -71,18 +66,27 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     );
   };
 
+  const onHideOtherCategories = (category: Category) => {
+    onCloseCategoryMenu();
+    dispatch(
+      projectSlice.actions.updateOtherCategoryVisibilityAction({
+        id: category.id,
+      })
+    );
+  };
+
   return (
     <React.Fragment>
       <ListItem dense key={category.id} id={category.id}>
         <ListItemIcon>
           <Checkbox
-            checked
+            checked={category.visible}
             checkedIcon={<LabelIcon style={{ color: category.color }} />}
             disableRipple
             edge="start"
             icon={<LabelOutlinedIcon style={{ color: category.color }} />}
             tabIndex={-1}
-            onChange={(event) => onToggleCategory(event, category)}
+            onChange={() => onToggleCategory(category)}
           />
         </ListItemIcon>
 
@@ -109,12 +113,14 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
         transformOrigin={{ horizontal: "center", vertical: "top" }}
       >
         <MenuList dense variant="menu">
-          <MenuItem onClick={onCloseCategoryMenu}>
+          <MenuItem onClick={() => onHideOtherCategories(category)}>
             <Typography variant="inherit">Hide other categories</Typography>
           </MenuItem>
 
-          <MenuItem onClick={onCloseCategoryMenu}>
-            <Typography variant="inherit">Hide category</Typography>
+          <MenuItem onClick={() => onToggleCategory(category)}>
+            <Typography variant="inherit">
+              {category.visible ? "Hide" : "Show"} category
+            </Typography>
           </MenuItem>
 
           <Divider />

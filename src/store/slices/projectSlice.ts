@@ -3,12 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Category } from "../../types/Category";
 import { v4 } from "uuid";
 import { Image } from "../../types/Image";
-import { findIndex } from "underscore";
+import { findIndex, filter } from "underscore";
 
 const initialState: Project = {
   categories: [
     {
-      color: "rgb(255, 255, 0)",
+      color: "#AAAAAA",
       id: "00000000-0000-0000-0000-000000000000",
       name: "Unknown",
       visible: true,
@@ -79,6 +79,17 @@ export const projectSlice = createSlice({
       });
 
       state.categories[index].visible = action.payload.visible;
+    },
+    updateOtherCategoryVisibilityAction(
+      state: Project,
+      action: PayloadAction<{ id: string }>
+    ) {
+      const categories = filter(state.categories, (category: Category) => {
+        return category.id !== action.payload.id;
+      });
+      for (let category of categories) {
+        category.visible = false;
+      }
     },
     updateImageCategoryAction(
       state: Project,
