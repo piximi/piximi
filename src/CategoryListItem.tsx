@@ -66,6 +66,15 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     );
   };
 
+  const onHideOtherCategories = (category: Category) => {
+    onCloseCategoryMenu();
+    dispatch(
+      projectSlice.actions.updateOtherCategoryVisibilityAction({
+        id: category.id,
+      })
+    );
+  };
+
   return (
     <React.Fragment>
       <ListItem dense key={category.id} id={category.id}>
@@ -104,7 +113,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
         transformOrigin={{ horizontal: "center", vertical: "top" }}
       >
         <MenuList dense variant="menu">
-          <MenuItem onClick={onCloseCategoryMenu}>
+          <MenuItem onClick={() => onHideOtherCategories(category)}>
             <Typography variant="inherit">Hide other categories</Typography>
           </MenuItem>
 
