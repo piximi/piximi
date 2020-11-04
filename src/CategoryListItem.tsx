@@ -61,7 +61,20 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     event: React.ChangeEvent<HTMLInputElement>,
     category: Category
   ) => {
-    console.log("detected change");
+    const visible = !category.visible;
+    dispatch(
+      projectSlice.actions.updateCategoryVisibilityAction({
+        id: category.id,
+        visible: visible,
+      })
+    );
+  };
+
+  const onMenuToggleCategory = (
+    event: React.MouseEvent<HTMLElement>,
+    category: Category
+  ) => {
+    onCloseCategoryMenu();
     const visible = !category.visible;
     dispatch(
       projectSlice.actions.updateCategoryVisibilityAction({
@@ -76,7 +89,7 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
       <ListItem dense key={category.id} id={category.id}>
         <ListItemIcon>
           <Checkbox
-            checked
+            checked={category.visible}
             checkedIcon={<LabelIcon style={{ color: category.color }} />}
             disableRipple
             edge="start"
@@ -113,8 +126,14 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
             <Typography variant="inherit">Hide other categories</Typography>
           </MenuItem>
 
-          <MenuItem onClick={onCloseCategoryMenu}>
-            <Typography variant="inherit">Hide category</Typography>
+          <MenuItem
+            onClick={(event: React.MouseEvent<HTMLElement>) =>
+              onMenuToggleCategory(event, category)
+            }
+          >
+            <Typography variant="inherit">
+              {category.visible ? "Hide" : "Show"} category
+            </Typography>
           </MenuItem>
 
           <Divider />
