@@ -1,6 +1,5 @@
 import React from "react";
 import Menu from "@material-ui/core/Menu";
-import { bindMenu, PopupState } from "material-ui-popup-state/hooks";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
@@ -9,10 +8,18 @@ import { useDispatch } from "react-redux";
 import { projectSlice } from "../../store/slices";
 
 type OpenMenuProps = {
-  menu: PopupState;
+  anchorEl: any;
+  onClose: () => void;
+  onOpen: (event: any) => void;
+  open: boolean;
 };
 
-export const OpenMenu = ({ menu }: OpenMenuProps) => {
+export const OpenMenu = ({
+  anchorEl,
+  onClose,
+  onOpen,
+  open,
+}: OpenMenuProps) => {
   const dispatch = useDispatch();
 
   const classes = useStyles();
@@ -20,7 +27,7 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
   const onOpenProject = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.info("onOpenProject");
 
-    menu.close();
+    onClose();
 
     event.persist();
 
@@ -58,29 +65,22 @@ export const OpenMenu = ({ menu }: OpenMenuProps) => {
       />
 
       <Menu
-        anchorOrigin={{
-          horizontal: "center",
-          vertical: "bottom",
-        }}
+        anchorEl={anchorEl}
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
         getContentAnchorEl={null}
-        transformOrigin={{
-          horizontal: "center",
-          vertical: "top",
-        }}
-        {...bindMenu(menu)}
+        open={open}
+        transformOrigin={{ horizontal: "center", vertical: "top" }}
       >
         <MenuList dense variant="menu">
-          <React.Fragment>
-            <label htmlFor="open-project">
-              <MenuItem onClick={menu.close}>Open project</MenuItem>
-            </label>
-          </React.Fragment>
+          <label htmlFor="open-project">
+            <MenuItem onClick={onClose}>Open project</MenuItem>
+          </label>
 
           <Divider />
 
-          <MenuItem onClick={menu.close}>Open example project</MenuItem>
+          <MenuItem onClick={onClose}>Open example project</MenuItem>
 
-          <MenuItem onClick={menu.close}>Open classifier</MenuItem>
+          <MenuItem onClick={onClose}>Open classifier</MenuItem>
         </MenuList>
       </Menu>
     </React.Fragment>

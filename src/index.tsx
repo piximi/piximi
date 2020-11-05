@@ -24,16 +24,16 @@ const Application = () => {
   };
 
   useEffect(() => {
-    const pathname =
-      "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
-
-    dispatch(
-      classifierSlice.actions.open({
-        pathname: pathname,
-        classes: 10,
-        units: 100,
-      })
-    );
+    // const pathname =
+    //   "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+    //
+    // dispatch(
+    //   classifierSlice.actions.open({
+    //     pathname: pathname,
+    //     classes: 10,
+    //     units: 100,
+    //   })
+    // );
   });
 
   return (
@@ -53,11 +53,9 @@ const Application = () => {
 };
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={productionStore}>
-      <Application />
-    </Provider>
-  </React.StrictMode>,
+  <Provider store={productionStore}>
+    <Application />
+  </Provider>,
   document.getElementById("root")
 );
 

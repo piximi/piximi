@@ -1,12 +1,12 @@
-import { CollapsibleList } from "../CollapsibleList/CollapsibleList";
+import { CollapsibleList } from "../CollapsibleList";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import AddIcon from "@material-ui/icons/Add";
 import React from "react";
-import { CreateCategoryDialog } from "../CreateCategoryDialog/CreateCategoryDialog";
+import { CreateCategoryDialog } from "../CreateCategoryDialog";
 import { useSelector } from "react-redux";
-import { CategoryListItem } from "../CategoryListItem/CategoryListItem";
+import { CategoryListItem } from "../CategoryListItem";
 import Checkbox from "@material-ui/core/Checkbox";
 import LabelIcon from "@material-ui/icons/Label";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
@@ -14,23 +14,13 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { Category } from "../../types/Category";
-import { createdCategoriesSelector } from "../../store/selectors/createdCategoriesSelector";
+import { createdCategoriesSelector } from "../../store/selectors";
+import { useDialog } from "../../hooks";
 
 export const CategoriesList = () => {
   const categories = useSelector(createdCategoriesSelector);
 
-  const [
-    openCreateCategoryDialog,
-    setOpenCreateCategoryDialog,
-  ] = React.useState(false);
-
-  const onOpenCreateCategoryDialog = () => {
-    setOpenCreateCategoryDialog(true);
-  };
-
-  const onCloseCreateCategoryDialog = () => {
-    setOpenCreateCategoryDialog(false);
-  };
+  const { onClose, onOpen, open } = useDialog();
 
   return (
     <React.Fragment>
@@ -69,7 +59,7 @@ export const CategoriesList = () => {
           </ListItem>
         </React.Fragment>
 
-        <ListItem button onClick={onOpenCreateCategoryDialog}>
+        <ListItem button onClick={onOpen}>
           <ListItemIcon>
             <AddIcon />
           </ListItemIcon>
@@ -78,10 +68,7 @@ export const CategoriesList = () => {
         </ListItem>
       </CollapsibleList>
 
-      <CreateCategoryDialog
-        onClose={onCloseCreateCategoryDialog}
-        open={openCreateCategoryDialog}
-      />
+      <CreateCategoryDialog onClose={onClose} open={open} />
     </React.Fragment>
   );
 };

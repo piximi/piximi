@@ -1,4 +1,4 @@
-import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { History, LayersModel } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { FitOptions } from "../../../types/FitOptions";
 
