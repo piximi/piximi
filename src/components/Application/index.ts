@@ -14,4 +14,4 @@ export { ImageDialog } from "./ImageGrid/ImageDialog";
 export { ImageGrid } from "./ImageGrid/ImageGrid";
 export { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
 export { SettingsDialog } from "./ApplicationDrawer/ApplicationList/SettingsListItem/SettingsDialog";
-export { UploadMenu } from "./ApplicationAppBar/UploadMenu";
+export { UploadMenu } from "./ApplicationAppBar/ApplicationToolbar/UploadButton/UploadMenu";

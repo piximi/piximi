@@ -6,16 +6,17 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ComputerIcon from "@material-ui/icons/Computer";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import { useStyles } from "../../Application/Application.css";
+import { useStyles } from "../../../../Application/Application.css";
 import { useDispatch } from "react-redux";
-import { createProjectImageAction } from "../../../../store/slices";
+import { createProjectImageAction } from "../../../../../../store/slices";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement;
   onClose: () => void;
+  open: boolean;
 };
 
-export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
+export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   const dispatch = useDispatch();
   const classes = useStyles();
 

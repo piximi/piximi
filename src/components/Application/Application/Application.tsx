@@ -10,7 +10,7 @@ export const Application = () => {
     <React.Fragment>
       <CssBaseline />
 
-      <ApplicationAppBar onOpenDrawer={toggle} openDrawer={open} />
+      <ApplicationAppBar toggle={toggle} open={open} />
 
       <ApplicationDrawer onCloseDrawer={toggle} openDrawer={open} />
 
