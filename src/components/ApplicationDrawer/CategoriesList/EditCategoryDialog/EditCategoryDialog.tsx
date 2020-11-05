@@ -14,14 +14,14 @@ import { projectSlice } from "../../../../store/slices";
 
 type EditCategoryDialogProps = {
   category: Category;
-  onClose: () => void;
-  open: boolean;
+  onCloseDialog: () => void;
+  openDialog: boolean;
 };
 
 export const EditCategoryDialog = ({
   category,
-  onClose,
-  open,
+  onCloseDialog,
+  openDialog,
 }: EditCategoryDialogProps) => {
   const dispatch = useDispatch();
 
@@ -48,11 +48,11 @@ export const EditCategoryDialog = ({
       })
     );
 
-    onClose();
+    onCloseDialog();
   };
 
   return (
-    <Dialog fullWidth onClose={onClose} open={open}>
+    <Dialog fullWidth onClose={onCloseDialog} open={openDialog}>
       <DialogTitle>Edit category</DialogTitle>
 
       <DialogContent>
@@ -77,7 +77,7 @@ export const EditCategoryDialog = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onCloseDialog} color="primary">
           Cancel
         </Button>
 

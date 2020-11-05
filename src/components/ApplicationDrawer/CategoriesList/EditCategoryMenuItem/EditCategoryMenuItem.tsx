@@ -34,8 +34,8 @@ export const EditCategoryMenuItem = ({
 
       <EditCategoryDialog
         category={category}
-        onClose={onCloseDialog}
-        open={openDialog}
+        onCloseDialog={onCloseDialog}
+        openDialog={openDialog}
       />
     </React.Fragment>
   );
