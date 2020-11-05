@@ -3,7 +3,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../../../../../types/Category";
 import { useDispatch } from "react-redux";
-import { updateOtherCategoryVisibilityAction } from "../../../../../../../store/slices";
+import { updateOtherCategoryVisibility } from "../../../../../../../store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   category: Category;
@@ -20,7 +20,7 @@ export const HideOtherCategoriesMenuItem = ({
     onCloseCategoryMenu();
 
     dispatch(
-      updateOtherCategoryVisibilityAction({
+      updateOtherCategoryVisibility({
         id: category.id,
       })
     );

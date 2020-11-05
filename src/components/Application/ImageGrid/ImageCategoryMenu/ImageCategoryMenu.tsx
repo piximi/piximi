@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Category } from "../../../../types/Category";
 import { Image } from "../../../../types/Image";
 import { categoriesSelector } from "../../../../store/selectors";
-import { updateImageCategoryAction } from "../../../../store/slices";
+import { updateImageCategory } from "../../../../store/slices";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;
@@ -29,12 +29,7 @@ export const ImageCategoryMenu = ({
   ) => {
     onClose();
 
-    dispatch(
-      updateImageCategoryAction({
-        id: image.id,
-        categoryId: categoryId,
-      })
-    );
+    dispatch(updateImageCategory({ id: image.id, categoryId: categoryId }));
   };
 
   return (

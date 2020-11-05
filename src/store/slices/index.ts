@@ -20,13 +20,13 @@ export {
 } from "./classifierSlice";
 
 export {
-  createProjectAction,
-  createProjectCategoryAction,
-  createProjectImageAction,
-  deleteCategoryAction,
+  createProject,
+  createCategory,
+  createImage,
+  deleteCategory,
   projectSlice,
-  updateCategoryAction,
-  updateCategoryVisibilityAction,
-  updateImageCategoryAction,
-  updateOtherCategoryVisibilityAction,
+  updateCategory,
+  updateCategoryVisibility,
+  updateImageCategory,
+  updateOtherCategoryVisibility,
 } from "./projectSlice";

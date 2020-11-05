@@ -8,7 +8,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { useStyles } from "../../../../Application/Application.css";
 import { useDispatch } from "react-redux";
-import { createProjectImageAction } from "../../../../../../store/slices";
+import { createImage } from "../../../../../../store/slices";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement;
@@ -35,7 +35,7 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
         if (event.target) {
           const src = event.target.result;
 
-          dispatch(createProjectImageAction({ src: src as string }));
+          dispatch(createImage({ src: src as string }));
         }
       };
 

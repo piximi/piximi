@@ -22,7 +22,7 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
-    createProjectCategoryAction(
+    createCategory(
       state: Project,
       action: PayloadAction<{ name: string; color: string }>
     ) {
@@ -35,10 +35,7 @@ export const projectSlice = createSlice({
 
       state.categories.push(category);
     },
-    createProjectImageAction(
-      state: Project,
-      action: PayloadAction<{ src: string }>
-    ) {
+    createImage(state: Project, action: PayloadAction<{ src: string }>) {
       const image: Image = {
         id: v4(),
         name: "",
@@ -48,20 +45,14 @@ export const projectSlice = createSlice({
 
       state.images.push(image);
     },
-    createProjectAction(
-      state: Project,
-      action: PayloadAction<{ project: Project }>
-    ) {
+    createProject(state: Project, action: PayloadAction<{ project: Project }>) {
       state.categories = action.payload.project.categories;
 
       state.name = action.payload.project.name;
 
       state.images = action.payload.project.images;
     },
-    deleteCategoryAction(
-      state: Project,
-      action: PayloadAction<{ id: string }>
-    ) {
+    deleteCategory(state: Project, action: PayloadAction<{ id: string }>) {
       state.categories = filter(state.categories, (category: Category) => {
         return category.id !== action.payload.id;
       });
@@ -73,7 +64,7 @@ export const projectSlice = createSlice({
         return image;
       });
     },
-    updateCategoryAction(
+    updateCategory(
       state: Project,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
@@ -85,7 +76,7 @@ export const projectSlice = createSlice({
 
       state.categories[index].color = action.payload.color;
     },
-    updateCategoryVisibilityAction(
+    updateCategoryVisibility(
       state: Project,
       action: PayloadAction<{ id: string; visible: boolean }>
     ) {
@@ -95,7 +86,7 @@ export const projectSlice = createSlice({
 
       state.categories[index].visible = action.payload.visible;
     },
-    updateOtherCategoryVisibilityAction(
+    updateOtherCategoryVisibility(
       state: Project,
       action: PayloadAction<{ id: string }>
     ) {
@@ -106,7 +97,7 @@ export const projectSlice = createSlice({
         category.visible = false;
       }
     },
-    updateImageCategoryAction(
+    updateImageCategory(
       state: Project,
       action: PayloadAction<{ id: string; categoryId: string }>
     ) {
@@ -122,12 +113,12 @@ export const projectSlice = createSlice({
 });
 
 export const {
-  createProjectCategoryAction,
-  createProjectImageAction,
-  createProjectAction,
-  deleteCategoryAction,
-  updateCategoryAction,
-  updateCategoryVisibilityAction,
-  updateOtherCategoryVisibilityAction,
-  updateImageCategoryAction,
+  createCategory,
+  createImage,
+  createProject,
+  deleteCategory,
+  updateCategory,
+  updateCategoryVisibility,
+  updateImageCategory,
+  updateOtherCategoryVisibility,
 } = projectSlice.actions;

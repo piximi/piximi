@@ -2,7 +2,7 @@ import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useStyles } from "../../../../../Application/Application.css";
 import { useDispatch } from "react-redux";
-import { createProjectAction } from "../../../../../../../store/slices";
+import { createProject } from "../../../../../../../store/slices";
 
 type OpenProjectMenuItemProps = {
   onClose: () => void;
@@ -28,9 +28,7 @@ export const OpenProjectMenuItem = ({ onClose }: OpenProjectMenuItemProps) => {
           const src = event.target.result;
 
           dispatch(
-            createProjectAction({
-              project: JSON.parse(src as string).project,
-            })
+            createProject({ project: JSON.parse(src as string).project })
           );
         }
       };
