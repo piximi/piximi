@@ -19,11 +19,7 @@ export const HideOtherCategoriesMenuItem = ({
   const onClick = () => {
     onCloseCategoryMenu();
 
-    dispatch(
-      updateOtherCategoryVisibility({
-        id: category.id,
-      })
-    );
+    dispatch(updateOtherCategoryVisibility({ id: category.id }));
   };
 
   return (
