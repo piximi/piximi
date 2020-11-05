@@ -12,7 +12,7 @@ import Grid from "@material-ui/core/Grid";
 import { useStyles } from "../../../../index.css";
 import { ColorResult } from "react-color";
 import { sample } from "underscore";
-import { projectSlice } from "../../../../store/slices";
+import { createProjectCategoryAction } from "../../../../store/slices";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;
@@ -33,7 +33,7 @@ export const CreateCategoryDialog = ({
 
   const onCreate = () => {
     dispatch(
-      projectSlice.actions.createProjectCategoryAction({
+      createProjectCategoryAction({
         name: name,
         color: color,
       })

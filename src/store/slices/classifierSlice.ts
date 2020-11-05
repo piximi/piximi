@@ -178,3 +178,23 @@ export const classifierSlice = createSlice({
     },
   },
 });
+
+export const {
+  compile,
+  fit,
+  open,
+  preprocess,
+  updateBatchSize,
+  updateCompiled,
+  updateEpochs,
+  updateFitted,
+  updateLearningRate,
+  updateLossFunction,
+  updateMetrics,
+  updateOpened,
+  updateOptimizationAlgorithm,
+  updatePreprocessed,
+  updateTrainingPercentage,
+  updateValidationLossHistory,
+  updateValidationPercentage,
+} = classifierSlice.actions;

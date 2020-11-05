@@ -5,8 +5,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
-import { projectSlice } from "../../store/slices";
-import { categoriesSelector } from "../../store/selectors/categoriesSelector";
+import { categoriesSelector } from "../../store/selectors";
+import { updateImageCategoryAction } from "../../store/slices";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;
@@ -30,7 +30,7 @@ export const ImageCategoryMenu = ({
     onClose();
 
     dispatch(
-      projectSlice.actions.updateImageCategoryAction({
+      updateImageCategoryAction({
         id: image.id,
         categoryId: categoryId,
       })

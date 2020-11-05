@@ -9,7 +9,7 @@ import React from "react";
 import { useStyles } from "../../index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "../ImageDialog";
-import { ImageCategoryMenu } from "../ImageCategoryMenu/ImageCategoryMenu";
+import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import { categoriesSelector } from "../../store/selectors";

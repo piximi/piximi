@@ -5,7 +5,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import { useStyles } from "../../../../../index.css";
 import { useDispatch } from "react-redux";
-import { projectSlice } from "../../../../../store/slices";
+import { createProjectAction } from "../../../../../store/slices";
 
 type OpenMenuProps = {
   anchorEl: any;
@@ -43,7 +43,7 @@ export const OpenMenu = ({
           const src = event.target.result;
 
           dispatch(
-            projectSlice.actions.createProjectAction({
+            createProjectAction({
               project: JSON.parse(src as string).project,
             })
           );

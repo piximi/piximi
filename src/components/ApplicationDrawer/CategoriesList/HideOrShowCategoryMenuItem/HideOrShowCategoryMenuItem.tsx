@@ -3,7 +3,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../../types/Category";
 import { useDispatch } from "react-redux";
-import { projectSlice } from "../../../../store/slices";
+import { updateCategoryVisibilityAction } from "../../../../store/slices";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;
@@ -21,7 +21,7 @@ export const HideOrShowCategoryMenuItem = ({
 
     const payload = { id: category.id, visible: !category.visible };
 
-    dispatch(projectSlice.actions.updateCategoryVisibilityAction(payload));
+    dispatch(updateCategoryVisibilityAction(payload));
   };
 
   return (

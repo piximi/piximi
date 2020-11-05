@@ -120,3 +120,14 @@ export const projectSlice = createSlice({
     },
   },
 });
+
+export const {
+  createProjectCategoryAction,
+  createProjectImageAction,
+  createProjectAction,
+  deleteCategoryAction,
+  updateCategoryAction,
+  updateCategoryVisibilityAction,
+  updateOtherCategoryVisibilityAction,
+  updateImageCategoryAction,
+} = projectSlice.actions;

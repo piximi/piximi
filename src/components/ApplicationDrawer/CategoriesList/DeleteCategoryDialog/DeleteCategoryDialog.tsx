@@ -6,7 +6,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import { useDispatch } from "react-redux";
 import { Category } from "../../../../types/Category";
-import { projectSlice } from "../../../../store/slices";
+import { deleteCategoryAction } from "../../../../store/slices";
 
 type DeleteCategoryDialogProps = {
   category: Category;
@@ -23,7 +23,7 @@ export const DeleteCategoryDialog = ({
 
   const onDelete = () => {
     dispatch(
-      projectSlice.actions.deleteCategoryAction({
+      deleteCategoryAction({
         id: category.id,
       })
     );

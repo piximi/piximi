@@ -16,8 +16,8 @@ import Tab from "@material-ui/core/Tab";
 import { LossFunction } from "../../../../types/LossFunction";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { classifierSlice } from "../../../../store/slices";
-import { compileOptionsSelector } from "../../../../store/selectors/compileOptionsSelector";
-import { fitOptionsSelector } from "../../../../store/selectors/fitOptionsSelector";
+import { compileOptionsSelector } from "../../../../store/selectors";
+import { fitOptionsSelector } from "../../../../store/selectors";
 import { openedSelector } from "../../../../store/selectors";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(

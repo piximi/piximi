@@ -4,17 +4,17 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { OpenClassifierSnackbar } from "../../../OpenClassifierSnackbar/OpenClassifierSnackbar";
+import { OpenClassifierSnackbar } from "../../../OpenClassifierSnackbar";
 import { classifierSlice } from "../../../../store/slices";
-import { createdCategoriesSelector } from "../../../../store/selectors/createdCategoriesSelector";
-import { categorizedImagesSelector } from "../../../../store/selectors/categorizedImagesSelector";
-import { compileOptionsSelector } from "../../../../store/selectors/compileOptionsSelector";
-import { compiledSelector } from "../../../../store/selectors/compiledSelector";
-import { dataSelector } from "../../../../store/selectors/dataSelector";
-import { fitOptionsSelector } from "../../../../store/selectors/fitOptionsSelector";
-import { openedSelector } from "../../../../store/selectors/openedSelector";
-import { validationDataSelector } from "../../../../store/selectors/validationDataSelector";
-import { validationPercentageSelector } from "../../../../store/selectors/validationPercentageSelector";
+import { createdCategoriesSelector } from "../../../../store/selectors";
+import { categorizedImagesSelector } from "../../../../store/selectors";
+import { compileOptionsSelector } from "../../../../store/selectors";
+import { compiledSelector } from "../../../../store/selectors";
+import { dataSelector } from "../../../../store/selectors";
+import { fitOptionsSelector } from "../../../../store/selectors";
+import { openedSelector } from "../../../../store/selectors";
+import { validationDataSelector } from "../../../../store/selectors";
+import { validationPercentageSelector } from "../../../../store/selectors";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();

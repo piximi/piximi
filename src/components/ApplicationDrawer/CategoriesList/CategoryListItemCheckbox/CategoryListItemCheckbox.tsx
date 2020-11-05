@@ -5,7 +5,7 @@ import LabelIcon from "@material-ui/icons/Label";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import { Category } from "../../../../types/Category";
 import { useDispatch } from "react-redux";
-import { projectSlice } from "../../../../store/slices";
+import { updateCategoryVisibilityAction } from "../../../../store/slices";
 
 type CategoryListItemCheckboxProps = {
   category: Category;
@@ -22,7 +22,7 @@ export const CategoryListItemCheckbox = ({
       visible: !category.visible,
     };
 
-    dispatch(projectSlice.actions.updateCategoryVisibilityAction(payload));
+    dispatch(updateCategoryVisibilityAction(payload));
   };
 
   return (

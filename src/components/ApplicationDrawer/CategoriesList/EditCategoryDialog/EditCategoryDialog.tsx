@@ -7,10 +7,10 @@ import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
-import { ColorIcon } from "../../../ColorIcon/ColorIcon";
+import { ColorIcon } from "../../../ColorIcon";
 import { useStyles } from "../../../../index.css";
 import { Category } from "../../../../types/Category";
-import { projectSlice } from "../../../../store/slices";
+import { updateCategoryAction } from "../../../../store/slices";
 
 type EditCategoryDialogProps = {
   category: Category;
@@ -41,7 +41,7 @@ export const EditCategoryDialog = ({
 
   const onEdit = () => {
     dispatch(
-      projectSlice.actions.updateCategoryAction({
+      updateCategoryAction({
         id: category.id,
         name: name,
         color: color,

@@ -1,2 +1,32 @@
-export { classifierSlice } from "./classifierSlice";
-export { projectSlice } from "./projectSlice";
+export {
+  classifierSlice,
+  compile,
+  fit,
+  open,
+  preprocess,
+  updateBatchSize,
+  updateCompiled,
+  updateEpochs,
+  updateFitted,
+  updateLearningRate,
+  updateLossFunction,
+  updateMetrics,
+  updateOpened,
+  updateOptimizationAlgorithm,
+  updatePreprocessed,
+  updateTrainingPercentage,
+  updateValidationLossHistory,
+  updateValidationPercentage,
+} from "./classifierSlice";
+
+export {
+  createProjectAction,
+  createProjectCategoryAction,
+  createProjectImageAction,
+  deleteCategoryAction,
+  projectSlice,
+  updateCategoryAction,
+  updateCategoryVisibilityAction,
+  updateImageCategoryAction,
+  updateOtherCategoryVisibilityAction,
+} from "./projectSlice";
