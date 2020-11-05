@@ -4,9 +4,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { Category } from "../../../../types/Category";
-import { CategoryMenu } from "../CategoryMenu";
-import { useMenu } from "../../../../hooks";
+import { Category } from "../../../../../types/Category";
+import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
+import { useMenu } from "../../../../../hooks";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 
 type CategoryListItemProps = {

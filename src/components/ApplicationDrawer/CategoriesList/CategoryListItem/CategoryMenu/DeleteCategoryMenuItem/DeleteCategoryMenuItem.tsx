@@ -1,19 +1,19 @@
 import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
-import { EditCategoryDialog } from "../EditCategoryDialog";
-import { Category } from "../../../../types/Category";
-import { useDialog } from "../../../../hooks";
+import { Category } from "../../../../../../types/Category";
+import { DeleteCategoryDialog } from "../../../DeleteCategoryDialog";
+import { useDialog } from "../../../../../../hooks";
 
-type EditCategoryMenuItemProps = {
+type DeleteCategoryMenuItemProps = {
   category: Category;
   onCloseCategoryMenu: () => void;
 };
 
-export const EditCategoryMenuItem = ({
+export const DeleteCategoryMenuItem = ({
   category,
   onCloseCategoryMenu,
-}: EditCategoryMenuItemProps) => {
+}: DeleteCategoryMenuItemProps) => {
   const { onClose, onOpen, open } = useDialog();
 
   const onClick = () => {
@@ -25,14 +25,10 @@ export const EditCategoryMenuItem = ({
   return (
     <React.Fragment>
       <MenuItem onClick={onClick}>
-        <Typography variant="inherit">Edit category</Typography>
+        <Typography variant="inherit">Delete category</Typography>
       </MenuItem>
 
-      <EditCategoryDialog
-        category={category}
-        onCloseDialog={onClose}
-        openDialog={open}
-      />
+      <DeleteCategoryDialog category={category} onClose={onClose} open={open} />
     </React.Fragment>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
 import Divider from "@material-ui/core/Divider";
-import { Category } from "../../../../types/Category";
+import { Category } from "../../../../../../types/Category";
 import { EditCategoryMenuItem } from "../EditCategoryMenuItem";
 import { DeleteCategoryMenuItem } from "../DeleteCategoryMenuItem";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
