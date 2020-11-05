@@ -7,11 +7,16 @@ import { useMenu } from "../../../../../hooks";
 import { SaveMenu } from "../SaveMenu";
 
 export const SaveListItem = () => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
+  const {
+    anchorEl: anchorElCategoryMenu,
+    onClose: onCloseCategoryMenu,
+    onOpen: onOpenCategoryMenu,
+    open: openCategoryMenu,
+  } = useMenu();
 
   return (
     <React.Fragment>
-      <ListItem button onClick={onOpen}>
+      <ListItem button onClick={onOpenCategoryMenu}>
         <ListItemIcon>
           <FolderOpenIcon />
         </ListItemIcon>
@@ -20,10 +25,10 @@ export const SaveListItem = () => {
       </ListItem>
 
       <SaveMenu
-        anchorEl={anchorEl}
-        onClose={onClose}
-        onOpen={onOpen}
-        open={open}
+        anchorEl={anchorElCategoryMenu}
+        onClose={onCloseCategoryMenu}
+        onOpen={onOpenCategoryMenu}
+        open={openCategoryMenu}
       />
     </React.Fragment>
   );

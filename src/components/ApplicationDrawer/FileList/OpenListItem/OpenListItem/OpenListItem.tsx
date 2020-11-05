@@ -7,11 +7,16 @@ import { OpenMenu } from "../OpenMenu";
 import { useMenu } from "../../../../../hooks";
 
 export const OpenListItem = () => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
+  const {
+    anchorEl: anchorElCategoryMenu,
+    onClose: onCloseCategoryMenu,
+    onOpen: onOpenCategoryMenu,
+    open: openCategoryMenu,
+  } = useMenu();
 
   return (
     <React.Fragment>
-      <ListItem button onClick={onOpen}>
+      <ListItem button onClick={onOpenCategoryMenu}>
         <ListItemIcon>
           <FolderOpenIcon />
         </ListItemIcon>
@@ -20,10 +25,10 @@ export const OpenListItem = () => {
       </ListItem>
 
       <OpenMenu
-        anchorEl={anchorEl}
-        onClose={onClose}
-        onOpen={onOpen}
-        open={open}
+        anchorEl={anchorElCategoryMenu}
+        onClose={onCloseCategoryMenu}
+        onOpen={onOpenCategoryMenu}
+        open={openCategoryMenu}
       />
     </React.Fragment>
   );

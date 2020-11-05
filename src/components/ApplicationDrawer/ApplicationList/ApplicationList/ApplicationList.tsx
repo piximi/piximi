@@ -7,22 +7,15 @@ import FeedbackIcon from "@material-ui/icons/Feedback";
 import HelpIcon from "@material-ui/icons/Help";
 import React from "react";
 import { SettingsDialog } from "../SettingsDialog";
+import { useDialog } from "../../../../hooks";
 
 export const ApplicationList = () => {
-  const [openSettingsDialog, setOpenSettingsDialog] = React.useState(false);
-
-  const onOpenSettingsDialog = () => {
-    setOpenSettingsDialog(true);
-  };
-
-  const onCloseSettingsDialog = () => {
-    setOpenSettingsDialog(false);
-  };
+  const { onClose, onOpen, open } = useDialog();
 
   return (
     <React.Fragment>
       <List dense>
-        <ListItem button onClick={onOpenSettingsDialog}>
+        <ListItem button onClick={onOpen}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
@@ -47,10 +40,7 @@ export const ApplicationList = () => {
         </ListItem>
       </List>
 
-      <SettingsDialog
-        onClose={onCloseSettingsDialog}
-        open={openSettingsDialog}
-      />
+      <SettingsDialog onClose={onClose} open={open} />
     </React.Fragment>
   );
 };

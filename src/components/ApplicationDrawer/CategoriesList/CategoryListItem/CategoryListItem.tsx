@@ -8,16 +8,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import Menu from "@material-ui/core/Menu";
-import MenuList from "@material-ui/core/MenuList";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import { EditCategoryDialog } from "../EditCategoryDialog/EditCategoryDialog";
 import { Category } from "../../../../types/Category";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../../store/slices";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog/DeleteCategoryDialog";
+import { CategoryMenu } from "../CategoryMenu";
+import { useMenu } from "../../../../hooks";
 
 type CategoryListItemProps = {
   category: Category;
@@ -26,50 +21,12 @@ type CategoryListItemProps = {
 export const CategoryListItem = ({ category }: CategoryListItemProps) => {
   const dispatch = useDispatch();
 
-  const [openEditCategoryDialog, setOpenEditCategoryDialog] = React.useState(
-    false
-  );
-
-  const [
-    openDeleteCategoryDialog,
-    setOpenDeleteCategoryDialog,
-  ] = React.useState(false);
-
-  const onOpenEditCategoryDialog = () => {
-    onCloseCategoryMenu();
-    setOpenEditCategoryDialog(true);
-    setCategoryMenuAnchorEl(null);
-  };
-
-  const onOpenDeleteCategoryDialog = () => {
-    onCloseCategoryMenu();
-    setOpenDeleteCategoryDialog(true);
-    setCategoryMenuAnchorEl(null);
-  };
-
-  const [
-    categoryMenuAnchorEl,
-    setCategoryMenuAnchorEl,
-  ] = React.useState<null | HTMLElement>(null);
-
-  const onOpenCategoryMenu = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    category: Category
-  ) => {
-    setCategoryMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCloseCategoryMenu = () => {
-    setCategoryMenuAnchorEl(null);
-  };
-
-  const onCloseEditCategoryDialog = () => {
-    setOpenEditCategoryDialog(false);
-  };
-
-  const onCloseDeleteCategoryDialog = () => {
-    setOpenDeleteCategoryDialog(false);
-  };
+  const {
+    anchorEl: anchorElCategoryMenu,
+    onClose: onCloseCategoryMenu,
+    onOpen: onOpenCategoryMenu,
+    open: openCategoryMenu,
+  } = useMenu();
 
   const onToggleCategory = (category: Category) => {
     onCloseCategoryMenu();
@@ -78,15 +35,6 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
       projectSlice.actions.updateCategoryVisibilityAction({
         id: category.id,
         visible: visible,
-      })
-    );
-  };
-
-  const onHideOtherCategories = (category: Category) => {
-    onCloseCategoryMenu();
-    dispatch(
-      projectSlice.actions.updateOtherCategoryVisibilityAction({
-        id: category.id,
       })
     );
   };
@@ -109,57 +57,18 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
         <ListItemText id={category.id} primary={category.name} />
 
         <ListItemSecondaryAction>
-          <IconButton
-            edge="end"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-              onOpenCategoryMenu(event, category)
-            }
-          >
+          <IconButton edge="end" onClick={onOpenCategoryMenu}>
             <MoreHorizIcon />
           </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
 
-      <Menu
-        anchorEl={categoryMenuAnchorEl}
-        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-        getContentAnchorEl={null}
-        onClose={onCloseCategoryMenu}
-        open={Boolean(categoryMenuAnchorEl)}
-        transformOrigin={{ horizontal: "center", vertical: "top" }}
-      >
-        <MenuList dense variant="menu">
-          <MenuItem onClick={() => onHideOtherCategories(category)}>
-            <Typography variant="inherit">Hide other categories</Typography>
-          </MenuItem>
-
-          <MenuItem onClick={() => onToggleCategory(category)}>
-            <Typography variant="inherit">
-              {category.visible ? "Hide" : "Show"} category
-            </Typography>
-          </MenuItem>
-
-          <Divider />
-
-          <MenuItem onClick={onOpenEditCategoryDialog}>
-            <Typography variant="inherit">Edit category</Typography>
-          </MenuItem>
-
-          <MenuItem onClick={onOpenDeleteCategoryDialog}>
-            <Typography variant="inherit">Delete category</Typography>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-
-      <EditCategoryDialog
+      <CategoryMenu
+        anchorElCategoryMenu={anchorElCategoryMenu}
         category={category}
-        onClose={onCloseEditCategoryDialog}
-        open={openEditCategoryDialog}
-      />
-      <DeleteCategoryDialog
-        category={category}
-        onClose={onCloseDeleteCategoryDialog}
-        open={openDeleteCategoryDialog}
+        onCloseCategoryMenu={onCloseCategoryMenu}
+        onOpenCategoryMenu={onOpenCategoryMenu}
+        openCategoryMenu={openCategoryMenu}
       />
     </React.Fragment>
   );
