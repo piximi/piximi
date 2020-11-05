@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { COLORS } from "../../../../store";
-import { ColorIcon } from "../../../ColorIcon/ColorIcon";
+import { ColorIcon } from "../../../ColorIcon";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "../../../../index.css";
 import { ColorResult } from "react-color";

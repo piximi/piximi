@@ -3,6 +3,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../../types/Category";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
+import { useDialog } from "../../../../hooks";
 
 type DeleteCategoryMenuItemProps = {
   category: Category;
@@ -13,18 +14,16 @@ export const DeleteCategoryMenuItem = ({
   category,
   onCloseCategoryMenu,
 }: DeleteCategoryMenuItemProps) => {
-  const [
-    openDeleteCategoryDialog,
-    setOpenDeleteCategoryDialog,
-  ] = React.useState(false);
-
-  const onCloseDeleteCategoryDialog = () => {
-    setOpenDeleteCategoryDialog(false);
-  };
+  const {
+    onClose: onCloseDialog,
+    onOpen: onOpenDialog,
+    open: openDialog,
+  } = useDialog();
 
   const onOpenDeleteCategoryDialog = () => {
     onCloseCategoryMenu();
-    setOpenDeleteCategoryDialog(true);
+
+    onOpenDialog();
   };
 
   return (
@@ -35,8 +34,8 @@ export const DeleteCategoryMenuItem = ({
 
       <DeleteCategoryDialog
         category={category}
-        onClose={onCloseDeleteCategoryDialog}
-        open={openDeleteCategoryDialog}
+        onClose={onCloseDialog}
+        open={openDialog}
       />
     </React.Fragment>
   );
