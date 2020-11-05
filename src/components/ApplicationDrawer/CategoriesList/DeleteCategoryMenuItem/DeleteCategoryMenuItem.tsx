@@ -14,29 +14,21 @@ export const DeleteCategoryMenuItem = ({
   category,
   onCloseCategoryMenu,
 }: DeleteCategoryMenuItemProps) => {
-  const {
-    onClose: onCloseDialog,
-    onOpen: onOpenDialog,
-    open: openDialog,
-  } = useDialog();
+  const { onClose, onOpen, open } = useDialog();
 
-  const onOpenDeleteCategoryDialog = () => {
+  const onClick = () => {
     onCloseCategoryMenu();
 
-    onOpenDialog();
+    onOpen();
   };
 
   return (
     <React.Fragment>
-      <MenuItem onClick={onOpenDeleteCategoryDialog}>
+      <MenuItem onClick={onClick}>
         <Typography variant="inherit">Delete category</Typography>
       </MenuItem>
 
-      <DeleteCategoryDialog
-        category={category}
-        onClose={onCloseDialog}
-        open={openDialog}
-      />
+      <DeleteCategoryDialog category={category} onClose={onClose} open={open} />
     </React.Fragment>
   );
 };

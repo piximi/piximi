@@ -14,28 +14,24 @@ export const EditCategoryMenuItem = ({
   category,
   onCloseCategoryMenu,
 }: EditCategoryMenuItemProps) => {
-  const {
-    onClose: onCloseDialog,
-    onOpen: onOpenDialog,
-    open: openDialog,
-  } = useDialog();
+  const { onClose, onOpen, open } = useDialog();
 
-  const onOpenEditCategoryDialog = () => {
+  const onClick = () => {
     onCloseCategoryMenu();
 
-    onOpenDialog();
+    onOpen();
   };
 
   return (
     <React.Fragment>
-      <MenuItem onClick={onOpenEditCategoryDialog}>
+      <MenuItem onClick={onClick}>
         <Typography variant="inherit">Edit category</Typography>
       </MenuItem>
 
       <EditCategoryDialog
         category={category}
-        onCloseDialog={onCloseDialog}
-        openDialog={openDialog}
+        onCloseDialog={onClose}
+        openDialog={open}
       />
     </React.Fragment>
   );
