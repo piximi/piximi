@@ -13,6 +13,7 @@ export { EditCategoryDialog } from "./EditCategoryDialog";
 export { FileList } from "./FileList";
 export { FitListItem } from "./FitListItem";
 export { ImageCategoryMenu } from "./ImageCategoryMenu";
+export { ImageDialog } from "./ImageDialog";
 export { ImageGrid } from "./ImageGrid";
 export { NewClassifierDialog } from "./NewClassifierDialog";
 export { OpenClassifierSnackbar } from "./OpenClassifierSnackbar";
