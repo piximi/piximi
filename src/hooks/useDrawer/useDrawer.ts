@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
 
 export const useDrawer = () => {
-  const [openedDrawer, setOpenedDrawer] = useState(true);
+  const [open, setOpen] = useState(true);
 
-  const toggleDrawer = useCallback(() => {
-    setOpenedDrawer(!openedDrawer);
-  }, [openedDrawer]);
+  const toggle = useCallback(() => {
+    setOpen(!open);
+  }, [open]);
 
-  return { openedDrawer, toggleDrawer };
+  return { open, toggle };
 };
