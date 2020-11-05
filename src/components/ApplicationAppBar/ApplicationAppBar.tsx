@@ -44,7 +44,7 @@ export const ApplicationAppBar = ({
           className={clsx(classes.appBar, {
             [classes.appBarShift]: openDrawer,
           })}
-          color="transparent"
+          color="inherit"
           position="fixed"
         >
           <Toolbar>
