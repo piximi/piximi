@@ -16,8 +16,9 @@ export const HideOtherCategoriesMenuItem = ({
 }: HideOtherCategoriesMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onHideOtherCategories = (category: Category) => {
+  const onClick = () => {
     onCloseCategoryMenu();
+
     dispatch(
       projectSlice.actions.updateOtherCategoryVisibilityAction({
         id: category.id,
@@ -26,7 +27,7 @@ export const HideOtherCategoriesMenuItem = ({
   };
 
   return (
-    <MenuItem onClick={() => onHideOtherCategories(category)}>
+    <MenuItem onClick={onClick}>
       <Typography variant="inherit">Hide other categories</Typography>
     </MenuItem>
   );

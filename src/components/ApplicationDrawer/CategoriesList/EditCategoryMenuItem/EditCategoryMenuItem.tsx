@@ -3,6 +3,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import { EditCategoryDialog } from "../EditCategoryDialog";
 import { Category } from "../../../../types/Category";
+import { useDialog } from "../../../../hooks";
 
 type EditCategoryMenuItemProps = {
   category: Category;
@@ -13,17 +14,16 @@ export const EditCategoryMenuItem = ({
   category,
   onCloseCategoryMenu,
 }: EditCategoryMenuItemProps) => {
-  const [openEditCategoryDialog, setOpenEditCategoryDialog] = React.useState(
-    false
-  );
+  const {
+    onClose: onCloseDialog,
+    onOpen: onOpenDialog,
+    open: openDialog,
+  } = useDialog();
 
   const onOpenEditCategoryDialog = () => {
     onCloseCategoryMenu();
-    setOpenEditCategoryDialog(true);
-  };
 
-  const onCloseEditCategoryDialog = () => {
-    setOpenEditCategoryDialog(false);
+    onOpenDialog();
   };
 
   return (
@@ -34,8 +34,8 @@ export const EditCategoryMenuItem = ({
 
       <EditCategoryDialog
         category={category}
-        onClose={onCloseEditCategoryDialog}
-        open={openEditCategoryDialog}
+        onClose={onCloseDialog}
+        open={openDialog}
       />
     </React.Fragment>
   );

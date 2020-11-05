@@ -16,7 +16,7 @@ export const HideOrShowCategoryMenuItem = ({
 }: HideOrShowCategoryMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onToggleCategory = (category: Category) => {
+  const onClick = () => {
     onCloseCategoryMenu();
 
     const payload = { id: category.id, visible: !category.visible };
@@ -25,7 +25,7 @@ export const HideOrShowCategoryMenuItem = ({
   };
 
   return (
-    <MenuItem onClick={() => onToggleCategory(category)}>
+    <MenuItem onClick={onClick}>
       <Typography variant="inherit">
         {category.visible ? "Hide" : "Show"} category
       </Typography>
