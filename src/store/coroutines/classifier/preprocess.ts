@@ -68,16 +68,16 @@ export const preprocess = async (
   categories: Array<Category>,
   options?: { validationPercentage: number }
 ): Promise<{
-  data: Dataset<{ xs: Tensor; ys: Tensor }>;
-  validationData: Dataset<{ xs: Tensor; ys: Tensor }>;
+  data: Dataset<{ xs: any; ys: any }>;
+  validationData: Dataset<{ xs: any; ys: any }>;
 }> => {
-  const data = tensorflow.data
+  const data: any = tensorflow.data
     .generator(generator(images, categories))
     .map(encodeCategories(categories.length))
     .mapAsync(encodeImages)
     .mapAsync(resize);
 
-  const validationData = tensorflow.data
+  const validationData: any = tensorflow.data
     .generator(generator(images, categories))
     .map(encodeCategories(categories.length))
     .mapAsync(encodeImages)

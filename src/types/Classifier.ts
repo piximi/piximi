@@ -8,7 +8,7 @@ import { FitOptions } from "./FitOptions";
 export type Classifier = {
   compiled?: LayersModel;
   compiling: boolean;
-  data?: Dataset<{ xs: Tensor; ys: Tensor }>;
+  data?: Dataset<{ xs: any; ys: any }>;
   evaluating: boolean;
   evaluations?: Scalar | Array<Scalar>;
   fitOptions: FitOptions;
@@ -31,7 +31,7 @@ export type Classifier = {
   predictions?: Tensor;
   saving: boolean;
   trainingPercentage: number;
-  validationData?: Dataset<{ xs: Tensor; ys: Tensor }>;
+  validationData?: Dataset<{ xs: any; ys: any }>;
   validationLossHistory?: Array<{ x: number; y: number }>;
   validationPercentage: number;
 };

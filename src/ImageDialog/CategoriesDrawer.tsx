@@ -2,7 +2,7 @@ import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import React from "react";
 import { useStyles } from "../index.css";
-import { CategoriesList } from "../CategoriesList";
+import { CategoriesList } from "../components/CategoriesList/CategoriesList";
 
 export const CategoriesDrawer = () => {
   const classes = useStyles();

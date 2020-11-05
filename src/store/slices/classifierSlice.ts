@@ -46,9 +46,9 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         callback?: any;
         compiled: LayersModel;
-        data: Dataset<{ xs: Tensor; ys: Tensor }>;
+        data: Dataset<{ xs: any; ys: any }>;
         options: FitOptions;
-        validationData: Dataset<{ xs: Tensor; ys: Tensor }>;
+        validationData: Dataset<{ xs: any; ys: any }>;
       }>
     ) {
       state.fitting = true;
@@ -139,8 +139,8 @@ export const classifierSlice = createSlice({
     updatePreprocessed(
       state,
       action: PayloadAction<{
-        data: Dataset<{ xs: Tensor; ys: Tensor }>;
-        validationData?: Dataset<{ xs: Tensor; ys: Tensor }>;
+        data: Dataset<{ xs: any; ys: any }>;
+        validationData?: Dataset<{ xs: any; ys: any }>;
       }>
     ) {
       const { data, validationData } = action.payload;

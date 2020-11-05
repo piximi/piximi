@@ -4,8 +4,8 @@ import { FitOptions } from "../../../types/FitOptions";
 
 export const fit = async (
   compiled: LayersModel,
-  data: Dataset<{ xs: Tensor; ys: Tensor }>,
-  validationData: Dataset<{ xs: Tensor; ys: Tensor }>,
+  data: Dataset<{ xs: any; ys: any }>,
+  validationData: Dataset<{ xs: any; ys: any }>,
   options: FitOptions,
   callback?: any
 ): Promise<{ fitted: LayersModel; status: History }> => {

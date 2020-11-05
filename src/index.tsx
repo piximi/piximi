@@ -5,9 +5,7 @@ import ReactDOM from "react-dom";
 
 import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
-import { ImageGrid } from "./ImageGrid";
-import { ApplicationDrawer } from "./ApplicationDrawer";
-import { ApplicationAppBar } from "./ApplicationAppBar";
+import { ApplicationDrawer, ApplicationAppBar, ImageGrid } from "./components";
 import { productionStore } from "./store/stores";
 import { classifierSlice } from "./store/slices";
 import { useDispatch } from "react-redux";
