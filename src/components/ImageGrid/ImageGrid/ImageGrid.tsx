@@ -6,14 +6,14 @@ import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
-import { useStyles } from "../../index.css";
+import { useStyles } from "../../../index.css";
 import { useSelector } from "react-redux";
 import { ImageDialog } from "../ImageDialog";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
-import { Category } from "../../types/Category";
-import { Image } from "../../types/Image";
-import { categoriesSelector } from "../../store/selectors";
-import { visibleImagesSelector } from "../../store/selectors";
+import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
+import { categoriesSelector } from "../../../store/selectors";
+import { visibleImagesSelector } from "../../../store/selectors";
 
 type ImageGridProps = {
   openDrawer: boolean;

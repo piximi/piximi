@@ -2,7 +2,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "../../../OpenClassifierSnackbar";
 import { classifierSlice } from "../../../../store/slices";

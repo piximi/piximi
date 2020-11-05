@@ -1,46 +1,17 @@
 import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import SettingsIcon from "@material-ui/icons/Settings";
-import ListItemText from "@material-ui/core/ListItemText";
-import FeedbackIcon from "@material-ui/icons/Feedback";
-import HelpIcon from "@material-ui/icons/Help";
 import React from "react";
-import { SettingsDialog } from "../SettingsDialog";
-import { useDialog } from "../../../../hooks";
+import { SettingsListItem } from "../SettingsListItem/SettingsListItem";
+import { HelpListItem } from "../HelpListItem";
+import { SendFeedbackListItem } from "../SendFeedbackListItem";
 
 export const ApplicationList = () => {
-  const { onClose, onOpen, open } = useDialog();
-
   return (
-    <React.Fragment>
-      <List dense>
-        <ListItem button onClick={onOpen}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
+    <List dense>
+      <SettingsListItem />
 
-          <ListItemText primary="Settings" />
-        </ListItem>
+      <SendFeedbackListItem />
 
-        <ListItem button disabled>
-          <ListItemIcon>
-            <FeedbackIcon />
-          </ListItemIcon>
-
-          <ListItemText primary="Send feedback" />
-        </ListItem>
-
-        <ListItem button disabled>
-          <ListItemIcon>
-            <HelpIcon />
-          </ListItemIcon>
-
-          <ListItemText primary="Help" />
-        </ListItem>
-      </List>
-
-      <SettingsDialog onClose={onClose} open={open} />
-    </React.Fragment>
+      <HelpListItem />
+    </List>
   );
 };
