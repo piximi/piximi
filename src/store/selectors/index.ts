@@ -15,6 +15,7 @@ export { openedSelector } from "./openedSelector";
 export { openingSelector } from "./openingSelector";
 export { projectSelector } from "./projectSelector";
 export { trainingPercentageSelector } from "./trainingPercentageSelector";
+export { unknownCategorySelector } from "./unknownCategorySelector";
 export { validationDataSelector } from "./validationDataSelector";
 export { validationLossHistorySelector } from "./validationLossHistorySelector";
 export { validationPercentageSelector } from "./validationPercentageSelector";

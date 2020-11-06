@@ -42,17 +42,21 @@ export const CategoryMenu = ({
           onCloseCategoryMenu={onCloseCategoryMenu}
         />
 
-        <Divider />
+        {category.id !== "00000000-0000-0000-0000-000000000000" && (
+          <div>
+            <Divider />
 
-        <EditCategoryMenuItem
-          category={category}
-          onCloseCategoryMenu={onCloseCategoryMenu}
-        />
+            <EditCategoryMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
 
-        <DeleteCategoryMenuItem
-          category={category}
-          onCloseCategoryMenu={onCloseCategoryMenu}
-        />
+            <DeleteCategoryMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
+          </div>
+        )}
       </MenuList>
     </Menu>
   );
