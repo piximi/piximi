@@ -10,7 +10,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { ClassifierSettingsDialog } from "../ClassifierSettingsDialog";
+import { ClassifierSettingsDialog } from "../ClassifierSettingsDialog/ClassifierSettingsDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { FitListItem } from "../FitListItem";

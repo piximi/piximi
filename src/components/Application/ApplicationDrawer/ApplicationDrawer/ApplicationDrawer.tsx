@@ -10,6 +10,7 @@ import Drawer from "@material-ui/core/Drawer";
 import React from "react";
 import { useStyles } from "../../Application/Application.css";
 import useTheme from "@material-ui/core/styles/useTheme";
+import { Logo } from "../../ApplicationAppBar/ApplicationToolbar/Logo";
 
 type ApplicationDrawerProps = {
   onCloseDrawer: () => void;

@@ -1,0 +1,1 @@
+export { ArchitectureTabPanel } from "./ArchitectureTabPanel";

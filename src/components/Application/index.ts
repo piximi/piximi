@@ -4,7 +4,7 @@ export { ApplicationDrawer } from "./ApplicationDrawer/ApplicationDrawer";
 export { ApplicationList } from "./ApplicationDrawer/ApplicationList/ApplicationList";
 export { CategoriesList } from "./ApplicationDrawer/CategoriesList";
 export { ClassifierList } from "./ApplicationDrawer/ClassifierList/ClassifierList";
-export { ClassifierSettingsDialog } from "./ApplicationDrawer/ClassifierList/ClassifierSettingsDialog";
+export { ClassifierSettingsDialog } from "./ApplicationDrawer/ClassifierList/ClassifierSettingsDialog/ClassifierSettingsDialog";
 export { CollapsibleList } from "./CollapsibleList";
 export { ColorIcon } from "./ColorIcon";
 export { EditCategoryDialog } from "./ApplicationDrawer/CategoriesList/EditCategoryDialog";

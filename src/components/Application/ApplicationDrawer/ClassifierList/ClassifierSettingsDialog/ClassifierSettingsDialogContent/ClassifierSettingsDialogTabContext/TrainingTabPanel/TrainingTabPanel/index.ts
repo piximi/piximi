@@ -1,0 +1,1 @@
+export { TrainingTabPanel } from "./TrainingTabPanel";

@@ -6,7 +6,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ComputerIcon from "@material-ui/icons/Computer";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import { useStyles } from "../../../../Application/Application.css";
+import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../../../../../store/slices";
 
@@ -47,23 +47,24 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
     <React.Fragment>
       <input
         accept="image/*"
-        className={classes.fileInput}
+        hidden
         type="file"
         id="upload-images"
         onChange={onUploadFromComputerChange}
       />
       <Menu
+        PaperProps={{ style: { width: 320 } }}
         TransitionComponent={Fade}
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: "center", horizontal: "left" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         getContentAnchorEl={null}
         onClose={onClose}
         open={Boolean(anchorEl)}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <ListSubheader>Upload from</ListSubheader>
+        <ListSubheader className={classes.subheader}>Upload from</ListSubheader>
         <label htmlFor="upload-images">
-          <MenuItem onClick={onClose} component="span">
+          <MenuItem className={classes.item} component="span" onClick={onClose}>
             <ListItemIcon>
               <ComputerIcon />
             </ListItemIcon>
