@@ -57,7 +57,7 @@ export const EditCategoryDialog = ({
 
       <DialogContent>
         <div>
-          <Grid container spacing={1} xs={12}>
+          <Grid container spacing={1}>
             <Grid item xs={2} className={classes.createCategoryDialogItem}>
               <ColorIcon color={color} onColorChange={onColorChange} />
             </Grid>
