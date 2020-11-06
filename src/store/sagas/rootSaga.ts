@@ -1,15 +1,15 @@
 import { all, fork } from "redux-saga/effects";
-import { watchCompileActionSaga } from "./classifier";
-import { watchFitActionSaga } from "./classifier";
-import { watchPreprocessActionSaga } from "./classifier";
-import { watchOpenActionSaga } from "./classifier";
+import { watchCompileSaga } from "./classifier";
+import { watchFitSaga } from "./classifier";
+import { watchPreprocessSaga } from "./classifier";
+import { watchOpenSaga } from "./classifier";
 
 export function* rootSaga() {
   const effects = [
-    fork(watchCompileActionSaga),
-    fork(watchFitActionSaga),
-    fork(watchPreprocessActionSaga),
-    fork(watchOpenActionSaga),
+    fork(watchCompileSaga),
+    fork(watchFitSaga),
+    fork(watchPreprocessSaga),
+    fork(watchOpenSaga),
   ];
 
   yield all(effects);

@@ -1,4 +1,4 @@
-export { watchCompileActionSaga } from "./watchCompileActionSaga";
-export { watchFitActionSaga } from "./watchFitActionSaga";
-export { watchPreprocessActionSaga } from "./watchPreprocessActionSaga";
-export { watchOpenActionSaga } from "./watchOpenActionSaga";
+export { watchCompileSaga } from "./watchCompileSaga";
+export { watchFitSaga } from "./watchFitSaga";
+export { watchPreprocessSaga } from "./watchPreprocessSaga";
+export { watchOpenSaga } from "./watchOpenSaga";
