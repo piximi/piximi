@@ -39,7 +39,11 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
       <ListItem dense key={category.id} id={category.id}>
         <CategoryListItemCheckbox category={category} />
 
-        <ListItemText id={category.id} primary={category.name} />
+        <ListItemText
+          id={category.id}
+          primary={category.name}
+          primaryTypographyProps={{ noWrap: true }}
+        />
 
         <ListItemSecondaryAction>
           <IconButton edge="end" onClick={onOpenCategoryMenu}>
