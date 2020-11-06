@@ -38,7 +38,7 @@ export const InputShape = () => {
         <TextField
           InputProps={{
             endAdornment: (
-              <InputAdornment position="end">pixels</InputAdornment>
+              <InputAdornment position="end">channels</InputAdornment>
             ),
           }}
           disabled
