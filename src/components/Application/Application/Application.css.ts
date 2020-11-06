@@ -11,12 +11,12 @@ export const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
-    marginLeft: theme.spacing(30),
+    marginLeft: theme.spacing(32),
     transition: theme.transitions.create(["margin", "width"], {
       duration: theme.transitions.duration.enteringScreen,
       easing: theme.transitions.easing.easeOut,
     }),
-    width: `calc(100% - ${theme.spacing(30)}px)`,
+    width: `calc(100% - ${theme.spacing(32)}px)`,
   },
   card: {},
   classifierSettingsDialogContent: {
@@ -40,7 +40,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   drawer: {
     flexShrink: 0,
-    width: theme.spacing(30),
+    width: theme.spacing(32),
   },
   drawerHeader: {
     ...theme.mixins.toolbar,
@@ -50,7 +50,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0, 1),
   },
   drawerPaper: {
-    width: theme.spacing(30),
+    width: theme.spacing(32),
   },
   fileInput: {
     display: "none",
@@ -74,7 +74,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   main: {
     flexGrow: 1,
-    marginLeft: -theme.spacing(30),
+    marginLeft: -theme.spacing(32),
     padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
       duration: theme.transitions.duration.leavingScreen,

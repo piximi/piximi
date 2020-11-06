@@ -10,6 +10,11 @@ import { useDialog, useMenu } from "../../../../../../hooks";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
+import { Chip } from "@material-ui/core";
+// import {filter} from "underscore";
+import { useSelector } from "react-redux";
+import { State } from "../../../../../../types/State";
+import { Image } from "../../../../../../types/Image";
 
 type CategoryListItemProps = {
   category: Category;
@@ -34,6 +39,12 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     open: openCategoryMenu,
   } = useMenu();
 
+  const imageCount = useSelector((state: State) => {
+    return state.project.images.filter((image: Image) => {
+      return image.categoryId === category.id;
+    }).length;
+  });
+
   return (
     <React.Fragment>
       <ListItem dense key={category.id} id={category.id}>
@@ -44,6 +55,8 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
           primary={category.name}
           primaryTypographyProps={{ noWrap: true }}
         />
+
+        <Chip label={imageCount} color="primary" size="small" />
 
         <ListItemSecondaryAction>
           <IconButton edge="end" onClick={onOpenCategoryMenu}>

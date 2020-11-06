@@ -6,6 +6,8 @@ import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import { Category } from "../../../../../../types/Category";
 import { useDispatch } from "react-redux";
 import { updateCategoryVisibility } from "../../../../../../store/slices";
+import { Badge } from "@material-ui/core";
+import { useStyles } from "../../../../Application/Application.css";
 
 type CategoryListItemCheckboxProps = {
   category: Category;
@@ -15,6 +17,8 @@ export const CategoryListItemCheckbox = ({
   category,
 }: CategoryListItemCheckboxProps) => {
   const dispatch = useDispatch();
+
+  const classes = useStyles();
 
   const onChange = () => {
     const payload = {
