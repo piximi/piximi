@@ -3,10 +3,10 @@ import Menu from "@material-ui/core/Menu";
 import MenuList from "@material-ui/core/MenuList";
 import Divider from "@material-ui/core/Divider";
 import { Category } from "../../../../../../../types/Category";
-import { EditCategoryMenuItem } from "../EditCategoryMenuItem";
-import { DeleteCategoryMenuItem } from "../DeleteCategoryMenuItem";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
+import MenuItem from "@material-ui/core/MenuItem";
+import Typography from "@material-ui/core/Typography";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -14,6 +14,8 @@ type CategoryMenuProps = {
   onCloseCategoryMenu: () => void;
   onOpenCategoryMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
   openCategoryMenu: boolean;
+  onOpenDeleteCategoryDialog: () => void;
+  onOpenEditCategoryDialog: () => void;
 };
 
 export const CategoryMenu = ({
@@ -21,7 +23,19 @@ export const CategoryMenu = ({
   category,
   onCloseCategoryMenu,
   openCategoryMenu,
+  onOpenDeleteCategoryDialog,
+  onOpenEditCategoryDialog,
 }: CategoryMenuProps) => {
+  const onOpenDeleteCategoryDialogClick = () => {
+    onOpenDeleteCategoryDialog();
+    onCloseCategoryMenu();
+  };
+
+  const onOpenEditCategoryDialogClick = () => {
+    onOpenEditCategoryDialog();
+    onCloseCategoryMenu();
+  };
+
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
@@ -46,15 +60,13 @@ export const CategoryMenu = ({
           <div>
             <Divider />
 
-            <EditCategoryMenuItem
-              category={category}
-              onCloseCategoryMenu={onCloseCategoryMenu}
-            />
+            <MenuItem onClick={onOpenEditCategoryDialogClick}>
+              <Typography variant="inherit">Edit category</Typography>
+            </MenuItem>
 
-            <DeleteCategoryMenuItem
-              category={category}
-              onCloseCategoryMenu={onCloseCategoryMenu}
-            />
+            <MenuItem onClick={onOpenDeleteCategoryDialogClick}>
+              <Typography variant="inherit">Delete category</Typography>
+            </MenuItem>
           </div>
         )}
       </MenuList>

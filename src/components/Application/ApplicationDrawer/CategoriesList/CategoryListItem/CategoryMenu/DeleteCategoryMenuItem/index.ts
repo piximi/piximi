@@ -1,1 +1,0 @@
-export { DeleteCategoryMenuItem } from "./DeleteCategoryMenuItem";

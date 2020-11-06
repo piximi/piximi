@@ -6,14 +6,27 @@ import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { Category } from "../../../../../../types/Category";
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
-import { useMenu } from "../../../../../../hooks";
+import { useDialog, useMenu } from "../../../../../../hooks";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
+import { EditCategoryDialog } from "../../EditCategoryDialog";
+import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
 
 type CategoryListItemProps = {
   category: Category;
 };
 
 export const CategoryListItem = ({ category }: CategoryListItemProps) => {
+  const {
+    onClose: onCloseDeleteCategoryDialog,
+    onOpen: onOpenDeleteCategoryDialog,
+    open: openDeleteCategoryDialog,
+  } = useDialog();
+  const {
+    onClose: onCloseEditCategoryDialog,
+    onOpen: onOpenEditCategoryDialog,
+    open: openEditCategoryDialog,
+  } = useDialog();
+
   const {
     anchorEl: anchorElCategoryMenu,
     onClose: onCloseCategoryMenu,
@@ -40,7 +53,21 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
         category={category}
         onCloseCategoryMenu={onCloseCategoryMenu}
         onOpenCategoryMenu={onOpenCategoryMenu}
+        onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
+        onOpenEditCategoryDialog={onOpenEditCategoryDialog}
         openCategoryMenu={openCategoryMenu}
+      />
+
+      <DeleteCategoryDialog
+        category={category}
+        onClose={onCloseDeleteCategoryDialog}
+        open={openDeleteCategoryDialog}
+      />
+
+      <EditCategoryDialog
+        category={category}
+        onCloseDialog={onCloseEditCategoryDialog}
+        openDialog={openEditCategoryDialog}
       />
     </React.Fragment>
   );
