@@ -1,7 +1,7 @@
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import FolderOpenIcon from "@material-ui/icons/FolderOpen";
+import SaveIcon from "@material-ui/icons/Save";
 import React from "react";
 import { useMenu } from "../../../../../../hooks";
 import { SaveMenu } from "../SaveMenu";
@@ -18,7 +18,7 @@ export const SaveListItem = () => {
     <React.Fragment>
       <ListItem button onClick={onOpenCategoryMenu}>
         <ListItemIcon>
-          <FolderOpenIcon />
+          <SaveIcon />
         </ListItemIcon>
 
         <ListItemText primary="Save" />
