@@ -22,6 +22,12 @@ export const useStyles = makeStyles((theme) => ({
   classifierSettingsDialogContent: {
     marginTop: theme.spacing(8),
   },
+  chip: {
+    height: "20px",
+    borderWidth: "2px",
+    fontSize: "0.875rem",
+    color: "white",
+  },
   colorPicker: {
     margin: "16px",
   },
