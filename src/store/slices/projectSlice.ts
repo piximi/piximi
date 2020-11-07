@@ -16,6 +16,7 @@ const initialState: Project = {
   ],
   images: [],
   name: "Untitled project",
+  tileSize: 1,
 };
 
 export const projectSlice = createSlice({
@@ -51,6 +52,8 @@ export const projectSlice = createSlice({
       state.name = action.payload.project.name;
 
       state.images = action.payload.project.images;
+
+      state.tileSize = 1;
     },
     deleteCategory(state: Project, action: PayloadAction<{ id: string }>) {
       state.categories = filter(state.categories, (category: Category) => {
@@ -108,6 +111,12 @@ export const projectSlice = createSlice({
       if (index >= 0) {
         state.images[index].categoryId = action.payload.categoryId;
       }
+    },
+    updateTileSize(
+      state: Project,
+      action: PayloadAction<{ newValue: number }>
+    ) {
+      state.tileSize = action.payload.newValue!;
     },
   },
 });
