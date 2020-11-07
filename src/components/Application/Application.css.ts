@@ -88,7 +88,7 @@ export const useStyles = makeStyles((theme) => ({
     }),
   },
   mainShift: {
-    marginLeft: 0,
+    marginLeft: theme.spacing(32),
     transition: theme.transitions.create("margin", {
       duration: theme.transitions.duration.enteringScreen,
       easing: theme.transitions.easing.easeOut,
