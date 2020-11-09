@@ -32,6 +32,12 @@ export const ApplicationToolbar = ({
     newValue: number | number[]
   ) => {
     setValue(newValue as number);
+  };
+
+  const onChangeCommitted = (
+    event: React.ChangeEvent<{}>,
+    newValue: number | number[]
+  ) => {
     dispatch(
       settingsSlice.actions.updateTileSize({
         newValue: newValue as number,
@@ -60,6 +66,7 @@ export const ApplicationToolbar = ({
         max={4}
         step={0.01}
         onChange={onChange}
+        onChangeCommitted={onChangeCommitted}
         style={{ width: "10%" }}
       />
       <ZoomInIcon />
