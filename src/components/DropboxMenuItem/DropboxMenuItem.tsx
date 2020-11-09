@@ -20,7 +20,9 @@ export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
   const { open } = useDropboxChooser({
     appKey: "tetle78x244mpkz",
     chooserOptions: { multiselect: true, linkType: "direct" },
-    onSelected: (items) => {
+    onSelected: (items: readonly Dropbox.ChooserFile[]) => {
+      onClose();
+
       items.forEach((item: Dropbox.ChooserFile) => {
         dispatch(createImage({ src: item.link as string }));
       });
