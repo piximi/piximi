@@ -49,7 +49,7 @@ export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
         max={4}
         step={0.01}
         onChange={handleChange}
-        style={{ width: "15%" }}
+        style={{ width: "10%" }}
       />
       <ZoomInIcon />
 
