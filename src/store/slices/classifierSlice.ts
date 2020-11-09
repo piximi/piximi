@@ -7,6 +7,8 @@ import { Dataset } from "@tensorflow/tfjs-data";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../types/CompileOptions";
 import { FitOptions } from "../../types/FitOptions";
+import { Image } from "../../types/Image";
+import { Category } from "../../types/Category";
 
 const initialState: Classifier = {
   compiling: false,
@@ -63,7 +65,16 @@ export const classifierSlice = createSlice({
     ) {
       state.opening = true;
     },
-    preprocess(state) {
+    preprocess(
+      state,
+      action: PayloadAction<{
+        images: Array<Image>;
+        categories: Array<Category>;
+        options: {
+          validationPercentage: number;
+        };
+      }>
+    ) {
       state.generating = true;
     },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {

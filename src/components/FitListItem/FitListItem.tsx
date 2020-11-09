@@ -6,7 +6,11 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "../OpenClassifierSnackbar";
 import { classifierSlice } from "../../store/slices";
-import { compileOptionsSelector } from "../../store/selectors";
+import {
+  compileOptionsSelector,
+  createdCategoriesSelector,
+  imagesSelector,
+} from "../../store/selectors";
 import { openedSelector } from "../../store/selectors";
 
 export const FitListItem = () => {
@@ -14,6 +18,9 @@ export const FitListItem = () => {
 
   const compileOptions = useSelector(compileOptionsSelector);
   const opened = useSelector(openedSelector);
+
+  const images = useSelector(imagesSelector);
+  const categories = useSelector(createdCategoriesSelector);
 
   const [
     openOpenClassifierSnackbar,
@@ -29,25 +36,13 @@ export const FitListItem = () => {
   }, [compileOptions, dispatch, opened]);
 
   const onOpenClassifierSnackbar = () => {
-    const pathname =
-      "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
-
     dispatch(
-      classifierSlice.actions.open({
-        pathname: pathname,
-        classes: 10,
-        units: 100,
+      classifierSlice.actions.preprocess({
+        images: images,
+        categories: categories,
+        options: { validationPercentage: 0.0 },
       })
     );
-
-    // dispatch(
-    //   preprocessModelAction({
-    //     images: images,
-    //     categories: categories,
-    //     options: { validationPercentage: validationPercentage },
-    //   })
-    // );
-    // dispatch(fitAction({compiled: compiled, data: data, validationData: validationData, options: fitOptions, callback: callback}));
 
     setOpenOpenClassifierSnackbar(true);
   };

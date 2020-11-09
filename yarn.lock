@@ -1816,6 +1816,11 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/dropbox-chooser@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/dropbox-chooser/-/dropbox-chooser-1.0.2.tgz#f65ee5cc34da51309a7a6ae8055ec55b92ad2597"
+  integrity sha512-RmsWRNP6LBB4jVPQAisst95vST9NM+PX6xWa8KhbtHDLA9ZtQ1eK8PbasQeaFX2fWb2oaFtKRDgubngeAxneZg==
+
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -7358,6 +7363,11 @@ load-json-file@^4.0.0:
     pify "^3.0.0"
     strip-bom "^3.0.0"
 
+load-script@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/load-script/-/load-script-1.0.0.tgz#0491939e0bee5643ee494a7e3da3d2bac70c6ca4"
+  integrity sha1-BJGTngvuVkPuSUp+PaPSuscMbKQ=
+
 loader-fs-cache@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/loader-fs-cache/-/loader-fs-cache-1.0.2.tgz#54cedf6b727e1779fd8f01205f05f6e88706f086"
@@ -11811,6 +11821,14 @@ use-asset@^0.1.1:
   integrity sha512-hXnxOm5nDtxN5KPL5PUhEXbNsL9z8xIkYXo4WSBzV2dfS9ahaL6K+P/oMOUUiJ0FfyD1+N5EL8LhwVPUE6xHWA==
   dependencies:
     fast-deep-equal "^3.1.3"
+
+use-dropbox-chooser@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/use-dropbox-chooser/-/use-dropbox-chooser-0.0.4.tgz#c20c06d43e8dfc8098462df9cb77734ad7db076e"
+  integrity sha512-umb3sBL4ob/IrXFCbP6i1N6bbTjzkFV6ODBPxJskaYpImoMMK8+/ZYTVUSG9i76H2JYw82D8Kbufp4oWy+Xogg==
+  dependencies:
+    "@types/dropbox-chooser" "^1.0.2"
+    load-script "^1.0.0"
 
 use-memo-one@^1.1.0:
   version "1.1.1"

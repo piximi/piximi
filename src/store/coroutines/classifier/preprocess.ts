@@ -2,7 +2,6 @@ import { Image } from "../../../types/Image";
 import { Category } from "../../../types/Category";
 import { Dataset } from "@tensorflow/tfjs-data";
 import * as tensorflow from "@tensorflow/tfjs";
-import { Tensor } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 
 export const encodeCategories = (categories: number) => {
@@ -17,7 +16,7 @@ export const encodeCategories = (categories: number) => {
 export const encodeImages = async (item: {
   xs: string;
   ys: tensorflow.Tensor;
-}): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
+}): Promise<{ xs: tensorflow.Tensor3D; ys: tensorflow.Tensor }> => {
   const fetched = await tensorflow.util.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
@@ -45,13 +44,9 @@ export const generator = (
     while (index < count) {
       const image = images[index];
 
-      const ys = categories
-        .filter((category: Category) => {
-          return category.id !== "00000000--0000-0000-00000000000";
-        })
-        .findIndex((category: Category) => {
-          return category.id === image.categoryId;
-        });
+      const ys = categories.findIndex((category: Category) => {
+        return category.id === image.categoryId;
+      });
 
       yield {
         xs: image.src,
@@ -67,11 +62,8 @@ export const preprocess = async (
   images: Array<Image>,
   categories: Array<Category>,
   options?: { validationPercentage: number }
-): Promise<{
-  data: Dataset<{ xs: any; ys: any }>;
-  validationData: Dataset<{ xs: any; ys: any }>;
-}> => {
-  const data: any = tensorflow.data
+) => {
+  const data = tensorflow.data
     .generator(generator(images, categories))
     .map(encodeCategories(categories.length))
     .mapAsync(encodeImages)
@@ -83,6 +75,8 @@ export const preprocess = async (
     .mapAsync(encodeImages)
     .mapAsync(resize);
 
+  data.forEachAsync((e) => console.log(e));
+
   return {
     data: data,
     validationData: validationData,
@@ -90,7 +84,7 @@ export const preprocess = async (
 };
 
 export const resize = async (item: {
-  xs: any;
+  xs: tensorflow.Tensor3D;
   ys: tensorflow.Tensor;
 }): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
   const resized = tensorflow.image.resizeBilinear(item.xs, [224, 224]);
