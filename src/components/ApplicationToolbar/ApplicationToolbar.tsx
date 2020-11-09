@@ -59,7 +59,7 @@ export const ApplicationToolbar = ({
 
       <div className={classes.grow} />
 
-      <ZoomOutIcon />
+      <ZoomOutIcon className={classes.zoomIcon} />
       <Slider
         value={value}
         min={0.6}
@@ -67,9 +67,9 @@ export const ApplicationToolbar = ({
         step={0.01}
         onChange={onChange}
         onChangeCommitted={onChangeCommitted}
-        style={{ width: "10%" }}
+        className={classes.zoomSlider}
       />
-      <ZoomInIcon />
+      <ZoomInIcon className={classes.zoomIcon} />
 
       <SearchInput />
 
