@@ -14,6 +14,7 @@ import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import { categoriesSelector } from "../../store/selectors";
 import { visibleImagesSelector } from "../../store/selectors";
+import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 
 type ImageGridProps = {
   openDrawer: boolean;
@@ -66,15 +67,28 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     return categories[index];
   };
 
+  const scaleFactor = useSelector(tileSizeSelector);
+
+  const getSize = (scaleFactor: number) => {
+    const width = (230 * scaleFactor).toString() + "px";
+    const height = (185 * scaleFactor).toString() + "px";
+    return { width: width, height: height };
+  };
+
   return (
     <React.Fragment>
       <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
         <Container className={classes.container} maxWidth="md">
-          <GridList className={classes.gridList} cols={4}>
+          <GridList
+            className={classes.gridList}
+            cols={Math.floor(4 / scaleFactor)}
+            cellHeight="auto"
+          >
             {images.map((image: Image) => (
               <GridListTile
                 key={image.id}
                 onClick={() => onOpenImageDialog(image)}
+                style={getSize(scaleFactor)}
               >
                 <img alt="" src={image.src} />
 

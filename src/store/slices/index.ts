@@ -30,3 +30,5 @@ export {
   updateImageCategory,
   updateOtherCategoryVisibility,
 } from "./projectSlice";
+
+export { settingsSlice, updateTileSize } from "./settingsSlice";
