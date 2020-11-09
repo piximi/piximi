@@ -1,5 +1,9 @@
-import { Project } from "../../types/Project";
+import { Settings } from "../../types/Settings";
 
-export const tileSizeSelector = ({ project }: { project: Project }): number => {
-  return project.tileSize;
+export const tileSizeSelector = ({
+  settings,
+}: {
+  settings: Settings;
+}): number => {
+  return settings.tileSize;
 };

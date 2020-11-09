@@ -7,7 +7,7 @@ import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
 import { SearchInput } from "../SearchInput";
 import { Slider } from "@material-ui/core";
-import { projectSlice } from "../../store/slices";
+import { settingsSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
@@ -26,7 +26,7 @@ export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
   const handleChange = (event: any, newValue: any) => {
     setValue(newValue);
     dispatch(
-      projectSlice.actions.updateTileSize({
+      settingsSlice.actions.updateTileSize({
         newValue: newValue,
       })
     );
