@@ -1,11 +1,13 @@
 import { History, LayersModel } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
 import { FitOptions } from "../../../types/FitOptions";
+import * as tensorflow from "@tensorflow/tfjs";
 
 export const fit = async (
   compiled: LayersModel,
-  data: Dataset<{ xs: any; ys: any }>,
-  validationData: Dataset<{ xs: any; ys: any }>,
+  data: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+  }>,
   options: FitOptions,
   callback?: any
 ): Promise<{ fitted: LayersModel; status: History }> => {
@@ -14,7 +16,6 @@ export const fit = async (
       onBatchEnd: callback,
     },
     epochs: options.epochs,
-    validationData: validationData.batch(options.batchSize),
   };
 
   const status = await compiled.fitDataset(data.batch(options.batchSize), args);

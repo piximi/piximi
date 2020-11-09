@@ -1,10 +1,9 @@
-import { Image } from "../../../types/Image";
-import { Category } from "../../../types/Category";
-import { Dataset } from "@tensorflow/tfjs-data";
 import * as tensorflow from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
+import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
 
-export const encodeCategories = (categories: number) => {
+export const decodeCategory = (categories: number) => {
   return (item: {
     xs: string;
     ys: number;
@@ -13,10 +12,10 @@ export const encodeCategories = (categories: number) => {
   };
 };
 
-export const encodeImages = async (item: {
+export const decodeImage = async (item: {
   xs: string;
   ys: tensorflow.Tensor;
-}): Promise<{ xs: tensorflow.Tensor3D; ys: tensorflow.Tensor }> => {
+}): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
   const fetched = await tensorflow.util.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
@@ -29,6 +28,20 @@ export const encodeImages = async (item: {
 
   return new Promise((resolve) => {
     return resolve({ ...item, xs: xs });
+  });
+};
+
+export const resize = async (item: {
+  xs: tensorflow.Tensor;
+  ys: tensorflow.Tensor;
+}): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
+  const resized = tensorflow.image.resizeBilinear(
+    item.xs as tensorflow.Tensor3D,
+    [224, 224]
+  );
+
+  return new Promise((resolve) => {
+    return resolve({ ...item, xs: resized });
   });
 };
 
@@ -45,7 +58,9 @@ export const generator = (
       const image = images[index];
 
       const ys = categories.findIndex((category: Category) => {
-        return category.id === image.categoryId;
+        if (category.id !== "00000000-0000-0000-0000-00000000000") {
+          return category.id === image.categoryId;
+        }
       });
 
       yield {
@@ -60,36 +75,13 @@ export const generator = (
 
 export const preprocess = async (
   images: Array<Image>,
-  categories: Array<Category>,
-  options?: { validationPercentage: number }
-) => {
-  const data = tensorflow.data
+  categories: Array<Category>
+): Promise<
+  tensorflow.data.Dataset<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }>
+> => {
+  return tensorflow.data
     .generator(generator(images, categories))
-    .map(encodeCategories(categories.length))
-    .mapAsync(encodeImages)
+    .map(decodeCategory(categories.length))
+    .mapAsync(decodeImage)
     .mapAsync(resize);
-
-  const validationData: any = tensorflow.data
-    .generator(generator(images, categories))
-    .map(encodeCategories(categories.length))
-    .mapAsync(encodeImages)
-    .mapAsync(resize);
-
-  data.forEachAsync((e) => console.log(e));
-
-  return {
-    data: data,
-    validationData: validationData,
-  };
-};
-
-export const resize = async (item: {
-  xs: tensorflow.Tensor3D;
-  ys: tensorflow.Tensor;
-}): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
-  const resized = tensorflow.image.resizeBilinear(item.xs, [224, 224]);
-
-  return new Promise((resolve) => {
-    return resolve({ ...item, xs: resized });
-  });
 };

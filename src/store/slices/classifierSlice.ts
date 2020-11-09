@@ -9,6 +9,7 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { FitOptions } from "../../types/FitOptions";
 import { Image } from "../../types/Image";
 import { Category } from "../../types/Category";
+import * as tensorflow from "@tensorflow/tfjs";
 
 const initialState: Classifier = {
   compiling: false,
@@ -19,7 +20,7 @@ const initialState: Classifier = {
     initialEpoch: 0,
   },
   fitting: false,
-  generating: false,
+  preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
   lossHistory: [],
@@ -47,10 +48,11 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         callback?: any;
-        compiled: LayersModel;
-        data: Dataset<{ xs: any; ys: any }>;
         options: FitOptions;
-        validationData: Dataset<{ xs: any; ys: any }>;
+        classes: number;
+        compileOptions: CompileOptions;
+        pathname: string;
+        units: number;
       }>
     ) {
       state.fitting = true;
@@ -70,12 +72,9 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         images: Array<Image>;
         categories: Array<Category>;
-        options: {
-          validationPercentage: number;
-        };
       }>
     ) {
-      state.generating = true;
+      state.preprocessing = true;
     },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
@@ -150,15 +149,17 @@ export const classifierSlice = createSlice({
     updatePreprocessed(
       state,
       action: PayloadAction<{
-        data: Dataset<{ xs: any; ys: any }>;
-        validationData?: Dataset<{ xs: any; ys: any }>;
+        data: tensorflow.data.Dataset<{
+          xs: tensorflow.Tensor;
+          ys: tensorflow.Tensor;
+        }>;
       }>
     ) {
-      const { data, validationData } = action.payload;
+      const { data } = action.payload;
 
       state.data = data;
-      state.generating = false;
-      state.validationData = validationData;
+
+      state.preprocessing = false;
     },
     updateTrainingPercentage(
       state,

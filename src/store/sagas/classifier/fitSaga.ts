@@ -1,29 +1,28 @@
 import { put, select } from "redux-saga/effects";
-import { fit } from "../../coroutines/classifier";
+import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
-import { compiledSelector } from "../../selectors";
-import { dataSelector } from "../../selectors";
+import {
+  categorizedImagesSelector,
+  createdCategoriesSelector,
+} from "../../selectors";
 import { fitOptionsSelector } from "../../selectors";
-import { validationDataSelector } from "../../selectors";
 
 export function* fitSaga(action: any) {
-  const { callback } = action.payload;
+  const { callback, classes, compileOptions, pathname, units } = action.payload;
 
-  const compiled = yield select(compiledSelector);
+  const opened = yield open(pathname, classes, units);
 
-  const data = yield select(dataSelector);
+  const compiled = yield compile(opened, compileOptions);
 
-  const validationData = yield select(validationDataSelector);
+  const images = yield select(categorizedImagesSelector);
+
+  const categories = yield select(createdCategoriesSelector);
+
+  const data = yield preprocess(images, categories);
 
   const options = yield select(fitOptionsSelector);
 
-  const { fitted, status } = yield fit(
-    compiled,
-    data,
-    validationData,
-    options,
-    callback
-  );
+  const { fitted, status } = yield fit(compiled, data, options, callback);
 
   const payload = { fitted: fitted, status: status };
 

@@ -6,12 +6,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { OpenClassifierSnackbar } from "../OpenClassifierSnackbar";
 import { classifierSlice } from "../../store/slices";
-import {
-  compileOptionsSelector,
-  createdCategoriesSelector,
-  imagesSelector,
-} from "../../store/selectors";
-import { openedSelector } from "../../store/selectors";
+import { compileOptionsSelector, openedSelector } from "../../store/selectors";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();
@@ -19,13 +14,20 @@ export const FitListItem = () => {
   const compileOptions = useSelector(compileOptionsSelector);
   const opened = useSelector(openedSelector);
 
-  const images = useSelector(imagesSelector);
-  const categories = useSelector(createdCategoriesSelector);
-
   const [
     openOpenClassifierSnackbar,
     setOpenOpenClassifierSnackbar,
   ] = React.useState(false);
+
+  const callback = (batch: number, logs: any) => {
+    console.info(logs);
+    dispatch(
+      classifierSlice.actions.updateLossHistory({
+        batch: batch,
+        loss: logs.loss,
+      })
+    );
+  };
 
   useCallback(() => {
     console.info("useCallback");
@@ -37,10 +39,18 @@ export const FitListItem = () => {
 
   const onOpenClassifierSnackbar = () => {
     dispatch(
-      classifierSlice.actions.preprocess({
-        images: images,
-        categories: categories,
-        options: { validationPercentage: 0.0 },
+      classifierSlice.actions.fit({
+        callback: callback,
+        classes: 2,
+        options: {
+          epochs: 10,
+          batchSize: 1,
+          initialEpoch: 1,
+        },
+        compileOptions: compileOptions,
+        pathname:
+          "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json",
+        units: 10,
       })
     );
 

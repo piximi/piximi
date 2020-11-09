@@ -46,10 +46,12 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "@tensorflow/tfjs-node": "^2.7.0",
     "@types/react-redux": "^7.1.9",
     "@types/redux-logger": "^3.0.8",
     "@types/underscore": "^1.10.24",
     "@types/uuid": "^8.3.0",
+    "canvas": "^2.6.1",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
     "prettier": "^2.1.2"

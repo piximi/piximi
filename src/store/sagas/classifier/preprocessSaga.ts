@@ -11,7 +11,7 @@ export function* preprocessSaga() {
 
   const categories = yield select(createdCategoriesSelector);
 
-  const { data } = yield preprocess(images, categories);
+  const data = yield preprocess(images, categories);
 
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 }
