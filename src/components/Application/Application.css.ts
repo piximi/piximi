@@ -52,8 +52,7 @@ export const useStyles = makeStyles((theme) => ({
     ...theme.mixins.toolbar,
     alignItems: "center",
     display: "flex",
-    justifyContent: "flex-end",
-    padding: theme.spacing(0, 1),
+    paddingLeft: theme.spacing(3),
   },
   drawerPaper: {
     width: theme.spacing(32),

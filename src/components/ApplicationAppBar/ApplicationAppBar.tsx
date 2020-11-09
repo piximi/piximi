@@ -22,7 +22,7 @@ export const ApplicationAppBar = ({ open, toggle }: ApplicationAppBar) => {
           color="inherit"
           position="fixed"
         >
-          <ApplicationToolbar toggle={toggle} />
+          <ApplicationToolbar toggle={toggle} open={open} />
         </AppBar>
       </div>
     </React.Fragment>

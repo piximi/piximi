@@ -14,9 +14,13 @@ import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 
 type ApplicationToolbarProps = {
   toggle: () => void;
+  open: boolean;
 };
 
-export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
+export const ApplicationToolbar = ({
+  toggle,
+  open,
+}: ApplicationToolbarProps) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -37,11 +41,15 @@ export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
 
   return (
     <Toolbar>
-      <IconButton color="inherit" onClick={toggle} edge="start">
-        <MenuIcon />
-      </IconButton>
+      {!open && (
+        <React.Fragment>
+          <IconButton color="inherit" onClick={toggle} edge="start">
+            <MenuIcon />
+          </IconButton>
 
-      <Logo />
+          <Logo />
+        </React.Fragment>
+      )}
 
       <div className={classes.grow} />
 

@@ -10,6 +10,9 @@ import Drawer from "@material-ui/core/Drawer";
 import React from "react";
 import { useStyles } from "../Application/Application.css";
 import useTheme from "@material-ui/core/styles/useTheme";
+import Toolbar from "@material-ui/core/Toolbar";
+import { Logo } from "../Logo";
+import MenuIcon from "@material-ui/icons/Menu";
 
 type ApplicationDrawerProps = {
   onCloseDrawer: () => void;
@@ -33,13 +36,15 @@ export const ApplicationDrawer = ({
       variant="persistent"
     >
       <div className={classes.drawerHeader}>
-        <IconButton onClick={onCloseDrawer}>
-          {theme.direction === "ltr" ? (
-            <ChevronLeftIcon />
-          ) : (
-            <ChevronRightIcon />
-          )}
-        </IconButton>
+        {openDrawer && (
+          <React.Fragment>
+            <IconButton color="inherit" onClick={onCloseDrawer} edge="start">
+              <MenuIcon />
+            </IconButton>
+
+            <Logo />
+          </React.Fragment>
+        )}
       </div>
 
       <Divider />
