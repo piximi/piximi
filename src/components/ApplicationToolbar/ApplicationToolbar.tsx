@@ -23,11 +23,14 @@ export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
 
   const [value, setValue] = React.useState<number>(1);
 
-  const handleChange = (event: any, newValue: any) => {
-    setValue(newValue);
+  const onChange = (
+    event: React.ChangeEvent<{}>,
+    newValue: number | number[]
+  ) => {
+    setValue(newValue as number);
     dispatch(
       settingsSlice.actions.updateTileSize({
-        newValue: newValue,
+        newValue: newValue as number,
       })
     );
   };
@@ -48,7 +51,7 @@ export const ApplicationToolbar = ({ toggle }: ApplicationToolbarProps) => {
         min={0.6}
         max={4}
         step={0.01}
-        onChange={handleChange}
+        onChange={onChange}
         style={{ width: "10%" }}
       />
       <ZoomInIcon />
