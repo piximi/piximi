@@ -32,7 +32,7 @@ export const CreateCategoryDialog = ({
   const classes = useStyles();
 
   const onCreate = () => {
-    dispatch(createCategory({ name: name, color: color }));
+    dispatch(createCategory({ name: name ? name : "Unnamed", color: color }));
 
     onClose();
 

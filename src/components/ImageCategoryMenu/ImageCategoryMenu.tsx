@@ -7,6 +7,7 @@ import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import { categoriesSelector } from "../../store/selectors";
 import { updateImageCategory } from "../../store/slices";
+import LabelIcon from "@material-ui/icons/Label";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;
@@ -53,6 +54,7 @@ export const ImageCategoryMenu = ({
             key={category.id}
             onClick={(event) => onClick(event, category.id)}
           >
+            <LabelIcon style={{ color: category.color, paddingRight: "8px" }} />
             {category.name}
           </MenuItem>
         ))}

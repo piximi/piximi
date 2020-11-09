@@ -14,6 +14,7 @@ import { EditCategoryDialog } from "../EditCategoryDialog";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { State } from "../../types/State";
 import { Image } from "../../types/Image";
+import { useStyles } from "../Application/Application.css";
 
 type CategoryListItemProps = {
   category: Category;
@@ -44,6 +45,8 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
     }).length;
   });
 
+  const classes = useStyles();
+
   return (
     <React.Fragment>
       <ListItem dense key={category.id} id={category.id}>
@@ -55,7 +58,12 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
           primaryTypographyProps={{ noWrap: true }}
         />
 
-        <Chip label={imageCount} color="primary" size="small" />
+        <Chip
+          label={imageCount}
+          size="small"
+          className={classes.chip}
+          style={{ backgroundColor: category.color }}
+        />
 
         <ListItemSecondaryAction>
           <IconButton edge="end" onClick={onOpenCategoryMenu}>
