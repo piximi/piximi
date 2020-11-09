@@ -65,4 +65,11 @@ export const useStyles = makeStyles((theme) => ({
       display: "block",
     },
   },
+  zoomIcon: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  zoomSlider: {
+    width: "10%",
+  },
 }));
