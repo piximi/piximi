@@ -9,7 +9,7 @@ import ListSubheader from "@material-ui/core/ListSubheader";
 import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
-import useDropboxChooser from "use-dropbox-chooser";
+import { DropboxMenuItem } from "../DropboxMenuItem";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement;
@@ -44,17 +44,6 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
     }
   };
 
-  const {
-    open: onOpenDropboxChooser,
-    isOpen: openDropboxChooser,
-  } = useDropboxChooser({
-    appKey: "tetle78x244mpkz",
-    chooserOptions: { multiselect: true, linkType: "direct" },
-    onSelected: (files) => {
-      console.log(files);
-    },
-  });
-
   return (
     <React.Fragment>
       <input
@@ -77,7 +66,12 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
         <ListSubheader className={classes.subheader}>Upload from</ListSubheader>
 
         <label htmlFor="upload-images">
-          <MenuItem className={classes.item} component="span" onClick={onClose}>
+          <MenuItem
+            className={classes.item}
+            component="span"
+            dense
+            onClick={onClose}
+          >
             <ListItemIcon>
               <ComputerIcon />
             </ListItemIcon>
@@ -85,16 +79,7 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
           </MenuItem>
         </label>
 
-        <MenuItem
-          className={classes.item}
-          component="span"
-          onClick={onOpenDropboxChooser}
-        >
-          <ListItemIcon>
-            <ComputerIcon />
-          </ListItemIcon>
-          <ListItemText primary="Dropbox" />
-        </MenuItem>
+        <DropboxMenuItem onClose={onClose} />
       </Menu>
     </React.Fragment>
   );
