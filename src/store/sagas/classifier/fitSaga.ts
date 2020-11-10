@@ -3,14 +3,23 @@ import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
   categorizedImagesSelector,
+  compileOptionsSelector,
+  createdCategoriesCountSelector,
   createdCategoriesSelector,
 } from "../../selectors";
 import { fitOptionsSelector } from "../../selectors";
 
 export function* fitSaga(action: any) {
-  const { callback, classes, compileOptions, pathname, units } = action.payload;
+  const { callback } = action.payload;
 
-  const opened = yield open(pathname, classes, units);
+  const pathname =
+    "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+
+  const classes = yield select(createdCategoriesCountSelector);
+
+  const opened = yield open(pathname, classes);
+
+  const compileOptions = yield select(compileOptionsSelector);
 
   const compiled = yield compile(opened, compileOptions);
 

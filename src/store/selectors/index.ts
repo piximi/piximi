@@ -1,4 +1,4 @@
-export { categoriesCountSelector } from "./categoriesCountSelector";
+export { createdCategoriesCountSelector } from "./createdCategoriesCountSelector";
 export { categoriesSelector } from "./categoriesSelector";
 export { categorizedImagesSelector } from "./categorizedImagesSelector";
 export { classifierSelector } from "./classifierSelector";

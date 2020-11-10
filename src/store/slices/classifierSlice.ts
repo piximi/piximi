@@ -48,11 +48,6 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         callback?: any;
-        options: FitOptions;
-        classes: number;
-        compileOptions: CompileOptions;
-        pathname: string;
-        units: number;
       }>
     ) {
       state.fitting = true;

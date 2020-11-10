@@ -1,6 +1,6 @@
 import { Project } from "../../types/Project";
 
-export const categoriesCountSelector = ({
+export const createdCategoriesCountSelector = ({
   project,
 }: {
   project: Project;
