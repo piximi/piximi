@@ -15,18 +15,16 @@ export const FitListItem = () => {
     setOpenOpenClassifierSnackbar,
   ] = React.useState(false);
 
-  const callback = (batch: number, logs: any) => {
+  const onEpochEnd = (batch: number, logs: any) => {
     console.info(logs);
-    dispatch(
-      classifierSlice.actions.updateLossHistory({
-        batch: batch,
-        loss: logs.loss,
-      })
-    );
+
+    const payload = { batch: batch, loss: logs.loss };
+
+    dispatch(classifierSlice.actions.updateLossHistory(payload));
   };
 
   const onOpenClassifierSnackbar = () => {
-    dispatch(classifierSlice.actions.fit({ callback: callback }));
+    dispatch(classifierSlice.actions.fit({ onEpochEnd: onEpochEnd }));
 
     setOpenOpenClassifierSnackbar(true);
   };

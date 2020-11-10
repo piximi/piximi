@@ -15,7 +15,7 @@ const initialState: Classifier = {
   compiling: false,
   evaluating: false,
   fitOptions: {
-    epochs: 1,
+    epochs: 10,
     batchSize: 32,
     initialEpoch: 0,
   },
@@ -47,7 +47,7 @@ export const classifierSlice = createSlice({
     fit(
       state,
       action: PayloadAction<{
-        callback?: any;
+        onEpochEnd: any;
       }>
     ) {
       state.fitting = true;

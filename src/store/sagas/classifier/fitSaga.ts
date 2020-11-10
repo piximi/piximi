@@ -10,7 +10,7 @@ import {
 import { fitOptionsSelector } from "../../selectors";
 
 export function* fitSaga(action: any) {
-  const { callback } = action.payload;
+  const { onEpochEnd } = action.payload;
 
   const pathname =
     "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
@@ -31,7 +31,7 @@ export function* fitSaga(action: any) {
 
   const options = yield select(fitOptionsSelector);
 
-  const { fitted, status } = yield fit(compiled, data, options, callback);
+  const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
 
   const payload = { fitted: fitted, status: status };
 

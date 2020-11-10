@@ -9,11 +9,11 @@ export const fit = async (
     ys: tensorflow.Tensor;
   }>,
   options: FitOptions,
-  callback?: any
+  onEpochEnd: any
 ): Promise<{ fitted: LayersModel; status: History }> => {
   const args = {
     callbacks: {
-      onBatchEnd: callback,
+      onEpochEnd: onEpochEnd,
     },
     epochs: options.epochs,
   };
