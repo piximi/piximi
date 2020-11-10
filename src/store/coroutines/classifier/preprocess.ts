@@ -83,5 +83,6 @@ export const preprocess = async (
     .generator(generator(images, categories))
     .map(decodeCategory(categories.length))
     .mapAsync(decodeImage)
-    .mapAsync(resize);
+    .mapAsync(resize)
+    .shuffle(32);
 };

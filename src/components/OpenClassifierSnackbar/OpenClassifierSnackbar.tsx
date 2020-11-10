@@ -1,33 +1,24 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import Snackbar from "@material-ui/core/Snackbar";
-import { LinearProgress } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { useStyles } from "../Application/Application.css";
-import { useSelector } from "react-redux";
-import { lossHistorySelector } from "../../store/selectors";
 import Typography from "@material-ui/core/Typography";
 
 type OpenClassifierSnackbar = {
+  epoch: number;
+  loss: number;
   onClose: () => void;
   open: boolean;
 };
 
 export const OpenClassifierSnackbar = ({
+  epoch,
+  loss,
   onClose,
   open,
 }: OpenClassifierSnackbar) => {
-  const lossHistory: Array<{ x: number; y: number }> = useSelector(
-    lossHistorySelector
-  );
-
-  const [loss, setLoss] = useState<number>(0.0);
-
-  useCallback(() => {
-    setLoss(lossHistory[lossHistory.length - 1].y);
-  }, [lossHistory]);
-
   const classes = useStyles();
 
   return (
@@ -40,7 +31,9 @@ export const OpenClassifierSnackbar = ({
         <AlertTitle>Training…</AlertTitle>
         <Grid container>
           <Grid item xs={12}>
-            <Typography>{loss}</Typography>
+            <Typography>
+              {epoch}, {loss}
+            </Typography>
           </Grid>
         </Grid>
       </Alert>

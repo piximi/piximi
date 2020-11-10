@@ -15,12 +15,13 @@ export const FitListItem = () => {
     setOpenOpenClassifierSnackbar,
   ] = React.useState(false);
 
-  const onEpochEnd = (batch: number, logs: any) => {
-    console.info(logs);
+  const [epoch, setEpoch] = React.useState<number>(0);
 
-    const payload = { batch: batch, loss: logs.loss };
+  const [loss, setLoss] = React.useState<number>(0);
 
-    dispatch(classifierSlice.actions.updateLossHistory(payload));
+  const onEpochEnd = (index: number, logs: any) => {
+    setEpoch(index);
+    setLoss(logs.loss);
   };
 
   const onOpenClassifierSnackbar = () => {
@@ -48,6 +49,8 @@ export const FitListItem = () => {
       </ListItem>
 
       <OpenClassifierSnackbar
+        epoch={epoch}
+        loss={loss}
         onClose={onCloseOpenClassifierSnackbar}
         open={openOpenClassifierSnackbar}
       />
