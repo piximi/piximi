@@ -6,7 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import { useStyles } from "../Application/Application.css";
 import Typography from "@material-ui/core/Typography";
 
-type TrainingClassifierSnackbarProps = {
+export type TrainingClassifierSnackbarProps = {
   epoch: number;
   loss: number;
   onClose: () => void;
