@@ -32,11 +32,18 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
 
       const reader = new FileReader();
 
-      reader.onload = (event) => {
+      reader.onload = (event: ProgressEvent<FileReader>) => {
         if (event.target) {
+          const img = new Image();
           const src = event.target.result;
 
-          dispatch(createImage({ src: src as string }));
+          img.onload = (e: Event) => {
+            const element = e.target as HTMLCanvasElement;
+            const aspectRatio = element.height / element.width;
+
+            dispatch(createImage({ src: img.src, aspectRatio: aspectRatio }));
+          };
+          img.src = src as string;
         }
       };
 

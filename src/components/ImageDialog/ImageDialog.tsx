@@ -38,7 +38,7 @@ export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
       <CategoriesDrawer />
 
       <DialogContent className={classes.imageDialogContent}>
-        <Container fixed maxWidth="sm">
+        <Container className={classes.imageDialog} fixed maxWidth="lg">
           <ImageCanvas image={image} />
         </Container>
       </DialogContent>

@@ -22,9 +22,8 @@ export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
     chooserOptions: { multiselect: true, linkType: "direct" },
     onSelected: (items: readonly Dropbox.ChooserFile[]) => {
       onClose();
-
       items.forEach((item: Dropbox.ChooserFile) => {
-        dispatch(createImage({ src: item.link as string }));
+        dispatch(createImage({ src: item.link as string, aspectRatio: 1 }));
       });
     },
   });

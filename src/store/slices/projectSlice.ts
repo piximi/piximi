@@ -35,11 +35,15 @@ export const projectSlice = createSlice({
 
       state.categories.push(category);
     },
-    createImage(state: Project, action: PayloadAction<{ src: string }>) {
+    createImage(
+      state: Project,
+      action: PayloadAction<{ src: string; aspectRatio: number }>
+    ) {
       const image: Image = {
         id: v4(),
         name: "",
         src: action.payload.src,
+        aspectRatio: action.payload.aspectRatio,
         categoryId: "00000000-0000-0000-0000-000000000000",
       };
 

@@ -26,7 +26,7 @@ export const ImageCanvas = ({ image }: ImageCanvasProps) => {
         <PerspectiveCamera makeDefault position={[0, 0, 2]} />
 
         <mesh ref={ref}>
-          <Box args={[1, 1, 1]}>
+          <Box args={[1, image.aspectRatio, 1]}>
             <meshBasicMaterial attach="material" map={texture} />
           </Box>
         </mesh>

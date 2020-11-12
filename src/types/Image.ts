@@ -3,4 +3,5 @@ export type Image = {
   id: string;
   name: string;
   src: string;
+  aspectRatio: number;
 };
