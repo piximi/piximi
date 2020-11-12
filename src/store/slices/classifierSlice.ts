@@ -3,13 +3,11 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { Dataset } from "@tensorflow/tfjs-data";
+import * as tensorflow from "@tensorflow/tfjs";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../types/CompileOptions";
-import { FitOptions } from "../../types/FitOptions";
 import { Image } from "../../types/Image";
 import { Category } from "../../types/Category";
-import * as tensorflow from "@tensorflow/tfjs";
 
 const initialState: Classifier = {
   compiling: false,
