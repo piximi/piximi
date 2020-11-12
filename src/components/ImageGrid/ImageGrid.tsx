@@ -50,7 +50,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
-    // setOpenImageDialog(true);
+    setOpenImageDialog(true);
   };
 
   const onCloseImageDialog = () => {

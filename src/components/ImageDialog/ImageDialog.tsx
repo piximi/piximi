@@ -11,6 +11,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { Image } from "../../types/Image";
+import { ImageCanvas } from "./ImageCanvas";
 
 type ImageDialogProps = {
   onClose: () => void;
@@ -38,7 +39,7 @@ export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
 
       <DialogContent className={classes.imageDialogContent}>
         <Container fixed maxWidth="sm">
-          <div />
+          <ImageCanvas image={image} />
         </Container>
       </DialogContent>
 
