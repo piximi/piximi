@@ -6,29 +6,29 @@ import Grid from "@material-ui/core/Grid";
 import { useStyles } from "../Application/Application.css";
 import Typography from "@material-ui/core/Typography";
 
-type OpenClassifierSnackbar = {
+type TrainingClassifierSnackbarProps = {
   epoch: number;
   loss: number;
   onClose: () => void;
   open: boolean;
 };
 
-export const OpenClassifierSnackbar = ({
+export const TrainingClassifierSnackbar = ({
   epoch,
   loss,
   onClose,
   open,
-}: OpenClassifierSnackbar) => {
+}: TrainingClassifierSnackbarProps) => {
   const classes = useStyles();
 
   return (
     <Snackbar
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       onClose={onClose}
       open={open}
     >
       <Alert className={classes.alert} onClose={onClose} severity="info">
-        <AlertTitle>Training…</AlertTitle>
+        <AlertTitle>Training classifier…</AlertTitle>
         <Grid container>
           <Grid item xs={12}>
             <Typography>

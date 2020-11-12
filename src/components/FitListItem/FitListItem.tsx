@@ -4,8 +4,8 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { OpenClassifierSnackbar } from "../OpenClassifierSnackbar";
 import { classifierSlice } from "../../store/slices";
+import { TrainingClassifierSnackbar } from "../TrainingClassifierSnackbar";
 
 export const FitListItem = () => {
   const dispatch = useDispatch();
@@ -48,7 +48,7 @@ export const FitListItem = () => {
         <ListItemText primary="Fit" />
       </ListItem>
 
-      <OpenClassifierSnackbar
+      <TrainingClassifierSnackbar
         epoch={epoch}
         loss={loss}
         onClose={onCloseOpenClassifierSnackbar}
