@@ -31,6 +31,8 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const [selectedImage, setSelectedImage] = React.useState();
 
+  const [selectedImages, setSelectedImages] = React.useState([] as string[]);
+
   const [
     categoryMenuAnchorEl,
     setCategoryMenuAnchorEl,
@@ -51,6 +53,16 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
   const onOpenImageDialog = (photo: Image) => {
     setOpenedImage(photo);
     // setOpenImageDialog(true);
+  };
+
+  const onSelectImage = (image: Image) => {
+    if (selectedImages.includes(image.id)) {
+      setSelectedImages((selected: string[]) =>
+        selected.filter((id) => id !== image.id)
+      );
+    } else {
+      setSelectedImages((selected: string[]) => selected.concat(image.id));
+    }
   };
 
   const onCloseImageDialog = () => {
@@ -75,10 +87,16 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     return { width: width, height: height };
   };
 
+  const getSelectionStatus = (imageId: string) => {
+    return selectedImages.includes(imageId)
+      ? classes.imageSelected
+      : classes.imageUnselected;
+  };
+
   return (
     <React.Fragment>
       <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
-        <Container className={classes.container} maxWidth="md">
+        <Container className={classes.container} maxWidth={false}>
           <GridList
             className={classes.gridList}
             cols={Math.floor(4 / scaleFactor)}
@@ -87,8 +105,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
             {images.map((image: Image) => (
               <GridListTile
                 key={image.id}
-                onClick={() => onOpenImageDialog(image)}
+                onClick={() => onSelectImage(image)}
                 style={getSize(scaleFactor)}
+                className={getSelectionStatus(image.id)}
               >
                 <img alt="" src={image.src} />
 

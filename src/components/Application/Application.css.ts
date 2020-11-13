@@ -77,6 +77,13 @@ export const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(12),
     paddingTop: theme.spacing(12),
   },
+  imageSelected: {
+    border: "solid 2px blue",
+    borderRadius: "3px",
+  },
+  imageUnselected: {
+    border: "none",
+  },
   main: {
     flexGrow: 1,
     marginLeft: -theme.spacing(32),
