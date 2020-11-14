@@ -1,4 +1,9 @@
-import { Box, PerspectiveCamera } from "@react-three/drei";
+import {
+  Box,
+  OrbitControls,
+  PerspectiveCamera,
+  TransformControls,
+} from "@react-three/drei";
 import React from "react";
 import * as THREE from "three";
 import { Canvas } from "react-three-fiber";
@@ -24,12 +29,14 @@ export const ImageCanvas = ({ image }: ImageCanvasProps) => {
     >
       <React.Suspense fallback={null}>
         <PerspectiveCamera makeDefault position={[0, 0, 2]} />
-
-        <mesh ref={ref}>
-          <Box args={[1, image.aspectRatio, 1]}>
-            <meshBasicMaterial attach="material" map={texture} />
-          </Box>
-        </mesh>
+        <TransformControls>
+          <mesh ref={ref}>
+            <Box args={[1, image.aspectRatio, 1]}>
+              <meshBasicMaterial attach="material" map={texture} />
+            </Box>
+          </mesh>
+        </TransformControls>
+        <OrbitControls enableRotate={false} enablePan={false} />
       </React.Suspense>
     </Canvas>
   );
