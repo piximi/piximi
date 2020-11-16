@@ -9,9 +9,11 @@ import { useStyles } from "../Application/Application.css";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
+import BrushIcon from "@material-ui/icons/Brush";
 import CloseIcon from "@material-ui/icons/Close";
 import { Image } from "../../types/Image";
 import { ImageCanvas } from "./ImageCanvas";
+import { SimpleImageCanvas } from "./SimpleImageCanvas";
 
 type ImageDialogProps = {
   onClose: () => void;
@@ -39,7 +41,7 @@ export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
 
       <DialogContent className={classes.imageDialogContent}>
         <Container className={classes.imageDialog} fixed maxWidth="lg">
-          <ImageCanvas image={image} />
+          <SimpleImageCanvas image={image} />
         </Container>
       </DialogContent>
 
