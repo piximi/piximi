@@ -31,4 +31,4 @@ export {
   updateOtherCategoryVisibility,
 } from "./projectSlice";
 
-export { settingsSlice, updateTileSize } from "./settingsSlice";
+export { applicationSlice, updateTileSize } from "./applicationSlice";

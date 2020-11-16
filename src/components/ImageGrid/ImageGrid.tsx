@@ -7,23 +7,35 @@ import IconButton from "@material-ui/core/IconButton";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "../Application/Application.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ImageDialog } from "../ImageDialog";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
-import { categoriesSelector } from "../../store/selectors";
+import {
+  categoriesSelector,
+  selectedImagesSelector,
+} from "../../store/selectors";
 import { visibleImagesSelector } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
+import { AppBar, Slide, Toolbar } from "@material-ui/core";
+import ClearIcon from "@material-ui/icons/Clear";
+import ViewComfyIcon from "@material-ui/icons/ViewComfy";
+import Typography from "@material-ui/core/Typography";
+import { applicationSlice } from "../../store/slices";
 
 type ImageGridProps = {
   openDrawer: boolean;
 };
 
 export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
+  const dispatch = useDispatch();
+
   const categories = useSelector(categoriesSelector);
 
   const images = useSelector(visibleImagesSelector);
+
+  const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
@@ -31,7 +43,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const [selectedImage, setSelectedImage] = React.useState();
 
-  const [selectedImages, setSelectedImages] = React.useState([] as string[]);
+  // const [selectedImages, setSelectedImages] = React.useState([] as string[]);
 
   const [
     categoryMenuAnchorEl,
@@ -57,11 +69,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
-      setSelectedImages((selected: string[]) =>
-        selected.filter((id) => id !== image.id)
-      );
+      dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
     } else {
-      setSelectedImages((selected: string[]) => selected.concat(image.id));
+      dispatch(applicationSlice.actions.selectImage({ id: image.id }));
     }
   };
 
@@ -91,6 +101,15 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     return selectedImages.includes(imageId)
       ? classes.imageSelected
       : classes.imageUnselected;
+  };
+
+  const selectAllImages = () => {
+    const newSelected = images.map((image) => image.id);
+    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
+  };
+
+  const selectNoImages = () => {
+    dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
   return (
@@ -134,6 +153,29 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
               </GridListTile>
             ))}
           </GridList>
+          <Slide appear={false} direction="up" in={selectedImages.length > 0}>
+            <AppBar
+              position="fixed"
+              color="inherit"
+              style={{ top: "auto", bottom: 0 }}
+              className={clsx(classes.appBar, {
+                [classes.appBarShift]: openDrawer,
+              })}
+            >
+              <Toolbar>
+                <Typography color="inherit">
+                  {selectedImages.length} selected images
+                </Typography>
+                <div style={{ flexGrow: 1 }} />
+                <IconButton color="inherit" onClick={selectAllImages}>
+                  <ViewComfyIcon />
+                </IconButton>
+                <IconButton color="inherit" onClick={selectNoImages}>
+                  <ClearIcon />
+                </IconButton>
+              </Toolbar>
+            </AppBar>
+          </Slide>
         </Container>
       </main>
 

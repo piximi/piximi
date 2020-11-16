@@ -1,11 +1,14 @@
 import { combineReducers } from "redux";
 import { classifierSlice, projectSlice } from "../slices";
-import { settingsSlice } from "../slices/settingsSlice";
+import { applicationSlice } from "../slices/applicationSlice";
+import { enableMapSet } from "immer";
+
+enableMapSet();
 
 const reducers = {
   classifier: classifierSlice.reducer,
   project: projectSlice.reducer,
-  settings: settingsSlice.reducer,
+  settings: applicationSlice.reducer,
 };
 
 export const reducer = combineReducers(reducers);

@@ -7,7 +7,7 @@ import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
 import { SearchInput } from "../SearchInput";
 import { Slider } from "@material-ui/core";
-import { settingsSlice } from "../../store/slices";
+import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
@@ -39,7 +39,7 @@ export const ApplicationToolbar = ({
     newValue: number | number[]
   ) => {
     dispatch(
-      settingsSlice.actions.updateTileSize({
+      applicationSlice.actions.updateTileSize({
         newValue: newValue as number,
       })
     );

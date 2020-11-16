@@ -14,6 +14,7 @@ export { lossHistorySelector } from "./lossHistorySelector";
 export { openedSelector } from "./openedSelector";
 export { openingSelector } from "./openingSelector";
 export { projectSelector } from "./projectSelector";
+export { selectedImagesSelector } from "./selectedImagesSelector";
 export { trainingPercentageSelector } from "./trainingPercentageSelector";
 export { unknownCategorySelector } from "./unknownCategorySelector";
 export { validationDataSelector } from "./validationDataSelector";
