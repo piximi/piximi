@@ -31,4 +31,11 @@ export {
   updateOtherCategoryVisibility,
 } from "./projectSlice";
 
-export { applicationSlice, updateTileSize } from "./applicationSlice";
+export {
+  applicationSlice,
+  updateTileSize,
+  selectImage,
+  deselectImage,
+  deselectImages,
+  clearSelectedImages,
+} from "./applicationSlice";

@@ -30,6 +30,11 @@ export const applicationSlice = createSlice({
     deselectImage(state: Settings, action: PayloadAction<{ id: string }>) {
       state.selectedImages.delete(action.payload.id);
     },
+    deselectImages(state: Settings, action: PayloadAction<{ ids: string[] }>) {
+      action.payload.ids.forEach((id) => {
+        state.selectedImages.delete(id);
+      });
+    },
     clearSelectedImages(state: Settings) {
       state.selectedImages.clear();
     },
@@ -40,5 +45,6 @@ export const {
   updateTileSize,
   selectImage,
   deselectImage,
+  deselectImages,
   clearSelectedImages,
 } = applicationSlice.actions;
