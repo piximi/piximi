@@ -22,8 +22,11 @@ import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import Typography from "@material-ui/core/Typography";
 import { applicationSlice } from "../../store/slices";
+import { useDialog } from "../../hooks";
+import { DeleteImagesDialog } from "../DeleteImagesDialog";
 
 type ImageGridProps = {
   openDrawer: boolean;
@@ -46,6 +49,8 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     categoryMenuAnchorEl,
     setCategoryMenuAnchorEl,
   ] = React.useState<null | HTMLElement>(null);
+
+  const { onClose, onOpen, open } = useDialog();
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -181,6 +186,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                 <IconButton color="inherit" onClick={selectNoImages}>
                   <ClearIcon />
                 </IconButton>
+                <IconButton color="inherit" onClick={onOpen}>
+                  <DeleteForeverIcon />
+                </IconButton>
               </Toolbar>
             </AppBar>
           </Slide>
@@ -197,6 +205,12 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
         anchorEl={categoryMenuAnchorEl as HTMLElement}
         imageIds={selectedImages}
         onClose={onCloseCategoryMenu}
+      />
+
+      <DeleteImagesDialog
+        imageIds={selectedImages}
+        onClose={onClose}
+        open={open}
       />
     </React.Fragment>
   );

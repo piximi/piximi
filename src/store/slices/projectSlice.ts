@@ -64,6 +64,14 @@ export const projectSlice = createSlice({
         return image;
       });
     },
+    deleteImages(
+      state: Project,
+      action: PayloadAction<{ ids: Array<string> }>
+    ) {
+      state.images = filter(state.images, (image: Image) => {
+        return !action.payload.ids.includes(image.id);
+      });
+    },
     updateCategory(
       state: Project,
       action: PayloadAction<{ id: string; name: string; color: string }>
