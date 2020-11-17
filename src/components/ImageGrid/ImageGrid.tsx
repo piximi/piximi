@@ -4,6 +4,7 @@ import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
+import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "../Application/Application.css";
@@ -18,7 +19,7 @@ import {
 } from "../../store/selectors";
 import { visibleImagesSelector } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
-import { AppBar, Slide, Toolbar } from "@material-ui/core";
+import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import Typography from "@material-ui/core/Typography";
@@ -41,10 +42,6 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   const [openedImage, setOpenedImage] = React.useState<Image>(images[0]);
 
-  const [selectedImage, setSelectedImage] = React.useState();
-
-  // const [selectedImages, setSelectedImages] = React.useState([] as string[]);
-
   const [
     categoryMenuAnchorEl,
     setCategoryMenuAnchorEl,
@@ -54,7 +51,12 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     event: React.MouseEvent<HTMLButtonElement>,
     image: Image
   ) => {
-    setSelectedImage(image);
+    dispatch(applicationSlice.actions.selectOneImage({ id: image.id }));
+    setCategoryMenuAnchorEl(event.currentTarget);
+    event.stopPropagation();
+  };
+
+  const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     setCategoryMenuAnchorEl(event.currentTarget);
   };
 
@@ -163,9 +165,15 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
               })}
             >
               <Toolbar>
-                <Typography color="inherit">
+                <Typography color="inherit" style={{ paddingRight: 20 }}>
                   {selectedImages.length} selected images
                 </Typography>
+                <Chip
+                  avatar={<LabelOutlinedIcon color="inherit" />}
+                  label="Categorise"
+                  onClick={onOpenCategoriesMenu}
+                  variant="outlined"
+                />
                 <div style={{ flexGrow: 1 }} />
                 <IconButton color="inherit" onClick={selectAllImages}>
                   <ViewComfyIcon />
@@ -187,7 +195,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
-        image={selectedImage}
+        imageIds={selectedImages}
         onClose={onCloseCategoryMenu}
       />
     </React.Fragment>

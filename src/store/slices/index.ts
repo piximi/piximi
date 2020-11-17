@@ -28,6 +28,7 @@ export {
   updateCategory,
   updateCategoryVisibility,
   updateImageCategory,
+  updateImageCategories,
   updateOtherCategoryVisibility,
 } from "./projectSlice";
 

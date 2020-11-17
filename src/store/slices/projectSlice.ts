@@ -109,6 +109,20 @@ export const projectSlice = createSlice({
         state.images[index].categoryId = action.payload.categoryId;
       }
     },
+    updateImageCategories(
+      state: Project,
+      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
+    ) {
+      action.payload.ids.forEach((imageId) => {
+        const index = findIndex(state.images, (image: Image) => {
+          return image.id === imageId;
+        });
+
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryId;
+        }
+      });
+    },
   },
 });
 
@@ -120,5 +134,6 @@ export const {
   updateCategory,
   updateCategoryVisibility,
   updateImageCategory,
+  updateImageCategories,
   updateOtherCategoryVisibility,
 } = projectSlice.actions;

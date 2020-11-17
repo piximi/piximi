@@ -4,20 +4,19 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { Category } from "../../types/Category";
-import { Image } from "../../types/Image";
 import { categoriesSelector } from "../../store/selectors";
-import { updateImageCategory } from "../../store/slices";
+import { updateImageCategories } from "../../store/slices";
 import LabelIcon from "@material-ui/icons/Label";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;
-  image: Image;
+  imageIds: Array<string>;
   onClose: () => void;
 };
 
 export const ImageCategoryMenu = ({
   anchorEl,
-  image,
+  imageIds,
   onClose,
 }: ImageCategoryMenuProps) => {
   const categories = useSelector(categoriesSelector);
@@ -30,7 +29,7 @@ export const ImageCategoryMenu = ({
   ) => {
     onClose();
 
-    dispatch(updateImageCategory({ id: image.id, categoryId: categoryId }));
+    dispatch(updateImageCategories({ ids: imageIds, categoryId: categoryId }));
   };
 
   return (

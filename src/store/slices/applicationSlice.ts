@@ -19,6 +19,11 @@ export const applicationSlice = createSlice({
     selectImage(state: Settings, action: PayloadAction<{ id: string }>) {
       state.selectedImages.add(action.payload.id);
     },
+    selectOneImage(state: Settings, action: PayloadAction<{ id: string }>) {
+      state.selectedImages.clear();
+
+      state.selectedImages.add(action.payload.id);
+    },
     selectAllImages(
       state: Settings,
       action: PayloadAction<{ ids: Array<string> }>
@@ -44,6 +49,7 @@ export const applicationSlice = createSlice({
 export const {
   updateTileSize,
   selectImage,
+  selectOneImage,
   deselectImage,
   deselectImages,
   clearSelectedImages,
