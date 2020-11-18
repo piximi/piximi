@@ -1,17 +1,9 @@
-import {
-  Box,
-  OrbitControls,
-  PerspectiveCamera,
-  TransformControls,
-} from "@react-three/drei";
 import React, { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
-import { Canvas } from "react-three-fiber";
-import { Image } from "../../types/Image";
 
-type coordinate = {
+type clickData = {
   x: number;
   y: number;
+  dragging: boolean;
 };
 
 type ImageCanvasProps = {
@@ -19,43 +11,83 @@ type ImageCanvasProps = {
 };
 
 export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
-  const [clicks, setClick] = useState<Array<coordinate>>([]);
+  const [clicks, setClick] = useState<Array<clickData>>([]);
+  const [paint, setPaint] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const clearCanvas = (ctx: CanvasRenderingContext2D) => {
+    setClick([]);
+    ctx.clearRect(0, 0, 300, 300);
+  };
+
+  const redraw = (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    clicks.forEach((click, index) => {
+      clicks[index].dragging
+        ? ctx.moveTo(clicks[index - 1].x, clicks[index - 1].y)
+        : ctx.moveTo(clicks[index].x, clicks[index].y);
+      ctx.lineTo(clicks[index].x, clicks[index].y);
+      ctx.stroke();
+    });
+    ctx.closePath();
+  };
 
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    console.log("Clicked!");
-    const newClick = { x: event.pageX, y: event.pageY };
-    setClick([...clicks, newClick]);
-    console.log(clicks);
+    if (canvasRef.current) {
+      const clickX = event.pageX - canvasRef.current.offsetLeft;
+      const clickY = event.pageY - canvasRef.current.offsetTop;
+      const newClick = { x: clickX, y: clickY, dragging: false };
+      setClick([...clicks, newClick]);
+      const context = canvasRef.current.getContext("2d");
+      if (context) {
+        redraw(context);
+      }
+    }
+    setPaint(true);
   };
 
-  const onDrag = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-    console.log("MOVING");
+  const onMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    if (canvasRef.current) {
+      const clickX = event.pageX - canvasRef.current.offsetLeft;
+      const clickY = event.pageY - canvasRef.current.offsetTop;
+      if (paint) {
+        const newClick = { x: clickX, y: clickY, dragging: true };
+        setClick([...clicks, newClick]);
+        const context = canvasRef.current.getContext("2d");
+        if (context) {
+          redraw(context);
+        }
+      }
+    }
+    event.preventDefault();
   };
 
-  const draw = (ctx: CanvasRenderingContext2D) => {
-    ctx.fillStyle = "#000000";
-    ctx.beginPath();
-    ctx.arc(50, 100, 20, 0, 2 * Math.PI);
-    ctx.fill();
-  };
-
-  useEffect(() => {
+  const onMouseUp = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    setPaint(false);
     const context = canvasRef.current?.getContext("2d");
     if (context) {
-      // context.fillStyle = '#000000'
-      // context.fillRect(0, 0, context.canvas.width, context.canvas.height)
-      //canvasRef.addEventListener("mousedown", onMouseDown)
-      draw(context);
+      redraw(context);
     }
-  }, [draw]);
+  };
+
+  const onMouseOut = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    setPaint(false);
+  };
 
   return (
     <canvas
-      onDrag={onDrag}
       onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseOut={onMouseOut}
       ref={canvasRef}
       id={"myCanvas"}
       width={300}
