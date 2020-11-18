@@ -5,6 +5,7 @@ import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
+import GestureIcon from "@material-ui/icons/Gesture";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "../Application/Application.css";
@@ -178,9 +179,10 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                   label="Categorise"
                   onClick={onOpenCategoriesMenu}
                   variant="outlined"
+                  style={{ marginRight: 15 }}
                 />
                 <Chip
-                  avatar={<LabelOutlinedIcon color="inherit" />}
+                  avatar={<GestureIcon color="inherit" />}
                   label="Annotate"
                   onClick={onOpenImageDialog}
                   variant="outlined"

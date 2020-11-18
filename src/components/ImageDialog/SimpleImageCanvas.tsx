@@ -36,8 +36,9 @@ export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     if (canvasRef.current) {
-      const clickX = event.pageX - canvasRef.current.offsetLeft;
-      const clickY = event.pageY - canvasRef.current.offsetTop;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
       const newClick = { x: clickX, y: clickY, dragging: false };
       setClick([...clicks, newClick]);
       const context = canvasRef.current.getContext("2d");
@@ -52,8 +53,9 @@ export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     if (canvasRef.current) {
-      const clickX = event.pageX - canvasRef.current.offsetLeft;
-      const clickY = event.pageY - canvasRef.current.offsetTop;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
       if (paint) {
         const newClick = { x: clickX, y: clickY, dragging: true };
         setClick([...clicks, newClick]);
@@ -92,6 +94,7 @@ export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
       id={"myCanvas"}
       width={300}
       height={300}
+      style={{ border: "1px solid" }}
     />
   );
 };
