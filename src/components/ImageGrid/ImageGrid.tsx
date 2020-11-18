@@ -69,9 +69,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
     setCategoryMenuAnchorEl(null);
   };
 
-  const onOpenImageDialog = (photo: Image) => {
-    setOpenedImage(photo);
-    // setOpenImageDialog(true);
+  const onOpenImageDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+    //setOpenedImage(photo);
+    setOpenImageDialog(true);
   };
 
   const onSelectImage = (image: Image) => {
@@ -179,6 +179,12 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                   onClick={onOpenCategoriesMenu}
                   variant="outlined"
                 />
+                <Chip
+                  avatar={<LabelOutlinedIcon color="inherit" />}
+                  label="Annotate"
+                  onClick={onOpenImageDialog}
+                  variant="outlined"
+                />
                 <div style={{ flexGrow: 1 }} />
                 <IconButton color="inherit" onClick={selectAllImages}>
                   <ViewComfyIcon />
@@ -198,7 +204,8 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
       <ImageDialog
         onClose={onCloseImageDialog}
         open={openImageDialog}
-        image={openedImage}
+        imageIds={selectedImages}
+        //image={openedImage}
       />
 
       <ImageCategoryMenu

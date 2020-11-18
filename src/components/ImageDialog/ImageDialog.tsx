@@ -11,17 +11,18 @@ import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { Image } from "../../types/Image";
+import { SimpleImageCanvas } from "./SimpleImageCanvas";
 
 type ImageDialogProps = {
   onClose: () => void;
   open: boolean;
-  image: Image;
+  imageIds: Array<string>;
   TransitionComponent?: React.ComponentType<
     TransitionProps & { children?: React.ReactElement<any, any> }
   >;
 };
 
-export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
+export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
   const classes = useStyles();
 
   return (
@@ -37,8 +38,8 @@ export const ImageDialog = ({ onClose, open, image }: ImageDialogProps) => {
       <CategoriesDrawer />
 
       <DialogContent className={classes.imageDialogContent}>
-        <Container fixed maxWidth="sm">
-          <div />
+        <Container fixed maxWidth="lg">
+          <SimpleImageCanvas imageIds={imageIds} />
         </Container>
       </DialogContent>
 
