@@ -1,10 +1,10 @@
 import React from "react";
-import Alert from "@material-ui/lab/Alert";
-import AlertTitle from "@material-ui/lab/AlertTitle";
 import Snackbar from "@material-ui/core/Snackbar";
 import Grid from "@material-ui/core/Grid";
-import { useStyles } from "../Application/Application.css";
-import Typography from "@material-ui/core/Typography";
+import { useStyles } from "./TrainingClassifierSnackbar.css";
+import { Alert } from "@material-ui/lab";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import { VictoryLine } from "victory";
 
 export type TrainingClassifierSnackbarProps = {
   epoch: number;
@@ -24,18 +24,52 @@ export const TrainingClassifierSnackbar = ({
   return (
     <Snackbar
       anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      className={classes.snackbar}
       onClose={onClose}
       open={open}
     >
-      <Alert className={classes.alert} onClose={onClose} severity="info">
+      <Alert
+        classes={{ message: classes.message }}
+        className={classes.snackbar}
+        severity="info"
+      >
         <AlertTitle>Training classifier…</AlertTitle>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography>
-              {epoch}, {loss}
-            </Typography>
+
+        <div>
+          <Grid container className={classes.gridContainer} spacing={2}>
+            <Grid item xs={6}>
+              <Grid container>
+                <Grid className={classes.item} item xs={12}>
+                  <VictoryLine
+                    data={[
+                      { x: 1, y: 2 },
+                      { x: 2, y: 3 },
+                      { x: 3, y: 5 },
+                      { x: 4, y: 4 },
+                      { x: 5, y: 7 },
+                    ]}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={6}>
+              <Grid container>
+                <Grid className={classes.item} item xs={12}>
+                  <VictoryLine
+                    data={[
+                      { x: 1, y: 2 },
+                      { x: 2, y: 3 },
+                      { x: 3, y: 5 },
+                      { x: 4, y: 4 },
+                      { x: 5, y: 7 },
+                    ]}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
+        </div>
       </Alert>
     </Snackbar>
   );
