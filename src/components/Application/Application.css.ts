@@ -79,9 +79,6 @@ export const useStyles = makeStyles((theme) => ({
   imageDialogAppBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
-  imageDialogToolboxBar: {
-    paddingBottom: "50px;",
-  },
   imageDialogContent: {
     paddingBottom: theme.spacing(12),
     paddingTop: theme.spacing(12),
