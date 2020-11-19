@@ -66,7 +66,7 @@ export const ImageGridAppBar = () => {
   return (
     <React.Fragment>
       <Slide appear={false} direction="down" in={selectedImages.length > 0}>
-        <AppBar className={classes.appBar} color="inherit" position="fixed">
+        <AppBar color="inherit" position="fixed">
           <Toolbar>
             <IconButton
               className={classes.closeButton}
