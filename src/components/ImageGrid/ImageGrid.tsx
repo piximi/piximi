@@ -3,14 +3,10 @@ import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import IconButton from "@material-ui/core/IconButton";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
-import GestureIcon from "@material-ui/icons/Gesture";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
-import { ImageDialog } from "../ImageDialog";
-import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import {
@@ -19,15 +15,8 @@ import {
   visibleImagesSelector,
 } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
-import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
-import ViewComfyIcon from "@material-ui/icons/ViewComfy";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Typography from "@material-ui/core/Typography";
 import { applicationSlice } from "../../store/slices";
-import { useDialog } from "../../hooks";
-import { DeleteImagesDialog } from "../DeleteImagesDialog";
-import Tooltip from "@material-ui/core/Tooltip";
+import { ImageGridAppBar } from "../ImageGridAppBar";
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
@@ -38,14 +27,10 @@ export const ImageGrid = () => {
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
-  const [openImageDialog, setOpenImageDialog] = React.useState(false);
-
   const [
     categoryMenuAnchorEl,
     setCategoryMenuAnchorEl,
   ] = React.useState<null | HTMLElement>(null);
-
-  const { onClose, onOpen, open } = useDialog();
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -56,29 +41,12 @@ export const ImageGrid = () => {
     event.stopPropagation();
   };
 
-  const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    setCategoryMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCloseCategoryMenu = () => {
-    setCategoryMenuAnchorEl(null);
-  };
-
-  const onOpenImageDialog = (event: React.MouseEvent<HTMLDivElement>) => {
-    //setOpenedImage(photo);
-    setOpenImageDialog(true);
-  };
-
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
       dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
     } else {
       dispatch(applicationSlice.actions.selectImage({ id: image.id }));
     }
-  };
-
-  const onCloseImageDialog = () => {
-    setOpenImageDialog(false);
   };
 
   const classes = useStyles();
@@ -103,15 +71,6 @@ export const ImageGrid = () => {
     return selectedImages.includes(imageId)
       ? classes.imageSelected
       : classes.imageUnselected;
-  };
-
-  const selectAllImages = () => {
-    const newSelected = images.map((image) => image.id);
-    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
-  };
-
-  const selectNoImages = () => {
-    dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
   return (
@@ -156,75 +115,9 @@ export const ImageGrid = () => {
             ))}
           </GridList>
 
-          <Slide appear={false} direction="down" in={selectedImages.length > 0}>
-            <AppBar
-              className={classes.appBarShift}
-              color="inherit"
-              position="fixed"
-            >
-              <Toolbar>
-                <IconButton
-                  className={classes.closeButton}
-                  edge="start"
-                  color="inherit"
-                  onClick={selectNoImages}
-                >
-                  <ClearIcon />
-                </IconButton>
-
-                <Typography className={classes.count}>
-                  {selectedImages.length} selected images
-                </Typography>
-
-                <div style={{ flexGrow: 1 }} />
-
-                <Chip
-                  avatar={<LabelOutlinedIcon color="inherit" />}
-                  label="Categorise"
-                  onClick={onOpenCategoriesMenu}
-                  variant="outlined"
-                  style={{ marginRight: 15 }}
-                />
-                <Chip
-                  avatar={<GestureIcon color="inherit" />}
-                  label="Annotate"
-                  onClick={onOpenImageDialog}
-                  variant="outlined"
-                />
-
-                <IconButton color="inherit" onClick={selectAllImages}>
-                  <ViewComfyIcon />
-                </IconButton>
-
-                <Tooltip title="Delete">
-                  <IconButton color="inherit" onClick={onOpen}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </Toolbar>
-            </AppBar>
-          </Slide>
+          <ImageGridAppBar />
         </Container>
       </main>
-
-      <ImageDialog
-        onClose={onCloseImageDialog}
-        open={openImageDialog}
-        imageIds={selectedImages}
-        //image={openedImage}
-      />
-
-      <ImageCategoryMenu
-        anchorEl={categoryMenuAnchorEl as HTMLElement}
-        imageIds={selectedImages}
-        onClose={onCloseCategoryMenu}
-      />
-
-      <DeleteImagesDialog
-        imageIds={selectedImages}
-        onClose={onClose}
-        open={open}
-      />
     </React.Fragment>
   );
 };
