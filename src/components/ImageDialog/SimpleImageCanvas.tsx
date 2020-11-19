@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useStyles } from "../Application/Application.css";
+import { Box } from "@material-ui/core";
+import { ImageDialogToolboxBar } from "../ImageDialogToolboxBar";
 
 type clickData = {
   x: number;
@@ -11,6 +14,8 @@ type ImageCanvasProps = {
 };
 
 export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
+  const classes = useStyles();
+
   const [clicks, setClick] = useState<Array<clickData>>([]);
   const [paint, setPaint] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,16 +90,21 @@ export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
   };
 
   return (
-    <canvas
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseOut={onMouseOut}
-      ref={canvasRef}
-      id={"myCanvas"}
-      width={300}
-      height={300}
-      style={{ border: "1px solid" }}
-    />
+    <div>
+      <ImageDialogToolboxBar />
+      <div className={classes.imageCanvasContainer}>
+        <canvas
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseOut={onMouseOut}
+          ref={canvasRef}
+          id={"myCanvas"}
+          width={300}
+          height={300}
+          style={{ border: "1px solid" }}
+        />
+      </div>
+    </div>
   );
 };
