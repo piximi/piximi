@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import { useStyles } from "./TrainingClassifierSnackbar.css";
 import { Alert } from "@material-ui/lab";
 import AlertTitle from "@material-ui/lab/AlertTitle";
-import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
+import { VictoryAxis, VictoryChart } from "victory";
 import { useSelector } from "react-redux";
 import { epochsSelector } from "../../store/selectors";
 
