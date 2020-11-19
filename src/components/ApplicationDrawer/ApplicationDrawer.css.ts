@@ -22,9 +22,6 @@ export const useStyles = makeStyles((theme) => ({
   classifierSettingsDialogContent: {
     marginTop: theme.spacing(8),
   },
-  closeButton: {
-    marginRight: theme.spacing(2),
-  },
   chip: {
     height: "20px",
     borderWidth: "2px",
@@ -38,18 +35,13 @@ export const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),
   },
-  count: {
-    flexGrow: 1,
-  },
   createCategoryDialogContent: {
     paddingLeft: "0 !important",
   },
   createCategoryDialogGrid: {
     margin: theme.spacing(1),
   },
-  createCategoryDialogItem: {
-    // paddingLeft: "0 !important",
-  },
+  createCategoryDialogItem: {},
   drawer: {
     flexShrink: 0,
     width: theme.spacing(32),
@@ -61,6 +53,7 @@ export const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(3),
   },
   drawerPaper: {
+    zIndex: 0,
     width: theme.spacing(32),
   },
   fileInput: {
@@ -75,6 +68,12 @@ export const useStyles = makeStyles((theme) => ({
   },
   gridTileBarIconButton: {
     color: "white",
+  },
+  imageCanvasContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageDialogAppBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -92,7 +91,14 @@ export const useStyles = makeStyles((theme) => ({
   },
   main: {
     flexGrow: 1,
-    paddingTop: theme.spacing(3),
+    marginLeft: -theme.spacing(32),
+    padding: theme.spacing(3),
+    transition: theme.transitions.create("margin", {
+      duration: theme.transitions.duration.leavingScreen,
+      easing: theme.transitions.easing.sharp,
+    }),
+  },
+  mainShift: {
     marginLeft: theme.spacing(32),
     transition: theme.transitions.create("margin", {
       duration: theme.transitions.duration.enteringScreen,

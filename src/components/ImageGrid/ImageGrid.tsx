@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import Container from "@material-ui/core/Container";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
@@ -17,8 +16,8 @@ import { Image } from "../../types/Image";
 import {
   categoriesSelector,
   selectedImagesSelector,
+  visibleImagesSelector,
 } from "../../store/selectors";
-import { visibleImagesSelector } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -30,11 +29,7 @@ import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 
-type ImageGridProps = {
-  openDrawer: boolean;
-};
-
-export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
+export const ImageGrid = () => {
   const dispatch = useDispatch();
 
   const categories = useSelector(categoriesSelector);
@@ -44,8 +39,6 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
-
-  const [openedImage, setOpenedImage] = React.useState<Image>(images[0]);
 
   const [
     categoryMenuAnchorEl,
@@ -123,7 +116,7 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
   return (
     <React.Fragment>
-      <main className={clsx(classes.main, { [classes.mainShift]: openDrawer })}>
+      <main className={classes.main}>
         <Container className={classes.container} maxWidth={false}>
           <GridList
             className={classes.gridList}
@@ -165,12 +158,9 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
 
           <Slide appear={false} direction="down" in={selectedImages.length > 0}>
             <AppBar
-              position="fixed"
+              className={classes.appBarShift}
               color="inherit"
-              // style={{ top: "auto", bottom: 0 }}
-              className={clsx(classes.appBar, {
-                [classes.appBarShift]: openDrawer,
-              })}
+              position="fixed"
             >
               <Toolbar>
                 <IconButton

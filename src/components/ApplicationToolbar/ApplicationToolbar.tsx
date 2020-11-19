@@ -1,6 +1,4 @@
 import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
 import React from "react";
 import { useStyles } from "./ApplicationToolbar.css";
 import { UploadButton } from "../UploadButton";
@@ -12,15 +10,7 @@ import { useDispatch } from "react-redux";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 
-type ApplicationToolbarProps = {
-  toggle: () => void;
-  open: boolean;
-};
-
-export const ApplicationToolbar = ({
-  toggle,
-  open,
-}: ApplicationToolbarProps) => {
+export const ApplicationToolbar = () => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -47,19 +37,12 @@ export const ApplicationToolbar = ({
 
   return (
     <Toolbar>
-      {!open && (
-        <React.Fragment>
-          <IconButton color="inherit" onClick={toggle} edge="start">
-            <MenuIcon />
-          </IconButton>
-
-          <Logo />
-        </React.Fragment>
-      )}
+      <Logo />
 
       <div className={classes.grow} />
 
       <ZoomOutIcon className={classes.zoomIcon} />
+
       <Slider
         value={value}
         min={0.6}

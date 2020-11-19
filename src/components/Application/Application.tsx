@@ -1,22 +1,19 @@
 import CssBaseline from "@material-ui/core/CssBaseline";
 import React from "react";
-import { useDrawer } from "../../hooks";
 import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 
 export const Application = () => {
-  const { open, toggle } = useDrawer();
-
   return (
     <React.Fragment>
       <CssBaseline />
 
-      <ApplicationAppBar toggle={toggle} open={open} />
+      <ApplicationAppBar />
 
-      <ApplicationDrawer onCloseDrawer={toggle} openDrawer={open} />
+      <ApplicationDrawer />
 
-      <ImageGrid openDrawer={open} />
+      <ImageGrid />
     </React.Fragment>
   );
 };

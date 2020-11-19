@@ -1,28 +1,16 @@
 import AppBar from "@material-ui/core/AppBar";
-import clsx from "clsx";
 import React from "react";
 import { useStyles } from "./ApplicationAppBar.css";
 import { ApplicationToolbar } from "../ApplicationToolbar";
 
-type ApplicationAppBar = {
-  open: boolean;
-  toggle: () => void;
-};
-
-export const ApplicationAppBar = ({ open, toggle }: ApplicationAppBar) => {
+export const ApplicationAppBar = () => {
   const classes = useStyles();
 
   return (
     <React.Fragment>
       <div className={classes.grow}>
-        <AppBar
-          className={clsx(classes.appBar, {
-            [classes.appBarShift]: open,
-          })}
-          color="inherit"
-          position="fixed"
-        >
-          <ApplicationToolbar toggle={toggle} open={open} />
+        <AppBar className={classes.appBar} color="inherit" position="fixed">
+          <ApplicationToolbar />
         </AppBar>
       </div>
     </React.Fragment>

@@ -1,6 +1,7 @@
 import { Settings } from "../../types/Settings";
 import { Project } from "../../types/Project";
 import { Image } from "../../types/Image";
+import { Category } from "../../types/Category";
 
 export const selectedImagesSelector = ({
   project,
@@ -10,9 +11,11 @@ export const selectedImagesSelector = ({
   settings: Settings;
 }): Array<string> => {
   return Array.from(settings.selectedImages).filter((id: string) => {
-    const visible_categories = project.categories
-      .filter((category) => category.visible)
-      .map((category) => {
+    const visibleCategories: Array<string> = project.categories
+      .filter((category: Category) => {
+        return category.visible;
+      })
+      .map((category: Category) => {
         return category.id;
       });
 
@@ -21,9 +24,7 @@ export const selectedImagesSelector = ({
         return id === image.id;
       })
       .filter((image: Image) => {
-        if (image.categoryId) {
-          visible_categories.includes(image.categoryId);
-        }
+        return image.categoryId && visibleCategories.includes(image.categoryId);
       })
       .map((image) => {
         return image.id;
