@@ -1,4 +1,4 @@
-import { AppBar, Button, Chip, Slide, Toolbar } from "@material-ui/core";
+import { AppBar, Button, Toolbar } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import BrushIcon from "@material-ui/icons/Brush";
 import Crop32Icon from "@material-ui/icons/Crop32";

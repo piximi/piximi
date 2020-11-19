@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useStyles } from "../Application/Application.css";
-import { Box } from "@material-ui/core";
 import { ImageDialogToolboxBar } from "../ImageDialogToolboxBar";
 
 type clickData = {

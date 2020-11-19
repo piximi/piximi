@@ -5,7 +5,7 @@ import LabelIcon from "@material-ui/icons/Label";
 import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import { Category } from "../../types/Category";
 import { useDispatch, useSelector } from "react-redux";
-import { updateCategoryVisibility, deselectImages } from "../../store/slices";
+import { deselectImages, updateCategoryVisibility } from "../../store/slices";
 import { visibleImagesSelector } from "../../store/selectors";
 import { Image } from "../../types/Image";
 
