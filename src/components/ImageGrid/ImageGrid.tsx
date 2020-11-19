@@ -161,11 +161,12 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
               </GridListTile>
             ))}
           </GridList>
-          <Slide appear={false} direction="up" in={selectedImages.length > 0}>
+
+          <Slide appear={false} direction="down" in={selectedImages.length > 0}>
             <AppBar
               position="fixed"
               color="inherit"
-              style={{ top: "auto", bottom: 0 }}
+              // style={{ top: "auto", bottom: 0 }}
               className={clsx(classes.appBar, {
                 [classes.appBarShift]: openDrawer,
               })}
