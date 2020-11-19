@@ -4,11 +4,11 @@ import * as THREE from "three";
 import { Canvas } from "react-three-fiber";
 import { Image } from "../../types/Image";
 
-type ImageCanvasProps = {
+type ImageDialogCanvasProps = {
   image: Image;
 };
 
-export const ImageCanvas = ({ image }: ImageCanvasProps) => {
+export const ImageDialogCanvas = ({ image }: ImageDialogCanvasProps) => {
   const ref = React.useRef();
 
   const texture = React.useMemo(() => {
