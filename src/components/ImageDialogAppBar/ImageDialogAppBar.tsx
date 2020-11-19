@@ -14,7 +14,7 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
   return (
     <React.Fragment>
       <Slide appear={false} direction="down">
-        <AppBar color="inherit" position="fixed" style={{ zIndex: 1000000 }}>
+        <AppBar color="inherit" position="fixed">
           <Toolbar>
             <IconButton
               className={classes.closeButton}
