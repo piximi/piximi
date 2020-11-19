@@ -8,7 +8,7 @@ import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import GestureIcon from "@material-ui/icons/Gesture";
 import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
 import { ImageDialog } from "../ImageDialog";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
@@ -23,11 +23,12 @@ import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import DeleteIcon from "@material-ui/icons/Delete";
 import Typography from "@material-ui/core/Typography";
 import { applicationSlice } from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
+import Tooltip from "@material-ui/core/Tooltip";
 
 type ImageGridProps = {
   openDrawer: boolean;
@@ -161,19 +162,32 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
               </GridListTile>
             ))}
           </GridList>
-          <Slide appear={false} direction="up" in={selectedImages.length > 0}>
+
+          <Slide appear={false} direction="down" in={selectedImages.length > 0}>
             <AppBar
               position="fixed"
               color="inherit"
-              style={{ top: "auto", bottom: 0 }}
+              // style={{ top: "auto", bottom: 0 }}
               className={clsx(classes.appBar, {
                 [classes.appBarShift]: openDrawer,
               })}
             >
               <Toolbar>
-                <Typography color="inherit" style={{ paddingRight: 20 }}>
+                <IconButton
+                  className={classes.closeButton}
+                  edge="start"
+                  color="inherit"
+                  onClick={selectNoImages}
+                >
+                  <ClearIcon />
+                </IconButton>
+
+                <Typography className={classes.count}>
                   {selectedImages.length} selected images
                 </Typography>
+
+                <div style={{ flexGrow: 1 }} />
+
                 <Chip
                   avatar={<LabelOutlinedIcon color="inherit" />}
                   label="Categorise"
@@ -187,16 +201,16 @@ export const ImageGrid = ({ openDrawer }: ImageGridProps) => {
                   onClick={onOpenImageDialog}
                   variant="outlined"
                 />
-                <div style={{ flexGrow: 1 }} />
+
                 <IconButton color="inherit" onClick={selectAllImages}>
                   <ViewComfyIcon />
                 </IconButton>
-                <IconButton color="inherit" onClick={selectNoImages}>
-                  <ClearIcon />
-                </IconButton>
-                <IconButton color="inherit" onClick={onOpen}>
-                  <DeleteForeverIcon />
-                </IconButton>
+
+                <Tooltip title="Delete">
+                  <IconButton color="inherit" onClick={onOpen}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </Toolbar>
             </AppBar>
           </Slide>

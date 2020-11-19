@@ -6,6 +6,7 @@ export { compiledSelector } from "./compiledSelector";
 export { compileOptionsSelector } from "./compileOptionsSelector";
 export { createdCategoriesSelector } from "./createdCategoriesSelector";
 export { dataSelector } from "./dataSelector";
+export { epochsSelector } from "./epochsSelector";
 export { fitOptionsSelector } from "./fitOptionsSelector";
 export { fittedSelector } from "./fittedSelector";
 export { generatorOptionsSelector } from "./generatorOptionsSelector";
