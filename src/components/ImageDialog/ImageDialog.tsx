@@ -3,11 +3,12 @@ import React from "react";
 import { TransitionProps } from "@material-ui/core/transitions";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "./ImageDialog.css";
 import { SimpleImageCanvas } from "./SimpleImageCanvas";
-import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageProcessingDrawer } from "../ImageProcessingDrawer";
 import { ImageDialogAppBar } from "../ImageDialogAppBar";
+import { ImageDialogToolboxBar } from "../ImageDialogToolboxBar";
+import { ApplicationDrawer } from "../ApplicationDrawer";
 
 type ImageDialogProps = {
   onClose: () => void;
@@ -22,12 +23,12 @@ export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
   const classes = useStyles();
 
   return (
-    <Dialog fullScreen onClose={onClose} open={open}>
+    <Dialog className={classes.dialog} fullScreen onClose={onClose} open={open}>
       <ImageDialogAppBar onClose={onClose} />
 
       <ApplicationDrawer />
 
-      <DialogContent className={classes.imageDialogContent}>
+      <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
           <SimpleImageCanvas imageIds={imageIds} />
         </Container>

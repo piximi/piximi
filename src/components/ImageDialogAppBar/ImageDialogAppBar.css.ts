@@ -10,7 +10,7 @@ export const useStyles = makeStyles((theme) => ({
   closeButton: {
     marginRight: theme.spacing(2),
   },
-  count: {
+  grow: {
     flexGrow: 1,
   },
 }));

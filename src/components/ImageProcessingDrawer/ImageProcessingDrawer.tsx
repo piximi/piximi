@@ -2,7 +2,7 @@ import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import React, { ReactElement } from "react";
 import { VolumeUp } from "@material-ui/icons";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "./ImageProcessingDrawer.css";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { Slider } from "@material-ui/core";

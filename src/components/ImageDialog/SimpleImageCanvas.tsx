@@ -90,7 +90,6 @@ export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
 
   return (
     <div>
-      <ImageDialogToolboxBar />
       <div className={classes.imageCanvasContainer}>
         <canvas
           onMouseDown={onMouseDown}
