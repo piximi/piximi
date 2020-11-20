@@ -83,6 +83,13 @@ export const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(12),
     paddingTop: theme.spacing(12),
   },
+  imageTile: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    top: 0,
+    transform: "none",
+  },
   imageSelected: {
     border: "solid 2px blue",
     borderRadius: "3px",

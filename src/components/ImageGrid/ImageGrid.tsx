@@ -64,7 +64,12 @@ export const ImageGrid = () => {
   const getSize = (scaleFactor: number) => {
     const width = (230 * scaleFactor).toString() + "px";
     const height = (185 * scaleFactor).toString() + "px";
-    return { width: width, height: height };
+    return {
+      width: width,
+      height: height,
+      background: "lightgray",
+      margin: "2px",
+    };
   };
 
   const getSelectionStatus = (imageId: string) => {
@@ -89,28 +94,28 @@ export const ImageGrid = () => {
                 style={getSize(scaleFactor)}
                 className={getSelectionStatus(image.id)}
               >
-                <img alt="" src={image.src} />
+                <img alt="" src={image.src} className={classes.imageTile} />
 
-                <GridListTileBar
-                  actionIcon={
-                    <IconButton
-                      className={classes.gridTileBarIconButton}
-                      disableRipple
-                      onClick={(event) => onOpenCategoryMenu(event, image)}
-                    >
-                      <LabelIcon
-                        style={{
-                          color: imageCategory(image)
-                            ? imageCategory(image).color
-                            : "#AAAAAA",
-                        }}
-                      />
-                    </IconButton>
-                  }
-                  actionPosition="left"
-                  className={classes.gridTileBar}
-                  titlePosition="top"
-                />
+                {/*<GridListTileBar*/}
+                {/*  actionIcon={*/}
+                {/*    <IconButton*/}
+                {/*      className={classes.gridTileBarIconButton}*/}
+                {/*      disableRipple*/}
+                {/*      onClick={(event) => onOpenCategoryMenu(event, image)}*/}
+                {/*    >*/}
+                {/*      <LabelIcon*/}
+                {/*        style={{*/}
+                {/*          color: imageCategory(image)*/}
+                {/*            ? imageCategory(image).color*/}
+                {/*            : "#AAAAAA",*/}
+                {/*        }}*/}
+                {/*      />*/}
+                {/*    </IconButton>*/}
+                {/*  }*/}
+                {/*  actionPosition="left"*/}
+                {/*  className={classes.gridTileBar}*/}
+                {/*  titlePosition="top"*/}
+                {/*/>*/}
               </GridListTile>
             ))}
           </GridList>
