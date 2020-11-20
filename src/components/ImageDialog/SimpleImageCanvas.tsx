@@ -10,9 +10,15 @@ type clickData = {
 
 type ImageCanvasProps = {
   imageIds: Array<string>;
+  box: boolean;
+  brush: boolean;
 };
 
-export const SimpleImageCanvas = ({ imageIds }: ImageCanvasProps) => {
+export const SimpleImageCanvas = ({
+  imageIds,
+  box,
+  brush,
+}: ImageCanvasProps) => {
   const classes = useStyles();
 
   const [clicks, setClick] = useState<Array<clickData>>([]);

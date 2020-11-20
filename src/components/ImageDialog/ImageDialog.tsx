@@ -22,15 +22,31 @@ type ImageDialogProps = {
 export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
   const classes = useStyles();
 
+  //state of annotation type
+  const [box, setBox] = React.useState<boolean>(false);
+  const [brush, setBrush] = React.useState<boolean>(false);
+
+  const onBrushClick = () => {
+    setBrush(true);
+  };
+
+  const onBoxClick = () => {
+    setBox(true);
+  };
+
   return (
     <Dialog className={classes.dialog} fullScreen onClose={onClose} open={open}>
-      <ImageDialogAppBar onClose={onClose} />
+      <ImageDialogAppBar
+        onClose={onClose}
+        onBrushClick={onBrushClick}
+        onBoxClick={onBoxClick}
+      />
 
       <ApplicationDrawer />
 
       <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
-          <SimpleImageCanvas imageIds={imageIds} />
+          <SimpleImageCanvas imageIds={imageIds} box={box} brush={brush} />
         </Container>
       </DialogContent>
 

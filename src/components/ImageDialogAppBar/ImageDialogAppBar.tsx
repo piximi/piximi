@@ -10,9 +10,15 @@ import PanToolIcon from "@material-ui/icons/PanTool";
 
 type ImageDialogAppBarProps = {
   onClose: () => void;
+  onBoxClick: () => void;
+  onBrushClick: () => void;
 };
 
-export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
+export const ImageDialogAppBar = ({
+  onClose,
+  onBoxClick,
+  onBrushClick,
+}: ImageDialogAppBarProps) => {
   const classes = useStyles();
 
   return (
@@ -29,11 +35,11 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
 
         <Typography color="inherit" style={{ paddingRight: 20 }} />
 
-        <IconButton color="inherit" onClick={() => {}}>
+        <IconButton color="inherit" onClick={onBrushClick}>
           <BrushIcon />
         </IconButton>
 
-        <IconButton color="inherit" onClick={() => {}}>
+        <IconButton color="inherit" onClick={onBoxClick}>
           <Crop32Icon />
         </IconButton>
 
