@@ -7,7 +7,6 @@ import { useStyles } from "./ImageDialog.css";
 import { SimpleImageCanvas } from "./SimpleImageCanvas";
 import { ImageProcessingDrawer } from "../ImageProcessingDrawer";
 import { ImageDialogAppBar } from "../ImageDialogAppBar";
-import { ImageDialogToolboxBar } from "../ImageDialogToolboxBar";
 import { ApplicationDrawer } from "../ApplicationDrawer";
 
 type ImageDialogProps = {
