@@ -22,6 +22,11 @@ export const ApplicationToolbar = () => {
     newValue: number | number[]
   ) => {
     setValue(newValue as number);
+    dispatch(
+      applicationSlice.actions.updateTileSize({
+        newValue: newValue as number,
+      })
+    );
   };
 
   const onChangeCommitted = (
@@ -47,9 +52,8 @@ export const ApplicationToolbar = () => {
         value={value}
         min={0.6}
         max={4}
-        step={0.01}
+        step={0.1}
         onChange={onChange}
-        onChangeCommitted={onChangeCommitted}
         className={classes.zoomSlider}
       />
       <ZoomInIcon className={classes.zoomIcon} />
