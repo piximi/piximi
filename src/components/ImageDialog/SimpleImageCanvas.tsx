@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import { useStyles } from "../Application/Application.css";
-import { ImageDialogToolboxBar } from "../ImageDialogToolboxBar";
+import { useSelector } from "react-redux";
+import { imagesSelector } from "../../store/selectors";
+import { Image as ImageType } from "../../types/Image";
 
 type clickData = {
   x: number;
@@ -26,6 +28,20 @@ export const SimpleImageCanvas = ({
     dragging: false,
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const selectedImages: Array<ImageType> = useSelector(imagesSelector);
+
+  React.useEffect(() => {
+    if (canvasRef.current) {
+      const context = canvasRef.current.getContext("2d");
+      const background = new Image();
+      background.src = selectedImages[0].src;
+      background.onload = () => {
+        if (context) {
+          context.drawImage(background, 0, 0);
+        }
+      };
+    }
+  }, []);
 
   const drawLine = (
     context: CanvasRenderingContext2D,
