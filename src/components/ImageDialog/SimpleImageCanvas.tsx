@@ -104,7 +104,7 @@ export const SimpleImageCanvas = ({
         if (box) {
           context.rect(clickX, clickY, 50, 50);
           context.fill();
-        } else {
+        } else if (brush) {
           drawLine(context, click.x, click.y, clickX, clickY);
         }
         setNewClick({ x: 0, y: 0, dragging: false });
