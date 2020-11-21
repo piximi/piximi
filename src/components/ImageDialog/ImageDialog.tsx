@@ -1,5 +1,5 @@
 import Dialog from "@material-ui/core/Dialog";
-import React from "react";
+import React, { useState } from "react";
 import { TransitionProps } from "@material-ui/core/transitions";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
@@ -8,6 +8,8 @@ import { SimpleImageCanvas } from "./SimpleImageCanvas";
 import { ImageProcessingDrawer } from "../ImageProcessingDrawer";
 import { ImageDialogAppBar } from "../ImageDialogAppBar";
 import { ApplicationDrawer } from "../ApplicationDrawer";
+import { Image as ImageType } from "../../types/Image";
+import { useSelector } from "react-redux";
 
 type ImageDialogProps = {
   onClose: () => void;
