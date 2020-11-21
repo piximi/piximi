@@ -27,10 +27,12 @@ export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
 
   const onBrushClick = () => {
     setBrush(true);
+    setBox(false);
   };
 
   const onBoxClick = () => {
     setBox(true);
+    setBrush(false);
   };
 
   return (

@@ -62,10 +62,10 @@ export const SimpleImageCanvas = ({
       const clickX = event.clientX - rect.left;
       const clickY = event.clientY - rect.top;
       const context = canvasRef.current.getContext("2d");
-      if (context) {
+      if (context && brush) {
         drawLine(context, click.x, click.y, clickX, clickY);
+        setNewClick({ x: clickX, y: clickY, dragging: true });
       }
-      setNewClick({ x: clickX, y: clickY, dragging: true });
       event.preventDefault();
     }
   };
@@ -79,10 +79,15 @@ export const SimpleImageCanvas = ({
       const clickY = event.clientY - rect.top;
       const context = canvasRef.current.getContext("2d");
       if (context) {
-        drawLine(context, click.x, click.y, clickX, clickY);
+        if (box) {
+          context.rect(clickX, clickY, 50, 50);
+          context.fill();
+        } else {
+          drawLine(context, click.x, click.y, clickX, clickY);
+        }
+        setNewClick({ x: 0, y: 0, dragging: false });
       }
     }
-    setNewClick({ x: 0, y: 0, dragging: false });
   };
 
   const onMouseOut = (
