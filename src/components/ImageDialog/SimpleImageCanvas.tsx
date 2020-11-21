@@ -29,19 +29,22 @@ export const SimpleImageCanvas = ({
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const selectedImages: Array<ImageType> = useSelector(imagesSelector);
+  const [selectedImage, setSelectedImage] = useState<ImageType>(
+    selectedImages[0]
+  );
 
   React.useEffect(() => {
     if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       const background = new Image();
-      background.src = selectedImages[0].src;
+      background.src = selectedImage.src;
       background.onload = () => {
         if (context) {
           context.drawImage(background, 0, 0);
         }
       };
     }
-  }, []);
+  }, [selectedImage]);
 
   const drawLine = (
     context: CanvasRenderingContext2D,
@@ -122,8 +125,8 @@ export const SimpleImageCanvas = ({
           onMouseOut={onMouseOut}
           ref={canvasRef}
           id={"myCanvas"}
-          width={300}
-          height={300}
+          width={500}
+          height={500}
           style={{ border: "1px solid" }}
         />
       </div>
