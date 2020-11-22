@@ -3,6 +3,10 @@ import { useStyles } from "../Application/Application.css";
 import { useSelector } from "react-redux";
 import { imagesSelector } from "../../store/selectors";
 import { Image as ImageType } from "../../types/Image";
+import { AppBar, Button, Toolbar } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
 type clickData = {
   x: number;
@@ -29,13 +33,20 @@ export const SimpleImageCanvas = ({
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const selectedImages: Array<ImageType> = useSelector(imagesSelector);
+  const [counter, setCounter] = React.useState<number>(0);
 
   const [selectedImage, setSelectedImage] = useState<ImageType>(
-    selectedImages[0]
+    selectedImages[counter]
   );
   const [aspectRatio, setAspectRatio] = React.useState<number>(1);
 
   React.useEffect(() => {
+    const nextImage = selectedImages.find(
+      (image) => image.id === imageIds[counter]
+    );
+    if (nextImage) {
+      setSelectedImage(nextImage);
+    }
     if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       const background = new Image();
@@ -47,7 +58,21 @@ export const SimpleImageCanvas = ({
         }
       };
     }
-  }, [selectedImage]);
+  }, [selectedImages, selectedImage, imageIds, counter]);
+
+  const onNextImage = () => {
+    setCounter((prevCounter: number) => {
+      return prevCounter === imageIds.length - 1
+        ? imageIds.length - 1
+        : prevCounter + 1;
+    });
+  };
+
+  const onPreviousImage = () => {
+    setCounter((prevCounter: number) => {
+      return prevCounter === 0 ? 0 : prevCounter - 1;
+    });
+  };
 
   const drawLine = (
     context: CanvasRenderingContext2D,
@@ -132,6 +157,16 @@ export const SimpleImageCanvas = ({
           height={700 * aspectRatio}
           style={{ border: "1px solid" }}
         />
+      </div>
+      <div>
+        <Toolbar style={{ justifyContent: "center" }}>
+          <IconButton color="inherit" onClick={onPreviousImage}>
+            <ArrowBackIosIcon />
+          </IconButton>
+          <IconButton color="inherit" onClick={onNextImage}>
+            <ArrowForwardIosIcon />
+          </IconButton>
+        </Toolbar>
       </div>
     </div>
   );

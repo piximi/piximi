@@ -6,7 +6,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import Typography from "@material-ui/core/Typography";
 import BrushIcon from "@material-ui/icons/Brush";
 import Crop32Icon from "@material-ui/icons/Crop32";
-import PanToolIcon from "@material-ui/icons/PanTool";
+import OpenWithIcon from "@material-ui/icons/OpenWith";
 
 type ImageDialogAppBarProps = {
   onClose: () => void;
@@ -46,7 +46,7 @@ export const ImageDialogAppBar = ({
         <div className={classes.grow} />
 
         <IconButton color="inherit" onClick={() => {}}>
-          <PanToolIcon />
+          <OpenWithIcon />
         </IconButton>
 
         <Button />
