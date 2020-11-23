@@ -13,7 +13,10 @@ export const ImageDialogCanvas = () => {
   const classes = useStyles();
 
   return (
-    <div className={classes.canvas}>
+    <div
+      style={{ height: "1000px", width: "1000px" }}
+      className={classes.stage}
+    >
       <BackgroundCanvas />
       <MasksCanvas />
       <UserEventsCanvas />

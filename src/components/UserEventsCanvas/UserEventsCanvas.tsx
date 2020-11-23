@@ -101,9 +101,7 @@ export const UserEventsCanvas = () => {
       onMouseOut={onMouseOut}
       ref={canvasRef}
       id={"myCanvas"}
-      width={700}
-      height={700 * 1}
-      style={{ border: "1px solid" }}
+      style={{ border: "1px solid blue" }}
     />
   );
 };
