@@ -1,6 +1,5 @@
 import Dialog from "@material-ui/core/Dialog";
-import React, { useState } from "react";
-import { TransitionProps } from "@material-ui/core/transitions";
+import React from "react";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
 import { useStyles } from "./ImageDialog.css";
@@ -8,20 +7,40 @@ import { SimpleImageCanvas } from "./SimpleImageCanvas";
 import { ImageProcessingDrawer } from "../ImageProcessingDrawer";
 import { ImageDialogAppBar } from "../ImageDialogAppBar";
 import { ApplicationDrawer } from "../ApplicationDrawer";
-import { Image as ImageType } from "../../types/Image";
 import { useSelector } from "react-redux";
+import { Project } from "../../types/Project";
+import { Image } from "../../types/Image";
 
 type ImageDialogProps = {
   onClose: () => void;
   open: boolean;
   imageIds: Array<string>;
-  TransitionComponent?: React.ComponentType<
-    TransitionProps & { children?: React.ReactElement<any, any> }
-  >;
 };
 
 export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
+  const id = "foo";
+
   const classes = useStyles();
+
+  const nextImage = useSelector(({ project }: { project: Project }) => {
+    const index = project.images.findIndex((image: Image) => id === image.id);
+
+    if (index && index + 1 <= project.images.length) {
+      return project.images[index + 1];
+    }
+
+    return null;
+  });
+
+  const previousImage = useSelector(({ project }: { project: Project }) => {
+    const index = project.images.findIndex((image: Image) => id === image.id);
+
+    if (index && index - 1 >= 0) {
+      return project.images[index - 1];
+    }
+
+    return null;
+  });
 
   //state of annotation type
   const [box, setBox] = React.useState<boolean>(false);

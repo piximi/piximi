@@ -3,7 +3,7 @@ import { useStyles } from "../Application/Application.css";
 import { useSelector } from "react-redux";
 import { imagesSelector } from "../../store/selectors";
 import { Image as ImageType } from "../../types/Image";
-import { AppBar, Button, Toolbar } from "@material-ui/core";
+import { Toolbar } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";

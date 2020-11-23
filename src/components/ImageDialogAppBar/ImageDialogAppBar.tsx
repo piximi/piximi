@@ -1,7 +1,7 @@
 import IconButton from "@material-ui/core/IconButton";
 import React from "react";
 import { useStyles } from "./ImageDialogAppBar.css";
-import { AppBar, Button, Slide, Toolbar } from "@material-ui/core";
+import { AppBar, Button, Toolbar } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
 import Typography from "@material-ui/core/Typography";
 import BrushIcon from "@material-ui/icons/Brush";
