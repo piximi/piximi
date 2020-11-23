@@ -1,13 +1,13 @@
 import React from "react";
 import IconButton from "@material-ui/core/IconButton";
-import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 
 export const NextImageButton = () => {
-  const onNextImage = () => {};
+  const onClick = () => {};
 
   return (
-    <IconButton color="inherit" onClick={onNextImage}>
-      <ArrowForwardIosIcon />
+    <IconButton onClick={onClick}>
+      <ArrowForwardIcon />
     </IconButton>
   );
 };
