@@ -3,13 +3,13 @@ import React from "react";
 import DialogContent from "@material-ui/core/DialogContent";
 import Container from "@material-ui/core/Container";
 import { useStyles } from "./ImageDialog.css";
-import { SimpleImageCanvas } from "./SimpleImageCanvas";
 import { ImageProcessingDrawer } from "../ImageProcessingDrawer";
 import { ImageDialogAppBar } from "../ImageDialogAppBar";
 import { ApplicationDrawer } from "../ApplicationDrawer";
-import { useSelector } from "react-redux";
-import { Project } from "../../types/Project";
-import { Image } from "../../types/Image";
+import { ImageDialogCanvas } from "../ImageDialogCanvas";
+import { Toolbar } from "@material-ui/core";
+import { PreviousImageButton } from "../PreviousImageButton";
+import { NextImageButton } from "../NextImageButton";
 
 type ImageDialogProps = {
   onClose: () => void;
@@ -69,7 +69,13 @@ export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
 
       <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
-          <SimpleImageCanvas box={box} brush={brush} />
+          <ImageDialogCanvas box={box} brush={brush} />
+
+          <Toolbar style={{ justifyContent: "center" }}>
+            <PreviousImageButton />
+
+            <NextImageButton />
+          </Toolbar>
         </Container>
       </DialogContent>
 

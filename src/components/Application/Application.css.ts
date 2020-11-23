@@ -70,12 +70,6 @@ export const useStyles = makeStyles((theme) => ({
   gridTileBarIconButton: {
     color: "white",
   },
-  imageCanvasContainer: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   imageDialogAppBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
