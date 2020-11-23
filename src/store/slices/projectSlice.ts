@@ -37,10 +37,11 @@ export const projectSlice = createSlice({
     },
     createImage(state: Project, action: PayloadAction<{ src: string }>) {
       const image: Image = {
+        categoryId: "00000000-0000-0000-0000-000000000000",
         id: v4(),
+        instances: [],
         name: "",
         src: action.payload.src,
-        categoryId: "00000000-0000-0000-0000-000000000000",
       };
 
       state.images.push(image);
