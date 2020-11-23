@@ -58,16 +58,23 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
           size="small"
           value={selectionMethod}
         >
-          <Tooltip title="Rectangular selection">
+          <Tooltip title={SelectionMethod.Quick}>
+            <ToggleButton value={SelectionMethod.Quick}>
+              <BrushIcon />
+            </ToggleButton>
+          </Tooltip>
+
+          <Tooltip title={SelectionMethod.RectangularMarquee}>
             <ToggleButton value={SelectionMethod.RectangularMarquee}>
               <Crop32Icon />
               <ArrowDropDownIcon />
             </ToggleButton>
           </Tooltip>
 
-          <Tooltip title="Quick selection">
-            <ToggleButton value={SelectionMethod.Quick}>
-              <BrushIcon />
+          <Tooltip title={SelectionMethod.Lasso}>
+            <ToggleButton value={SelectionMethod.Lasso}>
+              <Crop32Icon />
+              <ArrowDropDownIcon />
             </ToggleButton>
           </Tooltip>
         </ToggleButtonGroup>

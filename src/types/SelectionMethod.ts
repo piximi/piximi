@@ -1,8 +1,8 @@
 export enum SelectionMethod {
-  EllipticalMarquee = "elliptical-marquee",
-  Lasso = "lasso",
-  MagneticLasso = "magnetic-lasso",
-  PolygonalLasso = "polygonal-lasso",
-  Quick = "quick",
-  RectangularMarquee = "rectangular-marquee",
+  EllipticalMarquee = "Elliptical marquee",
+  Lasso = "Lasso",
+  MagneticLasso = "Magnetic lasso",
+  PolygonalLasso = "Polygonal lasso",
+  Quick = "Quick",
+  RectangularMarquee = "Rectangular marquee",
 }
