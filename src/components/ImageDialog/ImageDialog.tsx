@@ -19,10 +19,6 @@ type ImageDialogProps = {
 export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
   const classes = useStyles();
 
-  //state of annotation type
-  const [box, setBox] = React.useState<boolean>(false);
-  const [brush, setBrush] = React.useState<boolean>(false);
-
   return (
     <Dialog className={classes.dialog} fullScreen onClose={onClose} open={open}>
       <ImageDialogAppBar onClose={onClose} />
@@ -31,7 +27,7 @@ export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
 
       <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
-          <ImageDialogCanvas box={box} brush={brush} />
+          <ImageDialogCanvas />
 
           <Toolbar style={{ justifyContent: "center" }}>
             <PreviousImageButton />

@@ -3,6 +3,8 @@ import { useStyles } from "./ImageDialogCanvas.css";
 import { useSelector } from "react-redux";
 import { imagesSelector, selectedImagesSelector } from "../../store/selectors";
 import { Image as ImageType } from "../../types/Image";
+import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
+import { SelectionMethod } from "../../types/SelectionMethod";
 
 type clickData = {
   x: number;
@@ -10,17 +12,11 @@ type clickData = {
   dragging: boolean;
 };
 
-type ImageDialogCanvasProps = {
-  box: boolean;
-  brush: boolean;
-};
-
-export const ImageDialogCanvas = ({ box, brush }: ImageDialogCanvasProps) => {
+export const ImageDialogCanvas = () => {
   const classes = useStyles();
-
   const images = useSelector(imagesSelector);
-
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
+  const selectionMethod = useSelector(selectionMethodSelector);
 
   const [click, setNewClick] = useState<clickData>({
     x: 0,
@@ -99,7 +95,7 @@ export const ImageDialogCanvas = ({ box, brush }: ImageDialogCanvasProps) => {
       const clickX = event.clientX - rect.left;
       const clickY = event.clientY - rect.top;
       const context = canvasRef.current.getContext("2d");
-      if (context && brush) {
+      if (context && selectionMethod === SelectionMethod.Quick) {
         drawLine(context, click.x, click.y, clickX, clickY);
         setNewClick({ x: clickX, y: clickY, dragging: true });
       }
@@ -116,10 +112,10 @@ export const ImageDialogCanvas = ({ box, brush }: ImageDialogCanvasProps) => {
       const clickY = event.clientY - rect.top;
       const context = canvasRef.current.getContext("2d");
       if (context) {
-        if (box) {
+        if (selectionMethod === SelectionMethod.RectangularMarquee) {
           context.rect(clickX, clickY, 50, 50);
           context.fill();
-        } else if (brush) {
+        } else if (selectionMethod === SelectionMethod.Quick) {
           drawLine(context, click.x, click.y, clickX, clickY);
         }
         setNewClick({ x: 0, y: 0, dragging: false });
