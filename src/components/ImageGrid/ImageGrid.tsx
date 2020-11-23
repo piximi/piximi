@@ -1,16 +1,11 @@
 import Container from "@material-ui/core/Container";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
-import GridListTileBar from "@material-ui/core/GridListTileBar";
-import IconButton from "@material-ui/core/IconButton";
-import LabelIcon from "@material-ui/icons/Label";
 import React from "react";
 import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
-import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import {
-  categoriesSelector,
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
@@ -21,25 +16,9 @@ import { ImageGridAppBar } from "../ImageGridAppBar";
 export const ImageGrid = () => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(categoriesSelector);
-
   const images = useSelector(visibleImagesSelector);
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
-
-  const [
-    categoryMenuAnchorEl,
-    setCategoryMenuAnchorEl,
-  ] = React.useState<null | HTMLElement>(null);
-
-  const onOpenCategoryMenu = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    image: Image
-  ) => {
-    dispatch(applicationSlice.actions.selectOneImage({ id: image.id }));
-    setCategoryMenuAnchorEl(event.currentTarget);
-    event.stopPropagation();
-  };
 
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
@@ -50,14 +29,6 @@ export const ImageGrid = () => {
   };
 
   const classes = useStyles();
-
-  const imageCategory = (image: Image) => {
-    const index = categories.findIndex((category: Category) => {
-      return image.categoryId === category.id;
-    });
-
-    return categories[index];
-  };
 
   const scaleFactor = useSelector(tileSizeSelector);
 
@@ -95,27 +66,6 @@ export const ImageGrid = () => {
                 className={getSelectionStatus(image.id)}
               >
                 <img alt="" src={image.src} className={classes.imageTile} />
-
-                {/*<GridListTileBar*/}
-                {/*  actionIcon={*/}
-                {/*    <IconButton*/}
-                {/*      className={classes.gridTileBarIconButton}*/}
-                {/*      disableRipple*/}
-                {/*      onClick={(event) => onOpenCategoryMenu(event, image)}*/}
-                {/*    >*/}
-                {/*      <LabelIcon*/}
-                {/*        style={{*/}
-                {/*          color: imageCategory(image)*/}
-                {/*            ? imageCategory(image).color*/}
-                {/*            : "#AAAAAA",*/}
-                {/*        }}*/}
-                {/*      />*/}
-                {/*    </IconButton>*/}
-                {/*  }*/}
-                {/*  actionPosition="left"*/}
-                {/*  className={classes.gridTileBar}*/}
-                {/*  titlePosition="top"*/}
-                {/*/>*/}
               </GridListTile>
             ))}
           </GridList>
