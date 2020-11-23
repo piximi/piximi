@@ -16,6 +16,54 @@ import { applicationSlice } from "../../store/slices";
 import Tooltip from "@material-ui/core/Tooltip";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
+type ButtonGroupProps = {};
+
+const ButtonGroup = ({}: ButtonGroupProps) => {
+  const dispatch = useDispatch();
+
+  const selectionMethod = useSelector(selectionMethodSelector);
+
+  const onChange = (
+    event: React.MouseEvent<HTMLElement>,
+    selectionMethod: SelectionMethod
+  ) => {
+    const payload = {
+      selectionMethod: selectionMethod,
+    };
+
+    dispatch(applicationSlice.actions.updateSelectionMethod(payload));
+  };
+
+  return (
+    <ToggleButtonGroup
+      exclusive
+      onChange={onChange}
+      size="small"
+      value={selectionMethod}
+    >
+      <Tooltip title={SelectionMethod.Quick}>
+        <ToggleButton value={SelectionMethod.Quick}>
+          <BrushIcon />
+        </ToggleButton>
+      </Tooltip>
+
+      <Tooltip title={SelectionMethod.RectangularMarquee}>
+        <ToggleButton value={SelectionMethod.RectangularMarquee}>
+          <Crop32Icon />
+          <ArrowDropDownIcon />
+        </ToggleButton>
+      </Tooltip>
+
+      <Tooltip title={SelectionMethod.Lasso}>
+        <ToggleButton value={SelectionMethod.Lasso}>
+          <Crop32Icon />
+          <ArrowDropDownIcon />
+        </ToggleButton>
+      </Tooltip>
+    </ToggleButtonGroup>
+  );
+};
+
 type ImageDialogAppBarProps = {
   onClose: () => void;
 };
@@ -52,32 +100,7 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
 
         <Typography color="inherit" style={{ paddingRight: 20 }} />
 
-        <ToggleButtonGroup
-          exclusive
-          onChange={onChange}
-          size="small"
-          value={selectionMethod}
-        >
-          <Tooltip title={SelectionMethod.Quick}>
-            <ToggleButton value={SelectionMethod.Quick}>
-              <BrushIcon />
-            </ToggleButton>
-          </Tooltip>
-
-          <Tooltip title={SelectionMethod.RectangularMarquee}>
-            <ToggleButton value={SelectionMethod.RectangularMarquee}>
-              <Crop32Icon />
-              <ArrowDropDownIcon />
-            </ToggleButton>
-          </Tooltip>
-
-          <Tooltip title={SelectionMethod.Lasso}>
-            <ToggleButton value={SelectionMethod.Lasso}>
-              <Crop32Icon />
-              <ArrowDropDownIcon />
-            </ToggleButton>
-          </Tooltip>
-        </ToggleButtonGroup>
+        <ButtonGroup />
 
         <div className={classes.grow} />
 
