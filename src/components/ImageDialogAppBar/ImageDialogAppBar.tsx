@@ -69,21 +69,6 @@ type ImageDialogAppBarProps = {
 export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
   const classes = useStyles();
 
-  const dispatch = useDispatch();
-
-  const selectionMethod = useSelector(selectionMethodSelector);
-
-  const onChange = (
-    event: React.MouseEvent<HTMLElement>,
-    selectionMethod: SelectionMethod
-  ) => {
-    const payload = {
-      selectionMethod: selectionMethod,
-    };
-
-    dispatch(applicationSlice.actions.updateSelectionMethod(payload));
-  };
-
   return (
     <AppBar color="inherit" position="fixed">
       <Toolbar>
