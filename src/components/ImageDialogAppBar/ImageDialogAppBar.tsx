@@ -13,6 +13,8 @@ import { ToggleButton } from "@material-ui/lab";
 import { useDispatch, useSelector } from "react-redux";
 import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
 import { applicationSlice } from "../../store/slices";
+import Tooltip from "@material-ui/core/Tooltip";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
 type ImageDialogAppBarProps = {
   onClose: () => void;
@@ -56,13 +58,18 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
           size="small"
           value={selectionMethod}
         >
-          <ToggleButton value={SelectionMethod.RectangularMarquee}>
-            <Crop32Icon />
-          </ToggleButton>
+          <Tooltip title="Rectangular selection">
+            <ToggleButton value={SelectionMethod.RectangularMarquee}>
+              <Crop32Icon />
+              <ArrowDropDownIcon />
+            </ToggleButton>
+          </Tooltip>
 
-          <ToggleButton value={SelectionMethod.Quick}>
-            <BrushIcon />
-          </ToggleButton>
+          <Tooltip title="Quick selection">
+            <ToggleButton value={SelectionMethod.Quick}>
+              <BrushIcon />
+            </ToggleButton>
+          </Tooltip>
         </ToggleButtonGroup>
 
         <div className={classes.grow} />
