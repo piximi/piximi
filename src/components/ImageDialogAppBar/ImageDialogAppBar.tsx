@@ -29,11 +29,11 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
     event: React.MouseEvent<HTMLElement>,
     selectionMethod: SelectionMethod
   ) => {
-    dispatch(
-      applicationSlice.actions.updateSelectionMethod({
-        selectionMethod: selectionMethod,
-      })
-    );
+    const payload = {
+      selectionMethod: selectionMethod,
+    };
+
+    dispatch(applicationSlice.actions.updateSelectionMethod(payload));
   };
 
   return (
