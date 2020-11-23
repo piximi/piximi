@@ -16,9 +16,7 @@ import { applicationSlice } from "../../store/slices";
 import Tooltip from "@material-ui/core/Tooltip";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
-type ButtonGroupProps = {};
-
-const ButtonGroup = ({}: ButtonGroupProps) => {
+const ButtonGroup = () => {
   const dispatch = useDispatch();
 
   const selectionMethod = useSelector(selectionMethodSelector);
