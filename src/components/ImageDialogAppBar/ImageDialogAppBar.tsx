@@ -7,19 +7,27 @@ import Typography from "@material-ui/core/Typography";
 import BrushIcon from "@material-ui/icons/Brush";
 import Crop32Icon from "@material-ui/icons/Crop32";
 import OpenWithIcon from "@material-ui/icons/OpenWith";
+import { SelectionMethod } from "../../types/SelectionMethod";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import { ToggleButton } from "@material-ui/lab";
 
 type ImageDialogAppBarProps = {
   onClose: () => void;
-  onBoxClick: () => void;
-  onBrushClick: () => void;
 };
 
-export const ImageDialogAppBar = ({
-  onClose,
-  onBoxClick,
-  onBrushClick,
-}: ImageDialogAppBarProps) => {
+export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
   const classes = useStyles();
+
+  const [method, setMethod] = React.useState<SelectionMethod>(
+    SelectionMethod.RectangularMarquee
+  );
+
+  const onChange = (
+    event: React.MouseEvent<HTMLElement>,
+    method: SelectionMethod
+  ) => {
+    setMethod(method);
+  };
 
   return (
     <AppBar color="inherit" position="fixed">
@@ -35,13 +43,15 @@ export const ImageDialogAppBar = ({
 
         <Typography color="inherit" style={{ paddingRight: 20 }} />
 
-        <IconButton color="inherit" onClick={onBrushClick}>
-          <BrushIcon />
-        </IconButton>
+        <ToggleButtonGroup exclusive onChange={onChange} value={method}>
+          <ToggleButton value={SelectionMethod.RectangularMarquee}>
+            <Crop32Icon />
+          </ToggleButton>
 
-        <IconButton color="inherit" onClick={onBoxClick}>
-          <Crop32Icon />
-        </IconButton>
+          <ToggleButton value={SelectionMethod.Quick}>
+            <BrushIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
 
         <div className={classes.grow} />
 
