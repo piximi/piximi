@@ -10,6 +10,9 @@ import OpenWithIcon from "@material-ui/icons/OpenWith";
 import { SelectionMethod } from "../../types/SelectionMethod";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { ToggleButton } from "@material-ui/lab";
+import { useDispatch, useSelector } from "react-redux";
+import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
+import { applicationSlice } from "../../store/slices";
 
 type ImageDialogAppBarProps = {
   onClose: () => void;
@@ -18,15 +21,19 @@ type ImageDialogAppBarProps = {
 export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
   const classes = useStyles();
 
-  const [method, setMethod] = React.useState<SelectionMethod>(
-    SelectionMethod.RectangularMarquee
-  );
+  const dispatch = useDispatch();
+
+  const selectionMethod = useSelector(selectionMethodSelector);
 
   const onChange = (
     event: React.MouseEvent<HTMLElement>,
-    method: SelectionMethod
+    selectionMethod: SelectionMethod
   ) => {
-    setMethod(method);
+    dispatch(
+      applicationSlice.actions.updateSelectionMethod({
+        selectionMethod: selectionMethod,
+      })
+    );
   };
 
   return (
@@ -43,7 +50,11 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
 
         <Typography color="inherit" style={{ paddingRight: 20 }} />
 
-        <ToggleButtonGroup exclusive onChange={onChange} value={method}>
+        <ToggleButtonGroup
+          exclusive
+          onChange={onChange}
+          value={selectionMethod}
+        >
           <ToggleButton value={SelectionMethod.RectangularMarquee}>
             <Crop32Icon />
           </ToggleButton>

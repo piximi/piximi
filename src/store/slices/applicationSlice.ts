@@ -1,15 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Settings } from "../../types/Settings";
+import { SelectionMethod } from "../../types/SelectionMethod";
 
 const initialState: Settings = {
-  tileSize: 1,
   selectedImages: [],
+  selectionMethod: SelectionMethod.RectangularMarquee,
+  tileSize: 1,
 };
 
 export const applicationSlice = createSlice({
   name: "settings",
   initialState: initialState,
   reducers: {
+    updateSelectionMethod(
+      state: Settings,
+      action: PayloadAction<{ selectionMethod: SelectionMethod }>
+    ) {
+      state.selectionMethod = action.payload.selectionMethod;
+    },
     updateTileSize(
       state: Settings,
       action: PayloadAction<{ newValue: number }>
