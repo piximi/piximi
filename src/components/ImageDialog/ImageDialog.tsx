@@ -14,37 +14,34 @@ import { Image } from "../../types/Image";
 type ImageDialogProps = {
   onClose: () => void;
   open: boolean;
-  imageIds: Array<string>;
 };
 
-export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
-  const id = "foo";
-
+export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
   const classes = useStyles();
 
-  const nextImage: Image | null = useSelector(
-    ({ project }: { project: Project }): Image | null => {
-      const index = project.images.findIndex((image: Image) => id === image.id);
-
-      if (index && index + 1 <= project.images.length) {
-        return project.images[index + 1];
-      }
-
-      return null;
-    }
-  );
-
-  const previousImage: Image | null = useSelector(
-    ({ project }: { project: Project }): Image | null => {
-      const index = project.images.findIndex((image: Image) => id === image.id);
-
-      if (index && index - 1 >= 0) {
-        return project.images[index - 1];
-      }
-
-      return null;
-    }
-  );
+  // const nextImage: Image | null = useSelector(
+  //   ({ project }: { project: Project }): Image | null => {
+  //     const index = project.images.findIndex((image: Image) => id === image.id);
+  //
+  //     if (index && index + 1 <= project.images.length) {
+  //       return project.images[index + 1];
+  //     }
+  //
+  //     return null;
+  //   }
+  // );
+  //
+  // const previousImage: Image | null = useSelector(
+  //   ({ project }: { project: Project }): Image | null => {
+  //     const index = project.images.findIndex((image: Image) => id === image.id);
+  //
+  //     if (index && index - 1 >= 0) {
+  //       return project.images[index - 1];
+  //     }
+  //
+  //     return null;
+  //   }
+  // );
 
   //state of annotation type
   const [box, setBox] = React.useState<boolean>(false);
@@ -72,7 +69,7 @@ export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
 
       <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
-          <SimpleImageCanvas imageIds={imageIds} box={box} brush={brush} />
+          <SimpleImageCanvas box={box} brush={brush} />
         </Container>
       </DialogContent>
 

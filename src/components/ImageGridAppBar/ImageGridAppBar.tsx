@@ -110,11 +110,7 @@ export const ImageGridAppBar = () => {
         </AppBar>
       </Slide>
 
-      <ImageDialog
-        onClose={onCloseImageDialog}
-        open={openImageDialog}
-        imageIds={selectedImages}
-      />
+      <ImageDialog onClose={onCloseImageDialog} open={openImageDialog} />
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}

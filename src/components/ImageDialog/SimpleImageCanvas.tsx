@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useStyles } from "../Application/Application.css";
 import { useSelector } from "react-redux";
-import { imagesSelector } from "../../store/selectors";
+import { imagesSelector, selectedImagesSelector } from "../../store/selectors";
 import { Image as ImageType } from "../../types/Image";
 import { Toolbar } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
@@ -15,34 +15,36 @@ type clickData = {
 };
 
 type ImageCanvasProps = {
-  imageIds: Array<string>;
   box: boolean;
   brush: boolean;
 };
 
-export const SimpleImageCanvas = ({
-  imageIds,
-  box,
-  brush,
-}: ImageCanvasProps) => {
+export const SimpleImageCanvas = ({ box, brush }: ImageCanvasProps) => {
   const classes = useStyles();
+
+  const images = useSelector(imagesSelector);
+
+  const selectedImages: Array<string> = useSelector(selectedImagesSelector);
+
   const [click, setNewClick] = useState<clickData>({
     x: 0,
     y: 0,
     dragging: false,
   });
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const selectedImages: Array<ImageType> = useSelector(imagesSelector);
+
   const [counter, setCounter] = React.useState<number>(0);
 
-  const [selectedImage, setSelectedImage] = useState<ImageType>(
+  const [selectedImage, setSelectedImage] = useState<string>(
     selectedImages[counter]
   );
+
   const [aspectRatio, setAspectRatio] = React.useState<number>(1);
 
   React.useEffect(() => {
     const nextImage = selectedImages.find(
-      (image) => image.id === imageIds[counter]
+      (image) => image === selectedImages[counter]
     );
     if (nextImage) {
       setSelectedImage(nextImage);
@@ -50,7 +52,13 @@ export const SimpleImageCanvas = ({
     if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       const background = new Image();
-      background.src = selectedImage.src;
+
+      const index = images.findIndex(
+        (image: ImageType) => image.id === selectedImage
+      );
+
+      background.src = images[index].src;
+
       background.onload = () => {
         if (context) {
           setAspectRatio(background.height / background.width);
@@ -58,12 +66,12 @@ export const SimpleImageCanvas = ({
         }
       };
     }
-  }, [selectedImages, selectedImage, imageIds, counter]);
+  }, [selectedImages, selectedImage, selectedImages, counter]);
 
   const onNextImage = () => {
     setCounter((prevCounter: number) => {
-      return prevCounter === imageIds.length - 1
-        ? imageIds.length - 1
+      return prevCounter === selectedImages.length - 1
+        ? selectedImages.length - 1
         : prevCounter + 1;
     });
   };
