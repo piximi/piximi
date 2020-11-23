@@ -3,7 +3,7 @@ import { Settings } from "../../types/Settings";
 
 const initialState: Settings = {
   tileSize: 1,
-  selectedImages: new Set([]),
+  selectedImages: [],
 };
 
 export const applicationSlice = createSlice({
@@ -17,31 +17,36 @@ export const applicationSlice = createSlice({
       state.tileSize = action.payload.newValue!;
     },
     selectImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages.add(action.payload.id);
+      state.selectedImages.push(action.payload.id);
     },
     selectOneImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages.clear();
+      state.selectedImages = [];
 
-      state.selectedImages.add(action.payload.id);
+      state.selectedImages.push(action.payload.id);
     },
     selectAllImages(
       state: Settings,
       action: PayloadAction<{ ids: Array<string> }>
     ) {
-      state.selectedImages.clear();
+      state.selectedImages = [];
 
-      state.selectedImages = new Set(action.payload.ids);
+      state.selectedImages = action.payload.ids;
     },
     deselectImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages.delete(action.payload.id);
+      state.selectedImages = state.selectedImages.filter(
+        (id: string) => id !== action.payload.id
+      );
     },
-    deselectImages(state: Settings, action: PayloadAction<{ ids: string[] }>) {
-      action.payload.ids.forEach((id) => {
-        state.selectedImages.delete(id);
-      });
+    deselectImages(
+      state: Settings,
+      action: PayloadAction<{ ids: Array<string> }>
+    ) {
+      state.selectedImages = state.selectedImages.filter(
+        (id: string) => !action.payload.ids.includes(id)
+      );
     },
     clearSelectedImages(state: Settings) {
-      state.selectedImages.clear();
+      state.selectedImages = [];
     },
   },
 });
