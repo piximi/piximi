@@ -22,25 +22,29 @@ export const ImageDialog = ({ onClose, open, imageIds }: ImageDialogProps) => {
 
   const classes = useStyles();
 
-  const nextImage = useSelector(({ project }: { project: Project }) => {
-    const index = project.images.findIndex((image: Image) => id === image.id);
+  const nextImage: Image | null = useSelector(
+    ({ project }: { project: Project }): Image | null => {
+      const index = project.images.findIndex((image: Image) => id === image.id);
 
-    if (index && index + 1 <= project.images.length) {
-      return project.images[index + 1];
+      if (index && index + 1 <= project.images.length) {
+        return project.images[index + 1];
+      }
+
+      return null;
     }
+  );
 
-    return null;
-  });
+  const previousImage: Image | null = useSelector(
+    ({ project }: { project: Project }): Image | null => {
+      const index = project.images.findIndex((image: Image) => id === image.id);
 
-  const previousImage = useSelector(({ project }: { project: Project }) => {
-    const index = project.images.findIndex((image: Image) => id === image.id);
+      if (index && index - 1 >= 0) {
+        return project.images[index - 1];
+      }
 
-    if (index && index - 1 >= 0) {
-      return project.images[index - 1];
+      return null;
     }
-
-    return null;
-  });
+  );
 
   //state of annotation type
   const [box, setBox] = React.useState<boolean>(false);
