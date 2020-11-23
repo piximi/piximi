@@ -53,6 +53,7 @@ export const ImageDialogAppBar = ({ onClose }: ImageDialogAppBarProps) => {
         <ToggleButtonGroup
           exclusive
           onChange={onChange}
+          size="small"
           value={selectionMethod}
         >
           <ToggleButton value={SelectionMethod.RectangularMarquee}>
