@@ -15,6 +15,5 @@ export const useStyles = makeStyles((theme) => ({
   backgroundCanvas: {
     position: "absolute",
     zIndex: 1,
-    border: "dashed",
   },
 }));

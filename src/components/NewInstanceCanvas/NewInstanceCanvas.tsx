@@ -113,7 +113,6 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
       onMouseOut={onMouseOut}
       ref={ref}
       id={"myCanvas"}
-      style={{ border: "1px solid blue" }}
     />
   );
 };
