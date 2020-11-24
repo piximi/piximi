@@ -4,6 +4,7 @@ import { Category } from "../../types/Category";
 import { v4 } from "uuid";
 import { Image } from "../../types/Image";
 import { findIndex, filter } from "underscore";
+import { Shape } from "../../types/Shape";
 
 const initialState: Project = {
   categories: [
@@ -35,12 +36,16 @@ export const projectSlice = createSlice({
 
       state.categories.push(category);
     },
-    createImage(state: Project, action: PayloadAction<{ src: string }>) {
+    createImage(
+      state: Project,
+      action: PayloadAction<{ shape: Shape; src: string }>
+    ) {
       const image: Image = {
         categoryId: "00000000-0000-0000-0000-000000000000",
         id: v4(),
         instances: [],
         name: "",
+        shape: action.payload.shape,
         src: action.payload.src,
       };
 

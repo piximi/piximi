@@ -43,11 +43,5 @@ export const BackgroundCanvas = () => {
       };
     }
   }, [selectedImages, selectedImage, selectedImages, counter]);
-  return (
-    <canvas
-      style={{ height: heightRef.current, width: widthRef.current }}
-      className={classes.backgroundCanvas}
-      ref={canvasRef}
-    />
-  );
+  return <canvas className={classes.backgroundCanvas} ref={canvasRef} />;
 };

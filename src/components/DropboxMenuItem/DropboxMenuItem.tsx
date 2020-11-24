@@ -24,7 +24,7 @@ export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
       onClose();
 
       items.forEach((item: Dropbox.ChooserFile) => {
-        dispatch(createImage({ src: item.link as string }));
+        //dispatch(createImage({ src: item.link as string }));
       });
     },
   });

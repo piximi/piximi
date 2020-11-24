@@ -10,6 +10,7 @@ import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "../DropboxMenuItem";
+import { Shape } from "../../types/Shape";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement;
@@ -26,7 +27,6 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   ) => {
     onClose();
     event.persist();
-    console.log(event.currentTarget.files);
     if (event.currentTarget.files) {
       const blob = event.currentTarget.files[0];
 
@@ -36,7 +36,18 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
         if (event.target) {
           const src = event.target.result;
 
-          dispatch(createImage({ src: src as string }));
+          const image = new Image();
+
+          image.onload = () => {
+            const shape: Shape = {
+              r: image.naturalHeight,
+              c: image.naturalWidth,
+              channels: 4,
+            };
+            dispatch(createImage({ shape: shape, src: src as string }));
+          };
+
+          image.src = src as string;
         }
       };
 
