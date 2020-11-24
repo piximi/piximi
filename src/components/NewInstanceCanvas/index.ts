@@ -1,0 +1,1 @@
+export { NewInstanceCanvas } from "./NewInstanceCanvas";

@@ -3,6 +3,7 @@ import { SelectionMethod } from "../../types/SelectionMethod";
 import { useSelector } from "react-redux";
 import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
 import { useStyles } from "../ImageDialogCanvas/ImageDialogCanvas.css";
+import { Image } from "../../types/Image";
 
 type clickData = {
   x: number;
@@ -10,16 +11,27 @@ type clickData = {
   dragging: boolean;
 };
 
-export const UserEventsCanvas = () => {
+type NewInstanceCanvasProps = {
+  image: Image;
+};
+
+export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
   const classes = useStyles();
   const selectionMethod = useSelector(selectionMethodSelector);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ref = useRef<HTMLCanvasElement>(null);
 
   const [click, setNewClick] = useState<clickData>({
     x: 0,
     y: 0,
     dragging: false,
   });
+
+  React.useEffect(() => {
+    if (ref.current) {
+      ref.current.height = image.shape!.r;
+      ref.current.width = image.shape!.c;
+    }
+  }, [image.shape]);
 
   const drawLine = (
     context: CanvasRenderingContext2D,
@@ -40,8 +52,8 @@ export const UserEventsCanvas = () => {
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
       const clickX = event.clientX - rect.left;
       const clickY = event.clientY - rect.top;
       setNewClick({ x: clickX, y: clickY, dragging: true });
@@ -51,11 +63,11 @@ export const UserEventsCanvas = () => {
   const onMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (click.dragging && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
+    if (click.dragging && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
       const clickX = event.clientX - rect.left;
       const clickY = event.clientY - rect.top;
-      const context = canvasRef.current.getContext("2d");
+      const context = ref.current.getContext("2d");
       if (context && selectionMethod === SelectionMethod.Quick) {
         drawLine(context, click.x, click.y, clickX, clickY);
         setNewClick({ x: clickX, y: clickY, dragging: true });
@@ -67,11 +79,11 @@ export const UserEventsCanvas = () => {
   const onMouseUp = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (click.dragging && canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
+    if (click.dragging && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
       const clickX = event.clientX - rect.left;
       const clickY = event.clientY - rect.top;
-      const context = canvasRef.current.getContext("2d");
+      const context = ref.current.getContext("2d");
       if (context) {
         if (selectionMethod === SelectionMethod.RectangularMarquee) {
           context.rect(clickX, clickY, 50, 50);
@@ -99,7 +111,7 @@ export const UserEventsCanvas = () => {
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseOut={onMouseOut}
-      ref={canvasRef}
+      ref={ref}
       id={"myCanvas"}
       style={{ border: "1px solid blue" }}
     />

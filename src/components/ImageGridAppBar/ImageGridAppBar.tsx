@@ -19,6 +19,7 @@ import { applicationSlice } from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import Tooltip from "@material-ui/core/Tooltip";
+import * as _ from "underscore";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -110,7 +111,13 @@ export const ImageGridAppBar = () => {
         </AppBar>
       </Slide>
 
-      <ImageDialog onClose={onCloseImageDialog} open={openImageDialog} />
+      {Array.isArray(selectedImages) && selectedImages.length && (
+        <ImageDialog
+          image={_.find(images, (image) => image.id === selectedImages[0])!}
+          onClose={onCloseImageDialog}
+          open={openImageDialog}
+        />
+      )}
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}

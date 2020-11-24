@@ -10,13 +10,15 @@ import { ImageDialogCanvas } from "../ImageDialogCanvas";
 import { Toolbar } from "@material-ui/core";
 import { PreviousImageButton } from "../PreviousImageButton";
 import { NextImageButton } from "../NextImageButton";
+import { Image } from "../../types/Image";
 
 type ImageDialogProps = {
+  image: Image;
   onClose: () => void;
   open: boolean;
 };
 
-export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
+export const ImageDialog = ({ image, onClose, open }: ImageDialogProps) => {
   const classes = useStyles();
 
   return (
@@ -27,7 +29,7 @@ export const ImageDialog = ({ onClose, open }: ImageDialogProps) => {
 
       <DialogContent className={classes.content}>
         <Container fixed maxWidth="lg">
-          <ImageDialogCanvas />
+          <ImageDialogCanvas image={image} />
 
           <Toolbar style={{ justifyContent: "center" }}>
             <PreviousImageButton />

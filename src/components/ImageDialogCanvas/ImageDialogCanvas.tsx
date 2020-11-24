@@ -1,22 +1,22 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { useStyles } from "./ImageDialogCanvas.css";
-import { useSelector } from "react-redux";
-import { imagesSelector, selectedImagesSelector } from "../../store/selectors";
-import { Image as ImageType } from "../../types/Image";
-import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
-import { SelectionMethod } from "../../types/SelectionMethod";
-import { BackgroundCanvas } from "../BackgroundCanvas";
-import { MasksCanvas } from "../MasksCanvas";
-import { UserEventsCanvas } from "../UserEventsCanvas";
+import { Image } from "../../types/Image";
+import { ImageCanvas } from "../ImageCanvas";
+import { LabelCanvas } from "../LabelCanvas";
+import { NewInstanceCanvas } from "../NewInstanceCanvas";
 
-export const ImageDialogCanvas = () => {
+type ImageDialogCanvasProps = {
+  image: Image;
+};
+
+export const ImageDialogCanvas = ({ image }: ImageDialogCanvasProps) => {
   const classes = useStyles();
 
   return (
-    <div style={{ height: "500px", width: "500px" }} className={classes.stage}>
-      <BackgroundCanvas />
-      <MasksCanvas />
-      <UserEventsCanvas />
+    <div className={classes.stage}>
+      <ImageCanvas image={image} />
+      <LabelCanvas image={image} />
+      <NewInstanceCanvas image={image} />
     </div>
   );
 };
