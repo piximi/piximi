@@ -1,9 +1,6 @@
 import { combineReducers } from "redux";
 import { classifierSlice, projectSlice } from "../slices";
 import { applicationSlice } from "../slices/applicationSlice";
-import { enableMapSet } from "immer";
-
-enableMapSet();
 
 const reducers = {
   classifier: classifierSlice.reducer,

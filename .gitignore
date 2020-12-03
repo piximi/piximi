@@ -3,12 +3,13 @@
 .env.local
 .env.production.local
 .env.test.local
+.eslintcache
 .idea
 .pnp.js
 /.pnp
-/build
 /coverage
 /node_modules
+build
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
