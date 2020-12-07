@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
 import { useStyles } from "../ImageDialogCanvas/ImageDialogCanvas.css";
 import { Image } from "../../types/Image";
+import { imread } from "../../image";
 
 type clickData = {
   x: number;
