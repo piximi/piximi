@@ -76,14 +76,8 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
 
   const [refresh, setRefresh] = useState<boolean>();
   const [rectangles, setRectangles] = useState<Array<Rectangle>>();
-  const [rectangle, setRectangle] = useState<Rectangle>(
-    new Rectangle(0, 0, 1, 1)
-  );
-
-  const mouse = {
-    x: 0,
-    y: 0,
-  };
+  const [rectangle, setRectangle] = useState<Rectangle>();
+  const [mouse, setMouse] = useState();
 
   const open = (src: string) => {
     const image = new Image();
@@ -100,12 +94,12 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
   const useAnimationFrame = () => {
     const animationRef = useRef<number>();
     const animate = () => {
-      if (mouse) {
+      if (mouse && rectangle) {
         rectangle.update(mouse);
       }
       if (ref && ref.current) {
         const ctx = ref.current.getContext("2d");
-        if (ctx) {
+        if (ctx && rectangle) {
           rectangle.draw(ctx);
         }
       }
@@ -158,10 +152,18 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
       if (mouse) {
         mouse.x = event.clientX - rect.left;
         mouse.y = event.clientY - rect.top;
-        setRectangle(
-          (prevRectangle) =>
-            new Rectangle(prevRectangle.x0, prevRectangle.y0, mouse.x, mouse.y)
-        );
+        if (rectangle) {
+          setRectangle((prevRectangle) => {
+            if (prevRectangle) {
+              return new Rectangle(
+                prevRectangle.x0,
+                prevRectangle.y0,
+                mouse.x,
+                mouse.y
+              );
+            }
+          });
+        }
       }
     }
   };
