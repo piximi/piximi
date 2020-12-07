@@ -80,9 +80,9 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
     new Rectangle(0, 0, 1, 1)
   );
 
-  let mouse: {
-    x: number;
-    y: number;
+  const mouse = {
+    x: 0,
+    y: 0,
   };
 
   const open = (src: string) => {
@@ -103,7 +103,6 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
       if (mouse) {
         rectangle.update(mouse);
       }
-      rectangle.translate();
       if (ref && ref.current) {
         const ctx = ref.current.getContext("2d");
         if (ctx) {
@@ -159,6 +158,10 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
       if (mouse) {
         mouse.x = event.clientX - rect.left;
         mouse.y = event.clientY - rect.top;
+        setRectangle(
+          (prevRectangle) =>
+            new Rectangle(prevRectangle.x0, prevRectangle.y0, mouse.x, mouse.y)
+        );
       }
     }
   };
@@ -177,11 +180,11 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
 
   return (
     <canvas
-      height={500}
+      height={image.shape?.r}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       ref={ref}
-      width={800}
+      width={image.shape?.c}
     />
   );
 };
