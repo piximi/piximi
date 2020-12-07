@@ -138,13 +138,12 @@ const useRenderingContext = () => {
 };
 
 type HexagonProps = {
-  size: number;
   color: string;
   rotation: number;
   speed: number;
 };
 
-const Hexagon = ({ size, color, rotation, speed }: HexagonProps) => {
+const Hexagon = ({ color, rotation, speed }: HexagonProps) => {
   const animation = useAnimation(rotation, (angle) => angle + speed);
 
   const { context, end, start } = useRenderingContext()!;
