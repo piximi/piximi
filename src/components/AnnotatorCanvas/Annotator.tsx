@@ -180,7 +180,7 @@ const Hexagon = ({ color, rotation, speed }: HexagonProps) => {
 export const Annotator = () => {
   return (
     <Canvas animate height={256} width={256}>
-      <Hexagon size={128} color="#CCCCCC" rotation={0.5} speed={0.5} />
+      <Hexagon color="#CCCCCC" rotation={0.5} speed={0.5} />
     </Canvas>
   );
 };
