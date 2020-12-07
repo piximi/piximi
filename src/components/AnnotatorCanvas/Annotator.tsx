@@ -16,7 +16,12 @@ type Point = {
   y: number;
 };
 
-const RenderingContextContext = createContext<CanvasRenderingContext2D | null>(
+type RenderingContextContextProps = {
+  context: CanvasRenderingContext2D;
+  start?: Point;
+};
+
+const RenderingContextContext = createContext<RenderingContextContextProps | null>(
   null
 );
 
@@ -62,6 +67,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const [start, setStart] = useState<Point | null>();
 
   const onStart = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    if (context) context.clearRect(0, 0, width, height);
+
     if (ref && ref.current) {
       const boundingClientRect = ref.current.getBoundingClientRect();
 
@@ -79,7 +86,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const style = { width, height };
 
   return (
-    <RenderingContextContext.Provider value={context!}>
+    <RenderingContextContext.Provider
+      value={{ context: context!, start: start! }}
+    >
       <FrameContext.Provider value={frame}>
         <canvas
           height={height}
@@ -112,39 +121,43 @@ const useRenderingContext = () => {
 };
 
 type HexagonProps = {
-  x: number;
-  y: number;
   size: number;
   color: string;
   rotation: number;
   speed: number;
 };
 
-const Hexagon = ({ x, y, size, color, rotation, speed }: HexagonProps) => {
+const Hexagon = ({ size, color, rotation, speed }: HexagonProps) => {
   const animation = useAnimation(rotation, (angle) => angle + speed);
 
-  const context = useRenderingContext();
+  const { context, start } = useRenderingContext()!;
+
+  console.info(start);
 
   if (context) {
     const edgeLength = size * 0.5;
 
     context.beginPath();
 
-    [30, 90, 150, 210, 270, 330].forEach((angle, index) => {
-      const radAngle = ((angle + animation) * Math.PI) / 180;
-      const point = {
-        x: x + edgeLength + edgeLength * Math.cos(radAngle),
-        y: y + edgeLength + edgeLength * Math.sin(radAngle),
-      };
+    if (start) {
+      [30, 90, 150, 210, 270, 330].forEach((angle, index) => {
+        const radAngle = ((angle + animation) * Math.PI) / 180;
+        const point = {
+          x: start.x + edgeLength + edgeLength * Math.cos(radAngle),
+          y: start.y + edgeLength + edgeLength * Math.sin(radAngle),
+        };
 
-      if (index === 0) {
-        context.moveTo(point.x, point.y);
-      } else {
-        context.lineTo(point.x, point.y);
-      }
-    });
-    context.fillStyle = color;
-    context.fill();
+        if (index === 0) {
+          context.moveTo(point.x, point.y);
+        } else {
+          context.lineTo(point.x, point.y);
+        }
+      });
+
+      context.fillStyle = color;
+
+      context.fill();
+    }
   }
 
   return null;
@@ -153,14 +166,7 @@ const Hexagon = ({ x, y, size, color, rotation, speed }: HexagonProps) => {
 export const Annotator = () => {
   return (
     <Canvas animate height={256} width={256}>
-      <Hexagon
-        x={32}
-        y={32}
-        size={128}
-        color={"#CCCCCC"}
-        rotation={0.5}
-        speed={0.5}
-      />
+      <Hexagon size={128} color="#CCCCCC" rotation={0.5} speed={0.5} />
     </Canvas>
   );
 };
