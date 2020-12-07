@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SelectionMethod } from "../../types/SelectionMethod";
 import { useSelector } from "react-redux";
 import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
@@ -15,104 +15,180 @@ type NewInstanceCanvasProps = {
   image: Image;
 };
 
-export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
-  const classes = useStyles();
-  const selectionMethod = useSelector(selectionMethodSelector);
+export const NewInstanceCanvas = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
-  const [click, setNewClick] = useState<clickData>({
-    x: 0,
-    y: 0,
-    dragging: false,
-  });
+  const [refresh, setRefresh] = useState<boolean>();
+  const [rectangles, setRectangles] = useState<Array<Rectangle>>();
 
-  React.useEffect(() => {
-    if (ref.current) {
-      ref.current.height = image.shape!.r;
-      ref.current.width = image.shape!.c;
+  let mouse: {
+    x: number;
+    y: number;
+  };
+
+  const open = (src: string) => {
+    const image = new Image();
+
+    image.src = src;
+
+    image.onload = () => {
+      setRefresh(true);
+    };
+
+    return image;
+  };
+
+  class Rectangle {
+    public render: boolean = false;
+
+    public x0: number;
+    public y0: number;
+    public x1: number;
+    public y1: number;
+    public x: number;
+    public y: number;
+    public width: number;
+    public height: number;
+
+    constructor(x0: number, y0: number, x1: number, y1: number) {
+      this.x0 = x0;
+      this.y0 = y0;
+      this.x1 = x1;
+      this.y1 = y1;
+      this.x = Math.min(x0, x1);
+      this.y = Math.min(y0, y1);
+      this.width = Math.max(x0, x1) - Math.min(x0, x1);
+      this.height = Math.max(y0, y1) - Math.min(y0, y1);
     }
-  }, [image.shape]);
 
-  const drawLine = (
-    context: CanvasRenderingContext2D,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ) => {
-    context.beginPath();
-    context.strokeStyle = "black";
+    draw(context: CanvasRenderingContext2D) {
+      if (this.render) {
+        context.strokeRect(this.x, this.y, this.width, this.height);
+      }
+    }
+
+    reset(point: { x: number; y: number }) {
+      this.x0 = point.x;
+      this.x1 = point.x;
+      this.y0 = point.y;
+      this.y1 = point.y;
+
+      this.translate();
+
+      this.render = true;
+    }
+
+    translate() {
+      this.x = Math.min(this.x0, this.x1);
+      this.y = Math.min(this.y0, this.y1);
+      this.width = Math.max(this.x0, this.x1) - Math.min(this.x0, this.x1);
+      this.height = Math.max(this.y0, this.y1) - Math.min(this.y0, this.y1);
+    }
+
+    update(point: { x: number; y: number }) {
+      this.x1 = point.x;
+      this.y1 = point.y;
+
+      this.translate();
+
+      this.render = true;
+    }
+  }
+
+  let rectangle = new Rectangle(0, 0, 0, 0);
+
+  const useAnimationFrame = () => {
+    const animationRef = useRef<number>();
+
+    const animate = () => {
+      if (mouse) {
+        rectangle.update(mouse);
+      }
+      rectangle.translate();
+      if (ref && ref.current) {
+        const ctx = ref.current.getContext("2d");
+        if (ctx) {
+          rectangle.draw(ctx);
+        }
+      }
+    };
+
+    useEffect(() => {
+      animationRef.current = requestAnimationFrame(animate);
+      return () => cancelAnimationFrame(animationRef.current!);
+    });
+  };
+
+  useAnimationFrame();
+
+  const draw = (context: CanvasRenderingContext2D, src: string) => {
+    const image = open(src);
+
+    context.drawImage(image, 0, 0, context.canvas.width, context.canvas.height);
+
     context.lineWidth = 1;
-    context.moveTo(x1, y1);
-    context.lineTo(x2, y2);
-    context.stroke();
-    context.closePath();
+    context.strokeStyle = "red";
+
+    rectangles?.forEach((rectangle: Rectangle) => {
+      rectangle.draw(context);
+    });
+
+    context.strokeStyle = "green";
+  };
+
+  const pointer = {
+    element: null,
+    event: (e: MouseEvent) => {},
   };
 
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (ref.current) {
+    if (ref && ref.current) {
       const rect = ref.current.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-      const clickY = event.clientY - rect.top;
-      setNewClick({ x: clickX, y: clickY, dragging: true });
+      const x0 = event.clientX - rect.left;
+      const y0 = event.clientY - rect.top;
+      rectangle = new Rectangle(x0, y0, x0, y0);
     }
   };
 
   const onMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (click.dragging && ref.current) {
+    if (ref && ref.current) {
       const rect = ref.current.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-      const clickY = event.clientY - rect.top;
-      const context = ref.current.getContext("2d");
-      if (context && selectionMethod === SelectionMethod.Quick) {
-        drawLine(context, click.x, click.y, clickX, clickY);
-        setNewClick({ x: clickX, y: clickY, dragging: true });
+      if (mouse) {
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
       }
-      event.preventDefault();
     }
   };
 
-  const onMouseUp = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
-    if (click.dragging && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-      const clickY = event.clientY - rect.top;
+  useEffect(() => {
+    if (ref && ref.current) {
       const context = ref.current.getContext("2d");
+
+      const image = open("https://www.w3schools.com/css/img_fjords.jpg");
+
       if (context) {
-        if (selectionMethod === SelectionMethod.RectangularMarquee) {
-          context.rect(clickX, clickY, 50, 50);
-          context.fill();
-          ////add instance to store
-          //createImageBitmap(canvasRef.current).then()
-        } else if (selectionMethod === SelectionMethod.Quick) {
-          drawLine(context, click.x, click.y, clickX, clickY);
-        }
-        setNewClick({ x: 0, y: 0, dragging: false });
+        context.drawImage(
+          image,
+          0,
+          0,
+          context.canvas.width,
+          context.canvas.height
+        );
       }
     }
-  };
-
-  const onMouseOut = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
-    setNewClick({ x: 0, y: 0, dragging: false });
-  };
+  });
 
   return (
     <canvas
-      className={classes.userEventsCanvas}
+      height={500}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseOut={onMouseOut}
       ref={ref}
-      id={"myCanvas"}
+      width={800}
     />
   );
 };
