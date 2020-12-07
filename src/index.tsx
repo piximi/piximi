@@ -5,49 +5,84 @@ import { Provider } from "react-redux";
 import { productionStore } from "./store/stores";
 import { Application } from "./components/Application";
 
-const useAnimationFrame = (callback: (delta: number) => void) => {
-  const ref = useRef<number>();
+// const callback = (delta: number): void => {
+//   setCount((previous) => {
+//     return (previous + delta * 0.01) % 100;
+//   });
+// };
 
-  const previous = useRef<number>();
+// const useAnimationFrame = (callback: (delta: number) => void) => {
+//   const ref = useRef<number>();
+//
+//   const previous = useRef<number>();
+//
+//   const animate = (time: number) => {
+//     if (previous && previous.current) {
+//       const delta = time - previous.current;
+//
+//       callback(delta);
+//     }
+//
+//     previous.current = time;
+//
+//     ref.current = requestAnimationFrame(animate);
+//   };
+//
+//   useEffect(() => {
+//     ref.current = requestAnimationFrame(animate);
+//
+//     return () => cancelAnimationFrame(ref.current!);
+//   });
+// };
+//
+// export const Counter = () => {
+//   const [count, setCount] = React.useState(0);
+//
+//   const callback = (delta: number): void => {
+//     setCount((previous) => {
+//       return (previous + delta * 0.01) % 100;
+//     });
+//   };
+//
+//   useAnimationFrame();
+//
+//   return <div>{Math.round(count)}</div>;
+// };
 
-  const animate = (time: number) => {
-    if (previous && previous.current) {
-      const delta = time - previous.current;
-
-      callback(delta);
-    }
-
-    previous.current = time;
-
-    ref.current = requestAnimationFrame(animate);
-  };
-
-  useEffect(() => {
-    ref.current = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(ref.current!);
-  });
-};
-
-export const Counter = () => {
-  const [count, setCount] = React.useState(0);
-
-  const callback = (delta: number): void => {
-    setCount((previous) => {
-      return (previous + delta * 0.01) % 100;
-    });
-  };
-
-  useAnimationFrame(callback);
-
-  return <div>{Math.round(count)}</div>;
-};
+// const useAnimationFrame = (callback: (delta: number) => void) => {
+//   const ref = useRef<number>();
+//
+//   const previous = useRef<number>();
+//
+//   const animate = (time: number) => {
+//     if (previous && previous.current) {
+//       const delta = time - previous.current;
+//
+//       callback(delta);
+//     }
+//
+//     previous.current = time;
+//
+//     ref.current = requestAnimationFrame(animate);
+//   };
+//
+//   useEffect(() => {
+//     ref.current = requestAnimationFrame(animate);
+//
+//     return () => cancelAnimationFrame(ref.current!);
+//   });
+// };
 
 const Canvas = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   const [refresh, setRefresh] = useState<boolean>();
   const [rectangles, setRectangles] = useState<Array<Rectangle>>();
+
+  let mouse: {
+    x: number;
+    y: number;
+  };
 
   const open = (src: string) => {
     const image = new Image();
@@ -118,6 +153,32 @@ const Canvas = () => {
     }
   }
 
+  let rectangle = new Rectangle(0, 0, 0, 0);
+
+  const useAnimationFrame = () => {
+    const animationRef = useRef<number>();
+
+    const animate = () => {
+      if (mouse) {
+        rectangle.update(mouse);
+      }
+      rectangle.translate();
+      if (ref && ref.current) {
+        const ctx = ref.current.getContext("2d");
+        if (ctx) {
+          rectangle.draw(ctx);
+        }
+      }
+    };
+
+    useEffect(() => {
+      animationRef.current = requestAnimationFrame(animate);
+      return () => cancelAnimationFrame(animationRef.current!);
+    });
+  };
+
+  useAnimationFrame();
+
   const draw = (context: CanvasRenderingContext2D, src: string) => {
     const image = open(src);
 
@@ -138,6 +199,29 @@ const Canvas = () => {
     event: (e: MouseEvent) => {},
   };
 
+  const onMouseDown = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    if (ref && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const x0 = event.clientX - rect.left;
+      const y0 = event.clientY - rect.top;
+      rectangle = new Rectangle(x0, y0, x0, y0);
+    }
+  };
+
+  const onMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    if (ref && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      if (mouse) {
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
+      }
+    }
+  };
+
   useEffect(() => {
     if (ref && ref.current) {
       const context = ref.current.getContext("2d");
@@ -156,7 +240,15 @@ const Canvas = () => {
     }
   });
 
-  return <canvas height={500} ref={ref} width={800} />;
+  return (
+    <canvas
+      height={500}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      ref={ref}
+      width={800}
+    />
+  );
 };
 
 export const App = () => {
