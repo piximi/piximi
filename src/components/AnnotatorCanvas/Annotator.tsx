@@ -18,6 +18,7 @@ type Point = {
 
 type RenderingContextContextProps = {
   context: CanvasRenderingContext2D;
+  end?: Point;
   start?: Point;
 };
 
@@ -81,21 +82,37 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     }
   };
 
+  const [end, setEnd] = useState<Point | null>();
+
+  const onEnd = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    if (ref && ref.current) {
+      const boundingClientRect = ref.current.getBoundingClientRect();
+
+      const position = {
+        x: event.clientX - boundingClientRect.left,
+        y: event.clientY - boundingClientRect.top,
+      };
+
+      setEnd(position);
+    }
+  };
+
   if (context) context.clearRect(0, 0, width, height);
 
   const style = { width, height };
 
   return (
     <RenderingContextContext.Provider
-      value={{ context: context!, start: start! }}
+      value={{ context: context!, end: end!, start: start! }}
     >
       <FrameContext.Provider value={frame}>
         <canvas
           height={height}
+          onMouseDown={onStart}
+          onMouseUp={onEnd}
           ref={ref}
           style={style}
           width={width}
-          onMouseDown={onStart}
         />
 
         {children}
@@ -117,7 +134,7 @@ const useRenderingContext = () => {
 
   const context = useContext(RenderingContextContext);
 
-  return context;
+  return context!;
 };
 
 type HexagonProps = {
@@ -130,16 +147,14 @@ type HexagonProps = {
 const Hexagon = ({ size, color, rotation, speed }: HexagonProps) => {
   const animation = useAnimation(rotation, (angle) => angle + speed);
 
-  const { context, start } = useRenderingContext()!;
-
-  console.info(start);
+  const { context, end, start } = useRenderingContext()!;
 
   if (context) {
-    const edgeLength = size * 0.5;
-
     context.beginPath();
 
-    if (start) {
+    if (start && end) {
+      const edgeLength = end.x * 0.5;
+
       [30, 90, 150, 210, 270, 330].forEach((angle, index) => {
         const radAngle = ((angle + animation) * Math.PI) / 180;
         const point = {
