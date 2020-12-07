@@ -129,8 +129,7 @@ const Hexagon = ({ x, y, size, color, rotation, speed }: HexagonProps) => {
     const edgeLength = size * 0.5;
 
     context.beginPath();
-    // This article explains all the math behind hexagons
-    // https://www.redblobgames.com/grids/hexagons/
+
     [30, 90, 150, 210, 270, 330].forEach((angle, index) => {
       const radAngle = ((angle + animation) * Math.PI) / 180;
       const point = {
@@ -151,39 +150,17 @@ const Hexagon = ({ x, y, size, color, rotation, speed }: HexagonProps) => {
   return null;
 };
 
-const RectangularSelection = () => {
-  const animation = useAnimation(0.5, (x) => x + 1);
-
-  const context = useRenderingContext();
-
-  const select = (x1: number, y1: number, length: number, angle: number) => {
-    angle *= Math.PI / 180;
-
-    let x2 = x1 + length * Math.cos(angle);
-    let y2 = y1 + length * Math.sin(angle);
-
-    context!.moveTo(x1, y1);
-
-    context!.lineTo(x2, y2);
-  };
-
-  if (context) {
-    context.beginPath();
-
-    [8, 16, 32, 64, 128, 256].forEach((step) => {
-      select(32, 32, 32, step);
-    });
-
-    context.stroke();
-  }
-
-  return null;
-};
-
 export const Annotator = () => {
   return (
     <Canvas animate height={256} width={256}>
-      <RectangularSelection />
+      <Hexagon
+        x={32}
+        y={32}
+        size={128}
+        color={"#CCCCCC"}
+        rotation={0.5}
+        speed={0.5}
+      />
     </Canvas>
   );
 };
