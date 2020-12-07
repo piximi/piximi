@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { selectionMethodSelector } from "../../store/selectors/selectionMethodSelector";
 import { useStyles } from "../ImageDialogCanvas/ImageDialogCanvas.css";
 import { Image } from "../../types/Image";
+import { imread } from "../../image";
 
 type clickData = {
   x: number;
@@ -27,6 +28,10 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
   });
 
   React.useEffect(() => {
+    if (ref && ref.current) {
+      imread(image.src, ref.current);
+    }
+
     if (ref.current) {
       ref.current.height = image.shape!.r;
       ref.current.width = image.shape!.c;

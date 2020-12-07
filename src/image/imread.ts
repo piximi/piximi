@@ -1,6 +1,6 @@
 export const imread = (src: string, canvas: HTMLCanvasElement) => {
   return new Promise((resolve) => {
-    const image = new HTMLImageElement();
+    const image = new Image();
 
     image.onload = () => {
       const width = image.width;
@@ -17,6 +17,8 @@ export const imread = (src: string, canvas: HTMLCanvasElement) => {
 
       resolve(data);
     };
+
+    image.crossOrigin = "Anonymous";
 
     image.src = src;
   });

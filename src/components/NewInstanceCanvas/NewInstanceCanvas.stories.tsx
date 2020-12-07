@@ -18,6 +18,7 @@ const image: Image = {
   id: "",
   instances: [],
   name: "foo.png",
+  shape: { c: 512, channels: 3, r: 512 },
   src: "https://picsum.photos/id/237/512/512",
 };
 
