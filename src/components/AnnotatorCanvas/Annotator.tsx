@@ -16,12 +16,6 @@ type Point = {
   y: number;
 };
 
-type InputContextProps = {
-  start: Point;
-};
-
-const InputContext = createContext<InputContextProps | null>(null);
-
 const RenderingContextContext = createContext<CanvasRenderingContext2D | null>(
   null
 );
