@@ -8,6 +8,7 @@ import React, {
   useLayoutEffect,
 } from "react";
 import random from "lodash/random";
+import { current } from "@reduxjs/toolkit";
 
 const FrameContext = createContext<number>(0);
 
@@ -18,8 +19,9 @@ type Point = {
 
 type RenderingContextContextProps = {
   context: CanvasRenderingContext2D;
-  end?: Point;
-  start?: Point;
+  current: Point;
+  end: Point;
+  start: Point;
 };
 
 const RenderingContextContext = createContext<RenderingContextContextProps | null>(
@@ -65,7 +67,7 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     setFrame(random(1, true));
   }, [width, height]);
 
-  const [start, setStart] = useState<Point | null>();
+  const [start, setStart] = useState<Point>({ x: 0, y: 0 });
 
   const onStart = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if (context) context.clearRect(0, 0, width, height);
@@ -82,7 +84,22 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     }
   };
 
-  const [end, setEnd] = useState<Point | null>();
+  const [current, setCurrent] = useState<Point>({ x: 0, y: 0 });
+
+  const onMove = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    if (ref && ref.current) {
+      const boundingClientRect = ref.current.getBoundingClientRect();
+
+      const position = {
+        x: event.clientX - boundingClientRect.left,
+        y: event.clientY - boundingClientRect.top,
+      };
+
+      setCurrent(position);
+    }
+  };
+
+  const [end, setEnd] = useState<Point>({ x: 0, y: 0 });
 
   const onEnd = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
     if (ref && ref.current) {
@@ -103,13 +120,14 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
   return (
     <RenderingContextContext.Provider
-      value={{ context: context!, end: end!, start: start! }}
+      value={{ context: context!, current: current, end: end, start: start }}
     >
       <FrameContext.Provider value={frame}>
         <canvas
           height={height}
           onMouseDown={onStart}
           onMouseUp={onEnd}
+          onMouseMove={onMove}
           ref={ref}
           style={style}
           width={width}
@@ -141,6 +159,47 @@ type HexagonProps = {
   color: string;
   rotation: number;
   speed: number;
+};
+
+const RectangularSelect = () => {
+  const { context, current, end, start } = useRenderingContext();
+
+  const animated = useAnimation({ start, current }, ({ start, current }) => {
+    return {
+      width: current.x - start.x,
+      height: current.y - start.y,
+    };
+  });
+
+  // if (start) {
+  //   context.strokeRect(start.x, this.y, this.width, this.height)
+  // }
+
+  if (context) {
+    context.beginPath();
+
+    if (start && end && animated) {
+      context.rect(start.x, start.y, animated.width, animated.height);
+    }
+
+    context.fill();
+  }
+
+  return null;
+};
+
+const EllipticalSelect = () => {
+  const { context } = useRenderingContext();
+
+  if (context) {
+    context.beginPath();
+
+    context.rect(0, 0, 100, 100);
+
+    context.fill();
+  }
+
+  return null;
 };
 
 const Hexagon = ({ color, rotation, speed }: HexagonProps) => {
@@ -177,10 +236,18 @@ const Hexagon = ({ color, rotation, speed }: HexagonProps) => {
   return null;
 };
 
-export const Annotator = () => {
+export const Annotator = ({
+  rotation,
+  speed,
+}: {
+  rotation: number;
+  speed: number;
+}) => {
   return (
     <Canvas animate height={256} width={256}>
-      <Hexagon color="#CCCCCC" rotation={0.5} speed={0.5} />
+      {/*<Hexagon color="#CCCCCC" rotation={rotation} speed={speed} />*/}
+      <RectangularSelect />
+      {/*<EllipticalSelect/>*/}
     </Canvas>
   );
 };

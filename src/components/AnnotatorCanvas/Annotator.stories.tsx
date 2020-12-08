@@ -23,5 +23,6 @@ const image: Image = {
 };
 
 Default.args = {
-  image: image,
+  rotation: 0.5,
+  speed: 0.5,
 };
