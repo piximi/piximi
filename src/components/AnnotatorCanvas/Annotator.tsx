@@ -172,18 +172,18 @@ const RectangularSelect = () => {
     };
   };
 
-  const animated = useAnimation({}, animation);
+  const animated = useAnimation({}, () => animation({ current, start }));
 
   // if (start) {
-  //   context.strokeRect(start.x, this.y, this.width, this.height)
+  //   context.strokeRect(start.x, start.y, animated.width, animated.height)
   // }
 
   if (context) {
     context.beginPath();
 
-    // if (start && end && animated) {
-    //   context.rect(start.x, start.y, animated.width, animated.height);
-    // }
+    if (start && end && animated) {
+      context.rect(start.x, start.y, animated.width, animated.height);
+    }
 
     context.fill();
   }
