@@ -139,8 +139,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   );
 };
 
-const useAnimation = (initialValue: any, callback: (current: any) => void) => {
+const useAnimation = (initialValue: any, callback: (arg0: any) => void) => {
   const ref = useRef(initialValue);
+  console.log(ref.current);
 
   ref.current = callback(ref.current);
 
@@ -164,12 +165,14 @@ type HexagonProps = {
 const RectangularSelect = () => {
   const { context, current, end, start } = useRenderingContext();
 
-  const animated = useAnimation({ start, current }, ({ start, current }) => {
+  const animation = ({ current, start }: { current: Point; start: Point }) => {
     return {
       width: current.x - start.x,
       height: current.y - start.y,
     };
-  });
+  };
+
+  const animated = useAnimation({}, animation);
 
   // if (start) {
   //   context.strokeRect(start.x, this.y, this.width, this.height)
@@ -178,9 +181,9 @@ const RectangularSelect = () => {
   if (context) {
     context.beginPath();
 
-    if (start && end && animated) {
-      context.rect(start.x, start.y, animated.width, animated.height);
-    }
+    // if (start && end && animated) {
+    //   context.rect(start.x, start.y, animated.width, animated.height);
+    // }
 
     context.fill();
   }
