@@ -2,7 +2,7 @@ type BoundaryMask = {
   data: Uint8Array;
   width: number;
   height: number;
-  offset: { x: number; y: number };
+  offset: Point;
 };
 
 type BoundingBox = {
@@ -12,10 +12,11 @@ type BoundingBox = {
   maxY: number;
 };
 
-type Countour = {
+type Contour = {
+  initialCount?: number;
   inner: boolean;
-  label: boolean;
-  points: Array<any>;
+  label: number;
+  points: Array<Point>;
 };
 
 type Image = {
@@ -30,6 +31,11 @@ type Mask = {
   width: number;
   height: number;
   bounds: BoundingBox;
+};
+
+type Point = {
+  x: number;
+  y: number;
 };
 
 /** Create a binary mask on the image by color threshold
@@ -82,7 +88,14 @@ function floodFillWithoutBorders(
   let minY = h + 1;
   let i = py * w + px; // start point index in the mask data
   let result = new Uint8Array(w * h); // result mask
-  let visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
+
+  let visited: Uint8Array;
+
+  if (mask) {
+    visited = new Uint8Array(mask);
+  } else {
+    visited = new Uint8Array(w * h);
+  }
 
   if (visited[i] === 1) return null;
 
@@ -219,7 +232,14 @@ function floodFillWithBorders(
   let minY = h + 1;
   let i = py * w + px; // start point index in the mask data
   let result = new Uint8Array(w * h); // result mask
-  let visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
+
+  let visited: Uint8Array;
+
+  if (mask) {
+    visited = new Uint8Array(mask);
+  } else {
+    visited = new Uint8Array(w * h);
+  }
 
   if (visited[i] === 1) return null;
 
@@ -711,11 +731,10 @@ export function createBorderMask(mask: Mask): BoundaryMask {
 }
 
 /** Create a border index array of boundary points of the mask
- * @param {Object} mask: {Uint8Array} data, {int} width, {int} height
- * @return {Array} border index array boundary points of the mask
  */
-export function getBorderIndices(mask: Mask) {
+export function getBorderIndices(mask: Mask): Array<number> {
   let x, y, k, k1, k2;
+
   const w = mask.width,
     h = mask.height,
     data = mask.data,
@@ -764,8 +783,6 @@ export function getBorderIndices(mask: Mask) {
 }
 
 /** Create a compressed mask with a "white" border (1px border with zero values) for the contour tracing
- * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
- * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
  */
 function prepareMask(mask: Mask): BoundaryMask {
   let x, y;
@@ -799,10 +816,12 @@ function prepareMask(mask: Mask): BoundaryMask {
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  * @return {Array} contours: {Array} points, {bool} inner, {int} label
  */
-export function traceContours(mask: Mask): Array<Countour> {
+export function traceContours(mask: Mask): Array<Contour> {
   const m = prepareMask(mask),
     contours = [];
+
   let label = 0;
+
   const w = m.width,
     w2 = w * 2,
     h = m.height,
@@ -810,6 +829,7 @@ export function traceContours(mask: Mask): Array<Countour> {
     dx = m.offset.x,
     dy = m.offset.y,
     dest = new Uint8Array(src);
+
   let // label matrix
     i,
     j,
@@ -916,10 +936,10 @@ export function traceContours(mask: Mask): Array<Countour> {
  * @return {Array} contours: {Array} points, {bool} inner, {int} label, {int} initialCount
  */
 export function simplifyContours(
-  contours: Array<Countour>,
+  contours: Array<Contour>,
   simplifyTolerant: number,
   simplifyCount: number
-) {
+): Array<Contour> {
   const lenContours = contours.length,
     result = [];
   let i,
