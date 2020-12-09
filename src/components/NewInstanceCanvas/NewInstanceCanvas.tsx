@@ -117,6 +117,7 @@ export const NewInstanceCanvas = ({ image }: NewInstanceCanvasProps) => {
 
       if (context) {
         context.drawImage(img, 0, 0, image.shape!.c, image.shape!.r);
+
         draw(context);
       }
     }

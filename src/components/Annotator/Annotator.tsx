@@ -8,7 +8,6 @@ import React, {
   useLayoutEffect,
 } from "react";
 import random from "lodash/random";
-import { current } from "@reduxjs/toolkit";
 
 const FrameContext = createContext<number>(0);
 
@@ -156,12 +155,6 @@ const useRenderingContext = () => {
   return context!;
 };
 
-type HexagonProps = {
-  color: string;
-  rotation: number;
-  speed: number;
-};
-
 const RectangularSelect = () => {
   const { context, current, end, start } = useRenderingContext();
 
@@ -174,15 +167,19 @@ const RectangularSelect = () => {
 
   const animated = useAnimation({}, () => animation({ current, start }));
 
-  // if (start) {
-  //   context.strokeRect(start.x, start.y, animated.width, animated.height)
-  // }
-
   if (context) {
     context.beginPath();
 
-    if (start && end && animated) {
-      context.rect(start.x, start.y, animated.width, animated.height);
+    context.setLineDash([10, 10]);
+
+    if (
+      animated &&
+      start.x !== 0 &&
+      start.y !== 0 &&
+      end.x !== 0 &&
+      end.y !== 0
+    ) {
+      context.strokeRect(start.x, start.y, animated.width, animated.height);
     }
 
     context.fill();
@@ -191,66 +188,10 @@ const RectangularSelect = () => {
   return null;
 };
 
-const EllipticalSelect = () => {
-  const { context } = useRenderingContext();
-
-  if (context) {
-    context.beginPath();
-
-    context.rect(0, 0, 100, 100);
-
-    context.fill();
-  }
-
-  return null;
-};
-
-const Hexagon = ({ color, rotation, speed }: HexagonProps) => {
-  const animation = useAnimation(rotation, (angle) => angle + speed);
-
-  const { context, end, start } = useRenderingContext()!;
-
-  if (context) {
-    context.beginPath();
-
-    if (start && end) {
-      const edgeLength = end.x * 0.5;
-
-      [30, 90, 150, 210, 270, 330].forEach((angle, index) => {
-        const radAngle = ((angle + animation) * Math.PI) / 180;
-        const point = {
-          x: start.x + edgeLength + edgeLength * Math.cos(radAngle),
-          y: start.y + edgeLength + edgeLength * Math.sin(radAngle),
-        };
-
-        if (index === 0) {
-          context.moveTo(point.x, point.y);
-        } else {
-          context.lineTo(point.x, point.y);
-        }
-      });
-
-      context.fillStyle = color;
-
-      context.fill();
-    }
-  }
-
-  return null;
-};
-
-export const Annotator = ({
-  rotation,
-  speed,
-}: {
-  rotation: number;
-  speed: number;
-}) => {
+export const Annotator = () => {
   return (
-    <Canvas animate height={256} width={256}>
-      {/*<Hexagon color="#CCCCCC" rotation={rotation} speed={speed} />*/}
+    <Canvas animate height={512} width={512}>
       <RectangularSelect />
-      {/*<EllipticalSelect/>*/}
     </Canvas>
   );
 };
