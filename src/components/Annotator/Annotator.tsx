@@ -9,6 +9,22 @@ import React, {
 } from "react";
 import random from "lodash/random";
 import { Image as ImageType } from "../../types/Image";
+import { useKeyPress } from "../../hooks";
+
+/**
+ * useKeyPress
+ * @param {string} key - the name of the key to respond to, compared against event.key
+ * @param {function} action - the action to perform on key press
+ */
+export const useKeypress = (key: string, action: () => void) => {
+  useEffect(() => {
+    function onKeyup(e: any) {
+      if (e.key === key) action();
+    }
+    window.addEventListener("keyup", onKeyup);
+    return () => window.removeEventListener("keyup", onKeyup);
+  }, [action, key]);
+};
 
 const FrameContext = createContext<number>(0);
 
@@ -49,6 +65,12 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const [moving, setMoving] = useState<boolean>(false);
   const [ended, setEnded] = useState<boolean>(false);
 
+  useKeypress("Escape", () => {
+    setSelecting(false);
+
+    setSelected(false);
+  });
+
   const [
     context,
     setContext,
@@ -57,8 +79,6 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   useEffect(() => {
     if (ref && ref.current) {
       const context = ref.current.getContext("2d");
-
-      context.imageSmoothingEnabled = false;
 
       setContext(context);
     }
@@ -85,19 +105,21 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    setStarted(!started);
+    if (!selecting && !started) {
+      setStarted(true);
 
-    setSelecting(!selecting);
+      setSelecting(true);
 
-    if (ref && ref.current) {
-      const boundingClientRect = ref.current.getBoundingClientRect();
+      if (ref && ref.current) {
+        const boundingClientRect = ref.current.getBoundingClientRect();
 
-      const position = {
-        x: event.clientX - boundingClientRect.left,
-        y: event.clientY - boundingClientRect.top,
-      };
+        const position = {
+          x: event.clientX - boundingClientRect.left,
+          y: event.clientY - boundingClientRect.top,
+        };
 
-      setStart(position);
+        setStart(position);
+      }
     }
   };
 
