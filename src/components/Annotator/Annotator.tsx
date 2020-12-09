@@ -20,8 +20,12 @@ type RenderingContextContextProps = {
   context: CanvasRenderingContext2D;
   current: Point;
   end: Point;
+  ended: boolean;
+  moving: boolean;
+  selected: boolean;
   selecting: boolean;
   start: Point;
+  started: boolean;
 };
 
 const RenderingContextContext = createContext<RenderingContextContextProps | null>(
@@ -39,6 +43,10 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
   const [selecting, setSelecting] = useState<boolean>(false);
+  const [selected, setSelected] = useState<boolean>(false);
+  const [started, setStarted] = useState<boolean>(false);
+  const [moving, setMoving] = useState<boolean>(false);
+  const [ended, setEnded] = useState<boolean>(false);
 
   const [
     context,
@@ -74,6 +82,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
+    setStarted(!started);
+
     setSelecting(!selecting);
 
     if (context) context.clearRect(0, 0, width, height);
@@ -95,15 +105,20 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseMove = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (ref && ref.current) {
-      const boundingClientRect = ref.current.getBoundingClientRect();
+    // Tests whether the primary button is depressed
+    if (event.buttons === 1) {
+      setMoving(!moving);
 
-      const position = {
-        x: event.clientX - boundingClientRect.left,
-        y: event.clientY - boundingClientRect.top,
-      };
+      if (ref && ref.current) {
+        const boundingClientRect = ref.current.getBoundingClientRect();
 
-      setCurrent(position);
+        const position = {
+          x: event.clientX - boundingClientRect.left,
+          y: event.clientY - boundingClientRect.top,
+        };
+
+        setCurrent(position);
+      }
     }
   };
 
@@ -112,18 +127,22 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseUp = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (ref && ref.current) {
-      const boundingClientRect = ref.current.getBoundingClientRect();
+    if (selecting) {
+      if (ref && ref.current) {
+        const boundingClientRect = ref.current.getBoundingClientRect();
 
-      const position = {
-        x: event.clientX - boundingClientRect.left,
-        y: event.clientY - boundingClientRect.top,
-      };
+        const position = {
+          x: event.clientX - boundingClientRect.left,
+          y: event.clientY - boundingClientRect.top,
+        };
 
-      setEnd(position);
+        setEnd(position);
+      }
+
+      setSelecting(!selecting);
+
+      setSelected(!selected);
     }
-
-    setSelecting(!selecting);
   };
 
   if (context) context.clearRect(0, 0, width, height);
@@ -136,8 +155,12 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
         context: context!,
         current: current,
         end: end,
+        ended: ended,
+        moving: moving,
+        selected: selected,
         selecting: selecting,
         start: start,
+        started: started,
       }}
     >
       <FrameContext.Provider value={frame}>
@@ -159,7 +182,6 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
 const useAnimation = (initialValue: any, callback: (arg0: any) => void) => {
   const ref = useRef(initialValue);
-  console.log(ref.current);
 
   ref.current = callback(ref.current);
 
@@ -175,7 +197,14 @@ const useRenderingContext = () => {
 };
 
 const RectangularSelect = () => {
-  const { context, current, end, selecting, start } = useRenderingContext();
+  const {
+    context,
+    current,
+    end,
+    selected,
+    selecting,
+    start,
+  } = useRenderingContext();
 
   const animation = ({ current, start }: { current: Point; start: Point }) => {
     return {
@@ -198,7 +227,11 @@ const RectangularSelect = () => {
       end.x !== 0 &&
       end.y !== 0
     ) {
-      if (selecting) {
+      if (selecting && !selected) {
+        context.strokeRect(start.x, start.y, animated.width, animated.height);
+      }
+
+      if (!selecting && selected) {
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
     }
