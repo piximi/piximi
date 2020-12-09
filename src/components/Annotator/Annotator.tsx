@@ -20,6 +20,7 @@ type RenderingContextContextProps = {
   context: CanvasRenderingContext2D;
   current: Point;
   end: Point;
+  selecting: boolean;
   start: Point;
 };
 
@@ -35,7 +36,9 @@ type CanvasProps = {
 };
 
 const Canvas = ({ animate, children, height, width }: CanvasProps) => {
-  const ref = React.useRef<HTMLCanvasElement | null>(null);
+  const ref = useRef<HTMLCanvasElement | null>(null);
+
+  const [selecting, setSelecting] = useState<boolean>(false);
 
   const [
     context,
@@ -68,7 +71,11 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
   const [start, setStart] = useState<Point>({ x: 0, y: 0 });
 
-  const onStart = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+  const onMouseDown = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
+    setSelecting(!selecting);
+
     if (context) context.clearRect(0, 0, width, height);
 
     if (ref && ref.current) {
@@ -85,7 +92,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
   const [current, setCurrent] = useState<Point>({ x: 0, y: 0 });
 
-  const onMove = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+  const onMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
     if (ref && ref.current) {
       const boundingClientRect = ref.current.getBoundingClientRect();
 
@@ -100,7 +109,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
   const [end, setEnd] = useState<Point>({ x: 0, y: 0 });
 
-  const onEnd = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+  const onMouseUp = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  ) => {
     if (ref && ref.current) {
       const boundingClientRect = ref.current.getBoundingClientRect();
 
@@ -111,6 +122,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
       setEnd(position);
     }
+
+    setSelecting(!selecting);
   };
 
   if (context) context.clearRect(0, 0, width, height);
@@ -119,14 +132,20 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
   return (
     <RenderingContextContext.Provider
-      value={{ context: context!, current: current, end: end, start: start }}
+      value={{
+        context: context!,
+        current: current,
+        end: end,
+        selecting: selecting,
+        start: start,
+      }}
     >
       <FrameContext.Provider value={frame}>
         <canvas
           height={height}
-          onMouseDown={onStart}
-          onMouseUp={onEnd}
-          onMouseMove={onMove}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onMouseMove={onMouseMove}
           ref={ref}
           style={style}
           width={width}
@@ -156,7 +175,7 @@ const useRenderingContext = () => {
 };
 
 const RectangularSelect = () => {
-  const { context, current, end, start } = useRenderingContext();
+  const { context, current, end, selecting, start } = useRenderingContext();
 
   const animation = ({ current, start }: { current: Point; start: Point }) => {
     return {
@@ -179,7 +198,9 @@ const RectangularSelect = () => {
       end.x !== 0 &&
       end.y !== 0
     ) {
-      context.strokeRect(start.x, start.y, animated.width, animated.height);
+      if (selecting) {
+        context.strokeRect(start.x, start.y, animated.width, animated.height);
+      }
     }
 
     context.fill();
