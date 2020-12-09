@@ -8,6 +8,7 @@ import React, {
   useLayoutEffect,
 } from "react";
 import random from "lodash/random";
+import { Image as ImageType } from "../../types/Image";
 
 const FrameContext = createContext<number>(0);
 
@@ -86,8 +87,6 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
 
     setSelecting(!selecting);
 
-    if (context) context.clearRect(0, 0, width, height);
-
     if (ref && ref.current) {
       const boundingClientRect = ref.current.getBoundingClientRect();
 
@@ -128,6 +127,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     if (selecting) {
+      setMoving(!moving);
+
       if (ref && ref.current) {
         const boundingClientRect = ref.current.getBoundingClientRect();
 
@@ -145,7 +146,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     }
   };
 
-  if (context) context.clearRect(0, 0, width, height);
+  if (context) {
+    context.clearRect(0, 0, width, height);
+  }
 
   const style = { width, height };
 
@@ -196,6 +199,26 @@ const useRenderingContext = () => {
   return context!;
 };
 
+type BackgroundImageProps = {
+  image: ImageType;
+};
+
+const BackgroundImage = ({ image }: BackgroundImageProps) => {
+  const { context } = useRenderingContext();
+
+  if (context) {
+    const img = new Image();
+
+    img.src = image.src;
+
+    img.onload = () => {};
+
+    context.drawImage(img, 0, 0, image.shape!.c, image.shape!.r);
+  }
+
+  return null;
+};
+
 const RectangularSelect = () => {
   const {
     context,
@@ -242,9 +265,14 @@ const RectangularSelect = () => {
   return null;
 };
 
-export const Annotator = () => {
+type AnnotatorProps = {
+  image: ImageType;
+};
+
+export const Annotator = ({ image }: AnnotatorProps) => {
   return (
-    <Canvas animate height={512} width={512}>
+    <Canvas animate height={image.shape?.r!} width={image.shape?.c!}>
+      <BackgroundImage image={image} />
       <RectangularSelect />
     </Canvas>
   );
