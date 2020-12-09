@@ -58,6 +58,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
     if (ref && ref.current) {
       const context = ref.current.getContext("2d");
 
+      context.imageSmoothingEnabled = false;
+
       setContext(context);
     }
   }, [ref]);
@@ -241,8 +243,6 @@ const RectangularSelect = () => {
   if (context) {
     context.beginPath();
 
-    context.setLineDash([10, 10]);
-
     if (
       animated &&
       start.x !== 0 &&
@@ -251,10 +251,22 @@ const RectangularSelect = () => {
       end.y !== 0
     ) {
       if (selecting && !selected) {
+        context.strokeStyle = "white";
+        context.setLineDash([10, 10]);
+        context.strokeRect(start.x, start.y, animated.width, animated.height);
+
+        context.strokeStyle = "black";
+        context.setLineDash([5, 5]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
 
       if (!selecting && selected) {
+        context.strokeStyle = "white";
+        context.setLineDash([10, 10]);
+        context.strokeRect(start.x, start.y, animated.width, animated.height);
+
+        context.strokeStyle = "black";
+        context.setLineDash([5, 5]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
     }
