@@ -842,10 +842,11 @@ export function traceContours(mask: Mask): Array<Contour> {
     dir,
     first,
     second,
-    current,
-    previous,
-    next,
     d;
+
+  let current: Point | null;
+  let previous: Point;
+  let next: Point | null = null;
 
   // all [dx,dy] pairs (array index is the direction)
   // 5 6 7
@@ -878,41 +879,44 @@ export function traceContours(mask: Mask): Array<Contour> {
             current = previous = first = { x: x, y: y };
             second = null;
             while (true) {
-              dest[current.y * w + current.x] = label; // mark label for the current point
-              // bypass all the neighbors around the current point in a clockwise
-              for (j = 0; j < 8; j++) {
-                dir = (dir + 1) % 8;
+              if (current) {
+                dest[current.y * w + current.x] = label; // mark label for the current point
 
-                // get the next point by new direction
-                d = directions[dir]; // index as direction
-                next = { x: current.x + d[0], y: current.y + d[1] };
+                // bypass all the neighbors around the current point in a clockwise
+                for (j = 0; j < 8; j++) {
+                  dir = (dir + 1) % 8;
 
-                k1 = next.y * w + next.x;
-                if (src[k1] === 1) {
-                  // black boundary pixel
-                  dest[k1] = label; // mark a label
-                  break;
+                  // get the next point by new direction
+                  d = directions[dir]; // index as direction
+                  next = { x: current.x + d[0], y: current.y + d[1] };
+
+                  k1 = next.y * w + next.x;
+                  if (src[k1] === 1) {
+                    // black boundary pixel
+                    dest[k1] = label; // mark a label
+                    break;
+                  }
+                  dest[k1] = -1; // mark a white boundary pixel
+                  next = null;
                 }
-                dest[k1] = -1; // mark a white boundary pixel
-                next = null;
-              }
-              if (next === null) break; // no neighbours (one-point contour)
-              current = next;
-              if (second) {
-                if (
-                  previous.x === first.x &&
-                  previous.y === first.y &&
-                  current.x === second.x &&
-                  current.y === second.y
-                ) {
-                  break; // creating the contour completed when returned to original position
+                if (next === null) break; // no neighbours (one-point contour)
+                current = next;
+                if (second) {
+                  if (
+                    previous.x === first.x &&
+                    previous.y === first.y &&
+                    current.x === second.x &&
+                    current.y === second.y
+                  ) {
+                    break; // creating the contour completed when returned to original position
+                  }
+                } else {
+                  second = next;
                 }
-              } else {
-                second = next;
+                c.push({ x: previous.x + dx, y: previous.y + dy });
+                previous = current;
+                dir = (dir + 4) % 8; // next dir (symmetrically to the current direction)
               }
-              c.push({ x: previous.x + dx, y: previous.y + dy });
-              previous = current;
-              dir = (dir + 4) % 8; // next dir (symmetrically to the current direction)
             }
 
             if (next != null) {
