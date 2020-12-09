@@ -1,8 +1,21 @@
+type BoundaryMask = {
+  data: Uint8Array;
+  width: number;
+  height: number;
+  offset: { x: number; y: number };
+};
+
 type BoundingBox = {
   minX: number;
   minY: number;
   maxX: number;
   maxY: number;
+};
+
+type Countour = {
+  inner: boolean;
+  label: boolean;
+  points: Array<any>;
 };
 
 type Image = {
@@ -16,7 +29,7 @@ type Mask = {
   data: Uint8Array;
   width: number;
   height: number;
-  bounds: number;
+  bounds: BoundingBox;
 };
 
 /** Create a binary mask on the image by color threshold
@@ -49,117 +62,120 @@ function floodFillWithoutBorders(
   colorThreshold: number,
   mask: Uint8Array
 ) {
-  var c,
-    x,
-    newY,
-    el,
-    xr,
-    xl,
-    dy,
-    dyl,
-    dyr,
-    checkY,
-    data = image.data,
-    w = image.width,
-    h = image.height,
-    bytes = image.bytes, // number of bytes in the color
-    maxX = -1,
-    minX = w + 1,
-    maxY = -1,
-    minY = h + 1,
-    i = py * w + px, // start point index in the mask data
-    result = new Uint8Array(w * h), // result mask
-    visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
+  let c;
+  let x;
+  let newY;
+  let el;
+  let xr;
+  let xl;
+  let dy;
+  let dyl;
+  let dyr;
+  let checkY;
+  let data = image.data;
+  let w = image.width;
+  let h = image.height;
+  let bytes = image.bytes; // number of bytes in the color
+  let maxX = -1;
+  let minX = w + 1;
+  let maxY = -1;
+  let minY = h + 1;
+  let i = py * w + px; // start point index in the mask data
+  let result = new Uint8Array(w * h); // result mask
+  let visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
 
   if (visited[i] === 1) return null;
 
   i = i * bytes; // start point index in the image data
-  var sampleColor = [data[i], data[i + 1], data[i + 2], data[i + 3]]; // start point color (sample)
+  const sampleColor = [data[i], data[i + 1], data[i + 2], data[i + 3]]; // start point color (sample)
 
-  var stack = [{ y: py, left: px - 1, right: px + 1, dir: 1 }]; // first scanning line
+  const stack = [{ y: py, left: px - 1, right: px + 1, dir: 1 }]; // first scanning line
   do {
     el = stack.shift(); // get line for scanning
 
     checkY = false;
-    for (x = el.left + 1; x < el.right; x++) {
-      dy = el.y * w;
-      i = (dy + x) * bytes; // point index in the image data
+    if (el) {
+      for (x = el.left + 1; x < el.right; x++) {
+        dy = el.y * w;
+        i = (dy + x) * bytes; // point index in the image data
 
-      if (visited[dy + x] === 1) continue; // check whether the point has been visited
-      // compare the color of the sample
-      c = data[i] - sampleColor[0]; // check by red
-      if (c > colorThreshold || c < -colorThreshold) continue;
-      c = data[i + 1] - sampleColor[1]; // check by green
-      if (c > colorThreshold || c < -colorThreshold) continue;
-      c = data[i + 2] - sampleColor[2]; // check by blue
-      if (c > colorThreshold || c < -colorThreshold) continue;
-
-      checkY = true; // if the color of the new point(x,y) is similar to the sample color need to check minmax for Y
-
-      result[dy + x] = 1; // mark a new point in mask
-      visited[dy + x] = 1; // mark a new point as visited
-
-      xl = x - 1;
-      // walk to left side starting with the left neighbor
-      while (xl > -1) {
-        dyl = dy + xl;
-        i = dyl * bytes; // point index in the image data
-        if (visited[dyl] === 1) break; // check whether the point has been visited
+        if (visited[dy + x] === 1) continue; // check whether the point has been visited
         // compare the color of the sample
         c = data[i] - sampleColor[0]; // check by red
-        if (c > colorThreshold || c < -colorThreshold) break;
+        if (c > colorThreshold || c < -colorThreshold) continue;
         c = data[i + 1] - sampleColor[1]; // check by green
-        if (c > colorThreshold || c < -colorThreshold) break;
+        if (c > colorThreshold || c < -colorThreshold) continue;
         c = data[i + 2] - sampleColor[2]; // check by blue
-        if (c > colorThreshold || c < -colorThreshold) break;
+        if (c > colorThreshold || c < -colorThreshold) continue;
 
-        result[dyl] = 1;
-        visited[dyl] = 1;
+        checkY = true; // if the color of the new point(x,y) is similar to the sample color need to check minmax for Y
 
-        xl--;
+        result[dy + x] = 1; // mark a new point in mask
+        visited[dy + x] = 1; // mark a new point as visited
+
+        xl = x - 1;
+        // walk to left side starting with the left neighbor
+        while (xl > -1) {
+          dyl = dy + xl;
+          i = dyl * bytes; // point index in the image data
+          if (visited[dyl] === 1) break; // check whether the point has been visited
+          // compare the color of the sample
+          c = data[i] - sampleColor[0]; // check by red
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 1] - sampleColor[1]; // check by green
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 2] - sampleColor[2]; // check by blue
+          if (c > colorThreshold || c < -colorThreshold) break;
+
+          result[dyl] = 1;
+          visited[dyl] = 1;
+
+          xl--;
+        }
+        xr = x + 1;
+        // walk to right side starting with the right neighbor
+        while (xr < w) {
+          dyr = dy + xr;
+          i = dyr * bytes; // index point in the image data
+          if (visited[dyr] === 1) break; // check whether the point has been visited
+          // compare the color of the sample
+          c = data[i] - sampleColor[0]; // check by red
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 1] - sampleColor[1]; // check by green
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 2] - sampleColor[2]; // check by blue
+          if (c > colorThreshold || c < -colorThreshold) break;
+
+          result[dyr] = 1;
+          visited[dyr] = 1;
+
+          xr++;
+        }
+
+        // check minmax for X
+        if (xl < minX) minX = xl + 1;
+        if (xr > maxX) maxX = xr - 1;
+
+        newY = el.y - el.dir;
+        if (newY >= 0 && newY < h) {
+          // add two scanning lines in the opposite direction (y - dir) if necessary
+          if (xl < el.left)
+            stack.push({ y: newY, left: xl, right: el.left, dir: -el.dir }); // from "new left" to "current left"
+          if (el.right < xr)
+            stack.push({ y: newY, left: el.right, right: xr, dir: -el.dir }); // from "current right" to "new right"
+        }
+        newY = el.y + el.dir;
+        if (newY >= 0 && newY < h) {
+          // add the scanning line in the direction (y + dir) if necessary
+          if (xl < xr)
+            stack.push({ y: newY, left: xl, right: xr, dir: el.dir }); // from "new left" to "new right"
+        }
       }
-      xr = x + 1;
-      // walk to right side starting with the right neighbor
-      while (xr < w) {
-        dyr = dy + xr;
-        i = dyr * bytes; // index point in the image data
-        if (visited[dyr] === 1) break; // check whether the point has been visited
-        // compare the color of the sample
-        c = data[i] - sampleColor[0]; // check by red
-        if (c > colorThreshold || c < -colorThreshold) break;
-        c = data[i + 1] - sampleColor[1]; // check by green
-        if (c > colorThreshold || c < -colorThreshold) break;
-        c = data[i + 2] - sampleColor[2]; // check by blue
-        if (c > colorThreshold || c < -colorThreshold) break;
-
-        result[dyr] = 1;
-        visited[dyr] = 1;
-
-        xr++;
+      // check minmax for Y if necessary
+      if (checkY) {
+        if (el.y < minY) minY = el.y;
+        if (el.y > maxY) maxY = el.y;
       }
-
-      // check minmax for X
-      if (xl < minX) minX = xl + 1;
-      if (xr > maxX) maxX = xr - 1;
-
-      newY = el.y - el.dir;
-      if (newY >= 0 && newY < h) {
-        // add two scanning lines in the opposite direction (y - dir) if necessary
-        if (xl < el.left)
-          stack.push({ y: newY, left: xl, right: el.left, dir: -el.dir }); // from "new left" to "current left"
-        if (el.right < xr)
-          stack.push({ y: newY, left: el.right, right: xr, dir: -el.dir }); // from "current right" to "new right"
-      }
-      newY = el.y + el.dir;
-      if (newY >= 0 && newY < h) {
-        // add the scanning line in the direction (y + dir) if necessary
-        if (xl < xr) stack.push({ y: newY, left: xl, right: xr, dir: el.dir }); // from "new left" to "new right"
-      }
-    }
-    // check minmax for Y if necessary
-    if (checkY) {
-      if (el.y < minY) minY = el.y;
-      if (el.y > maxY) maxY = el.y;
     }
   } while (stack.length > 0);
 
@@ -183,118 +199,122 @@ function floodFillWithBorders(
   colorThreshold: number,
   mask: Uint8Array
 ) {
-  var c,
-    x,
-    newY,
-    el,
-    xr,
-    xl,
-    dy,
-    dyl,
-    dyr,
-    checkY,
-    data = image.data,
-    w = image.width,
-    h = image.height,
-    bytes = image.bytes, // number of bytes in the color
-    maxX = -1,
-    minX = w + 1,
-    maxY = -1,
-    minY = h + 1,
-    i = py * w + px, // start point index in the mask data
-    result = new Uint8Array(w * h), // result mask
-    visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
+  let c;
+  let x;
+  let newY;
+  let el;
+  let xr;
+  let xl;
+  let dy;
+  let dyl;
+  let dyr;
+  let checkY;
+  let data = image.data;
+  let w = image.width;
+  let h = image.height;
+  let bytes = image.bytes; // number of bytes in the color
+  let maxX = -1;
+  let minX = w + 1;
+  let maxY = -1;
+  let minY = h + 1;
+  let i = py * w + px; // start point index in the mask data
+  let result = new Uint8Array(w * h); // result mask
+  let visited = new Uint8Array(mask ? mask : w * h); // mask of visited points
 
   if (visited[i] === 1) return null;
 
   i = i * bytes; // start point index in the image data
-  var sampleColor = [data[i], data[i + 1], data[i + 2], data[i + 3]]; // start point color (sample)
+  const sampleColor = [data[i], data[i + 1], data[i + 2], data[i + 3]]; // start point color (sample)
 
-  var stack = [{ y: py, left: px - 1, right: px + 1, dir: 1 }]; // first scanning line
+  const stack = [{ y: py, left: px - 1, right: px + 1, dir: 1 }]; // first scanning line
   do {
     el = stack.shift(); // get line for scanning
 
     checkY = false;
-    for (x = el.left + 1; x < el.right; x++) {
-      dy = el.y * w;
-      i = (dy + x) * bytes; // point index in the image data
 
-      if (visited[dy + x] === 1) continue; // check whether the point has been visited
+    if (el) {
+      for (x = el.left + 1; x < el.right; x++) {
+        dy = el.y * w;
+        i = (dy + x) * bytes; // point index in the image data
 
-      checkY = true; // if the color of the new point(x,y) is similar to the sample color need to check minmax for Y
+        if (visited[dy + x] === 1) continue; // check whether the point has been visited
 
-      result[dy + x] = 1; // mark a new point in mask
-      visited[dy + x] = 1; // mark a new point as visited
+        checkY = true; // if the color of the new point(x,y) is similar to the sample color need to check minmax for Y
 
-      // compare the color of the sample
-      c = data[i] - sampleColor[0]; // check by red
-      if (c > colorThreshold || c < -colorThreshold) continue;
-      c = data[i + 1] - sampleColor[1]; // check by green
-      if (c > colorThreshold || c < -colorThreshold) continue;
-      c = data[i + 2] - sampleColor[2]; // check by blue
-      if (c > colorThreshold || c < -colorThreshold) continue;
-
-      xl = x - 1;
-      // walk to left side starting with the left neighbor
-      while (xl > -1) {
-        dyl = dy + xl;
-        i = dyl * bytes; // point index in the image data
-        if (visited[dyl] === 1) break; // check whether the point has been visited
-
-        result[dyl] = 1;
-        visited[dyl] = 1;
-        xl--;
+        result[dy + x] = 1; // mark a new point in mask
+        visited[dy + x] = 1; // mark a new point as visited
 
         // compare the color of the sample
         c = data[i] - sampleColor[0]; // check by red
-        if (c > colorThreshold || c < -colorThreshold) break;
+        if (c > colorThreshold || c < -colorThreshold) continue;
         c = data[i + 1] - sampleColor[1]; // check by green
-        if (c > colorThreshold || c < -colorThreshold) break;
+        if (c > colorThreshold || c < -colorThreshold) continue;
         c = data[i + 2] - sampleColor[2]; // check by blue
-        if (c > colorThreshold || c < -colorThreshold) break;
-      }
-      xr = x + 1;
-      // walk to right side starting with the right neighbor
-      while (xr < w) {
-        dyr = dy + xr;
-        i = dyr * bytes; // index point in the image data
-        if (visited[dyr] === 1) break; // check whether the point has been visited
+        if (c > colorThreshold || c < -colorThreshold) continue;
 
-        result[dyr] = 1;
-        visited[dyr] = 1;
-        xr++;
+        xl = x - 1;
+        // walk to left side starting with the left neighbor
+        while (xl > -1) {
+          dyl = dy + xl;
+          i = dyl * bytes; // point index in the image data
+          if (visited[dyl] === 1) break; // check whether the point has been visited
 
-        // compare the color of the sample
-        c = data[i] - sampleColor[0]; // check by red
-        if (c > colorThreshold || c < -colorThreshold) break;
-        c = data[i + 1] - sampleColor[1]; // check by green
-        if (c > colorThreshold || c < -colorThreshold) break;
-        c = data[i + 2] - sampleColor[2]; // check by blue
-        if (c > colorThreshold || c < -colorThreshold) break;
-      }
+          result[dyl] = 1;
+          visited[dyl] = 1;
+          xl--;
 
-      // check minmax for X
-      if (xl < minX) minX = xl + 1;
-      if (xr > maxX) maxX = xr - 1;
+          // compare the color of the sample
+          c = data[i] - sampleColor[0]; // check by red
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 1] - sampleColor[1]; // check by green
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 2] - sampleColor[2]; // check by blue
+          if (c > colorThreshold || c < -colorThreshold) break;
+        }
+        xr = x + 1;
+        // walk to right side starting with the right neighbor
+        while (xr < w) {
+          dyr = dy + xr;
+          i = dyr * bytes; // index point in the image data
+          if (visited[dyr] === 1) break; // check whether the point has been visited
 
-      newY = el.y - el.dir;
-      if (newY >= 0 && newY < h) {
-        // add two scanning lines in the opposite direction (y - dir) if necessary
-        if (xl < el.left)
-          stack.push({ y: newY, left: xl, right: el.left, dir: -el.dir }); // from "new left" to "current left"
-        if (el.right < xr)
-          stack.push({ y: newY, left: el.right, right: xr, dir: -el.dir }); // from "current right" to "new right"
+          result[dyr] = 1;
+          visited[dyr] = 1;
+          xr++;
+
+          // compare the color of the sample
+          c = data[i] - sampleColor[0]; // check by red
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 1] - sampleColor[1]; // check by green
+          if (c > colorThreshold || c < -colorThreshold) break;
+          c = data[i + 2] - sampleColor[2]; // check by blue
+          if (c > colorThreshold || c < -colorThreshold) break;
+        }
+
+        // check minmax for X
+        if (xl < minX) minX = xl + 1;
+        if (xr > maxX) maxX = xr - 1;
+
+        newY = el.y - el.dir;
+        if (newY >= 0 && newY < h) {
+          // add two scanning lines in the opposite direction (y - dir) if necessary
+          if (xl < el.left)
+            stack.push({ y: newY, left: xl, right: el.left, dir: -el.dir }); // from "new left" to "current left"
+          if (el.right < xr)
+            stack.push({ y: newY, left: el.right, right: xr, dir: -el.dir }); // from "current right" to "new right"
+        }
+        newY = el.y + el.dir;
+        if (newY >= 0 && newY < h) {
+          // add the scanning line in the direction (y + dir) if necessary
+          if (xl < xr)
+            stack.push({ y: newY, left: xl, right: xr, dir: el.dir }); // from "new left" to "new right"
+        }
       }
-      newY = el.y + el.dir;
-      if (newY >= 0 && newY < h) {
-        // add the scanning line in the direction (y + dir) if necessary
-        if (xl < xr) stack.push({ y: newY, left: xl, right: xr, dir: el.dir }); // from "new left" to "new right"
+      // check minmax for Y if necessary
+      if (checkY) {
+        if (el.y < minY) minY = el.y;
+        if (el.y > maxY) maxY = el.y;
       }
-    }
-    // check minmax for Y if necessary
-    if (checkY) {
-      if (el.y < minY) minY = el.y;
-      if (el.y > maxY) maxY = el.y;
     }
   } while (stack.length > 0);
 
@@ -316,22 +336,17 @@ function floodFillWithBorders(
  * http://www.librow.com/articles/article-9
  * http://elynxsdk.free.fr/ext-docs/Blur/Fast_box_blur.pdf
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
- * @param {int} blur radius
+ * @param {number} radius:
  * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  */
-export function gaussBlur(mask, radius) {
-  var i,
-    k,
-    k1,
-    x,
-    y,
-    val,
-    start,
-    end,
-    n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with the center point)
+export function gaussBlur(mask: Mask, radius: number): Mask {
+  let i, k, k1, x, y, val, start, end;
+  const n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with the center point)
     s2 = radius * radius,
-    wg = new Float32Array(n), // weights
-    total = 0, // sum of weights(used for normalization)
+    wg = new Float32Array(n);
+  let // weights
+    total = 0;
+  const // sum of weights(used for normalization)
     w = mask.width,
     h = mask.height,
     data = mask.data,
@@ -342,8 +357,8 @@ export function gaussBlur(mask, radius) {
 
   // calc gauss weights
   for (i = 0; i < radius; i++) {
-    var dsq = (radius - i) * (radius - i);
-    var ww = Math.exp(-dsq / (2.0 * s2)) / (2 * Math.PI * s2);
+    const dsq = (radius - i) * (radius - i);
+    const ww = Math.exp(-dsq / (2.0 * s2)) / (2 * Math.PI * s2);
     wg[radius + i] = wg[radius - i] = ww;
     total += 2 * ww;
   }
@@ -352,7 +367,7 @@ export function gaussBlur(mask, radius) {
     wg[i] /= total;
   }
 
-  var result = new Uint8Array(w * h), // result mask
+  const result = new Uint8Array(w * h), // result mask
     endX = radius + w,
     endY = radius + h;
 
@@ -393,28 +408,26 @@ export function gaussBlur(mask, radius) {
 
 /** Create a border index array of boundary points of the mask with radius-neighbors
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
- * @param {int} blur radius
+ * @param {number} radius:
  * @param {Uint8Array} visited: mask of visited points (optional)
  * @return {Array} border index array of boundary points with radius-neighbors (only points need for blur)
  */
-function createBorderForBlur(mask, radius, visited) {
-  var x,
-    i,
-    j,
-    y,
-    k,
-    k1,
-    k2,
-    w = mask.width,
+function createBorderForBlur(
+  mask: Mask,
+  radius: number,
+  visited: Uint8Array
+): Array<any> {
+  let x, i, j, y, k, k1, k2;
+  const w = mask.width,
     h = mask.height,
     data = mask.data,
     visitedData = new Uint8Array(data),
     minX = mask.bounds.minX,
     maxX = mask.bounds.maxX,
     minY = mask.bounds.minY,
-    maxY = mask.bounds.maxY,
-    len = w * h,
-    temp = new Uint8Array(len), // auxiliary array to check uniqueness
+    maxY = mask.bounds.maxY;
+  let len = w * h;
+  const temp = new Uint8Array(len), // auxiliary array to check uniqueness
     border = [], // only border points
     x0 = Math.max(minX, 1),
     x1 = Math.min(maxX, w - 2),
@@ -455,24 +468,25 @@ function createBorderForBlur(mask, radius, visited) {
 
   // walk through points on the boundary of the image if necessary
   // if the "black" point is adjacent to the boundary of the image, it is a border point
-  if (minX == 0)
+  if (minX === 0)
     for (y = minY; y < maxY + 1; y++) if (data[y * w] === 1) border.push(y * w);
 
-  if (maxX == w - 1)
+  if (maxX === w - 1)
     for (y = minY; y < maxY + 1; y++)
       if (data[y * w + maxX] === 1) border.push(y * w + maxX);
 
-  if (minY == 0)
+  if (minY === 0)
     for (x = minX; x < maxX + 1; x++) if (data[x] === 1) border.push(x);
 
-  if (maxY == h - 1)
+  if (maxY === h - 1)
     for (x = minX; x < maxX + 1; x++)
       if (data[maxY * w + x] === 1) border.push(maxY * w + x);
 
-  var result = [], // border points with radius-neighbors
+  const result = [];
+  let // border points with radius-neighbors
     start,
-    end,
-    endX = radius + w,
+    end;
+  const endX = radius + w,
     endY = radius + h,
     n = radius * 2 + 1; // size of the pattern for radius-neighbors (from -r to +r with the center point)
 
@@ -518,12 +532,17 @@ function createBorderForBlur(mask, radius, visited) {
  * http://www.librow.com/articles/article-9
  * http://elynxsdk.free.fr/ext-docs/Blur/Fast_box_blur.pdf
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
- * @param {int} blur radius
+ * @param {int} radius:
  * @param {Uint8Array} visited: mask of visited points (optional)
  * @return {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  */
-export function gaussBlurOnlyBorder(mask, radius, visited) {
-  var border = createBorderForBlur(mask, radius, visited), // get border points with radius-neighbors
+export function gaussBlurOnlyBorder(
+  mask: Mask,
+  radius: number,
+  visited: Uint8Array
+): Mask {
+  const border = createBorderForBlur(mask, radius, visited);
+  let // get border points with radius-neighbors
     ww,
     dsq,
     i,
@@ -534,19 +553,21 @@ export function gaussBlurOnlyBorder(mask, radius, visited) {
     y,
     val,
     start,
-    end,
-    n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with center point)
+    end;
+  const n = radius * 2 + 1, // size of the pattern for radius-neighbors (from -r to +r with center point)
     s2 = 2 * radius * radius,
-    wg = new Float32Array(n), // weights
-    total = 0, // sum of weights(used for normalization)
+    wg = new Float32Array(n);
+  let // weights
+    total = 0;
+  const // sum of weights(used for normalization)
     w = mask.width,
     h = mask.height,
-    data = mask.data,
-    minX = mask.bounds.minX,
+    data = mask.data;
+  let minX = mask.bounds.minX,
     maxX = mask.bounds.maxX,
     minY = mask.bounds.minY,
-    maxY = mask.bounds.maxY,
-    len = border.length;
+    maxY = mask.bounds.maxY;
+  const len = border.length;
 
   // calc gauss weights
   for (i = 0; i < radius; i++) {
@@ -560,7 +581,7 @@ export function gaussBlurOnlyBorder(mask, radius, visited) {
     wg[i] /= total;
   }
 
-  var result = new Uint8Array(data), // copy the source mask
+  const result = new Uint8Array(data), // copy the source mask
     endX = radius + w,
     endY = radius + h;
 
@@ -622,13 +643,9 @@ export function gaussBlurOnlyBorder(mask, radius, visited) {
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
  */
-export function createBorderMask(mask) {
-  var x,
-    y,
-    k,
-    k1,
-    k2,
-    w = mask.width,
+export function createBorderMask(mask: Mask): BoundaryMask {
+  let x, y, k, k1, k2;
+  const w = mask.width,
     h = mask.height,
     data = mask.data,
     minX = mask.bounds.minX,
@@ -670,18 +687,18 @@ export function createBorderMask(mask) {
 
   // walk through points on the boundary of the image if necessary
   // if the "black" point is adjacent to the boundary of the image, it is a border point
-  if (minX == 0)
+  if (minX === 0)
     for (y = minY; y < maxY + 1; y++)
       if (data[y * w] === 1) result[(y - minY) * rw] = 1;
 
-  if (maxX == w - 1)
+  if (maxX === w - 1)
     for (y = minY; y < maxY + 1; y++)
       if (data[y * w + maxX] === 1) result[(y - minY) * rw + (maxX - minX)] = 1;
 
-  if (minY == 0)
+  if (minY === 0)
     for (x = minX; x < maxX + 1; x++) if (data[x] === 1) result[x - minX] = 1;
 
-  if (maxY == h - 1)
+  if (maxY === h - 1)
     for (x = minX; x < maxX + 1; x++)
       if (data[maxY * w + x] === 1) result[(maxY - minY) * rw + (x - minX)] = 1;
 
@@ -697,13 +714,9 @@ export function createBorderMask(mask) {
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height
  * @return {Array} border index array boundary points of the mask
  */
-export function getBorderIndices(mask) {
-  var x,
-    y,
-    k,
-    k1,
-    k2,
-    w = mask.width,
+export function getBorderIndices(mask: Mask) {
+  let x, y, k, k1, k2;
+  const w = mask.width,
     h = mask.height,
     data = mask.data,
     border = [], // only border points
@@ -754,10 +767,9 @@ export function getBorderIndices(mask) {
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  * @return {Object} border mask: {Uint8Array} data, {int} width, {int} height, {Object} offset
  */
-function prepareMask(mask) {
-  var x,
-    y,
-    w = mask.width,
+function prepareMask(mask: Mask): BoundaryMask {
+  let x, y;
+  const w = mask.width,
     data = mask.data,
     minX = mask.bounds.minX,
     maxX = mask.bounds.maxX,
@@ -787,17 +799,18 @@ function prepareMask(mask) {
  * @param {Object} mask: {Uint8Array} data, {int} width, {int} height, {Object} bounds
  * @return {Array} contours: {Array} points, {bool} inner, {int} label
  */
-export function traceContours(mask) {
-  var m = prepareMask(mask),
-    contours = [],
-    label = 0,
-    w = m.width,
+export function traceContours(mask: Mask): Array<Countour> {
+  const m = prepareMask(mask),
+    contours = [];
+  let label = 0;
+  const w = m.width,
     w2 = w * 2,
     h = m.height,
     src = m.data,
     dx = m.offset.x,
     dy = m.offset.y,
-    dest = new Uint8Array(src), // label matrix
+    dest = new Uint8Array(src);
+  let // label matrix
     i,
     j,
     x,
@@ -818,7 +831,7 @@ export function traceContours(mask) {
   // 5 6 7
   // 4 X 0
   // 3 2 1
-  var directions = [
+  const directions = [
     [1, 0],
     [1, 1],
     [0, 1],
@@ -902,10 +915,14 @@ export function traceContours(mask) {
  * @param {int} simplify count: min number of points when the contour is simplified
  * @return {Array} contours: {Array} points, {bool} inner, {int} label, {int} initialCount
  */
-export function simplifyContours(contours, simplifyTolerant, simplifyCount) {
-  var lenContours = contours.length,
-    result = [],
-    i,
+export function simplifyContours(
+  contours: Array<Countour>,
+  simplifyTolerant: number,
+  simplifyCount: number
+) {
+  const lenContours = contours.length,
+    result = [];
+  let i,
     j,
     k,
     c,
@@ -953,50 +970,53 @@ export function simplifyContours(contours, simplifyTolerant, simplifyCount) {
 
     do {
       ids = stack.shift();
-      if (ids.last <= ids.first + 1) {
-        // no intermediate points
-        continue;
-      }
 
-      maxd = -1.0; // max distance from point to current edge
-      maxi = ids.first; // index of maximally distant point
-
-      for (
-        i = ids.first + 1;
-        i < ids.last;
-        i++ // bypass intermediate points in edge
-      ) {
-        // calc the distance from current point to edge
-        pi = points[i];
-        pf = points[ids.first];
-        pl = points[ids.last];
-        dx = pi.x - pf.x;
-        dy = pi.y - pf.y;
-        r1 = Math.sqrt(dx * dx + dy * dy);
-        dx = pi.x - pl.x;
-        dy = pi.y - pl.y;
-        r2 = Math.sqrt(dx * dx + dy * dy);
-        dx = pf.x - pl.x;
-        dy = pf.y - pl.y;
-        r12 = Math.sqrt(dx * dx + dy * dy);
-        if (r1 >= Math.sqrt(r2 * r2 + r12 * r12)) dist = r2;
-        else if (r2 >= Math.sqrt(r1 * r1 + r12 * r12)) dist = r1;
-        else
-          dist = Math.abs(
-            (dy * pi.x - dx * pi.y + pf.x * pl.y - pl.x * pf.y) / r12
-          );
-
-        if (dist > maxd) {
-          maxi = i; // save the index of maximally distant point
-          maxd = dist;
+      if (ids) {
+        if (ids.last <= ids.first + 1) {
+          // no intermediate points
+          continue;
         }
-      }
 
-      if (maxd > simplifyTolerant) {
-        // if the max "deviation" is larger than allowed then...
-        lst.push(maxi); // add index to the simplified list
-        stack.push({ first: ids.first, last: maxi }); // add the left part for processing
-        stack.push({ first: maxi, last: ids.last }); // add the right part for processing
+        maxd = -1.0; // max distance from point to current edge
+        maxi = ids.first; // index of maximally distant point
+
+        for (
+          i = ids.first + 1;
+          i < ids.last;
+          i++ // bypass intermediate points in edge
+        ) {
+          // calc the distance from current point to edge
+          pi = points[i];
+          pf = points[ids.first];
+          pl = points[ids.last];
+          dx = pi.x - pf.x;
+          dy = pi.y - pf.y;
+          r1 = Math.sqrt(dx * dx + dy * dy);
+          dx = pi.x - pl.x;
+          dy = pi.y - pl.y;
+          r2 = Math.sqrt(dx * dx + dy * dy);
+          dx = pf.x - pl.x;
+          dy = pf.y - pl.y;
+          r12 = Math.sqrt(dx * dx + dy * dy);
+          if (r1 >= Math.sqrt(r2 * r2 + r12 * r12)) dist = r2;
+          else if (r2 >= Math.sqrt(r1 * r1 + r12 * r12)) dist = r1;
+          else
+            dist = Math.abs(
+              (dy * pi.x - dx * pi.y + pf.x * pl.y - pl.x * pf.y) / r12
+            );
+
+          if (dist > maxd) {
+            maxi = i; // save the index of maximally distant point
+            maxd = dist;
+          }
+        }
+
+        if (maxd > simplifyTolerant) {
+          // if the max "deviation" is larger than allowed then...
+          lst.push(maxi); // add index to the simplified list
+          stack.push({ first: ids.first, last: maxi }); // add the left part for processing
+          stack.push({ first: maxi, last: ids.last }); // add the right part for processing
+        }
       }
     } while (stack.length > 0);
 
