@@ -1099,8 +1099,6 @@ function paint(
     }
   }
 
-  mask = null;
-
   context.putImageData(imgData, 0, 0);
 }
 
@@ -1156,4 +1154,55 @@ export const trace = (
   context.strokeStyle = "blue";
 
   context.stroke();
+};
+
+const concatMasks = (a: Mask, b: Mask): Mask => {
+  let mask = new Uint8Array(a.width * a.height);
+
+  let rA: number;
+  let rB: number;
+
+  const nA = a.bounds.maxX - a.bounds.minX + 1;
+  const nB = b.bounds.maxX - b.bounds.minX + 1;
+
+  let indexA = a.bounds.minY * a.width + a.bounds.minX;
+
+  for (
+    let r = a.bounds.minY * a.width + a.bounds.minX;
+    r < a.bounds.maxY * a.width + a.bounds.minX + 1;
+    r += a.width
+  ) {
+    mask.set(a.data.subarray(r, r + nA), indexA);
+
+    indexA += a.width;
+  }
+
+  //
+
+  let indexB = b.bounds.minY * a.width + b.bounds.minX;
+
+  rA = b.bounds.minY * b.width + b.bounds.minX;
+  rB = b.bounds.maxY * b.width + b.bounds.minX + 1;
+
+  for (let r = rA; r < rB; r += b.width) {
+    for (let c = 0; c < nB; c++) {
+      if (b.data[r + c] === 1) {
+        mask[indexB + c] = 1;
+      }
+    }
+
+    indexB += a.width;
+  }
+
+  return {
+    data: mask,
+    width: a.width,
+    height: a.height,
+    bounds: {
+      minX: Math.min(a.bounds.minX, b.bounds.minX),
+      minY: Math.min(a.bounds.minY, b.bounds.minY),
+      maxX: Math.max(a.bounds.maxX, b.bounds.maxX),
+      maxY: Math.max(a.bounds.maxY, b.bounds.maxY),
+    },
+  };
 };
