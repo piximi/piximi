@@ -105,9 +105,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (!selecting && !started) {
+    if (!selecting && !selected) {
       setStarted(true);
-
       setSelecting(true);
 
       if (ref && ref.current) {
@@ -130,7 +129,7 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   ) => {
     // Tests whether the primary button is depressed
     if (event.buttons === 1) {
-      setMoving(!moving);
+      setMoving(true);
 
       if (ref && ref.current) {
         const boundingClientRect = ref.current.getBoundingClientRect();
@@ -165,8 +164,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
       }
 
       setSelecting(!selecting);
-
-      setSelected(!selected);
+      setSelected(true);
+      setStarted(!started);
     }
   };
 
@@ -250,7 +249,7 @@ const RectangularSelect = () => {
   const {
     context,
     current,
-    end,
+    moving,
     selected,
     selecting,
     start,
@@ -268,14 +267,8 @@ const RectangularSelect = () => {
   if (context) {
     context.beginPath();
 
-    if (
-      animated &&
-      start.x !== 0 &&
-      start.y !== 0 &&
-      end.x !== 0 &&
-      end.y !== 0
-    ) {
-      if (selecting && !selected) {
+    if (animated) {
+      if (selecting && !selected && moving) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
@@ -285,7 +278,7 @@ const RectangularSelect = () => {
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
 
-      if (!selecting && selected) {
+      if (selected) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
