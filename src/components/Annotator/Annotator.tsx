@@ -107,8 +107,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   ) => {
     if (!selecting && !started) {
       setStarted(true);
-
       setSelecting(true);
+      setSelected(false);
 
       if (ref && ref.current) {
         const boundingClientRect = ref.current.getBoundingClientRect();
@@ -165,8 +165,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
       }
 
       setSelecting(!selecting);
-
       setSelected(!selected);
+      setStarted(!started);
     }
   };
 
@@ -248,10 +248,15 @@ const RectangularSelect = () => {
     context,
     current,
     end,
+    moving,
     selected,
     selecting,
     start,
+    started,
   } = useRenderingContext();
+
+  // console.log(selecting)
+  console.log(started);
 
   const animation = ({ current, start }: { current: Point; start: Point }) => {
     return {
@@ -265,13 +270,7 @@ const RectangularSelect = () => {
   if (context) {
     context.beginPath();
 
-    if (
-      animated &&
-      start.x !== 0 &&
-      start.y !== 0 &&
-      end.x !== 0 &&
-      end.y !== 0
-    ) {
+    if (animated) {
       if (selecting && !selected) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
