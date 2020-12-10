@@ -2,6 +2,13 @@ import { toRGBA } from "../../image/toRGBA";
 import { useRenderingContext } from "./Annotator";
 import { useState } from "react";
 
+export enum SelectionMode {
+  Add,
+  Intersect,
+  New,
+  Subtract,
+}
+
 type BoundaryMask = {
   data: Uint8Array;
   width: number;
@@ -1203,27 +1210,89 @@ const concatMasks = (a: Mask, b: Mask): Mask => {
   };
 };
 
-type QuickSelectProps = {
-  image: Image;
-  threshold: number;
-  radius: number;
+const drawBorder = (
+  antLength: number,
+  antOffset: number,
+  cached: Array<number>,
+  context: CanvasRenderingContext2D,
+  image: Image,
+  mask: Mask,
+  noBorder: boolean
+) => {
+  if (!noBorder) {
+    cached = getBorderIndices(mask);
+  }
+
+  context.clearRect(0, 0, image.width, image.height);
+
+  const imagedata = context.createImageData(image.width, image.height);
+
+  let res = imagedata.data;
+
+  for (let j = 0; j < cached.length; j++) {
+    let i = cached[j];
+    let x = i % image.width; // calc x by index
+    let y = (i - x) / image.width; // calc y by index
+    let k = (y * image.width + x) * 4;
+
+    if ((x + y + antOffset) % (antLength * 2) < antLength) {
+      res[k + 3] = 255; // black, change only alpha
+    } else {
+      res[k] = 255; // white
+      res[k + 1] = 255;
+      res[k + 2] = 255;
+      res[k + 3] = 255;
+    }
+  }
+
+  context.putImageData(imagedata, 0, 0);
 };
 
-const QuickSelect = ({ image, radius, threshold }: QuickSelectProps) => {
-  const { context } = useRenderingContext();
+type QuickSelectProps = {
+  antLength?: number;
+  antOffset?: number;
+  contourCount: number;
+  contourTolerance?: number;
+  image: Image;
+  mode: SelectionMode;
+  radius: number;
+  threshold: number;
+};
 
-  const [mask, setMask] = useState<Mask | null>();
-  const [previousMask, setPreviousMask] = useState<Mask | null>();
+export const QuickSelect = ({
+  contourTolerance,
+  contourCount,
+  image,
+  mode,
+  radius,
+  threshold,
+}: QuickSelectProps) => {
+  const antLength = 4;
+  const antOffset = 0;
+
+  if (!contourCount) {
+    contourCount = 30;
+  }
+
+  if (!contourTolerance) {
+    contourTolerance = 30;
+  }
+
+  const { context, start, started } = useRenderingContext();
+
+  const [cached, setCached] = useState<Array<number>>([]);
+  const [mask, setMask] = useState<Mask | null>(null);
+  const [previousMask, setPreviousMask] = useState<Mask | null>(null);
 
   const draw = (x: number, y: number) => {
-    var img = {
+    const img = {
       data: image.data,
       width: image.width,
       height: image.height,
       bytes: 4,
     };
 
-    if (addMode && !previousMask) {
+    if (mode === SelectionMode.Add && !previousMask) {
       setPreviousMask(mask);
     }
 
@@ -1246,7 +1315,7 @@ const QuickSelect = ({ image, radius, threshold }: QuickSelectProps) => {
         setMask(response);
       }
 
-      if (addMode && previousMask) {
+      if (mode === SelectionMode.Add && previousMask) {
         if (mask) {
           const combined = concatMasks(mask, previousMask);
 
@@ -1256,11 +1325,16 @@ const QuickSelect = ({ image, radius, threshold }: QuickSelectProps) => {
         }
       }
 
-      drawBorder();
+      if (mask) {
+        drawBorder(antLength, antOffset, cached, context, image, mask, false);
+      }
     }
   };
 
   if (context) {
+    if (started) {
+      draw(start.x, start.y);
+    }
   }
 
   return null;
