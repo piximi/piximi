@@ -1062,3 +1062,53 @@ export function simplifyContours(
 
   return result;
 }
+
+function toRGBA(color: string, alpha: number) {
+  const parsed = parseInt(color, 16);
+
+  const r = (parsed >> 16) & 255;
+  const g = (parsed >> 8) & 255;
+  const b = parsed & 255;
+  const a = Math.round(alpha * 255);
+
+  return [r, g, b, a];
+}
+
+function paint(
+  context: CanvasRenderingContext2D,
+  image: Image,
+  color: string,
+  alpha: number,
+  mask?: Mask
+) {
+  if (!mask) return;
+
+  let rgba = toRGBA(color, alpha);
+
+  let x,
+    y,
+    data = mask.data,
+    bounds = mask.bounds,
+    maskW = mask.width,
+    w = image.width,
+    h = image.height,
+    imgData = context.createImageData(w, h),
+    res = imgData.data;
+
+  for (y = bounds.minY; y <= bounds.maxY; y++) {
+    for (x = bounds.minX; x <= bounds.maxX; x++) {
+      if (data[y * maskW + x] === 0) continue;
+
+      const index = (y * w + x) * 4;
+
+      res[index] = rgba[0];
+      res[index + 1] = rgba[1];
+      res[index + 2] = rgba[2];
+      res[index + 3] = rgba[3];
+    }
+  }
+
+  mask = null;
+
+  context.putImageData(imgData, 0, 0);
+}

@@ -243,6 +243,15 @@ const BackgroundImage = ({ image }: BackgroundImageProps) => {
   return null;
 };
 
+const QuickSelect = () => {
+  const { context } = useRenderingContext();
+
+  if (context) {
+  }
+
+  return null;
+};
+
 const RectangularSelect = () => {
   const {
     context,
