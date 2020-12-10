@@ -1,3 +1,5 @@
+import { toRGBA } from "../../image/toRGBA";
+
 type BoundaryMask = {
   data: Uint8Array;
   width: number;
@@ -1063,17 +1065,6 @@ export function simplifyContours(
   return result;
 }
 
-function toRGBA(color: string, alpha: number) {
-  const parsed = parseInt(color, 16);
-
-  const r = (parsed >> 16) & 255;
-  const g = (parsed >> 8) & 255;
-  const b = parsed & 255;
-  const a = Math.round(alpha * 255);
-
-  return [r, g, b, a];
-}
-
 function paint(
   context: CanvasRenderingContext2D,
   image: Image,
@@ -1112,3 +1103,57 @@ function paint(
 
   context.putImageData(imgData, 0, 0);
 }
+
+export const trace = (
+  context: CanvasRenderingContext2D,
+  image: Image,
+  mask: Mask,
+  tolerance: number,
+  count: number
+) => {
+  let points;
+
+  let contours = traceContours(mask);
+
+  contours = simplifyContours(contours, tolerance, count);
+
+  context.clearRect(0, 0, image.width, image.height);
+
+  context.beginPath();
+
+  for (let j = 0; j < contours.length; j++) {
+    if (!contours[j].inner) {
+      continue;
+    }
+
+    points = contours[j].points;
+
+    context.moveTo(points[0].x, points[0].y);
+
+    for (let k = 1; k < points.length; k++) {
+      context.lineTo(points[k].x, points[k].y);
+    }
+  }
+
+  context.strokeStyle = "red";
+
+  context.stroke();
+
+  context.beginPath();
+
+  for (let j = 0; j < contours.length; j++) {
+    if (contours[j].inner) continue;
+
+    points = contours[j].points;
+
+    context.moveTo(points[0].x, points[0].y);
+
+    for (let k = 1; k < points.length; k++) {
+      context.lineTo(points[k].x, points[k].y);
+    }
+  }
+
+  context.strokeStyle = "blue";
+
+  context.stroke();
+};
