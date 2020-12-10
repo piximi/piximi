@@ -207,7 +207,10 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   );
 };
 
-const useAnimation = (initialValue: any, callback: (arg0: any) => void) => {
+export const useAnimation = (
+  initialValue: any,
+  callback: (arg0: any) => void
+) => {
   const ref = useRef(initialValue);
 
   ref.current = callback(ref.current);
@@ -215,7 +218,7 @@ const useAnimation = (initialValue: any, callback: (arg0: any) => void) => {
   return ref.current;
 };
 
-const useRenderingContext = () => {
+export const useRenderingContext = () => {
   useContext(FrameContext);
 
   const context = useContext(RenderingContextContext);
@@ -238,15 +241,6 @@ const BackgroundImage = ({ image }: BackgroundImageProps) => {
     img.onload = () => {};
 
     context.drawImage(img, 0, 0, image.shape!.c, image.shape!.r);
-  }
-
-  return null;
-};
-
-const QuickSelect = () => {
-  const { context } = useRenderingContext();
-
-  if (context) {
   }
 
   return null;

@@ -1,4 +1,6 @@
 import { toRGBA } from "../../image/toRGBA";
+import { useRenderingContext } from "./Annotator";
+import { useState } from "react";
 
 type BoundaryMask = {
   data: Uint8Array;
@@ -1201,35 +1203,65 @@ const concatMasks = (a: Mask, b: Mask): Mask => {
   };
 };
 
-// const drawMask = (x: number, y: number) => {
-//   if (!imageInfo) return;
-//
-//   var image = {
-//     data: imageInfo.data.data,
-//     width: imageInfo.width,
-//     height: imageInfo.height,
-//     bytes: 4
-//   };
-//
-//   if (addMode && !oldMask) {
-//     oldMask = mask;
-//   }
-//
-//   let old = oldMask ? oldMask.data : null;
-//
-//   mask = floodFill(image, x, y, currentThreshold, old, true);
-//
-//   if (mask) {
-//     mask = gaussBlurOnlyBorder(mask, blurRadius, old)
-//   }
-//
-//   if (addMode && oldMask) {
-//     if (mask) {
-//       mask = concatMasks(mask, oldMask)
-//     } else {
-//       mask = oldMask
-//     }
-//   }
-//
-//   drawBorder();
-// }
+type QuickSelectProps = {
+  image: Image;
+  threshold: number;
+  radius: number;
+};
+
+const QuickSelect = ({ image, radius, threshold }: QuickSelectProps) => {
+  const { context } = useRenderingContext();
+
+  const [mask, setMask] = useState<Mask | null>();
+  const [previousMask, setPreviousMask] = useState<Mask | null>();
+
+  const draw = (x: number, y: number) => {
+    var img = {
+      data: image.data,
+      width: image.width,
+      height: image.height,
+      bytes: 4,
+    };
+
+    if (addMode && !previousMask) {
+      setPreviousMask(mask);
+    }
+
+    let previousData;
+
+    if (previousMask) {
+      previousData = previousMask.data;
+    } else {
+      previousData = null;
+    }
+
+    if (previousData) {
+      const flooded = floodFill(img, x, y, threshold, previousData, true);
+
+      setMask(flooded);
+
+      if (mask) {
+        const response = gaussBlurOnlyBorder(mask, radius, previousData);
+
+        setMask(response);
+      }
+
+      if (addMode && previousMask) {
+        if (mask) {
+          const combined = concatMasks(mask, previousMask);
+
+          setMask(combined);
+        } else {
+          setMask(previousMask);
+        }
+      }
+
+      drawBorder();
+    }
+  };
+
+  if (context) {
+  }
+
+  return null;
+};
