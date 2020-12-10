@@ -130,7 +130,7 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   ) => {
     // Tests whether the primary button is depressed
     if (event.buttons === 1) {
-      setMoving(!moving);
+      setMoving(true);
 
       if (ref && ref.current) {
         const boundingClientRect = ref.current.getBoundingClientRect();
@@ -247,16 +247,11 @@ const RectangularSelect = () => {
   const {
     context,
     current,
-    end,
     moving,
     selected,
     selecting,
     start,
-    started,
   } = useRenderingContext();
-
-  // console.log(selecting)
-  console.log(started);
 
   const animation = ({ current, start }: { current: Point; start: Point }) => {
     return {
@@ -271,7 +266,7 @@ const RectangularSelect = () => {
     context.beginPath();
 
     if (animated) {
-      if (selecting && !selected) {
+      if (selecting && !selected && moving) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
@@ -281,7 +276,7 @@ const RectangularSelect = () => {
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
 
-      if (!selecting && selected) {
+      if (!selecting && selected && !moving) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
