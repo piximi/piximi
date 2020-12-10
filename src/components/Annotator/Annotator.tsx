@@ -105,10 +105,9 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
   const onMouseDown = (
     event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
-    if (!selecting && !started) {
+    if (!selecting && !selected) {
       setStarted(true);
       setSelecting(true);
-      setSelected(false);
 
       if (ref && ref.current) {
         const boundingClientRect = ref.current.getBoundingClientRect();
@@ -165,7 +164,7 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
       }
 
       setSelecting(!selecting);
-      setSelected(!selected);
+      setSelected(true);
       setStarted(!started);
     }
   };
@@ -276,7 +275,7 @@ const RectangularSelect = () => {
         context.strokeRect(start.x, start.y, animated.width, animated.height);
       }
 
-      if (!selecting && selected && !moving) {
+      if (selected) {
         context.strokeStyle = "white";
         context.setLineDash([10, 10]);
         context.strokeRect(start.x, start.y, animated.width, animated.height);
