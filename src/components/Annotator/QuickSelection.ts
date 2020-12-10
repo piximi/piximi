@@ -1200,3 +1200,36 @@ const concatMasks = (a: Mask, b: Mask): Mask => {
     },
   };
 };
+
+// const drawMask = (x: number, y: number) => {
+//   if (!imageInfo) return;
+//
+//   var image = {
+//     data: imageInfo.data.data,
+//     width: imageInfo.width,
+//     height: imageInfo.height,
+//     bytes: 4
+//   };
+//
+//   if (addMode && !oldMask) {
+//     oldMask = mask;
+//   }
+//
+//   let old = oldMask ? oldMask.data : null;
+//
+//   mask = floodFill(image, x, y, currentThreshold, old, true);
+//
+//   if (mask) {
+//     mask = gaussBlurOnlyBorder(mask, blurRadius, old)
+//   }
+//
+//   if (addMode && oldMask) {
+//     if (mask) {
+//       mask = concatMasks(mask, oldMask)
+//     } else {
+//       mask = oldMask
+//     }
+//   }
+//
+//   drawBorder();
+// }
