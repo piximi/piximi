@@ -10,8 +10,6 @@ import React, {
 import random from "lodash/random";
 import { Image as ImageType } from "../../types/Image";
 import { useKeyPress } from "../../hooks";
-import { Point } from "victory";
-import { current } from "@reduxjs/toolkit";
 
 /**
  * useKeyPress
