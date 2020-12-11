@@ -10,6 +10,8 @@ import React, {
 import random from "lodash/random";
 import { Image as ImageType } from "../../types/Image";
 import { useKeyPress } from "../../hooks";
+import { Point } from "victory";
+import { current } from "@reduxjs/toolkit";
 
 /**
  * useKeyPress
@@ -163,7 +165,8 @@ const Canvas = ({ animate, children, height, width }: CanvasProps) => {
         setEnd(position);
       }
 
-      setSelecting(!selecting);
+      setSelecting(false);
+      setMoving(false);
       setSelected(true);
       setStarted(!started);
     }
@@ -245,6 +248,94 @@ const BackgroundImage = ({ image }: BackgroundImageProps) => {
   return null;
 };
 
+const EllipticalSelect = () => {
+  const {
+    context,
+    current,
+    moving,
+    selected,
+    selecting,
+    start,
+  } = useRenderingContext();
+
+  const animation = ({ current, start }: { current: Point; start: Point }) => {
+    return {
+      center: {
+        x: (current.x - start.x) / 2 + start.x,
+        y: (current.y - start.y) / 2 + start.y,
+      },
+      radiusX: Math.abs((current.x - start.x) / 2),
+      radiusY: Math.abs((current.y - start.y) / 2),
+    };
+  };
+
+  const animated = useAnimation({}, () => animation({ current, start }));
+
+  if (context) {
+    context.beginPath();
+
+    if (animated) {
+      if (selecting && moving && !selected) {
+        context.strokeStyle = "white";
+        context.setLineDash([10, 10]);
+        context.ellipse(
+          animated.center.x,
+          animated.center.y,
+          animated.radiusX,
+          animated.radiusY,
+          0,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+
+        context.strokeStyle = "black";
+        context.setLineDash([5, 5]);
+        context.ellipse(
+          animated.center.x,
+          animated.center.y,
+          animated.radiusX,
+          animated.radiusY,
+          0,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+      }
+
+      if (selected) {
+        context.strokeStyle = "white";
+        context.setLineDash([10, 10]);
+        context.ellipse(
+          animated.center.x,
+          animated.center.y,
+          animated.radiusX,
+          animated.radiusY,
+          0,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+
+        context.strokeStyle = "black";
+        context.setLineDash([5, 5]);
+        context.ellipse(
+          animated.center.x,
+          animated.center.y,
+          animated.radiusX,
+          animated.radiusY,
+          0,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+      }
+    }
+  }
+
+  return null;
+};
+
 const RectangularSelect = () => {
   const {
     context,
@@ -303,7 +394,8 @@ export const Annotator = ({ image }: AnnotatorProps) => {
   return (
     <Canvas animate height={image.shape?.r!} width={image.shape?.c!}>
       <BackgroundImage image={image} />
-      <RectangularSelect />
+      {/*<RectangularSelect />*/}
+      <EllipticalSelect />
     </Canvas>
   );
 };
