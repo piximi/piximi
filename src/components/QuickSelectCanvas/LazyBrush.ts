@@ -3,7 +3,7 @@ import LazyPoint from "./LazyPoint";
 class LazyBrush {
   private radius: number;
   private readonly pointer: LazyPoint;
-  private readonly brush: LazyPoint;
+  brush: LazyPoint;
   angle: number;
   private distance: number;
   private _isEnabled: boolean;
@@ -51,7 +51,7 @@ class LazyBrush {
   /**
    * @returns {boolean}
    */
-  isEnabled() {
+  isEnabled(): boolean {
     return this._isEnabled;
   }
 
@@ -69,7 +69,7 @@ class LazyBrush {
    *
    * @returns {number}
    */
-  getRadius() {
+  getRadius(): number {
     return this.radius;
   }
 
@@ -78,7 +78,7 @@ class LazyBrush {
    *
    * @returns {object}
    */
-  getBrushCoordinates() {
+  getBrushCoordinates(): { x: number; y: number } {
     return this.brush.toObject();
   }
 
@@ -87,7 +87,7 @@ class LazyBrush {
    *
    * @returns {object}
    */
-  getPointerCoordinates() {
+  getPointerCoordinates(): { x: number; y: number } {
     return this.pointer.toObject();
   }
 
@@ -96,7 +96,7 @@ class LazyBrush {
    *
    * @returns {LazyPoint}
    */
-  getBrush() {
+  getBrush(): LazyPoint {
     return this.brush;
   }
 
@@ -105,7 +105,7 @@ class LazyBrush {
    *
    * @returns {LazyPoint}
    */
-  getPointer() {
+  getPointer(): LazyPoint {
     return this.pointer;
   }
 
@@ -114,7 +114,7 @@ class LazyBrush {
    *
    * @returns {number} Angle in radians
    */
-  getAngle() {
+  getAngle(): number {
     return this.angle;
   }
 

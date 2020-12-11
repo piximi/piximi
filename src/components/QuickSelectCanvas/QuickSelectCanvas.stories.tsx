@@ -9,7 +9,7 @@ export default {
 } as Meta;
 
 const Template: Story<ComponentProps<typeof QuickSelectCanvas>> = (args) => (
-  <QuickSelectCanvas />
+  <QuickSelectCanvas {...args} />
 );
 
 export const Default = Template.bind({});
@@ -22,4 +22,6 @@ const image: Image = {
   src: "https://picsum.photos/id/237/512/512",
 };
 
-Default.args = {};
+Default.args = {
+  image: image,
+};
