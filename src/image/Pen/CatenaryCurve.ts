@@ -17,8 +17,8 @@ export class CatenaryCurve {
 
   drawToCanvas(
     context: CanvasRenderingContext2D,
-    point1: Point,
-    point2: Point,
+    point1: Point | { x: number; y: number },
+    point2: Point | { x: number; y: number },
     chainLength: number
   ) {
     this.point1.update(point1);

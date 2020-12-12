@@ -2,9 +2,9 @@ export class Point {
   x: number;
   y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  constructor(coordinates: { x: number; y: number }) {
+    this.x = coordinates.x;
+    this.y = coordinates.y;
   }
 
   equalsTo(that: Point): boolean {
@@ -12,22 +12,19 @@ export class Point {
   }
 
   getAngleTo(point: Point): number {
-    const difference = this.getDifference(point);
+    const { x, y } = this.getDifference(point);
 
-    return Math.atan2(difference.y, difference.x);
+    return Math.atan2(y, x);
   }
 
   getDifference(that: Point): Point {
-    return new Point(this.x - that.x, this.y - that.y);
+    return new Point({ x: this.x - that.x, y: this.y - that.y });
   }
 
   getDistance(that: Point): number {
-    const difference = this.getDifference(that);
+    const { x, y } = this.getDifference(that);
 
-    const a = Math.pow(difference.x, 2);
-    const b = Math.pow(difference.y, 2);
-
-    return Math.sqrt(a + b);
+    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
   }
 
   moveByAngle(angle: number, distance: number) {
@@ -41,8 +38,8 @@ export class Point {
     return { x: this.x, y: this.y };
   }
 
-  update(point: Point) {
-    this.x = point.x;
-    this.y = point.y;
+  update(coordinates: { x: number; y: number }) {
+    this.x = coordinates.x;
+    this.y = coordinates.y;
   }
 }
