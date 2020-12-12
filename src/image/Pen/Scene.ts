@@ -6,6 +6,13 @@ import { Pen } from "./Pen";
 const LAZY_RADIUS = 60;
 const BRUSH_RADIUS = 12.5;
 
+function midpoint(p1: Point, p2: Point) {
+  return {
+    x: p1.x + (p2.x - p1.x) / 2,
+    y: p1.y + (p2.y - p1.y) / 2,
+  };
+}
+
 export class Scene {
   private sidebar: HTMLElement | null;
   private canvasContainer: HTMLElement | null;
@@ -140,11 +147,11 @@ export class Scene {
     this.button.lazy.addEventListener("click", (e) => this.handleButtonLazy(e));
 
     // Listeners for input events on range sliders
-    this.slider.brush.addEventListener("input", (e) =>
+    this.slider.brush.addEventListener("input", (e: any) =>
       this.handleSliderBrush(e)
     );
 
-    this.slider.lazy?.addEventListener("input", (e) =>
+    this.slider.lazy.addEventListener("input", (e: any) =>
       this.handleSliderLazy(e)
     );
 
@@ -168,67 +175,77 @@ export class Scene {
     window.setTimeout(() => {
       const initX = window.innerWidth / 2;
       const initY = window.innerHeight / 2;
+
       this.pen.update(
-        { x: initX - this.chainLength / 4, y: initY },
-        { both: true }
+        new Point({ x: initX - this.chainLength / 4, y: initY }),
+        true
       );
+
       this.pen.update(
-        { x: initX + this.chainLength / 4, y: initY },
-        { both: false }
+        new Point({ x: initX + this.chainLength / 4, y: initY }),
+        false
       );
+
       this.mouseHasMoved = true;
       this.valuesChanged = true;
+
       this.clearCanvas();
     }, 100);
   }
 
-  handleTouchStart(e) {
-    const x = e.changedTouches[0].clientX;
-    const y = e.changedTouches[0].clientY;
-    this.pen.update({ x: x, y: y }, { both: true });
-    this.handlePointerDown(e);
+  handleTouchStart(event: TouchEvent) {
+    const x = event.changedTouches[0].clientX;
+    const y = event.changedTouches[0].clientY;
+
+    this.pen.update(new Point({ x: x, y: y }), true);
+
+    this.handlePointerDown(event);
 
     this.mouseHasMoved = true;
   }
 
-  handleTouchMove(e) {
-    e.preventDefault();
+  handleTouchMove(event: TouchEvent) {
+    event.preventDefault();
+
     this.handlePointerMove(
-      e.changedTouches[0].clientX,
-      e.changedTouches[0].clientY
+      event.changedTouches[0].clientX,
+      event.changedTouches[0].clientY
     );
   }
 
-  handleTouchEnd(e) {
-    this.handlePointerUp(e);
+  handleTouchEnd(event: TouchEvent) {
+    this.handlePointerUp(event);
     const brush = this.pen.getTipCoordinates();
-    this.pen.update({ x: brush.x, y: brush.y }, { both: true });
+    this.pen.update(new Point({ x: brush.x, y: brush.y }), true);
     this.mouseHasMoved = true;
   }
 
-  handleContextMenu(e) {
-    e.preventDefault();
-    if (e.button === 2) {
-      this.clearCanvas();
-    }
+  handleContextMenu(event: MouseEvent) {
+    event.preventDefault();
+
+    if (event.button === 2) this.clearCanvas();
   }
 
-  handleButtonMenu(e) {
-    e.preventDefault();
+  handleButtonMenu(event: MouseEvent) {
+    event.preventDefault();
+
     document.body.classList.toggle("menu-visible");
   }
 
-  handleButtonClear(e) {
-    e.preventDefault();
+  handleButtonClear(event: MouseEvent) {
+    event.preventDefault();
+
     this.clearCanvas();
   }
 
-  handleButtonLazy(e) {
-    e.preventDefault();
+  handleButtonLazy(event: MouseEvent) {
+    event.preventDefault();
+
     this.valuesChanged = true;
+
     this.button.lazy.classList.toggle("disabled");
 
-    if (this.pen.isEnabled()) {
+    if (this.pen.enabled) {
       this.button.lazy.innerHTML = "Off";
       this.pen.disable();
     } else {
@@ -259,13 +276,13 @@ export class Scene {
     }
   }
 
-  handleSliderBrush(e) {
+  handleSliderBrush(e: any) {
     const val = parseInt(e.target.value);
     this.valuesChanged = true;
     this.brushRadius = val;
   }
 
-  handleSliderLazy(e) {
+  handleSliderLazy(e: any) {
     this.valuesChanged = true;
     const val = parseInt(e.target.value);
     this.chainLength = val;
@@ -349,8 +366,10 @@ export class Scene {
       for (let i = 1, len = this.points.length; i < len; i++) {
         // we pick the point between pi+1 & pi+2 as the
         // end point and p1 as our control point
-        const midPoint = midPointBtw(p1, p2);
+        const midPoint = midpoint(p1, p2);
+
         this.context.temp?.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+
         p1 = this.points[i];
         p2 = this.points[i + 1];
       }
