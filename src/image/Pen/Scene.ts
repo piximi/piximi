@@ -6,12 +6,9 @@ import { Pen } from "./Pen";
 const LAZY_RADIUS = 60;
 const BRUSH_RADIUS = 12.5;
 
-function midpoint(p1: Point, p2: Point) {
-  return {
-    x: p1.x + (p2.x - p1.x) / 2,
-    y: p1.y + (p2.y - p1.y) / 2,
-  };
-}
+const midpoint = (a: Point, b: Point) => {
+  return { x: a.x + (b.x - a.x) / 2, y: a.y + (b.y - a.y) / 2 };
+};
 
 export class Scene {
   private sidebar: HTMLElement | null;
