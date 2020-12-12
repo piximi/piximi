@@ -1,21 +1,17 @@
 import { Point } from "./Point";
 
-const EPSILON = 1e-6;
-
 export class CatenaryCurve {
-  p1?: Point;
-  p2?: Point;
+  point1: Point;
+  point2: Point;
+
   iterations: number;
   segments: number;
 
-  constructor(
-    { iterations, segments }: { iterations: number; segments: number } = {
-      iterations: 100,
-      segments: 50,
-    }
-  ) {
-    this.iterations = iterations;
+  constructor(iterations: number = 100, segments: number = 50) {
+    this.point1 = new Point({ x: 0, y: 0 });
+    this.point2 = new Point({ x: 0, y: 0 });
 
+    this.iterations = iterations;
     this.segments = segments;
   }
 
@@ -25,78 +21,70 @@ export class CatenaryCurve {
     point2: Point,
     chainLength: number
   ) {
-    if (this.p1) {
-      this.p1.update(point1);
-    } else {
-      return;
-    }
+    this.point1.update(point1);
+    this.point2.update(point2);
 
-    if (this.p2) {
-      this.p2.update(point2);
-    } else {
-      return;
-    }
-
-    const isFlipped = this.p1.x > this.p2.x;
-
-    const p1 = isFlipped ? this.p2 : this.p1;
-    const p2 = isFlipped ? this.p1 : this.p2;
+    const p1 = this.point1.x > this.point2.x ? this.point2 : this.point1;
+    const p2 = this.point1.x > this.point2.x ? this.point1 : this.point2;
 
     const distance = p1.getDistance(p2);
 
-    let curve = [];
+    let curveData = [];
     let isStraight = true;
 
-    // Prevent "expensive" catenary calculations if it would only result
-    // in a straight line.
+    // Prevent "expensive" catenary calculations if it would only result in a straight line.
     if (distance < chainLength) {
-      const diff = p2.x - p1.x;
+      const difference = p2.x - p1.x;
 
-      // If the distance on the x axis of both points is too small, don't
-      // calculate a catenary.
-      if (diff > 0.01) {
+      // If the distance on the x axis of both points is too small, don't calculate a catenary.
+      if (difference > 0.01) {
         let h = p2.x - p1.x;
         let v = p2.y - p1.y;
+
         let a = -this.getCatenaryParameter(h, v, chainLength, this.iterations);
+
         let x = (a * Math.log((chainLength + v) / (chainLength - v)) - h) * 0.5;
         let y = a * Math.cosh(x / a);
+
         let offsetX = p1.x - x;
         let offsetY = p1.y - y;
-        curve = this.getCurve(a, p1, p2, offsetX, offsetY, this.segments);
+
+        curveData = this.getCurve(a, p1, p2, offsetX, offsetY, this.segments);
+
         isStraight = false;
       } else {
         let mx = (p1.x + p2.x) * 0.5;
         let my = (p1.y + p2.y + chainLength) * 0.5;
 
-        curve = [
+        curveData = [
           [p1.x, p1.y],
           [mx, my],
           [p2.x, p2.y],
         ];
       }
     } else {
-      curve = [
+      curveData = [
         [p1.x, p1.y],
         [p2.x, p2.y],
       ];
     }
 
     if (isStraight) {
-      this.drawLine(curve, context);
+      this.drawLine(curveData, context);
     } else {
-      this.drawCurve(curve, context);
+      this.drawCurve(curveData, context);
     }
 
-    return curve;
+    return curveData;
   }
 
-  getCatenaryParameter(h: number, v: number, size: number, iterations: number) {
-    let m = Math.sqrt(size * size - v * v) / h;
+  getCatenaryParameter(h: number, v: number, length: number, limit: number) {
+    let m = Math.sqrt(length * length - v * v) / h;
     let x = Math.acosh(m) + 1;
     let prevx = -1;
     let count = 0;
 
-    while (Math.abs(x - prevx) > EPSILON && count < iterations) {
+    while (Math.abs(x - prevx) > 1e-6 && count < limit) {
       prevx = x;
       x = x - (Math.sinh(x) - m * x) / (Math.cosh(x) - m);
       count++;
@@ -106,25 +94,25 @@ export class CatenaryCurve {
   }
 
   getCurve(
-    p: number,
-    a: Point,
-    b: Point,
+    a: number,
+    p1: Point,
+    p2: Point,
     offsetX: number,
     offsetY: number,
     segments: number
   ) {
-    let data = [a.x, p * Math.cosh((a.x - offsetX) / p) + offsetY];
+    let data = [p1.x, a * Math.cosh((p1.x - offsetX) / a) + offsetY];
 
-    const d = b.x - a.x;
+    const d = p2.x - p1.x;
     const length = segments - 1;
 
     for (let i = 0; i < length; i++) {
-      let x = a.x + (d * (i + 0.5)) / length;
-      let y = p * Math.cosh((x - offsetX) / p) + offsetY;
+      let x = p1.x + (d * (i + 0.5)) / length;
+      let y = a * Math.cosh((x - offsetX) / a) + offsetY;
       data.push(x, y);
     }
 
-    data.push(b.x, p * Math.cosh((b.x - offsetX) / p) + offsetY);
+    data.push(p2.x, a * Math.cosh((p2.x - offsetX) / a) + offsetY);
 
     return data;
   }
@@ -156,7 +144,6 @@ export class CatenaryCurve {
     }
 
     length = data.length;
-
     context.quadraticCurveTo(
       data[length - 4],
       data[length - 3],
