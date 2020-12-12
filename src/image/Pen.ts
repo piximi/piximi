@@ -1,7 +1,5 @@
 import { Point } from "./Point";
 
-const RADIUS_DEFAULT = 30;
-
 export class Pen {
   angle: number;
   distance: number;
@@ -11,18 +9,18 @@ export class Pen {
   radius: number;
   tip: Point;
 
-  constructor({
-    radius = RADIUS_DEFAULT,
-    enabled = true,
-    initialPoint = { x: 0, y: 0 },
-  } = {}) {
+  constructor(
+    enabled: boolean = true,
+    point: { x: number; y: number } = { x: 0, y: 0 },
+    radius: number = 30
+  ) {
     this.angle = 0;
     this.distance = 0;
     this.enabled = enabled;
     this.moved = false;
-    this.pointer = new Point({ x: initialPoint.x, y: initialPoint.y });
+    this.pointer = new Point({ x: point.x, y: point.y });
     this.radius = radius;
-    this.tip = new Point({ x: initialPoint.x, y: initialPoint.y });
+    this.tip = new Point({ x: point.x, y: point.y });
   }
 
   enable() {
