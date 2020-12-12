@@ -114,22 +114,22 @@ export class Scene {
       this.canvas.interface.addEventListener("mouseup", () =>
         this.handlePointerUp.bind(this)
       );
-      this.canvas.interface.addEventListener("mousemove", (e) =>
-        this.handlePointerMove(e.clientX, e.clientY)
+      this.canvas.interface.addEventListener("mousemove", (event) =>
+        this.handlePointerMove(event.clientX, event.clientY)
       );
-      this.canvas.interface.addEventListener("contextmenu", (e) =>
-        this.handleContextMenu(e)
+      this.canvas.interface.addEventListener("contextmenu", (event) =>
+        this.handleContextMenu(event)
       );
 
       // Listeners for touch events
-      this.canvas.interface.addEventListener("touchstart", (e) =>
-        this.handleTouchStart(e)
+      this.canvas.interface.addEventListener("touchstart", (event) =>
+        this.handleTouchStart(event)
       );
-      this.canvas.interface.addEventListener("touchend", (e) =>
-        this.handleTouchEnd(e)
+      this.canvas.interface.addEventListener("touchend", (event) =>
+        this.handleTouchEnd(event)
       );
-      this.canvas.interface.addEventListener("touchmove", (e) =>
-        this.handleTouchMove(e)
+      this.canvas.interface.addEventListener("touchmove", (event) =>
+        this.handleTouchMove(event)
       );
     }
 
