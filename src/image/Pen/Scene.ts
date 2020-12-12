@@ -1,14 +1,10 @@
 import ResizeObserver from "resize-observer-polyfill";
 import { CatenaryCurve } from "./CatenaryCurve";
-import { Point } from "./Point";
+import { midpoint, Point } from "./Point";
 import { Pen } from "./Pen";
 
 const LAZY_RADIUS = 60;
 const BRUSH_RADIUS = 12.5;
-
-const midpoint = (a: Point, b: Point) => {
-  return { x: a.x + (b.x - a.x) / 2, y: a.y + (b.y - a.y) / 2 };
-};
 
 export class Scene {
   private sidebar: HTMLElement | null;
@@ -78,6 +74,7 @@ export class Scene {
 
     this.canvas = {};
     this.context = {};
+
     Object.keys(canvas).forEach((c) => {
       const el = document.getElementById(canvas[c]);
       this.canvas[c] = el;
@@ -109,32 +106,39 @@ export class Scene {
   }
 
   init() {
-    // Listeners for mouse events
-    this.canvas.interface?.addEventListener(
-      "mousedown",
-      this.handlePointerDown.bind(this)
-    );
-    this.canvas.interface?.addEventListener(
-      "mouseup",
-      this.handlePointerUp.bind(this)
-    );
-    this.canvas.interface?.addEventListener("mousemove", (e) =>
-      this.handlePointerMove(e.clientX, e.clientY)
-    );
-    this.canvas.interface?.addEventListener("contextmenu", (e) =>
-      this.handleContextMenu(e)
-    );
+    if (this.canvas.interface) {
+      // Listeners for mouse events
+      this.canvas.interface.addEventListener(
+        "mousedown",
+        this.handlePointerDown.bind(this)
+      );
 
-    // Listeners for touch events
-    this.canvas.interface?.addEventListener("touchstart", (e) =>
-      this.handleTouchStart(e)
-    );
-    this.canvas.interface?.addEventListener("touchend", (e) =>
-      this.handleTouchEnd(e)
-    );
-    this.canvas.interface?.addEventListener("touchmove", (e) =>
-      this.handleTouchMove(e)
-    );
+      this.canvas.interface.addEventListener(
+        "mouseup",
+        this.handlePointerUp.bind(this)
+      );
+
+      this.canvas.interface.addEventListener("mousemove", (e) =>
+        this.handlePointerMove(e.clientX, e.clientY)
+      );
+
+      this.canvas.interface.addEventListener("contextmenu", (e) =>
+        this.handleContextMenu(e)
+      );
+
+      // Listeners for touch events
+      this.canvas.interface.addEventListener("touchstart", (e) =>
+        this.handleTouchStart(e)
+      );
+
+      this.canvas.interface.addEventListener("touchend", (e) =>
+        this.handleTouchEnd(e)
+      );
+
+      this.canvas.interface.addEventListener("touchmove", (e) =>
+        this.handleTouchMove(e)
+      );
+    }
 
     // Listeners for click events on butons
     this.button.menu.addEventListener("click", (e) => this.handleButtonMenu(e));
@@ -309,12 +313,12 @@ export class Scene {
     context?.scale(dpi, dpi);
   }
 
-  handlePointerDown(e) {
+  handlePointerDown(e: TouchEvent) {
     e.preventDefault();
     this.isPressing = true;
   }
 
-  handlePointerUp(e) {
+  handlePointerUp(e: TouchEvent) {
     e.preventDefault();
     this.isDrawing = false;
     this.isPressing = false;
@@ -472,7 +476,7 @@ export class Scene {
     context.fill();
 
     //Draw catharina
-    if (this.pen.isEnabled()) {
+    if (this.pen.enabled) {
       context.beginPath();
       context.lineWidth = 2;
       context.lineCap = "round";

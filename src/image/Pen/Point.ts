@@ -43,3 +43,7 @@ export class Point {
     this.y = coordinates.y;
   }
 }
+
+export const midpoint = (a: Point, b: Point) => {
+  return { x: a.x + (b.x - a.x) / 2, y: a.y + (b.y - a.y) / 2 };
+};
