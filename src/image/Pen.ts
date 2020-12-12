@@ -11,16 +11,16 @@ export class Pen {
 
   constructor(
     enabled: boolean = true,
-    point: { x: number; y: number } = { x: 0, y: 0 },
+    point: Point = new Point({ x: 0, y: 0 }),
     radius: number = 30
   ) {
     this.angle = 0;
     this.distance = 0;
     this.enabled = enabled;
     this.moved = false;
-    this.pointer = new Point({ x: point.x, y: point.y });
+    this.pointer = point;
     this.radius = radius;
-    this.tip = new Point({ x: point.x, y: point.y });
+    this.tip = point;
   }
 
   enable() {
@@ -65,10 +65,6 @@ export class Pen {
 
   getDistance(): number {
     return this.distance;
-  }
-
-  brushHasMoved() {
-    return this.moved;
   }
 
   update(point: Point, updateTip: boolean = false): boolean {

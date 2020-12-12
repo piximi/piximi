@@ -2,7 +2,7 @@ export class Point {
   x: number;
   y: number;
 
-  constructor({ x, y }: { x: number; y: number }) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
@@ -18,7 +18,7 @@ export class Point {
   }
 
   getDifference(that: Point): Point {
-    return new Point({ x: this.x - that.x, y: this.y - that.y });
+    return new Point(this.x - that.x, this.y - that.y);
   }
 
   getDistance(that: Point): number {
