@@ -108,7 +108,9 @@ export class CatenaryCurve {
 
     for (let i = 0; i < length; i++) {
       let x = p1.x + (d * (i + 0.5)) / length;
+
       let y = a * Math.cosh((x - offsetX) / a) + offsetY;
+
       data.push(x, y);
     }
 
@@ -144,6 +146,7 @@ export class CatenaryCurve {
     }
 
     length = data.length;
+
     context.quadraticCurveTo(
       data[length - 4],
       data[length - 3],
