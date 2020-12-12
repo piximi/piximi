@@ -2,8 +2,7 @@ import ResizeObserver from "resize-observer-polyfill";
 import { CatenaryCurve } from "./CatenaryCurve";
 import { midpoint, Point } from "./Point";
 import { Pen } from "./Pen";
-
-const LAZY_RADIUS = 60;
+import React from "react";
 
 export class Scene {
   private sidebar: HTMLElement | null;
@@ -98,8 +97,8 @@ export class Scene {
 
     this.points = [];
 
-    this.brushRadius = BRUSH_RADIUS;
-    this.chainLength = LAZY_RADIUS;
+    this.brushRadius = 12.5;
+    this.chainLength = 60;
 
     this.devicePixelRatio = 1;
   }
@@ -206,13 +205,13 @@ export class Scene {
 
     if (this.sliders.brush) {
       this.sliders.brush.addEventListener("input", (event: any) => {
-        this.handleSliderBrush(event);
+        this.onBrushChange(event);
       });
     }
 
     if (this.sliders.lazy) {
-      this.sliders.lazy.addEventListener("input", (e: any) => {
-        this.handleSliderLazy(e);
+      this.sliders.lazy.addEventListener("input", (event: any) => {
+        this.onLazyChange(event);
       });
     }
 
@@ -227,11 +226,13 @@ export class Scene {
     const observeCanvas = new ResizeObserver((entries, observer) =>
       this.onCanvasResize(entries, observer)
     );
+
     observeCanvas.observe(this.canvasContainer!);
 
     const observeSidebar = new ResizeObserver((entries, observer) =>
       this.onSidebarResize(entries, observer)
     );
+
     observeSidebar.observe(this.sidebar!);
 
     this.render();
@@ -257,6 +258,13 @@ export class Scene {
     }, 100);
   }
 
+  onBrushChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const radius = parseInt(event.target.value);
+
+    this.valuesChanged = true;
+    this.brushRadius = radius;
+  }
+
   onCanvasResize(entries: Array<ResizeObserverEntry>, observer: any) {
     this.devicePixelRatio = window.devicePixelRatio;
 
@@ -276,13 +284,13 @@ export class Scene {
     }
   }
 
-  onContextMenu(event: MouseEvent) {
+  onContextMenu(event: React.MouseEvent) {
     event.preventDefault();
 
     if (event.button === 2) this.clear();
   }
 
-  onMouseDown(event: TouchEvent) {
+  onMouseDown(event: React.TouchEvent) {
     event.preventDefault();
 
     this.isPressing = true;
@@ -346,7 +354,7 @@ export class Scene {
     this.mouseHasMoved = true;
   }
 
-  onMouseUp(event: TouchEvent) {
+  onMouseUp(event: React.TouchEvent) {
     event.preventDefault();
     this.isDrawing = false;
     this.isPressing = false;
@@ -367,14 +375,17 @@ export class Scene {
     }
   }
 
-  onTouchEnd(event: TouchEvent) {
+  onTouchEnd(event: React.TouchEvent) {
     this.onMouseUp(event);
-    const brush = this.pen.getTipCoordinates();
-    this.pen.update(new Point({ x: brush.x, y: brush.y }), true);
+
+    const tip = this.pen.getTipCoordinates();
+
+    this.pen.update(new Point({ x: tip.x, y: tip.y }), true);
+
     this.mouseHasMoved = true;
   }
 
-  onTouchMove(event: TouchEvent) {
+  onTouchMove(event: React.TouchEvent) {
     event.preventDefault();
 
     this.onMouseMove(
@@ -383,7 +394,7 @@ export class Scene {
     );
   }
 
-  onTouchStart(event: TouchEvent) {
+  onTouchStart(event: React.TouchEvent) {
     const x = event.changedTouches[0].clientX;
     const y = event.changedTouches[0].clientY;
 
@@ -394,19 +405,19 @@ export class Scene {
     this.mouseHasMoved = true;
   }
 
-  onMenuButtonClick(event: MouseEvent) {
+  onMenuButtonClick(event: React.MouseEvent) {
     event.preventDefault();
 
     document.body.classList.toggle("menu-visible");
   }
 
-  onClearButtonClick(event: MouseEvent) {
+  onClearButtonClick(event: React.MouseEvent) {
     event.preventDefault();
 
     this.clear();
   }
 
-  onLazyButtonClick(event: MouseEvent) {
+  onLazyButtonClick(event: React.MouseEvent) {
     event.preventDefault();
 
     this.valuesChanged = true;
@@ -424,13 +435,7 @@ export class Scene {
     }
   }
 
-  handleSliderBrush(event: any) {
-    const val = parseInt(event.target.value);
-    this.valuesChanged = true;
-    this.brushRadius = val;
-  }
-
-  handleSliderLazy(event: any) {
+  onLazyChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.valuesChanged = true;
     const val = parseInt(event.target.value);
     this.chainLength = val;
