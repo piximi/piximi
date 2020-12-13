@@ -9,7 +9,7 @@ export const useStyles = makeStyles((theme) => ({
     top: 0,
     zIndex: 10,
   },
-  canvasDrawing: {
+  selection: {
     display: "block",
     height: "100%",
     left: 0,
@@ -36,7 +36,7 @@ export const useStyles = makeStyles((theme) => ({
     width: "100%",
     zIndex: 15,
   },
-  canvasTmp: {
+  temporary: {
     display: "block",
     height: "100%",
     left: 0,
