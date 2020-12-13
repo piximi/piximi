@@ -29,7 +29,7 @@ export const useStyles = makeStyles((theme) => ({
     position: "absolute",
     top: 0,
     width: "100%",
-    zIndex: 14,
+    zIndex: 9,
   },
   interface: {
     display: "block",

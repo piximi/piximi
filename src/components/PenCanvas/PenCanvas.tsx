@@ -51,12 +51,20 @@ const drawCursor = (
   context: CanvasRenderingContext2D,
   point: Point,
   outerColor: string = "#FFF",
-  radius: number = 16
+  innerColor: string = "#000",
+  radius: number = 12
 ) => {
   context.beginPath();
   context.lineWidth = 1;
   context.setLineDash([]);
   context.strokeStyle = outerColor;
+  context.arc(point.x, point.y, radius + 1, 0, 2 * Math.PI);
+  context.stroke();
+
+  context.beginPath();
+  context.lineWidth = 1;
+  context.setLineDash([]);
+  context.strokeStyle = innerColor;
   context.arc(point.x, point.y, radius, 0, 2 * Math.PI);
   context.stroke();
 };
@@ -292,6 +300,10 @@ export const PenCanvas = ({
     saveStroke(tipColor, tipRadius);
   };
 
+  const onLeave = (event: React.MouseEvent) => {
+    clear(interfaceCanvasContext);
+  };
+
   const onMove = (event: React.MouseEvent | React.TouchEvent) => {
     event.preventDefault();
 
@@ -447,7 +459,9 @@ export const PenCanvas = ({
 
     requestRef.current = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(requestRef.current as number);
+    return () => {
+      cancelAnimationFrame(requestRef.current as number);
+    };
   }, [
     chainLength,
     curve,
@@ -465,7 +479,9 @@ export const PenCanvas = ({
     <div className={classes.container}>
       <canvas
         className={classes.interface}
+        height={image.shape?.r}
         onMouseDown={onStart}
+        onMouseLeave={onLeave}
         onMouseMove={onMove}
         onMouseUp={onEnd}
         onTouchCancel={onEnd}
@@ -474,7 +490,6 @@ export const PenCanvas = ({
         onTouchStart={onStart}
         ref={interfaceCanvasRef}
         width={image.shape?.c}
-        height={image.shape?.r}
       />
 
       <canvas
@@ -491,12 +506,12 @@ export const PenCanvas = ({
         width={image.shape?.c}
       />
 
-      {/*<canvas*/}
-      {/*  className={classes.image}*/}
-      {/*  height={image.shape?.r}*/}
-      {/*  ref={imageCanvasRef}*/}
-      {/*  width={image.shape?.c}*/}
-      {/*/>*/}
+      <canvas
+        className={classes.image}
+        height={image.shape?.r}
+        ref={imageCanvasRef}
+        width={image.shape?.c}
+      />
     </div>
   );
 };

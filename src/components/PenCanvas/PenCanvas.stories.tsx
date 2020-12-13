@@ -5,7 +5,7 @@ import { PenCanvas } from "./PenCanvas";
 
 export default {
   component: PenCanvas,
-  title: "Components/PenCanvasBackup",
+  title: "Components/PenCanvas",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof PenCanvas>> = (args) => (
