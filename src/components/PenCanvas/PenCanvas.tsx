@@ -3,6 +3,7 @@ import { useStyles } from "./PenCanvas.css";
 import { Pen } from "../../image/Pen/Pen";
 import { midpoint, Point } from "../../image/Pen/Point";
 import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
+import { Image as ImageType } from "../../types/Image";
 
 type Stroke = {
   color: string;
@@ -14,7 +15,13 @@ type PenCanvasProps = {
   lazyRadius: number;
   tipColor: string;
   tipRadius: number;
-  src: string;
+  image: ImageType;
+};
+
+const clear = (context: CanvasRenderingContext2D | null) => {
+  if (context) {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  }
 };
 
 const drawCatenaryCurve = (
@@ -183,7 +190,7 @@ export const PenCanvas = ({
   lazyRadius,
   tipColor,
   tipRadius,
-  src,
+  image,
 }: PenCanvasProps) => {
   const interfaceCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const selectionCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -228,7 +235,7 @@ export const PenCanvas = ({
   );
 
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-  const [moved, setMoved] = useState<boolean>(true);
+  const [moved, setMoved] = useState<boolean>(false);
   const [pressed, setPressed] = useState<boolean>(false);
   const [selecting, setSelecting] = useState<boolean>(false);
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
@@ -249,12 +256,10 @@ export const PenCanvas = ({
       y = event.changedTouches[0].clientY;
     }
 
-    const coordinates = {
+    return {
       x: x - boundingClientRect!.left,
       y: y - boundingClientRect!.top,
     };
-
-    return coordinates;
   };
 
   const move = (x: number, y: number) => {
@@ -314,7 +319,11 @@ export const PenCanvas = ({
   const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
-    const stroke = { color: color, points: [...points], radius: radius };
+    const stroke: Stroke = {
+      color: color,
+      points: [...points],
+      radius: radius,
+    };
 
     setStrokes([...strokes, stroke]);
 
@@ -334,12 +343,7 @@ export const PenCanvas = ({
 
       // Clear the temporary canvas
       if (temporaryCanvasContext) {
-        // temporaryCanvasContext.clearRect(
-        //   0,
-        //   0,
-        //   temporaryCanvasRef.current.width,
-        //   temporaryCanvasRef.current.height
-        // );
+        clear(temporaryCanvasContext);
       }
     }
   };
@@ -351,6 +355,8 @@ export const PenCanvas = ({
       const tip = new Point(pen.current.getTipCoordinates());
 
       if (moved || updated) {
+        console.info(`moved:`, moved);
+
         if (interfaceCanvasContext) {
           interfaceCanvasContext.clearRect(
             0,
@@ -396,34 +402,19 @@ export const PenCanvas = ({
         false
       );
 
-      setMoved(true);
-      setUpdated(true);
+      // setMoved(true);
+      // setUpdated(true);
 
-      // clear();
+      // setStrokes([]);
+      // setUpdated(true);
+
+      // clear([selectionCanvasContext, temporaryCanvasContext]);
+      // clear(temporaryCanvasContext)
+      // clear([temporaryCanvasContext]);
 
       // if (this.props.saveData) {
       //   this.loadSaveData(this.props.saveData);
       // }
-    };
-
-    const clear = () => {
-      setStrokes([]);
-
-      setUpdated(true);
-
-      selectionCanvasContext?.clearRect(
-        0,
-        0,
-        selectionCanvasRef.current!.width,
-        selectionCanvasRef.current!.height
-      );
-
-      temporaryCanvasContext?.clearRect(
-        0,
-        0,
-        temporaryCanvasRef.current!.width,
-        temporaryCanvasRef.current!.height
-      );
     };
 
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
@@ -442,17 +433,17 @@ export const PenCanvas = ({
       setImageCanvasContext(imageCanvasRef.current?.getContext("2d"));
     }
 
-    const image = new Image();
+    const img = new Image();
 
-    image.crossOrigin = "anonymous";
+    img.crossOrigin = "anonymous";
 
-    image.onload = () => {
+    img.onload = () => {
       if (imageCanvasContext) {
-        drawImage(imageCanvasContext, image);
+        drawImage(imageCanvasContext, img);
       }
     };
 
-    image.src = src;
+    img.src = image.src;
 
     requestRef.current = requestAnimationFrame(animate);
 
@@ -465,7 +456,7 @@ export const PenCanvas = ({
     moved,
     pen,
     selectionCanvasContext,
-    src,
+    image,
     temporaryCanvasContext,
     updated,
   ]);
@@ -482,25 +473,30 @@ export const PenCanvas = ({
         onTouchMove={onMove}
         onTouchStart={onStart}
         ref={interfaceCanvasRef}
-        width={512}
-        height={512}
+        width={image.shape?.c}
+        height={image.shape?.r}
       />
 
       <canvas
         className={classes.selection}
+        height={image.shape?.r}
         ref={selectionCanvasRef}
-        width={512}
-        height={512}
+        width={image.shape?.c}
       />
 
       <canvas
         className={classes.temporary}
+        height={image.shape?.r}
         ref={temporaryCanvasRef}
-        width={512}
-        height={512}
+        width={image.shape?.c}
       />
 
-      {/*<canvas className={classes.image} ref={imageCanvasRef} />*/}
+      {/*<canvas*/}
+      {/*  className={classes.image}*/}
+      {/*  height={image.shape?.r}*/}
+      {/*  ref={imageCanvasRef}*/}
+      {/*  width={image.shape?.c}*/}
+      {/*/>*/}
     </div>
   );
 };

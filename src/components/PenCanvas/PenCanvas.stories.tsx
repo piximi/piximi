@@ -5,7 +5,7 @@ import { PenCanvas } from "./PenCanvas";
 
 export default {
   component: PenCanvas,
-  title: "Components/PenCanvas",
+  title: "Components/PenCanvasBackup",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof PenCanvas>> = (args) => (
@@ -23,8 +23,7 @@ const image: Image = {
 };
 
 Default.args = {
-  lazyRadius: 10,
-  tipRadius: 10,
-  tipColor: "#444",
-  src: "https://picsum.photos/id/237/512/512",
+  image: image,
+  tipColor: "#f2530b",
+  tipRadius: 2,
 };

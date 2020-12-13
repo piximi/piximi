@@ -11,6 +11,7 @@ export const useStyles = makeStyles((theme) => ({
     width: 512,
     zIndex: 10,
     backgroundColor: "#CCC",
+    cursor: "none",
   },
   selection: {
     display: "block",
