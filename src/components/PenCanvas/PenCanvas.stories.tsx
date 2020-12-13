@@ -23,5 +23,8 @@ const image: Image = {
 };
 
 Default.args = {
+  lazyRadius: 10,
+  tipRadius: 10,
+  tipColor: "#444",
   src: "https://picsum.photos/id/237/512/512",
 };

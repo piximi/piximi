@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useStyles } from "./PenCanvas.css";
 import { Pen } from "../../image/Pen/Pen";
 import { midpoint, Point } from "../../image/Pen/Point";
@@ -10,7 +10,10 @@ type Stroke = {
   points: Array<{ x: number; y: number }>;
 };
 
-type PenProps = {
+type PenCanvasProps = {
+  lazyRadius: number;
+  tipColor: string;
+  tipRadius: number;
   src: string;
 };
 
@@ -109,8 +112,8 @@ const drawImage = (
 const drawPoints = (
   context: CanvasRenderingContext2D,
   points: Array<{ x: number; y: number }>,
-  color: string,
-  radius: number
+  color: string = "#f2530b",
+  radius: number = 2
 ) => {
   if (points.length < 2) return;
 
@@ -177,11 +180,18 @@ const drawTip = (
   context.fill();
 };
 
-export const PenCanvas = ({ src }: PenProps) => {
+export const PenCanvas = ({
+  lazyRadius,
+  tipColor,
+  tipRadius,
+  src,
+}: PenCanvasProps) => {
   const interfaceCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const selectionCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const temporaryCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const requestRef = React.useRef<number>();
 
   const [
     interfaceCanvasContext,
@@ -205,16 +215,16 @@ export const PenCanvas = ({ src }: PenProps) => {
 
   const [curve, setCurve] = useState<CatenaryCurve>(new CatenaryCurve());
 
-  const chainLength = 12 * window.devicePixelRatio;
+  const chainLength = lazyRadius * window.devicePixelRatio;
 
   const [pen, setPen] = useState<Pen>(
     new Pen(
       true,
       new Point({
-        x: 0,
-        y: 0,
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
       }),
-      12 * window.devicePixelRatio
+      lazyRadius * window.devicePixelRatio
     )
   );
 
@@ -258,7 +268,7 @@ export const PenCanvas = ({ src }: PenProps) => {
     if (selecting) {
       setPoints([...points, { x: pen.tip.x, y: pen.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, "#f2530b", 2);
+      drawPoints(temporaryCanvasContext!, points, tipColor, tipRadius);
     }
 
     setMoved(true);
@@ -300,46 +310,6 @@ export const PenCanvas = ({ src }: PenProps) => {
     move(x, y);
   };
 
-  const render = useCallback(
-    ({ once = false } = {}) => {
-      const draw = (context: CanvasRenderingContext2D, a: Point, b: Point) => {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-        drawPreview(context, b);
-
-        drawCursor(context, a);
-
-        if (pen.enabled) {
-          drawCatenaryCurve(context, curve, a, b, chainLength);
-        }
-
-        drawTip(context, b);
-      };
-
-      if (moved || updated) {
-        const cursorPosition = pen.getPointerCoordinates();
-
-        const tipPosition = pen.getTipCoordinates();
-
-        draw(
-          interfaceCanvasContext!,
-          new Point(cursorPosition),
-          new Point(tipPosition)
-        );
-
-        setMoved(false);
-        setUpdated(false);
-      }
-
-      if (!once) {
-        window.requestAnimationFrame(() => {
-          render();
-        });
-      }
-    },
-    [curve, chainLength, interfaceCanvasContext, moved, pen, updated]
-  );
-
   const save = (color: string, radius: number) => {
     if (points.length < 2) return;
 
@@ -366,6 +336,78 @@ export const PenCanvas = ({ src }: PenProps) => {
   };
 
   useEffect(() => {
+    const animate = () => {
+      if (moved || updated) {
+        draw(
+          interfaceCanvasContext!,
+          new Point(pen.getPointerCoordinates()),
+          new Point(pen.getTipCoordinates())
+        );
+
+        setMoved(false);
+        setUpdated(false);
+      }
+
+      pen.update(
+        new Point({
+          x: window.innerWidth / 2 - chainLength / 4,
+          y: window.innerHeight / 2,
+        }),
+        true
+      );
+
+      pen.update(
+        new Point({
+          x: window.innerWidth / 2 + chainLength / 4,
+          y: window.innerHeight / 2,
+        }),
+        false
+      );
+
+      setMoved(true);
+      setUpdated(true);
+
+      // clear();
+
+      // if (this.props.saveData) {
+      //   this.loadSaveData(this.props.saveData);
+      // }
+    };
+
+    const clear = () => {
+      setStrokes([]);
+
+      setUpdated(true);
+
+      selectionCanvasContext?.clearRect(
+        0,
+        0,
+        selectionCanvasRef.current!.width,
+        selectionCanvasRef.current!.height
+      );
+
+      temporaryCanvasContext?.clearRect(
+        0,
+        0,
+        temporaryCanvasRef.current!.width,
+        temporaryCanvasRef.current!.height
+      );
+    };
+
+    const draw = (context: CanvasRenderingContext2D, a: Point, b: Point) => {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+      drawPreview(context, b);
+
+      drawCursor(context, a);
+
+      if (pen.enabled) {
+        drawCatenaryCurve(context, curve, a, b, chainLength);
+      }
+
+      drawTip(context, b);
+    };
+
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
       setInterfaceCanvasContext(interfaceCanvasRef.current?.getContext("2d"));
     }
@@ -394,8 +436,19 @@ export const PenCanvas = ({ src }: PenProps) => {
 
     image.src = src;
 
-    render();
-  }, [imageCanvasContext, render, src]);
+    requestRef.current = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(requestRef.current as number);
+  }, [
+    chainLength,
+    curve,
+    imageCanvasContext,
+    interfaceCanvasContext,
+    moved,
+    pen,
+    src,
+    updated,
+  ]);
 
   return (
     <div className={classes.container}>
