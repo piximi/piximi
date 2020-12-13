@@ -1,12 +1,14 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 export const useStyles = makeStyles((theme) => ({
-  canvasContainer: {
+  container: {
     bottom: 0,
+    height: "100%",
     left: 0,
     position: "fixed",
     right: 0,
     top: 0,
+    width: "100%",
     zIndex: 10,
   },
   selection: {
@@ -18,7 +20,7 @@ export const useStyles = makeStyles((theme) => ({
     width: "100%",
     zIndex: 10,
   },
-  canvasGrid: {
+  image: {
     display: "block",
     height: "100%",
     left: 0,
@@ -27,7 +29,7 @@ export const useStyles = makeStyles((theme) => ({
     width: "100%",
     zIndex: 14,
   },
-  canvasInterface: {
+  interface: {
     display: "block",
     height: "100%",
     left: 0,

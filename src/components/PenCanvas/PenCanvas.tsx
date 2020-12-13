@@ -19,21 +19,36 @@ const drawCatenaryCurve = (
   curve: CatenaryCurve,
   a: Point,
   b: Point,
-  chainLength: number
+  chainLength: number,
+  color: string = "#0a0302"
 ) => {
   context.beginPath();
+
   context.lineWidth = 2;
+
   context.lineCap = "round";
+
   context.setLineDash([2, 4]);
-  context.strokeStyle = "#0a0302";
+
+  context.strokeStyle = color;
+
   curve.drawToCanvas(context, a, b, chainLength);
+
   context.stroke();
 };
 
-const drawCursor = (context: CanvasRenderingContext2D, point: Point) => {
+const drawCursor = (
+  context: CanvasRenderingContext2D,
+  point: Point,
+  color: string = "#0a0302",
+  radius: number = 4
+) => {
   context.beginPath();
-  context.fillStyle = "#0a0302";
-  context.arc(point.x, point.y, 4, 0, Math.PI * 2, true);
+
+  context.fillStyle = color;
+
+  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
+
   context.fill();
 };
 
@@ -132,17 +147,33 @@ const drawPoints = (
   }
 };
 
-const drawPreview = (context: CanvasRenderingContext2D, point: Point) => {
+const drawPreview = (
+  context: CanvasRenderingContext2D,
+  point: Point,
+  color: string = "#444",
+  radius: number = 10
+) => {
   context.beginPath();
-  context.fillStyle = "#444";
-  context.arc(point.x, point.y, 10, 0, Math.PI * 2, true);
+
+  context.fillStyle = color;
+
+  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
+
   context.fill();
 };
 
-const drawTip = (context: CanvasRenderingContext2D, point: Point) => {
+const drawTip = (
+  context: CanvasRenderingContext2D,
+  point: Point,
+  color: string = "#0a0302",
+  radius: number = 2
+) => {
   context.beginPath();
-  context.fillStyle = "#0a0302";
-  context.arc(point.x, point.y, 2, 0, Math.PI * 2, true);
+
+  context.fillStyle = color;
+
+  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
+
   context.fill();
 };
 
@@ -180,8 +211,8 @@ export const PenCanvas = ({ src }: PenProps) => {
     new Pen(
       true,
       new Point({
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2,
+        x: 0,
+        y: 0,
       }),
       12 * window.devicePixelRatio
     )
@@ -201,15 +232,12 @@ export const PenCanvas = ({ src }: PenProps) => {
   ): { x: number; y: number } => {
     const boundingClientRect = interfaceCanvasRef.current?.getBoundingClientRect();
 
-    let x: number;
-    let y: number;
+    let x: number = (event as React.MouseEvent).clientX;
+    let y: number = (event as React.MouseEvent).clientY;
 
     if (event instanceof TouchEvent) {
       x = event.changedTouches[0].clientX;
       y = event.changedTouches[0].clientY;
-    } else {
-      x = (event as React.MouseEvent).clientX;
-      y = (event as React.MouseEvent).clientY;
     }
 
     return {
@@ -230,7 +258,7 @@ export const PenCanvas = ({ src }: PenProps) => {
     if (selecting) {
       setPoints([...points, { x: pen.tip.x, y: pen.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, "#444", 10);
+      drawPoints(temporaryCanvasContext!, points, "#f2530b", 2);
     }
 
     setMoved(true);
@@ -264,7 +292,9 @@ export const PenCanvas = ({ src }: PenProps) => {
     const { x, y } = getPosition(event);
 
     if (event instanceof TouchEvent) {
-      pen.update(new Point({ x: x, y: y }), true);
+      const point = new Point({ x: x, y: y });
+
+      pen.update(point, true);
     }
 
     move(x, y);
@@ -287,10 +317,15 @@ export const PenCanvas = ({ src }: PenProps) => {
       };
 
       if (moved || updated) {
-        const pointer = pen.getPointerCoordinates();
-        const tip = pen.getTipCoordinates();
+        const cursorPosition = pen.getPointerCoordinates();
 
-        draw(interfaceCanvasContext!, new Point(pointer), new Point(tip));
+        const tipPosition = pen.getTipCoordinates();
+
+        draw(
+          interfaceCanvasContext!,
+          new Point(cursorPosition),
+          new Point(tipPosition)
+        );
 
         setMoved(false);
         setUpdated(false);
@@ -363,9 +398,9 @@ export const PenCanvas = ({ src }: PenProps) => {
   }, [imageCanvasContext, render, src]);
 
   return (
-    <div className={classes.canvasContainer}>
+    <div className={classes.container}>
       <canvas
-        className={classes.canvasInterface}
+        className={classes.interface}
         onMouseDown={onStart}
         onMouseMove={onMove}
         onMouseUp={onEnd}
@@ -377,7 +412,7 @@ export const PenCanvas = ({ src }: PenProps) => {
       />
       <canvas className={classes.selection} ref={selectionCanvasRef} />
       <canvas className={classes.temporary} ref={temporaryCanvasRef} />
-      {/*<canvas className={classes.canvasGrid} ref={imageCanvasRef} />*/}
+      {/*<canvas className={classes.image} ref={imageCanvasRef} />*/}
     </div>
   );
 };
