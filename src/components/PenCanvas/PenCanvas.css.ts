@@ -3,13 +3,14 @@ import { makeStyles } from "@material-ui/core/styles";
 export const useStyles = makeStyles((theme) => ({
   container: {
     bottom: 0,
-    height: "100%",
+    height: 512,
     left: 0,
     position: "fixed",
     right: 0,
     top: 0,
-    width: "100%",
+    width: 512,
     zIndex: 10,
+    backgroundColor: "#CCC",
   },
   selection: {
     display: "block",

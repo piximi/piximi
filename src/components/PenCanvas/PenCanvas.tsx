@@ -43,16 +43,15 @@ const drawCatenaryCurve = (
 const drawCursor = (
   context: CanvasRenderingContext2D,
   point: Point,
-  color: string = "#0a0302",
-  radius: number = 4
+  outerColor: string = "#FFF",
+  radius: number = 16
 ) => {
   context.beginPath();
-
-  context.fillStyle = color;
-
-  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
-
-  context.fill();
+  context.lineWidth = 1;
+  context.setLineDash([]);
+  context.strokeStyle = outerColor;
+  context.arc(point.x, point.y, radius, 0, 2 * Math.PI);
+  context.stroke();
 };
 
 const drawImage = (
@@ -122,7 +121,7 @@ const drawPoints = (
     context.lineCap = "round";
     context.strokeStyle = color;
 
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     context.lineWidth = radius * 2;
 
@@ -153,7 +152,7 @@ const drawPoints = (
 const drawPreview = (
   context: CanvasRenderingContext2D,
   point: Point,
-  color: string = "#444",
+  color: string = "#f2530b",
   radius: number = 10
 ) => {
   context.beginPath();
@@ -168,7 +167,7 @@ const drawPreview = (
 const drawTip = (
   context: CanvasRenderingContext2D,
   point: Point,
-  color: string = "#0a0302",
+  color: string = "#f2530b",
   radius: number = 2
 ) => {
   context.beginPath();
@@ -213,11 +212,11 @@ export const PenCanvas = ({
     setImageCanvasContext,
   ] = useState<CanvasRenderingContext2D | null>(null);
 
-  const [curve, setCurve] = useState<CatenaryCurve>(new CatenaryCurve());
+  const curve = useRef<CatenaryCurve>(new CatenaryCurve());
 
   const chainLength = lazyRadius * window.devicePixelRatio;
 
-  const [pen, setPen] = useState<Pen>(
+  const pen = useRef<Pen>(
     new Pen(
       true,
       new Point({
@@ -229,11 +228,11 @@ export const PenCanvas = ({
   );
 
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-  const [moved, setMoved] = useState<boolean>(false);
+  const [moved, setMoved] = useState<boolean>(true);
   const [pressed, setPressed] = useState<boolean>(false);
   const [selecting, setSelecting] = useState<boolean>(false);
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
-  const [updated, setUpdated] = useState<boolean>(false);
+  const [updated, setUpdated] = useState<boolean>(true);
 
   const classes = useStyles();
 
@@ -250,23 +249,25 @@ export const PenCanvas = ({
       y = event.changedTouches[0].clientY;
     }
 
-    return {
+    const coordinates = {
       x: x - boundingClientRect!.left,
       y: y - boundingClientRect!.top,
     };
+
+    return coordinates;
   };
 
   const move = (x: number, y: number) => {
-    pen.update(new Point({ x: x, y: y }));
+    pen.current.update(new Point({ x: x, y: y }));
 
-    if ((pressed && !selecting) || (!pen.enabled && pressed)) {
+    if ((pressed && !selecting) || (!pen.current.enabled && pressed)) {
       setSelecting(true);
 
-      setPoints([...points, { x: pen.tip.x, y: pen.tip.y }]);
+      setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
     }
 
     if (selecting) {
-      setPoints([...points, { x: pen.tip.x, y: pen.tip.y }]);
+      setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
       drawPoints(temporaryCanvasContext!, points, tipColor, tipRadius);
     }
@@ -283,7 +284,7 @@ export const PenCanvas = ({
 
     setPressed(false);
 
-    save("#444", 10);
+    saveStroke(tipColor, tipRadius);
   };
 
   const onMove = (event: React.MouseEvent | React.TouchEvent) => {
@@ -304,13 +305,13 @@ export const PenCanvas = ({
     if (event instanceof TouchEvent) {
       const point = new Point({ x: x, y: y });
 
-      pen.update(point, true);
+      pen.current.update(point, true);
     }
 
     move(x, y);
   };
 
-  const save = (color: string, radius: number) => {
+  const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
     const stroke = { color: color, points: [...points], radius: radius };
@@ -320,35 +321,66 @@ export const PenCanvas = ({
     setPoints([]);
 
     if (temporaryCanvasRef && temporaryCanvasRef.current) {
-      const width = temporaryCanvasRef.current.width;
-      const height = temporaryCanvasRef.current.height;
+      // Copy the stroke to the selection canvas
+      if (selectionCanvasContext) {
+        selectionCanvasContext.drawImage(
+          temporaryCanvasRef.current,
+          0,
+          0,
+          temporaryCanvasRef.current.width,
+          temporaryCanvasRef.current.height
+        );
+      }
 
-      selectionCanvasContext?.drawImage(
-        temporaryCanvasRef.current,
-        0,
-        0,
-        width!,
-        height!
-      );
-
-      temporaryCanvasContext?.clearRect(0, 0, width!, height!);
+      // Clear the temporary canvas
+      if (temporaryCanvasContext) {
+        // temporaryCanvasContext.clearRect(
+        //   0,
+        //   0,
+        //   temporaryCanvasRef.current.width,
+        //   temporaryCanvasRef.current.height
+        // );
+      }
     }
   };
 
   useEffect(() => {
     const animate = () => {
+      const cursor = new Point(pen.current.getPointerCoordinates());
+
+      const tip = new Point(pen.current.getTipCoordinates());
+
       if (moved || updated) {
-        draw(
-          interfaceCanvasContext!,
-          new Point(pen.getPointerCoordinates()),
-          new Point(pen.getTipCoordinates())
-        );
+        if (interfaceCanvasContext) {
+          interfaceCanvasContext.clearRect(
+            0,
+            0,
+            interfaceCanvasContext.canvas.width,
+            interfaceCanvasContext.canvas.height
+          );
+
+          drawPreview(interfaceCanvasContext, tip);
+
+          drawCursor(interfaceCanvasContext, cursor);
+
+          if (pen.current.enabled) {
+            drawCatenaryCurve(
+              interfaceCanvasContext,
+              curve.current,
+              tip,
+              cursor,
+              chainLength
+            );
+          }
+
+          drawTip(interfaceCanvasContext, tip);
+        }
 
         setMoved(false);
         setUpdated(false);
       }
 
-      pen.update(
+      pen.current.update(
         new Point({
           x: window.innerWidth / 2 - chainLength / 4,
           y: window.innerHeight / 2,
@@ -356,7 +388,7 @@ export const PenCanvas = ({
         true
       );
 
-      pen.update(
+      pen.current.update(
         new Point({
           x: window.innerWidth / 2 + chainLength / 4,
           y: window.innerHeight / 2,
@@ -392,20 +424,6 @@ export const PenCanvas = ({
         temporaryCanvasRef.current!.width,
         temporaryCanvasRef.current!.height
       );
-    };
-
-    const draw = (context: CanvasRenderingContext2D, a: Point, b: Point) => {
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-      drawPreview(context, b);
-
-      drawCursor(context, a);
-
-      if (pen.enabled) {
-        drawCatenaryCurve(context, curve, a, b, chainLength);
-      }
-
-      drawTip(context, b);
     };
 
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
@@ -446,7 +464,9 @@ export const PenCanvas = ({
     interfaceCanvasContext,
     moved,
     pen,
+    selectionCanvasContext,
     src,
+    temporaryCanvasContext,
     updated,
   ]);
 
@@ -462,9 +482,24 @@ export const PenCanvas = ({
         onTouchMove={onMove}
         onTouchStart={onStart}
         ref={interfaceCanvasRef}
+        width={512}
+        height={512}
       />
-      <canvas className={classes.selection} ref={selectionCanvasRef} />
-      <canvas className={classes.temporary} ref={temporaryCanvasRef} />
+
+      <canvas
+        className={classes.selection}
+        ref={selectionCanvasRef}
+        width={512}
+        height={512}
+      />
+
+      <canvas
+        className={classes.temporary}
+        ref={temporaryCanvasRef}
+        width={512}
+        height={512}
+      />
+
       {/*<canvas className={classes.image} ref={imageCanvasRef} />*/}
     </div>
   );
