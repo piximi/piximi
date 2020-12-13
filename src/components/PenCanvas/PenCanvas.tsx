@@ -11,13 +11,6 @@ type Stroke = {
   points: Array<{ x: number; y: number }>;
 };
 
-type PenCanvasProps = {
-  lazyRadius: number;
-  tipColor: string;
-  tipRadius: number;
-  image: ImageType;
-};
-
 const clear = (context: CanvasRenderingContext2D | null) => {
   if (context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -33,17 +26,11 @@ const drawCatenaryCurve = (
   color: string = "#0a0302"
 ) => {
   context.beginPath();
-
   context.lineWidth = 2;
-
   context.lineCap = "round";
-
   context.setLineDash([2, 4]);
-
   context.strokeStyle = color;
-
   curve.drawToCanvas(context, a, b, chainLength);
-
   context.stroke();
 };
 
@@ -136,9 +123,10 @@ const drawPoints = (
     context.lineCap = "round";
     context.strokeStyle = color;
 
-    // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-    context.lineWidth = radius * 2;
+    context.lineWidth = 1;
+    context.setLineDash([2, 4]);
 
     let p1 = points[0];
     let p2 = points[1];
@@ -171,11 +159,8 @@ const drawPreview = (
   radius: number = 10
 ) => {
   context.beginPath();
-
   context.fillStyle = color;
-
   context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
-
   context.fill();
 };
 
@@ -186,12 +171,16 @@ const drawTip = (
   radius: number = 2
 ) => {
   context.beginPath();
-
   context.fillStyle = color;
-
   context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
-
   context.fill();
+};
+
+type PenCanvasProps = {
+  lazyRadius: number;
+  tipColor: string;
+  tipRadius: number;
+  image: ImageType;
 };
 
 export const PenCanvas = ({
@@ -282,7 +271,7 @@ export const PenCanvas = ({
     if (selecting) {
       setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, tipColor, tipRadius);
+      drawPoints(temporaryCanvasContext!, points, "#000", 2);
     }
 
     setMoved(true);
