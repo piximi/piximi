@@ -110,48 +110,6 @@ const drawImage = (
   context.drawImage(image, cx, cy, cw, ch, x, y, w, h);
 };
 
-const drawPoints = (
-  context: CanvasRenderingContext2D,
-  points: Array<{ x: number; y: number }>,
-  color: string = "#f2530b",
-  radius: number = 2
-) => {
-  if (points.length < 2) return;
-
-  if (context) {
-    context.lineJoin = "round";
-    context.lineCap = "round";
-    context.strokeStyle = color;
-
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-    context.lineWidth = 1;
-    context.setLineDash([2, 4]);
-
-    let p1 = points[0];
-    let p2 = points[1];
-
-    context.moveTo(p2.x, p2.y);
-    context.beginPath();
-
-    for (let i = 1, len = points.length; i < len; i++) {
-      // we pick the point between pi+1 & pi+2 as the
-      // end point and p1 as our control point
-      const m = midpoint(new Point(p1), new Point(p2));
-
-      context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
-      p1 = points[i];
-      p2 = points[i + 1];
-    }
-
-    // Draw last line as a straight line while
-    // we wait for the next point to be able to calculate
-    // the bezier control point
-    context.lineTo(p1.x, p1.y);
-    context.stroke();
-  }
-};
-
 const drawPreview = (
   context: CanvasRenderingContext2D,
   point: Point,
@@ -218,6 +176,8 @@ export const PenCanvas = ({
 
   const curve = useRef<CatenaryCurve>(new CatenaryCurve());
 
+  const [offset, setOffset] = useState<number>(0);
+
   const chainLength = lazyRadius * window.devicePixelRatio;
 
   const pen = useRef<Pen>(
@@ -239,6 +199,52 @@ export const PenCanvas = ({
   const [updated, setUpdated] = useState<boolean>(true);
 
   const classes = useStyles();
+
+  const drawPoints = (
+    context: CanvasRenderingContext2D,
+    points: Array<{ x: number; y: number }>,
+    dash: [number, number],
+    color: string = "#f2530b",
+    radius: number = 2,
+    offset: number = 5
+  ) => {
+    if (points.length < 2) return;
+
+    if (context) {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.strokeStyle = color;
+
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+      context.lineWidth = radius;
+
+      context.setLineDash(dash);
+      context.lineDashOffset = offset;
+
+      let p1 = points[0];
+      let p2 = points[1];
+
+      context.moveTo(p2.x, p2.y);
+      context.beginPath();
+
+      for (let i = 1, len = points.length; i < len; i++) {
+        // we pick the point between pi+1 & pi+2 as the
+        // end point and p1 as our control point
+        const m = midpoint(new Point(p1), new Point(p2));
+
+        context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+        p1 = points[i];
+        p2 = points[i + 1];
+      }
+
+      // Draw last line as a straight line while
+      // we wait for the next point to be able to calculate
+      // the bezier control point
+      context.lineTo(p1.x, p1.y);
+      context.stroke();
+    }
+  };
 
   const getPosition = (
     event: React.MouseEvent | React.TouchEvent
@@ -271,7 +277,7 @@ export const PenCanvas = ({
     if (selecting) {
       setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, "#000", 2);
+      drawPoints(temporaryCanvasContext!, points, [5, 5], "#FFF", 2, offset);
     }
 
     setMoved(true);
@@ -356,8 +362,6 @@ export const PenCanvas = ({
       const tip = new Point(pen.current.getTipCoordinates());
 
       if (moved || updated) {
-        console.info(`moved:`, moved);
-
         if (interfaceCanvasContext) {
           interfaceCanvasContext.clearRect(
             0,
@@ -416,6 +420,11 @@ export const PenCanvas = ({
       // if (this.props.saveData) {
       //   this.loadSaveData(this.props.saveData);
       // }
+
+      setOffset(offset + 1);
+      if (offset > 16) {
+        setOffset(0);
+      }
     };
 
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
