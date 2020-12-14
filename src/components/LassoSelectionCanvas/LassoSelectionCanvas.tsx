@@ -259,6 +259,27 @@ export const LassoSelectionCanvas = ({
 
     setPressed(false);
 
+    //two cases:
+    //CASE 1: mouse is up, but we are not over the control point
+    //change to line tool
+
+    //CASE 2: if we are on control point, "finish selection" should should up
+    let p1 = points[0];
+    //Do we allow for pixels around for the control point, for better UI?
+    let possible_x = [];
+    let possible_y = [];
+    let buffer = 2;
+    for (var i = -buffer; i <= buffer; i++) {
+      possible_x.push(p1.x + i);
+      possible_y.push(p1.y + i);
+    }
+    if (
+      possible_x.includes(points[points.length - 1].x) &&
+      possible_y.includes(points[points.length - 1].y)
+    ) {
+      console.log("here I am above the control point");
+    }
+
     saveStroke(tipColor, tipRadius);
   };
 
@@ -301,8 +322,6 @@ export const LassoSelectionCanvas = ({
       radius: radius,
       category: selectedCategory,
     };
-
-    console.log(stroke);
 
     setStrokes([...strokes, stroke]);
 
@@ -467,11 +486,11 @@ export const LassoSelectionCanvas = ({
         />
       </div>
 
-      <SelectCategoryDialog
-        selectedCategory={selectedCategory}
-        open={open}
-        onClose={handleClose}
-      />
+      {/*<SelectCategoryDialog*/}
+      {/*  selectedCategory={selectedCategory}*/}
+      {/*  open={open}*/}
+      {/*  onClose={handleClose}*/}
+      {/*/>*/}
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
