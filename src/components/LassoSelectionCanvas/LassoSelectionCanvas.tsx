@@ -6,6 +6,7 @@ import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
 import { Image as ImageType } from "../../types/Image";
 import * as Konva from "react-konva";
 import * as _ from "underscore";
+import { SelectCategoryDialog } from "../SelectCategoryDialog";
 
 type Stroke = {
   color: string;
@@ -152,7 +153,15 @@ export const LassoSelectionCanvas = ({
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [updated, setUpdated] = useState<boolean>(true);
 
+  const [open, setOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState("category_0");
+
   const classes = useStyles();
+
+  const handleClose = (category: string) => {
+    setOpen(false);
+    setSelectedCategory(category);
+  };
 
   const drawPoints = (
     context: CanvasRenderingContext2D,
@@ -250,6 +259,8 @@ export const LassoSelectionCanvas = ({
     setPressed(false);
 
     saveStroke(tipColor, tipRadius);
+
+    setOpen(true);
   };
 
   const onLeave = (event: React.MouseEvent) => {
@@ -451,6 +462,12 @@ export const LassoSelectionCanvas = ({
           width={image.shape?.c}
         />
       </div>
+
+      <SelectCategoryDialog
+        selectedCategory={selectedCategory}
+        open={open}
+        onClose={handleClose}
+      />
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
