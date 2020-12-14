@@ -17,45 +17,6 @@ const clear = (context: CanvasRenderingContext2D | null) => {
   }
 };
 
-const drawCatenaryCurve = (
-  context: CanvasRenderingContext2D,
-  curve: CatenaryCurve,
-  a: Point,
-  b: Point,
-  chainLength: number,
-  color: string = "#0a0302"
-) => {
-  context.beginPath();
-  context.lineWidth = 2;
-  context.lineCap = "round";
-  context.setLineDash([2, 4]);
-  context.strokeStyle = color;
-  curve.drawToCanvas(context, a, b, chainLength);
-  context.stroke();
-};
-
-const drawCursor = (
-  context: CanvasRenderingContext2D,
-  point: Point,
-  outerColor: string = "#FFF",
-  innerColor: string = "#000",
-  radius: number = 12
-) => {
-  context.beginPath();
-  context.lineWidth = 1;
-  context.setLineDash([]);
-  context.strokeStyle = outerColor;
-  context.arc(point.x, point.y, radius + 1, 0, 2 * Math.PI);
-  context.stroke();
-
-  context.beginPath();
-  context.lineWidth = 1;
-  context.setLineDash([]);
-  context.strokeStyle = innerColor;
-  context.arc(point.x, point.y, radius, 0, 2 * Math.PI);
-  context.stroke();
-};
-
 const drawImage = (
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
@@ -110,42 +71,18 @@ const drawImage = (
   context.drawImage(image, cx, cy, cw, ch, x, y, w, h);
 };
 
-const drawPreview = (
-  context: CanvasRenderingContext2D,
-  point: Point,
-  color: string = "#f2530b",
-  radius: number = 10
-) => {
-  context.beginPath();
-  context.fillStyle = color;
-  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
-  context.fill();
-};
-
 const drawStartingPoint = (
   context: CanvasRenderingContext2D,
   point: { x: number; y: number }
 ) => {
   context.beginPath();
   context.setLineDash([]);
-  context.arc(point.x, point.y, 4, 0, 2 * Math.PI);
+  context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
   context.fill();
   context.strokeStyle = "#FFF";
   context.lineWidth = 1;
-  context.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+  context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
   context.stroke();
-};
-
-const drawTip = (
-  context: CanvasRenderingContext2D,
-  point: Point,
-  color: string = "#f2530b",
-  radius: number = 2
-) => {
-  context.beginPath();
-  context.fillStyle = color;
-  context.arc(point.x, point.y, radius, 0, Math.PI * 2, true);
-  context.fill();
 };
 
 type PenCanvasProps = {
@@ -219,7 +156,7 @@ export const LassoSelectionCanvas = ({
     points: Array<{ x: number; y: number }>,
     dash: [number, number],
     color: string = "#f2530b",
-    radius: number = 2,
+    radius: number = 1,
     offset: number = 5
   ) => {
     if (points.length < 2) return;
@@ -294,7 +231,7 @@ export const LassoSelectionCanvas = ({
     if (selecting) {
       setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, [5, 5], "#FFF", 2, offset);
+      drawPoints(temporaryCanvasContext!, points, [5, 5], "#FFF", 1, offset);
     }
 
     setMoved(true);
@@ -374,10 +311,6 @@ export const LassoSelectionCanvas = ({
 
   useEffect(() => {
     const animate = () => {
-      const cursor = new Point(pen.current.getPointerCoordinates());
-
-      const tip = new Point(pen.current.getTipCoordinates());
-
       if (moved || updated) {
         if (interfaceCanvasContext) {
           interfaceCanvasContext.clearRect(
@@ -386,22 +319,6 @@ export const LassoSelectionCanvas = ({
             interfaceCanvasContext.canvas.width,
             interfaceCanvasContext.canvas.height
           );
-
-          drawPreview(interfaceCanvasContext, tip);
-
-          drawCursor(interfaceCanvasContext, cursor);
-
-          if (pen.current.enabled) {
-            drawCatenaryCurve(
-              interfaceCanvasContext,
-              curve.current,
-              tip,
-              cursor,
-              chainLength
-            );
-          }
-
-          drawTip(interfaceCanvasContext, tip);
         }
 
         setMoved(false);

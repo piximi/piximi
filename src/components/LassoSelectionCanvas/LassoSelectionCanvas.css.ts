@@ -11,7 +11,7 @@ export const useStyles = makeStyles((theme) => ({
     width: 512,
     zIndex: 10,
     backgroundColor: "#CCC",
-    cursor: "none",
+    cursor: "crosshair",
   },
   selection: {
     display: "block",
