@@ -422,6 +422,7 @@ export const PenCanvas = ({
       // }
 
       setOffset(offset + 1);
+
       if (offset > 16) {
         setOffset(0);
       }
@@ -471,6 +472,7 @@ export const PenCanvas = ({
     image,
     temporaryCanvasContext,
     updated,
+    offset,
   ]);
 
   return (
