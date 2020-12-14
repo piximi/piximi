@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../types/Image";
-import { PenCanvas } from "./PenCanvas";
+import { LassoSelectionCanvas } from "./LassoSelectionCanvas";
 
 export default {
-  component: PenCanvas,
-  title: "Components/PenCanvas",
+  component: LassoSelectionCanvas,
+  title: "Components/LassoSelectionCanvas",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof PenCanvas>> = (args) => (
-  <PenCanvas {...args} />
+const Template: Story<ComponentProps<typeof LassoSelectionCanvas>> = (args) => (
+  <LassoSelectionCanvas {...args} />
 );
 
 export const Default = Template.bind({});

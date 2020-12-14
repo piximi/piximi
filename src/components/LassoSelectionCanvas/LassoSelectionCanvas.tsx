@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStyles } from "./PenCanvas.css";
+import { useStyles } from "./LassoSelectionCanvas.css";
 import { Pen } from "../../image/Pen/Pen";
 import { midpoint, Point } from "../../image/Pen/Point";
 import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
@@ -122,6 +122,20 @@ const drawPreview = (
   context.fill();
 };
 
+const drawStartingPoint = (
+  context: CanvasRenderingContext2D,
+  point: { x: number; y: number }
+) => {
+  context.beginPath();
+  context.setLineDash([]);
+  context.arc(point.x, point.y, 4, 0, 2 * Math.PI);
+  context.fill();
+  context.strokeStyle = "#FFF";
+  context.lineWidth = 1;
+  context.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+  context.stroke();
+};
+
 const drawTip = (
   context: CanvasRenderingContext2D,
   point: Point,
@@ -141,7 +155,7 @@ type PenCanvasProps = {
   image: ImageType;
 };
 
-export const PenCanvas = ({
+export const LassoSelectionCanvas = ({
   lazyRadius,
   tipColor,
   tipRadius,
@@ -211,22 +225,24 @@ export const PenCanvas = ({
     if (points.length < 2) return;
 
     if (context) {
-      context.lineJoin = "round";
-      context.lineCap = "round";
-      context.strokeStyle = color;
-
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-      context.lineWidth = radius;
-
-      context.setLineDash(dash);
-      context.lineDashOffset = offset;
 
       let p1 = points[0];
       let p2 = points[1];
 
+      drawStartingPoint(context, p1);
+
       context.moveTo(p2.x, p2.y);
+
       context.beginPath();
+      context.globalCompositeOperation = "destination-over";
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.strokeStyle = color;
+
+      context.lineWidth = radius;
+      context.setLineDash(dash);
+      context.lineDashOffset = offset;
 
       for (let i = 1, len = points.length; i < len; i++) {
         // we pick the point between pi+1 & pi+2 as the
@@ -234,6 +250,7 @@ export const PenCanvas = ({
         const m = midpoint(new Point(p1), new Point(p2));
 
         context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+
         p1 = points[i];
         p2 = points[i + 1];
       }
