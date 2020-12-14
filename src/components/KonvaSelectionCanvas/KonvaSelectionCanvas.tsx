@@ -6,7 +6,7 @@ import useImage from "use-image";
 
 export enum Method {
   Lasso,
-  Bar,
+  Rectangular,
 }
 
 type KonvaSelectionCanvasProps = {
@@ -100,19 +100,21 @@ export const KonvaSelectionCanvas = ({
         <Konva.Image image={img} />
       </Konva.Layer>
 
-      <Konva.Layer>
-        {strokes.map((stroke: Stroke, key: number) => {
-          return (
-            <Konva.Line
-              dash={[4, 2]}
-              dashOffset={dashOffset}
-              key={key}
-              points={stroke.points}
-              stroke="#df4b26"
-            />
-          );
-        })}
-      </Konva.Layer>
+      {method === Method.Lasso && (
+        <Konva.Layer>
+          {strokes.map((stroke: Stroke, key: number) => {
+            return (
+              <Konva.Line
+                dash={[4, 2]}
+                dashOffset={dashOffset}
+                key={key}
+                points={stroke.points}
+                stroke="#df4b26"
+              />
+            );
+          })}
+        </Konva.Layer>
+      )}
     </Konva.Stage>
   );
 };
