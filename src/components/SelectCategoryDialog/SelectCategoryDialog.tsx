@@ -25,7 +25,7 @@ export const SelectCategoryDialog = (props: SimpleDialogProps) => {
   const { onClose, selectedCategory, open } = props;
 
   const handleClose = () => {
-    onClose(selectedValue);
+    onClose(selectedCategory);
   };
 
   const handleListItemClick = (value: string) => {

@@ -12,6 +12,7 @@ type Stroke = {
   color: string;
   radius: number;
   points: Array<{ x: number; y: number }>;
+  category: string;
 };
 
 const clear = (context: CanvasRenderingContext2D | null) => {
@@ -154,7 +155,7 @@ export const LassoSelectionCanvas = ({
   const [updated, setUpdated] = useState<boolean>(true);
 
   const [open, setOpen] = React.useState(false);
-  const [selectedCategory, setSelectedCategory] = React.useState("category_0");
+  const [selectedCategory, setSelectedCategory] = React.useState("category 1");
 
   const classes = useStyles();
 
@@ -259,8 +260,6 @@ export const LassoSelectionCanvas = ({
     setPressed(false);
 
     saveStroke(tipColor, tipRadius);
-
-    setOpen(true);
   };
 
   const onLeave = (event: React.MouseEvent) => {
@@ -294,11 +293,16 @@ export const LassoSelectionCanvas = ({
   const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
+    setOpen(true);
+
     const stroke: Stroke = {
       color: color,
       points: [...points],
       radius: radius,
+      category: selectedCategory,
     };
+
+    console.log(stroke);
 
     setStrokes([...strokes, stroke]);
 
