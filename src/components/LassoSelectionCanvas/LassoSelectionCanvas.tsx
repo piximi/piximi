@@ -4,6 +4,8 @@ import { Pen } from "../../image/Pen/Pen";
 import { midpoint, Point } from "../../image/Pen/Point";
 import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
 import { Image as ImageType } from "../../types/Image";
+import * as Konva from "react-konva";
+import * as _ from "underscore";
 
 type Stroke = {
   color: string;
@@ -102,6 +104,7 @@ export const LassoSelectionCanvas = ({
   const selectionCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const temporaryCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const requestRef = React.useRef<number>();
 
@@ -410,42 +413,56 @@ export const LassoSelectionCanvas = ({
   ]);
 
   return (
-    <div className={classes.container}>
-      <canvas
-        className={classes.interface}
-        height={image.shape?.r}
-        onMouseDown={onStart}
-        onMouseLeave={onLeave}
-        onMouseMove={onMove}
-        onMouseUp={onEnd}
-        onTouchCancel={onEnd}
-        onTouchEnd={onEnd}
-        onTouchMove={onMove}
-        onTouchStart={onStart}
-        ref={interfaceCanvasRef}
-        width={image.shape?.c}
-      />
+    <React.Fragment>
+      <div className={classes.container}>
+        <canvas
+          className={classes.interface}
+          height={image.shape?.r}
+          onMouseDown={onStart}
+          onMouseLeave={onLeave}
+          onMouseMove={onMove}
+          onMouseUp={onEnd}
+          onTouchCancel={onEnd}
+          onTouchEnd={onEnd}
+          onTouchMove={onMove}
+          onTouchStart={onStart}
+          ref={interfaceCanvasRef}
+          width={image.shape?.c}
+        />
 
-      <canvas
-        className={classes.selection}
-        height={image.shape?.r}
-        ref={selectionCanvasRef}
-        width={image.shape?.c}
-      />
+        <canvas
+          className={classes.selection}
+          height={image.shape?.r}
+          ref={selectionCanvasRef}
+          width={image.shape?.c}
+        />
 
-      <canvas
-        className={classes.temporary}
-        height={image.shape?.r}
-        ref={temporaryCanvasRef}
-        width={image.shape?.c}
-      />
+        <canvas
+          className={classes.temporary}
+          height={image.shape?.r}
+          ref={temporaryCanvasRef}
+          width={image.shape?.c}
+        />
 
-      <canvas
-        className={classes.image}
-        height={image.shape?.r}
-        ref={imageCanvasRef}
-        width={image.shape?.c}
-      />
-    </div>
+        <canvas
+          className={classes.image}
+          height={image.shape?.r}
+          ref={imageCanvasRef}
+          width={image.shape?.c}
+        />
+      </div>
+
+      <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
+        <Konva.Layer>
+          {strokes.map((stroke: Stroke) => {
+            const points: Array<number> = _.flatten(
+              stroke.points.map(({ x, y }) => [x, y])
+            );
+
+            return <Konva.Line points={points} />;
+          })}
+        </Konva.Layer>
+      </Konva.Stage>
+    </React.Fragment>
   );
 };

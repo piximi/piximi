@@ -38,7 +38,7 @@
     "react": "^16.13.1",
     "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
-    "react-konva": "^17.0.0-0",
+    "react-konva": "^16.13.0-6",
     "react-redux": "^7.2.1",
     "react-scripts": "4.0.1",
     "react-three-fiber": "^5.0.3",
