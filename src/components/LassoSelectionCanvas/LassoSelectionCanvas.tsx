@@ -9,6 +9,7 @@ import * as _ from "underscore";
 import { SelectCategoryDialog } from "../SelectCategoryDialog";
 import { MenuItem } from "@material-ui/core";
 import Menu from "@material-ui/core/Menu";
+import Popover from "@material-ui/core/Popover";
 
 type Stroke = {
   color: string;
@@ -159,6 +160,7 @@ export const LassoSelectionCanvas = ({
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("category 1");
   const [anchorEl, setAnchorEl] = React.useState<null | Element>(null);
+  const [onControl, setOnControl] = useState<boolean>(false);
 
   const classes = useStyles();
 
@@ -287,7 +289,8 @@ export const LassoSelectionCanvas = ({
       possible_y.includes(points[points.length - 1].y)
     ) {
       console.log("here I am above the control point");
-      setAnchorEl(event.currentTarget);
+      setOnControl(true);
+      //setAnchorEl(event.currentTarget);
     }
 
     saveStroke(tipColor, tipRadius);
@@ -501,17 +504,23 @@ export const LassoSelectionCanvas = ({
       {/*  open={open}*/}
       {/*  onClose={handleClose}*/}
       {/*/>*/}
-      <Menu
-        id="simple-menu"
+      <Popover
+        id="mouse-over-popover"
+        open={onControl}
         anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={handleCloseMenu}
+        disableRestoreFocus
       >
-        <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
-        <MenuItem onClick={handleCloseMenu}>My account</MenuItem>
-        <MenuItem onClick={handleCloseMenu}>Logout</MenuItem>
-      </Menu>
+        Finish selection
+      </Popover>
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
