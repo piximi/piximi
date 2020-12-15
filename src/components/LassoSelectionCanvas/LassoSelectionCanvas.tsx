@@ -7,6 +7,8 @@ import { Image as ImageType } from "../../types/Image";
 import * as Konva from "react-konva";
 import * as _ from "underscore";
 import { SelectCategoryDialog } from "../SelectCategoryDialog";
+import { MenuItem } from "@material-ui/core";
+import Menu from "@material-ui/core/Menu";
 
 type Stroke = {
   color: string;
@@ -156,12 +158,17 @@ export const LassoSelectionCanvas = ({
 
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("category 1");
+  const [anchorEl, setAnchorEl] = React.useState<null | Element>(null);
 
   const classes = useStyles();
 
   const handleClose = (category: string) => {
     setOpen(false);
     setSelectedCategory(category);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
   };
 
   const drawPoints = (
@@ -253,6 +260,8 @@ export const LassoSelectionCanvas = ({
   const onEnd = (event: React.MouseEvent | React.TouchEvent) => {
     event.preventDefault();
 
+    console.log(event.currentTarget);
+
     onMove(event);
 
     setSelecting(false);
@@ -278,6 +287,7 @@ export const LassoSelectionCanvas = ({
       possible_y.includes(points[points.length - 1].y)
     ) {
       console.log("here I am above the control point");
+      setAnchorEl(event.currentTarget);
     }
 
     saveStroke(tipColor, tipRadius);
@@ -491,6 +501,17 @@ export const LassoSelectionCanvas = ({
       {/*  open={open}*/}
       {/*  onClose={handleClose}*/}
       {/*/>*/}
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
+        <MenuItem onClick={handleCloseMenu}>My account</MenuItem>
+        <MenuItem onClick={handleCloseMenu}>Logout</MenuItem>
+      </Menu>
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
