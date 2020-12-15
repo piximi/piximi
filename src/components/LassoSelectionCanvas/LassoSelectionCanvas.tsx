@@ -186,6 +186,9 @@ export const LassoSelectionCanvas = ({
 
   const handlePromptClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    if (straightLine) {
+      setStraightLine(false);
+    }
   };
 
   const drawPoints = (
@@ -312,6 +315,7 @@ export const LassoSelectionCanvas = ({
       possible_y.push(firstPoint.y + i);
     }
     if (
+      points[points.length - 1] &&
       possible_x.includes(points[points.length - 1].x) &&
       possible_y.includes(points[points.length - 1].y)
     ) {
