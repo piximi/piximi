@@ -78,20 +78,6 @@ const drawImage = (
   context.drawImage(image, cx, cy, cw, ch, x, y, w, h);
 };
 
-const drawStartingPoint = (
-  context: CanvasRenderingContext2D,
-  point: { x: number; y: number }
-) => {
-  context.beginPath();
-  context.setLineDash([]);
-  context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-  context.fill();
-  context.strokeStyle = "#FFF";
-  context.lineWidth = 1;
-  context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-  context.stroke();
-};
-
 type PenCanvasProps = {
   lazyRadius: number;
   tipColor: string;
@@ -110,6 +96,7 @@ export const LassoSelectionCanvas = ({
   const temporaryCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const anchorPointsCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const requestRef = React.useRef<number>();
 
@@ -131,6 +118,11 @@ export const LassoSelectionCanvas = ({
   const [
     imageCanvasContext,
     setImageCanvasContext,
+  ] = useState<CanvasRenderingContext2D | null>(null);
+
+  const [
+    anchorPointsContext,
+    setAnchorPointsContext,
   ] = useState<CanvasRenderingContext2D | null>(null);
 
   const curve = useRef<CatenaryCurve>(new CatenaryCurve());
@@ -156,7 +148,7 @@ export const LassoSelectionCanvas = ({
   const [selecting, setSelecting] = useState<boolean>(false);
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [updated, setUpdated] = useState<boolean>(true);
-  const [straightLine, setStraightLine] = useState<boolean>(false);
+  const [straightLineMode, setStraightLineMode] = useState<boolean>(false);
 
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("category 1");
@@ -171,9 +163,64 @@ export const LassoSelectionCanvas = ({
     y: 0,
   });
 
+  const [anchorPoints, setAnchorPoints] = useState<
+    Array<{ x: number; y: number }>
+  >([]);
+
   const classes = useStyles();
 
   const categories = ["category 1", "category 2", "category 3"];
+
+  const drawAnchorPoints = (
+    context: CanvasRenderingContext2D,
+    anchorPoints: Array<{ x: number; y: number }>
+  ) => {
+    if (anchorPointsContext) {
+      anchorPointsContext.clearRect(
+        0,
+        0,
+        anchorPointsContext.canvas.width,
+        anchorPointsContext.canvas.height
+      );
+
+      //draw starting point
+      anchorPointsContext.beginPath();
+      anchorPointsContext.setLineDash([]);
+      anchorPointsContext.arc(
+        anchorPoints[0].x,
+        anchorPoints[0].y,
+        2,
+        0,
+        2 * Math.PI
+      );
+      anchorPointsContext.fillStyle = "#000";
+      anchorPointsContext.fill();
+      anchorPointsContext.strokeStyle = "#FFF";
+      anchorPointsContext.lineWidth = 1;
+      anchorPointsContext.arc(
+        anchorPoints[0].x,
+        anchorPoints[0].y,
+        3,
+        0,
+        2 * Math.PI
+      );
+      anchorPointsContext.stroke();
+
+      //draw ending point if we have one already
+      if (anchorPoints.length > 1) {
+        anchorPointsContext.beginPath();
+        anchorPointsContext.arc(
+          anchorPoints[1].x,
+          anchorPoints[1].y,
+          3,
+          0,
+          2 * Math.PI
+        );
+        anchorPointsContext.fillStyle = "#FFF";
+        anchorPointsContext.fill();
+      }
+    }
+  };
 
   const handlePopOverClose = () => {
     setShowPrompt(false);
@@ -186,8 +233,8 @@ export const LassoSelectionCanvas = ({
 
   const handlePromptClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
-    if (straightLine) {
-      setStraightLine(false);
+    if (straightLineMode) {
+      setStraightLineMode(false);
     }
   };
 
@@ -208,7 +255,7 @@ export const LassoSelectionCanvas = ({
       let p1 = points[0];
       let p2 = points[1];
 
-      drawStartingPoint(context, p1);
+      drawAnchorPoints(context, anchorPoints);
 
       context.moveTo(p2.x, p2.y);
 
@@ -289,7 +336,7 @@ export const LassoSelectionCanvas = ({
         "#FFF",
         1,
         offset,
-        straightLine
+        straightLineMode
       );
     }
 
@@ -325,8 +372,12 @@ export const LassoSelectionCanvas = ({
     //change to line tool
     else {
       if (temporaryCanvasContext) {
-        setStraightLine(true);
+        setStraightLineMode(true);
         setSelecting(true);
+        setAnchorPoints([
+          { x: anchorPoints[0].x, y: anchorPoints[0].y },
+          { x: points[points.length - 1].x, y: points[points.length - 1].y },
+        ]);
         // temporaryCanvasContext.moveTo(points[points.length - 1].x, points[points.length - 1].y)
         // temporaryCanvasContext.lineTo(p1.x, p1.y)
         // temporaryCanvasContext.stroke()
@@ -361,8 +412,9 @@ export const LassoSelectionCanvas = ({
       pen.current.update(point, true);
     }
 
-    if (!straightLine) {
+    if (!straightLineMode) {
       setFirstPoint({ x: x, y: y });
+      setAnchorPoints([{ x: x, y: y }]);
     }
 
     move(x, y);
@@ -473,6 +525,10 @@ export const LassoSelectionCanvas = ({
       setImageCanvasContext(imageCanvasRef.current?.getContext("2d"));
     }
 
+    if (anchorPointsCanvasRef && anchorPointsCanvasRef.current) {
+      setAnchorPointsContext(anchorPointsCanvasRef.current?.getContext("2d"));
+    }
+
     const img = new Image();
 
     img.crossOrigin = "anonymous";
@@ -521,7 +577,12 @@ export const LassoSelectionCanvas = ({
           ref={interfaceCanvasRef}
           width={image.shape?.c}
         />
-
+        <canvas
+          className={classes.anchorpoints}
+          height={image.shape?.r}
+          ref={anchorPointsCanvasRef}
+          width={image.shape?.c}
+        />
         <canvas
           className={classes.selection}
           height={image.shape?.r}

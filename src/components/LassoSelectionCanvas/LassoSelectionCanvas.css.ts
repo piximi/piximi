@@ -22,6 +22,15 @@ export const useStyles = makeStyles((theme) => ({
     width: "100%",
     zIndex: 10,
   },
+  anchorpoints: {
+    display: "block",
+    height: "100%",
+    left: 0,
+    position: "absolute",
+    top: 0,
+    width: "100%",
+    zIndex: 11,
+  },
   image: {
     display: "block",
     height: "100%",
