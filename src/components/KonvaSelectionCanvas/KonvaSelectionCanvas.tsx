@@ -33,7 +33,8 @@ type KonvaSelectionCanvasProps = {
 };
 
 type LassoSelectionLayerProps = {
-  anchors: [Anchor, Anchor?];
+  end?: Anchor;
+  start?: Anchor;
   strokes: Array<Stroke>;
 };
 
@@ -86,7 +87,8 @@ const ImageLayer = ({ src }: ImageLayerProps) => {
 };
 
 const LassoSelectionLayer = ({
-  anchors,
+  end,
+  start,
   strokes,
 }: LassoSelectionLayerProps) => {
   return (
@@ -94,9 +96,7 @@ const LassoSelectionLayer = ({
       {strokes.map((stroke: Stroke, key: number) => {
         return (
           <React.Fragment>
-            {anchors[0] && (
-              <StartingAnchorPoint x={anchors[0].x} y={anchors[0].y} />
-            )}
+            {start && <StartingAnchorPoint x={start.x} y={start.y} />}
 
             <Konva.Line
               dash={[4, 2]}
@@ -106,7 +106,7 @@ const LassoSelectionLayer = ({
               stroke="#df4b26"
             />
 
-            {anchors[1] && <AnchorPoint x={anchors[1].x} y={anchors[1].y} />}
+            {end && <AnchorPoint x={end.x} y={end.y} />}
           </React.Fragment>
         );
       })}
@@ -118,7 +118,9 @@ export const KonvaSelectionCanvas = ({
   image,
   method,
 }: KonvaSelectionCanvasProps) => {
-  const [anchors, setAnchors] = useState<[Anchor, Anchor?]>();
+  const [start, setStart] = useState<Anchor>();
+  const [end, setEnd] = useState<Anchor>();
+
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
   const annotating = useRef<boolean>(false);
@@ -132,7 +134,7 @@ export const KonvaSelectionCanvas = ({
       const position = stage.getPointerPosition();
 
       if (position) {
-        setAnchors([{ x: position.x, y: position.y }]);
+        setStart({ x: position.x, y: position.y });
 
         const stroke: Stroke = {
           method: method,
@@ -181,8 +183,8 @@ export const KonvaSelectionCanvas = ({
     if (stage) {
       const position = stage.getPointerPosition();
 
-      if (anchors && position) {
-        setAnchors([anchors[0], { x: position.x, y: position.y }]);
+      if (position) {
+        setEnd({ x: position.x, y: position.y });
 
         const intersection = stage.getIntersection(
           position,
@@ -231,7 +233,7 @@ export const KonvaSelectionCanvas = ({
       <ImageLayer src={image.src} />
 
       {method === Method.Lasso && (
-        <LassoSelectionLayer anchors={anchors} strokes={strokes} />
+        <LassoSelectionLayer end={end} start={start} strokes={strokes} />
       )}
     </Konva.Stage>
   );
