@@ -166,6 +166,10 @@ export const LassoSelectionCanvas = ({
     x: 0,
     y: 0,
   });
+  const [firstPoint, setFirstPoint] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   const classes = useStyles();
 
@@ -240,12 +244,6 @@ export const LassoSelectionCanvas = ({
         );
         context.stroke();
       }
-
-      // } else {
-      //   context.moveTo(p1.x, p1.y)
-      //   context.lineTo(p2.x, p2.y)
-      //   context.stroke()
-      // }
     }
     // }
   };
@@ -305,14 +303,13 @@ export const LassoSelectionCanvas = ({
     setPressed(false);
 
     //CASE 1: if we are on control point, "finish selection" should should up
-    let p1 = points[0];
     //Do we allow for pixels around for the control point, for better UI?
     let possible_x = [];
     let possible_y = [];
     let buffer = 2;
     for (var i = -buffer; i <= buffer; i++) {
-      possible_x.push(p1.x + i);
-      possible_y.push(p1.y + i);
+      possible_x.push(firstPoint.x + i);
+      possible_y.push(firstPoint.y + i);
     }
     if (
       possible_x.includes(points[points.length - 1].x) &&
@@ -358,6 +355,10 @@ export const LassoSelectionCanvas = ({
       const point = new Point({ x: x, y: y });
 
       pen.current.update(point, true);
+    }
+
+    if (!straightLine) {
+      setFirstPoint({ x: x, y: y });
     }
 
     move(x, y);
