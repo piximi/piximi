@@ -6,10 +6,8 @@ import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
 import { Image as ImageType } from "../../types/Image";
 import * as Konva from "react-konva";
 import * as _ from "underscore";
-import { SelectCategoryDialog } from "../SelectCategoryDialog";
-import { MenuItem } from "@material-ui/core";
-import Menu from "@material-ui/core/Menu";
 import Popover from "@material-ui/core/Popover";
+import Button from "@material-ui/core/Button";
 
 type Stroke = {
   color: string;
@@ -160,7 +158,11 @@ export const LassoSelectionCanvas = ({
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("category 1");
   const [anchorEl, setAnchorEl] = React.useState<null | Element>(null);
-  const [onControl, setOnControl] = useState<boolean>(false);
+  const [showPrompt, setShowPrompt] = useState<boolean>(false);
+  const [lastPoint, setLastPoint] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   const classes = useStyles();
 
@@ -170,8 +172,14 @@ export const LassoSelectionCanvas = ({
   };
 
   const handleCloseMenu = () => {
-    setAnchorEl(null);
+    setShowPrompt(false);
   };
+
+  // const defineAnchorPosition = () => {
+  //   return (
+  //
+  //   )
+  // }
 
   const drawPoints = (
     context: CanvasRenderingContext2D,
@@ -262,8 +270,6 @@ export const LassoSelectionCanvas = ({
   const onEnd = (event: React.MouseEvent | React.TouchEvent) => {
     event.preventDefault();
 
-    console.log(event.currentTarget);
-
     onMove(event);
 
     setSelecting(false);
@@ -288,8 +294,8 @@ export const LassoSelectionCanvas = ({
       possible_x.includes(points[points.length - 1].x) &&
       possible_y.includes(points[points.length - 1].y)
     ) {
-      console.log("here I am above the control point");
-      setOnControl(true);
+      console.log(lastPoint);
+      setShowPrompt(true);
       //setAnchorEl(event.currentTarget);
     }
 
@@ -338,6 +344,7 @@ export const LassoSelectionCanvas = ({
 
     setStrokes([...strokes, stroke]);
 
+    setLastPoint(points[points.length - 1]);
     setPoints([]);
 
     if (temporaryCanvasRef && temporaryCanvasRef.current) {
@@ -506,8 +513,14 @@ export const LassoSelectionCanvas = ({
       {/*/>*/}
       <Popover
         id="mouse-over-popover"
-        open={onControl}
+        open={showPrompt}
         anchorEl={anchorEl}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          lastPoint
+            ? { top: lastPoint.y, left: lastPoint.x }
+            : { top: 0, left: 0 }
+        }
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
@@ -519,7 +532,15 @@ export const LassoSelectionCanvas = ({
         onClose={handleCloseMenu}
         disableRestoreFocus
       >
-        Finish selection
+        <Button
+          onClick={() => {
+            setShowPrompt(false);
+          }}
+          variant="contained"
+          color="primary"
+        >
+          Finish selection
+        </Button>
       </Popover>
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
