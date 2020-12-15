@@ -38,6 +38,12 @@ type LassoSelectionLayerProps = {
   strokes: Array<Stroke>;
 };
 
+type PolygonalSelectionLayerProps = {
+  end?: Anchor;
+  start?: Anchor;
+  strokes: Array<Stroke>;
+};
+
 type StartingAnchorPointProps = {
   x: number;
   y: number;
@@ -98,6 +104,32 @@ const LassoSelectionLayer = ({
           <React.Fragment>
             {start && <StartingAnchorPoint x={start.x} y={start.y} />}
 
+            <Konva.Line
+              dash={[4, 2]}
+              globalCompositeOperation="destination-over"
+              key={key}
+              points={stroke.points}
+              stroke="#df4b26"
+            />
+
+            {end && <AnchorPoint x={end.x} y={end.y} />}
+          </React.Fragment>
+        );
+      })}
+    </Konva.Layer>
+  );
+};
+
+const PolygonalSelectionLayer = ({
+  end,
+  start,
+  strokes,
+}: PolygonalSelectionLayerProps) => {
+  return (
+    <Konva.Layer>
+      {strokes.map((stroke: Stroke, key: number) => {
+        return (
+          <React.Fragment>
             <Konva.Line
               dash={[4, 2]}
               globalCompositeOperation="destination-over"
@@ -185,26 +217,49 @@ export const KonvaSelectionCanvas = ({
 
       if (position) {
         setEnd({ x: position.x, y: position.y });
-
-        const intersection = stage.getIntersection(
-          position,
-          ".starting-anchor-point"
-        );
-
-        if (intersection) {
-          console.info("onLassoMouseUp intersection");
-        } else {
-        }
       }
     }
 
     annotating.current = false;
   };
 
+  const onPolygonalMouseDown = (event: KonvaEventObject<MouseEvent>) => {};
+
+  const onPolygonalMouseMove = (event: KonvaEventObject<MouseEvent>) => {};
+
+  const onPolygonalMouseUp = (event: KonvaEventObject<MouseEvent>) => {
+    if (!annotating.current) return;
+
+    const stage = event.target.getStage();
+
+    if (stage) {
+      const position = stage.getPointerPosition();
+
+      if (position) {
+        const intersection = stage.getIntersection(
+          position,
+          ".starting-anchor-point"
+        );
+
+        if (intersection) {
+          annotating.current = false;
+        } else {
+          onPolygonalMouseUp(event);
+        }
+      }
+    }
+  };
+
   const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
     switch (method) {
       case Method.Lasso:
         onLassoMouseDown(event);
+
+        break;
+      case Method.Polygonal:
+        onPolygonalMouseDown(event);
+
+        break;
     }
   };
 
@@ -212,6 +267,12 @@ export const KonvaSelectionCanvas = ({
     switch (method) {
       case Method.Lasso:
         onLassoMouseMove(event);
+
+        break;
+      case Method.Polygonal:
+        onPolygonalMouseMove(event);
+
+        break;
     }
   };
 
@@ -219,6 +280,12 @@ export const KonvaSelectionCanvas = ({
     switch (method) {
       case Method.Lasso:
         onLassoMouseUp(event);
+
+        break;
+      case Method.Polygonal:
+        onPolygonalMouseUp(event);
+
+        break;
     }
   };
 
@@ -232,8 +299,15 @@ export const KonvaSelectionCanvas = ({
     >
       <ImageLayer src={image.src} />
 
+      <Konva.Layer>
+        {start && <StartingAnchorPoint x={start.x} y={start.y} />}
+      </Konva.Layer>
+
       {method === Method.Lasso && (
         <LassoSelectionLayer end={end} start={start} strokes={strokes} />
+      )}
+      {method === Method.Polygonal && (
+        <PolygonalSelectionLayer end={end} start={start} strokes={strokes} />
       )}
     </Konva.Stage>
   );
