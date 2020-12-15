@@ -8,6 +8,8 @@ import * as Konva from "react-konva";
 import * as _ from "underscore";
 import Popover from "@material-ui/core/Popover";
 import Button from "@material-ui/core/Button";
+import { Menu } from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
 
 type Stroke = {
   color: string;
@@ -166,20 +168,20 @@ export const LassoSelectionCanvas = ({
 
   const classes = useStyles();
 
-  const handleClose = (category: string) => {
-    setOpen(false);
-    setSelectedCategory(category);
-  };
+  const categories = ["category 1", "category 2", "category 3"];
 
-  const handleCloseMenu = () => {
+  const handlePopOverClose = () => {
     setShowPrompt(false);
   };
 
-  // const defineAnchorPosition = () => {
-  //   return (
-  //
-  //   )
-  // }
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setShowPrompt(false);
+  };
+
+  const handlePromptClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   const drawPoints = (
     context: CanvasRenderingContext2D,
@@ -294,9 +296,7 @@ export const LassoSelectionCanvas = ({
       possible_x.includes(points[points.length - 1].x) &&
       possible_y.includes(points[points.length - 1].y)
     ) {
-      console.log(lastPoint);
       setShowPrompt(true);
-      //setAnchorEl(event.currentTarget);
     }
 
     saveStroke(tipColor, tipRadius);
@@ -529,19 +529,23 @@ export const LassoSelectionCanvas = ({
           vertical: "top",
           horizontal: "left",
         }}
-        onClose={handleCloseMenu}
+        onClose={handlePopOverClose}
         disableRestoreFocus
       >
-        <Button
-          onClick={() => {
-            setShowPrompt(false);
-          }}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={handlePromptClick} variant="contained" color="primary">
           Finish selection
         </Button>
       </Popover>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        {categories.map((category) => (
+          <MenuItem onClick={handleMenuClose}>{category}</MenuItem>
+        ))}
+      </Menu>
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
