@@ -6,11 +6,16 @@ import { CatenaryCurve } from "../../image/Pen/CatenaryCurve";
 import { Image as ImageType } from "../../types/Image";
 import * as Konva from "react-konva";
 import * as _ from "underscore";
+import Popover from "@material-ui/core/Popover";
+import Button from "@material-ui/core/Button";
+import { Menu } from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
 
 type Stroke = {
   color: string;
   radius: number;
   points: Array<{ x: number; y: number }>;
+  category: string;
 };
 
 const clear = (context: CanvasRenderingContext2D | null) => {
@@ -151,8 +156,33 @@ export const LassoSelectionCanvas = ({
   const [selecting, setSelecting] = useState<boolean>(false);
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [updated, setUpdated] = useState<boolean>(true);
+  const [straightLine, setStraightLine] = useState<boolean>(false);
+
+  const [open, setOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState("category 1");
+  const [anchorEl, setAnchorEl] = React.useState<null | Element>(null);
+  const [showPrompt, setShowPrompt] = useState<boolean>(false);
+  const [lastPoint, setLastPoint] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   const classes = useStyles();
+
+  const categories = ["category 1", "category 2", "category 3"];
+
+  const handlePopOverClose = () => {
+    setShowPrompt(false);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setShowPrompt(false);
+  };
+
+  const handlePromptClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   const drawPoints = (
     context: CanvasRenderingContext2D,
@@ -160,7 +190,8 @@ export const LassoSelectionCanvas = ({
     dash: [number, number],
     color: string = "#f2530b",
     radius: number = 1,
-    offset: number = 5
+    offset: number = 5,
+    straightLine: boolean = false
   ) => {
     if (points.length < 2) return;
 
@@ -184,23 +215,39 @@ export const LassoSelectionCanvas = ({
       context.setLineDash(dash);
       context.lineDashOffset = offset;
 
-      for (let i = 1, len = points.length; i < len; i++) {
-        // we pick the point between pi+1 & pi+2 as the
-        // end point and p1 as our control point
-        const m = midpoint(new Point(p1), new Point(p2));
+      if (!straightLine) {
+        for (let i = 1, len = points.length; i < len; i++) {
+          // we pick the point between pi+1 & pi+2 as the
+          // end point and p1 as our control point
+          const m = midpoint(new Point(p1), new Point(p2));
 
-        context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+          context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
 
-        p1 = points[i];
-        p2 = points[i + 1];
+          p1 = points[i];
+          p2 = points[i + 1];
+        }
+
+        // Draw last line as a straight line while
+        // we wait for the next point to be able to calculate
+        // the bezier control point
+        context.lineTo(p1.x, p1.y);
+        context.stroke();
+      } else {
+        context.moveTo(points[0].x, points[0].y);
+        context.lineTo(
+          points[points.length - 1].x,
+          points[points.length - 1].y
+        );
+        context.stroke();
       }
 
-      // Draw last line as a straight line while
-      // we wait for the next point to be able to calculate
-      // the bezier control point
-      context.lineTo(p1.x, p1.y);
-      context.stroke();
+      // } else {
+      //   context.moveTo(p1.x, p1.y)
+      //   context.lineTo(p2.x, p2.y)
+      //   context.stroke()
+      // }
     }
+    // }
   };
 
   const getPosition = (
@@ -234,7 +281,15 @@ export const LassoSelectionCanvas = ({
     if (selecting) {
       setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, [5, 5], "#FFF", 1, offset);
+      drawPoints(
+        temporaryCanvasContext!,
+        points,
+        [5, 5],
+        "#FFF",
+        1,
+        offset,
+        straightLine
+      );
     }
 
     setMoved(true);
@@ -248,6 +303,34 @@ export const LassoSelectionCanvas = ({
     setSelecting(false);
 
     setPressed(false);
+
+    //CASE 1: if we are on control point, "finish selection" should should up
+    let p1 = points[0];
+    //Do we allow for pixels around for the control point, for better UI?
+    let possible_x = [];
+    let possible_y = [];
+    let buffer = 2;
+    for (var i = -buffer; i <= buffer; i++) {
+      possible_x.push(p1.x + i);
+      possible_y.push(p1.y + i);
+    }
+    if (
+      possible_x.includes(points[points.length - 1].x) &&
+      possible_y.includes(points[points.length - 1].y)
+    ) {
+      setShowPrompt(true);
+    }
+    //CASE 2: We are not over the control point
+    //change to line tool
+    else {
+      if (temporaryCanvasContext) {
+        setStraightLine(true);
+        setSelecting(true);
+        // temporaryCanvasContext.moveTo(points[points.length - 1].x, points[points.length - 1].y)
+        // temporaryCanvasContext.lineTo(p1.x, p1.y)
+        // temporaryCanvasContext.stroke()
+      }
+    }
 
     saveStroke(tipColor, tipRadius);
   };
@@ -283,14 +366,18 @@ export const LassoSelectionCanvas = ({
   const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
+    setOpen(true);
+
     const stroke: Stroke = {
       color: color,
       points: [...points],
       radius: radius,
+      category: selectedCategory,
     };
 
     setStrokes([...strokes, stroke]);
 
+    setLastPoint(points[points.length - 1]);
     setPoints([]);
 
     if (temporaryCanvasRef && temporaryCanvasRef.current) {
@@ -451,6 +538,47 @@ export const LassoSelectionCanvas = ({
           width={image.shape?.c}
         />
       </div>
+
+      {/*<SelectCategoryDialog*/}
+      {/*  selectedCategory={selectedCategory}*/}
+      {/*  open={open}*/}
+      {/*  onClose={handleClose}*/}
+      {/*/>*/}
+      <Popover
+        id="mouse-over-popover"
+        open={showPrompt}
+        anchorEl={anchorEl}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          lastPoint
+            ? { top: lastPoint.y, left: lastPoint.x }
+            : { top: 0, left: 0 }
+        }
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={handlePopOverClose}
+        disableRestoreFocus
+      >
+        <Button onClick={handlePromptClick} variant="contained" color="primary">
+          Finish selection
+        </Button>
+      </Popover>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        {categories.map((category) => (
+          <MenuItem onClick={handleMenuClose}>{category}</MenuItem>
+        ))}
+      </Menu>
 
       <Konva.Stage height={image.shape?.c} width={image.shape?.c}>
         <Konva.Layer>
