@@ -156,6 +156,7 @@ export const LassoSelectionCanvas = ({
   const [selecting, setSelecting] = useState<boolean>(false);
   const [points, setPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [updated, setUpdated] = useState<boolean>(true);
+  const [straightLine, setStraightLine] = useState<boolean>(false);
 
   const [open, setOpen] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("category 1");
@@ -189,7 +190,8 @@ export const LassoSelectionCanvas = ({
     dash: [number, number],
     color: string = "#f2530b",
     radius: number = 1,
-    offset: number = 5
+    offset: number = 5,
+    straightLine: boolean = false
   ) => {
     if (points.length < 2) return;
 
@@ -213,23 +215,39 @@ export const LassoSelectionCanvas = ({
       context.setLineDash(dash);
       context.lineDashOffset = offset;
 
-      for (let i = 1, len = points.length; i < len; i++) {
-        // we pick the point between pi+1 & pi+2 as the
-        // end point and p1 as our control point
-        const m = midpoint(new Point(p1), new Point(p2));
+      if (!straightLine) {
+        for (let i = 1, len = points.length; i < len; i++) {
+          // we pick the point between pi+1 & pi+2 as the
+          // end point and p1 as our control point
+          const m = midpoint(new Point(p1), new Point(p2));
 
-        context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+          context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
 
-        p1 = points[i];
-        p2 = points[i + 1];
+          p1 = points[i];
+          p2 = points[i + 1];
+        }
+
+        // Draw last line as a straight line while
+        // we wait for the next point to be able to calculate
+        // the bezier control point
+        context.lineTo(p1.x, p1.y);
+        context.stroke();
+      } else {
+        context.moveTo(points[0].x, points[0].y);
+        context.lineTo(
+          points[points.length - 1].x,
+          points[points.length - 1].y
+        );
+        context.stroke();
       }
 
-      // Draw last line as a straight line while
-      // we wait for the next point to be able to calculate
-      // the bezier control point
-      context.lineTo(p1.x, p1.y);
-      context.stroke();
+      // } else {
+      //   context.moveTo(p1.x, p1.y)
+      //   context.lineTo(p2.x, p2.y)
+      //   context.stroke()
+      // }
     }
+    // }
   };
 
   const getPosition = (
@@ -263,7 +281,15 @@ export const LassoSelectionCanvas = ({
     if (selecting) {
       setPoints([...points, { x: pen.current.tip.x, y: pen.current.tip.y }]);
 
-      drawPoints(temporaryCanvasContext!, points, [5, 5], "#FFF", 1, offset);
+      drawPoints(
+        temporaryCanvasContext!,
+        points,
+        [5, 5],
+        "#FFF",
+        1,
+        offset,
+        straightLine
+      );
     }
 
     setMoved(true);
@@ -278,11 +304,7 @@ export const LassoSelectionCanvas = ({
 
     setPressed(false);
 
-    //two cases:
-    //CASE 1: mouse is up, but we are not over the control point
-    //change to line tool
-
-    //CASE 2: if we are on control point, "finish selection" should should up
+    //CASE 1: if we are on control point, "finish selection" should should up
     let p1 = points[0];
     //Do we allow for pixels around for the control point, for better UI?
     let possible_x = [];
@@ -297,6 +319,17 @@ export const LassoSelectionCanvas = ({
       possible_y.includes(points[points.length - 1].y)
     ) {
       setShowPrompt(true);
+    }
+    //CASE 2: We are not over the control point
+    //change to line tool
+    else {
+      if (temporaryCanvasContext) {
+        setStraightLine(true);
+        setSelecting(true);
+        // temporaryCanvasContext.moveTo(points[points.length - 1].x, points[points.length - 1].y)
+        // temporaryCanvasContext.lineTo(p1.x, p1.y)
+        // temporaryCanvasContext.stroke()
+      }
     }
 
     saveStroke(tipColor, tipRadius);
