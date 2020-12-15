@@ -13,6 +13,11 @@ export enum Method {
   Rectangular,
 }
 
+type Anchor = {
+  x: number;
+  y: number;
+};
+
 type AnchorPointProps = {
   x: number;
   y: number;
@@ -28,6 +33,7 @@ type KonvaSelectionCanvasProps = {
 };
 
 type LassoSelectionLayerProps = {
+  anchors: [Anchor, Anchor?];
   strokes: Array<Stroke>;
 };
 
@@ -79,13 +85,18 @@ const ImageLayer = ({ src }: ImageLayerProps) => {
   );
 };
 
-const LassoSelectionLayer = ({ strokes }: LassoSelectionLayerProps) => {
+const LassoSelectionLayer = ({
+  anchors,
+  strokes,
+}: LassoSelectionLayerProps) => {
   return (
     <Konva.Layer>
       {strokes.map((stroke: Stroke, key: number) => {
         return (
           <React.Fragment>
-            <StartingAnchorPoint x={stroke.points[0]} y={stroke.points[1]} />
+            {anchors[0] && (
+              <StartingAnchorPoint x={anchors[0].x} y={anchors[0].y} />
+            )}
 
             <Konva.Line
               dash={[4, 2]}
@@ -95,10 +106,7 @@ const LassoSelectionLayer = ({ strokes }: LassoSelectionLayerProps) => {
               stroke="#df4b26"
             />
 
-            <AnchorPoint
-              x={stroke.points[stroke.points.length - 2]}
-              y={stroke.points[stroke.points.length - 1]}
-            />
+            {anchors[1] && <AnchorPoint x={anchors[1].x} y={anchors[1].y} />}
           </React.Fragment>
         );
       })}
@@ -110,7 +118,7 @@ export const KonvaSelectionCanvas = ({
   image,
   method,
 }: KonvaSelectionCanvasProps) => {
-  const [anchors, setAnchors] = useState<Array<{ x: number; y: number }>>([]);
+  const [anchors, setAnchors] = useState<[Anchor, Anchor?]>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
   const annotating = useRef<boolean>(false);
@@ -124,6 +132,8 @@ export const KonvaSelectionCanvas = ({
       const position = stage.getPointerPosition();
 
       if (position) {
+        setAnchors([{ x: position.x, y: position.y }]);
+
         const stroke: Stroke = {
           method: method,
           points: [position.x, position.y],
@@ -171,7 +181,9 @@ export const KonvaSelectionCanvas = ({
     if (stage) {
       const position = stage.getPointerPosition();
 
-      if (position) {
+      if (anchors && position) {
+        setAnchors([anchors[0], { x: position.x, y: position.y }]);
+
         const intersection = stage.getIntersection(
           position,
           ".starting-anchor-point"
@@ -179,6 +191,7 @@ export const KonvaSelectionCanvas = ({
 
         if (intersection) {
           console.info("onLassoMouseUp intersection");
+        } else {
         }
       }
     }
@@ -217,7 +230,9 @@ export const KonvaSelectionCanvas = ({
     >
       <ImageLayer src={image.src} />
 
-      {method === Method.Lasso && <LassoSelectionLayer strokes={strokes} />}
+      {method === Method.Lasso && (
+        <LassoSelectionLayer anchors={anchors} strokes={strokes} />
+      )}
     </Konva.Stage>
   );
 };
