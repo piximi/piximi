@@ -373,6 +373,7 @@ export const LassoSelectionCanvas = ({
       possible_y.includes(points[points.length - 1].y)
     ) {
       setShowPrompt(true);
+      clear(anchorPointsContext);
     }
     //CASE 2: We are not over the control point
     //change to line tool
