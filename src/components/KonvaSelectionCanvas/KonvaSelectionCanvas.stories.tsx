@@ -24,5 +24,5 @@ const image: Image = {
 
 Default.args = {
   image: image,
-  method: Method.Lasso,
+  method: Method.Polygonal,
 };
