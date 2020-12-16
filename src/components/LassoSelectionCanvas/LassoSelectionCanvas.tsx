@@ -8,8 +8,9 @@ import * as Konva from "react-konva";
 import * as _ from "underscore";
 import Popover from "@material-ui/core/Popover";
 import Button from "@material-ui/core/Button";
-import { Menu } from "@material-ui/core";
+import { ClickAwayListener, Menu } from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
+import { useKeypress } from "../Annotator/Annotator";
 
 type Stroke = {
   color: string;
@@ -167,6 +168,16 @@ export const LassoSelectionCanvas = ({
     Array<{ x: number; y: number }>
   >([]);
 
+  useKeypress("Escape", () => {
+    setAnchorPoints([]);
+    setSelecting(false);
+    setPressed(false);
+    clear(interfaceCanvasContext);
+    clear(temporaryCanvasContext);
+    clear(selectionCanvasContext);
+    clear(anchorPointsContext);
+  });
+
   const classes = useStyles();
 
   const categories = ["category 1", "category 2", "category 3"];
@@ -176,12 +187,7 @@ export const LassoSelectionCanvas = ({
     anchorPoints: Array<{ x: number; y: number }>
   ) => {
     if (anchorPointsContext) {
-      anchorPointsContext.clearRect(
-        0,
-        0,
-        anchorPointsContext.canvas.width,
-        anchorPointsContext.canvas.height
-      );
+      clear(anchorPointsContext);
 
       //draw starting point
       anchorPointsContext.beginPath();
@@ -367,6 +373,7 @@ export const LassoSelectionCanvas = ({
       possible_y.includes(points[points.length - 1].y)
     ) {
       setShowPrompt(true);
+      clear(anchorPointsContext);
     }
     //CASE 2: We are not over the control point
     //change to line tool
@@ -378,9 +385,6 @@ export const LassoSelectionCanvas = ({
           { x: anchorPoints[0].x, y: anchorPoints[0].y },
           { x: points[points.length - 1].x, y: points[points.length - 1].y },
         ]);
-        // temporaryCanvasContext.moveTo(points[points.length - 1].x, points[points.length - 1].y)
-        // temporaryCanvasContext.lineTo(p1.x, p1.y)
-        // temporaryCanvasContext.stroke()
       }
     }
 
@@ -415,6 +419,9 @@ export const LassoSelectionCanvas = ({
     if (!straightLineMode) {
       setFirstPoint({ x: x, y: y });
       setAnchorPoints([{ x: x, y: y }]);
+
+      clear(selectionCanvasContext);
+      clear(anchorPointsContext);
     }
 
     move(x, y);
@@ -459,15 +466,7 @@ export const LassoSelectionCanvas = ({
   useEffect(() => {
     const animate = () => {
       if (moved || updated) {
-        if (interfaceCanvasContext) {
-          interfaceCanvasContext.clearRect(
-            0,
-            0,
-            interfaceCanvasContext.canvas.width,
-            interfaceCanvasContext.canvas.height
-          );
-        }
-
+        clear(interfaceCanvasContext);
         setMoved(false);
         setUpdated(false);
       }
@@ -487,20 +486,6 @@ export const LassoSelectionCanvas = ({
         }),
         false
       );
-
-      // setMoved(true);
-      // setUpdated(true);
-
-      // setStrokes([]);
-      // setUpdated(true);
-
-      // clear([selectionCanvasContext, temporaryCanvasContext]);
-      // clear(temporaryCanvasContext)
-      // clear([temporaryCanvasContext]);
-
-      // if (this.props.saveData) {
-      //   this.loadSaveData(this.props.saveData);
-      // }
 
       setOffset(offset + 1);
 
