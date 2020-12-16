@@ -415,6 +415,23 @@ export const LassoSelectionCanvas = ({
     if (!straightLineMode) {
       setFirstPoint({ x: x, y: y });
       setAnchorPoints([{ x: x, y: y }]);
+
+      if (selectionCanvasContext) {
+        selectionCanvasContext.clearRect(
+          0,
+          0,
+          selectionCanvasContext.canvas.width,
+          selectionCanvasContext.canvas.height
+        );
+      }
+      if (anchorPointsContext) {
+        anchorPointsContext.clearRect(
+          0,
+          0,
+          anchorPointsContext.canvas.width,
+          anchorPointsContext.canvas.height
+        );
+      }
     }
 
     move(x, y);
