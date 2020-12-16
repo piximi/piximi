@@ -10,6 +10,7 @@ import Popover from "@material-ui/core/Popover";
 import Button from "@material-ui/core/Button";
 import { Menu } from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
+import { useKeypress } from "../Annotator/Annotator";
 
 type Stroke = {
   color: string;
@@ -166,6 +167,18 @@ export const LassoSelectionCanvas = ({
   const [anchorPoints, setAnchorPoints] = useState<
     Array<{ x: number; y: number }>
   >([]);
+
+  useKeypress("Escape", () => {
+    setSelecting(false);
+    setPoints([]);
+    setPressed(false);
+    setAnchorPoints([]);
+    console.log(interfaceCanvasContext);
+    clear(temporaryCanvasContext);
+    clear(selectionCanvasContext);
+    clear(interfaceCanvasContext);
+    clear(anchorPointsContext);
+  });
 
   const classes = useStyles();
 
@@ -416,22 +429,8 @@ export const LassoSelectionCanvas = ({
       setFirstPoint({ x: x, y: y });
       setAnchorPoints([{ x: x, y: y }]);
 
-      if (selectionCanvasContext) {
-        selectionCanvasContext.clearRect(
-          0,
-          0,
-          selectionCanvasContext.canvas.width,
-          selectionCanvasContext.canvas.height
-        );
-      }
-      if (anchorPointsContext) {
-        anchorPointsContext.clearRect(
-          0,
-          0,
-          anchorPointsContext.canvas.width,
-          anchorPointsContext.canvas.height
-        );
-      }
+      clear(selectionCanvasContext);
+      clear(anchorPointsContext);
     }
 
     move(x, y);
@@ -476,15 +475,7 @@ export const LassoSelectionCanvas = ({
   useEffect(() => {
     const animate = () => {
       if (moved || updated) {
-        if (interfaceCanvasContext) {
-          interfaceCanvasContext.clearRect(
-            0,
-            0,
-            interfaceCanvasContext.canvas.width,
-            interfaceCanvasContext.canvas.height
-          );
-        }
-
+        clear(interfaceCanvasContext);
         setMoved(false);
         setUpdated(false);
       }
