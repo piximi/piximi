@@ -41,6 +41,7 @@ type LassoSelectionLayerProps = {
 type PolygonalSelectionLayerProps = {
   current?: Anchor;
   end?: Anchor;
+  midpoint?: Anchor;
   start?: Anchor;
 };
 
@@ -123,14 +124,20 @@ const LassoSelectionLayer = ({
 const PolygonalSelectionLayer = ({
   current,
   end,
+  midpoint,
   start,
 }: PolygonalSelectionLayerProps) => {
   return (
     <Konva.Layer>
       <React.Fragment>
-        {start && <StartingAnchorPoint x={start.x} y={start.y} />}
+        {start && (
+          <StartingAnchorPoint
+            x={start.x}
+            y={start.y}
+          />
+        )}
 
-        {start && current && (
+        {start && !midpoint && current && (
           <Konva.Line
             dash={[4, 2]}
             globalCompositeOperation="destination-over"
@@ -139,7 +146,27 @@ const PolygonalSelectionLayer = ({
           />
         )}
 
-        {/*{end && <AnchorPoint x={end.x} y={end.y} />}*/}
+        {start && midpoint && (
+          <Konva.Line
+            dash={[4, 2]}
+            globalCompositeOperation="destination-over"
+            points={[start.x, start.y, midpoint.x, midpoint.y]}
+            stroke="#df4b26"
+          />
+        )}
+
+        {/*{midpoint && (<AnchorPoint x={midpoint.x} y={midpoint.y} />)}*/}
+
+        {midpoint && current && (
+          <Konva.Line
+            dash={[4, 2]}
+            globalCompositeOperation="destination-over"
+            points={[midpoint.x, midpoint.y, current.x, current.y]}
+            stroke="#df4b26"
+          />
+        )}
+
+        {end && <AnchorPoint x={end.x} y={end.y} />}
       </React.Fragment>
     </Konva.Layer>
   );
@@ -150,6 +177,7 @@ export const KonvaSelectionCanvas = ({
   method,
 }: KonvaSelectionCanvasProps) => {
   const [current, setCurrent] = useState<Anchor>();
+  const [midpoint, setMidpoint] = useState<Anchor>();
   const [start, setStart] = useState<Anchor>();
   const [end, setEnd] = useState<Anchor>();
 
@@ -232,7 +260,25 @@ export const KonvaSelectionCanvas = ({
       const position = stage.getPointerPosition();
 
       if (position) {
-        setStart(position);
+        const intersection = stage.getIntersection(
+          position,
+          ".starting-anchor-point"
+        );
+
+        if (intersection) {
+          console.info("onPolygonalMouseDown intersection");
+        } else {
+          if (!midpoint) {
+            setStart(position);
+          } else if (midpoint && start) {
+
+
+            setStrokes([...strokes, {
+              method: Method.Polygonal,
+              points: [start.x, start.y, midpoint.x, midpoint.y]
+            }]);
+          }
+        }
       }
     }
   };
@@ -260,7 +306,7 @@ export const KonvaSelectionCanvas = ({
       const position = stage.getPointerPosition();
 
       if (position) {
-        setEnd(position);
+        setMidpoint(position);
       }
     }
   };
@@ -317,8 +363,14 @@ export const KonvaSelectionCanvas = ({
       {method === Method.Lasso && (
         <LassoSelectionLayer end={end} start={start} strokes={strokes} />
       )}
+
       {method === Method.Polygonal && (
-        <PolygonalSelectionLayer current={current} end={end} start={start} />
+        <PolygonalSelectionLayer
+          current={current}
+          end={end}
+          midpoint={midpoint}
+          start={start}
+        />
       )}
     </Konva.Stage>
   );
