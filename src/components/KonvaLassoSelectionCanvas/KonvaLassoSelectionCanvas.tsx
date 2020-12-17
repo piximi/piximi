@@ -1,9 +1,11 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import * as ReactKonva from "react-konva";
 import {Image} from "../../types/Image";
 import {KonvaEventObject} from "konva/types/Node";
 import useImage from "use-image";
 import {Stage} from "konva/types/Stage";
+import {Circle} from "konva/types/shapes/Circle";
+import * as Konva from "konva";
 
 export enum Method {
   Elliptical,
@@ -31,26 +33,33 @@ type Stroke = {
 export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProps) => {
   const [img] = useImage(image.src);
 
+  const stage = React.useRef<Stage>(null);
+  const startingAnchorCircle = React.useRef<Circle>(null);
+
   const [annotating, setAnnotating] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<Anchor>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
-  const connected = (stage: Stage, position: { x: number, y: number }): boolean => {
-    return !!stage.getIntersection(
-      position,
-      ".starting-anchor"
-    );
+  const connected = (position: { x: number, y: number }) => {
+    if (startingAnchorCircle && startingAnchorCircle.current) {
+      const rectangle = startingAnchorCircle.current.getClientRect();
+
+      const inside = (
+        (rectangle.x <= position.x && position.x <= rectangle.x + rectangle.width) &&
+        (rectangle.y <= position.y && position.y <= rectangle.y + rectangle.height)
+      );
+
+      return inside;
+    }
   }
 
   const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
-    const stage = event.target.getStage();
-
-    if (stage) {
-      const position = stage.getPointerPosition();
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
 
       if (position) {
-        if (connected(stage, position)) {
+        if (connected(position)) {
           setAnnotating(false);
         } else {
           if (anchor) {
@@ -82,10 +91,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   const onMouseMove = (event: KonvaEventObject<MouseEvent>) => {
     if (!annotating) return;
 
-    const stage = event.target.getStage();
-
-    if (stage) {
-      const position = stage.getPointerPosition();
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
 
       if (position) {
         if (anchor) {
@@ -110,8 +117,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
 
           setStrokes(strokes.concat());
 
-          if (connected(stage, position)) {
-
+          if (connected(position)) {
+            console.info("connected");
           } else {
 
           }
@@ -123,13 +130,11 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   const onMouseUp = (event: KonvaEventObject<MouseEvent>) => {
     if (!annotating) return;
 
-    const stage = event.target.getStage();
-
-    if (stage) {
-      const position = stage.getPointerPosition();
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
 
       if (position) {
-        if (connected(stage, position)) {
+        if (connected(position)) {
           setAnnotating(false);
         } else {
           setAnchor(position);
@@ -163,8 +168,10 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           fill="#000"
           globalCompositeOperation="source-over"
           hitStrokeWidth={64}
-          name="starting-anchor"
+          id="start"
+          name="anchor"
           radius={3}
+          ref={startingAnchorCircle}
           stroke="#FFF"
           strokeWidth={1}
           x={start.x}
@@ -183,6 +190,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
+      ref={stage}
       width={image.shape?.c}
     >
       <ReactKonva.Layer>
@@ -194,6 +202,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           return (
             <ReactKonva.Line
               dash={[4, 2]}
+              fillEnabled={false}
               key={key}
               points={stroke.points}
               stroke="#df4b26"
