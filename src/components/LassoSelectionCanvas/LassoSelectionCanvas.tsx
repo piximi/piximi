@@ -172,6 +172,7 @@ export const LassoSelectionCanvas = ({
     setAnchorPoints([]);
     setSelecting(false);
     setPressed(false);
+    setStraightLineMode(false);
     clear(interfaceCanvasContext);
     clear(temporaryCanvasContext);
     clear(selectionCanvasContext);
@@ -244,6 +245,44 @@ export const LassoSelectionCanvas = ({
     }
   };
 
+  const drawCurve = (
+    points: Array<{ x: number; y: number }>,
+    context: CanvasRenderingContext2D
+  ) => {
+    context.beginPath();
+
+    let p1 = points[0];
+    let p2 = points[1];
+
+    context.moveTo(p2.x, p2.y);
+    for (let i = 1, len = points.length; i < len; i++) {
+      // we pick the point between pi+1 & pi+2 as the
+      // end point and p1 as our control point
+      const m = midpoint(new Point(p1), new Point(p2));
+
+      context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+
+      p1 = points[i];
+      p2 = points[i + 1];
+    }
+
+    // Draw last line as a straight line while
+    // we wait for the next point to be able to calculate
+    // the bezier control point
+    context.lineTo(p1.x, p1.y);
+    context.stroke();
+  };
+
+  const drawStraightLine = (
+    points: Array<{ x: number; y: number }>,
+    context: CanvasRenderingContext2D
+  ) => {
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+    context.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+    context.stroke();
+  };
+
   const drawPoints = (
     context: CanvasRenderingContext2D,
     points: Array<{ x: number; y: number }>,
@@ -258,50 +297,38 @@ export const LassoSelectionCanvas = ({
     if (context) {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-      let p1 = points[0];
-      let p2 = points[1];
-
       drawAnchorPoints(context, anchorPoints);
 
-      context.moveTo(p2.x, p2.y);
-
-      context.beginPath();
-      context.globalCompositeOperation = "destination-over";
       context.lineJoin = "round";
       context.lineCap = "round";
-      context.strokeStyle = color;
-
-      context.lineWidth = radius;
-      context.setLineDash(dash);
-      context.lineDashOffset = offset;
 
       if (!straightLine) {
-        for (let i = 1, len = points.length; i < len; i++) {
-          // we pick the point between pi+1 & pi+2 as the
-          // end point and p1 as our control point
-          const m = midpoint(new Point(p1), new Point(p2));
+        context.lineWidth = radius;
+        context.strokeStyle = "black";
 
-          context.quadraticCurveTo(p1.x, p1.y, m.x, m.y);
+        drawCurve(points, context);
 
-          p1 = points[i];
-          p2 = points[i + 1];
-        }
+        context.lineWidth = radius;
+        context.strokeStyle = "white";
+        context.setLineDash(dash);
+        context.lineDashOffset = offset;
 
-        // Draw last line as a straight line while
-        // we wait for the next point to be able to calculate
-        // the bezier control point
-        context.lineTo(p1.x, p1.y);
-        context.stroke();
+        drawCurve(points, context);
       } else {
-        context.moveTo(points[0].x, points[0].y);
-        context.lineTo(
-          points[points.length - 1].x,
-          points[points.length - 1].y
-        );
-        context.stroke();
+        context.lineWidth = radius;
+        context.strokeStyle = "black";
+        context.setLineDash([]);
+
+        drawStraightLine(points, context);
+
+        context.lineWidth = radius;
+        context.strokeStyle = "white";
+        context.setLineDash(dash);
+        context.lineDashOffset = offset;
+
+        drawStraightLine(points, context);
       }
     }
-    // }
   };
 
   const getPosition = (
@@ -430,7 +457,7 @@ export const LassoSelectionCanvas = ({
   const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
-    setOpen(true);
+    //setOpen(true);
 
     const stroke: Stroke = {
       color: color,
@@ -496,6 +523,7 @@ export const LassoSelectionCanvas = ({
 
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
       setInterfaceCanvasContext(interfaceCanvasRef.current?.getContext("2d"));
+      interfaceCanvasRef.current.focus();
     }
 
     if (selectionCanvasRef && selectionCanvasRef.current) {
@@ -549,6 +577,7 @@ export const LassoSelectionCanvas = ({
     <React.Fragment>
       <div className={classes.container}>
         <canvas
+          tabIndex={1}
           className={classes.interface}
           height={image.shape?.r}
           onMouseDown={onStart}
