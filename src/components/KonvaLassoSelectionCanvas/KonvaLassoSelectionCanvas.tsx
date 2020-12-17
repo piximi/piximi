@@ -146,6 +146,15 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
 
       if (position) {
         if (connected(position)) {
+          if (start) {
+            const stroke = {
+              method: Method.Lasso,
+              points: [position.x, position.y, start.x, start.y]
+            }
+
+            setStrokes([...strokes, stroke]);
+          }
+
           setAnnotating(false);
 
           setAnnotated(true);
