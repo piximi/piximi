@@ -1,122 +1,136 @@
-// to suit your point format, run search/replace for '.x' and '.y';
-// for 3D version, see 3d branch (configurability would draw significant performance overhead)
-
 type Point = {
   x: number;
   y: number;
 };
 
-// square distance between 2 points
-const getSqDist = (p1: Point, p2: Point) => {
-  const dx = p1.x - p2.x;
-  const dy = p1.y - p2.y;
+type Segment = {
+  a: Point;
+  b: Point;
+};
+
+const getSquareDistance = (a: Point, b: Point) => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
 
   return dx * dx + dy * dy;
 };
 
-// square distance from a point to a segment
-const getSqSegDist = (p: Point, p1: Point, p2: Point) => {
-  let x = p1.x;
-  let y = p1.y;
-  let dx = p2.x - x;
-  let dy = p2.y - y;
+const getSquareSegmentDistance = (point: Point, segment: Segment) => {
+  const { a, b } = segment;
+
+  let x = a.x;
+  let y = a.y;
+  let dx = b.x - x;
+  let dy = b.y - y;
 
   if (dx !== 0 || dy !== 0) {
-    const t = ((p.x - x) * dx + (p.y - y) * dy) / (dx * dx + dy * dy);
+    const t = ((point.x - x) * dx + (point.y - y) * dy) / (dx * dx + dy * dy);
 
     if (t > 1) {
-      x = p2.x;
-      y = p2.y;
+      x = b.x;
+      y = b.y;
     } else if (t > 0) {
       x += dx * t;
       y += dy * t;
     }
   }
 
-  dx = p.x - x;
-  dy = p.y - y;
+  dx = point.x - x;
+  dy = point.y - y;
 
   return dx * dx + dy * dy;
 };
-// rest of the code doesn't care about point format
 
-// basic distance-based simplification
-function simplifyRadialDist(points: Array<Point>, sqTolerance: number) {
-  let prevPoint = points[0];
-  let newPoints = [prevPoint];
-  let point;
+const preprocess = (points: Array<Point>, tolerance: number) => {
+  let previous: Point = points[0];
+
+  let updated: Array<Point> = [previous];
+
+  let current;
 
   for (let i = 1, len = points.length; i < len; i++) {
-    point = points[i];
+    current = points[i];
 
-    if (getSqDist(point, prevPoint) > sqTolerance) {
-      newPoints.push(point);
-      prevPoint = point;
+    const distance = getSquareDistance(current, previous);
+
+    if (distance > tolerance) {
+      updated.push(current);
+
+      previous = current;
     }
   }
 
-  if (point && prevPoint !== point) {
-    newPoints.push(point);
+  if (current && previous !== current) {
+    updated.push(current);
   }
 
-  return newPoints;
-}
+  return updated;
+};
 
-const simplifyDPStep = (
+const step = (
   points: Array<Point>,
-  first: number,
-  last: number,
-  sqTolerance: number,
-  simplified: any[]
+  m: number,
+  n: number,
+  tolerance: number,
+  shape: any[]
 ) => {
-  let maxSqDist = sqTolerance;
+  let maximum: number = tolerance;
+
   let index;
 
-  for (let i = first + 1; i < last; i++) {
-    const sqDist = getSqSegDist(points[i], points[first], points[last]);
+  const segment: Segment = {
+    a: points[m],
+    b: points[n],
+  };
 
-    if (sqDist > maxSqDist) {
+  for (let i = m + 1; i < n; i++) {
+    const distance = getSquareSegmentDistance(points[i], segment);
+
+    if (distance > maximum) {
       index = i;
-      maxSqDist = sqDist;
+
+      maximum = distance;
     }
   }
 
-  if (index && maxSqDist > sqTolerance) {
-    if (index - first > 1) {
-      simplifyDPStep(points, first, index, sqTolerance, simplified);
+  if (index && maximum > tolerance) {
+    if (index - m > 1) {
+      step(points, m, index, tolerance, shape);
     }
 
-    simplified.push(points[index]);
+    shape.push(points[index]);
 
-    if (last - index > 1) {
-      simplifyDPStep(points, index, last, sqTolerance, simplified);
+    if (n - index > 1) {
+      step(points, index, n, tolerance, shape);
     }
   }
 };
 
 // simplification using Ramer-Douglas-Peucker algorithm
-const simplifyDouglasPeucker = (points: Array<Point>, sqTolerance: number) => {
-  const last = points.length - 1;
+const simplification = (points: Array<Point>, tolerance: number) => {
+  const n = points.length - 1;
 
-  const simplified = [points[0]];
-  simplifyDPStep(points, 0, last, sqTolerance, simplified);
-  simplified.push(points[last]);
+  const shape = [points[0]];
 
-  return simplified;
+  step(points, 0, n, tolerance, shape);
+
+  shape.push(points[n]);
+
+  return shape;
 };
 
-// both algorithms combined for awesome performance
 export const simplify = (
   points: Array<Point>,
   tolerance: number = 1,
-  highestQuality: boolean
+  preprocessing: boolean = false
 ) => {
-  if (points.length <= 2) return points;
+  if (points.length < 3) return points;
 
-  const sqTolerance = tolerance * tolerance;
+  tolerance = tolerance * tolerance;
 
-  points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
-  points = simplifyDouglasPeucker(points, sqTolerance);
+  if (preprocessing) {
+    points = preprocess(points, tolerance);
+  }
 
-  return points;
+  return simplification(points, tolerance);
 };

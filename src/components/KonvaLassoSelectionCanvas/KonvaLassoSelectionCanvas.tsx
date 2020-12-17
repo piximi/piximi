@@ -1,11 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useState } from "react";
 import * as ReactKonva from "react-konva";
-import {Image} from "../../types/Image";
-import {KonvaEventObject} from "konva/types/Node";
+import { Image } from "../../types/Image";
 import useImage from "use-image";
-import {Stage} from "konva/types/Stage";
-import {Circle} from "konva/types/shapes/Circle";
-import * as Konva from "konva";
+import { Stage } from "konva/types/Stage";
+import { Circle } from "konva/types/shapes/Circle";
+import { simplify } from "../LassoSelectionCanvas/simplify";
 
 export enum Method {
   Elliptical,
@@ -30,7 +29,9 @@ type Stroke = {
   points: Array<number>;
 };
 
-export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProps) => {
+export const KonvaLassoSelectionCanvas = ({
+  image,
+}: KonvaLassoSelectionCanvasProps) => {
   const [img] = useImage(image.src);
 
   const stage = React.useRef<Stage>(null);
@@ -42,20 +43,48 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
-  const connected = (position: { x: number, y: number }) => {
+  const connected = (position: { x: number; y: number }) => {
     if (startingAnchorCircle && startingAnchorCircle.current) {
       const rectangle = startingAnchorCircle.current.getClientRect();
 
-      const inside = (
-        (rectangle.x <= position.x && position.x <= rectangle.x + rectangle.width) &&
-        (rectangle.y <= position.y && position.y <= rectangle.y + rectangle.height)
-      );
+      const inside =
+        rectangle.x <= position.x &&
+        position.x <= rectangle.x + rectangle.width &&
+        rectangle.y <= position.y &&
+        position.y <= rectangle.y + rectangle.height;
 
       if (strokes && strokes.length > 0) {
         return inside && strokes[0].points.length > 32;
       }
     }
-  }
+  };
+
+  const select = () => {
+    const points = strokes
+      .map((stroke: Stroke) => stroke.points)
+      .flat()
+      .reduce(
+        (
+          points: Array<{ x: number; y: number }>,
+          value: number,
+          index: number,
+          array: Array<number>
+        ) => {
+          if (index % 2 === 0) {
+            const pair = array.slice(index, index + 2);
+
+            const point = { x: pair[0], y: pair[1] };
+
+            points.push(point);
+          }
+
+          return points;
+        },
+        []
+      );
+
+    const shape = simplify(points);
+  };
 
   const onMouseDown = () => {
     if (annotated) return;
@@ -65,6 +94,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
 
       if (position) {
         if (connected(position)) {
+          console.info(strokes);
+
           setAnnotating(false);
 
           setAnnotated(true);
@@ -72,8 +103,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           if (anchor) {
             const stroke = {
               method: Method.Lasso,
-              points: [anchor.x, anchor.y, position.x, position.y]
-            }
+              points: [anchor.x, anchor.y, position.x, position.y],
+            };
 
             setStrokes([...strokes, stroke]);
 
@@ -107,8 +138,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
         if (anchor) {
           const stroke = {
             method: Method.Lasso,
-            points: [anchor.x, anchor.y, position.x, position.y]
-          }
+            points: [anchor.x, anchor.y, position.x, position.y],
+          };
 
           if (strokes.length > 2) {
             strokes.splice(strokes.length - 1, 1, stroke);
@@ -129,7 +160,6 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           if (connected(position)) {
             console.info("connected");
           } else {
-
           }
         }
       }
@@ -149,11 +179,13 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           if (start) {
             const stroke = {
               method: Method.Lasso,
-              points: [position.x, position.y, start.x, start.y]
-            }
+              points: [position.x, position.y, start.x, start.y],
+            };
 
             setStrokes([...strokes, stroke]);
           }
+
+          console.info(strokes);
 
           setAnnotating(false);
 
@@ -179,7 +211,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
         />
       );
     } else {
-      return <React.Fragment/>
+      return <React.Fragment />;
     }
   };
 
@@ -201,9 +233,9 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
         />
       );
     } else {
-      return <React.Fragment/>
+      return <React.Fragment />;
     }
-  }
+  };
 
   return (
     <ReactKonva.Stage
@@ -232,7 +264,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
           );
         })}
 
-        <Anchor/>
+        <Anchor />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
