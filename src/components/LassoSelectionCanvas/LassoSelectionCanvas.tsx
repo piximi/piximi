@@ -172,6 +172,7 @@ export const LassoSelectionCanvas = ({
     setAnchorPoints([]);
     setSelecting(false);
     setPressed(false);
+    setStraightLineMode(false);
     clear(interfaceCanvasContext);
     clear(temporaryCanvasContext);
     clear(selectionCanvasContext);
@@ -456,7 +457,7 @@ export const LassoSelectionCanvas = ({
   const saveStroke = (color: string, radius: number) => {
     if (points.length < 2) return;
 
-    setOpen(true);
+    //setOpen(true);
 
     const stroke: Stroke = {
       color: color,
@@ -522,6 +523,7 @@ export const LassoSelectionCanvas = ({
 
     if (interfaceCanvasRef && interfaceCanvasRef.current) {
       setInterfaceCanvasContext(interfaceCanvasRef.current?.getContext("2d"));
+      interfaceCanvasRef.current.focus();
     }
 
     if (selectionCanvasRef && selectionCanvasRef.current) {
@@ -575,6 +577,7 @@ export const LassoSelectionCanvas = ({
     <React.Fragment>
       <div className={classes.container}>
         <canvas
+          tabIndex={1}
           className={classes.interface}
           height={image.shape?.r}
           onMouseDown={onStart}
