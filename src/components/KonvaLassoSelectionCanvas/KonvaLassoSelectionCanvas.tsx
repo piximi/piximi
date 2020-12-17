@@ -63,25 +63,13 @@ export const KonvaLassoSelectionCanvas = ({
     const points = strokes
       .map((stroke: Stroke) => stroke.points)
       .flat()
-      .reduce(
-        (
-          points: Array<{ x: number; y: number }>,
-          value: number,
-          index: number,
-          array: Array<number>
-        ) => {
-          if (index % 2 === 0) {
-            const pair = array.slice(index, index + 2);
+      .reduce((points: Array<{ x: number; y: number }>, index: number) => {
+        if (index % 2 === 0) {
+          points.push({ x: index, y: index + 2 });
+        }
 
-            const point = { x: pair[0], y: pair[1] };
-
-            points.push(point);
-          }
-
-          return points;
-        },
-        []
-      );
+        return points;
+      }, []);
 
     const shape = simplify(points);
   };
