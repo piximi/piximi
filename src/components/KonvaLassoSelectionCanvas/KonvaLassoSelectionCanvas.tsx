@@ -268,7 +268,7 @@ export const KonvaLassoSelectionCanvas = ({
 
         {annotated && annotation && (
           <ReactKonva.Line
-            closed
+            closed={true}
             dash={[4, 2]}
             fillEnabled={false}
             points={annotation.points}
