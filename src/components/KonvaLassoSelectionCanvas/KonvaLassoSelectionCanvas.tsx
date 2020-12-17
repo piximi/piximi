@@ -42,6 +42,7 @@ export const KonvaLassoSelectionCanvas = ({
   const [anchor, setAnchor] = useState<Anchor>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
+  const [annotation, setAnnotation] = useState<Stroke>();
 
   const connected = (position: { x: number; y: number }) => {
     if (startingAnchorCircle && startingAnchorCircle.current) {
@@ -63,15 +64,26 @@ export const KonvaLassoSelectionCanvas = ({
     const points = strokes
       .map((stroke: Stroke) => stroke.points)
       .flat()
-      .reduce((points: Array<{ x: number; y: number }>, index: number) => {
+      .reduce((points: Array<[number, number]>, index: number) => {
         if (index % 2 === 0) {
-          points.push({ x: index, y: index + 2 });
+          points.push([index, index + 2]);
         }
 
         return points;
       }, []);
 
-    const shape = simplify(points);
+    const simplified = simplify(points, 0.0001, true);
+
+    console.info(simplified);
+
+    const stroke: Stroke = {
+      method: Method.Lasso,
+      points: simplified.flat(),
+    };
+
+    console.info(stroke);
+
+    setAnnotation(stroke);
   };
 
   const onMouseDown = () => {
@@ -82,7 +94,7 @@ export const KonvaLassoSelectionCanvas = ({
 
       if (position) {
         if (connected(position)) {
-          console.info(strokes);
+          select();
 
           setAnnotating(false);
 
@@ -146,8 +158,9 @@ export const KonvaLassoSelectionCanvas = ({
           setStrokes(strokes.concat());
 
           if (connected(position)) {
-            console.info("connected");
+            //  TODO:
           } else {
+            //  TODO:
           }
         }
       }
@@ -173,7 +186,7 @@ export const KonvaLassoSelectionCanvas = ({
             setStrokes([...strokes, stroke]);
           }
 
-          console.info(strokes);
+          select();
 
           setAnnotating(false);
 
@@ -240,17 +253,28 @@ export const KonvaLassoSelectionCanvas = ({
 
         <StartingAnchor />
 
-        {strokes.map((stroke: Stroke, key: number) => {
-          return (
-            <ReactKonva.Line
-              dash={[4, 2]}
-              fillEnabled={false}
-              key={key}
-              points={stroke.points}
-              stroke="#df4b26"
-            />
-          );
-        })}
+        {!annotated &&
+          strokes.map((stroke: Stroke, key: number) => {
+            return (
+              <ReactKonva.Line
+                dash={[4, 2]}
+                fillEnabled={false}
+                key={key}
+                points={stroke.points}
+                stroke="#df4b26"
+              />
+            );
+          })}
+
+        {annotated && annotation && (
+          <ReactKonva.Line
+            closed
+            dash={[4, 2]}
+            fillEnabled={false}
+            points={annotation.points}
+            stroke="#df4b26"
+          />
+        )}
 
         <Anchor />
       </ReactKonva.Layer>

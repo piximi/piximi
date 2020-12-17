@@ -1,7 +1,4 @@
-type Point = {
-  x: number;
-  y: number;
-};
+type Point = [number, number];
 
 type Segment = {
   a: Point;
@@ -9,8 +6,8 @@ type Segment = {
 };
 
 const getSquareDistance = (a: Point, b: Point) => {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
+  const dx = a[0] - b[0];
+  const dy = a[1] - b[1];
 
   return dx * dx + dy * dy;
 };
@@ -18,25 +15,25 @@ const getSquareDistance = (a: Point, b: Point) => {
 const getSquareSegmentDistance = (point: Point, segment: Segment) => {
   const { a, b } = segment;
 
-  let x = a.x;
-  let y = a.y;
-  let dx = b.x - x;
-  let dy = b.y - y;
+  let x = a[0];
+  let y = a[1];
+  let dx = b[0] - x;
+  let dy = b[1] - y;
 
   if (dx !== 0 || dy !== 0) {
-    const t = ((point.x - x) * dx + (point.y - y) * dy) / (dx * dx + dy * dy);
+    const t = ((point[0] - x) * dx + (point[1] - y) * dy) / (dx * dx + dy * dy);
 
     if (t > 1) {
-      x = b.x;
-      y = b.y;
+      x = b[0];
+      y = b[1];
     } else if (t > 0) {
       x += dx * t;
       y += dy * t;
     }
   }
 
-  dx = point.x - x;
-  dy = point.y - y;
+  dx = point[0] - x;
+  dy = point[1] - y;
 
   return dx * dx + dy * dy;
 };
