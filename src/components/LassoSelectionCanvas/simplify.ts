@@ -4,7 +4,7 @@
 type Point = {
   x: number;
   y: number;
-}
+};
 
 // square distance between 2 points
 const getSqDist = (p1: Point, p2: Point) => {
@@ -27,7 +27,6 @@ const getSqSegDist = (p: Point, p1: Point, p2: Point) => {
     if (t > 1) {
       x = p2.x;
       y = p2.y;
-
     } else if (t > 0) {
       x += dx * t;
       y += dy * t;
@@ -43,8 +42,8 @@ const getSqSegDist = (p: Point, p1: Point, p2: Point) => {
 
 // basic distance-based simplification
 function simplifyRadialDist(points: Array<Point>, sqTolerance: number) {
-  let prevPoint = points[0]
-  let newPoints = [prevPoint]
+  let prevPoint = points[0];
+  let newPoints = [prevPoint];
   let point;
 
   for (let i = 1, len = points.length; i < len; i++) {
@@ -57,14 +56,20 @@ function simplifyRadialDist(points: Array<Point>, sqTolerance: number) {
   }
 
   if (point && prevPoint !== point) {
-    newPoints.push(point)
+    newPoints.push(point);
   }
 
   return newPoints;
 }
 
-const simplifyDPStep = (points: Array<Point>, first: number, last: number, sqTolerance: number, simplified: any[]) => {
-  let maxSqDist = sqTolerance
+const simplifyDPStep = (
+  points: Array<Point>,
+  first: number,
+  last: number,
+  sqTolerance: number,
+  simplified: any[]
+) => {
+  let maxSqDist = sqTolerance;
   let index;
 
   for (let i = first + 1; i < last; i++) {
@@ -78,13 +83,13 @@ const simplifyDPStep = (points: Array<Point>, first: number, last: number, sqTol
 
   if (index && maxSqDist > sqTolerance) {
     if (index - first > 1) {
-      simplifyDPStep(points, first, index, sqTolerance, simplified)
+      simplifyDPStep(points, first, index, sqTolerance, simplified);
     }
 
     simplified.push(points[index]);
 
     if (last - index > 1) {
-      simplifyDPStep(points, index, last, sqTolerance, simplified)
+      simplifyDPStep(points, index, last, sqTolerance, simplified);
     }
   }
 };
@@ -101,7 +106,11 @@ const simplifyDouglasPeucker = (points: Array<Point>, sqTolerance: number) => {
 };
 
 // both algorithms combined for awesome performance
-export const simplify = (points: Array<Point>, tolerance: number = 1, highestQuality: boolean) => {
+export const simplify = (
+  points: Array<Point>,
+  tolerance: number = 1,
+  highestQuality: boolean
+) => {
   if (points.length <= 2) return points;
 
   const sqTolerance = tolerance * tolerance;
