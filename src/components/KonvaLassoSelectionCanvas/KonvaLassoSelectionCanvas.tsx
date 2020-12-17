@@ -37,6 +37,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   const startingAnchorCircle = React.useRef<Circle>(null);
 
   const [annotating, setAnnotating] = useState<boolean>(false);
+  const [annotated, setAnnotated] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<Anchor>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
@@ -50,17 +51,23 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
         (rectangle.y <= position.y && position.y <= rectangle.y + rectangle.height)
       );
 
-      return inside;
+      if (strokes && strokes.length > 0) {
+        return inside && strokes[0].points.length > 32;
+      }
     }
   }
 
-  const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
+  const onMouseDown = () => {
+    if (annotated) return;
+
     if (stage && stage.current) {
       const position = stage.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
           setAnnotating(false);
+
+          setAnnotated(true);
         } else {
           if (anchor) {
             const stroke = {
@@ -88,7 +95,9 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
     }
   };
 
-  const onMouseMove = (event: KonvaEventObject<MouseEvent>) => {
+  const onMouseMove = () => {
+    if (annotated) return;
+
     if (!annotating) return;
 
     if (stage && stage.current) {
@@ -127,7 +136,9 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
     }
   };
 
-  const onMouseUp = (event: KonvaEventObject<MouseEvent>) => {
+  const onMouseUp = () => {
+    if (annotated) return;
+
     if (!annotating) return;
 
     if (stage && stage.current) {
@@ -136,6 +147,8 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
       if (position) {
         if (connected(position)) {
           setAnnotating(false);
+
+          setAnnotated(true);
         } else {
           setAnchor(position);
         }
@@ -144,7 +157,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   };
 
   const Anchor = () => {
-    if (anchor) {
+    if (annotating && anchor) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
@@ -162,7 +175,7 @@ export const KonvaLassoSelectionCanvas = ({image}: KonvaLassoSelectionCanvasProp
   };
 
   const StartingAnchor = () => {
-    if (start) {
+    if (annotating && start) {
       return (
         <ReactKonva.Circle
           fill="#000"
