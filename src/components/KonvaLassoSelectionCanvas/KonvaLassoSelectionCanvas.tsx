@@ -33,6 +33,18 @@ type Stroke = {
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
+  React.useEffect(() => {
+    setTimeout(() => {
+      setDashOffset(dashOffset + 1);
+
+      if (dashOffset > 16) {
+        setDashOffset(0);
+      }
+    }, 20);
+  });
+
+  const [dashOffset, setDashOffset] = React.useState();
+
   return (
     <React.Fragment>
       <ReactKonva.Line
@@ -44,6 +56,7 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
 
       <ReactKonva.Line
         dash={[4, 2]}
+        dashOffset={dashOffset}
         fillEnabled={false}
         points={stroke.points}
         stroke="#000"
@@ -278,17 +291,9 @@ export const KonvaLassoSelectionCanvas = ({
 
         {!annotated &&
           annotating &&
-          strokes.map((stroke: Stroke, key: number) => {
-            return (
-              <ReactKonva.Line
-                dash={[4, 2]}
-                fillEnabled={false}
-                key={key}
-                points={stroke.points}
-                stroke="#df4b26"
-              />
-            );
-          })}
+          strokes.map((stroke: Stroke, key: number) => (
+            <MarchingAnts key={key} stroke={stroke} />
+          ))}
 
         <Anchor />
 
