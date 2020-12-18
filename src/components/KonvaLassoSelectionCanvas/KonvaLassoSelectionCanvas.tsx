@@ -4,7 +4,8 @@ import { Image } from "../../types/Image";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
 import { Circle } from "konva/types/shapes/Circle";
-import { simplify } from "../LassoSelectionCanvas/simplify";
+import { Transformer } from "konva/types/shapes/Transformer";
+import { Group } from "konva/types/Group";
 
 export enum Method {
   Elliptical,
@@ -36,13 +37,28 @@ export const KonvaLassoSelectionCanvas = ({
 
   const stage = React.useRef<Stage>(null);
   const startingAnchorCircle = React.useRef<Circle>(null);
+  const transformer = React.useRef<Transformer>(null);
+  const group = React.useRef<Group>(null);
 
   const [annotating, setAnnotating] = useState<boolean>(false);
   const [annotated, setAnnotated] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<Anchor>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-  const [annotation, setAnnotation] = useState<Stroke>();
+
+  React.useEffect(() => {
+    if (
+      annotated &&
+      group &&
+      group.current &&
+      transformer &&
+      transformer.current
+    ) {
+      transformer.current.nodes([group.current]);
+
+      transformer.current.getLayer()?.batchDraw();
+    }
+  }, [annotated]);
 
   const connected = (position: { x: number; y: number }) => {
     if (startingAnchorCircle && startingAnchorCircle.current) {
@@ -60,32 +76,6 @@ export const KonvaLassoSelectionCanvas = ({
     }
   };
 
-  const select = () => {
-    const points = strokes
-      .map((stroke: Stroke) => stroke.points)
-      .flat()
-      .reduce((points: Array<[number, number]>, index: number) => {
-        if (index % 2 === 0) {
-          points.push([index, index + 2]);
-        }
-
-        return points;
-      }, []);
-
-    const simplified = simplify(points, 0.0001, true);
-
-    console.info(simplified);
-
-    const stroke: Stroke = {
-      method: Method.Lasso,
-      points: simplified.flat(),
-    };
-
-    console.info(stroke);
-
-    setAnnotation(stroke);
-  };
-
   const onMouseDown = () => {
     if (annotated) return;
 
@@ -94,8 +84,6 @@ export const KonvaLassoSelectionCanvas = ({
 
       if (position) {
         if (connected(position)) {
-          select();
-
           setAnnotating(false);
 
           setAnnotated(true);
@@ -186,8 +174,6 @@ export const KonvaLassoSelectionCanvas = ({
             setStrokes([...strokes, stroke]);
           }
 
-          select();
-
           setAnnotating(false);
 
           setAnnotated(true);
@@ -251,10 +237,10 @@ export const KonvaLassoSelectionCanvas = ({
       <ReactKonva.Layer>
         <ReactKonva.Image image={img} />
 
-        <StartingAnchor />
+        <ReactKonva.Group draggable ref={group}>
+          <StartingAnchor />
 
-        {!annotated &&
-          strokes.map((stroke: Stroke, key: number) => {
+          {strokes.map((stroke: Stroke, key: number) => {
             return (
               <ReactKonva.Line
                 dash={[4, 2]}
@@ -266,17 +252,10 @@ export const KonvaLassoSelectionCanvas = ({
             );
           })}
 
-        {annotated && annotation && (
-          <ReactKonva.Line
-            closed={true}
-            dash={[4, 2]}
-            fillEnabled={false}
-            points={annotation.points}
-            stroke="#df4b26"
-          />
-        )}
+          <Anchor />
+        </ReactKonva.Group>
 
-        <Anchor />
+        <ReactKonva.Transformer ref={transformer} />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
