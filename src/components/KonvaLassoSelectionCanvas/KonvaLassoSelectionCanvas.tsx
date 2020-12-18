@@ -6,6 +6,7 @@ import { Stage } from "konva/types/Stage";
 import { Circle } from "konva/types/shapes/Circle";
 import { Transformer } from "konva/types/shapes/Transformer";
 import { Group } from "konva/types/Group";
+import * as _ from "underscore";
 
 export enum Method {
   Elliptical,
@@ -40,9 +41,10 @@ export const KonvaLassoSelectionCanvas = ({
   const transformer = React.useRef<Transformer>(null);
   const group = React.useRef<Group>(null);
 
-  const [annotating, setAnnotating] = useState<boolean>(false);
-  const [annotated, setAnnotated] = useState<boolean>(false);
   const [anchor, setAnchor] = useState<Anchor>();
+  const [annotated, setAnnotated] = useState<boolean>(false);
+  const [annotating, setAnnotating] = useState<boolean>(false);
+  const [annotation, setAnnotation] = useState<Stroke>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
@@ -84,6 +86,13 @@ export const KonvaLassoSelectionCanvas = ({
 
       if (position) {
         if (connected(position)) {
+          const stroke: Stroke = {
+            method: Method.Lasso,
+            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          };
+
+          setAnnotation(stroke);
+
           setAnnotating(false);
 
           setAnnotated(true);
@@ -174,6 +183,13 @@ export const KonvaLassoSelectionCanvas = ({
             setStrokes([...strokes, stroke]);
           }
 
+          setAnnotation({
+            method: Method.Lasso,
+            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          });
+
+          console.info(annotation);
+
           setAnnotating(false);
 
           setAnnotated(true);
@@ -240,17 +256,28 @@ export const KonvaLassoSelectionCanvas = ({
         <ReactKonva.Group draggable ref={group}>
           <StartingAnchor />
 
-          {strokes.map((stroke: Stroke, key: number) => {
-            return (
-              <ReactKonva.Line
-                dash={[4, 2]}
-                fillEnabled={false}
-                key={key}
-                points={stroke.points}
-                stroke="#df4b26"
-              />
-            );
-          })}
+          {!annotated &&
+            annotating &&
+            strokes.map((stroke: Stroke, key: number) => {
+              return (
+                <ReactKonva.Line
+                  dash={[4, 2]}
+                  fillEnabled={false}
+                  key={key}
+                  points={stroke.points}
+                  stroke="#df4b26"
+                />
+              );
+            })}
+
+          {annotation && annotated && !annotating && (
+            <ReactKonva.Line
+              dash={[4, 2]}
+              fillEnabled={false}
+              points={annotation.points}
+              stroke="#df4b26"
+            />
+          )}
 
           <Anchor />
         </ReactKonva.Group>
