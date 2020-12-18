@@ -255,7 +255,15 @@ export const KonvaLassoSelectionCanvas = ({
           <Anchor />
         </ReactKonva.Group>
 
-        <ReactKonva.Transformer ref={transformer} />
+        <ReactKonva.Transformer
+          anchorFill="#FFF"
+          anchorStroke="#000"
+          anchorStrokeWidth={1}
+          anchorSize={6}
+          borderEnabled={false}
+          ref={transformer}
+          rotateEnabled={false}
+        />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
