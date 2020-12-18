@@ -7,6 +7,7 @@ import { Circle } from "konva/types/shapes/Circle";
 import { Transformer } from "konva/types/shapes/Transformer";
 import { Group } from "konva/types/Group";
 import * as _ from "underscore";
+import { Line } from "konva/types/shapes/Line";
 
 export enum Method {
   Elliptical,
@@ -31,6 +32,27 @@ type Stroke = {
   points: Array<number>;
 };
 
+const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
+  return (
+    <React.Fragment>
+      <ReactKonva.Line
+        fillEnabled={false}
+        points={stroke.points}
+        stroke="#FFF"
+        strokeWidth={1}
+      />
+
+      <ReactKonva.Line
+        dash={[4, 2]}
+        fillEnabled={false}
+        points={stroke.points}
+        stroke="#000"
+        strokeWidth={1}
+      />
+    </React.Fragment>
+  );
+};
+
 export const KonvaLassoSelectionCanvas = ({
   image,
 }: KonvaLassoSelectionCanvasProps) => {
@@ -40,6 +62,7 @@ export const KonvaLassoSelectionCanvas = ({
   const startingAnchorCircle = React.useRef<Circle>(null);
   const transformer = React.useRef<Transformer>(null);
   const group = React.useRef<Group>(null);
+  const annotationRef = React.useRef<Line>(null);
 
   const [anchor, setAnchor] = useState<Anchor>();
   const [annotated, setAnnotated] = useState<boolean>(false);
@@ -51,12 +74,12 @@ export const KonvaLassoSelectionCanvas = ({
   React.useEffect(() => {
     if (
       annotated &&
-      group &&
-      group.current &&
+      annotationRef &&
+      annotationRef.current &&
       transformer &&
       transformer.current
     ) {
-      transformer.current.nodes([group.current]);
+      transformer.current.nodes([annotationRef.current]);
 
       transformer.current.getLayer()?.batchDraw();
     }
@@ -91,11 +114,10 @@ export const KonvaLassoSelectionCanvas = ({
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
           };
 
-          setAnnotation(stroke);
-
-          setAnnotating(false);
-
           setAnnotated(true);
+          setAnnotating(false);
+          setAnnotation(stroke);
+          setStrokes([]);
         } else {
           if (anchor) {
             const stroke = {
@@ -183,16 +205,15 @@ export const KonvaLassoSelectionCanvas = ({
             setStrokes([...strokes, stroke]);
           }
 
-          setAnnotation({
+          const stroke: Stroke = {
             method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
-          });
-
-          console.info(annotation);
-
-          setAnnotating(false);
+          };
 
           setAnnotated(true);
+          setAnnotating(false);
+          setAnnotation(stroke);
+          setStrokes([]);
         } else {
           setAnchor(position);
         }
@@ -253,33 +274,28 @@ export const KonvaLassoSelectionCanvas = ({
       <ReactKonva.Layer>
         <ReactKonva.Image image={img} />
 
+        <StartingAnchor />
+
+        {!annotated &&
+          annotating &&
+          strokes.map((stroke: Stroke, key: number) => {
+            return (
+              <ReactKonva.Line
+                dash={[4, 2]}
+                fillEnabled={false}
+                key={key}
+                points={stroke.points}
+                stroke="#df4b26"
+              />
+            );
+          })}
+
+        <Anchor />
+
         <ReactKonva.Group draggable ref={group}>
-          <StartingAnchor />
-
-          {!annotated &&
-            annotating &&
-            strokes.map((stroke: Stroke, key: number) => {
-              return (
-                <ReactKonva.Line
-                  dash={[4, 2]}
-                  fillEnabled={false}
-                  key={key}
-                  points={stroke.points}
-                  stroke="#df4b26"
-                />
-              );
-            })}
-
           {annotation && annotated && !annotating && (
-            <ReactKonva.Line
-              dash={[4, 2]}
-              fillEnabled={false}
-              points={annotation.points}
-              stroke="#df4b26"
-            />
+            <MarchingAnts stroke={annotation} />
           )}
-
-          <Anchor />
         </ReactKonva.Group>
 
         <ReactKonva.Transformer
