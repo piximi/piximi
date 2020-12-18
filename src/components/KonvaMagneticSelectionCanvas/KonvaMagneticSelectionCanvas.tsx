@@ -8,6 +8,7 @@ import { Transformer } from "konva/types/shapes/Transformer";
 import { Group } from "konva/types/Group";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
+import { Vector2d } from "konva/types/types";
 
 export enum Method {
   Elliptical,
@@ -66,6 +67,14 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
+const magnetize = (edgeMap: HTMLImageElement, position: Vector2d): Vector2d => {
+  return position;
+};
+
+const edgeDetector = (image: HTMLImageElement): HTMLImageElement => {
+  return image;
+};
+
 export const KonvaMagneticSelectionCanvas = ({
   image,
 }: KonvaMagneticSelectionCanvasProps) => {
@@ -83,6 +92,11 @@ export const KonvaMagneticSelectionCanvas = ({
   const [annotation, setAnnotation] = useState<Stroke>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
+
+  let edgeMap: HTMLImageElement;
+  if (img) {
+    edgeMap = edgeDetector(img);
+  }
 
   React.useEffect(() => {
     if (
@@ -167,10 +181,12 @@ export const KonvaMagneticSelectionCanvas = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
+        const magnetizedPos = magnetize(edgeMap, position);
+
         if (anchor) {
           const stroke = {
             method: Method.Magnetic,
-            points: [anchor.x, anchor.y, position.x, position.y],
+            points: [anchor.x, anchor.y, magnetizedPos.x, magnetizedPos.y],
           };
 
           if (strokes.length > 2) {
@@ -183,13 +199,13 @@ export const KonvaMagneticSelectionCanvas = ({
         } else {
           let stroke = strokes[strokes.length - 1];
 
-          stroke.points = [...stroke.points, position.x, position.y];
+          stroke.points = [...stroke.points, magnetizedPos.x, magnetizedPos.y];
 
           strokes.splice(strokes.length - 1, 1, stroke);
 
           setStrokes(strokes.concat());
 
-          if (connected(position)) {
+          if (connected(magnetizedPos)) {
             //  TODO:
           } else {
             //  TODO:
