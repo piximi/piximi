@@ -33,31 +33,24 @@ type Stroke = {
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
-  React.useEffect(() => {
-    setTimeout(() => {
-      setDashOffset(dashOffset + 1);
-
-      if (dashOffset > 16) {
-        setDashOffset(0);
-      }
-    }, 20);
-  });
-
-  const [dashOffset, setDashOffset] = React.useState();
+  // const [dashOffset, setDashOffset] = React.useState(0);
+  //
+  // React.useEffect(() => {
+  //   setTimeout(() => {
+  //     setDashOffset(dashOffset + 1);
+  //
+  //     if (dashOffset > 16) {
+  //       setDashOffset(0);
+  //     }
+  //   }, 20);
+  // }, [dashOffset]);
 
   return (
     <React.Fragment>
-      <ReactKonva.Line
-        fillEnabled={false}
-        points={stroke.points}
-        stroke="#FFF"
-        strokeWidth={1}
-      />
+      <ReactKonva.Line points={stroke.points} stroke="#FFF" strokeWidth={1} />
 
       <ReactKonva.Line
         dash={[4, 2]}
-        dashOffset={dashOffset}
-        fillEnabled={false}
         points={stroke.points}
         stroke="#000"
         strokeWidth={1}
@@ -297,11 +290,9 @@ export const KonvaLassoSelectionCanvas = ({
 
         <Anchor />
 
-        <ReactKonva.Group draggable ref={group}>
-          {annotation && annotated && !annotating && (
-            <MarchingAnts stroke={annotation} />
-          )}
-        </ReactKonva.Group>
+        {annotation && annotated && !annotating && (
+          <MarchingAnts stroke={annotation} />
+        )}
 
         <ReactKonva.Transformer
           anchorFill="#FFF"

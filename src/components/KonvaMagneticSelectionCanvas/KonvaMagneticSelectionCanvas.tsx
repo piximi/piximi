@@ -34,18 +34,6 @@ type Stroke = {
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
-  React.useEffect(() => {
-    setTimeout(() => {
-      setDashOffset(dashOffset + 1);
-
-      if (dashOffset > 16) {
-        setDashOffset(0);
-      }
-    }, 20);
-  });
-
-  const [dashOffset, setDashOffset] = React.useState();
-
   return (
     <React.Fragment>
       <ReactKonva.Line
@@ -57,7 +45,6 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
 
       <ReactKonva.Line
         dash={[4, 2]}
-        dashOffset={dashOffset}
         fillEnabled={false}
         points={stroke.points}
         stroke="#000"
