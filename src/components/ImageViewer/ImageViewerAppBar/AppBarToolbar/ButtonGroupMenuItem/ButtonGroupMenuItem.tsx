@@ -4,11 +4,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import MenuItem from "@material-ui/core/MenuItem";
 import React from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import { ReactComponent as LassoIcon } from "../../../../../icons/Lasso.svg";
 import { SelectionMethod } from "../../../../../types/SelectionMethod";
 import { useStyles } from "./ButtonGroupMenuItem.css";
 
 type ButtonGroupMenuItemProps = {
+  icon: React.ReactElement;
   method: SelectionMethod;
   name: string;
   onClick: (
@@ -18,6 +18,7 @@ type ButtonGroupMenuItemProps = {
 };
 
 export const ButtonGroupMenuItem = ({
+  icon,
   method,
   name,
   onClick,
@@ -32,9 +33,7 @@ export const ButtonGroupMenuItem = ({
     >
       <ListItem dense>
         <ListItemIcon className={classes.icon}>
-          <SvgIcon fontSize="small">
-            <LassoIcon />
-          </SvgIcon>
+          <SvgIcon fontSize="small">{icon}</SvgIcon>
         </ListItemIcon>
 
         <ListItemText className={classes.text} primary={name} />

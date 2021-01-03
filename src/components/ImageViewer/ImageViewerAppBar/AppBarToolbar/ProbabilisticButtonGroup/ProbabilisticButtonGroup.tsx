@@ -3,10 +3,6 @@ import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Grow from "@material-ui/core/Grow";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 import Paper from "@material-ui/core/Paper";
 import Popper from "@material-ui/core/Popper";
@@ -15,8 +11,8 @@ import SvgIcon from "@material-ui/core/SvgIcon";
 import { Image } from "../../../../../types/Image";
 import { ReactComponent as MagicWandIcon } from "../../../../../icons/MagicWand.svg";
 import { ReactComponent as QuickIcon } from "../../../../../icons/Quick.svg";
-import { useStyles } from "./ProbabilisticButtonGroup.css";
 import { SelectionMethod } from "../../../../../types/SelectionMethod";
+import { ButtonGroupMenuItem } from "../ButtonGroupMenuItem";
 
 type ProbabilisticButtonGroupProps = {
   data: Image;
@@ -32,8 +28,6 @@ export const ProbabilisticButtonGroup = ({
   );
 
   const [open, setOpen] = useState<boolean>(false);
-
-  const classes = useStyles();
 
   const onClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -101,68 +95,19 @@ export const ProbabilisticButtonGroup = ({
             <Paper>
               <ClickAwayListener onClickAway={onClose}>
                 <MenuList dense>
-                  <MenuItem
-                    onClick={(
-                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
-                    ) => {
-                      onClick(event, SelectionMethod.Color);
-                    }}
-                  >
-                    <ListItem dense>
-                      <ListItemIcon className={classes.icon}>
-                        <SvgIcon fontSize="small">
-                          <MagicWandIcon />
-                        </SvgIcon>
-                      </ListItemIcon>
+                  <ButtonGroupMenuItem
+                    icon={<MagicWandIcon />}
+                    method={SelectionMethod.Color}
+                    name="Color selection"
+                    onClick={onClick}
+                  />
 
-                      <ListItemText
-                        className={classes.text}
-                        primary="Color selection"
-                      />
-                    </ListItem>
-                  </MenuItem>
-
-                  <MenuItem
-                    onClick={(
-                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
-                    ) => {
-                      onClick(event, SelectionMethod.Object);
-                    }}
-                  >
-                    <ListItem dense>
-                      <ListItemIcon className={classes.icon}>
-                        <SvgIcon fontSize="small">
-                          <MagicWandIcon />
-                        </SvgIcon>
-                      </ListItemIcon>
-
-                      <ListItemText
-                        className={classes.text}
-                        primary="Object selection"
-                      />
-                    </ListItem>
-                  </MenuItem>
-
-                  <MenuItem
-                    onClick={(
-                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
-                    ) => {
-                      onClick(event, SelectionMethod.Quick);
-                    }}
-                  >
-                    <ListItem dense>
-                      <ListItemIcon className={classes.icon}>
-                        <SvgIcon fontSize="small">
-                          <QuickIcon />
-                        </SvgIcon>
-                      </ListItemIcon>
-
-                      <ListItemText
-                        className={classes.text}
-                        primary="Quick selection"
-                      />
-                    </ListItem>
-                  </MenuItem>
+                  <ButtonGroupMenuItem
+                    icon={<QuickIcon />}
+                    method={SelectionMethod.Quick}
+                    name="Quick selection"
+                    onClick={onClick}
+                  />
                 </MenuList>
               </ClickAwayListener>
             </Paper>

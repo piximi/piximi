@@ -2,6 +2,7 @@ import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { ButtonGroupMenuItem } from "./ButtonGroupMenuItem";
 import { SelectionMethod } from "../../../../../types/SelectionMethod";
+import { ReactComponent as LassoIcon } from "../../../../../icons/Lasso.svg";
 
 export default {
   component: ButtonGroupMenuItem,
@@ -20,6 +21,7 @@ const onClick = (
 ) => {};
 
 Default.args = {
+  icon: <LassoIcon />,
   method: SelectionMethod.Lasso,
   name: "Lasso selection",
   onClick: onClick,
