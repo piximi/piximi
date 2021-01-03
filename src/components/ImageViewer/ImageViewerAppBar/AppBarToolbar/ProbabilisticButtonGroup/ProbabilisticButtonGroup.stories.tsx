@@ -1,16 +1,16 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
-import { Image } from "../../../../types/Image";
-import { MarqueeButtonGroup } from "./MarqueeButtonGroup";
+import { Image } from "../../../../../types/Image";
+import { ProbabilisticButtonGroup } from "./ProbabilisticButtonGroup";
 
 export default {
-  component: MarqueeButtonGroup,
-  title: "Components/ImageViewer/MarqueeButtonGroup",
+  component: ProbabilisticButtonGroup,
+  title: "Components/ImageViewer/ProbabilisticButtonGroup",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof MarqueeButtonGroup>> = (args) => (
-  <MarqueeButtonGroup {...args} />
-);
+const Template: Story<ComponentProps<typeof ProbabilisticButtonGroup>> = (
+  args
+) => <ProbabilisticButtonGroup {...args} />;
 
 export const Default = Template.bind({});
 

@@ -12,10 +12,10 @@ import Paper from "@material-ui/core/Paper";
 import Popper from "@material-ui/core/Popper";
 import React, { useRef, useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import { Image } from "../../../../types/Image";
-import { ReactComponent as EllipticalIcon } from "../../../../icons/Elliptical.svg";
-import { ReactComponent as RectangularIcon } from "../../../../icons/Rectangular.svg";
-import { SelectionMethod } from "../../../../types/SelectionMethod";
+import { Image } from "../../../../../types/Image";
+import { ReactComponent as EllipticalIcon } from "../../../../../icons/Elliptical.svg";
+import { ReactComponent as RectangularIcon } from "../../../../../icons/Rectangular.svg";
+import { SelectionMethod } from "../../../../../types/SelectionMethod";
 import { useStyles } from "./MarqueeButtonGroup.css";
 
 type MarqueeButtonGroupProps = {

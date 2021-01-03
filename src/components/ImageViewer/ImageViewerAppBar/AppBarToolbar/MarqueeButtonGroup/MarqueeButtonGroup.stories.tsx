@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
-import { Image } from "../../../../types/Image";
-import { LassoButtonGroup } from "./LassoButtonGroup";
+import { Image } from "../../../../../types/Image";
+import { MarqueeButtonGroup } from "./MarqueeButtonGroup";
 
 export default {
-  component: LassoButtonGroup,
-  title: "Components/ImageViewer/LassoButtonGroup",
+  component: MarqueeButtonGroup,
+  title: "Components/ImageViewer/MarqueeButtonGroup",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof LassoButtonGroup>> = (args) => (
-  <LassoButtonGroup {...args} />
+const Template: Story<ComponentProps<typeof MarqueeButtonGroup>> = (args) => (
+  <MarqueeButtonGroup {...args} />
 );
 
 export const Default = Template.bind({});

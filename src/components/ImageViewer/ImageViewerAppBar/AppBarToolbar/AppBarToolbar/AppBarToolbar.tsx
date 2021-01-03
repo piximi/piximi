@@ -1,5 +1,5 @@
 import React from "react";
-import { Image } from "../../../../types/Image";
+import { Image } from "../../../../../types/Image";
 import { LassoButtonGroup } from "../LassoButtonGroup";
 import { MarqueeButtonGroup } from "../MarqueeButtonGroup";
 import { ProbabilisticButtonGroup } from "../ProbabilisticButtonGroup";

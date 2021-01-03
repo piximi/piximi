@@ -1,16 +1,16 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
-import { Image } from "../../../../types/Image";
-import { ProbabilisticButtonGroup } from "./ProbabilisticButtonGroup";
+import { Image } from "../../../../../types/Image";
+import { LassoButtonGroup } from "./LassoButtonGroup";
 
 export default {
-  component: ProbabilisticButtonGroup,
-  title: "Components/ImageViewer/ProbabilisticButtonGroup",
+  component: LassoButtonGroup,
+  title: "Components/ImageViewer/LassoButtonGroup",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof ProbabilisticButtonGroup>> = (
-  args
-) => <ProbabilisticButtonGroup {...args} />;
+const Template: Story<ComponentProps<typeof LassoButtonGroup>> = (args) => (
+  <LassoButtonGroup {...args} />
+);
 
 export const Default = Template.bind({});
 

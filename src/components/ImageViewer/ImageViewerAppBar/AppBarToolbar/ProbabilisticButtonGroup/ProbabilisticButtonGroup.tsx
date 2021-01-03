@@ -12,21 +12,23 @@ import Paper from "@material-ui/core/Paper";
 import Popper from "@material-ui/core/Popper";
 import React, { useRef, useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import { Image } from "../../../../types/Image";
-import { ReactComponent as LassoIcon } from "../../../../icons/Lasso.svg";
-import { ReactComponent as MagneticIcon } from "../../../../icons/Magnetic.svg";
-import { SelectionMethod } from "../../../../types/SelectionMethod";
-import { useStyles } from "./LassoButtonGroup.css";
+import { Image } from "../../../../../types/Image";
+import { ReactComponent as MagicWandIcon } from "../../../../../icons/MagicWand.svg";
+import { ReactComponent as QuickIcon } from "../../../../../icons/Quick.svg";
+import { useStyles } from "./ProbabilisticButtonGroup.css";
+import { SelectionMethod } from "../../../../../types/SelectionMethod";
 
-type LassoButtonGroupProps = {
+type ProbabilisticButtonGroupProps = {
   data: Image;
 };
 
-export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
+export const ProbabilisticButtonGroup = ({
+  data,
+}: ProbabilisticButtonGroupProps) => {
   const anchorEl = useRef<HTMLDivElement>(null);
 
   const [visible, setVisible] = useState<SelectionMethod>(
-    SelectionMethod.Lasso
+    SelectionMethod.Quick
   );
 
   const [open, setOpen] = useState<boolean>(false);
@@ -58,10 +60,10 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
 
   const MethodIcon = () => {
     switch (visible) {
-      case SelectionMethod.Magnetic:
-        return <MagneticIcon />;
+      case SelectionMethod.Color:
+        return <MagicWandIcon />;
       default:
-        return <LassoIcon />;
+        return <QuickIcon />;
     }
   };
 
@@ -101,19 +103,19 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
                     onClick={(
                       event: React.MouseEvent<HTMLLIElement, MouseEvent>
                     ) => {
-                      onClick(event, SelectionMethod.Lasso);
+                      onClick(event, SelectionMethod.Color);
                     }}
                   >
                     <ListItem dense>
                       <ListItemIcon className={classes.icon}>
                         <SvgIcon fontSize="small">
-                          <LassoIcon />
+                          <MagicWandIcon />
                         </SvgIcon>
                       </ListItemIcon>
 
                       <ListItemText
                         className={classes.text}
-                        primary="Lasso selection"
+                        primary="Color selection"
                       />
                     </ListItem>
                   </MenuItem>
@@ -122,19 +124,19 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
                     onClick={(
                       event: React.MouseEvent<HTMLLIElement, MouseEvent>
                     ) => {
-                      onClick(event, SelectionMethod.Magnetic);
+                      onClick(event, SelectionMethod.Quick);
                     }}
                   >
                     <ListItem dense>
                       <ListItemIcon className={classes.icon}>
                         <SvgIcon fontSize="small">
-                          <MagneticIcon />
+                          <QuickIcon />
                         </SvgIcon>
                       </ListItemIcon>
 
                       <ListItemText
                         className={classes.text}
-                        primary="Magnetic selection"
+                        primary="Quick selection"
                       />
                     </ListItem>
                   </MenuItem>
