@@ -56,8 +56,6 @@ export const ProbabilisticButtonGroup = ({
     switch (visible) {
       case SelectionMethod.Color:
         return <MagicWandIcon />;
-      case SelectionMethod.Object:
-        return <MagicWandIcon />;
       default:
         return <QuickIcon />;
     }
