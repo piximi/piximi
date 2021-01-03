@@ -8,7 +8,7 @@ import React from "react";
 type ButtonGroupPopperProps = {
   anchorEl: any;
   children: React.ReactNode;
-  onClose: () => void;
+  onClose: (event: React.MouseEvent<Document, MouseEvent>) => void;
   open: boolean;
 };
 

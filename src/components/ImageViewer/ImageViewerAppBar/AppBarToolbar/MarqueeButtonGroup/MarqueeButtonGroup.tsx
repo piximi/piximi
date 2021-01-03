@@ -1,19 +1,14 @@
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Grow from "@material-ui/core/Grow";
-import MenuList from "@material-ui/core/MenuList";
-import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
 import React, { useRef, useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { Image } from "../../../../../types/Image";
 import { ReactComponent as EllipticalIcon } from "../../../../../icons/Elliptical.svg";
 import { ReactComponent as RectangularIcon } from "../../../../../icons/Rectangular.svg";
 import { SelectionMethod } from "../../../../../types/SelectionMethod";
-import { useStyles } from "./MarqueeButtonGroup.css";
 import { ButtonGroupMenuItem } from "../ButtonGroupMenuItem";
+import { ButtonGroupMenu } from "../ButtonGroupMenu";
 
 type MarqueeButtonGroupProps = {
   data: Image;
@@ -74,43 +69,21 @@ export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
         </Button>
       </ButtonGroup>
 
-      <Popper
-        anchorEl={anchorEl.current}
-        disablePortal
-        open={open}
-        role={undefined}
-        transition
-      >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === "bottom" ? "center top" : "center bottom",
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={onClose}>
-                <MenuList dense>
-                  <ButtonGroupMenuItem
-                    icon={<RectangularIcon />}
-                    method={SelectionMethod.Rectangular}
-                    name="Rectangular selection"
-                    onClick={onClick}
-                  />
+      <ButtonGroupMenu anchorEl={anchorEl} onClose={onClose} open={open}>
+        <ButtonGroupMenuItem
+          icon={<RectangularIcon />}
+          method={SelectionMethod.Rectangular}
+          name="Rectangular selection"
+          onClick={onClick}
+        />
 
-                  <ButtonGroupMenuItem
-                    icon={<EllipticalIcon />}
-                    method={SelectionMethod.Elliptical}
-                    name="Elliptical selection"
-                    onClick={onClick}
-                  />
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
+        <ButtonGroupMenuItem
+          icon={<EllipticalIcon />}
+          method={SelectionMethod.Elliptical}
+          name="Elliptical selection"
+          onClick={onClick}
+        />
+      </ButtonGroupMenu>
     </React.Fragment>
   );
 };

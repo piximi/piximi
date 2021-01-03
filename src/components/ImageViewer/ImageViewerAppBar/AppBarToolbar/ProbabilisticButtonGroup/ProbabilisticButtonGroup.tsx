@@ -1,11 +1,6 @@
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Grow from "@material-ui/core/Grow";
-import MenuList from "@material-ui/core/MenuList";
-import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
 import React, { useRef, useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { Image } from "../../../../../types/Image";
@@ -13,6 +8,7 @@ import { ReactComponent as MagicWandIcon } from "../../../../../icons/MagicWand.
 import { ReactComponent as QuickIcon } from "../../../../../icons/Quick.svg";
 import { SelectionMethod } from "../../../../../types/SelectionMethod";
 import { ButtonGroupMenuItem } from "../ButtonGroupMenuItem";
+import { ButtonGroupMenu } from "../ButtonGroupMenu";
 
 type ProbabilisticButtonGroupProps = {
   data: Image;
@@ -75,43 +71,21 @@ export const ProbabilisticButtonGroup = ({
         </Button>
       </ButtonGroup>
 
-      <Popper
-        anchorEl={anchorEl.current}
-        disablePortal
-        open={open}
-        role={undefined}
-        transition
-      >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === "bottom" ? "center top" : "center bottom",
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={onClose}>
-                <MenuList dense>
-                  <ButtonGroupMenuItem
-                    icon={<MagicWandIcon />}
-                    method={SelectionMethod.Color}
-                    name="Color selection"
-                    onClick={onClick}
-                  />
+      <ButtonGroupMenu anchorEl={anchorEl} onClose={onClose} open={open}>
+        <ButtonGroupMenuItem
+          icon={<MagicWandIcon />}
+          method={SelectionMethod.Color}
+          name="Color selection"
+          onClick={onClick}
+        />
 
-                  <ButtonGroupMenuItem
-                    icon={<QuickIcon />}
-                    method={SelectionMethod.Quick}
-                    name="Quick selection"
-                    onClick={onClick}
-                  />
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
+        <ButtonGroupMenuItem
+          icon={<QuickIcon />}
+          method={SelectionMethod.Quick}
+          name="Quick selection"
+          onClick={onClick}
+        />
+      </ButtonGroupMenu>
     </React.Fragment>
   );
 };
