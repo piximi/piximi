@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
-import { Image } from "../../../types/Image";
-import { ImageViewerAppBar } from "./ImageViewerAppBar";
+import { Image } from "../../../../types/Image";
+import { LassoButtonGroup } from "./LassoButtonGroup";
 
 export default {
-  component: ImageViewerAppBar,
-  title: "Components/ImageViewer/ImageViewerAppBar",
+  component: LassoButtonGroup,
+  title: "Components/ImageViewer/LassoButtonGroup",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof ImageViewerAppBar>> = (args) => (
-  <ImageViewerAppBar {...args} />
+const Template: Story<ComponentProps<typeof LassoButtonGroup>> = (args) => (
+  <LassoButtonGroup {...args} />
 );
 
 export const Default = Template.bind({});

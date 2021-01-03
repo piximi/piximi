@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
-import { Image } from "../../../types/Image";
+import { Image } from "../../../../types/Image";
 import {
   ButtonGroup,
   ClickAwayListener,
   Grow,
+  ListItemIcon,
   MenuItem,
   MenuList,
   Paper,
@@ -13,21 +14,39 @@ import {
 import { useStyles } from "./LassoButtonGroup.css";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Button from "@material-ui/core/Button";
-import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
-import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
+import { ReactComponent as LassoIcon } from "../../../../icons/Lasso.svg";
+import { ReactComponent as MagneticIcon } from "../../../../icons/Magnetic.svg";
+import Typography from "@material-ui/core/Typography";
 
 type LassoButtonGroupProps = {
   data: Image;
 };
 
 export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
-  const options = [
-    <SvgIcon>
+  const icons = [
+    <SvgIcon fontSize="small">
       <LassoIcon />
     </SvgIcon>,
-    <SvgIcon>
+    <SvgIcon fontSize="small">
       <MagneticIcon />
     </SvgIcon>,
+  ];
+
+  const options = [
+    <ListItemIcon>
+      <SvgIcon fontSize="small">
+        <LassoIcon />
+      </SvgIcon>
+
+      <Typography variant="inherit">Lasso selection</Typography>
+    </ListItemIcon>,
+    <ListItemIcon>
+      <SvgIcon fontSize="small">
+        <MagneticIcon />
+      </SvgIcon>
+
+      <Typography variant="inherit">Magnetic selection</Typography>
+    </ListItemIcon>,
   ];
 
   const classes = useStyles();
@@ -63,15 +82,10 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
 
   return (
     <React.Fragment>
-      <ButtonGroup
-        variant="contained"
-        color="primary"
-        ref={lassoMenuAnchorRef}
-        aria-label="split button"
-      >
-        <Button onClick={onLassoButtonClick}>{options[selectedIndex]}</Button>
+      <ButtonGroup color="inherit" ref={lassoMenuAnchorRef} variant="contained">
+        <Button onClick={onLassoButtonClick}>{icons[selectedIndex]}</Button>
 
-        <Button color="primary" onClick={onLassoMenuToggle} size="small">
+        <Button color="inherit" onClick={onLassoMenuToggle} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>

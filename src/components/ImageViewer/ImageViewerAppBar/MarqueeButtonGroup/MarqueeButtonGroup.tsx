@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
-import { Image } from "../../../types/Image";
+import { Image } from "../../../../types/Image";
 import {
   ButtonGroup,
   ClickAwayListener,
   Grow,
+  ListItemIcon,
   MenuItem,
   MenuList,
   Paper,
@@ -12,21 +13,41 @@ import {
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Button from "@material-ui/core/Button";
-import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
-import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
+import { ReactComponent as RectangularIcon } from "../../../../icons/Rectangular.svg";
+import { ReactComponent as EllipticalIcon } from "../../../../icons/Elliptical.svg";
+import { ReactComponent as LassoIcon } from "../../../../icons/Lasso.svg";
+import { ReactComponent as MagneticIcon } from "../../../../icons/Magnetic.svg";
+import Typography from "@material-ui/core/Typography";
 
 type LassoButtonGroupProps = {
   data: Image;
 };
 
 export const MarqueeButtonGroup = ({ data }: LassoButtonGroupProps) => {
-  const options = [
-    <SvgIcon>
+  const icons = [
+    <SvgIcon fontSize="small">
       <RectangularIcon />
     </SvgIcon>,
-    <SvgIcon>
+    <SvgIcon fontSize="small">
       <EllipticalIcon />
     </SvgIcon>,
+  ];
+
+  const options = [
+    <ListItemIcon>
+      <SvgIcon fontSize="small">
+        <RectangularIcon />
+      </SvgIcon>
+
+      <Typography variant="inherit">Rectangular selection</Typography>
+    </ListItemIcon>,
+    <ListItemIcon>
+      <SvgIcon fontSize="small">
+        <EllipticalIcon />
+      </SvgIcon>
+
+      <Typography variant="inherit">Elliptical selection</Typography>
+    </ListItemIcon>,
   ];
 
   const [open, setOpen] = useState(false);
@@ -62,15 +83,10 @@ export const MarqueeButtonGroup = ({ data }: LassoButtonGroupProps) => {
 
   return (
     <React.Fragment>
-      <ButtonGroup
-        variant="contained"
-        color="primary"
-        ref={anchorRef}
-        aria-label="split button"
-      >
-        <Button onClick={onClick}>{options[selectedIndex]}</Button>
+      <ButtonGroup color="inherit" ref={anchorRef} variant="contained">
+        <Button onClick={onClick}>{icons[selectedIndex]}</Button>
 
-        <Button color="primary" onClick={onToggle} size="small">
+        <Button color="inherit" onClick={onToggle} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>

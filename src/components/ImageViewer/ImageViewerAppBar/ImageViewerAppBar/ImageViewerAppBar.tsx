@@ -1,5 +1,5 @@
 import React from "react";
-import { Image } from "../../../types/Image";
+import { Image } from "../../../../types/Image";
 import { AppBar, Toolbar } from "@material-ui/core";
 import { useStyles } from "./ImageViewerAppBar.css";
 import { LassoButtonGroup } from "../LassoButtonGroup";
@@ -16,7 +16,7 @@ export const ImageViewerAppBar = ({ data }: ImageViewerAppBarProps) => {
     <AppBar className={classes.appBar} color="inherit" position="fixed">
       <Toolbar>
         <MarqueeButtonGroup data={data} />
-
+        <span>&nbsp;&nbsp;</span>
         <LassoButtonGroup data={data} />
       </Toolbar>
     </AppBar>
