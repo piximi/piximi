@@ -28,6 +28,7 @@ export const ProbabilisticButtonGroup = ({
   const anchorEl = useRef<HTMLDivElement>(null);
 
   const [method, setMethod] = useState<SelectionMethod>(SelectionMethod.Quick);
+
   const [open, setOpen] = useState<boolean>(false);
 
   const classes = useStyles();

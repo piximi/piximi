@@ -28,6 +28,7 @@ export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
   const [method, setMethod] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
+
   const [open, setOpen] = useState<boolean>(false);
 
   const classes = useStyles();

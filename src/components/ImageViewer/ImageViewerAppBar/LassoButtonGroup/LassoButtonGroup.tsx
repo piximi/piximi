@@ -26,6 +26,7 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
   const anchorEl = useRef<HTMLDivElement>(null);
 
   const [method, setMethod] = useState<SelectionMethod>(SelectionMethod.Lasso);
+
   const [open, setOpen] = useState<boolean>(false);
 
   const classes = useStyles();
