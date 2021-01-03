@@ -25,7 +25,9 @@ type LassoButtonGroupProps = {
 export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
   const anchorEl = useRef<HTMLDivElement>(null);
 
-  const [method, setMethod] = useState<SelectionMethod>(SelectionMethod.Lasso);
+  const [visible, setVisible] = useState<SelectionMethod>(
+    SelectionMethod.Lasso
+  );
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -33,9 +35,9 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
 
   const onClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number
+    method: SelectionMethod
   ) => {
-    setMethod(index);
+    setVisible(method);
     setOpen(false);
   };
 
@@ -55,7 +57,7 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
   };
 
   const MethodIcon = () => {
-    switch (method) {
+    switch (visible) {
       case SelectionMethod.Magnetic:
         return <MagneticIcon />;
       default:

@@ -27,7 +27,9 @@ export const ProbabilisticButtonGroup = ({
 }: ProbabilisticButtonGroupProps) => {
   const anchorEl = useRef<HTMLDivElement>(null);
 
-  const [method, setMethod] = useState<SelectionMethod>(SelectionMethod.Quick);
+  const [visible, setVisible] = useState<SelectionMethod>(
+    SelectionMethod.Quick
+  );
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -35,9 +37,9 @@ export const ProbabilisticButtonGroup = ({
 
   const onClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number
+    method: SelectionMethod
   ) => {
-    setMethod(index);
+    setVisible(method);
     setOpen(false);
   };
 
@@ -57,7 +59,7 @@ export const ProbabilisticButtonGroup = ({
   };
 
   const MethodIcon = () => {
-    switch (method) {
+    switch (visible) {
       case SelectionMethod.Color:
         return <MagicWandIcon />;
       default:

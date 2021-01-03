@@ -25,7 +25,7 @@ type MarqueeButtonGroupProps = {
 export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
   const anchorEl = useRef<HTMLDivElement>(null);
 
-  const [method, setMethod] = useState<SelectionMethod>(
+  const [visible, setVisible] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
 
@@ -35,9 +35,9 @@ export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
 
   const onClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number
+    method: SelectionMethod
   ) => {
-    setMethod(index);
+    setVisible(method);
     setOpen(false);
   };
 
@@ -57,7 +57,7 @@ export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
   };
 
   const MethodIcon = () => {
-    switch (method) {
+    switch (visible) {
       case SelectionMethod.Elliptical:
         return <EllipticalIcon />;
       default:
