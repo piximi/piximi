@@ -1,79 +1,49 @@
-import React, { useRef, useState } from "react";
-import { Image } from "../../../../types/Image";
-import {
-  ButtonGroup,
-  ClickAwayListener,
-  Grow,
-  ListItemIcon,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-  SvgIcon,
-} from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Button from "@material-ui/core/Button";
-import { ReactComponent as RectangularIcon } from "../../../../icons/Rectangular.svg";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import Grow from "@material-ui/core/Grow";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import Paper from "@material-ui/core/Paper";
+import Popper from "@material-ui/core/Popper";
+import React, { useRef, useState } from "react";
+import SvgIcon from "@material-ui/core/SvgIcon";
+import { Image } from "../../../../types/Image";
 import { ReactComponent as EllipticalIcon } from "../../../../icons/Elliptical.svg";
-import { ReactComponent as LassoIcon } from "../../../../icons/Lasso.svg";
-import { ReactComponent as MagneticIcon } from "../../../../icons/Magnetic.svg";
-import Typography from "@material-ui/core/Typography";
+import { ReactComponent as RectangularIcon } from "../../../../icons/Rectangular.svg";
+import { SelectionMethod } from "../../../../types/SelectionMethod";
+import { useStyles } from "./MarqueeButtonGroup.css";
 
-type LassoButtonGroupProps = {
+type MarqueeButtonGroupProps = {
   data: Image;
 };
 
-export const MarqueeButtonGroup = ({ data }: LassoButtonGroupProps) => {
-  const icons = [
-    <SvgIcon fontSize="small">
-      <RectangularIcon />
-    </SvgIcon>,
-    <SvgIcon fontSize="small">
-      <EllipticalIcon />
-    </SvgIcon>,
-  ];
+export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
+  const anchorEl = useRef<HTMLDivElement>(null);
 
-  const options = [
-    <ListItemIcon>
-      <SvgIcon fontSize="small">
-        <RectangularIcon />
-      </SvgIcon>
+  const [method, setMethod] = useState<SelectionMethod>(
+    SelectionMethod.Rectangular
+  );
+  const [open, setOpen] = useState<boolean>(false);
 
-      <Typography variant="inherit">Rectangular selection</Typography>
-    </ListItemIcon>,
-    <ListItemIcon>
-      <SvgIcon fontSize="small">
-        <EllipticalIcon />
-      </SvgIcon>
+  const classes = useStyles();
 
-      <Typography variant="inherit">Elliptical selection</Typography>
-    </ListItemIcon>,
-  ];
-
-  const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState(1);
-
-  const onClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
-  };
-
-  const onMenuItemClick = (
+  const onClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number
   ) => {
-    setSelectedIndex(index);
+    setMethod(index);
     setOpen(false);
-  };
-
-  const onToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
   };
 
   const onClose = (event: React.MouseEvent<Document, MouseEvent>) => {
     if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
+      anchorEl.current &&
+      anchorEl.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
@@ -81,22 +51,39 @@ export const MarqueeButtonGroup = ({ data }: LassoButtonGroupProps) => {
     setOpen(false);
   };
 
+  const onOpen = () => {
+    setOpen(true);
+  };
+
+  const MethodIcon = () => {
+    switch (method) {
+      case SelectionMethod.Elliptical:
+        return <EllipticalIcon />;
+      default:
+        return <RectangularIcon />;
+    }
+  };
+
   return (
     <React.Fragment>
-      <ButtonGroup color="inherit" ref={anchorRef} variant="contained">
-        <Button onClick={onClick}>{icons[selectedIndex]}</Button>
+      <ButtonGroup color="inherit" ref={anchorEl} variant="contained">
+        <Button>
+          <SvgIcon fontSize="small">
+            <MethodIcon />
+          </SvgIcon>
+        </Button>
 
-        <Button color="inherit" onClick={onToggle} size="small">
+        <Button color="inherit" onClick={onOpen} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
 
       <Popper
+        anchorEl={anchorEl.current}
+        disablePortal
         open={open}
-        anchorEl={anchorRef.current}
         role={undefined}
         transition
-        disablePortal
       >
         {({ TransitionProps, placement }) => (
           <Grow
@@ -108,17 +95,48 @@ export const MarqueeButtonGroup = ({ data }: LassoButtonGroupProps) => {
           >
             <Paper>
               <ClickAwayListener onClickAway={onClose}>
-                <MenuList id="split-button-menu">
-                  {options.map((option, index) => (
-                    <MenuItem
-                      key={index}
-                      disabled={index === 2}
-                      selected={index === selectedIndex}
-                      onClick={(event) => onMenuItemClick(event, index)}
-                    >
-                      {option}
-                    </MenuItem>
-                  ))}
+                <MenuList dense>
+                  <MenuItem
+                    onClick={(
+                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
+                    ) => {
+                      onClick(event, SelectionMethod.Rectangular);
+                    }}
+                  >
+                    <ListItem dense>
+                      <ListItemIcon className={classes.icon}>
+                        <SvgIcon fontSize="small">
+                          <RectangularIcon />
+                        </SvgIcon>
+                      </ListItemIcon>
+
+                      <ListItemText
+                        className={classes.text}
+                        primary="Rectangular selection"
+                      />
+                    </ListItem>
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={(
+                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
+                    ) => {
+                      onClick(event, SelectionMethod.Elliptical);
+                    }}
+                  >
+                    <ListItem dense>
+                      <ListItemIcon className={classes.icon}>
+                        <SvgIcon fontSize="small">
+                          <EllipticalIcon />
+                        </SvgIcon>
+                      </ListItemIcon>
+
+                      <ListItemText
+                        className={classes.text}
+                        primary="Elliptical selection"
+                      />
+                    </ListItem>
+                  </MenuItem>
                 </MenuList>
               </ClickAwayListener>
             </Paper>
