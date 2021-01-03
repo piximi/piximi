@@ -62,6 +62,8 @@ export const ProbabilisticButtonGroup = ({
     switch (visible) {
       case SelectionMethod.Color:
         return <MagicWandIcon />;
+      case SelectionMethod.Object:
+        return <MagicWandIcon />;
       default:
         return <QuickIcon />;
     }
@@ -116,6 +118,27 @@ export const ProbabilisticButtonGroup = ({
                       <ListItemText
                         className={classes.text}
                         primary="Color selection"
+                      />
+                    </ListItem>
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={(
+                      event: React.MouseEvent<HTMLLIElement, MouseEvent>
+                    ) => {
+                      onClick(event, SelectionMethod.Object);
+                    }}
+                  >
+                    <ListItem dense>
+                      <ListItemIcon className={classes.icon}>
+                        <SvgIcon fontSize="small">
+                          <MagicWandIcon />
+                        </SvgIcon>
+                      </ListItemIcon>
+
+                      <ListItemText
+                        className={classes.text}
+                        primary="Object selection"
                       />
                     </ListItem>
                   </MenuItem>

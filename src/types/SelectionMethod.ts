@@ -3,6 +3,7 @@ export enum SelectionMethod {
   Elliptical,
   Lasso,
   Magnetic,
+  Object,
   Polygonal,
   Quick,
   Rectangular,
