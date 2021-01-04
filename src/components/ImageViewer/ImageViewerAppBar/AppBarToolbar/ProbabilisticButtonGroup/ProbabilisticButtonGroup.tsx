@@ -17,35 +17,39 @@ type ProbabilisticButtonGroupProps = {
 export const ProbabilisticButtonGroup = ({
   data,
 }: ProbabilisticButtonGroupProps) => {
-  const anchorEl = useRef<HTMLDivElement>(null);
+  const probabilisticMenuAnchorEl = useRef<HTMLDivElement>(null);
 
   const [visible, setVisible] = useState<SelectionMethod>(
     SelectionMethod.Quick
   );
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [openProbabilisticMenu, setOpenProbabilisticMenu] = useState<boolean>(
+    false
+  );
 
-  const onClick = (
+  const onClickProbabilisticMenuItem = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     method: SelectionMethod
   ) => {
     setVisible(method);
-    setOpen(false);
+    setOpenProbabilisticMenu(false);
   };
 
-  const onClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+  const onCloseProbabilisticMenu = (
+    event: React.MouseEvent<Document, MouseEvent>
+  ) => {
     if (
-      anchorEl.current &&
-      anchorEl.current.contains(event.target as HTMLElement)
+      probabilisticMenuAnchorEl.current &&
+      probabilisticMenuAnchorEl.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
 
-    setOpen(false);
+    setOpenProbabilisticMenu(false);
   };
 
-  const onOpen = () => {
-    setOpen(true);
+  const onOpenProbabilisticMenu = () => {
+    setOpenProbabilisticMenu(true);
   };
 
   const MethodIcon = () => {
@@ -59,31 +63,39 @@ export const ProbabilisticButtonGroup = ({
 
   return (
     <React.Fragment>
-      <ButtonGroup color="inherit" ref={anchorEl} variant="contained">
+      <ButtonGroup
+        color="inherit"
+        ref={probabilisticMenuAnchorEl}
+        variant="contained"
+      >
         <Button>
           <SvgIcon fontSize="small">
             <MethodIcon />
           </SvgIcon>
         </Button>
 
-        <Button color="inherit" onClick={onOpen} size="small">
+        <Button color="inherit" onClick={onOpenProbabilisticMenu} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
 
-      <ButtonGroupMenu anchorEl={anchorEl} onClose={onClose} open={open}>
+      <ButtonGroupMenu
+        anchorEl={probabilisticMenuAnchorEl}
+        onClose={onCloseProbabilisticMenu}
+        open={openProbabilisticMenu}
+      >
         <ButtonGroupMenuItem
           icon={<MagicWandIcon />}
           method={SelectionMethod.Color}
           name="Color selection"
-          onClick={onClick}
+          onClick={onClickProbabilisticMenuItem}
         />
 
         <ButtonGroupMenuItem
           icon={<QuickIcon />}
           method={SelectionMethod.Quick}
           name="Quick selection"
-          onClick={onClick}
+          onClick={onClickProbabilisticMenuItem}
         />
       </ButtonGroupMenu>
     </React.Fragment>

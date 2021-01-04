@@ -15,35 +15,35 @@ type LassoButtonGroupProps = {
 };
 
 export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
-  const anchorEl = useRef<HTMLDivElement>(null);
+  const lassoMenuAnchorEl = useRef<HTMLDivElement>(null);
 
   const [visible, setVisible] = useState<SelectionMethod>(
     SelectionMethod.Lasso
   );
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [openLassoMenu, setOpenLassoMenu] = useState<boolean>(false);
 
-  const onClick = (
+  const onClickLassoMenuItem = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     method: SelectionMethod
   ) => {
     setVisible(method);
-    setOpen(false);
+    setOpenLassoMenu(false);
   };
 
-  const onClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+  const onCloseLassoMenu = (event: React.MouseEvent<Document, MouseEvent>) => {
     if (
-      anchorEl.current &&
-      anchorEl.current.contains(event.target as HTMLElement)
+      lassoMenuAnchorEl.current &&
+      lassoMenuAnchorEl.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
 
-    setOpen(false);
+    setOpenLassoMenu(false);
   };
 
-  const onOpen = () => {
-    setOpen(true);
+  const onOpenLassoMenu = () => {
+    setOpenLassoMenu(true);
   };
 
   const MethodIcon = () => {
@@ -57,31 +57,35 @@ export const LassoButtonGroup = ({ data }: LassoButtonGroupProps) => {
 
   return (
     <React.Fragment>
-      <ButtonGroup color="inherit" ref={anchorEl} variant="contained">
+      <ButtonGroup color="inherit" ref={lassoMenuAnchorEl} variant="contained">
         <Button>
           <SvgIcon fontSize="small">
             <MethodIcon />
           </SvgIcon>
         </Button>
 
-        <Button color="inherit" onClick={onOpen} size="small">
+        <Button color="inherit" onClick={onOpenLassoMenu} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
 
-      <ButtonGroupMenu anchorEl={anchorEl} onClose={onClose} open={open}>
+      <ButtonGroupMenu
+        anchorEl={lassoMenuAnchorEl}
+        onClose={onCloseLassoMenu}
+        open={openLassoMenu}
+      >
         <ButtonGroupMenuItem
           icon={<LassoIcon />}
           method={SelectionMethod.Lasso}
           name="Lasso selection"
-          onClick={onClick}
+          onClick={onClickLassoMenuItem}
         />
 
         <ButtonGroupMenuItem
           icon={<MagneticIcon />}
           method={SelectionMethod.Magnetic}
           name="Magnetic selection"
-          onClick={onClick}
+          onClick={onClickLassoMenuItem}
         />
       </ButtonGroupMenu>
     </React.Fragment>

@@ -15,35 +15,37 @@ type MarqueeButtonGroupProps = {
 };
 
 export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
-  const anchorEl = useRef<HTMLDivElement>(null);
+  const marqueeMenuAnchorEl = useRef<HTMLDivElement>(null);
 
   const [visible, setVisible] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [openMarqueeMenu, setOpenMarqueeMenu] = useState<boolean>(false);
 
-  const onClick = (
+  const onClickMarqueeMenuItem = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     method: SelectionMethod
   ) => {
     setVisible(method);
-    setOpen(false);
+    setOpenMarqueeMenu(false);
   };
 
-  const onClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+  const onCloseMarqueeMenu = (
+    event: React.MouseEvent<Document, MouseEvent>
+  ) => {
     if (
-      anchorEl.current &&
-      anchorEl.current.contains(event.target as HTMLElement)
+      marqueeMenuAnchorEl.current &&
+      marqueeMenuAnchorEl.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
 
-    setOpen(false);
+    setOpenMarqueeMenu(false);
   };
 
-  const onOpen = () => {
-    setOpen(true);
+  const onOpenMarqueeMenu = () => {
+    setOpenMarqueeMenu(true);
   };
 
   const MethodIcon = () => {
@@ -57,31 +59,39 @@ export const MarqueeButtonGroup = ({ data }: MarqueeButtonGroupProps) => {
 
   return (
     <React.Fragment>
-      <ButtonGroup color="inherit" ref={anchorEl} variant="contained">
+      <ButtonGroup
+        color="inherit"
+        ref={marqueeMenuAnchorEl}
+        variant="contained"
+      >
         <Button>
           <SvgIcon fontSize="small">
             <MethodIcon />
           </SvgIcon>
         </Button>
 
-        <Button color="inherit" onClick={onOpen} size="small">
+        <Button color="inherit" onClick={onOpenMarqueeMenu} size="small">
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
 
-      <ButtonGroupMenu anchorEl={anchorEl} onClose={onClose} open={open}>
+      <ButtonGroupMenu
+        anchorEl={marqueeMenuAnchorEl}
+        onClose={onCloseMarqueeMenu}
+        open={openMarqueeMenu}
+      >
         <ButtonGroupMenuItem
           icon={<RectangularIcon />}
           method={SelectionMethod.Rectangular}
           name="Rectangular selection"
-          onClick={onClick}
+          onClick={onClickMarqueeMenuItem}
         />
 
         <ButtonGroupMenuItem
           icon={<EllipticalIcon />}
           method={SelectionMethod.Elliptical}
           name="Elliptical selection"
-          onClick={onClick}
+          onClick={onClickMarqueeMenuItem}
         />
       </ButtonGroupMenu>
     </React.Fragment>
