@@ -78,6 +78,7 @@ export const KonvaLassoSelectionCanvas = ({
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
   const [earlyRelease, setEarlyRelease] = useState<boolean>(false);
+  const [canClose, setCanClose] = useState<boolean>(false);
 
   React.useEffect(() => {
     if (
@@ -93,19 +94,27 @@ export const KonvaLassoSelectionCanvas = ({
     }
   }, [annotated]);
 
-  const connected = (position: { x: number; y: number }) => {
+  const isInside = (
+    startingAnchorCircle: React.RefObject<Circle>,
+    position: { x: number; y: number }
+  ) => {
     if (startingAnchorCircle && startingAnchorCircle.current) {
       const rectangle = startingAnchorCircle.current.getClientRect();
-
-      const inside =
+      return (
         rectangle.x <= position.x &&
         position.x <= rectangle.x + rectangle.width &&
         rectangle.y <= position.y &&
-        position.y <= rectangle.y + rectangle.height;
+        position.y <= rectangle.y + rectangle.height
+      );
+    } else {
+      return false;
+    }
+  };
 
-      if (strokes && strokes.length > 0) {
-        return inside && strokes[0].points.length > 32;
-      }
+  const connected = (position: { x: number; y: number }) => {
+    const inside = isInside(startingAnchorCircle, position);
+    if (strokes && strokes.length > 0) {
+      return inside && canClose;
     }
   };
 
@@ -166,6 +175,10 @@ export const KonvaLassoSelectionCanvas = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
+        if (!canClose && !isInside(startingAnchorCircle, position)) {
+          setCanClose(true);
+        }
+
         if (anchor && !earlyRelease) {
           const stroke = {
             method: Method.Lasso,
