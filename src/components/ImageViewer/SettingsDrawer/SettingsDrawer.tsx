@@ -17,7 +17,7 @@ export const SettingsDrawer = ({ data }: OptionsDrawerProps) => {
       classes={{ paper: classes.drawerPaper }}
       variant="permanent"
     >
-      <div />
+      <div className={classes.toolbar} />
     </Drawer>
   );
 };
