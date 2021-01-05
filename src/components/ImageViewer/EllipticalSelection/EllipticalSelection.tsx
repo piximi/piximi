@@ -23,6 +23,17 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
 
+  const [offset, setOffset] = useState<number>(0);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setOffset(offset + 1);
+      if (offset > 32) {
+        setOffset(0);
+      }
+    }, 200);
+  });
+
   const onMouseDown = () => {
     if (annotated) return;
 
@@ -74,13 +85,37 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
     >
       <ReactKonva.Layer>
         <ReactKonva.Image image={image} />
-        <ReactKonva.Ellipse
-          x={centerX}
-          y={centerY}
-          radiusX={radiusX}
-          radiusY={radiusY}
-          stroke="white"
-        />
+        {!annotated && annotating && centerX && centerY && (
+          <React.Fragment>
+            <ReactKonva.Ellipse
+              x={centerX}
+              y={centerY}
+              radiusX={radiusX}
+              radiusY={radiusY}
+              stroke="black"
+              strokeWidth={1}
+            />
+            <ReactKonva.Ellipse
+              x={centerX}
+              y={centerY}
+              radiusX={radiusX}
+              radiusY={radiusY}
+              stroke="white"
+              dash={[4, 2]}
+              dashOffset={-offset}
+              strokeWidth={1}
+            />
+          </React.Fragment>
+        )}
+        {annotated && !annotating && centerX && centerY && (
+          <ReactKonva.Ellipse
+            x={centerX}
+            y={centerY}
+            radiusX={radiusX}
+            radiusY={radiusY}
+            stroke="white"
+          />
+        )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
