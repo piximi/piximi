@@ -9,8 +9,9 @@ import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.sv
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
-import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
+import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
+
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import Tooltip from "@material-ui/core/Tooltip";
 
@@ -32,6 +33,30 @@ export const MethodDrawer = ({ data }: OptionsDrawerProps) => {
     setMethod(method);
   };
 
+  type MethodListItemProps = {
+    icon: React.ReactNode;
+    value: SelectionMethod;
+    name: string;
+  };
+
+  const MethodListItem = ({ icon, value, name }: MethodListItemProps) => {
+    return (
+      <Tooltip aria-label={name} title={name}>
+        <ListItem
+          button
+          onClick={(event: React.MouseEvent<HTMLElement>) =>
+            onChange(event, value)
+          }
+          selected={method === value}
+        >
+          <ListItemIcon>
+            <SvgIcon fontSize="small">{icon}</SvgIcon>
+          </ListItemIcon>
+        </ListItem>
+      </Tooltip>
+    );
+  };
+
   return (
     <Drawer
       anchor="right"
@@ -44,119 +69,36 @@ export const MethodDrawer = ({ data }: OptionsDrawerProps) => {
       <Divider />
 
       <List>
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Rectangular)
-            }
-            selected={method === SelectionMethod.Rectangular}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <RectangularIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Elliptical)
-            }
-            selected={method === SelectionMethod.Elliptical}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <EllipticalIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Lasso)
-            }
-            selected={method === SelectionMethod.Lasso}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <LassoIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Magnetic)
-            }
-            selected={method === SelectionMethod.Magnetic}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <MagneticIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Color)
-            }
-            selected={method === SelectionMethod.Color}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <MagicWandIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip
-          aria-label="rectangular selection"
-          title="Rectangular selection"
-        >
-          <ListItem
-            button
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              onChange(event, SelectionMethod.Quick)
-            }
-            selected={method === SelectionMethod.Quick}
-          >
-            <ListItemIcon>
-              <SvgIcon fontSize="small">
-                <QuickIcon />
-              </SvgIcon>
-            </ListItemIcon>
-          </ListItem>
-        </Tooltip>
+        <MethodListItem
+          icon={<RectangularIcon />}
+          value={SelectionMethod.Rectangular}
+          name="Rectangular selection"
+        />
+        <MethodListItem
+          icon={<EllipticalIcon />}
+          value={SelectionMethod.Elliptical}
+          name="Elliptical selection"
+        />
+        <MethodListItem
+          icon={<LassoIcon />}
+          value={SelectionMethod.Lasso}
+          name="Lasso selection"
+        />
+        <MethodListItem
+          icon={<MagneticIcon />}
+          value={SelectionMethod.Magnetic}
+          name="Magnetic selection"
+        />
+        <MethodListItem
+          icon={<MagicWandIcon />}
+          value={SelectionMethod.Color}
+          name="Color selection"
+        />
+        <MethodListItem
+          icon={<QuickIcon />}
+          value={SelectionMethod.Quick}
+          name="Quick selection"
+        />
       </List>
     </Drawer>
   );
