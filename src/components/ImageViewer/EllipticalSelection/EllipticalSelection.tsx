@@ -88,32 +88,35 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
         {!annotated && annotating && centerX && centerY && (
           <React.Fragment>
             <ReactKonva.Ellipse
-              x={centerX}
-              y={centerY}
               radiusX={radiusX}
               radiusY={radiusY}
               stroke="black"
               strokeWidth={1}
-            />
-            <ReactKonva.Ellipse
               x={centerX}
               y={centerY}
+            />
+            <ReactKonva.Ellipse
+              dash={[4, 2]}
+              dashOffset={-offset}
               radiusX={radiusX}
               radiusY={radiusY}
               stroke="white"
-              dash={[4, 2]}
-              dashOffset={-offset}
               strokeWidth={1}
+              x={centerX}
+              y={centerY}
             />
           </React.Fragment>
         )}
         {annotated && !annotating && centerX && centerY && (
           <ReactKonva.Ellipse
-            x={centerX}
-            y={centerY}
+            dash={[4, 2]}
+            dashOffset={-offset}
             radiusX={radiusX}
             radiusY={radiusY}
             stroke="white"
+            strokeWidth={1}
+            x={centerX}
+            y={centerY}
           />
         )}
       </ReactKonva.Layer>
