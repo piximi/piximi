@@ -71,22 +71,46 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
       <ReactKonva.Layer>
         <ReactKonva.Image image={image} />
         {!annotated && annotating && x && y && (
-          <ReactKonva.Rect
-            x={x}
-            y={y}
-            height={height}
-            width={width}
-            stroke="black"
-          />
+          <React.Fragment>
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="black"
+              strokeWidth={1}
+            />
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="white"
+              dash={[4, 2]}
+              strokeWidth={1}
+            />
+          </React.Fragment>
         )}
         {annotated && !annotating && x && y && (
-          <ReactKonva.Rect
-            x={x}
-            y={y}
-            height={height}
-            width={width}
-            stroke="black"
-          />
+          <React.Fragment>
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="black"
+              strokeWidth={1}
+            />
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="white"
+              dash={[4, 2]}
+              strokeWidth={1}
+            />
+          </React.Fragment>
         )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
