@@ -2,6 +2,7 @@ import React from "react";
 import { Image } from "../../../types/Image";
 import { Drawer } from "@material-ui/core";
 import { useStyles } from "./SettingsDrawer.css";
+import Divider from "@material-ui/core/Divider";
 
 type OptionsDrawerProps = {
   data: Image;
@@ -18,6 +19,8 @@ export const SettingsDrawer = ({ data }: OptionsDrawerProps) => {
       variant="permanent"
     >
       <div className={classes.toolbar} />
+
+      <Divider />
     </Drawer>
   );
 };

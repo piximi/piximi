@@ -8,7 +8,6 @@ export const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
   },
   drawerPaper: {
-    padding: 8,
     width: drawerWidth,
     right: 80,
   },
