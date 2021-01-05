@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
@@ -9,15 +9,54 @@ type ImageViewerProps = {
 };
 
 export const RectangularSelection = ({ data }: ImageViewerProps) => {
-  const [img] = useImage(data.src);
+  const [image] = useImage(data.src);
 
   const stage = React.useRef<Stage>(null);
 
-  const onMouseDown = () => {};
+  const [x, setX] = React.useState<number>();
+  const [y, setY] = React.useState<number>();
+  const [height, setHeight] = React.useState<number>(0);
+  const [width, setWidth] = React.useState<number>(0);
 
-  const onMouseMove = () => {};
+  const [annotated, setAnnotated] = useState<boolean>();
+  const [annotating, setAnnotating] = useState<boolean>();
 
-  const onMouseUp = () => {};
+  const onMouseDown = () => {
+    if (annotated) return;
+
+    setAnnotating(true);
+
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
+
+      if (position) {
+        setX(position.x);
+        setY(position.y);
+      }
+    }
+  };
+
+  const onMouseMove = () => {
+    if (annotated) return;
+
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
+
+      if (x && y && position) {
+        setHeight(position.y - y);
+        setWidth(position.x - x);
+      }
+    }
+  };
+
+  const onMouseUp = () => {
+    if (annotated) return;
+
+    if (!annotating) return;
+
+    setAnnotated(true);
+    setAnnotating(false);
+  };
 
   return (
     <ReactKonva.Stage
@@ -30,7 +69,25 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
       width={data.shape?.c}
     >
       <ReactKonva.Layer>
-        <ReactKonva.Image image={img} />
+        <ReactKonva.Image image={image} />
+        {!annotated && annotating && x && y && (
+          <ReactKonva.Rect
+            x={x}
+            y={y}
+            height={height}
+            width={width}
+            stroke="black"
+          />
+        )}
+        {annotated && !annotating && x && y && (
+          <ReactKonva.Rect
+            x={x}
+            y={y}
+            height={height}
+            width={width}
+            stroke="black"
+          />
+        )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
