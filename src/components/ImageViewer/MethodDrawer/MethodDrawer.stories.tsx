@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../../types/Image";
-import { SettingsDrawer } from "./SettingsDrawer";
+import { MethodDrawer } from "./MethodDrawer";
 
 export default {
-  component: SettingsDrawer,
-  title: "Components/ImageViewer/SettingsDrawer",
+  component: MethodDrawer,
+  title: "Components/ImageViewer/MethodDrawer",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof SettingsDrawer>> = (args) => (
-  <SettingsDrawer {...args} />
+const Template: Story<ComponentProps<typeof MethodDrawer>> = (args) => (
+  <MethodDrawer {...args} />
 );
 
 export const Default = Template.bind({});

@@ -1,13 +1,14 @@
 import React from "react";
 import { Image } from "../../../types/Image";
 import { Drawer } from "@material-ui/core";
-import { useStyles } from "./SettingsDrawer.css";
+import { useStyles } from "./MethodDrawer.css";
+import { ToolbarButtonGroup } from "../ImageViewerAppBar/AppBarToolbar/ToolbarButtonGroup";
 
 type OptionsDrawerProps = {
   data: Image;
 };
 
-export const SettingsDrawer = ({ data }: OptionsDrawerProps) => {
+export const MethodDrawer = ({ data }: OptionsDrawerProps) => {
   const classes = useStyles();
 
   return (
@@ -17,7 +18,7 @@ export const SettingsDrawer = ({ data }: OptionsDrawerProps) => {
       classes={{ paper: classes.drawerPaper }}
       variant="permanent"
     >
-      <div />
+      <ToolbarButtonGroup data={data} />
     </Drawer>
   );
 };
