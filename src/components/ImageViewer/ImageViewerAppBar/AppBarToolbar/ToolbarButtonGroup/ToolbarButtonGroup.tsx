@@ -10,7 +10,6 @@ import { ReactComponent as MagicWandIcon } from "../../../../../icons/MagicWand.
 import { ReactComponent as QuickIcon } from "../../../../../icons/Quick.svg";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup/ToggleButtonGroup";
 import ToggleButton from "@material-ui/lab/ToggleButton/ToggleButton";
-import Tooltip from "@material-ui/core/Tooltip";
 
 type ToolbarButtonGroupProps = {
   data: Image;
@@ -29,7 +28,12 @@ export const ToolbarButtonGroup = ({ data }: ToolbarButtonGroupProps) => {
   );
 
   return (
-    <ToggleButtonGroup exclusive onChange={onChange} value={method}>
+    <ToggleButtonGroup
+      exclusive
+      onChange={onChange}
+      orientation="vertical"
+      value={method}
+    >
       <ToggleButton
         aria-label="rectangular selection"
         value={SelectionMethod.Rectangular}

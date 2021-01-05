@@ -8,9 +8,5 @@ type ImageViewerAppBarProps = {
 };
 
 export const AppBarToolbar = ({ data }: ImageViewerAppBarProps) => {
-  return (
-    <Toolbar>
-      <ToolbarButtonGroup data={data} />
-    </Toolbar>
-  );
+  return <Toolbar />;
 };

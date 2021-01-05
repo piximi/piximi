@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-const drawerWidth = 240;
+const drawerWidth = 80;
 
 export const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -8,6 +8,7 @@ export const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
   },
   drawerPaper: {
+    padding: 8,
     width: drawerWidth,
   },
 }));
