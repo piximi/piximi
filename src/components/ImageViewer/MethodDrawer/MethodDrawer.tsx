@@ -11,7 +11,6 @@ import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
-
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import Tooltip from "@material-ui/core/Tooltip";
 
