@@ -3,6 +3,8 @@ import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
+import { Transformer } from "konva/types/shapes/Transformer";
+import { Rect } from "konva/types/shapes/Rect";
 
 type ImageViewerProps = {
   data: Image;
@@ -13,6 +15,9 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
 
   const stage = React.useRef<Stage>(null);
 
+  const transformer = React.useRef<Transformer>(null);
+  const shapeRef = React.useRef<Rect>(null);
+
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
@@ -21,17 +26,29 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
 
-  const [dash, setDash] = useState<[number, number]>([4, 2]);
   const [offset, setOffset] = useState<number>(0);
 
   React.useEffect(() => {
     setTimeout(() => {
       setOffset(offset + 1);
-      if (offset > 16) {
+      if (offset > 32) {
         setOffset(0);
       }
-    }, 20);
+    }, 200);
   });
+
+  React.useEffect(() => {
+    if (annotated) {
+      // we need to attach transformer manually
+      if (transformer && transformer.current && shapeRef && shapeRef.current) {
+        transformer.current.nodes([shapeRef.current]);
+        const layer = transformer.current.getLayer();
+        if (layer) {
+          layer.batchDraw();
+        }
+      }
+    }
+  }, [annotated]);
 
   const onMouseDown = () => {
     if (annotated) return;
@@ -98,34 +115,35 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
               height={height}
               width={width}
               stroke="white"
-              dash={dash}
-              dashOffset={offset}
+              dash={[4, 2]}
+              dashOffset={-offset}
               strokeWidth={1}
             />
           </React.Fragment>
         )}
         {annotated && !annotating && x && y && (
-          <React.Fragment>
-            <ReactKonva.Rect
-              x={x}
-              y={y}
-              height={height}
-              width={width}
-              stroke="black"
-              strokeWidth={1}
-            />
-            <ReactKonva.Rect
-              x={x}
-              y={y}
-              height={height}
-              width={width}
-              stroke="white"
-              dash={dash}
-              dashOffset={offset}
-              strokeWidth={1}
-            />
-          </React.Fragment>
+          <ReactKonva.Rect
+            dash={[4, 2]}
+            dashOffset={-offset}
+            height={height}
+            ref={shapeRef}
+            stroke="white"
+            strokeWidth={1}
+            width={width}
+            x={x}
+            y={y}
+          />
         )}
+
+        <ReactKonva.Transformer
+          anchorFill="#FFF"
+          anchorStroke="#000"
+          anchorStrokeWidth={1}
+          anchorSize={6}
+          borderEnabled={false}
+          ref={transformer}
+          rotateEnabled={false}
+        />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
