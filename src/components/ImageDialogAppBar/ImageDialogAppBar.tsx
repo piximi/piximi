@@ -45,8 +45,8 @@ const ButtonGroup = () => {
         </ToggleButton>
       </Tooltip>
 
-      <Tooltip title={SelectionMethod.RectangularMarquee}>
-        <ToggleButton value={SelectionMethod.RectangularMarquee}>
+      <Tooltip title={SelectionMethod.Rectangular}>
+        <ToggleButton value={SelectionMethod.Rectangular}>
           <Crop32Icon />
           <ArrowDropDownIcon />
         </ToggleButton>

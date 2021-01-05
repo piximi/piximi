@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 
 type OpenMenuProps = {
   anchorEl: any;
-  onClose: () => void;
+  onClose: (event: any) => void;
   open: boolean;
 };
 
@@ -18,7 +18,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   const dispatch = useDispatch();
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onClose();
+    onClose(event);
 
     event.persist();
 

@@ -13,8 +13,8 @@ import { DropboxMenuItem } from "../DropboxMenuItem";
 import { Shape } from "../../types/Shape";
 
 type UploadMenuProps = {
-  anchorEl: HTMLElement;
-  onClose: () => void;
+  anchorEl: HTMLElement | null;
+  onClose: (event: any) => void;
   open: boolean;
 };
 
@@ -25,7 +25,7 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   const onUploadFromComputerChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    onClose();
+    onClose(event);
     event.persist();
     if (event.currentTarget.files) {
       const blob = event.currentTarget.files[0];

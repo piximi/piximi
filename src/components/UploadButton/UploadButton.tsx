@@ -23,7 +23,7 @@ export const UploadButton = () => {
         </Button>
       </Tooltip>
 
-      <UploadMenu anchorEl={anchorEl!} onClose={onClose} open={open} />
+      <UploadMenu anchorEl={anchorEl!.current} onClose={onClose} open={open} />
     </React.Fragment>
   );
 };

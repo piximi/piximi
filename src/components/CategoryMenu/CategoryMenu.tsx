@@ -11,7 +11,9 @@ import Typography from "@material-ui/core/Typography";
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
-  onCloseCategoryMenu: () => void;
+  onCloseCategoryMenu: (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => void;
   onOpenCategoryMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
   openCategoryMenu: boolean;
   onOpenDeleteCategoryDialog: () => void;
@@ -26,14 +28,18 @@ export const CategoryMenu = ({
   onOpenDeleteCategoryDialog,
   onOpenEditCategoryDialog,
 }: CategoryMenuProps) => {
-  const onOpenDeleteCategoryDialogClick = () => {
+  const onOpenDeleteCategoryDialogClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     onOpenDeleteCategoryDialog();
-    onCloseCategoryMenu();
+    onCloseCategoryMenu(event);
   };
 
-  const onOpenEditCategoryDialogClick = () => {
+  const onOpenEditCategoryDialogClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     onOpenEditCategoryDialog();
-    onCloseCategoryMenu();
+    onCloseCategoryMenu(event);
   };
 
   return (

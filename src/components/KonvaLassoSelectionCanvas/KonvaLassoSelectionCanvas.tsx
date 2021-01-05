@@ -77,6 +77,8 @@ export const KonvaLassoSelectionCanvas = ({
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
+  const [earlyRelease, setEarlyRelease] = useState<boolean>(false);
+
   React.useEffect(() => {
     if (
       annotated &&
@@ -125,26 +127,30 @@ export const KonvaLassoSelectionCanvas = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (anchor) {
-            const stroke = {
-              method: Method.Lasso,
-              points: [anchor.x, anchor.y, position.x, position.y],
-            };
+          if (!earlyRelease) {
+            if (anchor) {
+              const stroke = {
+                method: Method.Lasso,
+                points: [anchor.x, anchor.y, position.x, position.y],
+              };
 
-            setStrokes([...strokes, stroke]);
+              setStrokes([...strokes, stroke]);
 
-            setAnchor(position);
+              setAnchor(position);
+            } else {
+              setAnnotating(true);
+
+              setStart(position);
+
+              const stroke: Stroke = {
+                method: Method.Lasso,
+                points: [position.x, position.y],
+              };
+
+              setStrokes([...strokes, stroke]);
+            }
           } else {
-            setAnnotating(true);
-
-            setStart(position);
-
-            const stroke: Stroke = {
-              method: Method.Lasso,
-              points: [position.x, position.y],
-            };
-
-            setStrokes([...strokes, stroke]);
+            setEarlyRelease(false);
           }
         }
       }
@@ -160,7 +166,7 @@ export const KonvaLassoSelectionCanvas = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
-        if (anchor) {
+        if (anchor && !earlyRelease) {
           const stroke = {
             method: Method.Lasso,
             points: [anchor.x, anchor.y, position.x, position.y],
@@ -221,6 +227,9 @@ export const KonvaLassoSelectionCanvas = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
+          if (!anchor && strokes[strokes.length - 1].points.length <= 2) {
+            setEarlyRelease(true);
+          }
           setAnchor(position);
         }
       }

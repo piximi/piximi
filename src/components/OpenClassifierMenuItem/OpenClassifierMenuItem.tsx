@@ -2,7 +2,7 @@ import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 
 type OpenClassifierMenuItemProps = {
-  onClose: () => void;
+  onClose: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 };
 
 export const OpenClassifierMenuItem = ({

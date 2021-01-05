@@ -4,7 +4,7 @@ import { SelectionMethod } from "../../types/SelectionMethod";
 
 const initialState: Settings = {
   selectedImages: [],
-  selectionMethod: SelectionMethod.RectangularMarquee,
+  selectionMethod: SelectionMethod.Rectangular,
   tileSize: 1,
 };
 
