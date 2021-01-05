@@ -1,9 +1,7 @@
 import React from "react";
 import { Image } from "../../../../../types/Image";
-import { LassoButtonGroup } from "../LassoButtonGroup";
-import { MarqueeButtonGroup } from "../MarqueeButtonGroup";
-import { ProbabilisticButtonGroup } from "../ProbabilisticButtonGroup";
 import Toolbar from "@material-ui/core/Toolbar";
+import { ToolbarButtonGroup } from "../ToolbarButtonGroup";
 
 type ImageViewerAppBarProps = {
   data: Image;
@@ -12,11 +10,7 @@ type ImageViewerAppBarProps = {
 export const AppBarToolbar = ({ data }: ImageViewerAppBarProps) => {
   return (
     <Toolbar>
-      <MarqueeButtonGroup data={data} />
-      <span>&nbsp;&nbsp;</span>
-      <LassoButtonGroup data={data} />
-      <span>&nbsp;&nbsp;</span>
-      <ProbabilisticButtonGroup data={data} />
+      <ToolbarButtonGroup data={data} />
     </Toolbar>
   );
 };
