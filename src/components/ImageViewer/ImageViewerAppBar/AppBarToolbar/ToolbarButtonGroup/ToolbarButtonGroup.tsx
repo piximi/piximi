@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Image } from "../../../../../types/Image";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
@@ -33,6 +33,17 @@ export const ToolbarButtonGroup = ({ data }: ToolbarButtonGroupProps) => {
     onOpen: onOpenLassoMenu,
     open: openLassoMenu,
   } = useMenu();
+
+  const {
+    anchorEl: probabilisticMenuAnchorEl,
+    onClose: onCloseProbabilisticMenu,
+    onOpen: onOpenProbabilisticMenu,
+    open: openProbabilisticMenu,
+  } = useMenu();
+
+  const [method, setMethod] = useState<SelectionMethod>(
+    SelectionMethod.Rectangular
+  );
 
   const [visibleLassoMethod, setVisibleLassoMethod] = useState<SelectionMethod>(
     SelectionMethod.Lasso
@@ -90,29 +101,6 @@ export const ToolbarButtonGroup = ({ data }: ToolbarButtonGroupProps) => {
       default:
         return <LassoIcon />;
     }
-  };
-
-  const probabilisticMenuAnchorEl = useRef<HTMLDivElement>(null);
-
-  const [openProbabilisticMenu, setOpenProbabilisticMenu] = useState<boolean>(
-    false
-  );
-
-  const onCloseProbabilisticMenu = (
-    event: React.MouseEvent<Document, MouseEvent>
-  ) => {
-    if (
-      probabilisticMenuAnchorEl.current &&
-      probabilisticMenuAnchorEl.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-
-    setOpenProbabilisticMenu(false);
-  };
-
-  const onOpenProbabilisticMenu = () => {
-    setOpenProbabilisticMenu(true);
   };
 
   const ProbabilisticMethodIcon = () => {
