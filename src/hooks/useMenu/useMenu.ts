@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 
 export const useMenu = () => {
-  const anchorEl = useRef<HTMLDivElement>(null);
+  const anchorEl = useRef<HTMLElement | null>(null);
 
   const [open, setOpen] = useState<boolean>(false);
 

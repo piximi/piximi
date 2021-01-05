@@ -9,7 +9,7 @@ import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
 
 type DropboxMenuItemProps = {
-  onClose: () => void;
+  onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 };
 
 export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
@@ -21,7 +21,7 @@ export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
     appKey: "tetle78x244mpkz",
     chooserOptions: { multiselect: true, linkType: "direct" },
     onSelected: (items: readonly Dropbox.ChooserFile[]) => {
-      onClose();
+      //onClose();
 
       items.forEach((item: Dropbox.ChooserFile) => {
         //dispatch(createImage({ src: item.link as string }));

@@ -7,7 +7,9 @@ import { updateCategoryVisibility } from "../../store/slices";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;
-  onCloseCategoryMenu: () => void;
+  onCloseCategoryMenu: (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => void;
 };
 
 export const HideOrShowCategoryMenuItem = ({
@@ -16,8 +18,8 @@ export const HideOrShowCategoryMenuItem = ({
 }: HideOrShowCategoryMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onClick = () => {
-    onCloseCategoryMenu();
+  const onClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    onCloseCategoryMenu(event);
 
     const payload = { id: category.id, visible: !category.visible };
 

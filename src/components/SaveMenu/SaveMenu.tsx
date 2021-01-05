@@ -9,7 +9,7 @@ import { classifierSelector, projectSelector } from "../../store/selectors";
 
 type SaveMenuProps = {
   anchorEl: any;
-  onClose: () => void;
+  onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onOpen: (event: any) => void;
   open: boolean;
 };
@@ -36,8 +36,6 @@ export const SaveMenu = ({
     const data = new Blob(parts, { type: "application/json;charset=utf-8" });
 
     saveAs(data, `${project.name}.json`);
-
-    onClose();
   };
 
   return (
