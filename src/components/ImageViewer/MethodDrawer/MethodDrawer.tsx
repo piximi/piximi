@@ -15,47 +15,49 @@ import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import Tooltip from "@material-ui/core/Tooltip";
 
+const items = [
+  {
+    icon: <RectangularIcon />,
+    method: SelectionMethod.Rectangular,
+    name: "Rectangular selection",
+  },
+  {
+    icon: <EllipticalIcon />,
+    method: SelectionMethod.Elliptical,
+    name: "Elliptical selection",
+  },
+  {
+    icon: <LassoIcon />,
+    method: SelectionMethod.Lasso,
+    name: "Lasso selection",
+  },
+  {
+    icon: <MagneticIcon />,
+    method: SelectionMethod.Magnetic,
+    name: "Magnetic selection",
+  },
+  {
+    icon: <MagicWandIcon />,
+    method: SelectionMethod.Color,
+    name: "Color selection",
+  },
+  {
+    icon: <QuickIcon />,
+    method: SelectionMethod.Quick,
+    name: "Quick selection",
+  },
+];
+
 type OptionsDrawerProps = {
   data: Image;
 };
 
 export const MethodDrawer = ({ data }: OptionsDrawerProps) => {
-  const [method, setMethod] = useState<SelectionMethod>(
+  const [selected, setSelected] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
 
   const classes = useStyles();
-
-  const onChange = (
-    event: React.MouseEvent<HTMLElement>,
-    method: SelectionMethod
-  ) => {
-    setMethod(method);
-  };
-
-  type MethodListItemProps = {
-    icon: React.ReactNode;
-    value: SelectionMethod;
-    name: string;
-  };
-
-  const MethodListItem = ({ icon, value, name }: MethodListItemProps) => {
-    return (
-      <Tooltip aria-label={name} title={name}>
-        <ListItem
-          button
-          onClick={(event: React.MouseEvent<HTMLElement>) =>
-            onChange(event, value)
-          }
-          selected={method === value}
-        >
-          <ListItemIcon>
-            <SvgIcon fontSize="small">{icon}</SvgIcon>
-          </ListItemIcon>
-        </ListItem>
-      </Tooltip>
-    );
-  };
 
   return (
     <Drawer
@@ -69,36 +71,21 @@ export const MethodDrawer = ({ data }: OptionsDrawerProps) => {
       <Divider />
 
       <List>
-        <MethodListItem
-          icon={<RectangularIcon />}
-          value={SelectionMethod.Rectangular}
-          name="Rectangular selection"
-        />
-        <MethodListItem
-          icon={<EllipticalIcon />}
-          value={SelectionMethod.Elliptical}
-          name="Elliptical selection"
-        />
-        <MethodListItem
-          icon={<LassoIcon />}
-          value={SelectionMethod.Lasso}
-          name="Lasso selection"
-        />
-        <MethodListItem
-          icon={<MagneticIcon />}
-          value={SelectionMethod.Magnetic}
-          name="Magnetic selection"
-        />
-        <MethodListItem
-          icon={<MagicWandIcon />}
-          value={SelectionMethod.Color}
-          name="Color selection"
-        />
-        <MethodListItem
-          icon={<QuickIcon />}
-          value={SelectionMethod.Quick}
-          name="Quick selection"
-        />
+        {items.map((item, index) => {
+          return (
+            <Tooltip aria-label={item.name} key={index} title={item.name}>
+              <ListItem
+                button
+                onClick={() => setSelected(item.method)}
+                selected={selected === item.method}
+              >
+                <ListItemIcon>
+                  <SvgIcon fontSize="small">{item.icon}</SvgIcon>
+                </ListItemIcon>
+              </ListItem>
+            </Tooltip>
+          );
+        })}
       </List>
     </Drawer>
   );
