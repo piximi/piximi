@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
@@ -20,6 +20,18 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
 
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
+
+  const [dash, setDash] = useState<[number, number]>([4, 2]);
+  const [offset, setOffset] = useState<number>(0);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setOffset(offset + 1);
+      if (offset > 16) {
+        setOffset(0);
+      }
+    }, 20);
+  });
 
   const onMouseDown = () => {
     if (annotated) return;
@@ -86,7 +98,8 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
               height={height}
               width={width}
               stroke="white"
-              dash={[4, 2]}
+              dash={dash}
+              dashOffset={offset}
               strokeWidth={1}
             />
           </React.Fragment>
@@ -107,7 +120,8 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
               height={height}
               width={width}
               stroke="white"
-              dash={[4, 2]}
+              dash={dash}
+              dashOffset={offset}
               strokeWidth={1}
             />
           </React.Fragment>
