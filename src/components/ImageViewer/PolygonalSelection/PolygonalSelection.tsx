@@ -23,7 +23,7 @@ type Anchor = {
   y: number;
 };
 
-type KonvaLassoSelectionCanvasProps = {
+type PolygonalSelectionProps = {
   image: Image;
 };
 
@@ -59,15 +59,12 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
-export const PolygonalSelection = ({
-  image,
-}: KonvaLassoSelectionCanvasProps) => {
+export const PolygonalSelection = ({ image }: PolygonalSelectionProps) => {
   const [img] = useImage(image.src);
 
   const stage = React.useRef<Stage>(null);
   const startingAnchorCircle = React.useRef<Circle>(null);
   const transformer = React.useRef<Transformer>(null);
-  const group = React.useRef<Group>(null);
   const annotationRef = React.useRef<Line>(null);
 
   const [anchor, setAnchor] = useState<Anchor>();
@@ -77,7 +74,6 @@ export const PolygonalSelection = ({
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
-  const [earlyRelease, setEarlyRelease] = useState<boolean>(false);
   const [canClose, setCanClose] = useState<boolean>(false);
 
   React.useEffect(() => {
@@ -136,30 +132,26 @@ export const PolygonalSelection = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (!earlyRelease) {
-            if (anchor) {
-              const stroke = {
-                method: Method.Lasso,
-                points: [anchor.x, anchor.y, position.x, position.y],
-              };
+          if (anchor) {
+            const stroke = {
+              method: Method.Lasso,
+              points: [anchor.x, anchor.y, position.x, position.y],
+            };
 
-              setStrokes([...strokes, stroke]);
+            setStrokes([...strokes, stroke]);
 
-              setAnchor(position);
-            } else {
-              setAnnotating(true);
-
-              setStart(position);
-
-              const stroke: Stroke = {
-                method: Method.Lasso,
-                points: [position.x, position.y],
-              };
-
-              setStrokes([...strokes, stroke]);
-            }
+            setAnchor(position);
           } else {
-            setEarlyRelease(false);
+            setAnnotating(true);
+
+            setStart(position);
+
+            const stroke: Stroke = {
+              method: Method.Lasso,
+              points: [position.x, position.y],
+            };
+
+            setStrokes([...strokes, stroke]);
           }
         }
       }
@@ -179,7 +171,7 @@ export const PolygonalSelection = ({
           setCanClose(true);
         }
 
-        if (anchor && !earlyRelease) {
+        if (anchor) {
           const stroke = {
             method: Method.Lasso,
             points: [anchor.x, anchor.y, position.x, position.y],
@@ -191,20 +183,6 @@ export const PolygonalSelection = ({
             setStrokes(strokes.concat());
           } else {
             setStrokes([...strokes, stroke]);
-          }
-        } else {
-          let stroke = strokes[strokes.length - 1];
-
-          stroke.points = [...stroke.points, position.x, position.y];
-
-          strokes.splice(strokes.length - 1, 1, stroke);
-
-          setStrokes(strokes.concat());
-
-          if (connected(position)) {
-            //  TODO:
-          } else {
-            //  TODO:
           }
         }
       }
@@ -240,9 +218,6 @@ export const PolygonalSelection = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (!anchor && strokes[strokes.length - 1].points.length <= 2) {
-            setEarlyRelease(true);
-          }
           setAnchor(position);
         }
       }
