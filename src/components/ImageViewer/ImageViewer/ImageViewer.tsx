@@ -1,34 +1,34 @@
-import React, { useState } from "react";
-import { Image } from "../../../types/Image";
-import { CssBaseline } from "@material-ui/core";
-import { useStyles } from "./ImageViewer.css";
 import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
+import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import Radio from "@material-ui/core/Radio";
-import { SelectionType } from "../../../types/SelectionType";
+import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
-import Drawer from "@material-ui/core/Drawer";
-import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
-import { SelectionMethod } from "../../../types/SelectionMethod";
-import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
-import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
-import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
-import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
-import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
+import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
-import { RectangularSelection } from "../RectangularSelection";
-import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
-import { MagneticSelection } from "../MagneticSelection/MagneticSelection";
-import { LassoSelection } from "../LassoSelection/LassoSelection";
+import { CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
+import { Image } from "../../../types/Image";
+import { LassoSelection } from "../LassoSelection/LassoSelection";
+import { MagneticSelection } from "../MagneticSelection/MagneticSelection";
+import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
+import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
+import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
+import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
+import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
+import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
+import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
+import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
+import { RectangularSelection } from "../RectangularSelection";
+import { SelectionMethod } from "../../../types/SelectionMethod";
+import { SelectionType } from "../../../types/SelectionType";
+import { useStyles } from "./ImageViewer.css";
 
 const operations = [
   {
@@ -63,14 +63,15 @@ const operations = [
   },
 ];
 
-type StageProps = {
+type ImageViewerStageProps = {
   operation: SelectionMethod;
   data: Image;
 };
 
-const Stage = ({ operation, data }: StageProps) => {
+const ImageViewerStage = ({ operation, data }: ImageViewerStageProps) => {
   switch (operation) {
     case SelectionMethod.Color:
+      return <React.Fragment />;
     case SelectionMethod.Elliptical:
       return <EllipticalSelection data={data} />;
     case SelectionMethod.Lasso:
@@ -78,9 +79,11 @@ const Stage = ({ operation, data }: StageProps) => {
     case SelectionMethod.Magnetic:
       return <MagneticSelection image={data} />;
     case SelectionMethod.Object:
+      return <React.Fragment />;
     case SelectionMethod.Polygonal:
       return <PolygonalSelection image={data} />;
     case SelectionMethod.Quick:
+      return <React.Fragment />;
     case SelectionMethod.Rectangular:
       return <RectangularSelection data={data} />;
     default:
@@ -115,7 +118,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <div className={classes.toolbar} />
 
         <Box alignItems="center" display="flex" justifyContent="center">
-          <Stage operation={active} data={data} />
+          <ImageViewerStage operation={active} data={data} />
         </Box>
       </main>
 
