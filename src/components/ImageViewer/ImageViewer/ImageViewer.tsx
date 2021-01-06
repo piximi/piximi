@@ -25,6 +25,7 @@ import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
 
 const operations = [
   {
@@ -77,7 +78,11 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
       <CssBaseline />
 
       <AppBar className={classes.appBar} color="inherit" position="fixed">
-        <Toolbar></Toolbar>
+        <Toolbar>
+          <Typography className={classes.logo} variant="h6">
+            <strong>Piximi</strong> Image viewer
+          </Typography>
+        </Toolbar>
       </AppBar>
 
       <main className={classes.content}>
