@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
-import { Image } from "../../types/Image";
-import { KonvaLassoSelectionCanvas, Method } from "./KonvaLassoSelectionCanvas";
+import { Image } from "../../../types/Image";
+import { LassoSelection, Method } from "./LassoSelection";
 
 export default {
-  component: KonvaLassoSelectionCanvas,
-  title: "Components/KonvaLassoSelectionCanvas",
+  component: LassoSelection,
+  title: "Components/ImageViewer/LassoSelection",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof KonvaLassoSelectionCanvas>> = (args) => (
-  <KonvaLassoSelectionCanvas {...args} />
+const Template: Story<ComponentProps<typeof LassoSelection>> = (args) => (
+  <LassoSelection {...args} />
 );
 
 export const Default = Template.bind({});
@@ -23,5 +23,5 @@ const image: Image = {
 };
 
 Default.args = {
-  image: image
+  image: image,
 };

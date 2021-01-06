@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import * as ReactKonva from "react-konva";
-import { Image } from "../../types/Image";
+import { Image } from "../../../types/Image";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
 import { Circle } from "konva/types/shapes/Circle";
@@ -59,9 +59,7 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
-export const KonvaLassoSelectionCanvas = ({
-  image,
-}: KonvaLassoSelectionCanvasProps) => {
+export const LassoSelection = ({ image }: KonvaLassoSelectionCanvasProps) => {
   const [img] = useImage(image.src);
 
   const stage = React.useRef<Stage>(null);
