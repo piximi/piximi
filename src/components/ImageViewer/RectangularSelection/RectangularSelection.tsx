@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
@@ -38,7 +38,7 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
   });
 
   React.useEffect(() => {
-    if (annotated) {
+    if (annotated && !annotating) {
       // we need to attach transformer manually
       if (transformer && transformer.current && shapeRef && shapeRef.current) {
         transformer.current.nodes([shapeRef.current]);
@@ -48,7 +48,7 @@ export const RectangularSelection = ({ data }: ImageViewerProps) => {
         }
       }
     }
-  }, [annotated]);
+  }, [annotated, annotating]);
 
   const onMouseDown = () => {
     if (annotated) return;
