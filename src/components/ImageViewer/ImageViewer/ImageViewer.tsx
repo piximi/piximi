@@ -5,8 +5,6 @@ import { useStyles } from "./ImageViewer.css";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Box from "@material-ui/core/Box";
-import * as Konva from "react-konva";
-import useImage from "use-image";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -26,6 +24,11 @@ import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
+import { RectangularSelection } from "../RectangularSelection";
+import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
+import { MagneticSelection } from "../MagneticSelection/MagneticSelection";
+import { LassoSelection } from "../LassoSelection/LassoSelection";
+import { EllipticalSelection } from "../EllipticalSelection";
 
 const operations = [
   {
@@ -60,13 +63,36 @@ const operations = [
   },
 ];
 
+type StageProps = {
+  operation: SelectionMethod;
+  data: Image;
+};
+
+const Stage = ({ operation, data }: StageProps) => {
+  switch (operation) {
+    case SelectionMethod.Color:
+    case SelectionMethod.Elliptical:
+      return <EllipticalSelection data={data} />;
+    case SelectionMethod.Lasso:
+      return <LassoSelection image={data} />;
+    case SelectionMethod.Magnetic:
+      return <MagneticSelection image={data} />;
+    case SelectionMethod.Object:
+    case SelectionMethod.Polygonal:
+      return <PolygonalSelection image={data} />;
+    case SelectionMethod.Quick:
+    case SelectionMethod.Rectangular:
+      return <RectangularSelection data={data} />;
+    default:
+      return <RectangularSelection data={data} />;
+  }
+};
+
 type ImageViewerProps = {
   data: Image;
 };
 
 export const ImageViewer = ({ data }: ImageViewerProps) => {
-  const [image] = useImage(data?.src);
-
   const [active, setActive] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
@@ -89,11 +115,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <div className={classes.toolbar} />
 
         <Box alignItems="center" display="flex" justifyContent="center">
-          <Konva.Stage height={data.shape?.r} width={data.shape?.c}>
-            <Konva.Layer>
-              <Konva.Image image={image} />
-            </Konva.Layer>
-          </Konva.Stage>
+          <Stage operation={active} data={data} />
         </Box>
       </main>
 
@@ -110,7 +132,13 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <List>
           <ListItem dense>
             <ListItemText
-              primary="Rectangular selection"
+              primary={
+                operations[
+                  operations.findIndex(
+                    (operation) => operation.method === active
+                  )
+                ].name
+              }
               secondary="Nam a facilisis velit, sit amet interdum ante. In sodales."
             />
           </ListItem>
