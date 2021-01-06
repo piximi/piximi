@@ -4,7 +4,7 @@ import { CssBaseline } from "@material-ui/core";
 import { useStyles } from "./ImageViewer.css";
 import { MethodDrawer } from "../MethodDrawer";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
-import { ImageViewerContent } from "../ImageViewerContent";
+import { ImageViewerContent } from "../ImageViewerContent/ImageViewerContent";
 import { SettingsDrawer } from "../SettingsDrawer";
 
 type ImageViewerProps = {
