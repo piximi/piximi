@@ -3,6 +3,8 @@ import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
+import { Transformer } from "konva/types/shapes/Transformer";
+import { Ellipse } from "konva/types/shapes/Ellipse";
 
 type ImageViewerProps = {
   data: Image;
@@ -12,6 +14,9 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
   const [image] = useImage(data.src);
 
   const stage = React.useRef<Stage>(null);
+
+  const transformer = React.useRef<Transformer>(null);
+  const shapeRef = React.useRef<Ellipse>(null);
 
   const [startX, setStartX] = React.useState<number>(0);
   const [startY, setStartY] = React.useState<number>(0);
@@ -33,6 +38,19 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
       }
     }, 200);
   });
+
+  React.useEffect(() => {
+    if (annotated && !annotating) {
+      // we need to attach transformer manually
+      if (transformer && transformer.current && shapeRef && shapeRef.current) {
+        transformer.current.nodes([shapeRef.current]);
+        const layer = transformer.current.getLayer();
+        if (layer) {
+          layer.batchDraw();
+        }
+      }
+    }
+  }, [annotated, annotating]);
 
   const onMouseDown = () => {
     if (annotated) return;
@@ -113,12 +131,22 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
             dashOffset={-offset}
             radiusX={radiusX}
             radiusY={radiusY}
+            ref={shapeRef}
             stroke="white"
             strokeWidth={1}
             x={centerX}
             y={centerY}
           />
         )}
+        <ReactKonva.Transformer
+          anchorFill="#FFF"
+          anchorStroke="#000"
+          anchorStrokeWidth={1}
+          anchorSize={6}
+          borderEnabled={false}
+          ref={transformer}
+          rotateEnabled={false}
+        />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
