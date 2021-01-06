@@ -31,12 +31,14 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
   const [offset, setOffset] = useState<number>(0);
 
   React.useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setOffset(offset + 1);
       if (offset > 32) {
         setOffset(0);
       }
     }, 200);
+
+    return () => clearTimeout(timer);
   });
 
   React.useEffect(() => {
