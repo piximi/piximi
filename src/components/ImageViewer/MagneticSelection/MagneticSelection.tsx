@@ -10,6 +10,7 @@ import { Line } from "konva/types/shapes/Line";
 import { Image } from "konva/types/shapes/Image";
 import Konva from "konva";
 import useImage from "use-image";
+import { Filter } from "konva/types/Node";
 
 export enum Method {
   Elliptical,
@@ -34,11 +35,11 @@ type Stroke = {
   points: Array<number>;
 };
 
-const sobel = (imageData: ImageData) => {
-  const get = (data: any) => {
+const sobel: Filter = (imageData: any) => {
+  const getIdx = (data: any) => {
     return (x: number, y: number, index: number) => {
       index = index || 0;
-      return data[(width * y + x) * 4 + index];
+      return (width * y + x) * 4 + index;
     };
   };
 
@@ -56,57 +57,57 @@ const sobel = (imageData: ImageData) => {
   const height = imageData.height;
 
   const grayscale = [];
-  const response = [];
   var data = imageData.data;
-  const pixel = get(data);
+
+  const idx = getIdx(data);
 
   let x, y;
   for (y = 0; y < height; y++) {
     for (x = 0; x < width; x++) {
-      const r = pixel(x, y, 0);
-      const g = pixel(x, y, 1);
-      const b = pixel(x, y, 2);
+      const r = data[idx(x, y, 0)];
+      const g = data[idx(x, y, 1)];
+      const b = data[idx(x, y, 2)];
 
       const mean = (r + g + b) / 3;
 
-      grayscale.push(mean, mean, mean, 255);
+      grayscale[idx(x, y, 0)] = mean;
+      grayscale[idx(x, y, 1)] = mean;
+      grayscale[idx(x, y, 2)] = mean;
     }
   }
-
-  const grayscalePixel = get(grayscale);
 
   for (y = 0; y < height; y++) {
     for (x = 0; x < width; x++) {
       const responseX =
-        kernelX[0][0] * grayscalePixel(x - 1, y - 1, 0) +
-        kernelX[0][1] * grayscalePixel(x + 0, y - 1, 0) +
-        kernelX[0][2] * grayscalePixel(x + 1, y - 1, 0) +
-        kernelX[1][0] * grayscalePixel(x - 1, y + 0, 0) +
-        kernelX[1][1] * grayscalePixel(x + 0, y + 0, 0) +
-        kernelX[1][2] * grayscalePixel(x + 1, y + 0, 0) +
-        kernelX[2][0] * grayscalePixel(x - 1, y + 1, 0) +
-        kernelX[2][1] * grayscalePixel(x + 0, y + 1, 0) +
-        kernelX[2][2] * grayscalePixel(x + 1, y + 1, 0);
+        kernelX[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
+        kernelX[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
+        kernelX[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
+        kernelX[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
+        kernelX[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
+        kernelX[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
+        kernelX[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
+        kernelX[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
+        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
 
       const responseY =
-        kernelY[0][0] * grayscalePixel(x - 1, y - 1, 0) +
-        kernelY[0][1] * grayscalePixel(x + 0, y - 1, 0) +
-        kernelY[0][2] * grayscalePixel(x + 1, y - 1, 0) +
-        kernelY[1][0] * grayscalePixel(x - 1, y + 0, 0) +
-        kernelY[1][1] * grayscalePixel(x + 0, y + 0, 0) +
-        kernelY[1][2] * grayscalePixel(x + 1, y + 0, 0) +
-        kernelY[2][0] * grayscalePixel(x - 1, y + 1, 0) +
-        kernelY[2][1] * grayscalePixel(x + 0, y + 1, 0) +
-        kernelX[2][2] * grayscalePixel(x + 1, y + 1, 0);
+        kernelY[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
+        kernelY[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
+        kernelY[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
+        kernelY[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
+        kernelY[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
+        kernelY[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
+        kernelY[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
+        kernelY[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
+        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
 
       const magnitude =
         Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
 
-      response.push(magnitude, magnitude, magnitude, 255);
+      data[idx(x, y, 0)] = magnitude;
+      data[idx(x, y, 1)] = magnitude;
+      data[idx(x, y, 2)] = magnitude;
     }
   }
-
-  data = new Uint8ClampedArray(response);
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
