@@ -111,13 +111,13 @@ export const ImageGridAppBar = () => {
         </AppBar>
       </Slide>
 
-      {Array.isArray(selectedImages) && selectedImages.length && (
+      {Array.isArray(selectedImages) && selectedImages.length ? (
         <ImageDialog
           image={_.find(images, (image) => image.id === selectedImages[0])!}
           onClose={onCloseImageDialog}
           open={openImageDialog}
         />
-      )}
+      ) : null}
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
