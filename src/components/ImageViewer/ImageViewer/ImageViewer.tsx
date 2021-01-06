@@ -66,7 +66,7 @@ type ImageViewerProps = {
 export const ImageViewer = ({ data }: ImageViewerProps) => {
   const [image] = useImage(data?.src);
 
-  const [selected, setSelected] = useState<SelectionMethod>(
+  const [active, setActive] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
 
@@ -185,16 +185,20 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <Divider />
 
         <List>
-          {operations.map((item, index) => {
+          {operations.map((operation, index) => {
             return (
-              <Tooltip aria-label={item.name} key={index} title={item.name}>
+              <Tooltip
+                aria-label={operation.name}
+                key={index}
+                title={operation.name}
+              >
                 <ListItem
                   button
-                  onClick={() => setSelected(item.method)}
-                  selected={selected === item.method}
+                  onClick={() => setActive(operation.method)}
+                  selected={active === operation.method}
                 >
                   <ListItemIcon>
-                    <SvgIcon fontSize="small">{item.icon}</SvgIcon>
+                    <SvgIcon fontSize="small">{operation.icon}</SvgIcon>
                   </ListItemIcon>
                 </ListItem>
               </Tooltip>
