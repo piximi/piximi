@@ -5,7 +5,6 @@ import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
 import { Circle } from "konva/types/shapes/Circle";
 import { Transformer } from "konva/types/shapes/Transformer";
-import { Group } from "konva/types/Group";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
 
@@ -145,6 +144,7 @@ export const PolygonalSelection = ({ image }: PolygonalSelectionProps) => {
             setAnnotating(true);
 
             setStart(position);
+            setAnchor(position);
 
             const stroke: Stroke = {
               method: Method.Lasso,
@@ -177,13 +177,8 @@ export const PolygonalSelection = ({ image }: PolygonalSelectionProps) => {
             points: [anchor.x, anchor.y, position.x, position.y],
           };
 
-          if (strokes.length > 2) {
-            strokes.splice(strokes.length - 1, 1, stroke);
-
-            setStrokes(strokes.concat());
-          } else {
-            setStrokes([...strokes, stroke]);
-          }
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
         }
       }
     }
@@ -218,7 +213,14 @@ export const PolygonalSelection = ({ image }: PolygonalSelectionProps) => {
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          setAnchor(position);
+          if (strokes.length === 1) {
+            setAnchor(position);
+            const stroke = {
+              method: Method.Lasso,
+              points: [anchor!.x, anchor!.y, position.x, position.y],
+            };
+            setStrokes([...strokes, stroke]);
+          }
         }
       }
     }
