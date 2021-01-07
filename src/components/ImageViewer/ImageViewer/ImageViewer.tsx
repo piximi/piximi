@@ -29,6 +29,11 @@ import { RectangularSelection } from "../RectangularSelection";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import { SelectionType } from "../../../types/SelectionType";
 import { useStyles } from "./ImageViewer.css";
+import { CollapsibleList } from "../../CollapsibleList";
+import { Category } from "../../../types/Category";
+import { useSelector } from "react-redux";
+import { createdCategoriesSelector } from "../../../store/selectors";
+import { CategorySelectionItem } from "../../CategorySelectionItem";
 
 const operations = [
   {
@@ -102,6 +107,12 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
 
   const classes = useStyles();
 
+  const categories = useSelector(createdCategoriesSelector);
+
+  const [activeCategory, setActiveCategory] = useState<string>(
+    categories[0].id
+  );
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -129,6 +140,19 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         variant="permanent"
       >
         <div className={classes.settingsToolbar} />
+
+        <CollapsibleList primary="Category to label">
+          {categories.map((category: Category) => {
+            return (
+              <CategorySelectionItem
+                category={category}
+                key={category.id}
+                active={activeCategory}
+                setActive={setActiveCategory}
+              />
+            );
+          })}
+        </CollapsibleList>
 
         <Divider />
 
