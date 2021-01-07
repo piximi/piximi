@@ -1,5 +1,3 @@
-import { computeResidualError } from "./computeResidualError";
-
 export const computeSLICSegmentation = (
   imageData: ImageData,
   regionSize: number = 40,
@@ -286,7 +284,16 @@ export const computeSLICSegmentation = (
       newCenters[region * 5 + 4] = newCenters[region * 5 + 4] * iMass;
     }
 
-    const error = computeResidualError(currentCenters, newCenters);
+    /*
+     * Compute residual error
+     */
+    let error = 0.0;
+
+    for (let index = 0; index < currentCenters.length; ++index) {
+      const d = currentCenters[index] - newCenters[index];
+
+      error += Math.sqrt(d * d);
+    }
 
     if (error < 1e-5) {
       break;
