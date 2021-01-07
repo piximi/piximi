@@ -34,9 +34,10 @@ import { SelectionType } from "../../../types/SelectionType";
 import {
   categoriesSelector,
   createdCategoriesSelector,
+  imagesSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
 import { ApplicationDrawer } from "../../ApplicationDrawer";
 import { FileList } from "../../FileList";
@@ -54,6 +55,7 @@ import { CategoryMenu } from "../../CategoryMenu";
 import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
+import { projectSlice } from "../../../store/slices";
 
 const operations = [
   {
@@ -104,33 +106,48 @@ const ImageViewerStage = ({
   data,
   category,
 }: ImageViewerStageProps) => {
-  switch (operation) {
-    case SelectionMethod.Color:
-      return <React.Fragment />;
-    case SelectionMethod.Elliptical:
-      return <EllipticalSelection data={data} category={category} />;
-    case SelectionMethod.Lasso:
-      return <LassoSelection image={data} category={category} />;
-    case SelectionMethod.Magnetic:
-      return <MagneticSelection image={data} />;
-    case SelectionMethod.Object:
-      return <React.Fragment />;
-    case SelectionMethod.Polygonal:
-      return <PolygonalSelection image={data} category={category} />;
-    case SelectionMethod.Quick:
-      return <React.Fragment />;
-    case SelectionMethod.Rectangular:
-      return <RectangularSelection data={data} category={category} />;
-    default:
-      return <RectangularSelection data={data} category={category} />;
+  if (data && data.shape && data.src) {
+    switch (operation) {
+      case SelectionMethod.Color:
+        return <React.Fragment />;
+      case SelectionMethod.Elliptical:
+        return <EllipticalSelection data={data} category={category} />;
+      case SelectionMethod.Lasso:
+        return <LassoSelection image={data} category={category} />;
+      case SelectionMethod.Magnetic:
+        return <MagneticSelection image={data} />;
+      case SelectionMethod.Object:
+        return <React.Fragment />;
+      case SelectionMethod.Polygonal:
+        return <PolygonalSelection image={data} category={category} />;
+      case SelectionMethod.Quick:
+        return <React.Fragment />;
+      case SelectionMethod.Rectangular:
+        return <RectangularSelection data={data} category={category} />;
+      default:
+        return <React.Fragment />;
+    }
+  } else {
+    return <React.Fragment />;
   }
 };
 
 type ImageViewerProps = {
-  data: Image;
+  foo: Image;
 };
 
-export const ImageViewer = ({ data }: ImageViewerProps) => {
+export const ImageViewer = ({ foo }: ImageViewerProps) => {
+  const dispatch = useDispatch();
+
+  // TODO: Testing code, please remove ASAP
+  React.useEffect(() => {
+    const payload = { shape: foo.shape!, src: foo.src };
+
+    dispatch(projectSlice.actions.createImage(payload));
+  }, [foo, dispatch]);
+
+  const images = useSelector(imagesSelector);
+
   const [active, setActive] = useState<SelectionMethod>(
     SelectionMethod.Rectangular
   );
@@ -269,7 +286,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <Box alignItems="center" display="flex" justifyContent="center">
           <ImageViewerStage
             operation={active}
-            data={data}
+            data={images[0]}
             category={activeCategory}
           />
         </Box>

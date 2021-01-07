@@ -9,14 +9,10 @@ import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
-
 export const ApplicationToolbar = () => {
   const classes = useStyles();
-
   const dispatch = useDispatch();
-
   const [value, setValue] = React.useState<number>(1);
-
   const onChange = (
     event: React.ChangeEvent<{}>,
     newValue: number | number[]
@@ -28,7 +24,6 @@ export const ApplicationToolbar = () => {
       })
     );
   };
-
   const onChangeCommitted = (
     event: React.ChangeEvent<{}>,
     newValue: number | number[]
@@ -39,15 +34,11 @@ export const ApplicationToolbar = () => {
       })
     );
   };
-
   return (
     <Toolbar>
       <Logo />
-
       <div className={classes.grow} />
-
       <ZoomOutIcon className={classes.zoomIcon} />
-
       <Slider
         value={value}
         min={0.6}
@@ -57,9 +48,7 @@ export const ApplicationToolbar = () => {
         className={classes.zoomSlider}
       />
       <ZoomInIcon className={classes.zoomIcon} />
-
       <SearchInput />
-
       <UploadButton />
     </Toolbar>
   );
