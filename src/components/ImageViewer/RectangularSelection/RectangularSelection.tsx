@@ -6,6 +6,7 @@ import { Stage } from "konva/types/Stage";
 import { Transformer } from "konva/types/shapes/Transformer";
 import { Rect } from "konva/types/shapes/Rect";
 import { Category } from "../../../types/Category";
+import { toRGBA } from "../../../image/toRGBA";
 
 type ImageViewerProps = {
   data: Image;
@@ -29,15 +30,6 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
   const [annotating, setAnnotating] = useState<boolean>();
 
   const [offset, setOffset] = useState<number>(0);
-
-  const hexToRGBA = (color: string) => {
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-    return "rgba(" + r + ", " + g + ", " + b + ", 0.3)";
-  };
-
-  const fillColor = hexToRGBA(category.color);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -112,6 +104,7 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
     >
       <ReactKonva.Layer>
         <ReactKonva.Image image={image} />
+
         {!annotated && annotating && x && y && (
           <React.Fragment>
             <ReactKonva.Rect
@@ -134,6 +127,7 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
             />
           </React.Fragment>
         )}
+
         {annotated && !annotating && x && y && (
           <ReactKonva.Rect
             dash={[4, 2]}
@@ -142,7 +136,7 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
             ref={shapeRef}
             stroke="white"
             strokeWidth={1}
-            fill={fillColor}
+            fill={toRGBA(category.color, 0.3)}
             width={width}
             x={x}
             y={y}

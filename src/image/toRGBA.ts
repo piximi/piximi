@@ -1,10 +1,7 @@
 export const toRGBA = (color: string, alpha: number) => {
-  const parsed = parseInt(color, 16);
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
 
-  const r = (parsed >> 16) & 255;
-  const g = (parsed >> 8) & 255;
-  const b = parsed & 255;
-  const a = Math.round(alpha * 255);
-
-  return [r, g, b, a];
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
