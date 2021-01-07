@@ -5,8 +5,15 @@ import { Stage } from "konva/types/Stage";
 import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
+import { slic } from "../../../image/slic";
 
-const filter: Filter = (imageData: any) => {};
+const filter: Filter = (imageData: ImageData) => {
+  const segmentation = slic(imageData, {});
+
+  var data = imageData.data;
+
+  data = Uint8ClampedArray.from(segmentation);
+};
 
 type QuickSelectionProps = {
   image: ImageType;
