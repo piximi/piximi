@@ -21,10 +21,12 @@ export const useKeyPress = (key: string, action: () => void) => {
     return () => window.removeEventListener("keyup", onKeyup);
   }, [action, key]);
 };
+
 type RectangularSelectionProps = {
   data: Image;
   category: Category;
 };
+
 export const RectangularSelection = ({
   data,
   category,
@@ -41,10 +43,12 @@ export const RectangularSelection = ({
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
   const [offset, setOffset] = useState<number>(0);
+
   useKeyPress("Escape", () => {
     setAnnotating(false);
     setAnnotated(false);
   });
+
   useKeyPress("Enter", () => {
     if (shapeRef && shapeRef.current) {
       const mask = shapeRef.current.toDataURL({
@@ -74,6 +78,7 @@ export const RectangularSelection = ({
     setAnnotating(false);
     setAnnotated(false);
   });
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setOffset(offset + 1);
@@ -83,6 +88,7 @@ export const RectangularSelection = ({
     }, 200);
     return () => clearTimeout(timer);
   });
+
   React.useEffect(() => {
     if (annotated && !annotating) {
       // we need to attach transformer manually
@@ -95,6 +101,7 @@ export const RectangularSelection = ({
       }
     }
   }, [annotated, annotating]);
+
   const onMouseDown = () => {
     if (annotated) return;
     setAnnotating(true);
@@ -106,6 +113,7 @@ export const RectangularSelection = ({
       }
     }
   };
+
   const onMouseMove = () => {
     if (annotated) return;
     if (stage && stage.current) {
@@ -116,6 +124,7 @@ export const RectangularSelection = ({
       }
     }
   };
+
   const onMouseUp = () => {
     if (annotated) return;
     if (!annotating) return;
@@ -135,6 +144,7 @@ export const RectangularSelection = ({
     >
       <ReactKonva.Layer>
         <ReactKonva.Image image={image} />
+
         {!annotated && annotating && x && y && (
           <React.Fragment>
             <ReactKonva.Rect
@@ -157,6 +167,7 @@ export const RectangularSelection = ({
             />
           </React.Fragment>
         )}
+
         {annotated && !annotating && x && y && (
           <ReactKonva.Rect
             dash={[4, 2]}
@@ -171,6 +182,7 @@ export const RectangularSelection = ({
             y={y}
           />
         )}
+
         {annotated && !annotating && x && y && (
           <ReactKonva.Transformer
             anchorFill="#FFF"

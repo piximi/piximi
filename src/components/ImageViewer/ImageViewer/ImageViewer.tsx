@@ -13,9 +13,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../types/Category";
-import { CategorySelectionItem } from "../../CategorySelectionItem";
-import { CollapsibleCategoryList } from "../../CollapsibleCategoryList";
-import { Chip, CssBaseline } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
@@ -32,20 +30,13 @@ import { RectangularSelection } from "../RectangularSelection";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import { SelectionType } from "../../../types/SelectionType";
 import {
-  categoriesSelector,
   createdCategoriesSelector,
   imagesSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
-import { ApplicationDrawer } from "../../ApplicationDrawer";
-import { FileList } from "../../FileList";
-import { CategoriesList } from "../../CategoriesList";
-import { ClassifierList } from "../../ClassifierList";
-import { ApplicationList } from "../../ApplicationList";
 import { CollapsibleList } from "../../CollapsibleList";
-import { CategoryListItem } from "../../CategoryListItem";
 import { CreateCategoryListItem } from "../../CreateCategoryListItem";
 import { CategoryListItemCheckbox } from "../../CategoryListItemCheckbox";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";

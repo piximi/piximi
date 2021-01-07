@@ -7,10 +7,13 @@ export default {
   component: ImageViewer,
   title: "Components/ImageViewer",
 } as Meta;
+
 const Template: Story<ComponentProps<typeof ImageViewer>> = (args) => (
   <ImageViewer {...args} />
 );
+
 export const Default = Template.bind({});
+
 const image: Image = {
   id: "",
   instances: [],
@@ -18,6 +21,7 @@ const image: Image = {
   shape: { c: 512, channels: 3, r: 512 },
   src: "https://picsum.photos/id/237/512/512",
 };
+
 Default.args = {
   foo: image,
 };
