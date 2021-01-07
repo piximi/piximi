@@ -29,6 +29,11 @@ import { RectangularSelection } from "../RectangularSelection";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import { SelectionType } from "../../../types/SelectionType";
 import { useStyles } from "./ImageViewer.css";
+import { Category } from "../../../types/Category";
+import { useSelector } from "react-redux";
+import { categoriesSelector } from "../../../store/selectors";
+import { CategorySelectionItem } from "../../CategorySelectionItem";
+import { CollapsibleCategoryList } from "../../CollapsibleCategoryList";
 
 const operations = [
   {
@@ -66,9 +71,14 @@ const operations = [
 type ImageViewerStageProps = {
   operation: SelectionMethod;
   data: Image;
+  category: Category;
 };
 
-const ImageViewerStage = ({ operation, data }: ImageViewerStageProps) => {
+const ImageViewerStage = ({
+  operation,
+  data,
+  category,
+}: ImageViewerStageProps) => {
   switch (operation) {
     case SelectionMethod.Color:
       return <React.Fragment />;
@@ -85,9 +95,9 @@ const ImageViewerStage = ({ operation, data }: ImageViewerStageProps) => {
     case SelectionMethod.Quick:
       return <React.Fragment />;
     case SelectionMethod.Rectangular:
-      return <RectangularSelection data={data} />;
+      return <RectangularSelection data={data} category={category} />;
     default:
-      return <RectangularSelection data={data} />;
+      return <RectangularSelection data={data} category={category} />;
   }
 };
 
@@ -101,6 +111,10 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
   );
 
   const classes = useStyles();
+
+  const categories = useSelector(categoriesSelector);
+
+  const [activeCategory, setActiveCategory] = useState<Category>(categories[0]);
 
   return (
     <div className={classes.root}>
@@ -118,7 +132,11 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <div className={classes.toolbar} />
 
         <Box alignItems="center" display="flex" justifyContent="center">
-          <ImageViewerStage operation={active} data={data} />
+          <ImageViewerStage
+            operation={active}
+            data={data}
+            category={activeCategory}
+          />
         </Box>
       </main>
 
@@ -129,6 +147,19 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         variant="permanent"
       >
         <div className={classes.settingsToolbar} />
+
+        <CollapsibleCategoryList primary="Category to label">
+          {categories.map((category: Category) => {
+            return (
+              <CategorySelectionItem
+                category={category}
+                key={category.id}
+                active={activeCategory}
+                setActive={setActiveCategory}
+              />
+            );
+          })}
+        </CollapsibleCategoryList>
 
         <Divider />
 
