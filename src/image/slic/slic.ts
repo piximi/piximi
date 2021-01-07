@@ -5,8 +5,6 @@ export const slic = (
   imageData: ImageData,
   options: { regionSize?: number; minRegionSize?: number; callback?: any }
 ) => {
-  var data = imageData.data;
-
   const regionSize = Math.round(options.regionSize || 40);
 
   const minRegionSize = options.minRegionSize || (regionSize * regionSize) / 4;

@@ -29,7 +29,6 @@ export function initializeKmeansCenters(
       x = Math.max(Math.min(x, imW - 1), 0);
       y = Math.max(Math.min(y, imH - 1), 0);
 
-      // Search in a 3x3 neighbourhood the smallest edge response.
       for (yp = Math.max(0, y - 1); yp <= Math.min(imH - 1, y + 1); yp++) {
         for (xp = Math.max(0, x - 1); xp <= Math.min(imW - 1, x + 1); xp++) {
           const thisEdgeValue = edgeMap[yp * imW + xp];
@@ -42,16 +41,13 @@ export function initializeKmeansCenters(
         }
       }
 
-      // Initialize the new center at this location.
       centers[i++] = parseFloat(String(centerx));
       centers[i++] = parseFloat(String(centery));
 
-      // 3 channels.
       centers[i++] = image[centery * imW + centerx];
       centers[i++] = image[imW * imH + centery * imW + centerx];
       centers[i++] = image[2 * imW * imH + centery * imW + centerx];
 
-      // THIS IS THE VARIABLE VALUE OF M, just start with 5.
       clusterParams[j++] = 10 * 10;
       clusterParams[j++] = regionSize * regionSize;
     }

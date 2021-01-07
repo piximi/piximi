@@ -31,9 +31,6 @@ export const eliminateSmallRegions = (
     segmentSize = 0;
     segment[segmentSize++] = pixel;
 
-    /** Find cleanedLabel as the label of an already cleaned region neighbor
-     * of this pixel.
-     */
     cleanedLabel = label + 1;
     cleaned[pixel] = label + 1;
     x = pixel % imW;
