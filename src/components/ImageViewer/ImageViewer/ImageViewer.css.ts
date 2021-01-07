@@ -52,4 +52,18 @@ export const useStyles = makeStyles((theme) => ({
   logo: {
     flexGrow: 1,
   },
+  applicationDrawer: {
+    flexShrink: 0,
+    width: theme.spacing(32),
+  },
+  applicationDrawerHeader: {
+    ...theme.mixins.toolbar,
+    alignItems: "center",
+    display: "flex",
+    paddingLeft: theme.spacing(3),
+  },
+  applicationDrawerPaper: {
+    zIndex: 0,
+    width: theme.spacing(32),
+  },
 }));

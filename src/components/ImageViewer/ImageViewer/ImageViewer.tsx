@@ -12,7 +12,10 @@ import SvgIcon from "@material-ui/core/SvgIcon";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
-import { CssBaseline } from "@material-ui/core";
+import { Category } from "../../../types/Category";
+import { CategorySelectionItem } from "../../CategorySelectionItem";
+import { CollapsibleCategoryList } from "../../CollapsibleCategoryList";
+import { Chip, CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
@@ -28,12 +31,29 @@ import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.sv
 import { RectangularSelection } from "../RectangularSelection";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import { SelectionType } from "../../../types/SelectionType";
-import { useStyles } from "./ImageViewer.css";
-import { Category } from "../../../types/Category";
+import {
+  categoriesSelector,
+  createdCategoriesSelector,
+  unknownCategorySelector,
+} from "../../../store/selectors";
 import { useSelector } from "react-redux";
-import { categoriesSelector } from "../../../store/selectors";
-import { CategorySelectionItem } from "../../CategorySelectionItem";
-import { CollapsibleCategoryList } from "../../CollapsibleCategoryList";
+import { useStyles } from "./ImageViewer.css";
+import { ApplicationDrawer } from "../../ApplicationDrawer";
+import { FileList } from "../../FileList";
+import { CategoriesList } from "../../CategoriesList";
+import { ClassifierList } from "../../ClassifierList";
+import { ApplicationList } from "../../ApplicationList";
+import { CollapsibleList } from "../../CollapsibleList";
+import { CategoryListItem } from "../../CategoryListItem";
+import { CreateCategoryListItem } from "../../CreateCategoryListItem";
+import { CategoryListItemCheckbox } from "../../CategoryListItemCheckbox";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import { CategoryMenu } from "../../CategoryMenu";
+import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
+import { EditCategoryDialog } from "../../EditCategoryDialog";
+import { useDialog, useMenu } from "../../../hooks";
 
 const operations = [
   {
@@ -112,9 +132,37 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
 
   const classes = useStyles();
 
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(createdCategoriesSelector);
+  const unknownCategory = useSelector(unknownCategorySelector);
 
-  const [activeCategory, setActiveCategory] = useState<Category>(categories[0]);
+  const [activeCategory, setActiveCategory] = useState<Category>(
+    unknownCategory
+  );
+
+  const {
+    onClose: onCloseDeleteCategoryDialog,
+    onOpen: onOpenDeleteCategoryDialog,
+    open: openDeleteCategoryDialog,
+  } = useDialog();
+  const {
+    onClose: onCloseEditCategoryDialog,
+    onOpen: onOpenEditCategoryDialog,
+    open: openEditCategoryDialog,
+  } = useDialog();
+
+  const {
+    anchorEl: anchorElCategoryMenu,
+    onClose: onCloseCategoryMenu,
+    onOpen: onOpenCategoryMenu,
+    open: openCategoryMenu,
+  } = useMenu();
+
+  const onCategoryClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    category: Category
+  ) => {
+    setActiveCategory(category);
+  };
 
   return (
     <div className={classes.root}>
@@ -127,6 +175,90 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <Drawer
+        anchor="left"
+        className={classes.applicationDrawer}
+        classes={{ paper: classes.applicationDrawerPaper }}
+        open
+        variant="persistent"
+      >
+        <div className={classes.applicationDrawerHeader} />
+
+        <Divider />
+
+        <CollapsibleList primary="Categories">
+          {categories.map((category: Category) => {
+            return (
+              <React.Fragment>
+                <ListItem
+                  button
+                  dense
+                  id={category.id}
+                  key={category.id}
+                  onClick={(event) => onCategoryClick(event, category)}
+                  selected={category.id === activeCategory.id}
+                >
+                  <CategoryListItemCheckbox category={category} />
+
+                  <ListItemText
+                    id={category.id}
+                    primary={category.name}
+                    primaryTypographyProps={{ noWrap: true }}
+                  />
+
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={onOpenCategoryMenu}>
+                      <MoreHorizIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+
+                <CategoryMenu
+                  anchorElCategoryMenu={anchorElCategoryMenu}
+                  category={category}
+                  onCloseCategoryMenu={onCloseCategoryMenu}
+                  onOpenCategoryMenu={onOpenCategoryMenu}
+                  onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
+                  onOpenEditCategoryDialog={onOpenEditCategoryDialog}
+                  openCategoryMenu={openCategoryMenu}
+                />
+
+                <DeleteCategoryDialog
+                  category={category}
+                  onClose={onCloseDeleteCategoryDialog}
+                  open={openDeleteCategoryDialog}
+                />
+
+                <EditCategoryDialog
+                  category={category}
+                  onCloseDialog={onCloseEditCategoryDialog}
+                  openDialog={openEditCategoryDialog}
+                />
+              </React.Fragment>
+            );
+          })}
+
+          <ListItem
+            button
+            dense
+            id={unknownCategory.id}
+            key={unknownCategory.id}
+            onClick={(event) => onCategoryClick(event, unknownCategory)}
+            selected={unknownCategory.id === activeCategory.id}
+          >
+            <CategoryListItemCheckbox category={unknownCategory} />
+
+            <ListItemText
+              id={unknownCategory.id}
+              primary={unknownCategory.name}
+              primaryTypographyProps={{ noWrap: true }}
+            />
+          </ListItem>
+
+          <CreateCategoryListItem />
+        </CollapsibleList>
+      </Drawer>
 
       <main className={classes.content}>
         <div className={classes.toolbar} />
