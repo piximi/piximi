@@ -185,8 +185,6 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
       >
         <div className={classes.applicationDrawerHeader} />
 
-        <Divider />
-
         <CollapsibleList primary="Categories">
           {categories.map((category: Category) => {
             return (
@@ -284,9 +282,9 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
           {categories.map((category: Category) => {
             return (
               <CategorySelectionItem
+                active={activeCategory}
                 category={category}
                 key={category.id}
-                active={activeCategory}
                 setActive={setActiveCategory}
               />
             );
