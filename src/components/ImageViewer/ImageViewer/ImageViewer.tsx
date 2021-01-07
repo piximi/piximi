@@ -71,9 +71,14 @@ const operations = [
 type ImageViewerStageProps = {
   operation: SelectionMethod;
   data: Image;
+  category: Category;
 };
 
-const ImageViewerStage = ({ operation, data }: ImageViewerStageProps) => {
+const ImageViewerStage = ({
+  operation,
+  data,
+  category,
+}: ImageViewerStageProps) => {
   switch (operation) {
     case SelectionMethod.Color:
       return <React.Fragment />;
@@ -90,9 +95,9 @@ const ImageViewerStage = ({ operation, data }: ImageViewerStageProps) => {
     case SelectionMethod.Quick:
       return <React.Fragment />;
     case SelectionMethod.Rectangular:
-      return <RectangularSelection data={data} />;
+      return <RectangularSelection data={data} category={category} />;
     default:
-      return <RectangularSelection data={data} />;
+      return <RectangularSelection data={data} category={category} />;
   }
 };
 
@@ -109,9 +114,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
 
   const categories = useSelector(createdCategoriesSelector);
 
-  const [activeCategory, setActiveCategory] = useState<string>(
-    categories[0].id
-  );
+  const [activeCategory, setActiveCategory] = useState<Category>(categories[0]);
 
   return (
     <div className={classes.root}>
@@ -129,7 +132,11 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
         <div className={classes.toolbar} />
 
         <Box alignItems="center" display="flex" justifyContent="center">
-          <ImageViewerStage operation={active} data={data} />
+          <ImageViewerStage
+            operation={active}
+            data={data}
+            category={activeCategory}
+          />
         </Box>
       </main>
 

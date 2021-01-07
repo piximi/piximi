@@ -8,8 +8,8 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 type CategorySelectionItemProps = {
   category: Category;
-  active: string;
-  setActive: (id: string) => void;
+  active: Category;
+  setActive: (newCategory: Category) => void;
 };
 
 export const CategorySelectionItem = ({
@@ -18,7 +18,7 @@ export const CategorySelectionItem = ({
   setActive,
 }: CategorySelectionItemProps) => {
   const handleChange = () => {
-    setActive(category.id);
+    setActive(category);
   };
 
   return (
@@ -27,7 +27,7 @@ export const CategorySelectionItem = ({
         <ListItemIcon>
           <Radio
             disableRipple
-            checked={active === category.id}
+            checked={active.id === category.id}
             onChange={handleChange}
             edge="start"
             tabIndex={-1}
