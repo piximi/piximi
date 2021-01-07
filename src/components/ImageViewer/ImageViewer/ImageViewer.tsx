@@ -280,21 +280,6 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
       >
         <div className={classes.settingsToolbar} />
 
-        <CollapsibleCategoryList primary="Category to label">
-          {categories.map((category: Category) => {
-            return (
-              <CategorySelectionItem
-                category={category}
-                key={category.id}
-                active={activeCategory}
-                setActive={setActiveCategory}
-              />
-            );
-          })}
-        </CollapsibleCategoryList>
-
-        <Divider />
-
         <List>
           <ListItem dense>
             <ListItemText
