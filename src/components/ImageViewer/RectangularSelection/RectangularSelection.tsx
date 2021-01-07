@@ -47,9 +47,9 @@ export const RectangularSelection = ({
   const validateBoundBox = (oldBox: Box, newBox: Box) => {
     if (
       0 <= newBox.x &&
-      newBox.width + newBox.x <= data.shape.c &&
+      newBox.width + newBox.x <= data.shape!.c &&
       0 <= newBox.y &&
-      newBox.height + newBox.y <= data.shape.r
+      newBox.height + newBox.y <= data.shape!.r
     ) {
       return newBox;
     } else {
