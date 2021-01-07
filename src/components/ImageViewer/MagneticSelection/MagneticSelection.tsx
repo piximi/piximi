@@ -35,14 +35,53 @@ type Stroke = {
   points: Array<number>;
 };
 
-const sobel: Filter = (imageData: any) => {
-  const getIdx = (data: any) => {
-    return (x: number, y: number, index: number) => {
-      index = index || 0;
-      return (width * y + x) * 4 + index;
-    };
+const getIdx = (width: number) => {
+  return (x: number, y: number, index: number) => {
+    index = index || 0;
+    return (width * y + x) * 4 + index;
   };
+};
 
+const findNearestEdge = (
+  position: { x: number; y: number },
+  edgemap: ImageData
+): { x: number; y: number } => {
+  const width = edgemap.width;
+  const edgedata = edgemap.data;
+
+  const setX = [];
+  const setY = [];
+
+  const idx = getIdx(width);
+
+  let x, y;
+  for (x = 0; x < edgemap.width; x++) {
+    if (edgedata[idx(x, position.y, 0)] === 255) {
+      setX.push(x);
+    }
+  }
+  for (y = 0; y < edgemap.height; y++) {
+    if (edgedata[idx(position.x, y, 0)] === 255) {
+      setY.push(y);
+    }
+  }
+
+  let minsum = Math.abs(setX[0] - position.x) + Math.abs(setY[0] - position.y);
+  let newcoords = { x: position.x, y: position.y };
+  for (x = 0; x < setX.length; x++) {
+    for (y = 0; y < setY.length; y++) {
+      if (
+        Math.abs(position.x - setX[x]) + Math.abs(position.y - setY[y]) <
+        minsum
+      ) {
+        newcoords = { x: x, y: y };
+      }
+    }
+  }
+  return newcoords;
+};
+
+const sobel: Filter = (imageData: any) => {
   const kernelX = [
     [-1, 0, 1],
     [-2, 0, 2],
@@ -59,7 +98,9 @@ const sobel: Filter = (imageData: any) => {
   const grayscale = [];
   var data = imageData.data;
 
-  const idx = getIdx(data);
+  const idx = getIdx(width);
+
+  const threshold = 100;
 
   let x, y;
   for (y = 0; y < height; y++) {
@@ -103,9 +144,9 @@ const sobel: Filter = (imageData: any) => {
       const magnitude =
         Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
 
-      data[idx(x, y, 0)] = magnitude;
-      data[idx(x, y, 1)] = magnitude;
-      data[idx(x, y, 2)] = magnitude;
+      data[idx(x, y, 0)] = magnitude > threshold ? 255 : 0;
+      data[idx(x, y, 1)] = magnitude > threshold ? 255 : 0;
+      data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
     }
   }
 };
@@ -388,12 +429,7 @@ export const MagneticSelection = ({
       width={image.shape?.c}
     >
       <ReactKonva.Layer>
-        <ReactKonva.Image
-          filters={[sobel]}
-          blurRadius={50}
-          image={img}
-          ref={imageRef}
-        />
+        <ReactKonva.Image filters={[sobel]} image={img} ref={imageRef} />
 
         <StartingAnchor />
 
