@@ -35,7 +35,13 @@ type Stroke = {
   points: Array<number>;
 };
 
-const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
+type MarchingAntsProps = {
+  closed: boolean;
+  color: string;
+  stroke: Stroke;
+};
+
+const MarchingAnts = ({ closed, color, stroke }: MarchingAntsProps) => {
   const [offset, setOffset] = React.useState(0);
 
   React.useEffect(() => {
