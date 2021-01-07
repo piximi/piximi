@@ -8,6 +8,8 @@ import { Transformer } from "konva/types/shapes/Transformer";
 import { Group } from "konva/types/Group";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
+import { toRGBA } from "../../../image/toRGBA";
+import { Category } from "../../../types/Category";
 
 export enum Method {
   Elliptical,
@@ -25,6 +27,7 @@ type Anchor = {
 
 type KonvaLassoSelectionCanvasProps = {
   image: Image;
+  category: Category;
 };
 
 type Stroke = {
@@ -61,7 +64,10 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
-export const LassoSelection = ({ image }: KonvaLassoSelectionCanvasProps) => {
+export const LassoSelection = ({
+  image,
+  category,
+}: KonvaLassoSelectionCanvasProps) => {
   const [img] = useImage(image.src);
 
   const stage = React.useRef<Stage>(null);

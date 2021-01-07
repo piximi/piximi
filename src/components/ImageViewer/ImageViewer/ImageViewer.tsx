@@ -103,15 +103,15 @@ const ImageViewerStage = ({
     case SelectionMethod.Color:
       return <React.Fragment />;
     case SelectionMethod.Elliptical:
-      return <EllipticalSelection data={data} />;
+      return <EllipticalSelection data={data} category={category} />;
     case SelectionMethod.Lasso:
-      return <LassoSelection image={data} />;
+      return <LassoSelection image={data} category={category} />;
     case SelectionMethod.Magnetic:
       return <MagneticSelection image={data} />;
     case SelectionMethod.Object:
       return <React.Fragment />;
     case SelectionMethod.Polygonal:
-      return <PolygonalSelection image={data} />;
+      return <PolygonalSelection image={data} category={category} />;
     case SelectionMethod.Quick:
       return <React.Fragment />;
     case SelectionMethod.Rectangular:

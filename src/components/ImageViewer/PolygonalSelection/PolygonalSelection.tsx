@@ -7,6 +7,8 @@ import { Circle } from "konva/types/shapes/Circle";
 import { Transformer } from "konva/types/shapes/Transformer";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
+import { toRGBA } from "../../../image/toRGBA";
+import { Category } from "../../../types/Category";
 
 export enum Method {
   Elliptical,
@@ -24,6 +26,7 @@ type Anchor = {
 
 type PolygonalSelectionProps = {
   image: Image;
+  category: Category;
 };
 
 type Stroke = {
@@ -60,7 +63,10 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
-export const PolygonalSelection = ({ image }: PolygonalSelectionProps) => {
+export const PolygonalSelection = ({
+  image,
+  category,
+}: PolygonalSelectionProps) => {
   const [img] = useImage(image.src);
 
   const stage = React.useRef<Stage>(null);
