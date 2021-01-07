@@ -67,6 +67,11 @@ const operations = [
     name: "Elliptical selection",
   },
   {
+    icon: <EllipticalIcon />,
+    method: SelectionMethod.Polygonal,
+    name: "Polygonal selection",
+  },
+  {
     icon: <LassoIcon />,
     method: SelectionMethod.Lasso,
     name: "Lasso selection",
