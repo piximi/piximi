@@ -3,7 +3,7 @@ import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
-import { Transformer } from "konva/types/shapes/Transformer";
+import { Box, Transformer } from "konva/types/shapes/Transformer";
 import { Rect } from "konva/types/shapes/Rect";
 import { Category } from "../../../types/Category";
 import { toRGBA } from "../../../image/toRGBA";
@@ -43,6 +43,19 @@ export const RectangularSelection = ({
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
   const [offset, setOffset] = useState<number>(0);
+
+  const validateBoundBox = (oldBox: Box, newBox: Box) => {
+    if (
+      0 <= newBox.x &&
+      newBox.width + newBox.x <= data.shape.c &&
+      0 <= newBox.y &&
+      newBox.height + newBox.y <= data.shape.r
+    ) {
+      return newBox;
+    } else {
+      return oldBox;
+    }
+  };
 
   useKeyPress("Escape", () => {
     setAnnotating(false);
@@ -186,10 +199,12 @@ export const RectangularSelection = ({
         {annotated && !annotating && x && y && (
           <ReactKonva.Transformer
             anchorFill="#FFF"
+            anchorSize={6}
             anchorStroke="#000"
             anchorStrokeWidth={1}
-            anchorSize={6}
             borderEnabled={false}
+            boundBoxFunc={validateBoundBox}
+            keepRatio={false}
             ref={transformer}
             rotateEnabled={false}
           />
