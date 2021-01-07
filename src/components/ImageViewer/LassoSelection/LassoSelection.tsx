@@ -33,26 +33,28 @@ type Stroke = {
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
-  // const [dashOffset, setDashOffset] = React.useState(0);
-  //
-  // React.useEffect(() => {
-  //   setTimeout(() => {
-  //     setDashOffset(dashOffset + 1);
-  //
-  //     if (dashOffset > 16) {
-  //       setDashOffset(0);
-  //     }
-  //   }, 20);
-  // }, [dashOffset]);
+  const [offset, setOffset] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setOffset(offset + 1);
+      if (offset > 32) {
+        setOffset(0);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  });
 
   return (
     <React.Fragment>
-      <ReactKonva.Line points={stroke.points} stroke="#FFF" strokeWidth={1} />
+      <ReactKonva.Line points={stroke.points} stroke="black" strokeWidth={1} />
 
       <ReactKonva.Line
         dash={[4, 2]}
+        dashOffset={-offset}
         points={stroke.points}
-        stroke="#000"
+        stroke="white"
         strokeWidth={1}
       />
     </React.Fragment>
