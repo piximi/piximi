@@ -5,12 +5,15 @@ import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
 import { Transformer } from "konva/types/shapes/Transformer";
 import { Ellipse } from "konva/types/shapes/Ellipse";
+import { toRGBA } from "../../../image/toRGBA";
+import { Category } from "../../../types/Category";
 
 type ImageViewerProps = {
   data: Image;
+  category: Category;
 };
 
-export const EllipticalSelection = ({ data }: ImageViewerProps) => {
+export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
   const [image] = useImage(data.src);
 
   const stage = React.useRef<Stage>(null);
@@ -138,6 +141,7 @@ export const EllipticalSelection = ({ data }: ImageViewerProps) => {
             strokeWidth={1}
             x={centerX}
             y={centerY}
+            fill={toRGBA(category.color, 0.3)}
           />
         )}
         <ReactKonva.Transformer
