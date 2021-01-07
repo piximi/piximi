@@ -120,6 +120,7 @@ export const RectangularSelection = ({
     setAnnotated(true);
     setAnnotating(false);
   };
+
   return (
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
