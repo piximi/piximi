@@ -23,7 +23,7 @@ export const CategorySelectionItem = ({
 
   return (
     <React.Fragment>
-      <ListItem dense key={category.id} id={category.id}>
+      <ListItem dense={false} key={category.id} id={category.id}>
         <ListItemIcon>
           <Radio
             disableRipple
@@ -31,6 +31,7 @@ export const CategorySelectionItem = ({
             onChange={handleChange}
             edge="start"
             tabIndex={-1}
+            style={{ padding: "2px", margin: "None" }}
           />
         </ListItemIcon>
 
