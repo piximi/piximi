@@ -1,4 +1,5 @@
-import { computeSegmentation } from "./computeSegmentation";
+import { computeSLICSegmentation } from "./computeSLICSegmentation";
+import { remapLabels } from "./remapLabels";
 
 export const slic = (
   imageData: ImageData,
@@ -14,5 +15,19 @@ export const slic = (
     regionSize: regionSize,
   };
 
-  return computeSegmentation(imageData, opts);
+  const segmentation = computeSLICSegmentation(imageData, opts);
+
+  const numSegments = remapLabels(segmentation);
+
+  if (opts.callback) {
+    const rgbData = new Uint8Array(imageData.data);
+
+    opts.callback({
+      width: imageData.width,
+      height: imageData.height,
+      size: numSegments,
+      indexMap: segmentation,
+      rgbData: rgbData,
+    });
+  }
 };

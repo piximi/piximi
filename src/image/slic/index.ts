@@ -1,0 +1,1 @@
+export { slic } from "./slic";
