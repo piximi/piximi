@@ -65,6 +65,8 @@ const MarchingAnts = ({ closed, color, stroke }: MarchingAntsProps) => {
         points={stroke.points}
         stroke="white"
         strokeWidth={1}
+        closed={closed}
+        fill={color}
       />
     </React.Fragment>
   );
@@ -319,13 +321,22 @@ export const LassoSelection = ({
         {!annotated &&
           annotating &&
           strokes.map((stroke: Stroke, key: number) => (
-            <MarchingAnts key={key} stroke={stroke} />
+            <MarchingAnts
+              key={key}
+              color="None"
+              closed={false}
+              stroke={stroke}
+            />
           ))}
 
         <Anchor />
 
         {annotation && annotated && !annotating && (
-          <MarchingAnts stroke={annotation} />
+          <MarchingAnts
+            color={toRGBA(category.color, 0.3)}
+            closed={true}
+            stroke={annotation}
+          />
         )}
 
         <ReactKonva.Transformer
