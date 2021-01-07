@@ -32,7 +32,7 @@ import { useStyles } from "./ImageViewer.css";
 import { CollapsibleList } from "../../CollapsibleList";
 import { Category } from "../../../types/Category";
 import { useSelector } from "react-redux";
-import { createdCategoriesSelector } from "../../../store/selectors";
+import { categoriesSelector } from "../../../store/selectors";
 import { CategorySelectionItem } from "../../CategorySelectionItem";
 
 const operations = [
@@ -112,7 +112,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
 
   const classes = useStyles();
 
-  const categories = useSelector(createdCategoriesSelector);
+  const categories = useSelector(categoriesSelector);
 
   const [activeCategory, setActiveCategory] = useState<Category>(categories[0]);
 
