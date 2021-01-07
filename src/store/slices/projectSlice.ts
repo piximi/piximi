@@ -7,6 +7,7 @@ import { findIndex, filter } from "underscore";
 import { Shape } from "../../types/Shape";
 import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
+
 const initialState: Project = {
   categories: [
     {
@@ -19,6 +20,7 @@ const initialState: Project = {
   images: [],
   name: "Untitled project",
 };
+
 export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
@@ -151,6 +153,7 @@ export const projectSlice = createSlice({
     },
   },
 });
+
 export const {
   createCategory,
   createImage,
