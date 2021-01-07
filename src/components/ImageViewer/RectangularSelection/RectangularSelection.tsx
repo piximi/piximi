@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
@@ -7,13 +7,27 @@ import { Transformer } from "konva/types/shapes/Transformer";
 import { Rect } from "konva/types/shapes/Rect";
 import { Category } from "../../../types/Category";
 import { toRGBA } from "../../../image/toRGBA";
+import { useKeypress } from "../../Annotator/Annotator";
 
-type ImageViewerProps = {
+export const useKeyPress = (key: string, action: () => void) => {
+  useEffect(() => {
+    function onKeyup(e: any) {
+      if (e.key === key) action();
+    }
+    window.addEventListener("keyup", onKeyup);
+    return () => window.removeEventListener("keyup", onKeyup);
+  }, [action, key]);
+};
+
+type RectangularSelectionProps = {
   data: Image;
   category: Category;
 };
 
-export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
+export const RectangularSelection = ({
+  data,
+  category,
+}: RectangularSelectionProps) => {
   const [image] = useImage(data.src);
 
   const stage = React.useRef<Stage>(null);
@@ -30,6 +44,11 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
   const [annotating, setAnnotating] = useState<boolean>();
 
   const [offset, setOffset] = useState<number>(0);
+
+  useKeypress("Escape", () => {
+    setAnnotating(false);
+    setAnnotated(false);
+  });
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -143,15 +162,17 @@ export const RectangularSelection = ({ data, category }: ImageViewerProps) => {
           />
         )}
 
-        <ReactKonva.Transformer
-          anchorFill="#FFF"
-          anchorStroke="#000"
-          anchorStrokeWidth={1}
-          anchorSize={6}
-          borderEnabled={false}
-          ref={transformer}
-          rotateEnabled={false}
-        />
+        {annotated && !annotating && x && y && (
+          <ReactKonva.Transformer
+            anchorFill="#FFF"
+            anchorStroke="#000"
+            anchorStrokeWidth={1}
+            anchorSize={6}
+            borderEnabled={false}
+            ref={transformer}
+            rotateEnabled={false}
+          />
+        )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
