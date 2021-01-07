@@ -2,6 +2,7 @@ import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../../types/Image";
 import { ImageViewer } from "./ImageViewer";
+
 export default {
   component: ImageViewer,
   title: "Components/ImageViewer",

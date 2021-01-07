@@ -10,11 +10,13 @@ import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
 import { applicationSlice, projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
+
 export const useKeyPress = (key: string, action: () => void) => {
   useEffect(() => {
     function onKeyup(e: any) {
       if (e.key === key) action();
     }
+
     window.addEventListener("keyup", onKeyup);
     return () => window.removeEventListener("keyup", onKeyup);
   }, [action, key]);
