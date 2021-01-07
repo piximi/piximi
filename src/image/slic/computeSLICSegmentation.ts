@@ -2,19 +2,23 @@ import { computeResidualError } from "./computeResidualError";
 
 export const computeSLICSegmentation = (
   imageData: ImageData,
-  options: { callback?: any; regionSize: number; minRegionSize: number }
+  regionSize: number = 40,
+  minRegionSize?: number
 ) => {
+  if (!minRegionSize) {
+    minRegionSize = (regionSize * regionSize) / 4;
+  }
+
   const imWidth = imageData.width;
   const imHeight = imageData.height;
-  const numRegionsX = parseInt(String(imWidth / options.regionSize), 10);
-  const numRegionsY = parseInt(String(imHeight / options.regionSize), 10);
+  const numRegionsX = parseInt(String(imWidth / regionSize), 10);
+  const numRegionsY = parseInt(String(imHeight / regionSize), 10);
   const numRegions = parseInt(String(numRegionsX * numRegionsY), 10);
   const numPixels = parseInt(String(imWidth * imHeight), 10);
-  const regionSize = options.regionSize;
   const masses = new Array(numPixels);
   const currentCenters = new Float32Array((2 + 3) * numRegions);
   const newCenters = new Float32Array((2 + 3) * numRegions);
-  const clusterParams = new Float32Array(2 * numRegions);
+  const parameters = new Float32Array(2 * numRegions);
   const mcMap = new Float32Array(numPixels);
   const msMap = new Float32Array(numPixels);
   const distanceMap = new Float32Array(numPixels);
@@ -31,10 +35,12 @@ export const computeSLICSegmentation = (
       parseFloat(String(imageData.data[4 * i])) * 0.00392156862,
       gamma
     );
+
     const g = Math.pow(
       parseFloat(String(imageData.data[4 * i + 1])) * 0.00392156862,
       gamma
     );
+
     const b = Math.pow(
       parseFloat(String(imageData.data[4 * i + 2])) * 0.00392156862,
       gamma
@@ -63,10 +69,12 @@ export const computeSLICSegmentation = (
       xyz[i] * ix > 0.00856
         ? Math.pow(xyz[i] * ix, 0.33333333)
         : 7.78706891568 * xyz[i] * ix + 0.1379310336;
+
     const fy =
       xyz[imWidth * imHeight + i] * iy > 0.00856
         ? Math.pow(xyz[imWidth * imHeight + i] * iy, 0.33333333)
         : 7.78706891568 * xyz[imWidth * imHeight + i] * iy + 0.1379310336;
+
     const fz =
       xyz[2 * imWidth * imHeight + i] * iz > 0.00856
         ? Math.pow(xyz[2 * imWidth * imHeight + i] * iz, 0.33333333)
@@ -143,8 +151,8 @@ export const computeSLICSegmentation = (
       currentCenters[i++] =
         lab[2 * imWidth * imHeight + centery * imWidth + centerx];
 
-      clusterParams[j++] = 10 * 10;
-      clusterParams[j++] = regionSize * regionSize;
+      parameters[j++] = 10 * 10;
+      parameters[j++] = regionSize * regionSize;
     }
   }
 
@@ -185,8 +193,8 @@ export const computeSLICSegmentation = (
           const appearance = dR * dR + dG * dG + dB * dB;
 
           const distance = Math.sqrt(
-            appearance / clusterParams[region * 2] +
-              spatial / clusterParams[region * 2 + 1]
+            appearance / parameters[region * 2] +
+              spatial / parameters[region * 2 + 1]
           );
 
           if (distance < distanceMap[y2 * imWidth + x2]) {
@@ -200,18 +208,18 @@ export const computeSLICSegmentation = (
     for (let y2 = 0; y2 < imHeight; ++y2) {
       for (let x2 = 0; x2 < imWidth; ++x2) {
         if (
-          clusterParams[segmentation[y2 * imWidth + x2] * 2] <
+          parameters[segmentation[y2 * imWidth + x2] * 2] <
           mcMap[y2 * imWidth + x2]
         ) {
-          clusterParams[segmentation[y2 * imWidth + x2] * 2] =
+          parameters[segmentation[y2 * imWidth + x2] * 2] =
             mcMap[y2 * imWidth + x2];
         }
 
         if (
-          clusterParams[segmentation[y2 * imWidth + x2] * 2 + 1] <
+          parameters[segmentation[y2 * imWidth + x2] * 2 + 1] <
           msMap[y2 * imWidth + x2]
         ) {
-          clusterParams[segmentation[y2 * imWidth + x2] * 2 + 1] =
+          parameters[segmentation[y2 * imWidth + x2] * 2 + 1] =
             msMap[y2 * imWidth + x2];
         }
       }
@@ -220,8 +228,8 @@ export const computeSLICSegmentation = (
     /*
      * Update parameters
      */
-    const mc = new Float32Array(clusterParams.length / 2);
-    const ms = new Float32Array(clusterParams.length / 2);
+    const mc = new Float32Array(parameters.length / 2);
+    const ms = new Float32Array(parameters.length / 2);
 
     for (let i1 = 0; i1 < segmentation.length; i1++) {
       const region = segmentation[i1];
@@ -229,13 +237,13 @@ export const computeSLICSegmentation = (
       if (mc[region] < mcMap[region]) {
         mc[region] = mcMap[region];
 
-        clusterParams[region * 2] = mcMap[region];
+        parameters[region * 2] = mcMap[region];
       }
 
       if (ms[region] < msMap[region]) {
         ms[region] = msMap[region];
 
-        clusterParams[region * 2 + 1] = msMap[region];
+        parameters[region * 2 + 1] = msMap[region];
       }
     }
 
@@ -362,7 +370,7 @@ export const computeSLICSegmentation = (
       }
     }
 
-    if (segmentSize < options.minRegionSize) {
+    if (segmentSize < minRegionSize) {
       while (segmentSize > 0) {
         cleaned[segment[--segmentSize]] = cleanedLabel;
       }

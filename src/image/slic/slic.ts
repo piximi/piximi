@@ -15,7 +15,7 @@ export const slic = (
     regionSize: regionSize,
   };
 
-  const segmentation = computeSLICSegmentation(imageData, opts);
+  const segmentation = computeSLICSegmentation(imageData);
 
   const numSegments = remapLabels(segmentation);
 
