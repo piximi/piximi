@@ -100,14 +100,16 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={data.shape?.r}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
       ref={stage}
       width={data.shape?.c}
     >
-      <ReactKonva.Layer>
+      <ReactKonva.Layer
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
         <ReactKonva.Image image={image} />
+
         {!annotated && annotating && centerX && centerY && (
           <React.Fragment>
             <ReactKonva.Ellipse
@@ -130,6 +132,7 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
             />
           </React.Fragment>
         )}
+
         {annotated && !annotating && centerX && centerY && (
           <ReactKonva.Ellipse
             dash={[4, 2]}
@@ -144,6 +147,7 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
             fill={toRGBA(category.color, 0.3)}
           />
         )}
+
         <ReactKonva.Transformer
           anchorFill="#FFF"
           anchorStroke="#000"

@@ -307,13 +307,14 @@ export const LassoSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={image.shape?.r}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
       ref={stage}
       width={image.shape?.c}
     >
-      <ReactKonva.Layer>
+      <ReactKonva.Layer
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
         <ReactKonva.Image image={img} />
 
         <StartingAnchor />

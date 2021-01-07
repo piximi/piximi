@@ -149,13 +149,14 @@ export const RectangularSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={data.shape?.r}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
       ref={stage}
       width={data.shape?.c}
     >
-      <ReactKonva.Layer>
+      <ReactKonva.Layer
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
         <ReactKonva.Image image={image} />
 
         {!annotated && annotating && x && y && (
