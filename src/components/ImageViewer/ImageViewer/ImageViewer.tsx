@@ -17,7 +17,7 @@ import { CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
-import { MagneticSelection } from "../MagneticSelection/MagneticSelection";
+import { MagneticSelection } from "../MagneticSelection";
 import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
 import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";

@@ -1,15 +1,15 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../../types/Image";
-import { MagneticSelection } from "./MagneticSelection";
+import { ColorSelection } from "./ColorSelection";
 
 export default {
-  component: MagneticSelection,
-  title: "Components/ImageViewer/MagneticSelection",
+  component: ColorSelection,
+  title: "Components/ImageViewer/ColorSelection",
 } as Meta;
 
-const Template: Story<ComponentProps<typeof MagneticSelection>> = (args) => (
-  <MagneticSelection {...args} />
+const Template: Story<ComponentProps<typeof ColorSelection>> = (args) => (
+  <ColorSelection {...args} />
 );
 
 export const Default = Template.bind({});
