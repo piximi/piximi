@@ -1,35 +1,14 @@
 import { computeSLICSegmentation } from "./computeSLICSegmentation";
 import { remapLabels } from "./remapLabels";
 
-export const slic = (
-  imageData: ImageData,
-  options: { regionSize?: number; minRegionSize?: number; callback?: any }
-) => {
-  const regionSize = Math.round(options.regionSize || 40);
-
-  const minRegionSize = options.minRegionSize || (regionSize * regionSize) / 4;
-
-  const opts = {
-    callback: options.callback,
-    minRegionSize: minRegionSize,
-    regionSize: regionSize,
-  };
-
+export const slic = (imageData: ImageData) => {
   const segmentation = computeSLICSegmentation(imageData);
 
-  const numSegments = remapLabels(segmentation);
+  const segments = remapLabels(segmentation);
 
-  if (opts.callback) {
-    const rgbData = new Uint8Array(imageData.data);
-
-    opts.callback({
-      width: imageData.width,
-      height: imageData.height,
-      size: numSegments,
-      indexMap: segmentation,
-      rgbData: rgbData,
-    });
-  }
-
-  return segmentation;
+  return {
+    image: new Uint8Array(imageData.data),
+    segmentation: segmentation,
+    segments: segments,
+  };
 };

@@ -8,11 +8,9 @@ import { Filter } from "konva/types/Node";
 import { slic } from "../../../image/slic";
 
 const filter: Filter = (imageData: ImageData) => {
-  const segmentation = slic(imageData, {});
+  const { image, segmentation, segments } = slic(imageData);
 
-  var data = imageData.data;
-
-  data = Uint8ClampedArray.from(segmentation);
+  // TODO: rendering
 };
 
 type QuickSelectionProps = {
