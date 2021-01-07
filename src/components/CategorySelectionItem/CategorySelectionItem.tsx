@@ -31,7 +31,12 @@ export const CategorySelectionItem = ({
             onChange={handleChange}
             edge="start"
             tabIndex={-1}
-            style={{ padding: "2px", margin: "None" }}
+            style={{
+              padding: "2px",
+              paddingTop: "2px",
+              paddingBottom: "2px",
+              marginLeft: "0px",
+            }}
           />
         </ListItemIcon>
 

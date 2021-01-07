@@ -29,11 +29,11 @@ import { RectangularSelection } from "../RectangularSelection";
 import { SelectionMethod } from "../../../types/SelectionMethod";
 import { SelectionType } from "../../../types/SelectionType";
 import { useStyles } from "./ImageViewer.css";
-import { CollapsibleList } from "../../CollapsibleList";
 import { Category } from "../../../types/Category";
 import { useSelector } from "react-redux";
 import { categoriesSelector } from "../../../store/selectors";
 import { CategorySelectionItem } from "../../CategorySelectionItem";
+import { CollapsibleCategoryList } from "../../CollapsibleCategoryList";
 
 const operations = [
   {
@@ -148,7 +148,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
       >
         <div className={classes.settingsToolbar} />
 
-        <CollapsibleList primary="Category to label">
+        <CollapsibleCategoryList primary="Category to label">
           {categories.map((category: Category) => {
             return (
               <CategorySelectionItem
@@ -159,7 +159,7 @@ export const ImageViewer = ({ data }: ImageViewerProps) => {
               />
             );
           })}
-        </CollapsibleList>
+        </CollapsibleCategoryList>
 
         <Divider />
 
