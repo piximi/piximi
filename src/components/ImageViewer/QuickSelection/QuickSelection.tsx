@@ -7,10 +7,81 @@ import useImage from "use-image";
 import { Filter } from "konva/types/Node";
 import { slic } from "../../../image/slic";
 
-const filter: Filter = (imageData: ImageData) => {
-  const { image, segmentation, segments } = slic(imageData);
+type Superpixels = {
+  [pixel: number]: {
+    mask: {
+      f: number; // foreground
+      b: number; // background
+    };
+    role: {
+      foreground: boolean;
+      background: boolean;
+      mixed: boolean;
+      unknown: boolean;
+    };
+    count: number;
+    mp: [number, number, number]; // RGB
+  };
+};
 
-  // TODO: rendering
+const filter: Filter = (imageData: ImageData) => {
+  const { data } = imageData;
+
+  const { image, segmentation } = slic(imageData);
+
+  let superpixels: Superpixels = {};
+
+  for (let index = 0; index < segmentation.length; index += 1) {
+    const current = segmentation[index];
+
+    if (!superpixels.hasOwnProperty(current)) {
+      superpixels[current] = {
+        mask: { b: 0, f: 0 },
+        count: 0,
+        mp: [0, 0, 0],
+        role: {
+          foreground: false,
+          background: false,
+          mixed: false,
+          unknown: false,
+        },
+      };
+    }
+
+    superpixels[current].count += 1;
+    superpixels[current].mp[0] += image[4 * index];
+    superpixels[current].mp[1] += image[4 * index + 1];
+    superpixels[current].mp[2] += image[4 * index + 2];
+  }
+
+  for (const superpixel in superpixels) {
+    superpixels[superpixel].mp[0] /= superpixels[superpixel].count;
+    superpixels[superpixel].mp[1] /= superpixels[superpixel].count;
+    superpixels[superpixel].mp[2] /= superpixels[superpixel].count;
+  }
+
+  Object.values(superpixels).forEach((superpixel) => {
+    if (superpixel.mask.f > 0 && superpixel.mask.b === 0) {
+      superpixel.role.foreground = true;
+    } else if (superpixel.mask.f === 0 && superpixel.mask.b > 0) {
+      superpixel.role.background = true;
+    } else if (superpixel.mask.f > 0 && superpixel.mask.b > 0) {
+      superpixel.role.mixed = true;
+    } else {
+      superpixel.role.unknown = true;
+    }
+  });
+
+  for (let index = 0; index < segmentation.length; index += 1) {
+    if (superpixels[segmentation[index]].role.foreground) {
+      data[4 * index] = image[4 * index];
+      data[4 * index + 1] = image[4 * index + 1];
+      data[4 * index + 2] = image[4 * index + 2];
+      data[4 * index + 3] = 255;
+    } else {
+      data[4 * index + 3] = 0;
+    }
+  }
 };
 
 type QuickSelectionProps = {
