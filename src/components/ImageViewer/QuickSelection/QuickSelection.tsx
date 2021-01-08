@@ -82,6 +82,21 @@ const filter: Filter = (imageData: ImageData) => {
       data[4 * index + 3] = 0;
     }
   }
+
+  let superpixel;
+  for (let index = 0; index < segmentation.length; ++index) {
+    superpixel = superpixels[segmentation[index]];
+    data[4 * index + 3] = 255;
+    if (segmentation[index] === segmentation[index + 1]) {
+      data[4 * index + 0] = superpixel.mp[0];
+      data[4 * index + 1] = superpixel.mp[1];
+      data[4 * index + 2] = superpixel.mp[2];
+    } else {
+      data[4 * index + 0] = 0;
+      data[4 * index + 1] = 0;
+      data[4 * index + 2] = 0;
+    }
+  }
 };
 
 type QuickSelectionProps = {
