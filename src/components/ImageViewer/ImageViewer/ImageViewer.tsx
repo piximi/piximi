@@ -51,36 +51,43 @@ import { QuickSelection } from "../QuickSelection";
 
 const operations = [
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <RectangularIcon />,
     method: SelectionMethod.Rectangular,
     name: "Rectangular selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <EllipticalIcon />,
     method: SelectionMethod.Elliptical,
     name: "Elliptical selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <EllipticalIcon />,
     method: SelectionMethod.Polygonal,
     name: "Polygonal selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <LassoIcon />,
     method: SelectionMethod.Lasso,
     name: "Lasso selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <MagneticIcon />,
     method: SelectionMethod.Magnetic,
     name: "Magnetic selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <MagicWandIcon />,
     method: SelectionMethod.Color,
     name: "Color selection",
   },
   {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <QuickIcon />,
     method: SelectionMethod.Quick,
     name: "Quick selection",
@@ -302,7 +309,13 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
                   )
                 ].name
               }
-              secondary="Nam a facilisis velit, sit amet interdum ante. In sodales."
+              secondary={
+                operations[
+                  operations.findIndex(
+                    (operation) => operation.method === active
+                  )
+                ].description
+              }
             />
           </ListItem>
         </List>
