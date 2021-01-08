@@ -22,7 +22,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   settingsPaper: {
     width: settingsWidth,
-    right: 80,
+    right: operationsWidth,
   },
   toolbar: {
     ...theme.mixins.toolbar,
