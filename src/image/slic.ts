@@ -1,4 +1,4 @@
-export const computeSLICSegmentation = (
+export const slic = (
   imageData: ImageData,
   regionSize: number = 40,
   minRegionSize?: number
@@ -392,5 +392,8 @@ export const computeSLICSegmentation = (
     segmentation[index] = cleaned[index];
   }
 
-  return segmentation;
+  return {
+    image: new Uint8Array(imageData.data),
+    segmentation: segmentation,
+  };
 };

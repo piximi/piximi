@@ -5,22 +5,23 @@ import { Stage } from "konva/types/Stage";
 import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
-import { slic } from "../../../image/slic";
+import { slic } from "../../../image";
+import { Category } from "../../../types/Category";
 
 type Superpixels = {
   [pixel: number]: {
+    count: number;
     mask: {
-      f: number; // foreground
-      b: number; // background
+      background: number;
+      foreground: number;
     };
+    mp: [number, number, number];
     role: {
-      foreground: boolean;
       background: boolean;
-      mixed: boolean;
+      background_and_foreground: boolean;
+      foreground: boolean;
       unknown: boolean;
     };
-    count: number;
-    mp: [number, number, number]; // RGB
   };
 };
 
@@ -36,13 +37,16 @@ const filter: Filter = (imageData: ImageData) => {
 
     if (!superpixels.hasOwnProperty(current)) {
       superpixels[current] = {
-        mask: { b: 0, f: 0 },
         count: 0,
+        mask: {
+          background: 0,
+          foreground: 0,
+        },
         mp: [0, 0, 0],
         role: {
-          foreground: false,
           background: false,
-          mixed: false,
+          background_and_foreground: false,
+          foreground: false,
           unknown: false,
         },
       };
@@ -61,12 +65,18 @@ const filter: Filter = (imageData: ImageData) => {
   }
 
   Object.values(superpixels).forEach((superpixel) => {
-    if (superpixel.mask.f > 0 && superpixel.mask.b === 0) {
+    if (superpixel.mask.foreground > 0 && superpixel.mask.background === 0) {
       superpixel.role.foreground = true;
-    } else if (superpixel.mask.f === 0 && superpixel.mask.b > 0) {
+    } else if (
+      superpixel.mask.foreground === 0 &&
+      superpixel.mask.background > 0
+    ) {
       superpixel.role.background = true;
-    } else if (superpixel.mask.f > 0 && superpixel.mask.b > 0) {
-      superpixel.role.mixed = true;
+    } else if (
+      superpixel.mask.foreground > 0 &&
+      superpixel.mask.background > 0
+    ) {
+      superpixel.role.background_and_foreground = true;
     } else {
       superpixel.role.unknown = true;
     }
@@ -101,9 +111,10 @@ const filter: Filter = (imageData: ImageData) => {
 
 type QuickSelectionProps = {
   image: ImageType;
+  category: Category;
 };
 
-export const QuickSelection = ({ image }: QuickSelectionProps) => {
+export const QuickSelection = ({ image, category }: QuickSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
 
   const stage = React.useRef<Stage>(null);
