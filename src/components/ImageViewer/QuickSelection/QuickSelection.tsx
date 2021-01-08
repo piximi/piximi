@@ -5,7 +5,7 @@ import { Stage } from "konva/types/Stage";
 import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
-import { slic } from "../../../image/slic";
+import { slic } from "../../../image";
 
 type Superpixels = {
   [pixel: number]: {
