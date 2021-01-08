@@ -27,7 +27,7 @@ import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { RectangularSelection } from "../RectangularSelection";
-import { SelectionMethod } from "../../../types/SelectionMethod";
+import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import { SelectionType } from "../../../types/SelectionType";
 import {
   createdCategoriesSelector,
@@ -53,49 +53,55 @@ const operations = [
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <RectangularIcon />,
-    method: SelectionMethod.Rectangular,
+    method: ImageViewerOperation.RectangularSelection,
     name: "Rectangular selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <EllipticalIcon />,
-    method: SelectionMethod.Elliptical,
+    method: ImageViewerOperation.EllipticalSelection,
     name: "Elliptical selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <EllipticalIcon />,
-    method: SelectionMethod.Polygonal,
+    method: ImageViewerOperation.PolygonalSelection,
     name: "Polygonal selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <LassoIcon />,
-    method: SelectionMethod.Lasso,
+    method: ImageViewerOperation.LassoSelection,
     name: "Lasso selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <MagneticIcon />,
-    method: SelectionMethod.Magnetic,
+    method: ImageViewerOperation.MagneticSelection,
     name: "Magnetic selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <MagicWandIcon />,
-    method: SelectionMethod.Color,
+    method: ImageViewerOperation.ColorSelection,
     name: "Color selection",
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <QuickIcon />,
-    method: SelectionMethod.Quick,
+    method: ImageViewerOperation.QuickSelection,
     name: "Quick selection",
+  },
+  {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+    icon: <QuickIcon />,
+    method: ImageViewerOperation.QuickSelection,
+    name: "Object selection",
   },
 ];
 
 type ImageViewerStageProps = {
-  operation: SelectionMethod;
+  operation: ImageViewerOperation;
   data: Image;
   category: Category;
 };
@@ -107,21 +113,21 @@ const ImageViewerStage = ({
 }: ImageViewerStageProps) => {
   if (data && data.shape && data.src) {
     switch (operation) {
-      case SelectionMethod.Color:
+      case ImageViewerOperation.ColorSelection:
         return <React.Fragment />;
-      case SelectionMethod.Elliptical:
+      case ImageViewerOperation.EllipticalSelection:
         return <EllipticalSelection data={data} category={category} />;
-      case SelectionMethod.Lasso:
+      case ImageViewerOperation.LassoSelection:
         return <LassoSelection image={data} category={category} />;
-      case SelectionMethod.Magnetic:
+      case ImageViewerOperation.MagneticSelection:
         return <MagneticSelection image={data} />;
-      case SelectionMethod.Object:
+      case ImageViewerOperation.ObjectSelection:
         return <React.Fragment />;
-      case SelectionMethod.Polygonal:
+      case ImageViewerOperation.PolygonalSelection:
         return <PolygonalSelection image={data} category={category} />;
-      case SelectionMethod.Quick:
+      case ImageViewerOperation.QuickSelection:
         return <QuickSelection image={data} category={category} />;
-      case SelectionMethod.Rectangular:
+      case ImageViewerOperation.RectangularSelection:
         return <RectangularSelection data={data} category={category} />;
       default:
         return <React.Fragment />;
@@ -147,8 +153,8 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
 
   const images = useSelector(imagesSelector);
 
-  const [active, setActive] = useState<SelectionMethod>(
-    SelectionMethod.Rectangular
+  const [active, setActive] = useState<ImageViewerOperation>(
+    ImageViewerOperation.RectangularSelection
   );
 
   const classes = useStyles();

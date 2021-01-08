@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Settings } from "../../types/Settings";
-import { SelectionMethod } from "../../types/SelectionMethod";
+import { ImageViewerOperation } from "../../types/ImageViewerOperation";
 
 const initialState: Settings = {
   selectedImages: [],
-  selectionMethod: SelectionMethod.Rectangular,
+  selectionMethod: ImageViewerOperation.RectangularSelection,
   tileSize: 1,
 };
 
@@ -14,7 +14,7 @@ export const applicationSlice = createSlice({
   reducers: {
     updateSelectionMethod(
       state: Settings,
-      action: PayloadAction<{ selectionMethod: SelectionMethod }>
+      action: PayloadAction<{ selectionMethod: ImageViewerOperation }>
     ) {
       state.selectionMethod = action.payload.selectionMethod;
     },
