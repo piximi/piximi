@@ -138,7 +138,7 @@ export const MagneticSelection = ({
 
     const idx = getIdx(width);
 
-    const threshold = 100;
+    const threshold = 150;
 
     let x, y;
     for (y = 0; y < height; y++) {
@@ -192,7 +192,6 @@ export const MagneticSelection = ({
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
-      console.log("HERE WE ARE");
       imageRef.current.cache();
 
       imageRef.current.getLayer()?.batchDraw();
@@ -244,14 +243,6 @@ export const MagneticSelection = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
-        if (edgemap && edgemap.current && img) {
-          console.log("PREV", position);
-          console.log(
-            "EDGE",
-            findNearestEdge(position, edgemap.current, img.height, img.width)
-          );
-        }
-
         if (connected(position)) {
           const stroke: Stroke = {
             method: Method.Lasso,
@@ -306,6 +297,16 @@ export const MagneticSelection = ({
           setCanClose(true);
         }
 
+        let edgeposition = position;
+        if (edgemap && edgemap.current && img) {
+          edgeposition = findNearestEdge(
+            position,
+            edgemap.current,
+            img.height,
+            img.width
+          );
+        }
+
         if (anchor && !earlyRelease) {
           const stroke = {
             method: Method.Lasso,
@@ -322,7 +323,7 @@ export const MagneticSelection = ({
         } else {
           let stroke = strokes[strokes.length - 1];
 
-          stroke.points = [...stroke.points, position.x, position.y];
+          stroke.points = [...stroke.points, edgeposition.x, edgeposition.y];
 
           strokes.splice(strokes.length - 1, 1, stroke);
 
