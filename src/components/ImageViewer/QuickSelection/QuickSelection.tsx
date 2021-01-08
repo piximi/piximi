@@ -27,7 +27,7 @@ type Superpixels = {
 const filter: Filter = (imageData: ImageData) => {
   const { data } = imageData;
 
-  const { image, segmentation } = slic(imageData);
+  const { image, segmentation } = slic(imageData, 32);
 
   let superpixels: Superpixels = {};
 
@@ -88,11 +88,11 @@ const filter: Filter = (imageData: ImageData) => {
     superpixel = superpixels[segmentation[index]];
     data[4 * index + 3] = 255;
     if (segmentation[index] === segmentation[index + 1]) {
-      data[4 * index + 0] = superpixel.mp[0];
+      data[4 * index] = superpixel.mp[0];
       data[4 * index + 1] = superpixel.mp[1];
       data[4 * index + 2] = superpixel.mp[2];
     } else {
-      data[4 * index + 0] = 0;
+      data[4 * index] = 0;
       data[4 * index + 1] = 0;
       data[4 * index + 2] = 0;
     }
