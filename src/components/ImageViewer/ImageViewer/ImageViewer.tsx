@@ -47,6 +47,7 @@ import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
+import { QuickSelection } from "../QuickSelection";
 
 const operations = [
   {
@@ -112,7 +113,7 @@ const ImageViewerStage = ({
       case SelectionMethod.Polygonal:
         return <PolygonalSelection image={data} category={category} />;
       case SelectionMethod.Quick:
-        return <React.Fragment />;
+        return <QuickSelection image={data} category={category} />;
       case SelectionMethod.Rectangular:
         return <RectangularSelection data={data} category={category} />;
       default:

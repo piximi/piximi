@@ -6,6 +6,7 @@ import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
 import { slic } from "../../../image";
+import { Category } from "../../../types/Category";
 
 type Superpixels = {
   [pixel: number]: {
@@ -110,9 +111,10 @@ const filter: Filter = (imageData: ImageData) => {
 
 type QuickSelectionProps = {
   image: ImageType;
+  category: Category;
 };
 
-export const QuickSelection = ({ image }: QuickSelectionProps) => {
+export const QuickSelection = ({ image, category }: QuickSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
 
   const stage = React.useRef<Stage>(null);
