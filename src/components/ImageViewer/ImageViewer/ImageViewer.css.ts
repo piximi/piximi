@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 const settingsWidth = 240;
-const operationsWidth = 80;
+const operationsWidth = 56;
 
 export const useStyles = makeStyles((theme) => ({
   appBar: {
