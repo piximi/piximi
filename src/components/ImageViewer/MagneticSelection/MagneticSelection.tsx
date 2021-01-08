@@ -44,24 +44,21 @@ const getIdx = (width: number) => {
 
 const findNearestEdge = (
   position: { x: number; y: number },
-  edgemap: ImageData
+  edgedata: Uint8ClampedArray,
+  height: number,
+  width: number
 ): { x: number; y: number } => {
-  const width = edgemap.width;
-  const edgedata = edgemap.data;
-
   const setX = [];
   const setY = [];
 
-  const idx = getIdx(width);
-
   let x, y;
-  for (x = 0; x < edgemap.width; x++) {
-    if (edgedata[idx(x, position.y, 0)] === 255) {
+  for (x = 0; x < width; x++) {
+    if (edgedata[(x + position.y * width) * 4] === 255) {
       setX.push(x);
     }
   }
-  for (y = 0; y < edgemap.height; y++) {
-    if (edgedata[idx(position.x, y, 0)] === 255) {
+  for (y = 0; y < height; y++) {
+    if (edgedata[(position.x + y * width) * 4] === 255) {
       setY.push(y);
     }
   }
@@ -74,7 +71,9 @@ const findNearestEdge = (
         Math.abs(position.x - setX[x]) + Math.abs(position.y - setY[y]) <
         minsum
       ) {
-        newcoords = { x: x, y: y };
+        newcoords = { x: setX[x], y: setY[y] };
+        minsum =
+          Math.abs(position.x - setX[x]) + Math.abs(position.y - setY[y]);
       }
     }
   }
@@ -82,18 +81,6 @@ const findNearestEdge = (
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
-  // const [dashOffset, setDashOffset] = React.useState(0);
-  //
-  // React.useEffect(() => {
-  //   setTimeout(() => {
-  //     setDashOffset(dashOffset + 1);
-  //
-  //     if (dashOffset > 16) {
-  //       setDashOffset(0);
-  //     }
-  //   }, 20);
-  // }, [dashOffset]);
-
   return (
     <React.Fragment>
       <ReactKonva.Line points={stroke.points} stroke="#FFF" strokeWidth={1} />
@@ -257,6 +244,14 @@ export const MagneticSelection = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
+        if (edgemap && edgemap.current && img) {
+          console.log("PREV", position);
+          console.log(
+            "EDGE",
+            findNearestEdge(position, edgemap.current, img.height, img.width)
+          );
+        }
+
         if (connected(position)) {
           const stroke: Stroke = {
             method: Method.Lasso,
