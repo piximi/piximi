@@ -254,30 +254,26 @@ export const MagneticSelection = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (!earlyRelease) {
-            if (anchor) {
-              const stroke = {
-                method: Method.Lasso,
-                points: [anchor.x, anchor.y, position.x, position.y],
-              };
+          if (anchor) {
+            const stroke = {
+              method: Method.Lasso,
+              points: [anchor.x, anchor.y, position.x, position.y],
+            };
 
-              setStrokes([...strokes, stroke]);
+            setStrokes([...strokes, stroke]);
 
-              setAnchor(position);
-            } else {
-              setAnnotating(true);
+            setAnchor(position);
+          } else if (start) {
+            const stroke = {
+              method: Method.Lasso,
+              points: [start.x, start.y, position.x, position.y],
+            };
 
-              setStart(position);
-
-              const stroke: Stroke = {
-                method: Method.Lasso,
-                points: [position.x, position.y],
-              };
-
-              setStrokes([...strokes, stroke]);
-            }
+            setStrokes([...strokes, stroke]);
+            setAnchor(position);
           } else {
-            setEarlyRelease(false);
+            setAnnotating(true);
+            setStart(position);
           }
         }
       }
@@ -297,43 +293,20 @@ export const MagneticSelection = ({
           setCanClose(true);
         }
 
-        let edgeposition = position;
-        if (edgemap && edgemap.current && img) {
-          edgeposition = findNearestEdge(
-            position,
-            edgemap.current,
-            img.height,
-            img.width
-          );
-        }
-
-        if (anchor && !earlyRelease) {
+        if (anchor) {
           const stroke = {
             method: Method.Lasso,
             points: [anchor.x, anchor.y, position.x, position.y],
           };
-
-          if (strokes.length > 2) {
-            strokes.splice(strokes.length - 1, 1, stroke);
-
-            setStrokes(strokes.concat());
-          } else {
-            setStrokes([...strokes, stroke]);
-          }
-        } else {
-          let stroke = strokes[strokes.length - 1];
-
-          stroke.points = [...stroke.points, edgeposition.x, edgeposition.y];
-
           strokes.splice(strokes.length - 1, 1, stroke);
-
           setStrokes(strokes.concat());
-
-          if (connected(position)) {
-            //  TODO:
-          } else {
-            //  TODO:
-          }
+        } else if (start) {
+          const stroke = {
+            method: Method.Lasso,
+            points: [start.x, start.y, position.x, position.y],
+          };
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
         }
       }
     }
@@ -368,10 +341,16 @@ export const MagneticSelection = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (!anchor && strokes[strokes.length - 1].points.length <= 2) {
-            setEarlyRelease(true);
+          if (strokes.length === 1) {
+            setAnchor(position);
+            if (start) {
+              const stroke = {
+                method: Method.Lasso,
+                points: [start!.x, start!.y, position.x, position.y],
+              };
+              setStrokes([...strokes, stroke]);
+            }
           }
-          setAnchor(position);
         }
       }
     }
