@@ -13,7 +13,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../types/Category";
-import { CssBaseline } from "@material-ui/core";
+import { Chip, CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
@@ -220,7 +220,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       <AppBar className={classes.appBar} color="inherit" position="fixed">
         <Toolbar>
           <Typography className={classes.logo} variant="h6">
-            <strong>Piximi</strong> Image viewer
+            <strong>Piximi</strong> Image viewer <Chip label="Early access" />
           </Typography>
         </Toolbar>
       </AppBar>
