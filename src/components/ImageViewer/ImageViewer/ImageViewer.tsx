@@ -424,21 +424,27 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         <List>
           {operations.map((operation, index) => {
             return (
-              <Tooltip
-                aria-label={operation.name}
-                key={index}
-                title={operation.name}
-              >
-                <ListItem
-                  button
-                  onClick={() => setActive(operation.method)}
-                  selected={active === operation.method}
+              <React.Fragment>
+                <Tooltip
+                  aria-label={operation.name}
+                  key={index}
+                  title={operation.name}
                 >
-                  <ListItemIcon>
-                    <SvgIcon fontSize="small">{operation.icon}</SvgIcon>
-                  </ListItemIcon>
-                </ListItem>
-              </Tooltip>
+                  <ListItem
+                    button
+                    onClick={() => setActive(operation.method)}
+                    selected={active === operation.method}
+                  >
+                    <ListItemIcon>
+                      <SvgIcon fontSize="small">{operation.icon}</SvgIcon>
+                    </ListItemIcon>
+                  </ListItem>
+                </Tooltip>
+
+                {(operation.method === ImageViewerOperation.ObjectSelection ||
+                  operation.method ===
+                    ImageViewerOperation.ColorAdjustment) && <Divider />}
+              </React.Fragment>
             );
           })}
         </List>
