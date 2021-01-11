@@ -10,6 +10,7 @@ import Radio from "@material-ui/core/Radio";
 import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Toolbar from "@material-ui/core/Toolbar";
+import Slider from "@material-ui/core/Slider";
 import Tooltip from "@material-ui/core/Tooltip";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
@@ -72,8 +73,8 @@ const ColorAdjustmentSettings = () => {
 
       <Divider />
 
-      <List>
-        <ListItem>
+      <List dense>
+        <ListItem dense>
           <ListItemText primary="Lightness" />
 
           <ListItemSecondaryAction>
@@ -86,9 +87,18 @@ const ColorAdjustmentSettings = () => {
         </ListItem>
 
         <Collapse in={openLightness} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItem button>
-              <ListItemText primary="example" />
+          <List component="div" dense disablePadding>
+            <ListItem dense>
+              <ListItemText
+                id="discrete-slider"
+                primary="Exposure"
+                secondary={
+                  <Slider
+                    aria-labelledby="discrete-slider"
+                    valueLabelDisplay="auto"
+                  />
+                }
+              />
             </ListItem>
           </List>
         </Collapse>
