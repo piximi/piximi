@@ -55,64 +55,7 @@ import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
-
-const ColorAdjustmentSettings = () => {
-  const LightnessSetting = ({ name }: { name: string }) => {
-    return (
-      <ListItemText
-        id="discrete-slider"
-        primary={name}
-        secondary={
-          <Slider
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            value={50}
-          />
-        }
-      />
-    );
-  };
-
-  const [openLightness, setOpenLightness] = React.useState(false);
-
-  const onLightnessToggle = () => {
-    setOpenLightness(!openLightness);
-  };
-
-  return (
-    <React.Fragment>
-      <List>
-        <ListItem dense disabled>
-          <ListItemText primary="Histogram" />
-        </ListItem>
-      </List>
-
-      <Divider />
-
-      <List dense>
-        <ListItem dense>
-          <ListItemText primary="Lightness" />
-
-          <ListItemSecondaryAction>
-            <Switch
-              checked={openLightness}
-              edge="end"
-              onChange={onLightnessToggle}
-            />
-          </ListItemSecondaryAction>
-        </ListItem>
-
-        <Collapse in={openLightness} timeout="auto" unmountOnExit>
-          <List component="div" dense disablePadding>
-            <ListItem dense>
-              <LightnessSetting name="Exposure" />
-            </ListItem>
-          </List>
-        </Collapse>
-      </List>
-    </React.Fragment>
-  );
-};
+import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions";
 
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
@@ -228,7 +171,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       icon: <ColorAdjustmentIcon />,
       method: ImageViewerOperation.ColorAdjustment,
       name: "Color adjustment",
-      settings: <ColorAdjustmentSettings />,
+      settings: <ColorAdjustmentOptions image={foo} />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
