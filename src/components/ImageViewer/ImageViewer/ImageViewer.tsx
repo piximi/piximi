@@ -53,75 +53,6 @@ import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
 
-const operations = [
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <ColorAdjustmentIcon />,
-    method: ImageViewerOperation.ColorAdjustment,
-    name: "Color adjustment",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <RectangularIcon />,
-    method: ImageViewerOperation.RectangularSelection,
-    name: "Rectangular selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <EllipticalIcon />,
-    method: ImageViewerOperation.EllipticalSelection,
-    name: "Elliptical selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <EllipticalIcon />,
-    method: ImageViewerOperation.PolygonalSelection,
-    name: "Polygonal selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <LassoIcon />,
-    method: ImageViewerOperation.LassoSelection,
-    name: "Lasso selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <MagneticIcon />,
-    method: ImageViewerOperation.MagneticSelection,
-    name: "Magnetic selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <MagicWandIcon />,
-    method: ImageViewerOperation.ColorSelection,
-    name: "Color selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <QuickIcon />,
-    method: ImageViewerOperation.QuickSelection,
-    name: "Quick selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <ObjectSelectionIcon />,
-    method: ImageViewerOperation.ObjectSelection,
-    name: "Object selection",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <HandIcon />,
-    method: ImageViewerOperation.Hand,
-    name: "Hand",
-  },
-  {
-    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <ZoomIcon />,
-    method: ImageViewerOperation.Zoom,
-    name: "Zoom",
-  },
-];
-
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
   data: Image;
@@ -159,11 +90,161 @@ const ImageViewerStage = ({
   }
 };
 
+const SelectionSettings = () => {
+  return (
+    <React.Fragment>
+      <List>
+        <ListItem dense disabled>
+          <ListItemIcon>
+            <Radio disableRipple disabled edge="start" tabIndex={-1} />
+          </ListItemIcon>
+
+          <ListItemText
+            primary={SelectionType.New}
+            secondary="Create a new selection."
+          />
+        </ListItem>
+
+        <ListItem dense disabled>
+          <ListItemIcon>
+            <Radio disableRipple disabled edge="start" tabIndex={-1} />
+          </ListItemIcon>
+
+          <ListItemText
+            primary={SelectionType.Addition}
+            secondary="Add area to the existing selection."
+          />
+        </ListItem>
+
+        <ListItem dense disabled>
+          <ListItemIcon>
+            <Radio disableRipple disabled edge="start" tabIndex={-1} />
+          </ListItemIcon>
+
+          <ListItemText
+            primary={SelectionType.Subtraction}
+            secondary="Subtract area from the existing selection."
+          />
+        </ListItem>
+
+        <ListItem dense disabled>
+          <ListItemIcon>
+            <Radio disableRipple disabled edge="start" tabIndex={-1} />
+          </ListItemIcon>
+
+          <ListItemText
+            primary={SelectionType.Intersection}
+            secondary="Constrain the boundary of the new selection to the existing selection."
+          />
+        </ListItem>
+      </List>
+
+      <Divider />
+
+      <List>
+        <ListItem button dense>
+          <ListItemIcon>
+            <SvgIcon>
+              <InvertSelectionIcon />
+            </SvgIcon>
+          </ListItemIcon>
+
+          <ListItemText primary="Invert selection" />
+        </ListItem>
+      </List>
+    </React.Fragment>
+  );
+};
+
 type ImageViewerProps = {
   foo: Image;
 };
 
 export const ImageViewer = ({ foo }: ImageViewerProps) => {
+  const ColorAdjustmentSettings = () => {
+    return <div />;
+  };
+
+  const operations = [
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <ColorAdjustmentIcon />,
+      method: ImageViewerOperation.ColorAdjustment,
+      name: "Color adjustment",
+      settings: <ColorAdjustmentSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <RectangularIcon />,
+      method: ImageViewerOperation.RectangularSelection,
+      name: "Rectangular selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <EllipticalIcon />,
+      method: ImageViewerOperation.EllipticalSelection,
+      name: "Elliptical selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <EllipticalIcon />,
+      method: ImageViewerOperation.PolygonalSelection,
+      name: "Polygonal selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <LassoIcon />,
+      method: ImageViewerOperation.LassoSelection,
+      name: "Lasso selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <MagneticIcon />,
+      method: ImageViewerOperation.MagneticSelection,
+      name: "Magnetic selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <MagicWandIcon />,
+      method: ImageViewerOperation.ColorSelection,
+      name: "Color selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <QuickIcon />,
+      method: ImageViewerOperation.QuickSelection,
+      name: "Quick selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <ObjectSelectionIcon />,
+      method: ImageViewerOperation.ObjectSelection,
+      name: "Object selection",
+      settings: <SelectionSettings />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <HandIcon />,
+      method: ImageViewerOperation.Hand,
+      name: "Hand",
+      settings: <React.Fragment />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <ZoomIcon />,
+      method: ImageViewerOperation.Zoom,
+      name: "Zoom",
+      settings: <React.Fragment />,
+    },
+  ];
+
   const dispatch = useDispatch();
 
   // TODO: Testing code, please remove ASAP
@@ -350,65 +431,11 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
 
         <Divider />
 
-        <List>
-          <ListItem dense disabled>
-            <ListItemIcon>
-              <Radio disableRipple disabled edge="start" tabIndex={-1} />
-            </ListItemIcon>
-
-            <ListItemText
-              primary={SelectionType.New}
-              secondary="Create a new selection."
-            />
-          </ListItem>
-
-          <ListItem dense disabled>
-            <ListItemIcon>
-              <Radio disableRipple disabled edge="start" tabIndex={-1} />
-            </ListItemIcon>
-
-            <ListItemText
-              primary={SelectionType.Addition}
-              secondary="Add area to the existing selection."
-            />
-          </ListItem>
-
-          <ListItem dense disabled>
-            <ListItemIcon>
-              <Radio disableRipple disabled edge="start" tabIndex={-1} />
-            </ListItemIcon>
-
-            <ListItemText
-              primary={SelectionType.Subtraction}
-              secondary="Subtract area from the existing selection."
-            />
-          </ListItem>
-
-          <ListItem dense disabled>
-            <ListItemIcon>
-              <Radio disableRipple disabled edge="start" tabIndex={-1} />
-            </ListItemIcon>
-
-            <ListItemText
-              primary={SelectionType.Intersection}
-              secondary="Constrain the boundary of the new selection to the existing selection."
-            />
-          </ListItem>
-        </List>
-
-        <Divider />
-
-        <List>
-          <ListItem button dense>
-            <ListItemIcon>
-              <SvgIcon>
-                <InvertSelectionIcon />
-              </SvgIcon>
-            </ListItemIcon>
-
-            <ListItemText primary="Invert selection" />
-          </ListItem>
-        </List>
+        {
+          operations[
+            operations.findIndex((operation) => operation.method === active)
+          ].settings
+        }
       </Drawer>
 
       <Drawer
