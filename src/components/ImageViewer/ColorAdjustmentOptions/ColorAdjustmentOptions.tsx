@@ -9,6 +9,15 @@ import Switch from "@material-ui/core/Switch";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { Image } from "../../../types/Image";
 
+const LIGHTNESS_OPTIONS = [
+  { name: "Exposure" },
+  { name: "Highlights" },
+  { name: "Shadows" },
+  { name: "Brightness" },
+  { name: "Contrast" },
+  { name: "Black point" },
+];
+
 type ColorAdjustmentOptionsProps = {
   image: Image;
 };
@@ -16,19 +25,21 @@ type ColorAdjustmentOptionsProps = {
 export const ColorAdjustmentOptions = ({
   image,
 }: ColorAdjustmentOptionsProps) => {
-  const LightnessSetting = ({ name }: { name: string }) => {
+  const Option = ({ name }: { name: string }) => {
     return (
-      <ListItemText
-        id="discrete-slider"
-        primary={name}
-        secondary={
-          <Slider
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            value={50}
-          />
-        }
-      />
+      <ListItem dense>
+        <ListItemText
+          id="discrete-slider"
+          primary={name}
+          secondary={
+            <Slider
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              value={50}
+            />
+          }
+        />
+      </ListItem>
     );
   };
 
@@ -63,9 +74,9 @@ export const ColorAdjustmentOptions = ({
 
         <Collapse in={openLightness} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <ListItem dense>
-              <LightnessSetting name="Exposure" />
-            </ListItem>
+            {LIGHTNESS_OPTIONS.map((option, index) => {
+              return <Option key={index} name={option.name} />;
+            })}
           </List>
         </Collapse>
       </List>
