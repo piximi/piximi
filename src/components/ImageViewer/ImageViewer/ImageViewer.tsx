@@ -57,6 +57,22 @@ import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
 
 const ColorAdjustmentSettings = () => {
+  const LightnessSetting = ({ name }: { name: string }) => {
+    return (
+      <ListItemText
+        id="discrete-slider"
+        primary={name}
+        secondary={
+          <Slider
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            value={50}
+          />
+        }
+      />
+    );
+  };
+
   const [openLightness, setOpenLightness] = React.useState(false);
 
   const onLightnessToggle = () => {
@@ -89,16 +105,7 @@ const ColorAdjustmentSettings = () => {
         <Collapse in={openLightness} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
             <ListItem dense>
-              <ListItemText
-                id="discrete-slider"
-                primary="Exposure"
-                secondary={
-                  <Slider
-                    aria-labelledby="discrete-slider"
-                    valueLabelDisplay="auto"
-                  />
-                }
-              />
+              <LightnessSetting name="Exposure" />
             </ListItem>
           </List>
         </Collapse>
