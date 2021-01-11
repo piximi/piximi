@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Object selection</title>
+    <g id="Object-selection" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Path" transform="translate(-0.000000, -0.000000)">
+            <polygon points="0 0 24.0000001 0 24.0000001 24.0000001 0 24.0000001"></polygon>
+            <path d="M18.1970001,15.9320001 L18.1970001,15.9320001 L20.1730001,17.9080001 C20.6090001,18.3440001 20.6090001,19.0520001 20.1730001,19.4880001 L18.9870001,20.6740001 C18.5510001,21.1100001 17.8430001,21.1100001 17.4070001,20.6740001 L15.4310001,18.6980001 L13.9420001,20.1870001 C13.6480001,20.4810001 13.1480001,20.3630001 13.0170001,19.9690001 L10.145,11.352 C9.99900004,10.915 10.415,10.5 10.852,10.645 L19.4690001,13.5170001 C19.8630001,13.6480001 19.9810001,14.1480001 19.6870001,14.4420001 L18.1970001,15.9320001" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="4.78000002" y1="10.93" x2="2.50000001" y2="10.93" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.44000003" y1="6.94000003" x2="4.82000002" y2="5.32000002" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.40000003" y1="14.9600001" x2="4.78000002" y2="16.5800001" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10.43" y1="5.28000002" x2="10.43" y2="3.00000001" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="14.4600001" y1="6.90000003" x2="16.0800001" y2="5.28000002" stroke="#323232" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

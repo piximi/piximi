@@ -26,6 +26,7 @@ import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
+import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { RectangularSelection } from "../RectangularSelection";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
@@ -101,8 +102,8 @@ const operations = [
   },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-    icon: <QuickIcon />,
-    method: ImageViewerOperation.QuickSelection,
+    icon: <ObjectSelectionIcon />,
+    method: ImageViewerOperation.ObjectSelection,
     name: "Object selection",
   },
 ];
