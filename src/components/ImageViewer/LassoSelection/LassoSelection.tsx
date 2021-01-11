@@ -264,7 +264,7 @@ export const LassoSelection = ({
   };
 
   const Anchor = () => {
-    if (annotating && anchor) {
+    if (annotating && anchor && strokes.length > 1) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
