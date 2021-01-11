@@ -158,18 +158,17 @@ export const PolygonalSelection = ({
             setStrokes([...strokes, stroke]);
 
             setAnchor(position);
-          } else {
-            setAnnotating(true);
-
-            setStart(position);
-            setAnchor(position);
-
-            const stroke: Stroke = {
+          } else if (start) {
+            const stroke = {
               method: Method.Lasso,
-              points: [position.x, position.y],
+              points: [start.x, start.y, position.x, position.y],
             };
 
             setStrokes([...strokes, stroke]);
+            setAnchor(position);
+          } else {
+            setAnnotating(true);
+            setStart(position);
           }
         }
       }
@@ -194,7 +193,13 @@ export const PolygonalSelection = ({
             method: Method.Lasso,
             points: [anchor.x, anchor.y, position.x, position.y],
           };
-
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
+        } else if (start) {
+          const stroke = {
+            method: Method.Lasso,
+            points: [start.x, start.y, position.x, position.y],
+          };
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
         }
@@ -233,11 +238,13 @@ export const PolygonalSelection = ({
         } else {
           if (strokes.length === 1) {
             setAnchor(position);
-            const stroke = {
-              method: Method.Lasso,
-              points: [anchor!.x, anchor!.y, position.x, position.y],
-            };
-            setStrokes([...strokes, stroke]);
+            if (start) {
+              const stroke = {
+                method: Method.Lasso,
+                points: [start!.x, start!.y, position.x, position.y],
+              };
+              setStrokes([...strokes, stroke]);
+            }
           }
         }
       }
@@ -245,7 +252,7 @@ export const PolygonalSelection = ({
   };
 
   const Anchor = () => {
-    if (annotating && anchor) {
+    if (annotating && anchor && strokes.length > 1) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
