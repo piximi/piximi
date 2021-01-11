@@ -18,6 +18,14 @@ const LIGHTNESS_OPTIONS = [
   { name: "Black point" },
 ];
 
+const Option = ({ name }: { name: string }) => {
+  return (
+    <ListItem dense>
+      <ListItemText primary={name} secondary={<Slider value={50} />} />
+    </ListItem>
+  );
+};
+
 type ColorAdjustmentOptionsProps = {
   image: Image;
 };
@@ -25,24 +33,6 @@ type ColorAdjustmentOptionsProps = {
 export const ColorAdjustmentOptions = ({
   image,
 }: ColorAdjustmentOptionsProps) => {
-  const Option = ({ name }: { name: string }) => {
-    return (
-      <ListItem dense>
-        <ListItemText
-          id="discrete-slider"
-          primary={name}
-          secondary={
-            <Slider
-              aria-labelledby="discrete-slider"
-              valueLabelDisplay="auto"
-              value={50}
-            />
-          }
-        />
-      </ListItem>
-    );
-  };
-
   const [openLightness, setOpenLightness] = React.useState(false);
 
   const onLightnessToggle = () => {
