@@ -11,7 +11,9 @@ import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
+import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
+import Switch from "@material-ui/core/Switch";
 import { Category } from "../../../types/Category";
 import { Chip, CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
@@ -52,6 +54,48 @@ import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
+
+const ColorAdjustmentSettings = () => {
+  const [openLightness, setOpenLightness] = React.useState(false);
+
+  const onLightnessToggle = () => {
+    setOpenLightness(!openLightness);
+  };
+
+  return (
+    <React.Fragment>
+      <List>
+        <ListItem dense disabled>
+          <ListItemText primary="Histogram" />
+        </ListItem>
+      </List>
+
+      <Divider />
+
+      <List>
+        <ListItem>
+          <ListItemText primary="Lightness" />
+
+          <ListItemSecondaryAction>
+            <Switch
+              checked={openLightness}
+              edge="end"
+              onChange={onLightnessToggle}
+            />
+          </ListItemSecondaryAction>
+        </ListItem>
+
+        <Collapse in={openLightness} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItem button>
+              <ListItemText primary="example" />
+            </ListItem>
+          </List>
+        </Collapse>
+      </List>
+    </React.Fragment>
+  );
+};
 
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
@@ -161,10 +205,6 @@ type ImageViewerProps = {
 };
 
 export const ImageViewer = ({ foo }: ImageViewerProps) => {
-  const ColorAdjustmentSettings = () => {
-    return <div />;
-  };
-
   const operations = [
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
