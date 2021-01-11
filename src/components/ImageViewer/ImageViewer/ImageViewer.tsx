@@ -19,6 +19,7 @@ import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
 import { MagneticSelection } from "../MagneticSelection";
 import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
+import { ReactComponent as ColorAdjustmentIcon } from "../../../icons/ColorAdjustment.svg";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
 import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
@@ -50,6 +51,12 @@ import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
 
 const operations = [
+  {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+    icon: <ColorAdjustmentIcon />,
+    method: ImageViewerOperation.ColorAdjustment,
+    name: "Color adjustment",
+  },
   {
     description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
     icon: <RectangularIcon />,

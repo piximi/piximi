@@ -1,4 +1,5 @@
 export enum ImageViewerOperation {
+  ColorAdjustment,
   ColorSelection,
   EllipticalSelection,
   LassoSelection,
