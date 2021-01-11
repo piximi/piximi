@@ -18,6 +18,16 @@ const LIGHTNESS_OPTIONS = [
   { name: "Black point" },
 ];
 
+const Histogram = () => {
+  return (
+    <List>
+      <ListItem dense disabled>
+        <ListItemText primary="Histogram" />
+      </ListItem>
+    </List>
+  );
+};
+
 const Option = ({ name }: { name: string }) => {
   return (
     <ListItem dense>
@@ -41,11 +51,7 @@ export const ColorAdjustmentOptions = ({
 
   return (
     <React.Fragment>
-      <List>
-        <ListItem dense disabled>
-          <ListItemText primary="Histogram" />
-        </ListItem>
-      </List>
+      <Histogram />
 
       <Divider />
 
