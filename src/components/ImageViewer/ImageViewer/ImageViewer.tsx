@@ -24,6 +24,8 @@ import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg"
 import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
+import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
+import { ReactComponent as HandIcon } from "../../../icons/Hand.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
@@ -105,6 +107,18 @@ const operations = [
     icon: <ObjectSelectionIcon />,
     method: ImageViewerOperation.ObjectSelection,
     name: "Object selection",
+  },
+  {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+    icon: <HandIcon />,
+    method: ImageViewerOperation.Hand,
+    name: "Hand",
+  },
+  {
+    description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+    icon: <ZoomIcon />,
+    method: ImageViewerOperation.Zoom,
+    name: "Zoom",
   },
 ];
 
