@@ -43,6 +43,78 @@ const getIdx = (width: number) => {
   };
 };
 
+const sobel = (imageData: ImageData) => {
+  const kernelX = [
+    [-1, 0, 1],
+    [-2, 0, 2],
+    [-1, 0, 1],
+  ];
+  const kernelY = [
+    [-1, -2, -1],
+    [0, 0, 0],
+    [1, 2, 1],
+  ];
+  const width = imageData.width;
+  const height = imageData.height;
+
+  const grayscale = [];
+  var data = imageData.data;
+
+  const idx = getIdx(width);
+
+  const threshold = 150;
+
+  let x, y;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      const r = data[idx(x, y, 0)];
+      const g = data[idx(x, y, 1)];
+      const b = data[idx(x, y, 2)];
+
+      const mean = (r + g + b) / 3;
+
+      grayscale[idx(x, y, 0)] = mean;
+      grayscale[idx(x, y, 1)] = mean;
+      grayscale[idx(x, y, 2)] = mean;
+    }
+  }
+
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      const responseX =
+        kernelX[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
+        kernelX[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
+        kernelX[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
+        kernelX[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
+        kernelX[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
+        kernelX[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
+        kernelX[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
+        kernelX[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
+        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
+
+      const responseY =
+        kernelY[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
+        kernelY[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
+        kernelY[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
+        kernelY[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
+        kernelY[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
+        kernelY[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
+        kernelY[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
+        kernelY[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
+        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
+
+      const magnitude =
+        Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
+
+      data[idx(x, y, 0)] = magnitude > threshold ? 255 : 0;
+      data[idx(x, y, 1)] = magnitude > threshold ? 255 : 0;
+      data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
+    }
+  }
+  //edgemap.current = data;
+  return data;
+};
+
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   return (
     <React.Fragment>
@@ -69,6 +141,7 @@ export const MagneticSelection = ({
   const group = React.useRef<Group>(null);
   const annotationRef = React.useRef<Line>(null);
   const imageRef = React.useRef<Image>(null);
+  const edgeRef = React.useRef<ImageData>(null);
 
   const [anchor, setAnchor] = useState<Anchor>();
   const [annotated, setAnnotated] = useState<boolean>(false);
@@ -77,81 +150,9 @@ export const MagneticSelection = ({
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
-  const [earlyRelease, setEarlyRelease] = useState<boolean>(false);
   const [canClose, setCanClose] = useState<boolean>(false);
 
-  const edgemap = React.useRef<Uint8ClampedArray | null>(null);
-
-  const sobel: Filter = (imageData: any) => {
-    const kernelX = [
-      [-1, 0, 1],
-      [-2, 0, 2],
-      [-1, 0, 1],
-    ];
-    const kernelY = [
-      [-1, -2, -1],
-      [0, 0, 0],
-      [1, 2, 1],
-    ];
-    const width = imageData.width;
-    const height = imageData.height;
-
-    const grayscale = [];
-    var data = imageData.data;
-
-    const idx = getIdx(width);
-
-    const threshold = 150;
-
-    let x, y;
-    for (y = 0; y < height; y++) {
-      for (x = 0; x < width; x++) {
-        const r = data[idx(x, y, 0)];
-        const g = data[idx(x, y, 1)];
-        const b = data[idx(x, y, 2)];
-
-        const mean = (r + g + b) / 3;
-
-        grayscale[idx(x, y, 0)] = mean;
-        grayscale[idx(x, y, 1)] = mean;
-        grayscale[idx(x, y, 2)] = mean;
-      }
-    }
-
-    for (y = 0; y < height; y++) {
-      for (x = 0; x < width; x++) {
-        const responseX =
-          kernelX[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-          kernelX[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-          kernelX[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-          kernelX[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-          kernelX[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-          kernelX[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-          kernelX[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-          kernelX[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-          kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-        const responseY =
-          kernelY[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-          kernelY[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-          kernelY[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-          kernelY[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-          kernelY[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-          kernelY[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-          kernelY[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-          kernelY[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-          kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-        const magnitude =
-          Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
-
-        data[idx(x, y, 0)] = magnitude > threshold ? 255 : 0;
-        data[idx(x, y, 1)] = magnitude > threshold ? 255 : 0;
-        data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
-      }
-    }
-    edgemap.current = data;
-  };
+  let edgedata: Uint8ClampedArray;
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -169,6 +170,7 @@ export const MagneticSelection = ({
         if (context) {
           context.drawImage(img, 0, 0, img.width, img.height);
           const imagedata = context.getImageData(0, 0, img.width, img.height);
+          edgedata = sobel(imagedata);
         }
       }
     }
@@ -384,7 +386,7 @@ export const MagneticSelection = ({
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <ReactKonva.Image filters={[sobel]} image={img} ref={imageRef} />
+        <ReactKonva.Image image={img} ref={imageRef} />
 
         <StartingAnchor />
 
