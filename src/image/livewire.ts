@@ -5,7 +5,6 @@ type metadata = {
   y: number;
   e: boolean;
   g: number;
-  p: { x: number; y: number } | null;
 };
 
 export const livewire = (
@@ -19,7 +18,15 @@ export const livewire = (
   for (let y = 0; y < height; y++) {
     metadata[y] = [];
     for (let x = 0; x < width; x++) {
-      metadata[y][x] = { x: x, y: y, e: false, g: infinity, p: null };
+      metadata[y][x] = { x: x, y: y, e: false, g: infinity };
+    }
+  }
+  // initialize pointers
+  let pointers: { x: number; y: number }[][] = [];
+  for (let y = 0; y < height; y++) {
+    pointers[y] = [];
+    for (let x = 0; x < width; x++) {
+      pointers[y][x] = { x: x, y: y };
     }
   }
 
@@ -28,8 +35,6 @@ export const livewire = (
   let gtmp: number;
   let r: metadata;
   let insert: boolean = false;
-
-  let pointers: { x: number; y: number }[][] = [];
 
   L.push({ x: seed.x, y: seed.y });
   metadata[seed.y][seed.x].g = 0;
@@ -49,6 +54,7 @@ export const livewire = (
         metadata[q.y + 1][q.x],
         metadata[q.y + 1][q.x + 1],
       ];
+      neighbours = neighbours.filter((neighbour) => !(neighbour === undefined));
       neighbours = neighbours.filter(
         (neighbour) => !metadata[neighbour.y][neighbour.x].e
       );
@@ -56,16 +62,17 @@ export const livewire = (
         r = neighbours[idx];
         if (!(r.x === q.x) || r.y === q.y) {
           //diagonal case: increase local cost
-          gtmp = r.g + cost[(width * r.y + r.x) * 4] * Math.sqrt(2);
+          gtmp =
+            metadata[q.y][q.x].g + cost[(width * r.y + r.x) * 4] * Math.sqrt(2);
         } else {
-          gtmp = r.g + cost[(width * r.y + r.x) * 4];
+          gtmp = metadata[q.y][q.x].g + cost[(width * r.y + r.x) * 4];
         }
         let rindex = L.indexOf({ x: r.x, y: r.y });
+        debugger;
         if (rindex > -1 && gtmp < r.g) {
           L.splice(rindex, 1); //remove from list, to be added with new score, and sorted again
-          insert = true;
         }
-        if (rindex === -1 || insert) {
+        if (rindex === -1) {
           r.g = gtmp;
           pointers[r.y][r.x] = { x: q.x, y: q.y };
           L.push({ x: r.x, y: r.y });
@@ -77,5 +84,6 @@ export const livewire = (
       }
     }
   }
+  debugger;
   return pointers;
 };

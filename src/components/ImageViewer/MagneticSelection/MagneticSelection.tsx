@@ -152,7 +152,9 @@ export const MagneticSelection = ({
 
   const [canClose, setCanClose] = useState<boolean>(false);
 
-  let edgedata: Uint8ClampedArray;
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [edgeData, setEdgeData] = useState<Uint8ClampedArray>();
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -170,7 +172,9 @@ export const MagneticSelection = ({
         if (context) {
           context.drawImage(img, 0, 0, img.width, img.height);
           const imagedata = context.getImageData(0, 0, img.width, img.height);
-          edgedata = sobel(imagedata);
+          setEdgeData(sobel(imagedata));
+          setWidth(img.width);
+          setHeight(img.height);
         }
       }
     }
@@ -241,13 +245,20 @@ export const MagneticSelection = ({
             setStrokes([...strokes, stroke]);
 
             setAnchor(position);
+
+            if (edgeData) {
+              const pointers = livewire(
+                { x: anchor.x, y: anchor.y },
+                edgeData,
+                width,
+                height
+              );
+            }
           } else if (start) {
             const stroke = {
               method: Method.Lasso,
               points: [start.x, start.y, position.x, position.y],
             };
-
-            // const pointers = livewire({x: start.x, y: start.y}, cost:)
 
             setStrokes([...strokes, stroke]);
             setAnchor(position);
