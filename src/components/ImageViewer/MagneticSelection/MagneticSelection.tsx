@@ -247,6 +247,8 @@ export const MagneticSelection = ({
               points: [start.x, start.y, position.x, position.y],
             };
 
+            // const pointers = livewire({x: start.x, y: start.y}, cost:)
+
             setStrokes([...strokes, stroke]);
             setAnchor(position);
           } else {

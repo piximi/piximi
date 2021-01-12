@@ -1,17 +1,4 @@
-const cost = (image: [], width: number, height: number) => {
-  let grayscale: number[][] = [];
-
-  let y, x;
-  for (y = 0; y < height; y++) {
-    grayscale[y] = [];
-    for (x = 0; x < height; x++) {
-      const idx = (width * y + x) * 4;
-      grayscale[y][x] = (image[idx] + image[idx + 1] + image[idx + 2]) / 3;
-    }
-  }
-};
-
-const infinity = Math.pow(10, 1000);
+const infinity = Number.MAX_SAFE_INTEGER;
 
 type metadata = {
   x: number;
@@ -23,7 +10,7 @@ type metadata = {
 
 export const livewire = (
   seed: { x: number; y: number },
-  cost: number[][],
+  cost: Uint8ClampedArray,
   width: number,
   height: number
 ) => {
@@ -40,6 +27,9 @@ export const livewire = (
   let q: { x: number; y: number } | undefined;
   let gtmp: number;
   let r: metadata;
+  let insert: boolean = false;
+
+  let pointers: { x: number; y: number }[][] = [];
 
   L.push({ x: seed.x, y: seed.y });
   metadata[seed.y][seed.x].g = 0;
@@ -65,18 +55,19 @@ export const livewire = (
       for (let idx = 0; idx < neighbours.length; idx++) {
         r = neighbours[idx];
         if (!(r.x === q.x) || r.y === q.y) {
-          //diagnoal case: increase local cost
-          gtmp = r.g + cost[r.y][r.x] * Math.sqrt(2);
+          //diagonal case: increase local cost
+          gtmp = r.g + cost[(width * r.y + r.x) * 4] * Math.sqrt(2);
         } else {
-          gtmp = r.g + cost[r.y][r.x];
+          gtmp = r.g + cost[(width * r.y + r.x) * 4];
         }
         let rindex = L.indexOf({ x: r.x, y: r.y });
         if (rindex > -1 && gtmp < r.g) {
-          L.splice(rindex, 1);
+          L.splice(rindex, 1); //remove from list, to be added with new score, and sorted again
+          insert = true;
         }
-        if (rindex === -1) {
+        if (rindex === -1 || insert) {
           r.g = gtmp;
-          r.p = { x: q.x, y: q.y };
+          pointers[r.y][r.x] = { x: q.x, y: q.y };
           L.push({ x: r.x, y: r.y });
           // sort list in descending order, so that a pop() operation gives the pixel with smallest total cost
           L.sort(function (a, b) {
@@ -86,4 +77,5 @@ export const livewire = (
       }
     }
   }
+  return pointers;
 };
