@@ -11,6 +11,7 @@ import { Image } from "konva/types/shapes/Image";
 import Konva from "konva";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
+import { livewire } from "../../../image/livewire";
 
 export enum Method {
   Elliptical,
@@ -40,44 +41,6 @@ const getIdx = (width: number) => {
     index = index || 0;
     return (width * y + x) * 4 + index;
   };
-};
-
-const findNearestEdge = (
-  position: { x: number; y: number },
-  edgedata: Uint8ClampedArray,
-  height: number,
-  width: number
-): { x: number; y: number } => {
-  const setX = [];
-  const setY = [];
-
-  let x, y;
-  for (x = 0; x < width; x++) {
-    if (edgedata[(x + position.y * width) * 4] === 255) {
-      setX.push(x);
-    }
-  }
-  for (y = 0; y < height; y++) {
-    if (edgedata[(position.x + y * width) * 4] === 255) {
-      setY.push(y);
-    }
-  }
-
-  let minsum = Math.abs(setX[0] - position.x) + Math.abs(setY[0] - position.y);
-  let newcoords = { x: position.x, y: position.y };
-  for (x = 0; x < setX.length; x++) {
-    for (y = 0; y < setY.length; y++) {
-      if (
-        Math.abs(position.x - setX[x]) + Math.abs(position.y - setY[y]) <
-        minsum
-      ) {
-        newcoords = { x: setX[x], y: setY[y] };
-        minsum =
-          Math.abs(position.x - setX[x]) + Math.abs(position.y - setY[y]);
-      }
-    }
-  }
-  return newcoords;
 };
 
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
@@ -195,6 +158,19 @@ export const MagneticSelection = ({
       imageRef.current.cache();
 
       imageRef.current.getLayer()?.batchDraw();
+    }
+
+    const canvas = document.createElement("canvas");
+    if (img) {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      if (canvas) {
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.drawImage(img, 0, 0, img.width, img.height);
+          const imagedata = context.getImageData(0, 0, img.width, img.height);
+        }
+      }
     }
   }, [img]);
 
