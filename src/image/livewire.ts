@@ -7,6 +7,13 @@ type metadata = {
   g: number;
 };
 
+const findWithAttr = (
+  array: { x: number; y: number }[],
+  value: { x: number; y: number }
+): number => {
+  return array.findIndex((el) => el.x === value.x && el.y === value.y);
+};
+
 export const livewire = (
   seed: { x: number; y: number },
   cost: Uint8ClampedArray,
@@ -67,8 +74,7 @@ export const livewire = (
         } else {
           gtmp = metadata[q.y][q.x].g + cost[(width * r.y + r.x) * 4];
         }
-        let rindex = L.indexOf({ x: r.x, y: r.y });
-        debugger;
+        let rindex = findWithAttr(L, { x: r.x, y: r.y });
         if (rindex > -1 && gtmp < r.g) {
           L.splice(rindex, 1); //remove from list, to be added with new score, and sorted again
         }
