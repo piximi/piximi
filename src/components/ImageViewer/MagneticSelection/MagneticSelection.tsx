@@ -43,6 +43,22 @@ const getIdx = (width: number) => {
   };
 };
 
+const computeCroppedEdges = (
+  edges: Uint8ClampedArray,
+  crop: number,
+  anchor: { x: number; y: number },
+  width: number,
+  height: number
+): number[] => {
+  let croppedEdges: number[] = [];
+  for (let j = anchor.y - crop; j < anchor.y + crop; j++) {
+    for (let i = anchor.x - crop; i < anchor.x + crop; i++) {
+      croppedEdges.push(edges[(width * j + i) * 4]);
+    }
+  }
+  return croppedEdges;
+};
+
 const sobel = (imageData: ImageData) => {
   const kernelX = [
     [-1, 0, 1],
@@ -111,7 +127,6 @@ const sobel = (imageData: ImageData) => {
       data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
     }
   }
-  //edgemap.current = data;
   return data;
 };
 
@@ -172,6 +187,7 @@ export const MagneticSelection = ({
         if (context) {
           context.drawImage(img, 0, 0, img.width, img.height);
           const imagedata = context.getImageData(0, 0, img.width, img.height);
+          console.log(imagedata);
           setEdgeData(sobel(imagedata));
           setWidth(img.width);
           setHeight(img.height);
@@ -247,11 +263,18 @@ export const MagneticSelection = ({
             setAnchor(position);
 
             if (edgeData) {
-              const pointers = livewire(
-                { x: anchor.x, y: anchor.y },
+              const croppedEdgeData = computeCroppedEdges(
                 edgeData,
+                50,
+                anchor,
                 width,
                 height
+              );
+              const pointers = livewire(
+                { x: 49, y: 49 },
+                croppedEdgeData,
+                50,
+                50
               );
             }
           } else if (start) {

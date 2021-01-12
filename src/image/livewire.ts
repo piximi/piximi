@@ -16,7 +16,7 @@ const findWithAttr = (
 
 export const livewire = (
   seed: { x: number; y: number },
-  cost: Uint8ClampedArray,
+  cost: number[],
   width: number,
   height: number
 ) => {
@@ -48,9 +48,10 @@ export const livewire = (
 
   while (L.length !== 0) {
     q = L.pop(); // get pixel coordinate with minimum total cost
-    if (q && q.x && q.y) {
+    if (q) {
       metadata[q.y][q.x].e = true; // label pixel as expanded
-      //for each neighhbor pixel
+      //for each neighbor pixel
+      // FIXME: we shouldn't use neighbours that are outside of image
       let neighbours = [
         metadata[q.y - 1][q.x - 1],
         metadata[q.y - 1][q.x],
@@ -75,7 +76,8 @@ export const livewire = (
           gtmp = metadata[q.y][q.x].g + cost[(width * r.y + r.x) * 4];
         }
         let rindex = findWithAttr(L, { x: r.x, y: r.y });
-        if (rindex > -1 && gtmp < r.g) {
+        if (rindex > -1) {
+          // TODO Figure out how to handle the case gtemp less that r.g (see pseudo algorithm)
           L.splice(rindex, 1); //remove from list, to be added with new score, and sorted again
         }
         if (rindex === -1) {
@@ -86,6 +88,9 @@ export const livewire = (
           L.sort(function (a, b) {
             return metadata[b.y][b.x].g - metadata[a.y][a.x].g;
           });
+          if (insert) {
+            insert = false;
+          }
         }
       }
     }
