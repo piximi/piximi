@@ -9,7 +9,6 @@ const cost = (image: [], width: number, height: number) => {
       grayscale[y][x] = (image[idx] + image[idx + 1] + image[idx + 2]) / 3;
     }
   }
-  //OPTIONAL: compute edges
 };
 
 const infinity = Math.pow(10, 1000);
@@ -24,17 +23,16 @@ type metadata = {
 
 export const livewire = (
   seed: { x: number; y: number },
-  metadata: metadata[][],
   cost: number[][],
   width: number,
   height: number
 ) => {
   //initialize metadata
-  let data: metadata[][] = [];
+  let metadata: metadata[][] = [];
   for (let y = 0; y < height; y++) {
-    data[y] = [];
+    metadata[y] = [];
     for (let x = 0; x < width; x++) {
-      data[y][x] = { x: x, y: y, e: false, g: infinity, p: null };
+      metadata[y][x] = { x: x, y: y, e: false, g: infinity, p: null };
     }
   }
 
@@ -66,7 +64,12 @@ export const livewire = (
       );
       for (let idx = 0; idx < neighbours.length; idx++) {
         r = neighbours[idx];
-        gtmp = r.g + cost[r.y][r.x];
+        if (!(r.x === q.x) || r.y === q.y) {
+          //diagnoal case: increase local cost
+          gtmp = r.g + cost[r.y][r.x] * Math.sqrt(2);
+        } else {
+          gtmp = r.g + cost[r.y][r.x];
+        }
         let rindex = L.indexOf({ x: r.x, y: r.y });
         if (rindex > -1 && gtmp < r.g) {
           L.splice(rindex, 1);
