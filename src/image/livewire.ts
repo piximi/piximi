@@ -92,11 +92,11 @@ export const livewire = (
           gtmp = metadata[q.y][q.x].g + cost[(width * r.y + r.x) * 4];
         }
         let rindex = findWithAttr(L, { x: r.x, y: r.y });
-        if (rindex > -1) {
-          // TODO Figure out how to handle the case gtemp less that r.g (see pseudo algorithm)
+        if (rindex > -1 && gtmp < r.g) {
           L.splice(rindex, 1); //remove from list, to be added with new score, and sorted again
+          insert = true;
         }
-        if (rindex === -1) {
+        if (rindex === -1 || insert) {
           r.g = gtmp;
           pointers[r.y][r.x] = { x: q.x, y: q.y };
           L.push({ x: r.x, y: r.y });
