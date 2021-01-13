@@ -8,9 +8,7 @@ import { Group } from "konva/types/Group";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
 import { Image } from "konva/types/shapes/Image";
-import Konva from "konva";
 import useImage from "use-image";
-import { Filter } from "konva/types/Node";
 import { livewire } from "../../../image/livewire";
 
 export enum Method {

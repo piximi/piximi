@@ -111,6 +111,5 @@ export const livewire = (
       }
     }
   }
-  debugger;
   return pointers;
 };
