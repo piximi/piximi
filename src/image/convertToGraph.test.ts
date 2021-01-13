@@ -27,7 +27,6 @@ test("foo", async () => {
 
   const graph = makeGraph(invertedEdges.data, img.height, img.width);
 
-  // for example, ind best path between node 11 and 45
   let path = require("ngraph.path");
   const pathFinder = path.aStar(graph, {
     distance(fromNode: number, toNode: number, link: Link) {
