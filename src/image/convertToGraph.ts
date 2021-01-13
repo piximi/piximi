@@ -1,7 +1,6 @@
 import createGraph from "ngraph.graph";
-import assert from "assert";
 import { getIdx } from "./imageHelper";
-import Image, { DataArray } from "image-js";
+import { DataArray } from "image-js";
 
 const validNeighbours = (
   x: number,
@@ -27,7 +26,7 @@ const validNeighbours = (
   }
   for (let xoffset of xoffsets) {
     for (let yoffset of yoffsets) {
-      if (xoffset !== 0 && yoffset !== 0) {
+      if (!(xoffset === 0 && yoffset === 0)) {
         output.push({ x: x + xoffset, y: y + yoffset });
       }
     }
@@ -57,9 +56,3 @@ export const makeGraph = (
   }
   return graph;
 };
-
-//
-// graph.addLink('b', 'a', {weight: 5});
-// console.log(graph.getLink('a', 'b'));
-// console.log(graph.getLink('b', 'a'));
-//

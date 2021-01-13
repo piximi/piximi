@@ -26,7 +26,7 @@ test("foo", async () => {
   edges.invert({ inPlace: true });
 
   const graph = makeGraph(edges.data, img.height, img.width);
-  console.log(graph.getNode(30));
+  console.log(graph.getNode(45));
 
   // run sobel transform
   // iterate through graph pixels : for each pixel, get neighbours and create graph links
