@@ -1,9 +1,8 @@
 import "jest";
-import createGraph from "ngraph.graph";
+import { Link, Node } from "ngraph.graph";
 import { Image as ImageType } from "../types/Image";
-import { Image } from "image-js";
-import { sobel } from "./imageHelper";
-import { makeGraph } from "./convertToGraph";
+import { Image, ThresholdAlgorithm } from "image-js";
+import { fromIdxToCoord, makeGraph } from "./convertToGraph";
 
 test("foo", async () => {
   // fetch an example image
@@ -23,17 +22,23 @@ test("foo", async () => {
 
   const grey = img.grey();
   const edges = grey.sobelFilter();
-  edges.invert({ inPlace: true });
+  const thresholdedEdges = edges.mask({ threshold: 30 });
+  const invertedEdges = thresholdedEdges.invert();
 
-  const graph = makeGraph(edges.data, img.height, img.width);
-  console.log(graph.getNode(10));
+  const graph = makeGraph(invertedEdges.data, img.height, img.width);
 
-  // run sobel transform
-  // iterate through graph pixels : for each pixel, get neighbours and create graph links
-
-  // let graph = createGraph();
-  // graph.addLink('a', 'b', {weight: 10});
-  // graph.addLink('b', 'a', {weight: 5});
-  // console.log(graph.getLink('b', 'a'));
-  // console.log(graph.getLink('a', 'b'));
+  // for example, ind best path between node 11 and 45
+  let path = require("ngraph.path");
+  const pathFinder = path.aStar(graph, {
+    distance(fromNode: number, toNode: number, link: Link) {
+      return -1 * link.data;
+    },
+  });
+  const foundPath = pathFinder.find(5, 10);
+  let node: Node;
+  for (node of foundPath) {
+    const id = node.id as number;
+    const [x, y] = fromIdxToCoord(id, img.width);
+    console.log(x, y);
+  }
 });

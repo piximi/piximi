@@ -34,6 +34,12 @@ const validNeighbours = (
   return output;
 };
 
+export const fromIdxToCoord = (idx: number, width: number) => {
+  const row = Math.floor(idx / width);
+  const col = idx - row * width;
+  return [col, row];
+};
+
 export const makeGraph = (
   edges: Uint8ClampedArray | DataArray,
   height: number,
