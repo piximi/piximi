@@ -15,13 +15,13 @@ const validNeighbours = (
   if (x > 0) {
     xoffsets.push(-1);
   }
-  if (x < width) {
+  if (x < width - 1) {
     xoffsets.push(1);
   }
   if (y > 0) {
     yoffsets.push(-1);
   }
-  if (y < height) {
+  if (y < height - 1) {
     yoffsets.push(1);
   }
   for (let xoffset of xoffsets) {
