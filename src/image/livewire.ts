@@ -48,24 +48,40 @@ export const livewire = (
 
   while (L.length !== 0) {
     q = L.pop(); // get pixel coordinate with minimum total cost
+
     if (q) {
       metadata[q.y][q.x].e = true; // label pixel as expanded
+
       //for each neighbor pixel
-      // FIXME: we shouldn't use neighbours that are outside of image
-      let neighbours = [
-        metadata[q.y - 1][q.x - 1],
-        metadata[q.y - 1][q.x],
-        metadata[q.y - 1][q.x + 1],
-        metadata[q.y][q.x - 1],
-        metadata[q.y][q.x + 2],
-        metadata[q.y + 1][q.x - 1],
-        metadata[q.y + 1][q.x],
-        metadata[q.y + 1][q.x + 1],
-      ];
-      neighbours = neighbours.filter((neighbour) => !(neighbour === undefined));
+      let neighbours = [];
+      if (q.y > 0 && q.x > 0) {
+        neighbours.push(metadata[q.y - 1][q.x - 1]);
+      }
+      if (q.y > 0) {
+        neighbours.push(metadata[q.y - 1][q.x]);
+      }
+      if (q.y > 0 && q.x < width - 1) {
+        neighbours.push(metadata[q.y - 1][q.x + 1]);
+      }
+      if (q.x > 0) {
+        neighbours.push(metadata[q.y][q.x - 1]);
+      }
+      if (q.x < width - 1) {
+        neighbours.push(metadata[q.y][q.x + 1]);
+      }
+      if (q.y < height - 1 && q.x > 0) {
+        neighbours.push(metadata[q.y + 1][q.x - 1]);
+      }
+      if (q.y < height - 1) {
+        neighbours.push(metadata[q.y + 1][q.x]);
+      }
+      if (q.y < height - 1 && q.x < width - 1) {
+        neighbours.push(metadata[q.y + 1][q.x + 1]);
+      }
       neighbours = neighbours.filter(
         (neighbour) => !metadata[neighbour.y][neighbour.x].e
       );
+
       for (let idx = 0; idx < neighbours.length; idx++) {
         r = neighbours[idx];
         if (!(r.x === q.x) || r.y === q.y) {
