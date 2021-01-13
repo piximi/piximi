@@ -18,13 +18,17 @@ export class Graph {
     return parseFloat(a) - parseFloat(b);
   }
 
-  findPaths(map: object[], start: string, end: string | number) {
+  findPaths(
+    map: { [key: string]: number }[],
+    start: string,
+    end: string | number
+  ) {
     let costs: { [key: string]: number } = {};
     let open: { [key: string]: Array<string> } = { "0": [start] };
-    let predecessors: {} = {};
+    let predecessors: { [key: string]: string } = {};
     let keys;
 
-    const addToOpen = (cost: string, vertex: string) => {
+    const addToOpen = (cost: number, vertex: string) => {
       const key = "" + cost;
       if (!open[key]) open[key] = [];
       open[key].push(vertex);
@@ -42,7 +46,9 @@ export class Graph {
       let node = bucket.shift();
       let currentCost = parseFloat(key);
 
-      let adjacentNodes: {} = node ? map[parseInt(node)] : {};
+      let adjacentNodes: { [key: string]: number } = node
+        ? map[parseInt(node)]
+        : {};
 
       if (!bucket.length) delete open[key];
 
@@ -55,7 +61,8 @@ export class Graph {
           if (vertexCost === undefined || vertexCost > totalCost) {
             costs[vertex] = totalCost;
             addToOpen(totalCost, vertex);
-            predecessors[vertex] = node;
+            // TODO: node might be undefined
+            predecessors[vertex] = node!;
           }
         }
       }
@@ -81,7 +88,7 @@ export class Graph {
     return nodes;
   }
 
-  findShortestPath(map: object[], nodes: any[]) {
+  findShortestPath(map: { [key: string]: number }[], nodes: any[]) {
     let start = nodes.shift();
     let end: string | number;
     let predecessors: {} | null;
@@ -124,7 +131,7 @@ export class Graph {
     } else if (arguments.length === 2) {
       return this.findShortestPath(this.map, [start, end]);
     } else {
-      return this.findShortestPath(this.map, this.toArray(arguments));
+      return this.findShortestPath(this.map, this.toArray(arguments, 0));
     }
   }
 
