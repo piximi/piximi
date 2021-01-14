@@ -50,22 +50,20 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
       const pathname =
         "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
 
-      const model = await tensorflow.loadLayersModel(pathname);
+      const graph = await tensorflow.loadLayersModel(pathname);
 
       const optimizer = tensorflow.train.adam();
 
-      model.compile({
+      graph.compile({
         optimizer: optimizer,
         loss: "categoricalCrossentropy",
         metrics: ["accuracy"],
       });
 
-      return model;
+      setModel(graph);
     };
 
-    createModel().then(() => {
-      setModel(model);
-    });
+    createModel();
   }, [model]);
 
   const validateBoundBox = (oldBox: Box, newBox: Box) => {
@@ -163,21 +161,33 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   };
 
   const onMouseUp = () => {
-    if (annotated) return;
-    if (!annotating) return;
-
-    // preproccessing
-    console.info("preprocessing");
-    const crop = tensorflow.randomNormal([124, 124, 3]);
-
-    if (model) {
-      // prediction
-      console.info("prediction");
-
-      const prediction = model.predict(crop);
-
-      console.info(prediction);
+    if (annotated) {
+      return;
     }
+
+    if (!annotating) {
+      return;
+    }
+
+    const mask = tensorflow.tidy(() => {
+      // FIXME: replace with crop
+      const crop: tensorflow.Tensor3D = tensorflow.randomNormal([128, 128, 3]);
+
+      const size: [number, number] = [128, 128];
+      const resized = tensorflow.image.resizeBilinear(crop, size);
+      const standardized = resized.div(tensorflow.scalar(255));
+      const batch = standardized.expandDims(0);
+
+      if (model) {
+        const prediction = model.predict(
+          batch
+        ) as tensorflow.Tensor<tensorflow.Rank>;
+
+        return prediction.squeeze([0]);
+      }
+    });
+
+    console.info(mask);
 
     setAnnotated(true);
     setAnnotating(false);
