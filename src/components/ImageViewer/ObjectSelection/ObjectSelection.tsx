@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image } from "../../../types/Image";
+import { Image as ImageViewerImage } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
 import * as tensorflow from "@tensorflow/tfjs";
+import { Image } from "konva/types/shapes/Image";
 
 export const useKeyPress = (key: string, action: () => void) => {
   useEffect(() => {
@@ -24,17 +25,17 @@ export const useKeyPress = (key: string, action: () => void) => {
 };
 
 type ObjectSelectionProps = {
-  data: Image;
+  data: ImageViewerImage;
   category: Category;
 };
 
 export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   const dispatch = useDispatch();
-  const [image] = useImage(data.src);
+  const [image] = useImage(data.src, "Anonymous");
   const stage = React.useRef<Stage>(null);
   const transformer = React.useRef<Transformer>(null);
   const shapeRef = React.useRef<Rect>(null);
-  const imageRef = React.useRef<any>(null);
+  const imageRef = React.useRef<Image>(null);
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
@@ -43,6 +44,7 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   const [annotating, setAnnotating] = useState<boolean>();
   const [offset, setOffset] = useState<number>(0);
   const [model, setModel] = useState<tensorflow.LayersModel>();
+  const [crop, setCrop] = useState<HTMLImageElement>();
 
   useEffect(() => {
     const createModel = async () => {
@@ -65,6 +67,27 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
 
     createModel();
   }, [model]);
+
+  useEffect(() => {
+    // FIXME: should only execute when selection is made
+    const f = async () => {
+      if (imageRef && imageRef.current) {
+        const config = {
+          callback: (cropped: HTMLImageElement) => {
+            setCrop(cropped);
+          },
+          height: height,
+          width: width,
+          x: x,
+          y: y,
+        };
+
+        imageRef.current.toImage(config);
+      }
+    };
+
+    f();
+  }, [height, width, x, y]);
 
   const validateBoundBox = (oldBox: Box, newBox: Box) => {
     if (
@@ -188,20 +211,23 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
     }
 
     const mask = tensorflow.tidy(() => {
-      // FIXME: replace with crop
-      const crop: tensorflow.Tensor3D = tensorflow.randomNormal([128, 128, 3]);
+      if (crop) {
+        const cropped: tensorflow.Tensor3D = tensorflow.browser.fromPixels(
+          crop
+        );
 
-      const size: [number, number] = [128, 128];
-      const resized = tensorflow.image.resizeBilinear(crop, size);
-      const standardized = resized.div(tensorflow.scalar(255));
-      const batch = standardized.expandDims(0);
+        const size: [number, number] = [128, 128];
+        const resized = tensorflow.image.resizeBilinear(cropped, size);
+        const standardized = resized.div(tensorflow.scalar(255));
+        const batch = standardized.expandDims(0);
 
-      if (model) {
-        const prediction = model.predict(
-          batch
-        ) as tensorflow.Tensor<tensorflow.Rank>;
+        if (model) {
+          const prediction = model.predict(
+            batch
+          ) as tensorflow.Tensor<tensorflow.Rank>;
 
-        return prediction.squeeze([0]);
+          return prediction.squeeze([0]);
+        }
       }
     });
 
