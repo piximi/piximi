@@ -8,9 +8,14 @@ import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
 import { Image as ImageKonvaType } from "konva/types/shapes/Image";
 import useImage from "use-image";
-import { makeGraph } from "../../../image/GraphHelper";
+import {
+  convertPathToCoords,
+  createPathFinder,
+  makeGraph,
+} from "../../../image/GraphHelper";
 import { Image } from "image-js";
 import { Graph } from "ngraph.graph";
+import { getIdx } from "../../../image/imageHelper";
 
 export enum Method {
   Elliptical,
@@ -88,6 +93,29 @@ export const MagneticSelection = ({
 
   const [graph, setGraph] = useState<Graph | null>(null);
 
+  let pathStrokes = [];
+
+  if (graph && img) {
+    const pathFinder = createPathFinder(graph, img.width);
+    const foundPath = pathFinder.find(
+      getIdx(img.width, 1)(106, 37, 0),
+      getIdx(img.width, 1)(182, 34, 0)
+    );
+    //const foundPath = pathFinder.find(4, 10);
+
+    const pathCoords = convertPathToCoords(foundPath, img.width);
+
+    for (let i = 0; i < pathCoords.length - 1; i++) {
+      const [startX, startY] = pathCoords[i];
+      const [endX, endY] = pathCoords[i + 1];
+      const stroke: Stroke = {
+        method: Method.Lasso,
+        points: [startX, startY, endX, endY],
+      };
+      pathStrokes.push(stroke);
+    }
+  }
+
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
       imageRef.current.cache();
@@ -151,6 +179,7 @@ export const MagneticSelection = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
+        console.log(position);
         if (connected(position)) {
           const stroke: Stroke = {
             method: Method.Lasso,
@@ -331,6 +360,12 @@ export const MagneticSelection = ({
         {annotation && annotated && !annotating && (
           <MarchingAnts stroke={annotation} />
         )}
+
+        {img &&
+          graph &&
+          pathStrokes.map((stroke: Stroke, key: number) => (
+            <MarchingAnts key={key} stroke={stroke} />
+          ))}
 
         <ReactKonva.Transformer
           anchorFill="#FFF"

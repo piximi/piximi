@@ -77,6 +77,11 @@ export const createPathFinder = (graph: Graph, width: number) => {
       }
       return 1.41 * toNode.data;
     },
+    //   if (x1 === x2 || y1 === y2) {
+    //     return 1;
+    //   }
+    //   return 1.41;
+    // },
   });
 };
 
