@@ -228,15 +228,22 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
             batch
           ) as tensorflow.Tensor<tensorflow.Rank>;
 
-          const squeezed: tensorflow.Tensor3D = prediction.squeeze([0]);
+          const squeezed: tensorflow.Tensor3D = prediction
+            .squeeze([0])
+            .tile([1, 1, 3])
+            .sub(0.3)
+            .sign()
+            .relu();
 
-          return squeezed;
+          return tensorflow.image.resizeBilinear(squeezed, [height, width]);
         }
       }
     });
 
     if (maskRef && maskRef.current && mask) {
       await tensorflow.browser.toPixels(mask, maskRef.current);
+
+      tensorflow.dispose(mask);
     }
 
     setAnnotated(true);
