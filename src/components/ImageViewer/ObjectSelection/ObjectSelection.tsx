@@ -91,7 +91,9 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
           return data;
         },
       });
+
       const { x, y, width, height } = shapeRef.current.getClientRect();
+
       const boundingBox: BoundingBox = {
         maximum: {
           r: y + height,
@@ -102,14 +104,17 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
           c: x,
         },
       };
+
       const payload = {
         boundingBox: boundingBox,
         categoryId: category.id,
         id: data.id,
         mask: mask,
       };
+
       dispatch(projectSlice.actions.createImageInstance(payload));
     }
+
     setAnnotating(false);
     setAnnotated(false);
   });
@@ -117,10 +122,12 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setOffset(offset + 1);
+
       if (offset > 32) {
         setOffset(0);
       }
     }, 200);
+
     return () => clearTimeout(timer);
   });
 
@@ -129,7 +136,9 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
       // we need to attach transformer manually
       if (transformer && transformer.current && shapeRef && shapeRef.current) {
         transformer.current.nodes([shapeRef.current]);
+
         const layer = transformer.current.getLayer();
+
         if (layer) {
           layer.batchDraw();
         }
@@ -138,10 +147,15 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   }, [annotated, annotating]);
 
   const onMouseDown = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
+
     setAnnotating(true);
+
     if (stage && stage.current) {
       const position = stage.current.getPointerPosition();
+
       if (position) {
         setX(position.x);
         setY(position.y);
@@ -150,9 +164,13 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   };
 
   const onMouseMove = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
+
     if (stage && stage.current) {
       const position = stage.current.getPointerPosition();
+
       if (x && y && position) {
         setHeight(position.y - y);
         setWidth(position.x - x);
