@@ -1,8 +1,9 @@
 import "jest";
-import { Link, Node } from "ngraph.graph";
+import { Node } from "ngraph.graph";
 import { Image as ImageType } from "../types/Image";
 import { Image, ThresholdAlgorithm } from "image-js";
 import { fromIdxToCoord, makeGraph } from "./convertToGraph";
+import { aStar } from "ngraph.path";
 
 test("foo", async () => {
   // fetch an example image
@@ -26,8 +27,7 @@ test("foo", async () => {
 
   const graph = makeGraph(edges.data, img.height, img.width);
 
-  let path = require("ngraph.path");
-  const pathFinder = path.aStar(graph, {
+  const pathFinder = aStar(graph, {
     distance(fromNode: Node, toNode: Node) {
       const [x1, y1] = fromIdxToCoord(fromNode.id as number, img.width);
       const [x2, y2] = fromIdxToCoord(toNode.id as number, img.width);
