@@ -1,4 +1,4 @@
-import createGraph from "ngraph.graph";
+import createGraph, { NodeId } from "ngraph.graph";
 import { getIdx } from "./imageHelper";
 import { DataArray } from "image-js";
 
@@ -56,6 +56,7 @@ export const makeGraph = (
       for (let pixel of pixels) {
         const idx = getIdx(width, 1)(pixel.x, pixel.y, 0);
         const dist = edges[idx];
+        graph.addNode(idx, dist);
         graph.addLink(startIdx, idx, dist);
       }
     }
