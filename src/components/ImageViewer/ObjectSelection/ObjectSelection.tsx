@@ -34,6 +34,7 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   const stage = React.useRef<Stage>(null);
   const transformer = React.useRef<Transformer>(null);
   const shapeRef = React.useRef<Rect>(null);
+  const imageRef = React.useRef<any>(null);
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
@@ -41,10 +42,11 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
   const [offset, setOffset] = useState<number>(0);
-  const [model, setModel] = useState<any>();
+  const [model, setModel] = useState<tensorflow.LayersModel>();
 
   useEffect(() => {
     const createModel = async () => {
+      // FIXME: should be a local file
       const pathname =
         "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
 
@@ -163,6 +165,20 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
   const onMouseUp = () => {
     if (annotated) return;
     if (!annotating) return;
+
+    // preproccessing
+    console.info("preprocessing");
+    const crop = tensorflow.randomNormal([124, 124, 3]);
+
+    if (model) {
+      // prediction
+      console.info("prediction");
+
+      const prediction = model.predict(crop);
+
+      console.info(prediction);
+    }
+
     setAnnotated(true);
     setAnnotating(false);
   };
@@ -179,7 +195,7 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <ReactKonva.Image image={image} />
+        <ReactKonva.Image image={image} ref={imageRef} />
 
         {!annotated && annotating && x && y && (
           <React.Fragment>
