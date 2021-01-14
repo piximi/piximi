@@ -56,6 +56,20 @@ const computeCroppedEdges = (
   return croppedEdges;
 };
 
+const convertCoordsToStrokes = (pathCoords: number[][]): Array<Stroke> => {
+  const pathStrokes = [];
+  for (let i = 0; i < pathCoords.length - 1; i++) {
+    const [startX, startY] = pathCoords[i];
+    const [endX, endY] = pathCoords[i + 1];
+    const stroke: Stroke = {
+      method: Method.Lasso,
+      points: [startX, startY, endX, endY],
+    };
+    pathStrokes.push(stroke);
+  }
+  return pathStrokes;
+};
+
 const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   return (
     <React.Fragment>
@@ -64,7 +78,7 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
       <ReactKonva.Line
         dash={[4, 2]}
         points={stroke.points}
-        stroke="#000"
+        stroke="#FFF"
         strokeWidth={1}
       />
     </React.Fragment>
@@ -86,6 +100,7 @@ export const MagneticSelection = ({
   const [annotated, setAnnotated] = useState<boolean>(false);
   const [annotating, setAnnotating] = useState<boolean>(false);
   const [annotation, setAnnotation] = useState<Stroke>();
+  const [didFindPath, setDidFindPath] = useState<boolean>(false);
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
@@ -93,28 +108,23 @@ export const MagneticSelection = ({
 
   const [graph, setGraph] = useState<Graph | null>(null);
 
-  let pathStrokes = [];
+  const [pathStrokes, setPathStrokes] = useState<Array<Stroke>>([]);
 
-  if (graph && img) {
-    const pathFinder = createPathFinder(graph, img.width);
-    const foundPath = pathFinder.find(
-      getIdx(img.width, 1)(106, 37, 0),
-      getIdx(img.width, 1)(182, 34, 0)
-    );
-    //const foundPath = pathFinder.find(4, 10);
+  // CODE IS HERE
 
-    const pathCoords = convertPathToCoords(foundPath, img.width);
-
-    for (let i = 0; i < pathCoords.length - 1; i++) {
-      const [startX, startY] = pathCoords[i];
-      const [endX, endY] = pathCoords[i + 1];
-      const stroke: Stroke = {
-        method: Method.Lasso,
-        points: [startX, startY, endX, endY],
-      };
-      pathStrokes.push(stroke);
+  React.useEffect(() => {
+    if (graph && img) {
+      const pathFinder = createPathFinder(graph, img.width);
+      const foundPath = pathFinder.find(
+        getIdx(img.width, 1)(106, 37, 0),
+        getIdx(img.width, 1)(182, 34, 0)
+      );
+      //const foundPath = pathFinder.find(4, 10);
+      const pathCoords = convertPathToCoords(foundPath, img.width);
+      setPathStrokes(convertCoordsToStrokes(pathCoords));
+      setDidFindPath(true);
     }
-  }
+  }, [graph, img]);
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -179,7 +189,6 @@ export const MagneticSelection = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
-        console.log(position);
         if (connected(position)) {
           const stroke: Stroke = {
             method: Method.Lasso,
@@ -361,8 +370,7 @@ export const MagneticSelection = ({
           <MarchingAnts stroke={annotation} />
         )}
 
-        {img &&
-          graph &&
+        {didFindPath &&
           pathStrokes.map((stroke: Stroke, key: number) => (
             <MarchingAnts key={key} stroke={stroke} />
           ))}
