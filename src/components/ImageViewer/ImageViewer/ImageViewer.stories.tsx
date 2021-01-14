@@ -5,7 +5,7 @@ import { ImageViewer } from "./ImageViewer";
 
 export default {
   component: ImageViewer,
-  title: "Components/ImageViewer",
+  title: "Components/ImageViewer/ImageViewer",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof ImageViewer>> = (args) => (
