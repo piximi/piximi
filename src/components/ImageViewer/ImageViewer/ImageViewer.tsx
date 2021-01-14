@@ -52,7 +52,6 @@ import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
-import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions";
 
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
@@ -168,7 +167,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       icon: <ColorAdjustmentIcon />,
       method: ImageViewerOperation.ColorAdjustment,
       name: "Color adjustment",
-      settings: <ColorAdjustmentOptions image={foo} />,
+      settings: <React.Fragment />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
@@ -254,7 +253,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
   const images = useSelector(imagesSelector);
 
   const [active, setActive] = useState<ImageViewerOperation>(
-    ImageViewerOperation.ColorAdjustment
+    ImageViewerOperation.RectangularSelection
   );
 
   const classes = useStyles();
@@ -456,6 +455,14 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
                 >
                   <ListItem
                     button
+                    disabled={[
+                      ImageViewerOperation.ColorAdjustment,
+                      ImageViewerOperation.ColorSelection,
+                      ImageViewerOperation.Hand,
+                      ImageViewerOperation.ObjectSelection,
+                      ImageViewerOperation.QuickSelection,
+                      ImageViewerOperation.Zoom,
+                    ].includes(operation.method)}
                     onClick={() => setActive(operation.method)}
                     selected={active === operation.method}
                   >
