@@ -51,6 +51,7 @@ export const makeGraph = (
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const startIdx = getIdx(width, 1)(x, y, 0);
+      // TODO : Go back to inferring max from actual image data
       // const cap = Math.max.apply(Math, edges.data);
       const cap = 255;
       const dist = cap - edges[startIdx];

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
@@ -15,6 +15,7 @@ import {
 } from "../../../image/GraphHelper";
 import { Image } from "image-js";
 import { Graph } from "ngraph.graph";
+import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 
 export enum Method {
@@ -39,6 +40,31 @@ type Stroke = {
   method: Method;
   points: Array<number>;
 };
+
+// Hook
+function useDebounce(value: { x: number; y: number } | null, delay: number) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  );
+
+  return debouncedValue;
+}
 
 const computeCroppedEdges = (
   edges: Uint8ClampedArray,
@@ -110,19 +136,30 @@ export const MagneticSelection = ({
 
   const [pathStrokes, setPathStrokes] = useState<Array<Stroke>>([]);
 
-  // CODE IS HERE
+  const pathFinder = React.useRef<PathFinder<any>>();
 
+  const [trackedPosition, setPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+
+  const debouncedPosition = useDebounce(trackedPosition, 500);
+
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(
+    () => {
+      if (debouncedPosition) {
+        setIsSearching(true);
+        onMouseMove();
+      }
+    },
+    [debouncedPosition] // Only call effect if debounced search term changes
+  );
+  // CODE IS HERE
   React.useEffect(() => {
     if (graph && img) {
-      const pathFinder = createPathFinder(graph, img.width);
-      const foundPath = pathFinder.find(
-        getIdx(img.width, 1)(106, 37, 0),
-        getIdx(img.width, 1)(182, 34, 0)
-      );
-      //const foundPath = pathFinder.find(4, 10);
-      const pathCoords = convertPathToCoords(foundPath, img.width);
-      setPathStrokes(convertCoordsToStrokes(pathCoords));
-      setDidFindPath(true);
+      pathFinder.current = createPathFinder(graph, img.width);
     }
   }, [graph, img]);
 
@@ -142,7 +179,7 @@ export const MagneticSelection = ({
       setGraph(makeGraph(edges.data, img.height, img.width));
     };
     loadImg();
-  }, [img]);
+  }, [image.src]);
 
   React.useEffect(() => {
     if (
@@ -226,6 +263,14 @@ export const MagneticSelection = ({
     }
   };
 
+  // const throttledOnMouseMove = () => {
+  //   _.throttle(() => {
+  //     console.info("beep");
+  //
+  //     onMouseMove();
+  //   }, 100);
+  // }
+
   const onMouseMove = () => {
     if (annotated) return;
 
@@ -235,6 +280,7 @@ export const MagneticSelection = ({
       const position = stage.current.getPointerPosition();
 
       if (position) {
+        setPosition(position);
         if (!canClose && !isInside(startingAnchorCircle, position)) {
           setCanClose(true);
         }
@@ -253,6 +299,23 @@ export const MagneticSelection = ({
           };
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
+          //We don't want to show path right away.
+          if (
+            Math.sqrt(
+              (position.x - start.x) * (position.x - start.x) +
+                (position.y - start.y) * (position.y - start.y)
+            ) > 50
+          ) {
+            if (pathFinder && pathFinder.current && img) {
+              const foundPath = pathFinder.current.find(
+                getIdx(img.width, 1)(start.x, start.y, 0),
+                getIdx(img.width, 1)(position.x, position.y, 0)
+              );
+              const pathCoords = convertPathToCoords(foundPath, img.width);
+              setPathStrokes(convertCoordsToStrokes(pathCoords));
+              setDidFindPath(true);
+            }
+          }
         }
       }
     }
