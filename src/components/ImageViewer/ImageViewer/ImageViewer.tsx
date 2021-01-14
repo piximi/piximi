@@ -254,7 +254,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
   const images = useSelector(imagesSelector);
 
   const [active, setActive] = useState<ImageViewerOperation>(
-    ImageViewerOperation.ObjectSelection
+    ImageViewerOperation.RectangularSelection
   );
 
   const classes = useStyles();
@@ -460,7 +460,6 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
                       ImageViewerOperation.ColorAdjustment,
                       ImageViewerOperation.ColorSelection,
                       ImageViewerOperation.Hand,
-                      // ImageViewerOperation.ObjectSelection,
                       ImageViewerOperation.QuickSelection,
                       ImageViewerOperation.Zoom,
                     ].includes(operation.method)}
