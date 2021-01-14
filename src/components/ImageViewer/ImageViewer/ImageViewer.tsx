@@ -254,7 +254,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
   const images = useSelector(imagesSelector);
 
   const [active, setActive] = useState<ImageViewerOperation>(
-    ImageViewerOperation.RectangularSelection
+    ImageViewerOperation.ObjectSelection
   );
 
   const classes = useStyles();
