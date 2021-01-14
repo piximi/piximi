@@ -1,7 +1,7 @@
 import createGraph, { Graph, Node, NodeId } from "ngraph.graph";
 import { getIdx } from "./imageHelper";
 import { DataArray } from "image-js";
-let path = require("ngraph.path");
+import { aStar } from "ngraph.path";
 
 const validNeighbours = (
   x: number,
@@ -69,7 +69,7 @@ export const makeGraph = (
 };
 
 export const createPathFinder = (graph: Graph, width: number) => {
-  return path.aStar(graph, {
+  return aStar(graph, {
     distance(fromNode: Node, toNode: Node) {
       const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
       const [x2, y2] = fromIdxToCoord(toNode.id as number, width);

@@ -1,8 +1,8 @@
 import "jest";
 import { Node } from "ngraph.graph";
 import { Image as ImageType } from "../types/Image";
-import { Image, ThresholdAlgorithm } from "image-js";
-import { fromIdxToCoord, makeGraph } from "./convertToGraph";
+import { Image } from "image-js";
+import { fromIdxToCoord, makeGraph } from "./GraphHelper";
 import { aStar } from "ngraph.path";
 
 test("foo", async () => {
