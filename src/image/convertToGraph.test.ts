@@ -22,8 +22,6 @@ test("foo", async () => {
 
   const grey = img.grey();
   const edges = grey.sobelFilter();
-  // const thresholdedEdges = edges.mask({ threshold: 30 });
-  // const invertedEdges = edges.invert();
   console.log(edges);
 
   const graph = makeGraph(edges.data, img.height, img.width);

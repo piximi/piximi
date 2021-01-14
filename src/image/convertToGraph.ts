@@ -50,14 +50,16 @@ export const makeGraph = (
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const startIdx = getIdx(width, 1)(x, y, 0);
+      const cap = Math.max.apply(Math, edges.data);
+      const dist = cap - edges[startIdx];
+
+      graph.addNode(startIdx, dist);
 
       const pixels = validNeighbours(x, y, height, width);
 
       for (let pixel of pixels) {
         const idx = getIdx(width, 1)(pixel.x, pixel.y, 0);
-        const dist = edges[idx];
-        graph.addNode(idx, dist);
-        graph.addLink(startIdx, idx, dist);
+        graph.addLink(startIdx, idx);
       }
     }
   }
