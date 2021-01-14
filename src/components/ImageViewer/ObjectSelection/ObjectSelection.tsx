@@ -12,7 +12,6 @@ import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
 import * as tensorflow from "@tensorflow/tfjs";
 import { Image as KonvaImage } from "konva/types/shapes/Image";
-import * as ImageJS from "image-js";
 
 export const useKeyPress = (key: string, action: () => void) => {
   useEffect(() => {
@@ -228,20 +227,22 @@ export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
             batch
           ) as tensorflow.Tensor<tensorflow.Rank>;
 
-          const squeezed: tensorflow.Tensor3D = prediction
+          return prediction
             .squeeze([0])
             .tile([1, 1, 3])
             .sub(0.3)
             .sign()
-            .relu();
-
-          return tensorflow.image.resizeBilinear(squeezed, [height, width]);
+            .relu()
+            .resizeBilinear([height, width]);
         }
       }
     });
 
     if (maskRef && maskRef.current && mask) {
-      await tensorflow.browser.toPixels(mask, maskRef.current);
+      await tensorflow.browser.toPixels(
+        mask as tensorflow.Tensor3D,
+        maskRef.current
+      );
 
       tensorflow.dispose(mask);
     }
