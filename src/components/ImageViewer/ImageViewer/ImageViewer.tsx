@@ -32,6 +32,7 @@ import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSele
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { RectangularSelection } from "../RectangularSelection";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
+import { ObjectSelection } from "../ObjectSelection";
 import { SelectionType } from "../../../types/SelectionType";
 import {
   createdCategoriesSelector,
@@ -75,7 +76,7 @@ const ImageViewerStage = ({
       case ImageViewerOperation.MagneticSelection:
         return <MagneticSelection image={data} />;
       case ImageViewerOperation.ObjectSelection:
-        return <React.Fragment />;
+        return <ObjectSelection data={data} category={category} />;
       case ImageViewerOperation.PolygonalSelection:
         return <PolygonalSelection image={data} category={category} />;
       case ImageViewerOperation.QuickSelection:
@@ -459,7 +460,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
                       ImageViewerOperation.ColorAdjustment,
                       ImageViewerOperation.ColorSelection,
                       ImageViewerOperation.Hand,
-                      ImageViewerOperation.ObjectSelection,
+                      // ImageViewerOperation.ObjectSelection,
                       ImageViewerOperation.QuickSelection,
                       ImageViewerOperation.Zoom,
                     ].includes(operation.method)}

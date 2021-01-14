@@ -1,125 +1,237 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
-import { Image as ImageType } from "../../../types/Image";
-import { Stage } from "konva/types/Stage";
-import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
-import { Filter } from "konva/types/Node";
+import { Stage } from "konva/types/Stage";
+import { Box, Transformer } from "konva/types/shapes/Transformer";
+import { Rect } from "konva/types/shapes/Rect";
+import { Category } from "../../../types/Category";
+import { toRGBA } from "../../../image/toRGBA";
+import { useDispatch } from "react-redux";
+import { projectSlice } from "../../../store/slices";
+import { BoundingBox } from "../../../types/BoundingBox";
+import * as tensorflow from "@tensorflow/tfjs";
+
+export const useKeyPress = (key: string, action: () => void) => {
+  useEffect(() => {
+    function onKeyup(e: any) {
+      if (e.key === key) action();
+    }
+
+    window.addEventListener("keyup", onKeyup);
+    return () => window.removeEventListener("keyup", onKeyup);
+  }, [action, key]);
+};
 
 type ObjectSelectionProps = {
-  image: ImageType;
+  data: Image;
+  category: Category;
 };
 
-const getIdx = (width: number) => {
-  return (x: number, y: number, index: number) => {
-    index = index || 0;
-    return (width * y + x) * 4 + index;
-  };
-};
-
-const filter: Filter = (imageData: any) => {
-  const kernelX = [
-    [-1, 0, 1],
-    [-2, 0, 2],
-    [-1, 0, 1],
-  ];
-  const kernelY = [
-    [-1, -2, -1],
-    [0, 0, 0],
-    [1, 2, 1],
-  ];
-  const width = imageData.width;
-  const height = imageData.height;
-
-  const grayscale = [];
-  var data = imageData.data;
-
-  const idx = getIdx(width);
-
-  const threshold = 100;
-
-  let x, y;
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      const r = data[idx(x, y, 0)];
-      const g = data[idx(x, y, 1)];
-      const b = data[idx(x, y, 2)];
-
-      const mean = (r + g + b) / 3;
-
-      grayscale[idx(x, y, 0)] = mean;
-      grayscale[idx(x, y, 1)] = mean;
-      grayscale[idx(x, y, 2)] = mean;
-    }
-  }
-
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      const responseX =
-        kernelX[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-        kernelX[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-        kernelX[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-        kernelX[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-        kernelX[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-        kernelX[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-        kernelX[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-        kernelX[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-      const responseY =
-        kernelY[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-        kernelY[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-        kernelY[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-        kernelY[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-        kernelY[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-        kernelY[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-        kernelY[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-        kernelY[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-      const magnitude =
-        Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
-
-      data[idx(x, y, 0)] = magnitude > threshold ? 255 : 0;
-      data[idx(x, y, 1)] = magnitude > threshold ? 255 : 0;
-      data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
-    }
-  }
-};
-
-export const ObjectSelection = ({ image }: ObjectSelectionProps) => {
-  const [img] = useImage(image.src, "Anonymous");
-
+export const ObjectSelection = ({ data, category }: ObjectSelectionProps) => {
+  const dispatch = useDispatch();
+  const [image] = useImage(data.src);
   const stage = React.useRef<Stage>(null);
-  const imageRef = React.useRef<Image>(null);
+  const transformer = React.useRef<Transformer>(null);
+  const shapeRef = React.useRef<Rect>(null);
+  const [x, setX] = React.useState<number>();
+  const [y, setY] = React.useState<number>();
+  const [height, setHeight] = React.useState<number>(0);
+  const [width, setWidth] = React.useState<number>(0);
+  const [annotated, setAnnotated] = useState<boolean>();
+  const [annotating, setAnnotating] = useState<boolean>();
+  const [offset, setOffset] = useState<number>(0);
+  const [model, setModel] = useState<any>();
+
+  useEffect(() => {
+    const createModel = async () => {
+      const pathname =
+        "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
+
+      const model = await tensorflow.loadLayersModel(pathname);
+
+      const optimizer = tensorflow.train.adam();
+
+      model.compile({
+        optimizer: optimizer,
+        loss: "categoricalCrossentropy",
+        metrics: ["accuracy"],
+      });
+
+      return model;
+    };
+
+    createModel().then(() => {
+      setModel(model);
+    });
+  }, [model]);
+
+  const validateBoundBox = (oldBox: Box, newBox: Box) => {
+    if (
+      0 <= newBox.x &&
+      newBox.width + newBox.x <= data.shape!.c &&
+      0 <= newBox.y &&
+      newBox.height + newBox.y <= data.shape!.r
+    ) {
+      return newBox;
+    } else {
+      return oldBox;
+    }
+  };
+
+  useKeyPress("Escape", () => {
+    setAnnotating(false);
+    setAnnotated(false);
+  });
+
+  useKeyPress("Enter", () => {
+    if (shapeRef && shapeRef.current) {
+      const mask = shapeRef.current.toDataURL({
+        callback(data: string) {
+          return data;
+        },
+      });
+      const { x, y, width, height } = shapeRef.current.getClientRect();
+      const boundingBox: BoundingBox = {
+        maximum: {
+          r: y + height,
+          c: x + width,
+        },
+        minimum: {
+          r: y,
+          c: x,
+        },
+      };
+      const payload = {
+        boundingBox: boundingBox,
+        categoryId: category.id,
+        id: data.id,
+        mask: mask,
+      };
+      dispatch(projectSlice.actions.createImageInstance(payload));
+    }
+    setAnnotating(false);
+    setAnnotated(false);
+  });
 
   React.useEffect(() => {
-    if (imageRef && imageRef.current) {
-      imageRef.current.cache();
+    const timer = setTimeout(() => {
+      setOffset(offset + 1);
+      if (offset > 32) {
+        setOffset(0);
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  });
 
-      imageRef.current.getLayer()?.batchDraw();
+  React.useEffect(() => {
+    if (annotated && !annotating) {
+      // we need to attach transformer manually
+      if (transformer && transformer.current && shapeRef && shapeRef.current) {
+        transformer.current.nodes([shapeRef.current]);
+        const layer = transformer.current.getLayer();
+        if (layer) {
+          layer.batchDraw();
+        }
+      }
     }
-  }, [img]);
+  }, [annotated, annotating]);
 
-  const onMouseDown = () => {};
+  const onMouseDown = () => {
+    if (annotated) return;
+    setAnnotating(true);
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
+      if (position) {
+        setX(position.x);
+        setY(position.y);
+      }
+    }
+  };
 
-  const onMouseMove = () => {};
+  const onMouseMove = () => {
+    if (annotated) return;
+    if (stage && stage.current) {
+      const position = stage.current.getPointerPosition();
+      if (x && y && position) {
+        setHeight(position.y - y);
+        setWidth(position.x - x);
+      }
+    }
+  };
 
-  const onMouseUp = () => {};
+  const onMouseUp = () => {
+    if (annotated) return;
+    if (!annotating) return;
+    setAnnotated(true);
+    setAnnotating(false);
+  };
 
   return (
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
-      height={image.shape?.r}
+      height={data.shape?.r}
       ref={stage}
-      width={image.shape?.c}
+      width={data.shape?.c}
     >
       <ReactKonva.Layer
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <ReactKonva.Image filters={[filter]} image={img} ref={imageRef} />
+        <ReactKonva.Image image={image} />
+
+        {!annotated && annotating && x && y && (
+          <React.Fragment>
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="black"
+              strokeWidth={1}
+            />
+            <ReactKonva.Rect
+              x={x}
+              y={y}
+              height={height}
+              width={width}
+              stroke="white"
+              dash={[4, 2]}
+              dashOffset={-offset}
+              strokeWidth={1}
+            />
+          </React.Fragment>
+        )}
+
+        {annotated && !annotating && x && y && (
+          <ReactKonva.Rect
+            dash={[4, 2]}
+            dashOffset={-offset}
+            height={height}
+            ref={shapeRef}
+            stroke="white"
+            strokeWidth={1}
+            fill={toRGBA(category.color, 0.3)}
+            width={width}
+            x={x}
+            y={y}
+          />
+        )}
+
+        {annotated && !annotating && x && y && (
+          <ReactKonva.Transformer
+            anchorFill="#FFF"
+            anchorSize={6}
+            anchorStroke="#000"
+            anchorStrokeWidth={1}
+            borderEnabled={false}
+            boundBoxFunc={validateBoundBox}
+            keepRatio={false}
+            ref={transformer}
+            rotateEnabled={false}
+          />
+        )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
