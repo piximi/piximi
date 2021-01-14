@@ -4,12 +4,13 @@ import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
 import { Circle } from "konva/types/shapes/Circle";
 import { Transformer } from "konva/types/shapes/Transformer";
-import { Group } from "konva/types/Group";
 import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
-import { Image } from "konva/types/shapes/Image";
+import { Image as ImageKonvaType } from "konva/types/shapes/Image";
 import useImage from "use-image";
-import { livewire } from "../../../image/livewire";
+import { makeGraph } from "../../../image/GraphHelper";
+import { Image } from "image-js";
+import { Graph } from "ngraph.graph";
 
 export enum Method {
   Elliptical,
@@ -73,10 +74,8 @@ export const MagneticSelection = ({
   const stage = React.useRef<Stage>(null);
   const startingAnchorCircle = React.useRef<Circle>(null);
   const transformer = React.useRef<Transformer>(null);
-  const group = React.useRef<Group>(null);
   const annotationRef = React.useRef<Line>(null);
-  const imageRef = React.useRef<Image>(null);
-  const edgeRef = React.useRef<ImageData>(null);
+  const imageRef = React.useRef<ImageKonvaType>(null);
 
   const [anchor, setAnchor] = useState<Anchor>();
   const [annotated, setAnnotated] = useState<boolean>(false);
@@ -87,9 +86,7 @@ export const MagneticSelection = ({
 
   const [canClose, setCanClose] = useState<boolean>(false);
 
-  const [width, setWidth] = useState<number>(0);
-  const [height, setHeight] = useState<number>(0);
-  const [edgeData, setEdgeData] = useState<Uint8ClampedArray>();
+  const [graph, setGraph] = useState<Graph | null>(null);
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -97,23 +94,16 @@ export const MagneticSelection = ({
 
       imageRef.current.getLayer()?.batchDraw();
     }
+  });
 
-    const canvas = document.createElement("canvas");
-    if (img) {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      if (canvas) {
-        const context = canvas.getContext("2d");
-        if (context) {
-          context.drawImage(img, 0, 0, img.width, img.height);
-          const imagedata = context.getImageData(0, 0, img.width, img.height);
-          // console.log(imagedata);
-          // setEdgeData(sobel(imagedata));
-          setWidth(img.width);
-          setHeight(img.height);
-        }
-      }
-    }
+  React.useEffect(() => {
+    const loadImg = async () => {
+      const img = await Image.load(image.src);
+      const grey = img.grey();
+      const edges = grey.sobelFilter();
+      setGraph(makeGraph(edges.data, img.height, img.width));
+    };
+    loadImg();
   }, [img]);
 
   React.useEffect(() => {
@@ -181,22 +171,6 @@ export const MagneticSelection = ({
             setStrokes([...strokes, stroke]);
 
             setAnchor(position);
-
-            if (edgeData) {
-              const croppedEdgeData = computeCroppedEdges(
-                edgeData,
-                50,
-                anchor,
-                width,
-                height
-              );
-              const pointers = livewire(
-                { x: 49, y: 49 },
-                croppedEdgeData,
-                50,
-                50
-              );
-            }
           } else if (start) {
             const stroke = {
               method: Method.Lasso,
