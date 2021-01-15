@@ -285,11 +285,6 @@ export const MagneticSelection = ({
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
         } else if (start) {
-          const result = Math.sqrt(
-            (position.current.x - start.x) * (position.current.x - start.x) +
-              (position.current.y - start.y) * (position.current.y - start.y)
-          );
-
           if (pathFinder && pathFinder.current && img) {
             const foundPath = pathFinder.current.find(
               getIdx(downsizedWidth, 1)(
@@ -310,12 +305,6 @@ export const MagneticSelection = ({
             );
             setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
           }
-
-          // if (result > 50) {
-          //   setMagnetize(true);
-          // }
-
-          //setStrokes(strokes.concat());
         }
       }
     }
