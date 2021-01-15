@@ -10,18 +10,12 @@ import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
-import { useMarchingAnts, useTransformer } from "../../../hooks";
-
-export const useKeyPress = (key: string, action: () => void) => {
-  useEffect(() => {
-    function onKeyup(e: any) {
-      if (e.key === key) action();
-    }
-
-    window.addEventListener("keyup", onKeyup);
-    return () => window.removeEventListener("keyup", onKeyup);
-  }, [action, key]);
-};
+import {
+  useKeyPress,
+  useMarchingAnts,
+  useSelection,
+  useTransformer,
+} from "../../../hooks";
 
 type RectangularSelectionProps = {
   data: Image;
@@ -40,8 +34,8 @@ export const RectangularSelection = ({
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
   const [width, setWidth] = React.useState<number>(0);
-  const [annotated, setAnnotated] = useState<boolean>();
-  const [annotating, setAnnotating] = useState<boolean>();
+
+  const { annotated, annotating, setAnnotated, setAnnotating } = useSelection();
 
   const dashOffset = useMarchingAnts();
 
@@ -59,11 +53,6 @@ export const RectangularSelection = ({
       return oldBox;
     }
   };
-
-  useKeyPress("Escape", () => {
-    setAnnotating(false);
-    setAnnotated(false);
-  });
 
   useKeyPress("Enter", () => {
     if (shapeRef && shapeRef.current) {
