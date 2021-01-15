@@ -133,7 +133,7 @@ export const MagneticSelection = ({
 
   useEffect(
     () => {
-      if (debouncedPosition) {
+      if (debouncedPosition && annotating && !annotated) {
         onMouseMove();
       }
     },
@@ -224,36 +224,19 @@ export const MagneticSelection = ({
           setStrokes([]);
         } else {
           if (anchor) {
-            const stroke = {
-              method: Method.Lasso,
-              points: [
-                anchor.x,
-                anchor.y,
-                position.current.x,
-                position.current.y,
-              ],
-            };
-
-            setStrokes([...strokes, stroke]);
-
             setAnchor(position.current);
           } else if (start) {
-            const stroke = {
-              method: Method.Lasso,
-              points: [
-                start.x,
-                start.y,
-                position.current.x,
-                position.current.y,
-              ],
-            };
-
-            setStrokes([...strokes, stroke]);
+            //setStrokes([...strokes, stroke]);
             setAnchor(position.current);
           } else {
             setAnnotating(true);
             setStart(position.current);
           }
+        }
+        if (strokes.length > 0) {
+          setAnchor(position.current);
+        } else {
+          setStart(position.current);
         }
       }
     }
@@ -271,40 +254,31 @@ export const MagneticSelection = ({
         if (!canClose && !isInside(startingAnchorCircle, position.current)) {
           setCanClose(true);
         }
-
+        let startPosition;
         if (anchor) {
-          const stroke = {
-            method: Method.Lasso,
-            points: [
-              anchor.x,
-              anchor.y,
-              position.current.x,
-              position.current.y,
-            ],
-          };
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
+          startPosition = [anchor.x, anchor.y];
         } else if (start) {
-          if (pathFinder && pathFinder.current && img) {
-            const foundPath = pathFinder.current.find(
-              getIdx(downsizedWidth, 1)(
-                Math.floor(start.x * factor),
-                Math.floor(start.y * factor),
-                0
-              ),
-              getIdx(downsizedWidth, 1)(
-                Math.floor(position.current.x * factor),
-                Math.floor(position.current.y * factor),
-                0
-              )
-            );
-            pathCoordsRef.current = convertPathToCoords(
-              foundPath,
-              downsizedWidth,
-              factor
-            );
-            setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
-          }
+          startPosition = [start.x, start.y];
+        }
+        if (pathFinder && pathFinder.current && img && startPosition) {
+          const foundPath = pathFinder.current.find(
+            getIdx(downsizedWidth, 1)(
+              Math.floor(startPosition[0] * factor),
+              Math.floor(startPosition[1] * factor),
+              0
+            ),
+            getIdx(downsizedWidth, 1)(
+              Math.floor(position.current.x * factor),
+              Math.floor(position.current.y * factor),
+              0
+            )
+          );
+          pathCoordsRef.current = convertPathToCoords(
+            foundPath,
+            downsizedWidth,
+            factor
+          );
+          setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
         }
       }
     }
@@ -344,20 +318,10 @@ export const MagneticSelection = ({
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (strokes.length === 1) {
+          if (strokes.length > 0) {
             setAnchor(position.current);
-            if (start) {
-              const stroke = {
-                method: Method.Lasso,
-                points: [
-                  start!.x,
-                  start!.y,
-                  position.current.x,
-                  position.current.y,
-                ],
-              };
-              setStrokes([...strokes, stroke]);
-            }
+          } else {
+            setStart(position.current);
           }
         }
       }
@@ -365,7 +329,7 @@ export const MagneticSelection = ({
   };
 
   const Anchor = () => {
-    if (annotating && anchor && strokes.length > 1) {
+    if (anchor) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
@@ -383,7 +347,7 @@ export const MagneticSelection = ({
   };
 
   const StartingAnchor = () => {
-    if (annotating && start) {
+    if (start) {
       return (
         <ReactKonva.Circle
           fill="#000"
