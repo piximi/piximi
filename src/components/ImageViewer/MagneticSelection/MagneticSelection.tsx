@@ -280,37 +280,42 @@ export const MagneticSelection = ({
           setCanClose(true);
         }
 
+        let stroke = null;
+
         if (anchor) {
-          const stroke = {
+          stroke = {
             method: Method.Lasso,
             points: [anchor.x, anchor.y, position.x, position.y],
           };
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
         } else if (start) {
+          stroke = {
+            method: Method.Lasso,
+            points: [start.x, start.y, position.x, position.y],
+          };
+        }
+
+        if (stroke) {
           if (
             Math.sqrt(
-              (position.x - start.x) * (position.x - start.x) +
-                (position.y - start.y) * (position.y - start.y)
+              (position.x - stroke.points[0]) *
+                (position.x - stroke.points[0]) +
+                (position.y - stroke.points[1]) *
+                  (position.y - stroke.points[1])
             ) > 50
           ) {
             if (pathFinder && pathFinder.current && img) {
               const foundPath = pathFinder.current.find(
-                getIdx(img.width, 1)(start.x, start.y, 0),
+                getIdx(img.width, 1)(stroke.points[0], stroke.points[1], 0),
                 getIdx(img.width, 1)(position.x, position.y, 0)
               );
               const pathCoords = convertPathToCoords(foundPath, img.width);
               setPathStrokes(convertCoordsToStrokes(pathCoords));
               setDidFindPath(true);
             }
-          } else {
-            const stroke = {
-              method: Method.Lasso,
-              points: [start.x, start.y, position.x, position.y],
-            };
-            strokes.splice(strokes.length - 1, 1, stroke);
-            setStrokes(strokes.concat());
           }
+
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
         }
       }
     }
