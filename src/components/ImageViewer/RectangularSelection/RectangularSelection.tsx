@@ -70,7 +70,7 @@ export const RectangularSelection = ({
 
   const transformer = useTransformer(shapeRef, annotated, annotating);
 
-  const validateBoundBox = (oldBox: Box, newBox: Box) => {
+  const boundBoxFunc = (oldBox: Box, newBox: Box) => {
     if (
       0 <= newBox.x &&
       newBox.width + newBox.x <= data.shape!.c &&
@@ -83,7 +83,7 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseDown = () => {
+  const onRectangularSelectionMouseDown = () => {
     if (annotated) {
       return;
     }
@@ -100,7 +100,7 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseMove = () => {
+  const onRectangularSelectionMouseMove = () => {
     if (annotated) {
       return;
     }
@@ -116,7 +116,7 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseUp = () => {
+  const onRectangularSelectionMouseUp = () => {
     if (annotated) {
       return;
     }
@@ -138,9 +138,9 @@ export const RectangularSelection = ({
       width={data.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
+        onMouseDown={onRectangularSelectionMouseDown}
+        onMouseMove={onRectangularSelectionMouseMove}
+        onMouseUp={onRectangularSelectionMouseUp}
       >
         <ReactKonva.Image image={image} />
 
@@ -189,7 +189,7 @@ export const RectangularSelection = ({
             anchorStroke="#000"
             anchorStrokeWidth={1}
             borderEnabled={false}
-            boundBoxFunc={validateBoundBox}
+            boundBoxFunc={boundBoxFunc}
             keepRatio={false}
             ref={transformer}
             rotateEnabled={false}
