@@ -132,6 +132,9 @@ export const MagneticSelection = ({
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
+  const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
+  const [factor, setFactor] = useState<number>(1);
+
   const [canClose, setCanClose] = useState<boolean>(false);
 
   const [graph, setGraph] = useState<Graph | null>(null);
@@ -155,7 +158,7 @@ export const MagneticSelection = ({
 
   React.useEffect(() => {
     if (graph && img) {
-      pathFinder.current = createPathFinder(graph, img.width);
+      pathFinder.current = createPathFinder(graph, downsizedWidth);
     }
   }, [graph, img]);
 
@@ -172,7 +175,11 @@ export const MagneticSelection = ({
       const img = await Image.load(image.src);
       const grey = img.grey();
       const edges = grey.sobelFilter();
-      setGraph(makeGraph(edges.data, img.height, img.width));
+      setDownsizedWidth(img.width * 0.25);
+      const downsized = edges.resize({ factor: 0.25 });
+      console.log(img.width, img.height);
+      console.log(downsized.width, downsized.height);
+      setGraph(makeGraph(downsized.data, downsized.height, downsized.width));
     };
     loadImg();
   }, [image.src]);
@@ -302,10 +309,22 @@ export const MagneticSelection = ({
           ) {
             if (pathFinder && pathFinder.current && img) {
               const foundPath = pathFinder.current.find(
-                getIdx(img.width, 1)(stroke.points[0], stroke.points[1], 0),
-                getIdx(img.width, 1)(position.x, position.y, 0)
+                getIdx(downsizedWidth, 1)(
+                  Math.floor(stroke.points[0] * 0.25),
+                  Math.floor(stroke.points[1] * 0.25),
+                  0
+                ),
+                getIdx(downsizedWidth, 1)(
+                  Math.floor(position.x * 0.25),
+                  Math.floor(position.y * 0.25),
+                  0
+                )
               );
-              const pathCoords = convertPathToCoords(foundPath, img.width);
+              const pathCoords = convertPathToCoords(
+                foundPath,
+                downsizedWidth,
+                0.25
+              );
               setPathStrokes(convertCoordsToStrokes(pathCoords));
               setDidFindPath(true);
             }
@@ -413,7 +432,7 @@ export const MagneticSelection = ({
     >
       <ReactKonva.Layer
         onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
+        onMouseMove={() => {}}
         onMouseUp={onMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />

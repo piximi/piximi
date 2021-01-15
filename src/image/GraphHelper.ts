@@ -82,12 +82,16 @@ export const createPathFinder = (graph: Graph, width: number) => {
   });
 };
 
-export const convertPathToCoords = (foundPath: any, width: number) => {
+export const convertPathToCoords = (
+  foundPath: any,
+  width: number,
+  factor: number = 1
+) => {
   const pathCoords = [];
   for (let node of foundPath) {
     const id = node.id as number;
     const [x, y] = fromIdxToCoord(id, width);
-    pathCoords.push([x, y]);
+    pathCoords.push([x / factor, y / factor]);
   }
   return pathCoords;
 };
