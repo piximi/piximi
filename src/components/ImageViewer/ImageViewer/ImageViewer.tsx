@@ -1,12 +1,5 @@
 import Box from "@material-ui/core/Box";
-import Divider from "@material-ui/core/Divider";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import React, { useState } from "react";
-import SvgIcon from "@material-ui/core/SvgIcon";
-import Tooltip from "@material-ui/core/Tooltip";
 import { Category } from "../../../types/Category";
 import { CssBaseline } from "@material-ui/core";
 import { Image } from "../../../types/Image";
