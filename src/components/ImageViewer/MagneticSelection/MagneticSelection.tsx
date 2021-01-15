@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
@@ -143,18 +143,43 @@ export const MagneticSelection = ({
 
   const pathFinder = React.useRef<PathFinder<any>>();
 
-  let position: { x: number; y: number } | null = { x: 0, y: 0 };
+  const position = React.useRef<{ x: number; y: number } | null>(null);
 
-  const debouncedPosition = useDebounce(position, 20);
+  const debouncedPosition = useDebounce(position.current, 20);
 
-  useEffect(
-    () => {
-      if (debouncedPosition) {
-        onMouseMove();
-      }
-    },
-    [debouncedPosition] // Only call effect if debounced search term changes
-  );
+  useEffect(() => {
+    if (debouncedPosition && position && position.current) {
+      //   if (
+      //       Math.sqrt(
+      //           (position.current.x - stroke.points[0]) *
+      //           (position.x - stroke.points[0]) +
+      //           (position.y - stroke.points[1]) *
+      //           (position.y - stroke.points[1])
+      //       ) > 50
+      //   ) {
+      //     if (pathFinder && pathFinder.current && img) {
+      //       const foundPath = pathFinder.current.find(
+      //           getIdx(downsizedWidth, 1)(
+      //               Math.floor(stroke.points[0] * 0.25),
+      //               Math.floor(stroke.points[1] * 0.25),
+      //               0
+      //           ),
+      //           getIdx(downsizedWidth, 1)(
+      //               Math.floor(position.x * 0.25),
+      //               Math.floor(position.y * 0.25),
+      //               0
+      //           )
+      //       );
+      //       const pathCoords = convertPathToCoords(
+      //           foundPath,
+      //           downsizedWidth,
+      //           0.25
+      //       );
+      //       setStrokes(convertCoordsToStrokes(pathCoords));
+      //       setDidFindPath(true);
+      // }
+    }
+  }, [debouncedPosition]);
 
   React.useEffect(() => {
     if (graph && img) {
@@ -224,10 +249,10 @@ export const MagneticSelection = ({
     if (annotated) return;
 
     if (stage && stage.current) {
-      position = stage.current.getPointerPosition();
+      position.current = stage.current.getPointerPosition();
 
-      if (position) {
-        if (connected(position)) {
+      if (position && position.current) {
+        if (connected(position.current)) {
           const stroke: Stroke = {
             method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
@@ -241,36 +266,38 @@ export const MagneticSelection = ({
           if (anchor) {
             const stroke = {
               method: Method.Lasso,
-              points: [anchor.x, anchor.y, position.x, position.y],
+              points: [
+                anchor.x,
+                anchor.y,
+                position.current.x,
+                position.current.y,
+              ],
             };
 
             setStrokes([...strokes, stroke]);
 
-            setAnchor(position);
+            setAnchor(position.current);
           } else if (start) {
             const stroke = {
               method: Method.Lasso,
-              points: [start.x, start.y, position.x, position.y],
+              points: [
+                start.x,
+                start.y,
+                position.current.x,
+                position.current.y,
+              ],
             };
 
             setStrokes([...strokes, stroke]);
-            setAnchor(position);
+            setAnchor(position.current);
           } else {
             setAnnotating(true);
-            setStart(position);
+            setStart(position.current);
           }
         }
       }
     }
   };
-
-  // const throttledOnMouseMove = () => {
-  //   _.throttle(() => {
-  //     console.info("beep");
-  //
-  //     onMouseMove();
-  //   }, 100);
-  // }
 
   const onMouseMove = () => {
     if (annotated) return;
@@ -278,59 +305,32 @@ export const MagneticSelection = ({
     if (!annotating) return;
 
     if (stage && stage.current) {
-      position = stage.current.getPointerPosition();
+      position.current = stage.current.getPointerPosition();
 
-      if (position) {
-        if (!canClose && !isInside(startingAnchorCircle, position)) {
+      if (position && position.current) {
+        if (!canClose && !isInside(startingAnchorCircle, position.current)) {
           setCanClose(true);
         }
 
-        let stroke = null;
-
         if (anchor) {
-          stroke = {
+          const stroke = {
             method: Method.Lasso,
-            points: [anchor.x, anchor.y, position.x, position.y],
+            points: [
+              anchor.x,
+              anchor.y,
+              position.current.x,
+              position.current.y,
+            ],
           };
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
         } else if (start) {
-          debugger;
-          stroke = {
+          const stroke = {
             method: Method.Lasso,
-            points: [start.x, start.y, position.x, position.y],
+            points: [start.x, start.y, position.current.x, position.current.y],
           };
-          if (
-            Math.sqrt(
-              (position.x - stroke.points[0]) *
-                (position.x - stroke.points[0]) +
-                (position.y - stroke.points[1]) *
-                  (position.y - stroke.points[1])
-            ) > 50
-          ) {
-            if (pathFinder && pathFinder.current && img) {
-              const foundPath = pathFinder.current.find(
-                getIdx(downsizedWidth, 1)(
-                  Math.floor(stroke.points[0] * 0.25),
-                  Math.floor(stroke.points[1] * 0.25),
-                  0
-                ),
-                getIdx(downsizedWidth, 1)(
-                  Math.floor(position.x * 0.25),
-                  Math.floor(position.y * 0.25),
-                  0
-                )
-              );
-              const pathCoords = convertPathToCoords(
-                foundPath,
-                downsizedWidth,
-                0.25
-              );
-              setStrokes(convertCoordsToStrokes(pathCoords));
-              setDidFindPath(true);
-            }
-          } else {
-            strokes.splice(strokes.length - 1, 1, stroke);
-            setStrokes(strokes.concat());
-          }
+          strokes.splice(strokes.length - 1, 1, stroke);
+          setStrokes(strokes.concat());
         }
       }
     }
@@ -374,14 +374,19 @@ export const MagneticSelection = ({
     if (!annotating) return;
 
     if (stage && stage.current) {
-      position = stage.current.getPointerPosition();
+      position.current = stage.current.getPointerPosition();
 
-      if (position) {
-        if (connected(position)) {
+      if (position && position.current) {
+        if (connected(position.current)) {
           if (start) {
             const stroke = {
               method: Method.Lasso,
-              points: [position.x, position.y, start.x, start.y],
+              points: [
+                position.current.x,
+                position.current.y,
+                start.x,
+                start.y,
+              ],
             };
 
             setStrokes([...strokes, stroke]);
@@ -398,11 +403,16 @@ export const MagneticSelection = ({
           setStrokes([]);
         } else {
           if (strokes.length === 1) {
-            setAnchor(position);
+            setAnchor(position.current);
             if (start) {
               const stroke = {
                 method: Method.Lasso,
-                points: [start!.x, start!.y, position.x, position.y],
+                points: [
+                  start!.x,
+                  start!.y,
+                  position.current.x,
+                  position.current.y,
+                ],
               };
               setStrokes([...strokes, stroke]);
             }
@@ -461,7 +471,7 @@ export const MagneticSelection = ({
     >
       <ReactKonva.Layer
         onMouseDown={onMouseDown}
-        onMouseMove={() => {}}
+        onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />

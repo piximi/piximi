@@ -176,6 +176,7 @@ export const PolygonalSelection = ({
   };
 
   const onMouseMove = () => {
+    debugger;
     if (annotated) return;
 
     if (!annotating) return;
