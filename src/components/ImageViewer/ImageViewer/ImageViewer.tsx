@@ -4,21 +4,14 @@ import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Radio from "@material-ui/core/Radio";
 import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Tooltip from "@material-ui/core/Tooltip";
 import { Category } from "../../../types/Category";
 import { CssBaseline } from "@material-ui/core";
-import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
-import { LassoSelection } from "../LassoSelection/LassoSelection";
-import { MagneticSelection } from "../MagneticSelection";
-import { PolygonalSelection } from "../PolygonalSelection/PolygonalSelection";
 import { ReactComponent as ColorAdjustmentIcon } from "../../../icons/ColorAdjustment.svg";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
-import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
@@ -27,10 +20,7 @@ import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
-import { RectangularSelection } from "../RectangularSelection";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
-import { ObjectSelection } from "../ObjectSelection";
-import { SelectionType } from "../../../types/SelectionType";
 import {
   imagesSelector,
   unknownCategorySelector,
@@ -38,113 +28,11 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
 import { projectSlice } from "../../../store/slices";
-import { QuickSelection } from "../QuickSelection";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
-import { CategoriesDrawer } from "../CategoriesDrawer";
-import { OperationOptionsDrawer } from "../OperationOptionsDrawer";
-
-type ImageViewerStageProps = {
-  operation: ImageViewerOperation;
-  data: Image;
-  category: Category;
-};
-
-const ImageViewerStage = ({
-  operation,
-  data,
-  category,
-}: ImageViewerStageProps) => {
-  if (data && data.shape && data.src) {
-    switch (operation) {
-      case ImageViewerOperation.ColorSelection:
-        return <React.Fragment />;
-      case ImageViewerOperation.EllipticalSelection:
-        return <EllipticalSelection data={data} category={category} />;
-      case ImageViewerOperation.LassoSelection:
-        return <LassoSelection image={data} category={category} />;
-      case ImageViewerOperation.MagneticSelection:
-        return <MagneticSelection image={data} />;
-      case ImageViewerOperation.ObjectSelection:
-        return <ObjectSelection data={data} category={category} />;
-      case ImageViewerOperation.PolygonalSelection:
-        return <PolygonalSelection image={data} category={category} />;
-      case ImageViewerOperation.QuickSelection:
-        return <QuickSelection image={data} category={category} />;
-      case ImageViewerOperation.RectangularSelection:
-        return <RectangularSelection data={data} category={category} />;
-      default:
-        return <React.Fragment />;
-    }
-  } else {
-    return <React.Fragment />;
-  }
-};
-
-const SelectionSettings = () => {
-  return (
-    <React.Fragment>
-      <List>
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.New}
-            secondary="Create a new selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Addition}
-            secondary="Add area to the existing selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Subtraction}
-            secondary="Subtract area from the existing selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Intersection}
-            secondary="Constrain the boundary of the new selection to the existing selection."
-          />
-        </ListItem>
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem button dense>
-          <ListItemIcon>
-            <SvgIcon>
-              <InvertSelectionIcon />
-            </SvgIcon>
-          </ListItemIcon>
-
-          <ListItemText primary="Invert selection" />
-        </ListItem>
-      </List>
-    </React.Fragment>
-  );
-};
+import { Categories } from "../Categories";
+import { OperationOptions } from "../OperationOptions";
+import { ImageViewerStage } from "../ImageViewerStage";
+import { SelectionOptions } from "../SelectionOptions";
 
 type ImageViewerProps = {
   foo: Image;
@@ -164,56 +52,56 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       icon: <RectangularIcon />,
       method: ImageViewerOperation.RectangularSelection,
       name: "Rectangular selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <EllipticalIcon />,
       method: ImageViewerOperation.EllipticalSelection,
       name: "Elliptical selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <EllipticalIcon />,
       method: ImageViewerOperation.PolygonalSelection,
       name: "Polygonal selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <LassoIcon />,
       method: ImageViewerOperation.LassoSelection,
       name: "Lasso selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <MagneticIcon />,
       method: ImageViewerOperation.MagneticSelection,
       name: "Magnetic selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <MagicWandIcon />,
       method: ImageViewerOperation.ColorSelection,
       name: "Color selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <QuickIcon />,
       method: ImageViewerOperation.QuickSelection,
       name: "Quick selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: <ObjectSelectionIcon />,
       method: ImageViewerOperation.ObjectSelection,
       name: "Object selection",
-      settings: <SelectionSettings />,
+      settings: <SelectionOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
@@ -267,7 +155,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
 
       <ImageViewerAppBar />
 
-      <CategoriesDrawer
+      <Categories
         activeCategory={activeCategory}
         onCategoryClick={onCategoryClick}
       />
@@ -284,7 +172,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         </Box>
       </main>
 
-      <OperationOptionsDrawer
+      <OperationOptions
         description={
           operations[
             operations.findIndex(

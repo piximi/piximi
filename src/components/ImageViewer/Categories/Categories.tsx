@@ -8,7 +8,7 @@ import {
   unknownCategorySelector,
 } from "../../../store/selectors";
 import { useSelector } from "react-redux";
-import { useStyles } from "./CategoriesDrawer.css";
+import { useStyles } from "./Categories.css";
 import { CollapsibleList } from "../../CollapsibleList";
 import { CreateCategoryListItem } from "../../CreateCategoryListItem";
 import { CategoryListItemCheckbox } from "../../CategoryListItemCheckbox";
@@ -20,7 +20,7 @@ import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../EditCategoryDialog";
 import { useDialog, useMenu } from "../../../hooks";
 
-type CategoriesDrawerProps = {
+type CategoriesProps = {
   activeCategory: Category;
   onCategoryClick: (
     event: React.MouseEvent<HTMLDivElement>,
@@ -28,10 +28,10 @@ type CategoriesDrawerProps = {
   ) => void;
 };
 
-export const CategoriesDrawer = ({
+export const Categories = ({
   activeCategory,
   onCategoryClick,
-}: CategoriesDrawerProps) => {
+}: CategoriesProps) => {
   const classes = useStyles();
 
   const categories = useSelector(createdCategoriesSelector);

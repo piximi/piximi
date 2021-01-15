@@ -1,4 +1,4 @@
-export class Quick {
+export class QuickSelection {
   radius: number;
 
   constructor(radius: number) {

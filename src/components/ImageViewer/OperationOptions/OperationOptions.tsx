@@ -4,19 +4,19 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
-import { useStyles } from "./OperationOptionsDrawer.css";
+import { useStyles } from "./OperationOptions.css";
 
-type OperationOptionsDrawerProps = {
+type OperationOptionsProps = {
   description: string;
   name: string;
   settings: React.ReactNode;
 };
 
-export const OperationOptionsDrawer = ({
+export const OperationOptions = ({
   description,
   name,
   settings,
-}: OperationOptionsDrawerProps) => {
+}: OperationOptionsProps) => {
   const classes = useStyles();
 
   return (
