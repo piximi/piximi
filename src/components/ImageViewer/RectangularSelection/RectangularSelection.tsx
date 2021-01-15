@@ -8,7 +8,7 @@ import { Rect } from "konva/types/shapes/Rect";
 import { Category } from "../../../types/Category";
 import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
-import { applicationSlice, projectSlice } from "../../../store/slices";
+import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
 
 export const useKeyPress = (key: string, action: () => void) => {

@@ -1,7 +1,7 @@
 import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../../types/Image";
-import { LassoSelection, Method } from "./LassoSelection";
+import { LassoSelection } from "./LassoSelection";
 
 export default {
   component: LassoSelection,

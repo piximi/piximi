@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
