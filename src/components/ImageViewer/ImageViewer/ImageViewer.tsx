@@ -33,6 +33,7 @@ import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
 import { ImageViewerStage } from "../ImageViewerStage";
 import { SelectionOptions } from "../SelectionOptions";
+import { Operations } from "../Operations";
 
 type ImageViewerProps = {
   foo: Image;
@@ -196,51 +197,10 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         }
       />
 
-      <Drawer
-        anchor="right"
-        className={classes.operations}
-        classes={{ paper: classes.operationsPaper }}
-        variant="permanent"
-      >
-        <div className={classes.operationsToolbar} />
-
-        <Divider />
-
-        <List>
-          {operations.map((operation, index) => {
-            return (
-              <React.Fragment>
-                <Tooltip
-                  aria-label={operation.name}
-                  key={index}
-                  title={operation.name}
-                >
-                  <ListItem
-                    button
-                    disabled={[
-                      ImageViewerOperation.ColorAdjustment,
-                      ImageViewerOperation.ColorSelection,
-                      ImageViewerOperation.Hand,
-                      ImageViewerOperation.QuickSelection,
-                      ImageViewerOperation.Zoom,
-                    ].includes(operation.method)}
-                    onClick={() => setActiveOperation(operation.method)}
-                    selected={activeOperation === operation.method}
-                  >
-                    <ListItemIcon>
-                      <SvgIcon fontSize="small">{operation.icon}</SvgIcon>
-                    </ListItemIcon>
-                  </ListItem>
-                </Tooltip>
-
-                {(operation.method === ImageViewerOperation.ObjectSelection ||
-                  operation.method ===
-                    ImageViewerOperation.ColorAdjustment) && <Divider />}
-              </React.Fragment>
-            );
-          })}
-        </List>
-      </Drawer>
+      <Operations
+        activeOperation={activeOperation}
+        setActiveOperation={setActiveOperation}
+      />
     </div>
   );
 };
