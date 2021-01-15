@@ -50,7 +50,9 @@ function useDebounce(value: { x: number; y: number } | null, delay: number) {
     () => {
       // Update debounced value after delay
       const handler = setTimeout(() => {
-        setDebouncedValue(value);
+        if (value) {
+          setDebouncedValue(value);
+        }
       }, delay);
 
       // Cancel the timeout if value changes (also on delay change or unmount)
@@ -138,25 +140,19 @@ export const MagneticSelection = ({
 
   const pathFinder = React.useRef<PathFinder<any>>();
 
-  const [trackedPosition, setPosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
+  let position: { x: number; y: number } | null = { x: 0, y: 0 };
 
-  const debouncedPosition = useDebounce(trackedPosition, 500);
-
-  const [isSearching, setIsSearching] = useState(false);
+  const debouncedPosition = useDebounce(position, 20);
 
   useEffect(
     () => {
       if (debouncedPosition) {
-        setIsSearching(true);
         onMouseMove();
       }
     },
     [debouncedPosition] // Only call effect if debounced search term changes
   );
-  // CODE IS HERE
+
   React.useEffect(() => {
     if (graph && img) {
       pathFinder.current = createPathFinder(graph, img.width);
@@ -223,7 +219,7 @@ export const MagneticSelection = ({
     if (annotated) return;
 
     if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+      position = stage.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
@@ -277,10 +273,9 @@ export const MagneticSelection = ({
     if (!annotating) return;
 
     if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+      position = stage.current.getPointerPosition();
 
       if (position) {
-        setPosition(position);
         if (!canClose && !isInside(startingAnchorCircle, position)) {
           setCanClose(true);
         }
@@ -293,13 +288,6 @@ export const MagneticSelection = ({
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
         } else if (start) {
-          const stroke = {
-            method: Method.Lasso,
-            points: [start.x, start.y, position.x, position.y],
-          };
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
-          //We don't want to show path right away.
           if (
             Math.sqrt(
               (position.x - start.x) * (position.x - start.x) +
@@ -315,6 +303,13 @@ export const MagneticSelection = ({
               setPathStrokes(convertCoordsToStrokes(pathCoords));
               setDidFindPath(true);
             }
+          } else {
+            const stroke = {
+              method: Method.Lasso,
+              points: [start.x, start.y, position.x, position.y],
+            };
+            strokes.splice(strokes.length - 1, 1, stroke);
+            setStrokes(strokes.concat());
           }
         }
       }
@@ -327,7 +322,7 @@ export const MagneticSelection = ({
     if (!annotating) return;
 
     if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+      position = stage.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
@@ -414,7 +409,7 @@ export const MagneticSelection = ({
     >
       <ReactKonva.Layer
         onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
+        onMouseMove={() => {}}
         onMouseUp={onMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />
