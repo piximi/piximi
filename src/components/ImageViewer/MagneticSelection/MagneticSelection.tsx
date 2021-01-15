@@ -144,6 +144,7 @@ export const MagneticSelection = ({
     if (graph && img) {
       pathFinder.current = createPathFinder(graph, downsizedWidth);
     }
+    setFactor(0.25);
   }, [graph, img]);
 
   React.useEffect(() => {
@@ -159,12 +160,12 @@ export const MagneticSelection = ({
       const img = await Image.load(image.src);
       const grey = img.grey();
       const edges = grey.sobelFilter();
-      setDownsizedWidth(img.width * 0.25);
-      const downsized = edges.resize({ factor: 0.25 });
+      setDownsizedWidth(img.width * factor);
+      const downsized = edges.resize({ factor: factor });
       setGraph(makeGraph(downsized.data, downsized.height, downsized.width));
     };
     loadImg();
-  }, [image.src]);
+  }, [image.src, factor]);
 
   React.useEffect(() => {
     if (
@@ -292,20 +293,20 @@ export const MagneticSelection = ({
           if (pathFinder && pathFinder.current && img) {
             const foundPath = pathFinder.current.find(
               getIdx(downsizedWidth, 1)(
-                Math.floor(start.x * 0.25),
-                Math.floor(start.y * 0.25),
+                Math.floor(start.x * factor),
+                Math.floor(start.y * factor),
                 0
               ),
               getIdx(downsizedWidth, 1)(
-                Math.floor(position.current.x * 0.25),
-                Math.floor(position.current.y * 0.25),
+                Math.floor(position.current.x * factor),
+                Math.floor(position.current.y * factor),
                 0
               )
             );
             pathCoordsRef.current = convertPathToCoords(
               foundPath,
               downsizedWidth,
-              0.25
+              factor
             );
             setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
           }
@@ -319,38 +320,6 @@ export const MagneticSelection = ({
       }
     }
   };
-  //
-  // const onMouseMove = () => {
-  //   if (annotated) return;
-  //
-  //   if (!annotating) return;
-  //
-  //   if (stage && stage.current) {
-  //     const position = stage.current.getPointerPosition();
-  //
-  //     if (position) {
-  //       if (!canClose && !isInside(startingAnchorCircle, position)) {
-  //         setCanClose(true);
-  //       }
-  //
-  //       if (anchor) {
-  //         const stroke = {
-  //           method: Method.Lasso,
-  //           points: [anchor.x, anchor.y, position.x, position.y],
-  //         };
-  //         strokes.splice(strokes.length - 1, 1, stroke);
-  //         setStrokes(strokes.concat());
-  //       } else if (start) {
-  //         const stroke = {
-  //           method: Method.Lasso,
-  //           points: [start.x, start.y, position.x, position.y],
-  //         };
-  //         strokes.splice(strokes.length - 1, 1, stroke);
-  //         setStrokes(strokes.concat());
-  //       }
-  //     }
-  //   }
-  // };
 
   const onMouseUp = () => {
     if (annotated) return;
