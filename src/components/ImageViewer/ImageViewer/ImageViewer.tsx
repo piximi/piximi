@@ -4,8 +4,6 @@ import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Radio from "@material-ui/core/Radio";
 import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -14,7 +12,6 @@ import { CssBaseline } from "@material-ui/core";
 import { Image } from "../../../types/Image";
 import { ReactComponent as ColorAdjustmentIcon } from "../../../icons/ColorAdjustment.svg";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
-import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagicWandIcon } from "../../../icons/MagicWand.svg";
 import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
@@ -24,7 +21,6 @@ import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
-import { SelectionType } from "../../../types/SelectionType";
 import {
   imagesSelector,
   unknownCategorySelector,
@@ -36,72 +32,7 @@ import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
 import { ImageViewerStage } from "../ImageViewerStage";
-
-const SelectionOptions = () => {
-  return (
-    <React.Fragment>
-      <List>
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.New}
-            secondary="Create a new selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Addition}
-            secondary="Add area to the existing selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Subtraction}
-            secondary="Subtract area from the existing selection."
-          />
-        </ListItem>
-
-        <ListItem dense disabled>
-          <ListItemIcon>
-            <Radio disableRipple disabled edge="start" tabIndex={-1} />
-          </ListItemIcon>
-
-          <ListItemText
-            primary={SelectionType.Intersection}
-            secondary="Constrain the boundary of the new selection to the existing selection."
-          />
-        </ListItem>
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem button dense>
-          <ListItemIcon>
-            <SvgIcon>
-              <InvertSelectionIcon />
-            </SvgIcon>
-          </ListItemIcon>
-
-          <ListItemText primary="Invert selection" />
-        </ListItem>
-      </List>
-    </React.Fragment>
-  );
-};
+import { SelectionOptions } from "../SelectionOptions";
 
 type ImageViewerProps = {
   foo: Image;
