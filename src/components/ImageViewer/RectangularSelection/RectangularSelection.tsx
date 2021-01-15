@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
@@ -10,18 +10,7 @@ import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
-import { useMarchingAnts, useTransformer } from "../../../hooks";
-
-export const useKeyPress = (key: string, action: () => void) => {
-  useEffect(() => {
-    function onKeyup(e: any) {
-      if (e.key === key) action();
-    }
-
-    window.addEventListener("keyup", onKeyup);
-    return () => window.removeEventListener("keyup", onKeyup);
-  }, [action, key]);
-};
+import { useMarchingAnts, useSelection, useTransformer } from "../../../hooks";
 
 type RectangularSelectionProps = {
   data: Image;
@@ -40,8 +29,42 @@ export const RectangularSelection = ({
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
   const [width, setWidth] = React.useState<number>(0);
-  const [annotated, setAnnotated] = useState<boolean>();
-  const [annotating, setAnnotating] = useState<boolean>();
+
+  const onSelection = () => {
+    if (shapeRef && shapeRef.current) {
+      const mask = shapeRef.current.toDataURL({
+        callback(data: string) {
+          return data;
+        },
+      });
+
+      const { x, y, width, height } = shapeRef.current.getClientRect();
+
+      const boundingBox: BoundingBox = {
+        maximum: {
+          r: y + height,
+          c: x + width,
+        },
+        minimum: {
+          r: y,
+          c: x,
+        },
+      };
+
+      const payload = {
+        boundingBox: boundingBox,
+        categoryId: category.id,
+        id: data.id,
+        mask: mask,
+      };
+
+      dispatch(projectSlice.actions.createImageInstance(payload));
+    }
+  };
+
+  const { annotated, annotating, setAnnotated, setAnnotating } = useSelection(
+    onSelection
+  );
 
   const dashOffset = useMarchingAnts();
 
@@ -60,46 +83,16 @@ export const RectangularSelection = ({
     }
   };
 
-  useKeyPress("Escape", () => {
-    setAnnotating(false);
-    setAnnotated(false);
-  });
-
-  useKeyPress("Enter", () => {
-    if (shapeRef && shapeRef.current) {
-      const mask = shapeRef.current.toDataURL({
-        callback(data: string) {
-          return data;
-        },
-      });
-      const { x, y, width, height } = shapeRef.current.getClientRect();
-      const boundingBox: BoundingBox = {
-        maximum: {
-          r: y + height,
-          c: x + width,
-        },
-        minimum: {
-          r: y,
-          c: x,
-        },
-      };
-      const payload = {
-        boundingBox: boundingBox,
-        categoryId: category.id,
-        id: data.id,
-        mask: mask,
-      };
-      dispatch(projectSlice.actions.createImageInstance(payload));
-    }
-    setAnnotating(false);
-    setAnnotated(false);
-  });
-
   const onMouseDown = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
+
     setAnnotating(true);
+
     if (stage && stage.current) {
       const position = stage.current.getPointerPosition();
+
       if (position) {
         setX(position.x);
         setY(position.y);
@@ -108,20 +101,32 @@ export const RectangularSelection = ({
   };
 
   const onMouseMove = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
+
     if (stage && stage.current) {
       const position = stage.current.getPointerPosition();
+
       if (x && y && position) {
         setHeight(position.y - y);
+
         setWidth(position.x - x);
       }
     }
   };
 
   const onMouseUp = () => {
-    if (annotated) return;
-    if (!annotating) return;
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
     setAnnotated(true);
+
     setAnnotating(false);
   };
 
