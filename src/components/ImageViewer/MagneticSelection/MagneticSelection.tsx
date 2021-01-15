@@ -114,7 +114,6 @@ export const MagneticSelection = ({
   const [annotation, setAnnotation] = useState<Stroke>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-  const [magnetize, setMagnetize] = useState<boolean>(false);
 
   const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
   const [factor, setFactor] = useState<number>(1);
@@ -126,6 +125,7 @@ export const MagneticSelection = ({
   const pathFinder = React.useRef<PathFinder<any>>();
 
   const position = React.useRef<{ x: number; y: number } | null>(null);
+  const startPosition = React.useRef<{ x: number; y: number } | null>(null);
 
   const pathCoordsRef = React.useRef<any>();
 
@@ -133,11 +133,11 @@ export const MagneticSelection = ({
 
   useEffect(
     () => {
-      if (debouncedPosition && annotating && !annotated) {
+      if (debouncedPosition && annotating) {
         onMouseMove();
       }
     },
-    [debouncedPosition] // Only call effect if debounced search term changes
+    [debouncedPosition, startPosition] // Only call effect if debounced search term changes
   );
 
   React.useEffect(() => {
@@ -220,9 +220,9 @@ export const MagneticSelection = ({
           setAnnotated(true);
           setAnnotating(false);
           setAnnotation(stroke);
-          setStrokes([]);
         } else {
           setAnnotating(true);
+          startPosition.current = position.current;
           if (strokes.length > 0) {
             setAnchor(position.current);
           } else {
@@ -245,17 +245,18 @@ export const MagneticSelection = ({
         if (!canClose && !isInside(startingAnchorCircle, position.current)) {
           setCanClose(true);
         }
-        let startPosition;
-        if (anchor) {
-          startPosition = [anchor.x, anchor.y];
-        } else if (start) {
-          startPosition = [start.x, start.y];
-        }
-        if (pathFinder && pathFinder.current && img && startPosition) {
+        // let startPosition;
+        if (
+          pathFinder &&
+          pathFinder.current &&
+          img &&
+          startPosition &&
+          startPosition.current
+        ) {
           const foundPath = pathFinder.current.find(
             getIdx(downsizedWidth, 1)(
-              Math.floor(startPosition[0] * factor),
-              Math.floor(startPosition[1] * factor),
+              Math.floor(startPosition.current.x * factor),
+              Math.floor(startPosition.current.y * factor),
               0
             ),
             getIdx(downsizedWidth, 1)(
@@ -303,7 +304,6 @@ export const MagneticSelection = ({
             method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
           };
-
           setAnnotated(true);
           setAnnotating(false);
           setAnnotation(stroke);
@@ -311,6 +311,7 @@ export const MagneticSelection = ({
         } else {
           if (strokes.length > 0) {
             setAnchor(position.current);
+            startPosition.current = position.current;
           } else {
             setStart(position.current);
           }
