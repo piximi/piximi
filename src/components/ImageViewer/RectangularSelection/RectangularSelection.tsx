@@ -24,21 +24,38 @@ export const RectangularSelection = ({
   const dispatch = useDispatch();
   const [image] = useImage(data.src, "Anonymous");
   const stageRef = React.useRef<Stage>(null);
-  const shapeRef = React.useRef<Rect>(null);
-  const [x, setX] = React.useState<number>();
-  const [y, setY] = React.useState<number>();
-  const [height, setHeight] = React.useState<number>(0);
-  const [width, setWidth] = React.useState<number>(0);
+  const rectangularSelectionRef = React.useRef<Rect>(null);
+  const [
+    rectangularSelectionX,
+    setRectangularSelectionX,
+  ] = React.useState<number>();
+  const [
+    rectangularSelectionY,
+    setRectangularSelectionY,
+  ] = React.useState<number>();
+  const [
+    rectangularSelectionHeight,
+    setRectangularSelectionHeight,
+  ] = React.useState<number>(0);
+  const [
+    rectangularSelectionWidth,
+    setRectangularSelectionWidth,
+  ] = React.useState<number>(0);
 
   const onRectangularSelection = () => {
-    if (shapeRef && shapeRef.current) {
-      const mask = shapeRef.current.toDataURL({
+    if (rectangularSelectionRef && rectangularSelectionRef.current) {
+      const mask = rectangularSelectionRef.current.toDataURL({
         callback(data: string) {
           return data;
         },
       });
 
-      const { x, y, width, height } = shapeRef.current.getClientRect();
+      const {
+        x,
+        y,
+        width,
+        height,
+      } = rectangularSelectionRef.current.getClientRect();
 
       const boundingBox: BoundingBox = {
         maximum: {
@@ -68,7 +85,11 @@ export const RectangularSelection = ({
 
   const dashOffset = useMarchingAnts();
 
-  const transformer = useTransformer(shapeRef, annotated, annotating);
+  const transformer = useTransformer(
+    rectangularSelectionRef,
+    annotated,
+    annotating
+  );
 
   const boundBoxFunc = (oldBox: Box, newBox: Box) => {
     if (
@@ -94,8 +115,8 @@ export const RectangularSelection = ({
       const position = stageRef.current.getPointerPosition();
 
       if (position) {
-        setX(position.x);
-        setY(position.y);
+        setRectangularSelectionX(position.x);
+        setRectangularSelectionY(position.y);
       }
     }
   };
@@ -108,10 +129,10 @@ export const RectangularSelection = ({
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
-      if (x && y && position) {
-        setHeight(position.y - y);
+      if (rectangularSelectionX && rectangularSelectionY && position) {
+        setRectangularSelectionHeight(position.y - rectangularSelectionY);
 
-        setWidth(position.x - x);
+        setRectangularSelectionWidth(position.x - rectangularSelectionX);
       }
     }
   };
@@ -144,57 +165,66 @@ export const RectangularSelection = ({
       >
         <ReactKonva.Image image={image} />
 
-        {!annotated && annotating && x && y && (
-          <React.Fragment>
+        {!annotated &&
+          annotating &&
+          rectangularSelectionX &&
+          rectangularSelectionY && (
+            <React.Fragment>
+              <ReactKonva.Rect
+                x={rectangularSelectionX}
+                y={rectangularSelectionY}
+                height={rectangularSelectionHeight}
+                width={rectangularSelectionWidth}
+                stroke="black"
+                strokeWidth={1}
+              />
+              <ReactKonva.Rect
+                x={rectangularSelectionX}
+                y={rectangularSelectionY}
+                height={rectangularSelectionHeight}
+                width={rectangularSelectionWidth}
+                stroke="white"
+                dash={[4, 2]}
+                dashOffset={-dashOffset}
+                strokeWidth={1}
+              />
+            </React.Fragment>
+          )}
+
+        {annotated &&
+          !annotating &&
+          rectangularSelectionX &&
+          rectangularSelectionY && (
             <ReactKonva.Rect
-              x={x}
-              y={y}
-              height={height}
-              width={width}
-              stroke="black"
-              strokeWidth={1}
-            />
-            <ReactKonva.Rect
-              x={x}
-              y={y}
-              height={height}
-              width={width}
-              stroke="white"
               dash={[4, 2]}
               dashOffset={-dashOffset}
+              height={rectangularSelectionHeight}
+              ref={rectangularSelectionRef}
+              stroke="white"
               strokeWidth={1}
+              fill={toRGBA(category.color, 0.3)}
+              width={rectangularSelectionWidth}
+              x={rectangularSelectionX}
+              y={rectangularSelectionY}
             />
-          </React.Fragment>
-        )}
+          )}
 
-        {annotated && !annotating && x && y && (
-          <ReactKonva.Rect
-            dash={[4, 2]}
-            dashOffset={-dashOffset}
-            height={height}
-            ref={shapeRef}
-            stroke="white"
-            strokeWidth={1}
-            fill={toRGBA(category.color, 0.3)}
-            width={width}
-            x={x}
-            y={y}
-          />
-        )}
-
-        {annotated && !annotating && x && y && (
-          <ReactKonva.Transformer
-            anchorFill="#FFF"
-            anchorSize={6}
-            anchorStroke="#000"
-            anchorStrokeWidth={1}
-            borderEnabled={false}
-            boundBoxFunc={boundBoxFunc}
-            keepRatio={false}
-            ref={transformer}
-            rotateEnabled={false}
-          />
-        )}
+        {annotated &&
+          !annotating &&
+          rectangularSelectionX &&
+          rectangularSelectionY && (
+            <ReactKonva.Transformer
+              anchorFill="#FFF"
+              anchorSize={6}
+              anchorStroke="#000"
+              anchorStrokeWidth={1}
+              borderEnabled={false}
+              boundBoxFunc={boundBoxFunc}
+              keepRatio={false}
+              ref={transformer}
+              rotateEnabled={false}
+            />
+          )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );

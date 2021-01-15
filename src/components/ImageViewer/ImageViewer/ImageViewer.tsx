@@ -1,4 +1,3 @@
-import Box from "@material-ui/core/Box";
 import React, { useState } from "react";
 import { Category } from "../../../types/Category";
 import { CssBaseline } from "@material-ui/core";
@@ -24,9 +23,9 @@ import { projectSlice } from "../../../store/slices";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
-import { ImageViewerStage } from "../ImageViewerStage";
 import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
+import { Main } from "../Main";
 
 type ImageViewerProps = {
   foo: Image;
@@ -154,17 +153,11 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         onCategoryClick={onCategoryClick}
       />
 
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-
-        <Box alignItems="center" display="flex" justifyContent="center">
-          <ImageViewerStage
-            operation={activeOperation}
-            data={images[0]}
-            category={activeCategory}
-          />
-        </Box>
-      </main>
+      <Main
+        activeCategory={activeCategory}
+        activeOperation={activeOperation}
+        image={foo}
+      />
 
       <OperationOptions
         description={
