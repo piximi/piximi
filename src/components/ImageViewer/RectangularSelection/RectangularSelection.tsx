@@ -10,6 +10,7 @@ import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
+import { useMarchingAnts } from "../../../hooks";
 
 export const useKeyPress = (key: string, action: () => void) => {
   useEffect(() => {
@@ -42,7 +43,8 @@ export const RectangularSelection = ({
   const [width, setWidth] = React.useState<number>(0);
   const [annotated, setAnnotated] = useState<boolean>();
   const [annotating, setAnnotating] = useState<boolean>();
-  const [offset, setOffset] = useState<number>(0);
+
+  const dashOffset = useMarchingAnts();
 
   const validateBoundBox = (oldBox: Box, newBox: Box) => {
     if (
@@ -90,16 +92,6 @@ export const RectangularSelection = ({
     }
     setAnnotating(false);
     setAnnotated(false);
-  });
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setOffset(offset + 1);
-      if (offset > 32) {
-        setOffset(0);
-      }
-    }, 200);
-    return () => clearTimeout(timer);
   });
 
   React.useEffect(() => {
@@ -176,7 +168,7 @@ export const RectangularSelection = ({
               width={width}
               stroke="white"
               dash={[4, 2]}
-              dashOffset={-offset}
+              dashOffset={-dashOffset}
               strokeWidth={1}
             />
           </React.Fragment>
@@ -185,7 +177,7 @@ export const RectangularSelection = ({
         {annotated && !annotating && x && y && (
           <ReactKonva.Rect
             dash={[4, 2]}
-            dashOffset={-offset}
+            dashOffset={-dashOffset}
             height={height}
             ref={shapeRef}
             stroke="white"
