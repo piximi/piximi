@@ -13,6 +13,7 @@ import { BoundingBox } from "../../../types/BoundingBox";
 import { projectSlice } from "../../../store/slices";
 import { useDispatch } from "react-redux";
 import { toRGBA } from "../../../image/toRGBA";
+import { Ellipse } from "konva/types/shapes/Ellipse";
 
 type MainProps = {
   activeCategory: Category;
@@ -27,19 +28,238 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const classes = useStyles();
   const stageRef = useRef<Stage>(null);
 
+  /*
+   * Color selection
+   */
+  const ColorSelection = () => {
+    return null;
+  };
+
   const onColorSelection = () => {};
+
+  const onColorSelectionMouseDown = () => {};
+
+  const onColorSelectionMouseMove = () => {};
+
+  const onColorSelectionMouseUp = () => {};
+
+  /*
+   * Elliptical selection
+   */
+  const ellipticalSelectionRef = React.useRef<Ellipse>(null);
+
+  const [
+    ellipticalSelectionStartX,
+    setEllipticalSelectionStartX,
+  ] = React.useState<number>(0);
+
+  const [
+    ellipticalSelectionStartY,
+    setEllipticalSelectionStartY,
+  ] = React.useState<number>(0);
+
+  const [
+    ellipticalSelectionCenterX,
+    setEllipticalSelectionCenterX,
+  ] = React.useState<number>();
+
+  const [
+    ellipticalSelectionCenterY,
+    setEllipticalSelectionCenterY,
+  ] = React.useState<number>();
+
+  const [
+    ellipticalSelectionRadiusX,
+    setEllipticalSelectionRadiusX,
+  ] = React.useState<number>(0);
+
+  const [
+    ellipticalSelectionRadiusY,
+    setEllipticalSelectionRadiusY,
+  ] = React.useState<number>(0);
+
+  const EllipticalSelection = () => {
+    if (annotated && !annotating) {
+      return (
+        <ReactKonva.Ellipse
+          dash={[4, 2]}
+          dashOffset={-dashOffset}
+          radiusX={ellipticalSelectionRadiusX}
+          radiusY={ellipticalSelectionRadiusY}
+          ref={ellipticalSelectionRef}
+          stroke="white"
+          strokeWidth={1}
+          x={ellipticalSelectionCenterX}
+          y={ellipticalSelectionCenterY}
+          fill={toRGBA(activeCategory.color, 0.3)}
+        />
+      );
+    } else if (!annotated && annotating) {
+      return (
+        <React.Fragment>
+          <ReactKonva.Ellipse
+            radiusX={ellipticalSelectionRadiusX}
+            radiusY={ellipticalSelectionRadiusY}
+            stroke="black"
+            strokeWidth={1}
+            x={ellipticalSelectionCenterX}
+            y={ellipticalSelectionCenterY}
+          />
+          <ReactKonva.Ellipse
+            dash={[4, 2]}
+            dashOffset={-dashOffset}
+            radiusX={ellipticalSelectionRadiusX}
+            radiusY={ellipticalSelectionRadiusY}
+            stroke="white"
+            strokeWidth={1}
+            x={ellipticalSelectionCenterX}
+            y={ellipticalSelectionCenterY}
+          />
+        </React.Fragment>
+      );
+    } else {
+      return null;
+    }
+  };
 
   const onEllipticalSelection = () => {};
 
+  const onEllipticalSelectionMouseDown = () => {
+    if (annotated) {
+      return;
+    }
+
+    setAnnotating(true);
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        setEllipticalSelectionStartX(position.x);
+
+        setEllipticalSelectionStartY(position.y);
+      }
+    }
+  };
+
+  const onEllipticalSelectionMouseMove = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (ellipticalSelectionStartX && ellipticalSelectionStartY && position) {
+        setEllipticalSelectionCenterX(
+          (position.x - ellipticalSelectionStartX) / 2 +
+            ellipticalSelectionStartX
+        );
+
+        setEllipticalSelectionCenterY(
+          (position.y - ellipticalSelectionStartY) / 2 +
+            ellipticalSelectionStartY
+        );
+
+        setEllipticalSelectionRadiusX(
+          Math.abs((position.x - ellipticalSelectionStartX) / 2)
+        );
+
+        setEllipticalSelectionRadiusY(
+          Math.abs((position.y - ellipticalSelectionStartY) / 2)
+        );
+      }
+    }
+  };
+
+  const onEllipticalSelectionMouseUp = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
+    setAnnotated(true);
+
+    setAnnotating(false);
+  };
+
+  /*
+   * Lasso selection
+   */
+  const LassoSelection = () => {
+    return null;
+  };
+
   const onLassoSelection = () => {};
+
+  const onLassoSelectionMouseDown = () => {};
+
+  const onLassoSelectionMouseMove = () => {};
+
+  const onLassoSelectionMouseUp = () => {};
+
+  /*
+   * Magnetic selection
+   */
+  const MagneticSelection = () => {
+    return null;
+  };
 
   const onMagneticSelection = () => {};
 
+  const onMagneticSelectionMouseDown = () => {};
+
+  const onMagneticSelectionMouseMove = () => {};
+
+  const onMagneticSelectionMouseUp = () => {};
+
+  /*
+   * Object selection
+   */
+  const ObjectSelection = () => {
+    return null;
+  };
+
   const onObjectSelection = () => {};
+
+  const onObjectSelectionMouseDown = () => {};
+
+  const onObjectSelectionMouseMove = () => {};
+
+  const onObjectSelectionMouseUp = () => {};
+
+  /*
+   * Polygonal selection
+   */
+  const PolygonalSelection = () => {
+    return null;
+  };
 
   const onPolygonalSelection = () => {};
 
+  const onPolygonalSelectionMouseDown = () => {};
+
+  const onPolygonalSelectionMouseMove = () => {};
+
+  const onPolygonalSelectionMouseUp = () => {};
+
+  /*
+   * Quick selection
+   */
+  const QuickSelection = () => {
+    return null;
+  };
+
   const onQuickSelection = () => {};
+
+  const onQuickSelectionMouseDown = () => {};
+
+  const onQuickSelectionMouseMove = () => {};
+
+  const onQuickSelectionMouseUp = () => {};
 
   /*
    * Rectangular selection
@@ -151,53 +371,47 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const RectangularSelection = () => {
-    return (
-      <React.Fragment>
-        {!annotated &&
-          annotating &&
-          rectangularSelectionX &&
-          rectangularSelectionY && (
-            <React.Fragment>
-              <ReactKonva.Rect
-                x={rectangularSelectionX}
-                y={rectangularSelectionY}
-                height={rectangularSelectionHeight}
-                width={rectangularSelectionWidth}
-                stroke="black"
-                strokeWidth={1}
-              />
-              <ReactKonva.Rect
-                x={rectangularSelectionX}
-                y={rectangularSelectionY}
-                height={rectangularSelectionHeight}
-                width={rectangularSelectionWidth}
-                stroke="white"
-                dash={[4, 2]}
-                dashOffset={-dashOffset}
-                strokeWidth={1}
-              />
-            </React.Fragment>
-          )}
-
-        {annotated &&
-          !annotating &&
-          rectangularSelectionX &&
-          rectangularSelectionY && (
-            <ReactKonva.Rect
-              dash={[4, 2]}
-              dashOffset={-dashOffset}
-              height={rectangularSelectionHeight}
-              ref={rectangularSelectionRef}
-              stroke="white"
-              strokeWidth={1}
-              fill={toRGBA(activeCategory.color, 0.3)}
-              width={rectangularSelectionWidth}
-              x={rectangularSelectionX}
-              y={rectangularSelectionY}
-            />
-          )}
-      </React.Fragment>
-    );
+    if (annotated && !annotating) {
+      return (
+        <ReactKonva.Rect
+          dash={[4, 2]}
+          dashOffset={-dashOffset}
+          height={rectangularSelectionHeight}
+          ref={rectangularSelectionRef}
+          stroke="white"
+          strokeWidth={1}
+          fill={toRGBA(activeCategory.color, 0.3)}
+          width={rectangularSelectionWidth}
+          x={rectangularSelectionX}
+          y={rectangularSelectionY}
+        />
+      );
+    } else if (!annotated && annotating) {
+      return (
+        <React.Fragment>
+          <ReactKonva.Rect
+            x={rectangularSelectionX}
+            y={rectangularSelectionY}
+            height={rectangularSelectionHeight}
+            width={rectangularSelectionWidth}
+            stroke="black"
+            strokeWidth={1}
+          />
+          <ReactKonva.Rect
+            x={rectangularSelectionX}
+            y={rectangularSelectionY}
+            height={rectangularSelectionHeight}
+            width={rectangularSelectionWidth}
+            stroke="white"
+            dash={[4, 2]}
+            dashOffset={-dashOffset}
+            strokeWidth={1}
+          />
+        </React.Fragment>
+      );
+    } else {
+      return null;
+    }
   };
 
   const onSelection = () => {
@@ -236,21 +450,21 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorAdjustment:
         break;
       case ImageViewerOperation.ColorSelection:
-        break;
+        return onColorSelectionMouseDown();
       case ImageViewerOperation.EllipticalSelection:
-        break;
+        return onEllipticalSelectionMouseDown();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
-        break;
+        return onLassoSelectionMouseDown();
       case ImageViewerOperation.MagneticSelection:
-        break;
+        return onMagneticSelectionMouseDown();
       case ImageViewerOperation.ObjectSelection:
-        break;
+        return onObjectSelectionMouseDown();
       case ImageViewerOperation.PolygonalSelection:
-        break;
+        return onPolygonalSelectionMouseDown();
       case ImageViewerOperation.QuickSelection:
-        break;
+        return onRectangularSelectionMouseDown();
       case ImageViewerOperation.RectangularSelection:
         return onRectangularSelectionMouseDown();
       case ImageViewerOperation.Zoom:
@@ -263,21 +477,21 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorAdjustment:
         break;
       case ImageViewerOperation.ColorSelection:
-        break;
+        return onColorSelectionMouseMove();
       case ImageViewerOperation.EllipticalSelection:
-        break;
+        return onEllipticalSelectionMouseMove();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
-        break;
+        return onLassoSelectionMouseMove();
       case ImageViewerOperation.MagneticSelection:
-        break;
+        return onMagneticSelectionMouseMove();
       case ImageViewerOperation.ObjectSelection:
-        break;
+        return onObjectSelectionMouseMove();
       case ImageViewerOperation.PolygonalSelection:
-        break;
+        return onPolygonalSelectionMouseMove();
       case ImageViewerOperation.QuickSelection:
-        break;
+        return onRectangularSelectionMouseMove();
       case ImageViewerOperation.RectangularSelection:
         return onRectangularSelectionMouseMove();
       case ImageViewerOperation.Zoom:
@@ -290,21 +504,21 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorAdjustment:
         break;
       case ImageViewerOperation.ColorSelection:
-        break;
+        return onColorSelectionMouseUp();
       case ImageViewerOperation.EllipticalSelection:
-        break;
+        return onEllipticalSelectionMouseUp();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
-        break;
+        return onLassoSelectionMouseUp();
       case ImageViewerOperation.MagneticSelection:
-        break;
+        return onMagneticSelectionMouseUp();
       case ImageViewerOperation.ObjectSelection:
-        break;
+        return onObjectSelectionMouseUp();
       case ImageViewerOperation.PolygonalSelection:
-        break;
+        return onPolygonalSelectionMouseUp();
       case ImageViewerOperation.QuickSelection:
-        break;
+        return onRectangularSelectionMouseUp();
       case ImageViewerOperation.RectangularSelection:
         return onRectangularSelectionMouseUp();
       case ImageViewerOperation.Zoom:
@@ -330,6 +544,27 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
           >
             <ReactKonva.Image image={img} />
 
+            {activeOperation === ImageViewerOperation.ColorSelection && (
+              <ColorSelection />
+            )}
+            {activeOperation === ImageViewerOperation.EllipticalSelection && (
+              <EllipticalSelection />
+            )}
+            {activeOperation === ImageViewerOperation.LassoSelection && (
+              <LassoSelection />
+            )}
+            {activeOperation === ImageViewerOperation.MagneticSelection && (
+              <MagneticSelection />
+            )}
+            {activeOperation === ImageViewerOperation.ObjectSelection && (
+              <ObjectSelection />
+            )}
+            {activeOperation === ImageViewerOperation.PolygonalSelection && (
+              <PolygonalSelection />
+            )}
+            {activeOperation === ImageViewerOperation.QuickSelection && (
+              <QuickSelection />
+            )}
             {activeOperation === ImageViewerOperation.RectangularSelection && (
               <RectangularSelection />
             )}
