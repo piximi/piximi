@@ -22,15 +22,15 @@ export const RectangularSelection = ({
   category,
 }: RectangularSelectionProps) => {
   const dispatch = useDispatch();
-  const [image] = useImage(data.src);
-  const stage = React.useRef<Stage>(null);
+  const [image] = useImage(data.src, "Anonymous");
+  const stageRef = React.useRef<Stage>(null);
   const shapeRef = React.useRef<Rect>(null);
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
   const [width, setWidth] = React.useState<number>(0);
 
-  const onSelection = () => {
+  const onRectangularSelection = () => {
     if (shapeRef && shapeRef.current) {
       const mask = shapeRef.current.toDataURL({
         callback(data: string) {
@@ -63,7 +63,7 @@ export const RectangularSelection = ({
   };
 
   const { annotated, annotating, setAnnotated, setAnnotating } = useSelection(
-    onSelection
+    onRectangularSelection
   );
 
   const dashOffset = useMarchingAnts();
@@ -90,8 +90,8 @@ export const RectangularSelection = ({
 
     setAnnotating(true);
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         setX(position.x);
@@ -105,8 +105,8 @@ export const RectangularSelection = ({
       return;
     }
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (x && y && position) {
         setHeight(position.y - y);
@@ -134,7 +134,7 @@ export const RectangularSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={data.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={data.shape?.c}
     >
       <ReactKonva.Layer
