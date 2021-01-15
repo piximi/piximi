@@ -1,4 +1,3 @@
-import Box from "@material-ui/core/Box";
 import React, { useState } from "react";
 import { Category } from "../../../types/Category";
 import { CssBaseline } from "@material-ui/core";
@@ -24,7 +23,6 @@ import { projectSlice } from "../../../store/slices";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
-import { ImageViewerStage } from "../ImageViewerStage";
 import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
 import { Main } from "../Main";
