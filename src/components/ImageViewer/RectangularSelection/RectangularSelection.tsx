@@ -22,15 +22,15 @@ export const RectangularSelection = ({
   category,
 }: RectangularSelectionProps) => {
   const dispatch = useDispatch();
-  const [image] = useImage(data.src);
-  const stage = React.useRef<Stage>(null);
+  const [image] = useImage(data.src, "Anonymous");
+  const stageRef = React.useRef<Stage>(null);
   const shapeRef = React.useRef<Rect>(null);
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
   const [height, setHeight] = React.useState<number>(0);
   const [width, setWidth] = React.useState<number>(0);
 
-  const onSelection = () => {
+  const onRectangularSelection = () => {
     if (shapeRef && shapeRef.current) {
       const mask = shapeRef.current.toDataURL({
         callback(data: string) {
@@ -63,14 +63,14 @@ export const RectangularSelection = ({
   };
 
   const { annotated, annotating, setAnnotated, setAnnotating } = useSelection(
-    onSelection
+    onRectangularSelection
   );
 
   const dashOffset = useMarchingAnts();
 
   const transformer = useTransformer(shapeRef, annotated, annotating);
 
-  const validateBoundBox = (oldBox: Box, newBox: Box) => {
+  const boundBoxFunc = (oldBox: Box, newBox: Box) => {
     if (
       0 <= newBox.x &&
       newBox.width + newBox.x <= data.shape!.c &&
@@ -83,15 +83,15 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseDown = () => {
+  const onRectangularSelectionMouseDown = () => {
     if (annotated) {
       return;
     }
 
     setAnnotating(true);
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         setX(position.x);
@@ -100,13 +100,13 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseMove = () => {
+  const onRectangularSelectionMouseMove = () => {
     if (annotated) {
       return;
     }
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (x && y && position) {
         setHeight(position.y - y);
@@ -116,7 +116,7 @@ export const RectangularSelection = ({
     }
   };
 
-  const onMouseUp = () => {
+  const onRectangularSelectionMouseUp = () => {
     if (annotated) {
       return;
     }
@@ -134,13 +134,13 @@ export const RectangularSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={data.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={data.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
+        onMouseDown={onRectangularSelectionMouseDown}
+        onMouseMove={onRectangularSelectionMouseMove}
+        onMouseUp={onRectangularSelectionMouseUp}
       >
         <ReactKonva.Image image={image} />
 
@@ -189,7 +189,7 @@ export const RectangularSelection = ({
             anchorStroke="#000"
             anchorStrokeWidth={1}
             borderEnabled={false}
-            boundBoxFunc={validateBoundBox}
+            boundBoxFunc={boundBoxFunc}
             keepRatio={false}
             ref={transformer}
             rotateEnabled={false}
