@@ -1,4 +1,3 @@
-import AppBar from "@material-ui/core/AppBar";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
@@ -9,11 +8,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Radio from "@material-ui/core/Radio";
 import React, { useState } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
 import { Category } from "../../../types/Category";
-import { Chip, CssBaseline } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import { EllipticalSelection } from "../EllipticalSelection";
 import { Image } from "../../../types/Image";
 import { LassoSelection } from "../LassoSelection/LassoSelection";
@@ -35,24 +32,16 @@ import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import { ObjectSelection } from "../ObjectSelection";
 import { SelectionType } from "../../../types/SelectionType";
 import {
-  createdCategoriesSelector,
   imagesSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
-import { CollapsibleList } from "../../CollapsibleList";
-import { CreateCategoryListItem } from "../../CreateCategoryListItem";
-import { CategoryListItemCheckbox } from "../../CategoryListItemCheckbox";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { CategoryMenu } from "../../CategoryMenu";
-import { DeleteCategoryDialog } from "../../DeleteCategoryDialog";
-import { EditCategoryDialog } from "../../EditCategoryDialog";
-import { useDialog, useMenu } from "../../../hooks";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
+import { ImageViewerAppBar } from "../ImageViewerAppBar";
+import { CategoriesDrawer } from "../CategoriesDrawer";
+import { OperationOptionsDrawer } from "../OperationOptionsDrawer";
 
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
@@ -253,36 +242,17 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
 
   const images = useSelector(imagesSelector);
 
-  const [active, setActive] = useState<ImageViewerOperation>(
+  const [activeOperation, setActiveOperation] = useState<ImageViewerOperation>(
     ImageViewerOperation.RectangularSelection
   );
 
   const classes = useStyles();
 
-  const categories = useSelector(createdCategoriesSelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 
   const [activeCategory, setActiveCategory] = useState<Category>(
     unknownCategory
   );
-
-  const {
-    onClose: onCloseDeleteCategoryDialog,
-    onOpen: onOpenDeleteCategoryDialog,
-    open: openDeleteCategoryDialog,
-  } = useDialog();
-  const {
-    onClose: onCloseEditCategoryDialog,
-    onOpen: onOpenEditCategoryDialog,
-    open: openEditCategoryDialog,
-  } = useDialog();
-
-  const {
-    anchorEl: anchorElCategoryMenu,
-    onClose: onCloseCategoryMenu,
-    onOpen: onOpenCategoryMenu,
-    open: openCategoryMenu,
-  } = useMenu();
 
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
@@ -295,145 +265,48 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
     <div className={classes.root}>
       <CssBaseline />
 
-      <AppBar className={classes.appBar} color="inherit" position="fixed">
-        <Toolbar>
-          <Typography className={classes.logo} variant="h6">
-            <strong>Piximi</strong> Image viewer <Chip label="Early access" />
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <ImageViewerAppBar />
 
-      <Drawer
-        anchor="left"
-        className={classes.applicationDrawer}
-        classes={{ paper: classes.applicationDrawerPaper }}
-        open
-        variant="persistent"
-      >
-        <div className={classes.applicationDrawerHeader} />
-
-        <CollapsibleList primary="Categories">
-          {categories.map((category: Category) => {
-            return (
-              <React.Fragment>
-                <ListItem
-                  button
-                  dense
-                  id={category.id}
-                  key={category.id}
-                  onClick={(event) => onCategoryClick(event, category)}
-                  selected={category.id === activeCategory.id}
-                >
-                  <CategoryListItemCheckbox category={category} />
-
-                  <ListItemText
-                    id={category.id}
-                    primary={category.name}
-                    primaryTypographyProps={{ noWrap: true }}
-                  />
-
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" onClick={onOpenCategoryMenu}>
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-
-                <CategoryMenu
-                  anchorElCategoryMenu={anchorElCategoryMenu}
-                  category={category}
-                  onCloseCategoryMenu={onCloseCategoryMenu}
-                  onOpenCategoryMenu={onOpenCategoryMenu}
-                  onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
-                  onOpenEditCategoryDialog={onOpenEditCategoryDialog}
-                  openCategoryMenu={openCategoryMenu}
-                />
-
-                <DeleteCategoryDialog
-                  category={category}
-                  onClose={onCloseDeleteCategoryDialog}
-                  open={openDeleteCategoryDialog}
-                />
-
-                <EditCategoryDialog
-                  category={category}
-                  onCloseDialog={onCloseEditCategoryDialog}
-                  openDialog={openEditCategoryDialog}
-                />
-              </React.Fragment>
-            );
-          })}
-
-          <ListItem
-            button
-            dense
-            id={unknownCategory.id}
-            key={unknownCategory.id}
-            onClick={(event) => onCategoryClick(event, unknownCategory)}
-            selected={unknownCategory.id === activeCategory.id}
-          >
-            <CategoryListItemCheckbox category={unknownCategory} />
-
-            <ListItemText
-              id={unknownCategory.id}
-              primary={unknownCategory.name}
-              primaryTypographyProps={{ noWrap: true }}
-            />
-          </ListItem>
-
-          <CreateCategoryListItem />
-        </CollapsibleList>
-      </Drawer>
+      <CategoriesDrawer
+        activeCategory={activeCategory}
+        onCategoryClick={onCategoryClick}
+      />
 
       <main className={classes.content}>
         <div className={classes.toolbar} />
 
         <Box alignItems="center" display="flex" justifyContent="center">
           <ImageViewerStage
-            operation={active}
+            operation={activeOperation}
             data={images[0]}
             category={activeCategory}
           />
         </Box>
       </main>
 
-      <Drawer
-        anchor="right"
-        className={classes.settings}
-        classes={{ paper: classes.settingsPaper }}
-        variant="permanent"
-      >
-        <div className={classes.settingsToolbar} />
-
-        <List>
-          <ListItem dense>
-            <ListItemText
-              primary={
-                operations[
-                  operations.findIndex(
-                    (operation) => operation.method === active
-                  )
-                ].name
-              }
-              secondary={
-                operations[
-                  operations.findIndex(
-                    (operation) => operation.method === active
-                  )
-                ].description
-              }
-            />
-          </ListItem>
-        </List>
-
-        <Divider />
-
-        {
+      <OperationOptionsDrawer
+        description={
           operations[
-            operations.findIndex((operation) => operation.method === active)
+            operations.findIndex(
+              (operation) => operation.method === activeOperation
+            )
+          ].description
+        }
+        name={
+          operations[
+            operations.findIndex(
+              (operation) => operation.method === activeOperation
+            )
+          ].name
+        }
+        settings={
+          operations[
+            operations.findIndex(
+              (operation) => operation.method === activeOperation
+            )
           ].settings
         }
-      </Drawer>
+      />
 
       <Drawer
         anchor="right"
@@ -463,8 +336,8 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
                       ImageViewerOperation.QuickSelection,
                       ImageViewerOperation.Zoom,
                     ].includes(operation.method)}
-                    onClick={() => setActive(operation.method)}
-                    selected={active === operation.method}
+                    onClick={() => setActiveOperation(operation.method)}
+                    selected={activeOperation === operation.method}
                   >
                     <ListItemIcon>
                       <SvgIcon fontSize="small">{operation.icon}</SvgIcon>
