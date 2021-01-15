@@ -292,9 +292,6 @@ export const MagneticSelection = ({
             method: Method.Lasso,
             points: [start.x, start.y, position.x, position.y],
           };
-        }
-
-        if (stroke) {
           if (
             Math.sqrt(
               (position.x - stroke.points[0]) *
@@ -313,7 +310,9 @@ export const MagneticSelection = ({
               setDidFindPath(true);
             }
           }
+        }
 
+        if (stroke) {
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
         }
@@ -414,7 +413,7 @@ export const MagneticSelection = ({
     >
       <ReactKonva.Layer
         onMouseDown={onMouseDown}
-        onMouseMove={() => {}}
+        onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />
