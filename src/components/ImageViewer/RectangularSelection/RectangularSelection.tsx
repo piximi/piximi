@@ -3,14 +3,14 @@ import { Image } from "../../../types/Image";
 import * as ReactKonva from "react-konva";
 import useImage from "use-image";
 import { Stage } from "konva/types/Stage";
-import { Box, Transformer } from "konva/types/shapes/Transformer";
+import { Box } from "konva/types/shapes/Transformer";
 import { Rect } from "konva/types/shapes/Rect";
 import { Category } from "../../../types/Category";
 import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
 import { projectSlice } from "../../../store/slices";
 import { BoundingBox } from "../../../types/BoundingBox";
-import { useMarchingAnts } from "../../../hooks";
+import { useMarchingAnts, useTransformer } from "../../../hooks";
 
 export const useKeyPress = (key: string, action: () => void) => {
   useEffect(() => {
@@ -35,7 +35,6 @@ export const RectangularSelection = ({
   const dispatch = useDispatch();
   const [image] = useImage(data.src);
   const stage = React.useRef<Stage>(null);
-  const transformer = React.useRef<Transformer>(null);
   const shapeRef = React.useRef<Rect>(null);
   const [x, setX] = React.useState<number>();
   const [y, setY] = React.useState<number>();
@@ -45,6 +44,8 @@ export const RectangularSelection = ({
   const [annotating, setAnnotating] = useState<boolean>();
 
   const dashOffset = useMarchingAnts();
+
+  const transformer = useTransformer(shapeRef, annotated, annotating);
 
   const validateBoundBox = (oldBox: Box, newBox: Box) => {
     if (
@@ -93,19 +94,6 @@ export const RectangularSelection = ({
     setAnnotating(false);
     setAnnotated(false);
   });
-
-  React.useEffect(() => {
-    if (annotated && !annotating) {
-      // we need to attach transformer manually
-      if (transformer && transformer.current && shapeRef && shapeRef.current) {
-        transformer.current.nodes([shapeRef.current]);
-        const layer = transformer.current.getLayer();
-        if (layer) {
-          layer.batchDraw();
-        }
-      }
-    }
-  }, [annotated, annotating]);
 
   const onMouseDown = () => {
     if (annotated) return;

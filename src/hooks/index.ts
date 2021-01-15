@@ -5,3 +5,4 @@ export { useKeyPress } from "./useKeyPress/useKeyPress";
 export { useMarchingAnts } from "./useMarchingAnts/useMarchingAnts";
 export { useMenu } from "./useMenu/useMenu";
 export { useSnackbar } from "./useSnackbar/useSnackbar";
+export { useTransformer } from "./useTransformer/useTransformer";
