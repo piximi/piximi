@@ -217,26 +217,17 @@ export const MagneticSelection = ({
             method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
           };
-
           setAnnotated(true);
           setAnnotating(false);
           setAnnotation(stroke);
           setStrokes([]);
         } else {
-          if (anchor) {
-            setAnchor(position.current);
-          } else if (start) {
-            //setStrokes([...strokes, stroke]);
+          setAnnotating(true);
+          if (strokes.length > 0) {
             setAnchor(position.current);
           } else {
-            setAnnotating(true);
             setStart(position.current);
           }
-        }
-        if (strokes.length > 0) {
-          setAnchor(position.current);
-        } else {
-          setStart(position.current);
         }
       }
     }
