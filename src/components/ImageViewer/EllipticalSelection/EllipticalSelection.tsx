@@ -57,7 +57,7 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
     }
   }, [annotated, annotating]);
 
-  const onMouseDown = () => {
+  const onEllipticalSelectionMouseDown = () => {
     if (annotated) return;
 
     setAnnotating(true);
@@ -72,7 +72,7 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
     }
   };
 
-  const onMouseMove = () => {
+  const onEllipticalSelectionMouseMove = () => {
     if (annotated) return;
 
     if (stage && stage.current) {
@@ -87,7 +87,7 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
     }
   };
 
-  const onMouseUp = () => {
+  const onEllipticalSelectionMouseUp = () => {
     if (annotated) return;
 
     if (!annotating) return;
@@ -104,9 +104,9 @@ export const EllipticalSelection = ({ data, category }: ImageViewerProps) => {
       width={data.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
+        onMouseDown={onEllipticalSelectionMouseDown}
+        onMouseMove={onEllipticalSelectionMouseMove}
+        onMouseUp={onEllipticalSelectionMouseUp}
       >
         <ReactKonva.Image image={image} />
 

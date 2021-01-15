@@ -156,7 +156,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       <Main
         activeCategory={activeCategory}
         activeOperation={activeOperation}
-        image={images[0]}
+        image={foo}
       />
 
       <OperationOptions
