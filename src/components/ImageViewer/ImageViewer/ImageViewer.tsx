@@ -27,6 +27,7 @@ import { OperationOptions } from "../OperationOptions";
 import { ImageViewerStage } from "../ImageViewerStage";
 import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
+import { Main } from "../Main";
 
 type ImageViewerProps = {
   foo: Image;
@@ -154,17 +155,11 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         onCategoryClick={onCategoryClick}
       />
 
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-
-        <Box alignItems="center" display="flex" justifyContent="center">
-          <ImageViewerStage
-            operation={activeOperation}
-            data={images[0]}
-            category={activeCategory}
-          />
-        </Box>
-      </main>
+      <Main
+        activeCategory={activeCategory}
+        activeOperation={activeOperation}
+        image={images[0]}
+      />
 
       <OperationOptions
         description={
