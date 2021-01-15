@@ -40,8 +40,8 @@ import { useStyles } from "./ImageViewer.css";
 import { projectSlice } from "../../../store/slices";
 import { QuickSelection } from "../QuickSelection";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
-import { CategoriesDrawer } from "../CategoriesDrawer";
-import { OperationOptionsDrawer } from "../OperationOptionsDrawer";
+import { Categories } from "../Categories";
+import { OperationOptions } from "../OperationOptions";
 
 type ImageViewerStageProps = {
   operation: ImageViewerOperation;
@@ -267,7 +267,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
 
       <ImageViewerAppBar />
 
-      <CategoriesDrawer
+      <Categories
         activeCategory={activeCategory}
         onCategoryClick={onCategoryClick}
       />
@@ -284,7 +284,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         </Box>
       </main>
 
-      <OperationOptionsDrawer
+      <OperationOptions
         description={
           operations[
             operations.findIndex(

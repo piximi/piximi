@@ -4,7 +4,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
-import { useStyles } from "./OperationOptionsDrawer.css";
+import { useStyles } from "./OperationOptions.css";
 
 type OperationOptionsDrawerProps = {
   description: string;
@@ -12,7 +12,7 @@ type OperationOptionsDrawerProps = {
   settings: React.ReactNode;
 };
 
-export const OperationOptionsDrawer = ({
+export const OperationOptions = ({
   description,
   name,
   settings,
