@@ -138,7 +138,7 @@ export const MagneticSelection = ({
         onMouseMove();
       }
     },
-    [debouncedPosition, startPosition] // Only call effect if debounced search term changes
+    [debouncedPosition] // Only call effect if debounced search term changes
   );
 
   React.useEffect(() => {
