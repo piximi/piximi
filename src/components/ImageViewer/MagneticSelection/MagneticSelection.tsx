@@ -114,6 +114,7 @@ export const MagneticSelection = ({
   const [annotation, setAnnotation] = useState<Stroke>();
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
+  const [prevStrokes, setPrevStrokes] = useState<Array<Stroke>>([]);
 
   const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
   const [factor, setFactor] = useState<number>(1);
@@ -225,6 +226,7 @@ export const MagneticSelection = ({
           startPosition.current = position.current;
           if (strokes.length > 0) {
             setAnchor(position.current);
+            setPrevStrokes([...prevStrokes, ...strokes]);
           } else {
             setStart(position.current);
           }
@@ -312,6 +314,7 @@ export const MagneticSelection = ({
           if (strokes.length > 0) {
             setAnchor(position.current);
             startPosition.current = position.current;
+            setPrevStrokes([...prevStrokes, ...strokes]);
           } else {
             setStart(position.current);
           }
@@ -379,6 +382,12 @@ export const MagneticSelection = ({
         {!annotated &&
           annotating &&
           strokes.map((stroke: Stroke, key: number) => (
+            <MarchingAnts key={key} stroke={stroke} />
+          ))}
+
+        {!annotated &&
+          annotating &&
+          prevStrokes.map((stroke: Stroke, key: number) => (
             <MarchingAnts key={key} stroke={stroke} />
           ))}
 
