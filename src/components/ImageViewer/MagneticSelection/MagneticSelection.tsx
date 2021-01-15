@@ -131,6 +131,7 @@ export const MagneticSelection = ({
   const [didFindPath, setDidFindPath] = useState<boolean>(false);
   const [start, setStart] = useState<Anchor>();
   const [strokes, setStrokes] = useState<Array<Stroke>>([]);
+  const [magnetize, setMagnetize] = useState<boolean>(false);
 
   const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
   const [factor, setFactor] = useState<number>(1);
@@ -144,42 +145,39 @@ export const MagneticSelection = ({
   const pathFinder = React.useRef<PathFinder<any>>();
 
   const position = React.useRef<{ x: number; y: number } | null>(null);
+  // const startPosition = React.useRef<{ x: number; y: number } | null>(null);
 
   const debouncedPosition = useDebounce(position.current, 20);
 
   useEffect(() => {
-    if (debouncedPosition && position && position.current) {
-      //   if (
-      //       Math.sqrt(
-      //           (position.current.x - stroke.points[0]) *
-      //           (position.x - stroke.points[0]) +
-      //           (position.y - stroke.points[1]) *
-      //           (position.y - stroke.points[1])
-      //       ) > 50
-      //   ) {
-      //     if (pathFinder && pathFinder.current && img) {
-      //       const foundPath = pathFinder.current.find(
-      //           getIdx(downsizedWidth, 1)(
-      //               Math.floor(stroke.points[0] * 0.25),
-      //               Math.floor(stroke.points[1] * 0.25),
-      //               0
-      //           ),
-      //           getIdx(downsizedWidth, 1)(
-      //               Math.floor(position.x * 0.25),
-      //               Math.floor(position.y * 0.25),
-      //               0
-      //           )
-      //       );
-      //       const pathCoords = convertPathToCoords(
-      //           foundPath,
-      //           downsizedWidth,
-      //           0.25
-      //       );
-      //       setStrokes(convertCoordsToStrokes(pathCoords));
-      //       setDidFindPath(true);
-      // }
+    if (debouncedPosition && start) {
+      if (magnetize) {
+        console.log(debouncedPosition.x, debouncedPosition.y);
+        console.log(start.x, start.y);
+        if (pathFinder && pathFinder.current && img) {
+          const foundPath = pathFinder.current.find(
+            getIdx(downsizedWidth, 1)(
+              Math.floor(start.x * 0.25),
+              Math.floor(start.y * 0.25),
+              0
+            ),
+            getIdx(downsizedWidth, 1)(
+              Math.floor(debouncedPosition.x * 0.25),
+              Math.floor(debouncedPosition.y * 0.25),
+              0
+            )
+          );
+          const pathCoords = convertPathToCoords(
+            foundPath,
+            downsizedWidth,
+            0.25
+          );
+          setStrokes(convertCoordsToStrokes(pathCoords));
+          setDidFindPath(true);
+        }
+      }
     }
-  }, [debouncedPosition]);
+  }, [debouncedPosition, start]);
 
   React.useEffect(() => {
     if (graph && img) {
@@ -325,6 +323,16 @@ export const MagneticSelection = ({
           strokes.splice(strokes.length - 1, 1, stroke);
           setStrokes(strokes.concat());
         } else if (start) {
+          const result = Math.sqrt(
+            (position.current.x - start.x) * (position.current.x - start.x) +
+              (position.current.y - start.y) * (position.current.y - start.y)
+          );
+          console.log(result);
+
+          if (result > 50) {
+            setMagnetize(true);
+          }
+
           const stroke = {
             method: Method.Lasso,
             points: [start.x, start.y, position.current.x, position.current.y],
