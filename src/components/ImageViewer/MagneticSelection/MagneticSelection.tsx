@@ -177,8 +177,6 @@ export const MagneticSelection = ({
       const edges = grey.sobelFilter();
       setDownsizedWidth(img.width * 0.25);
       const downsized = edges.resize({ factor: 0.25 });
-      console.log(img.width, img.height);
-      console.log(downsized.width, downsized.height);
       setGraph(makeGraph(downsized.data, downsized.height, downsized.width));
     };
     loadImg();
@@ -295,6 +293,7 @@ export const MagneticSelection = ({
             points: [anchor.x, anchor.y, position.x, position.y],
           };
         } else if (start) {
+          debugger;
           stroke = {
             method: Method.Lasso,
             points: [start.x, start.y, position.x, position.y],
@@ -325,19 +324,49 @@ export const MagneticSelection = ({
                 downsizedWidth,
                 0.25
               );
-              setPathStrokes(convertCoordsToStrokes(pathCoords));
+              setStrokes(convertCoordsToStrokes(pathCoords));
               setDidFindPath(true);
             }
+          } else {
+            strokes.splice(strokes.length - 1, 1, stroke);
+            setStrokes(strokes.concat());
           }
-        }
-
-        if (stroke) {
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
         }
       }
     }
   };
+  //
+  // const onMouseMove = () => {
+  //   if (annotated) return;
+  //
+  //   if (!annotating) return;
+  //
+  //   if (stage && stage.current) {
+  //     const position = stage.current.getPointerPosition();
+  //
+  //     if (position) {
+  //       if (!canClose && !isInside(startingAnchorCircle, position)) {
+  //         setCanClose(true);
+  //       }
+  //
+  //       if (anchor) {
+  //         const stroke = {
+  //           method: Method.Lasso,
+  //           points: [anchor.x, anchor.y, position.x, position.y],
+  //         };
+  //         strokes.splice(strokes.length - 1, 1, stroke);
+  //         setStrokes(strokes.concat());
+  //       } else if (start) {
+  //         const stroke = {
+  //           method: Method.Lasso,
+  //           points: [start.x, start.y, position.x, position.y],
+  //         };
+  //         strokes.splice(strokes.length - 1, 1, stroke);
+  //         setStrokes(strokes.concat());
+  //       }
+  //     }
+  //   }
+  // };
 
   const onMouseUp = () => {
     if (annotated) return;
