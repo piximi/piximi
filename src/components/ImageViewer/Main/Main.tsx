@@ -17,7 +17,6 @@ import { useStyles } from "./Main.css";
 import { Circle } from "konva/types/shapes/Circle";
 import { Line } from "konva/types/shapes/Line";
 import * as _ from "underscore";
-import { Method } from "../LassoSelection/LassoSelection";
 
 type LassoSelectionAnchor = {
   x: number;
@@ -457,7 +456,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
         if (lassoSelectionAnchor && !lassoSelectionEarlyRelease) {
           const stroke = {
-            method: Method.Lasso,
             points: [
               lassoSelectionAnchor.x,
               lassoSelectionAnchor.y,
