@@ -19,7 +19,7 @@ export enum Method {
   Rectangular,
 }
 
-type Anchor = {
+type PolygonalSelectionAnchor = {
   x: number;
   y: number;
 };
@@ -29,15 +29,14 @@ type PolygonalSelectionProps = {
   category: Category;
 };
 
-type Stroke = {
-  method: Method;
+type PolygonalSelectionStroke = {
   points: Array<number>;
 };
 
 type MarchingAntsProps = {
   closed: boolean;
   color: string;
-  stroke: Stroke;
+  stroke: PolygonalSelectionStroke;
 };
 
 const MarchingAnts = ({ closed, color, stroke }: MarchingAntsProps) => {
@@ -77,33 +76,48 @@ export const PolygonalSelection = ({
 }: PolygonalSelectionProps) => {
   const [img] = useImage(image.src);
 
-  const stage = React.useRef<Stage>(null);
-  const startingAnchorCircle = React.useRef<Circle>(null);
-  const transformer = React.useRef<Transformer>(null);
-  const annotationRef = React.useRef<Line>(null);
+  const stageRef = React.useRef<Stage>(null);
+  const transformerRef = React.useRef<Transformer>(null);
 
-  const [anchor, setAnchor] = useState<Anchor>();
+  const polygonalSelectionRef = React.useRef<Line>(null);
+  const polygonalSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
+
   const [annotated, setAnnotated] = useState<boolean>(false);
   const [annotating, setAnnotating] = useState<boolean>(false);
-  const [annotation, setAnnotation] = useState<Stroke>();
-  const [start, setStart] = useState<Anchor>();
-  const [strokes, setStrokes] = useState<Array<Stroke>>([]);
 
-  const [canClose, setCanClose] = useState<boolean>(false);
+  const [
+    polygonalSelectionAnchor,
+    setPolygonalSelectionAnchor,
+  ] = useState<PolygonalSelectionAnchor>();
+  const [
+    polygonalSelectionAnnotation,
+    setPolygonalSelectionAnnotation,
+  ] = useState<PolygonalSelectionStroke>();
+  const [
+    polygonalSelectionStart,
+    setPolygonalSelectionStart,
+  ] = useState<PolygonalSelectionAnchor>();
+  const [polygonalSelectionStrokes, setPolygonalSelectionStrokes] = useState<
+    Array<PolygonalSelectionStroke>
+  >([]);
+  const [
+    polygonalSelectionCanClose,
+    setPolygonalSelectionCanClose,
+  ] = useState<boolean>(false);
 
   const [offset, setOffset] = useState<number>(0);
 
   React.useEffect(() => {
     if (
       annotated &&
-      annotationRef &&
-      annotationRef.current &&
-      transformer &&
-      transformer.current
+      polygonalSelectionRef &&
+      polygonalSelectionRef.current &&
+      transformerRef &&
+      transformerRef.current
     ) {
-      transformer.current.nodes([annotationRef.current]);
+      transformerRef.current.nodes([polygonalSelectionRef.current]);
 
-      transformer.current.getLayer()?.batchDraw();
+      transformerRef.current.getLayer()?.batchDraw();
     }
   }, [annotated]);
 
@@ -125,125 +139,204 @@ export const PolygonalSelection = ({
   };
 
   const connected = (position: { x: number; y: number }) => {
-    const inside = isInside(startingAnchorCircle, position);
-    if (strokes && strokes.length > 0) {
-      return inside && canClose;
+    const inside = isInside(
+      polygonalSelectionStartingAnchorCircleRef,
+      position
+    );
+    if (polygonalSelectionStrokes && polygonalSelectionStrokes.length > 0) {
+      return inside && polygonalSelectionCanClose;
     }
   };
 
-  const onMouseDown = () => {
-    if (annotated) return;
+  const onPolygonalSelectionMouseDown = () => {
+    if (annotated) {
+      return;
+    }
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
-          const stroke: Stroke = {
-            method: Method.Lasso,
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          const stroke: PolygonalSelectionStroke = {
+            points: _.flatten(
+              polygonalSelectionStrokes.map(
+                (stroke: PolygonalSelectionStroke) => stroke.points
+              )
+            ),
           };
 
           setAnnotated(true);
+
           setAnnotating(false);
-          setAnnotation(stroke);
-          setStrokes([]);
+
+          setPolygonalSelectionAnnotation(stroke);
+
+          setPolygonalSelectionStrokes([]);
         } else {
-          if (anchor) {
+          if (polygonalSelectionAnchor) {
             const stroke = {
-              method: Method.Lasso,
-              points: [anchor.x, anchor.y, position.x, position.y],
+              points: [
+                polygonalSelectionAnchor.x,
+                polygonalSelectionAnchor.y,
+                position.x,
+                position.y,
+              ],
             };
 
-            setStrokes([...strokes, stroke]);
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
 
-            setAnchor(position);
-          } else if (start) {
+            setPolygonalSelectionAnchor(position);
+          } else if (polygonalSelectionStart) {
             const stroke = {
-              method: Method.Lasso,
-              points: [start.x, start.y, position.x, position.y],
+              points: [
+                polygonalSelectionStart.x,
+                polygonalSelectionStart.y,
+                position.x,
+                position.y,
+              ],
             };
 
-            setStrokes([...strokes, stroke]);
-            setAnchor(position);
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
+
+            setPolygonalSelectionAnchor(position);
           } else {
             setAnnotating(true);
-            setStart(position);
+
+            setPolygonalSelectionStart(position);
           }
         }
       }
     }
   };
 
-  const onMouseMove = () => {
-    if (annotated) return;
+  const onPolygonalSelectionMouseMove = () => {
+    if (annotated) {
+      return;
+    }
 
-    if (!annotating) return;
+    if (!annotating) {
+      return;
+    }
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
-        if (!canClose && !isInside(startingAnchorCircle, position)) {
-          setCanClose(true);
+        if (
+          !polygonalSelectionCanClose &&
+          !isInside(polygonalSelectionStartingAnchorCircleRef, position)
+        ) {
+          setPolygonalSelectionCanClose(true);
         }
 
-        if (anchor) {
+        if (polygonalSelectionAnchor) {
           const stroke = {
-            method: Method.Lasso,
-            points: [anchor.x, anchor.y, position.x, position.y],
+            points: [
+              polygonalSelectionAnchor.x,
+              polygonalSelectionAnchor.y,
+              position.x,
+              position.y,
+            ],
           };
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
-        } else if (start) {
+          polygonalSelectionStrokes.splice(
+            polygonalSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
+
+          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
+        } else if (polygonalSelectionStart) {
           const stroke = {
-            method: Method.Lasso,
-            points: [start.x, start.y, position.x, position.y],
+            points: [
+              polygonalSelectionStart.x,
+              polygonalSelectionStart.y,
+              position.x,
+              position.y,
+            ],
           };
-          strokes.splice(strokes.length - 1, 1, stroke);
-          setStrokes(strokes.concat());
+
+          polygonalSelectionStrokes.splice(
+            polygonalSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
+
+          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
         }
       }
     }
   };
 
-  const onMouseUp = () => {
-    if (annotated) return;
+  const onPolygonalSelectionMouseUp = () => {
+    if (annotated) {
+      return;
+    }
 
-    if (!annotating) return;
+    if (!annotating) {
+      return;
+    }
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
-          if (start) {
+          if (polygonalSelectionStart) {
             const stroke = {
-              method: Method.Lasso,
-              points: [position.x, position.y, start.x, start.y],
+              points: [
+                position.x,
+                position.y,
+                polygonalSelectionStart.x,
+                polygonalSelectionStart.y,
+              ],
             };
 
-            setStrokes([...strokes, stroke]);
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
           }
 
-          const stroke: Stroke = {
-            method: Method.Lasso,
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          const stroke: PolygonalSelectionStroke = {
+            points: _.flatten(
+              polygonalSelectionStrokes.map(
+                (stroke: PolygonalSelectionStroke) => stroke.points
+              )
+            ),
           };
 
           setAnnotated(true);
+
           setAnnotating(false);
-          setAnnotation(stroke);
-          setStrokes([]);
+
+          setPolygonalSelectionAnnotation(stroke);
+
+          setPolygonalSelectionStrokes([]);
         } else {
-          if (strokes.length === 1) {
-            setAnchor(position);
-            if (start) {
+          if (polygonalSelectionStrokes.length === 1) {
+            setPolygonalSelectionAnchor(position);
+
+            if (polygonalSelectionStart) {
               const stroke = {
-                method: Method.Lasso,
-                points: [start!.x, start!.y, position.x, position.y],
+                points: [
+                  polygonalSelectionStart!.x,
+                  polygonalSelectionStart!.y,
+                  position.x,
+                  position.y,
+                ],
               };
-              setStrokes([...strokes, stroke]);
+
+              setPolygonalSelectionStrokes([
+                ...polygonalSelectionStrokes,
+                stroke,
+              ]);
             }
           }
         }
@@ -251,8 +344,12 @@ export const PolygonalSelection = ({
     }
   };
 
-  const Anchor = () => {
-    if (annotating && anchor && strokes.length > 1) {
+  const PolygonalSelectionAnchor = () => {
+    if (
+      annotating &&
+      polygonalSelectionAnchor &&
+      polygonalSelectionStrokes.length > 1
+    ) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
@@ -260,8 +357,8 @@ export const PolygonalSelection = ({
           radius={3}
           stroke="#FFF"
           strokeWidth={1}
-          x={anchor.x}
-          y={anchor.y}
+          x={polygonalSelectionAnchor.x}
+          y={polygonalSelectionAnchor.y}
         />
       );
     } else {
@@ -269,8 +366,8 @@ export const PolygonalSelection = ({
     }
   };
 
-  const StartingAnchor = () => {
-    if (annotating && start) {
+  const PolygonalSelectionStartingAnchor = () => {
+    if (annotating && polygonalSelectionStart) {
       return (
         <ReactKonva.Circle
           fill="#000"
@@ -279,11 +376,11 @@ export const PolygonalSelection = ({
           id="start"
           name="anchor"
           radius={3}
-          ref={startingAnchorCircle}
+          ref={polygonalSelectionStartingAnchorCircleRef}
           stroke="#FFF"
           strokeWidth={1}
-          x={start.x}
-          y={start.y}
+          x={polygonalSelectionStart.x}
+          y={polygonalSelectionStart.y}
         />
       );
     } else {
@@ -295,36 +392,38 @@ export const PolygonalSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={image.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={image.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
+        onMouseDown={onPolygonalSelectionMouseDown}
+        onMouseMove={onPolygonalSelectionMouseMove}
+        onMouseUp={onPolygonalSelectionMouseUp}
       >
         <ReactKonva.Image image={img} />
 
-        <StartingAnchor />
+        <PolygonalSelectionStartingAnchor />
 
         {!annotated &&
           annotating &&
-          strokes.map((stroke: Stroke, key: number) => (
-            <MarchingAnts
-              key={key}
-              color="None"
-              closed={false}
-              stroke={stroke}
-            />
-          ))}
+          polygonalSelectionStrokes.map(
+            (stroke: PolygonalSelectionStroke, key: number) => (
+              <MarchingAnts
+                key={key}
+                color="None"
+                closed={false}
+                stroke={stroke}
+              />
+            )
+          )}
 
-        <Anchor />
+        <PolygonalSelectionAnchor />
 
-        {annotation && annotated && !annotating && (
+        {polygonalSelectionAnnotation && annotated && !annotating && (
           <MarchingAnts
             color={toRGBA(category.color, 0.3)}
             closed={true}
-            stroke={annotation}
+            stroke={polygonalSelectionAnnotation}
           />
         )}
 
@@ -334,7 +433,7 @@ export const PolygonalSelection = ({
           anchorStrokeWidth={1}
           anchorSize={6}
           borderEnabled={false}
-          ref={transformer}
+          ref={transformerRef}
           rotateEnabled={false}
         />
       </ReactKonva.Layer>

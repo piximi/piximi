@@ -28,6 +28,15 @@ type LassoSelectionStroke = {
   points: Array<number>;
 };
 
+type PolygonalSelectionAnchor = {
+  x: number;
+  y: number;
+};
+
+type PolygonalSelectionStroke = {
+  points: Array<number>;
+};
+
 type MainProps = {
   activeCategory: Category;
   activeOperation: ImageViewerOperation;
@@ -573,17 +582,343 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   /*
    * Polygonal selection
    */
+  const polygonalSelectionRef = React.useRef<Line>(null);
+
+  const polygonalSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
+
+  const [
+    polygonalSelectionAnchor,
+    setPolygonalSelectionAnchor,
+  ] = useState<PolygonalSelectionAnchor>();
+
+  const [
+    polygonalSelectionAnnotation,
+    setPolygonalSelectionAnnotation,
+  ] = useState<PolygonalSelectionStroke>();
+
+  const [
+    polygonalSelectionCanClose,
+    setPolygonalSelectionCanClose,
+  ] = useState<boolean>(false);
+
+  const [
+    polygonalSelectionStart,
+    setPolygonalSelectionStart,
+  ] = useState<PolygonalSelectionAnchor>();
+
+  const [polygonalSelectionStrokes, setPolygonalSelectionStrokes] = useState<
+    Array<PolygonalSelectionStroke>
+  >([]);
+
+  const PolygonalSelectionAnchor = () => {
+    if (
+      annotating &&
+      polygonalSelectionAnchor &&
+      polygonalSelectionStrokes.length > 1
+    ) {
+      return (
+        <ReactKonva.Circle
+          fill="#FFF"
+          name="anchor"
+          radius={3}
+          stroke="#FFF"
+          strokeWidth={1}
+          x={polygonalSelectionAnchor.x}
+          y={polygonalSelectionAnchor.y}
+        />
+      );
+    } else {
+      return <React.Fragment />;
+    }
+  };
+
+  const PolygonalSelectionStartingAnchor = () => {
+    if (annotating && polygonalSelectionStart) {
+      return (
+        <ReactKonva.Circle
+          fill="#000"
+          globalCompositeOperation="source-over"
+          hitStrokeWidth={64}
+          id="start"
+          name="anchor"
+          radius={3}
+          ref={polygonalSelectionStartingAnchorCircleRef}
+          stroke="#FFF"
+          strokeWidth={1}
+          x={polygonalSelectionStart.x}
+          y={polygonalSelectionStart.y}
+        />
+      );
+    } else {
+      return <React.Fragment />;
+    }
+  };
+
   const PolygonalSelection = () => {
-    return null;
+    if (annotated && !annotating) {
+      return (
+        <React.Fragment>
+          <PolygonalSelectionStartingAnchor />
+
+          <PolygonalSelectionAnchor />
+
+          {polygonalSelectionAnnotation && (
+            <React.Fragment>
+              <ReactKonva.Line
+                points={polygonalSelectionAnnotation.points}
+                stroke="black"
+                strokeWidth={1}
+              />
+
+              <ReactKonva.Line
+                closed
+                dash={[4, 2]}
+                dashOffset={-dashOffset}
+                fill={activeCategory.color}
+                points={polygonalSelectionAnnotation.points}
+                stroke="white"
+                strokeWidth={1}
+              />
+            </React.Fragment>
+          )}
+        </React.Fragment>
+      );
+    } else if (!annotated && annotating) {
+      return (
+        <React.Fragment>
+          <PolygonalSelectionStartingAnchor />
+
+          {polygonalSelectionStrokes.map(
+            (stroke: PolygonalSelectionStroke, key: number) => {
+              return (
+                <React.Fragment>
+                  <ReactKonva.Line
+                    key={key}
+                    points={stroke.points}
+                    stroke="black"
+                    strokeWidth={1}
+                  />
+
+                  <ReactKonva.Line
+                    closed={false}
+                    dash={[4, 2]}
+                    dashOffset={-dashOffset}
+                    fill="None"
+                    key={key}
+                    points={stroke.points}
+                    stroke="white"
+                    strokeWidth={1}
+                  />
+                </React.Fragment>
+              );
+            }
+          )}
+
+          <PolygonalSelectionAnchor />
+        </React.Fragment>
+      );
+    } else {
+      return null;
+    }
   };
 
   const onPolygonalSelection = () => {};
 
-  const onPolygonalSelectionMouseDown = () => {};
+  const onPolygonalSelectionMouseDown = () => {
+    if (annotated) {
+      return;
+    }
 
-  const onPolygonalSelectionMouseMove = () => {};
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
-  const onPolygonalSelectionMouseUp = () => {};
+      if (position) {
+        if (connected(position)) {
+          const stroke: PolygonalSelectionStroke = {
+            points: _.flatten(
+              polygonalSelectionStrokes.map(
+                (stroke: PolygonalSelectionStroke) => stroke.points
+              )
+            ),
+          };
+
+          setAnnotated(true);
+
+          setAnnotating(false);
+
+          setPolygonalSelectionAnnotation(stroke);
+
+          setPolygonalSelectionStrokes([]);
+        } else {
+          if (polygonalSelectionAnchor) {
+            const stroke = {
+              points: [
+                polygonalSelectionAnchor.x,
+                polygonalSelectionAnchor.y,
+                position.x,
+                position.y,
+              ],
+            };
+
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
+
+            setPolygonalSelectionAnchor(position);
+          } else if (polygonalSelectionStart) {
+            const stroke = {
+              points: [
+                polygonalSelectionStart.x,
+                polygonalSelectionStart.y,
+                position.x,
+                position.y,
+              ],
+            };
+
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
+
+            setPolygonalSelectionAnchor(position);
+          } else {
+            setAnnotating(true);
+
+            setPolygonalSelectionStart(position);
+          }
+        }
+      }
+    }
+  };
+
+  const onPolygonalSelectionMouseMove = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        if (
+          !polygonalSelectionCanClose &&
+          !isInside(polygonalSelectionStartingAnchorCircleRef, position)
+        ) {
+          setPolygonalSelectionCanClose(true);
+        }
+
+        if (polygonalSelectionAnchor) {
+          const stroke = {
+            points: [
+              polygonalSelectionAnchor.x,
+              polygonalSelectionAnchor.y,
+              position.x,
+              position.y,
+            ],
+          };
+          polygonalSelectionStrokes.splice(
+            polygonalSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
+
+          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
+        } else if (polygonalSelectionStart) {
+          const stroke = {
+            points: [
+              polygonalSelectionStart.x,
+              polygonalSelectionStart.y,
+              position.x,
+              position.y,
+            ],
+          };
+
+          polygonalSelectionStrokes.splice(
+            polygonalSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
+
+          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
+        }
+      }
+    }
+  };
+
+  const onPolygonalSelectionMouseUp = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        if (connected(position)) {
+          if (polygonalSelectionStart) {
+            const stroke = {
+              points: [
+                position.x,
+                position.y,
+                polygonalSelectionStart.x,
+                polygonalSelectionStart.y,
+              ],
+            };
+
+            setPolygonalSelectionStrokes([
+              ...polygonalSelectionStrokes,
+              stroke,
+            ]);
+          }
+
+          const stroke: PolygonalSelectionStroke = {
+            points: _.flatten(
+              polygonalSelectionStrokes.map(
+                (stroke: PolygonalSelectionStroke) => stroke.points
+              )
+            ),
+          };
+
+          setAnnotated(true);
+
+          setAnnotating(false);
+
+          setPolygonalSelectionAnnotation(stroke);
+
+          setPolygonalSelectionStrokes([]);
+        } else {
+          if (polygonalSelectionStrokes.length === 1) {
+            setPolygonalSelectionAnchor(position);
+
+            if (polygonalSelectionStart) {
+              const stroke = {
+                points: [
+                  polygonalSelectionStart!.x,
+                  polygonalSelectionStart!.y,
+                  position.x,
+                  position.y,
+                ],
+              };
+
+              setPolygonalSelectionStrokes([
+                ...polygonalSelectionStrokes,
+                stroke,
+              ]);
+            }
+          }
+        }
+      }
+    }
+  };
 
   /*
    * Quick selection
