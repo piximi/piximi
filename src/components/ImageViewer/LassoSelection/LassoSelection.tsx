@@ -78,33 +78,41 @@ export const LassoSelection = ({
 }: KonvaLassoSelectionCanvasProps) => {
   const [img] = useImage(image.src);
 
-  const stage = React.useRef<Stage>(null);
-  const startingAnchorCircle = React.useRef<Circle>(null);
-  const transformer = React.useRef<Transformer>(null);
-  const group = React.useRef<Group>(null);
-  const annotationRef = React.useRef<Line>(null);
+  const stageRef = React.useRef<Stage>(null);
+  const lassoSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
+  const transformerRef = React.useRef<Transformer>(null);
+  const lassoSelectionRef = React.useRef<Line>(null);
 
-  const [anchor, setAnchor] = useState<Anchor>();
-  const [annotated, setAnnotated] = useState<boolean>(false);
-  const [annotating, setAnnotating] = useState<boolean>(false);
-  const [annotation, setAnnotation] = useState<Stroke>();
-  const [start, setStart] = useState<Anchor>();
-  const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-
-  const [earlyRelease, setEarlyRelease] = useState<boolean>(false);
-  const [canClose, setCanClose] = useState<boolean>(false);
+  const [lassoSelectionAnchor, setLassoSelectionAnchor] = useState<Anchor>();
+  const [annotated, setLassoSelectionAnnotated] = useState<boolean>(false);
+  const [annotating, setLassoSelectionAnnotating] = useState<boolean>(false);
+  const [
+    lassoSelectionAnnotation,
+    setLassoSelectionAnnotation,
+  ] = useState<Stroke>();
+  const [lassoSelectionStart, setLassoSelectionStart] = useState<Anchor>();
+  const [lassoSelectionStrokes, setLassoSelectionStrokes] = useState<
+    Array<Stroke>
+  >([]);
+  const [
+    lassoSelectionEarlyRelease,
+    setLassoSelectionEarlyRelease,
+  ] = useState<boolean>(false);
+  const [lassoSelectionCanClose, setLassoSelectionCanClose] = useState<boolean>(
+    false
+  );
 
   React.useEffect(() => {
     if (
       annotated &&
-      annotationRef &&
-      annotationRef.current &&
-      transformer &&
-      transformer.current
+      lassoSelectionRef &&
+      lassoSelectionRef.current &&
+      transformerRef &&
+      transformerRef.current
     ) {
-      transformer.current.nodes([annotationRef.current]);
+      transformerRef.current.nodes([lassoSelectionRef.current]);
 
-      transformer.current.getLayer()?.batchDraw();
+      transformerRef.current.getLayer()?.batchDraw();
     }
   }, [annotated]);
 
@@ -126,94 +134,117 @@ export const LassoSelection = ({
   };
 
   const connected = (position: { x: number; y: number }) => {
-    const inside = isInside(startingAnchorCircle, position);
-    if (strokes && strokes.length > 0) {
-      return inside && canClose;
+    const inside = isInside(lassoSelectionStartingAnchorCircleRef, position);
+    if (lassoSelectionStrokes && lassoSelectionStrokes.length > 0) {
+      return inside && lassoSelectionCanClose;
     }
   };
 
-  const onMouseDown = () => {
+  const onLassoSelectionMouseDown = () => {
     if (annotated) return;
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
           const stroke: Stroke = {
             method: Method.Lasso,
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+            points: _.flatten(
+              lassoSelectionStrokes.map((stroke: Stroke) => stroke.points)
+            ),
           };
 
-          setAnnotated(true);
-          setAnnotating(false);
-          setAnnotation(stroke);
-          setStrokes([]);
+          setLassoSelectionAnnotated(true);
+          setLassoSelectionAnnotating(false);
+          setLassoSelectionAnnotation(stroke);
+          setLassoSelectionStrokes([]);
         } else {
-          if (!earlyRelease) {
-            if (anchor) {
+          if (!lassoSelectionEarlyRelease) {
+            if (lassoSelectionAnchor) {
               const stroke = {
                 method: Method.Lasso,
-                points: [anchor.x, anchor.y, position.x, position.y],
+                points: [
+                  lassoSelectionAnchor.x,
+                  lassoSelectionAnchor.y,
+                  position.x,
+                  position.y,
+                ],
               };
 
-              setStrokes([...strokes, stroke]);
+              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
 
-              setAnchor(position);
+              setLassoSelectionAnchor(position);
             } else {
-              setAnnotating(true);
+              setLassoSelectionAnnotating(true);
 
-              setStart(position);
+              setLassoSelectionStart(position);
 
               const stroke: Stroke = {
                 method: Method.Lasso,
                 points: [position.x, position.y],
               };
 
-              setStrokes([...strokes, stroke]);
+              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
             }
           } else {
-            setEarlyRelease(false);
+            setLassoSelectionEarlyRelease(false);
           }
         }
       }
     }
   };
 
-  const onMouseMove = () => {
+  const onLassoSelectionMouseMove = () => {
     if (annotated) return;
 
     if (!annotating) return;
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
-        if (!canClose && !isInside(startingAnchorCircle, position)) {
-          setCanClose(true);
+        if (
+          !lassoSelectionCanClose &&
+          !isInside(lassoSelectionStartingAnchorCircleRef, position)
+        ) {
+          setLassoSelectionCanClose(true);
         }
 
-        if (anchor && !earlyRelease) {
+        if (lassoSelectionAnchor && !lassoSelectionEarlyRelease) {
           const stroke = {
             method: Method.Lasso,
-            points: [anchor.x, anchor.y, position.x, position.y],
+            points: [
+              lassoSelectionAnchor.x,
+              lassoSelectionAnchor.y,
+              position.x,
+              position.y,
+            ],
           };
 
-          if (strokes.length > 2) {
-            strokes.splice(strokes.length - 1, 1, stroke);
+          if (lassoSelectionStrokes.length > 2) {
+            lassoSelectionStrokes.splice(
+              lassoSelectionStrokes.length - 1,
+              1,
+              stroke
+            );
 
-            setStrokes(strokes.concat());
+            setLassoSelectionStrokes(lassoSelectionStrokes.concat());
           } else {
-            setStrokes([...strokes, stroke]);
+            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
           }
         } else {
-          let stroke = strokes[strokes.length - 1];
+          let stroke = lassoSelectionStrokes[lassoSelectionStrokes.length - 1];
 
           stroke.points = [...stroke.points, position.x, position.y];
 
-          strokes.splice(strokes.length - 1, 1, stroke);
+          lassoSelectionStrokes.splice(
+            lassoSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
 
-          setStrokes(strokes.concat());
+          setLassoSelectionStrokes(lassoSelectionStrokes.concat());
 
           if (connected(position)) {
             //  TODO:
@@ -225,46 +256,61 @@ export const LassoSelection = ({
     }
   };
 
-  const onMouseUp = () => {
+  const onLassoSelectionMouseUp = () => {
     if (annotated) return;
 
     if (!annotating) return;
 
-    if (stage && stage.current) {
-      const position = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
       if (position) {
         if (connected(position)) {
-          if (start) {
+          if (lassoSelectionStart) {
             const stroke = {
               method: Method.Lasso,
-              points: [position.x, position.y, start.x, start.y],
+              points: [
+                position.x,
+                position.y,
+                lassoSelectionStart.x,
+                lassoSelectionStart.y,
+              ],
             };
 
-            setStrokes([...strokes, stroke]);
+            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
           }
 
           const stroke: Stroke = {
             method: Method.Lasso,
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+            points: _.flatten(
+              lassoSelectionStrokes.map((stroke: Stroke) => stroke.points)
+            ),
           };
 
-          setAnnotated(true);
-          setAnnotating(false);
-          setAnnotation(stroke);
-          setStrokes([]);
+          setLassoSelectionAnnotated(true);
+          setLassoSelectionAnnotating(false);
+          setLassoSelectionAnnotation(stroke);
+          setLassoSelectionStrokes([]);
         } else {
-          if (!anchor && strokes[strokes.length - 1].points.length <= 2) {
-            setEarlyRelease(true);
+          if (
+            !lassoSelectionAnchor &&
+            lassoSelectionStrokes[lassoSelectionStrokes.length - 1].points
+              .length <= 2
+          ) {
+            setLassoSelectionEarlyRelease(true);
           }
-          setAnchor(position);
+          setLassoSelectionAnchor(position);
         }
       }
     }
   };
 
-  const Anchor = () => {
-    if (annotating && anchor && strokes.length > 1) {
+  const LassoSelectionAnchor = () => {
+    if (
+      annotating &&
+      lassoSelectionAnchor &&
+      lassoSelectionStrokes.length > 1
+    ) {
       return (
         <ReactKonva.Circle
           fill="#FFF"
@@ -272,8 +318,8 @@ export const LassoSelection = ({
           radius={3}
           stroke="#FFF"
           strokeWidth={1}
-          x={anchor.x}
-          y={anchor.y}
+          x={lassoSelectionAnchor.x}
+          y={lassoSelectionAnchor.y}
         />
       );
     } else {
@@ -281,8 +327,8 @@ export const LassoSelection = ({
     }
   };
 
-  const StartingAnchor = () => {
-    if (annotating && start) {
+  const LassoSelectionStartingAnchor = () => {
+    if (annotating && lassoSelectionStart) {
       return (
         <ReactKonva.Circle
           fill="#000"
@@ -291,11 +337,11 @@ export const LassoSelection = ({
           id="start"
           name="anchor"
           radius={3}
-          ref={startingAnchorCircle}
+          ref={lassoSelectionStartingAnchorCircleRef}
           stroke="#FFF"
           strokeWidth={1}
-          x={start.x}
-          y={start.y}
+          x={lassoSelectionStart.x}
+          y={lassoSelectionStart.y}
         />
       );
     } else {
@@ -307,21 +353,21 @@ export const LassoSelection = ({
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={image.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={image.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
+        onMouseDown={onLassoSelectionMouseDown}
+        onMouseMove={onLassoSelectionMouseMove}
+        onMouseUp={onLassoSelectionMouseUp}
       >
         <ReactKonva.Image image={img} />
 
-        <StartingAnchor />
+        <LassoSelectionStartingAnchor />
 
         {!annotated &&
           annotating &&
-          strokes.map((stroke: Stroke, key: number) => (
+          lassoSelectionStrokes.map((stroke: Stroke, key: number) => (
             <MarchingAnts
               key={key}
               color="None"
@@ -330,13 +376,13 @@ export const LassoSelection = ({
             />
           ))}
 
-        <Anchor />
+        <LassoSelectionAnchor />
 
-        {annotation && annotated && !annotating && (
+        {lassoSelectionAnnotation && annotated && !annotating && (
           <MarchingAnts
             color={toRGBA(category.color, 0.3)}
             closed={true}
-            stroke={annotation}
+            stroke={lassoSelectionAnnotation}
           />
         )}
 
@@ -346,7 +392,7 @@ export const LassoSelection = ({
           anchorStrokeWidth={1}
           anchorSize={6}
           borderEnabled={false}
-          ref={transformer}
+          ref={transformerRef}
           rotateEnabled={false}
         />
       </ReactKonva.Layer>

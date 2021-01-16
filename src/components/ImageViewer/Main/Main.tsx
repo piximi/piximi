@@ -1,19 +1,32 @@
+import * as ReactKonva from "react-konva";
 import Box from "@material-ui/core/Box";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import useImage from "use-image";
+import { BoundingBox } from "../../../types/BoundingBox";
 import { Category } from "../../../types/Category";
+import { Ellipse } from "konva/types/shapes/Ellipse";
 import { Image as PiximiImage } from "../../../types/Image";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
-import { useStyles } from "./Main.css";
-import * as ReactKonva from "react-konva";
-import { Stage } from "konva/types/Stage";
-import useImage from "use-image";
-import { useMarchingAnts, useSelection } from "../../../hooks";
 import { Rect } from "konva/types/shapes/Rect";
-import { BoundingBox } from "../../../types/BoundingBox";
+import { Stage } from "konva/types/Stage";
 import { projectSlice } from "../../../store/slices";
-import { useDispatch } from "react-redux";
 import { toRGBA } from "../../../image/toRGBA";
-import { Ellipse } from "konva/types/shapes/Ellipse";
+import { useDispatch } from "react-redux";
+import { useMarchingAnts, useSelection } from "../../../hooks";
+import { useStyles } from "./Main.css";
+import { Circle } from "konva/types/shapes/Circle";
+import { Line } from "konva/types/shapes/Line";
+import * as _ from "underscore";
+import { Method } from "../LassoSelection/LassoSelection";
+
+type LassoSelectionAnchor = {
+  x: number;
+  y: number;
+};
+
+type LassoSelectionStroke = {
+  points: Array<number>;
+};
 
 type MainProps = {
   activeCategory: Category;
@@ -189,17 +202,343 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   /*
    * Lasso selection
    */
+  const lassoSelectionRef = React.useRef<Line>(null);
+
+  const lassoSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
+
+  const [
+    lassoSelectionAnchor,
+    setLassoSelectionAnchor,
+  ] = useState<LassoSelectionAnchor>();
+
+  const [
+    lassoSelectionAnnotation,
+    setLassoSelectionAnnotation,
+  ] = useState<LassoSelectionStroke>();
+
+  const [lassoSelectionCanClose, setLassoSelectionCanClose] = useState<boolean>(
+    false
+  );
+
+  const [
+    lassoSelectionEarlyRelease,
+    setLassoSelectionEarlyRelease,
+  ] = useState<boolean>(false);
+
+  const [
+    lassoSelectionStart,
+    setLassoSelectionStart,
+  ] = useState<LassoSelectionAnchor>();
+
+  const [lassoSelectionStrokes, setLassoSelectionStrokes] = useState<
+    Array<LassoSelectionStroke>
+  >([]);
+
+  const LassoSelectionAnchor = () => {
+    if (
+      annotating &&
+      lassoSelectionAnchor &&
+      lassoSelectionStrokes.length > 1
+    ) {
+      return (
+        <ReactKonva.Circle
+          fill="#FFF"
+          name="anchor"
+          radius={3}
+          stroke="#FFF"
+          strokeWidth={1}
+          x={lassoSelectionAnchor.x}
+          y={lassoSelectionAnchor.y}
+        />
+      );
+    } else {
+      return <React.Fragment />;
+    }
+  };
+
+  const LassoSelectionStartingAnchor = () => {
+    if (annotating && lassoSelectionStart) {
+      return (
+        <ReactKonva.Circle
+          fill="#000"
+          globalCompositeOperation="source-over"
+          hitStrokeWidth={64}
+          id="start"
+          name="anchor"
+          radius={3}
+          ref={lassoSelectionStartingAnchorCircleRef}
+          stroke="#FFF"
+          strokeWidth={1}
+          x={lassoSelectionStart.x}
+          y={lassoSelectionStart.y}
+        />
+      );
+    } else {
+      return <React.Fragment />;
+    }
+  };
+
   const LassoSelection = () => {
-    return null;
+    if (annotated && !annotating) {
+      return (
+        <React.Fragment>
+          <LassoSelectionStartingAnchor />
+
+          <LassoSelectionAnchor />
+
+          {lassoSelectionAnnotation && (
+            <React.Fragment>
+              <ReactKonva.Line
+                points={lassoSelectionAnnotation.points}
+                stroke="black"
+                strokeWidth={1}
+              />
+
+              <ReactKonva.Line
+                closed
+                dash={[4, 2]}
+                dashOffset={-dashOffset}
+                fill={toRGBA(activeCategory.color, 0.3)}
+                points={lassoSelectionAnnotation.points}
+                ref={lassoSelectionRef}
+                stroke="white"
+                strokeWidth={1}
+              />
+            </React.Fragment>
+          )}
+        </React.Fragment>
+      );
+    } else if (!annotated && annotating) {
+      return (
+        <React.Fragment>
+          <LassoSelectionStartingAnchor />
+
+          {lassoSelectionStrokes.map(
+            (stroke: LassoSelectionStroke, key: number) => {
+              return (
+                <React.Fragment>
+                  <ReactKonva.Line
+                    key={key}
+                    points={stroke.points}
+                    stroke="black"
+                    strokeWidth={1}
+                  />
+
+                  <ReactKonva.Line
+                    closed={false}
+                    dash={[4, 2]}
+                    dashOffset={-dashOffset}
+                    fill="None"
+                    key={key}
+                    points={stroke.points}
+                    stroke="white"
+                    strokeWidth={1}
+                  />
+                </React.Fragment>
+              );
+            }
+          )}
+        </React.Fragment>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const isInside = (
+    startingAnchorCircle: React.RefObject<Circle>,
+    position: { x: number; y: number }
+  ) => {
+    if (
+      lassoSelectionStartingAnchorCircleRef &&
+      lassoSelectionStartingAnchorCircleRef.current
+    ) {
+      const rectangle = lassoSelectionStartingAnchorCircleRef.current.getClientRect();
+      return (
+        rectangle.x <= position.x &&
+        position.x <= rectangle.x + rectangle.width &&
+        rectangle.y <= position.y &&
+        position.y <= rectangle.y + rectangle.height
+      );
+    } else {
+      return false;
+    }
+  };
+
+  const connected = (position: { x: number; y: number }) => {
+    const inside = isInside(lassoSelectionStartingAnchorCircleRef, position);
+    if (lassoSelectionStrokes && lassoSelectionStrokes.length > 0) {
+      return inside && lassoSelectionCanClose;
+    }
   };
 
   const onLassoSelection = () => {};
 
-  const onLassoSelectionMouseDown = () => {};
+  const onLassoSelectionMouseDown = () => {
+    if (annotated) return;
 
-  const onLassoSelectionMouseMove = () => {};
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
-  const onLassoSelectionMouseUp = () => {};
+      if (position) {
+        if (connected(position)) {
+          const stroke: LassoSelectionStroke = {
+            points: _.flatten(
+              lassoSelectionStrokes.map(
+                (stroke: LassoSelectionStroke) => stroke.points
+              )
+            ),
+          };
+
+          setAnnotated(true);
+          setAnnotating(false);
+          setLassoSelectionAnnotation(stroke);
+          setLassoSelectionStrokes([]);
+        } else {
+          if (!lassoSelectionEarlyRelease) {
+            if (lassoSelectionAnchor) {
+              const stroke = {
+                points: [
+                  lassoSelectionAnchor.x,
+                  lassoSelectionAnchor.y,
+                  position.x,
+                  position.y,
+                ],
+              };
+
+              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
+
+              setLassoSelectionAnchor(position);
+            } else {
+              setAnnotating(true);
+
+              setLassoSelectionStart(position);
+
+              const stroke: LassoSelectionStroke = {
+                points: [position.x, position.y],
+              };
+
+              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
+            }
+          } else {
+            setLassoSelectionEarlyRelease(false);
+          }
+        }
+      }
+    }
+  };
+
+  const onLassoSelectionMouseMove = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) return;
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        if (
+          !lassoSelectionCanClose &&
+          !isInside(lassoSelectionStartingAnchorCircleRef, position)
+        ) {
+          setLassoSelectionCanClose(true);
+        }
+
+        if (lassoSelectionAnchor && !lassoSelectionEarlyRelease) {
+          const stroke = {
+            method: Method.Lasso,
+            points: [
+              lassoSelectionAnchor.x,
+              lassoSelectionAnchor.y,
+              position.x,
+              position.y,
+            ],
+          };
+
+          if (lassoSelectionStrokes.length > 2) {
+            lassoSelectionStrokes.splice(
+              lassoSelectionStrokes.length - 1,
+              1,
+              stroke
+            );
+
+            setLassoSelectionStrokes(lassoSelectionStrokes.concat());
+          } else {
+            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
+          }
+        } else {
+          let stroke = lassoSelectionStrokes[lassoSelectionStrokes.length - 1];
+
+          stroke.points = [...stroke.points, position.x, position.y];
+
+          lassoSelectionStrokes.splice(
+            lassoSelectionStrokes.length - 1,
+            1,
+            stroke
+          );
+
+          setLassoSelectionStrokes(lassoSelectionStrokes.concat());
+
+          if (connected(position)) {
+            //  TODO:
+          } else {
+            //  TODO:
+          }
+        }
+      }
+    }
+  };
+
+  const onLassoSelectionMouseUp = () => {
+    if (annotated) return;
+
+    if (!annotating) return;
+
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        if (connected(position)) {
+          if (lassoSelectionStart) {
+            const stroke = {
+              points: [
+                position.x,
+                position.y,
+                lassoSelectionStart.x,
+                lassoSelectionStart.y,
+              ],
+            };
+
+            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
+          }
+
+          const stroke: LassoSelectionStroke = {
+            points: _.flatten(
+              lassoSelectionStrokes.map(
+                (stroke: LassoSelectionStroke) => stroke.points
+              )
+            ),
+          };
+
+          setAnnotated(true);
+          setAnnotating(false);
+          setLassoSelectionAnnotation(stroke);
+          setLassoSelectionStrokes([]);
+        } else {
+          if (
+            !lassoSelectionAnchor &&
+            lassoSelectionStrokes[lassoSelectionStrokes.length - 1].points
+              .length <= 2
+          ) {
+            setLassoSelectionEarlyRelease(true);
+          }
+          setLassoSelectionAnchor(position);
+        }
+      }
+    }
+  };
 
   /*
    * Magnetic selection
