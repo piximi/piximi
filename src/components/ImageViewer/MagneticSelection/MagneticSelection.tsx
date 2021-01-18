@@ -139,8 +139,10 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
     }
   };
 
-  const onMouseDown = () => {
-    if (annotated) return;
+  const onMagneticSelectionMouseDown = () => {
+    if (annotated) {
+      return;
+    }
 
     if (stage && stage.current) {
       position.current = stage.current.getPointerPosition();
@@ -152,14 +154,20 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
               strokes.map((stroke: { points: Array<number> }) => stroke.points)
             ),
           };
+
           setAnnotated(true);
+
           setAnnotating(false);
+
           setAnnotation(stroke);
         } else {
           setAnnotating(true);
+
           startPosition.current = position.current;
+
           if (strokes.length > 0) {
             setAnchor(position.current);
+
             setPrevStrokes([...prevStrokes, ...strokes]);
           } else {
             setStart(position.current);
@@ -169,7 +177,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
     }
   };
 
-  const onMouseMove = () => {
+  const onMagneticSelectionMouseMove = () => {
     if (annotated) return;
 
     if (!annotating) return;
@@ -212,7 +220,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
     }
   };
 
-  const onMouseUp = () => {
+  const onMagneticSelectionMouseUp = () => {
     if (annotated) return;
 
     if (!annotating) return;
@@ -260,51 +268,11 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   useEffect(
     () => {
       if (debouncedPosition && annotating) {
-        onMouseMove();
+        onMagneticSelectionMouseMove();
       }
     },
-    [annotating, debouncedPosition, onMouseMove] // Only call effect if debounced search term changes
+    [annotating, debouncedPosition, onMagneticSelectionMouseMove] // Only call effect if debounced search term changes
   );
-
-  const Anchor = () => {
-    if (anchor) {
-      return (
-        <ReactKonva.Circle
-          fill="#FFF"
-          name="anchor"
-          radius={3}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={anchor.x}
-          y={anchor.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
-
-  const StartingAnchor = () => {
-    if (start) {
-      return (
-        <ReactKonva.Circle
-          fill="#000"
-          globalCompositeOperation="source-over"
-          hitStrokeWidth={64}
-          id="start"
-          name="anchor"
-          radius={3}
-          ref={startingAnchorCircle}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={start.x}
-          y={start.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
 
   return (
     <ReactKonva.Stage
@@ -314,13 +282,27 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       width={image.shape?.c}
     >
       <ReactKonva.Layer
-        onMouseDown={onMouseDown}
-        onMouseMove={() => {}}
-        onMouseUp={onMouseUp}
+        onMouseDown={onMagneticSelectionMouseDown}
+        onMouseMove={onMagneticSelectionMouseMove}
+        onMouseUp={onMagneticSelectionMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />
 
-        <StartingAnchor />
+        {start && (
+          <ReactKonva.Circle
+            fill="#000"
+            globalCompositeOperation="source-over"
+            hitStrokeWidth={64}
+            id="start"
+            name="anchor"
+            radius={3}
+            ref={startingAnchorCircle}
+            stroke="#FFF"
+            strokeWidth={1}
+            x={start.x}
+            y={start.y}
+          />
+        )}
 
         {!annotated &&
           annotating &&
@@ -364,7 +346,17 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
             </React.Fragment>
           ))}
 
-        <Anchor />
+        {anchor && (
+          <ReactKonva.Circle
+            fill="#FFF"
+            name="anchor"
+            radius={3}
+            stroke="#FFF"
+            strokeWidth={1}
+            x={anchor.x}
+            y={anchor.y}
+          />
+        )}
 
         {annotation && annotated && !annotating && (
           <React.Fragment>
