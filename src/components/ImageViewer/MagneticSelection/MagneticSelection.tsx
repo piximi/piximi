@@ -19,15 +19,6 @@ import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { useDebounce } from "../../../hooks";
 
-export enum Method {
-  Elliptical,
-  Lasso,
-  Magnetic,
-  Polygonal,
-  Quick,
-  Rectangular,
-}
-
 type Anchor = {
   x: number;
   y: number;
