@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
@@ -17,6 +17,7 @@ import { Image } from "image-js";
 import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
+import { useDebounce } from "../../../hooks";
 
 export enum Method {
   Elliptical,
@@ -37,36 +38,8 @@ type KonvaLassoSelectionCanvasProps = {
 };
 
 type Stroke = {
-  method: Method;
   points: Array<number>;
 };
-
-// Hook
-function useDebounce(value: { x: number; y: number } | null, delay: number) {
-  // State and setters for debounced value
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(
-    () => {
-      // Update debounced value after delay
-      const handler = setTimeout(() => {
-        if (value) {
-          setDebouncedValue(value);
-        }
-      }, delay);
-
-      // Cancel the timeout if value changes (also on delay change or unmount)
-      // This is how we prevent debounced value from updating if value is changed ...
-      // .. within the delay period. Timeout gets cleared and restarted.
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    [value, delay] // Only re-call effect if value or delay changes
-  );
-
-  return debouncedValue;
-}
 
 const convertCoordsToStrokes = (pathCoords: number[][]): Array<Stroke> => {
   const pathStrokes = [];
@@ -74,7 +47,6 @@ const convertCoordsToStrokes = (pathCoords: number[][]): Array<Stroke> => {
     const [startX, startY] = pathCoords[i];
     const [endX, endY] = pathCoords[i + 1];
     const stroke: Stroke = {
-      method: Method.Lasso,
       points: [startX, startY, endX, endY],
     };
     pathStrokes.push(stroke);
@@ -132,21 +104,12 @@ export const MagneticSelection = ({
 
   const debouncedPosition = useDebounce(position.current, 20);
 
-  useEffect(
-    () => {
-      if (debouncedPosition && annotating) {
-        onMouseMove();
-      }
-    },
-    [debouncedPosition] // Only call effect if debounced search term changes
-  );
-
   React.useEffect(() => {
     if (graph && img) {
       pathFinder.current = createPathFinder(graph, downsizedWidth);
     }
     setFactor(0.25);
-  }, [graph, img]);
+  }, [downsizedWidth, graph, img]);
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -215,7 +178,6 @@ export const MagneticSelection = ({
       if (position && position.current) {
         if (connected(position.current)) {
           const stroke: Stroke = {
-            method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
           };
           setAnnotated(true);
@@ -290,7 +252,6 @@ export const MagneticSelection = ({
         if (connected(position.current)) {
           if (start) {
             const stroke = {
-              method: Method.Lasso,
               points: [
                 position.current.x,
                 position.current.y,
@@ -303,7 +264,6 @@ export const MagneticSelection = ({
           }
 
           const stroke: Stroke = {
-            method: Method.Lasso,
             points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
           };
           setAnnotated(true);
@@ -322,6 +282,15 @@ export const MagneticSelection = ({
       }
     }
   };
+
+  useEffect(
+    () => {
+      if (debouncedPosition && annotating) {
+        onMouseMove();
+      }
+    },
+    [annotating, debouncedPosition, onMouseMove] // Only call effect if debounced search term changes
+  );
 
   const Anchor = () => {
     if (anchor) {
