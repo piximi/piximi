@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
@@ -19,25 +19,18 @@ import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { useDebounce } from "../../../hooks";
 
-type Anchor = {
-  x: number;
-  y: number;
-};
-
-type KonvaLassoSelectionCanvasProps = {
+type MagneticSelectionProps = {
   image: ImageType;
 };
 
-type Stroke = {
-  points: Array<number>;
-};
-
-const convertCoordsToStrokes = (pathCoords: number[][]): Array<Stroke> => {
+const convertCoordsToStrokes = (
+  pathCoords: number[][]
+): Array<{ points: Array<number> }> => {
   const pathStrokes = [];
   for (let i = 0; i < pathCoords.length - 1; i++) {
     const [startX, startY] = pathCoords[i];
     const [endX, endY] = pathCoords[i + 1];
-    const stroke: Stroke = {
+    const stroke: { points: Array<number> } = {
       points: [startX, startY, endX, endY],
     };
     pathStrokes.push(stroke);
@@ -45,7 +38,7 @@ const convertCoordsToStrokes = (pathCoords: number[][]): Array<Stroke> => {
   return pathStrokes;
 };
 
-const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
+const MarchingAnts = ({ stroke }: { stroke: { points: Array<number> } }) => {
   return (
     <React.Fragment>
       <ReactKonva.Line points={stroke.points} stroke="#FFF" strokeWidth={1} />
@@ -60,9 +53,7 @@ const MarchingAnts = ({ stroke }: { stroke: Stroke }) => {
   );
 };
 
-export const MagneticSelection = ({
-  image,
-}: KonvaLassoSelectionCanvasProps) => {
+export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
 
   const stage = React.useRef<Stage>(null);
@@ -71,13 +62,15 @@ export const MagneticSelection = ({
   const annotationRef = React.useRef<Line>(null);
   const imageRef = React.useRef<ImageKonvaType>(null);
 
-  const [anchor, setAnchor] = useState<Anchor>();
+  const [anchor, setAnchor] = useState<{ x: number; y: number }>();
   const [annotated, setAnnotated] = useState<boolean>(false);
   const [annotating, setAnnotating] = useState<boolean>(false);
-  const [annotation, setAnnotation] = useState<Stroke>();
-  const [start, setStart] = useState<Anchor>();
-  const [strokes, setStrokes] = useState<Array<Stroke>>([]);
-  const [prevStrokes, setPrevStrokes] = useState<Array<Stroke>>([]);
+  const [annotation, setAnnotation] = useState<{ points: Array<number> }>();
+  const [start, setStart] = useState<{ x: number; y: number }>();
+  const [strokes, setStrokes] = useState<Array<{ points: Array<number> }>>([]);
+  const [prevStrokes, setPrevStrokes] = useState<
+    Array<{ points: Array<number> }>
+  >([]);
 
   const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
   const [factor, setFactor] = useState<number>(1);
@@ -168,8 +161,10 @@ export const MagneticSelection = ({
 
       if (position && position.current) {
         if (connected(position.current)) {
-          const stroke: Stroke = {
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          const stroke: { points: Array<number> } = {
+            points: _.flatten(
+              strokes.map((stroke: { points: Array<number> }) => stroke.points)
+            ),
           };
           setAnnotated(true);
           setAnnotating(false);
@@ -254,8 +249,10 @@ export const MagneticSelection = ({
             setStrokes([...strokes, stroke]);
           }
 
-          const stroke: Stroke = {
-            points: _.flatten(strokes.map((stroke: Stroke) => stroke.points)),
+          const stroke: { points: Array<number> } = {
+            points: _.flatten(
+              strokes.map((stroke: { points: Array<number> }) => stroke.points)
+            ),
           };
           setAnnotated(true);
           setAnnotating(false);
@@ -341,13 +338,13 @@ export const MagneticSelection = ({
 
         {!annotated &&
           annotating &&
-          strokes.map((stroke: Stroke, key: number) => (
+          strokes.map((stroke: { points: Array<number> }, key: number) => (
             <MarchingAnts key={key} stroke={stroke} />
           ))}
 
         {!annotated &&
           annotating &&
-          prevStrokes.map((stroke: Stroke, key: number) => (
+          prevStrokes.map((stroke: { points: Array<number> }, key: number) => (
             <MarchingAnts key={key} stroke={stroke} />
           ))}
 
