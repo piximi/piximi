@@ -553,16 +553,21 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
    * Magnetic selection
    */
   const magneticSelectionPathCoordsRef = React.useRef<any>();
+
   const magneticSelectionPathFinder = React.useRef<PathFinder<any>>();
+
   const magneticSelectionPosition = React.useRef<{
     x: number;
     y: number;
   } | null>(null);
+
   const magneticSelectionRef = React.useRef<Line>(null);
+
   const magneticSelectionStartPosition = React.useRef<{
     x: number;
     y: number;
   } | null>(null);
+
   const magneticSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
 
   const magneticSelectionDebouncedPosition = useDebounce(
@@ -574,34 +579,42 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     x: number;
     y: number;
   }>();
+
   const [
     magneticSelectionAnnotation,
     setMagneticSelectionAnnotation,
   ] = useState<{ points: Array<number> }>();
+
   const [
     magneticSelectionCanClose,
     setMagneticSelectionCanClose,
   ] = useState<boolean>(false);
+
   const [
     magneticSelectionDownsizedWidth,
     setMagneticSelectionDownsizedWidth,
   ] = useState<number>(0);
+
   const [
     magneticSelectionFactor,
     setMagneticSelectionFactor,
   ] = useState<number>(1);
+
   const [
     magneticSelectionGraph,
     setMagneticSelectionGraph,
   ] = useState<Graph | null>(null);
+
   const [
     magneticSelectionPreviousStroke,
     setMagneticSelectionPreviousStroke,
   ] = useState<Array<{ points: Array<number> }>>([]);
+
   const [magneticSelectionStart, setMagneticSelectionStart] = useState<{
     x: number;
     y: number;
   }>();
+
   const [magneticSelectionStrokes, setMagneticSelectionStrokes] = useState<
     Array<{ points: Array<number> }>
   >([]);
