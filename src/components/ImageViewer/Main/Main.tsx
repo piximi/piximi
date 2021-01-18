@@ -1,6 +1,6 @@
 import * as ReactKonva from "react-konva";
 import Box from "@material-ui/core/Box";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import useImage from "use-image";
 import { BoundingBox } from "../../../types/BoundingBox";
 import { Category } from "../../../types/Category";
@@ -20,12 +20,7 @@ import * as _ from "underscore";
 import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
-import {
-  convertPathToCoords,
-  createPathFinder,
-  makeGraph,
-} from "../../../image/GraphHelper";
-import { Image } from "image-js";
+import { convertPathToCoords } from "../../../image/GraphHelper";
 
 type LassoSelectionAnchor = {
   x: number;
