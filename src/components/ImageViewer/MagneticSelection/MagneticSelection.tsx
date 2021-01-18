@@ -151,9 +151,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       if (position && position.current) {
         if (connected(position.current)) {
           const stroke = {
-            points: _.flatten(
-              strokes.map((stroke: { points: Array<number> }) => stroke.points)
-            ),
+            points: _.flatten(strokes.map((stroke) => stroke.points)),
           };
 
           setAnnotated(true);
@@ -194,6 +192,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
         if (!canClose && !isInside(startingAnchorCircle, position.current)) {
           setCanClose(true);
         }
+
         // let startPosition;
         if (
           pathFinder &&
@@ -214,11 +213,13 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
               0
             )
           );
+
           pathCoordsRef.current = convertPathToCoords(
             foundPath,
             downsizedWidth,
             factor
           );
+
           setStrokes(transformCoordinatesToStrokes(pathCoordsRef.current));
         }
       }
@@ -253,9 +254,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
           }
 
           const stroke = {
-            points: _.flatten(
-              strokes.map((stroke: { points: Array<number> }) => stroke.points)
-            ),
+            points: _.flatten(strokes.map((stroke) => stroke.points)),
           };
 
           setAnnotated(true);
