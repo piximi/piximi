@@ -12,11 +12,13 @@ import { Stage } from "konva/types/Stage";
 import { projectSlice } from "../../../store/slices";
 import { toRGBA } from "../../../image/toRGBA";
 import { useDispatch } from "react-redux";
-import { useMarchingAnts, useSelection } from "../../../hooks";
+import { useDebounce, useMarchingAnts, useSelection } from "../../../hooks";
 import { useStyles } from "./Main.css";
 import { Circle } from "konva/types/shapes/Circle";
 import { Line } from "konva/types/shapes/Line";
 import * as _ from "underscore";
+import { Graph } from "ngraph.graph";
+import { PathFinder } from "ngraph.path";
 
 type LassoSelectionAnchor = {
   x: number;
@@ -550,6 +552,60 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   /*
    * Magnetic selection
    */
+  const magneticSelectionPathCoordsRef = React.useRef<any>();
+  const magneticSelectionPathFinder = React.useRef<PathFinder<any>>();
+  const magneticSelectionPosition = React.useRef<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const magneticSelectionRef = React.useRef<Line>(null);
+  const magneticSelectionStartPosition = React.useRef<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const magneticSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
+
+  const magneticSelectionDebouncedPosition = useDebounce(
+    magneticSelectionPosition.current,
+    20
+  );
+
+  const [magneticSelectionAnchor, setMagneticSelectionAnchor] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [
+    magneticSelectionAnnotation,
+    setMagneticSelectionAnnotation,
+  ] = useState<{ points: Array<number> }>();
+  const [
+    magneticSelectionCanClose,
+    setMagneticSelectionCanClose,
+  ] = useState<boolean>(false);
+  const [
+    magneticSelectionDownsizedWidth,
+    setMagneticSelectionDownsizedWidth,
+  ] = useState<number>(0);
+  const [
+    magneticSelectionFactor,
+    setMagneticSelectionFactor,
+  ] = useState<number>(1);
+  const [
+    magneticSelectionGraph,
+    setMagneticSelectionGraph,
+  ] = useState<Graph | null>(null);
+  const [
+    magneticSelectionPreviousStroke,
+    setMagneticSelectionPreviousStroke,
+  ] = useState<Array<{ points: Array<number> }>>([]);
+  const [magneticSelectionStart, setMagneticSelectionStart] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [magneticSelectionStrokes, setMagneticSelectionStrokes] = useState<
+    Array<{ points: Array<number> }>
+  >([]);
+
   const MagneticSelection = () => {
     return null;
   };

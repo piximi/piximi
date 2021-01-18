@@ -41,45 +41,73 @@ const transformCoordinatesToStrokes = (
 export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
 
-  const stage = React.useRef<Stage>(null);
-  const startingAnchorCircle = React.useRef<Circle>(null);
-  const transformer = React.useRef<Transformer>(null);
-  const annotationRef = React.useRef<Line>(null);
+  const stageRef = React.useRef<Stage>(null);
+  const transformerRef = React.useRef<Transformer>(null);
   const imageRef = React.useRef<ImageKonvaType>(null);
-
-  const [anchor, setAnchor] = useState<{ x: number; y: number }>();
   const [annotated, setAnnotated] = useState<boolean>(false);
   const [annotating, setAnnotating] = useState<boolean>(false);
-  const [annotation, setAnnotation] = useState<{ points: Array<number> }>();
-  const [start, setStart] = useState<{ x: number; y: number }>();
-  const [strokes, setStrokes] = useState<Array<{ points: Array<number> }>>([]);
 
-  const [previousStroke, setPreviousStroke] = useState<
+  const [magneticSelectionAnchor, setMagneticSelectionAnchor] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [
+    magneticSelectionAnnotation,
+    setMagneticSelectionAnnotation,
+  ] = useState<{ points: Array<number> }>();
+  const [
+    magneticSelectionCanClose,
+    setMagneticSelectionCanClose,
+  ] = useState<boolean>(false);
+  const [
+    magneticSelectionDownsizedWidth,
+    setMagneticSelectionDownsizedWidth,
+  ] = useState<number>(0);
+  const [
+    magneticSelectionFactor,
+    setMagneticSelectionFactor,
+  ] = useState<number>(1);
+  const [
+    magneticSelectionGraph,
+    setMagneticSelectionGraph,
+  ] = useState<Graph | null>(null);
+  const [
+    magneticSelectionPreviousStroke,
+    setMagneticSelectionPreviousStroke,
+  ] = useState<Array<{ points: Array<number> }>>([]);
+  const [magneticSelectionStart, setMagneticSelectionStart] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [magneticSelectionStrokes, setMagneticSelectionStrokes] = useState<
     Array<{ points: Array<number> }>
   >([]);
-
-  const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
-  const [factor, setFactor] = useState<number>(1);
-
-  const [canClose, setCanClose] = useState<boolean>(false);
-
-  const [graph, setGraph] = useState<Graph | null>(null);
-
-  const pathFinder = React.useRef<PathFinder<any>>();
-
-  const position = React.useRef<{ x: number; y: number } | null>(null);
-  const startPosition = React.useRef<{ x: number; y: number } | null>(null);
-
-  const pathCoordsRef = React.useRef<any>();
-
-  const debouncedPosition = useDebounce(position.current, 20);
+  const magneticSelectionPosition = React.useRef<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const magneticSelectionDebouncedPosition = useDebounce(
+    magneticSelectionPosition.current,
+    20
+  );
+  const magneticSelectionPathCoordsRef = React.useRef<any>();
+  const magneticSelectionPathFinder = React.useRef<PathFinder<any>>();
+  const magneticSelectionRef = React.useRef<Line>(null);
+  const magneticSelectionStartPosition = React.useRef<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const magneticSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
 
   React.useEffect(() => {
-    if (graph && img) {
-      pathFinder.current = createPathFinder(graph, downsizedWidth);
+    if (magneticSelectionGraph && img) {
+      magneticSelectionPathFinder.current = createPathFinder(
+        magneticSelectionGraph,
+        magneticSelectionDownsizedWidth
+      );
     }
-    setFactor(0.25);
-  }, [downsizedWidth, graph, img]);
+    setMagneticSelectionFactor(0.25);
+  }, [magneticSelectionDownsizedWidth, magneticSelectionGraph, img]);
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -94,24 +122,26 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       const img = await Image.load(image.src);
       const grey = img.grey();
       const edges = grey.sobelFilter();
-      setDownsizedWidth(img.width * factor);
-      const downsized = edges.resize({ factor: factor });
-      setGraph(makeGraph(downsized.data, downsized.height, downsized.width));
+      setMagneticSelectionDownsizedWidth(img.width * magneticSelectionFactor);
+      const downsized = edges.resize({ factor: magneticSelectionFactor });
+      setMagneticSelectionGraph(
+        makeGraph(downsized.data, downsized.height, downsized.width)
+      );
     };
     loadImg();
-  }, [image.src, factor]);
+  }, [image.src, magneticSelectionFactor]);
 
   React.useEffect(() => {
     if (
       annotated &&
-      annotationRef &&
-      annotationRef.current &&
-      transformer &&
-      transformer.current
+      magneticSelectionRef &&
+      magneticSelectionRef.current &&
+      transformerRef &&
+      transformerRef.current
     ) {
-      transformer.current.nodes([annotationRef.current]);
+      transformerRef.current.nodes([magneticSelectionRef.current]);
 
-      transformer.current.getLayer()?.batchDraw();
+      transformerRef.current.getLayer()?.batchDraw();
     }
   }, [annotated]);
 
@@ -134,9 +164,9 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   };
 
   const connected = (position: { x: number; y: number }) => {
-    const inside = isInside(startingAnchorCircle, position);
-    if (strokes && strokes.length > 0) {
-      return inside && canClose;
+    const inside = isInside(magneticSelectionStartingAnchorCircleRef, position);
+    if (magneticSelectionStrokes && magneticSelectionStrokes.length > 0) {
+      return inside && magneticSelectionCanClose;
     }
   };
 
@@ -145,31 +175,37 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       return;
     }
 
-    if (stage && stage.current) {
-      position.current = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
-      if (position && position.current) {
-        if (connected(position.current)) {
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (connected(magneticSelectionPosition.current)) {
           const stroke = {
-            points: _.flatten(strokes.map((stroke) => stroke.points)),
+            points: _.flatten(
+              magneticSelectionStrokes.map((stroke) => stroke.points)
+            ),
           };
 
           setAnnotated(true);
 
           setAnnotating(false);
 
-          setAnnotation(stroke);
+          setMagneticSelectionAnnotation(stroke);
         } else {
           setAnnotating(true);
 
-          startPosition.current = position.current;
+          magneticSelectionStartPosition.current =
+            magneticSelectionPosition.current;
 
-          if (strokes.length > 0) {
-            setAnchor(position.current);
+          if (magneticSelectionStrokes.length > 0) {
+            setMagneticSelectionAnchor(magneticSelectionPosition.current);
 
-            setPreviousStroke([...previousStroke, ...strokes]);
+            setMagneticSelectionPreviousStroke([
+              ...magneticSelectionPreviousStroke,
+              ...magneticSelectionStrokes,
+            ]);
           } else {
-            setStart(position.current);
+            setMagneticSelectionStart(magneticSelectionPosition.current);
           }
         }
       }
@@ -185,42 +221,62 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       return;
     }
 
-    if (stage && stage.current) {
-      position.current = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
-      if (position && position.current) {
-        if (!canClose && !isInside(startingAnchorCircle, position.current)) {
-          setCanClose(true);
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (
+          !magneticSelectionCanClose &&
+          !isInside(
+            magneticSelectionStartingAnchorCircleRef,
+            magneticSelectionPosition.current
+          )
+        ) {
+          setMagneticSelectionCanClose(true);
         }
 
         // let startPosition;
         if (
-          pathFinder &&
-          pathFinder.current &&
+          magneticSelectionPathFinder &&
+          magneticSelectionPathFinder.current &&
           img &&
-          startPosition &&
-          startPosition.current
+          magneticSelectionStartPosition &&
+          magneticSelectionStartPosition.current
         ) {
-          const foundPath = pathFinder.current.find(
-            getIdx(downsizedWidth, 1)(
-              Math.floor(startPosition.current.x * factor),
-              Math.floor(startPosition.current.y * factor),
+          const foundPath = magneticSelectionPathFinder.current.find(
+            getIdx(magneticSelectionDownsizedWidth, 1)(
+              Math.floor(
+                magneticSelectionStartPosition.current.x *
+                  magneticSelectionFactor
+              ),
+              Math.floor(
+                magneticSelectionStartPosition.current.y *
+                  magneticSelectionFactor
+              ),
               0
             ),
-            getIdx(downsizedWidth, 1)(
-              Math.floor(position.current.x * factor),
-              Math.floor(position.current.y * factor),
+            getIdx(magneticSelectionDownsizedWidth, 1)(
+              Math.floor(
+                magneticSelectionPosition.current.x * magneticSelectionFactor
+              ),
+              Math.floor(
+                magneticSelectionPosition.current.y * magneticSelectionFactor
+              ),
               0
             )
           );
 
-          pathCoordsRef.current = convertPathToCoords(
+          magneticSelectionPathCoordsRef.current = convertPathToCoords(
             foundPath,
-            downsizedWidth,
-            factor
+            magneticSelectionDownsizedWidth,
+            magneticSelectionFactor
           );
 
-          setStrokes(transformCoordinatesToStrokes(pathCoordsRef.current));
+          setMagneticSelectionStrokes(
+            transformCoordinatesToStrokes(
+              magneticSelectionPathCoordsRef.current
+            )
+          );
         }
       }
     }
@@ -235,44 +291,50 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       return;
     }
 
-    if (stage && stage.current) {
-      position.current = stage.current.getPointerPosition();
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
-      if (position && position.current) {
-        if (connected(position.current)) {
-          if (start) {
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (connected(magneticSelectionPosition.current)) {
+          if (magneticSelectionStart) {
             const stroke = {
               points: [
-                position.current.x,
-                position.current.y,
-                start.x,
-                start.y,
+                magneticSelectionPosition.current.x,
+                magneticSelectionPosition.current.y,
+                magneticSelectionStart.x,
+                magneticSelectionStart.y,
               ],
             };
 
-            setStrokes([...strokes, stroke]);
+            setMagneticSelectionStrokes([...magneticSelectionStrokes, stroke]);
           }
 
           const stroke = {
-            points: _.flatten(strokes.map((stroke) => stroke.points)),
+            points: _.flatten(
+              magneticSelectionStrokes.map((stroke) => stroke.points)
+            ),
           };
 
           setAnnotated(true);
 
           setAnnotating(false);
 
-          setAnnotation(stroke);
+          setMagneticSelectionAnnotation(stroke);
 
-          setStrokes([]);
+          setMagneticSelectionStrokes([]);
         } else {
-          if (strokes.length > 0) {
-            setAnchor(position.current);
+          if (magneticSelectionStrokes.length > 0) {
+            setMagneticSelectionAnchor(magneticSelectionPosition.current);
 
-            startPosition.current = position.current;
+            magneticSelectionStartPosition.current =
+              magneticSelectionPosition.current;
 
-            setPreviousStroke([...previousStroke, ...strokes]);
+            setMagneticSelectionPreviousStroke([
+              ...magneticSelectionPreviousStroke,
+              ...magneticSelectionStrokes,
+            ]);
           } else {
-            setStart(position.current);
+            setMagneticSelectionStart(magneticSelectionPosition.current);
           }
         }
       }
@@ -281,18 +343,22 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
 
   useEffect(
     () => {
-      if (debouncedPosition && annotating) {
+      if (magneticSelectionDebouncedPosition && annotating) {
         onMagneticSelectionMouseMove();
       }
     },
-    [annotating, debouncedPosition, onMagneticSelectionMouseMove] // Only call effect if debounced search term changes
+    [
+      annotating,
+      magneticSelectionDebouncedPosition,
+      onMagneticSelectionMouseMove,
+    ] // Only call effect if debounced search term changes
   );
 
   return (
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={image.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={image.shape?.c}
     >
       <ReactKonva.Layer
@@ -302,7 +368,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
       >
         <ReactKonva.Image image={img} ref={imageRef} />
 
-        {start && (
+        {magneticSelectionStart && (
           <ReactKonva.Circle
             fill="#000"
             globalCompositeOperation="source-over"
@@ -310,38 +376,17 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
             id="start"
             name="anchor"
             radius={3}
-            ref={startingAnchorCircle}
+            ref={magneticSelectionStartingAnchorCircleRef}
             stroke="#FFF"
             strokeWidth={1}
-            x={start.x}
-            y={start.y}
+            x={magneticSelectionStart.x}
+            y={magneticSelectionStart.y}
           />
         )}
 
         {!annotated &&
           annotating &&
-          strokes.map((stroke: { points: Array<number> }, key: number) => (
-            <React.Fragment>
-              <ReactKonva.Line
-                key={key}
-                points={stroke.points}
-                stroke="#FFF"
-                strokeWidth={1}
-              />
-
-              <ReactKonva.Line
-                dash={[4, 2]}
-                key={key}
-                points={stroke.points}
-                stroke="#FFF"
-                strokeWidth={1}
-              />
-            </React.Fragment>
-          ))}
-
-        {!annotated &&
-          annotating &&
-          previousStroke.map(
+          magneticSelectionStrokes.map(
             (stroke: { points: Array<number> }, key: number) => (
               <React.Fragment>
                 <ReactKonva.Line
@@ -362,29 +407,52 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
             )
           )}
 
-        {anchor && (
+        {!annotated &&
+          annotating &&
+          magneticSelectionPreviousStroke.map(
+            (stroke: { points: Array<number> }, key: number) => (
+              <React.Fragment>
+                <ReactKonva.Line
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+
+                <ReactKonva.Line
+                  dash={[4, 2]}
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+              </React.Fragment>
+            )
+          )}
+
+        {magneticSelectionAnchor && (
           <ReactKonva.Circle
             fill="#FFF"
             name="anchor"
             radius={3}
             stroke="#FFF"
             strokeWidth={1}
-            x={anchor.x}
-            y={anchor.y}
+            x={magneticSelectionAnchor.x}
+            y={magneticSelectionAnchor.y}
           />
         )}
 
-        {annotation && annotated && !annotating && (
+        {magneticSelectionAnnotation && annotated && !annotating && (
           <React.Fragment>
             <ReactKonva.Line
-              points={annotation.points}
+              points={magneticSelectionAnnotation.points}
               stroke="#FFF"
               strokeWidth={1}
             />
 
             <ReactKonva.Line
               dash={[4, 2]}
-              points={annotation.points}
+              points={magneticSelectionAnnotation.points}
               stroke="#FFF"
               strokeWidth={1}
             />
@@ -397,7 +465,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
           anchorStrokeWidth={1}
           anchorSize={6}
           borderEnabled={false}
-          ref={transformer}
+          ref={transformerRef}
           rotateEnabled={false}
         />
       </ReactKonva.Layer>
