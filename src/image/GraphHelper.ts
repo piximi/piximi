@@ -2,6 +2,7 @@ import createGraph, { Graph, Node, NodeId } from "ngraph.graph";
 import { getIdx } from "./imageHelper";
 import { DataArray } from "image-js";
 import { aStar } from "ngraph.path";
+import { cachedAStarPathSearch } from "./pathFinder/pathFinder";
 
 const validNeighbours = (
   x: number,
@@ -46,6 +47,8 @@ export const makeGraph = (
   height: number,
   width: number
 ) => {
+  console.log("Creating graph");
+  let t0 = performance.now();
   let graph = createGraph();
 
   for (let y = 0; y < height; y++) {
@@ -66,20 +69,27 @@ export const makeGraph = (
       }
     }
   }
+  let t1 = performance.now();
+  console.log("Graph creation took " + (t1 - t0) + " milliseconds.");
   return graph;
 };
 
 export const createPathFinder = (graph: Graph, width: number) => {
-  return aStar(graph, {
-    distance(fromNode: Node, toNode: Node) {
-      const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
-      const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
-      if (x1 === x2 || y1 === y2) {
-        return toNode.data;
-      }
-      return 1.41 * toNode.data;
-    },
-  });
+  console.log("Regenerating path finder");
+  return cachedAStarPathSearch(graph);
+  // return  aStar(graph, {
+  //   distance(fromNode: Node, toNode: Node) {
+  //     return toNode.data
+  //   },
+  // heuristic(fromNode: Node, toNode: Node) {
+  //   const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
+  //   const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
+  //   if (x1 === x2 || y1 === y2) {
+  //     return toNode.data;
+  //   }
+  //   return 1.41 * toNode.data;
+  // },
+  // });
 };
 
 export const convertPathToCoords = (
