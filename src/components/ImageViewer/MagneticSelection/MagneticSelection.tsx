@@ -53,7 +53,8 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   const [annotation, setAnnotation] = useState<{ points: Array<number> }>();
   const [start, setStart] = useState<{ x: number; y: number }>();
   const [strokes, setStrokes] = useState<Array<{ points: Array<number> }>>([]);
-  const [prevStrokes, setPrevStrokes] = useState<
+
+  const [previousStroke, setPreviousStroke] = useState<
     Array<{ points: Array<number> }>
   >([]);
 
@@ -149,7 +150,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
 
       if (position && position.current) {
         if (connected(position.current)) {
-          const stroke: { points: Array<number> } = {
+          const stroke = {
             points: _.flatten(
               strokes.map((stroke: { points: Array<number> }) => stroke.points)
             ),
@@ -168,7 +169,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
           if (strokes.length > 0) {
             setAnchor(position.current);
 
-            setPrevStrokes([...prevStrokes, ...strokes]);
+            setPreviousStroke([...previousStroke, ...strokes]);
           } else {
             setStart(position.current);
           }
@@ -178,9 +179,13 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   };
 
   const onMagneticSelectionMouseMove = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
 
-    if (!annotating) return;
+    if (!annotating) {
+      return;
+    }
 
     if (stage && stage.current) {
       position.current = stage.current.getPointerPosition();
@@ -221,9 +226,13 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   };
 
   const onMagneticSelectionMouseUp = () => {
-    if (annotated) return;
+    if (annotated) {
+      return;
+    }
 
-    if (!annotating) return;
+    if (!annotating) {
+      return;
+    }
 
     if (stage && stage.current) {
       position.current = stage.current.getPointerPosition();
@@ -243,20 +252,26 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
             setStrokes([...strokes, stroke]);
           }
 
-          const stroke: { points: Array<number> } = {
+          const stroke = {
             points: _.flatten(
               strokes.map((stroke: { points: Array<number> }) => stroke.points)
             ),
           };
+
           setAnnotated(true);
+
           setAnnotating(false);
+
           setAnnotation(stroke);
+
           setStrokes([]);
         } else {
           if (strokes.length > 0) {
             setAnchor(position.current);
+
             startPosition.current = position.current;
-            setPrevStrokes([...prevStrokes, ...strokes]);
+
+            setPreviousStroke([...previousStroke, ...strokes]);
           } else {
             setStart(position.current);
           }
@@ -327,24 +342,26 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
 
         {!annotated &&
           annotating &&
-          prevStrokes.map((stroke: { points: Array<number> }, key: number) => (
-            <React.Fragment>
-              <ReactKonva.Line
-                key={key}
-                points={stroke.points}
-                stroke="#FFF"
-                strokeWidth={1}
-              />
+          previousStroke.map(
+            (stroke: { points: Array<number> }, key: number) => (
+              <React.Fragment>
+                <ReactKonva.Line
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
 
-              <ReactKonva.Line
-                dash={[4, 2]}
-                key={key}
-                points={stroke.points}
-                stroke="#FFF"
-                strokeWidth={1}
-              />
-            </React.Fragment>
-          ))}
+                <ReactKonva.Line
+                  dash={[4, 2]}
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+              </React.Fragment>
+            )
+          )}
 
         {anchor && (
           <ReactKonva.Circle
