@@ -19,6 +19,8 @@ import { Line } from "konva/types/shapes/Line";
 import * as _ from "underscore";
 import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
+import { getIdx } from "../../../image/imageHelper";
+import { convertPathToCoords } from "../../../image/GraphHelper";
 
 type LassoSelectionAnchor = {
   x: number;
@@ -552,6 +554,21 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   /*
    * Magnetic selection
    */
+  const transformCoordinatesToStrokes = (
+    coordinates: number[][]
+  ): Array<{ points: Array<number> }> => {
+    const strokes = [];
+
+    for (let index = 0; index < coordinates.length - 1; index++) {
+      const [startX, startY] = coordinates[index];
+      const [endX, endY] = coordinates[index + 1];
+
+      strokes.push({ points: [startX, startY, endX, endY] });
+    }
+
+    return strokes;
+  };
+
   const magneticSelectionPathCoordsRef = React.useRef<any>();
 
   const magneticSelectionPathFinder = React.useRef<PathFinder<any>>();
@@ -620,16 +637,274 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   >([]);
 
   const MagneticSelection = () => {
-    return null;
+    return (
+      <React.Fragment>
+        {magneticSelectionStart && (
+          <ReactKonva.Circle
+            fill="#000"
+            globalCompositeOperation="source-over"
+            hitStrokeWidth={64}
+            id="start"
+            name="anchor"
+            radius={3}
+            ref={magneticSelectionStartingAnchorCircleRef}
+            stroke="#FFF"
+            strokeWidth={1}
+            x={magneticSelectionStart.x}
+            y={magneticSelectionStart.y}
+          />
+        )}
+
+        {!annotated &&
+          annotating &&
+          magneticSelectionStrokes.map(
+            (stroke: { points: Array<number> }, key: number) => (
+              <React.Fragment>
+                <ReactKonva.Line
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+
+                <ReactKonva.Line
+                  dash={[4, 2]}
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+              </React.Fragment>
+            )
+          )}
+
+        {!annotated &&
+          annotating &&
+          magneticSelectionPreviousStroke.map(
+            (stroke: { points: Array<number> }, key: number) => (
+              <React.Fragment>
+                <ReactKonva.Line
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+
+                <ReactKonva.Line
+                  dash={[4, 2]}
+                  key={key}
+                  points={stroke.points}
+                  stroke="#FFF"
+                  strokeWidth={1}
+                />
+              </React.Fragment>
+            )
+          )}
+
+        {magneticSelectionAnchor && (
+          <ReactKonva.Circle
+            fill="#FFF"
+            name="anchor"
+            radius={3}
+            stroke="#FFF"
+            strokeWidth={1}
+            x={magneticSelectionAnchor.x}
+            y={magneticSelectionAnchor.y}
+          />
+        )}
+
+        {magneticSelectionAnnotation && annotated && !annotating && (
+          <React.Fragment>
+            <ReactKonva.Line
+              points={magneticSelectionAnnotation.points}
+              stroke="#FFF"
+              strokeWidth={1}
+            />
+
+            <ReactKonva.Line
+              dash={[4, 2]}
+              points={magneticSelectionAnnotation.points}
+              stroke="#FFF"
+              strokeWidth={1}
+            />
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    );
   };
 
   const onMagneticSelection = () => {};
 
-  const onMagneticSelectionMouseDown = () => {};
+  const onMagneticSelectionMouseDown = () => {
+    if (annotated) {
+      return;
+    }
 
-  const onMagneticSelectionMouseMove = () => {};
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
-  const onMagneticSelectionMouseUp = () => {};
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (connected(magneticSelectionPosition.current)) {
+          const stroke = {
+            points: _.flatten(
+              magneticSelectionStrokes.map((stroke) => stroke.points)
+            ),
+          };
+
+          setAnnotated(true);
+
+          setAnnotating(false);
+
+          setMagneticSelectionAnnotation(stroke);
+        } else {
+          setAnnotating(true);
+
+          magneticSelectionStartPosition.current =
+            magneticSelectionPosition.current;
+
+          if (magneticSelectionStrokes.length > 0) {
+            setMagneticSelectionAnchor(magneticSelectionPosition.current);
+
+            setMagneticSelectionPreviousStroke([
+              ...magneticSelectionPreviousStroke,
+              ...magneticSelectionStrokes,
+            ]);
+          } else {
+            setMagneticSelectionStart(magneticSelectionPosition.current);
+          }
+        }
+      }
+    }
+  };
+
+  const onMagneticSelectionMouseMove = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
+
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (
+          !magneticSelectionCanClose &&
+          !isInside(
+            magneticSelectionStartingAnchorCircleRef,
+            magneticSelectionPosition.current
+          )
+        ) {
+          setMagneticSelectionCanClose(true);
+        }
+
+        // let startPosition;
+        if (
+          magneticSelectionPathFinder &&
+          magneticSelectionPathFinder.current &&
+          img &&
+          magneticSelectionStartPosition &&
+          magneticSelectionStartPosition.current
+        ) {
+          const foundPath = magneticSelectionPathFinder.current.find(
+            getIdx(magneticSelectionDownsizedWidth, 1)(
+              Math.floor(
+                magneticSelectionStartPosition.current.x *
+                  magneticSelectionFactor
+              ),
+              Math.floor(
+                magneticSelectionStartPosition.current.y *
+                  magneticSelectionFactor
+              ),
+              0
+            ),
+            getIdx(magneticSelectionDownsizedWidth, 1)(
+              Math.floor(
+                magneticSelectionPosition.current.x * magneticSelectionFactor
+              ),
+              Math.floor(
+                magneticSelectionPosition.current.y * magneticSelectionFactor
+              ),
+              0
+            )
+          );
+
+          magneticSelectionPathCoordsRef.current = convertPathToCoords(
+            foundPath,
+            magneticSelectionDownsizedWidth,
+            magneticSelectionFactor
+          );
+
+          setMagneticSelectionStrokes(
+            transformCoordinatesToStrokes(
+              magneticSelectionPathCoordsRef.current
+            )
+          );
+        }
+      }
+    }
+  };
+
+  const onMagneticSelectionMouseUp = () => {
+    if (annotated) {
+      return;
+    }
+
+    if (!annotating) {
+      return;
+    }
+
+    if (stageRef && stageRef.current) {
+      magneticSelectionPosition.current = stageRef.current.getPointerPosition();
+
+      if (magneticSelectionPosition && magneticSelectionPosition.current) {
+        if (connected(magneticSelectionPosition.current)) {
+          if (magneticSelectionStart) {
+            const stroke = {
+              points: [
+                magneticSelectionPosition.current.x,
+                magneticSelectionPosition.current.y,
+                magneticSelectionStart.x,
+                magneticSelectionStart.y,
+              ],
+            };
+
+            setMagneticSelectionStrokes([...magneticSelectionStrokes, stroke]);
+          }
+
+          const stroke = {
+            points: _.flatten(
+              magneticSelectionStrokes.map((stroke) => stroke.points)
+            ),
+          };
+
+          setAnnotated(true);
+
+          setAnnotating(false);
+
+          setMagneticSelectionAnnotation(stroke);
+
+          setMagneticSelectionStrokes([]);
+        } else {
+          if (magneticSelectionStrokes.length > 0) {
+            setMagneticSelectionAnchor(magneticSelectionPosition.current);
+
+            magneticSelectionStartPosition.current =
+              magneticSelectionPosition.current;
+
+            setMagneticSelectionPreviousStroke([
+              ...magneticSelectionPreviousStroke,
+              ...magneticSelectionStrokes,
+            ]);
+          } else {
+            setMagneticSelectionStart(magneticSelectionPosition.current);
+          }
+        }
+      }
+    }
+  };
 
   /*
    * Object selection
