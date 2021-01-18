@@ -23,34 +23,19 @@ type MagneticSelectionProps = {
   image: ImageType;
 };
 
-const convertCoordsToStrokes = (
-  pathCoords: number[][]
+const transformCoordinatesToStrokes = (
+  coordinates: number[][]
 ): Array<{ points: Array<number> }> => {
-  const pathStrokes = [];
-  for (let i = 0; i < pathCoords.length - 1; i++) {
-    const [startX, startY] = pathCoords[i];
-    const [endX, endY] = pathCoords[i + 1];
-    const stroke: { points: Array<number> } = {
-      points: [startX, startY, endX, endY],
-    };
-    pathStrokes.push(stroke);
+  const strokes = [];
+
+  for (let index = 0; index < coordinates.length - 1; index++) {
+    const [startX, startY] = coordinates[index];
+    const [endX, endY] = coordinates[index + 1];
+
+    strokes.push({ points: [startX, startY, endX, endY] });
   }
-  return pathStrokes;
-};
 
-const MarchingAnts = ({ stroke }: { stroke: { points: Array<number> } }) => {
-  return (
-    <React.Fragment>
-      <ReactKonva.Line points={stroke.points} stroke="#FFF" strokeWidth={1} />
-
-      <ReactKonva.Line
-        dash={[4, 2]}
-        points={stroke.points}
-        stroke="#FFF"
-        strokeWidth={1}
-      />
-    </React.Fragment>
-  );
+  return strokes;
 };
 
 export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
@@ -135,6 +120,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
   ) => {
     if (startingAnchorCircle && startingAnchorCircle.current) {
       const rectangle = startingAnchorCircle.current.getClientRect();
+
       return (
         rectangle.x <= position.x &&
         position.x <= rectangle.x + rectangle.width &&
@@ -220,7 +206,7 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
             downsizedWidth,
             factor
           );
-          setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
+          setStrokes(transformCoordinatesToStrokes(pathCoordsRef.current));
         }
       }
     }
@@ -339,19 +325,62 @@ export const MagneticSelection = ({ image }: MagneticSelectionProps) => {
         {!annotated &&
           annotating &&
           strokes.map((stroke: { points: Array<number> }, key: number) => (
-            <MarchingAnts key={key} stroke={stroke} />
+            <React.Fragment>
+              <ReactKonva.Line
+                key={key}
+                points={stroke.points}
+                stroke="#FFF"
+                strokeWidth={1}
+              />
+
+              <ReactKonva.Line
+                dash={[4, 2]}
+                key={key}
+                points={stroke.points}
+                stroke="#FFF"
+                strokeWidth={1}
+              />
+            </React.Fragment>
           ))}
 
         {!annotated &&
           annotating &&
           prevStrokes.map((stroke: { points: Array<number> }, key: number) => (
-            <MarchingAnts key={key} stroke={stroke} />
+            <React.Fragment>
+              <ReactKonva.Line
+                key={key}
+                points={stroke.points}
+                stroke="#FFF"
+                strokeWidth={1}
+              />
+
+              <ReactKonva.Line
+                dash={[4, 2]}
+                key={key}
+                points={stroke.points}
+                stroke="#FFF"
+                strokeWidth={1}
+              />
+            </React.Fragment>
           ))}
 
         <Anchor />
 
         {annotation && annotated && !annotating && (
-          <MarchingAnts stroke={annotation} />
+          <React.Fragment>
+            <ReactKonva.Line
+              points={annotation.points}
+              stroke="#FFF"
+              strokeWidth={1}
+            />
+
+            <ReactKonva.Line
+              dash={[4, 2]}
+              points={annotation.points}
+              stroke="#FFF"
+              strokeWidth={1}
+            />
+          </React.Fragment>
         )}
 
         <ReactKonva.Transformer
