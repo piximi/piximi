@@ -4,6 +4,7 @@ import { Image as ImageType } from "../types/Image";
 import { Image } from "image-js";
 import { fromIdxToCoord, makeGraph } from "./GraphHelper";
 import { aStar } from "ngraph.path";
+import { newPathSearch } from "./pathFinder/pathFinder";
 
 test("foo", async () => {
   // fetch an example image
@@ -54,4 +55,24 @@ test("foo", async () => {
   console.log(pathCoords);
   console.log(pathValues);
   console.log(distanceValues);
+
+  const pathFinder2 = newPathSearch(graph);
+  const foundPath2 = pathFinder2.find(4, 10);
+  const pathCoords2 = [];
+  const pathValues2 = [];
+  const distanceValues2 = [];
+  let lastId2 = 10;
+  for (node of foundPath2) {
+    const id = node.id as number;
+    const [x, y] = fromIdxToCoord(id, img.width);
+    pathCoords2.push([x, y]);
+    pathValues2.push(edges.data[id]);
+    distanceValues2.push(graph.getLink(lastId2, id));
+    lastId2 = id;
+  }
+  console.log("New functions here");
+
+  console.log(pathCoords2);
+  console.log(pathValues2);
+  console.log(distanceValues2);
 });
