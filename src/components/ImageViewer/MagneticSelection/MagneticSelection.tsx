@@ -255,7 +255,8 @@ export const MagneticSelection = ({
           startPosition &&
           startPosition.current
         ) {
-          const foundPath = pathFinder.current.find(
+          let t0 = performance.now();
+          pathCoordsRef.current = pathFinder.current.find(
             getIdx(downsizedWidth, 1)(
               Math.floor(startPosition.current.x * factor),
               Math.floor(startPosition.current.y * factor),
@@ -267,12 +268,10 @@ export const MagneticSelection = ({
               0
             )
           );
-          pathCoordsRef.current = convertPathToCoords(
-            foundPath,
-            downsizedWidth,
-            factor
-          );
+
           setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
+          let t1 = performance.now();
+          console.log("Found path in", t1 - t0, pathCoordsRef.current);
         }
       }
     }

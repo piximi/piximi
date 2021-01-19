@@ -1,7 +1,7 @@
 import { NodeHeap } from "./nodeHeap";
-import { Graph, Node, Link } from "ngraph.graph";
+import { Node, Link } from "ngraph.graph";
 import { makeSearchStatePool, NodeSearchState } from "./makeSearchStatePool";
-import { fromIdxToCoord } from "../GraphHelper";
+import { fromIdxToCoord, PiximiGraph, PiximiNode } from "../GraphHelper";
 
 /**
  * Performs a uni-directional A Star search on graph.
@@ -13,34 +13,26 @@ import { fromIdxToCoord } from "../GraphHelper";
 
 const NO_PATH: never[] = [];
 
-interface BetterGraph extends Graph {
-  fromId: number;
-  openSet: NodeHeap;
-  nodeState: Map<any, any>;
-}
-
 /**
  * Creates a new instance of pathfinder. A pathfinder has just one method:
  * `find(fromId, toId)`, it may be extended in future.
  *
  * @param graph instance. See https://github.com/anvaka/ngraph.graph
- * @param {Object} options that configures search
- * @param {Function(a, b)} options.heuristic - a function that returns estimated distance between
- * nodes `a` and `b`. This function should never overestimate actual distance between two
- * nodes (otherwise the found path will not be the shortest). Defaults function returns 0,
- * which makes this search equivalent to Dijkstra search.
- * @param {Function(a, b)} options.distance - a function that returns actual distance between two
- * nodes `a` and `b`. By default this is set to return graph-theoretical distance (always 1);
- * @param {Boolean} options.oriented - whether graph should be considered oriented or not.
+ * @param {width} width of the original image
  *
  * @returns {Object} A pathfinder with single method `find()`.
  */
-export function cachedAStarPathSearch(graph: BetterGraph) {
+export function cachedAStarPathSearch(graph: PiximiGraph, width: number) {
   // whether traversal should be considered over oriented graph.
   const oriented = true;
 
   const heuristic = (fromNode: Node, toNode: Node) => {
-    return 0;
+    const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
+    const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
+    if (x1 === x2 || y1 === y2) {
+      return 1;
+    }
+    return 1.41;
   };
 
   const distance = (fromNode: Node, toNode: Node, link: Link) => {
@@ -68,16 +60,18 @@ export function cachedAStarPathSearch(graph: BetterGraph) {
     let cameFrom: any;
     // Maps nodeId to NodeSearchState.
 
-    if (graph.fromId === fromId) {
-      const dest = graph.getNode(toId);
-      if (dest.hasOwnProperty("trace")) {
-        // TODO: check if destination fromid is correct
+    const dest: PiximiNode | undefined = graph.getNode(toId);
+    if (dest) {
+      if (dest.fromId === fromId) {
         console.log("Calling cached path");
-        return reconstructPath(null, dest);
+        return dest.trace;
       }
-      console.log("Resuming search");
+    }
+
+    if (graph.fromId === fromId && graph.openSet.length > 0) {
+      console.log("Resuming search for path", graph.openSet.length);
     } else {
-      console.log("Resetting pool");
+      console.log("Resetting search for path");
       pool.reset();
       graph.openSet = new NodeHeap();
       const startNode = pool.createNewState(from);
@@ -100,12 +94,17 @@ export function cachedAStarPathSearch(graph: BetterGraph) {
     while (graph.openSet.length > 0) {
       cameFrom = graph.openSet.pop();
 
-      if (goalReached(cameFrom, to)) return reconstructPath(cameFrom);
+      if (goalReached(cameFrom, to)) {
+        cameFrom.closed = true;
+        cameFrom.node.trace = reconstructPath(cameFrom, width);
+        cameFrom.node.fromId = fromId;
+        return cameFrom.node.trace;
+      }
 
       // no need to visit this node anymore
       cameFrom.closed = true;
-      cameFrom.node.trace = cameFrom.parent;
-      cameFrom.node.target = from.id;
+      cameFrom.node.trace = reconstructPath(cameFrom, width);
+      cameFrom.node.fromId = fromId;
       cameFrom.node.closed = true;
       graph.forEachLinkedNode(cameFrom.node.id, visitNeighbour, oriented);
     }
@@ -154,28 +153,14 @@ function goalReached(searchState: NodeSearchState, targetNode: Node) {
 
 function reconstructPath(
   searchState: NodeSearchState | null,
-  node: any = false
+  width: number,
+  factor: number = 1
 ) {
-  console.log("Returning path from local searcher");
-  if (node) {
-    console.log("Got here");
-    const path = [node];
-    let parent = node.trace;
-
-    while (parent) {
-      path.push(parent.node);
-      parent = parent.parent;
-    }
-
-    return path;
+  let coords = [];
+  if (searchState.parent !== null) {
+    coords.push(...searchState.parent.node.trace);
   }
-  const path = [searchState.node];
-  let parent = searchState.parent;
-
-  while (parent) {
-    path.push(parent.node);
-    parent = parent.parent;
-  }
-
-  return path;
+  const [x, y] = fromIdxToCoord(searchState.node.id, width);
+  coords.push([x / factor, y / factor]);
+  return coords;
 }
