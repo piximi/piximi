@@ -33,6 +33,11 @@ type ImageViewerProps = {
 };
 
 export const ImageViewer = ({ foo }: ImageViewerProps) => {
+  const handleZoomMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setZoomMode((event.target as HTMLInputElement).value);
+  };
+  const [zoomMode, setZoomMode] = useState<string>("zoom in");
+
   const operations = [
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
@@ -109,7 +114,9 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       icon: <ZoomIcon />,
       method: ImageViewerOperation.Zoom,
       name: "Zoom",
-      settings: <ZoomOptions />,
+      settings: (
+        <ZoomOptions zoomMode={zoomMode} handleChange={handleZoomMode} />
+      ),
     },
   ];
 
