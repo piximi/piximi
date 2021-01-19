@@ -19,10 +19,15 @@ const NO_PATH: never[] = [];
  *
  * @param graph instance. See https://github.com/anvaka/ngraph.graph
  * @param {width} width of the original image
+ * @param {factor} scaling factor between image and graph
  *
  * @returns {Object} A pathfinder with single method `find()`.
  */
-export function cachedAStarPathSearch(graph: PiximiGraph, width: number) {
+export function cachedAStarPathSearch(
+  graph: PiximiGraph,
+  width: number,
+  factor: number
+) {
   // whether traversal should be considered over oriented graph.
   const oriented = true;
 
@@ -60,6 +65,11 @@ export function cachedAStarPathSearch(graph: PiximiGraph, width: number) {
     let cameFrom: any;
     // Maps nodeId to NodeSearchState.
 
+    if (graph.openSet) {
+      console.log(fromId, toId, graph.fromId, graph.openSet.length);
+    } else {
+      console.log(fromId, toId, graph.fromId, "no openset");
+    }
     const dest: PiximiNode | undefined = graph.getNode(toId);
     if (dest) {
       if (dest.fromId === fromId) {
@@ -96,14 +106,14 @@ export function cachedAStarPathSearch(graph: PiximiGraph, width: number) {
 
       if (goalReached(cameFrom, to)) {
         cameFrom.closed = true;
-        cameFrom.node.trace = reconstructPath(cameFrom, width);
+        cameFrom.node.trace = reconstructPath(cameFrom, width, factor);
         cameFrom.node.fromId = fromId;
         return cameFrom.node.trace;
       }
 
       // no need to visit this node anymore
       cameFrom.closed = true;
-      cameFrom.node.trace = reconstructPath(cameFrom, width);
+      cameFrom.node.trace = reconstructPath(cameFrom, width, factor);
       cameFrom.node.fromId = fromId;
       cameFrom.node.closed = true;
       graph.forEachLinkedNode(cameFrom.node.id, visitNeighbour, oriented);

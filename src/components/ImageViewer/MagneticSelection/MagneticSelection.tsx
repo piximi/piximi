@@ -143,7 +143,7 @@ export const MagneticSelection = ({
 
   React.useEffect(() => {
     if (graph && img) {
-      pathFinder.current = createPathFinder(graph, downsizedWidth);
+      pathFinder.current = createPathFinder(graph, downsizedWidth, factor);
     }
     setFactor(0.25);
   }, [graph, img]);

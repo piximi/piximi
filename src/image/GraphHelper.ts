@@ -87,8 +87,12 @@ export const makeGraph = (
   return graph;
 };
 
-export const createPathFinder = (graph: PiximiGraph, width: number) => {
-  return cachedAStarPathSearch(graph, width);
+export const createPathFinder = (
+  graph: PiximiGraph,
+  width: number,
+  factor: number
+) => {
+  return cachedAStarPathSearch(graph, width, factor);
 };
 
 export const convertPathToCoords = (
