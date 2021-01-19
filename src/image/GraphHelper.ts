@@ -7,13 +7,39 @@ import { NodeHeap } from "./pathFinder/nodeHeap";
 export interface PiximiGraph extends Graph {
   fromId?: number;
   openSet?: NodeHeap;
-  nodeState?: Map<any, any>;
 }
 
 export interface PiximiNode extends Node {
-  fromId?: number;
-  trace?: [];
+  fromId: number;
+  trace: Array<Array<number>>;
+
+  parentId: number | null;
+  closed: boolean;
+  open: number;
+  distanceToSource: number;
+  fScore: number;
+  heapIndex: number;
 }
+
+// export class PiximiNode extends Node {
+//   public fromId: number = -1;
+//   public trace: Array<Array<number>> = [];
+//
+//   public parentId: number | null = null;
+//   public closed: boolean = false;
+//   public open: number = 0;
+//   public distanceToSource: number = Number.POSITIVE_INFINITY;
+//   // the f(n) = g(n) + h(n) value
+//   public fScore: number = Number.POSITIVE_INFINITY;
+//
+//   // used to reconstruct heap when fScore is updated.
+//   public heapIndex: number = -1;
+//
+//   public constructor(init?: Partial<PiximiNode>) {
+//     super();
+//     Object.assign(this, init);
+//   }
+// }
 
 const validNeighbours = (
   x: number,
@@ -61,8 +87,9 @@ export const makeGraph = (
   console.log("Creating graph");
   let t0 = performance.now();
 
-  let graph: PiximiGraph = createGraph();
+  let graph: any = createGraph();
   graph.fromId = -1;
+  graph.openSet = new NodeHeap();
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -84,11 +111,11 @@ export const makeGraph = (
   }
   let t1 = performance.now();
   console.log("Graph creation took " + (t1 - t0) + " milliseconds.");
-  return graph;
+  return graph as PiximiGraph;
 };
 
 export const createPathFinder = (
-  graph: PiximiGraph,
+  graph: PiximiGraph | Graph,
   width: number,
   factor: number
 ) => {

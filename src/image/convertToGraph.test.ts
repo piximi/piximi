@@ -56,7 +56,7 @@ test("foo", async () => {
   console.log(pathValues);
   console.log(distanceValues);
 
-  const pathFinder2 = cachedAStarPathSearch(graph);
+  const pathFinder2 = cachedAStarPathSearch(graph, img.width, 1);
   const foundPath2 = pathFinder2.find(4, 10);
   const pathCoords2 = [];
   const pathValues2 = [];
@@ -71,7 +71,7 @@ test("foo", async () => {
     lastId2 = id;
   }
   console.log("New functions here");
-
+  console.log(foundPath2);
   console.log(pathCoords2);
   console.log(pathValues2);
   console.log(distanceValues2);

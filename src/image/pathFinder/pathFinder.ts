@@ -1,7 +1,7 @@
 import { NodeHeap } from "./nodeHeap";
-import { Node, Link } from "ngraph.graph";
-import { makeSearchStatePool, NodeSearchState } from "./makeSearchStatePool";
+import { Link } from "ngraph.graph";
 import { fromIdxToCoord, PiximiGraph, PiximiNode } from "../GraphHelper";
+import { Node } from "ngraph.graph";
 
 /**
  * Performs a uni-directional A Star search on graph.
@@ -19,7 +19,7 @@ const NO_PATH: never[] = [];
  *
  * @param graph instance. See https://github.com/anvaka/ngraph.graph
  * @param {width} width of the original image
- * @param {factor} scaling factor between image and graph
+ * @param {factor} factor for scaling between image and graph
  *
  * @returns {Object} A pathfinder with single method `find()`.
  */
@@ -31,7 +31,7 @@ export function cachedAStarPathSearch(
   // whether traversal should be considered over oriented graph.
   const oriented = true;
 
-  const heuristic = (fromNode: Node, toNode: Node) => {
+  const heuristic = (fromNode: PiximiNode, toNode: PiximiNode) => {
     const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
     const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
     if (x1 === x2 || y1 === y2) {
@@ -44,8 +44,6 @@ export function cachedAStarPathSearch(
     return toNode.data;
   };
 
-  const pool = makeSearchStatePool();
-
   return {
     /**
      * Finds a path between node `fromId` and `toId`.
@@ -56,7 +54,7 @@ export function cachedAStarPathSearch(
   };
 
   function find(fromId: number, toId: number) {
-    const from = graph.getNode(fromId);
+    const from = graph.getNode(fromId) as PiximiNode;
     if (!from) return NO_PATH;
     const to = graph.getNode(toId);
     if (!to) return NO_PATH;
@@ -64,112 +62,99 @@ export function cachedAStarPathSearch(
     let cameFrom: any;
     // Maps nodeId to NodeSearchState.
 
-    if (graph.openSet) {
-      console.log(fromId, toId, graph.fromId, graph.openSet.length);
-    } else {
-      console.log(fromId, toId, graph.fromId, "no openset");
-    }
-    const dest: PiximiNode | undefined = graph.getNode(toId);
+    const dest = graph.getNode(toId);
     if (dest) {
       if (dest.fromId === fromId) {
-        console.log("Calling cached path");
         return dest.trace;
       }
     }
 
-    if (graph.fromId === fromId && graph.openSet.length > 0) {
-      console.log("Resuming search for path", graph.openSet.length);
-    } else {
-      console.log("Resetting search for path");
-      pool.reset();
+    if (graph.fromId !== fromId || graph.openSet.length === 0) {
+      console.log("Resetting search for new path");
       graph.openSet = new NodeHeap();
-      const startNode = pool.createNewState(from);
-      graph.nodeState = new Map();
-
-      // the nodes that we still need to evaluate
-
-      graph.nodeState.set(fromId, startNode);
-
       // For the first node, fScore is completely heuristic.
-      startNode.fScore = heuristic(from, to);
+      from.fScore = heuristic(from, to);
 
       // The cost of going from start to start is zero.
-      startNode.distanceToSource = 0;
-      graph.openSet.push(startNode);
-      startNode.open = 1;
+      from.distanceToSource = 0;
+      graph.openSet.push(from);
+      from.open = 1;
       graph.fromId = fromId;
     }
 
     while (graph.openSet.length > 0) {
       cameFrom = graph.openSet.pop();
 
-      if (goalReached(cameFrom, to)) {
-        cameFrom.closed = true;
-        cameFrom.node.trace = reconstructPath(cameFrom, width, factor);
-        cameFrom.node.fromId = fromId;
-        return cameFrom.node.trace;
+      if (cameFrom.id === toId) {
+        cameFrom.trace = reconstructPath(graph, cameFrom, width, factor);
+        cameFrom.fromId = fromId;
+        return cameFrom.trace;
       }
 
       // no need to visit this node anymore
+      cameFrom.trace = reconstructPath(graph, cameFrom, width, factor);
+      cameFrom.fromId = fromId;
       cameFrom.closed = true;
-      cameFrom.node.trace = reconstructPath(cameFrom, width, factor);
-      cameFrom.node.fromId = fromId;
-      cameFrom.node.closed = true;
-      graph.forEachLinkedNode(cameFrom.node.id, visitNeighbour, oriented);
+      graph.forEachLinkedNode(cameFrom.id, visitNeighbour, oriented);
     }
 
     // If we got here, then there is no path.
     return NO_PATH;
 
-    function visitNeighbour(otherNode: Node, link: Link) {
-      let otherSearchState = graph.nodeState.get(otherNode.id);
-      if (!otherSearchState) {
-        otherSearchState = pool.createNewState(otherNode);
-        graph.nodeState.set(otherNode.id, otherSearchState);
+    function visitNeighbour(otherNode: PiximiNode, link: Link) {
+      if (otherNode.fromId !== graph.fromId) {
+        // This is old data, reset all params
+        otherNode.fromId = graph.fromId;
+        otherNode.trace = [];
+        otherNode.parentId = null;
+        otherNode.closed = false;
+        otherNode.open = 0;
+        otherNode.distanceToSource = Number.POSITIVE_INFINITY;
+        otherNode.fScore = Number.POSITIVE_INFINITY;
+        otherNode.heapIndex = -1;
       }
 
-      if (otherSearchState.closed) {
+      if (otherNode.closed) {
         // Already processed this node.
         return;
       }
-      if (otherSearchState.open === 0) {
+      if (otherNode.open === 0) {
         // Remember this node.
-        graph.openSet.push(otherSearchState);
-        otherSearchState.open = 1;
+        graph.openSet.push(otherNode);
+        otherNode.open = 1;
       }
 
       const tentativeDistance =
-        cameFrom.distanceToSource + distance(otherNode, cameFrom.node, link);
-      if (tentativeDistance >= otherSearchState.distanceToSource) {
+        cameFrom.distanceToSource + distance(otherNode, cameFrom, link);
+      if (tentativeDistance >= otherNode.distanceToSource) {
         // This would only make our path longer. Ignore this route.
         return;
       }
 
       // bingo! we found shorter path:
-      otherSearchState.parent = cameFrom;
-      otherSearchState.distanceToSource = tentativeDistance;
-      otherSearchState.fScore =
-        tentativeDistance + heuristic(otherSearchState.node, to);
+      otherNode.parentId = cameFrom.id;
+      otherNode.distanceToSource = tentativeDistance;
+      otherNode.fScore = tentativeDistance + heuristic(otherNode, to);
 
-      graph.openSet.updateItem(otherSearchState.heapIndex);
+      graph.openSet.updateItem(otherNode.heapIndex);
     }
   }
 }
 
-function goalReached(searchState: NodeSearchState, targetNode: Node) {
-  return searchState.node === targetNode;
-}
-
 function reconstructPath(
-  searchState: NodeSearchState | null,
+  graph: PiximiGraph,
+  searchNode: PiximiNode | null,
   width: number,
   factor: number = 1
 ) {
   let coords = [];
-  if (searchState.parent !== null) {
-    coords.push(...searchState.parent.node.trace);
+  if (searchNode!.parentId !== null) {
+    const parentNode = graph.getNode(searchNode!.parentId);
+    if (typeof parentNode !== "undefined") {
+      coords.push(...parentNode.trace);
+    }
   }
-  const [x, y] = fromIdxToCoord(searchState.node.id, width);
+  const [x, y] = fromIdxToCoord(searchNode.id, width);
   coords.push([x / factor, y / factor]);
   return coords;
 }

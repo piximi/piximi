@@ -8,11 +8,7 @@ import * as _ from "underscore";
 import { Line } from "konva/types/shapes/Line";
 import { Image as ImageKonvaType } from "konva/types/shapes/Image";
 import useImage from "use-image";
-import {
-  convertPathToCoords,
-  createPathFinder,
-  makeGraph,
-} from "../../../image/GraphHelper";
+import { createPathFinder, makeGraph } from "../../../image/GraphHelper";
 import { Image } from "image-js";
 import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
@@ -123,7 +119,7 @@ export const MagneticSelection = ({
 
   const [graph, setGraph] = useState<Graph | null>(null);
 
-  const pathFinder = React.useRef<PathFinder<any>>();
+  const pathFinder = React.useRef<any>();
 
   const position = React.useRef<{ x: number; y: number } | null>(null);
   const startPosition = React.useRef<{ x: number; y: number } | null>(null);
@@ -271,7 +267,7 @@ export const MagneticSelection = ({
 
           setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
           let t1 = performance.now();
-          console.log("Found path in", t1 - t0, pathCoordsRef.current);
+          console.log("Found path in", t1 - t0);
         }
       }
     }

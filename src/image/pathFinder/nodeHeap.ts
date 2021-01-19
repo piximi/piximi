@@ -5,19 +5,19 @@
  * Adapted for PathFinding needs by @anvaka
  * Copyright (c) 2017, Andrei Kashcha
  */
-import { NodeSearchState } from "./makeSearchStatePool";
+import { PiximiNode } from "../GraphHelper";
 
 export class NodeHeap {
   public data: Array<any> = [];
 
   public length: number = 0;
 
-  compare(a: NodeSearchState, b: NodeSearchState) {
+  compare(a: PiximiNode, b: PiximiNode) {
     return a.fScore - b.fScore;
   }
 
-  setNodeId(nodeSearchState: NodeSearchState, heapIndex: number) {
-    nodeSearchState.heapIndex = heapIndex;
+  setNodeId(node: PiximiNode, heapIndex: number) {
+    node.heapIndex = heapIndex;
   }
 
   push(item: any) {
@@ -95,19 +95,3 @@ export class NodeHeap {
     setNodeId(item, pos);
   }
 }
-
-// function getNodeHeap(nodeHeap: NodeHeap) {
-//     if (!(nodeHeap instanceof NodeHeap)) return new NodeHeap();
-//
-//
-//     if (nodeHeap.length > 0) {
-//         for (let i = (nodeHeap.length >> 1); i >= 0; i--) nodeHeap._down(i);
-//     }
-//
-//     if (options.setNodeId) {
-//         for (let i = 0; i < this.length; ++i) {
-//             this.setNodeId(this.data[i], i);
-//         }
-//     }
-// }
-//
