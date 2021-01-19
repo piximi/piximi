@@ -22,6 +22,7 @@ import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { convertPathToCoords } from "../../../image/GraphHelper";
 import { RectangularSelection } from "./RectangularSelection";
+import { StartingAnchor } from "./StartingAnchor";
 
 type MainProps = {
   activeCategory: Category;
@@ -877,33 +878,15 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const PolygonalSelectionStartingAnchor = () => {
-    if (annotating && polygonalSelectionStart) {
-      return (
-        <ReactKonva.Circle
-          fill="#000"
-          globalCompositeOperation="source-over"
-          hitStrokeWidth={64}
-          id="start"
-          name="anchor"
-          radius={3}
-          ref={polygonalSelectionStartingAnchorCircleRef}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={polygonalSelectionStart.x}
-          y={polygonalSelectionStart.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
-
   const PolygonalSelection = () => {
     if (annotated && !annotating) {
       return (
         <React.Fragment>
-          <PolygonalSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={polygonalSelectionStart}
+            ref={polygonalSelectionStartingAnchorCircleRef}
+          />
 
           <PolygonalSelectionAnchor />
 
@@ -931,7 +914,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     } else if (!annotated && annotating) {
       return (
         <React.Fragment>
-          <PolygonalSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={polygonalSelectionStart}
+            ref={polygonalSelectionStartingAnchorCircleRef}
+          />
 
           {polygonalSelectionStrokes.map(
             (stroke: { points: Array<number> }, key: number) => {
