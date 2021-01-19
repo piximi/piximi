@@ -1265,6 +1265,44 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
+  /*
+   * Zoom
+   */
+  const [zoomScaleX, setZoomScaleX] = useState<number>(1);
+  const [zoomScaleY, setZoomScaleY] = useState<number>(1);
+  const [stageX, setStageX] = useState<number>(0);
+  const [stageY, setStageY] = useState<number>(0);
+
+  let scaleStep = 1.1;
+
+  const onZoomMouseDown = (position: { x: number; y: number }) => {
+    if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
+      let pointerX = stageRef.current.getPointerPosition()!.x;
+      let pointerY = stageRef.current.getPointerPosition()!.y;
+
+      const mousePointTo = {
+        x: (pointerX - stageX) / zoomScaleX,
+        y: (pointerY - stageY) / zoomScaleY,
+      };
+
+      const newScale = zoomScaleX * scaleStep;
+
+      setStageX(
+        stageRef.current.getPointerPosition()!.x - mousePointTo.x * newScale
+      );
+      setStageY(
+        stageRef.current.getPointerPosition()!.y - mousePointTo.y * newScale
+      );
+
+      setZoomScaleX(newScale);
+      setZoomScaleY(newScale);
+    }
+  };
+
+  const onZoomMouseMove = (position: { x: number; y: number }) => {};
+
+  const onZoomMouseUp = (position: { x: number; y: number }) => {};
+
   const onSelection = () => {
     switch (activeOperation) {
       case ImageViewerOperation.ColorAdjustment:
@@ -1337,7 +1375,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
             return onRectangularSelectionMouseDown(position);
           case ImageViewerOperation.Zoom:
-            break;
+            return onZoomMouseDown(position);
         }
       }
     }
@@ -1380,7 +1418,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
             return onRectangularSelectionMouseMove(position);
           case ImageViewerOperation.Zoom:
-            break;
+            return onZoomMouseMove(position);
         }
       }
     }
@@ -1429,7 +1467,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
             return onRectangularSelectionMouseUp(position);
           case ImageViewerOperation.Zoom:
-            break;
+            return onZoomMouseUp(position);
         }
       }
     }
@@ -1443,7 +1481,9 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
         <ReactKonva.Stage
           globalCompositeOperation="destination-over"
           height={image.shape?.r}
+          position={{ x: stageX, y: stageY }}
           ref={stageRef}
+          scale={{ x: zoomScaleX, y: zoomScaleY }}
           width={image.shape?.c}
         >
           <ReactKonva.Layer
