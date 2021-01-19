@@ -18,5 +18,10 @@ export class RectangularSelection extends Selection {
     }
   }
 
-  public onMouseUp(position: { x: number; y: number }): void {}
+  public onMouseUp(position: { x: number; y: number }): void {
+    if (this.x && this.y) {
+      this.r = position.y - this.y;
+      this.c = position.x - this.x;
+    }
+  }
 }
