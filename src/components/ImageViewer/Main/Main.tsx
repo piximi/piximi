@@ -22,24 +22,6 @@ import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { convertPathToCoords } from "../../../image/GraphHelper";
 
-type LassoSelectionAnchor = {
-  x: number;
-  y: number;
-};
-
-type LassoSelectionStroke = {
-  points: Array<number>;
-};
-
-type PolygonalSelectionAnchor = {
-  x: number;
-  y: number;
-};
-
-type PolygonalSelectionStroke = {
-  points: Array<number>;
-};
-
 type MainProps = {
   activeCategory: Category;
   activeOperation: ImageViewerOperation;
@@ -62,11 +44,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onColorSelection = () => {};
 
-  const onColorSelectionMouseDown = () => {};
+  const onColorSelectionMouseDown = (position: { x: number; y: number }) => {};
 
-  const onColorSelectionMouseMove = () => {};
+  const onColorSelectionMouseMove = (position: { x: number; y: number }) => {};
 
-  const onColorSelectionMouseUp = () => {};
+  const onColorSelectionMouseUp = (position: { x: number; y: number }) => {};
 
   /*
    * Elliptical selection
@@ -149,45 +131,42 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onEllipticalSelection = () => {};
 
-  const onEllipticalSelectionMouseDown = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onEllipticalSelectionMouseDown = (position: {
+    x: number;
+    y: number;
+  }) => {
+    setEllipticalSelectionStartX(position.x);
 
-      if (position) {
-        setEllipticalSelectionStartX(position.x);
+    setEllipticalSelectionStartY(position.y);
+  };
 
-        setEllipticalSelectionStartY(position.y);
-      }
+  const onEllipticalSelectionMouseMove = (position: {
+    x: number;
+    y: number;
+  }) => {
+    if (ellipticalSelectionStartX && ellipticalSelectionStartY) {
+      setEllipticalSelectionCenterX(
+        (position.x - ellipticalSelectionStartX) / 2 + ellipticalSelectionStartX
+      );
+
+      setEllipticalSelectionCenterY(
+        (position.y - ellipticalSelectionStartY) / 2 + ellipticalSelectionStartY
+      );
+
+      setEllipticalSelectionRadiusX(
+        Math.abs((position.x - ellipticalSelectionStartX) / 2)
+      );
+
+      setEllipticalSelectionRadiusY(
+        Math.abs((position.y - ellipticalSelectionStartY) / 2)
+      );
     }
   };
 
-  const onEllipticalSelectionMouseMove = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
-
-      if (ellipticalSelectionStartX && ellipticalSelectionStartY && position) {
-        setEllipticalSelectionCenterX(
-          (position.x - ellipticalSelectionStartX) / 2 +
-            ellipticalSelectionStartX
-        );
-
-        setEllipticalSelectionCenterY(
-          (position.y - ellipticalSelectionStartY) / 2 +
-            ellipticalSelectionStartY
-        );
-
-        setEllipticalSelectionRadiusX(
-          Math.abs((position.x - ellipticalSelectionStartX) / 2)
-        );
-
-        setEllipticalSelectionRadiusY(
-          Math.abs((position.y - ellipticalSelectionStartY) / 2)
-        );
-      }
-    }
-  };
-
-  const onEllipticalSelectionMouseUp = () => {};
+  const onEllipticalSelectionMouseUp = (position: {
+    x: number;
+    y: number;
+  }) => {};
 
   /*
    * Lasso selection
@@ -196,15 +175,14 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const lassoSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
 
-  const [
-    lassoSelectionAnchor,
-    setLassoSelectionAnchor,
-  ] = useState<LassoSelectionAnchor>();
+  const [lassoSelectionAnchor, setLassoSelectionAnchor] = useState<{
+    x: number;
+    y: number;
+  }>();
 
-  const [
-    lassoSelectionAnnotation,
-    setLassoSelectionAnnotation,
-  ] = useState<LassoSelectionStroke>();
+  const [lassoSelectionAnnotation, setLassoSelectionAnnotation] = useState<{
+    points: Array<number>;
+  }>();
 
   const [lassoSelectionCanClose, setLassoSelectionCanClose] = useState<boolean>(
     false
@@ -215,13 +193,13 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     setLassoSelectionEarlyRelease,
   ] = useState<boolean>(false);
 
-  const [
-    lassoSelectionStart,
-    setLassoSelectionStart,
-  ] = useState<LassoSelectionAnchor>();
+  const [lassoSelectionStart, setLassoSelectionStart] = useState<{
+    x: number;
+    y: number;
+  }>();
 
   const [lassoSelectionStrokes, setLassoSelectionStrokes] = useState<
-    Array<LassoSelectionStroke>
+    Array<{ points: Array<number> }>
   >([]);
 
   const LassoSelectionAnchor = () => {
@@ -304,7 +282,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
           <LassoSelectionStartingAnchor />
 
           {lassoSelectionStrokes.map(
-            (stroke: LassoSelectionStroke, key: number) => {
+            (stroke: { points: Array<number> }, key: number) => {
               return (
                 <React.Fragment>
                   <ReactKonva.Line
@@ -364,71 +342,23 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onLassoSelection = () => {};
 
-  const onLassoSelectionMouseDown = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onLassoSelectionMouseDown = (position: { x: number; y: number }) => {
+    if (connected(position)) {
+      const stroke: { points: Array<number> } = {
+        points: _.flatten(
+          lassoSelectionStrokes.map(
+            (stroke: { points: Array<number> }) => stroke.points
+          )
+        ),
+      };
 
-      if (position) {
-        if (connected(position)) {
-          const stroke: LassoSelectionStroke = {
-            points: _.flatten(
-              lassoSelectionStrokes.map(
-                (stroke: LassoSelectionStroke) => stroke.points
-              )
-            ),
-          };
-
-          setAnnotated(true);
-          setAnnotating(false);
-          setLassoSelectionAnnotation(stroke);
-          setLassoSelectionStrokes([]);
-        } else {
-          if (!lassoSelectionEarlyRelease) {
-            if (lassoSelectionAnchor) {
-              const stroke = {
-                points: [
-                  lassoSelectionAnchor.x,
-                  lassoSelectionAnchor.y,
-                  position.x,
-                  position.y,
-                ],
-              };
-
-              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
-
-              setLassoSelectionAnchor(position);
-            } else {
-              setAnnotating(true);
-
-              setLassoSelectionStart(position);
-
-              const stroke: LassoSelectionStroke = {
-                points: [position.x, position.y],
-              };
-
-              setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
-            }
-          } else {
-            setLassoSelectionEarlyRelease(false);
-          }
-        }
-      }
-    }
-  };
-
-  const onLassoSelectionMouseMove = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
-
-      if (position) {
-        if (
-          !lassoSelectionCanClose &&
-          !isInside(lassoSelectionStartingAnchorCircleRef, position)
-        ) {
-          setLassoSelectionCanClose(true);
-        }
-
-        if (lassoSelectionAnchor && !lassoSelectionEarlyRelease) {
+      setAnnotated(true);
+      setAnnotating(false);
+      setLassoSelectionAnnotation(stroke);
+      setLassoSelectionStrokes([]);
+    } else {
+      if (!lassoSelectionEarlyRelease) {
+        if (lassoSelectionAnchor) {
           const stroke = {
             points: [
               lassoSelectionAnchor.x,
@@ -438,82 +368,108 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
             ],
           };
 
-          if (lassoSelectionStrokes.length > 2) {
-            lassoSelectionStrokes.splice(
-              lassoSelectionStrokes.length - 1,
-              1,
-              stroke
-            );
+          setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
 
-            setLassoSelectionStrokes(lassoSelectionStrokes.concat());
-          } else {
-            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
-          }
+          setLassoSelectionAnchor(position);
         } else {
-          let stroke = lassoSelectionStrokes[lassoSelectionStrokes.length - 1];
+          setAnnotating(true);
 
-          stroke.points = [...stroke.points, position.x, position.y];
+          setLassoSelectionStart(position);
 
-          lassoSelectionStrokes.splice(
-            lassoSelectionStrokes.length - 1,
-            1,
-            stroke
-          );
+          const stroke: { points: Array<number> } = {
+            points: [position.x, position.y],
+          };
 
-          setLassoSelectionStrokes(lassoSelectionStrokes.concat());
-
-          if (connected(position)) {
-            //  TODO:
-          } else {
-            //  TODO:
-          }
+          setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
         }
+      } else {
+        setLassoSelectionEarlyRelease(false);
       }
     }
   };
 
-  const onLassoSelectionMouseUp = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onLassoSelectionMouseMove = (position: { x: number; y: number }) => {
+    if (
+      !lassoSelectionCanClose &&
+      !isInside(lassoSelectionStartingAnchorCircleRef, position)
+    ) {
+      setLassoSelectionCanClose(true);
+    }
 
-      if (position) {
-        if (connected(position)) {
-          if (lassoSelectionStart) {
-            const stroke = {
-              points: [
-                position.x,
-                position.y,
-                lassoSelectionStart.x,
-                lassoSelectionStart.y,
-              ],
-            };
+    if (lassoSelectionAnchor && !lassoSelectionEarlyRelease) {
+      const stroke = {
+        points: [
+          lassoSelectionAnchor.x,
+          lassoSelectionAnchor.y,
+          position.x,
+          position.y,
+        ],
+      };
 
-            setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
-          }
+      if (lassoSelectionStrokes.length > 2) {
+        lassoSelectionStrokes.splice(
+          lassoSelectionStrokes.length - 1,
+          1,
+          stroke
+        );
 
-          const stroke: LassoSelectionStroke = {
-            points: _.flatten(
-              lassoSelectionStrokes.map(
-                (stroke: LassoSelectionStroke) => stroke.points
-              )
-            ),
-          };
-
-          setAnnotated(true);
-          setAnnotating(false);
-          setLassoSelectionAnnotation(stroke);
-          setLassoSelectionStrokes([]);
-        } else {
-          if (
-            !lassoSelectionAnchor &&
-            lassoSelectionStrokes[lassoSelectionStrokes.length - 1].points
-              .length <= 2
-          ) {
-            setLassoSelectionEarlyRelease(true);
-          }
-          setLassoSelectionAnchor(position);
-        }
+        setLassoSelectionStrokes(lassoSelectionStrokes.concat());
+      } else {
+        setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
       }
+    } else {
+      let stroke = lassoSelectionStrokes[lassoSelectionStrokes.length - 1];
+
+      stroke.points = [...stroke.points, position.x, position.y];
+
+      lassoSelectionStrokes.splice(lassoSelectionStrokes.length - 1, 1, stroke);
+
+      setLassoSelectionStrokes(lassoSelectionStrokes.concat());
+
+      if (connected(position)) {
+        //  TODO:
+      } else {
+        //  TODO:
+      }
+    }
+  };
+
+  const onLassoSelectionMouseUp = (position: { x: number; y: number }) => {
+    if (connected(position)) {
+      if (lassoSelectionStart) {
+        const stroke = {
+          points: [
+            position.x,
+            position.y,
+            lassoSelectionStart.x,
+            lassoSelectionStart.y,
+          ],
+        };
+
+        setLassoSelectionStrokes([...lassoSelectionStrokes, stroke]);
+      }
+
+      const stroke: { points: Array<number> } = {
+        points: _.flatten(
+          lassoSelectionStrokes.map(
+            (stroke: { points: Array<number> }) => stroke.points
+          )
+        ),
+      };
+
+      setAnnotated(true);
+      setAnnotating(false);
+      setLassoSelectionAnnotation(stroke);
+      setLassoSelectionStrokes([]);
+    } else {
+      if (
+        !lassoSelectionAnchor &&
+        lassoSelectionStrokes[lassoSelectionStrokes.length - 1].points.length <=
+          2
+      ) {
+        setLassoSelectionEarlyRelease(true);
+      }
+      setLassoSelectionAnchor(position);
     }
   };
 
@@ -701,7 +657,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onMagneticSelection = () => {};
 
-  const onMagneticSelectionMouseDown = () => {
+  const onMagneticSelectionMouseDown = (position: { x: number; y: number }) => {
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -739,7 +695,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const onMagneticSelectionMouseMove = () => {
+  const onMagneticSelectionMouseMove = (position: { x: number; y: number }) => {
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -801,7 +757,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const onMagneticSelectionMouseUp = () => {
+  const onMagneticSelectionMouseUp = (position: { x: number; y: number }) => {
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -861,11 +817,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onObjectSelection = () => {};
 
-  const onObjectSelectionMouseDown = () => {};
+  const onObjectSelectionMouseDown = (position: { x: number; y: number }) => {};
 
-  const onObjectSelectionMouseMove = () => {};
+  const onObjectSelectionMouseMove = (position: { x: number; y: number }) => {};
 
-  const onObjectSelectionMouseUp = () => {};
+  const onObjectSelectionMouseUp = (position: { x: number; y: number }) => {};
 
   /*
    * Polygonal selection
@@ -874,28 +830,28 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const polygonalSelectionStartingAnchorCircleRef = React.useRef<Circle>(null);
 
-  const [
-    polygonalSelectionAnchor,
-    setPolygonalSelectionAnchor,
-  ] = useState<PolygonalSelectionAnchor>();
+  const [polygonalSelectionAnchor, setPolygonalSelectionAnchor] = useState<{
+    x: number;
+    y: number;
+  }>();
 
   const [
     polygonalSelectionAnnotation,
     setPolygonalSelectionAnnotation,
-  ] = useState<PolygonalSelectionStroke>();
+  ] = useState<{ points: Array<number> }>();
 
   const [
     polygonalSelectionCanClose,
     setPolygonalSelectionCanClose,
   ] = useState<boolean>(false);
 
-  const [
-    polygonalSelectionStart,
-    setPolygonalSelectionStart,
-  ] = useState<PolygonalSelectionAnchor>();
+  const [polygonalSelectionStart, setPolygonalSelectionStart] = useState<{
+    x: number;
+    y: number;
+  }>();
 
   const [polygonalSelectionStrokes, setPolygonalSelectionStrokes] = useState<
-    Array<PolygonalSelectionStroke>
+    Array<{ points: Array<number> }>
   >([]);
 
   const PolygonalSelectionAnchor = () => {
@@ -977,7 +933,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
           <PolygonalSelectionStartingAnchor />
 
           {polygonalSelectionStrokes.map(
-            (stroke: PolygonalSelectionStroke, key: number) => {
+            (stroke: { points: Array<number> }, key: number) => {
               return (
                 <React.Fragment>
                   <ReactKonva.Line
@@ -1012,177 +968,153 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onPolygonalSelection = () => {};
 
-  const onPolygonalSelectionMouseDown = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onPolygonalSelectionMouseDown = (position: {
+    x: number;
+    y: number;
+  }) => {
+    if (connected(position)) {
+      const stroke: { points: Array<number> } = {
+        points: _.flatten(
+          polygonalSelectionStrokes.map(
+            (stroke: { points: Array<number> }) => stroke.points
+          )
+        ),
+      };
 
-      if (position) {
-        if (connected(position)) {
-          const stroke: PolygonalSelectionStroke = {
-            points: _.flatten(
-              polygonalSelectionStrokes.map(
-                (stroke: PolygonalSelectionStroke) => stroke.points
-              )
-            ),
-          };
+      setAnnotated(true);
 
-          setAnnotated(true);
+      setAnnotating(false);
 
-          setAnnotating(false);
+      setPolygonalSelectionAnnotation(stroke);
 
-          setPolygonalSelectionAnnotation(stroke);
+      setPolygonalSelectionStrokes([]);
+    } else {
+      if (polygonalSelectionAnchor) {
+        const stroke = {
+          points: [
+            polygonalSelectionAnchor.x,
+            polygonalSelectionAnchor.y,
+            position.x,
+            position.y,
+          ],
+        };
 
-          setPolygonalSelectionStrokes([]);
-        } else {
-          if (polygonalSelectionAnchor) {
-            const stroke = {
-              points: [
-                polygonalSelectionAnchor.x,
-                polygonalSelectionAnchor.y,
-                position.x,
-                position.y,
-              ],
-            };
+        setPolygonalSelectionStrokes([...polygonalSelectionStrokes, stroke]);
 
-            setPolygonalSelectionStrokes([
-              ...polygonalSelectionStrokes,
-              stroke,
-            ]);
+        setPolygonalSelectionAnchor(position);
+      } else if (polygonalSelectionStart) {
+        const stroke = {
+          points: [
+            polygonalSelectionStart.x,
+            polygonalSelectionStart.y,
+            position.x,
+            position.y,
+          ],
+        };
 
-            setPolygonalSelectionAnchor(position);
-          } else if (polygonalSelectionStart) {
-            const stroke = {
-              points: [
-                polygonalSelectionStart.x,
-                polygonalSelectionStart.y,
-                position.x,
-                position.y,
-              ],
-            };
+        setPolygonalSelectionStrokes([...polygonalSelectionStrokes, stroke]);
 
-            setPolygonalSelectionStrokes([
-              ...polygonalSelectionStrokes,
-              stroke,
-            ]);
+        setPolygonalSelectionAnchor(position);
+      } else {
+        setAnnotating(true);
 
-            setPolygonalSelectionAnchor(position);
-          } else {
-            setAnnotating(true);
-
-            setPolygonalSelectionStart(position);
-          }
-        }
+        setPolygonalSelectionStart(position);
       }
     }
   };
 
-  const onPolygonalSelectionMouseMove = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onPolygonalSelectionMouseMove = (position: {
+    x: number;
+    y: number;
+  }) => {
+    if (
+      !polygonalSelectionCanClose &&
+      !isInside(polygonalSelectionStartingAnchorCircleRef, position)
+    ) {
+      setPolygonalSelectionCanClose(true);
+    }
 
-      if (position) {
-        if (
-          !polygonalSelectionCanClose &&
-          !isInside(polygonalSelectionStartingAnchorCircleRef, position)
-        ) {
-          setPolygonalSelectionCanClose(true);
-        }
+    if (polygonalSelectionAnchor) {
+      const stroke = {
+        points: [
+          polygonalSelectionAnchor.x,
+          polygonalSelectionAnchor.y,
+          position.x,
+          position.y,
+        ],
+      };
+      polygonalSelectionStrokes.splice(
+        polygonalSelectionStrokes.length - 1,
+        1,
+        stroke
+      );
 
-        if (polygonalSelectionAnchor) {
-          const stroke = {
-            points: [
-              polygonalSelectionAnchor.x,
-              polygonalSelectionAnchor.y,
-              position.x,
-              position.y,
-            ],
-          };
-          polygonalSelectionStrokes.splice(
-            polygonalSelectionStrokes.length - 1,
-            1,
-            stroke
-          );
+      setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
+    } else if (polygonalSelectionStart) {
+      const stroke = {
+        points: [
+          polygonalSelectionStart.x,
+          polygonalSelectionStart.y,
+          position.x,
+          position.y,
+        ],
+      };
 
-          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
-        } else if (polygonalSelectionStart) {
-          const stroke = {
-            points: [
-              polygonalSelectionStart.x,
-              polygonalSelectionStart.y,
-              position.x,
-              position.y,
-            ],
-          };
+      polygonalSelectionStrokes.splice(
+        polygonalSelectionStrokes.length - 1,
+        1,
+        stroke
+      );
 
-          polygonalSelectionStrokes.splice(
-            polygonalSelectionStrokes.length - 1,
-            1,
-            stroke
-          );
-
-          setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
-        }
-      }
+      setPolygonalSelectionStrokes(polygonalSelectionStrokes.concat());
     }
   };
 
-  const onPolygonalSelectionMouseUp = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onPolygonalSelectionMouseUp = (position: { x: number; y: number }) => {
+    if (connected(position)) {
+      if (polygonalSelectionStart) {
+        const stroke = {
+          points: [
+            position.x,
+            position.y,
+            polygonalSelectionStart.x,
+            polygonalSelectionStart.y,
+          ],
+        };
 
-      if (position) {
-        if (connected(position)) {
-          if (polygonalSelectionStart) {
-            const stroke = {
-              points: [
-                position.x,
-                position.y,
-                polygonalSelectionStart.x,
-                polygonalSelectionStart.y,
-              ],
-            };
+        setPolygonalSelectionStrokes([...polygonalSelectionStrokes, stroke]);
+      }
 
-            setPolygonalSelectionStrokes([
-              ...polygonalSelectionStrokes,
-              stroke,
-            ]);
-          }
+      const stroke: { points: Array<number> } = {
+        points: _.flatten(
+          polygonalSelectionStrokes.map(
+            (stroke: { points: Array<number> }) => stroke.points
+          )
+        ),
+      };
 
-          const stroke: PolygonalSelectionStroke = {
-            points: _.flatten(
-              polygonalSelectionStrokes.map(
-                (stroke: PolygonalSelectionStroke) => stroke.points
-              )
-            ),
+      setAnnotated(true);
+
+      setAnnotating(false);
+
+      setPolygonalSelectionAnnotation(stroke);
+
+      setPolygonalSelectionStrokes([]);
+    } else {
+      if (polygonalSelectionStrokes.length === 1) {
+        setPolygonalSelectionAnchor(position);
+
+        if (polygonalSelectionStart) {
+          const stroke = {
+            points: [
+              polygonalSelectionStart!.x,
+              polygonalSelectionStart!.y,
+              position.x,
+              position.y,
+            ],
           };
 
-          setAnnotated(true);
-
-          setAnnotating(false);
-
-          setPolygonalSelectionAnnotation(stroke);
-
-          setPolygonalSelectionStrokes([]);
-        } else {
-          if (polygonalSelectionStrokes.length === 1) {
-            setPolygonalSelectionAnchor(position);
-
-            if (polygonalSelectionStart) {
-              const stroke = {
-                points: [
-                  polygonalSelectionStart!.x,
-                  polygonalSelectionStart!.y,
-                  position.x,
-                  position.y,
-                ],
-              };
-
-              setPolygonalSelectionStrokes([
-                ...polygonalSelectionStrokes,
-                stroke,
-              ]);
-            }
-          }
+          setPolygonalSelectionStrokes([...polygonalSelectionStrokes, stroke]);
         }
       }
     }
@@ -1197,11 +1129,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
   const onQuickSelection = () => {};
 
-  const onQuickSelectionMouseDown = () => {};
+  const onQuickSelectionMouseDown = (position: { x: number; y: number }) => {};
 
-  const onQuickSelectionMouseMove = () => {};
+  const onQuickSelectionMouseMove = (position: { x: number; y: number }) => {};
 
-  const onQuickSelectionMouseUp = () => {};
+  const onQuickSelectionMouseUp = (position: { x: number; y: number }) => {};
 
   /*
    * Rectangular selection
@@ -1265,30 +1197,29 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const onRectangularSelectionMouseDown = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+  const onRectangularSelectionMouseDown = (position: {
+    x: number;
+    y: number;
+  }) => {
+    setRectangularSelectionX(position.x);
+    setRectangularSelectionY(position.y);
+  };
 
-      if (position) {
-        setRectangularSelectionX(position.x);
-        setRectangularSelectionY(position.y);
-      }
+  const onRectangularSelectionMouseMove = (position: {
+    x: number;
+    y: number;
+  }) => {
+    if (rectangularSelectionX && rectangularSelectionY) {
+      setRectangularSelectionHeight(position.y - rectangularSelectionY);
+
+      setRectangularSelectionWidth(position.x - rectangularSelectionX);
     }
   };
 
-  const onRectangularSelectionMouseMove = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
-
-      if (rectangularSelectionX && rectangularSelectionY && position) {
-        setRectangularSelectionHeight(position.y - rectangularSelectionY);
-
-        setRectangularSelectionWidth(position.x - rectangularSelectionX);
-      }
-    }
-  };
-
-  const onRectangularSelectionMouseUp = () => {};
+  const onRectangularSelectionMouseUp = (position: {
+    x: number;
+    y: number;
+  }) => {};
 
   const RectangularSelection = () => {
     if (annotated && !annotating) {
@@ -1366,123 +1297,141 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   );
 
   const onMouseDown = () => {
-    switch (activeOperation) {
-      case ImageViewerOperation.ColorAdjustment:
-        break;
-      case ImageViewerOperation.ColorSelection:
-        return onColorSelectionMouseDown();
-      case ImageViewerOperation.EllipticalSelection:
-        if (annotated) return;
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
-        setAnnotating(true);
+      if (position) {
+        switch (activeOperation) {
+          case ImageViewerOperation.ColorAdjustment:
+            break;
+          case ImageViewerOperation.ColorSelection:
+            return onColorSelectionMouseDown(position);
+          case ImageViewerOperation.EllipticalSelection:
+            if (annotated) return;
 
-        return onEllipticalSelectionMouseDown();
-      case ImageViewerOperation.Hand:
-        break;
-      case ImageViewerOperation.LassoSelection:
-        if (annotated) return;
+            setAnnotating(true);
 
-        return onLassoSelectionMouseDown();
-      case ImageViewerOperation.MagneticSelection:
-        if (annotated) return;
+            return onEllipticalSelectionMouseDown(position);
+          case ImageViewerOperation.Hand:
+            break;
+          case ImageViewerOperation.LassoSelection:
+            if (annotated) return;
 
-        return onMagneticSelectionMouseDown();
-      case ImageViewerOperation.ObjectSelection:
-        return onObjectSelectionMouseDown();
-      case ImageViewerOperation.PolygonalSelection:
-        if (annotated) return;
+            return onLassoSelectionMouseDown(position);
+          case ImageViewerOperation.MagneticSelection:
+            if (annotated) return;
 
-        return onPolygonalSelectionMouseDown();
-      case ImageViewerOperation.QuickSelection:
-        return onRectangularSelectionMouseDown();
-      case ImageViewerOperation.RectangularSelection:
-        if (annotated) return;
+            return onMagneticSelectionMouseDown(position);
+          case ImageViewerOperation.ObjectSelection:
+            return onObjectSelectionMouseDown(position);
+          case ImageViewerOperation.PolygonalSelection:
+            if (annotated) return;
 
-        setAnnotating(true);
+            return onPolygonalSelectionMouseDown(position);
+          case ImageViewerOperation.QuickSelection:
+            return onRectangularSelectionMouseDown(position);
+          case ImageViewerOperation.RectangularSelection:
+            if (annotated) return;
 
-        return onRectangularSelectionMouseDown();
-      case ImageViewerOperation.Zoom:
-        break;
+            setAnnotating(true);
+
+            return onRectangularSelectionMouseDown(position);
+          case ImageViewerOperation.Zoom:
+            break;
+        }
+      }
     }
   };
 
   const onMouseMove = () => {
-    switch (activeOperation) {
-      case ImageViewerOperation.ColorAdjustment:
-        break;
-      case ImageViewerOperation.ColorSelection:
-        return onColorSelectionMouseMove();
-      case ImageViewerOperation.EllipticalSelection:
-        if (annotated) return;
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
-        return onEllipticalSelectionMouseMove();
-      case ImageViewerOperation.Hand:
-        break;
-      case ImageViewerOperation.LassoSelection:
-        if (annotated || !annotating) return;
+      if (position) {
+        switch (activeOperation) {
+          case ImageViewerOperation.ColorAdjustment:
+            break;
+          case ImageViewerOperation.ColorSelection:
+            return onColorSelectionMouseMove(position);
+          case ImageViewerOperation.EllipticalSelection:
+            if (annotated) return;
 
-        return onLassoSelectionMouseMove();
-      case ImageViewerOperation.MagneticSelection:
-        if (annotated || !annotating) return;
+            return onEllipticalSelectionMouseMove(position);
+          case ImageViewerOperation.Hand:
+            break;
+          case ImageViewerOperation.LassoSelection:
+            if (annotated || !annotating) return;
 
-        return onMagneticSelectionMouseMove();
-      case ImageViewerOperation.ObjectSelection:
-        return onObjectSelectionMouseMove();
-      case ImageViewerOperation.PolygonalSelection:
-        if (annotated || !annotating) return;
+            return onLassoSelectionMouseMove(position);
+          case ImageViewerOperation.MagneticSelection:
+            if (annotated || !annotating) return;
 
-        return onPolygonalSelectionMouseMove();
-      case ImageViewerOperation.QuickSelection:
-        return onRectangularSelectionMouseMove();
-      case ImageViewerOperation.RectangularSelection:
-        if (annotated) return;
+            return onMagneticSelectionMouseMove(position);
+          case ImageViewerOperation.ObjectSelection:
+            return onObjectSelectionMouseMove(position);
+          case ImageViewerOperation.PolygonalSelection:
+            if (annotated || !annotating) return;
 
-        return onRectangularSelectionMouseMove();
-      case ImageViewerOperation.Zoom:
-        break;
+            return onPolygonalSelectionMouseMove(position);
+          case ImageViewerOperation.QuickSelection:
+            return onRectangularSelectionMouseMove(position);
+          case ImageViewerOperation.RectangularSelection:
+            if (annotated) return;
+
+            return onRectangularSelectionMouseMove(position);
+          case ImageViewerOperation.Zoom:
+            break;
+        }
+      }
     }
   };
 
   const onMouseUp = () => {
-    switch (activeOperation) {
-      case ImageViewerOperation.ColorAdjustment:
-        break;
-      case ImageViewerOperation.ColorSelection:
-        return onColorSelectionMouseUp();
-      case ImageViewerOperation.EllipticalSelection:
-        if (annotated || !annotating) return;
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
 
-        setAnnotated(true);
-        setAnnotating(false);
+      if (position) {
+        switch (activeOperation) {
+          case ImageViewerOperation.ColorAdjustment:
+            break;
+          case ImageViewerOperation.ColorSelection:
+            return onColorSelectionMouseUp(position);
+          case ImageViewerOperation.EllipticalSelection:
+            if (annotated || !annotating) return;
 
-        return onEllipticalSelectionMouseUp();
-      case ImageViewerOperation.Hand:
-        break;
-      case ImageViewerOperation.LassoSelection:
-        if (annotated || !annotating) return;
+            setAnnotated(true);
+            setAnnotating(false);
 
-        return onLassoSelectionMouseUp();
-      case ImageViewerOperation.MagneticSelection:
-        if (annotated || !annotating) return;
+            return onEllipticalSelectionMouseUp(position);
+          case ImageViewerOperation.Hand:
+            break;
+          case ImageViewerOperation.LassoSelection:
+            if (annotated || !annotating) return;
 
-        return onMagneticSelectionMouseUp();
-      case ImageViewerOperation.ObjectSelection:
-        return onObjectSelectionMouseUp();
-      case ImageViewerOperation.PolygonalSelection:
-        if (annotated || !annotating) return;
+            return onLassoSelectionMouseUp(position);
+          case ImageViewerOperation.MagneticSelection:
+            if (annotated || !annotating) return;
 
-        return onPolygonalSelectionMouseUp();
-      case ImageViewerOperation.QuickSelection:
-        return onRectangularSelectionMouseUp();
-      case ImageViewerOperation.RectangularSelection:
-        if (annotated || !annotating) return;
+            return onMagneticSelectionMouseUp(position);
+          case ImageViewerOperation.ObjectSelection:
+            return onObjectSelectionMouseUp(position);
+          case ImageViewerOperation.PolygonalSelection:
+            if (annotated || !annotating) return;
 
-        setAnnotated(true);
-        setAnnotating(false);
+            return onPolygonalSelectionMouseUp(position);
+          case ImageViewerOperation.QuickSelection:
+            return onRectangularSelectionMouseUp(position);
+          case ImageViewerOperation.RectangularSelection:
+            if (annotated || !annotating) return;
 
-        return onRectangularSelectionMouseUp();
-      case ImageViewerOperation.Zoom:
-        break;
+            setAnnotated(true);
+            setAnnotating(false);
+
+            return onRectangularSelectionMouseUp(position);
+          case ImageViewerOperation.Zoom:
+            break;
+        }
+      }
     }
   };
 
