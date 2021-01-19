@@ -21,6 +21,8 @@ import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { convertPathToCoords } from "../../../image/GraphHelper";
+import { RectangularSelection } from "./RectangularSelection";
+import { StartingAnchor } from "./StartingAnchor";
 
 type MainProps = {
   activeCategory: Category;
@@ -224,33 +226,15 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const LassoSelectionStartingAnchor = () => {
-    if (annotating && lassoSelectionStart) {
-      return (
-        <ReactKonva.Circle
-          fill="#000"
-          globalCompositeOperation="source-over"
-          hitStrokeWidth={64}
-          id="start"
-          name="anchor"
-          radius={3}
-          ref={lassoSelectionStartingAnchorCircleRef}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={lassoSelectionStart.x}
-          y={lassoSelectionStart.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
-
   const LassoSelection = () => {
     if (annotated && !annotating) {
       return (
         <React.Fragment>
-          <LassoSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={lassoSelectionStart}
+            ref={lassoSelectionStartingAnchorCircleRef}
+          />
 
           <LassoSelectionAnchor />
 
@@ -279,7 +263,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     } else if (!annotated && annotating) {
       return (
         <React.Fragment>
-          <LassoSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={lassoSelectionStart}
+            ref={lassoSelectionStartingAnchorCircleRef}
+          />
 
           {lassoSelectionStrokes.map(
             (stroke: { points: Array<number> }, key: number) => {
@@ -876,33 +864,15 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const PolygonalSelectionStartingAnchor = () => {
-    if (annotating && polygonalSelectionStart) {
-      return (
-        <ReactKonva.Circle
-          fill="#000"
-          globalCompositeOperation="source-over"
-          hitStrokeWidth={64}
-          id="start"
-          name="anchor"
-          radius={3}
-          ref={polygonalSelectionStartingAnchorCircleRef}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={polygonalSelectionStart.x}
-          y={polygonalSelectionStart.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
-
   const PolygonalSelection = () => {
     if (annotated && !annotating) {
       return (
         <React.Fragment>
-          <PolygonalSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={polygonalSelectionStart}
+            ref={polygonalSelectionStartingAnchorCircleRef}
+          />
 
           <PolygonalSelectionAnchor />
 
@@ -930,7 +900,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     } else if (!annotated && annotating) {
       return (
         <React.Fragment>
-          <PolygonalSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={polygonalSelectionStart}
+            ref={polygonalSelectionStartingAnchorCircleRef}
+          />
 
           {polygonalSelectionStrokes.map(
             (stroke: { points: Array<number> }, key: number) => {
@@ -1221,50 +1195,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     y: number;
   }) => {};
 
-  const RectangularSelection = () => {
-    if (annotated && !annotating) {
-      return (
-        <ReactKonva.Rect
-          dash={[4, 2]}
-          dashOffset={-dashOffset}
-          height={rectangularSelectionHeight}
-          ref={rectangularSelectionRef}
-          stroke="white"
-          strokeWidth={1}
-          fill={toRGBA(activeCategory.color, 0.3)}
-          width={rectangularSelectionWidth}
-          x={rectangularSelectionX}
-          y={rectangularSelectionY}
-        />
-      );
-    } else if (!annotated && annotating) {
-      return (
-        <React.Fragment>
-          <ReactKonva.Rect
-            x={rectangularSelectionX}
-            y={rectangularSelectionY}
-            height={rectangularSelectionHeight}
-            width={rectangularSelectionWidth}
-            stroke="black"
-            strokeWidth={1}
-          />
-          <ReactKonva.Rect
-            x={rectangularSelectionX}
-            y={rectangularSelectionY}
-            height={rectangularSelectionHeight}
-            width={rectangularSelectionWidth}
-            stroke="white"
-            dash={[4, 2]}
-            dashOffset={-dashOffset}
-            strokeWidth={1}
-          />
-        </React.Fragment>
-      );
-    } else {
-      return null;
-    }
-  };
-
   /*
    * Zoom
    */
@@ -1511,7 +1441,16 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
               <QuickSelection />
             )}
             {activeOperation === ImageViewerOperation.RectangularSelection && (
-              <RectangularSelection />
+              <RectangularSelection
+                activeCategory={activeCategory}
+                annotated={annotated}
+                annotating={annotating}
+                height={rectangularSelectionHeight}
+                ref={rectangularSelectionRef}
+                width={rectangularSelectionWidth}
+                x={rectangularSelectionX}
+                y={rectangularSelectionY}
+              />
             )}
           </ReactKonva.Layer>
         </ReactKonva.Stage>
