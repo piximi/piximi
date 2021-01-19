@@ -1287,12 +1287,8 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
 
       const newScale = zoomScaleX * scaleStep;
 
-      setStageX(
-        stageRef.current.getPointerPosition()!.x - mousePointTo.x * newScale
-      );
-      setStageY(
-        stageRef.current.getPointerPosition()!.y - mousePointTo.y * newScale
-      );
+      setStageX(pointerX - mousePointTo.x * newScale);
+      setStageY(pointerY - mousePointTo.y * newScale);
 
       setZoomScaleX(newScale);
       setZoomScaleY(newScale);

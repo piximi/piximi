@@ -26,6 +26,7 @@ import { OperationOptions } from "../OperationOptions";
 import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
 import { Main } from "../Main";
+import { ZoomOptions } from "../ZoomOptions";
 
 type ImageViewerProps = {
   foo: Image;
@@ -104,11 +105,11 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       settings: <React.Fragment />,
     },
     {
-      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      description: "Description of zoom here.",
       icon: <ZoomIcon />,
       method: ImageViewerOperation.Zoom,
       name: "Zoom",
-      settings: <React.Fragment />,
+      settings: <ZoomOptions />,
     },
   ];
 
