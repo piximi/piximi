@@ -117,7 +117,7 @@ export const MagneticSelection = ({
   const [prevStrokes, setPrevStrokes] = useState<Array<Stroke>>([]);
 
   const [downsizedWidth, setDownsizedWidth] = useState<number>(0);
-  const [factor, setFactor] = useState<number>(1);
+  const [factor, setFactor] = useState<number>(0.25);
 
   const [canClose, setCanClose] = useState<boolean>(false);
 

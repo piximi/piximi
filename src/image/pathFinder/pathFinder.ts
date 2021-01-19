@@ -57,10 +57,9 @@ export function cachedAStarPathSearch(
 
   function find(fromId: number, toId: number) {
     const from = graph.getNode(fromId);
-    if (!from)
-      throw new Error("fromId is not defined in this graph: " + fromId);
+    if (!from) return NO_PATH;
     const to = graph.getNode(toId);
-    if (!to) throw new Error("toId is not defined in this graph: " + toId);
+    if (!to) return NO_PATH;
 
     let cameFrom: any;
     // Maps nodeId to NodeSearchState.
