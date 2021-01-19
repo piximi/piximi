@@ -13,15 +13,15 @@ export class RectangularSelection extends Selection {
 
   public onMouseMove(position: { x: number; y: number }): void {
     if (this.x && this.y) {
-      this.r = position.y - this.y;
       this.c = position.x - this.x;
+      this.r = position.y - this.y;
     }
   }
 
   public onMouseUp(position: { x: number; y: number }): void {
     if (this.x && this.y) {
-      this.r = position.y - this.y;
       this.c = position.x - this.x;
+      this.r = position.y - this.y;
     }
   }
 }
