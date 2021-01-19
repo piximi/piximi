@@ -21,26 +21,6 @@ export interface PiximiNode extends Node {
   heapIndex: number;
 }
 
-// export class PiximiNode extends Node {
-//   public fromId: number = -1;
-//   public trace: Array<Array<number>> = [];
-//
-//   public parentId: number | null = null;
-//   public closed: boolean = false;
-//   public open: number = 0;
-//   public distanceToSource: number = Number.POSITIVE_INFINITY;
-//   // the f(n) = g(n) + h(n) value
-//   public fScore: number = Number.POSITIVE_INFINITY;
-//
-//   // used to reconstruct heap when fScore is updated.
-//   public heapIndex: number = -1;
-//
-//   public constructor(init?: Partial<PiximiNode>) {
-//     super();
-//     Object.assign(this, init);
-//   }
-// }
-
 const validNeighbours = (
   x: number,
   y: number,
