@@ -2,18 +2,19 @@ import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import React from "react";
+import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
+import { Operation } from "../Operation";
 import { ReactComponent as ColorAdjustmentIcon } from "../../../icons/ColorAdjustment.svg";
+import { ReactComponent as ColorSelectionIcon } from "../../../icons/ColorSelection.svg";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
-import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
-import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
 import { ReactComponent as HandIcon } from "../../../icons/Hand.svg";
+import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
+import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
-import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
-import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
+import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
 import { useStyles } from "./Operations.css";
-import { Operation } from "../Operation";
 
 type ImageViewerProps = {
   activeOperation: ImageViewerOperation;
@@ -111,7 +112,7 @@ export const Operations = ({
           }
           selected={activeOperation === ImageViewerOperation.ColorSelection}
         >
-          <MagneticIcon />
+          <ColorSelectionIcon />
         </Operation>
 
         <Operation

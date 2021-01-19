@@ -226,33 +226,15 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const LassoSelectionStartingAnchor = () => {
-    if (annotating && lassoSelectionStart) {
-      return (
-        <ReactKonva.Circle
-          fill="#000"
-          globalCompositeOperation="source-over"
-          hitStrokeWidth={64}
-          id="start"
-          name="anchor"
-          radius={3}
-          ref={lassoSelectionStartingAnchorCircleRef}
-          stroke="#FFF"
-          strokeWidth={1}
-          x={lassoSelectionStart.x}
-          y={lassoSelectionStart.y}
-        />
-      );
-    } else {
-      return <React.Fragment />;
-    }
-  };
-
   const LassoSelection = () => {
     if (annotated && !annotating) {
       return (
         <React.Fragment>
-          <LassoSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={lassoSelectionStart}
+            ref={lassoSelectionStartingAnchorCircleRef}
+          />
 
           <LassoSelectionAnchor />
 
@@ -281,7 +263,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     } else if (!annotated && annotating) {
       return (
         <React.Fragment>
-          <LassoSelectionStartingAnchor />
+          <StartingAnchor
+            annotating={annotating}
+            position={lassoSelectionStart}
+            ref={lassoSelectionStartingAnchorCircleRef}
+          />
 
           {lassoSelectionStrokes.map(
             (stroke: { points: Array<number> }, key: number) => {
