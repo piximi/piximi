@@ -11,6 +11,7 @@ import { ReactComponent as HandIcon } from "../../../icons/Hand.svg";
 import { ReactComponent as LassoIcon } from "../../../icons/Lasso.svg";
 import { ReactComponent as MagneticIcon } from "../../../icons/Magnetic.svg";
 import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSelection.svg";
+import { ReactComponent as PolygonalSelectionIcon } from "../../../icons/PolygonalSelection.svg";
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
@@ -92,7 +93,7 @@ export const Operations = ({
           }
           selected={activeOperation === ImageViewerOperation.PolygonalSelection}
         >
-          <EllipticalIcon />
+          <PolygonalSelectionIcon />
         </Operation>
 
         <Operation
