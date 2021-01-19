@@ -150,12 +150,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const onEllipticalSelection = () => {};
 
   const onEllipticalSelectionMouseDown = () => {
-    if (annotated) {
-      return;
-    }
-
-    setAnnotating(true);
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -168,10 +162,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onEllipticalSelectionMouseMove = () => {
-    if (annotated) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -197,19 +187,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const onEllipticalSelectionMouseUp = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
-    setAnnotated(true);
-
-    setAnnotating(false);
-  };
+  const onEllipticalSelectionMouseUp = () => {};
 
   /*
    * Lasso selection
@@ -387,8 +365,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const onLassoSelection = () => {};
 
   const onLassoSelectionMouseDown = () => {
-    if (annotated) return;
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -441,12 +417,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onLassoSelectionMouseMove = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) return;
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -503,10 +473,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onLassoSelectionMouseUp = () => {
-    if (annotated) return;
-
-    if (!annotating) return;
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -736,10 +702,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const onMagneticSelection = () => {};
 
   const onMagneticSelectionMouseDown = () => {
-    if (annotated) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -778,14 +740,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onMagneticSelectionMouseMove = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -848,14 +802,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onMagneticSelectionMouseUp = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       magneticSelectionPosition.current = stageRef.current.getPointerPosition();
 
@@ -1067,10 +1013,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const onPolygonalSelection = () => {};
 
   const onPolygonalSelectionMouseDown = () => {
-    if (annotated) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -1135,14 +1077,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onPolygonalSelectionMouseMove = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -1193,14 +1127,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onPolygonalSelectionMouseUp = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -1340,12 +1266,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onRectangularSelectionMouseDown = () => {
-    if (annotated) {
-      return;
-    }
-
-    setAnnotating(true);
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -1357,10 +1277,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   };
 
   const onRectangularSelectionMouseMove = () => {
-    if (annotated) {
-      return;
-    }
-
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -1372,19 +1288,7 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     }
   };
 
-  const onRectangularSelectionMouseUp = () => {
-    if (annotated) {
-      return;
-    }
-
-    if (!annotating) {
-      return;
-    }
-
-    setAnnotated(true);
-
-    setAnnotating(false);
-  };
+  const onRectangularSelectionMouseUp = () => {};
 
   const RectangularSelection = () => {
     if (annotated && !annotating) {
@@ -1468,20 +1372,34 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorSelection:
         return onColorSelectionMouseDown();
       case ImageViewerOperation.EllipticalSelection:
+        if (annotated) return;
+
+        setAnnotating(true);
+
         return onEllipticalSelectionMouseDown();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
+        if (annotated) return;
+
         return onLassoSelectionMouseDown();
       case ImageViewerOperation.MagneticSelection:
+        if (annotated) return;
+
         return onMagneticSelectionMouseDown();
       case ImageViewerOperation.ObjectSelection:
         return onObjectSelectionMouseDown();
       case ImageViewerOperation.PolygonalSelection:
+        if (annotated) return;
+
         return onPolygonalSelectionMouseDown();
       case ImageViewerOperation.QuickSelection:
         return onRectangularSelectionMouseDown();
       case ImageViewerOperation.RectangularSelection:
+        if (annotated) return;
+
+        setAnnotating(true);
+
         return onRectangularSelectionMouseDown();
       case ImageViewerOperation.Zoom:
         break;
@@ -1495,20 +1413,30 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorSelection:
         return onColorSelectionMouseMove();
       case ImageViewerOperation.EllipticalSelection:
+        if (annotated) return;
+
         return onEllipticalSelectionMouseMove();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
+        if (annotated || !annotating) return;
+
         return onLassoSelectionMouseMove();
       case ImageViewerOperation.MagneticSelection:
+        if (annotated || !annotating) return;
+
         return onMagneticSelectionMouseMove();
       case ImageViewerOperation.ObjectSelection:
         return onObjectSelectionMouseMove();
       case ImageViewerOperation.PolygonalSelection:
+        if (annotated || !annotating) return;
+
         return onPolygonalSelectionMouseMove();
       case ImageViewerOperation.QuickSelection:
         return onRectangularSelectionMouseMove();
       case ImageViewerOperation.RectangularSelection:
+        if (annotated) return;
+
         return onRectangularSelectionMouseMove();
       case ImageViewerOperation.Zoom:
         break;
@@ -1522,20 +1450,36 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
       case ImageViewerOperation.ColorSelection:
         return onColorSelectionMouseUp();
       case ImageViewerOperation.EllipticalSelection:
+        if (annotated || !annotating) return;
+
+        setAnnotated(true);
+        setAnnotating(false);
+
         return onEllipticalSelectionMouseUp();
       case ImageViewerOperation.Hand:
         break;
       case ImageViewerOperation.LassoSelection:
+        if (annotated || !annotating) return;
+
         return onLassoSelectionMouseUp();
       case ImageViewerOperation.MagneticSelection:
+        if (annotated || !annotating) return;
+
         return onMagneticSelectionMouseUp();
       case ImageViewerOperation.ObjectSelection:
         return onObjectSelectionMouseUp();
       case ImageViewerOperation.PolygonalSelection:
+        if (annotated || !annotating) return;
+
         return onPolygonalSelectionMouseUp();
       case ImageViewerOperation.QuickSelection:
         return onRectangularSelectionMouseUp();
       case ImageViewerOperation.RectangularSelection:
+        if (annotated || !annotating) return;
+
+        setAnnotated(true);
+        setAnnotating(false);
+
         return onRectangularSelectionMouseUp();
       case ImageViewerOperation.Zoom:
         break;
