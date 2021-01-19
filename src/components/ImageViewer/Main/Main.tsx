@@ -21,6 +21,7 @@ import { Graph } from "ngraph.graph";
 import { PathFinder } from "ngraph.path";
 import { getIdx } from "../../../image/imageHelper";
 import { convertPathToCoords } from "../../../image/GraphHelper";
+import { RectangularSelection } from "./RectangularSelection";
 
 type MainProps = {
   activeCategory: Category;
@@ -1221,50 +1222,6 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
     y: number;
   }) => {};
 
-  const RectangularSelection = () => {
-    if (annotated && !annotating) {
-      return (
-        <ReactKonva.Rect
-          dash={[4, 2]}
-          dashOffset={-dashOffset}
-          height={rectangularSelectionHeight}
-          ref={rectangularSelectionRef}
-          stroke="white"
-          strokeWidth={1}
-          fill={toRGBA(activeCategory.color, 0.3)}
-          width={rectangularSelectionWidth}
-          x={rectangularSelectionX}
-          y={rectangularSelectionY}
-        />
-      );
-    } else if (!annotated && annotating) {
-      return (
-        <React.Fragment>
-          <ReactKonva.Rect
-            x={rectangularSelectionX}
-            y={rectangularSelectionY}
-            height={rectangularSelectionHeight}
-            width={rectangularSelectionWidth}
-            stroke="black"
-            strokeWidth={1}
-          />
-          <ReactKonva.Rect
-            x={rectangularSelectionX}
-            y={rectangularSelectionY}
-            height={rectangularSelectionHeight}
-            width={rectangularSelectionWidth}
-            stroke="white"
-            dash={[4, 2]}
-            dashOffset={-dashOffset}
-            strokeWidth={1}
-          />
-        </React.Fragment>
-      );
-    } else {
-      return null;
-    }
-  };
-
   const onSelection = () => {
     switch (activeOperation) {
       case ImageViewerOperation.ColorAdjustment:
@@ -1475,7 +1432,16 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
               <QuickSelection />
             )}
             {activeOperation === ImageViewerOperation.RectangularSelection && (
-              <RectangularSelection />
+              <RectangularSelection
+                activeCategory={activeCategory}
+                annotated={annotated}
+                annotating={annotating}
+                height={rectangularSelectionHeight}
+                ref={rectangularSelectionRef}
+                width={rectangularSelectionWidth}
+                x={rectangularSelectionX}
+                y={rectangularSelectionY}
+              />
             )}
           </ReactKonva.Layer>
         </ReactKonva.Stage>
