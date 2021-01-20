@@ -1243,23 +1243,28 @@ export const Main = ({
   const onZoomMouseDown = (position: { x: number; y: number }) => {
     if (zoomSelected) return;
 
-    if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
-      setZoomSelectionX(stageRef.current.getPointerPosition()!.x);
-      setZoomSelectionY(stageRef.current.getPointerPosition()!.y);
-    }
+    setZoomSelectionX((position.x - stageX) / zoomScaleX);
+    setZoomSelectionY((position.y - stageY) / zoomScaleY);
+
+    setZoomSelecting(true);
   };
 
   const onZoomMouseMove = (position: { x: number; y: number }) => {
     if (zoomSelected) return;
+    if (!zoomSelecting) return;
+
     if (zoomSelectionX && zoomSelectionY) {
-      setZoomSelectionHeight(position.y - zoomSelectionY);
-      setZoomSelectionWidth(position.x - zoomSelectionX);
+      setZoomSelectionHeight(
+        (position.y - stageY) / zoomScaleY - zoomSelectionY
+      );
+      setZoomSelectionWidth(
+        (position.x - stageX) / zoomScaleX - zoomSelectionX
+      );
       setZoomSelecting(true);
     }
   };
 
   const onZoomMouseUp = (position: { x: number; y: number }) => {
-    // RECTANGLE SELECTION MODE
     if (
       zoomSelecting &&
       zoomSelectionX &&
@@ -1278,10 +1283,7 @@ export const Main = ({
         setZoomScaleY(newScaleY);
       }
       setZoomSelected(true);
-    }
-
-    // CLICK MODE
-    else {
+    } else {
       const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
 
       if (stageRef && stageRef.current) {
@@ -1302,6 +1304,7 @@ export const Main = ({
         setZoomScaleY(newScale);
       }
     }
+
     setZoomSelecting(false);
   };
 
