@@ -1246,16 +1246,13 @@ export const Main = ({
   const onZoomMouseUp = (position: { x: number; y: number }) => {
     // RECTANGLE SELECTION MODE
     if (
+      zoomSelecting &&
       zoomSelectionX &&
       zoomSelectionY &&
       zoomSelectionWidth &&
       zoomSelectionHeight
     ) {
-      if (
-        stageRef &&
-        stageRef.current &&
-        stageRef.current.getPointerPosition()
-      ) {
+      if (stageRef && stageRef.current) {
         const newScaleX =
           zoomScaleX * (stageRef.current.width() / zoomSelectionWidth);
         const newScaleY =
@@ -1271,13 +1268,9 @@ export const Main = ({
     else {
       const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
 
-      if (
-        stageRef &&
-        stageRef.current &&
-        stageRef.current.getPointerPosition()
-      ) {
-        let pointerX = stageRef.current.getPointerPosition()!.x;
-        let pointerY = stageRef.current.getPointerPosition()!.y;
+      if (stageRef && stageRef.current) {
+        let pointerX = position.x;
+        let pointerY = position.y;
 
         const mousePointTo = {
           x: (pointerX - stageX) / zoomScaleX,
