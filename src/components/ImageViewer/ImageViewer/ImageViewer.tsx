@@ -27,6 +27,7 @@ import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
 import { Main } from "../Main";
 import { ZoomOptions } from "../ZoomOptions";
+import { ZoomType } from "../Main/Main";
 
 type ImageViewerProps = {
   foo: Image;
@@ -34,9 +35,11 @@ type ImageViewerProps = {
 
 export const ImageViewer = ({ foo }: ImageViewerProps) => {
   const handleZoomMode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setZoomMode((event.target as HTMLInputElement).value);
+    const mode = parseInt((event.target as HTMLInputElement).value);
+    setZoomMode(mode);
   };
-  const [zoomMode, setZoomMode] = useState<string>("zoom in");
+
+  const [zoomMode, setZoomMode] = useState<ZoomType>(ZoomType.In);
 
   const operations = [
     {
@@ -165,6 +168,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         activeCategory={activeCategory}
         activeOperation={activeOperation}
         image={foo}
+        zoomMode={zoomMode}
       />
 
       <OperationOptions

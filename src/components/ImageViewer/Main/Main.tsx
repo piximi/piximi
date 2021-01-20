@@ -24,13 +24,24 @@ import { convertPathToCoords } from "../../../image/GraphHelper";
 import { RectangularSelection } from "./RectangularSelection";
 import { StartingAnchor } from "./StartingAnchor";
 
+export enum ZoomType {
+  In,
+  Out,
+}
+
 type MainProps = {
   activeCategory: Category;
   activeOperation: ImageViewerOperation;
   image: PiximiImage;
+  zoomMode: ZoomType;
 };
 
-export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
+export const Main = ({
+  activeCategory,
+  activeOperation,
+  image,
+  zoomMode,
+}: MainProps) => {
   const dispatch = useDispatch();
   const [img] = useImage(image.src, "Anonymous");
   const dashOffset = useMarchingAnts();
@@ -1203,9 +1214,11 @@ export const Main = ({ activeCategory, activeOperation, image }: MainProps) => {
   const [stageX, setStageX] = useState<number>(0);
   const [stageY, setStageY] = useState<number>(0);
 
-  let scaleStep = 1.1;
+  const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
 
   const onZoomMouseDown = (position: { x: number; y: number }) => {
+    const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
+
     if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
       let pointerX = stageRef.current.getPointerPosition()!.x;
       let pointerY = stageRef.current.getPointerPosition()!.y;

@@ -2,9 +2,10 @@ import Radio from "@material-ui/core/Radio";
 import React, { useState } from "react";
 import { RadioGroup } from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { ZoomType } from "../Main/Main";
 
 type ZoomProps = {
-  zoomMode: string;
+  zoomMode: ZoomType;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -18,12 +19,12 @@ export const ZoomOptions = ({ zoomMode, handleChange }: ZoomProps) => {
         onChange={handleChange}
       >
         <FormControlLabel
-          value="zoom in"
+          value={ZoomType.In}
           control={<Radio tabIndex={-1} />}
           label="Zoom In"
         />
         <FormControlLabel
-          value="zoom out"
+          value={ZoomType.Out}
           control={<Radio tabIndex={-1} />}
           label="Zoom out"
         />
