@@ -1,12 +1,12 @@
 import React from "react";
-import { useStyles } from "./UploadButton.css";
+import { useStyles } from "./OpenImageButton.css";
 import { Button } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import Tooltip from "@material-ui/core/Tooltip";
-import { useMenu } from "../../hooks";
-import { UploadMenu } from "../UploadMenu";
+import { useMenu } from "../../../hooks";
+import { UploadMenu } from "../../UploadMenu";
 
-export const UploadButton = () => {
+export const OpenImageButton = () => {
   const { anchorEl, onClose, onOpen, open } = useMenu();
 
   const classes = useStyles();

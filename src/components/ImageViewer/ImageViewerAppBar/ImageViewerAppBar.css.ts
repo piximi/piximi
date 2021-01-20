@@ -16,6 +16,9 @@ export const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
     width: "100%",
   },
+  grow: {
+    flexGrow: 1,
+  },
   settings: {
     width: settingsWidth,
     flexShrink: 0,
