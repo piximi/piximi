@@ -12,10 +12,15 @@ import Button from "@material-ui/core/Button";
 
 type ZoomProps = {
   zoomMode: ZoomType;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleModeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleRevert: () => void;
 };
 
-export const ZoomOptions = ({ zoomMode, handleChange }: ZoomProps) => {
+export const ZoomOptions = ({
+  zoomMode,
+  handleModeChange,
+  handleRevert,
+}: ZoomProps) => {
   return (
     <React.Fragment>
       <List>
@@ -25,7 +30,7 @@ export const ZoomOptions = ({ zoomMode, handleChange }: ZoomProps) => {
             defaultValue="zoom in"
             name="zoom-mode"
             value={zoomMode}
-            onChange={handleChange}
+            onChange={handleModeChange}
           >
             <FormControlLabel
               value={ZoomType.In}
@@ -40,7 +45,9 @@ export const ZoomOptions = ({ zoomMode, handleChange }: ZoomProps) => {
           </RadioGroup>
         </ListItem>
         <ListItem>
-          <Button variant="contained">Actual Size</Button>
+          <Button onClick={handleRevert} variant="contained">
+            Actual Size
+          </Button>
         </ListItem>
       </List>
     </React.Fragment>

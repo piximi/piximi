@@ -1,6 +1,6 @@
 import * as ReactKonva from "react-konva";
 import Box from "@material-ui/core/Box";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useImage from "use-image";
 import { BoundingBox } from "../../../types/BoundingBox";
 import { Category } from "../../../types/Category";
@@ -35,6 +35,7 @@ type MainProps = {
   activeOperation: ImageViewerOperation;
   image: PiximiImage;
   zoomMode: ZoomType;
+  zoomReset: boolean;
 };
 
 export const Main = ({
@@ -42,6 +43,7 @@ export const Main = ({
   activeOperation,
   image,
   zoomMode,
+  zoomReset,
 }: MainProps) => {
   const dispatch = useDispatch();
   const [img] = useImage(image.src, "Anonymous");
@@ -1225,26 +1227,44 @@ export const Main = ({
 
   const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
 
+  useEffect(() => {
+    setZoomScaleX(1);
+    setZoomScaleY(1);
+    setStageX(0);
+    setStageY(0);
+    setZoomSelectionX(0);
+    setZoomSelectionY(0);
+    setZoomSelectionHeight(0);
+    setZoomSelectionWidth(0);
+    setZoomSelecting(false);
+    setZoomSelected(false);
+  }, [zoomReset]);
+
   const onZoomMouseDown = (position: { x: number; y: number }) => {
     if (zoomSelected) return;
 
-    if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
-      setZoomSelectionX(stageRef.current.getPointerPosition()!.x);
-      setZoomSelectionY(stageRef.current.getPointerPosition()!.y);
-    }
+    setZoomSelectionX((position.x - stageX) / zoomScaleX);
+    setZoomSelectionY((position.y - stageY) / zoomScaleY);
+
+    setZoomSelecting(true);
   };
 
   const onZoomMouseMove = (position: { x: number; y: number }) => {
     if (zoomSelected) return;
+    if (!zoomSelecting) return;
+
     if (zoomSelectionX && zoomSelectionY) {
-      setZoomSelectionHeight(position.y - zoomSelectionY);
-      setZoomSelectionWidth(position.x - zoomSelectionX);
+      setZoomSelectionHeight(
+        (position.y - stageY) / zoomScaleY - zoomSelectionY
+      );
+      setZoomSelectionWidth(
+        (position.x - stageX) / zoomScaleX - zoomSelectionX
+      );
       setZoomSelecting(true);
     }
   };
 
   const onZoomMouseUp = (position: { x: number; y: number }) => {
-    // RECTANGLE SELECTION MODE
     if (
       zoomSelecting &&
       zoomSelectionX &&
@@ -1262,10 +1282,8 @@ export const Main = ({
         setZoomScaleX(newScaleX);
         setZoomScaleY(newScaleY);
       }
-    }
-
-    // CLICK MODE
-    else {
+      setZoomSelected(true);
+    } else {
       const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
 
       if (stageRef && stageRef.current) {
@@ -1287,7 +1305,6 @@ export const Main = ({
       }
     }
 
-    setZoomSelected(true);
     setZoomSelecting(false);
   };
 
