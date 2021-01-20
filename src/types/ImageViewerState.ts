@@ -1,9 +1,11 @@
 import { Image } from "./Image";
 import { ImageViewerOperation } from "./ImageViewerOperation";
-import { SelectionMode } from "./SelectionMode";
+import { ImageViewerSelectionMode } from "./ImageViewerSelectionMode";
+import { ImageViewerZoomMode } from "./ImageViewerZoomMode";
 
 export type ImageViewerState = {
   image?: Image;
   operation: ImageViewerOperation;
-  selectionMode: SelectionMode;
+  selectionMode: ImageViewerSelectionMode;
+  zoomMode: ImageViewerZoomMode;
 };

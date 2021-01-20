@@ -15,11 +15,11 @@ import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.sv
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import {
   imagesSelector,
+  imageViewerOperationSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
-import { projectSlice } from "../../../store/slices";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
@@ -143,9 +143,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
     }
   }, [images, props]);
 
-  const [activeOperation, setActiveOperation] = useState<ImageViewerOperation>(
-    ImageViewerOperation.RectangularSelection
-  );
+  const activeOperation = useSelector(imageViewerOperationSelector);
 
   const classes = useStyles();
 
@@ -172,7 +170,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
         activeCategory={activeCategory}
         onCategoryClick={onCategoryClick}
       />
-      
+
       {image && (
         <Main
           activeCategory={activeCategory}
@@ -207,10 +205,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
         }
       />
 
-      <Operations
-        activeOperation={activeOperation}
-        setActiveOperation={setActiveOperation}
-      />
+      <Operations />
     </div>
   );
 };

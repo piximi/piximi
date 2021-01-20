@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ImageViewerState } from "../../types/ImageViewerState";
 import { Image } from "../../types/Image";
-import { SelectionMode } from "../../types/SelectionMode";
+import { ImageViewerSelectionMode } from "../../types/ImageViewerSelectionMode";
 import { ImageViewerOperation } from "../../types/ImageViewerOperation";
+import { ImageViewerZoomMode } from "../../types/ImageViewerZoomMode";
 
 const initialState: ImageViewerState = {
   operation: ImageViewerOperation.RectangularSelection,
-  selectionMode: SelectionMode.New,
+  selectionMode: ImageViewerSelectionMode.New,
+  zoomMode: ImageViewerZoomMode.In,
 };
 
 export const imageViewerSlice = createSlice({
@@ -27,9 +29,15 @@ export const imageViewerSlice = createSlice({
     },
     setImageViewerSelectionMode(
       state: ImageViewerState,
-      action: PayloadAction<{ selectionMode: SelectionMode }>
+      action: PayloadAction<{ selectionMode: ImageViewerSelectionMode }>
     ) {
       state.selectionMode = action.payload.selectionMode;
+    },
+    setImageViewerZoomMode(
+      state: ImageViewerState,
+      action: PayloadAction<{ zoomMode: ImageViewerZoomMode }>
+    ) {
+      state.zoomMode = action.payload.zoomMode;
     },
   },
 });
@@ -38,4 +46,5 @@ export const {
   setImageViewerImage,
   setImageViewerOperation,
   setImageViewerSelectionMode,
+  setImageViewerZoomMode,
 } = imageViewerSlice.actions;

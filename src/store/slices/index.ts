@@ -29,6 +29,7 @@ export {
 } from "./classifierSlice";
 
 export {
+  imageViewerSlice,
   setImageViewerImage,
   setImageViewerOperation,
   setImageViewerSelectionMode,
