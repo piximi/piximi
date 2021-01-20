@@ -38,8 +38,12 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
     const mode = parseInt((event.target as HTMLInputElement).value);
     setZoomMode(mode);
   };
+  const handleRevertZoom = () => {
+    setZoomReset(!zoomReset);
+  };
 
   const [zoomMode, setZoomMode] = useState<ZoomType>(ZoomType.In);
+  const [zoomReset, setZoomReset] = useState<boolean>(false);
 
   const operations = [
     {
@@ -118,7 +122,11 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       method: ImageViewerOperation.Zoom,
       name: "Zoom",
       settings: (
-        <ZoomOptions zoomMode={zoomMode} handleChange={handleZoomMode} />
+        <ZoomOptions
+          zoomMode={zoomMode}
+          handleModeChange={handleZoomMode}
+          handleRevert={handleRevertZoom}
+        />
       ),
     },
   ];
@@ -169,6 +177,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
         activeOperation={activeOperation}
         image={foo}
         zoomMode={zoomMode}
+        zoomReset={zoomReset}
       />
 
       <OperationOptions

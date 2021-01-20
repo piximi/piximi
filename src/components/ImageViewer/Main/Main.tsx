@@ -1,6 +1,6 @@
 import * as ReactKonva from "react-konva";
 import Box from "@material-ui/core/Box";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useImage from "use-image";
 import { BoundingBox } from "../../../types/BoundingBox";
 import { Category } from "../../../types/Category";
@@ -35,6 +35,7 @@ type MainProps = {
   activeOperation: ImageViewerOperation;
   image: PiximiImage;
   zoomMode: ZoomType;
+  zoomReset: boolean;
 };
 
 export const Main = ({
@@ -42,6 +43,7 @@ export const Main = ({
   activeOperation,
   image,
   zoomMode,
+  zoomReset,
 }: MainProps) => {
   const dispatch = useDispatch();
   const [img] = useImage(image.src, "Anonymous");
@@ -1225,6 +1227,19 @@ export const Main = ({
 
   const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
 
+  useEffect(() => {
+    setZoomScaleX(1);
+    setZoomScaleY(1);
+    setStageX(0);
+    setStageY(0);
+    setZoomSelectionX(0);
+    setZoomSelectionY(0);
+    setZoomSelectionHeight(0);
+    setZoomSelectionWidth(0);
+    setZoomSelecting(false);
+    setZoomSelected(false);
+  }, [zoomReset]);
+
   const onZoomMouseDown = (position: { x: number; y: number }) => {
     if (zoomSelected) return;
 
@@ -1262,6 +1277,7 @@ export const Main = ({
         setZoomScaleX(newScaleX);
         setZoomScaleY(newScaleY);
       }
+      setZoomSelected(true);
     }
 
     // CLICK MODE
@@ -1286,8 +1302,6 @@ export const Main = ({
         setZoomScaleY(newScale);
       }
     }
-
-    setZoomSelected(true);
     setZoomSelecting(false);
   };
 
