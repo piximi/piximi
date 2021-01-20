@@ -46,23 +46,22 @@ export const OpenImageButton = () => {
 
   return (
     <React.Fragment>
-      <div>
-        <input
-          accept="image/*"
-          hidden
-          type="file"
-          id="open-image"
-          onChange={onChange}
-        />
-
-        <Tooltip title="Open image">
-          <label htmlFor="open-image">
-            <Button className={classes.button} startIcon={<CloudUploadIcon />}>
-              Open image
-            </Button>
-          </label>
-        </Tooltip>
-      </div>
+      <Tooltip title="Open image">
+        <Button
+          className={classes.button}
+          component="label"
+          startIcon={<CloudUploadIcon />}
+        >
+          Open image
+          <input
+            accept="image/*"
+            hidden
+            type="file"
+            id="open-image"
+            onChange={onChange}
+          />
+        </Button>
+      </Tooltip>
     </React.Fragment>
   );
 };
