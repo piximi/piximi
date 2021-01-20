@@ -1474,43 +1474,42 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
     }
   };
 
-  const stageParentDivRef = useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
   const [stageWidth, setStageWidth] = useState<number>(1000);
   const [stageHeight, setStageHeight] = useState<number>(1000);
+  const [scale, setScale] = useState<number>(1000 / stageWidth);
 
-  const scale = 1000 / stageWidth;
+  const resize = () => {
+    if (parentRef && parentRef.current) {
+      setScale(parentRef.current.offsetWidth / stageWidth);
+
+      setStageWidth(stageWidth * scale);
+      setStageHeight(stageHeight * scale);
+
+      setZoomScaleX(scale);
+      setZoomScaleY(scale);
+    }
+  };
 
   useEffect(() => {
-    const checkSize = () => {
-      setStageWidth(window.innerWidth);
-      setStageHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", checkSize);
-    return () => window.removeEventListener("resize", checkSize);
-  }, []);
+    window.addEventListener("resize", resize);
 
-  // useEffect( () => {
-  //   // now we need to fit stage into parent
-  //   if (stageParentDivRef && stageParentDivRef.current) {
-  //     const containerWidth = stageParentDivRef.current.offsetWidth;
-  //     // to do this we need to scale the stage
-  //     const scale = containerWidth / stageWidth;
-  //     setStageWidth(stageWidth * scale)
-  //     setStageHeight(stageHeight * scale)
-  //     setZoomScaleX(scale)
-  //     setZoomScaleY(scale)
-  //     if (stageRef && stageRef.current) {
-  //       stageRef.current.width(stageWidth)
-  //       stageRef.current.height(stageHeight)
-  //     }
-  //   }
-  // }, [stageHeight, stageWidth])
+    return () => {
+      window.removeEventListener("resize", resize);
+    };
+  }, [scale, stageHeight, stageWidth]);
+
+  useEffect(() => {
+    resize();
+  }, []);
 
   return (
     <main className={classes.content}>
       <div className={classes.toolbar} />
-      <div ref={stageParentDivRef} className={classes.stage}>
+
+      <div ref={parentRef} className={classes.parent}>
         <ReactKonva.Stage
+          className={classes.stage}
           globalCompositeOperation="destination-over"
           height={stageHeight}
           position={{ x: stageX, y: stageY }}
