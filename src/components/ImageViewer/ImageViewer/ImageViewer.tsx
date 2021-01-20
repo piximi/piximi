@@ -27,22 +27,16 @@ import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
 import { Main } from "../Main";
 import { ZoomOptions } from "../ZoomOptions";
-import { ZoomType } from "../Main/Main";
 
 type ImageViewerProps = {
   image?: Image;
 };
 
 export const ImageViewer = (props: ImageViewerProps) => {
-  const handleZoomMode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const mode = parseInt((event.target as HTMLInputElement).value);
-    setZoomMode(mode);
-  };
   const handleRevertZoom = () => {
     setZoomReset(!zoomReset);
   };
 
-  const [zoomMode, setZoomMode] = useState<ZoomType>(ZoomType.In);
   const [zoomReset, setZoomReset] = useState<boolean>(false);
 
   const operations = [
@@ -121,13 +115,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
       icon: <ZoomIcon />,
       method: ImageViewerOperation.Zoom,
       name: "Zoom",
-      settings: (
-        <ZoomOptions
-          zoomMode={zoomMode}
-          handleModeChange={handleZoomMode}
-          handleRevert={handleRevertZoom}
-        />
-      ),
+      settings: <ZoomOptions handleRevert={handleRevertZoom} />,
     },
   ];
 
@@ -176,7 +164,6 @@ export const ImageViewer = (props: ImageViewerProps) => {
           activeCategory={activeCategory}
           activeOperation={activeOperation}
           image={image}
-          zoomMode={zoomMode}
           zoomReset={zoomReset}
         />
       )}

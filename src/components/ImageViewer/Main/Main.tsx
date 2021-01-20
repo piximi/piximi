@@ -1,5 +1,4 @@
 import * as ReactKonva from "react-konva";
-import Box from "@material-ui/core/Box";
 import React, { useEffect, useRef, useState } from "react";
 import useImage from "use-image";
 import { BoundingBox } from "../../../types/BoundingBox";
@@ -11,7 +10,7 @@ import { Rect } from "konva/types/shapes/Rect";
 import { Stage } from "konva/types/Stage";
 import { projectSlice } from "../../../store/slices";
 import { toRGBA } from "../../../image/toRGBA";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useDebounce, useMarchingAnts, useSelection } from "../../../hooks";
 import { useStyles } from "./Main.css";
 import { Circle } from "konva/types/shapes/Circle";
@@ -24,6 +23,7 @@ import { convertPathToCoords } from "../../../image/GraphHelper";
 import { RectangularSelection } from "./RectangularSelection";
 import { StartingAnchor } from "./StartingAnchor";
 import { ZoomSelection } from "./ZoomSelection";
+import { imageViewerZoomModeSelector } from "../../../store/selectors/imageViewerZoomModeSelector";
 
 export enum ZoomType {
   In,
@@ -34,7 +34,6 @@ type MainProps = {
   activeCategory: Category;
   activeOperation: ImageViewerOperation;
   image: PiximiImage;
-  zoomMode: ZoomType;
   zoomReset: boolean;
 };
 
@@ -42,7 +41,6 @@ export const Main = ({
   activeCategory,
   activeOperation,
   image,
-  zoomMode,
   zoomReset,
 }: MainProps) => {
   const dispatch = useDispatch();
@@ -1226,6 +1224,8 @@ export const Main = ({
   const [zoomSelected, setZoomSelected] = useState<boolean>(false);
 
   const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
+
+  const zoomMode = useSelector(imageViewerZoomModeSelector);
 
   useEffect(() => {
     setZoomScaleX(1);

@@ -12,7 +12,6 @@ import { ImageViewerZoomMode } from "../../../types/ImageViewerZoomMode";
 import { imageViewerSlice } from "../../../store/slices";
 
 type ZoomOptionsProps = {
-  handleModeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleRevert: () => void;
 };
 
