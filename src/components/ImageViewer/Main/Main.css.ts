@@ -66,4 +66,7 @@ export const useStyles = makeStyles((theme) => ({
     zIndex: 0,
     width: theme.spacing(32),
   },
+  stage: {
+    width: "100%",
+  },
 }));

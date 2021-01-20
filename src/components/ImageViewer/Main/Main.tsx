@@ -1478,18 +1478,49 @@ export const Main = ({
     }
   };
 
+  const stageParentDivRef = useRef<HTMLDivElement>(null);
+  const [stageWidth, setStageWidth] = useState<number>(1000);
+  const [stageHeight, setStageHeight] = useState<number>(1000);
+
+  const scale = 1000 / stageWidth;
+
+  useEffect(() => {
+    const checkSize = () => {
+      setStageWidth(window.innerWidth);
+      setStageHeight(window.innerHeight);
+    };
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
+
+  // useEffect( () => {
+  //   // now we need to fit stage into parent
+  //   if (stageParentDivRef && stageParentDivRef.current) {
+  //     const containerWidth = stageParentDivRef.current.offsetWidth;
+  //     // to do this we need to scale the stage
+  //     const scale = containerWidth / stageWidth;
+  //     setStageWidth(stageWidth * scale)
+  //     setStageHeight(stageHeight * scale)
+  //     setZoomScaleX(scale)
+  //     setZoomScaleY(scale)
+  //     if (stageRef && stageRef.current) {
+  //       stageRef.current.width(stageWidth)
+  //       stageRef.current.height(stageHeight)
+  //     }
+  //   }
+  // }, [stageHeight, stageWidth])
+
   return (
     <main className={classes.content}>
       <div className={classes.toolbar} />
-
-      <Box alignItems="center" display="flex" justifyContent="center">
+      <div ref={stageParentDivRef} className={classes.stage}>
         <ReactKonva.Stage
           globalCompositeOperation="destination-over"
-          height={image.shape?.r}
+          height={stageHeight}
           position={{ x: stageX, y: stageY }}
           ref={stageRef}
-          scale={{ x: zoomScaleX, y: zoomScaleY }}
-          width={image.shape?.c}
+          scale={{ x: scale, y: scale }}
+          width={stageWidth}
         >
           <ReactKonva.Layer
             onMouseDown={onMouseDown}
@@ -1543,7 +1574,7 @@ export const Main = ({
             )}
           </ReactKonva.Layer>
         </ReactKonva.Stage>
-      </Box>
+      </div>
     </main>
   );
 };
