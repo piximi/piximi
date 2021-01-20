@@ -17,9 +17,8 @@ import {
   imagesSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
-import { projectSlice } from "../../../store/slices";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
 import { OperationOptions } from "../OperationOptions";
@@ -172,7 +171,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
         activeCategory={activeCategory}
         onCategoryClick={onCategoryClick}
       />
-      
+
       {image && (
         <Main
           activeCategory={activeCategory}
