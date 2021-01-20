@@ -1,8 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ImageViewerState } from "../../types/ImageViewerState";
 import { Image } from "../../types/Image";
+import { SelectionMode } from "../../types/SelectionMode";
 
-const initialState: ImageViewerState = {};
+const initialState: ImageViewerState = {
+  selectionMode: SelectionMode.New,
+};
 
 export const imageViewerSlice = createSlice({
   initialState: initialState,
@@ -14,7 +17,16 @@ export const imageViewerSlice = createSlice({
     ) {
       state.image = action.payload.image;
     },
+    setImageViewerSelectionMode(
+      state: ImageViewerState,
+      action: PayloadAction<{ selectionMode: SelectionMode }>
+    ) {
+      state.selectionMode = action.payload.selectionMode;
+    },
   },
 });
 
-export const { setImageViewerImage } = imageViewerSlice.actions;
+export const {
+  setImageViewerImage,
+  setImageViewerSelectionMode,
+} = imageViewerSlice.actions;
