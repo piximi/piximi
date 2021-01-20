@@ -13,13 +13,13 @@ export const UploadButton = () => {
 
   return (
     <React.Fragment>
-      <Tooltip title="Upload images">
+      <Tooltip title="Open image">
         <Button
           className={classes.button}
           onClick={onOpen}
           startIcon={<CloudUploadIcon />}
         >
-          Upload
+          Open image
         </Button>
       </Tooltip>
 

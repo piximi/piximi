@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Category } from "../../../types/Category";
 import { CssBaseline } from "@material-ui/core";
 import { Image } from "../../../types/Image";
@@ -30,10 +30,10 @@ import { ZoomOptions } from "../ZoomOptions";
 import { ZoomType } from "../Main/Main";
 
 type ImageViewerProps = {
-  foo: Image;
+  image?: Image;
 };
 
-export const ImageViewer = ({ foo }: ImageViewerProps) => {
+export const ImageViewer = (props: ImageViewerProps) => {
   const handleZoomMode = (event: React.ChangeEvent<HTMLInputElement>) => {
     const mode = parseInt((event.target as HTMLInputElement).value);
     setZoomMode(mode);
@@ -131,16 +131,17 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
     },
   ];
 
-  const dispatch = useDispatch();
-
-  // TODO: Testing code, please remove ASAP
-  React.useEffect(() => {
-    const payload = { shape: foo.shape!, src: foo.src };
-
-    dispatch(projectSlice.actions.createImage(payload));
-  }, [foo, dispatch]);
+  const [image, setImage] = useState<Image>();
 
   const images = useSelector(imagesSelector);
+
+  useEffect(() => {
+    if (props.image) {
+      setImage(props.image);
+    } else if (images.length) {
+      setImage(images[0]);
+    }
+  }, [images, props]);
 
   const [activeOperation, setActiveOperation] = useState<ImageViewerOperation>(
     ImageViewerOperation.RectangularSelection
@@ -175,7 +176,7 @@ export const ImageViewer = ({ foo }: ImageViewerProps) => {
       <Main
         activeCategory={activeCategory}
         activeOperation={activeOperation}
-        image={foo}
+        image={image}
         zoomMode={zoomMode}
         zoomReset={zoomReset}
       />

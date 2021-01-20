@@ -46,7 +46,7 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
             x: position.x,
             y: position.y,
             image: jsImage,
-            tolerance: 100,
+            tolerance: 5,
           });
           console.log(position, results);
         }

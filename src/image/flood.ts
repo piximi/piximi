@@ -60,7 +60,7 @@ export const flood = ({
 
   let visit: Array<number> = [start];
 
-  let visited: Array<number> = [];
+  const visited = new Set();
 
   const directions: Array<Position> = [
     new Position(-1, 0),
@@ -72,38 +72,31 @@ export const flood = ({
   const positivePixels = [];
 
   while (visit.length > 0) {
-    const index = visit[0];
+    const testIndex = visit.shift()!;
 
-    visit.splice(0, 1);
+    position.x = testIndex % boundary.x;
+    position.y = Math.floor(testIndex / (boundary.x === 0 ? 1 : boundary.x));
+    const data = image.getPixelXY(position.x, position.y);
 
-    visited[index] = index;
+    visited.add(testIndex);
 
-    const data = image.getPixel(index);
-    position.x = index % boundary.x;
-    position.y = Math.floor(index / (boundary.x === 0 ? 1 : boundary.x));
-    if (index < image.data.length) {
-      const difference: number = Math.abs(
-        data[0] - color[0] + (data[1] - color[1]) + (data[2] - color[2])
-      );
-      // console.log(difference, tolerance, position.x, position.y, data, index)
-      if (difference <= tolerance) {
-        // context!.fillRect(position.x, position.y, 1, 1);
-        // console.log("Pushed")
-        positivePixels.push(index);
-        const next: Position = new Position(0, 0);
+    const difference: number = Math.abs(
+      data[0] - color[0] + (data[1] - color[1]) + (data[2] - color[2])
+    );
 
-        for (let direction of directions) {
-          const post = new Position(position.x, position.y).add(direction);
+    if (difference <= tolerance) {
+      // context!.fillRect(position.x, position.y, 1, 1);
+      positivePixels.push(position);
+      const next: Position = new Position(0, 0);
 
-          next.overwrite(new Position(position.x, position.y)).add(direction);
+      for (const direction of directions) {
+        next.overwrite(new Position(position.x, position.y)).add(direction);
 
-          if (next.in(boundary)) {
-            const nextIndex = next.y * image.width + next.x;
+        if (next.in(boundary)) {
+          const nextIndex = next.y * image.width + next.x;
 
-            if (visit.indexOf(nextIndex) === -1 && visited[index] != null) {
-              // console.log("Queueing", post.x, post.y, nextIndex)
-              visit.push(nextIndex);
-            }
+          if (!visit.includes(nextIndex) && !visited.has(nextIndex)) {
+            visit.push(nextIndex);
           }
         }
       }

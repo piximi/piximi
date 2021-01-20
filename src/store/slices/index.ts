@@ -1,4 +1,13 @@
 export {
+  applicationSlice,
+  updateTileSize,
+  selectImage,
+  deselectImage,
+  deselectImages,
+  clearSelectedImages,
+} from "./applicationSlice";
+
+export {
   classifierSlice,
   compile,
   fit,
@@ -20,6 +29,12 @@ export {
 } from "./classifierSlice";
 
 export {
+  setImageViewerImage,
+  setImageViewerOperation,
+  setImageViewerSelectionMode,
+} from "./imageViewerSlice";
+
+export {
   createProject,
   createCategory,
   createImage,
@@ -31,12 +46,3 @@ export {
   updateImageCategories,
   updateOtherCategoryVisibility,
 } from "./projectSlice";
-
-export {
-  applicationSlice,
-  updateTileSize,
-  selectImage,
-  deselectImage,
-  deselectImages,
-  clearSelectedImages,
-} from "./applicationSlice";

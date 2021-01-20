@@ -7,7 +7,7 @@ import Radio from "@material-ui/core/Radio";
 import React from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
-import { SelectionType } from "../../../types/SelectionType";
+import { SelectionMode } from "../../../types/SelectionMode";
 
 export const SelectionOptions = () => {
   return (
@@ -18,10 +18,7 @@ export const SelectionOptions = () => {
             <Radio disableRipple disabled edge="start" tabIndex={-1} />
           </ListItemIcon>
 
-          <ListItemText
-            primary={SelectionType.New}
-            secondary="Create a new selection."
-          />
+          <ListItemText primary="New" secondary="Create a new selection." />
         </ListItem>
 
         <ListItem dense disabled>
@@ -30,7 +27,7 @@ export const SelectionOptions = () => {
           </ListItemIcon>
 
           <ListItemText
-            primary={SelectionType.Addition}
+            primary="Addition"
             secondary="Add area to the existing selection."
           />
         </ListItem>
@@ -41,7 +38,7 @@ export const SelectionOptions = () => {
           </ListItemIcon>
 
           <ListItemText
-            primary={SelectionType.Subtraction}
+            primary="Addition"
             secondary="Subtract area from the existing selection."
           />
         </ListItem>
@@ -52,7 +49,7 @@ export const SelectionOptions = () => {
           </ListItemIcon>
 
           <ListItemText
-            primary={SelectionType.Intersection}
+            primary="Intersection"
             secondary="Constrain the boundary of the new selection to the existing selection."
           />
         </ListItem>
