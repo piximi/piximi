@@ -1,3 +1,5 @@
+import Image from "image-js";
+
 class Position {
   x: number;
   y: number;
@@ -40,23 +42,21 @@ class Position {
 export const flood = ({
   x,
   y,
-  canvas,
+  image,
   tolerance,
 }: {
   x: number;
   y: number;
-  canvas: HTMLCanvasElement;
+  image: Image;
   tolerance: number;
 }) => {
-  const context = canvas.getContext("2d");
-
   let position: Position = new Position(x, y);
 
-  const color = context!.getImageData(position.x, position.y, 1, 1).data;
+  const color = image.getPixelXY(x, y);
 
-  const boundary = new Position(canvas.width, canvas.height);
+  const boundary = new Position(image.width, image.height);
 
-  let start: number = position.x * boundary.x + position.x;
+  let start: number = position.y * boundary.x + position.x;
 
   let visit: Array<number> = [start];
 
@@ -69,6 +69,8 @@ export const flood = ({
     new Position(0, 1),
   ];
 
+  const positivePixels = [];
+
   while (visit.length > 0) {
     const index = visit[0];
 
@@ -76,38 +78,36 @@ export const flood = ({
 
     visited[index] = index;
 
+    const data = image.getPixel(index);
     position.x = index % boundary.x;
-    position.y = Math.floor(index / boundary.x === 0 ? 1 : boundary.x);
+    position.y = Math.floor(index / (boundary.x === 0 ? 1 : boundary.x));
+    if (index < image.data.length) {
+      const difference: number = Math.abs(
+        data[0] - color[0] + (data[1] - color[1]) + (data[2] - color[2])
+      );
+      // console.log(difference, tolerance, position.x, position.y, data, index)
+      if (difference <= tolerance) {
+        // context!.fillRect(position.x, position.y, 1, 1);
+        // console.log("Pushed")
+        positivePixels.push(index);
+        const next: Position = new Position(0, 0);
 
-    const data: Uint8ClampedArray = context!.getImageData(
-      position.x,
-      position.y,
-      1,
-      1
-    ).data;
+        for (let direction of directions) {
+          const post = new Position(position.x, position.y).add(direction);
 
-    const difference: number = Math.abs(
-      data[0] - color[0] + (data[1] - color[1]) + (data[2] - color[2])
-    );
+          next.overwrite(new Position(position.x, position.y)).add(direction);
 
-    if (difference <= tolerance) {
-      context!.fillRect(position.x, position.y, 1, 1);
+          if (next.in(boundary)) {
+            const nextIndex = next.y * image.width + next.x;
 
-      const next: Position = new Position(0, 0);
-
-      for (let j = 0; j < directions.length; j++) {
-        const direction: Position = directions[index];
-
-        next.overwrite(new Position(x, y)).add(direction);
-
-        if (direction.in(boundary)) {
-          const nextIndex = direction.y * canvas.width + direction.x;
-
-          if (visit.indexOf(nextIndex) >= 0 && visited[index] != null) {
-            visit.push(nextIndex);
+            if (visit.indexOf(nextIndex) === -1 && visited[index] != null) {
+              // console.log("Queueing", post.x, post.y, nextIndex)
+              visit.push(nextIndex);
+            }
           }
         }
       }
     }
   }
+  return positivePixels;
 };
