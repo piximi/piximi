@@ -7,7 +7,6 @@ import Radio from "@material-ui/core/Radio";
 import React from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { ReactComponent as InvertSelectionIcon } from "../../../icons/InvertSelection.svg";
-import { ImageViewerSelectionMode } from "../../../types/SelectionMode";
 
 export const SelectionOptions = () => {
   return (

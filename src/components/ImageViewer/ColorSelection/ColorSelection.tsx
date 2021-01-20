@@ -4,7 +4,6 @@ import { Image as ImageType } from "../../../types/Image";
 import { Stage } from "konva/types/Stage";
 import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
-import { Filter } from "konva/types/Node";
 import { flood } from "../../../image";
 import * as ImageJS from "image-js";
 

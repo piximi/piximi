@@ -6,7 +6,6 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { Shape } from "../../../types/Shape";
 import { createImage } from "../../../store/slices";
 import { useDispatch } from "react-redux";
-import * as ImageJS from "image-js";
 
 export const OpenImageButton = () => {
   const dispatch = useDispatch();

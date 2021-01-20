@@ -14,7 +14,6 @@ import { ReactComponent as ObjectSelectionIcon } from "../../../icons/ObjectSele
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import {
-  imagesSelector,
   imageViewerImageSelector,
   imageViewerOperationSelector,
   unknownCategorySelector,
