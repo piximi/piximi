@@ -30,6 +30,7 @@ export {
 
 export {
   setImageViewerImage,
+  setImageViewerOperation,
   setImageViewerSelectionMode,
 } from "./imageViewerSlice";
 
