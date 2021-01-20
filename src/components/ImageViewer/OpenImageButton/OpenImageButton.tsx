@@ -6,6 +6,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { Shape } from "../../../types/Shape";
 import { createImage } from "../../../store/slices";
 import { useDispatch } from "react-redux";
+import * as ImageJS from "image-js";
 
 export const OpenImageButton = () => {
   const dispatch = useDispatch();
@@ -20,20 +21,24 @@ export const OpenImageButton = () => {
 
       const reader = new FileReader();
 
-      reader.onload = (event) => {
+      reader.onload = async (event: ProgressEvent<FileReader>) => {
         if (event.target) {
           const src = event.target.result;
 
           const image = new Image();
 
           image.onload = () => {
+            const name = blob.name;
+
             const shape: Shape = {
               r: image.naturalHeight,
               c: image.naturalWidth,
               channels: 4,
             };
 
-            dispatch(createImage({ shape: shape, src: src as string }));
+            dispatch(
+              createImage({ name: name, shape: shape, src: src as string })
+            );
           };
 
           image.src = src as string;

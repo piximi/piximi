@@ -23,5 +23,5 @@ const image: Image = {
 };
 
 Default.args = {
-  foo: image,
+  image: image,
 };

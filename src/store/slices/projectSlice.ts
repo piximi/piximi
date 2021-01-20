@@ -39,13 +39,13 @@ export const projectSlice = createSlice({
     },
     createImage(
       state: Project,
-      action: PayloadAction<{ shape: Shape; src: string }>
+      action: PayloadAction<{ name: string; shape: Shape; src: string }>
     ) {
       const image: Image = {
         categoryId: "00000000-0000-0000-0000-000000000000",
         id: v4(),
         instances: [],
-        name: "",
+        name: action.payload.name,
         shape: action.payload.shape,
         src: action.payload.src,
       };
