@@ -3,10 +3,12 @@ import { ImageViewerState } from "../../types/ImageViewerState";
 import { Image } from "../../types/Image";
 import { SelectionMode } from "../../types/SelectionMode";
 import { ImageViewerOperation } from "../../types/ImageViewerOperation";
+import { ZoomMode } from "../../types/ZoomMode";
 
 const initialState: ImageViewerState = {
   operation: ImageViewerOperation.RectangularSelection,
   selectionMode: SelectionMode.New,
+  zoomMode: ZoomMode.In,
 };
 
 export const imageViewerSlice = createSlice({
@@ -31,6 +33,12 @@ export const imageViewerSlice = createSlice({
     ) {
       state.selectionMode = action.payload.selectionMode;
     },
+    setImageViewerZoomMode(
+      state: ImageViewerState,
+      action: PayloadAction<{ zoomMode: ZoomMode }>
+    ) {
+      state.zoomMode = action.payload.zoomMode;
+    },
   },
 });
 
@@ -38,4 +46,5 @@ export const {
   setImageViewerImage,
   setImageViewerOperation,
   setImageViewerSelectionMode,
+  setImageViewerZoomMode,
 } = imageViewerSlice.actions;
