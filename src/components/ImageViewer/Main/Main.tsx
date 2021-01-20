@@ -1265,9 +1265,6 @@ export const Main = ({
         setZoomScaleX(newScaleX);
         setZoomScaleY(newScaleY);
       }
-
-      setZoomSelected(true);
-      setZoomSelecting(false);
     }
 
     // CLICK MODE
@@ -1296,6 +1293,9 @@ export const Main = ({
         setZoomScaleY(newScale);
       }
     }
+
+    setZoomSelected(true);
+    setZoomSelecting(false);
   };
 
   const onSelection = () => {
