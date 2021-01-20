@@ -8,7 +8,7 @@ export const imageViewerSlice = createSlice({
   initialState: initialState,
   name: "image-viewer",
   reducers: {
-    updateImageViewerImage(
+    setImageViewerImage(
       state: ImageViewerState,
       action: PayloadAction<{ image: Image }>
     ) {
@@ -17,4 +17,4 @@ export const imageViewerSlice = createSlice({
   },
 });
 
-export const { updateImageViewerImage } = imageViewerSlice.actions;
+export const { setImageViewerImage } = imageViewerSlice.actions;
