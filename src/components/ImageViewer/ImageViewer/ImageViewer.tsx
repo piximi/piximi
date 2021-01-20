@@ -15,10 +15,11 @@ import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.sv
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import {
   imagesSelector,
+  imageViewerImageSelector,
   imageViewerOperationSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./ImageViewer.css";
 import { ImageViewerAppBar } from "../ImageViewerAppBar";
 import { Categories } from "../Categories";
@@ -27,6 +28,7 @@ import { SelectionOptions } from "../SelectionOptions";
 import { Operations } from "../Operations";
 import { Main } from "../Main";
 import { ZoomOptions } from "../ZoomOptions";
+import { imageViewerSlice } from "../../../store/slices";
 
 type ImageViewerProps = {
   image?: Image;
@@ -119,17 +121,17 @@ export const ImageViewer = (props: ImageViewerProps) => {
     },
   ];
 
-  const [image, setImage] = useState<Image>();
-
-  const images = useSelector(imagesSelector);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (props.image) {
-      setImage(props.image);
-    } else if (images.length) {
-      setImage(images[0]);
+      dispatch(
+        imageViewerSlice.actions.setImageViewerImage({ image: props.image })
+      );
     }
-  }, [images, props]);
+  }, [dispatch, props.image]);
+
+  const image = useSelector(imageViewerImageSelector);
 
   const activeOperation = useSelector(imageViewerOperationSelector);
 
@@ -159,14 +161,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
         onCategoryClick={onCategoryClick}
       />
 
-      {image && (
-        <Main
-          activeCategory={activeCategory}
-          activeOperation={activeOperation}
-          image={image}
-          zoomReset={zoomReset}
-        />
-      )}
+      {image && <Main activeCategory={activeCategory} zoomReset={zoomReset} />}
 
       <OperationOptions
         description={

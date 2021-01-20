@@ -4,7 +4,6 @@ import useImage from "use-image";
 import { BoundingBox } from "../../../types/BoundingBox";
 import { Category } from "../../../types/Category";
 import { Ellipse } from "konva/types/shapes/Ellipse";
-import { Image as PiximiImage } from "../../../types/Image";
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import { Rect } from "konva/types/shapes/Rect";
 import { Stage } from "konva/types/Stage";
@@ -24,30 +23,27 @@ import { RectangularSelection } from "./RectangularSelection";
 import { StartingAnchor } from "./StartingAnchor";
 import { ZoomSelection } from "./ZoomSelection";
 import { imageViewerZoomModeSelector } from "../../../store/selectors/imageViewerZoomModeSelector";
-
-export enum ZoomType {
-  In,
-  Out,
-}
+import {
+  imageViewerImageSelector,
+  imageViewerOperationSelector,
+} from "../../../store/selectors";
 
 type MainProps = {
   activeCategory: Category;
-  activeOperation: ImageViewerOperation;
-  image: PiximiImage;
   zoomReset: boolean;
 };
 
-export const Main = ({
-  activeCategory,
-  activeOperation,
-  image,
-  zoomReset,
-}: MainProps) => {
+export const Main = ({ activeCategory, zoomReset }: MainProps) => {
   const dispatch = useDispatch();
-  const [img] = useImage(image.src, "Anonymous");
+
+  const image = useSelector(imageViewerImageSelector);
+
+  const [img] = useImage(image!.src, "Anonymous");
   const dashOffset = useMarchingAnts();
   const classes = useStyles();
   const stageRef = useRef<Stage>(null);
+
+  const activeOperation = useSelector(imageViewerOperationSelector);
 
   /*
    * Color selection
@@ -1175,7 +1171,7 @@ export const Main = ({
       const payload = {
         boundingBox: boundingBox,
         categoryId: activeCategory.id,
-        id: image.id,
+        id: image!.id,
         mask: mask,
       };
 
