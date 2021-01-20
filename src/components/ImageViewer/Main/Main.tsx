@@ -1223,13 +1223,9 @@ export const Main = ({
 
   const onZoomMouseDown = (position: { x: number; y: number }) => {
     if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
-      setZoomSelectionX(position.x);
-      setZoomSelectionY(position.y);
-      console.log("SET SELECTION");
+      setZoomSelectionX(stageRef.current.getPointerPosition()!.x);
+      setZoomSelectionY(stageRef.current.getPointerPosition()!.y);
     }
-
-    // setRectangularSelectionX(position.x);
-    // setRectangularSelectionY(position.y);
   };
 
   const onZoomMouseMove = (position: { x: number; y: number }) => {
@@ -1248,10 +1244,14 @@ export const Main = ({
         zoomSelectionWidth &&
         zoomSelectionHeight
       ) {
-        setZoomScaleX(stageRef.current.width() / zoomSelectionWidth);
-        setZoomScaleY(stageRef.current.height() / zoomSelectionHeight);
-        setStageX(-1 * zoomSelectionX);
-        setStageY(-1 * zoomSelectionY);
+        const newScaleX =
+          zoomScaleX * (stageRef.current.width() / zoomSelectionWidth);
+        const newScaleY =
+          zoomScaleY * (stageRef.current.height() / zoomSelectionHeight);
+        setStageX(-1 * zoomSelectionX * newScaleX);
+        setStageY(-1 * zoomSelectionY * newScaleY);
+        setZoomScaleX(newScaleX);
+        setZoomScaleY(newScaleY);
       }
     }
 
