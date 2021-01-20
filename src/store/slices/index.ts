@@ -28,7 +28,10 @@ export {
   updateValidationPercentage,
 } from "./classifierSlice";
 
-export { setImageViewerImage } from "./imageViewerSlice";
+export {
+  setImageViewerImage,
+  setImageViewerSelectionMode,
+} from "./imageViewerSlice";
 
 export {
   createProject,
