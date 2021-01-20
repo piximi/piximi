@@ -172,14 +172,15 @@ export const ImageViewer = (props: ImageViewerProps) => {
         activeCategory={activeCategory}
         onCategoryClick={onCategoryClick}
       />
-
+      
+      {image && (
       <Main
         activeCategory={activeCategory}
         activeOperation={activeOperation}
         image={image}
         zoomMode={zoomMode}
         zoomReset={zoomReset}
-      />
+      />)}
 
       <OperationOptions
         description={
