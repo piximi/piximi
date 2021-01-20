@@ -5,6 +5,8 @@ import { Stage } from "konva/types/Stage";
 import { Image } from "konva/types/shapes/Image";
 import useImage from "use-image";
 import { Filter } from "konva/types/Node";
+import { flood } from "../../../image";
+import * as ImageJS from "image-js";
 
 type ColorSelectionProps = {
   image: ImageType;
@@ -17,80 +19,10 @@ const getIdx = (width: number) => {
   };
 };
 
-const filter: Filter = (imageData: any) => {
-  const kernelX = [
-    [-1, 0, 1],
-    [-2, 0, 2],
-    [-1, 0, 1],
-  ];
-  const kernelY = [
-    [-1, -2, -1],
-    [0, 0, 0],
-    [1, 2, 1],
-  ];
-  const width = imageData.width;
-  const height = imageData.height;
-
-  const grayscale = [];
-  var data = imageData.data;
-
-  const idx = getIdx(width);
-
-  const threshold = 100;
-
-  let x, y;
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      const r = data[idx(x, y, 0)];
-      const g = data[idx(x, y, 1)];
-      const b = data[idx(x, y, 2)];
-
-      const mean = (r + g + b) / 3;
-
-      grayscale[idx(x, y, 0)] = mean;
-      grayscale[idx(x, y, 1)] = mean;
-      grayscale[idx(x, y, 2)] = mean;
-    }
-  }
-
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      const responseX =
-        kernelX[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-        kernelX[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-        kernelX[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-        kernelX[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-        kernelX[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-        kernelX[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-        kernelX[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-        kernelX[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-      const responseY =
-        kernelY[0][0] * grayscale[idx(x - 1, y - 1, 0)] +
-        kernelY[0][1] * grayscale[idx(x + 0, y - 1, 0)] +
-        kernelY[0][2] * grayscale[idx(x + 1, y - 1, 0)] +
-        kernelY[1][0] * grayscale[idx(x - 1, y + 0, 0)] +
-        kernelY[1][1] * grayscale[idx(x + 0, y + 0, 0)] +
-        kernelY[1][2] * grayscale[idx(x + 1, y + 0, 0)] +
-        kernelY[2][0] * grayscale[idx(x - 1, y + 1, 0)] +
-        kernelY[2][1] * grayscale[idx(x + 0, y + 1, 0)] +
-        kernelX[2][2] * grayscale[idx(x + 1, y + 1, 0)];
-
-      const magnitude =
-        Math.sqrt(responseX * responseX + responseY * responseY) >>> 0;
-
-      data[idx(x, y, 0)] = magnitude > threshold ? 255 : 0;
-      data[idx(x, y, 1)] = magnitude > threshold ? 255 : 0;
-      data[idx(x, y, 2)] = magnitude > threshold ? 255 : 0;
-    }
-  }
-};
-
 export const ColorSelection = ({ image }: ColorSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
 
-  const stage = React.useRef<Stage>(null);
+  const stageRef = React.useRef<Stage>(null);
   const imageRef = React.useRef<Image>(null);
 
   React.useEffect(() => {
@@ -101,7 +33,26 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
     }
   }, [img]);
 
-  const onMouseDown = () => {};
+  const onMouseDown = async () => {
+    if (stageRef && stageRef.current) {
+      const position = stageRef.current.getPointerPosition();
+
+      if (position) {
+        if (imageRef && imageRef.current) {
+          const jsImage = await ImageJS.Image.load(
+            imageRef.current.toDataURL()
+          );
+          const results = flood({
+            x: position.x,
+            y: position.y,
+            image: jsImage,
+            tolerance: 100,
+          });
+          console.log(position, results);
+        }
+      }
+    }
+  };
 
   const onMouseMove = () => {};
 
@@ -111,7 +62,7 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
     <ReactKonva.Stage
       globalCompositeOperation="destination-over"
       height={image.shape?.r}
-      ref={stage}
+      ref={stageRef}
       width={image.shape?.c}
     >
       <ReactKonva.Layer
@@ -119,7 +70,7 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <ReactKonva.Image filters={[filter]} image={img} ref={imageRef} />
+        <ReactKonva.Image image={img} ref={imageRef} />
       </ReactKonva.Layer>
     </ReactKonva.Stage>
   );
