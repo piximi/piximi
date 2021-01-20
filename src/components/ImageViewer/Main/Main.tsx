@@ -1214,33 +1214,68 @@ export const Main = ({
   const [stageX, setStageX] = useState<number>(0);
   const [stageY, setStageY] = useState<number>(0);
 
+  const [zoomSelectionX, setZoomSelectionX] = useState<number>();
+  const [zoomSelectionY, setZoomSelectionY] = useState<number>();
+  const [zoomSelectionHeight, setZoomSelectionHeight] = useState<number>();
+  const [zoomSelectionWidth, setZoomSelectionWidth] = useState<number>();
+
   const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
 
   const onZoomMouseDown = (position: { x: number; y: number }) => {
-    const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
-
     if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
-      let pointerX = stageRef.current.getPointerPosition()!.x;
-      let pointerY = stageRef.current.getPointerPosition()!.y;
+      setZoomSelectionX(position.x);
+      setZoomSelectionY(position.y);
+      console.log("SET SELECTION");
+    }
 
-      const mousePointTo = {
-        x: (pointerX - stageX) / zoomScaleX,
-        y: (pointerY - stageY) / zoomScaleY,
-      };
+    // setRectangularSelectionX(position.x);
+    // setRectangularSelectionY(position.y);
+  };
 
-      const newScale = zoomScaleX * scaleStep;
-
-      setStageX(pointerX - mousePointTo.x * newScale);
-      setStageY(pointerY - mousePointTo.y * newScale);
-
-      setZoomScaleX(newScale);
-      setZoomScaleY(newScale);
+  const onZoomMouseMove = (position: { x: number; y: number }) => {
+    if (zoomSelectionX && zoomSelectionY) {
+      setZoomSelectionHeight(position.y - zoomSelectionY);
+      setZoomSelectionWidth(position.x - zoomSelectionX);
     }
   };
 
-  const onZoomMouseMove = (position: { x: number; y: number }) => {};
+  const onZoomMouseUp = (position: { x: number; y: number }) => {
+    // RECTANGLE SELECTION MODE
+    if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
+      if (
+        zoomSelectionX &&
+        zoomSelectionY &&
+        zoomSelectionWidth &&
+        zoomSelectionHeight
+      ) {
+        setZoomScaleX(stageRef.current.width() / zoomSelectionWidth);
+        setZoomScaleY(stageRef.current.height() / zoomSelectionHeight);
+        setStageX(-1 * zoomSelectionX);
+        setStageY(-1 * zoomSelectionY);
+      }
+    }
 
-  const onZoomMouseUp = (position: { x: number; y: number }) => {};
+    // CLICK MODE
+    // const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
+    //
+    // if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
+    //   let pointerX = stageRef.current.getPointerPosition()!.x;
+    //   let pointerY = stageRef.current.getPointerPosition()!.y;
+    //
+    //   const mousePointTo = {
+    //     x: (pointerX - stageX) / zoomScaleX,
+    //     y: (pointerY - stageY) / zoomScaleY,
+    //   };
+    //
+    //   const newScale = zoomScaleX * scaleStep;
+    //
+    //   setStageX(pointerX - mousePointTo.x * newScale);
+    //   setStageY(pointerY - mousePointTo.y * newScale);
+    //
+    //   setZoomScaleX(newScale);
+    //   setZoomScaleY(newScale);
+    // }
+  };
 
   const onSelection = () => {
     switch (activeOperation) {
