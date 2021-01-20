@@ -4,7 +4,7 @@ import { Button } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import Tooltip from "@material-ui/core/Tooltip";
 import { Shape } from "../../../types/Shape";
-import { createImage } from "../../../store/slices";
+import { setImageViewerImage } from "../../../store/slices";
 import { useDispatch } from "react-redux";
 
 export const OpenImageButton = () => {
@@ -36,7 +36,15 @@ export const OpenImageButton = () => {
             };
 
             dispatch(
-              createImage({ name: name, shape: shape, src: src as string })
+              setImageViewerImage({
+                image: {
+                  id: "",
+                  instances: [],
+                  name: name,
+                  shape: shape,
+                  src: src as string,
+                },
+              })
             );
           };
 
