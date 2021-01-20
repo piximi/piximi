@@ -15,6 +15,7 @@ import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.sv
 import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import {
   imagesSelector,
+  imageViewerOperationSelector,
   unknownCategorySelector,
 } from "../../../store/selectors";
 import { useSelector } from "react-redux";
@@ -142,9 +143,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
     }
   }, [images, props]);
 
-  const [activeOperation, setActiveOperation] = useState<ImageViewerOperation>(
-    ImageViewerOperation.RectangularSelection
-  );
+  const activeOperation = useSelector(imageViewerOperationSelector);
 
   const classes = useStyles();
 
@@ -206,10 +205,7 @@ export const ImageViewer = (props: ImageViewerProps) => {
         }
       />
 
-      <Operations
-        activeOperation={activeOperation}
-        setActiveOperation={setActiveOperation}
-      />
+      <Operations />
     </div>
   );
 };

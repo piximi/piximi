@@ -2,6 +2,8 @@ import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import React from "react";
+import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
+import { Operation } from "../Operation";
 import { ReactComponent as ColorAdjustmentIcon } from "../../../icons/ColorAdjustment.svg";
 import { ReactComponent as ColorSelectionIcon } from "../../../icons/ColorSelection.svg";
 import { ReactComponent as EllipticalIcon } from "../../../icons/Elliptical.svg";
@@ -13,21 +15,17 @@ import { ReactComponent as PolygonalSelectionIcon } from "../../../icons/Polygon
 import { ReactComponent as QuickIcon } from "../../../icons/Quick.svg";
 import { ReactComponent as RectangularIcon } from "../../../icons/Rectangular.svg";
 import { ReactComponent as ZoomIcon } from "../../../icons/Zoom.svg";
-
-import { ImageViewerOperation } from "../../../types/ImageViewerOperation";
 import { useStyles } from "./Operations.css";
-import { Operation } from "../Operation";
+import { useDispatch, useSelector } from "react-redux";
+import { imageViewerOperationSelector } from "../../../store/selectors";
+import { imageViewerSlice } from "../../../store/slices/imageViewerSlice";
 
-type ImageViewerProps = {
-  activeOperation: ImageViewerOperation;
-  setActiveOperation: (operation: ImageViewerOperation) => void;
-};
-
-export const Operations = ({
-  activeOperation,
-  setActiveOperation,
-}: ImageViewerProps) => {
+export const Operations = () => {
   const classes = useStyles();
+
+  const dispatch = useDispatch();
+
+  const activeOperation = useSelector(imageViewerOperationSelector);
 
   return (
     <Drawer
@@ -44,7 +42,11 @@ export const Operations = ({
         <Operation
           name="Color adjustment"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.ColorAdjustment)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.ColorAdjustment,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.ColorAdjustment}
         >
@@ -56,7 +58,11 @@ export const Operations = ({
         <Operation
           name="Rectangular selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.RectangularSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.RectangularSelection,
+              })
+            )
           }
           selected={
             activeOperation === ImageViewerOperation.RectangularSelection
@@ -68,7 +74,11 @@ export const Operations = ({
         <Operation
           name="Elliptical selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.EllipticalSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.EllipticalSelection,
+              })
+            )
           }
           selected={
             activeOperation === ImageViewerOperation.EllipticalSelection
@@ -80,7 +90,11 @@ export const Operations = ({
         <Operation
           name="Lasso selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.LassoSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.LassoSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.LassoSelection}
         >
@@ -90,7 +104,11 @@ export const Operations = ({
         <Operation
           name="Polygonal selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.PolygonalSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.PolygonalSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.PolygonalSelection}
         >
@@ -100,7 +118,11 @@ export const Operations = ({
         <Operation
           name="Magnetic selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.MagneticSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.MagneticSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.MagneticSelection}
         >
@@ -110,7 +132,11 @@ export const Operations = ({
         <Operation
           name="Color selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.ColorSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.ColorSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.ColorSelection}
         >
@@ -120,7 +146,11 @@ export const Operations = ({
         <Operation
           name="Quick selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.QuickSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.QuickSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.QuickSelection}
         >
@@ -130,7 +160,11 @@ export const Operations = ({
         <Operation
           name="Object selection"
           onClick={() =>
-            setActiveOperation(ImageViewerOperation.ObjectSelection)
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.ObjectSelection,
+              })
+            )
           }
           selected={activeOperation === ImageViewerOperation.ObjectSelection}
         >
@@ -141,7 +175,13 @@ export const Operations = ({
 
         <Operation
           name="Zoom"
-          onClick={() => setActiveOperation(ImageViewerOperation.Zoom)}
+          onClick={() => {
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.Zoom,
+              })
+            );
+          }}
           selected={activeOperation === ImageViewerOperation.Zoom}
         >
           <ZoomIcon />
@@ -149,7 +189,13 @@ export const Operations = ({
 
         <Operation
           name="Hand"
-          onClick={() => setActiveOperation(ImageViewerOperation.Hand)}
+          onClick={() => {
+            dispatch(
+              imageViewerSlice.actions.setImageViewerOperation({
+                operation: ImageViewerOperation.Hand,
+              })
+            );
+          }}
           selected={activeOperation === ImageViewerOperation.Hand}
         >
           <HandIcon />
