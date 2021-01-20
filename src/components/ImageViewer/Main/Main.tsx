@@ -23,6 +23,7 @@ import { getIdx } from "../../../image/imageHelper";
 import { convertPathToCoords } from "../../../image/GraphHelper";
 import { RectangularSelection } from "./RectangularSelection";
 import { StartingAnchor } from "./StartingAnchor";
+import { ZoomSelection } from "./ZoomSelection";
 
 export enum ZoomType {
   In,
@@ -1216,19 +1217,27 @@ export const Main = ({
 
   const [zoomSelectionX, setZoomSelectionX] = useState<number>();
   const [zoomSelectionY, setZoomSelectionY] = useState<number>();
-  const [zoomSelectionHeight, setZoomSelectionHeight] = useState<number>();
-  const [zoomSelectionWidth, setZoomSelectionWidth] = useState<number>();
+  const [zoomSelectionHeight, setZoomSelectionHeight] = useState<number>(0);
+  const [zoomSelectionWidth, setZoomSelectionWidth] = useState<number>(0);
+
+  const [zoomSelecting, setZoomSelecting] = useState<boolean>(false);
+  const [zoomSelected, setZoomSelected] = useState<boolean>(false);
 
   const zoomIncrement = 1.1; // by how much we want to zoom in or out with each click
 
   const onZoomMouseDown = (position: { x: number; y: number }) => {
+    if (zoomSelected) return;
+
     if (stageRef && stageRef.current && stageRef.current.getPointerPosition()) {
       setZoomSelectionX(stageRef.current.getPointerPosition()!.x);
       setZoomSelectionY(stageRef.current.getPointerPosition()!.y);
     }
+
+    setZoomSelecting(true);
   };
 
   const onZoomMouseMove = (position: { x: number; y: number }) => {
+    if (zoomSelected) return;
     if (zoomSelectionX && zoomSelectionY) {
       setZoomSelectionHeight(position.y - zoomSelectionY);
       setZoomSelectionWidth(position.x - zoomSelectionX);
@@ -1254,6 +1263,8 @@ export const Main = ({
         setZoomScaleY(newScaleY);
       }
     }
+    setZoomSelected(true);
+    setZoomSelecting(false);
 
     // CLICK MODE
     // const scaleStep = zoomMode ? 1 / zoomIncrement : zoomIncrement;
@@ -1498,6 +1509,16 @@ export const Main = ({
                 width={rectangularSelectionWidth}
                 x={rectangularSelectionX}
                 y={rectangularSelectionY}
+              />
+            )}
+            {activeOperation === ImageViewerOperation.Zoom && (
+              <ZoomSelection
+                selected={zoomSelected}
+                selecting={zoomSelecting}
+                height={zoomSelectionHeight}
+                width={zoomSelectionWidth}
+                x={zoomSelectionX}
+                y={zoomSelectionY}
               />
             )}
           </ReactKonva.Layer>
