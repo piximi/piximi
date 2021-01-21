@@ -86,7 +86,7 @@ export const flood = ({
 
     if (difference <= tolerance) {
       // context!.fillRect(position.x, position.y, 1, 1);
-      positivePixels.push(position);
+      positivePixels.push(new Position(position.x, position.y));
       const next: Position = new Position(0, 0);
 
       for (const direction of directions) {
