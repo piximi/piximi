@@ -21,15 +21,12 @@ const getIdx = (width: number) => {
 
 export const ColorSelection = ({ image }: ColorSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
-
-  // const blank = new ImageJS.Image(image.shape!.c, image.shape!.r).toDataURL()
-  // const [overlay, setOverlay] = useState<ImageJS.Image>(new ImageJS.Image(image.shape!.c, image.shape!.r));
-  const [data, setData] = useState<string>("");
-
-  const [overlayImage] = useImage(data, "Anonymous");
+  const [overlayData, setOverlayData] = useState<string>("");
+  const [overlayImage] = useImage(overlayData, "Anonymous");
 
   const stageRef = React.useRef<Stage>(null);
   const imageRef = React.useRef<Image>(null);
+  const overlayRef = React.useRef<Image>(null);
 
   const [annotated, setAnnotated] = useState<boolean>(false);
 
@@ -56,10 +53,7 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
             image: jsImage,
             tolerance: 10,
           });
-          console.log(position);
-
-          // setOverlay(results.toDataURL());
-          setData(results);
+          setOverlayData(results);
           setAnnotated(true);
         }
       }
@@ -85,7 +79,7 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
         <ReactKonva.Image image={img} ref={imageRef} />
 
         {annotated && (
-          <ReactKonva.Image image={overlayImage} ref={imageRef} opacity={0.2} />
+          <ReactKonva.Image image={overlayImage} ref={overlayRef} />
         )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>
