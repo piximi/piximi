@@ -42,6 +42,7 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
   const dashOffset = useMarchingAnts();
   const classes = useStyles();
   const stageRef = useRef<Stage>(null);
+  const imageRef = useRef<any>(null);
 
   const activeOperation = useSelector(imageViewerOperationSelector);
 
@@ -1336,8 +1337,11 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
   );
 
   const onMouseDown = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+    if (stageRef && stageRef.current && imageRef && imageRef.current) {
+      // const position = stageRef.current.getPointerPosition();
+      const transform = imageRef.current.getAbsoluteTransform().copy();
+      transform.invert();
+      const position = transform.point(stageRef.current.getPointerPosition());
 
       if (position) {
         switch (activeOperation) {
@@ -1383,8 +1387,12 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
   };
 
   const onMouseMove = () => {
-    if (stageRef && stageRef.current) {
-      const position = stageRef.current.getPointerPosition();
+    if (stageRef && stageRef.current && imageRef && imageRef.current) {
+      // const position = stageRef.current.getPointerPosition();
+
+      const transform = imageRef.current.getAbsoluteTransform().copy();
+      transform.invert();
+      const position = transform.point(stageRef.current.getPointerPosition());
 
       if (position) {
         switch (activeOperation) {
@@ -1521,7 +1529,7 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
           >
-            {img && <ReactKonva.Image image={img} />}
+            {img && <ReactKonva.Image ref={imageRef} image={img} />}
 
             {activeOperation === ImageViewerOperation.ColorSelection && (
               <ColorSelection />
