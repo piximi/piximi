@@ -109,5 +109,6 @@ export const flood = ({
       }
     }
   }
+  overlay.setPixelXY(x, y, [255, 255, 255, 255]);
   return overlay.toDataURL();
 };
