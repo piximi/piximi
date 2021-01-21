@@ -50,6 +50,14 @@ export const flood = ({
   image: Image;
   tolerance: number;
 }) => {
+  // const canvas = new HTMLCanvasElement;
+  // const ctx = canvas.getContext('2d');
+  // const imData = ctx.createImageData(image.width, image.height);
+  const overlay2 = Image.createFrom(image, {});
+  // const overlay2 = new Image(image.width, image.height)
+  console.log("FFFFFFF");
+  console.log(overlay2);
+
   let position: Position = new Position(x, y);
 
   const color = image.getPixelXY(x, y);
@@ -87,6 +95,7 @@ export const flood = ({
     if (difference <= tolerance) {
       // context!.fillRect(position.x, position.y, 1, 1);
       positivePixels.push(new Position(position.x, position.y));
+      overlay2.setPixelXY(position.x, position.y, [255, 255, 255, 255]);
       const next: Position = new Position(0, 0);
 
       for (const direction of directions) {
@@ -102,5 +111,6 @@ export const flood = ({
       }
     }
   }
-  return positivePixels;
+  console.log(positivePixels);
+  return overlay2.toDataURL();
 };
