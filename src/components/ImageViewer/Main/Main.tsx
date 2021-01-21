@@ -1474,18 +1474,17 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
     }
   };
 
+  const initialWidth = 1000;
   const parentRef = useRef<HTMLDivElement>(null);
-  const [stageWidth, setStageWidth] = useState<number>(1000);
-  const [stageHeight, setStageHeight] = useState<number>(1000);
-  const [scale, setScale] = useState<number>(1000 / stageWidth);
+  const [stageWidth, setStageWidth] = useState<number>(initialWidth);
+  const [stageHeight, setStageHeight] = useState<number>(initialWidth);
+  const [scale, setScale] = useState<number>(initialWidth / stageWidth);
 
   const resize = () => {
     if (parentRef && parentRef.current) {
-      setScale(parentRef.current.offsetWidth / stageWidth);
-
+      setScale(parentRef.current.offsetWidth / initialWidth);
       setStageWidth(stageWidth * scale);
       setStageHeight(stageHeight * scale);
-
       setZoomScaleX(scale);
       setZoomScaleY(scale);
     }
@@ -1511,18 +1510,18 @@ export const Main = ({ activeCategory, zoomReset }: MainProps) => {
         <ReactKonva.Stage
           className={classes.stage}
           globalCompositeOperation="destination-over"
-          height={stageHeight}
+          height={initialWidth}
           position={{ x: stageX, y: stageY }}
           ref={stageRef}
           scale={{ x: scale, y: scale }}
-          width={stageWidth}
+          width={initialWidth}
         >
           <ReactKonva.Layer
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
           >
-            <ReactKonva.Image image={img} />
+            {img && <ReactKonva.Image image={img} />}
 
             {activeOperation === ImageViewerOperation.ColorSelection && (
               <ColorSelection />

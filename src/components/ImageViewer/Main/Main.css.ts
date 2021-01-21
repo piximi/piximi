@@ -67,7 +67,11 @@ export const useStyles = makeStyles((theme) => ({
     width: theme.spacing(32),
   },
   parent: {
-    width: `calc(100% - ${settingsWidth}px)`,
+    backgroundColor: "red",
+    width: `calc(100% - ${settingsWidth}px - ${theme.spacing(3)}px)`,
   },
-  stage: {},
+  stage: {
+    backgroundColor: "yellow",
+    margin: "8px",
+  },
 }));
