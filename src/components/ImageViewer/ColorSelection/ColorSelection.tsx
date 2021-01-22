@@ -7,9 +7,14 @@ import useImage from "use-image";
 import { flood } from "../../../image";
 import * as ImageJS from "image-js";
 import { Vector2d } from "konva/types/types";
+import { floodMap, floodPixels } from "../../../image/flood";
+import { toRGBA } from "../../../image/toRGBA";
+import { Category } from "../../../types/Category";
+import { Tooltip } from "@material-ui/core";
 
 type ColorSelectionProps = {
   image: ImageType;
+  category: Category;
 };
 
 const getIdx = (width: number) => {
@@ -19,8 +24,9 @@ const getIdx = (width: number) => {
   };
 };
 
-export const ColorSelection = ({ image }: ColorSelectionProps) => {
+export const ColorSelection = ({ image, category }: ColorSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
+  const [toleranceMap, setToleranceMap] = useState<ImageJS.Image>();
   const [overlayData, setOverlayData] = useState<string>("");
   const [overlayImage] = useImage(overlayData, "Anonymous");
 
@@ -32,6 +38,19 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
   const [mouseHeld, setMouseHeld] = useState<boolean>(false);
   const [initialPosition, setInitialPosition] = useState<Vector2d>();
   const [tolerance, setTolerance] = useState<number>(1);
+
+  const updateOverlay = (position: { x: any; y: any }) => {
+    if (toleranceMap) {
+      const results = floodPixels({
+        x: position.x,
+        y: position.y,
+        image: toleranceMap,
+        tolerance: tolerance,
+        color: category.color,
+      });
+      setOverlayData(results);
+    }
+  };
 
   React.useEffect(() => {
     if (imageRef && imageRef.current) {
@@ -49,27 +68,26 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
 
       if (position) {
         if (imageRef && imageRef.current) {
-          console.log(position, initialPosition);
           if (position !== initialPosition) {
             setInitialPosition(position);
+            const jsImage = await ImageJS.Image.load(
+              imageRef.current.toDataURL()
+            );
+            setToleranceMap(
+              floodMap({
+                x: position.x,
+                y: position.y,
+                image: jsImage,
+              })
+            );
           }
-          const jsImage = await ImageJS.Image.load(
-            imageRef.current.toDataURL()
-          );
-          const results = flood({
-            x: position.x,
-            y: position.y,
-            image: jsImage,
-            tolerance: tolerance,
-          });
-          setOverlayData(results);
-          setAnnotated(true);
+          updateOverlay(position);
         }
       }
     }
   };
 
-  const onMouseMove = () => {
+  const onMouseMove = async () => {
     if (mouseHeld && stageRef && stageRef.current) {
       const newPosition = stageRef.current.getPointerPosition();
       if (newPosition && initialPosition) {
@@ -79,9 +97,9 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
             newPosition.y - initialPosition!.y
           )
         );
-        if (diff > 1) {
+        if (diff !== tolerance) {
           setTolerance(diff);
-          console.log("Set tolerance to ", diff);
+          updateOverlay(initialPosition);
         }
       }
     }
@@ -104,9 +122,20 @@ export const ColorSelection = ({ image }: ColorSelectionProps) => {
         onMouseUp={onMouseUp}
       >
         <ReactKonva.Image image={img} ref={imageRef} />
-
-        {annotated && (
-          <ReactKonva.Image image={overlayImage} ref={overlayRef} />
+        <ReactKonva.Image image={overlayImage} ref={overlayRef} />
+        {mouseHeld && initialPosition && (
+          <ReactKonva.Label x={initialPosition.x} y={initialPosition.y}>
+            <ReactKonva.Tag
+              fill={"#f0ce0f"}
+              stroke={"#907c09"}
+              shadowColor={"black"}
+              pointerDirection={"up"}
+              pointerWidth={10}
+              pointerHeight={10}
+              cornerRadius={5}
+            />
+            <ReactKonva.Text text={tolerance as string} padding={5} />
+          </ReactKonva.Label>
         )}
       </ReactKonva.Layer>
     </ReactKonva.Stage>

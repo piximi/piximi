@@ -2,6 +2,7 @@ import React, { ComponentProps } from "react";
 import { Meta, Story } from "@storybook/react/types-6-0";
 import { Image } from "../../../types/Image";
 import { ColorSelection } from "./ColorSelection";
+import { Category } from "../../../types/Category";
 
 export default {
   component: ColorSelection,
@@ -22,6 +23,14 @@ const image: Image = {
   src: "https://picsum.photos/id/237/512/512",
 };
 
+const category: Category = {
+  id: "",
+  color: "#9c27b0",
+  name: "TestCat",
+  visible: true,
+};
+
 Default.args = {
   image: image,
+  category: category,
 };
