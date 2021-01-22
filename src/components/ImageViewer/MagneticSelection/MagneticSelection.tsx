@@ -141,7 +141,7 @@ export const MagneticSelection = ({
     if (graph && img) {
       pathFinder.current = createPathFinder(graph, downsizedWidth, factor);
     }
-    setFactor(0.25);
+    setFactor(0.5);
   }, [graph, img]);
 
   React.useEffect(() => {
@@ -251,7 +251,6 @@ export const MagneticSelection = ({
           startPosition &&
           startPosition.current
         ) {
-          let t0 = performance.now();
           pathCoordsRef.current = pathFinder.current.find(
             getIdx(downsizedWidth, 1)(
               Math.floor(startPosition.current.x * factor),
@@ -266,8 +265,6 @@ export const MagneticSelection = ({
           );
 
           setStrokes(convertCoordsToStrokes(pathCoordsRef.current));
-          let t1 = performance.now();
-          console.log("Found path in", t1 - t0);
         }
       }
     }

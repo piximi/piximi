@@ -70,7 +70,6 @@ export function cachedAStarPathSearch(
     }
 
     if (graph.fromId !== fromId || graph.openSet.length === 0) {
-      console.log("Resetting search for new path");
       graph.openSet = new NodeHeap();
       // For the first node, fScore is completely heuristic.
       from.fScore = heuristic(from, to);
