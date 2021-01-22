@@ -7,7 +7,7 @@ import useImage from "use-image";
 import { flood } from "../../../image";
 import * as ImageJS from "image-js";
 import { Vector2d } from "konva/types/types";
-import { floodMap, floodPixels } from "../../../image/flood";
+import { FloodImage, floodPixels, makeFloodMap } from "../../../image/flood";
 import { toRGBA } from "../../../image/toRGBA";
 import { Category } from "../../../types/Category";
 import { Tooltip } from "@material-ui/core";
@@ -26,7 +26,8 @@ const getIdx = (width: number) => {
 
 export const ColorSelection = ({ image, category }: ColorSelectionProps) => {
   const [img] = useImage(image.src, "Anonymous");
-  const [toleranceMap, setToleranceMap] = useState<ImageJS.Image>();
+  // const [toleranceMap, setToleranceMap] = useState<ImageJS.Image>();
+
   const [overlayData, setOverlayData] = useState<string>("");
   const [overlayImage] = useImage(overlayData, "Anonymous");
 
@@ -39,17 +40,24 @@ export const ColorSelection = ({ image, category }: ColorSelectionProps) => {
   const [initialPosition, setInitialPosition] = useState<Vector2d>();
   const [tolerance, setTolerance] = useState<number>(1);
 
+  const [imageData, setImageData] = useState<FloodImage>();
   const updateOverlay = (position: { x: any; y: any }) => {
-    if (toleranceMap) {
-      const results = floodPixels({
-        x: position.x,
-        y: position.y,
-        image: toleranceMap,
-        tolerance: tolerance,
-        color: category.color,
-      });
-      setOverlayData(results);
-    }
+    const results = floodPixels({
+      x: position.x,
+      y: position.y,
+      image: imageData!,
+      tolerance: tolerance,
+      color: category.color,
+    });
+    // const results = updateFlood({
+    //   x: position.x,
+    //   y: position.y,
+    //   floodImage: imageData!,
+    //   newTolerance: tolerance,
+    //   color: category.color,
+    // });
+    // setImageData(results);
+    setOverlayData(results);
   };
 
   React.useEffect(() => {
@@ -63,6 +71,12 @@ export const ColorSelection = ({ image, category }: ColorSelectionProps) => {
   const onMouseDown = async () => {
     setTolerance(1);
     setMouseHeld(true);
+    let jsImage;
+    if (imageRef.current && !imageData) {
+      jsImage = await ImageJS.Image.load(imageRef.current.toDataURL());
+      setImageData(jsImage as FloodImage);
+      return;
+    }
     if (stageRef && stageRef.current) {
       const position = stageRef.current.getPointerPosition();
 
@@ -70,14 +84,11 @@ export const ColorSelection = ({ image, category }: ColorSelectionProps) => {
         if (imageRef && imageRef.current) {
           if (position !== initialPosition) {
             setInitialPosition(position);
-            const jsImage = await ImageJS.Image.load(
-              imageRef.current.toDataURL()
-            );
-            setToleranceMap(
-              floodMap({
+            setImageData(
+              makeFloodMap({
                 x: position.x,
                 y: position.y,
-                image: jsImage,
+                image: imageData!,
               })
             );
           }
