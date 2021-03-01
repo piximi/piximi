@@ -28,7 +28,7 @@
     "react-three-fiber": "^4.2.21",
     "react-vis": "^1.11.7",
     "redux": "^4.0.5",
-    "three": "^0.120.1"
+    "three": "^0.125.0"
   },
   "devDependencies": {
     "@types/react-color": "^3.0.1",
