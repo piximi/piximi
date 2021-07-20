@@ -4,7 +4,6 @@ import { ImageViewerOperation } from "../../types/ImageViewerOperation";
 
 const initialState: Settings = {
   selectedImages: [],
-  selectionMethod: ImageViewerOperation.RectangularSelection,
   tileSize: 1,
 };
 
@@ -12,12 +11,6 @@ export const applicationSlice = createSlice({
   name: "settings",
   initialState: initialState,
   reducers: {
-    updateSelectionMethod(
-      state: Settings,
-      action: PayloadAction<{ selectionMethod: ImageViewerOperation }>
-    ) {
-      state.selectionMethod = action.payload.selectionMethod;
-    },
     updateTileSize(
       state: Settings,
       action: PayloadAction<{ newValue: number }>

@@ -45,7 +45,9 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
               channels: 4,
             };
 
-            dispatch(createImage({ shape: shape, src: src as string }));
+            dispatch(
+              createImage({ name: "foo", shape: shape, src: src as string })
+            );
           };
 
           image.src = src as string;

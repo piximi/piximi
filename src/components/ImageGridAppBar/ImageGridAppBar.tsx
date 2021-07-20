@@ -4,7 +4,7 @@ import GestureIcon from "@material-ui/icons/Gesture";
 import React from "react";
 import { useStyles } from "./ImageGridAppBar.css";
 import { useDispatch, useSelector } from "react-redux";
-import { ImageDialog } from "../ImageDialog";
+// import { ImageDialog } from "../ImageDialog";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
   selectedImagesSelector,
@@ -111,13 +111,13 @@ export const ImageGridAppBar = () => {
         </AppBar>
       </Slide>
 
-      {Array.isArray(selectedImages) && selectedImages.length ? (
-        <ImageDialog
-          image={_.find(images, (image) => image.id === selectedImages[0])!}
-          onClose={onCloseImageDialog}
-          open={openImageDialog}
-        />
-      ) : null}
+      {/*{Array.isArray(selectedImages) && selectedImages.length ? (*/}
+      {/*  <ImageDialog*/}
+      {/*    image={_.find(images, (image) => image.id === selectedImages[0])!}*/}
+      {/*    onClose={onCloseImageDialog}*/}
+      {/*    open={openImageDialog}*/}
+      {/*  />*/}
+      {/*) : null}*/}
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
