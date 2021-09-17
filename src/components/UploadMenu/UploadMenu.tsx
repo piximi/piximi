@@ -18,7 +18,7 @@ type UploadMenuProps = {
   open: boolean;
 };
 
-export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
+export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   const dispatch = useDispatch();
   const classes = useStyles();
 

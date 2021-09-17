@@ -99,7 +99,7 @@
     "build": "react-scripts build",
     "build-storybook": "build-storybook -s public",
     "eject": "react-scripts eject",
-    "start": "react-scripts start",
+    "start": "BROWSER='chrome' react-scripts start",
     "storybook": "start-storybook -p 6006 -s public",
     "test": "react-scripts test"
   },

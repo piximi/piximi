@@ -7,6 +7,14 @@ import { findIndex, filter } from "underscore";
 import { Shape } from "../../types/Shape";
 import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
+import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
+
+const dummyImage: Image = {
+  id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
+  instances: [],
+  name: "nuclei",
+  src: nuclei,
+};
 
 const initialState: Project = {
   categories: [
@@ -17,7 +25,7 @@ const initialState: Project = {
       visible: true,
     },
   ],
-  images: [],
+  images: [dummyImage],
   name: "Untitled project",
 };
 
