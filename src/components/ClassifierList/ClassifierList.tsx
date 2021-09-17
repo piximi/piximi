@@ -2,7 +2,6 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import ListItemText from "@material-ui/core/ListItemText";
-import BarChartIcon from "@material-ui/icons/BarChart";
 import React from "react";
 import List from "@material-ui/core/List";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
@@ -14,6 +13,7 @@ import { ClassifierSettingsDialog } from "../ClassifierSettingsDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { FitListItem } from "../FitListItem";
+import { EvaluateListItem } from "../EvaluateListItem";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(true);
@@ -58,13 +58,7 @@ export const ClassifierList = () => {
           <List component="div" dense disablePadding>
             <FitListItem />
 
-            <ListItem button disabled>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Evaluate" />
-            </ListItem>
+            <EvaluateListItem />
 
             <ListItem button disabled>
               <ListItemIcon>
