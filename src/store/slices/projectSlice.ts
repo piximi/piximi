@@ -14,6 +14,11 @@ const dummyImage: Image = {
   instances: [],
   name: "nuclei",
   src: nuclei,
+  shape: {
+    r: 256,
+    c: 256,
+    channels: 3,
+  },
 };
 
 const initialState: Project = {
