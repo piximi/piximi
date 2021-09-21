@@ -6,6 +6,18 @@ import BarChartIcon from "@material-ui/icons/BarChart";
 import * as tf from "@tensorflow/tfjs";
 import { useImage } from "../../hooks/useImage/useImage";
 
+const postprocessOutput = async (
+  out: tf.Tensor4D
+): Promise<Uint8ClampedArray> => {
+  const probs = tf.squeeze(tf.argMax(out, 3)) as tf.Tensor2D;
+  const pixels = await tf.browser.toPixels(probs);
+
+  out.dispose();
+  probs.dispose();
+
+  return pixels;
+};
+
 async function predict(
   imgElement: HTMLImageElement,
   imgSize: number,
@@ -19,7 +31,7 @@ async function predict(
   // The second start time excludes the extraction and preprocessing and
   // includes only the predict() call.
   let startTime2 = 0;
-  const logits = tf.tidy(() => {
+  const out = tf.tidy(() => {
     // tf.browser.fromPixels() returns a Tensor from an image element.
     const img = tf.cast(tf.browser.fromPixels(imgElement), "float32");
 
@@ -32,7 +44,8 @@ async function predict(
     const batched = resized.reshape([1, imgSize, imgSize, 3]);
 
     startTime2 = performance.now();
-    // Make a prediction through mobilenet.
+
+    //make prediction
     return net.predict(batched);
   });
 
@@ -43,12 +56,17 @@ async function predict(
     `Done in ${Math.floor(totalTime1)} ms ` +
       `(not including preprocessing: ${Math.floor(totalTime2)} ms)`
   );
+  return out;
 }
 
 const mobilenetDemo = async (image: HTMLImageElement) => {
+  // const MOBILENET_MODEL_PATH =
+  //   // tslint:disable-next-line:max-line-length
+  //   "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1";
+
   const MOBILENET_MODEL_PATH =
     // tslint:disable-next-line:max-line-length
-    "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1";
+    "https://storage.piximi.app/examples/unet/model.json";
 
   const IMAGE_SIZE = 224;
   const TOPK_PREDICTIONS = 10;
@@ -57,9 +75,10 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
 
   let mobilenet;
 
-  mobilenet = await tf.loadGraphModel(MOBILENET_MODEL_PATH, {
-    fromTFHub: true,
-  });
+  // mobilenet = await tf.loadGraphModel(MOBILENET_MODEL_PATH, {
+  //   fromTFHub: true,
+  // });
+  mobilenet = await tf.loadLayersModel(MOBILENET_MODEL_PATH);
 
   // Warmup the model. This isn't necessary, but makes the first prediction
   // faster. Call `dispose` to release the WebGL memory allocated for the return
@@ -71,10 +90,40 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
   console.info("successful load");
 
   if (image.complete && image.height !== 0) {
-    predict(image, IMAGE_SIZE, mobilenet);
-  }
+    const out = await predict(image, IMAGE_SIZE, mobilenet);
+    const labels = await postprocessOutput(out);
+    const colorData = [];
+    const [r, g, b] = [255, 0, 0];
+    for (let i = 0; i < labels.length; i += 4) {
+      if (labels[i] === 0) {
+        colorData.push(0);
+        colorData.push(0);
+        colorData.push(0);
+        colorData.push(255);
+      } else {
+        colorData.push(r);
+        colorData.push(g);
+        colorData.push(b);
+        colorData.push(255);
+      }
+    }
 
-  //TODO: make prediction on image
+    const [width, height] = [216, 216]; //FIXME this should not be hard coded
+
+    //look at image
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 216;
+    canvas.height = 216;
+
+    if (!ctx) return;
+
+    const imageData = ctx.createImageData(width, height);
+    imageData.data.set(colorData);
+
+    console.info(canvas.toDataURL());
+    debugger;
+  }
 };
 
 export const EvaluateListItem = () => {

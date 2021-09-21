@@ -6,7 +6,8 @@ export const useImage = () => {
 
   if (!image || !image.shape) return;
 
-  const imageHTMLElement = new Image(image.shape.c, image.shape.r);
+  const htmlImage = new Image(image.shape.c, image.shape.r);
+  htmlImage.src = image.src;
 
-  return imageHTMLElement;
+  return htmlImage;
 };
