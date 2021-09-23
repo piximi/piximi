@@ -56,10 +56,6 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <FitClassifierListItem />
-
-            <EvaluateClassifierListItem />
-
             <ListItem button disabled>
               <ListItemIcon>
                 <LabelImportantIcon />
@@ -67,6 +63,10 @@ export const ClassifierList = () => {
 
               <ListItemText primary="Predict" />
             </ListItem>
+
+            <FitClassifierListItem />
+
+            <EvaluateClassifierListItem />
           </List>
         </Collapse>
       </List>

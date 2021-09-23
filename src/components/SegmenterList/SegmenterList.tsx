@@ -1,6 +1,5 @@
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
 import List from "@material-ui/core/List";
@@ -14,6 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { FitSegmenterListItem } from "../FitSegmenterListItem";
 import { EvaluateSegmenterListItem } from "../EvaluateSegmenterListItem";
+import { PredictSegmenterListItem } from "../PredictSegmenterListItem";
 
 export const SegmenterList = () => {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -56,17 +56,11 @@ export const SegmenterList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
+            <PredictSegmenterListItem />
+
             <FitSegmenterListItem />
 
             <EvaluateSegmenterListItem />
-
-            <ListItem button disabled>
-              <ListItemIcon>
-                <LabelImportantIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Predict" />
-            </ListItem>
           </List>
         </Collapse>
       </List>
