@@ -117,11 +117,10 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
       components: 3,
     });
     console.info(result.toDataURL());
-    debugger;
   }
 };
 
-export const EvaluateListItem = () => {
+export const EvaluateSegmenterListItem = () => {
   const image = useImage();
 
   if (!image) return <React.Fragment />;

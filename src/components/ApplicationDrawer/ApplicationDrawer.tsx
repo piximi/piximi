@@ -2,6 +2,7 @@ import Divider from "@material-ui/core/Divider";
 import { FileList } from "../FileList";
 import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
+import { SegmenterList } from "../SegmenterList";
 import { ApplicationList } from "../ApplicationList";
 import Drawer from "@material-ui/core/Drawer";
 import React from "react";
@@ -29,6 +30,7 @@ export const ApplicationDrawer = () => {
       <Divider />
 
       <ClassifierList />
+      <SegmenterList />
 
       <Divider />
 

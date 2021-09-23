@@ -9,13 +9,13 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { ClassifierSettingsDialog } from "../ClassifierSettingsDialog";
+import { SegmenterSettingsDialog } from "../SegmenterSettingsDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import { FitClassifierListItem } from "../FitClassifierListItem";
-import { EvaluateClassifierListItem } from "../EvaluateClassifierListItem";
+import { FitSegmenterListItem } from "../FitSegmenterListItem";
+import { EvaluateSegmenterListItem } from "../EvaluateSegmenterListItem";
 
-export const ClassifierList = () => {
+export const SegmenterList = () => {
   const [collapsed, setCollapsed] = React.useState(false);
 
   const onCollapseClick = () => {
@@ -23,16 +23,16 @@ export const ClassifierList = () => {
   };
 
   const [
-    openClassifierSettingsDialog,
-    setOpenClassifierSettingsDialog,
+    openSegmenterSettingsDialog,
+    setOpenSegmenterSettingsDialog,
   ] = React.useState(false);
 
-  const onOpenClassifierSettingsDialog = () => {
-    setOpenClassifierSettingsDialog(true);
+  const onOpenSegmenterSettingsDialog = () => {
+    setOpenSegmenterSettingsDialog(true);
   };
 
-  const onCloseClassifierSettingsDialog = () => {
-    setOpenClassifierSettingsDialog(false);
+  const onCloseSegmenterSettingsDialog = () => {
+    setOpenSegmenterSettingsDialog(false);
   };
 
   return (
@@ -43,11 +43,11 @@ export const ClassifierList = () => {
             {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </ListItemIcon>
 
-          <ListItemText primary="Classifier" />
+          <ListItemText primary="Segmenter" />
 
           <ListItemSecondaryAction>
-            <Tooltip title="Classifier settings">
-              <IconButton edge="end" onClick={onOpenClassifierSettingsDialog}>
+            <Tooltip title="Segmenter settings">
+              <IconButton edge="end" onClick={onOpenSegmenterSettingsDialog}>
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
@@ -56,9 +56,9 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <FitClassifierListItem />
+            <FitSegmenterListItem />
 
-            <EvaluateClassifierListItem />
+            <EvaluateSegmenterListItem />
 
             <ListItem button disabled>
               <ListItemIcon>
@@ -71,9 +71,9 @@ export const ClassifierList = () => {
         </Collapse>
       </List>
 
-      <ClassifierSettingsDialog
-        onClose={onCloseClassifierSettingsDialog}
-        open={openClassifierSettingsDialog}
+      <SegmenterSettingsDialog
+        onClose={onCloseSegmenterSettingsDialog}
+        open={openSegmenterSettingsDialog}
       />
     </React.Fragment>
   );
