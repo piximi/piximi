@@ -8,4 +8,5 @@ export type Image = {
   src: string;
   shape?: Shape;
   instances: Array<Instance>;
+  partition?: number;
 };

@@ -7,6 +7,8 @@ import * as tf from "@tensorflow/tfjs";
 import { useImage } from "../../hooks/useImage/useImage";
 import * as ImageJS from "image-js";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
+import { PredictSegmenterDialog } from "../PredictSegmenterDialog";
+import { useDialog } from "../../hooks";
 
 const postprocessOutput = async (
   out: tf.Tensor4D
@@ -124,23 +126,27 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
 export const PredictSegmenterListItem = () => {
   const image = useImage();
 
+  const { onClose, onOpen, open } = useDialog();
+
   if (!image) return <React.Fragment />;
 
-  const onEvaluateClick = () => {
-    console.info("Clicked on evaluate! ");
-
-    mobilenetDemo(image);
+  const onPredictClick = () => {
+    console.info("Clicked on predict! ");
+    onOpen();
+    // mobilenetDemo(image);
   };
 
   return (
     <React.Fragment>
-      <ListItem button onClick={onEvaluateClick}>
+      <ListItem button onClick={onPredictClick}>
         <ListItemIcon>
           <LabelImportantIcon />
         </ListItemIcon>
 
         <ListItemText primary="Predict" />
       </ListItem>
+
+      <PredictSegmenterDialog openedDialog={open} closeDialog={onClose} />
     </React.Fragment>
   );
 };
