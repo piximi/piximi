@@ -5,6 +5,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import * as tf from "@tensorflow/tfjs";
 import { useImage } from "../../hooks/useImage/useImage";
+import * as ImageJS from "image-js";
 
 const postprocessOutput = async (
   out: tf.Tensor4D
@@ -111,17 +112,11 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
     const [width, height] = [216, 216]; //FIXME this should not be hard coded
 
     //look at image
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = 216;
-    canvas.height = 216;
-
-    if (!ctx) return;
-
-    const imageData = ctx.createImageData(width, height);
-    imageData.data.set(colorData);
-
-    console.info(canvas.toDataURL());
+    const result = new ImageJS.Image(width, height, colorData, {
+      alpha: 1,
+      components: 3,
+    });
+    console.info(result.toDataURL());
     debugger;
   }
 };
