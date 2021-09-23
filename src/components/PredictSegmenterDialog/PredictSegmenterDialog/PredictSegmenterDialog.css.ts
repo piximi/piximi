@@ -3,6 +3,10 @@ import { makeStyles } from "@material-ui/core/styles";
 const drawerWidth = 280;
 
 export const useStyles = makeStyles((theme) => ({
+  container: {
+    paddingBottom: theme.spacing(8),
+    paddingTop: theme.spacing(8),
+  },
   content: {
     flexGrow: 1,
     transition: theme.transitions.create("margin", {
@@ -21,6 +25,16 @@ export const useStyles = makeStyles((theme) => ({
   },
   contentShiftLeft: {
     marginLeft: drawerWidth,
+  },
+  gridList: {
+    transform: "translateZ(0)",
+  },
+  imageTile: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    top: 0,
+    transform: "none",
   },
   paper: {
     zIndex: 1203,

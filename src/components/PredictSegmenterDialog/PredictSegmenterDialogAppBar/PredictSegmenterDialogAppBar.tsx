@@ -1,13 +1,7 @@
 import * as React from "react";
 import { ArrowBack, PlayCircleOutline } from "@material-ui/icons";
 import { useStyles } from "./PredictSegmentorDialogAppBar.css";
-import {
-  AppBar,
-  IconButton,
-  Toolbar,
-  Tooltip,
-  Switch,
-} from "@material-ui/core";
+import { AppBar, IconButton, Toolbar, Tooltip } from "@material-ui/core";
 
 type DialogAppBarProps = {
   closeDialog: () => void;
@@ -32,12 +26,6 @@ export const PredictSegmenterDialogAppBar = (props: DialogAppBarProps) => {
           >
             <ArrowBack />
           </IconButton>
-        </Tooltip>
-
-        <Tooltip title="use cross validation" placement="bottom">
-          <div>
-            <Switch checked={false} onChange={() => {}} />
-          </div>
         </Tooltip>
 
         <Tooltip title="Evaluate the model" placement="bottom">
