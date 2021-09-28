@@ -2,13 +2,14 @@ import React from "react";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import BarChartIcon from "@material-ui/icons/BarChart";
 import * as tf from "@tensorflow/tfjs";
 import { useImage } from "../../hooks/useImage/useImage";
 import * as ImageJS from "image-js";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import { PredictSegmenterDialog } from "../PredictSegmenterDialog";
 import { useDialog } from "../../hooks";
+import { useSelector } from "react-redux";
+import { categoriesSelector } from "../../store/selectors";
 
 const postprocessOutput = async (
   out: tf.Tensor4D
@@ -87,9 +88,9 @@ const mobilenetDemo = async (image: HTMLImageElement) => {
   // Warmup the model. This isn't necessary, but makes the first prediction
   // faster. Call `dispose` to release the WebGL memory allocated for the return
   // value of `predict`.
-  (mobilenet.predict(
-    tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])
-  ) as tf.Tensor).dispose();
+  (
+    mobilenet.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])) as tf.Tensor
+  ).dispose();
 
   console.info("successful load");
 
@@ -128,7 +129,7 @@ export const PredictSegmenterListItem = () => {
 
   const { onClose, onOpen, open } = useDialog();
 
-  if (!image) return <React.Fragment />;
+  if (!image) return <></>;
 
   const onPredictClick = () => {
     console.info("Clicked on predict! ");
@@ -137,7 +138,7 @@ export const PredictSegmenterListItem = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onPredictClick}>
         <ListItemIcon>
           <LabelImportantIcon />
@@ -147,6 +148,6 @@ export const PredictSegmenterListItem = () => {
       </ListItem>
 
       <PredictSegmenterDialog openedDialog={open} closeDialog={onClose} />
-    </React.Fragment>
+    </>
   );
 };

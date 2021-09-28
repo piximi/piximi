@@ -50,7 +50,7 @@ export const ImageGrid = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <main className={classes.main}>
         <Container className={classes.container} maxWidth={false}>
           <GridList
@@ -73,6 +73,6 @@ export const ImageGrid = () => {
           <ImageGridAppBar />
         </Container>
       </main>
-    </React.Fragment>
+    </>
   );
 };

@@ -30,10 +30,8 @@ export const ImageGridAppBar = () => {
 
   const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
-  const [
-    categoryMenuAnchorEl,
-    setCategoryMenuAnchorEl,
-  ] = React.useState<null | HTMLElement>(null);
+  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null);
 
   const { onClose, onOpen, open } = useDialog();
 
@@ -65,7 +63,7 @@ export const ImageGridAppBar = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Slide appear={false} direction="down" in={selectedImages.length > 0}>
         <AppBar color="inherit" position="fixed">
           <Toolbar>
@@ -130,6 +128,6 @@ export const ImageGridAppBar = () => {
         onClose={onClose}
         open={open}
       />
-    </React.Fragment>
+    </>
   );
 };
