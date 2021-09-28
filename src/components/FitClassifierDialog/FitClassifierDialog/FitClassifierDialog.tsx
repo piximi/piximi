@@ -45,8 +45,8 @@ import seedrandom from "seedrandom";
 import { assertTypesMatch } from "@tensorflow/tfjs-core/dist/tensor_util";
 
 import * as tfvis from "@tensorflow/tfjs-vis";
-import { Image } from "../../../types/Image";
 import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -54,9 +54,6 @@ const seed: seedrandom.prng = seedrandom(SEED_WORD);
 const vis = tfvis.visor();
 vis.close();
 const surface = { name: "show.fitCallbacks", tab: "Training" };
-
-// @ts-ignore
-var Table = require("cli-table");
 
 const BEAN_DATASET_URL =
   "https://storage.googleapis.com/teachable-machine-models/test_data/image/beans/";
@@ -190,29 +187,30 @@ function showMetrics(
 
   const header = "α=" + alpha + ", t=" + (time / 1000).toFixed(1) + "s";
 
-  const table = new Table({
-    head: [header, "Accuracy", "Loss"],
-    colWidths: [18, 10, 10],
-  });
-
-  table.push(
-    ["Train", lastEpoch.acc.toFixed(3), lastEpoch.loss.toFixed(5)],
-    ["Validation", lastEpoch.val_acc.toFixed(3), lastEpoch.val_loss.toFixed(5)]
-  );
-  console.log("\n" + table.toString());
+  //FIXME bring that back
+  // const table = new Table({
+  //   head: [header, "Accuracy", "Loss"],
+  //   colWidths: [18, 10, 10],
+  // });
+  //FIXME bring that back
+  // table.push(
+  //   ["Train", lastEpoch.acc.toFixed(3), lastEpoch.loss.toFixed(5)],
+  //   ["Validation", lastEpoch.val_acc.toFixed(3), lastEpoch.val_loss.toFixed(5)]
+  // );
+  // console.log("\n" + table.toString());
 }
 
 type LossHistory = { x: number; y: number }[];
 
 type FitClassifierDialogProps = {
   categories: Category[];
-  setImagesPartition: (partitions: number[]) => void;
+  // setImagesPartition: (partitions: number[]) => void;
   closeDialog: () => void;
   images: Image[];
   openedDialog: boolean;
   openedDrawer: boolean;
-  datasetInitialized: boolean;
-  setDatasetInitialized: (datasetInitialized: boolean) => void;
+  // datasetInitialized: boolean;
+  // setDatasetInitialized: (datasetInitialized: boolean) => void;
 };
 
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
@@ -222,9 +220,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     images,
     openedDialog,
     openedDrawer,
-    setImagesPartition,
-    datasetInitialized,
-    setDatasetInitialized,
+    // setImagesPartition,
+    // datasetInitialized,
+    // setDatasetInitialized,
   } = props;
 
   const styles = useStyles({});
@@ -249,16 +247,17 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   // assign each image to train- test- or validation- set
   const initializeDatasets = () => {
-    if (datasetInitialized) {
-      return;
-    }
-    var partitions: number[] = [];
-    images.forEach((image: Image) => {
-      const setItentifier = assignToSet();
-      partitions.push(setItentifier);
-    });
-    setImagesPartition(partitions);
-    setDatasetInitialized(true);
+    //FIXME bring that back
+    // if (datasetInitialized) {
+    //   return;
+    // }
+    // var partitions: number[] = [];
+    // images.forEach((image: Image) => {
+    //   const setItentifier = assignToSet();
+    //   partitions.push(setItentifier);
+    // });
+    // // setImagesPartition(partitions);
+    // setDatasetInitialized(true);
   };
 
   // Preprocessing clicks
@@ -272,9 +271,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setPaddingOption2(!paddingOption2);
   };
 
-  const [dataAugmentation, setDataAugmentation] = React.useState<boolean>(
-    false
-  );
+  const [dataAugmentation, setDataAugmentation] =
+    React.useState<boolean>(false);
   const onDataAugmentationClick = () => {
     setDataAugmentation(!dataAugmentation);
   };
@@ -293,10 +291,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setUpperPercentile(value);
   };
 
-  const [
-    collapsedPreprocessingList,
-    setCollapsedPreprocessingList,
-  ] = useState<boolean>(false);
+  const [collapsedPreprocessingList, setCollapsedPreprocessingList] =
+    useState<boolean>(false);
   const onPreprocessingListClick = () => {
     // shows or hides preprocessing list in interface
     setCollapsedPreprocessingList(!collapsedPreprocessingList);
@@ -341,10 +337,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setCollapsedClasssifierSettingsList(!collapsedClasssifierSettingsList);
   };
 
-  const [
-    collapsedDatasetSettingsList,
-    setCollapsedDatasetSettingsList,
-  ] = useState<boolean>(false);
+  const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
+    useState<boolean>(false);
 
   const onDatasetSettingsListClick = () => {
     setCollapsedDatasetSettingsList(!collapsedDatasetSettingsList);
@@ -355,9 +349,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [epochs, setEpochs] = useState<number>(10);
 
-  const [optimizationAlgorithm, setOptimizationAlgorithm] = useState<string>(
-    "adam"
-  );
+  const [optimizationAlgorithm, setOptimizationAlgorithm] =
+    useState<string>("adam");
   const [learningRate, setLearningRate] = useState<number>(0.01);
   const [lossFunction, setLossFunction] = useState<string>("meanSquaredError");
   const [trainStatus, setTrainStatus] = useState<string>("meanSquaredError");
@@ -372,10 +365,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setTrainingLossHistory(history);
   };
 
-  const [
-    trainingAccuracyHistory,
-    setTrainingAccuracyHistory,
-  ] = useState<LossHistory>([]);
+  const [trainingAccuracyHistory, setTrainingAccuracyHistory] =
+    useState<LossHistory>([]);
   const updateAccuracHistory = (x: number, y: number) => {
     var history = trainingAccuracyHistory;
     history.push({ x, y });
@@ -392,10 +383,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setTrainingValidationAccuracyHistory(history);
   };
 
-  const [
-    trainingValidationLossHistory,
-    setTrainingValidationLossHistory,
-  ] = useState<LossHistory>([]);
+  const [trainingValidationLossHistory, setTrainingValidationLossHistory] =
+    useState<LossHistory>([]);
 
   const updateValidationLossHistory = (x: number, y: number) => {
     var history = trainingValidationLossHistory;
@@ -502,12 +491,13 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
     const TRAIN_VALIDATION_SIZE_PER_CLASS = NUM_IMAGE_PER_CLASS;
 
-    const table = new Table();
-    table.push({
-      "train/validation size":
-        TRAIN_VALIDATION_SIZE_PER_CLASS * classLabels.length,
-    });
-    console.log("\n" + table.toString());
+    //FIXME bring that back
+    // const table = new Table();
+    // table.push({
+    //   "train/validation size":
+    //     TRAIN_VALIDATION_SIZE_PER_CLASS * classLabels.length,
+    // });
+    // console.log("\n" + table.toString());
 
     // 2. Create our datasets once
     // const datasets = await createDatasets(

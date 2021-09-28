@@ -1,1 +1,1 @@
-export { ConnectedFitClassifierDialog } from "./FitClassifierDialog";
+export { FitClassifierDialog } from "./FitClassifierDialog";

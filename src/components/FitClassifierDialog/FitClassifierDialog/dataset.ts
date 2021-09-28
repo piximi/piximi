@@ -1,6 +1,7 @@
-import { Category, Image } from "@piximi/types";
 import * as ImageJS from "image-js";
 import * as tensorflow from "@tensorflow/tfjs";
+import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
 
 export const createTrainingSet = async (
   categories: Category[],
@@ -68,7 +69,7 @@ export const createTestSet = async (
   images: Image[]
 ) => {
   const labeledData = images.filter((image: Image) => {
-    return image.categoryIdentifier !== "00000000-0000-0000-0000-000000000000";
+    return image.categoryId !== "00000000-0000-0000-0000-000000000000";
   });
 
   const testData: Image[] = [];
@@ -86,7 +87,7 @@ export const createTestSet = async (
 export const createPredictionSet = async (images: Image[]) => {
   const predictionImageSet = images.filter(
     (image: Image) =>
-      image.categoryIdentifier === "00000000-0000-0000-0000-000000000000"
+      image.categoryId === "00000000-0000-0000-0000-000000000000"
   );
 
   const predictionTensorSet: tensorflow.Tensor<tensorflow.Rank>[] = [];
@@ -94,7 +95,7 @@ export const createPredictionSet = async (images: Image[]) => {
 
   for (const image of predictionImageSet) {
     predictionTensorSet.push(await tensorImageData(image));
-    imageIdentifiers.push(image.identifier);
+    imageIdentifiers.push(image.id);
   }
   return { data: predictionTensorSet, identifiers: imageIdentifiers };
 };
@@ -123,7 +124,7 @@ const createLabledTensorflowDataSet = async (
 
   for (const image of labledData) {
     tensorData.push(await tensorImageData(image));
-    tensorLabels.push(findCategoryIndex(categories, image.categoryIdentifier));
+    tensorLabels.push(findCategoryIndex(categories, image.categoryId!));
   }
 
   return { data: tensorData, labels: tensorLabels };
@@ -160,15 +161,13 @@ const findCategoryIndex = (
 ): number => {
   const labels = categories.filter(
     (category: Category) =>
-      category.identifier !== "00000000-0000-0000-0000-000000000000"
+      category.id !== "00000000-0000-0000-0000-000000000000"
   );
-  return labels.findIndex(
-    (category: Category) => category.identifier === identifier
-  );
+  return labels.findIndex((category: Category) => category.id === identifier);
 };
 
 export const tensorImageData = async (image: Image) => {
-  const data = await ImageJS.Image.load(image.data);
+  const data = await ImageJS.Image.load(image.src);
 
   return tensorflow.tidy(() => {
     return tensorflow.browser

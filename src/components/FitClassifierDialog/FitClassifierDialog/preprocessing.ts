@@ -1,9 +1,9 @@
-import * as types from "@piximi/types";
+import { Image } from "../../../types/Image";
 
 export const rescaleData = async (
   lowerPercentile: number,
   upperPercentile: number,
-  labeledData: types.Image[]
+  labeledData: Image[]
 ) => {
   // do something
   // old :const testDataSet = await createLabledTensorflowDataSet(testData, categories);
@@ -14,7 +14,7 @@ export const rescaleData = async (
 export const resizeData = async (
   paddingOption1: boolean,
   paddingOption2: boolean,
-  labeledData: types.Image[]
+  labeledData: Image[]
 ) => {
   // do something
   let resizedSet;
@@ -23,7 +23,7 @@ export const resizeData = async (
 
 export const augmentData = async (
   dataAugmentation: boolean,
-  labeledData: types.Image[]
+  labeledData: Image[]
 ) => {
   // do something
   // old :const testDataSet = await createLabledTensorflowDataSet(testData, categories);

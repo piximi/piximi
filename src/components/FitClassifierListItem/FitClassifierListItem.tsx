@@ -3,12 +3,23 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
+import { useDialog } from "../../hooks";
+import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
+import { useSelector } from "react-redux";
+import { categoriesSelector, imagesSelector } from "../../store/selectors";
 
 export const FitClassifierListItem = () => {
-  const onFitClick = () => {};
+  const { onClose, onOpen, open } = useDialog();
+
+  const categories = useSelector(categoriesSelector);
+  const images = useSelector(imagesSelector);
+
+  const onFitClick = () => {
+    onOpen();
+  };
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onFitClick}>
         <ListItemIcon>
           <ScatterPlotIcon />
@@ -16,6 +27,13 @@ export const FitClassifierListItem = () => {
 
         <ListItemText primary="Fit" />
       </ListItem>
-    </React.Fragment>
+      <FitClassifierDialog
+        categories={categories}
+        images={images}
+        openedDialog={open}
+        openedDrawer={true}
+        closeDialog={onClose}
+      />
+    </>
   );
 };
