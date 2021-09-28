@@ -26,13 +26,10 @@ import { DialogTransition } from "../DialogTransition";
 import { Form } from "../Form/Form";
 import { RescalingForm } from "../RescalingForm/RescalingForm";
 import { History } from "../History";
-import classNames from "classnames";
 import { makeStyles } from "@material-ui/styles";
-import * as types from "@piximi/types";
 import * as tensorflow from "@tensorflow/tfjs";
 import { useState, useEffect } from "react";
-import { styles } from "./FitClassifierDialog.css";
-import { useCollapseList } from "@piximi/hooks";
+import { useStyles } from "./FitClassifierDialog.css";
 import {
   createTrainingSet,
   assignToSet,
@@ -48,6 +45,8 @@ import seedrandom from "seedrandom";
 import { assertTypesMatch } from "@tensorflow/tfjs-core/dist/tensor_util";
 
 import * as tfvis from "@tensorflow/tfjs-vis";
+import { Image } from "../../../types/Image";
+import { Category } from "../../../types/Category";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -83,17 +82,17 @@ function loadPngImage(
   });
 }
 
-function loadPiximiImage(image: types.Image): HTMLImageElement {
-  if (image.data.endsWith(".png")) {
-    Promise.resolve(loadPiximiPngImage(image.data));
+function loadPiximiImage(image: Image): HTMLImageElement {
+  if (image.src.endsWith(".png")) {
+    Promise.resolve(loadPiximiPngImage(image.src));
   }
   return getPiximiImage(image);
 }
 
-function getPiximiImage(image: types.Image) {
+function getPiximiImage(image: Image) {
   const img = new Image(224, 224);
   img.crossOrigin = "anonymous";
-  img.src = image.data;
+  img.src = image.src;
   return img;
 }
 
@@ -114,8 +113,8 @@ function loadPiximiPngImage(dataset_url: string): Promise<HTMLImageElement> {
  * Create train/validation dataset and test dataset with unique images
  */
 async function createDatasetsFromPiximiImages(
-  images: types.Image[],
-  classes: types.Category[]
+  images: Image[],
+  classes: Category[]
 ) {
   // fill in an array with unique numbers
   let listNumbers = [];
@@ -136,7 +135,7 @@ async function createDatasetsFromPiximiImages(
     let load: Array<HTMLImageElement> = [];
     for (let i = 0; i < trainAndValidationIndeces.length; ++i) {
       let imageIndex = trainAndValidationIndeces[i];
-      if (images[imageIndex].categoryIdentifier === classes[j].identifier) {
+      if (images[imageIndex].categoryId === classes[j].id) {
         load.push(await loadPiximiImage(images[imageIndex]));
       }
     }
@@ -145,7 +144,7 @@ async function createDatasetsFromPiximiImages(
     load = [];
     for (let i = 0; i < testIndices.length; ++i) {
       let imageIndex = testIndices[i];
-      if (images[imageIndex].categoryIdentifier === classes[j].identifier) {
+      if (images[imageIndex].categoryId === classes[j].id) {
         load.push(await loadPiximiImage(images[imageIndex]));
       }
     }
@@ -203,15 +202,13 @@ function showMetrics(
   console.log("\n" + table.toString());
 }
 
-const useStyles = makeStyles(styles);
-
 type LossHistory = { x: number; y: number }[];
 
 type FitClassifierDialogProps = {
-  categories: types.Category[];
+  categories: Category[];
   setImagesPartition: (partitions: number[]) => void;
   closeDialog: () => void;
-  images: types.Image[];
+  images: Image[];
   openedDialog: boolean;
   openedDrawer: boolean;
   datasetInitialized: boolean;
@@ -256,7 +253,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       return;
     }
     var partitions: number[] = [];
-    images.forEach((image: types.Image) => {
+    images.forEach((image: Image) => {
       const setItentifier = assignToSet();
       partitions.push(setItentifier);
     });
@@ -308,7 +305,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const onPreprocessingClick = async (
     lowerPercentile: number,
     upperPercentile: number,
-    labeledData: types.Image[]
+    labeledData: Image[]
   ) => {
     //does actual preprocessing upon clicking button
     // Skeleton
@@ -335,7 +332,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     return `${value}%`;
   }
 
-  const { collapsedList, collapseList } = useCollapseList();
   const [
     collapsedClasssifierSettingsList,
     setCollapsedClasssifierSettingsList,
@@ -456,14 +452,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setOptimizationAlgorithm(target.value);
   };
 
-  const className = classNames(styles.content, styles.contentLeft, {
-    [styles.contentShift]: openedDrawer,
-    [styles.contentShiftLeft]: openedDrawer,
-  });
-
-  const classes = {
-    paper: styles.paper,
-  };
+  const classes = useStyles();
 
   const lossLabelElement = document.getElementById("loss-label");
   const accuracyLabelElement = document.getElementById("accuracy-label");
@@ -473,6 +462,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     // @ts-ignore
     lossValues[series].push({ x: batch, y: loss });
     const lossContainer = document.getElementById("loss-canvas");
+    if (!lossContainer) return;
     tfvis.render.linechart(
       lossContainer,
       { values: lossValues, series: ["train", "validation"] },
@@ -499,8 +489,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     //const classLabels = metadata.classes as string[];
     const classLabels: string[] = [];
     for (let i = 0; i < categories.length; i++) {
-      if (categories[i].identifier !== "00000000-0000-0000-0000-000000000000") {
-        classLabels.push(categories[i].identifier);
+      if (categories[i].id !== "00000000-0000-0000-0000-000000000000") {
+        classLabels.push(categories[i].id);
       }
     }
     console.log(classLabels);
@@ -527,8 +517,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     //   0,
     //   loadFunction
     // );
-    const classes = categories.filter((category: types.Category) => {
-      return category.identifier !== "00000000-0000-0000-0000-000000000000";
+    const classes = categories.filter((category: Category) => {
+      return category.id !== "00000000-0000-0000-0000-000000000000";
     });
     const datasets = await createDatasetsFromPiximiImages(images, classes);
     const trainAndValidationImages = datasets.trainAndValidationImages;
@@ -667,7 +657,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   return (
     // @ts-ignore
     <Dialog
-      className={className}
       classes={classes}
       disableBackdropClick
       disableEscapeKeyDown
