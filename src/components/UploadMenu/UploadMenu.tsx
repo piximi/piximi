@@ -59,7 +59,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <input
         accept="image/*"
         hidden
@@ -95,6 +95,6 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
         <DropboxMenuItem onClose={onClose} />
       </Menu>
-    </React.Fragment>
+    </>
   );
 };

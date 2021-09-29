@@ -22,10 +22,8 @@ export const ClassifierList = () => {
     setCollapsed(!collapsed);
   };
 
-  const [
-    openClassifierSettingsDialog,
-    setOpenClassifierSettingsDialog,
-  ] = React.useState(false);
+  const [openClassifierSettingsDialog, setOpenClassifierSettingsDialog] =
+    React.useState(false);
 
   const onOpenClassifierSettingsDialog = () => {
     setOpenClassifierSettingsDialog(true);
@@ -36,7 +34,7 @@ export const ClassifierList = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <List dense>
         <ListItem button dense onClick={onCollapseClick}>
           <ListItemIcon>
@@ -75,6 +73,6 @@ export const ClassifierList = () => {
         onClose={onCloseClassifierSettingsDialog}
         open={openClassifierSettingsDialog}
       />
-    </React.Fragment>
+    </>
   );
 };

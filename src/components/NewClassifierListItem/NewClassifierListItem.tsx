@@ -10,7 +10,7 @@ export const NewClassifierListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
           <AddIcon />
@@ -20,6 +20,6 @@ export const NewClassifierListItem = () => {
       </ListItem>
 
       <NewClassifierDialog onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

@@ -6,7 +6,7 @@ import {
   createdCategoriesSelector,
 } from "../../selectors";
 
-export function* preprocessSaga() {
+export function* preprocessSaga(): any {
   const images = yield select(categorizedImagesSelector);
 
   const categories = yield select(createdCategoriesSelector);

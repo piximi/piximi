@@ -8,12 +8,12 @@ import { useImage } from "../../hooks/useImage/useImage";
 export const EvaluateClassifierListItem = () => {
   const image = useImage();
 
-  if (!image) return <React.Fragment />;
+  if (!image) return <></>;
 
   const onEvaluateClick = () => {};
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onEvaluateClick}>
         <ListItemIcon>
           <BarChartIcon />
@@ -21,6 +21,6 @@ export const EvaluateClassifierListItem = () => {
 
         <ListItemText primary="Evaluate" />
       </ListItem>
-    </React.Fragment>
+    </>
   );
 };

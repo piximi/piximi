@@ -14,10 +14,8 @@ type ColorIconButtonProps = {
 export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
   const classes = useStyles();
 
-  const [
-    colorMenuAnchorEl,
-    setColorMenuAnchorEl,
-  ] = React.useState<null | HTMLButtonElement>(null);
+  const [colorMenuAnchorEl, setColorMenuAnchorEl] =
+    React.useState<null | HTMLButtonElement>(null);
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
@@ -36,7 +34,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <IconButton onClick={onOpenColorPicker}>
         <Avatar style={{ backgroundColor: "#F3F3F3" }}>
           <Label style={{ color: color }} />
@@ -60,6 +58,6 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
           <CirclePicker colors={COLORS} onChange={onChange} />
         </div>
       </Popover>
-    </React.Fragment>
+    </>
   );
 };

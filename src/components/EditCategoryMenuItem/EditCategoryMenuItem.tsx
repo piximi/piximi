@@ -23,7 +23,7 @@ export const EditCategoryMenuItem = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <MenuItem onClick={onClick}>
         <Typography variant="inherit">Edit category</Typography>
       </MenuItem>
@@ -33,6 +33,6 @@ export const EditCategoryMenuItem = ({
         onCloseDialog={onClose}
         openDialog={open}
       />
-    </React.Fragment>
+    </>
   );
 };

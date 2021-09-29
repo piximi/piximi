@@ -13,7 +13,7 @@ export const UnknownCategoryListItem = () => {
   const id = "00000000-0000-0000-0000-000000000000";
 
   return (
-    <React.Fragment>
+    <>
       <ListItem dense key={id} id={id}>
         <ListItemIcon>
           <Checkbox
@@ -34,6 +34,6 @@ export const UnknownCategoryListItem = () => {
           </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
-    </React.Fragment>
+    </>
   );
 };

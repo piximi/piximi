@@ -10,7 +10,7 @@ export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
           <SettingsIcon />
@@ -20,6 +20,6 @@ export const SettingsListItem = () => {
       </ListItem>
 
       <SettingsDialog onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

@@ -23,12 +23,12 @@ export const DeleteCategoryMenuItem = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <MenuItem onClick={onClick}>
         <Typography variant="inherit">Delete category</Typography>
       </MenuItem>
 
       <DeleteCategoryDialog category={category} onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

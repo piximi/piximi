@@ -10,7 +10,7 @@ export const OpenListItem = () => {
   const { anchorEl, onClose, onOpen, open } = useMenu();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
           <FolderOpenIcon />
@@ -20,6 +20,6 @@ export const OpenListItem = () => {
       </ListItem>
 
       <OpenMenu anchorEl={anchorEl} onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

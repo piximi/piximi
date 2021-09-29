@@ -9,7 +9,7 @@ import {
 } from "../../selectors";
 import { fitOptionsSelector } from "../../selectors";
 
-export function* fitSaga(action: any) {
+export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
   const pathname =

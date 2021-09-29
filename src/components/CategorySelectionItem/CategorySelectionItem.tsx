@@ -22,7 +22,7 @@ export const CategorySelectionItem = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <ListItem dense={false} key={category.id} id={category.id}>
         <ListItemIcon>
           <Radio
@@ -48,6 +48,6 @@ export const CategorySelectionItem = ({
 
         <LabelIcon style={{ color: category.color, transform: "scaleX(-1)" }} />
       </ListItem>
-    </React.Fragment>
+    </>
   );
 };

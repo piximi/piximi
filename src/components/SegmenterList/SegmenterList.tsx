@@ -22,10 +22,8 @@ export const SegmenterList = () => {
     setCollapsed(!collapsed);
   };
 
-  const [
-    openSegmenterSettingsDialog,
-    setOpenSegmenterSettingsDialog,
-  ] = React.useState(false);
+  const [openSegmenterSettingsDialog, setOpenSegmenterSettingsDialog] =
+    React.useState(false);
 
   const onOpenSegmenterSettingsDialog = () => {
     setOpenSegmenterSettingsDialog(true);
@@ -36,7 +34,7 @@ export const SegmenterList = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <List dense>
         <ListItem button dense onClick={onCollapseClick}>
           <ListItemIcon>
@@ -69,6 +67,6 @@ export const SegmenterList = () => {
         onClose={onCloseSegmenterSettingsDialog}
         open={openSegmenterSettingsDialog}
       />
-    </React.Fragment>
+    </>
   );
 };

@@ -42,7 +42,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <input
         accept="application/json"
         hidden
@@ -70,6 +70,6 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
           <OpenClassifierMenuItem onClose={onClose} />
         </MenuList>
       </Menu>
-    </React.Fragment>
+    </>
   );
 };

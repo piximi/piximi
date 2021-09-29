@@ -2,7 +2,7 @@ import { put } from "redux-saga/effects";
 import { open } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 
-export function* openSaga(action: any) {
+export function* openSaga(action: any): any {
   const { pathname, classes } = action.payload;
 
   const opened = yield open(pathname, classes);

@@ -8,14 +8,14 @@ import { useImage } from "../../hooks/useImage/useImage";
 export const EvaluateSegmenterListItem = () => {
   const image = useImage();
 
-  if (!image) return <React.Fragment />;
+  if (!image) return <></>;
 
   const onEvaluateClick = () => {
     console.info("Clicked on evaluate! ");
   };
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onEvaluateClick}>
         <ListItemIcon>
           <BarChartIcon />
@@ -23,6 +23,6 @@ export const EvaluateSegmenterListItem = () => {
 
         <ListItemText primary="Evaluate" />
       </ListItem>
-    </React.Fragment>
+    </>
   );
 };

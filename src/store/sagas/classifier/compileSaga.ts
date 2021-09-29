@@ -3,7 +3,7 @@ import { compile } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import { openedSelector } from "../../selectors/openedSelector";
 
-export function* compileSaga(action: any) {
+export function* compileSaga(action: any): any {
   const { options } = action.payload;
 
   const opened = yield select(openedSelector);

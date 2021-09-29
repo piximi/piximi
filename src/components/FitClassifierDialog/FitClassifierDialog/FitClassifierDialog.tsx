@@ -46,7 +46,7 @@ import { assertTypesMatch } from "@tensorflow/tfjs-core/dist/tensor_util";
 
 import * as tfvis from "@tensorflow/tfjs-vis";
 import { Category } from "../../../types/Category";
-import { Image } from "../../../types/Image";
+import { Image as ImageType } from "../../../types/Image";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -79,14 +79,14 @@ function loadPngImage(
   });
 }
 
-function loadPiximiImage(image: Image): HTMLImageElement {
+function loadPiximiImage(image: ImageType): HTMLImageElement {
   if (image.src.endsWith(".png")) {
     Promise.resolve(loadPiximiPngImage(image.src));
   }
   return getPiximiImage(image);
 }
 
-function getPiximiImage(image: Image) {
+function getPiximiImage(image: ImageType) {
   const img = new Image(224, 224);
   img.crossOrigin = "anonymous";
   img.src = image.src;
@@ -110,7 +110,7 @@ function loadPiximiPngImage(dataset_url: string): Promise<HTMLImageElement> {
  * Create train/validation dataset and test dataset with unique images
  */
 async function createDatasetsFromPiximiImages(
-  images: Image[],
+  images: ImageType[],
   classes: Category[]
 ) {
   // fill in an array with unique numbers
@@ -206,7 +206,7 @@ type FitClassifierDialogProps = {
   categories: Category[];
   // setImagesPartition: (partitions: number[]) => void;
   closeDialog: () => void;
-  images: Image[];
+  images: ImageType[];
   openedDialog: boolean;
   openedDrawer: boolean;
   // datasetInitialized: boolean;
@@ -252,7 +252,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     //   return;
     // }
     // var partitions: number[] = [];
-    // images.forEach((image: Image) => {
+    // images.forEach((image: Images) => {
     //   const setItentifier = assignToSet();
     //   partitions.push(setItentifier);
     // });
@@ -301,7 +301,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const onPreprocessingClick = async (
     lowerPercentile: number,
     upperPercentile: number,
-    labeledData: Image[]
+    labeledData: ImageType[]
   ) => {
     //does actual preprocessing upon clicking button
     // Skeleton

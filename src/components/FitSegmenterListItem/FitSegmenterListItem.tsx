@@ -8,7 +8,7 @@ export const FitSegmenterListItem = () => {
   const onFitClick = () => {};
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onFitClick}>
         <ListItemIcon>
           <ScatterPlotIcon />
@@ -16,6 +16,6 @@ export const FitSegmenterListItem = () => {
 
         <ListItemText primary="Fit" />
       </ListItem>
-    </React.Fragment>
+    </>
   );
 };

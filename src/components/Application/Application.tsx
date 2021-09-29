@@ -6,7 +6,7 @@ import { ApplicationAppBar } from "../ApplicationAppBar";
 
 export const Application = () => {
   return (
-    <React.Fragment>
+    <>
       <CssBaseline />
 
       <ApplicationAppBar />
@@ -14,6 +14,6 @@ export const Application = () => {
       <ApplicationDrawer />
 
       <ImageGrid />
-    </React.Fragment>
+    </>
   );
 };

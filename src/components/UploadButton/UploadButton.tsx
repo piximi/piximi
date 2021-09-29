@@ -12,7 +12,7 @@ export const UploadButton = () => {
   const classes = useStyles();
 
   return (
-    <React.Fragment>
+    <>
       <Tooltip title="Open image">
         <Button
           className={classes.button}
@@ -24,6 +24,6 @@ export const UploadButton = () => {
       </Tooltip>
 
       <UploadMenu anchorEl={anchorEl!.current} onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

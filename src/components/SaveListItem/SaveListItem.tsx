@@ -15,7 +15,7 @@ export const SaveListItem = () => {
   } = useMenu();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpenCategoryMenu}>
         <ListItemIcon>
           <SaveIcon />
@@ -30,6 +30,6 @@ export const SaveListItem = () => {
         onOpen={onOpenCategoryMenu}
         open={openCategoryMenu}
       />
-    </React.Fragment>
+    </>
   );
 };

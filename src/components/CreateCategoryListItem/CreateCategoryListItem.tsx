@@ -10,7 +10,7 @@ export const CreateCategoryListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
           <AddIcon />
@@ -20,6 +20,6 @@ export const CreateCategoryListItem = () => {
       </ListItem>
 
       <CreateCategoryDialog onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };
