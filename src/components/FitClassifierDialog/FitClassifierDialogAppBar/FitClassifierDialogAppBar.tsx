@@ -6,7 +6,6 @@ import {
   ReplayRounded,
 } from "@material-ui/icons";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import classNames from "classnames";
 import { AppBar, IconButton, Toolbar, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -29,18 +28,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const DialogAppBar = (props: any) => {
+export const FitClassifierDialogAppBar = (props: any) => {
   const { onStopTrainingChange, closeDialog, fit, openedDrawer } = props;
 
   const classes = useStyles({});
 
   return (
-    <AppBar
-      className={classNames(classes.appBar, {
-        [classes.appBarShift]: openedDrawer,
-        [classes.appBarShiftLeft]: openedDrawer,
-      })}
-    >
+    <AppBar className={classes.appBar}>
       <Toolbar>
         <Tooltip title="Close Dialog" placement="bottom">
           <IconButton

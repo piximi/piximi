@@ -21,7 +21,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import * as React from "react";
-import { DialogAppBar } from "../DialogAppBar";
+import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
 import { Form } from "../Form/Form";
 import { RescalingForm } from "../RescalingForm/RescalingForm";
@@ -47,6 +47,7 @@ import { assertTypesMatch } from "@tensorflow/tfjs-core/dist/tensor_util";
 import * as tfvis from "@tensorflow/tfjs-vis";
 import { Category } from "../../../types/Category";
 import { Image as ImageType } from "../../../types/Image";
+import { PredictSegmenterDialogAppBar } from "../../PredictSegmenterDialog/PredictSegmenterDialogAppBar";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -647,16 +648,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   return (
     // @ts-ignore
     <Dialog
-      classes={classes}
       disableBackdropClick
       disableEscapeKeyDown
       fullScreen
       onClose={closeDialog}
       open={openedDialog}
       TransitionComponent={DialogTransition}
-      style={{ zIndex: 900 }}
+      style={{ zIndex: 1203 }}
     >
-      <DialogAppBar
+      <FitClassifierDialogAppBar
         onStopTrainingChange={onStopTrainingChange}
         closeDialog={closeDialog}
         fit={onFit}
