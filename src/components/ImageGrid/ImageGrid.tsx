@@ -1,7 +1,6 @@
 import Container from "@material-ui/core/Container";
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
-import React from "react";
+import ImageList from "@material-ui/core/ImageList";
+import ImageListItem from "@material-ui/core/ImageListItem";
 import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "../../types/Image";
@@ -53,22 +52,22 @@ export const ImageGrid = () => {
     <>
       <main className={classes.main}>
         <Container className={classes.container} maxWidth={false}>
-          <GridList
+          <ImageList
             className={classes.gridList}
             cols={Math.floor(4 / scaleFactor)}
             cellHeight="auto"
           >
             {images.map((image: Image) => (
-              <GridListTile
+              <ImageListItem
                 key={image.id}
                 onClick={() => onSelectImage(image)}
                 style={getSize(scaleFactor)}
                 className={getSelectionStatus(image.id)}
               >
                 <img alt="" src={image.src} className={classes.imageTile} />
-              </GridListTile>
+              </ImageListItem>
             ))}
-          </GridList>
+          </ImageList>
 
           <ImageGridAppBar />
         </Container>
