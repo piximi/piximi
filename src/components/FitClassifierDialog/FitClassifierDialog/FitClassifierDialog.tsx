@@ -48,6 +48,7 @@ import * as tfvis from "@tensorflow/tfjs-vis";
 import { Category } from "../../../types/Category";
 import { Image as ImageType } from "../../../types/Image";
 import { PredictSegmenterDialogAppBar } from "../../PredictSegmenterDialog/PredictSegmenterDialogAppBar";
+import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -261,64 +262,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     // setDatasetInitialized(true);
   };
 
-  // Preprocessing clicks
-  const [paddingOption1, setPaddingOption1] = React.useState<boolean>(false);
-  const onPaddingOption1Click = () => {
-    setPaddingOption1(!paddingOption1);
-  };
-
-  const [paddingOption2, setPaddingOption2] = React.useState<boolean>(false);
-  const onpaddingOption2Click = () => {
-    setPaddingOption2(!paddingOption2);
-  };
-
-  const [dataAugmentation, setDataAugmentation] =
-    React.useState<boolean>(false);
-  const onDataAugmentationClick = () => {
-    setDataAugmentation(!dataAugmentation);
-  };
-
-  const [lowerPercentile, setLowerPercentile] = React.useState<number>(0);
-  const onLowerPercentileChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    setLowerPercentile(value);
-  };
-
-  const [upperPercentile, setUpperPercentile] = React.useState<number>(1);
-  const onUpperPercentileChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    setUpperPercentile(value);
-  };
-
-  const [collapsedPreprocessingList, setCollapsedPreprocessingList] =
-    useState<boolean>(false);
-  const onPreprocessingListClick = () => {
-    // shows or hides preprocessing list in interface
-    setCollapsedPreprocessingList(!collapsedPreprocessingList);
-  };
-
-  const onPreprocessingClick = async (
-    lowerPercentile: number,
-    upperPercentile: number,
-    labeledData: ImageType[]
-  ) => {
-    //does actual preprocessing upon clicking button
-    // Skeleton
-    const rescaledSet = await rescaleData(
-      lowerPercentile,
-      upperPercentile,
-      labeledData
-    );
-    const resizedSet = await resizeData(
-      paddingOption1,
-      paddingOption2,
-      labeledData
-    );
-    const augmentedSet = await augmentData(dataAugmentation, labeledData);
-  };
-
   const [datasetSplits, setDatasetSplits] = React.useState([60, 80]);
 
   const handleChange = (event: any, newValue: any) => {
@@ -475,6 +418,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ) {
     // classes, samplesPerClass, url
     const metadata = await (await fetch(dataset_url + "metadata.json")).json();
+    debugger;
     // 1. Setup dataset parameters
     //const classLabels = metadata.classes as string[];
     const classLabels: string[] = [];
@@ -530,12 +474,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
 
     const earlyStopEpochs = earlyStop ? 5 : EPOCHS;
+
+    //TODO: pretty sure the code is not to stop here, we should actually be training something...
+    // testModel(something, 0.25, classes, trainAndValidationImages, testImages, 1, EPOCHS, LEARNING_RATE, false);
   }
 
   async function testModel(
     model: any,
     alpha: number,
-    classes: string[],
+    classes: Category[],
     trainAndValidationImages: HTMLImageElement[][],
     testImages: HTMLImageElement[][],
     testSizePerClass: number,
@@ -633,17 +580,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     testMobilenet(FLOWER_DATASET_URL, 1, loadPngImage);
   };
 
-  enum LossFunction {
-    "absoluteDifference",
-    "cosineDistance",
-    "hingeLoss",
-    "huberLoss",
-    "logLoss",
-    "meanSquaredError",
-    "sigmoidCrossEntropy",
-    "categoricalCrossentropy",
-  }
-
   // specifies interface
   return (
     // @ts-ignore
@@ -665,79 +601,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <ListItem
-            button
-            onClick={onPreprocessingListClick}
-            style={{ padding: "12px 0px" }}
-          >
-            <ListItemIcon>
-              {collapsedPreprocessingList ? (
-                <ExpandLessIcon />
-              ) : (
-                <ExpandMoreIcon />
-              )}
-            </ListItemIcon>
+          <PreprocessingSettingsListItem
+            closeDialog={closeDialog}
+            openedDialog={openedDialog}
+          />
 
-            <ListItemText primary="Preprocessing" style={{ fontSize: "1em" }} />
-          </ListItem>
-          <Collapse
-            in={collapsedPreprocessingList}
-            timeout="auto"
-            unmountOnExit
-          >
-            <Tooltip title="Apply Preprocessing Settings" placement="bottom">
-              <div>
-                <Button variant="contained" color="primary" onClick={() => {}}>
-                  Apply preprocessing
-                </Button>
-              </div>
-            </Tooltip>
-            <Typography id="rescaling" gutterBottom>
-              Pixel Intensity Rescaling
-            </Typography>
-            <RescalingForm
-              onLowerPercentileChange={onLowerPercentileChange}
-              onUpperPercentileChange={onUpperPercentileChange}
-              lowerPercentile={lowerPercentile}
-              upperPercentile={upperPercentile}
-              closeDialog={closeDialog}
-              openedDialog={openedDialog}
-            />
-
-            <Typography id="augmentation" gutterBottom>
-              Data Augmentation
-            </Typography>
-
-            <FormGroup row>
-              <FormControlLabel
-                control={
-                  // @ts-ignore
-                  <Checkbox value="randomDataAugmentation" />
-                }
-                label="Random Data Augmentation"
-              ></FormControlLabel>
-            </FormGroup>
-
-            <Typography id="resizing" gutterBottom>
-              Resizing
-            </Typography>
-
-            <FormGroup row>
-              <FormControlLabel
-                // @ts-ignore
-                control={<Checkbox value="paddingOption1" />}
-                label="Padding Option 1"
-              ></FormControlLabel>
-            </FormGroup>
-
-            <FormGroup row>
-              <FormControlLabel
-                // @ts-ignore
-                control={<Checkbox value="paddingOption2" />}
-                label="Padding Option 2"
-              ></FormControlLabel>
-            </FormGroup>
-          </Collapse>
           <ListItem
             button
             onClick={onClasssifierSettingsListClick}
