@@ -23,7 +23,7 @@ import Slider from "@material-ui/core/Slider";
 import * as React from "react";
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
-import { Form } from "../Form/Form";
+import { ClassifierSettingsListItem } from "../ClassifierSettingsListItem/ClassifierSettingsListItem";
 import { RescalingForm } from "../RescalingForm/RescalingForm";
 import { History } from "../History";
 import { makeStyles } from "@material-ui/styles";
@@ -272,15 +272,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     return `${value}%`;
   }
 
-  const [
-    collapsedClasssifierSettingsList,
-    setCollapsedClasssifierSettingsList,
-  ] = useState<boolean>(false);
-
-  const onClasssifierSettingsListClick = () => {
-    setCollapsedClasssifierSettingsList(!collapsedClasssifierSettingsList);
-  };
-
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
     useState<boolean>(false);
 
@@ -289,7 +280,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   };
 
   const [stopTraining, setStopTraining] = useState<boolean>(false);
-  const [batchSize, setBatchSize] = useState<number>(32);
 
   const [epochs, setEpochs] = useState<number>(10);
 
@@ -336,6 +326,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setTrainingValidationLossHistory(history);
   };
 
+  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    var value = Number(target.value);
+
+    setLearningRate(value);
+  };
+
+  const [batchSize, setBatchSize] = useState<number>(32);
+
   const onBatchSizeChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
     var value = Number(target.value);
@@ -362,13 +361,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     const target = event.target as HTMLInputElement;
 
     setInputShape(target.value);
-  };
-
-  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-
-    setLearningRate(value);
   };
 
   const onLossFunctionChange = (event: React.FormEvent<EventTarget>) => {
@@ -606,48 +598,19 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             openedDialog={openedDialog}
           />
 
-          <ListItem
-            button
-            onClick={onClasssifierSettingsListClick}
-            style={{ padding: "12px 0px" }}
-          >
-            <ListItemIcon>
-              {collapsedClasssifierSettingsList ? (
-                <ExpandLessIcon />
-              ) : (
-                <ExpandMoreIcon />
-              )}
-            </ListItemIcon>
+          <ClassifierSettingsListItem
+            epochs={epochs}
+            onEpochsChange={onEpochsChange}
+            learningRate={learningRate}
+            lossFunction={lossFunction}
+            onLossFunctionChange={onLossFunctionChange}
+            onBatchSizeChange={onBatchSizeChange}
+            onOptimizationAlgorithmChange={onOptimizationAlgorithmChange}
+            optimizationAlgorithm={optimizationAlgorithm}
+            batchSize={batchSize}
+            onLearningRateChange={onLearningRateChange}
+          />
 
-            <ListItemText
-              primary="Classifier Settings"
-              style={{ fontSize: "20px" }}
-            />
-          </ListItem>
-
-          <Collapse
-            in={collapsedClasssifierSettingsList}
-            timeout="auto"
-            unmountOnExit
-          >
-            <Form
-              batchSize={batchSize}
-              closeDialog={closeDialog}
-              epochs={epochs}
-              inputShape={inputShape}
-              learningRate={learningRate}
-              lossFunction={lossFunction}
-              onBatchSizeChange={onBatchSizeChange}
-              onEpochsChange={onEpochsChange}
-              onInputShapeChange={onInputShapeChange}
-              onLearningRateChange={onLearningRateChange}
-              onLossFunctionChange={onLossFunctionChange}
-              onOptimizationAlgorithmChange={onOptimizationAlgorithmChange}
-              // onDataAugmentationChange={onDataAugmentationChange}
-              openedDialog={openedDialog}
-              optimizationAlgorithm={optimizationAlgorithm}
-            />
-          </Collapse>
           <ListItem
             button
             onClick={onDatasetSettingsListClick}
