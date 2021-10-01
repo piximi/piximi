@@ -49,6 +49,7 @@ import { Category } from "../../../types/Category";
 import { Image as ImageType } from "../../../types/Image";
 import { PredictSegmenterDialogAppBar } from "../../PredictSegmenterDialog/PredictSegmenterDialogAppBar";
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
+import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
@@ -264,13 +265,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [datasetSplits, setDatasetSplits] = React.useState([60, 80]);
 
-  const handleChange = (event: any, newValue: any) => {
+  const handleSliderChange = (event: any, newValue: any) => {
     setDatasetSplits(newValue);
     setTestsetRatio(datasetSplits[1] - datasetSplits[0]);
   };
-  function valuetext(value: any) {
-    return `${value}%`;
-  }
 
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
     useState<boolean>(false);
@@ -611,53 +609,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             onLearningRateChange={onLearningRateChange}
           />
 
-          <ListItem
-            button
-            onClick={onDatasetSettingsListClick}
-            style={{ padding: "12px 0px" }}
-          >
-            <ListItemIcon>
-              {collapsedDatasetSettingsList ? (
-                <ExpandLessIcon />
-              ) : (
-                <ExpandMoreIcon />
-              )}
-            </ListItemIcon>
-
-            <ListItemText
-              primary="Dataset Settings"
-              style={{ fontSize: "1em" }}
-            />
-          </ListItem>
-
-          <Collapse
-            in={collapsedDatasetSettingsList}
-            timeout="auto"
-            unmountOnExit
-          >
-            <Tooltip title="Initialize dataset" placement="bottom">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={initializeDatasets}
-              >
-                Initialize Dataset
-              </Button>
-            </Tooltip>
-            <div style={{ padding: "12px 0px", width: "300" }}>
-              <Typography id="range-slider" gutterBottom>
-                Dataset Splits
-              </Typography>
-
-              <Slider
-                value={datasetSplits}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-                aria-labelledby="range-slider"
-                getAriaValueText={valuetext}
-              />
-            </div>
-          </Collapse>
+          <DatasetSettingsListItem
+            datasetSplits={datasetSplits}
+            handleChange={handleSliderChange}
+            initializeDatasets={initializeDatasets}
+          />
         </List>
       </DialogContent>
     </Dialog>

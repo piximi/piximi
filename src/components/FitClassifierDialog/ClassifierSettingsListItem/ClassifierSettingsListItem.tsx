@@ -109,13 +109,11 @@ export const ClassifierSettingsListItem = ({
   onOptimizationAlgorithmChange,
   optimizationAlgorithm,
 }: ClassifierSettingsListItemProps) => {
-  const [
-    collapsedClasssifierSettingsList,
-    setCollapsedClasssifierSettingsList,
-  ] = useState<boolean>(false);
+  const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
+    useState<boolean>(false);
 
   const onClasssifierSettingsListClick = () => {
-    setCollapsedClasssifierSettingsList(!collapsedClasssifierSettingsList);
+    setCollapsedClassifierSettingsList(!collapsedClassifierSettingsList);
   };
 
   interface State {
@@ -143,7 +141,7 @@ export const ClassifierSettingsListItem = ({
         style={{ padding: "12px 0px" }}
       >
         <ListItemIcon>
-          {collapsedClasssifierSettingsList ? (
+          {collapsedClassifierSettingsList ? (
             <ExpandLessIcon />
           ) : (
             <ExpandMoreIcon />
@@ -156,7 +154,7 @@ export const ClassifierSettingsListItem = ({
         />
       </ListItem>
       <Collapse
-        in={collapsedClasssifierSettingsList}
+        in={collapsedClassifierSettingsList}
         timeout="auto"
         unmountOnExit
       >
