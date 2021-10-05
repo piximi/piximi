@@ -6,20 +6,13 @@ import Divider from "@material-ui/core/Divider";
 import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
 import { classifierSelector, projectSelector } from "../../store/selectors";
+import { bindMenu } from "material-ui-popup-state";
 
 type SaveMenuProps = {
-  anchorEl: any;
-  onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-  onOpen: (event: any) => void;
-  open: boolean;
+  popupState: any;
 };
 
-export const SaveMenu = ({
-  anchorEl,
-  onClose,
-  onOpen,
-  open,
-}: SaveMenuProps) => {
+export const SaveMenu = ({ popupState }: SaveMenuProps) => {
   const classifier = useSelector(classifierSelector);
 
   const project = useSelector(projectSelector);
@@ -38,26 +31,18 @@ export const SaveMenu = ({
     const data = new Blob(parts, { type: "application/json;charset=utf-8" });
 
     saveAs(data, `${project.name}.json`);
-
-    onClose(event);
   };
 
   return (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-      getContentAnchorEl={null}
-      open={open}
-      transformOrigin={{ horizontal: "center", vertical: "top" }}
-    >
+    <Menu {...bindMenu(popupState)}>
       <MenuList dense variant="menu">
         <MenuItem onClick={onSaveProjectClick}>Save project</MenuItem>
 
         <Divider />
 
-        <MenuItem onClick={onClose}>Save example project</MenuItem>
+        <MenuItem onClick={() => {}}>Save example project</MenuItem>
 
-        <MenuItem onClick={onClose}>Save classifier</MenuItem>
+        <MenuItem onClick={() => {}}>Save classifier</MenuItem>
       </MenuList>
     </Menu>
   );
