@@ -2,11 +2,19 @@ import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 
 type OpenExampleProjectMenuItemProps = {
-  onClose: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
+  popupState: any;
 };
 
 export const OpenExampleProjectMenuItem = ({
-  onClose,
+  popupState,
 }: OpenExampleProjectMenuItemProps) => {
-  return <MenuItem onClick={onClose}>Open example project</MenuItem>;
+  const onClickExampleProject = (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
+    popupState.close();
+  };
+
+  return (
+    <MenuItem onClick={onClickExampleProject}>Open example project</MenuItem>
+  );
 };

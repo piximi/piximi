@@ -4,12 +4,12 @@ export const useDialog = () => {
   const [open, setOpen] = useState(false);
 
   const onClose = useCallback(() => {
-    setOpen(false);
-  }, []);
+    setOpen(!open);
+  }, [open]);
 
   const onOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
+    setOpen(!open);
+  }, [open]);
 
   return { onClose, onOpen, open };
 };

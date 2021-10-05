@@ -24,7 +24,9 @@ export const SaveMenu = ({
 
   const project = useSelector(projectSelector);
 
-  const onSaveProjectClick = () => {
+  const onSaveProjectClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     const part = {
       classifier: classifier,
       project: project,
@@ -36,6 +38,8 @@ export const SaveMenu = ({
     const data = new Blob(parts, { type: "application/json;charset=utf-8" });
 
     saveAs(data, `${project.name}.json`);
+
+    onClose(event);
   };
 
   return (
