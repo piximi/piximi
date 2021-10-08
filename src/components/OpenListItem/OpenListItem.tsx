@@ -4,22 +4,25 @@ import ListItemText from "@material-ui/core/ListItemText";
 import FolderOpenIcon from "@material-ui/icons/FolderOpen";
 import React from "react";
 import { OpenMenu } from "../OpenMenu";
-import { useMenu } from "../../hooks";
+import PopupState, { bindTrigger } from "material-ui-popup-state";
 
 export const OpenListItem = () => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
-
   return (
-    <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <FolderOpenIcon />
-        </ListItemIcon>
+    //@ts-ignore
+    <PopupState variant="popover">
+      {(popupState) => (
+        <>
+          <ListItem button {...bindTrigger(popupState)}>
+            <ListItemIcon>
+              <FolderOpenIcon />
+            </ListItemIcon>
 
-        <ListItemText primary="Open" />
-      </ListItem>
+            <ListItemText primary="Open" />
+          </ListItem>
 
-      <OpenMenu anchorEl={anchorEl} onClose={onClose} open={open} />
-    </>
+          <OpenMenu popupState={popupState} />
+        </>
+      )}
+    </PopupState>
   );
 };

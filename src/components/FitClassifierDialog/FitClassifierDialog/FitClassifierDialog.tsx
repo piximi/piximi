@@ -82,33 +82,6 @@ function loadPngImage(
   });
 }
 
-function loadPiximiImage(image: ImageType): HTMLImageElement {
-  if (image.src.endsWith(".png")) {
-    Promise.resolve(loadPiximiPngImage(image.src));
-  }
-  return getPiximiImage(image);
-}
-
-function getPiximiImage(image: ImageType) {
-  const img = new Image(224, 224);
-  img.crossOrigin = "anonymous";
-  img.src = image.src;
-  return img;
-}
-
-function loadPiximiPngImage(dataset_url: string): Promise<HTMLImageElement> {
-  // tslint:disable-next-line:max-line-length
-  const src = dataset_url;
-
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.crossOrigin = "anonymous";
-    img.src = src;
-  });
-}
-
 /**
  * Create train/validation dataset and test dataset with unique images
  */
@@ -136,7 +109,7 @@ async function createDatasetsFromPiximiImages(
     for (let i = 0; i < trainAndValidationIndeces.length; ++i) {
       let imageIndex = trainAndValidationIndeces[i];
       if (images[imageIndex].categoryId === classes[j].id) {
-        load.push(await loadPiximiImage(images[imageIndex]));
+        // load.push(await loadPiximiImage(images[imageIndex])); //FIXME uncomment
       }
     }
     trainAndValidationImages.push(load);
@@ -145,7 +118,7 @@ async function createDatasetsFromPiximiImages(
     for (let i = 0; i < testIndices.length; ++i) {
       let imageIndex = testIndices[i];
       if (images[imageIndex].categoryId === classes[j].id) {
-        load.push(await loadPiximiImage(images[imageIndex]));
+        // load.push(await loadPiximiImage(images[imageIndex])); //FIXME uncomment
       }
     }
     testImages.push(load);
@@ -408,7 +381,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ) {
     // classes, samplesPerClass, url
     const metadata = await (await fetch(dataset_url + "metadata.json")).json();
-    debugger;
+
     // 1. Setup dataset parameters
     //const classLabels = metadata.classes as string[];
     const classLabels: string[] = [];
@@ -465,8 +438,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
     const earlyStopEpochs = earlyStop ? 5 : EPOCHS;
 
+    const mobilenet = createMobileNet(classes.length);
+
     //TODO: pretty sure the code is not to stop here, we should actually be training something...
-    // testModel(something, 0.25, classes, trainAndValidationImages, testImages, 1, EPOCHS, LEARNING_RATE, false);
+    // testModel(mobilenet, 0.25, classes, trainAndValidationImages, testImages, 1, EPOCHS, LEARNING_RATE, false);
   }
 
   async function testModel(

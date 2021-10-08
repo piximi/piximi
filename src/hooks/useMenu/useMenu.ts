@@ -1,25 +1,22 @@
 import React, { useCallback, useRef, useState } from "react";
 
 export const useMenu = () => {
-  const anchorEl = useRef<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const [open, setOpen] = useState<boolean>(false);
 
   const onClose = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      if (
-        anchorEl.current &&
-        anchorEl.current.contains(event.target as HTMLElement)
-      )
-        return;
+      setAnchorEl(null);
 
       setOpen(false);
     },
     []
   );
 
-  const onOpen = useCallback(() => {
+  const onOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setOpen(true);
+    setAnchorEl(event.currentTarget);
   }, []);
 
   return {

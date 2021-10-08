@@ -5,31 +5,27 @@ import SaveIcon from "@material-ui/icons/Save";
 import React from "react";
 import { useMenu } from "../../hooks";
 import { SaveMenu } from "../SaveMenu";
+import PopupState, { bindTrigger } from "material-ui-popup-state";
+import FolderOpenIcon from "@material-ui/icons/FolderOpen";
+import { OpenMenu } from "../OpenMenu";
 
 export const SaveListItem = () => {
-  const {
-    anchorEl: anchorElCategoryMenu,
-    onClose: onCloseCategoryMenu,
-    onOpen: onOpenCategoryMenu,
-    open: openCategoryMenu,
-  } = useMenu();
-
   return (
-    <>
-      <ListItem button onClick={onOpenCategoryMenu}>
-        <ListItemIcon>
-          <SaveIcon />
-        </ListItemIcon>
+    //@ts-ignore
+    <PopupState variant="popover">
+      {(popupState) => (
+        <>
+          <ListItem button {...bindTrigger(popupState)}>
+            <ListItemIcon>
+              <FolderOpenIcon />
+            </ListItemIcon>
 
-        <ListItemText primary="Save" />
-      </ListItem>
+            <ListItemText primary="Save" />
+          </ListItem>
 
-      <SaveMenu
-        anchorEl={anchorElCategoryMenu}
-        onClose={onCloseCategoryMenu}
-        onOpen={onOpenCategoryMenu}
-        open={openCategoryMenu}
-      />
-    </>
+          <SaveMenu popupState={popupState} />
+        </>
+      )}
+    </PopupState>
   );
 };
