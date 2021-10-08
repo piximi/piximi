@@ -381,7 +381,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ) {
     // classes, samplesPerClass, url
     const metadata = await (await fetch(dataset_url + "metadata.json")).json();
-    debugger;
+
     // 1. Setup dataset parameters
     //const classLabels = metadata.classes as string[];
     const classLabels: string[] = [];

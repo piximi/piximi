@@ -5,17 +5,20 @@ import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "../../types/Image";
 import {
+  categoriesSelector,
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
 import { ImageGridAppBar } from "../ImageGridAppBar";
+import { Category } from "../../types/Category";
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
 
   const images = useSelector(visibleImagesSelector);
+  const categories = useSelector(categoriesSelector);
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
@@ -31,13 +34,18 @@ export const ImageGrid = () => {
 
   const scaleFactor = useSelector(tileSizeSelector);
 
-  const getSize = (scaleFactor: number) => {
+  const getSize = (scaleFactor: number, image: Image) => {
     const width = (230 * scaleFactor).toString() + "px";
     const height = (185 * scaleFactor).toString() + "px";
+
+    const color = categories.find((category: Category) => {
+      return category.id === image.categoryId;
+    })?.color;
+
     return {
       width: width,
       height: height,
-      background: "lightgray",
+      background: color,
       margin: "2px",
     };
   };
@@ -61,7 +69,7 @@ export const ImageGrid = () => {
               <ImageListItem
                 key={image.id}
                 onClick={() => onSelectImage(image)}
-                style={getSize(scaleFactor)}
+                style={getSize(scaleFactor, image)}
                 className={getSelectionStatus(image.id)}
               >
                 <img alt="" src={image.src} className={classes.imageTile} />

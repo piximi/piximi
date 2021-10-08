@@ -15,6 +15,15 @@ type OpenExampleProjectMenuItemProps = {
   popupState: any;
 };
 
+const getRandomColor = () => {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 export const OpenExampleProjectMenuItem = ({
   popupState,
 }: OpenExampleProjectMenuItemProps) => {
@@ -69,7 +78,7 @@ export const OpenExampleProjectMenuItem = ({
       if (!category) {
         id = uuid.v4();
         categories.push({
-          color: "",
+          color: getRandomColor(),
           id: id,
           name: classes[i].toString(),
           visible: true,
