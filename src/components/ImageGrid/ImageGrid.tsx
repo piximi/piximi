@@ -22,6 +22,8 @@ export const ImageGrid = () => {
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
+  const max_images = 1000; //number of images from the project that we'll show
+
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
       dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
@@ -65,16 +67,20 @@ export const ImageGrid = () => {
             cols={Math.floor(4 / scaleFactor)}
             cellHeight="auto"
           >
-            {images.map((image: Image) => (
-              <ImageListItem
-                key={image.id}
-                onClick={() => onSelectImage(image)}
-                style={getSize(scaleFactor, image)}
-                className={getSelectionStatus(image.id)}
-              >
-                <img alt="" src={image.src} className={classes.imageTile} />
-              </ImageListItem>
-            ))}
+            {images.slice(0, max_images).map(
+              (
+                image: Image //FIXME for now we'll have to cap the number of shown images to 1000
+              ) => (
+                <ImageListItem
+                  key={image.id}
+                  onClick={() => onSelectImage(image)}
+                  style={getSize(scaleFactor, image)}
+                  className={getSelectionStatus(image.id)}
+                >
+                  <img alt="" src={image.src} className={classes.imageTile} />
+                </ImageListItem>
+              )
+            )}
           </ImageList>
 
           <ImageGridAppBar />
