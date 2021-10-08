@@ -2,8 +2,12 @@ import React from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import { architectureOptionsSelector } from "../../store/selectors/architectureOptionsSelector";
+import { useSelector } from "react-redux";
 
 export const InputShape = () => {
+  const inputShape = useSelector(architectureOptionsSelector).inputShape;
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={3}>
@@ -16,7 +20,7 @@ export const InputShape = () => {
           disabled
           helperText="Image height"
           label="Input shape"
-          value={224}
+          value={inputShape.r}
         />
       </Grid>
 
@@ -30,7 +34,7 @@ export const InputShape = () => {
           disabled
           helperText="Image width"
           label="&nbsp;"
-          value={224}
+          value={inputShape.c}
         />
       </Grid>
 
@@ -44,7 +48,7 @@ export const InputShape = () => {
           disabled
           helperText="Color depth"
           label="&nbsp;"
-          value={3}
+          value={inputShape.channels}
         />
       </Grid>
     </Grid>

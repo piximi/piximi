@@ -8,10 +8,17 @@ import { History, LayersModel } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../types/CompileOptions";
 import { Image } from "../../types/Image";
 import { Category } from "../../types/Category";
+import { Shape } from "../../types/Shape";
+import { ArchitectureOptions } from "../../types/ArchitectureOptions";
 
 const initialState: Classifier = {
   compiling: false,
   evaluating: false,
+  inputShape: {
+    r: 256,
+    c: 256,
+    channels: 3,
+  },
   fitOptions: {
     epochs: 10,
     batchSize: 32,
@@ -22,6 +29,9 @@ const initialState: Classifier = {
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
   lossHistory: [],
+  modelName: "MobileNet",
+  modelMultiplier: "0.0",
+  modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],
   opening: false,
   optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
@@ -98,6 +108,9 @@ export const classifierSlice = createSlice({
 
       state.history = status;
     },
+    updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
+      state.inputShape = action.payload.inputShape;
+    },
     updateLearningRate(state, action: PayloadAction<{ learningRate: number }>) {
       const { learningRate } = action.payload;
 
@@ -123,6 +136,14 @@ export const classifierSlice = createSlice({
       const { metrics } = action.payload;
 
       state.metrics = metrics;
+    },
+    updateModel(
+      state,
+      action: PayloadAction<{ modelOptions: ArchitectureOptions }>
+    ) {
+      state.modelName = action.payload.modelOptions.modelName;
+      state.modelVersion = action.payload.modelOptions.modelVersion;
+      state.modelMultiplier = action.payload.modelOptions.modelMultiplier;
     },
     updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
       const { opened } = action.payload;

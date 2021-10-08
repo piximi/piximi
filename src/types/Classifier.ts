@@ -4,6 +4,7 @@ import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 import { FitOptions } from "./FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
+import { Shape } from "./Shape";
 
 export type Classifier = {
   compiled?: LayersModel;
@@ -17,6 +18,7 @@ export type Classifier = {
   fitOptions: FitOptions;
   fitted?: LayersModel;
   fitting: boolean;
+  inputShape: Shape;
   preprocessing: boolean;
   history?: History;
   learningRate: number;
@@ -27,6 +29,9 @@ export type Classifier = {
   lossHistory?: Array<{ x: number; y: number }>;
   metrics: Array<Metric>;
   model?: LayersModel;
+  modelName?: string;
+  modelMultiplier?: string;
+  modelVersion?: string;
   opened?: LayersModel;
   opening: boolean;
   optimizationAlgorithm: OptimizationAlgorithm;

@@ -1,5 +1,79 @@
 import * as tensorflow from "@tensorflow/tfjs";
 
+/***
+ * Creates convolutional neural network for mnist classification problem
+ * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
+ */
+export const getModel = () => {
+  const model = tensorflow.sequential();
+
+  const IMAGE_WIDTH = 28;
+  const IMAGE_HEIGHT = 28;
+  const IMAGE_CHANNELS = 1;
+
+  // In the first layer of our convolutional neural network we have
+  // to specify the input shape. Then we specify some parameters for
+  // the convolution operation that takes place in this layer.
+  model.add(
+    tensorflow.layers.conv2d({
+      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS],
+      kernelSize: 5,
+      filters: 8,
+      strides: 1,
+      activation: "relu",
+      kernelInitializer: "varianceScaling",
+    })
+  );
+
+  // The MaxPooling layer acts as a sort of downsampling using max values
+  // in a region instead of averaging.
+  model.add(
+    tensorflow.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] })
+  );
+
+  // Repeat another conv2d + maxPooling stack.
+  // Note that we have more filters in the convolution.
+  model.add(
+    tensorflow.layers.conv2d({
+      kernelSize: 5,
+      filters: 16,
+      strides: 1,
+      activation: "relu",
+      kernelInitializer: "varianceScaling",
+    })
+  );
+  model.add(
+    tensorflow.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] })
+  );
+
+  // Now we flatten the output from the 2D filters into a 1D vector to prepare
+  // it for input into our last layer. This is common practice when feeding
+  // higher dimensional data to a final classification output layer.
+  model.add(tensorflow.layers.flatten());
+
+  // Our last layer is a dense layer which has 10 output units, one for each
+  // output class (i.e. 0, 1, 2, 3, 4, 5, 6, 7, 8, 9).
+  const NUM_OUTPUT_CLASSES = 10;
+  model.add(
+    tensorflow.layers.dense({
+      units: NUM_OUTPUT_CLASSES,
+      kernelInitializer: "varianceScaling",
+      activation: "softmax",
+    })
+  );
+
+  // Choose an optimizer, loss function and accuracy metric,
+  // then compile and return the model
+  const optimizer = tensorflow.train.adam();
+  model.compile({
+    optimizer: optimizer,
+    loss: "categoricalCrossentropy",
+    metrics: ["accuracy"],
+  });
+
+  return model;
+};
+
 /**
  * Creates a convolutional neural network (Convnet) for the MNIST data.
  *

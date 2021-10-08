@@ -30,6 +30,9 @@ export const OpenExampleProjectMenuItem = ({
   const dispatch = useDispatch();
 
   const onClickExampleProject = async () => {
+    popupState.close();
+
+    // Load project with data
     const data = new MnistData();
     await data.load();
     const examples = data.nextTestBatch(100);
@@ -82,7 +85,7 @@ export const OpenExampleProjectMenuItem = ({
           id: id,
           name: classes[i].toString(),
           visible: true,
-        }); //TODO assign a color to each new category
+        });
       }
 
       //Make Image object from URI
@@ -109,7 +112,10 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(projectSlice.actions.createProject({ project: mnistProject }));
 
-    popupState.close();
+    // Update classifier settings
+    //Call UpdateImageShape to be 32, 32
+    //Call Update compile options, where you set the loss function, epoch, optimization algoirhtm, etc to what is suggested in the tutorial
+    //Set the layers "model" of classifier to correspond to the definition described in the tutorial
   };
 
   return (
