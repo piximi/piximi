@@ -23,6 +23,7 @@ const initialState: Classifier = {
     epochs: 10,
     batchSize: 32,
     initialEpoch: 0,
+    shuffle: true,
   },
   fitting: false,
   preprocessing: false,

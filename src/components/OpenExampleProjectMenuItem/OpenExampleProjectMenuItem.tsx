@@ -8,8 +8,17 @@ import { Image } from "../../types/Image";
 import * as uuid from "uuid";
 import { Project } from "../../types/Project";
 import { Category } from "../../types/Category";
-import { createProject, projectSlice } from "../../store/slices";
-import { useDispatch } from "react-redux";
+import { projectSlice } from "../../store/slices";
+import { useDispatch, useSelector } from "react-redux";
+import { CompileOptions } from "../../types/CompileOptions";
+import { LossFunction } from "../../types/LossFunction";
+import { Metric } from "../../types/Metric";
+import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { getModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
+import { compile } from "../../store/coroutines/classifier/compile";
+import { categorizedImagesSelector } from "../../store/selectors";
+import { FitOptions } from "../../types/FitOptions";
+import * as tfvis from "@tensorflow/tfjs-vis";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -28,6 +37,8 @@ export const OpenExampleProjectMenuItem = ({
   popupState,
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
+
+  const categorizedImages = useSelector(categorizedImagesSelector);
 
   const onClickExampleProject = async () => {
     popupState.close();
@@ -112,10 +123,79 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(projectSlice.actions.createProject({ project: mnistProject }));
 
-    // Update classifier settings
+    //TODO  Update classifier settings
     //Call UpdateImageShape to be 32, 32
     //Call Update compile options, where you set the loss function, epoch, optimization algoirhtm, etc to what is suggested in the tutorial
     //Set the layers "model" of classifier to correspond to the definition described in the tutorial
+
+    const mnistCompileOptions: CompileOptions = {
+      learningRate: 0.001,
+      lossFunction: LossFunction.CategoricalCrossEntropy,
+      metrics: [Metric.BinaryAccuracy],
+      optimizationAlgorithm: OptimizationAlgorithm.Adam,
+    };
+
+    const mnistModel = getModel();
+
+    const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
+
+    const mnistFitOptions: FitOptions = {
+      batchSize: 512,
+      epochs: 10,
+      initialEpoch: 0,
+      test_data_size: 1000,
+      train_data_size: 5500,
+      shuffle: true,
+    };
+
+    //TODO add callback options to Types and to Classifier project
+    const metrics = ["loss", "val_loss", "acc", "val_acc"];
+    const container = {
+      name: "Model Training",
+      tab: "Model",
+      styles: { height: "1000px" },
+    };
+    const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
+    //TODO fix tfvis (can't see it)
+
+    const [trainXs, trainYs] = tensorflow.tidy(() => {
+      const d = data.nextTrainBatch(mnistFitOptions.train_data_size!);
+
+      if (!d) return;
+
+      return [
+        d.xs.reshape([mnistFitOptions.train_data_size!, 28, 28, 1]),
+        d.labels,
+      ];
+    }) as Array<Tensor2D>;
+
+    const [testXs, testYs] = tensorflow.tidy(() => {
+      const d = data.nextTestBatch(mnistFitOptions.test_data_size!);
+      if (!d) return;
+      return [
+        d.xs.reshape([mnistFitOptions.test_data_size!, 28, 28, 1]),
+        d.labels,
+      ];
+    }) as Array<Tensor2D>;
+
+    console.info("Fitting...");
+
+    const history = await mnistModel.fit(trainXs, trainYs, {
+      batchSize: mnistFitOptions.batchSize!,
+      validationData: [testXs, testYs],
+      epochs: mnistFitOptions.epochs!,
+      shuffle: true,
+      callbacks: fitCallbacks,
+    });
+
+    // const data = yield preprocess(images, categories);
+    //
+    //
+    // const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
+    //
+    // const payload = { fitted: fitted, status: status };
+    //
+    // yield put(classifierSlice.actions.updateFitted(payload));
   };
 
   return (
