@@ -160,7 +160,6 @@ export const OpenExampleProjectMenuItem = ({
       training_percentage * trainValXs.shape[0]
     );
 
-    debugger; //TODO check stht trainValXs.shape is the one you expect
     //extract validation from test data
     const [trainXs, valXs] = tensorflow.split(trainValXs, [
       training_split,

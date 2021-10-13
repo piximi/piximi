@@ -2,13 +2,23 @@ import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Grid, MenuItem, TextField } from "@material-ui/core";
 import * as _ from "lodash";
+import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  classifierSlice,
+  updateOptimizationAlgorithm,
+} from "../../../../store/slices";
+import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
+import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 
 const optimizationAlgorithms = {
   adadelta: "Adadelta",
+  adagrad: "Adagrad",
   adam: "Adam",
   adamax: "Adamax",
-  rmsprop: "RMSProp",
-  sgd: "Stochastic gradient descent (SGD)",
+  momentum: "Momentum",
+  rmsProp: "RMSProp",
+  stochasticGradientDescent: "Stochastic gradient descent (SGD)",
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,30 +35,53 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type OptimizationGridProps = {
-  optimizationAlgorithm: string;
-  onOptimizationAlgorithmChange: (event: React.FormEvent<EventTarget>) => void;
-  learningRate: number;
-  onLearningRateChange: (event: React.FormEvent<EventTarget>) => void;
-};
+export const OptimizationGrid = () => {
+  const dispatch = useDispatch();
 
-export const OptimizationGrid = (props: OptimizationGridProps) => {
-  const {
-    optimizationAlgorithm,
-    onOptimizationAlgorithmChange,
-    learningRate,
-    onLearningRateChange,
-  } = props;
+  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
+  const learningRate = useSelector(learningRateSelector);
 
-  interface State {
-    lossFunction: string;
-    optimizationAlgorithm: string;
-  }
+  const onOptimizationAlgorithmChange = (
+    event: React.FormEvent<EventTarget>
+  ) => {
+    const target = event.target as HTMLInputElement; //target.value is string
 
-  const [values, setValues] = React.useState<State>({
-    lossFunction: "softmaxCrossEntropy",
-    optimizationAlgorithm: "adam",
-  });
+    const optimizationAlgorithm = () => {
+      switch (target.value) {
+        case "adadelta":
+          return OptimizationAlgorithm.Adadelta;
+        case "adagrad":
+          return OptimizationAlgorithm.Adagrad;
+        case "adam":
+          return OptimizationAlgorithm.Adam;
+        case "adamax":
+          return OptimizationAlgorithm.Adamax;
+        case "momentum":
+          return OptimizationAlgorithm.Momentum;
+        case "rmsProp":
+          return OptimizationAlgorithm.RMSProp;
+        case "stochasticGradientDescent":
+          return OptimizationAlgorithm.StochasticGradientDescent;
+        default:
+          return OptimizationAlgorithm.Adam;
+      }
+    };
+
+    dispatch(
+      classifierSlice.actions.updateOptimizationAlgorithm({
+        optimizationAlgorithm: optimizationAlgorithm(),
+      })
+    );
+  };
+
+  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    const learningRate = Number(target.value);
+
+    dispatch(
+      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
+    );
+  };
 
   const classes = useStyles({});
 
@@ -60,7 +93,7 @@ export const OptimizationGrid = (props: OptimizationGridProps) => {
           select
           label="Optimization algorithm"
           className={classes.textField}
-          value={optimizationAlgorithm}
+          defaultValue={optimizationAlgorithm}
           onChange={onOptimizationAlgorithmChange}
           SelectProps={{
             MenuProps: {

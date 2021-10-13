@@ -159,77 +159,72 @@ export const ClassifierSettingsListItem = ({
         unmountOnExit
       >
         <form className={classes.container} noValidate autoComplete="off">
-          <OptimizationGrid
-            optimizationAlgorithm={optimizationAlgorithm}
-            onOptimizationAlgorithmChange={onOptimizationAlgorithmChange}
-            learningRate={learningRate}
-            onLearningRateChange={onLearningRateChange}
-          />
+          <OptimizationGrid />
 
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <TextField
-                id="loss-function"
-                select
-                label="Loss function"
-                className={classes.textField}
-                value={lossFunction}
-                onChange={onLossFunctionChange}
-                SelectProps={{
-                  MenuProps: {
-                    className: classes.menu,
-                  },
-                }}
-                margin="normal"
-              >
-                {_.map(lossFunctions, (v, k) => {
-                  return (
-                    <MenuItem dense key={k} value={k}>
-                      {v}
-                    </MenuItem>
-                  );
-                })}
-              </TextField>
-            </Grid>
-          </Grid>
+          {/*<Grid container spacing={2}>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <TextField*/}
+          {/*      id="loss-function"*/}
+          {/*      select*/}
+          {/*      label="Loss function"*/}
+          {/*      className={classes.textField}*/}
+          {/*      value={lossFunction}*/}
+          {/*      onChange={onLossFunctionChange}*/}
+          {/*      SelectProps={{*/}
+          {/*        MenuProps: {*/}
+          {/*          className: classes.menu,*/}
+          {/*        },*/}
+          {/*      }}*/}
+          {/*      margin="normal"*/}
+          {/*    >*/}
+          {/*      {_.map(lossFunctions, (v, k) => {*/}
+          {/*        return (*/}
+          {/*          <MenuItem dense key={k} value={k}>*/}
+          {/*            {v}*/}
+          {/*          </MenuItem>*/}
+          {/*        );*/}
+          {/*      })}*/}
+          {/*    </TextField>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
 
-          <Grid container spacing={2}>
-            {/* <Grid item xs={4}>
-              <TextField
-                id="input-shape"
-                label="Input shape"
-                className={classes.textField}
-                value={''}
-                disabled
-                onChange={onInputShapeChange}
-                margin="normal"
-              />
-            </Grid> */}
+          {/*<Grid container spacing={2}>*/}
+          {/*  /!* <Grid item xs={4}>*/}
+          {/*    <TextField*/}
+          {/*      id="input-shape"*/}
+          {/*      label="Input shape"*/}
+          {/*      className={classes.textField}*/}
+          {/*      value={''}*/}
+          {/*      disabled*/}
+          {/*      onChange={onInputShapeChange}*/}
+          {/*      margin="normal"*/}
+          {/*    />*/}
+          {/*  </Grid> *!/*/}
 
-            <Grid item xs={2}>
-              <TextField
-                id="batch-size"
-                label="Batch size"
-                className={classes.textField}
-                value={batchSize}
-                onChange={onBatchSizeChange}
-                type="number"
-                margin="normal"
-              />
-            </Grid>
+          {/*  <Grid item xs={2}>*/}
+          {/*    <TextField*/}
+          {/*      id="batch-size"*/}
+          {/*      label="Batch size"*/}
+          {/*      className={classes.textField}*/}
+          {/*      value={batchSize}*/}
+          {/*      onChange={onBatchSizeChange}*/}
+          {/*      type="number"*/}
+          {/*      margin="normal"*/}
+          {/*    />*/}
+          {/*  </Grid>*/}
 
-            <Grid item xs={2}>
-              <TextField
-                id="epochs"
-                label="Epochs"
-                className={classes.textField}
-                value={epochs}
-                onChange={onEpochsChange}
-                margin="normal"
-                type="number"
-              />
-            </Grid>
-          </Grid>
+          {/*  <Grid item xs={2}>*/}
+          {/*    <TextField*/}
+          {/*      id="epochs"*/}
+          {/*      label="Epochs"*/}
+          {/*      className={classes.textField}*/}
+          {/*      value={epochs}*/}
+          {/*      onChange={onEpochsChange}*/}
+          {/*      margin="normal"*/}
+          {/*      type="number"*/}
+          {/*    />*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
         </form>
       </Collapse>
     </>
