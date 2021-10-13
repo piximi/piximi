@@ -40,7 +40,7 @@ const initialState: Classifier = {
   saving: false,
   trainingPercentage: 0.5,
   validationLossHistory: [],
-  validationPercentage: 0.25,
+  testPercentage: 0.25,
 };
 
 export const classifierSlice = createSlice({
@@ -84,6 +84,11 @@ export const classifierSlice = createSlice({
       const { batchSize } = action.payload;
 
       state.fitOptions.batchSize = batchSize;
+    },
+    updateClassifier(state, action: PayloadAction<{ classifier: Classifier }>) {
+      const { classifier } = action.payload;
+
+      state = classifier;
     },
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
@@ -195,13 +200,13 @@ export const classifierSlice = createSlice({
         { x: batch, y: loss },
       ];
     },
-    updateValidationPercentage(
+    updateTestPercentage(
       state,
-      action: PayloadAction<{ validationPercentage: number }>
+      action: PayloadAction<{ testPercentage: number }>
     ) {
-      const { validationPercentage } = action.payload;
+      const { testPercentage } = action.payload;
 
-      state.validationPercentage = validationPercentage;
+      state.testPercentage = testPercentage;
     },
   },
 });
@@ -212,6 +217,7 @@ export const {
   open,
   preprocess,
   updateBatchSize,
+  updateClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,
@@ -223,5 +229,5 @@ export const {
   updatePreprocessed,
   updateTrainingPercentage,
   updateValidationLossHistory,
-  updateValidationPercentage,
+  updateTestPercentage,
 } = classifierSlice.actions;

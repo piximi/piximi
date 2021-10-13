@@ -1,4 +1,10 @@
-import { History, LayersModel, Scalar, Tensor } from "@tensorflow/tfjs";
+import {
+  History,
+  LayersModel,
+  Scalar,
+  Tensor,
+  Tensor2D,
+} from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
@@ -9,10 +15,12 @@ import { Shape } from "./Shape";
 export type Classifier = {
   compiled?: LayersModel;
   compiling: boolean;
-  data?: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-  }>;
+  data?:
+    | tensorflow.data.Dataset<{
+        xs: tensorflow.Tensor;
+        ys: tensorflow.Tensor;
+      }>
+    | Array<Tensor2D>;
   evaluating: boolean;
   evaluations?: Scalar | Array<Scalar>;
   fitOptions: FitOptions;
@@ -39,10 +47,12 @@ export type Classifier = {
   predictions?: Tensor;
   saving: boolean;
   trainingPercentage: number;
-  validationData?: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-  }>;
+  validationData?:
+    | tensorflow.data.Dataset<{
+        xs: tensorflow.Tensor;
+        ys: tensorflow.Tensor;
+      }>
+    | Array<Tensor2D>;
   validationLossHistory?: Array<{ x: number; y: number }>;
-  validationPercentage: number;
+  testPercentage: number;
 };

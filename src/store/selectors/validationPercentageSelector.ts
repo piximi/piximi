@@ -5,5 +5,5 @@ export const validationPercentageSelector = ({
 }: {
   classifier: Classifier;
 }): number => {
-  return classifier.validationPercentage;
+  return classifier.testPercentage;
 };

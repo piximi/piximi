@@ -5,5 +5,5 @@ export const generatorOptionsSelector = ({
 }: {
   classifier: Classifier;
 }): { validationPercentage: number } => {
-  return { validationPercentage: classifier.validationPercentage };
+  return { validationPercentage: classifier.testPercentage };
 };

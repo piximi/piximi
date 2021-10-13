@@ -18,9 +18,9 @@ export const ClassifierSettingsDialogAppBar = ({
   const classes = useStyles();
 
   const onClick = async () => {
-    const history = await train_mnist();
-    console.info(history);
-    debugger;
+    // const history = await train_mnist();
+    // console.info(history);
+    // debugger;
   };
 
   //TODO I would like the play button to be on the right side of the toolbar

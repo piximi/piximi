@@ -13,6 +13,8 @@ import { MnistData } from "../../../examples/mnist/data";
 export const train_mnist = async () => {
   const mnistModel = getModel();
 
+  //TODO update fitting to True
+
   const container = document.getElementById(
     "vis-train-container"
   ) as HTMLElement;
@@ -72,4 +74,10 @@ export const train_mnist = async () => {
     shuffle: true,
     callbacks: fitCallbacks,
   });
+
+  //TODO "classifier's fitted should be udpated
+  //TODO updte "fitting" to False
+  //TODO update "hisotry"
+  //TODO update "loss history"
+  //TODO update "validation loss history"
 };

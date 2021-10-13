@@ -2,13 +2,13 @@ import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import { MnistData } from "../../examples/mnist/data";
 import * as tensorflow from "@tensorflow/tfjs";
-import { Tensor2D } from "@tensorflow/tfjs";
+import { Tensor2D, train } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
 import * as uuid from "uuid";
 import { Project } from "../../types/Project";
 import { Category } from "../../types/Category";
-import { projectSlice } from "../../store/slices";
+import { classifierSlice, projectSlice } from "../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
@@ -19,6 +19,8 @@ import { compile } from "../../store/coroutines/classifier/compile";
 import { categorizedImagesSelector } from "../../store/selectors";
 import { FitOptions } from "../../types/FitOptions";
 import * as tfvis from "@tensorflow/tfjs-vis";
+import { Classifier } from "../../types/Classifier";
+import { Tensor4D } from "@tensorflow/tfjs-node";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -46,6 +48,8 @@ export const OpenExampleProjectMenuItem = ({
     // Load project with data
     const data = new MnistData();
     await data.load();
+
+    //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTestBatch(100);
 
     if (!examples) return;
@@ -123,19 +127,90 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(projectSlice.actions.createProject({ project: mnistProject }));
 
-    //TODO  Update classifier settings
-    //Call UpdateImageShape to be 32, 32
-    //Call Update compile options, where you set the loss function, epoch, optimization algoirhtm, etc to what is suggested in the tutorial
-    //Set the layers "model" of classifier to correspond to the definition described in the tutorial
+    const mnistFitOptions: FitOptions = {
+      batchSize: 512,
+      epochs: 5,
+      initialEpoch: 0,
+      test_data_size: 1000, //TODO experiment with 10000
+      train_data_size: 6500, //TODO experiment with 55000
+      shuffle: true,
+    };
 
-    // const data = yield preprocess(images, categories);
-    //
-    //
-    // const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
-    //
-    // const payload = { fitted: fitted, status: status };
-    //
-    // yield put(classifierSlice.actions.updateFitted(payload));
+    const mnistCompileOptions: CompileOptions = {
+      learningRate: 0.001,
+      lossFunction: LossFunction.CategoricalCrossEntropy,
+      metrics: [Metric.BinaryAccuracy],
+      optimizationAlgorithm: OptimizationAlgorithm.Adam,
+    };
+
+    //get training data
+    const [trainValXs, trainValYs] = tensorflow.tidy(() => {
+      const d = data.nextTrainBatch(mnistFitOptions.train_data_size!);
+
+      if (!d) return;
+
+      return [
+        d.xs.reshape([mnistFitOptions.train_data_size!, 28, 28, 1]),
+        d.labels,
+      ];
+    }) as Array<Tensor2D>;
+
+    const training_percentage = 0.85;
+    const training_split = Math.round(
+      training_percentage * trainValXs.shape[0]
+    );
+
+    debugger; //TODO check stht trainValXs.shape is the one you expect
+    //extract validation from test data
+    const [trainXs, valXs] = tensorflow.split(trainValXs, [
+      training_split,
+      trainValXs.shape[0] - training_split,
+    ]);
+    const [trainYs, valYs] = tensorflow.split(trainValYs, [
+      training_split,
+      trainValXs.shape[0] - training_split,
+    ]);
+
+    //get model
+    const mnistModel = getModel();
+
+    const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
+
+    const mnistClassifier: Classifier = {
+      compiled: compiledMnistModel,
+      compiling: false,
+      data: [trainXs, trainYs],
+      evaluating: false,
+      evaluations: undefined,
+      fitOptions: mnistFitOptions,
+      fitted: undefined,
+      fitting: false,
+      history: undefined,
+      inputShape: { r: 28, c: 28, channels: 1 },
+      learningRate: mnistCompileOptions.learningRate,
+      lossFunction: mnistCompileOptions.lossFunction,
+      lossHistory: undefined,
+      metrics: mnistCompileOptions.metrics,
+      model: mnistModel,
+      modelMultiplier: "0.0",
+      modelName: "mnist",
+      modelVersion: "1",
+      opened: undefined,
+      opening: false,
+      optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
+      predicting: false,
+      predictions: undefined,
+      preprocessing: false,
+      saving: false,
+      trainingPercentage: training_percentage, //determines train-val split
+      validationData: [valXs, valYs],
+      validationLossHistory: undefined,
+      testPercentage: 0,
+    };
+
+    dispatch(
+      classifierSlice.actions.updateClassifier({ classifier: mnistClassifier })
+    );
   };
 
   return (
