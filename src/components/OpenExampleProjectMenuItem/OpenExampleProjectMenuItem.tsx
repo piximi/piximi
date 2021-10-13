@@ -175,41 +175,24 @@ export const OpenExampleProjectMenuItem = ({
 
     const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
 
-    const mnistClassifier: Classifier = {
+    const mnistClassifier = {
       compiled: compiledMnistModel,
-      compiling: false,
       data: [trainXs, trainYs],
-      evaluating: false,
-      evaluations: undefined,
       fitOptions: mnistFitOptions,
-      fitted: undefined,
-      fitting: false,
-      history: undefined,
       inputShape: { r: 28, c: 28, channels: 1 },
       learningRate: mnistCompileOptions.learningRate,
       lossFunction: mnistCompileOptions.lossFunction,
-      lossHistory: undefined,
       metrics: mnistCompileOptions.metrics,
       model: mnistModel,
       modelMultiplier: "0.0",
       modelName: "mnist",
       modelVersion: "1",
-      opened: undefined,
-      opening: false,
       optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
-      predicting: false,
-      predictions: undefined,
-      preprocessing: false,
-      saving: false,
       trainingPercentage: training_percentage, //determines train-val split
       validationData: [valXs, valYs],
-      validationLossHistory: undefined,
-      testPercentage: 0,
     };
 
-    dispatch(
-      classifierSlice.actions.updateClassifier({ classifier: mnistClassifier })
-    );
+    dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));
   };
 
   return (

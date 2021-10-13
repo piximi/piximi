@@ -14,7 +14,7 @@ export {
   open,
   preprocess,
   updateBatchSize,
-  updateClassifier,
+  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,

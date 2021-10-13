@@ -85,10 +85,44 @@ export const classifierSlice = createSlice({
 
       state.fitOptions.batchSize = batchSize;
     },
-    updateClassifier(state, action: PayloadAction<{ classifier: Classifier }>) {
-      const { classifier } = action.payload;
+    openMnistClassifier(
+      state,
+      action: PayloadAction<{ mnistClassifier: any }>
+    ) {
+      const { mnistClassifier } = action.payload;
 
-      state = classifier;
+      state.compiled = mnistClassifier.compiled;
+      state.data = mnistClassifier.data;
+      state.fitOptions = mnistClassifier.fitOptions;
+      state.inputShape = mnistClassifier.inputShape;
+      state.learningRate = mnistClassifier.learningRate;
+      state.lossFunction = mnistClassifier.lossFunction;
+      state.metrics = mnistClassifier.metrics;
+      state.model = mnistClassifier.model;
+      state.modelName = mnistClassifier.modelName;
+      state.modelVersion = mnistClassifier.modelVersion;
+      state.modelMultiplier = mnistClassifier.modelMultiplier;
+
+      state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
+      state.trainingPercentage = mnistClassifier.trainingPercentage;
+      state.validationData = mnistClassifier.validationData;
+
+      //initialize all others to false/undefined, since we are essentially initializing a new classifier
+      state.compiling = false;
+      state.evaluating = false;
+      state.evaluations = undefined;
+      state.fitted = undefined;
+      state.fitting = false;
+      state.history = undefined;
+      state.lossHistory = undefined;
+      state.opened = undefined;
+      state.opening = false;
+      state.predicting = false;
+      state.predictions = undefined;
+      state.preprocessing = false;
+      state.saving = false;
+      state.validationLossHistory = undefined;
+      state.testPercentage = 0;
     },
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
@@ -217,7 +251,7 @@ export const {
   open,
   preprocess,
   updateBatchSize,
-  updateClassifier,
+  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,
