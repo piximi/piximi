@@ -7,11 +7,6 @@ import List from "@material-ui/core/List";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
-import IconButton from "@material-ui/core/IconButton";
-import SettingsIcon from "@material-ui/icons/Settings";
-import { ClassifierSettingsDialog } from "../ClassifierSettingsDialog";
-import Tooltip from "@material-ui/core/Tooltip";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { FitClassifierListItem } from "../FitClassifierListItem";
 import { EvaluateClassifierListItem } from "../EvaluateClassifierListItem";
 
@@ -42,14 +37,6 @@ export const ClassifierList = () => {
           </ListItemIcon>
 
           <ListItemText primary="Classifier" />
-
-          <ListItemSecondaryAction>
-            <Tooltip title="Classifier settings">
-              <IconButton edge="end" onClick={onOpenClassifierSettingsDialog}>
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
-          </ListItemSecondaryAction>
         </ListItem>
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
@@ -68,11 +55,6 @@ export const ClassifierList = () => {
           </List>
         </Collapse>
       </List>
-
-      <ClassifierSettingsDialog
-        onClose={onCloseClassifierSettingsDialog}
-        open={openClassifierSettingsDialog}
-      />
     </>
   );
 };
