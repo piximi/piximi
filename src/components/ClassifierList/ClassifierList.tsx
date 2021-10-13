@@ -17,17 +17,6 @@ export const ClassifierList = () => {
     setCollapsed(!collapsed);
   };
 
-  const [openClassifierSettingsDialog, setOpenClassifierSettingsDialog] =
-    React.useState(false);
-
-  const onOpenClassifierSettingsDialog = () => {
-    setOpenClassifierSettingsDialog(true);
-  };
-
-  const onCloseClassifierSettingsDialog = () => {
-    setOpenClassifierSettingsDialog(false);
-  };
-
   return (
     <>
       <List dense>

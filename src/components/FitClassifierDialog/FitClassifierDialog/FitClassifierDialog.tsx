@@ -13,6 +13,7 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  Box,
 } from "@material-ui/core";
 
 import * as ImageJS from "image-js";
@@ -50,13 +51,10 @@ import { Image as ImageType } from "../../../types/Image";
 import { PredictSegmenterDialogAppBar } from "../../PredictSegmenterDialog/PredictSegmenterDialogAppBar";
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
+import { train_mnist } from "./fit_mnist";
 
 const SEED_WORD = "testSuite";
 const seed: seedrandom.prng = seedrandom(SEED_WORD);
-
-const vis = tfvis.visor();
-vis.close();
-const surface = { name: "show.fitCallbacks", tab: "Training" };
 
 const BEAN_DATASET_URL =
   "https://storage.googleapis.com/teachable-machine-models/test_data/image/beans/";
@@ -540,9 +538,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   }
 
   const onFit = async () => {
-    vis.open();
-    // testMobilenet(BEAN_DATASET_URL, 2, loadPngImage);
-    testMobilenet(FLOWER_DATASET_URL, 1, loadPngImage);
+    const history = await train_mnist();
+    console.info(history);
+    // vis.open();
+    // // testMobilenet(BEAN_DATASET_URL, 2, loadPngImage);
+    // testMobilenet(FLOWER_DATASET_URL, 1, loadPngImage);
   };
 
   // specifies interface
@@ -590,6 +590,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             initializeDatasets={initializeDatasets}
           />
         </List>
+        <div id={"vis-train-container"} />
       </DialogContent>
     </Dialog>
   );

@@ -13,6 +13,11 @@ import { MnistData } from "../../../examples/mnist/data";
 export const train_mnist = async () => {
   const mnistModel = getModel();
 
+  const container = document.getElementById(
+    "vis-train-container"
+  ) as HTMLElement;
+  tfvis.show.modelSummary(container, mnistModel);
+
   const mnistCompileOptions: CompileOptions = {
     learningRate: 0.001,
     lossFunction: LossFunction.CategoricalCrossEntropy,
@@ -24,7 +29,7 @@ export const train_mnist = async () => {
 
   const mnistFitOptions: FitOptions = {
     batchSize: 512,
-    epochs: 10,
+    epochs: 5,
     initialEpoch: 0,
     test_data_size: 1000, //TODO experiment with 10000
     train_data_size: 5500, //TODO experiment with 55000
@@ -33,13 +38,7 @@ export const train_mnist = async () => {
 
   //TODO add callback options to Types and to Classifier project
   const metrics = ["loss", "val_loss", "acc", "val_acc"];
-  const container = {
-    name: "Model Training",
-    tab: "Model",
-    styles: { height: "1000px" },
-  };
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
-  //TODO fix tfvis (can't see it)
 
   // Load project with data
   const data = new MnistData();
@@ -66,13 +65,11 @@ export const train_mnist = async () => {
   }) as Array<Tensor2D>;
 
   console.info("fitting...");
-  const history = await compiledMnistModel.fit(trainXs, trainYs, {
+  return await compiledMnistModel.fit(trainXs, trainYs, {
     batchSize: mnistFitOptions.batchSize!,
     validationData: [testXs, testYs],
     epochs: mnistFitOptions.epochs!,
     shuffle: true,
     callbacks: fitCallbacks,
   });
-
-  return history;
 };
