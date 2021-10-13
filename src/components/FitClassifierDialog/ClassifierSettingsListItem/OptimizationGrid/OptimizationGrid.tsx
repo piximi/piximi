@@ -4,10 +4,7 @@ import { Grid, MenuItem, TextField } from "@material-ui/core";
 import * as _ from "lodash";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  classifierSlice,
-  updateOptimizationAlgorithm,
-} from "../../../../store/slices";
+import { classifierSlice } from "../../../../store/slices";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 
@@ -46,7 +43,7 @@ export const OptimizationGrid = () => {
   ) => {
     const target = event.target as HTMLInputElement; //target.value is string
 
-    const optimizationAlgorithm = () => {
+    const selectedAlgorithm = () => {
       switch (target.value) {
         case "adadelta":
           return OptimizationAlgorithm.Adadelta;
@@ -69,7 +66,7 @@ export const OptimizationGrid = () => {
 
     dispatch(
       classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: optimizationAlgorithm(),
+        optimizationAlgorithm: selectedAlgorithm(),
       })
     );
   };
@@ -93,7 +90,7 @@ export const OptimizationGrid = () => {
           select
           label="Optimization algorithm"
           className={classes.textField}
-          defaultValue={optimizationAlgorithm}
+          value={optimizationAlgorithm}
           onChange={onOptimizationAlgorithmChange}
           SelectProps={{
             MenuProps: {
