@@ -78,21 +78,6 @@ export const ClassifierSettingsListItem = ({}) => {
     setCollapsedClassifierSettingsList(!collapsedClassifierSettingsList);
   };
 
-  interface State {
-    lossFunction: string;
-    optimizationAlgorithm: string;
-  }
-
-  const [values, setValues] = React.useState<State>({
-    lossFunction: "meanSquaredError",
-    optimizationAlgorithm: "adam",
-  });
-
-  const onChange =
-    (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [name]: event.target.value });
-    };
-
   const classes = useStyles({});
 
   return (
@@ -121,7 +106,7 @@ export const ClassifierSettingsListItem = ({}) => {
         unmountOnExit
       >
         <form className={classes.container} noValidate autoComplete="off">
-          <OptimizationGrid />
+          {/*<OptimizationGrid />*/}
 
           <ClassifierSettingsGrid />
         </form>

@@ -9,16 +9,6 @@ import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 import { useState } from "react";
 
-const optimizationAlgorithms = {
-  adadelta: "Adadelta",
-  adagrad: "Adagrad",
-  adam: "Adam",
-  adamax: "Adamax",
-  momentum: "Momentum",
-  rmsProp: "RMSProp",
-  stochasticGradientDescent: "Stochastic gradient descent (SGD)",
-};
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menu: {
@@ -41,93 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const OptimizationGrid = () => {
   const dispatch = useDispatch();
 
-  const learningRate = useSelector(learningRateSelector);
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
-
-  const onOptimizationAlgorithmChange = (
-    event: React.FormEvent<EventTarget>
-  ) => {
-    const target = event.target as HTMLInputElement; //target.value is string
-
-    const selectedAlgorithm = () => {
-      switch (target.value) {
-        case "adadelta":
-          return OptimizationAlgorithm.Adadelta;
-        case "adagrad":
-          return OptimizationAlgorithm.Adagrad;
-        case "adam":
-          return OptimizationAlgorithm.Adam;
-        case "adamax":
-          return OptimizationAlgorithm.Adamax;
-        case "momentum":
-          return OptimizationAlgorithm.Momentum;
-        case "rmsProp":
-          return OptimizationAlgorithm.RMSProp;
-        case "stochasticGradientDescent":
-          return OptimizationAlgorithm.StochasticGradientDescent;
-        default:
-          return OptimizationAlgorithm.Adam;
-      }
-    };
-
-    dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: selectedAlgorithm(),
-      })
-    );
-  };
-
-  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const learningRate = Number(target.value);
-
-    dispatch(
-      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
-    );
-  };
-
   const classes = useStyles({});
 
-  return (
-    <form className={classes.container} noValidate>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <TextField
-            id="optimization-algorithm"
-            select
-            label="Optimization algorithm"
-            className={classes.textField}
-            defaultValue={""}
-            onChange={onOptimizationAlgorithmChange}
-            SelectProps={{
-              MenuProps: {
-                className: classes.menu,
-              },
-            }}
-            margin="normal"
-          >
-            {_.map(optimizationAlgorithms, (v, k) => {
-              return (
-                <MenuItem dense key={k} value={k}>
-                  {v}
-                </MenuItem>
-              );
-            })}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={4}>
-          <TextField
-            id="learning-rate"
-            label="Learning rate"
-            className={classes.textField}
-            value={learningRate}
-            onChange={onLearningRateChange}
-            margin="normal"
-            type="number"
-          />
-        </Grid>
-      </Grid>
-    </form>
-  );
+  return <></>;
 };

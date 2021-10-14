@@ -8,6 +8,19 @@ import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
+import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
+import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
+import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
+
+const optimizationAlgorithms = {
+  adadelta: "Adadelta",
+  adagrad: "Adagrad",
+  adam: "Adam",
+  adamax: "Adamax",
+  momentum: "Momentum",
+  rmsProp: "RMSProp",
+  stochasticGradientDescent: "Stochastic gradient descent (SGD)",
+};
 
 const lossFunctions = {
   absoluteDifference: "Absolute difference",
@@ -22,6 +35,11 @@ const lossFunctions = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    container: {
+      width: "100%",
+      display: "flex",
+      flexWrap: "wrap",
+    },
     menu: {
       // width: 200,
     },
@@ -81,6 +99,51 @@ export const ClassifierSettingsGrid = () => {
     );
   };
 
+  const learningRate = useSelector(learningRateSelector);
+  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
+
+  const onOptimizationAlgorithmChange = (
+    event: React.FormEvent<EventTarget>
+  ) => {
+    const target = event.target as HTMLInputElement; //target.value is string
+
+    const selectedAlgorithm = () => {
+      switch (target.value) {
+        case "adadelta":
+          return OptimizationAlgorithm.Adadelta;
+        case "adagrad":
+          return OptimizationAlgorithm.Adagrad;
+        case "adam":
+          return OptimizationAlgorithm.Adam;
+        case "adamax":
+          return OptimizationAlgorithm.Adamax;
+        case "momentum":
+          return OptimizationAlgorithm.Momentum;
+        case "rmsProp":
+          return OptimizationAlgorithm.RMSProp;
+        case "stochasticGradientDescent":
+          return OptimizationAlgorithm.StochasticGradientDescent;
+        default:
+          return OptimizationAlgorithm.Adam;
+      }
+    };
+
+    dispatch(
+      classifierSlice.actions.updateOptimizationAlgorithm({
+        optimizationAlgorithm: selectedAlgorithm(),
+      })
+    );
+  };
+
+  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    const learningRate = Number(target.value);
+
+    dispatch(
+      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
+    );
+  };
+
   const onLossFunctionChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement; //target.value is string
 
@@ -115,6 +178,46 @@ export const ClassifierSettingsGrid = () => {
 
   return (
     <>
+      <form className={classes.container} noValidate>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <TextField
+              id="optimization-algorithm"
+              select
+              label="Optimization algorithm"
+              className={classes.textField}
+              defaultValue={""}
+              onChange={onOptimizationAlgorithmChange}
+              SelectProps={{
+                MenuProps: {
+                  className: classes.menu,
+                },
+              }}
+              margin="normal"
+            >
+              {_.map(optimizationAlgorithms, (v, k) => {
+                return (
+                  <MenuItem dense key={k} value={k}>
+                    {v}
+                  </MenuItem>
+                );
+              })}
+            </TextField>
+          </Grid>
+
+          <Grid item xs={4}>
+            <TextField
+              id="learning-rate"
+              label="Learning rate"
+              className={classes.textField}
+              value={learningRate}
+              onChange={onLearningRateChange}
+              margin="normal"
+              type="number"
+            />
+          </Grid>
+        </Grid>
+      </form>
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <form noValidate>
