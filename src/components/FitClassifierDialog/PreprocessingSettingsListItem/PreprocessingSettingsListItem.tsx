@@ -104,16 +104,10 @@ export const PreprocessingSettingsListItem = ({
         <ListItemText primary="Preprocessing" style={{ fontSize: "1em" }} />
       </ListItem>
       <Collapse in={collapsedPreprocessingList} timeout="auto" unmountOnExit>
-        <Tooltip title="Apply Preprocessing Settings" placement="bottom">
-          <div>
-            <Button variant="contained" color="primary" onClick={() => {}}>
-              Apply preprocessing
-            </Button>
-          </div>
-        </Tooltip>
         <Typography id="rescaling" gutterBottom>
           Pixel Intensity Rescaling
         </Typography>
+
         <RescalingForm
           onLowerPercentileChange={onLowerPercentileChange}
           onUpperPercentileChange={onUpperPercentileChange}
@@ -156,6 +150,13 @@ export const PreprocessingSettingsListItem = ({
             label="Padding Option 2"
           ></FormControlLabel>
         </FormGroup>
+        <Tooltip title="Apply Preprocessing Settings" placement="bottom">
+          <div>
+            <Button variant="contained" color="primary" onClick={() => {}}>
+              Apply preprocessing
+            </Button>
+          </div>
+        </Tooltip>
       </Collapse>
     </>
   );
