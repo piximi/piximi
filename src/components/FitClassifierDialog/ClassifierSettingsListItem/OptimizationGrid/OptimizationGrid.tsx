@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export const OptimizationGrid = () => {
   const dispatch = useDispatch();
 
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
   const learningRate = useSelector(learningRateSelector);
 
   const onOptimizationAlgorithmChange = (
@@ -85,28 +84,29 @@ export const OptimizationGrid = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
-        <TextField
-          id="optimization-algorithm"
-          select
-          label="Optimization algorithm"
-          className={classes.textField}
-          value={optimizationAlgorithm}
-          onChange={onOptimizationAlgorithmChange}
-          SelectProps={{
-            MenuProps: {
-              className: classes.menu,
-            },
-          }}
-          margin="normal"
-        >
-          {_.map(optimizationAlgorithms, (v, k) => {
-            return (
-              <MenuItem dense key={k} value={k}>
-                {v}
-              </MenuItem>
-            );
-          })}
-        </TextField>
+        <form noValidate>
+          <TextField
+            id="optimization-algorithm"
+            select
+            label="Optimization algorithm"
+            className={classes.textField}
+            onChange={onOptimizationAlgorithmChange}
+            SelectProps={{
+              MenuProps: {
+                className: classes.menu,
+              },
+            }}
+            margin="normal"
+          >
+            {_.map(optimizationAlgorithms, (v, k) => {
+              return (
+                <MenuItem dense key={k} value={k}>
+                  {v}
+                </MenuItem>
+              );
+            })}
+          </TextField>
+        </form>
       </Grid>
 
       <Grid item xs={4}>

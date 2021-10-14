@@ -14,17 +14,7 @@ import * as _ from "lodash";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useState } from "react";
-
-const lossFunctions = {
-  absoluteDifference: "Absolute difference",
-  cosineDistance: "Cosine distance",
-  hingeLoss: "Hinge",
-  huberLoss: "Huber",
-  logLoss: "Log",
-  meanSquaredError: "Mean squared error (MSE)",
-  sigmoidCrossEntropy: "Sigmoid cross entropy",
-  categoricalCrossentropy: "Categorical cross entropy",
-};
+import { LossFunctionGrid } from "./LossFunctionGrid/LossFunctionGrid";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -161,32 +151,7 @@ export const ClassifierSettingsListItem = ({
         <form className={classes.container} noValidate autoComplete="off">
           <OptimizationGrid />
 
-          {/*<Grid container spacing={2}>*/}
-          {/*  <Grid item xs={4}>*/}
-          {/*    <TextField*/}
-          {/*      id="loss-function"*/}
-          {/*      select*/}
-          {/*      label="Loss function"*/}
-          {/*      className={classes.textField}*/}
-          {/*      value={lossFunction}*/}
-          {/*      onChange={onLossFunctionChange}*/}
-          {/*      SelectProps={{*/}
-          {/*        MenuProps: {*/}
-          {/*          className: classes.menu,*/}
-          {/*        },*/}
-          {/*      }}*/}
-          {/*      margin="normal"*/}
-          {/*    >*/}
-          {/*      {_.map(lossFunctions, (v, k) => {*/}
-          {/*        return (*/}
-          {/*          <MenuItem dense key={k} value={k}>*/}
-          {/*            {v}*/}
-          {/*          </MenuItem>*/}
-          {/*        );*/}
-          {/*      })}*/}
-          {/*    </TextField>*/}
-          {/*  </Grid>*/}
-          {/*</Grid>*/}
+          <LossFunctionGrid />
 
           {/*<Grid container spacing={2}>*/}
           {/*  /!* <Grid item xs={4}>*/}
