@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
+import { useState } from "react";
 
 const optimizationAlgorithms = {
   adadelta: "Adadelta",
@@ -29,6 +30,11 @@ const useStyles = makeStyles((theme: Theme) =>
       flexBasis: 300,
       width: "100%",
     },
+    container: {
+      width: "100%",
+      display: "flex",
+      flexWrap: "wrap",
+    },
   })
 );
 
@@ -36,6 +42,7 @@ export const OptimizationGrid = () => {
   const dispatch = useDispatch();
 
   const learningRate = useSelector(learningRateSelector);
+  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
 
   const onOptimizationAlgorithmChange = (
     event: React.FormEvent<EventTarget>
@@ -82,9 +89,9 @@ export const OptimizationGrid = () => {
   const classes = useStyles({});
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={4}>
-        <form noValidate>
+    <form className={classes.container} noValidate>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
           <TextField
             id="optimization-algorithm"
             select
@@ -107,20 +114,20 @@ export const OptimizationGrid = () => {
               );
             })}
           </TextField>
-        </form>
-      </Grid>
+        </Grid>
 
-      <Grid item xs={4}>
-        <TextField
-          id="learning-rate"
-          label="Learning rate"
-          className={classes.textField}
-          value={learningRate}
-          onChange={onLearningRateChange}
-          margin="normal"
-          type="number"
-        />
+        <Grid item xs={4}>
+          <TextField
+            id="learning-rate"
+            label="Learning rate"
+            className={classes.textField}
+            value={learningRate}
+            onChange={onLearningRateChange}
+            margin="normal"
+            type="number"
+          />
+        </Grid>
       </Grid>
-    </Grid>
+    </form>
   );
 };

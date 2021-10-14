@@ -36,7 +36,7 @@ export const SegmenterList = () => {
   return (
     <>
       <List dense>
-        <ListItem button dense onClick={onCollapseClick}>
+        <ListItem button disabled dense onClick={onCollapseClick}>
           <ListItemIcon>
             {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </ListItemIcon>
