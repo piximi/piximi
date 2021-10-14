@@ -14,7 +14,7 @@ import * as _ from "lodash";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useState } from "react";
-import { LossFunctionGrid } from "./LossFunctionGrid/LossFunctionGrid";
+import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -151,45 +151,7 @@ export const ClassifierSettingsListItem = ({
         <form className={classes.container} noValidate autoComplete="off">
           <OptimizationGrid />
 
-          <LossFunctionGrid />
-
-          {/*<Grid container spacing={2}>*/}
-          {/*  /!* <Grid item xs={4}>*/}
-          {/*    <TextField*/}
-          {/*      id="input-shape"*/}
-          {/*      label="Input shape"*/}
-          {/*      className={classes.textField}*/}
-          {/*      value={''}*/}
-          {/*      disabled*/}
-          {/*      onChange={onInputShapeChange}*/}
-          {/*      margin="normal"*/}
-          {/*    />*/}
-          {/*  </Grid> *!/*/}
-
-          {/*  <Grid item xs={2}>*/}
-          {/*    <TextField*/}
-          {/*      id="batch-size"*/}
-          {/*      label="Batch size"*/}
-          {/*      className={classes.textField}*/}
-          {/*      value={batchSize}*/}
-          {/*      onChange={onBatchSizeChange}*/}
-          {/*      type="number"*/}
-          {/*      margin="normal"*/}
-          {/*    />*/}
-          {/*  </Grid>*/}
-
-          {/*  <Grid item xs={2}>*/}
-          {/*    <TextField*/}
-          {/*      id="epochs"*/}
-          {/*      label="Epochs"*/}
-          {/*      className={classes.textField}*/}
-          {/*      value={epochs}*/}
-          {/*      onChange={onEpochsChange}*/}
-          {/*      margin="normal"*/}
-          {/*      type="number"*/}
-          {/*    />*/}
-          {/*  </Grid>*/}
-          {/*</Grid>*/}
+          <ClassifierSettingsGrid />
         </form>
       </Collapse>
     </>
