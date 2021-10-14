@@ -90,6 +90,7 @@ export const OptimizationGrid = () => {
             select
             label="Optimization algorithm"
             className={classes.textField}
+            defaultValue={""}
             onChange={onOptimizationAlgorithmChange}
             SelectProps={{
               MenuProps: {

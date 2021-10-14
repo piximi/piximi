@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
+import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 
 const lossFunctions = {
   absoluteDifference: "Absolute difference",
@@ -38,6 +39,7 @@ export const ClassifierSettingsGrid = () => {
   const dispatch = useDispatch();
 
   const fitOptions = useSelector(fitOptionsSelector);
+  const inputShape = useSelector(inputShapeSelector);
 
   const onBatchSizeChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
@@ -49,6 +51,34 @@ export const ClassifierSettingsGrid = () => {
     const target = event.target as HTMLInputElement;
     const epochs = Number(target.value);
     dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
+  };
+
+  const onRowsChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    const rows = Number(target.value);
+    dispatch(
+      classifierSlice.actions.updateInputShape({
+        inputShape: { ...inputShape, r: rows },
+      })
+    );
+  };
+  const onColsChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    const cols = Number(target.value);
+    dispatch(
+      classifierSlice.actions.updateInputShape({
+        inputShape: { ...inputShape, c: cols },
+      })
+    );
+  };
+  const onChannelsChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    const channels = Number(target.value);
+    dispatch(
+      classifierSlice.actions.updateInputShape({
+        inputShape: { ...inputShape, channels: channels },
+      })
+    );
   };
 
   const onLossFunctionChange = (event: React.FormEvent<EventTarget>) => {
@@ -93,6 +123,7 @@ export const ClassifierSettingsGrid = () => {
               select
               label="Loss function"
               className={classes.textField}
+              defaultValue={""}
               onChange={onLossFunctionChange}
               SelectProps={{
                 MenuProps: {
@@ -112,19 +143,39 @@ export const ClassifierSettingsGrid = () => {
           </form>
         </Grid>
       </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
+      <Grid container direction="row" spacing={2}>
+        <Grid item xs={1}>
           <TextField
-            id="input-shape"
-            label="Input shape"
+            id="shape-rows"
+            label="Rows"
             className={classes.textField}
-            value={""}
-            disabled
-            // onChange={onInputShapeChange}
+            value={inputShape.r}
+            onChange={onRowsChange}
             margin="normal"
           />
         </Grid>
-
+        <Grid item xs={1}>
+          <TextField
+            id="shape-cols"
+            label="Cols"
+            className={classes.textField}
+            value={inputShape.c}
+            margin="normal"
+            onChange={onColsChange}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <TextField
+            id="shape-channels"
+            label="Channels"
+            className={classes.textField}
+            value={inputShape.channels}
+            margin="normal"
+            onChange={onChannelsChange}
+          />
+        </Grid>
+      </Grid>
+      <Grid container>
         <Grid item xs={2}>
           <TextField
             id="batch-size"
