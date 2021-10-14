@@ -1,19 +1,15 @@
 import * as React from "react";
+import { useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { OptimizationGrid } from "./OptimizationGrid";
 import {
   Collapse,
-  Grid,
   ListItem,
   ListItemIcon,
   ListItemText,
-  MenuItem,
-  TextField,
 } from "@material-ui/core";
-import * as _ from "lodash";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { useState } from "react";
 import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -74,31 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type ClassifierSettingsListItemProps = {
-  batchSize: number;
-  epochs: number;
-  learningRate: number;
-  lossFunction: String;
-  onBatchSizeChange: (event: React.FormEvent<EventTarget>) => void;
-  onLearningRateChange: (event: React.FormEvent<EventTarget>) => void;
-  onEpochsChange: (event: React.FormEvent<EventTarget>) => void;
-  onLossFunctionChange: (event: React.FormEvent<EventTarget>) => void;
-  onOptimizationAlgorithmChange: (event: React.FormEvent<EventTarget>) => void;
-  optimizationAlgorithm: string;
-};
-
-export const ClassifierSettingsListItem = ({
-  batchSize,
-  epochs,
-  learningRate,
-  onBatchSizeChange,
-  onLearningRateChange,
-  lossFunction,
-  onEpochsChange,
-  onLossFunctionChange,
-  onOptimizationAlgorithmChange,
-  optimizationAlgorithm,
-}: ClassifierSettingsListItemProps) => {
+export const ClassifierSettingsListItem = ({}) => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 

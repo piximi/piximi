@@ -219,34 +219,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   //   // console.log(example.getHistograms());
   // });
 
-  // assign each image to train- test- or validation- set
-  const initializeDatasets = () => {
-    //FIXME bring that back
-    // if (datasetInitialized) {
-    //   return;
-    // }
-    // var partitions: number[] = [];
-    // images.forEach((image: Images) => {
-    //   const setItentifier = assignToSet();
-    //   partitions.push(setItentifier);
-    // });
-    // // setImagesPartition(partitions);
-    // setDatasetInitialized(true);
-  };
-
-  const [datasetSplits, setDatasetSplits] = React.useState([60, 80]);
-
-  const handleSliderChange = (event: any, newValue: any) => {
-    setDatasetSplits(newValue);
-    setTestsetRatio(datasetSplits[1] - datasetSplits[0]);
-  };
-
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
     useState<boolean>(false);
-
-  const onDatasetSettingsListClick = () => {
-    setCollapsedDatasetSettingsList(!collapsedDatasetSettingsList);
-  };
 
   const [stopTraining, setStopTraining] = useState<boolean>(false);
 
@@ -324,12 +298,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const resetStopTraining = async () => {
     setStopTraining(false);
-  };
-
-  const onInputShapeChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-
-    setInputShape(target.value);
   };
 
   const onLossFunctionChange = (event: React.FormEvent<EventTarget>) => {
@@ -571,24 +539,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             openedDialog={openedDialog}
           />
 
-          <ClassifierSettingsListItem
-            epochs={epochs}
-            onEpochsChange={onEpochsChange}
-            learningRate={learningRate}
-            lossFunction={lossFunction}
-            onLossFunctionChange={onLossFunctionChange}
-            onBatchSizeChange={onBatchSizeChange}
-            onOptimizationAlgorithmChange={onOptimizationAlgorithmChange}
-            optimizationAlgorithm={optimizationAlgorithm}
-            batchSize={batchSize}
-            onLearningRateChange={onLearningRateChange}
-          />
+          <ClassifierSettingsListItem />
 
-          <DatasetSettingsListItem
-            datasetSplits={datasetSplits}
-            handleChange={handleSliderChange}
-            initializeDatasets={initializeDatasets}
-          />
+          <DatasetSettingsListItem />
         </List>
         <div id={"vis-train-container"} />
       </DialogContent>

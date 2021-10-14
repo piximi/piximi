@@ -188,6 +188,7 @@ export const OpenExampleProjectMenuItem = ({
       modelName: "mnist",
       modelVersion: "1",
       optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
+      testPercentage: 0.2,
       trainingPercentage: training_percentage, //determines train-val split
       validationData: [valXs, valYs],
     };

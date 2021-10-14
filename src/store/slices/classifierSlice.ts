@@ -122,7 +122,6 @@ export const classifierSlice = createSlice({
       state.preprocessing = false;
       state.saving = false;
       state.validationLossHistory = undefined;
-      state.testPercentage = 0;
     },
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
