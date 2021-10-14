@@ -19,6 +19,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const onFit = async () => {
     const history = await train_mnist();
+    //this should be history = await train()
     console.info(history);
   };
 
