@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { OptimizationGrid } from "./OptimizationGrid";
 import {
   Collapse,
   ListItem,
@@ -106,8 +105,6 @@ export const ClassifierSettingsListItem = ({}) => {
         unmountOnExit
       >
         <form className={classes.container} noValidate autoComplete="off">
-          {/*<OptimizationGrid />*/}
-
           <ClassifierSettingsGrid />
         </form>
       </Collapse>

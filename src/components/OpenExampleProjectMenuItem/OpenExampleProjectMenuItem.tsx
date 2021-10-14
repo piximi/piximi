@@ -2,7 +2,7 @@ import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import { MnistData } from "../../examples/mnist/data";
 import * as tensorflow from "@tensorflow/tfjs";
-import { Tensor2D, train } from "@tensorflow/tfjs";
+import { Tensor2D } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
 import * as uuid from "uuid";
@@ -18,9 +18,6 @@ import { getModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
 import { compile } from "../../store/coroutines/classifier/compile";
 import { categorizedImagesSelector } from "../../store/selectors";
 import { FitOptions } from "../../types/FitOptions";
-import * as tfvis from "@tensorflow/tfjs-vis";
-import { Classifier } from "../../types/Classifier";
-import { Tensor4D } from "@tensorflow/tfjs-node";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;

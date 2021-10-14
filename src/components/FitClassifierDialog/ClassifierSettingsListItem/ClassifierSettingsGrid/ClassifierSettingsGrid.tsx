@@ -2,7 +2,6 @@ import { Grid, MenuItem, TextField } from "@material-ui/core";
 import * as _ from "lodash";
 import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
