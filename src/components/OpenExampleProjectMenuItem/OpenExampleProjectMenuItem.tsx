@@ -8,8 +8,16 @@ import { Image } from "../../types/Image";
 import * as uuid from "uuid";
 import { Project } from "../../types/Project";
 import { Category } from "../../types/Category";
-import { createProject, projectSlice } from "../../store/slices";
-import { useDispatch } from "react-redux";
+import { classifierSlice, projectSlice } from "../../store/slices";
+import { useDispatch, useSelector } from "react-redux";
+import { CompileOptions } from "../../types/CompileOptions";
+import { LossFunction } from "../../types/LossFunction";
+import { Metric } from "../../types/Metric";
+import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { getModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
+import { compile } from "../../store/coroutines/classifier/compile";
+import { categorizedImagesSelector } from "../../store/selectors";
+import { FitOptions } from "../../types/FitOptions";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -29,9 +37,16 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
+  const categorizedImages = useSelector(categorizedImagesSelector);
+
   const onClickExampleProject = async () => {
+    popupState.close();
+
+    // Load project with data
     const data = new MnistData();
     await data.load();
+
+    //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTestBatch(100);
 
     if (!examples) return;
@@ -82,7 +97,7 @@ export const OpenExampleProjectMenuItem = ({
           id: id,
           name: classes[i].toString(),
           visible: true,
-        }); //TODO assign a color to each new category
+        });
       }
 
       //Make Image object from URI
@@ -109,7 +124,73 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(projectSlice.actions.createProject({ project: mnistProject }));
 
-    popupState.close();
+    const mnistFitOptions: FitOptions = {
+      batchSize: 512,
+      epochs: 5,
+      initialEpoch: 0,
+      test_data_size: 1000, //TODO experiment with 10000
+      train_data_size: 6500, //TODO experiment with 55000
+      shuffle: true,
+    };
+
+    const mnistCompileOptions: CompileOptions = {
+      learningRate: 0.001,
+      lossFunction: LossFunction.CategoricalCrossEntropy,
+      metrics: [Metric.BinaryAccuracy],
+      optimizationAlgorithm: OptimizationAlgorithm.Adam,
+    };
+
+    //get training data
+    const [trainValXs, trainValYs] = tensorflow.tidy(() => {
+      const d = data.nextTrainBatch(mnistFitOptions.train_data_size!);
+
+      if (!d) return;
+
+      return [
+        d.xs.reshape([mnistFitOptions.train_data_size!, 28, 28, 1]),
+        d.labels,
+      ];
+    }) as Array<Tensor2D>;
+
+    const training_percentage = 0.85;
+    const training_split = Math.round(
+      training_percentage * trainValXs.shape[0]
+    );
+
+    //extract validation from test data
+    const [trainXs, valXs] = tensorflow.split(trainValXs, [
+      training_split,
+      trainValXs.shape[0] - training_split,
+    ]);
+    const [trainYs, valYs] = tensorflow.split(trainValYs, [
+      training_split,
+      trainValXs.shape[0] - training_split,
+    ]);
+
+    //get model
+    const mnistModel = getModel();
+
+    const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
+
+    const mnistClassifier = {
+      compiled: compiledMnistModel,
+      data: [trainXs, trainYs],
+      fitOptions: mnistFitOptions,
+      inputShape: { r: 28, c: 28, channels: 1 },
+      learningRate: mnistCompileOptions.learningRate,
+      lossFunction: mnistCompileOptions.lossFunction,
+      metrics: mnistCompileOptions.metrics,
+      model: mnistModel,
+      modelMultiplier: "0.0",
+      modelName: "mnist",
+      modelVersion: "1",
+      optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
+      testPercentage: 0.2,
+      trainingPercentage: training_percentage, //determines train-val split
+      validationData: [valXs, valYs],
+    };
+
+    dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));
   };
 
   return (

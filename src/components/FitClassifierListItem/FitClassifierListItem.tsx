@@ -28,8 +28,6 @@ export const FitClassifierListItem = () => {
         <ListItemText primary="Fit" />
       </ListItem>
       <FitClassifierDialog
-        categories={categories}
-        images={images}
         openedDialog={open}
         openedDrawer={true}
         closeDialog={onClose}

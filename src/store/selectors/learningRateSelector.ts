@@ -1,9 +1,9 @@
 import { Classifier } from "../../types/Classifier";
 
-export const validationPercentageSelector = ({
+export const learningRateSelector = ({
   classifier,
 }: {
   classifier: Classifier;
 }): number => {
-  return classifier.testPercentage;
+  return classifier.learningRate;
 };

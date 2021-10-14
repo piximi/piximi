@@ -14,6 +14,7 @@ export {
   open,
   preprocess,
   updateBatchSize,
+  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,
@@ -25,7 +26,7 @@ export {
   updatePreprocessed,
   updateTrainingPercentage,
   updateValidationLossHistory,
-  updateValidationPercentage,
+  updateTestPercentage,
 } from "./classifierSlice";
 
 export {

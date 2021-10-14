@@ -8,20 +8,31 @@ import { History, LayersModel } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../types/CompileOptions";
 import { Image } from "../../types/Image";
 import { Category } from "../../types/Category";
+import { Shape } from "../../types/Shape";
+import { ArchitectureOptions } from "../../types/ArchitectureOptions";
 
 const initialState: Classifier = {
   compiling: false,
   evaluating: false,
+  inputShape: {
+    r: 256,
+    c: 256,
+    channels: 3,
+  },
   fitOptions: {
     epochs: 10,
     batchSize: 32,
     initialEpoch: 0,
+    shuffle: true,
   },
   fitting: false,
   preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
   lossHistory: [],
+  modelName: "MobileNet",
+  modelMultiplier: "0.0",
+  modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],
   opening: false,
   optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
@@ -29,7 +40,7 @@ const initialState: Classifier = {
   saving: false,
   trainingPercentage: 0.5,
   validationLossHistory: [],
-  validationPercentage: 0.25,
+  testPercentage: 0.25,
 };
 
 export const classifierSlice = createSlice({
@@ -74,6 +85,44 @@ export const classifierSlice = createSlice({
 
       state.fitOptions.batchSize = batchSize;
     },
+    openMnistClassifier(
+      state,
+      action: PayloadAction<{ mnistClassifier: any }>
+    ) {
+      const { mnistClassifier } = action.payload;
+
+      state.compiled = mnistClassifier.compiled;
+      state.data = mnistClassifier.data;
+      state.fitOptions = mnistClassifier.fitOptions;
+      state.inputShape = mnistClassifier.inputShape;
+      state.learningRate = mnistClassifier.learningRate;
+      state.lossFunction = mnistClassifier.lossFunction;
+      state.metrics = mnistClassifier.metrics;
+      state.model = mnistClassifier.model;
+      state.modelName = mnistClassifier.modelName;
+      state.modelVersion = mnistClassifier.modelVersion;
+      state.modelMultiplier = mnistClassifier.modelMultiplier;
+
+      state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
+      state.trainingPercentage = mnistClassifier.trainingPercentage;
+      state.validationData = mnistClassifier.validationData;
+
+      //initialize all others to false/undefined, since we are essentially initializing a new classifier
+      state.compiling = false;
+      state.evaluating = false;
+      state.evaluations = undefined;
+      state.fitted = undefined;
+      state.fitting = false;
+      state.history = undefined;
+      state.lossHistory = undefined;
+      state.opened = undefined;
+      state.opening = false;
+      state.predicting = false;
+      state.predictions = undefined;
+      state.preprocessing = false;
+      state.saving = false;
+      state.validationLossHistory = undefined;
+    },
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
@@ -97,6 +146,9 @@ export const classifierSlice = createSlice({
       state.fitted = fitted;
 
       state.history = status;
+    },
+    updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
+      state.inputShape = action.payload.inputShape;
     },
     updateLearningRate(state, action: PayloadAction<{ learningRate: number }>) {
       const { learningRate } = action.payload;
@@ -123,6 +175,14 @@ export const classifierSlice = createSlice({
       const { metrics } = action.payload;
 
       state.metrics = metrics;
+    },
+    updateModel(
+      state,
+      action: PayloadAction<{ modelOptions: ArchitectureOptions }>
+    ) {
+      state.modelName = action.payload.modelOptions.modelName;
+      state.modelVersion = action.payload.modelOptions.modelVersion;
+      state.modelMultiplier = action.payload.modelOptions.modelMultiplier;
     },
     updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
       const { opened } = action.payload;
@@ -173,13 +233,13 @@ export const classifierSlice = createSlice({
         { x: batch, y: loss },
       ];
     },
-    updateValidationPercentage(
+    updateTestPercentage(
       state,
-      action: PayloadAction<{ validationPercentage: number }>
+      action: PayloadAction<{ testPercentage: number }>
     ) {
-      const { validationPercentage } = action.payload;
+      const { testPercentage } = action.payload;
 
-      state.validationPercentage = validationPercentage;
+      state.testPercentage = testPercentage;
     },
   },
 });
@@ -190,6 +250,7 @@ export const {
   open,
   preprocess,
   updateBatchSize,
+  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,
@@ -201,5 +262,5 @@ export const {
   updatePreprocessed,
   updateTrainingPercentage,
   updateValidationLossHistory,
-  updateValidationPercentage,
+  updateTestPercentage,
 } = classifierSlice.actions;

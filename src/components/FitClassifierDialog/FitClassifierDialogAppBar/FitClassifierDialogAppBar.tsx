@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const FitClassifierDialogAppBar = (props: any) => {
-  const { onStopTrainingChange, closeDialog, fit, openedDrawer } = props;
+  const { closeDialog, fit, openedDrawer } = props;
 
   const classes = useStyles({});
 
@@ -58,7 +58,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
         <Tooltip title="Stop fitting the model" placement="bottom">
           <IconButton
             className={classes.button}
-            onClick={onStopTrainingChange}
+            onClick={() => {}} //TODO implement this
             href={""}
           >
             <Stop />

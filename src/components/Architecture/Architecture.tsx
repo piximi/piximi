@@ -2,8 +2,12 @@ import React from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
+import { useSelector } from "react-redux";
+import { architectureOptionsSelector } from "../../store/selectors/architectureOptionsSelector";
 
 export const Architecture = () => {
+  const architectureOptions = useSelector(architectureOptionsSelector);
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={6}>
@@ -16,7 +20,7 @@ export const Architecture = () => {
           value={"MobileNet"}
         >
           <MenuItem disabled value={"MobileNet"}>
-            MobileNet
+            {architectureOptions.modelName}
           </MenuItem>
         </TextField>
       </Grid>
@@ -28,10 +32,10 @@ export const Architecture = () => {
           id="version"
           label="Version"
           select
-          value={"1"}
+          value={architectureOptions.modelVersion}
         >
-          <MenuItem disabled value={"1"}>
-            1
+          <MenuItem disabled value={architectureOptions.modelVersion}>
+            {architectureOptions.modelVersion}
           </MenuItem>
         </TextField>
       </Grid>
@@ -43,10 +47,10 @@ export const Architecture = () => {
           id="multiplier"
           label="Multiplier"
           select
-          value={"1.3"}
+          value={architectureOptions.modelMultiplier}
         >
-          <MenuItem disabled value={"1.3"}>
-            1.3
+          <MenuItem disabled value={architectureOptions.modelMultiplier}>
+            {architectureOptions.modelMultiplier}
           </MenuItem>
         </TextField>
       </Grid>
