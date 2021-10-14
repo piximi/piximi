@@ -8,13 +8,13 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { Box, Button } from "@material-ui/core";
 import { train_mnist } from "../FitClassifierDialog/FitClassifierDialog/fit_mnist";
 
-type ClassifierSettingsDialogAppBarProps = {
+type SegmenterSettingsDialogAppBarProps = {
   onClose: () => void;
 };
 
-export const ClassifierSettingsDialogAppBar = ({
+export const SegmenterSettingsDialogAppBar = ({
   onClose,
-}: ClassifierSettingsDialogAppBarProps) => {
+}: SegmenterSettingsDialogAppBarProps) => {
   const classes = useStyles();
 
   const onClick = async () => {

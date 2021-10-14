@@ -1,7 +1,7 @@
 import React from "react";
 import Dialog from "@material-ui/core/Dialog";
 import { ClassifierSettingsDialogContent } from "../ClassifierSettingsDialogContent";
-import { ClassifierSettingsDialogAppBar } from "../ClassifierSettingsDialogAppBar";
+import { SegmenterSettingsDialogAppBar } from "../SegmenterSettingsDialogAppBar";
 
 type ClassifierSettingsDialogProps = {
   onClose: () => void;
@@ -14,7 +14,7 @@ export const SegmenterSettingsDialog = ({
 }: ClassifierSettingsDialogProps) => {
   return (
     <Dialog fullScreen onClose={onClose} open={open}>
-      <ClassifierSettingsDialogAppBar onClose={onClose} />
+      <SegmenterSettingsDialogAppBar onClose={onClose} />
 
       <ClassifierSettingsDialogContent />
     </Dialog>
