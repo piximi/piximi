@@ -7,6 +7,8 @@ import { ClassifierSettingsListItem } from "../ClassifierSettingsListItem/Classi
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { train_mnist } from "./fit_mnist";
+import { useDispatch } from "react-redux";
+import { classifierSlice } from "../../../store/slices";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -17,10 +19,14 @@ type FitClassifierDialogProps = {
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const { closeDialog, openedDialog, openedDrawer } = props;
 
+  const dispatch = useDispatch();
+
   const onFit = async () => {
-    const history = await train_mnist();
+    // const history = await train_mnist();
+    dispatch(classifierSlice.actions.fit({ onEpochEnd: 4 }));
+
     //this should be history = await train()
-    console.info(history);
+    // console.info(history);
   };
 
   // specifies interface
