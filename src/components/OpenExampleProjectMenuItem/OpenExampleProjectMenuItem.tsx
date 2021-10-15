@@ -46,15 +46,12 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
-    const numExamples = 7000;
+    const numExamples = 500; //Eventually you might want to change this back to ~700 (better training)
 
     //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTestBatch(numExamples);
 
     if (!examples) return;
-
-    // const numExamples = examples.xs.shape[0];
-    let visible: boolean = true;
 
     const classes = examples.labels.argMax(-1).dataSync(); // gives array of labels for each example in batch
 
