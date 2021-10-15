@@ -62,16 +62,6 @@ export const getMnistModel = () => {
     })
   );
 
-  //TODO this compile code should go elsewhere, this is when we get a compiled model
-  // // Choose an optimizer, loss function and accuracy metric,
-  // // then compile and return the model
-  // const optimizer = tensorflow.train.adam();
-  // model.compile({
-  //   optimizer: optimizer,
-  //   loss: "categoricalCrossentropy",
-  //   metrics: ["accuracy"],
-  // });
-
   return model;
 };
 

@@ -46,12 +46,15 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
+    const numExamples = 7000;
+
     //those are the examples we'll show to the user (as to not load all data)
-    const examples = data.nextTestBatch(100);
+    const examples = data.nextTestBatch(numExamples);
 
     if (!examples) return;
 
-    const numExamples = examples.xs.shape[0];
+    // const numExamples = examples.xs.shape[0];
+    let visible: boolean = true;
 
     const classes = examples.labels.argMax(-1).dataSync(); // gives array of labels for each example in batch
 
@@ -67,13 +70,29 @@ export const OpenExampleProjectMenuItem = ({
 
     // Create a canvas element to render each example
     for (let i = 0; i < numExamples; i++) {
+      if (i % 500 === 0) {
+        console.info(`Processing image #${i} out of ${numExamples} images`);
+      }
       const imageTensor = tensorflow.tidy(() => {
         return examples.xs
           .slice([i, 0], [1, examples.xs.shape[1]])
           .reshape([28, 28, 1]);
       }) as Tensor2D;
 
-      // load tensor data into image
+      const category = categories.find((el: Category) => {
+        return el.name === classes[i].toString();
+      });
+      let id;
+
+      if (!category) {
+        id = uuid.v4();
+        categories.push({
+          color: getRandomColor(),
+          id: id,
+          name: classes[i].toString(),
+          visible: true,
+        });
+      }
 
       const canvas = document.createElement("canvas");
       canvas.width = 28;
@@ -85,20 +104,6 @@ export const OpenExampleProjectMenuItem = ({
         components: 3,
         alpha: 1,
       });
-
-      const category = categories.find((el: Category) => {
-        return el.name === classes[i].toString();
-      });
-      let id;
-      if (!category) {
-        id = uuid.v4();
-        categories.push({
-          color: getRandomColor(),
-          id: id,
-          name: classes[i].toString(),
-          visible: true,
-        });
-      }
 
       //Make Image object from URI
       const image: Image = {
@@ -192,6 +197,7 @@ export const OpenExampleProjectMenuItem = ({
     };
 
     dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));
+    debugger;
   };
 
   return (
