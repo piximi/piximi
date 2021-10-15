@@ -21,9 +21,9 @@ export const fit = async (
   // await data.batch(8).forEachAsync((e: any) => console.log(e))
   // const n = await data.batch(8).iterator()
   // console.info(await n.next());
-  // debugger;
 
-  const status = await compiled.fitDataset(data.batch(8), args); //TODO replace 8 by options.batchSize
+  const status = await compiled.fitDataset(data.batch(512), args); //TODO replace 512 by options.batchSize
+  //TODO fitDataset() should be taking test_data_size, train_data_size, shuffle args, as arguments
 
   return { fitted: compiled, status: status };
 };

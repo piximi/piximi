@@ -46,7 +46,7 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
-    const numExamples = 500; //Eventually you might want to change this back to ~700 (better training)
+    const numExamples = 2000; //Eventually you might want to change this back to ~7000 (better training)
 
     //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTestBatch(numExamples);
@@ -139,7 +139,7 @@ export const OpenExampleProjectMenuItem = ({
     const mnistCompileOptions: CompileOptions = {
       learningRate: 0.001,
       lossFunction: LossFunction.CategoricalCrossEntropy,
-      metrics: [Metric.BinaryAccuracy],
+      metrics: [Metric.CategoricalAccuracy],
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     };
 
@@ -194,7 +194,6 @@ export const OpenExampleProjectMenuItem = ({
     };
 
     dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));
-    debugger;
   };
 
   return (

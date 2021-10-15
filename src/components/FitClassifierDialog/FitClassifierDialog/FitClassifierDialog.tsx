@@ -29,9 +29,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           console.info(epoch + ":" + logs.loss),
       })
     );
-
-    //this should be history = await train()
-    // console.info(history);
   };
 
   // specifies interface
