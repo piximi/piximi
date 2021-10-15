@@ -8,16 +8,18 @@ import {
   createdCategoriesSelector,
 } from "../../selectors";
 import { fitOptionsSelector } from "../../selectors";
+import { getMnistModel } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  const pathname =
-    "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+  // const pathname =
+  //     "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
 
-  const classes = yield select(createdCategoriesCountSelector);
+  // const classes = yield select(createdCategoriesCountSelector);
 
-  const opened = yield open(pathname, classes);
+  // const opened = yield open(pathname, classes);
+  const opened = yield getMnistModel();
 
   const compileOptions = yield select(compileOptionsSelector);
 
@@ -32,6 +34,7 @@ export function* fitSaga(action: any): any {
   const options = yield select(fitOptionsSelector);
 
   const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
+  debugger;
 
   const payload = { fitted: fitted, status: status };
 

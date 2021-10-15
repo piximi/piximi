@@ -18,7 +18,12 @@ export const fit = async (
     epochs: options.epochs,
   };
 
-  const status = await compiled.fitDataset(data.batch(options.batchSize), args);
+  // await data.batch(8).forEachAsync((e: any) => console.log(e))
+  // const n = await data.batch(8).iterator()
+  // console.info(await n.next());
+  // debugger;
+
+  const status = await compiled.fitDataset(data.batch(8), args); //TODO replace 8 by options.batchSize
 
   return { fitted: compiled, status: status };
 };

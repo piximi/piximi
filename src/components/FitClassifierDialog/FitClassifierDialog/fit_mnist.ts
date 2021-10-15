@@ -1,4 +1,4 @@
-import { getModel } from "./networks";
+import { getMnistModel } from "./networks";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { LossFunction } from "../../../types/LossFunction";
 import { Metric } from "../../../types/Metric";
@@ -11,7 +11,7 @@ import { Tensor2D } from "@tensorflow/tfjs";
 import { MnistData } from "../../../examples/mnist/data";
 
 export const train_mnist = async () => {
-  const mnistModel = getModel();
+  const mnistModel = getMnistModel();
 
   //TODO update fitting to True
 

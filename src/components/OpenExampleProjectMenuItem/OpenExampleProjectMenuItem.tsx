@@ -14,7 +14,7 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { getModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
+import { getMnistModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
 import { compile } from "../../store/coroutines/classifier/compile";
 import { categorizedImagesSelector } from "../../store/selectors";
 import { FitOptions } from "../../types/FitOptions";
@@ -106,6 +106,7 @@ export const OpenExampleProjectMenuItem = ({
         id: uuid.v4(),
         instances: [],
         name: "mnist",
+        shape: { r: 28, c: 28, channels: 1 },
         src: img.toDataURL("image/png", {
           useCanvas: true,
         }),
@@ -168,7 +169,7 @@ export const OpenExampleProjectMenuItem = ({
     ]);
 
     //get model
-    const mnistModel = getModel();
+    const mnistModel = getMnistModel();
 
     const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
 

@@ -13,18 +13,19 @@ export const decodeCategory = (categories: number) => {
 };
 
 export const decodeImage = async (item: {
-  xs: string;
+  xs: string; //dataURL
   ys: tensorflow.Tensor;
 }): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
   const fetched = await tensorflow.util.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
-  const data: ImageJS.Image = await ImageJS.Image.load(buffer);
+  let data: ImageJS.Image = await ImageJS.Image.load(buffer);
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  const xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas);
+  const xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, 1);
+  //TODO here I set numChannels to 1 for testing the mnist, but I should be providing actual number of channels as argument to decodeImage()
 
   return new Promise((resolve) => {
     return resolve({ ...item, xs: xs });
@@ -37,7 +38,7 @@ export const resize = async (item: {
 }): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
   const resized = tensorflow.image.resizeBilinear(
     item.xs as tensorflow.Tensor3D,
-    [224, 224]
+    [224, 224] //TODO this should be using the input shape parameter in State
   );
 
   return new Promise((resolve) => {
@@ -79,10 +80,12 @@ export const preprocess = async (
 ): Promise<
   tensorflow.data.Dataset<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }>
 > => {
-  return tensorflow.data
-    .generator(generator(images, categories))
-    .map(decodeCategory(categories.length))
-    .mapAsync(decodeImage)
-    .mapAsync(resize)
-    .shuffle(32);
+  return (
+    tensorflow.data
+      .generator(generator(images, categories))
+      .map(decodeCategory(categories.length))
+      .mapAsync(decodeImage)
+      // .mapAsync(resize) //TODO figure this out
+      .shuffle(32)
+  );
 };
