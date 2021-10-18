@@ -1,6 +1,6 @@
-import Typography from "@material-ui/core/Typography";
 import React from "react";
 import { useStyles } from "./Logo.css";
+import { Typography } from "@mui/material";
 
 export const Logo = () => {
   const classes = useStyles();

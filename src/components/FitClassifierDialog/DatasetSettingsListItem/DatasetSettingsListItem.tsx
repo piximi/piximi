@@ -14,7 +14,7 @@ import * as React from "react";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import { useState } from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { testPercentageSelector } from "../../../store/selectors/testPercentageSelector";
 import { trainingPercentageSelector } from "../../../store/selectors";

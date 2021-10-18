@@ -1,16 +1,18 @@
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import TextField from "@material-ui/core/TextField";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import Grid from "@material-ui/core/Grid";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "../Application/Application.css";
 import { Category } from "../../types/Category";
 import { updateCategory } from "../../store/slices";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+} from "@mui/material";
 
 type EditCategoryDialogProps = {
   category: Category;

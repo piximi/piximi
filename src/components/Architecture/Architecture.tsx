@@ -1,7 +1,5 @@
+import { Grid, MenuItem, TextField } from "@mui/material";
 import React from "react";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import MenuItem from "@material-ui/core/MenuItem";
 import { useSelector } from "react-redux";
 import { architectureOptionsSelector } from "../../store/selectors/architectureOptionsSelector";
 

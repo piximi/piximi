@@ -1,17 +1,12 @@
 import * as React from "react";
 import { useState } from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import {
-  Collapse,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
+import { createStyles, makeStyles } from "@mui/styles";
+import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: any) =>
   createStyles({
     expansionPanel: {
       boxShadow: "none",

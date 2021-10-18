@@ -1,22 +1,19 @@
-import Toolbar from "@material-ui/core/Toolbar";
 import React from "react";
-import { useStyles } from "./ApplicationToolbar.css";
 import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
 import { SearchInput } from "../SearchInput";
-import { Slider } from "@material-ui/core";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import ZoomInIcon from "@material-ui/icons/ZoomIn";
-import ZoomOutIcon from "@material-ui/icons/ZoomOut";
+import { useStyles } from "./ApplicationToolbar.css";
+import { Slider, Toolbar } from "@mui/material";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+
 export const ApplicationToolbar = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [value, setValue] = React.useState<number>(1);
-  const onChange = (
-    event: React.ChangeEvent<{}>,
-    newValue: number | number[]
-  ) => {
+  const onChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
       applicationSlice.actions.updateTileSize({

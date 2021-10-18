@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@mui/styles";
 import { Checkbox, FormControlLabel, Grid, TextField } from "@material-ui/core";
 import { rescaleOptionsSelector } from "../../../store/selectors/rescaleOptionsSelector";
 import { useDispatch, useSelector } from "react-redux";

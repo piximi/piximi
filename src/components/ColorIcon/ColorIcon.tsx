@@ -1,10 +1,9 @@
-import { Label } from "@material-ui/icons";
 import * as React from "react";
-import { Avatar, IconButton } from "@material-ui/core";
-import Popover from "@material-ui/core/Popover";
 import { CirclePicker, ColorResult } from "react-color";
 import { useStyles } from "../Application/Application.css";
 import { COLORS } from "../../store";
+import { Avatar, IconButton, Popover } from "@mui/material";
+import { Label } from "@mui/icons-material";
 
 type ColorIconButtonProps = {
   color: string;

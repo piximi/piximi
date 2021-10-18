@@ -1,12 +1,11 @@
-import Divider from "@material-ui/core/Divider";
 import { FileList } from "../FileList";
 import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
 import { SegmenterList } from "../SegmenterList";
 import { ApplicationList } from "../ApplicationList";
-import Drawer from "@material-ui/core/Drawer";
 import React from "react";
 import { useStyles } from "./ApplicationDrawer.css";
+import { Divider, Drawer } from "@mui/material";
 
 export const ApplicationDrawer = () => {
   const classes = useStyles();

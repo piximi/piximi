@@ -1,12 +1,9 @@
 import React from "react";
-import Menu from "@material-ui/core/Menu";
-import MenuList from "@material-ui/core/MenuList";
-import MenuItem from "@material-ui/core/MenuItem";
-import Divider from "@material-ui/core/Divider";
 import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
 import { classifierSelector, projectSelector } from "../../store/selectors";
 import { bindMenu } from "material-ui-popup-state";
+import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 
 type SaveMenuProps = {
   popupState: any;

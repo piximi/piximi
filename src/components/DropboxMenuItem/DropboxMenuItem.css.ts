@@ -1,5 +1,7 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+const theme = createTheme();
 export const useStyles = makeStyles((theme) => ({
   item: {
     maxWidth: 320,

@@ -1,20 +1,22 @@
-import IconButton from "@material-ui/core/IconButton";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import React from "react";
 import { Category } from "../../types/Category";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import { CategoryMenu } from "../CategoryMenu";
-import { Chip } from "@material-ui/core";
 import { useDialog, useMenu } from "../../hooks";
 import { useSelector } from "react-redux";
 import { EditCategoryDialog } from "../EditCategoryDialog";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { State } from "../../types/State";
 import { Image } from "../../types/Image";
 import { useStyles } from "../Application/Application.css";
+import {
+  Chip,
+  IconButton,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
+} from "@mui/material";
 
 type CategoryListItemProps = {
   category: Category;

@@ -1,6 +1,9 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-export const useStyles = makeStyles((theme) => ({
+const theme = createTheme();
+
+export const useStyles = makeStyles((theme: any) => ({
   alert: {
     width: theme.spacing(64),
   },

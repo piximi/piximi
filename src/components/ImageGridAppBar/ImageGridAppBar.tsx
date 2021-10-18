@@ -1,25 +1,28 @@
-import IconButton from "@material-ui/core/IconButton";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
-import GestureIcon from "@material-ui/icons/Gesture";
 import React from "react";
 import { useStyles } from "./ImageGridAppBar.css";
 import { useDispatch, useSelector } from "react-redux";
-// import { ImageDialog } from "../ImageDialog";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
-import { AppBar, Chip, Slide, Toolbar } from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
-import ViewComfyIcon from "@material-ui/icons/ViewComfy";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Typography from "@material-ui/core/Typography";
 import { applicationSlice } from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
-import Tooltip from "@material-ui/core/Tooltip";
-import * as _ from "underscore";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  AppBar,
+  Chip,
+  IconButton,
+  Slide,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import ViewComfyIcon from "@mui/icons-material/ViewComfy";
+import GestureIcon from "@mui/icons-material/Gesture";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
