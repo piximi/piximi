@@ -28,7 +28,7 @@ export const decodeImage = async (item: {
   //TODO here I set numChannels to 1 for testing the mnist, but I should be providing actual number of channels as argument to decodeImage()
 
   return new Promise((resolve) => {
-    return resolve({ ...item, xs: xs });
+    return resolve({ ...item, xs: xs.div(255) }); //TODO Here we should use preprocessing options determined by user
   });
 };
 

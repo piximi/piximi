@@ -46,10 +46,10 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
-    const numExamples = 2000; //Eventually you might want to change this back to ~7000 (better training)
+    const numExamples = 5000; //Eventually you might want to change this back to ~7000 (better training)
 
     //those are the examples we'll show to the user (as to not load all data)
-    const examples = data.nextTestBatch(numExamples);
+    const examples = data.nextTrainBatch(numExamples);
 
     if (!examples) return;
 
@@ -129,7 +129,7 @@ export const OpenExampleProjectMenuItem = ({
 
     const mnistFitOptions: FitOptions = {
       batchSize: 512,
-      epochs: 5,
+      epochs: 10,
       initialEpoch: 0,
       test_data_size: 1000, //TODO experiment with 10000
       train_data_size: 6500, //TODO experiment with 55000
