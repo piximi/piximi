@@ -1,8 +1,8 @@
 import { makeStyles } from "@mui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Theme } from "@mui/material";
 
-const theme = createTheme();
-export const useStyles = makeStyles((theme: any) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   grow: {
     flexGrow: 1,
   },

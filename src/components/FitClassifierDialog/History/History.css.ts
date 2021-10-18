@@ -1,6 +1,7 @@
 import { createStyles, makeStyles } from "@mui/styles";
+import { Theme } from "@mui/material";
 
-export const useStyles = makeStyles((theme: any) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   typography: {
     color: "rgba(0, 0, 0, 0.54)",
     padding: 0,

@@ -1,8 +1,8 @@
 import { makeStyles } from "@mui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-const theme = createTheme();
-export const useStyles = makeStyles((theme) => ({
+import { Theme } from "@mui/material";
+export const useStyles = makeStyles((theme: Theme) => ({
   item: {
     maxWidth: 320,
   },

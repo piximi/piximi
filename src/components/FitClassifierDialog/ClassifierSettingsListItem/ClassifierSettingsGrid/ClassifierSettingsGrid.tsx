@@ -1,4 +1,4 @@
-import { Grid, MenuItem, TextField } from "@mui/material";
+import { Grid, MenuItem, TextField, Theme } from "@mui/material";
 import * as _ from "lodash";
 import * as React from "react";
 import { createStyles, makeStyles } from "@mui/styles";
@@ -32,7 +32,7 @@ const lossFunctions = {
   categoricalCrossentropy: "Categorical cross entropy",
 };
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       width: "100%",

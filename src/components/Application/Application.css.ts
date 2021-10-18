@@ -1,6 +1,7 @@
 import { makeStyles } from "@mui/styles";
+import { Theme } from "@mui/material";
 
-export const useStyles = makeStyles((theme: any) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   alert: {
     width: theme.spacing(64),
   },

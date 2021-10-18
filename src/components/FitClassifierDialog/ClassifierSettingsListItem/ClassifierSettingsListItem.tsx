@@ -2,11 +2,17 @@ import * as React from "react";
 import { useState } from "react";
 import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  Collapse,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Theme,
+} from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     expansionPanel: {
       boxShadow: "none",

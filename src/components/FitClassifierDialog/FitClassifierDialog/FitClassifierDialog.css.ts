@@ -1,10 +1,10 @@
 import { makeStyles } from "@mui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-const theme = createTheme();
+import { Theme } from "@mui/material";
 const drawerWidth = 280;
 
-export const useStyles = makeStyles((theme: any) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   content: {
     flexGrow: 0,
     transition: theme.transitions.create("margin", {

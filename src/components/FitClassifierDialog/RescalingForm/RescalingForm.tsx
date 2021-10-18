@@ -1,11 +1,17 @@
 import * as React from "react";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Theme,
+} from "@mui/material";
 import { rescaleOptionsSelector } from "../../../store/selectors/rescaleOptionsSelector";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     expansionPanel: {
       boxShadow: "none",

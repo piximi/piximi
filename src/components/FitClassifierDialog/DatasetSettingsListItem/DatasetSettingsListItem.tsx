@@ -14,11 +14,12 @@ import {
   ListItemIcon,
   ListItemText,
   TextField,
+  Theme,
   Tooltip,
   Typography,
 } from "@mui/material";
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     textField: {
       // marginLeft: theme.spacing(1),
