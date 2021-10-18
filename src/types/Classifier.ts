@@ -11,6 +11,7 @@ import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 import { FitOptions } from "./FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
+import { RescaleOptions } from "./RescaleOptions";
 
 export type Classifier = {
   compiled?: LayersModel;
@@ -45,6 +46,7 @@ export type Classifier = {
   optimizationAlgorithm: OptimizationAlgorithm;
   predicting: boolean;
   predictions?: Tensor;
+  rescaleOptions: RescaleOptions;
   saving: boolean;
   trainingPercentage: number;
   validationData?:

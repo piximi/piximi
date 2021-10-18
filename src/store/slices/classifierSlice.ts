@@ -10,6 +10,7 @@ import { Image } from "../../types/Image";
 import { Category } from "../../types/Category";
 import { Shape } from "../../types/Shape";
 import { ArchitectureOptions } from "../../types/ArchitectureOptions";
+import { RescaleOptions } from "../../types/RescaleOptions";
 
 const initialState: Classifier = {
   compiling: false,
@@ -37,6 +38,10 @@ const initialState: Classifier = {
   opening: false,
   optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
   predicting: false,
+  rescaleOptions: {
+    rescale: false,
+    rescaleMinMax: { min: 0, max: 1 },
+  },
   saving: false,
   trainingPercentage: 0.5,
   validationLossHistory: [],
@@ -213,6 +218,12 @@ export const classifierSlice = createSlice({
       state.data = data;
 
       state.preprocessing = false;
+    },
+    updateRescaleOptions(
+      state,
+      action: PayloadAction<{ rescaleOptions: RescaleOptions }>
+    ) {
+      state.rescaleOptions = action.payload.rescaleOptions;
     },
     updateTrainingPercentage(
       state,
