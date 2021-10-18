@@ -1,6 +1,12 @@
 import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Grid, MenuItem, TextField } from "@material-ui/core";
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  MenuItem,
+  TextField,
+} from "@material-ui/core";
 import * as _ from "lodash";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -82,14 +88,36 @@ export const RescalingForm = (props: FormProps) => {
 
   const classes = useStyles({});
 
+  const [disabled, setDisabled] = React.useState<boolean>(true);
+  const [checked, setChecked] = React.useState<boolean>(false);
+
+  const onCheckboxChange = () => {
+    setDisabled(!disabled);
+    setChecked(!checked);
+  };
+
   return (
     <form className={classes.container} noValidate autoComplete="off">
       <Grid container spacing={2}>
         <Grid item xs={2}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked}
+                onChange={onCheckboxChange}
+                name="rescale"
+                color="primary"
+              />
+            }
+            label="Rescale pixels?"
+          />
+        </Grid>
+        <Grid item xs={2}>
           <TextField
-            id="lower-percentile"
-            label="Lower Percentile"
+            id="minimum"
+            label="Minimum pixel value"
             className={classes.textField}
+            disabled={disabled}
             value={lowerPercentile}
             onChange={onLowerPercentileChange}
             type="number"
@@ -100,9 +128,10 @@ export const RescalingForm = (props: FormProps) => {
 
         <Grid item xs={2}>
           <TextField
-            id="upper-percentile"
-            label="Upper Percentile"
+            id="maximum"
+            label="Maximum pixel value"
             className={classes.textField}
+            disabled={disabled}
             value={upperPercentile}
             onChange={onUpperPercentileChange}
             margin="normal"
