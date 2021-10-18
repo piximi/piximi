@@ -2,7 +2,7 @@ import * as React from "react";
 import { makeStyles } from "@mui/material";
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
 import { Grid, Typography } from "@mui/material";
-import { styles } from "./History.css";
+import { useStyles } from "./History.css";
 
 type Data = { x: Number; y: Number }[];
 
@@ -14,8 +14,6 @@ type HistoryProps = {
   validationAccuracyData: Data;
 };
 
-const useStyles = makeStyles(styles);
-
 export const History = (props: HistoryProps) => {
   const {
     status,
@@ -25,7 +23,7 @@ export const History = (props: HistoryProps) => {
     validationAccuracyData,
   } = props;
 
-  const classes = useStyles({});
+  const classes = useStyles();
 
   return (
     <Grid container spacing={2}>

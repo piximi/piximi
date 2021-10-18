@@ -36,7 +36,6 @@ export const ImageCategoryMenu = ({
         horizontal: "center",
         vertical: "bottom",
       }}
-      getContentAnchorEl={null}
       transformOrigin={{
         horizontal: "center",
         vertical: "top",

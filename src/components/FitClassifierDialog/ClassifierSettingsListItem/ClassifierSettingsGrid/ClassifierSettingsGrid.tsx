@@ -1,7 +1,7 @@
 import { Grid, MenuItem, TextField } from "@mui/material";
 import * as _ from "lodash";
 import * as React from "react";
-import { createStyles, makeStyles, Theme } from "@mui/styles";
+import { createStyles, makeStyles } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
@@ -32,7 +32,7 @@ const lossFunctions = {
   categoricalCrossentropy: "Categorical cross entropy",
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: any) =>
   createStyles({
     container: {
       width: "100%",

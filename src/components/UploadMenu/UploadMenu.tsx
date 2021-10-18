@@ -72,7 +72,6 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         TransitionComponent={Fade}
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        getContentAnchorEl={null}
         onClose={onClose}
         open={Boolean(anchorEl)}
         transformOrigin={{ vertical: "top", horizontal: "center" }}

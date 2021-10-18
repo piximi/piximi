@@ -128,7 +128,6 @@ export const PredictSegmenterDialog = (
   return (
     // @ts-ignore
     <Dialog
-      disableBackdropClick
       disableEscapeKeyDown
       fullScreen
       onClose={closeDialog}
