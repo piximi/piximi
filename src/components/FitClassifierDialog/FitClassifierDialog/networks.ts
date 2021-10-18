@@ -4,7 +4,8 @@ import * as tensorflow from "@tensorflow/tfjs";
  * Creates convolutional neural network for mnist classification problem
  * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
  */
-export const getModel = () => {
+export const getMnistModel = () => {
+  //TODO this should take an argument, num_classes, which will be provided when being called from fit_Saga
   const model = tensorflow.sequential();
 
   const IMAGE_WIDTH = 28;
@@ -61,15 +62,6 @@ export const getModel = () => {
       activation: "softmax",
     })
   );
-
-  // Choose an optimizer, loss function and accuracy metric,
-  // then compile and return the model
-  const optimizer = tensorflow.train.adam();
-  model.compile({
-    optimizer: optimizer,
-    loss: "categoricalCrossentropy",
-    metrics: ["accuracy"],
-  });
 
   return model;
 };

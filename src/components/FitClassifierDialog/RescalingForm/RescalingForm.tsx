@@ -1,7 +1,9 @@
 import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Grid, MenuItem, TextField } from "@material-ui/core";
-import * as _ from "lodash";
+import { Checkbox, FormControlLabel, Grid, TextField } from "@material-ui/core";
+import { rescaleOptionsSelector } from "../../../store/selectors/rescaleOptionsSelector";
+import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "../../../store/slices";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,37 +63,77 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type FormProps = {
-  lowerPercentile: number;
-  closeDialog: () => void;
-  upperPercentile: number;
-  onLowerPercentileChange: (event: React.FormEvent<EventTarget>) => void;
-  onUpperPercentileChange: (event: React.FormEvent<EventTarget>) => void;
-  openedDialog: boolean;
-};
-
-export const RescalingForm = (props: FormProps) => {
-  const {
-    lowerPercentile,
-    closeDialog,
-    upperPercentile,
-    onLowerPercentileChange,
-    onUpperPercentileChange,
-    openedDialog,
-  } = props;
-
+export const RescalingForm = () => {
   const classes = useStyles({});
+
+  const rescaleOptions = useSelector(rescaleOptionsSelector);
+  const dispatch = useDispatch();
+
+  const [disabled, setDisabled] = React.useState<boolean>(
+    !rescaleOptions.rescale
+  );
+
+  const onCheckboxChange = () => {
+    setDisabled(!disabled);
+    dispatch(
+      classifierSlice.actions.updateRescaleOptions({
+        rescaleOptions: { ...rescaleOptions, rescale: !rescaleOptions.rescale },
+      })
+    );
+  };
+
+  const onMaxChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    var value = Number(target.value);
+    if (!value) return;
+    dispatch(
+      classifierSlice.actions.updateRescaleOptions({
+        rescaleOptions: {
+          ...rescaleOptions,
+          rescaleMinMax: { ...rescaleOptions.rescaleMinMax, max: value },
+        },
+      })
+    );
+  };
+
+  const onMinChange = (event: React.FormEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    var value = Number(target.value);
+    if (!value) return;
+    dispatch(
+      classifierSlice.actions.updateRescaleOptions({
+        rescaleOptions: {
+          ...rescaleOptions,
+          rescaleMinMax: { ...rescaleOptions.rescaleMinMax, min: value },
+        },
+      })
+    );
+  };
 
   return (
     <form className={classes.container} noValidate autoComplete="off">
       <Grid container spacing={2}>
         <Grid item xs={2}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={rescaleOptions.rescale}
+                onChange={onCheckboxChange}
+                name="rescale"
+                color="primary"
+              />
+            }
+            label="Rescale pixels?"
+          />
+        </Grid>
+        <Grid item xs={2}>
           <TextField
-            id="lower-percentile"
-            label="Lower Percentile"
+            id="minimum"
+            label="Minimum pixel value"
             className={classes.textField}
-            value={lowerPercentile}
-            onChange={onLowerPercentileChange}
+            disabled={disabled}
+            value={rescaleOptions.rescaleMinMax.min}
+            onChange={onMinChange}
             type="number"
             margin="normal"
             defaultValue="0"
@@ -100,11 +142,12 @@ export const RescalingForm = (props: FormProps) => {
 
         <Grid item xs={2}>
           <TextField
-            id="upper-percentile"
-            label="Upper Percentile"
+            id="maximum"
+            label="Maximum pixel value"
             className={classes.textField}
-            value={upperPercentile}
-            onChange={onUpperPercentileChange}
+            disabled={disabled}
+            value={rescaleOptions.rescaleMinMax.max}
+            onChange={onMaxChange}
             margin="normal"
             type="number"
             defaultValue="100"

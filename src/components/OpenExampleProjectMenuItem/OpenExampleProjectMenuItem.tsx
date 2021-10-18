@@ -14,7 +14,7 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { getModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
+import { getMnistModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
 import { compile } from "../../store/coroutines/classifier/compile";
 import { categorizedImagesSelector } from "../../store/selectors";
 import { FitOptions } from "../../types/FitOptions";
@@ -46,12 +46,12 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
+    const numExamples = 5000; //Eventually you might want to change this back to ~7000 (better training)
+
     //those are the examples we'll show to the user (as to not load all data)
-    const examples = data.nextTestBatch(100);
+    const examples = data.nextTrainBatch(numExamples);
 
     if (!examples) return;
-
-    const numExamples = examples.xs.shape[0];
 
     const classes = examples.labels.argMax(-1).dataSync(); // gives array of labels for each example in batch
 
@@ -67,13 +67,29 @@ export const OpenExampleProjectMenuItem = ({
 
     // Create a canvas element to render each example
     for (let i = 0; i < numExamples; i++) {
+      if (i % 500 === 0) {
+        console.info(`Processing image #${i} out of ${numExamples} images`);
+      }
       const imageTensor = tensorflow.tidy(() => {
         return examples.xs
           .slice([i, 0], [1, examples.xs.shape[1]])
           .reshape([28, 28, 1]);
       }) as Tensor2D;
 
-      // load tensor data into image
+      const category = categories.find((el: Category) => {
+        return el.name === classes[i].toString();
+      });
+      let id;
+
+      if (!category) {
+        id = uuid.v4();
+        categories.push({
+          color: getRandomColor(),
+          id: id,
+          name: classes[i].toString(),
+          visible: true,
+        });
+      }
 
       const canvas = document.createElement("canvas");
       canvas.width = 28;
@@ -86,26 +102,13 @@ export const OpenExampleProjectMenuItem = ({
         alpha: 1,
       });
 
-      const category = categories.find((el: Category) => {
-        return el.name === classes[i].toString();
-      });
-      let id;
-      if (!category) {
-        id = uuid.v4();
-        categories.push({
-          color: getRandomColor(),
-          id: id,
-          name: classes[i].toString(),
-          visible: true,
-        });
-      }
-
       //Make Image object from URI
       const image: Image = {
         categoryId: category ? category.id : id,
         id: uuid.v4(),
         instances: [],
         name: "mnist",
+        shape: { r: 28, c: 28, channels: 1 },
         src: img.toDataURL("image/png", {
           useCanvas: true,
         }),
@@ -126,7 +129,7 @@ export const OpenExampleProjectMenuItem = ({
 
     const mnistFitOptions: FitOptions = {
       batchSize: 512,
-      epochs: 5,
+      epochs: 10,
       initialEpoch: 0,
       test_data_size: 1000, //TODO experiment with 10000
       train_data_size: 6500, //TODO experiment with 55000
@@ -136,7 +139,7 @@ export const OpenExampleProjectMenuItem = ({
     const mnistCompileOptions: CompileOptions = {
       learningRate: 0.001,
       lossFunction: LossFunction.CategoricalCrossEntropy,
-      metrics: [Metric.BinaryAccuracy],
+      metrics: [Metric.CategoricalAccuracy],
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     };
 
@@ -168,7 +171,7 @@ export const OpenExampleProjectMenuItem = ({
     ]);
 
     //get model
-    const mnistModel = getModel();
+    const mnistModel = getMnistModel();
 
     const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
 

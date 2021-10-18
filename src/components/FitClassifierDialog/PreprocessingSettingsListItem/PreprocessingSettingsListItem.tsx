@@ -56,6 +56,7 @@ export const PreprocessingSettingsListItem = ({
     labeledData: ImageType[]
   ) => {
     //does actual preprocessing upon clicking button
+    //TODO implement this (when clicking, we should be doing the preprocessing in the background) -- set it to processed so that it's not re-done in the Saga
     // Skeleton
     const rescaledSet = await rescaleData(
       lowerPercentile,
@@ -76,20 +77,6 @@ export const PreprocessingSettingsListItem = ({
     setDataAugmentation(!dataAugmentation);
   };
 
-  const [lowerPercentile, setLowerPercentile] = React.useState<number>(0);
-  const onLowerPercentileChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    setLowerPercentile(value);
-  };
-
-  const [upperPercentile, setUpperPercentile] = React.useState<number>(1);
-  const onUpperPercentileChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    setUpperPercentile(value);
-  };
-
   return (
     <>
       <ListItem
@@ -108,14 +95,7 @@ export const PreprocessingSettingsListItem = ({
           Pixel Intensity Rescaling
         </Typography>
 
-        <RescalingForm
-          onLowerPercentileChange={onLowerPercentileChange}
-          onUpperPercentileChange={onUpperPercentileChange}
-          lowerPercentile={lowerPercentile}
-          upperPercentile={upperPercentile}
-          closeDialog={closeDialog}
-          openedDialog={openedDialog}
-        />
+        <RescalingForm />
 
         <Typography id="augmentation" gutterBottom>
           Data Augmentation

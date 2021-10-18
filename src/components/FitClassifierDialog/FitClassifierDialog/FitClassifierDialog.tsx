@@ -23,10 +23,16 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const onFit = async () => {
     // const history = await train_mnist();
-    dispatch(classifierSlice.actions.fit({ onEpochEnd: 4 }));
-
-    //this should be history = await train()
-    // console.info(history);
+    dispatch(
+      classifierSlice.actions.fit({
+        onEpochEnd: (epoch: number, logs: any) => {
+          //TODO here map over options.metrics and log each of those (in addition to logs.loss)
+          //Your logs should contain all specified options.metric
+          console.info(logs);
+          console.info(epoch + ":" + logs.loss);
+        },
+      })
+    );
   };
 
   // specifies interface
