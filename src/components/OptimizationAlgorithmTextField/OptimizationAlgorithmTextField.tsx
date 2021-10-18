@@ -1,6 +1,6 @@
 import React from "react";
-import MenuItem from "@material-ui/core/MenuItem";
-import TextField from "@material-ui/core/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 import { useDispatch, useSelector } from "react-redux";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import { classifierSlice } from "../../store/slices";

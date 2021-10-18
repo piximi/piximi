@@ -1,8 +1,8 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../store/slices";
 import { compileOptionsSelector } from "../../store/selectors";
+import { TextField } from "@mui/material";
 
 export const LearningRateTextField = () => {
   const dispatch = useDispatch();

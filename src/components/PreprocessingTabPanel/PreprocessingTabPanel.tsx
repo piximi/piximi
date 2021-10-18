@@ -1,5 +1,5 @@
 import React from "react";
-import TabPanel from "@material-ui/lab/TabPanel";
+import { TabPanel } from "@mui/lab";
 
 export const PreprocessingTabPanel = () => {
   return <TabPanel value="preprocessing"></TabPanel>;

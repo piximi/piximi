@@ -1,12 +1,8 @@
 import React from "react";
-import Menu from "@material-ui/core/Menu";
-import MenuList from "@material-ui/core/MenuList";
-import Divider from "@material-ui/core/Divider";
 import { Category } from "../../types/Category";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
+import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -46,7 +42,6 @@ export const CategoryMenu = ({
     <Menu
       anchorEl={anchorElCategoryMenu}
       anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-      getContentAnchorEl={null}
       onClose={onCloseCategoryMenu}
       open={openCategoryMenu}
       transformOrigin={{ horizontal: "center", vertical: "top" }}

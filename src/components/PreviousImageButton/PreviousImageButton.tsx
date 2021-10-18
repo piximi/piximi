@@ -1,6 +1,6 @@
 import React from "react";
-import IconButton from "@material-ui/core/IconButton";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { IconButton } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export const PreviousImageButton = () => {
   const onClick = () => {};

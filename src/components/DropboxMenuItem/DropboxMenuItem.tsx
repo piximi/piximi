@@ -1,12 +1,9 @@
 import React from "react";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ComputerIcon from "@material-ui/icons/Computer";
-import ListItemText from "@material-ui/core/ListItemText";
 import { useStyles } from "./DropboxMenuItem.css";
 import useDropboxChooser from "use-dropbox-chooser";
-import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
+import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
+import ComputerIcon from "@mui/icons-material/Computer";
 
 type DropboxMenuItemProps = {
   onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { makeStyles } from "@mui/material";
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, Typography } from "@mui/material";
 import { styles } from "./History.css";
 
 type Data = { x: Number; y: Number }[];

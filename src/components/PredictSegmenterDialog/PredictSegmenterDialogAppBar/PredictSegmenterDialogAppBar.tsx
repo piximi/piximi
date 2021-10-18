@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowBack, PlayCircleOutline } from "@material-ui/icons";
+import { ArrowBack, PlayCircleOutline } from "@mui/icons-material";
 import { useStyles } from "./PredictSegmentorDialogAppBar.css";
-import { AppBar, IconButton, Toolbar, Tooltip } from "@material-ui/core";
+import { AppBar, IconButton, Toolbar, Tooltip } from "@mui/material";
 
 type DialogAppBarProps = {
   closeDialog: () => void;
@@ -11,7 +11,7 @@ type DialogAppBarProps = {
 export const PredictSegmenterDialogAppBar = (props: DialogAppBarProps) => {
   const { closeDialog, evaluate } = props;
 
-  const classes = useStyles({});
+  const classes = useStyles();
 
   return (
     <AppBar className={classes.appBar}>

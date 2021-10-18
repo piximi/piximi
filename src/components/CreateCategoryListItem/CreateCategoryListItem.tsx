@@ -1,10 +1,8 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import AddIcon from "@material-ui/icons/Add";
 import React from "react";
 import { CreateCategoryDialog } from "../CreateCategoryDialog";
 import { useDialog } from "../../hooks";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 export const CreateCategoryListItem = () => {
   const { onClose, onOpen, open } = useDialog();

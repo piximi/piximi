@@ -7,8 +7,8 @@ import {
   Menu,
   MenuItem,
   MenuList,
-} from "@material-ui/core";
-import FolderOpenIcon from "@material-ui/icons/FolderOpen";
+} from "@mui/material";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { useDialog } from "../../hooks";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";

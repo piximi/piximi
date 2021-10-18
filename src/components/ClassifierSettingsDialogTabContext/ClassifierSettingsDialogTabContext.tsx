@@ -1,10 +1,9 @@
 import React from "react";
-import Tab from "@material-ui/core/Tab";
-import TabContext from "@material-ui/lab/TabContext";
-import TabList from "@material-ui/lab/TabList";
 import { PreprocessingTabPanel } from "../PreprocessingTabPanel";
 import { ArchitectureTabPanel } from "../ArchitectureTabPanel";
 import { TrainingTabPanel } from "../TrainingTabPanel";
+import { TabContext, TabList } from "@mui/lab";
+import { Tab } from "@mui/material";
 
 export const ClassifierSettingsDialogTabContext = () => {
   const [value, setValue] = React.useState<string>("preprocessing");

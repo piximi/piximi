@@ -1,7 +1,7 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import AddIcon from "@material-ui/icons/Add";
-import ListItemText from "@material-ui/core/ListItemText";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import AddIcon from "@mui/icons-material/Add";
+import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { NewClassifierDialog } from "../NewClassifierDialog";
 import { useDialog } from "../../hooks";
