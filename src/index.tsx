@@ -11,8 +11,7 @@ const theme = createTheme();
 
 ReactDOM.render(
   <Provider store={productionStore}>
-    {/*
- // @ts-ignore */}
+    {/*// @ts-ignore */}
     <ThemeProvider theme={theme}>
       <Application />
     </ThemeProvider>
