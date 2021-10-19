@@ -6,6 +6,7 @@ import { productionStore } from "./store/stores";
 import { Application } from "./components/Application";
 import { ThemeProvider } from "@mui/styles";
 import { createTheme } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
@@ -13,7 +14,9 @@ ReactDOM.render(
   <Provider store={productionStore}>
     {/*// @ts-ignore */}
     <ThemeProvider theme={theme}>
-      <Application />
+      <StyledEngineProvider injectFirst>
+        <Application />
+      </StyledEngineProvider>
     </ThemeProvider>
   </Provider>,
   document.getElementById("root")
