@@ -1,14 +1,16 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import LabelImportantIcon from "@material-ui/icons/LabelImportant";
-import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
-import List from "@material-ui/core/List";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Collapse from "@material-ui/core/Collapse";
 import { FitClassifierListItem } from "../FitClassifierListItem";
 import { EvaluateClassifierListItem } from "../EvaluateClassifierListItem";
+import {
+  Collapse,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(false);

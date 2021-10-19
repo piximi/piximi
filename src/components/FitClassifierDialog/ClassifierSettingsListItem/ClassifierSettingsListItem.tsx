@@ -1,15 +1,16 @@
 import * as React from "react";
 import { useState } from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
+import { createStyles, makeStyles } from "@mui/styles";
 import {
   Collapse,
   ListItem,
   ListItemIcon,
   ListItemText,
-} from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
+  Theme,
+} from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ClassifierSettingsListItem = ({}) => {
+export const ClassifierSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 

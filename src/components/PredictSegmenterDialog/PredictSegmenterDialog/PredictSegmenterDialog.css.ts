@@ -1,8 +1,9 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
+import { Theme } from "@mui/material";
 
 const drawerWidth = 280;
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   container: {
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),

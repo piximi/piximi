@@ -1,12 +1,11 @@
 import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import { useStyles } from "../Application/Application.css";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import { Box, Button } from "@material-ui/core";
-import { train_mnist } from "../FitClassifierDialog/FitClassifierDialog/fit_mnist";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { Button } from "@mui/material";
 
 type SegmenterSettingsDialogAppBarProps = {
   onClose: () => void;

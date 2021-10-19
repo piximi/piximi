@@ -1,14 +1,13 @@
-import { Grid, MenuItem, TextField } from "@material-ui/core";
+import { Grid, MenuItem, TextField, Theme } from "@mui/material";
 import * as _ from "lodash";
 import * as React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
-import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 
 const optimizationAlgorithms = {
@@ -99,7 +98,7 @@ export const ClassifierSettingsGrid = () => {
   };
 
   const learningRate = useSelector(learningRateSelector);
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
+  // const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
 
   const onOptimizationAlgorithmChange = (
     event: React.FormEvent<EventTarget>

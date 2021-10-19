@@ -1,8 +1,6 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import React from "react";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 
 export const FitSegmenterListItem = () => {
   const onFitClick = () => {};

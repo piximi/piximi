@@ -1,5 +1,5 @@
 import React from "react";
-import Dialog from "@material-ui/core/Dialog";
+import Dialog from "@mui/material/Dialog";
 import { ClassifierSettingsDialogContent } from "../ClassifierSettingsDialogContent";
 import { SegmenterSettingsDialogAppBar } from "../SegmenterSettingsDialogAppBar";
 

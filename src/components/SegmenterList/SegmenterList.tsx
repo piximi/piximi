@@ -1,19 +1,22 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
-import List from "@material-ui/core/List";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Collapse from "@material-ui/core/Collapse";
-import IconButton from "@material-ui/core/IconButton";
-import SettingsIcon from "@material-ui/icons/Settings";
 import { SegmenterSettingsDialog } from "../SegmenterSettingsDialog";
-import Tooltip from "@material-ui/core/Tooltip";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { FitSegmenterListItem } from "../FitSegmenterListItem";
 import { EvaluateSegmenterListItem } from "../EvaluateSegmenterListItem";
 import { PredictSegmenterListItem } from "../PredictSegmenterListItem";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+import {
+  Collapse,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
 
 export const SegmenterList = () => {
   const [collapsed, setCollapsed] = React.useState(false);

@@ -1,8 +1,8 @@
-import List from "@material-ui/core/List";
 import React from "react";
 import { SettingsListItem } from "../SettingsListItem";
 import { HelpListItem } from "../HelpListItem";
 import { SendFeedbackListItem } from "../SendFeedbackListItem";
+import { List } from "@mui/material";
 
 export const ApplicationList = () => {
   return (

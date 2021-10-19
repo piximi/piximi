@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 export const useMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

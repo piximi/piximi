@@ -1,10 +1,8 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import SettingsIcon from "@material-ui/icons/Settings";
-import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
 import { SettingsDialog } from "../SettingsDialog";
 import { useDialog } from "../../hooks";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialog();

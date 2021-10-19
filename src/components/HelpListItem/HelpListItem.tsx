@@ -1,8 +1,6 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import HelpIcon from "@material-ui/icons/Help";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import React from "react";
+import HelpIcon from "@mui/icons-material/Help";
 
 export const HelpListItem = () => {
   return (

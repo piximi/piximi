@@ -1,3 +1,6 @@
+import { RescalingForm } from "../RescalingForm/RescalingForm";
+import * as React from "react";
+import { useState } from "react";
 import {
   Button,
   Checkbox,
@@ -8,19 +11,10 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-} from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Typography from "@material-ui/core/Typography";
-import { RescalingForm } from "../RescalingForm/RescalingForm";
-import * as React from "react";
-import { Image as ImageType } from "../../../types/Image";
-import {
-  augmentData,
-  rescaleData,
-  resizeData,
-} from "../FitClassifierDialog/preprocessing";
-import { useState } from "react";
+  Typography,
+} from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 type PreprocessingSettingsListItemProps = {
   closeDialog: () => void;
@@ -39,43 +33,44 @@ export const PreprocessingSettingsListItem = ({
     setCollapsedPreprocessingList(!collapsedPreprocessingList);
   };
 
-  // Preprocessing clicks
-  const [paddingOption1, setPaddingOption1] = React.useState<boolean>(false);
-  const onPaddingOption1Click = () => {
-    setPaddingOption1(!paddingOption1);
-  };
+  // // Preprocessing clicks
+  // const [paddingOption1, setPaddingOption1] = React.useState<boolean>(false);
+  // const onPaddingOption1Click = () => {
+  //   setPaddingOption1(!paddingOption1);
+  // };
+  //
+  // const [paddingOption2, setPaddingOption2] = React.useState<boolean>(false);
+  // const onpaddingOption2Click = () => {
+  //   setPaddingOption2(!paddingOption2);
+  // };
 
-  const [paddingOption2, setPaddingOption2] = React.useState<boolean>(false);
-  const onpaddingOption2Click = () => {
-    setPaddingOption2(!paddingOption2);
-  };
-
-  const onPreprocessingClick = async (
-    lowerPercentile: number,
-    upperPercentile: number,
-    labeledData: ImageType[]
-  ) => {
-    //does actual preprocessing upon clicking button
-    //TODO implement this (when clicking, we should be doing the preprocessing in the background) -- set it to processed so that it's not re-done in the Saga
-    // Skeleton
-    const rescaledSet = await rescaleData(
-      lowerPercentile,
-      upperPercentile,
-      labeledData
-    );
-    const resizedSet = await resizeData(
-      paddingOption1,
-      paddingOption2,
-      labeledData
-    );
-    const augmentedSet = await augmentData(dataAugmentation, labeledData);
-  };
-
-  const [dataAugmentation, setDataAugmentation] =
-    React.useState<boolean>(false);
-  const onDataAugmentationClick = () => {
-    setDataAugmentation(!dataAugmentation);
-  };
+  //TODO implement this (when clicking, we should be doing the preprocessing in the background) -- set it to processed so that it's not re-done in the Saga
+  // Skeleton
+  // const onPreprocessingClick = async (
+  //   lowerPercentile: number,
+  //   upperPercentile: number,
+  //   labeledData: ImageType[]
+  // ) => {
+  //   //does actual preprocessing upon clicking button
+  //
+  //   const rescaledSet = await rescaleData(
+  //     lowerPercentile,
+  //     upperPercentile,
+  //     labeledData
+  //   );
+  //   const resizedSet = await resizeData(
+  //     paddingOption1,
+  //     paddingOption2,
+  //     labeledData
+  //   );
+  //   const augmentedSet = await augmentData(dataAugmentation, labeledData);
+  // };
+  //
+  // const [dataAugmentation, setDataAugmentation] =
+  //   React.useState<boolean>(false);
+  // const onDataAugmentationClick = () => {
+  //   setDataAugmentation(!dataAugmentation);
+  // };
 
   return (
     <>

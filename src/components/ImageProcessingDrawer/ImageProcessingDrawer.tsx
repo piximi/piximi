@@ -1,12 +1,14 @@
-import Drawer from "@material-ui/core/Drawer";
-import Divider from "@material-ui/core/Divider";
 import React, { ReactElement } from "react";
-import { VolumeUp } from "@material-ui/icons";
 import { useStyles } from "./ImageProcessingDrawer.css";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import { Slider } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
+import {
+  Divider,
+  Drawer,
+  Grid,
+  Input,
+  Slider,
+  Typography,
+} from "@mui/material";
+import { VolumeUp } from "@mui/icons-material";
 
 type SliderWithInputFieldProps = {
   icon: ReactElement;

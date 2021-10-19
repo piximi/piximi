@@ -1,6 +1,3 @@
-import Container from "@material-ui/core/Container";
-import ImageList from "@material-ui/core/ImageList";
-import ImageListItem from "@material-ui/core/ImageListItem";
 import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "../../types/Image";
@@ -13,6 +10,7 @@ import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
 import { ImageGridAppBar } from "../ImageGridAppBar";
 import { Category } from "../../types/Category";
+import { Container, ImageList, ImageListItem } from "@mui/material";
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
@@ -65,7 +63,7 @@ export const ImageGrid = () => {
           <ImageList
             className={classes.gridList}
             cols={Math.floor(4 / scaleFactor)}
-            cellHeight="auto"
+            rowHeight={"auto"}
           >
             {images.slice(0, max_images).map(
               (

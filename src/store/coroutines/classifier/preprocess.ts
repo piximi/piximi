@@ -58,6 +58,7 @@ export const generator = (
     while (index < count) {
       const image = images[index];
 
+      // eslint-disable-next-line array-callback-return
       const ys = categories.findIndex((category: Category) => {
         if (category.id !== "00000000-0000-0000-0000-00000000000") {
           return category.id === image.categoryId;

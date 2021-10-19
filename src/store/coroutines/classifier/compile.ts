@@ -43,6 +43,7 @@ export const compile = (
   };
 
   const metrics = () => {
+    // eslint-disable-next-line array-callback-return
     return options.metrics.map((metric: Metric) => {
       switch (metric) {
         case Metric.BinaryAccuracy:

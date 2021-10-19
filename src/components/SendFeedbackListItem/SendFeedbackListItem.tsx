@@ -1,8 +1,6 @@
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import FeedbackIcon from "@material-ui/icons/Feedback";
 import React from "react";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import FeedbackIcon from "@mui/icons-material/Feedback";
 
 export const SendFeedbackListItem = () => {
   return (

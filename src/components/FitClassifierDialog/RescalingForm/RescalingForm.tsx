@@ -1,6 +1,12 @@
 import * as React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Checkbox, FormControlLabel, Grid, TextField } from "@material-ui/core";
+import { createStyles, makeStyles } from "@mui/styles";
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Theme,
+} from "@mui/material";
 import { rescaleOptionsSelector } from "../../../store/selectors/rescaleOptionsSelector";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
