@@ -1,10 +1,10 @@
-import * as MaterialUI from "@material-ui/core";
 import * as React from "react";
-import { TransitionProps } from "@material-ui/core/transitions";
+import { Slider } from "@mui/material";
+import { TransitionProps } from "@mui/material/transitions";
 
 export const DialogTransition = React.forwardRef<unknown, TransitionProps>(
   function Transition(props, ref) {
     // @ts-ignore
-    return <MaterialUI.Slide direction="right" ref={ref} {...props} />;
+    return <Slider direction="right" ref={ref} {...props} />;
   }
 );

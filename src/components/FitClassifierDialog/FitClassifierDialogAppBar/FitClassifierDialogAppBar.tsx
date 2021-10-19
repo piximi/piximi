@@ -1,12 +1,12 @@
 import * as React from "react";
+import { createStyles, makeStyles } from "@mui/styles";
+import { AppBar, IconButton, Theme, Toolbar, Tooltip } from "@mui/material";
 import {
   ArrowBack,
-  Stop,
   PlayCircleOutline,
   ReplayRounded,
-} from "@material-ui/icons";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { AppBar, IconButton, Toolbar, Tooltip } from "@material-ui/core";
+  Stop,
+} from "@mui/icons-material";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

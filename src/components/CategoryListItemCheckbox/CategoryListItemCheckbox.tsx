@@ -1,13 +1,12 @@
 import React from "react";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import Checkbox from "@material-ui/core/Checkbox";
-import LabelIcon from "@material-ui/icons/Label";
-import LabelOutlinedIcon from "@material-ui/icons/LabelOutlined";
 import { Category } from "../../types/Category";
 import { useDispatch, useSelector } from "react-redux";
 import { deselectImages, updateCategoryVisibility } from "../../store/slices";
 import { visibleImagesSelector } from "../../store/selectors";
 import { Image } from "../../types/Image";
+import { Checkbox, ListItemIcon } from "@mui/material";
+import LabelIcon from "@mui/icons-material/Label";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 
 type CategoryListItemCheckboxProps = {
   category: Category;

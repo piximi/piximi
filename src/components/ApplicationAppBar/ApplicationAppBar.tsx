@@ -1,7 +1,7 @@
-import AppBar from "@material-ui/core/AppBar";
 import React from "react";
-import { useStyles } from "./ApplicationAppBar.css";
 import { ApplicationToolbar } from "../ApplicationToolbar";
+import { useStyles } from "./ApplicationAppBar.css";
+import { AppBar } from "@mui/material";
 
 export const ApplicationAppBar = () => {
   const classes = useStyles();

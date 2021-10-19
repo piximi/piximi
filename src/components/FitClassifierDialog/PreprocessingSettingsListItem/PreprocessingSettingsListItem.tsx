@@ -1,3 +1,12 @@
+import { RescalingForm } from "../RescalingForm/RescalingForm";
+import * as React from "react";
+import { Image as ImageType } from "../../../types/Image";
+import {
+  augmentData,
+  rescaleData,
+  resizeData,
+} from "../FitClassifierDialog/preprocessing";
+import { useState } from "react";
 import {
   Button,
   Checkbox,
@@ -8,19 +17,10 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-} from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Typography from "@material-ui/core/Typography";
-import { RescalingForm } from "../RescalingForm/RescalingForm";
-import * as React from "react";
-import { Image as ImageType } from "../../../types/Image";
-import {
-  augmentData,
-  rescaleData,
-  resizeData,
-} from "../FitClassifierDialog/preprocessing";
-import { useState } from "react";
+  Typography,
+} from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 type PreprocessingSettingsListItemProps = {
   closeDialog: () => void;

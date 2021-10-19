@@ -1,9 +1,10 @@
 import React from "react";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import BarChartIcon from "@material-ui/icons/BarChart";
 import { useImage } from "../../hooks/useImage/useImage";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
+function BarChartIcon() {
+  return null;
+}
 
 export const EvaluateSegmenterListItem = () => {
   const image = useImage();

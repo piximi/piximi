@@ -1,8 +1,7 @@
 import React from "react";
 import { useStyles } from "../Application/Application.css";
-import Container from "@material-ui/core/Container";
-import DialogContent from "@material-ui/core/DialogContent";
 import { ClassifierSettingsDialogTabContext } from "../ClassifierSettingsDialogTabContext";
+import { Container, DialogContent } from "@mui/material";
 
 export const ClassifierSettingsDialogContent = () => {
   const classes = useStyles();

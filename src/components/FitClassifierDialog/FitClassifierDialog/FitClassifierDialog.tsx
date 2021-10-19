@@ -1,4 +1,3 @@
-import { Dialog, DialogContent, List } from "@material-ui/core";
 import * as React from "react";
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
@@ -9,6 +8,7 @@ import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSetti
 import { train_mnist } from "./fit_mnist";
 import { useDispatch } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
+import { Dialog, DialogContent, List } from "@mui/material";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -39,7 +39,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   return (
     // @ts-ignore
     <Dialog
-      disableBackdropClick
       disableEscapeKeyDown
       fullScreen
       onClose={closeDialog}

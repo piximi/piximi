@@ -1,11 +1,11 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
-import TabPanel from "@material-ui/lab/TabPanel";
 import { LossFunctionTextField } from "../LossFunctionTextField";
 import { OptimizationAlgorithmTextField } from "../OptimizationAlgorithmTextField";
 import { LearningRateTextField } from "../LearningRateTextField";
 import { EpochsTextField } from "../EpochsTextField";
 import { BatchSizeTextField } from "../BatchSizeTextField";
+import { TabPanel } from "@mui/lab";
+import { Grid } from "@mui/material";
 
 export const TrainingTabPanel = () => {
   return (

@@ -1,11 +1,11 @@
 import React from "react";
-import { Menu } from "@material-ui/core";
-import MenuItem from "@material-ui/core/MenuItem";
-import Fade from "@material-ui/core/Fade";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ComputerIcon from "@material-ui/icons/Computer";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
+import { Menu } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import Fade from "@mui/material/Fade";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ComputerIcon from "@mui/icons-material/Computer";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
 import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
@@ -72,7 +72,6 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         TransitionComponent={Fade}
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        getContentAnchorEl={null}
         onClose={onClose}
         open={Boolean(anchorEl)}
         transformOrigin={{ vertical: "top", horizontal: "center" }}

@@ -1,10 +1,10 @@
-import { Dialog, DialogContent } from "@material-ui/core";
+import { Dialog, DialogContent } from "@mui/material";
 import * as React from "react";
 import * as tf from "@tensorflow/tfjs";
 import { PredictSegmenterDialogAppBar } from "../PredictSegmenterDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
 import { useStyles } from "./PredictSegmenterDialog.css";
-import Container from "@material-ui/core/Container";
+import Container from "@mui/material/Container";
 import { useSelector } from "react-redux";
 import { imagesSelector } from "../../../store/selectors";
 import * as ImageJS from "image-js";
@@ -92,9 +92,9 @@ export const PredictSegmenterDialog = (
     // Warmup the model. This isn't necessary, but makes the first prediction
     // faster. Call `dispose` to release the WebGL memory allocated for the return
     // value of `predict`.
-    (model.predict(
-      tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])
-    ) as tf.Tensor).dispose();
+    (
+      model.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])) as tf.Tensor
+    ).dispose();
 
     console.info("successful load");
 
@@ -128,7 +128,6 @@ export const PredictSegmenterDialog = (
   return (
     // @ts-ignore
     <Dialog
-      disableBackdropClick
       disableEscapeKeyDown
       fullScreen
       onClose={closeDialog}

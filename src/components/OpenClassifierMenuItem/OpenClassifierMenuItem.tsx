@@ -1,5 +1,5 @@
 import React from "react";
-import MenuItem from "@material-ui/core/MenuItem";
+import { MenuItem } from "@mui/material";
 
 type OpenClassifierMenuItemProps = {
   onClose: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;

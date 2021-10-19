@@ -1,3 +1,11 @@
+import { useState } from "react";
+import { createStyles, makeStyles } from "@mui/styles";
+import { useDispatch, useSelector } from "react-redux";
+import { testPercentageSelector } from "../../../store/selectors/testPercentageSelector";
+import { trainingPercentageSelector } from "../../../store/selectors";
+import { classifierSlice } from "../../../store/slices";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
   Button,
   Collapse,
@@ -6,19 +14,10 @@ import {
   ListItemIcon,
   ListItemText,
   TextField,
+  Theme,
   Tooltip,
-} from "@material-ui/core";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import * as React from "react";
-import Typography from "@material-ui/core/Typography";
-import Slider from "@material-ui/core/Slider";
-import { useState } from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { useDispatch, useSelector } from "react-redux";
-import { testPercentageSelector } from "../../../store/selectors/testPercentageSelector";
-import { trainingPercentageSelector } from "../../../store/selectors";
-import { classifierSlice } from "../../../store/slices";
+  Typography,
+} from "@mui/material";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

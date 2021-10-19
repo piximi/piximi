@@ -1,15 +1,11 @@
 import React from "react";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 import * as tf from "@tensorflow/tfjs";
 import { useImage } from "../../hooks/useImage/useImage";
 import * as ImageJS from "image-js";
-import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import { PredictSegmenterDialog } from "../PredictSegmenterDialog";
 import { useDialog } from "../../hooks";
-import { useSelector } from "react-redux";
-import { categoriesSelector } from "../../store/selectors";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { LabelImportant } from "@mui/icons-material";
 
 const postprocessOutput = async (
   out: tf.Tensor4D
@@ -141,7 +137,7 @@ export const PredictSegmenterListItem = () => {
     <>
       <ListItem button onClick={onPredictClick}>
         <ListItemIcon>
-          <LabelImportantIcon />
+          <LabelImportant />
         </ListItemIcon>
 
         <ListItemText primary="Predict" />

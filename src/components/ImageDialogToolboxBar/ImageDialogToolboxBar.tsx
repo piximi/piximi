@@ -1,11 +1,11 @@
-import { AppBar, Button, Toolbar } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import BrushIcon from "@material-ui/icons/Brush";
-import Crop32Icon from "@material-ui/icons/Crop32";
+import { AppBar, Button, Toolbar } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import BrushIcon from "@mui/icons-material/Brush";
+import Crop32Icon from "@mui/icons-material/Crop32";
 import React from "react";
 import { useStyles } from "./ImageDialogToolboxBar.css";
-import IconButton from "@material-ui/core/IconButton";
-import PanToolIcon from "@material-ui/icons/PanTool";
+import IconButton from "@mui/material/IconButton";
+import PanToolIcon from "@mui/icons-material/PanTool";
 
 export const ImageDialogToolboxBar = () => {
   const classes = useStyles();

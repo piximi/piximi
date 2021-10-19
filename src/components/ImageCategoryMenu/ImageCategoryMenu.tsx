@@ -1,12 +1,10 @@
 import React from "react";
-import Menu from "@material-ui/core/Menu";
-import MenuList from "@material-ui/core/MenuList";
-import MenuItem from "@material-ui/core/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { Category } from "../../types/Category";
 import { categoriesSelector } from "../../store/selectors";
 import { updateImageCategories } from "../../store/slices";
-import LabelIcon from "@material-ui/icons/Label";
+import { Menu, MenuItem, MenuList } from "@mui/material";
+import LabelIcon from "@mui/icons-material/Label";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;
@@ -38,7 +36,6 @@ export const ImageCategoryMenu = ({
         horizontal: "center",
         vertical: "bottom",
       }}
-      getContentAnchorEl={null}
       transformOrigin={{
         horizontal: "center",
         vertical: "top",
@@ -51,7 +48,7 @@ export const ImageCategoryMenu = ({
         {categories.map((category: Category) => (
           <MenuItem
             key={category.id}
-            onClick={(event) => onClick(event, category.id)}
+            onClick={(event: any) => onClick(event, category.id)}
           >
             <LabelIcon style={{ color: category.color, paddingRight: "8px" }} />
             {category.name}
