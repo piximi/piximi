@@ -1,13 +1,12 @@
 import { put, select } from "redux-saga/effects";
-import { compile, fit, open, preprocess } from "../../coroutines/classifier";
+import { compile, fit, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
   categorizedImagesSelector,
   compileOptionsSelector,
-  createdCategoriesCountSelector,
   createdCategoriesSelector,
+  fitOptionsSelector,
 } from "../../selectors";
-import { fitOptionsSelector } from "../../selectors";
 import { getMnistModel } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
 
 export function* fitSaga(action: any): any {

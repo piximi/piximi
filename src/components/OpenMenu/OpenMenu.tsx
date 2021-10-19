@@ -1,16 +1,6 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import {
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-} from "@mui/material";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
-import { useDialog } from "../../hooks";
+import { Menu, MenuList } from "@mui/material";
+import { bindMenu } from "material-ui-popup-state";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
 
 type OpenMenuProps = {

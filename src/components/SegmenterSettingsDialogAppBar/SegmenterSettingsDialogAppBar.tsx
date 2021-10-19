@@ -5,8 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { useStyles } from "../Application/Application.css";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Box, Button } from "@mui/material";
-import { train_mnist } from "../FitClassifierDialog/FitClassifierDialog/fit_mnist";
+import { Button } from "@mui/material";
 
 type SegmenterSettingsDialogAppBarProps = {
   onClose: () => void;

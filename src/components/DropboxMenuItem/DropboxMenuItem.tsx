@@ -1,7 +1,6 @@
 import React from "react";
 import { useStyles } from "./DropboxMenuItem.css";
 import useDropboxChooser from "use-dropbox-chooser";
-import { useDispatch } from "react-redux";
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import ComputerIcon from "@mui/icons-material/Computer";
 
@@ -10,7 +9,7 @@ type DropboxMenuItemProps = {
 };
 
 export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const classes = useStyles();
 

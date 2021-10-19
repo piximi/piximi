@@ -31,7 +31,7 @@ export const ImageGridAppBar = () => {
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
-  const [openImageDialog, setOpenImageDialog] = React.useState(false);
+  // const [openImageDialog, setOpenImageDialog] = React.useState(false);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -46,13 +46,13 @@ export const ImageGridAppBar = () => {
     setCategoryMenuAnchorEl(null);
   };
 
-  const onOpenImageDialog = (event: React.MouseEvent<HTMLDivElement>) => {
-    setOpenImageDialog(true);
-  };
+  // const onOpenImageDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+  //   setOpenImageDialog(true);
+  // };
 
-  const onCloseImageDialog = () => {
-    setOpenImageDialog(false);
-  };
+  // const onCloseImageDialog = () => {
+  //   setOpenImageDialog(false);
+  // };
 
   const classes = useStyles();
 
@@ -95,7 +95,7 @@ export const ImageGridAppBar = () => {
             <Chip
               avatar={<GestureIcon color="inherit" />}
               label="Annotate"
-              onClick={onOpenImageDialog}
+              onClick={() => {}} //TODO implement this
               variant="outlined"
             />
 

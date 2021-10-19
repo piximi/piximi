@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ClassifierSettingsListItem = ({}) => {
+export const ClassifierSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 

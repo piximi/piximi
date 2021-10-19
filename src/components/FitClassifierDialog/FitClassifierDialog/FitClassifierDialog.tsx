@@ -5,7 +5,6 @@ import { ClassifierSettingsListItem } from "../ClassifierSettingsListItem/Classi
 // additional stuff to test
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
-import { train_mnist } from "./fit_mnist";
 import { useDispatch } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";

@@ -34,23 +34,24 @@ export const DatasetSettingsListItem = () => {
   const classes = useStyles();
 
   // assign each image to train- test- or validation- set
-  const initializeDatasets = () => {
-    //FIXME bring that back
-    // if (datasetInitialized) {
-    //   return;
-    // }
-    // var partitions: number[] = [];
-    // images.forEach((image: Images) => {
-    //   const setItentifier = assignToSet();
-    //   partitions.push(setItentifier);
-    // });
-    // // setImagesPartition(partitions);
-    // setDatasetInitialized(true);
-  };
+  //FIXME bring that back
+  //
+  // const initializeDatasets = () => {
+  //   // if (datasetInitialized) {
+  //   //   return;
+  //   // }
+  //   // var partitions: number[] = [];
+  //   // images.forEach((image: Images) => {
+  //   //   const setItentifier = assignToSet();
+  //   //   partitions.push(setItentifier);
+  //   // });
+  //   // // setImagesPartition(partitions);
+  //   // setDatasetInitialized(true);
+  // };
 
-  function valuetext(value: any) {
-    return `${value}%`;
-  }
+  // function valuetext(value: any) {
+  //   return `${value}%`;
+  // }
 
   const dispatch = useDispatch();
 

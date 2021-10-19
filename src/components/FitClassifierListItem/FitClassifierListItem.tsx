@@ -5,14 +5,9 @@ import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import React from "react";
 import { useDialog } from "../../hooks";
 import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
-import { useSelector } from "react-redux";
-import { categoriesSelector, imagesSelector } from "../../store/selectors";
 
 export const FitClassifierListItem = () => {
   const { onClose, onOpen, open } = useDialog();
-
-  const categories = useSelector(categoriesSelector);
-  const images = useSelector(imagesSelector);
 
   const onFitClick = () => {
     onOpen();

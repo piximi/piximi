@@ -8,7 +8,6 @@ import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
-import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 
 const optimizationAlgorithms = {
@@ -99,7 +98,7 @@ export const ClassifierSettingsGrid = () => {
   };
 
   const learningRate = useSelector(learningRateSelector);
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
+  // const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
 
   const onOptimizationAlgorithmChange = (
     event: React.FormEvent<EventTarget>

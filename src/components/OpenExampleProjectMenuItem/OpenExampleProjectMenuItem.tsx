@@ -8,14 +8,13 @@ import * as uuid from "uuid";
 import { Project } from "../../types/Project";
 import { Category } from "../../types/Category";
 import { classifierSlice, projectSlice } from "../../store/slices";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import { getMnistModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
 import { compile } from "../../store/coroutines/classifier/compile";
-import { categorizedImagesSelector } from "../../store/selectors";
 import { FitOptions } from "../../types/FitOptions";
 import { MenuItem } from "@mui/material";
 
@@ -36,8 +35,6 @@ export const OpenExampleProjectMenuItem = ({
   popupState,
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
-
-  const categorizedImages = useSelector(categorizedImagesSelector);
 
   const onClickExampleProject = async () => {
     popupState.close();

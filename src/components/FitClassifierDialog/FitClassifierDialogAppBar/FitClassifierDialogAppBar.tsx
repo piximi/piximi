@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const FitClassifierDialogAppBar = (props: any) => {
-  const { closeDialog, fit, openedDrawer } = props;
+  const { closeDialog, fit } = props;
 
   const classes = useStyles({});
 

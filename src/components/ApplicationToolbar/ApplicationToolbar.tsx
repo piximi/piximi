@@ -21,16 +21,16 @@ export const ApplicationToolbar = () => {
       })
     );
   };
-  const onChangeCommitted = (
-    event: React.ChangeEvent<{}>,
-    newValue: number | number[]
-  ) => {
-    dispatch(
-      applicationSlice.actions.updateTileSize({
-        newValue: newValue as number,
-      })
-    );
-  };
+  // const onChangeCommitted = (
+  //   event: React.ChangeEvent<{}>,
+  //   newValue: number | number[]
+  // ) => {
+  //   dispatch(
+  //     applicationSlice.actions.updateTileSize({
+  //       newValue: newValue as number,
+  //     })
+  //   );
+  // };
   return (
     <Toolbar>
       <Logo />
