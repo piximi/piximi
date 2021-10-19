@@ -129,7 +129,7 @@ export const OpenExampleProjectMenuItem = ({
 
     const mnistFitOptions: FitOptions = {
       batchSize: 512,
-      epochs: 5,
+      epochs: 10,
       initialEpoch: 0,
       test_data_size: 1000, //TODO experiment with 10000
       train_data_size: 6500, //TODO experiment with 55000
