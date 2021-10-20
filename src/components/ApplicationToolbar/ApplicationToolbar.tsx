@@ -45,7 +45,7 @@ export const ApplicationToolbar = () => {
         className={classes.zoomSlider}
       />
       <ZoomInIcon className={classes.zoomIcon} />
-      <SearchInput />
+      {/*<SearchInput />*/}
       <UploadButton />
     </Toolbar>
   );

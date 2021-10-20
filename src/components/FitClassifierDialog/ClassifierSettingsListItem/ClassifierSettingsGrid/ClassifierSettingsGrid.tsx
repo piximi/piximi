@@ -9,6 +9,7 @@ import { fitOptionsSelector } from "../../../../store/selectors";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
+import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 
 const optimizationAlgorithms = {
   adadelta: "Adadelta",
@@ -30,25 +31,6 @@ const lossFunctions = {
   sigmoidCrossEntropy: "Sigmoid cross entropy",
   categoricalCrossentropy: "Categorical cross entropy",
 };
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      width: "100%",
-      display: "flex",
-      flexWrap: "wrap",
-    },
-    menu: {
-      // width: 200,
-    },
-    textField: {
-      // marginLeft: theme.spacing(1),
-      marginRight: theme.spacing(1),
-      flexBasis: 300,
-      width: "100%",
-    },
-  })
-);
 
 export const ClassifierSettingsGrid = () => {
   const classes = useStyles();
