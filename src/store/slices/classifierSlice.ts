@@ -31,7 +31,7 @@ const initialState: Classifier = {
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
   lossHistory: [],
-  modelName: "MobileNet",
+  modelName: "None",
   modelMultiplier: "0.0",
   modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],
@@ -188,6 +188,9 @@ export const classifierSlice = createSlice({
       state.modelName = action.payload.modelOptions.modelName;
       state.modelVersion = action.payload.modelOptions.modelVersion;
       state.modelMultiplier = action.payload.modelOptions.modelMultiplier;
+    },
+    updateModelName(state, action: PayloadAction<{ modelName: string }>) {
+      state.modelName = action.payload.modelName;
     },
     updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
       const { opened } = action.payload;

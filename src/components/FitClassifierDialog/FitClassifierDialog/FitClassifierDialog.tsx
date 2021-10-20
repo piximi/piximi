@@ -8,6 +8,7 @@ import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSetti
 import { useDispatch } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
+import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -57,6 +58,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             closeDialog={closeDialog}
             openedDialog={openedDialog}
           />
+
+          <ArchitectureSettingsListItem />
 
           <ClassifierSettingsListItem />
 

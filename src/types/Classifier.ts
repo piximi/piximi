@@ -38,9 +38,9 @@ export type Classifier = {
   lossHistory?: Array<{ x: number; y: number }>;
   metrics: Array<Metric>;
   model?: LayersModel;
-  modelName?: string;
-  modelMultiplier?: string;
-  modelVersion?: string;
+  modelName: string;
+  modelMultiplier: string;
+  modelVersion: string;
   opened?: LayersModel;
   opening: boolean;
   optimizationAlgorithm: OptimizationAlgorithm;

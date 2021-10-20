@@ -43,7 +43,7 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
-    const numExamples = 5000; //Eventually you might want to change this back to ~7000 (better training)
+    const numExamples = 1000; //Eventually you might want to change this back to ~7000 (better training)
 
     //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTrainBatch(numExamples);
@@ -182,7 +182,7 @@ export const OpenExampleProjectMenuItem = ({
       metrics: mnistCompileOptions.metrics,
       model: mnistModel,
       modelMultiplier: "0.0",
-      modelName: "mnist",
+      modelName: "MnistCNN",
       modelVersion: "1",
       optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
       testPercentage: 0.2,
