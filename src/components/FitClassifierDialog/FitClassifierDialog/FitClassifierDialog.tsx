@@ -22,7 +22,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
 
   const onFit = async () => {
-    // const history = await train_mnist();
     dispatch(
       classifierSlice.actions.fit({
         onEpochEnd: (epoch: number, logs: any) => {

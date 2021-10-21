@@ -13,8 +13,6 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { simpleCNN } from "../FitClassifierDialog/FitClassifierDialog/networks";
-import { compile } from "../../store/coroutines/classifier/compile";
 import { FitOptions } from "../../types/FitOptions";
 import { MenuItem } from "@mui/material";
 
@@ -167,20 +165,13 @@ export const OpenExampleProjectMenuItem = ({
       trainValXs.shape[0] - training_split,
     ]);
 
-    //get model
-    // const mnistModel = simpleCNN();
-
-    // const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
-
     const mnistClassifier = {
-      // compiled: compiledMnistModel,
       data: [trainXs, trainYs],
       fitOptions: mnistFitOptions,
       inputShape: { r: 28, c: 28, channels: 1 },
       learningRate: mnistCompileOptions.learningRate,
       lossFunction: mnistCompileOptions.lossFunction,
       metrics: mnistCompileOptions.metrics,
-      // model: mnistModel,
       modelMultiplier: "0.0",
       modelName: "SimpleCNN",
       modelVersion: "1",

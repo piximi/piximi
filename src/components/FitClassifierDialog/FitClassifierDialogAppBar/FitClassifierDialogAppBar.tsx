@@ -7,6 +7,9 @@ import {
   ReplayRounded,
   Stop,
 } from "@mui/icons-material";
+import { compiledSelector } from "../../../store/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { classifierSlice } from "../../../store/slices";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +36,15 @@ export const FitClassifierDialogAppBar = (props: any) => {
 
   const classes = useStyles({});
 
+  const dispatch = useDispatch();
+
+  const compiled = useSelector(compiledSelector);
+
+  const onStopFitting = () => {
+    compiled.stopTraining = true;
+    dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+  };
+
   return (
     <AppBar className={classes.appBar}>
       <Toolbar>
@@ -58,7 +70,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
         <Tooltip title="Stop fitting the model" placement="bottom">
           <IconButton
             className={classes.button}
-            onClick={() => {}} //TODO implement this
+            onClick={onStopFitting}
             href={""}
           >
             <Stop />

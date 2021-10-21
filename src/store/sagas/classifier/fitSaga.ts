@@ -19,9 +19,13 @@ export function* fitSaga(action: any): any {
 
   const opened = yield open(architectureOptions, classes);
 
+  yield put(classifierSlice.actions.updateOpened({ opened: opened }));
+
   const compileOptions = yield select(compileOptionsSelector);
 
   const compiled = yield compile(opened, compileOptions);
+
+  yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
 
   const images = yield select(categorizedImagesSelector);
 
@@ -32,7 +36,6 @@ export function* fitSaga(action: any): any {
   const options = yield select(fitOptionsSelector);
 
   const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
-  debugger;
 
   const payload = { fitted: fitted, status: status };
 
