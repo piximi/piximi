@@ -40,7 +40,7 @@ const lossFunctions = {
   CategoricalCrossEntropy: "Categorical cross entropy",
 };
 
-export const ClassifierSettingsGrid = () => {
+export const OptimizerSettingsGrid = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -104,8 +104,6 @@ export const ClassifierSettingsGrid = () => {
   const onLossFunctionChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
 
-    console.info(target.value);
-
     const selectedLossFunction = () => {
       switch (target.value) {
         case "Absolute difference":
@@ -165,57 +163,57 @@ export const ClassifierSettingsGrid = () => {
               className={classes.textField}
               value={learningRate}
               onChange={onLearningRateChange}
+              type="number"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <FormHelperText>Loss Function</FormHelperText>
+            <Select
+              value={lossFunction as string} //TODO fix so that multiple lossFunctions are shown, if we do have multiple loss functions
+              onChange={onLossFunctionChange}
+              className={classes.select}
+              displayEmpty
+              inputProps={{ "aria-label": "Without label" }}
+            >
+              {_.map(lossFunctions, (v, k) => {
+                return (
+                  <MenuItem dense key={k} value={v}>
+                    {v}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </Grid>
+        </Grid>
+        <Grid container direction={"row"} spacing={2}>
+          <Grid item xs={2}>
+            <TextField
+              id="batch-size"
+              label="Batch size"
+              className={classes.textField}
+              value={fitOptions.batchSize}
+              onChange={onBatchSizeChange}
+              type="number"
+              margin="normal"
+            />
+          </Grid>
+
+          <Grid item xs={2}>
+            <TextField
+              id="epochs"
+              label="Epochs"
+              className={classes.textField}
+              value={fitOptions.epochs}
+              onChange={onEpochsChange}
               margin="normal"
               type="number"
             />
           </Grid>
         </Grid>
       </FormControl>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <FormHelperText>Loss Function</FormHelperText>
-          <Select
-            value={lossFunction as string} //TODO fix so that multiple lossFunctions are shown, if we do have multiple loss functions
-            onChange={onLossFunctionChange}
-            className={classes.select}
-            displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
-          >
-            {_.map(lossFunctions, (v, k) => {
-              return (
-                <MenuItem dense key={k} value={v}>
-                  {v}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </Grid>
-      </Grid>
-      <Grid container>
-        <Grid item xs={2}>
-          <TextField
-            id="batch-size"
-            label="Batch size"
-            className={classes.textField}
-            value={fitOptions.batchSize}
-            onChange={onBatchSizeChange}
-            type="number"
-            margin="normal"
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <TextField
-            id="epochs"
-            label="Epochs"
-            className={classes.textField}
-            value={fitOptions.epochs}
-            onChange={onEpochsChange}
-            margin="normal"
-            type="number"
-          />
-        </Grid>
-      </Grid>
     </>
   );
 };

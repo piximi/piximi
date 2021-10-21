@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
+import { OptimizerSettingsGrid } from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
   Collapse,
@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ClassifierSettingsListItem = () => {
+export const OptimizerSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 
@@ -106,7 +106,7 @@ export const ClassifierSettingsListItem = () => {
         unmountOnExit
       >
         <form className={classes.container} noValidate autoComplete="off">
-          <ClassifierSettingsGrid />
+          <OptimizerSettingsGrid />
         </form>
       </Collapse>
     </>

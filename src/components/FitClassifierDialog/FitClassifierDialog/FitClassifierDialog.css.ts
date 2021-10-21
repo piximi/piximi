@@ -39,7 +39,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
     // marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     flexBasis: 300,
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(2.75),
     width: "100%",
   },
   select: {

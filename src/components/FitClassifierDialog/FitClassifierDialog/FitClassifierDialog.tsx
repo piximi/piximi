@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
-import { ClassifierSettingsListItem } from "../ClassifierSettingsListItem/ClassifierSettingsListItem";
+import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 // additional stuff to test
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
@@ -61,7 +61,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
           <ArchitectureSettingsListItem />
 
-          <ClassifierSettingsListItem />
+          <OptimizerSettingsListItem />
 
           <DatasetSettingsListItem />
         </List>
