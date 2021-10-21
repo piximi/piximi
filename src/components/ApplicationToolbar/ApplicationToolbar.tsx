@@ -1,7 +1,6 @@
 import React from "react";
 import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
-import { SearchInput } from "../SearchInput";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { useStyles } from "./ApplicationToolbar.css";

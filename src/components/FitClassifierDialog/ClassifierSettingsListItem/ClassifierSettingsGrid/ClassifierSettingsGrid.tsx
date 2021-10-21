@@ -1,35 +1,43 @@
-import { Grid, MenuItem, TextField, Theme } from "@mui/material";
+import {
+  FormControl,
+  FormHelperText,
+  Grid,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import * as _ from "lodash";
 import * as React from "react";
-import { createStyles, makeStyles } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
-import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
+import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
+import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
 
 const optimizationAlgorithms = {
-  adadelta: "Adadelta",
-  adagrad: "Adagrad",
-  adam: "Adam",
-  adamax: "Adamax",
-  momentum: "Momentum",
-  rmsProp: "RMSProp",
-  stochasticGradientDescent: "Stochastic gradient descent (SGD)",
+  Adadelta: "Adadelta",
+  Adagrad: "Adagrad",
+  Adam: "Adam",
+  Adamax: "Adamax",
+  Momentum: "Momentum",
+  RmsProp: "RMSProp",
+  StochasticGradientDescent: "Stochastic gradient descent (SGD)",
 };
 
 const lossFunctions = {
-  absoluteDifference: "Absolute difference",
-  cosineDistance: "Cosine distance",
-  hingeLoss: "Hinge",
-  huberLoss: "Huber",
-  logLoss: "Log",
-  meanSquaredError: "Mean squared error (MSE)",
-  sigmoidCrossEntropy: "Sigmoid cross entropy",
-  categoricalCrossentropy: "Categorical cross entropy",
+  AbsoluteDifference: "Absolute difference",
+  CosineDistance: "Cosine distance",
+  Hinge: "Hinge",
+  Huber: "Huber",
+  Log: "Log",
+  MeanSquaredError: "Mean squared error (MSE)",
+  SigmoidCrossEntropy: "Sigmoid cross entropy",
+  CategoricalCrossEntropy: "Categorical cross entropy",
 };
 
 export const ClassifierSettingsGrid = () => {
@@ -37,7 +45,9 @@ export const ClassifierSettingsGrid = () => {
   const dispatch = useDispatch();
 
   const fitOptions = useSelector(fitOptionsSelector);
-  const inputShape = useSelector(inputShapeSelector);
+  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
+  const lossFunction = useSelector(lossFunctionSelector);
+  const learningRate = useSelector(learningRateSelector);
 
   const onBatchSizeChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
@@ -51,57 +61,24 @@ export const ClassifierSettingsGrid = () => {
     dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
   };
 
-  const onRowsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const rows = Number(target.value);
-    dispatch(
-      classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, r: rows },
-      })
-    );
-  };
-  const onColsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const cols = Number(target.value);
-    dispatch(
-      classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, c: cols },
-      })
-    );
-  };
-  const onChannelsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const channels = Number(target.value);
-    dispatch(
-      classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, channels: channels },
-      })
-    );
-  };
-
-  const learningRate = useSelector(learningRateSelector);
-  // const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
-
-  const onOptimizationAlgorithmChange = (
-    event: React.FormEvent<EventTarget>
-  ) => {
+  const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
 
     const selectedAlgorithm = () => {
       switch (target.value) {
-        case "adadelta":
+        case "Adadelta":
           return OptimizationAlgorithm.Adadelta;
-        case "adagrad":
+        case "Adagrad":
           return OptimizationAlgorithm.Adagrad;
-        case "adam":
+        case "Adam":
           return OptimizationAlgorithm.Adam;
-        case "adamax":
+        case "Adamax":
           return OptimizationAlgorithm.Adamax;
-        case "momentum":
+        case "Momentum":
           return OptimizationAlgorithm.Momentum;
-        case "rmsProp":
+        case "RmsProp":
           return OptimizationAlgorithm.RMSProp;
-        case "stochasticGradientDescent":
+        case "StochasticGradientDescent":
           return OptimizationAlgorithm.StochasticGradientDescent;
         default:
           return OptimizationAlgorithm.Adam;
@@ -124,26 +101,28 @@ export const ClassifierSettingsGrid = () => {
     );
   };
 
-  const onLossFunctionChange = (event: React.FormEvent<EventTarget>) => {
+  const onLossFunctionChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
+
+    console.info(target.value);
 
     const selectedLossFunction = () => {
       switch (target.value) {
-        case "absoluteDifference":
+        case "Absolute difference":
           return LossFunction.AbsoluteDifference;
-        case "cosineDistance":
+        case "Cosine distance":
           return LossFunction.CosineDistance;
-        case "hingeLoss":
+        case "Hinge":
           return LossFunction.Hinge;
-        case "huberLoss":
+        case "Huber":
           return LossFunction.Huber;
-        case "logLoss":
+        case "Log":
           return LossFunction.Log;
-        case "meanSquaredError":
+        case "Mean squared error (MSE)":
           return LossFunction.MeanSquaredError;
-        case "sigmoidCrossEntropy":
+        case "Sigmoid cross entropy":
           return LossFunction.SigmoidCrossEntropy;
-        case "categoricalCrossentropy":
+        case "Categorical cross entropy":
           return LossFunction.CategoricalCrossEntropy;
         default:
           return LossFunction.CategoricalCrossEntropy;
@@ -158,22 +137,16 @@ export const ClassifierSettingsGrid = () => {
 
   return (
     <>
-      <form className={classes.container} noValidate>
+      <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <TextField
-              id="optimization-algorithm"
-              select
-              label="Optimization algorithm"
-              className={classes.textField}
-              defaultValue={""}
+            <FormHelperText>Optimization Algorithm</FormHelperText>
+            <Select
+              value={optimizationAlgorithm}
               onChange={onOptimizationAlgorithmChange}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              margin="normal"
+              className={classes.select}
+              displayEmpty
+              inputProps={{ "aria-label": "Without label" }}
             >
               {_.map(optimizationAlgorithms, (v, k) => {
                 return (
@@ -182,7 +155,7 @@ export const ClassifierSettingsGrid = () => {
                   </MenuItem>
                 );
               })}
-            </TextField>
+            </Select>
           </Grid>
 
           <Grid item xs={4}>
@@ -197,65 +170,25 @@ export const ClassifierSettingsGrid = () => {
             />
           </Grid>
         </Grid>
-      </form>
+      </FormControl>
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          <form noValidate>
-            <TextField
-              id="loss-function"
-              select
-              label="Loss function"
-              className={classes.textField}
-              defaultValue={""}
-              onChange={onLossFunctionChange}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu,
-                },
-              }}
-              margin="normal"
-            >
-              {_.map(lossFunctions, (v, k) => {
-                return (
-                  <MenuItem dense key={k} value={k}>
-                    {v}
-                  </MenuItem>
-                );
-              })}
-            </TextField>
-          </form>
-        </Grid>
-      </Grid>
-      <Grid container direction="row" spacing={2}>
-        <Grid item xs={1}>
-          <TextField
-            id="shape-rows"
-            label="Rows"
-            className={classes.textField}
-            value={inputShape.r}
-            onChange={onRowsChange}
-            margin="normal"
-          />
-        </Grid>
-        <Grid item xs={1}>
-          <TextField
-            id="shape-cols"
-            label="Cols"
-            className={classes.textField}
-            value={inputShape.c}
-            margin="normal"
-            onChange={onColsChange}
-          />
-        </Grid>
-        <Grid item xs={1}>
-          <TextField
-            id="shape-channels"
-            label="Channels"
-            className={classes.textField}
-            value={inputShape.channels}
-            margin="normal"
-            onChange={onChannelsChange}
-          />
+          <FormHelperText>Loss Function</FormHelperText>
+          <Select
+            value={lossFunction as string} //TODO fix so that multiple lossFunctions are shown, if we do have multiple loss functions
+            onChange={onLossFunctionChange}
+            className={classes.select}
+            displayEmpty
+            inputProps={{ "aria-label": "Without label" }}
+          >
+            {_.map(lossFunctions, (v, k) => {
+              return (
+                <MenuItem dense key={k} value={v}>
+                  {v}
+                </MenuItem>
+              );
+            })}
+          </Select>
         </Grid>
       </Grid>
       <Grid container>

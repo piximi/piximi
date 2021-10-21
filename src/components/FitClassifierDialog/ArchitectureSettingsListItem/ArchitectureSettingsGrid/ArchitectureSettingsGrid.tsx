@@ -28,14 +28,8 @@ export const ArchitectureSettingsGrid = () => {
 
   const classes = useStyles();
 
-  const [modelName, setModelName] = React.useState<string>(
-    architectureOptions.modelName
-  );
-
   const onModelNameChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement;
-
-    setModelName(target.value);
     dispatch(
       classifierSlice.actions.updateModelName({ modelName: target.value })
     );
@@ -76,15 +70,12 @@ export const ArchitectureSettingsGrid = () => {
           <Grid item xs={2}>
             <FormHelperText>Model name</FormHelperText>
             <Select
-              value={modelName}
+              value={architectureOptions.modelName}
               onChange={onModelNameChange}
               className={classes.select}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
             >
-              <MenuItem value="None">
-                <em>None</em>
-              </MenuItem>
               {_.map(modelArchitecture, (v, k) => {
                 return (
                   <MenuItem key={k} value={k}>
@@ -99,7 +90,7 @@ export const ArchitectureSettingsGrid = () => {
           <Grid item xs={1}>
             <TextField
               id="shape-rows"
-              label="Rows"
+              label="Input rows"
               className={classes.textField}
               value={inputShape.r}
               onChange={onRowsChange}
@@ -108,7 +99,7 @@ export const ArchitectureSettingsGrid = () => {
           <Grid item xs={1}>
             <TextField
               id="shape-cols"
-              label="Cols"
+              label="Input cols"
               className={classes.textField}
               value={inputShape.c}
               onChange={onColsChange}
@@ -117,7 +108,7 @@ export const ArchitectureSettingsGrid = () => {
           <Grid item xs={1}>
             <TextField
               id="shape-channels"
-              label="Channels"
+              label="Input channels"
               className={classes.textField}
               value={inputShape.channels}
               onChange={onChannelsChange}

@@ -96,7 +96,7 @@ export const ClassifierSettingsListItem = () => {
         </ListItemIcon>
 
         <ListItemText
-          primary="Classifier Settings"
+          primary="Optimization Settings"
           style={{ fontSize: "20px" }}
         />
       </ListItem>
