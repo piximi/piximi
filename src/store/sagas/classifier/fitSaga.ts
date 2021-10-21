@@ -7,13 +7,19 @@ import {
   createdCategoriesCountSelector,
   createdCategoriesSelector,
   fitOptionsSelector,
+  trainingPercentageSelector,
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
+import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
   const architectureOptions = yield select(architectureOptionsSelector);
+
+  const rescaleOptions = yield select(rescaleOptionsSelector);
+
+  const trainingPercentage = yield select(trainingPercentageSelector);
 
   const classes = yield select(createdCategoriesCountSelector);
 
@@ -31,7 +37,13 @@ export function* fitSaga(action: any): any {
 
   const categories = yield select(createdCategoriesSelector);
 
-  const data = yield preprocess(images, categories);
+  const data = yield preprocess(
+    images,
+    categories,
+    architectureOptions.inputShape,
+    rescaleOptions,
+    trainingPercentage
+  );
 
   const options = yield select(fitOptionsSelector);
 

@@ -39,7 +39,7 @@ const initialState: Classifier = {
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
   rescaleOptions: {
-    rescale: false,
+    rescale: true,
     rescaleMinMax: { min: 0, max: 1 },
   },
   saving: false,

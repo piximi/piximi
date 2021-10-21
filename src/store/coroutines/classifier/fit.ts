@@ -22,18 +22,13 @@ export const fit = async (
       onEpochEnd: onEpochEnd,
     },
     epochs: options.epochs,
-    validationData: data.val,
+    // validationData: data.val, //TODO fix this: when uncommenting, training loop cashes
   };
-
-  // await data.batch(8).forEachAsync((e: any) => console.log(e))
-  // const n = await data.batch(8).iterator()
-  // console.info(await n.next());
 
   const status = await compiled.fitDataset(
     data.train.batch(options.batchSize),
     args
-  ); //TODO replace with options.batchSize
-  //TODO fitDataset() should be taking val_ata_size, train_data_size, shuffle args, as arguments
+  );
 
   return { fitted: compiled, status: status };
 };
