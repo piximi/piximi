@@ -1,30 +1,13 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
+import { simpleCNN } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
 
 export const open = async (
-  modelUrl: string,
+  modelOptions: ArchitectureOptions,
   classes: number
-): Promise<tensorflow.LayersModel> => {
-  const backbone = await tensorflow.loadLayersModel(modelUrl);
-
-  const truncated = tensorflow.model({
-    inputs: backbone.inputs,
-    outputs: backbone.getLayer("conv_pw_13_relu").output,
-  });
-
-  const flattened = tensorflow.layers.flatten({
-    inputShape: truncated.outputs[0].shape.slice(1),
-  });
-
-  const softmax = tensorflow.layers.dense({
-    units: classes,
-    kernelInitializer: "varianceScaling",
-    useBias: false,
-    activation: "softmax",
-  });
-
-  const config = {
-    layers: [...truncated.layers, flattened, softmax],
-  };
-
-  return tensorflow.sequential(config);
+) => {
+  if (modelOptions.modelName === "SimpleCNN") {
+    return simpleCNN(modelOptions.inputShape, classes);
+  } else {
+    return simpleCNN(modelOptions.inputShape, classes); //default is simpleCNNs
+  }
 };

@@ -1,23 +1,23 @@
 import * as tensorflow from "@tensorflow/tfjs";
+import { Shape } from "../../../types/Shape";
 
 /***
- * Creates convolutional neural network for mnist classification problem
+ * Creates simple convolutional neural network, for example used for mnist classification problem
  * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
  */
-export const getMnistModel = () => {
-  //TODO this should take an argument, num_classes, which will be provided when being called from fit_Saga
+export const simpleCNN = (input_shape: Shape, num_classes: number) => {
   const model = tensorflow.sequential();
 
-  const IMAGE_WIDTH = 28;
-  const IMAGE_HEIGHT = 28;
-  const IMAGE_CHANNELS = 1;
+  const image_width = input_shape.c;
+  const image_height = input_shape.r;
+  const image_channels = input_shape.channels;
 
   // In the first layer of our convolutional neural network we have
   // to specify the input shape. Then we specify some parameters for
   // the convolution operation that takes place in this layer.
   model.add(
     tensorflow.layers.conv2d({
-      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS],
+      inputShape: [image_width, image_height, image_channels],
       kernelSize: 5,
       filters: 8,
       strides: 1,

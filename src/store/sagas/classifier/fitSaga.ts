@@ -1,24 +1,23 @@
 import { put, select } from "redux-saga/effects";
-import { compile, fit, preprocess } from "../../coroutines/classifier";
+import { compile, open, fit, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
   categorizedImagesSelector,
   compileOptionsSelector,
+  createdCategoriesCountSelector,
   createdCategoriesSelector,
   fitOptionsSelector,
 } from "../../selectors";
-import { getMnistModel } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
+import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  // const pathname =
-  //     "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+  const architectureOptions = yield select(architectureOptionsSelector);
 
-  // const classes = yield select(createdCategoriesCountSelector);
+  const classes = yield select(createdCategoriesCountSelector);
 
-  // const opened = yield open(pathname, classes);
-  const opened = yield getMnistModel();
+  const opened = yield open(architectureOptions, classes);
 
   const compileOptions = yield select(compileOptionsSelector);
 
