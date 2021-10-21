@@ -78,15 +78,25 @@ export const generator = (
 export const preprocess = async (
   images: Array<Image>,
   categories: Array<Category>
-): Promise<
-  tensorflow.data.Dataset<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }>
-> => {
-  return (
-    tensorflow.data
-      .generator(generator(images, categories))
-      .map(decodeCategory(categories.length))
-      .mapAsync(decodeImage)
-      // .mapAsync(resize) //TODO figure this out
-      .shuffle(32)
-  );
+): Promise<{
+  val: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+  }>;
+  train: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+  }>;
+}> => {
+  const allData = tensorflow.data
+    .generator(generator(images, categories))
+    .map(decodeCategory(categories.length))
+    .mapAsync(decodeImage)
+    // .mapAsync(resize) //TODO figure this out
+    .shuffle(32);
+
+  const valData = allData.take(500); //TODO use actual val split specified by user
+  const trainData = allData.skip(500);
+
+  return { val: valData, train: trainData };
 };
