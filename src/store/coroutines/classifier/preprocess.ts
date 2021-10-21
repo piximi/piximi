@@ -113,7 +113,7 @@ export const preprocess = async (
     .shuffle(32);
 
   //separate into train and val datasets
-  const valDataLength = Math.round(1 - trainingPercentage) * images.length;
+  const valDataLength = Math.round((1 - trainingPercentage) * images.length);
 
   const valData = allData.take(valDataLength); //TODO use actual val split specified by user
   const trainData = allData.skip(valDataLength);

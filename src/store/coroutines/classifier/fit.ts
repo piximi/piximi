@@ -22,7 +22,7 @@ export const fit = async (
       onEpochEnd: onEpochEnd,
     },
     epochs: options.epochs,
-    // validationData: data.val, //TODO fix this: when uncommenting, training loop cashes
+    validationData: data.val, //TODO fix this: when uncommenting, training loop cashes
   };
 
   const status = await compiled.fitDataset(
