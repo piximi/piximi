@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import * as tfvis from "@tensorflow/tfjs-vis";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -64,7 +65,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
           <DatasetSettingsListItem />
         </List>
-        <div id={"vis-train-container"} />
+        <div id={"tfvis-container"} />
       </DialogContent>
     </Dialog>
   );

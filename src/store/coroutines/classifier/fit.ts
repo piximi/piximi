@@ -1,6 +1,7 @@
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { FitOptions } from "../../../types/FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
+import * as tfvis from "@tensorflow/tfjs-vis";
 
 export const fit = async (
   compiled: LayersModel,
@@ -17,10 +18,20 @@ export const fit = async (
   options: FitOptions,
   onEpochEnd: any
 ): Promise<{ fitted: LayersModel; status: History }> => {
+  const metrics = ["loss", "val_loss"]; //TODO can I grab this from somewhre else?
+
+  //Visualization
+  const container = document.getElementById("tfvis-container") as HTMLElement;
+
+  tfvis.show.modelSummary(container, compiled);
+
   const args = {
-    callbacks: {
-      onEpochEnd: onEpochEnd,
-    },
+    callbacks: [
+      {
+        onEpochEnd: onEpochEnd,
+      },
+      tfvis.show.fitCallbacks(container, metrics),
+    ],
     epochs: options.epochs,
     validationData: data.val.batch(options.batchSize),
   };
