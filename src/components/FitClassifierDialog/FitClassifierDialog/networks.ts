@@ -54,10 +54,9 @@ export const simpleCNN = (input_shape: Shape, num_classes: number) => {
 
   // Our last layer is a dense layer which has 10 output units, one for each
   // output class (i.e. 0, 1, 2, 3, 4, 5, 6, 7, 8, 9).
-  const NUM_OUTPUT_CLASSES = 10;
   model.add(
     tensorflow.layers.dense({
-      units: NUM_OUTPUT_CLASSES,
+      units: num_classes,
       kernelInitializer: "varianceScaling",
       activation: "softmax",
     })
