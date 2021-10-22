@@ -4,7 +4,7 @@ import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { SaveMenu } from "../SaveMenu";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import DownloadIcon from "@mui/icons-material/Download";
 
 export const SaveListItem = () => {
   return (
@@ -14,7 +14,7 @@ export const SaveListItem = () => {
         <>
           <ListItem button {...bindTrigger(popupState)}>
             <ListItemIcon>
-              <FolderOpenIcon />
+              <DownloadIcon />
             </ListItemIcon>
 
             <ListItemText primary="Save" />

@@ -30,21 +30,19 @@ const initialState: Classifier = {
   preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  lossHistory: [],
-  modelName: "MobileNet",
+  modelName: "ResNet",
   modelMultiplier: "0.0",
   modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],
   opening: false,
-  optimizationAlgorithm: OptimizationAlgorithm.StochasticGradientDescent,
+  optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
   rescaleOptions: {
-    rescale: false,
+    rescale: true,
     rescaleMinMax: { min: 0, max: 1 },
   },
   saving: false,
   trainingPercentage: 0.5,
-  validationLossHistory: [],
   testPercentage: 0.25,
 };
 
@@ -97,7 +95,6 @@ export const classifierSlice = createSlice({
       const { mnistClassifier } = action.payload;
 
       state.compiled = mnistClassifier.compiled;
-      state.data = mnistClassifier.data;
       state.fitOptions = mnistClassifier.fitOptions;
       state.inputShape = mnistClassifier.inputShape;
       state.learningRate = mnistClassifier.learningRate;
@@ -110,7 +107,6 @@ export const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
       state.trainingPercentage = mnistClassifier.trainingPercentage;
-      state.validationData = mnistClassifier.validationData;
 
       //initialize all others to false/undefined, since we are essentially initializing a new classifier
       state.compiling = false;
@@ -119,15 +115,14 @@ export const classifierSlice = createSlice({
       state.fitted = undefined;
       state.fitting = false;
       state.history = undefined;
-      state.lossHistory = undefined;
       state.opened = undefined;
       state.opening = false;
       state.predicting = false;
       state.predictions = undefined;
       state.preprocessing = false;
       state.saving = false;
-      state.validationLossHistory = undefined;
     },
+
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
@@ -168,14 +163,6 @@ export const classifierSlice = createSlice({
 
       state.lossFunction = lossFunction;
     },
-    updateLossHistory(
-      state,
-      action: PayloadAction<{ batch: number; loss: number }>
-    ) {
-      const { batch, loss } = action.payload;
-
-      state.lossHistory = [...state.lossHistory!, { x: batch, y: loss }];
-    },
     updateMetrics(state, action: PayloadAction<{ metrics: Array<Metric> }>) {
       const { metrics } = action.payload;
 
@@ -188,6 +175,9 @@ export const classifierSlice = createSlice({
       state.modelName = action.payload.modelOptions.modelName;
       state.modelVersion = action.payload.modelOptions.modelVersion;
       state.modelMultiplier = action.payload.modelOptions.modelMultiplier;
+    },
+    updateModelName(state, action: PayloadAction<{ modelName: string }>) {
+      state.modelName = action.payload.modelName;
     },
     updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
       const { opened } = action.payload;
@@ -233,17 +223,6 @@ export const classifierSlice = createSlice({
 
       state.trainingPercentage = trainingPercentage;
     },
-    updateValidationLossHistory(
-      state,
-      action: PayloadAction<{ batch: number; loss: number }>
-    ) {
-      const { batch, loss } = action.payload;
-
-      state.validationLossHistory = [
-        ...state.validationLossHistory!,
-        { x: batch, y: loss },
-      ];
-    },
     updateTestPercentage(
       state,
       action: PayloadAction<{ testPercentage: number }>
@@ -272,6 +251,5 @@ export const {
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,
-  updateValidationLossHistory,
   updateTestPercentage,
 } = classifierSlice.actions;

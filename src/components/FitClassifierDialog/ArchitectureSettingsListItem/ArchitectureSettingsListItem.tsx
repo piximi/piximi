@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { ClassifierSettingsGrid } from "./ClassifierSettingsGrid/ClassifierSettingsGrid";
+import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
   Collapse,
@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const ClassifierSettingsListItem = () => {
+export const ArchitectureSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 
@@ -96,7 +96,7 @@ export const ClassifierSettingsListItem = () => {
         </ListItemIcon>
 
         <ListItemText
-          primary="Classifier Settings"
+          primary="Architecture Settings"
           style={{ fontSize: "20px" }}
         />
       </ListItem>
@@ -106,7 +106,7 @@ export const ClassifierSettingsListItem = () => {
         unmountOnExit
       >
         <form className={classes.container} noValidate autoComplete="off">
-          <ClassifierSettingsGrid />
+          <ArchitectureSettingsGrid />
         </form>
       </Collapse>
     </>

@@ -1,39 +1,72 @@
 import { put, select } from "redux-saga/effects";
-import { compile, fit, preprocess } from "../../coroutines/classifier";
+import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
   categorizedImagesSelector,
+  compiledSelector,
   compileOptionsSelector,
+  createdCategoriesCountSelector,
   createdCategoriesSelector,
+  dataSelector,
   fitOptionsSelector,
+  openedSelector,
+  trainingPercentageSelector,
 } from "../../selectors";
-import { getMnistModel } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
+import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
+import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 
 export function* fitSaga(action: any): any {
+  //TODO: there are some redundancies between fitSaga and openSaga/preprocessSaga. Should we be calling openSaga
+  //or compileSaga or preprocessSaga prior to calling fitSaga?
+
   const { onEpochEnd } = action.payload;
 
-  // const pathname =
-  //     "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
+  const architectureOptions = yield select(architectureOptionsSelector);
 
-  // const classes = yield select(createdCategoriesCountSelector);
+  const rescaleOptions = yield select(rescaleOptionsSelector);
 
-  // const opened = yield open(pathname, classes);
-  const opened = yield getMnistModel();
+  const trainingPercentage = yield select(trainingPercentageSelector);
 
-  const compileOptions = yield select(compileOptionsSelector);
+  const classes = yield select(createdCategoriesCountSelector);
 
-  const compiled = yield compile(opened, compileOptions);
+  let opened = yield select(openedSelector);
 
-  const images = yield select(categorizedImagesSelector);
+  if (!opened) {
+    opened = yield open(architectureOptions, classes);
+    yield put(classifierSlice.actions.updateOpened({ opened: opened }));
+  }
 
-  const categories = yield select(createdCategoriesSelector);
+  let compiled = yield select(compiledSelector);
 
-  const data = yield preprocess(images, categories);
+  if (!compiled) {
+    const compileOptions = yield select(compileOptionsSelector);
+
+    compiled = yield compile(opened, compileOptions);
+
+    yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+  }
+
+  let data = yield select(dataSelector);
+
+  if (!data) {
+    const images = yield select(categorizedImagesSelector);
+
+    const categories = yield select(createdCategoriesSelector);
+
+    data = yield preprocess(
+      images,
+      categories,
+      architectureOptions.inputShape,
+      rescaleOptions,
+      trainingPercentage
+    );
+
+    yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
+  }
 
   const options = yield select(fitOptionsSelector);
 
   const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
-  debugger;
 
   const payload = { fitted: fitted, status: status };
 

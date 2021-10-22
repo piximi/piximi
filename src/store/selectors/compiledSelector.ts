@@ -5,6 +5,6 @@ export const compiledSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): LayersModel => {
-  return classifier.compiled!;
+}): LayersModel | undefined => {
+  return classifier.compiled;
 };

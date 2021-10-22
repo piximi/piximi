@@ -1,13 +1,15 @@
 import * as React from "react";
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { DialogTransition } from "../DialogTransition";
-import { ClassifierSettingsListItem } from "../ClassifierSettingsListItem/ClassifierSettingsListItem";
+import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 // additional stuff to test
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
+import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import * as tfvis from "@tensorflow/tfjs-vis";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -21,12 +23,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
 
   const onFit = async () => {
-    // const history = await train_mnist();
     dispatch(
       classifierSlice.actions.fit({
         onEpochEnd: (epoch: number, logs: any) => {
-          //TODO here map over options.metrics and log each of those (in addition to logs.loss)
-          //Your logs should contain all specified options.metric
           console.info(logs);
           console.info(epoch + ":" + logs.loss);
         },
@@ -58,11 +57,13 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             openedDialog={openedDialog}
           />
 
-          <ClassifierSettingsListItem />
+          <ArchitectureSettingsListItem />
+
+          <OptimizerSettingsListItem />
 
           <DatasetSettingsListItem />
         </List>
-        <div id={"vis-train-container"} />
+        <div id={"tfvis-container"} />
       </DialogContent>
     </Dialog>
   );

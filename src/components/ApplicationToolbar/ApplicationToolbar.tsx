@@ -1,7 +1,6 @@
 import React from "react";
 import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
-import { SearchInput } from "../SearchInput";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { useStyles } from "./ApplicationToolbar.css";
@@ -45,7 +44,7 @@ export const ApplicationToolbar = () => {
         className={classes.zoomSlider}
       />
       <ZoomInIcon className={classes.zoomIcon} />
-      <SearchInput />
+      {/*<SearchInput />*/}
       <UploadButton />
     </Toolbar>
   );

@@ -22,7 +22,6 @@ export const SegmenterSettingsDialogAppBar = ({
     // debugger;
   };
 
-  //TODO I would like the play button to be on the right side of the toolbar
   return (
     <AppBar className={classes.settingsDialogAppBar}>
       <Toolbar>

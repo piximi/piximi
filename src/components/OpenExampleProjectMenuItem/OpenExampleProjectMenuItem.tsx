@@ -13,8 +13,6 @@ import { CompileOptions } from "../../types/CompileOptions";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { getMnistModel } from "../FitClassifierDialog/FitClassifierDialog/networks";
-import { compile } from "../../store/coroutines/classifier/compile";
 import { FitOptions } from "../../types/FitOptions";
 import { MenuItem } from "@mui/material";
 
@@ -43,7 +41,7 @@ export const OpenExampleProjectMenuItem = ({
     const data = new MnistData();
     await data.load();
 
-    const numExamples = 5000; //Eventually you might want to change this back to ~7000 (better training)
+    const numExamples = 1000; //Eventually you might want to change this back to ~7000 (better training)
 
     //those are the examples we'll show to the user (as to not load all data)
     const examples = data.nextTrainBatch(numExamples);
@@ -128,8 +126,8 @@ export const OpenExampleProjectMenuItem = ({
       batchSize: 512,
       epochs: 10,
       initialEpoch: 0,
-      test_data_size: 1000, //TODO experiment with 10000
-      train_data_size: 6500, //TODO experiment with 55000
+      test_data_size: 1000, //for better accuracy, experiment with 10000
+      train_data_size: 6500, //for better accuracy, experiment with 55000
       shuffle: true,
     };
 
@@ -140,54 +138,20 @@ export const OpenExampleProjectMenuItem = ({
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     };
 
-    //get training data
-    const [trainValXs, trainValYs] = tensorflow.tidy(() => {
-      const d = data.nextTrainBatch(mnistFitOptions.train_data_size!);
-
-      if (!d) return;
-
-      return [
-        d.xs.reshape([mnistFitOptions.train_data_size!, 28, 28, 1]),
-        d.labels,
-      ];
-    }) as Array<Tensor2D>;
-
     const training_percentage = 0.85;
-    const training_split = Math.round(
-      training_percentage * trainValXs.shape[0]
-    );
-
-    //extract validation from test data
-    const [trainXs, valXs] = tensorflow.split(trainValXs, [
-      training_split,
-      trainValXs.shape[0] - training_split,
-    ]);
-    const [trainYs, valYs] = tensorflow.split(trainValYs, [
-      training_split,
-      trainValXs.shape[0] - training_split,
-    ]);
-
-    //get model
-    const mnistModel = getMnistModel();
-
-    const compiledMnistModel = compile(mnistModel, mnistCompileOptions);
 
     const mnistClassifier = {
-      compiled: compiledMnistModel,
-      data: [trainXs, trainYs],
       fitOptions: mnistFitOptions,
       inputShape: { r: 28, c: 28, channels: 1 },
       learningRate: mnistCompileOptions.learningRate,
       lossFunction: mnistCompileOptions.lossFunction,
       metrics: mnistCompileOptions.metrics,
-      model: mnistModel,
       modelMultiplier: "0.0",
-      modelName: "mnist",
+      modelName: "SimpleCNN",
       modelVersion: "1",
       optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
       testPercentage: 0.2,
       trainingPercentage: training_percentage, //determines train-val split
-      validationData: [valXs, valYs],
     };
 
     dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));

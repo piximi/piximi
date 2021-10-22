@@ -1,29 +1,54 @@
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { FitOptions } from "../../../types/FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
+import * as tfvis from "@tensorflow/tfjs-vis";
 
 export const fit = async (
   compiled: LayersModel,
-  data: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-  }>,
+  data: {
+    val: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor;
+      ys: tensorflow.Tensor;
+    }>;
+    train: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor;
+      ys: tensorflow.Tensor;
+    }>;
+  },
   options: FitOptions,
   onEpochEnd: any
 ): Promise<{ fitted: LayersModel; status: History }> => {
+  const compiledMetrics = compiled.metrics as Array<string>;
+  const metrics = compiledMetrics.concat(
+    compiledMetrics.map((metric: string) => {
+      return "val_" + metric;
+    }),
+    "loss",
+    "val_loss"
+  );
+
+  //Visualization
+  // TODO eventually move this to the Architecture Settings component
+  const container = document.getElementById("tfvis-container") as HTMLElement;
+  tfvis.show.modelSummary(container, compiled);
+
   const args = {
-    callbacks: {
-      onEpochEnd: onEpochEnd,
-    },
+    callbacks: [
+      {
+        onEpochEnd: onEpochEnd,
+      },
+      tfvis.show.fitCallbacks(container, metrics, {
+        callbacks: ["onEpochEnd"],
+      }),
+    ],
     epochs: options.epochs,
+    validationData: data.val.batch(options.batchSize),
   };
 
-  // await data.batch(8).forEachAsync((e: any) => console.log(e))
-  // const n = await data.batch(8).iterator()
-  // console.info(await n.next());
-
-  const status = await compiled.fitDataset(data.batch(512), args); //TODO replace 512 by options.batchSize
-  //TODO fitDataset() should be taking test_data_size, train_data_size, shuffle args, as arguments
+  const status = await compiled.fitDataset(
+    data.train.batch(options.batchSize),
+    args
+  );
 
   return { fitted: compiled, status: status };
 };

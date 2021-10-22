@@ -5,6 +5,6 @@ export const openedSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): LayersModel => {
-  return classifier.opened!;
+}): LayersModel | undefined => {
+  return classifier.opened;
 };
