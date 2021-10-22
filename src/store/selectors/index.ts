@@ -15,6 +15,7 @@ export { imageViewerOperationSelector } from "./imageViewerOperationSelector";
 export { imageViewerSelectionModeSelector } from "./imageViewerSelectionModeSelector";
 export { imagesSelector } from "./imagesSelector";
 export { lossHistorySelector } from "./lossHistorySelector";
+export { metricsSelector } from "./metricsSelector";
 export { openedSelector } from "./openedSelector";
 export { openingSelector } from "./openingSelector";
 export { projectSelector } from "./projectSelector";
