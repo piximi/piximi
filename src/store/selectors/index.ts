@@ -21,7 +21,6 @@ export { projectSelector } from "./projectSelector";
 export { selectedImagesSelector } from "./selectedImagesSelector";
 export { trainingPercentageSelector } from "./trainingPercentageSelector";
 export { unknownCategorySelector } from "./unknownCategorySelector";
-export { validationDataSelector } from "./validationDataSelector";
 export { validationLossHistorySelector } from "./validationLossHistorySelector";
 export { validationPercentageSelector } from "./validationPercentageSelector";
 export { visibleImagesSelector } from "./visibleImagesSelector";

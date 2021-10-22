@@ -10,6 +10,7 @@ export const dataSelector = ({
       xs: tensorflow.Tensor;
       ys: tensorflow.Tensor;
     }>
-  | Array<tensorflow.Tensor2D> => {
-  return classifier.data!;
+  | Array<tensorflow.Tensor2D>
+  | undefined => {
+  return classifier.data;
 };

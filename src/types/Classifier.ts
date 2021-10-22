@@ -16,8 +16,8 @@ import { RescaleOptions } from "./RescaleOptions";
 export type Classifier = {
   compiled?: LayersModel;
   compiling: boolean;
-  data?: //TODO data and validationData might not be necessary (we should get this information preprocessing Images in the Project)
-  | tensorflow.data.Dataset<{
+  data?:
+    | tensorflow.data.Dataset<{
         xs: tensorflow.Tensor;
         ys: tensorflow.Tensor;
       }>
@@ -49,12 +49,6 @@ export type Classifier = {
   rescaleOptions: RescaleOptions;
   saving: boolean;
   trainingPercentage: number;
-  validationData?:
-    | tensorflow.data.Dataset<{
-        xs: tensorflow.Tensor;
-        ys: tensorflow.Tensor;
-      }>
-    | Array<Tensor2D>;
   validationLossHistory?: Array<{ x: number; y: number }>;
   testPercentage: number;
 };

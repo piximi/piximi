@@ -16,7 +16,7 @@ import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelect
 import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 
 const modelArchitecture = {
-  MnistCNN: "MnistCNN",
+  SimpleCNN: "SimpleCNN",
   ResNet: "ResNet",
 };
 

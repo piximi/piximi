@@ -41,6 +41,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
   const compiled = useSelector(compiledSelector);
 
   const onStopFitting = () => {
+    if (!compiled) return;
     compiled.stopTraining = true;
     dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
   };

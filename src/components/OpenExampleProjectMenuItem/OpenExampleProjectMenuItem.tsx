@@ -138,35 +138,9 @@ export const OpenExampleProjectMenuItem = ({
       optimizationAlgorithm: OptimizationAlgorithm.Adam,
     };
 
-    //get training data
-    const [trainValXs, trainValYs] = tensorflow.tidy(() => {
-      const d = data.nextTrainBatch(mnistFitOptions.train_data_size!);
-
-      if (!d) return;
-
-      return [
-        d.xs.reshape([mnistFitOptions.train_data_size!, 28, 28, 1]),
-        d.labels,
-      ];
-    }) as Array<Tensor2D>;
-
     const training_percentage = 0.85;
-    const training_split = Math.round(
-      training_percentage * trainValXs.shape[0]
-    );
-
-    //extract validation from test data
-    const [trainXs, valXs] = tensorflow.split(trainValXs, [
-      training_split,
-      trainValXs.shape[0] - training_split,
-    ]);
-    const [trainYs, valYs] = tensorflow.split(trainValYs, [
-      training_split,
-      trainValXs.shape[0] - training_split,
-    ]);
 
     const mnistClassifier = {
-      data: [trainXs, trainYs],
       fitOptions: mnistFitOptions,
       inputShape: { r: 28, c: 28, channels: 1 },
       learningRate: mnistCompileOptions.learningRate,
@@ -178,7 +152,6 @@ export const OpenExampleProjectMenuItem = ({
       optimizationAlgorithm: mnistCompileOptions.optimizationAlgorithm,
       testPercentage: 0.2,
       trainingPercentage: training_percentage, //determines train-val split
-      validationData: [valXs, valYs],
     };
 
     dispatch(classifierSlice.actions.openMnistClassifier({ mnistClassifier }));

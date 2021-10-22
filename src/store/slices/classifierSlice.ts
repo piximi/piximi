@@ -97,7 +97,6 @@ export const classifierSlice = createSlice({
       const { mnistClassifier } = action.payload;
 
       state.compiled = mnistClassifier.compiled;
-      state.data = mnistClassifier.data;
       state.fitOptions = mnistClassifier.fitOptions;
       state.inputShape = mnistClassifier.inputShape;
       state.learningRate = mnistClassifier.learningRate;
@@ -110,7 +109,6 @@ export const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
       state.trainingPercentage = mnistClassifier.trainingPercentage;
-      state.validationData = mnistClassifier.validationData;
 
       //initialize all others to false/undefined, since we are essentially initializing a new classifier
       state.compiling = false;
@@ -128,6 +126,7 @@ export const classifierSlice = createSlice({
       state.saving = false;
       state.validationLossHistory = undefined;
     },
+
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
