@@ -35,7 +35,6 @@ export type Classifier = {
     | LossFunction
     | Array<LossFunction>
     | { [outputName: string]: LossFunction };
-  lossHistory?: Array<{ x: number; y: number }>;
   metrics: Array<Metric>;
   model?: LayersModel;
   modelName: string;
@@ -49,6 +48,5 @@ export type Classifier = {
   rescaleOptions: RescaleOptions;
   saving: boolean;
   trainingPercentage: number;
-  validationLossHistory?: Array<{ x: number; y: number }>;
   testPercentage: number;
 };

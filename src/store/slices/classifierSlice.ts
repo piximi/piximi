@@ -30,7 +30,6 @@ const initialState: Classifier = {
   preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  lossHistory: [],
   modelName: "ResNet",
   modelMultiplier: "0.0",
   modelVersion: "3",
@@ -44,7 +43,6 @@ const initialState: Classifier = {
   },
   saving: false,
   trainingPercentage: 0.5,
-  validationLossHistory: [],
   testPercentage: 0.25,
 };
 
@@ -117,14 +115,12 @@ export const classifierSlice = createSlice({
       state.fitted = undefined;
       state.fitting = false;
       state.history = undefined;
-      state.lossHistory = undefined;
       state.opened = undefined;
       state.opening = false;
       state.predicting = false;
       state.predictions = undefined;
       state.preprocessing = false;
       state.saving = false;
-      state.validationLossHistory = undefined;
     },
 
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
@@ -166,14 +162,6 @@ export const classifierSlice = createSlice({
       const { lossFunction } = action.payload;
 
       state.lossFunction = lossFunction;
-    },
-    updateLossHistory(
-      state,
-      action: PayloadAction<{ batch: number; loss: number }>
-    ) {
-      const { batch, loss } = action.payload;
-
-      state.lossHistory = [...state.lossHistory!, { x: batch, y: loss }];
     },
     updateMetrics(state, action: PayloadAction<{ metrics: Array<Metric> }>) {
       const { metrics } = action.payload;
@@ -235,17 +223,6 @@ export const classifierSlice = createSlice({
 
       state.trainingPercentage = trainingPercentage;
     },
-    updateValidationLossHistory(
-      state,
-      action: PayloadAction<{ batch: number; loss: number }>
-    ) {
-      const { batch, loss } = action.payload;
-
-      state.validationLossHistory = [
-        ...state.validationLossHistory!,
-        { x: batch, y: loss },
-      ];
-    },
     updateTestPercentage(
       state,
       action: PayloadAction<{ testPercentage: number }>
@@ -274,6 +251,5 @@ export const {
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,
-  updateValidationLossHistory,
   updateTestPercentage,
 } = classifierSlice.actions;

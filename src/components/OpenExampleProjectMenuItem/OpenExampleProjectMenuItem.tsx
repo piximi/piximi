@@ -126,8 +126,8 @@ export const OpenExampleProjectMenuItem = ({
       batchSize: 512,
       epochs: 10,
       initialEpoch: 0,
-      test_data_size: 1000, //TODO experiment with 10000
-      train_data_size: 6500, //TODO experiment with 55000
+      test_data_size: 1000, //for better accuracy, experiment with 10000
+      train_data_size: 6500, //for better accuracy, experiment with 55000
       shuffle: true,
     };
 

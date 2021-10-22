@@ -26,8 +26,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     dispatch(
       classifierSlice.actions.fit({
         onEpochEnd: (epoch: number, logs: any) => {
-          //TODO here map over options.metrics and log each of those (in addition to logs.loss)
-          //Your logs should contain all specified options.metric
           console.info(logs);
           console.info(epoch + ":" + logs.loss);
         },

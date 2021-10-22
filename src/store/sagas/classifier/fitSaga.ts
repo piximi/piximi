@@ -1,5 +1,5 @@
 import { put, select } from "redux-saga/effects";
-import { compile, open, fit, preprocess } from "../../coroutines/classifier";
+import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
   categorizedImagesSelector,
@@ -14,7 +14,6 @@ import {
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
-import { metricsSelector } from "../../selectors/metricsSelector";
 
 export function* fitSaga(action: any): any {
   //TODO: there are some redundancies between fitSaga and openSaga/preprocessSaga. Should we be calling openSaga

@@ -2,7 +2,6 @@ import { History, LayersModel } from "@tensorflow/tfjs";
 import { FitOptions } from "../../../types/FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 import * as tfvis from "@tensorflow/tfjs-vis";
-import { Metric } from "../../../types/Metric";
 
 export const fit = async (
   compiled: LayersModel,
@@ -29,6 +28,7 @@ export const fit = async (
   );
 
   //Visualization
+  // TODO eventually move this to the Architecture Settings component
   const container = document.getElementById("tfvis-container") as HTMLElement;
   tfvis.show.modelSummary(container, compiled);
 
