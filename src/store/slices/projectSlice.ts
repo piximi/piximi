@@ -8,6 +8,7 @@ import { Shape } from "../../types/Shape";
 import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
+import { SerializedImageType } from "../../types/SerializedImageType";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
@@ -111,6 +112,34 @@ export const projectSlice = createSlice({
       state.images = filter(state.images, (image: Image) => {
         return !action.payload.ids.includes(image.id);
       });
+    },
+    openImages(
+      state: Project,
+      action: PayloadAction<{ images: Array<SerializedImageType> }>
+    ) {
+      const newImages: Array<Image> = [];
+
+      action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const image: Image = {
+          categoryId: serializedImage.imageCategoryId,
+          id: serializedImage.imageId,
+          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          name: serializedImage.imageFilename,
+          partition: 0,
+          shape: {
+            width: serializedImage.imageWidth,
+            height: serializedImage.imageHeight,
+            channels: serializedImage.imageChannels,
+            planes: serializedImage.imagePlanes,
+            frames: serializedImage.imageFrames,
+          },
+          src: serializedImage.imageData,
+        };
+
+        newImages.push(image);
+      });
+
+      state.images = newImages;
     },
     setCategories(
       state: Project,

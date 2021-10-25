@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { ListItemText, MenuItem } from "@mui/material";
 import { projectSlice } from "../../store/slices";
+import { SerializedImageType } from "../../types/SerializedImageType";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -18,6 +19,8 @@ export const OpenProjectMenuItem = ({
   ) => {
     event.persist();
 
+    close();
+
     if (!event.currentTarget.files) return;
 
     const file = event.currentTarget.files[0];
@@ -26,50 +29,23 @@ export const OpenProjectMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
+        //Open project (images, categories)
         const project = JSON.parse(event.target.result as string);
 
-        //update Project Slice
-        dispatch(projectSlice.actions.setImages({ images: project.images }));
-        debugger;
         dispatch(
-          projectSlice.actions.setCategories({ categories: project.categories })
+          projectSlice.actions.openImages({
+            images: project.project.serializedImages,
+          })
         );
-        dispatch(projectSlice.actions.setProjectName({ name: project.name }));
 
-        debugger;
-
-        //project.project and project.classifier
-
-        //clear all images
-        // dispatch(applicationSlice.actions.setImages({ images: [] }));
-
-        // project.forEach(
-        //     (serializedImage: SerializedFileType, index: number) => {
-        //       if (index === 0) {
-        //         dispatch(
-        //             setActiveImage({
-        //               image: serializedImage.imageId,
-        //             })
-        //         );
-        //
-        //         dispatch(
-        //             setSelectedAnnotations({
-        //               selectedAnnotations: [],
-        //               selectedAnnotation: undefined,
-        //             })
-        //         );
-        //
-        //         dispatch(
-        //             setOperation({ operation: ToolType.RectangularAnnotation })
-        //         );
-        //       }
-        //       dispatch(
-        //           applicationSlice.actions.openAnnotations({
-        //             file: serializedImage,
-        //           })
-        //       );
-        //     }
-        // );
+        dispatch(
+          projectSlice.actions.setCategories({
+            categories: project.project.categories,
+          })
+        );
+        dispatch(
+          projectSlice.actions.setProjectName({ name: project.project.name })
+        );
       }
     };
 
