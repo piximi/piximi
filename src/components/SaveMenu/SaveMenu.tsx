@@ -1,7 +1,7 @@
 import React from "react";
 import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
-import { classifierSelector, projectSelector } from "../../store/selectors";
+import { classifierSelector } from "../../store/selectors";
 import { bindMenu } from "material-ui-popup-state";
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";

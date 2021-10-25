@@ -85,12 +85,46 @@ export const classifierSlice = createSlice({
     ) {
       state.preprocessing = true;
     },
+    setClassifier(
+      state,
+      action: PayloadAction<{
+        classifier: Classifier;
+      }>
+    ) {
+      const { classifier } = action.payload;
+
+      state.fitOptions = classifier.fitOptions;
+      state.inputShape = classifier.inputShape;
+      state.learningRate = classifier.learningRate;
+      state.lossFunction = classifier.lossFunction;
+      state.metrics = classifier.metrics;
+      state.model = classifier.model;
+      state.modelName = classifier.modelName;
+      state.modelVersion = classifier.modelVersion;
+      state.modelMultiplier = classifier.modelMultiplier;
+
+      state.optimizationAlgorithm = classifier.optimizationAlgorithm;
+      state.trainingPercentage = classifier.trainingPercentage;
+
+      //initialize all others to false/undefined, since we are essentially initializing a new classifier
+      state.compiling = classifier.compiling;
+      state.evaluating = classifier.evaluating;
+      state.evaluations = classifier.evaluations;
+      state.fitting = classifier.fitting;
+      state.history = classifier.history;
+      state.opening = classifier.opening;
+      state.predicting = classifier.predicting;
+      state.predictions = classifier.predictions;
+      state.preprocessing = classifier.preprocessing;
+      state.saving = classifier.saving;
+    },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
 
       state.fitOptions.batchSize = batchSize;
     },
     openMnistClassifier(
+      //TODO this might not be necessary eventually
       state,
       action: PayloadAction<{ mnistClassifier: any }>
     ) {

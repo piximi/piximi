@@ -1,8 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { ListItemText, MenuItem } from "@mui/material";
-import { projectSlice } from "../../store/slices";
-import { SerializedImageType } from "../../types/SerializedImageType";
+import { classifierSlice, projectSlice } from "../../store/slices";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -45,6 +44,13 @@ export const OpenProjectMenuItem = ({
         );
         dispatch(
           projectSlice.actions.setProjectName({ name: project.project.name })
+        );
+
+        //Open Classifier
+        dispatch(
+          classifierSlice.actions.setClassifier({
+            classifier: project.classifier,
+          })
         );
       }
     };
