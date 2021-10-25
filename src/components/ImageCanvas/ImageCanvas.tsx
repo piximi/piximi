@@ -13,8 +13,8 @@ export const ImageCanvas = ({ image }: ImageCanvasProps) => {
 
   React.useEffect(() => {
     if (ref.current) {
-      ref.current.height = image.shape!.r;
-      ref.current.width = image.shape!.c;
+      ref.current.height = image.shape!.height;
+      ref.current.width = image.shape!.width;
 
       const context = ref.current.getContext("2d");
       const background = new Image();

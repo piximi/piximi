@@ -50,7 +50,7 @@ export const resize = async (
 ): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
   const resized = tensorflow.image.resizeBilinear(
     item.xs as tensorflow.Tensor3D,
-    [inputShape.r, inputShape.c]
+    [inputShape.height, inputShape.width]
   );
 
   return new Promise((resolve) => {

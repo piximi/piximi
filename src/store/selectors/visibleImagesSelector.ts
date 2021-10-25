@@ -7,6 +7,7 @@ export const visibleImagesSelector = ({
 }: {
   project: Project;
 }): Array<Image> => {
+  console.info(project.images);
   return project.images.filter((image: Image) => {
     const category = project.categories.find((c: Category) => {
       return c.id === image.categoryId;

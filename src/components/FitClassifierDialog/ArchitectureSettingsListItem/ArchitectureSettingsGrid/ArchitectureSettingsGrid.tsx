@@ -40,7 +40,7 @@ export const ArchitectureSettingsGrid = () => {
     const rows = Number(target.value);
     dispatch(
       classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, r: rows },
+        inputShape: { ...inputShape, height: rows },
       })
     );
   };
@@ -49,7 +49,7 @@ export const ArchitectureSettingsGrid = () => {
     const cols = Number(target.value);
     dispatch(
       classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, c: cols },
+        inputShape: { ...inputShape, width: cols },
       })
     );
   };
@@ -92,7 +92,7 @@ export const ArchitectureSettingsGrid = () => {
               id="shape-rows"
               label="Input rows"
               className={classes.textField}
-              value={inputShape.r}
+              value={inputShape.height}
               onChange={onRowsChange}
             />
           </Grid>
@@ -101,7 +101,7 @@ export const ArchitectureSettingsGrid = () => {
               id="shape-cols"
               label="Input cols"
               className={classes.textField}
-              value={inputShape.c}
+              value={inputShape.width}
               onChange={onColsChange}
             />
           </Grid>

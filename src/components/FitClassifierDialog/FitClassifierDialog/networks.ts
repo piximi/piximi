@@ -8,8 +8,8 @@ import { Shape } from "../../../types/Shape";
 export const simpleCNN = (input_shape: Shape, num_classes: number) => {
   const model = tensorflow.sequential();
 
-  const image_width = input_shape.c;
-  const image_height = input_shape.r;
+  const image_width = input_shape.width;
+  const image_height = input_shape.height;
   const image_channels = input_shape.channels;
 
   // In the first layer of our convolutional neural network we have

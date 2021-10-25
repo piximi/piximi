@@ -6,7 +6,7 @@ export type Image = {
   id: string;
   name: string;
   src: string;
-  shape?: Shape;
+  shape: Shape;
   instances: Array<Instance>;
   partition?: number;
 };

@@ -15,9 +15,11 @@ const dummyImage: Image = {
   name: "nuclei",
   src: nuclei,
   shape: {
-    r: 256,
-    c: 256,
+    height: 256,
+    width: 256,
     channels: 3,
+    planes: 1,
+    frames: 1,
   },
 };
 
@@ -109,6 +111,18 @@ export const projectSlice = createSlice({
       state.images = filter(state.images, (image: Image) => {
         return !action.payload.ids.includes(image.id);
       });
+    },
+    setCategories(
+      state: Project,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      state.categories = action.payload.categories;
+    },
+    setImages(state: Project, action: PayloadAction<{ images: Array<Image> }>) {
+      state.images = action.payload.images;
+    },
+    setProjectName(state: Project, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
     },
     updateCategory(
       state: Project,

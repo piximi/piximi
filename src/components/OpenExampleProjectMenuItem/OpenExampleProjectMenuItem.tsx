@@ -103,7 +103,7 @@ export const OpenExampleProjectMenuItem = ({
         id: uuid.v4(),
         instances: [],
         name: "mnist",
-        shape: { r: 28, c: 28, channels: 1 },
+        shape: { height: 28, width: 28, channels: 1, frames: 1, planes: 1 },
         src: img.toDataURL("image/png", {
           useCanvas: true,
         }),
@@ -142,7 +142,7 @@ export const OpenExampleProjectMenuItem = ({
 
     const mnistClassifier = {
       fitOptions: mnistFitOptions,
-      inputShape: { r: 28, c: 28, channels: 1 },
+      inputShape: { height: 28, width: 28, channels: 1, frames: 1, planes: 1 },
       learningRate: mnistCompileOptions.learningRate,
       lossFunction: mnistCompileOptions.lossFunction,
       metrics: mnistCompileOptions.metrics,
