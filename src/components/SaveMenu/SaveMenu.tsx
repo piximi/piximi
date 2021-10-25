@@ -37,8 +37,6 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
 
         <Divider />
 
-        <MenuItem onClick={() => {}}>Save example project</MenuItem>
-
         <MenuItem onClick={() => {}}>Save classifier</MenuItem>
       </MenuList>
     </Menu>
