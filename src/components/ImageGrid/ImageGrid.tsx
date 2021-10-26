@@ -67,7 +67,7 @@ export const ImageGrid = () => {
           >
             {images.slice(0, max_images).map(
               (
-                image: Image //FIXME for now we'll have to cap the number of shown images to 1000
+                image: Image //FIXME for now we'll have to cap the number of shown images to 100
               ) => (
                 <ImageListItem
                   key={image.id}

@@ -38,6 +38,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
   container: {
     paddingBottom: theme.spacing(8),
     paddingTop: theme.spacing(8),
+    height: "100%",
   },
   count: {
     flexGrow: 1,
@@ -69,6 +70,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   gridList: {
     transform: "translateZ(0)",
+    height: "100%",
   },
   gridTileBar: {
     background:
@@ -80,7 +82,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
   imageDialogAppBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
-  imageDialogContent: {
+  imageDialogContecnt: {
     paddingBottom: theme.spacing(12),
     paddingTop: theme.spacing(12),
   },
@@ -100,6 +102,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   main: {
     flexGrow: 1,
+    height: "100%",
     paddingTop: theme.spacing(3),
     marginLeft: theme.spacing(32),
     transition: theme.transitions.create("margin", {
