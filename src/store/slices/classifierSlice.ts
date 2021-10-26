@@ -123,42 +123,6 @@ export const classifierSlice = createSlice({
 
       state.fitOptions.batchSize = batchSize;
     },
-    openMnistClassifier(
-      //TODO this might not be necessary eventually
-      state,
-      action: PayloadAction<{ mnistClassifier: any }>
-    ) {
-      const { mnistClassifier } = action.payload;
-
-      state.compiled = mnistClassifier.compiled;
-      state.fitOptions = mnistClassifier.fitOptions;
-      state.inputShape = mnistClassifier.inputShape;
-      state.learningRate = mnistClassifier.learningRate;
-      state.lossFunction = mnistClassifier.lossFunction;
-      state.metrics = mnistClassifier.metrics;
-      state.model = mnistClassifier.model;
-      state.modelName = mnistClassifier.modelName;
-      state.modelVersion = mnistClassifier.modelVersion;
-      state.modelMultiplier = mnistClassifier.modelMultiplier;
-
-      state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
-      state.trainingPercentage = mnistClassifier.trainingPercentage;
-
-      //initialize all others to false/undefined, since we are essentially initializing a new classifier
-      state.compiling = false;
-      state.evaluating = false;
-      state.evaluations = undefined;
-      state.fitted = undefined;
-      state.fitting = false;
-      state.history = undefined;
-      state.opened = undefined;
-      state.opening = false;
-      state.predicting = false;
-      state.predictions = undefined;
-      state.preprocessing = false;
-      state.saving = false;
-    },
-
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
@@ -276,7 +240,6 @@ export const {
   open,
   preprocess,
   updateBatchSize,
-  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,

@@ -141,6 +141,42 @@ export const projectSlice = createSlice({
 
       state.images = newImages;
     },
+    openProject(
+      state: Project,
+      action: PayloadAction<{
+        images: Array<SerializedImageType>;
+        name: string;
+        categories: Array<Category>;
+      }>
+    ) {
+      state.categories = action.payload.categories;
+      state.name = action.payload.name;
+
+      //Open images
+      const newImages: Array<Image> = [];
+
+      action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const image: Image = {
+          categoryId: serializedImage.imageCategoryId,
+          id: serializedImage.imageId,
+          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          name: serializedImage.imageFilename,
+          partition: 0,
+          shape: {
+            width: serializedImage.imageWidth,
+            height: serializedImage.imageHeight,
+            channels: serializedImage.imageChannels,
+            planes: serializedImage.imagePlanes,
+            frames: serializedImage.imageFrames,
+          },
+          src: serializedImage.imageData,
+        };
+
+        newImages.push(image);
+      });
+
+      state.images = newImages;
+    },
     setCategories(
       state: Project,
       action: PayloadAction<{ categories: Array<Category> }>

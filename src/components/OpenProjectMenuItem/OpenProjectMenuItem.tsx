@@ -28,25 +28,18 @@ export const OpenProjectMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
-        //Open project (images, categories)
         const project = JSON.parse(event.target.result as string);
 
+        //Open project
         dispatch(
-          projectSlice.actions.openImages({
+          projectSlice.actions.openProject({
             images: project.project.serializedImages,
-          })
-        );
-
-        dispatch(
-          projectSlice.actions.setCategories({
             categories: project.project.categories,
+            name: project.project.name,
           })
         );
-        dispatch(
-          projectSlice.actions.setProjectName({ name: project.project.name })
-        );
 
-        //Open Classifier
+        //Open Classifier options
         dispatch(
           classifierSlice.actions.setClassifier({
             classifier: project.classifier,
