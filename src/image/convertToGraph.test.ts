@@ -12,7 +12,7 @@ test("foo", async () => {
     id: "",
     instances: [],
     name: "foo.png",
-    shape: { c: 512, channels: 3, r: 512 },
+    shape: { width: 512, channels: 3, height: 512 },
     src: "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg",
   };
 

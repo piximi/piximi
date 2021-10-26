@@ -1,5 +1,7 @@
 export type Shape = {
-  r: number;
-  c: number;
+  width: number;
   channels: number;
+  frames: number;
+  height: number;
+  planes: number;
 };

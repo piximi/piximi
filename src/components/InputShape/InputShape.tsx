@@ -18,7 +18,7 @@ export const InputShape = () => {
           disabled
           helperText="Image height"
           label="Input shape"
-          value={inputShape.r}
+          value={inputShape.height}
         />
       </Grid>
 
@@ -32,7 +32,7 @@ export const InputShape = () => {
           disabled
           helperText="Image width"
           label="&nbsp;"
-          value={inputShape.c}
+          value={inputShape.width}
         />
       </Grid>
 

@@ -16,9 +16,11 @@ const initialState: Classifier = {
   compiling: false,
   evaluating: false,
   inputShape: {
-    r: 256,
-    c: 256,
+    height: 256,
+    width: 256,
     channels: 3,
+    planes: 1,
+    frames: 1,
   },
   fitOptions: {
     epochs: 10,
@@ -83,46 +85,44 @@ export const classifierSlice = createSlice({
     ) {
       state.preprocessing = true;
     },
+    setClassifier(
+      state,
+      action: PayloadAction<{
+        classifier: Classifier;
+      }>
+    ) {
+      const { classifier } = action.payload;
+
+      state.fitOptions = classifier.fitOptions;
+      state.inputShape = classifier.inputShape;
+      state.learningRate = classifier.learningRate;
+      state.lossFunction = classifier.lossFunction;
+      state.metrics = classifier.metrics;
+      state.model = classifier.model;
+      state.modelName = classifier.modelName;
+      state.modelVersion = classifier.modelVersion;
+      state.modelMultiplier = classifier.modelMultiplier;
+
+      state.optimizationAlgorithm = classifier.optimizationAlgorithm;
+      state.trainingPercentage = classifier.trainingPercentage;
+
+      //initialize all others to false/undefined, since we are essentially initializing a new classifier
+      state.compiling = classifier.compiling;
+      state.evaluating = classifier.evaluating;
+      state.evaluations = classifier.evaluations;
+      state.fitting = classifier.fitting;
+      state.history = classifier.history;
+      state.opening = classifier.opening;
+      state.predicting = classifier.predicting;
+      state.predictions = classifier.predictions;
+      state.preprocessing = classifier.preprocessing;
+      state.saving = classifier.saving;
+    },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
 
       state.fitOptions.batchSize = batchSize;
     },
-    openMnistClassifier(
-      state,
-      action: PayloadAction<{ mnistClassifier: any }>
-    ) {
-      const { mnistClassifier } = action.payload;
-
-      state.compiled = mnistClassifier.compiled;
-      state.fitOptions = mnistClassifier.fitOptions;
-      state.inputShape = mnistClassifier.inputShape;
-      state.learningRate = mnistClassifier.learningRate;
-      state.lossFunction = mnistClassifier.lossFunction;
-      state.metrics = mnistClassifier.metrics;
-      state.model = mnistClassifier.model;
-      state.modelName = mnistClassifier.modelName;
-      state.modelVersion = mnistClassifier.modelVersion;
-      state.modelMultiplier = mnistClassifier.modelMultiplier;
-
-      state.optimizationAlgorithm = mnistClassifier.optimizationAlgorithm;
-      state.trainingPercentage = mnistClassifier.trainingPercentage;
-
-      //initialize all others to false/undefined, since we are essentially initializing a new classifier
-      state.compiling = false;
-      state.evaluating = false;
-      state.evaluations = undefined;
-      state.fitted = undefined;
-      state.fitting = false;
-      state.history = undefined;
-      state.opened = undefined;
-      state.opening = false;
-      state.predicting = false;
-      state.predictions = undefined;
-      state.preprocessing = false;
-      state.saving = false;
-    },
-
     updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
       const { compiled } = action.payload;
 
@@ -240,7 +240,6 @@ export const {
   open,
   preprocess,
   updateBatchSize,
-  openMnistClassifier,
   updateCompiled,
   updateEpochs,
   updateFitted,

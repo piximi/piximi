@@ -14,6 +14,12 @@
  * limitations under the License.
  * =============================================================================
  */
+
+/**
+ * WARNING: Unused code! We now have a saved Mnist example project that people can load in instead
+ * of downloading data from the cloud and preprocessing it into tensors. Current approach is much faster.
+ */
+
 import * as tensorflow from "@tensorflow/tfjs";
 
 const IMAGE_SIZE = 784;
@@ -34,6 +40,7 @@ const MNIST_LABELS_PATH =
  * NOTE: This will get much easier. For now, we do data fetching and
  * manipulation manually.
  */
+
 export class MnistData {
   private shuffledTrainIndex: number;
   private shuffledTestIndex: number;

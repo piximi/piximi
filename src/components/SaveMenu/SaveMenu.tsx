@@ -1,9 +1,10 @@
 import React from "react";
 import { saveAs } from "file-saver";
 import { useSelector } from "react-redux";
-import { classifierSelector, projectSelector } from "../../store/selectors";
+import { classifierSelector } from "../../store/selectors";
 import { bindMenu } from "material-ui-popup-state";
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
+import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";
 
 type SaveMenuProps = {
   popupState: any;
@@ -12,14 +13,14 @@ type SaveMenuProps = {
 export const SaveMenu = ({ popupState }: SaveMenuProps) => {
   const classifier = useSelector(classifierSelector);
 
-  const project = useSelector(projectSelector);
+  const serializedProject = useSelector(serializedProjectSelector);
 
   const onSaveProjectClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     const part = {
       classifier: classifier,
-      project: project,
+      project: serializedProject,
       version: "0.0.0",
     };
 
@@ -27,7 +28,7 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
 
     const data = new Blob(parts, { type: "application/json;charset=utf-8" });
 
-    saveAs(data, `${project.name}.json`);
+    saveAs(data, `${serializedProject.name}.json`);
   };
 
   return (
@@ -36,8 +37,6 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
         <MenuItem onClick={onSaveProjectClick}>Save project</MenuItem>
 
         <Divider />
-
-        <MenuItem onClick={() => {}}>Save example project</MenuItem>
 
         <MenuItem onClick={() => {}}>Save classifier</MenuItem>
       </MenuList>

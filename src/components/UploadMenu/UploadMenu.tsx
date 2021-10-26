@@ -40,9 +40,11 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
           image.onload = () => {
             const shape: Shape = {
-              r: image.naturalHeight,
-              c: image.naturalWidth,
+              height: image.naturalHeight,
+              width: image.naturalWidth,
               channels: 4,
+              frames: 1,
+              planes: 1,
             };
 
             dispatch(

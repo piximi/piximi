@@ -8,6 +8,7 @@ import { Shape } from "../../types/Shape";
 import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
+import { SerializedImageType } from "../../types/SerializedImageType";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
@@ -15,9 +16,11 @@ const dummyImage: Image = {
   name: "nuclei",
   src: nuclei,
   shape: {
-    r: 256,
-    c: 256,
+    height: 256,
+    width: 256,
     channels: 3,
+    planes: 1,
+    frames: 1,
   },
 };
 
@@ -109,6 +112,82 @@ export const projectSlice = createSlice({
       state.images = filter(state.images, (image: Image) => {
         return !action.payload.ids.includes(image.id);
       });
+    },
+    openImages(
+      state: Project,
+      action: PayloadAction<{ images: Array<SerializedImageType> }>
+    ) {
+      const newImages: Array<Image> = [];
+
+      action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const image: Image = {
+          categoryId: serializedImage.imageCategoryId,
+          id: serializedImage.imageId,
+          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          name: serializedImage.imageFilename,
+          partition: 0,
+          shape: {
+            width: serializedImage.imageWidth,
+            height: serializedImage.imageHeight,
+            channels: serializedImage.imageChannels,
+            planes: serializedImage.imagePlanes,
+            frames: serializedImage.imageFrames,
+          },
+          src: serializedImage.imageData,
+        };
+
+        newImages.push(image);
+      });
+
+      state.images = newImages;
+    },
+    openProject(
+      state: Project,
+      action: PayloadAction<{
+        images: Array<SerializedImageType>;
+        name: string;
+        categories: Array<Category>;
+      }>
+    ) {
+      state.categories = action.payload.categories;
+      state.name = action.payload.name;
+
+      //Open images
+      const newImages: Array<Image> = [];
+
+      action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const image: Image = {
+          categoryId: serializedImage.imageCategoryId,
+          id: serializedImage.imageId,
+          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          name: serializedImage.imageFilename,
+          partition: 0,
+          shape: {
+            width: serializedImage.imageWidth,
+            height: serializedImage.imageHeight,
+            channels: serializedImage.imageChannels,
+            planes: serializedImage.imagePlanes,
+            frames: serializedImage.imageFrames,
+          },
+          src: serializedImage.imageData,
+        };
+
+        newImages.push(image);
+      });
+
+      state.images = newImages;
+    },
+    setCategories(
+      state: Project,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      state.categories = action.payload.categories;
+    },
+    setImages(state: Project, action: PayloadAction<{ images: Array<Image> }>) {
+      state.images = action.payload.images;
+    },
+    setProjectName(state: Project, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
     },
     updateCategory(
       state: Project,

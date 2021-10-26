@@ -13,8 +13,8 @@ export const LabelCanvas = ({ image }: LabelCanvasProps) => {
 
   React.useEffect(() => {
     if (ref.current) {
-      ref.current.height = image.shape!.r;
-      ref.current.width = image.shape!.c;
+      ref.current.height = image.shape!.height;
+      ref.current.width = image.shape!.width;
     }
   }, [image.shape]);
 
