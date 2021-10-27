@@ -35,8 +35,8 @@ export const ImageGrid = () => {
   const scaleFactor = useSelector(tileSizeSelector);
 
   const getSize = (scaleFactor: number, image: Image) => {
-    const width = (230 * scaleFactor).toString() + "px";
-    const height = (185 * scaleFactor).toString() + "px";
+    const width = (200 * scaleFactor).toString() + "px";
+    const height = (200 * scaleFactor).toString() + "px";
 
     const color = categories.find((category: Category) => {
       return category.id === image.categoryId;
@@ -62,7 +62,7 @@ export const ImageGrid = () => {
         <Container className={classes.container} maxWidth={false}>
           <ImageList
             className={classes.gridList}
-            cols={Math.floor(4 / scaleFactor)}
+            cols={Math.floor(6 / scaleFactor)}
             rowHeight={"auto"}
           >
             {images.slice(0, max_images).map(
