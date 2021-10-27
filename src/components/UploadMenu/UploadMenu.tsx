@@ -11,6 +11,9 @@ import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "../DropboxMenuItem";
 import { Shape } from "../../types/Shape";
+import * as ImageJS from "image-js";
+import { Image } from "../../types/Image";
+import { v4 } from "uuid";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -28,35 +31,37 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
     onClose(event);
     event.persist();
     if (event.currentTarget.files) {
-      const blob = event.currentTarget.files[0];
+      for (let i = 0; i < event.currentTarget.files.length; i++) {
+        const file = event.currentTarget.files[i];
 
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        if (event.target) {
-          const src = event.target.result;
-
-          const image = new Image();
-
-          image.onload = () => {
+        file.arrayBuffer().then((buffer) => {
+          ImageJS.Image.load(buffer).then((image) => {
+            //check whether name already exists
             const shape: Shape = {
-              height: image.naturalHeight,
-              width: image.naturalWidth,
-              channels: 4,
+              channels: image.components,
               frames: 1,
+              height: image.height,
               planes: 1,
+              width: image.width,
             };
 
-            dispatch(
-              createImage({ name: "foo", shape: shape, src: src as string })
-            );
-          };
+            const imageDataURL = image.toDataURL("image/png", {
+              useCanvas: true,
+            });
 
-          image.src = src as string;
-        }
-      };
+            const loaded: Image = {
+              categoryId: "00000000-0000-0000-0000-000000000000",
+              id: v4(),
+              instances: [],
+              name: file.name,
+              shape: shape,
+              src: imageDataURL,
+            };
 
-      reader.readAsDataURL(blob);
+            dispatch(createImage({ image: loaded }));
+          });
+        });
+      }
     }
   };
 
@@ -66,6 +71,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         accept="image/*"
         hidden
         type="file"
+        multiple
         id="upload-images"
         onChange={onUploadFromComputerChange}
       />

@@ -3,8 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Category } from "../../types/Category";
 import { v4 } from "uuid";
 import { Image } from "../../types/Image";
-import { findIndex, filter } from "underscore";
-import { Shape } from "../../types/Shape";
+import { filter, findIndex } from "underscore";
 import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
@@ -12,6 +11,7 @@ import { SerializedImageType } from "../../types/SerializedImageType";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
+  categoryId: "00000000-0000-0000-0000-000000000000",
   instances: [],
   name: "nuclei",
   src: nuclei,
@@ -53,19 +53,8 @@ export const projectSlice = createSlice({
       };
       state.categories.push(category);
     },
-    createImage(
-      state: Project,
-      action: PayloadAction<{ name: string; shape: Shape; src: string }>
-    ) {
-      const image: Image = {
-        categoryId: "00000000-0000-0000-0000-000000000000",
-        id: v4(),
-        instances: [],
-        name: action.payload.name,
-        shape: action.payload.shape,
-        src: action.payload.src,
-      };
-      state.images.push(image);
+    createImage(state: Project, action: PayloadAction<{ image: Image }>) {
+      state.images.push(action.payload.image);
     },
     createImageInstance(
       state: Project,

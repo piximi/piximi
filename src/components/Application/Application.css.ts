@@ -19,6 +19,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
     }),
     width: `calc(100% - ${theme.spacing(32)}px)`,
   },
+  body: { height: "100vh" },
   card: {},
   classifierSettingsDialogContent: {
     marginTop: theme.spacing(8),
