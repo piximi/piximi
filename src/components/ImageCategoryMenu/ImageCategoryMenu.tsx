@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Category } from "../../types/Category";
 import { categoriesSelector } from "../../store/selectors";
-import { updateImageCategories } from "../../store/slices";
+import { applicationSlice, updateImageCategories } from "../../store/slices";
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
@@ -28,6 +28,7 @@ export const ImageCategoryMenu = ({
     onClose();
 
     dispatch(updateImageCategories({ ids: imageIds, categoryId: categoryId }));
+    dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
   return (

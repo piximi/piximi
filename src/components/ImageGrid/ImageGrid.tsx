@@ -26,7 +26,7 @@ export const ImageGrid = () => {
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
-  const max_images = 100; //number of images from the project that we'll show
+  const max_images = 1000; //number of images from the project that we'll show
 
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
