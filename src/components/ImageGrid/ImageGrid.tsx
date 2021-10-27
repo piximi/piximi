@@ -46,16 +46,13 @@ export const ImageGrid = () => {
     })?.color;
   };
 
-  const getSize = (scaleFactor: number, image: Image) => {
-    const width = (200 * scaleFactor).toString() + "px";
-    const height = (200 * scaleFactor).toString() + "px";
-
-    const color = getColor(image);
+  const getSize = (scaleFactor: number) => {
+    const width = (220 * scaleFactor).toString() + "px";
+    const height = (220 * scaleFactor).toString() + "px";
 
     return {
       width: width,
       height: height,
-      background: color,
       margin: "2px",
     };
   };
@@ -75,36 +72,32 @@ export const ImageGrid = () => {
             cols={Math.floor(6 / scaleFactor)}
             rowHeight={"auto"}
           >
-            {images.slice(0, max_images).map(
-              (
-                image: Image //FIXME for now we'll have to cap the number of shown images to 100
-              ) => (
-                <ImageListItem
-                  key={image.id}
-                  onClick={() => onSelectImage(image)}
-                  style={getSize(scaleFactor, image)}
-                  className={getSelectionStatus(image.id)}
-                >
-                  <img alt="" src={image.src} className={classes.imageTile} />
-                  <ImageListItemBar
-                    position="top"
-                    sx={{
-                      background: "transparent",
-                    }}
-                    actionIcon={
-                      <LabelIcon
-                        sx={{
-                          color: getColor(image),
-                          marginLeft: "8px",
-                          marginTop: "8px",
-                        }}
-                      />
-                    }
-                    actionPosition="left"
-                  />
-                </ImageListItem>
-              )
-            )}
+            {images.slice(0, max_images).map((image: Image) => (
+              <ImageListItem
+                key={image.id}
+                onClick={() => onSelectImage(image)}
+                style={getSize(scaleFactor)}
+                className={getSelectionStatus(image.id)}
+              >
+                <img alt="" src={image.src} className={classes.imageTile} />
+                <ImageListItemBar
+                  position="top"
+                  sx={{
+                    background: "transparent",
+                  }}
+                  actionIcon={
+                    <LabelIcon
+                      sx={{
+                        color: getColor(image),
+                        marginLeft: "8px",
+                        marginTop: "8px",
+                      }}
+                    />
+                  }
+                  actionPosition="left"
+                />
+              </ImageListItem>
+            ))}
           </ImageList>
 
           <ImageGridAppBar />
