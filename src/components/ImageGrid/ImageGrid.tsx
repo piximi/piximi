@@ -10,7 +10,13 @@ import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
 import { ImageGridAppBar } from "../ImageGridAppBar";
 import { Category } from "../../types/Category";
-import { Container, ImageList, ImageListItem } from "@mui/material";
+import {
+  Container,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
+} from "@mui/material";
+import LabelIcon from "@mui/icons-material/Label";
 
 export const ImageGrid = () => {
   const dispatch = useDispatch();
@@ -34,13 +40,17 @@ export const ImageGrid = () => {
 
   const scaleFactor = useSelector(tileSizeSelector);
 
+  const getColor = (image: Image) => {
+    return categories.find((category: Category) => {
+      return category.id === image.categoryId;
+    })?.color;
+  };
+
   const getSize = (scaleFactor: number, image: Image) => {
     const width = (200 * scaleFactor).toString() + "px";
     const height = (200 * scaleFactor).toString() + "px";
 
-    const color = categories.find((category: Category) => {
-      return category.id === image.categoryId;
-    })?.color;
+    const color = getColor(image);
 
     return {
       width: width,
@@ -76,6 +86,22 @@ export const ImageGrid = () => {
                   className={getSelectionStatus(image.id)}
                 >
                   <img alt="" src={image.src} className={classes.imageTile} />
+                  <ImageListItemBar
+                    position="top"
+                    sx={{
+                      background: "transparent",
+                    }}
+                    actionIcon={
+                      <LabelIcon
+                        sx={{
+                          color: getColor(image),
+                          marginLeft: "8px",
+                          marginTop: "8px",
+                        }}
+                      />
+                    }
+                    actionPosition="left"
+                  />
                 </ImageListItem>
               )
             )}

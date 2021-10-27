@@ -19,6 +19,12 @@ export const useStyles = makeStyles((theme: Theme) => ({
     }),
     width: `calc(100% - ${theme.spacing(32)}px)`,
   },
+  badge: {
+    top: "0px",
+    left: "0px",
+    marginLeft: "60px",
+    right: "auto",
+  },
   card: {},
   classifierSettingsDialogContent: {
     marginTop: theme.spacing(8),

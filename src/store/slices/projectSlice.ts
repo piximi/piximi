@@ -11,6 +11,7 @@ import { SerializedImageType } from "../../types/SerializedImageType";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
+  categoryId: "00000000-0000-0000-0000-000000000000",
   instances: [],
   name: "nuclei",
   src: nuclei,

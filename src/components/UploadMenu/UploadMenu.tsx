@@ -50,6 +50,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
             });
 
             const loaded: Image = {
+              categoryId: "00000000-0000-0000-0000-000000000000",
               id: v4(),
               instances: [],
               name: file.name,
@@ -70,6 +71,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         accept="image/*"
         hidden
         type="file"
+        multiple
         id="upload-images"
         onChange={onUploadFromComputerChange}
       />
