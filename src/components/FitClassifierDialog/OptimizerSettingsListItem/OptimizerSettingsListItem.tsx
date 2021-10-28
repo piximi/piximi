@@ -105,9 +105,7 @@ export const OptimizerSettingsListItem = () => {
         timeout="auto"
         unmountOnExit
       >
-        <form className={classes.container} noValidate autoComplete="off">
-          <OptimizerSettingsGrid />
-        </form>
+        <OptimizerSettingsGrid />
       </Collapse>
     </>
   );

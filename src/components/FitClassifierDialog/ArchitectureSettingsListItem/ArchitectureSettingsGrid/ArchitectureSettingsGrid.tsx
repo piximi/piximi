@@ -64,58 +64,56 @@ export const ArchitectureSettingsGrid = () => {
   };
 
   return (
-    <>
-      <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={2}>
-            <FormHelperText>Model name</FormHelperText>
-            <Select
-              value={architectureOptions.modelName}
-              onChange={onModelNameChange}
-              className={classes.select}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-            >
-              {_.map(modelArchitecture, (v, k) => {
-                return (
-                  <MenuItem key={k} value={k}>
-                    {v}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </Grid>
+    <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={2}>
+          <FormHelperText>Model name</FormHelperText>
+          <Select
+            value={architectureOptions.modelName}
+            onChange={onModelNameChange}
+            className={classes.select}
+            displayEmpty
+            inputProps={{ "aria-label": "Without label" }}
+          >
+            {_.map(modelArchitecture, (v, k) => {
+              return (
+                <MenuItem key={k} value={k}>
+                  {v}
+                </MenuItem>
+              );
+            })}
+          </Select>
         </Grid>
-        <Grid container direction={"row"} spacing={2}>
-          <Grid item xs={1}>
-            <TextField
-              id="shape-rows"
-              label="Input rows"
-              className={classes.textField}
-              value={inputShape.height}
-              onChange={onRowsChange}
-            />
-          </Grid>
-          <Grid item xs={1}>
-            <TextField
-              id="shape-cols"
-              label="Input cols"
-              className={classes.textField}
-              value={inputShape.width}
-              onChange={onColsChange}
-            />
-          </Grid>
-          <Grid item xs={1}>
-            <TextField
-              id="shape-channels"
-              label="Input channels"
-              className={classes.textField}
-              value={inputShape.channels}
-              onChange={onChannelsChange}
-            />
-          </Grid>
+      </Grid>
+      <Grid container direction={"row"} spacing={2}>
+        <Grid item xs={1}>
+          <TextField
+            id="shape-rows"
+            label="Input rows"
+            className={classes.textField}
+            value={inputShape.height}
+            onChange={onRowsChange}
+          />
         </Grid>
-      </FormControl>
-    </>
+        <Grid item xs={1}>
+          <TextField
+            id="shape-cols"
+            label="Input cols"
+            className={classes.textField}
+            value={inputShape.width}
+            onChange={onColsChange}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <TextField
+            id="shape-channels"
+            label="Input channels"
+            className={classes.textField}
+            value={inputShape.channels}
+            onChange={onChannelsChange}
+          />
+        </Grid>
+      </Grid>
+    </FormControl>
   );
 };
