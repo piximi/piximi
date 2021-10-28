@@ -76,9 +76,9 @@ export const OptimizerSettingsGrid = () => {
           return OptimizationAlgorithm.Adamax;
         case "Momentum":
           return OptimizationAlgorithm.Momentum;
-        case "RmsProp":
+        case "RMSProp":
           return OptimizationAlgorithm.RMSProp;
-        case "StochasticGradientDescent":
+        case "Stochastic gradient descent (SGD)":
           return OptimizationAlgorithm.StochasticGradientDescent;
         default:
           return OptimizationAlgorithm.Adam;
@@ -140,7 +140,7 @@ export const OptimizerSettingsGrid = () => {
           <Grid item xs={4}>
             <FormHelperText>Optimization Algorithm</FormHelperText>
             <Select
-              value={optimizationAlgorithm}
+              value={optimizationAlgorithm as string}
               onChange={onOptimizationAlgorithmChange}
               className={classes.select}
               displayEmpty
@@ -148,7 +148,7 @@ export const OptimizerSettingsGrid = () => {
             >
               {_.map(optimizationAlgorithms, (v, k) => {
                 return (
-                  <MenuItem dense key={k} value={k}>
+                  <MenuItem dense key={k} value={v}>
                     {v}
                   </MenuItem>
                 );
