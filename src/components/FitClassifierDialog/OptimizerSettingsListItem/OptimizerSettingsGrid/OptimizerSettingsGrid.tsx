@@ -155,7 +155,8 @@ export const OptimizerSettingsGrid = () => {
               })}
             </Select>
           </Grid>
-
+        </Grid>
+        <Grid container spacing={2}>
           <Grid item xs={4}>
             <TextField
               id="learning-rate"
@@ -167,7 +168,8 @@ export const OptimizerSettingsGrid = () => {
             />
           </Grid>
         </Grid>
-
+      </FormControl>
+      <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <FormHelperText>Loss Function</FormHelperText>
