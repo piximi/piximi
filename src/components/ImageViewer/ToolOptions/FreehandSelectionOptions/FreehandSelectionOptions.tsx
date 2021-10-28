@@ -1,0 +1,47 @@
+import React from "react";
+import { SelectionOptions } from "../SelectionOptions";
+import Divider from "@mui/material/Divider";
+import Slider from "@mui/material/Slider";
+import { useDispatch, useSelector } from "react-redux";
+import { applicationSlice } from "../../../../annotator/store";
+import { penSelectionBrushSizeSelector } from "../../../../annotator/store/selectors/penSelectionBrushSizeSelector";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+
+export const FreehandSelectionOptions = () => {
+  const dispatch = useDispatch();
+
+  const penSelectionBrushSizeBrushSize = useSelector(
+    penSelectionBrushSizeSelector
+  );
+
+  const onChange = (event: any, changed: number | number[]) => {
+    const payload = { penSelectionBrushSize: changed as number };
+
+    dispatch(applicationSlice.actions.setPenSelectionBrushSize(payload));
+  };
+
+  return (
+    <React.Fragment>
+      <SelectionOptions />
+
+      <Divider />
+
+      <List>
+        <ListItem dense>
+          <ListItemText
+            primary={"Brush size"}
+            secondary={
+              <Slider
+                aria-labelledby="pen-selection-brush-size"
+                onChange={onChange}
+                value={penSelectionBrushSizeBrushSize}
+              />
+            }
+          />
+        </ListItem>
+      </List>
+    </React.Fragment>
+  );
+};

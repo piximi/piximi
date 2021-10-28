@@ -1,0 +1,1 @@
+export { FreehandAnnotationOptions } from "./FreehandAnnotationOptions";

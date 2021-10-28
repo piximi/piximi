@@ -1,0 +1,1 @@
+export { EllipticalAnnotationOptions } from "./EllipticalAnnotationOptions";

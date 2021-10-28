@@ -1,0 +1,1 @@
+export { LassoAnnotationOptions } from "./LassoAnnotationOptions";
