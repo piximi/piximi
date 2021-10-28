@@ -116,6 +116,7 @@ export const DatasetSettingsListItem = () => {
               value={testPercentage}
               margin="normal"
               onChange={onTestPercentageChange}
+              type="number"
             />
           </Grid>
         </div>
@@ -132,6 +133,7 @@ export const DatasetSettingsListItem = () => {
               value={trainingPercentage}
               margin="normal"
               onChange={onTrainPercentageChange}
+              type="number"
             />
           </Grid>
         </div>
