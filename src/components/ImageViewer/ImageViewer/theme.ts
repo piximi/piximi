@@ -1,37 +1,44 @@
-import { createMuiTheme } from "@mui/styles";
-import { createTheme } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
-  overrides: {
+  components: {
     MuiDrawer: {
-      paperAnchorDockedLeft: {
-        borderRight: "1px solid rgba(16, 16, 16)",
-      },
-      paperAnchorDockedRight: {
-        borderLeft: "1px solid rgba(16, 16, 16)",
+      styleOverrides: {
+        paperAnchorDockedLeft: {
+          borderRight: "1px solid rgba(16, 16, 16)",
+        },
+        paperAnchorDockedRight: {
+          borderLeft: "1px solid rgba(16, 16, 16)",
+        },
       },
     },
     MuiListItem: {
-      root: {
-        "&$selected": {
-          backgroundColor: "rgba(60, 61, 62)",
+      styleOverrides: {
+        root: {
+          "&$selected": {
+            backgroundColor: "rgba(60, 61, 62)",
+          },
         },
       },
     },
     MuiListItemIcon: {
-      root: {
-        minWidth: 36,
+      styleOverrides: {
+        root: {
+          minWidth: 36,
+        },
       },
     },
     MuiSlider: {
-      rail: {
-        color: "rgba(73, 73, 73)",
-      },
-      thumb: {
-        color: "rgba(201, 201, 201)",
-      },
-      track: {
-        color: "rgba(159, 159, 159)",
+      styleOverrides: {
+        rail: {
+          color: "rgba(73, 73, 73)",
+        },
+        thumb: {
+          color: "rgba(201, 201, 201)",
+        },
+        track: {
+          color: "rgba(159, 159, 159)",
+        },
       },
     },
   },
@@ -44,6 +51,6 @@ export const theme = createTheme({
     text: {
       primary: "rgba(190, 190, 190)",
     },
-    type: "dark",
+    mode: "dark",
   },
 });
