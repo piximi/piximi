@@ -8,7 +8,7 @@ import { useTranslation } from "../../../../annotator/hooks/useTranslation";
 export const RectangularAnnotationOptions = () => {
   const t = useTranslation();
   return (
-    <React.Fragment>
+    <>
       <InformationBox
         description="Click and drag to create a rectangular annotation."
         name={t("Rectangular annotation")}
@@ -21,6 +21,6 @@ export const RectangularAnnotationOptions = () => {
       <Divider />
 
       <InvertAnnotation />
-    </React.Fragment>
+    </>
   );
 };

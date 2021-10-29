@@ -10,7 +10,7 @@ export const ColorAnnotationOptions = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Color annotation")} />
 
       <Divider />
@@ -24,6 +24,6 @@ export const ColorAnnotationOptions = () => {
       {/*<Divider />*/}
 
       {/*<SampleList />*/}
-    </React.Fragment>
+    </>
   );
 };

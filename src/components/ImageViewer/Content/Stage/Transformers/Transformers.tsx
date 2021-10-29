@@ -17,18 +17,18 @@ type TransformersProps = {
 export const Transformers = ({ transformPosition }: TransformersProps) => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
 
-  if (!selectedAnnotationsIds) return <React.Fragment />;
+  if (!selectedAnnotationsIds) return <></>;
 
   return (
     <>
       {selectedAnnotationsIds.map((annotationId, idx) => {
         return (
-          <React.Fragment key={annotationId}>
+          <div key={annotationId}>
             <Transformer
               transformPosition={transformPosition}
               annotationId={annotationId}
             />
-          </React.Fragment>
+          </div>
         );
       })}
     </>

@@ -16,13 +16,13 @@ export const PointerSelection = () => {
     pointerSelectionSelector
   );
 
-  if (!minimum || !maximum || !selecting || !dragging)
-    return <React.Fragment />;
+  if (!minimum || !maximum || !selecting || !dragging) return <></>;
 
-  if (toolType !== ToolType.Pointer) return <React.Fragment />;
+  if (toolType !== ToolType.Pointer) return <></>;
 
   return (
-    <React.Fragment>
+    <>
+      {/*// @ts-ignore */}
       <ReactKonva.Rect
         dash={[4, 2]}
         dashOffset={-dashOffset}
@@ -33,6 +33,6 @@ export const PointerSelection = () => {
         x={minimum.x}
         y={minimum.y}
       />
-    </React.Fragment>
+    </>
   );
 };

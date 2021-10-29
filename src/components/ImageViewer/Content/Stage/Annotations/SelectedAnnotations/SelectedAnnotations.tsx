@@ -10,15 +10,15 @@ export const SelectedAnnotations = () => {
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
 
-  if (!selectedAnnotations || !selectedAnnotation) return <React.Fragment />;
+  if (!selectedAnnotations || !selectedAnnotation) return <></>;
 
   return (
-    <React.Fragment>
+    <>
       {selectedAnnotations.map((annotation: AnnotationType) => {
         return (
           <SelectedAnnotation key={annotation.id} annotation={annotation} />
         );
       })}
-    </React.Fragment>
+    </>
   );
 };

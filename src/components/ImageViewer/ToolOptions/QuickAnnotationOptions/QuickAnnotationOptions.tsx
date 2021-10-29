@@ -32,7 +32,7 @@ export const QuickAnnotationOptions = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Quick annotation")} />
 
       <Divider />
@@ -65,6 +65,6 @@ export const QuickAnnotationOptions = () => {
       {/*<Divider />*/}
 
       {/*<SampleList />*/}
-    </React.Fragment>
+    </>
   );
 };

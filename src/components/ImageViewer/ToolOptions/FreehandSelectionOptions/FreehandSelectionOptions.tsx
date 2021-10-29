@@ -23,7 +23,7 @@ export const FreehandSelectionOptions = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <SelectionOptions />
 
       <Divider />
@@ -42,6 +42,6 @@ export const FreehandSelectionOptions = () => {
           />
         </ListItem>
       </List>
-    </React.Fragment>
+    </>
   );
 };

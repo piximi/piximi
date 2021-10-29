@@ -10,7 +10,7 @@ import { InvertAnnotation } from "../InvertAnnotation";
 
 export const SelectionOptions = () => {
   return (
-    <React.Fragment>
+    <>
       <List dense>
         <ListItem>
           <ListItemText>
@@ -46,6 +46,6 @@ export const SelectionOptions = () => {
       <Divider />
 
       <SampleList />
-    </React.Fragment>
+    </>
   );
 };

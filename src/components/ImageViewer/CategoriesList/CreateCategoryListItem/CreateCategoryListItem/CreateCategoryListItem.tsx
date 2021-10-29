@@ -13,7 +13,7 @@ export const CreateCategoryListItem = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
           <AddIcon />
@@ -23,6 +23,6 @@ export const CreateCategoryListItem = () => {
       </ListItem>
 
       <CreateCategoryDialog onClose={onClose} open={open} />
-    </React.Fragment>
+    </>
   );
 };

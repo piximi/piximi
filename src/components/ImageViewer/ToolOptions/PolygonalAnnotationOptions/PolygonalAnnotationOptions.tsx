@@ -9,7 +9,7 @@ export const PolygonalAnnotationOptions = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Polygonal annotation")} />
 
       <Divider />
@@ -19,6 +19,6 @@ export const PolygonalAnnotationOptions = () => {
       <Divider />
 
       <InvertAnnotation />
-    </React.Fragment>
+    </>
   );
 };

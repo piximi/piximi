@@ -34,7 +34,7 @@ export const Content = ({ onDrop }: ContentProps) => {
   );
 
   return (
-    <React.Fragment>
+    <>
       {/*<AppBar className={classes.appBar} color="default">*/}
       {/*  <Toolbar>*/}
       {/*    <Typography variant="h6" color="inherit">*/}
@@ -50,6 +50,6 @@ export const Content = ({ onDrop }: ContentProps) => {
           <Stage />
         </div>
       </main>
-    </React.Fragment>
+    </>
   );
 };

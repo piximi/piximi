@@ -8,7 +8,7 @@ import { InvertAnnotation } from "../InvertAnnotation";
 export const EllipticalAnnotationOptions = () => {
   const t = useTranslation();
   return (
-    <React.Fragment>
+    <>
       <InformationBox
         description="Click and drag to create an elliptical annotation."
         name={t("Elliptical annotation")}
@@ -21,6 +21,6 @@ export const EllipticalAnnotationOptions = () => {
       <Divider />
 
       <InvertAnnotation />
-    </React.Fragment>
+    </>
   );
 };

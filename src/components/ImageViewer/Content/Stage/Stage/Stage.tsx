@@ -758,53 +758,65 @@ export const Stage = () => {
   const { draggable } = useHandTool();
 
   return (
-    <ReactReduxContext.Consumer>
-      {({ store }) => (
-        <ReactKonva.Stage
-          draggable={draggable}
-          height={stageHeight}
-          onMouseDown={(evt) => onMouseDown(evt)}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onWheel={onZoomWheel}
-          position={stagePosition}
-          ref={stageRef}
-          width={stageWidth}
-        >
-          <Provider store={store}>
-            <DndProvider backend={HTML5Backend}>
-              <Layer>
-                <Image ref={imageRef} />
+    <>
+      {/*// @ts-ignore */}
+      <ReactReduxContext.Consumer>
+        {({ store }) => (
+          <>
+            {/*// @ts-ignore */}
+            <ReactKonva.Stage
+              draggable={draggable}
+              height={stageHeight}
+              onMouseDown={(evt) => onMouseDown(evt)}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              onWheel={onZoomWheel}
+              position={stagePosition}
+              ref={stageRef}
+              width={stageWidth}
+            >
+              <Provider store={store}>
+                {/*// @ts-ignore */}
+                <DndProvider backend={HTML5Backend}>
+                  <Layer>
+                    {/*// @ts-ignore */}
+                    <Image ref={imageRef} />
 
-                <ZoomSelection />
+                    <ZoomSelection />
 
-                <Selecting tool={tool!} />
+                    <Selecting tool={tool!} />
 
-                <PenAnnotationToolTip
-                  currentPosition={currentPosition}
-                  annotationTool={annotationTool}
-                />
+                    <PenAnnotationToolTip
+                      currentPosition={currentPosition}
+                      annotationTool={annotationTool}
+                    />
 
-                <PointerSelection />
+                    <PointerSelection />
 
-                <Annotations />
+                    <Annotations />
 
-                <Transformers transformPosition={getRelativePointerPosition} />
+                    <Transformers
+                      transformPosition={getRelativePointerPosition}
+                    />
 
-                <ColorAnnotationToolTip
-                  toolTipPosition={
-                    (annotationTool as ColorAnnotationTool)?.toolTipPosition
-                  }
-                  initialPosition={
-                    (annotationTool as ColorAnnotationTool)?.initialPosition
-                  }
-                  tolerance={(annotationTool as ColorAnnotationTool)?.tolerance}
-                />
-              </Layer>
-            </DndProvider>
-          </Provider>
-        </ReactKonva.Stage>
-      )}
-    </ReactReduxContext.Consumer>
+                    <ColorAnnotationToolTip
+                      toolTipPosition={
+                        (annotationTool as ColorAnnotationTool)?.toolTipPosition
+                      }
+                      initialPosition={
+                        (annotationTool as ColorAnnotationTool)?.initialPosition
+                      }
+                      tolerance={
+                        (annotationTool as ColorAnnotationTool)?.tolerance
+                      }
+                    />
+                  </Layer>
+                </DndProvider>
+              </Provider>
+            </ReactKonva.Stage>
+          </>
+        )}
+      </ReactReduxContext.Consumer>
+    </>
   );
 };

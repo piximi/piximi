@@ -13,7 +13,7 @@ export const HandToolOptions = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Hand tool")} />
 
       <Divider />
@@ -21,6 +21,6 @@ export const HandToolOptions = () => {
       <List dense>
         <ResetButton />
       </List>
-    </React.Fragment>
+    </>
   );
 };

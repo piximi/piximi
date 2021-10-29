@@ -11,32 +11,35 @@ export const ZoomSelection = ({}) => {
     zoomSelectionSelector
   );
 
-  if (!minimum || !maximum || !selecting || !dragging)
-    return <React.Fragment />;
+  if (!minimum || !maximum || !selecting || !dragging) return <></>;
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Rect
-        dash={[4, 2]}
-        dashOffset={-dashOffset}
-        height={maximum.y - minimum.y}
-        stroke="black"
-        strokeWidth={1}
-        width={maximum.x - minimum.x}
-        x={minimum.x}
-        y={minimum.y}
-      />
-
-      <ReactKonva.Rect
-        dash={[4, 2]}
-        dashOffset={-dashOffset}
-        height={maximum.y - minimum.y}
-        stroke="white"
-        strokeWidth={1}
-        width={maximum.x - minimum.x}
-        x={minimum.x}
-        y={minimum.y}
-      />
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Rect
+          dash={[4, 2]}
+          dashOffset={-dashOffset}
+          height={maximum.y - minimum.y}
+          stroke="black"
+          strokeWidth={1}
+          width={maximum.x - minimum.x}
+          x={minimum.x}
+          y={minimum.y}
+        />
+        {/*// @ts-ignore */}
+        <ReactKonva.Rect
+          dash={[4, 2]}
+          dashOffset={-dashOffset}
+          height={maximum.y - minimum.y}
+          stroke="white"
+          strokeWidth={1}
+          width={maximum.x - minimum.x}
+          x={minimum.x}
+          y={minimum.y}
+        />
+      </ReactKonva.Group>
+    </>
   );
 };

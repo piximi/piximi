@@ -22,7 +22,7 @@ export const SettingsButton = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <Tooltip title={t("Settings")}>
         <Button
           className={classes.button}
@@ -36,6 +36,6 @@ export const SettingsButton = () => {
         open={openSettingsDialog}
         onClose={onSettingsDialogClose}
       />
-    </React.Fragment>
+    </>
   );
 };

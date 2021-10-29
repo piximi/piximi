@@ -32,7 +32,7 @@ export const PenAnnotationToolTip = ({
     !imageWidth ||
     !imageHeight
   )
-    return <React.Fragment />;
+    return <></>;
 
   if (
     currentPosition.x > imageWidth - penSelectionBrushSize ||
@@ -40,17 +40,20 @@ export const PenAnnotationToolTip = ({
     currentPosition.x < 0 ||
     currentPosition.y < 0
   )
-    return <React.Fragment />;
+    return <></>;
 
   return (
-    <ReactKonva.Ellipse
-      radiusX={penSelectionBrushSize}
-      radiusY={penSelectionBrushSize}
-      x={currentPosition.x}
-      y={currentPosition.y}
-      stroke="grey"
-      strokewidth={1}
-      dash={[2, 2]}
-    />
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Ellipse
+        radiusX={penSelectionBrushSize}
+        radiusY={penSelectionBrushSize}
+        x={currentPosition.x}
+        y={currentPosition.y}
+        stroke="grey"
+        strokewidth={1}
+        dash={[2, 2]}
+      />
+    </>
   );
 };

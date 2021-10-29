@@ -29,7 +29,7 @@ type SelectionProps = {
 };
 
 export const Selection = ({ tool, toolType }: SelectionProps) => {
-  if (!toolType || !tool) return <React.Fragment />;
+  if (!toolType || !tool) return <></>;
 
   switch (toolType) {
     case ToolType.ColorAnnotation:
@@ -57,6 +57,6 @@ export const Selection = ({ tool, toolType }: SelectionProps) => {
     case ToolType.QuickAnnotation:
       return <QuickSelection operator={tool as QuickAnnotationTool} />;
     default:
-      return <React.Fragment />;
+      return <></>;
   }
 };

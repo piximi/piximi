@@ -47,12 +47,15 @@ export const Layer = ({ children }: LayerProps) => {
   }, [automaticCentering, stageWidth, stageHeight, imageWidth, imageHeight]);
 
   return (
-    <ReactKonva.Layer
-      imageSmoothingEnabled={false}
-      offset={offset}
-      position={position}
-    >
-      {children}
-    </ReactKonva.Layer>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Layer
+        imageSmoothingEnabled={false}
+        offset={offset}
+        position={position}
+      >
+        {children}
+      </ReactKonva.Layer>
+    </>
   );
 };

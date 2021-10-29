@@ -31,10 +31,10 @@ export const ConfirmedAnnotations = () => {
   }, [annotations, selectedAnnotations, visibleCategories]);
 
   return (
-    <React.Fragment>
+    <>
       {visibleAnnotations.map((annotation: AnnotationType) => (
         <Annotation annotation={annotation} key={annotation.id} />
       ))}
-    </React.Fragment>
+    </>
   );
 };

@@ -11,15 +11,19 @@ type PenSelectionProps = {
 export const PenSelection = ({ operator }: PenSelectionProps) => {
   const stageScale = useSelector(stageScaleSelector);
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Line
-        points={operator.buffer}
-        lineJoin="round"
-        lineCap="round"
-        scale={{ x: stageScale, y: stageScale }}
-        stroke="red"
-        strokeWidth={operator.brushSize * 2}
-      />
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Line
+          points={operator.buffer}
+          lineJoin="round"
+          lineCap="round"
+          scale={{ x: stageScale, y: stageScale }}
+          stroke="red"
+          strokeWidth={operator.brushSize * 2}
+        />
+      </ReactKonva.Group>
+    </>
   );
 };

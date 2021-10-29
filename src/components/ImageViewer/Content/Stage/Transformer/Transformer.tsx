@@ -383,70 +383,83 @@ export const Transformer = ({
   }
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Transformer
-        boundBoxFunc={boundingBoxFunc}
-        onTransform={onTransform}
-        onTransformEnd={onTransformEnd}
-        onTransformStart={onTransformStart}
-        id={"tr-".concat(annotationId)}
-        ref={transformerRef}
-        rotateEnabled={false}
-      />
-      {selectedAnnotation && selectedAnnotations.length === 1 && (
-        <ReactKonva.Group>
-          <ReactKonva.Label
-            position={{
-              x: posX - 58,
-              y: posY + 6,
-            }}
-            onClick={onSaveAnnotationClick}
-            id={"label"}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-          >
-            <ReactKonva.Tag
-              cornerRadius={3}
-              fill={"darkgreen"}
-              lineJoin={"round"}
-              shadowColor={"black"}
-              shadowBlur={10}
-              shadowOffset={{ x: 5, y: 5 }}
-            />
-            <ReactKonva.Text
-              fill={"white"}
-              fontSize={14}
-              padding={6}
-              text={"Confirm"}
-            />
-          </ReactKonva.Label>
-          <ReactKonva.Label
-            position={{
-              x: posX - 52,
-              y: posY + 35,
-            }}
-            onClick={onClearAnnotationClick}
-            id={"label"}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-          >
-            <ReactKonva.Tag
-              cornerRadius={3}
-              fill={"darkred"}
-              lineJoin={"round"}
-              shadowColor={"black"}
-              shadowBlur={10}
-              shadowOffset={{ x: 5, y: 5 }}
-            />
-            <ReactKonva.Text
-              fill={"white"}
-              fontSize={14}
-              padding={6}
-              text={"Cancel"}
-            />
-          </ReactKonva.Label>
-        </ReactKonva.Group>
-      )}
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Transformer
+          boundBoxFunc={boundingBoxFunc}
+          onTransform={onTransform}
+          onTransformEnd={onTransformEnd}
+          onTransformStart={onTransformStart}
+          id={"tr-".concat(annotationId)}
+          ref={transformerRef}
+          rotateEnabled={false}
+        />
+        {selectedAnnotation && selectedAnnotations.length === 1 && (
+          <>
+            {/*// @ts-ignore */}
+            <ReactKonva.Group>
+              {/*// @ts-ignore */}
+              <ReactKonva.Label
+                position={{
+                  x: posX - 58,
+                  y: posY + 6,
+                }}
+                onClick={onSaveAnnotationClick}
+                id={"label"}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+              >
+                {/*// @ts-ignore */}
+                <ReactKonva.Tag
+                  cornerRadius={3}
+                  fill={"darkgreen"}
+                  lineJoin={"round"}
+                  shadowColor={"black"}
+                  shadowBlur={10}
+                  shadowOffset={{ x: 5, y: 5 }}
+                />
+                {/*// @ts-ignore */}
+                <ReactKonva.Text
+                  fill={"white"}
+                  fontSize={14}
+                  padding={6}
+                  text={"Confirm"}
+                />
+              </ReactKonva.Label>
+              {/*// @ts-ignore */}
+              <ReactKonva.Label
+                position={{
+                  x: posX - 52,
+                  y: posY + 35,
+                }}
+                onClick={onClearAnnotationClick}
+                id={"label"}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+              >
+                {/*// @ts-ignore */}
+                <ReactKonva.Tag
+                  cornerRadius={3}
+                  fill={"darkred"}
+                  lineJoin={"round"}
+                  shadowColor={"black"}
+                  shadowBlur={10}
+                  shadowOffset={{ x: 5, y: 5 }}
+                />
+                {/*// @ts-ignore */}
+                <ReactKonva.Text
+                  fill={"white"}
+                  fontSize={14}
+                  padding={6}
+                  text={"Cancel"}
+                />
+              </ReactKonva.Label>
+            </ReactKonva.Group>
+          </>
+        )}
+      </ReactKonva.Group>
+    </>
   );
 };

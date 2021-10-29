@@ -65,7 +65,7 @@ export const PointerSelectionOptions = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Select annotations")} />
 
       <Divider />
@@ -108,6 +108,6 @@ export const PointerSelectionOptions = () => {
           );
         })}
       </CollapsibleList>
-    </React.Fragment>
+    </>
   );
 };

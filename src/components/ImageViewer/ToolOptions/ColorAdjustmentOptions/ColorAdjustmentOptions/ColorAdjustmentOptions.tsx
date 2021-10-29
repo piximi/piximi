@@ -165,7 +165,7 @@ export const ColorAdjustmentOptions = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Color adjustment")} />
 
       <Divider />
@@ -182,6 +182,6 @@ export const ColorAdjustmentOptions = () => {
           <ListItemText>{t("Reset")}</ListItemText>
         </ListItem>
       </List>
-    </React.Fragment>
+    </>
   );
 };

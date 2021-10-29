@@ -22,7 +22,7 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
 
   const height = useSelector(scaledImageHeightSelector);
 
-  const [image] = useImage(src ? src : "", "Anonymous");
+  const [image] = useImage(src ? src : "", "anonymous");
 
   const [filters, setFilters] = useState<Array<any>>();
 
@@ -66,27 +66,34 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
 
   if (!src) {
     return (
-      <ReactKonva.Text
-        x={
-          boundingClientRect.x + (80 * boundingClientRect.width) / normalizeFont
-        } //center depending on window width
-        y={0.4 * boundingClientRect.height}
-        text={
-          'To start annotating, drag and drop an image onto the canvas or click on "Open Image".'
-        }
-        fill={"white"}
-        fontSize={(30 * boundingClientRect.width) / normalizeFont} //scale font depending on window width
-      />
+      <>
+        {/*// @ts-ignore */}
+        <ReactKonva.Text
+          x={
+            boundingClientRect.x +
+            (80 * boundingClientRect.width) / normalizeFont
+          } //center depending on window width
+          y={0.4 * boundingClientRect.height}
+          text={
+            'To start annotating, drag and drop an image onto the canvas or click on "Open Image".'
+          }
+          fill={"white"}
+          fontSize={(30 * boundingClientRect.width) / normalizeFont} //scale font depending on window width
+        />
+      </>
     );
   }
 
   return (
-    <ReactKonva.Image
-      height={height}
-      image={image}
-      ref={ref}
-      width={width}
-      filters={filters}
-    />
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Image
+        height={height}
+        image={image}
+        ref={ref}
+        width={width}
+        filters={filters}
+      />
+    </>
   );
 });

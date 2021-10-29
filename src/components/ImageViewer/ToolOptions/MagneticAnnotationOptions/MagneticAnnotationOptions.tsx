@@ -10,7 +10,7 @@ export const MagneticAnnotationOptions = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Magnetic annotation")} />
 
       <Divider />
@@ -24,6 +24,6 @@ export const MagneticAnnotationOptions = () => {
       {/*<Divider />*/}
 
       {/*<SampleList />*/}
-    </React.Fragment>
+    </>
   );
 };

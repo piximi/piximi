@@ -50,17 +50,21 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
     );
   }, [annotation.mask, fill]);
 
-  if (!annotation) return <React.Fragment />;
+  if (!annotation) return <></>;
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Image
-        id={annotation.id}
-        image={imageMask}
-        scale={{ x: stageScale, y: stageScale }}
-        x={annotation.boundingBox[0] * stageScale}
-        y={annotation.boundingBox[1] * stageScale}
-      />
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Image
+          id={annotation.id}
+          image={imageMask}
+          scale={{ x: stageScale, y: stageScale }}
+          x={annotation.boundingBox[0] * stageScale}
+          y={annotation.boundingBox[1] * stageScale}
+        />
+      </ReactKonva.Group>
+    </>
   );
 };

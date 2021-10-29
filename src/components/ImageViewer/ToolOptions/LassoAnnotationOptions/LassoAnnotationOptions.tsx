@@ -9,7 +9,7 @@ export const LassoAnnotationOptions = () => {
   const t = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <InformationBox description="…" name={t("Lasso annotation")} />
 
       <Divider />
@@ -19,6 +19,6 @@ export const LassoAnnotationOptions = () => {
       <Divider />
 
       <InvertAnnotation />
-    </React.Fragment>
+    </>
   );
 };

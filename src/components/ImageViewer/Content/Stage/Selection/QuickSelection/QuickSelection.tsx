@@ -26,11 +26,15 @@ export const QuickSelection = ({ operator }: QuickSelectionProps) => {
   if (!operator.currentMask) return null;
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Image
-        image={image}
-        scale={{ x: stageScale, y: stageScale }}
-      />
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Image
+          image={image}
+          scale={{ x: stageScale, y: stageScale }}
+        />
+      </ReactKonva.Group>
+    </>
   );
 };

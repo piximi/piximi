@@ -33,35 +33,47 @@ export const ColorAnnotationToolTip = ({
     setText(`Tolerance: ${tolerance}`);
   }, [toolTipPosition]);
 
-  if (toolType !== ToolType.ColorAnnotation) return <React.Fragment />;
+  if (toolType !== ToolType.ColorAnnotation) return <></>;
 
   if (!annotating || annotated || !toolTipPosition || !initialPosition) {
-    return <React.Fragment />;
+    return <></>;
   }
 
   return (
-    <ReactKonva.Group>
-      <ReactKonva.Line
-        points={[
-          toolTipPosition.x,
-          toolTipPosition.y!,
-          initialPosition.x,
-          initialPosition.y,
-        ]}
-        scale={{ x: stageScale, y: stageScale }}
-        strokeWidth={1}
-        stroke="white"
-      />
-      <ReactKonva.Label
-        position={{
-          x: toolTipPosition.x * stageScale,
-          y: toolTipPosition.y * stageScale,
-        }}
-        opacity={0.75}
-      >
-        <ReactKonva.Tag fill={"black"} />
-        <ReactKonva.Text fill={"white"} fontSize={12} padding={5} text={text} />
-      </ReactKonva.Label>
-    </ReactKonva.Group>
+    <>
+      {/*// @ts-ignore */}
+      <ReactKonva.Group>
+        {/*// @ts-ignore */}
+        <ReactKonva.Line
+          points={[
+            toolTipPosition.x,
+            toolTipPosition.y!,
+            initialPosition.x,
+            initialPosition.y,
+          ]}
+          scale={{ x: stageScale, y: stageScale }}
+          strokeWidth={1}
+          stroke="white"
+        />
+        {/*// @ts-ignore */}
+        <ReactKonva.Label
+          position={{
+            x: toolTipPosition.x * stageScale,
+            y: toolTipPosition.y * stageScale,
+          }}
+          opacity={0.75}
+        >
+          {/*// @ts-ignore */}
+          <ReactKonva.Tag fill={"black"} />
+          {/*// @ts-ignore */}
+          <ReactKonva.Text
+            fill={"white"}
+            fontSize={12}
+            padding={5}
+            text={text}
+          />
+        </ReactKonva.Label>
+      </ReactKonva.Group>
+    </>
   );
 };

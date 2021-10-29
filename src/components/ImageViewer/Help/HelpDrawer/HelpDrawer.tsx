@@ -4,7 +4,7 @@ import Drawer from "@mui/material/Drawer";
 import CloseIcon from "@mui/icons-material/Close";
 
 import { CollapsibleHelpContent } from "./CollapsibleHelpContent";
-import { IconButton } from "@mui/material";
+import { IconButton, Theme } from "@mui/material";
 import {
   ChangingAnnotationsHelpContent,
   CreatingCategoriesContent,
@@ -56,7 +56,7 @@ export default function HelpDrawer() {
   return (
     <div>
       {
-        <React.Fragment key={"left"}>
+        <div key={"left"}>
           <ListItem button onClick={toggleDrawer("left", true)}>
             <ListItemIcon>
               <HelpIcon />
@@ -137,7 +137,7 @@ export default function HelpDrawer() {
               </Container>
             </CollapsibleHelpContent>
           </Drawer>
-        </React.Fragment>
+        </div>
       }
     </div>
   );

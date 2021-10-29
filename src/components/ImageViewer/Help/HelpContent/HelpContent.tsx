@@ -16,14 +16,14 @@ import {
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import React from "react";
-import { KeyboardKey } from "../HelpDialog/KeyboardKey";
 import Divider from "@mui/material/Divider";
 
 export const ManipulatingCanvasContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <HelpWindowToolTitle toolName={"Hand tool"} letter={"H"}>
+        {/*// @ts-ignore */}
         <HandIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -34,6 +34,7 @@ export const ManipulatingCanvasContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Zoom tool"} letter={"Z"}>
+        {/*// @ts-ignore */}
         <ZoomIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -51,6 +52,7 @@ export const ManipulatingCanvasContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Intensity adjustment"} letter={"I"}>
+        {/*// @ts-ignore */}
         <ColorAdjustmentIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -59,13 +61,13 @@ export const ManipulatingCanvasContent = () => {
         "Reset" to reset the intensities to their original values.
       </Typography>
       <br />
-    </React.Fragment>
+    </>
   );
 };
 
 export const OpeningImagesHelpContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <Typography>
         <Box fontWeight="fontWeightBold">{"Opening images"}</Box>
@@ -105,13 +107,13 @@ export const OpeningImagesHelpContent = () => {
         and selecting the image of choice!
       </Typography>
       <br />
-    </React.Fragment>
+    </>
   );
 };
 
 export const CreatingCategoriesContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <Typography>
         <Box fontWeight="fontWeightBold">{" Creating a new category"}</Box>
@@ -140,13 +142,13 @@ export const CreatingCategoriesContent = () => {
         Make sure to press the "Enter" key to save the selected annotations with
         the new category assigned.
       </Typography>
-    </React.Fragment>
+    </>
   );
 };
 
 export const MakingNewAnnotationsHelpContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <Typography>
         All annotation tools are accessed from the toolbar to the right of the
@@ -168,6 +170,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Rectangular annotation"} letter={"R"}>
+        {/*// @ts-ignore */}
         <RectangularSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -178,6 +181,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Elliptical annotation"} letter={"E"}>
+        {/*// @ts-ignore */}
         <EllipticalSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -188,6 +192,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Pen annotation"} letter={"D"}>
+        {/*// @ts-ignore */}
         <PenSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -199,6 +204,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Lasso annotation"} letter={"L"}>
+        {/*// @ts-ignore */}
         <LassoSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -209,6 +215,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Polygonal annotation"} letter={"P"}>
+        {/*// @ts-ignore */}
         <PolygonalSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -220,6 +227,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Magnetic annotation"} letter={"M"}>
+        {/*// @ts-ignore */}
         <MagneticSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -231,6 +239,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Color annotation"} letter={"C"}>
+        {/*// @ts-ignore */}
         <ColorSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -242,6 +251,7 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Quick annotation"} letter={"Q"}>
+        {/*// @ts-ignore */}
         <QuickSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -249,15 +259,16 @@ export const MakingNewAnnotationsHelpContent = () => {
         annotation.
       </Typography>
       <br />
-    </React.Fragment>
+    </>
   );
 };
 
 export const ChangingAnnotationsHelpContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <HelpWindowToolTitle toolName={"Select tool"} letter={"S"}>
+        {/*// @ts-ignore */}
         <SelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -370,13 +381,13 @@ export const ChangingAnnotationsHelpContent = () => {
         loaded, not just the active image.
       </Typography>
       <br />
-    </React.Fragment>
+    </>
   );
 };
 
 export const SavingProjectHelpContent = () => {
   return (
-    <React.Fragment>
+    <>
       <br />
       <Typography>
         <Box fontWeight="fontWeightBold">{"Saving a project"}</Box>
@@ -420,6 +431,6 @@ export const SavingProjectHelpContent = () => {
         corresponding instances), or label matrices (a single image contains all
         instances labeled by an integer).
       </Typography>
-    </React.Fragment>
+    </>
   );
 };

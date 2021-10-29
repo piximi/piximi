@@ -47,7 +47,8 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
   }, [annotation.mask, fill]);
 
   return (
-    <React.Fragment>
+    <>
+      {/*// @ts-ignore */}
       <ReactKonva.Image
         image={imageMask}
         id={annotation.id}
@@ -58,6 +59,6 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
         width={annotation.boundingBox[2] - annotation.boundingBox[0]}
         height={annotation.boundingBox[3] - annotation.boundingBox[1]}
       />
-    </React.Fragment>
+    </>
   );
 };
