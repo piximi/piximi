@@ -50,6 +50,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.Hand}
       >
+        {/*// @ts-ignore */}
         <HandIcon />
       </Tool>
 
@@ -64,6 +65,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.Zoom}
       >
+        {/*// @ts-ignore */}
         <ZoomIcon />
       </Tool>
 
@@ -78,6 +80,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.ColorAdjustment}
       >
+        {/*// @ts-ignore */}
         <ColorAdjustmentIcon />
       </Tool>
 
@@ -94,6 +97,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.Pointer}
       >
+        {/*// @ts-ignore */}
         <SelectionIcon />
       </Tool>
 
@@ -109,6 +113,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.RectangularAnnotation}
       >
+        {/*// @ts-ignore */}
         <RectangularSelectionIcon />
       </Tool>
 
@@ -123,6 +128,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.EllipticalAnnotation}
       >
+        {/*// @ts-ignore */}
         <EllipticalSelectionIcon />
       </Tool>
 
@@ -137,6 +143,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.PolygonalAnnotation}
       >
+        {/*// @ts-ignore */}
         <PolygonalSelectionIcon />
       </Tool>
 
@@ -153,6 +160,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.PenAnnotation}
       >
+        {/*// @ts-ignore */}
         <PenSelectionIcon />
       </Tool>
 
@@ -169,6 +177,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.LassoAnnotation}
       >
+        {/*// @ts-ignore */}
         <LassoSelectionIcon />
       </Tool>
 
@@ -183,6 +192,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.MagneticAnnotation}
       >
+        {/*// @ts-ignore */}
         <MagneticSelectionIcon />
       </Tool>
 
@@ -199,6 +209,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.ColorAnnotation}
       >
+        {/*// @ts-ignore */}
         <ColorSelectionIcon />
       </Tool>
 
@@ -213,6 +224,7 @@ export const Tools = () => {
         }}
         selected={activeOperation === OperationType.QuickAnnotation}
       >
+        {/*// @ts-ignore */}
         <QuickSelectionIcon />
       </Tool>
 
