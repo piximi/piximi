@@ -28,7 +28,10 @@ export const InvertAnnotation = () => {
       <ListItem button onClick={onInvertClick} dense>
         <ListItemIcon>
           <SvgIcon>
-            <InvertSelectionIcon />
+            <>
+              {/*// @ts-ignore */}
+              <InvertSelectionIcon />
+            </>
           </SvgIcon>
         </ListItemIcon>
 

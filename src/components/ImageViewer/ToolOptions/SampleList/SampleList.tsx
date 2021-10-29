@@ -35,8 +35,18 @@ export const SampleList = () => {
             checked={checked.indexOf(0) !== -1}
             disableRipple
             edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
+            icon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxUncheckedIcon />
+              </>
+            }
+            checkedIcon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxCheckedIcon />
+              </>
+            }
             tabIndex={-1}
           />
         </ListItemIcon>
@@ -50,8 +60,18 @@ export const SampleList = () => {
             checked={checked.indexOf(1) !== -1}
             disableRipple
             edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
+            icon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxUncheckedIcon />
+              </>
+            }
+            checkedIcon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxCheckedIcon />
+              </>
+            }
             tabIndex={-1}
           />
         </ListItemIcon>
@@ -65,8 +85,18 @@ export const SampleList = () => {
             checked={checked.indexOf(2) !== -1}
             disableRipple
             edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
+            icon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxUncheckedIcon />
+              </>
+            }
+            checkedIcon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxCheckedIcon />
+              </>
+            }
             tabIndex={-1}
           />
         </ListItemIcon>

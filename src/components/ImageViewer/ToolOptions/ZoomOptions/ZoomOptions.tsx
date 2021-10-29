@@ -315,8 +315,18 @@ export const ZoomOptions = () => {
                 <Radio
                   disableRipple
                   edge="start"
-                  icon={<RadioUncheckedIcon />}
-                  checkedIcon={<RadioCheckedIcon />}
+                  icon={
+                    <>
+                      {/*// @ts-ignore */}
+                      <RadioUncheckedIcon />
+                    </>
+                  }
+                  checkedIcon={
+                    <>
+                      {/*// @ts-ignore */}
+                      <RadioCheckedIcon />
+                    </>
+                  }
                   tabIndex={-1}
                   value={ZoomModeType.In}
                 />
@@ -334,8 +344,18 @@ export const ZoomOptions = () => {
                 <Radio
                   disableRipple
                   edge="start"
-                  icon={<RadioUncheckedIcon />}
-                  checkedIcon={<RadioCheckedIcon />}
+                  icon={
+                    <>
+                      {/*// @ts-ignore */}
+                      <RadioUncheckedIcon />
+                    </>
+                  }
+                  checkedIcon={
+                    <>
+                      {/*// @ts-ignore */}
+                      <RadioCheckedIcon />
+                    </>
+                  }
                   tabIndex={-1}
                   value={ZoomModeType.Out}
                 />
@@ -356,8 +376,18 @@ export const ZoomOptions = () => {
             checked={options.automaticCentering}
             disableRipple
             edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
+            icon={
+              <>
+                {/*// @ts-ignore */}
+                <CheckboxUncheckedIcon />
+              </>
+            }
+            checkedIcon={
+              <>
+                {/*// @ts-ignore */}
+                <RadioCheckedIcon />
+              </>
+            }
             tabIndex={-1}
           />
         </ListItemIcon>

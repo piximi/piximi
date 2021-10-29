@@ -41,97 +41,218 @@ export const ToolOptions = () => {
 
   const activeOperation = useSelector(toolTypeSelector);
 
+  // @ts-ignore
   const operations = [
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <ColorAdjustmentIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorAdjustmentIcon />
+        </>
+      ),
       method: ToolType.ColorAdjustment,
       name: t("Color adjustment"),
       options: <ColorAdjustmentOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <RectangularSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <RectangularSelectionIcon />
+        </>
+      ),
       method: ToolType.RectangularAnnotation,
       name: "Rectangular selection",
-      options: <RectangularAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <RectangularAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <EllipticalSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <EllipticalSelectionIcon />
+        </>
+      ),
       method: ToolType.EllipticalAnnotation,
       name: "Elliptical selection",
-      options: <EllipticalAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <EllipticalAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <PenSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <PenSelectionIcon />
+        </>
+      ),
       method: ToolType.PenAnnotation,
       name: "Pen selection",
       options: <FreehandAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <LassoSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <LassoSelectionIcon />
+        </>
+      ),
       method: ToolType.LassoAnnotation,
       name: "Lasso selection",
-      options: <LassoAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <LassoAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <PolygonalSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <PolygonalSelectionIcon />
+        </>
+      ),
       method: ToolType.PolygonalAnnotation,
       name: "Polygonal selection",
-      options: <PolygonalAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <PolygonalAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <MagneticSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <MagneticSelectionIcon />
+        </>
+      ),
       method: ToolType.MagneticAnnotation,
       name: "Magnetic selection",
-      options: <MagneticAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <MagneticAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <ColorSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorSelectionIcon />
+        </>
+      ),
       method: ToolType.ColorAnnotation,
       name: "Color selection",
-      options: <ColorAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <QuickSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <QuickSelectionIcon />
+        </>
+      ),
       method: ToolType.QuickAnnotation,
       name: "Quick selection",
-      options: <QuickAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <QuickAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <ObjectSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectSelectionIcon />
+        </>
+      ),
       method: ToolType.ObjectAnnotation,
       name: "Object selection",
-      options: <ObjectAnnotationOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectAnnotationOptions />
+        </>
+      ),
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: <HandIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <HandIcon />
+        </>
+      ),
       method: ToolType.Hand,
       name: "Hand",
-      options: <HandToolOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <HandToolOptions />
+        </>
+      ),
     },
     {
       description: "Description of zoom here.",
-      icon: <ZoomIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ZoomIcon />
+        </>
+      ),
       method: ToolType.Zoom,
       name: "Zoom",
-      options: <ZoomOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ZoomOptions />
+        </>
+      ),
     },
     {
       description: "Description of pointer here.",
-      icon: <ObjectSelectionIcon />,
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectSelectionIcon />
+        </>
+      ),
       method: ToolType.Pointer,
       name: "Pointer",
-      options: <PointerSelectionOptions />,
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <PointerSelectionOptions />
+        </>
+      ),
     },
   ];
 
