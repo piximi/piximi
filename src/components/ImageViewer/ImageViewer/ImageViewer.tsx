@@ -111,18 +111,21 @@ export const ImageViewer = (props: ImageViewerProps) => {
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <CssBaseline />
+    <>
+      {/*// @ts-ignore */}
+      <ThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <CssBaseline />
 
-        <CategoriesList />
+          <CategoriesList />
 
-        <Content onDrop={onDrop} />
+          <Content onDrop={onDrop} />
 
-        <ToolOptions />
+          <ToolOptions />
 
-        <Tools />
-      </div>
-    </ThemeProvider>
+          <Tools />
+        </div>
+      </ThemeProvider>
+    </>
   );
 };

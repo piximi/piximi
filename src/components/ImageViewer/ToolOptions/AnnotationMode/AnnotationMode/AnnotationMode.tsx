@@ -61,8 +61,18 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
+                icon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioUncheckedIcon />
+                  </>
+                }
+                checkedIcon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioCheckedIcon />
+                  </>
+                }
                 tabIndex={-1}
                 value={AnnotationModeType.New}
               />
@@ -82,8 +92,18 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
+                icon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioUncheckedIcon />
+                  </>
+                }
+                checkedIcon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioCheckedIcon />
+                  </>
+                }
                 tabIndex={-1}
                 value={AnnotationModeType.Add}
               />
@@ -105,8 +125,18 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
+                icon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioUncheckedIcon />
+                  </>
+                }
+                checkedIcon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioCheckedIcon />
+                  </>
+                }
                 tabIndex={-1}
                 value={AnnotationModeType.Subtract}
               />
@@ -128,8 +158,18 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
+                icon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioUncheckedIcon />
+                  </>
+                }
+                checkedIcon={
+                  <>
+                    {/*// @ts-ignore */}
+                    <RadioCheckedIcon />
+                  </>
+                }
                 tabIndex={-1}
                 value={AnnotationModeType.Intersect}
               />
