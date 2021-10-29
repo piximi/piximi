@@ -23,6 +23,7 @@ import ViewComfyIcon from "@mui/icons-material/ViewComfy";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
+import { ImageViewer } from "../ImageViewer";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ export const ImageGridAppBar = () => {
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
-  // const [openImageDialog, setOpenImageDialog] = React.useState(false);
+  const [openAnnotatorDialog, setOpenAnnotatorDialog] = React.useState(false);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -46,13 +47,13 @@ export const ImageGridAppBar = () => {
     setCategoryMenuAnchorEl(null);
   };
 
-  // const onOpenImageDialog = (event: React.MouseEvent<HTMLDivElement>) => {
-  //   setOpenImageDialog(true);
-  // };
+  const onOpenAnnotatorDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+    setOpenAnnotatorDialog(true);
+  };
 
-  // const onCloseImageDialog = () => {
-  //   setOpenImageDialog(false);
-  // };
+  const onCloseAnnotatorDialog = () => {
+    setOpenAnnotatorDialog(false);
+  };
 
   const classes = useStyles();
 
@@ -95,7 +96,7 @@ export const ImageGridAppBar = () => {
             <Chip
               avatar={<GestureIcon color="inherit" />}
               label="Annotate"
-              onClick={() => {}} //TODO implement this
+              onClick={onOpenAnnotatorDialog}
               variant="outlined"
             />
 
@@ -113,11 +114,10 @@ export const ImageGridAppBar = () => {
       </Slide>
 
       {/*{Array.isArray(selectedImages) && selectedImages.length ? (*/}
-      {/*  <ImageDialog*/}
-      {/*    image={_.find(images, (image) => image.id === selectedImages[0])!}*/}
-      {/*    onClose={onCloseImageDialog}*/}
-      {/*    open={openImageDialog}*/}
-      {/*  />*/}
+      <ImageViewer
+        open={openAnnotatorDialog}
+        onClose={onCloseAnnotatorDialog}
+      />
       {/*) : null}*/}
 
       <ImageCategoryMenu

@@ -21,9 +21,7 @@ ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
         {/* @ts-ignore */}
-        <DndProvider backend={HTML5Backend}>
-          <ImageViewer />
-        </DndProvider>
+        <DndProvider backend={HTML5Backend}>{/*<ImageViewer />*/}</DndProvider>
       </Provider>
     </React.StrictMode>
   </>,

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { CssBaseline } from "@mui/material";
+import { CssBaseline, Dialog } from "@mui/material";
 import { ImageType } from "../../../annotator/types/ImageType";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
@@ -24,25 +24,25 @@ import { v4 } from "uuid";
 
 type ImageViewerProps = {
   image?: ImageType;
+  onClose: () => void;
+  open: boolean;
 };
 
-export const ImageViewer = (props: ImageViewerProps) => {
+export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
   const dispatch = useDispatch();
+  //
+  // useEffect(() => {
+  //   const path =
+  //     "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
+  //
+  //   dispatch(loadLayersModelThunk({ name: "foo", path: path }));
+  // });
 
   useEffect(() => {
-    const path =
-      "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
-
-    dispatch(loadLayersModelThunk({ name: "foo", path: path }));
-  });
-
-  useEffect(() => {
-    if (props.image) {
-      dispatch(
-        applicationSlice.actions.setActiveImage({ image: props.image.id })
-      );
+    if (image) {
+      dispatch(applicationSlice.actions.setActiveImage({ image: image.id }));
     }
-  }, [dispatch, props.image]);
+  }, [dispatch, image]);
 
   const classes = useStyles();
 
@@ -114,17 +114,19 @@ export const ImageViewer = (props: ImageViewerProps) => {
     <>
       {/*// @ts-ignore */}
       <ThemeProvider theme={theme}>
-        <div className={classes.root}>
-          <CssBaseline />
+        <Dialog fullScreen open={open} onClose={onClose}>
+          <div className={classes.root}>
+            <CssBaseline />
 
-          <CategoriesList />
+            <CategoriesList />
 
-          <Content onDrop={onDrop} />
+            <Content onDrop={onDrop} />
 
-          <ToolOptions />
+            <ToolOptions />
 
-          <Tools />
-        </div>
+            <Tools />
+          </div>
+        </Dialog>
       </ThemeProvider>
     </>
   );
