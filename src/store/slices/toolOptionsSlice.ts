@@ -44,4 +44,5 @@ export const toolOptionsSlice = createSlice({
   },
 });
 
-export const { setZoomToolOptions } = toolOptionsSlice.actions;
+export const { setColorAdjustmentOptions, setZoomToolOptions } =
+  toolOptionsSlice.actions;

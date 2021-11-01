@@ -77,3 +77,5 @@ export {
   updateImageCategories,
   updateOtherCategoryVisibility,
 } from "./projectSlice";
+
+export { toolOptionsSlice } from "./toolOptionsSlice";
