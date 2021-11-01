@@ -47,8 +47,6 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
   }, [annotation.mask, fill]);
 
   return (
-    <>
-      {/*// @ts-ignore */}
       <ReactKonva.Image
         image={imageMask}
         id={annotation.id}
@@ -59,6 +57,5 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
         width={annotation.boundingBox[2] - annotation.boundingBox[0]}
         height={annotation.boundingBox[3] - annotation.boundingBox[1]}
       />
-    </>
   );
 };
