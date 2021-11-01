@@ -1,14 +1,14 @@
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { CategoryType } from "../../../../../annotator/types/CategoryType";
+import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
 import { applicationSlice } from "../../../../../annotator/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   categoriesSelector,
   selectedCategorySelector,
-} from "../../../../../annotator/store/selectors";
+} from "../../../../../store/selectors";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (

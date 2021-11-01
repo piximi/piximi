@@ -1,12 +1,12 @@
 import React from "react";
-import { ToolType } from "../../../../../annotator/types/ToolType";
+import { ToolType } from "../../../../../types/ToolType";
 import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
 import { AnnotationTool } from "../../../../../annotator/image/Tool/AnnotationTool/AnnotationTool";
-import { toolTypeSelector } from "../../../../../annotator/store/selectors";
-import { penSelectionBrushSizeSelector } from "../../../../../annotator/store/selectors/penSelectionBrushSizeSelector";
-import { scaledImageWidthSelector } from "../../../../../annotator/store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "../../../../../annotator/store/selectors/scaledImageHeightSelector";
+import { toolTypeSelector } from "../../../../../store/selectors";
+import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
+import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
+import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };

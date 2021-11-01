@@ -1,6 +1,6 @@
 import { test } from "@jest/globals";
 import { PolygonalAnnotationTool } from "./PolygonalAnnotationTool";
-import { CategoryType } from "../../../../types/CategoryType";
+import { Category } from "../../../../../types/Category";
 import * as ImageJS from "image-js";
 
 test("deselect", () => {

@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CategoryType } from "../../types/CategoryType";
-import { ImageType } from "../../types/ImageType";
-import { ToolType } from "../../types/ToolType";
-import { AnnotationType } from "../../types/AnnotationType";
-import { AnnotationModeType } from "../../types/AnnotationModeType";
+import { Category } from "../../../types/Category";
+import { ImageViewerImage } from "../../../types/ImageViewerImage";
+import { ToolType } from "../../../types/ToolType";
+import { AnnotationType } from "../../../types/AnnotationType";
+import { AnnotationModeType } from "../../../types/AnnotationModeType";
 import * as _ from "lodash";
-import colorImage from "../../images/cell-painting.png";
-import { LanguageType } from "../../types/LanguageType";
+import colorImage from "../../../images/cell-painting.png";
+import { LanguageType } from "../../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
-import { StateType } from "../../types/StateType";
-import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
-import { ChannelType } from "../../types/ChannelType";
-import { SerializedFileType } from "../../types/SerializedFileType";
+import { ImageViewer } from "../../../types/ImageViewer";
+import { SerializedAnnotationType } from "../../../types/SerializedAnnotationType";
+import { ChannelType } from "../../../types/ChannelType";
+import { SerializedFileType } from "../../../types/SerializedFileType";
 import {
   importSerializedAnnotations,
   replaceDuplicateName,
-} from "../../image/imageHelper";
+} from "../../../image/imageHelper";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -67,7 +67,7 @@ const initialCategories =
         },
       ];
 
-const initialState: StateType = {
+const initialState: ImageViewerImage = {
   annotated: false,
   annotating: false,
   boundingClientRect: new DOMRect(),
@@ -131,28 +131,30 @@ export const applicationSlice = createSlice({
   name: "image-viewer-application",
   reducers: {
     addImages(
-      state: StateType,
-      action: PayloadAction<{ newImages: Array<ImageType> }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ newImages: Array<ImageViewerImage> }>
     ) {
       //we look for image name duplicates and append number if such duplicates are found
-      const imageNames = state.images.map((image: ImageType) => {
+      const imageNames = state.images.map((image: ImageViewerImage) => {
         return image.name.split(".")[0];
       });
-      const updatedImages = action.payload.newImages.map((image: ImageType) => {
-        const initialName = image.name.split(".")[0]; //get name before file extension
-        //add filename extension to updatedName
-        const updatedName =
-          replaceDuplicateName(initialName, imageNames) +
-          "." +
-          image.name.split(".")[1];
-        return { ...image, name: updatedName };
-      });
+      const updatedImages = action.payload.newImages.map(
+        (image: ImageViewerImage) => {
+          const initialName = image.name.split(".")[0]; //get name before file extension
+          //add filename extension to updatedName
+          const updatedName =
+            replaceDuplicateName(initialName, imageNames) +
+            "." +
+            image.name.split(".")[1];
+          return { ...image, name: updatedName };
+        }
+      );
 
       state.images.push(...updatedImages);
     },
     clearCategoryAnnotations(
-      state: StateType,
-      action: PayloadAction<{ category: CategoryType }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ category: Category }>
     ) {
       for (let image of state.images) {
         image.annotations = image.annotations.filter(
@@ -163,16 +165,19 @@ export const applicationSlice = createSlice({
       }
     },
     deleteCategory(
-      state: StateType,
-      action: PayloadAction<{ category: CategoryType }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ category: Category }>
     ) {
       state.categories = state.categories.filter(
-        (category: CategoryType) => category.id !== action.payload.category.id
+        (category: Category) => category.id !== action.payload.category.id
       );
     },
-    deleteImage(state: StateType, action: PayloadAction<{ id: string }>) {
+    deleteImage(
+      state: ImageViewerImage,
+      action: PayloadAction<{ id: string }>
+    ) {
       state.images = state.images.filter(
-        (image: ImageType) => image.id !== action.payload.id
+        (image: ImageViewerImage) => image.id !== action.payload.id
       );
       if (!state.images.length) state.activeImageId = undefined;
       else if (
@@ -183,20 +188,20 @@ export const applicationSlice = createSlice({
       }
     },
     deleteAllInstances(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ id: string }>
     ) {
       //deletes all instances across all images
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image: ImageViewerImage) => {
         return { ...image, annotations: [] };
       });
     },
     deleteAllImageInstances(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ imageId: string }>
     ) {
       //deletes all instances across a given image
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image: ImageViewerImage) => {
         if (image.id === action.payload.imageId) {
           return { ...image, annotations: [] };
         } else return image;
@@ -204,12 +209,12 @@ export const applicationSlice = createSlice({
     },
     deleteImageInstances(
       //deletes given instance on active image
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ ids: Array<string> }>
     ) {
       if (!state.activeImageId) return;
 
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image: ImageViewerImage) => {
         if (image.id === state.activeImageId) {
           const updatedAnnotations = image.annotations.filter(
             (annotation: AnnotationType) => {
@@ -221,7 +226,7 @@ export const applicationSlice = createSlice({
       });
     },
     openAnnotations(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ file: SerializedFileType }>
     ) {
       /*
@@ -241,7 +246,7 @@ export const applicationSlice = createSlice({
         }
       );
 
-      const loaded: ImageType = {
+      const loaded: ImageViewerImage = {
         avatar: action.payload.file.imageData,
         id: action.payload.file.imageId,
         src: action.payload.file.imageData,
@@ -260,38 +265,38 @@ export const applicationSlice = createSlice({
       state.images.push(...[loaded]);
     },
     setAnnotated(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ annotated: boolean }>
     ) {
       state.annotated = action.payload.annotated;
     },
     setAnnotating(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ annotating: boolean }>
     ) {
       state.annotating = action.payload.annotating;
     },
     setBoundingClientRect(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ boundingClientRect: DOMRect }>
     ) {
       state.boundingClientRect = action.payload.boundingClientRect;
     },
     setBrightness(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ brightness: number }>
     ) {
       state.brightness = action.payload.brightness;
     },
     setCategories(
-      state: StateType,
-      action: PayloadAction<{ categories: Array<CategoryType> }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ categories: Array<Category> }>
     ) {
       state.categories = action.payload.categories;
     },
     setCategoryVisibility(
-      state: StateType,
-      action: PayloadAction<{ category: CategoryType; visible: boolean }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ category: Category; visible: boolean }>
     ) {
       const category = _.find(state.categories, (category) => {
         return category.id === action.payload.category.id;
@@ -305,24 +310,33 @@ export const applicationSlice = createSlice({
         category,
       ];
     },
-    setContrast(state: StateType, action: PayloadAction<{ contrast: number }>) {
+    setContrast(
+      state: ImageViewerImage,
+      action: PayloadAction<{ contrast: number }>
+    ) {
       state.contrast = action.payload.contrast;
     },
     setCurrentIndex(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ currentIndex: number }>
     ) {
       state.currentIndex = action.payload.currentIndex;
     },
-    setExposure(state: StateType, action: PayloadAction<{ exposure: number }>) {
+    setExposure(
+      state: ImageViewerImage,
+      action: PayloadAction<{ exposure: number }>
+    ) {
       state.exposure = action.payload.exposure;
     },
-    setHue(state: StateType, action: PayloadAction<{ hue: number }>) {
+    setHue(state: ImageViewerImage, action: PayloadAction<{ hue: number }>) {
       state.hue = action.payload.hue;
     },
-    setActiveImage(state: StateType, action: PayloadAction<{ image: string }>) {
+    setActiveImage(
+      state: ImageViewerImage,
+      action: PayloadAction<{ image: string }>
+    ) {
       state.activeImageId = action.payload.image;
-      const activeImage = state.images.find((image: ImageType) => {
+      const activeImage = state.images.find((image: ImageViewerImage) => {
         return image.id === action.payload.image;
       });
       if (!activeImage) return;
@@ -336,13 +350,13 @@ export const applicationSlice = createSlice({
       state.channels = defaultChannels;
     },
     setImageInstances(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ instances: Array<AnnotationType> }>
     ) {
       if (!state.activeImageId) return;
 
       //update corresponding image object in array of Images stored in state
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image: ImageViewerImage) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
@@ -350,9 +364,12 @@ export const applicationSlice = createSlice({
         }
       });
     },
-    setImageSrc(state: StateType, action: PayloadAction<{ src: string }>) {
+    setImageSrc(
+      state: ImageViewerImage,
+      action: PayloadAction<{ src: string }>
+    ) {
       if (!state.activeImageId) return;
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image: ImageViewerImage) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
@@ -361,13 +378,13 @@ export const applicationSlice = createSlice({
       });
     },
     setImages(
-      state: StateType,
-      action: PayloadAction<{ images: Array<ImageType> }>
+      state: ImageViewerImage,
+      action: PayloadAction<{ images: Array<ImageViewerImage> }>
     ) {
       state.images = action.payload.images;
     },
     setChannels(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{
         channels: Array<ChannelType>;
       }>
@@ -375,7 +392,7 @@ export const applicationSlice = createSlice({
       state.channels = action.payload.channels;
     },
     setCursor(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{
         cursor: string;
       }>
@@ -383,37 +400,37 @@ export const applicationSlice = createSlice({
       state.cursor = action.payload.cursor;
     },
     setInvertMode(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ invertMode: boolean }>
     ) {
       state.invertMode = action.payload.invertMode;
     },
     setLanguage(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ language: LanguageType }>
     ) {
       state.language = action.payload.language;
     },
     setOffset(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ offset: { x: number; y: number } }>
     ) {
       state.offset = action.payload.offset;
     },
     setOperation(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ operation: ToolType }>
     ) {
       state.toolType = action.payload.operation;
     },
     setPenSelectionBrushSize(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ penSelectionBrushSize: number }>
     ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
     setPointerSelection(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{
         pointerSelection: {
           dragging: boolean;
@@ -426,25 +443,25 @@ export const applicationSlice = createSlice({
       state.pointerSelection = action.payload.pointerSelection;
     },
     setQuickSelectionBrushSize(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ quickSelectionBrushSize: number }>
     ) {
       state.quickSelectionBrushSize = action.payload.quickSelectionBrushSize;
     },
     setSaturation(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ saturation: number }>
     ) {
       state.saturation = action.payload.saturation;
     },
     setSelectedCategory(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ selectedCategory: string }>
     ) {
       state.selectedCategory = action.payload.selectedCategory;
     },
     setSelectedAnnotations(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{
         selectedAnnotations: Array<AnnotationType>;
         selectedAnnotation: AnnotationType | undefined;
@@ -454,46 +471,49 @@ export const applicationSlice = createSlice({
       state.selectedAnnotation = action.payload.selectedAnnotation;
     },
     setSelectionMode(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ selectionMode: AnnotationModeType }>
     ) {
       state.selectionMode = action.payload.selectionMode;
     },
     setStageHeight(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ stageHeight: number }>
     ) {
       state.stageHeight = action.payload.stageHeight;
     },
     setStagePosition(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ stagePosition: { x: number; y: number } }>
     ) {
       state.stagePosition = action.payload.stagePosition;
     },
     setStageScale(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ stageScale: number }>
     ) {
       state.stageScale = action.payload.stageScale;
     },
     setStageWidth(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ stageWidth: number }>
     ) {
       state.stageWidth = action.payload.stageWidth;
     },
     setSoundEnabled(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{ soundEnabled: boolean }>
     ) {
       state.soundEnabled = action.payload.soundEnabled;
     },
-    setVibrance(state: StateType, action: PayloadAction<{ vibrance: number }>) {
+    setVibrance(
+      state: ImageViewerImage,
+      action: PayloadAction<{ vibrance: number }>
+    ) {
       state.vibrance = action.payload.vibrance;
     },
     setZoomSelection(
-      state: StateType,
+      state: ImageViewerImage,
       action: PayloadAction<{
         zoomSelection: {
           dragging: boolean;
@@ -507,8 +527,8 @@ export const applicationSlice = createSlice({
     },
   },
   extraReducers: {
-    ["thunks/loadLayersModel/fulfilled"]: (
-      state: StateType,
+    "thunks/loadLayersModel/fulfilled": (
+      state: ImageViewerImage,
       action: PayloadAction<tensorflow.LayersModel>
     ) => {
       console.info(action.payload);

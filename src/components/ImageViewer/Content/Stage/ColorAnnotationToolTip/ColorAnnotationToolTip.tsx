@@ -4,10 +4,10 @@ import {
   annotatingSelector,
   stageScaleSelector,
   toolTypeSelector,
-} from "../../../../../annotator/store/selectors";
+} from "../../../../../store/selectors";
 import { useSelector } from "react-redux";
-import { ToolType } from "../../../../../annotator/types/ToolType";
-import { annotatedSelector } from "../../../../../annotator/store/selectors/annotatedSelector";
+import { ToolType } from "../../../../../types/ToolType";
+import { annotatedSelector } from "../../../../../store/selectors/annotatedSelector";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };

@@ -4,7 +4,7 @@ import Divider from "@mui/material/Divider";
 import Slider from "@mui/material/Slider";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSlice } from "../../../../annotator/store";
-import { penSelectionBrushSizeSelector } from "../../../../annotator/store/selectors/penSelectionBrushSizeSelector";
+import { penSelectionBrushSizeSelector } from "../../../../store/selectors/penSelectionBrushSizeSelector";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";

@@ -13,10 +13,10 @@ import {
 } from "../../../../../icons";
 import { applicationSlice } from "../../../../../annotator/store/slices";
 import { useDispatch, useSelector } from "react-redux";
-import { channelsSelector } from "../../../../../annotator/store/selectors/intensityRangeSelector";
-import { ChannelType } from "../../../../../annotator/types/ChannelType";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
+import { ChannelType } from "../../../../../types/ChannelType";
 import { debounce } from "lodash";
-import { imageShapeSelector } from "../../../../../annotator/store/selectors/imageShapeSelector";
+import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 
 type ColorAdjustmentSlidersProp = {

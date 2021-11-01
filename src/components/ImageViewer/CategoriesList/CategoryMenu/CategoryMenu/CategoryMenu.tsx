@@ -8,9 +8,9 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { imagesSelector } from "../../../../../annotator/store/selectors/imagesSelector";
+import { imagesSelector } from "../../../../../store/selectors/imagesSelector";
 import { applicationSlice } from "../../../../../annotator/store/slices";
-import { selectedCategorySelector } from "../../../../../annotator/store/selectors";
+import { selectedCategorySelector } from "../../../../../store/selectors";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;

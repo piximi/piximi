@@ -1,5 +1,5 @@
 import { Tool } from "../Tool";
-import { ZoomModeType } from "../../../types/ZoomModeType";
+import { ZoomModeType } from "../../../../types/ZoomModeType";
 import * as _ from "lodash";
 import numeral from "numeral";
 import { KonvaEventObject } from "konva/types/Node";

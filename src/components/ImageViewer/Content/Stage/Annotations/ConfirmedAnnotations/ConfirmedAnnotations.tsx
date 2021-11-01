@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { AnnotationType } from "../../../../../../annotator/types/AnnotationType";
+import { AnnotationType } from "../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
-import { visibleCategoriesSelector } from "../../../../../../annotator/store/selectors/visibleCategoriesSelector";
+import { visibleCategoriesSelector } from "../../../../../../store/selectors/visibleCategoriesSelector";
 import { Annotation } from "./Annotation";
-import { imageInstancesSelector } from "../../../../../../annotator/store/selectors";
-import { selectedAnnotationsSelector } from "../../../../../../annotator/store/selectors/selectedAnnotationsSelector";
-import { unselectedAnnotationsSelector } from "../../../../../../annotator/store/selectors/unselectedAnnotationsSelector";
+import { imageInstancesSelector } from "../../../../../../store/selectors";
+import { selectedAnnotationsSelector } from "../../../../../../store/selectors/selectedAnnotationsSelector";
+import { unselectedAnnotationsSelector } from "../../../../../../store/selectors/unselectedAnnotationsSelector";
 
 export const ConfirmedAnnotations = () => {
   const annotations = useSelector(imageInstancesSelector);

@@ -2,7 +2,7 @@ import * as ReactKonva from "react-konva";
 import React from "react";
 import { PenAnnotationTool } from "../../../../../../annotator/image/Tool";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../annotator/store/selectors";
+import { stageScaleSelector } from "../../../../../../store/selectors";
 
 type PenSelectionProps = {
   operator: PenAnnotationTool;

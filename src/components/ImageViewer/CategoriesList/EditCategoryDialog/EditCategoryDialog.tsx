@@ -9,12 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "./EditCategoryDialog.css";
-import { CategoryType } from "../../../../annotator/types/CategoryType";
+import { Category } from "../../../../types/Category";
 import { applicationSlice } from "../../../../annotator/store";
 import {
   categoriesSelector,
   selectedCategorySelector,
-} from "../../../../annotator/store/selectors";
+} from "../../../../store/selectors";
 
 type EditCategoryDialogProps = {
   onCloseDialog: () => void;
@@ -51,7 +51,7 @@ export const EditCategoryDialog = ({
   const categories = useSelector(categoriesSelector);
 
   const onEdit = () => {
-    const updatedCategories = categories?.map((v: CategoryType) => {
+    const updatedCategories = categories?.map((v: Category) => {
       if (v.id === category.id) {
         return {
           ...category,

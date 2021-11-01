@@ -2,14 +2,14 @@ import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
-import { CategoryType } from "../../../../annotator/types/CategoryType";
+import { Category } from "../../../../types/Category";
 import {
   categoryCountsSelector,
   createdCategoriesSelector,
   imageSelector,
   selectedCategorySelector,
   unknownCategorySelector,
-} from "../../../../annotator/store/selectors";
+} from "../../../../store/selectors";
 import { useDispatch, useSelector, batch } from "react-redux";
 import { useStyles } from "./CategoriesList.css";
 import { CollapsibleList } from "../CollapsibleList";
@@ -52,11 +52,11 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
-import { selectedAnnotationsIdsSelector } from "../../../../annotator/store/selectors/selectedAnnotationsIdsSelector";
-import { ImageType } from "../../../../annotator/types/ImageType";
+import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
+import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
-import { imagesSelector } from "../../../../annotator/store/selectors/imagesSelector";
+import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
@@ -118,7 +118,7 @@ export const CategoriesList = () => {
 
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
-    category: CategoryType
+    category: Category
   ) => {
     dispatch(
       applicationSlice.actions.setSelectedCategory({
@@ -129,7 +129,7 @@ export const CategoriesList = () => {
 
   const onCategoryMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    category: CategoryType
+    category: Category
   ) => {
     dispatch(
       applicationSlice.actions.setSelectedCategory({
@@ -145,7 +145,7 @@ export const CategoriesList = () => {
 
   const onImageMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    image: ImageType
+    image: ImageViewerImage
   ) => {
     onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
@@ -157,7 +157,7 @@ export const CategoriesList = () => {
 
   const onClearAllAnnotations = () => {
     const existingAnnotations = images
-      .map((image: ImageType) => {
+      .map((image: ImageViewerImage) => {
         return [...image.annotations];
       })
       .flat();
@@ -190,7 +190,7 @@ export const CategoriesList = () => {
 
   const onImageItemClick = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: ImageType
+    image: ImageViewerImage
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
@@ -240,7 +240,7 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Images")}>
-        {images.map((image: ImageType) => {
+        {images.map((image: ImageViewerImage) => {
           return (
             <div key={image.id}>
               <ListItem
@@ -288,7 +288,7 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Categories")}>
-        {createdCategories.map((category: CategoryType) => {
+        {createdCategories.map((category: Category) => {
           return (
             <div key={category.id}>
               <ListItem

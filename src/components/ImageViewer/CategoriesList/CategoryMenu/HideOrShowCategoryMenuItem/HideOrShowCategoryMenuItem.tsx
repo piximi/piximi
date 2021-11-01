@@ -1,14 +1,14 @@
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { CategoryType } from "../../../../../annotator/types/CategoryType";
+import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSlice } from "../../../../../annotator/store";
-import { selectedCategorySelector } from "../../../../../annotator/store/selectors";
+import { selectedCategorySelector } from "../../../../../store/selectors";
 
 type HideOrShowCategoryMenuItemProps = {
-  category: CategoryType;
+  category: Category;
   onCloseCategoryMenu: (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>
   ) => void;

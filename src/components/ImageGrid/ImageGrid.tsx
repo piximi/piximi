@@ -79,7 +79,11 @@ export const ImageGrid = () => {
                 style={getSize(scaleFactor)}
                 className={getSelectionStatus(image.id)}
               >
-                <img alt="" src={image.src} className={classes.imageTile} />
+                <img
+                  alt=""
+                  src={image.originalSrc}
+                  className={classes.imageTile}
+                />
                 <ImageListItemBar
                   position="top"
                   sx={{

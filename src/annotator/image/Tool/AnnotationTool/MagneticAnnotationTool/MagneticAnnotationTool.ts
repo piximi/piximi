@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { createPathFinder, makeGraph, PiximiGraph } from "../../../GraphHelper";
-import { getIdx } from "../../../imageHelper";
+import { getIdx } from "../../../../../image/imageHelper";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { encode } from "../../../rle";

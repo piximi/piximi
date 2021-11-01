@@ -13,10 +13,10 @@ import { ColorResult } from "react-color";
 import { sample } from "underscore";
 import { applicationSlice } from "../../../../../annotator/store";
 import { v4 } from "uuid";
-import { CategoryType } from "../../../../../annotator/types/CategoryType";
-import { categoriesSelector } from "../../../../../annotator/store/selectors";
+import { Category } from "../../../../../types/Category";
+import { categoriesSelector } from "../../../../../store/selectors";
 import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
-import { replaceDuplicateName } from "../../../../../annotator/image/imageHelper";
+import { replaceDuplicateName } from "../../../../../image/imageHelper";
 
 const COLORS = [
   "#f44336",
@@ -60,12 +60,12 @@ export const CreateCategoryDialog = ({
 
   const onCreate = () => {
     const initialName = name ? name : "Unnamed";
-    const categoryNames = categories.map((category: CategoryType) => {
+    const categoryNames = categories.map((category: Category) => {
       return category.name;
     });
     const updatedName = replaceDuplicateName(initialName, categoryNames);
 
-    const category: CategoryType = {
+    const category: Category = {
       color: color,
       id: v4().toString(),
       name: updatedName,

@@ -2,7 +2,7 @@ import * as ReactKonva from "react-konva";
 import React from "react";
 import { useMarchingAnts } from "../../../../../../annotator/hooks";
 import { useSelector } from "react-redux";
-import { zoomSelectionSelector } from "../../../../../../annotator/store/selectors";
+import { zoomSelectionSelector } from "../../../../../../store/selectors";
 
 export const ZoomSelection = ({}) => {
   const dashOffset = useMarchingAnts();

@@ -8,8 +8,8 @@ import {
 } from "../../../../annotator/store/slices";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import { SerializedFileType } from "../../../../annotator/types/SerializedFileType";
-import { ToolType } from "../../../../annotator/types/ToolType";
+import { SerializedFileType } from "../../../../types/SerializedFileType";
+import { ToolType } from "../../../../types/ToolType";
 
 type OpenAnnotationsMenuItemProps = {
   popupState: any;

@@ -1,5 +1,5 @@
 import { makeStyles } from "@mui/styles";
-import texture from "../../../../annotator/images/texture.png";
+import texture from "../../../../images/texture.png";
 import { Theme } from "@mui/material";
 
 const settingsWidth = 240;

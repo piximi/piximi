@@ -2,7 +2,7 @@ import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { ToolType } from "../../../../../annotator/types/ToolType";
+import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
   imageOriginalSrcSelector,
@@ -14,7 +14,7 @@ import {
   stageWidthSelector,
   toolTypeSelector,
   zoomSelectionSelector,
-} from "../../../../../annotator/store/selectors";
+} from "../../../../../store/selectors";
 import {
   applicationSlice,
   setSelectedAnnotations,
@@ -32,12 +32,12 @@ import {
   useHandTool,
   useZoom,
 } from "../../../../../annotator/hooks";
-import { AnnotationType } from "../../../../../annotator/types/AnnotationType";
-import { penSelectionBrushSizeSelector } from "../../../../../annotator/store/selectors/penSelectionBrushSizeSelector";
-import { AnnotationModeType } from "../../../../../annotator/types/AnnotationModeType";
+import { AnnotationType } from "../../../../../types/AnnotationType";
+import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
+import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
-import { annotatedSelector } from "../../../../../annotator/store/selectors/annotatedSelector";
+import { annotatedSelector } from "../../../../../store/selectors/annotatedSelector";
 import {
   ColorAnnotationTool,
   ObjectAnnotationTool,
@@ -47,31 +47,31 @@ import { ColorAnnotationToolTip } from "../ColorAnnotationToolTip";
 import useSound from "use-sound";
 import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
-import { soundEnabledSelector } from "../../../../../annotator/store/selectors/soundEnabledSelector";
+import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
 import { useKeyboardShortcuts } from "../../../../../annotator/hooks/useKeyboardShortcuts";
-import { selectedAnnotationSelector } from "../../../../../annotator/store/selectors/selectedAnnotationSelector";
-import { selectedAnnotationsIdsSelector } from "../../../../../annotator/store/selectors/selectedAnnotationsIdsSelector";
+import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
+import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
 import { Transformers } from "../Transformers/Transformers";
 import { useWindowFocusHandler } from "../../../../../annotator/hooks/useWindowFocusHandler/useWindowFocusHandler";
-import { stagePositionSelector } from "../../../../../annotator/store/selectors/stagePositionSelector";
+import { stagePositionSelector } from "../../../../../store/selectors/stagePositionSelector";
 import { KonvaEventObject } from "konva/types/Node";
-import { scaledImageWidthSelector } from "../../../../../annotator/store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "../../../../../annotator/store/selectors/scaledImageHeightSelector";
+import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
+import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
-import { selectedAnnotationsSelector } from "../../../../../annotator/store/selectors/selectedAnnotationsSelector";
+import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
 import { Annotations } from "../Annotations/Annotations";
-import { unselectedAnnotationsSelector } from "../../../../../annotator/store/selectors/unselectedAnnotationsSelector";
-import { quickSelectionBrushSizeSelector } from "../../../../../annotator/store/selectors/quickSelectionBrushSizeSelector";
+import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
+import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/quickSelectionBrushSizeSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
 import { usePointer } from "../../../../../annotator/hooks/usePointer/usePointer";
-import { pointerSelectionSelector } from "../../../../../annotator/store/selectors/pointerSelectionSelector";
+import { pointerSelectionSelector } from "../../../../../store/selectors/pointerSelectionSelector";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { channelsSelector } from "../../../../../annotator/store/selectors/intensityRangeSelector";
-import { cursorSelector } from "../../../../../annotator/store/selectors/cursorSelector";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
+import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);

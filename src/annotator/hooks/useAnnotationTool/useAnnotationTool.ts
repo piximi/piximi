@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as ImageJS from "image-js";
-import { ToolType } from "../../types/ToolType";
+import { ToolType } from "../../../types/ToolType";
 import {
   AnnotationTool,
   ColorAnnotationTool,
@@ -14,10 +14,10 @@ import {
   RectangularAnnotationTool,
 } from "../../image/Tool";
 import { useSelector } from "react-redux";
-import { stageScaleSelector, toolTypeSelector } from "../../store/selectors";
-import { penSelectionBrushSizeSelector } from "../../store/selectors/penSelectionBrushSizeSelector";
-import { quickSelectionBrushSizeSelector } from "../../store/selectors/quickSelectionBrushSizeSelector";
-import { imageSrcSelector } from "../../store/selectors/imageSrcSelector";
+import { stageScaleSelector, toolTypeSelector } from "../../../store/selectors";
+import { penSelectionBrushSizeSelector } from "../../../store/selectors/penSelectionBrushSizeSelector";
+import { quickSelectionBrushSizeSelector } from "../../../store/selectors/quickSelectionBrushSizeSelector";
+import { imageSrcSelector } from "../../../store/selectors/imageSrcSelector";
 
 export const useAnnotationTool = () => {
   const src = useSelector(imageSrcSelector);

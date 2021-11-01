@@ -10,11 +10,11 @@ import { ReactComponent as InvertSelectionIcon } from "../../../../icons/InvertA
 import ListItemText from "@mui/material/ListItemText";
 import { applicationSlice } from "../../../../annotator/store";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedAnnotationsSelector } from "../../../../annotator/store/selectors/selectedAnnotationsSelector";
-import { unselectedAnnotationsSelector } from "../../../../annotator/store/selectors/unselectedAnnotationsSelector";
-import { CategoryType } from "../../../../annotator/types/CategoryType";
+import { selectedAnnotationsSelector } from "../../../../store/selectors/selectedAnnotationsSelector";
+import { unselectedAnnotationsSelector } from "../../../../store/selectors/unselectedAnnotationsSelector";
+import { Category } from "../../../../types/Category";
 import { CollapsibleList } from "../../CategoriesList/CollapsibleList";
-import { categoriesSelector } from "../../../../annotator/store/selectors";
+import { categoriesSelector } from "../../../../store/selectors";
 import LabelIcon from "@mui/icons-material/Label";
 
 export const PointerSelectionOptions = () => {
@@ -50,7 +50,7 @@ export const PointerSelectionOptions = () => {
       | React.MouseEvent<HTMLLIElement>
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLDivElement>,
-    category: CategoryType
+    category: Category
   ) => {
     const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
     const desiredAnnotations = allAnnotations.filter((annotation) => {
@@ -99,7 +99,7 @@ export const PointerSelectionOptions = () => {
 
       <Divider />
       <CollapsibleList closed dense primary={t("Select Category")}>
-        {categories.map((category: CategoryType) => {
+        {categories.map((category: Category) => {
           return (
             <ListItem
               button

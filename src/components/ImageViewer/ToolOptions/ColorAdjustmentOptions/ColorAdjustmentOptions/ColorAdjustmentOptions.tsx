@@ -7,11 +7,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSlice } from "../../../../../annotator/store";
-import { imageOriginalSrcSelector } from "../../../../../annotator/store/selectors";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
-import { channelsSelector } from "../../../../../annotator/store/selectors/intensityRangeSelector";
-import { ChannelType } from "../../../../../annotator/types/ChannelType";
-import { imageShapeSelector } from "../../../../../annotator/store/selectors/imageShapeSelector";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
+import { ChannelType } from "../../../../../types/ChannelType";
+import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import Slider from "@mui/material/Slider";
 

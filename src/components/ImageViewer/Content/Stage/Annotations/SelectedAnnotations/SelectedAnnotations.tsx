@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectedAnnotationSelector } from "../../../../../../annotator/store/selectors/selectedAnnotationSelector";
-import { AnnotationType } from "../../../../../../annotator/types/AnnotationType";
-import { selectedAnnotationsSelector } from "../../../../../../annotator/store/selectors/selectedAnnotationsSelector";
+import { selectedAnnotationSelector } from "../../../../../../store/selectors/selectedAnnotationSelector";
+import { AnnotationType } from "../../../../../../types/AnnotationType";
+import { selectedAnnotationsSelector } from "../../../../../../store/selectors/selectedAnnotationsSelector";
 import { SelectedAnnotation } from "../SelectedAnnotation/SelectedAnnotation";
 
 export const SelectedAnnotations = () => {

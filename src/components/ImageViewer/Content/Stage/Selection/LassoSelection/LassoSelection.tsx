@@ -3,7 +3,7 @@ import React from "react";
 import { LassoAnnotationTool } from "../../../../../../annotator/image/Tool";
 import { useMarchingAnts } from "../../../../../../annotator/hooks";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../annotator/store/selectors";
+import { stageScaleSelector } from "../../../../../../store/selectors";
 
 type LassoSelectionProps = {
   operator: LassoAnnotationTool;

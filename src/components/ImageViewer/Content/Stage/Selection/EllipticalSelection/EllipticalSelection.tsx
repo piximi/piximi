@@ -3,7 +3,7 @@ import * as ReactKonva from "react-konva";
 import React from "react";
 import { useMarchingAnts } from "../../../../../../annotator/hooks";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../annotator/store/selectors";
+import { stageScaleSelector } from "../../../../../../store/selectors";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;

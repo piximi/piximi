@@ -1,17 +1,17 @@
 import * as _ from "lodash";
-import { CategoryType } from "../../../../../../annotator/types/CategoryType";
+import { Category } from "../../../../../../types/Category";
 import * as ReactKonva from "react-konva";
 import React, { useEffect, useState } from "react";
-import { AnnotationType } from "../../../../../../annotator/types/AnnotationType";
+import { AnnotationType } from "../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
 import {
   categoriesSelector,
   stageScaleSelector,
-} from "../../../../../../annotator/store/selectors";
-import { imageWidthSelector } from "../../../../../../annotator/store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../../../../annotator/store/selectors/imageHeightSelector";
+} from "../../../../../../store/selectors";
+import { imageWidthSelector } from "../../../../../../store/selectors/imageWidthSelector";
+import { imageHeightSelector } from "../../../../../../store/selectors/imageHeightSelector";
 import { toRGBA } from "../../../../../../annotator/image";
-import { colorOverlayROI } from "../../../../../../annotator/image/imageHelper";
+import { colorOverlayROI } from "../../../../../../image/imageHelper";
 
 type AnnotationProps = {
   annotation: AnnotationType;
@@ -28,7 +28,7 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
 
   const fill = _.find(
     categories,
-    (category: CategoryType) => category.id === annotation.categoryId
+    (category: Category) => category.id === annotation.categoryId
   )?.color;
 
   useEffect(() => {

@@ -1,8 +1,8 @@
 import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
 import * as ImageJS from "image-js";
-import { ShapeType } from "../../../../annotator/types/ShapeType";
-import { ImageType } from "../../../../annotator/types/ImageType";
+import { ShapeType } from "../../../../types/ShapeType";
+import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
 import {
   addImages,
@@ -46,7 +46,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
               useCanvas: true,
             });
 
-            const loaded: ImageType = {
+            const loaded: ImageViewerImage = {
               avatar: image
                 .resize({ width: 50 })
                 .toDataURL("image/png", { useCanvas: true }),

@@ -11,7 +11,7 @@ import {
   imageSelector,
   stageHeightSelector,
   stageWidthSelector,
-} from "../../store/selectors";
+} from "../../../store/selectors";
 
 export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
   const dispatch = useDispatch();

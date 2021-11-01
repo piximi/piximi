@@ -6,13 +6,13 @@ import { useSelector } from "react-redux";
 import {
   boundingClientRectSelector,
   stageScaleSelector,
-} from "../../../../../annotator/store/selectors";
-import { scaledImageWidthSelector } from "../../../../../annotator/store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "../../../../../annotator/store/selectors/scaledImageHeightSelector";
-import { imageSrcSelector } from "../../../../../annotator/store/selectors/imageSrcSelector";
-import { channelsSelector } from "../../../../../annotator/store/selectors/intensityRangeSelector";
+} from "../../../../../store/selectors";
+import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
+import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
+import { imageSrcSelector } from "../../../../../store/selectors/imageSrcSelector";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { createIntensityFilter } from "../../../ToolOptions/ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
-import { ChannelType } from "../../../../../annotator/types/ChannelType";
+import { ChannelType } from "../../../../../types/ChannelType";
 import { isEqual } from "lodash";
 
 export const Image = React.forwardRef<Konva.Image>((_, ref) => {

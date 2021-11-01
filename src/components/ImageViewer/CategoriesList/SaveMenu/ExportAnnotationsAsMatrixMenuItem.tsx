@@ -5,11 +5,11 @@ import { useSelector } from "react-redux";
 import {
   categoriesSelector,
   imageInstancesSelector,
-} from "../../../../annotator/store/selectors";
-import { imagesSelector } from "../../../../annotator/store/selectors/imagesSelector";
+} from "../../../../store/selectors";
+import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { saveAnnotationsAsLabelMatrix } from "../../../../annotator/image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "../../../../image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

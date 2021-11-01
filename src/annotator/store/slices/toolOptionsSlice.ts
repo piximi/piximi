@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ToolOptionsStateType } from "../../types/ToolOptionsStateType";
-import { ZoomModeType } from "../../types/ZoomModeType";
-import { ZoomToolOptionsType } from "../../types/ZoomToolOptionsType";
-import { ColorAdjustmentOptionsType } from "../../types/ColorAdjustmentOptionsType";
+import { ToolOptionsStateType } from "../../../types/ToolOptionsStateType";
+import { ZoomModeType } from "../../../types/ZoomModeType";
+import { ZoomToolOptionsType } from "../../../types/ZoomToolOptionsType";
+import { ColorAdjustmentOptionsType } from "../../../types/ColorAdjustmentOptionsType";
 
 const initialState: ToolOptionsStateType = {
   colorAdjustment: {

@@ -1,5 +1,5 @@
 import createGraph, { Graph, Node } from "ngraph.graph";
-import { getIdx } from "./imageHelper";
+import { getIdx } from "../../image/imageHelper";
 import { DataArray } from "image-js";
 
 import { cachedAStarPathSearch } from "./pathfinder/PathFinder";

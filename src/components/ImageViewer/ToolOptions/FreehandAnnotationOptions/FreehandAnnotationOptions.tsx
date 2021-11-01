@@ -9,7 +9,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
 import { useDispatch, useSelector } from "react-redux";
-import { penSelectionBrushSizeSelector } from "../../../../annotator/store/selectors/penSelectionBrushSizeSelector";
+import { penSelectionBrushSizeSelector } from "../../../../store/selectors/penSelectionBrushSizeSelector";
 import { applicationSlice } from "../../../../annotator/store";
 
 export const FreehandAnnotationOptions = () => {

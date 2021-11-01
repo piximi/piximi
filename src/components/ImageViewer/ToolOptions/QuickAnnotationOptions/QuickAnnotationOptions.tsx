@@ -9,7 +9,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
-import { quickSelectionBrushSizeSelector } from "../../../../annotator/store/selectors/quickSelectionBrushSizeSelector";
+import { quickSelectionBrushSizeSelector } from "../../../../store/selectors/quickSelectionBrushSizeSelector";
 import { applicationSlice } from "../../../../annotator/store/slices";
 import { useDispatch, useSelector } from "react-redux";
 

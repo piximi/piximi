@@ -1,6 +1,6 @@
 import Dialog from "@mui/material/Dialog";
 import React from "react";
-import { ShapeType } from "../../../../annotator/types/ShapeType";
+import { ShapeType } from "../../../../types/ShapeType";
 import {
   applicationSlice,
   setActiveImage,
@@ -13,20 +13,20 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import malaria from "../../../../annotator/images/malaria.png";
-import cellpainting from "../../../../annotator/images/cell-painting.png";
-import { ChannelType } from "../../../../annotator/types/ChannelType";
-import { ToolType } from "../../../../annotator/types/ToolType";
-import { ImageType } from "../../../../annotator/types/ImageType";
+import malaria from "../../../../images/malaria.png";
+import cellpainting from "../../../../images/cell-painting.png";
+import { ChannelType } from "../../../../types/ChannelType";
+import { ToolType } from "../../../../types/ToolType";
+import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
-import { imagesSelector } from "../../../../annotator/store/selectors/imagesSelector";
-import * as malariaAnnotations from "../../../../annotator/images/malaria.json";
-import * as cellpaintingAnnotations from "../../../../annotator/images/cellpainting.json";
-import { AnnotationType } from "../../../../annotator/types/AnnotationType";
-import { SerializedAnnotationType } from "../../../../annotator/types/SerializedAnnotationType";
-import { CategoryType } from "../../../../annotator/types/CategoryType";
-import { categoriesSelector } from "../../../../annotator/store/selectors";
-import { importSerializedAnnotations } from "../../../../annotator/image/imageHelper";
+import { imagesSelector } from "../../../../store/selectors/imagesSelector";
+import * as malariaAnnotations from "../../../../images/malaria.json";
+import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
+import { AnnotationType } from "../../../../types/AnnotationType";
+import { SerializedAnnotationType } from "../../../../types/SerializedAnnotationType";
+import { Category } from "../../../../types/Category";
+import { categoriesSelector } from "../../../../store/selectors";
+import { importSerializedAnnotations } from "../../../../image/imageHelper";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -91,7 +91,7 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
-    const example: ImageType = {
+    const example: ImageViewerImage = {
       avatar: data as string,
       id: v4(),
       annotations: [],
@@ -108,7 +108,7 @@ export const ExampleImageDialog = ({
 
     const newAnnotations: Array<AnnotationType> = [];
 
-    let updatedCategories: Array<CategoryType> = categories_in;
+    let updatedCategories: Array<Category> = categories_in;
 
     project[0].annotations.forEach(
       (serializedAnnotation: SerializedAnnotationType) => {

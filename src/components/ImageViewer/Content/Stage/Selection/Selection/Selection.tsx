@@ -12,7 +12,7 @@ import {
   Tool,
 } from "../../../../../../annotator/image/Tool";
 import { EllipticalSelection } from "../EllipticalSelection";
-import { ToolType } from "../../../../../../annotator/types/ToolType";
+import { ToolType } from "../../../../../../types/ToolType";
 import { LassoSelection } from "../LassoSelection";
 import { MagneticSelection } from "../MagneticSelection";
 import { ObjectSelection } from "../ObjectSelection";

@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { allSerializedAnnotationsSelector } from "../../../../annotator/store/selectors/allSerializedAnnotationsSelector";
+import { allSerializedAnnotationsSelector } from "../../../../store/selectors/allSerializedAnnotationsSelector";
 import { saveAs } from "file-saver";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";

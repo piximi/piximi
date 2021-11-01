@@ -2,13 +2,13 @@ import { combineReducers } from "redux";
 import { applicationSlice } from "../slices";
 import { toolOptionsSlice } from "../slices/toolOptionsSlice";
 import undoable, { groupByActionTypes } from "redux-undo";
-import { StateType } from "../../types/StateType";
-import { HistoryStateType } from "../../types/HistoryStateType";
+import { ImageViewer } from "../../../types/ImageViewer";
+import { HistoryStateType } from "../../../types/HistoryStateType";
 import * as _ from "lodash";
 
 const filterActions = (
   action: any,
-  currentState: StateType,
+  currentState: ImageViewer,
   previousHistory: HistoryStateType
 ) => {
   const actions = [

@@ -1,8 +1,8 @@
-import { AnnotationType } from "../../../../types/AnnotationType";
+import { AnnotationType } from "../../../../../types/AnnotationType";
 import * as ImageJS from "image-js";
-import { CategoryType } from "../../../../types/CategoryType";
+import { Category } from "../../../../../types/Category";
 import * as _ from "lodash";
-import { connectPoints, drawLine } from "../../../imageHelper";
+import { connectPoints, drawLine } from "../../../../../image/imageHelper";
 import { simplify } from "../../../simplify/simplify";
 import { slpf } from "../../../polygon-fill/slpf";
 import * as uuid from "uuid";
@@ -414,7 +414,7 @@ export abstract class AnnotationTool extends Tool {
 
   abstract onMouseUp(position: { x: number; y: number }): void;
 
-  annotate(category: CategoryType): void {
+  annotate(category: Category): void {
     if (!this.boundingBox || !this.mask) return;
 
     this.annotation = {

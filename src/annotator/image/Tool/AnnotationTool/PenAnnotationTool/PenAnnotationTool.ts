@@ -1,7 +1,7 @@
 import { AnnotationTool } from "../AnnotationTool";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
-import { connectPoints } from "../../../imageHelper";
+import { connectPoints } from "../../../../../image/imageHelper";
 import { encode } from "../../../rle";
 
 export class PenAnnotationTool extends AnnotationTool {

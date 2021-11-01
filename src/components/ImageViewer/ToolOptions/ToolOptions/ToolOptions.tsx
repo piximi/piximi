@@ -15,7 +15,7 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "../../../../icons";
-import { ToolType } from "../../../../annotator/types/ToolType";
+import { ToolType } from "../../../../types/ToolType";
 import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
 import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
 import { FreehandAnnotationOptions } from "../FreehandAnnotationOptions";
@@ -27,7 +27,7 @@ import { QuickAnnotationOptions } from "../QuickAnnotationOptions";
 import { ObjectAnnotationOptions } from "../ObjectAnnotationOptions";
 import { ZoomOptions } from "../ZoomOptions";
 import { useSelector } from "react-redux";
-import { toolTypeSelector } from "../../../../annotator/store/selectors";
+import { toolTypeSelector } from "../../../../store/selectors";
 import { useTranslation } from "react-i18next";
 import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
 import Box from "@mui/material/Box";

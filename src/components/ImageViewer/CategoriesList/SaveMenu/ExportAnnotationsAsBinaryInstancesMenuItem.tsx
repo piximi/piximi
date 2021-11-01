@@ -5,10 +5,10 @@ import { useSelector } from "react-redux";
 import {
   categoriesSelector,
   imageInstancesSelector,
-} from "../../../../annotator/store/selectors";
-import { imagesSelector } from "../../../../annotator/store/selectors/imagesSelector";
+} from "../../../../store/selectors";
+import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import JSZip from "jszip";
-import { saveAnnotationsAsBinaryInstanceSegmentationMasks } from "../../../../annotator/image/imageHelper";
+import { saveAnnotationsAsBinaryInstanceSegmentationMasks } from "../../../../image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

@@ -1,6 +1,6 @@
 import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 import { test } from "@jest/globals";
-import { CategoryType } from "../../../../types/CategoryType";
+import { Category } from "../../../../../types/Category";
 import * as ImageJS from "image-js";
 
 test("deselect", () => {

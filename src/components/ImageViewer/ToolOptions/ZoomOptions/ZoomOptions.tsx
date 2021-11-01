@@ -5,7 +5,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { ZoomModeType } from "../../../../annotator/types/ZoomModeType";
+import { ZoomModeType } from "../../../../types/ZoomModeType";
 import {
   setOffset,
   setStageScale,
@@ -18,7 +18,7 @@ import {
   stageScaleSelector,
   stageWidthSelector,
   zoomToolOptionsSelector,
-} from "../../../../annotator/store/selectors";
+} from "../../../../store/selectors";
 import ListSubheader from "@mui/material/ListSubheader";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import {
@@ -34,7 +34,7 @@ import Slider from "@mui/material/Slider";
 import Grid from "@mui/material/Grid";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import { offsetSelector } from "../../../../annotator/store/selectors/offsetSelector";
+import { offsetSelector } from "../../../../store/selectors/offsetSelector";
 import { ResetButton } from "../HandToolOptions/ResetButton";
 
 export const ZoomOptions = () => {

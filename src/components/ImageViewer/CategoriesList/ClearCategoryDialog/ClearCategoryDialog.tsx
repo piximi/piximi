@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSlice } from "../../../../annotator/store";
-import { selectedCategorySelector } from "../../../../annotator/store/selectors";
+import { selectedCategorySelector } from "../../../../store/selectors";
 
 type ClearCategoryDialogProps = {
   onClose: () => void;

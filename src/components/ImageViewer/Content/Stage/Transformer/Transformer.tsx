@@ -1,28 +1,28 @@
 import * as ReactKonva from "react-konva";
 import React, { useRef, useState } from "react";
 import * as _ from "lodash";
-import { AnnotationType } from "../../../../../annotator/types/AnnotationType";
+import { AnnotationType } from "../../../../../types/AnnotationType";
 import { useDispatch, useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../annotator/store/selectors";
+import { stageScaleSelector } from "../../../../../store/selectors";
 import {
   applicationSlice,
   setSelectedAnnotations,
 } from "../../../../../annotator/store/slices";
 import Konva from "konva";
-import { selectedAnnotationSelector } from "../../../../../annotator/store/selectors/selectedAnnotationSelector";
+import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
 import { decode, encode } from "../../../../../annotator/image/rle";
 import * as ImageJS from "image-js";
-import { selectedAnnotationsSelector } from "../../../../../annotator/store/selectors/selectedAnnotationsSelector";
+import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
 import { useCursor } from "../../../../../annotator/hooks";
-import { AnnotationModeType } from "../../../../../annotator/types/AnnotationModeType";
-import { unselectedAnnotationsSelector } from "../../../../../annotator/store/selectors/unselectedAnnotationsSelector";
+import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
+import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
 import useSound from "use-sound";
 import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
-import { soundEnabledSelector } from "../../../../../annotator/store/selectors/soundEnabledSelector";
+import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
 import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
-import { imageWidthSelector } from "../../../../../annotator/store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../../../annotator/store/selectors/imageHeightSelector";
-import { cursorSelector } from "../../../../../annotator/store/selectors/cursorSelector";
+import { imageWidthSelector } from "../../../../../store/selectors/imageWidthSelector";
+import { imageHeightSelector } from "../../../../../store/selectors/imageHeightSelector";
+import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 
 type box = {
   x: number;

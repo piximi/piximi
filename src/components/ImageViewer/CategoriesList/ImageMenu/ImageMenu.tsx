@@ -6,17 +6,17 @@ import Typography from "@mui/material/Typography";
 import { useDispatch, useSelector } from "react-redux";
 import { applicationSlice } from "../../../../annotator/store";
 import { useTranslation } from "../../../../annotator/hooks/useTranslation";
-import { activeImageIdSelector } from "../../../../annotator/store/selectors/activeImageIdSelector";
+import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-} from "../../../../annotator/image/imageHelper";
+} from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { categoriesSelector } from "../../../../annotator/store/selectors";
-import { imagesSelector } from "../../../../annotator/store/selectors/imagesSelector";
-import { ImageType } from "../../../../annotator/types/ImageType";
+import { categoriesSelector } from "../../../../store/selectors";
+import { imagesSelector } from "../../../../store/selectors/imagesSelector";
+import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { Divider } from "@mui/material";
 
 type ImageMenuProps = {
@@ -61,7 +61,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
+    const activeImage = images.find((image: ImageViewerImage) => {
       return image.id === currentImageId;
     });
 
@@ -84,7 +84,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
+    const activeImage = images.find((image: ImageViewerImage) => {
       return image.id === currentImageId;
     });
 
@@ -103,7 +103,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
+    const activeImage = images.find((image: ImageViewerImage) => {
       return image.id === currentImageId;
     });
 
@@ -126,7 +126,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
+    const activeImage = images.find((image: ImageViewerImage) => {
       return image.id === currentImageId;
     });
 
@@ -147,7 +147,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
+    const activeImage = images.find((image: ImageViewerImage) => {
       return image.id === currentImageId;
     });
 

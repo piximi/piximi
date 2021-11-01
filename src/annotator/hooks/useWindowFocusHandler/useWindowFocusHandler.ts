@@ -1,7 +1,7 @@
 // User has switched back to the tab
 import { useEffect, useState } from "react";
 import { applicationSlice } from "../../store/slices";
-import { AnnotationModeType } from "../../types/AnnotationModeType";
+import { AnnotationModeType } from "../../../types/AnnotationModeType";
 import { useDispatch } from "react-redux";
 
 export const useWindowFocusHandler = () => {

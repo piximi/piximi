@@ -26,14 +26,14 @@ const images: Array<Image> = [
     id: "00000000-0000-0000-0001-00000000000",
     instances: [],
     name: "",
-    src: "https://picsum.photos/seed/piximi/224",
+    originalSrc: "https://picsum.photos/seed/piximi/224",
   },
   {
     categoryId: "00000000-0000-0000-0000-00000000002",
     id: "00000000-0000-0000-0002-00000000000",
     instances: [],
     name: "",
-    src: "https://picsum.photos/seed/piximi/224",
+    originalSrc: "https://picsum.photos/seed/piximi/224",
   },
 ];
 

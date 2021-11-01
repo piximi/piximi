@@ -5,13 +5,13 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { AnnotationType } from "../../../../annotator/types/AnnotationType";
+import { AnnotationType } from "../../../../types/AnnotationType";
 import { applicationSlice } from "../../../../annotator/store";
 import {
   imageInstancesSelector,
   selectedCategorySelector,
   unknownCategorySelector,
-} from "../../../../annotator/store/selectors";
+} from "../../../../store/selectors";
 
 type DeleteCategoryDialogProps = {
   onClose: () => void;

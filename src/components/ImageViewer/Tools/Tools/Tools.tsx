@@ -1,10 +1,10 @@
 import Drawer from "@mui/material/Drawer";
 import React from "react";
-import { ToolType as OperationType } from "../../../../annotator/types/ToolType";
+import { ToolType as OperationType } from "../../../../types/ToolType";
 import { Tool } from "../Tool";
 import { useStyles } from "./Tools.css";
 import { useDispatch, useSelector } from "react-redux";
-import { toolTypeSelector } from "../../../../annotator/store/selectors";
+import { toolTypeSelector } from "../../../../store/selectors";
 import { applicationSlice } from "../../../../annotator/store";
 import {
   ColorAdjustmentIcon,

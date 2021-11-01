@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { invertModeSelector } from "../../../../annotator/store/selectors";
+import { invertModeSelector } from "../../../../store/selectors";
 import { applicationSlice } from "../../../../annotator/store/slices";
 import { useTranslation } from "../../../../annotator/hooks/useTranslation";
 import List from "@mui/material/List";

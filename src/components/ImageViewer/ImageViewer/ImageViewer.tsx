@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { CssBaseline, Dialog } from "@mui/material";
-import { ImageType } from "../../../annotator/types/ImageType";
+import { ImageViewerImage } from "../../../types/ImageViewerImage";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
@@ -17,13 +17,13 @@ import { ThemeProvider } from "@mui/styles";
 import { useStyles } from "./ImageViewer.css";
 import { theme } from "./theme";
 import * as ImageJS from "image-js";
-import { ShapeType } from "../../../annotator/types/ShapeType";
+import { ShapeType } from "../../../types/ShapeType";
 import { loadLayersModelThunk } from "../../../annotator/store/thunks";
-import { ToolType } from "../../../annotator/types/ToolType";
+import { ToolType } from "../../../types/ToolType";
 import { v4 } from "uuid";
 
 type ImageViewerProps = {
-  image?: ImageType;
+  image?: ImageViewerImage;
   onClose: () => void;
   open: boolean;
 };
@@ -68,7 +68,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
                 useCanvas: true,
               });
 
-              const loaded: ImageType = {
+              const loaded: ImageViewerImage = {
                 avatar: image
                   .resize({ width: 50 })
                   .toDataURL("image/png", { useCanvas: true }),

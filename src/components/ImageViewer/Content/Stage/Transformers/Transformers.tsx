@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectedAnnotationsIdsSelector } from "../../../../../annotator/store/selectors/selectedAnnotationsIdsSelector";
+import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
 
 import { Transformer } from "../Transformer/Transformer";
 

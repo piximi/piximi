@@ -3,9 +3,9 @@ import React from "react";
 import { useMarchingAnts } from "../../../../../../annotator/hooks";
 import { useSelector } from "react-redux";
 
-import { pointerSelectionSelector } from "../../../../../../annotator/store/selectors/pointerSelectionSelector";
-import { toolTypeSelector } from "../../../../../../annotator/store/selectors";
-import { ToolType } from "../../../../../../annotator/types/ToolType";
+import { pointerSelectionSelector } from "../../../../../../store/selectors/pointerSelectionSelector";
+import { toolTypeSelector } from "../../../../../../store/selectors";
+import { ToolType } from "../../../../../../types/ToolType";
 
 export const PointerSelection = () => {
   const dashOffset = useMarchingAnts();

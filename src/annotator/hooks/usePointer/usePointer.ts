@@ -1,9 +1,9 @@
-import { ToolType } from "../../types/ToolType";
+import { ToolType } from "../../../types/ToolType";
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
-} from "../../image/imageHelper";
-import { AnnotationType } from "../../types/AnnotationType";
+} from "../../../image/imageHelper";
+import { AnnotationType } from "../../../types/AnnotationType";
 import {
   applicationSlice,
   setPointerSelection,
@@ -15,16 +15,16 @@ import {
   imageInstancesSelector,
   stageScaleSelector,
   toolTypeSelector,
-} from "../../store/selectors";
-import { selectedAnnotationsSelector } from "../../store/selectors/selectedAnnotationsSelector";
-import { currentIndexSelector } from "../../store/selectors/currentIndexSelector";
+} from "../../../store/selectors";
+import { selectedAnnotationsSelector } from "../../../store/selectors/selectedAnnotationsSelector";
+import { currentIndexSelector } from "../../../store/selectors/currentIndexSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import hotkeys from "hotkeys-js";
 import { useState } from "react";
-import { pointerSelectionSelector } from "../../store/selectors/pointerSelectionSelector";
-import { selectedAnnotationsIdsSelector } from "../../store/selectors/selectedAnnotationsIdsSelector";
-import { imageWidthSelector } from "../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../store/selectors/imageHeightSelector";
+import { pointerSelectionSelector } from "../../../store/selectors/pointerSelectionSelector";
+import { selectedAnnotationsIdsSelector } from "../../../store/selectors/selectedAnnotationsIdsSelector";
+import { imageWidthSelector } from "../../../store/selectors/imageWidthSelector";
+import { imageHeightSelector } from "../../../store/selectors/imageHeightSelector";
 
 export const usePointer = () => {
   const dispatch = useDispatch();
