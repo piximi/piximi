@@ -17,7 +17,7 @@ import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import { LanguageType } from "../../../../types/LanguageType";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 import { languageSelector } from "../../../../store/selectors/languageSelector";
 import { soundEnabledSelector } from "../../../../store/selectors/soundEnabledSelector";
 import { useStyles } from "./SettingsDialog.css";
@@ -39,7 +39,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
   const onLanguageChange = (event: SelectChangeEvent) => {
     dispatch(
-      applicationSlice.actions.setLanguage({
+      imageViewerSlice.actions.setLanguage({
         language: event.target.value as unknown as LanguageType,
       })
     );
@@ -47,7 +47,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
   const onSoundEffectsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(
-      applicationSlice.actions.setSoundEnabled({
+      imageViewerSlice.actions.setSoundEnabled({
         soundEnabled: event.target.checked,
       })
     );

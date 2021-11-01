@@ -6,11 +6,11 @@ import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../../hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { imagesSelector } from "../../../../../store/selectors/imagesSelector";
-import { applicationSlice } from "../../../../../annotator/store/slices";
 import { selectedCategorySelector } from "../../../../../store/selectors";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -59,13 +59,13 @@ export const CategoryMenu = ({
     else {
       batch(() => {
         dispatch(
-          applicationSlice.actions.setSelectedCategory({
+          imageViewerSlice.actions.setSelectedCategory({
             selectedCategory: "00000000-0000-0000-0000-000000000000",
           })
         );
 
         dispatch(
-          applicationSlice.actions.deleteCategory({ category: category })
+          imageViewerSlice.actions.deleteCategory({ category: category })
         );
       });
     }

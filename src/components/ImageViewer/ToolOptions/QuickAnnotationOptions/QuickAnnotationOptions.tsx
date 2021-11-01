@@ -4,13 +4,13 @@ import { SampleList } from "../SampleList";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
 import { quickSelectionBrushSizeSelector } from "../../../../store/selectors/quickSelectionBrushSizeSelector";
-import { applicationSlice } from "../../../../annotator/store/slices";
+import { imageViewerSlice } from "../../../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 
 export const QuickAnnotationOptions = () => {
@@ -28,7 +28,7 @@ export const QuickAnnotationOptions = () => {
 
   const onChangeCommitted = (event: any, changed: number | number[]) => {
     const payload = { quickSelectionBrushSize: changed as number };
-    dispatch(applicationSlice.actions.setQuickSelectionBrushSize(payload));
+    dispatch(imageViewerSlice.actions.setQuickSelectionBrushSize(payload));
   };
 
   return (

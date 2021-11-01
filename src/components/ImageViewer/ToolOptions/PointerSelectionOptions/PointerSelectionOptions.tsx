@@ -1,14 +1,14 @@
 import Divider from "@mui/material/Divider";
 import React from "react";
 import { InformationBox } from "../InformationBox";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import SvgIcon from "@mui/material/SvgIcon";
 import { ReactComponent as InvertSelectionIcon } from "../../../../icons/InvertAnnotation.svg";
 import ListItemText from "@mui/material/ListItemText";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedAnnotationsSelector } from "../../../../store/selectors/selectedAnnotationsSelector";
 import { unselectedAnnotationsSelector } from "../../../../store/selectors/unselectedAnnotationsSelector";
@@ -29,7 +29,7 @@ export const PointerSelectionOptions = () => {
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
     dispatch(
-      applicationSlice.actions.setSelectedAnnotations({
+      imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: allAnnotations,
         selectedAnnotation: allAnnotations[0],
       })
@@ -38,7 +38,7 @@ export const PointerSelectionOptions = () => {
 
   const onSelectNone = () => {
     dispatch(
-      applicationSlice.actions.setSelectedAnnotations({
+      imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [],
         selectedAnnotation: undefined,
       })
@@ -57,7 +57,7 @@ export const PointerSelectionOptions = () => {
       return annotation.categoryId === category.id;
     });
     dispatch(
-      applicationSlice.actions.setSelectedAnnotations({
+      imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: desiredAnnotations,
         selectedAnnotation: desiredAnnotations[0],
       })

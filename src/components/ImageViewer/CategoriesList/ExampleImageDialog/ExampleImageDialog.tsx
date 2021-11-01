@@ -1,14 +1,6 @@
 import Dialog from "@mui/material/Dialog";
 import React from "react";
 import { ShapeType } from "../../../../types/ShapeType";
-import {
-  applicationSlice,
-  setActiveImage,
-  setChannels,
-  setImages,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../../annotator/store";
 import { batch, useDispatch, useSelector } from "react-redux";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -27,6 +19,14 @@ import { SerializedAnnotationType } from "../../../../types/SerializedAnnotation
 import { Category } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
+import {
+  imageViewerSlice,
+  setActiveImage,
+  setChannels,
+  setImages,
+  setOperation,
+  setSelectedAnnotations,
+} from "../../../../store/slices";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -144,12 +144,12 @@ export const ExampleImageDialog = ({
       );
 
       dispatch(
-        applicationSlice.actions.setImageInstances({
+        imageViewerSlice.actions.setImageInstances({
           instances: newAnnotations,
         })
       );
       dispatch(
-        applicationSlice.actions.setCategories({
+        imageViewerSlice.actions.setCategories({
           categories: updatedCategories,
         })
       );

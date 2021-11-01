@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
-import { languageSelector } from "../../../store/selectors/languageSelector";
-import { de, en, fas, fi, gr, hi, hu } from "../../translations/";
-import { LanguageType } from "../../../types/LanguageType";
+import { languageSelector } from "../../store/selectors/languageSelector";
+import { de, en, fas, fi, gr, hi, hu } from "../../translations";
+import { LanguageType } from "../../types/LanguageType";
 import fr from "../../translations/fr";
 
 export const useTranslation = () => {

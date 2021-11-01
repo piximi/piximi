@@ -1,15 +1,19 @@
 import { KonvaEventObject } from "konva/types/Node";
 import { useDispatch, useSelector } from "react-redux";
-import { ToolType } from "../../../types/ToolType";
-import { ZoomModeType } from "../../../types/ZoomModeType";
-import { setOffset, setStageScale, setZoomSelection } from "../../store";
+import { ToolType } from "../../types/ToolType";
+import { ZoomModeType } from "../../types/ZoomModeType";
+import {
+  setOffset,
+  setStageScale,
+  setZoomSelection,
+} from "../../annotator/store";
 import {
   stageScaleSelector,
   toolTypeSelector,
   zoomSelectionSelector,
   zoomToolOptionsSelector,
-} from "../../../store/selectors";
-import { scaledImageWidthSelector } from "../../../store/selectors/scaledImageWidthSelector";
+} from "../../store/selectors";
+import { scaledImageWidthSelector } from "../../store/selectors/scaledImageWidthSelector";
 
 export const useZoom = () => {
   const delta = 10;

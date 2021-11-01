@@ -7,7 +7,7 @@ import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import {
   addImages,
-  applicationSlice,
+  imageViewerSlice,
   setActiveImage,
   setOperation,
   setSelectedAnnotations,
@@ -40,7 +40,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
 
   useEffect(() => {
     if (image) {
-      dispatch(applicationSlice.actions.setActiveImage({ image: image.id }));
+      dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
     }
   }, [dispatch, image]);
 

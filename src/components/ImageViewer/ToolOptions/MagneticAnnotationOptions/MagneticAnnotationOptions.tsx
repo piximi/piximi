@@ -4,7 +4,7 @@ import { SampleList } from "../SampleList";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 
 export const MagneticAnnotationOptions = () => {
   const t = useTranslation();

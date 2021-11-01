@@ -4,13 +4,13 @@ import * as ImageJS from "image-js";
 import { ShapeType } from "../../../../types/ShapeType";
 import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
+import { MenuItem } from "@mui/material";
+import ListItemText from "@mui/material/ListItemText";
 import {
   addImages,
   setActiveImage,
   setSelectedAnnotations,
-} from "../../../../annotator/store/slices";
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+} from "../../../../store/slices";
 
 type OpenImageMenuItemProps = {
   popupState: any;

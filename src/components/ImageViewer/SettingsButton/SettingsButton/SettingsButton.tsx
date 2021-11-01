@@ -3,7 +3,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { SettingsDialog } from "../SettingsDialog";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import { useStyles } from "./SettingsButton.css";
 
 export const SettingsButton = () => {

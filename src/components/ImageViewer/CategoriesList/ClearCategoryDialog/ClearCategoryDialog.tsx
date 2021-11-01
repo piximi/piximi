@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 import { selectedCategorySelector } from "../../../../store/selectors";
 
 type ClearCategoryDialogProps = {
@@ -23,7 +23,7 @@ export const ClearCategoryDialog = ({
 
   const onClear = () => {
     dispatch(
-      applicationSlice.actions.clearCategoryAnnotations({ category: category })
+      imageViewerSlice.actions.clearCategoryAnnotations({ category: category })
     );
 
     onClose();

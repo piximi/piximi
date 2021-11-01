@@ -11,11 +11,11 @@ import Grid from "@mui/material/Grid";
 import { useStyles } from "./CreateCategoryDialog.css";
 import { ColorResult } from "react-color";
 import { sample } from "underscore";
-import { applicationSlice } from "../../../../../annotator/store";
+import { imageViewerSlice } from "../../../../../annotator/store";
 import { v4 } from "uuid";
 import { Category } from "../../../../../types/Category";
 import { categoriesSelector } from "../../../../../store/selectors";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
 
 const COLORS = [
@@ -73,13 +73,13 @@ export const CreateCategoryDialog = ({
     };
 
     dispatch(
-      applicationSlice.actions.setCategories({
+      imageViewerSlice.actions.setCategories({
         categories: [...categories, category],
       })
     );
 
     dispatch(
-      applicationSlice.actions.setSelectedCategory({
+      imageViewerSlice.actions.setSelectedCategory({
         selectedCategory: category.id,
       })
     );

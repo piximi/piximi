@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch } from "react-redux";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 
 type DeleteAllAnnotationsDialogProps = {
   onClose: () => void;
@@ -20,9 +20,9 @@ export const DeleteAllAnnotationsDialog = ({
 
   const onDelete = () => {
     batch(() => {
-      dispatch(applicationSlice.actions.deleteAllInstances({ id: "" }));
+      dispatch(imageViewerSlice.actions.deleteAllInstances({ id: "" }));
       dispatch(
-        applicationSlice.actions.setSelectedCategory({
+        imageViewerSlice.actions.setSelectedCategory({
           selectedCategory: "00000000-0000-0000-0000-000000000000",
         })
       );

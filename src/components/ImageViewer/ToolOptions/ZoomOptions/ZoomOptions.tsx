@@ -27,7 +27,7 @@ import {
   RadioCheckedIcon,
   RadioUncheckedIcon,
 } from "../../../../icons";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import Divider from "@mui/material/Divider";
 import { InformationBox } from "../InformationBox";
 import Slider from "@mui/material/Slider";

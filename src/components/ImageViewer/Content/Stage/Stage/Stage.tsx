@@ -16,7 +16,7 @@ import {
   zoomSelectionSelector,
 } from "../../../../../store/selectors";
 import {
-  applicationSlice,
+  imageViewerSlice,
   setSelectedAnnotations,
 } from "../../../../../annotator/store";
 import {
@@ -50,11 +50,11 @@ import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-
 import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
-import { useKeyboardShortcuts } from "../../../../../annotator/hooks/useKeyboardShortcuts";
+import { useKeyboardShortcuts } from "../../../../../hooks/useKeyboardShortcuts";
 import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
 import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
 import { Transformers } from "../Transformers/Transformers";
-import { useWindowFocusHandler } from "../../../../../annotator/hooks/useWindowFocusHandler/useWindowFocusHandler";
+import { useWindowFocusHandler } from "../../../../../hooks/useWindowFocusHandler/useWindowFocusHandler";
 import { stagePositionSelector } from "../../../../../store/selectors/stagePositionSelector";
 import { KonvaEventObject } from "konva/types/Node";
 import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
@@ -66,7 +66,7 @@ import { unselectedAnnotationsSelector } from "../../../../../store/selectors/un
 import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/quickSelectionBrushSizeSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
-import { usePointer } from "../../../../../annotator/hooks/usePointer/usePointer";
+import { usePointer } from "../../../../../hooks/usePointer/usePointer";
 import { pointerSelectionSelector } from "../../../../../store/selectors/pointerSelectionSelector";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";

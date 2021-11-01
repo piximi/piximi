@@ -4,10 +4,6 @@ import * as _ from "lodash";
 import { AnnotationType } from "../../../../../types/AnnotationType";
 import { useDispatch, useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../store/selectors";
-import {
-  applicationSlice,
-  setSelectedAnnotations,
-} from "../../../../../annotator/store/slices";
 import Konva from "konva";
 import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
 import { decode, encode } from "../../../../../annotator/image/rle";
@@ -23,6 +19,10 @@ import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-
 import { imageWidthSelector } from "../../../../../store/selectors/imageWidthSelector";
 import { imageHeightSelector } from "../../../../../store/selectors/imageHeightSelector";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
+import {
+  imageViewerSlice,
+  setSelectedAnnotations,
+} from "../../../../../store/slices";
 
 type box = {
   x: number;
@@ -209,7 +209,7 @@ export const Transformer = ({
     };
 
     dispatch(
-      applicationSlice.actions.setSelectedAnnotations({
+      imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [],
         selectedAnnotation: undefined,
       })
@@ -320,16 +320,16 @@ export const Transformer = ({
     container.style.cursor = cursor;
 
     dispatch(
-      applicationSlice.actions.setImageInstances({
+      imageViewerSlice.actions.setImageInstances({
         instances: [...unselectedAnnotations, ...selectedAnnotations],
       })
     );
 
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
-    dispatch(applicationSlice.actions.setAnnotating({ annotating: false }));
+    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
     dispatch(
-      applicationSlice.actions.setSelectionMode({
+      imageViewerSlice.actions.setSelectionMode({
         selectionMode: AnnotationModeType.New,
       })
     );

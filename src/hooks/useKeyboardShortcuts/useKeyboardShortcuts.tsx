@@ -1,18 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  applicationSlice,
-  setOperation,
-  setSelectedCategory,
-} from "../../store";
-import { ToolType } from "../../../types/ToolType";
+
+import { ToolType } from "../../types/ToolType";
 import {
   createdCategoriesSelector,
   toolTypeSelector,
-} from "../../../store/selectors";
+} from "../../store/selectors";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ActionCreators } from "redux-undo";
-import { AnnotationModeType } from "../../../types/AnnotationModeType";
+import { AnnotationModeType } from "../../types/AnnotationModeType";
 import hotkeys from "hotkeys-js";
+import { setOperation, setSelectedCategory } from "../../store/slices";
 
 export const useKeyboardShortcuts = () => {
   const dispatch = useDispatch();

@@ -1,14 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { invertModeSelector } from "../../../../store/selectors";
-import { applicationSlice } from "../../../../annotator/store/slices";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import SvgIcon from "@mui/material/SvgIcon";
 import { ReactComponent as InvertSelectionIcon } from "../../../../icons/InvertAnnotation.svg";
 import ListItemText from "@mui/material/ListItemText";
+import { imageViewerSlice } from "../../../../store/slices";
 
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();
@@ -17,7 +17,7 @@ export const InvertAnnotation = () => {
 
   const onInvertClick = () => {
     dispatch(
-      applicationSlice.actions.setInvertMode({ invertMode: !invertMode })
+      imageViewerSlice.actions.setInvertMode({ invertMode: !invertMode })
     );
   };
 

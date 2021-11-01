@@ -1,30 +1,30 @@
-import { ToolType } from "../../../types/ToolType";
+import { ToolType } from "../../types/ToolType";
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
-} from "../../../image/imageHelper";
-import { AnnotationType } from "../../../types/AnnotationType";
-import {
-  applicationSlice,
-  setPointerSelection,
-  setSelectedAnnotations,
-  setSelectedCategory,
-} from "../../store/slices";
+} from "../../image/imageHelper";
+import { AnnotationType } from "../../types/AnnotationType";
 import { batch, useDispatch, useSelector } from "react-redux";
 import {
   imageInstancesSelector,
   stageScaleSelector,
   toolTypeSelector,
-} from "../../../store/selectors";
-import { selectedAnnotationsSelector } from "../../../store/selectors/selectedAnnotationsSelector";
-import { currentIndexSelector } from "../../../store/selectors/currentIndexSelector";
+} from "../../store/selectors";
+import { selectedAnnotationsSelector } from "../../store/selectors/selectedAnnotationsSelector";
+import { currentIndexSelector } from "../../store/selectors/currentIndexSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import hotkeys from "hotkeys-js";
 import { useState } from "react";
-import { pointerSelectionSelector } from "../../../store/selectors/pointerSelectionSelector";
-import { selectedAnnotationsIdsSelector } from "../../../store/selectors/selectedAnnotationsIdsSelector";
-import { imageWidthSelector } from "../../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../store/selectors/imageHeightSelector";
+import { pointerSelectionSelector } from "../../store/selectors/pointerSelectionSelector";
+import { selectedAnnotationsIdsSelector } from "../../store/selectors/selectedAnnotationsIdsSelector";
+import { imageWidthSelector } from "../../store/selectors/imageWidthSelector";
+import { imageHeightSelector } from "../../store/selectors/imageHeightSelector";
+import {
+  imageViewerSlice,
+  setPointerSelection,
+  setSelectedAnnotations,
+  setSelectedCategory,
+} from "../../store/slices";
 
 export const usePointer = () => {
   const dispatch = useDispatch();
@@ -229,7 +229,7 @@ export const usePointer = () => {
 
     if (overlappingAnnotationsIds.length > 1) {
       dispatch(
-        applicationSlice.actions.setCurrentIndex({
+        imageViewerSlice.actions.setCurrentIndex({
           currentIndex:
             currentIndex + 1 === overlappingAnnotationsIds.length
               ? 0
@@ -246,7 +246,7 @@ export const usePointer = () => {
         return annotation.id === overlappingAnnotationsIds[0];
       });
       dispatch(
-        applicationSlice.actions.setCurrentIndex({
+        imageViewerSlice.actions.setCurrentIndex({
           currentIndex: 0,
         })
       );

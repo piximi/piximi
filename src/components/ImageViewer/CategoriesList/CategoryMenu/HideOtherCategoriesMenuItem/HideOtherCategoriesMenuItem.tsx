@@ -2,8 +2,8 @@ import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Category } from "../../../../../types/Category";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
-import { applicationSlice } from "../../../../../annotator/store";
+import { useTranslation } from "../../../../../hooks/useTranslation";
+import { imageViewerSlice } from "../../../../../annotator/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   categoriesSelector,
@@ -29,7 +29,7 @@ export const HideOtherCategoriesMenuItem = ({
     for (let cat of categories) {
       if (category.id != cat.id) {
         dispatch(
-          applicationSlice.actions.setCategoryVisibility({
+          imageViewerSlice.actions.setCategoryVisibility({
             category: cat,
             visible: false,
           })

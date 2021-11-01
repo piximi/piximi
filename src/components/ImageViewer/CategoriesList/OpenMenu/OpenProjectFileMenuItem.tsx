@@ -1,15 +1,15 @@
 import { useDispatch } from "react-redux";
 import React from "react";
-import {
-  applicationSlice,
-  setActiveImage,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../../annotator/store/slices";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { SerializedFileType } from "../../../../types/SerializedFileType";
 import { ToolType } from "../../../../types/ToolType";
+import {
+  imageViewerSlice,
+  setActiveImage,
+  setOperation,
+  setSelectedAnnotations,
+} from "../../../../store/slices";
 
 type OpenAnnotationsMenuItemProps = {
   popupState: any;
@@ -39,7 +39,7 @@ export const OpenProjectFileMenuItem = ({
         const project = JSON.parse(event.target.result as string);
 
         //clear all images
-        dispatch(applicationSlice.actions.setImages({ images: [] }));
+        dispatch(imageViewerSlice.actions.setImages({ images: [] }));
 
         project.forEach(
           (serializedImage: SerializedFileType, index: number) => {
@@ -62,7 +62,7 @@ export const OpenProjectFileMenuItem = ({
               );
             }
             dispatch(
-              applicationSlice.actions.openAnnotations({
+              imageViewerSlice.actions.openAnnotations({
                 file: serializedImage,
               })
             );

@@ -1,12 +1,12 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSlice } from "../../../../../annotator/store";
+import { imageViewerSlice } from "../../../../../annotator/store";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
@@ -151,7 +151,7 @@ export const ColorAdjustmentOptions = () => {
     if (!imageShape) return;
     const defaultChannels = generateDefaultChannels(imageShape.channels);
     dispatch(
-      applicationSlice.actions.setChannels({
+      imageViewerSlice.actions.setChannels({
         channels: defaultChannels,
       })
     );

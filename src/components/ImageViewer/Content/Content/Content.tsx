@@ -3,7 +3,7 @@ import { Stage } from "../Stage";
 import { useStyles } from "./Content.css";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { DropTargetMonitor, useDrop } from "react-dnd";
-import { useBoundingClientRect } from "../../../../annotator/hooks/useBoundingClientRect";
+import { useBoundingClientRect } from "../../../../hooks/useBoundingClientRect";
 import { useCursor } from "../../../../annotator/hooks";
 
 type ContentProps = {

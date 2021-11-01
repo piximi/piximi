@@ -7,7 +7,7 @@ import React from "react";
 import RadioGroup from "@mui/material/RadioGroup";
 import { useDispatch, useSelector } from "react-redux";
 import { selectionModeSelector } from "../../../../../store/selectors";
-import { applicationSlice } from "../../../../../annotator/store";
+import { imageViewerSlice } from "../../../../../annotator/store";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import ListSubheader from "@mui/material/ListSubheader";
 import { NewTooltip } from "../NewTooltip";
@@ -15,7 +15,7 @@ import { AddTooltip } from "../AddTooltip";
 import { SubtractTooltip } from "../SubtractTooltip";
 import { IntersectionTooltip } from "../IntersectionTooltip";
 import { RadioCheckedIcon, RadioUncheckedIcon } from "../../../../../icons";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../../hooks/useTranslation";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();
@@ -26,14 +26,14 @@ export const AnnotationMode = () => {
     const payload = {
       selectionMode: parseInt((event.target as HTMLInputElement).value),
     };
-    dispatch(applicationSlice.actions.setSelectionMode(payload));
+    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
   };
 
   const onClickLabel = (event: any, mode: AnnotationModeType) => {
     const payload = {
       selectionMode: mode,
     };
-    dispatch(applicationSlice.actions.setSelectionMode(payload));
+    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
   };
 
   const t = useTranslation();

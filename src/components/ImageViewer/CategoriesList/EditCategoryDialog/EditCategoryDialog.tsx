@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "./EditCategoryDialog.css";
 import { Category } from "../../../../types/Category";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 import {
   categoriesSelector,
   selectedCategorySelector,
@@ -63,7 +63,7 @@ export const EditCategoryDialog = ({
       }
     });
     dispatch(
-      applicationSlice.actions.setCategories({ categories: updatedCategories })
+      imageViewerSlice.actions.setCategories({ categories: updatedCategories })
     );
 
     onCloseDialog();

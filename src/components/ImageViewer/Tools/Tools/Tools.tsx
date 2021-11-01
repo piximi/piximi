@@ -5,7 +5,7 @@ import { Tool } from "../Tool";
 import { useStyles } from "./Tools.css";
 import { useDispatch, useSelector } from "react-redux";
 import { toolTypeSelector } from "../../../../store/selectors";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
@@ -20,7 +20,7 @@ import {
   SelectionIcon,
   ZoomIcon,
 } from "../../../../icons";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 
 export const Tools = () => {
   const classes = useStyles();
@@ -43,7 +43,7 @@ export const Tools = () => {
         name={t("Hand")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.Hand,
             })
           );
@@ -58,7 +58,7 @@ export const Tools = () => {
         name={t("Zoom")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.Zoom,
             })
           );
@@ -73,7 +73,7 @@ export const Tools = () => {
         name={t("Color Adjustment")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.ColorAdjustment,
             })
           );
@@ -90,7 +90,7 @@ export const Tools = () => {
         name={t("Pointer")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.Pointer,
             })
           );
@@ -106,7 +106,7 @@ export const Tools = () => {
         name={t("Rectangular annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.RectangularAnnotation,
             })
           );
@@ -121,7 +121,7 @@ export const Tools = () => {
         name={t("Elliptical annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.EllipticalAnnotation,
             })
           );
@@ -136,7 +136,7 @@ export const Tools = () => {
         name={t("Polygonal annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.PolygonalAnnotation,
             })
           );
@@ -153,7 +153,7 @@ export const Tools = () => {
         name={t("Freehand annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.PenAnnotation,
             })
           );
@@ -170,7 +170,7 @@ export const Tools = () => {
         name={t("Lasso annotation (L)")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.LassoAnnotation,
             })
           );
@@ -185,7 +185,7 @@ export const Tools = () => {
         name={t("Magnetic annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.MagneticAnnotation,
             })
           );
@@ -202,7 +202,7 @@ export const Tools = () => {
         name={t("Color annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.ColorAnnotation,
             })
           );
@@ -217,7 +217,7 @@ export const Tools = () => {
         name={t("Quick annotation")}
         onClick={() => {
           dispatch(
-            applicationSlice.actions.setOperation({
+            imageViewerSlice.actions.setOperation({
               operation: OperationType.QuickAnnotation,
             })
           );

@@ -8,3 +8,7 @@ export { useMenu } from "./useMenu/useMenu";
 export { useSelection } from "./useSelection/useSelection";
 export { useSnackbar } from "./useSnackbar/useSnackbar";
 export { useTransformer } from "./useTransformer/useTransformer";
+export { useAnnotationTool } from "./useAnnotationTool/useAnnotationTool";
+export { useCursor } from "./useCursor/useCursor";
+export { useHandTool } from "./useHandTool/useHandTool";
+export { useZoom } from "./useZoom/useZoom";

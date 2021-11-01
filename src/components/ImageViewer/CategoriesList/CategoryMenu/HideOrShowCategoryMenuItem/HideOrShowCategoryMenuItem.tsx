@@ -2,9 +2,9 @@ import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Category } from "../../../../../types/Category";
-import { useTranslation } from "../../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../../hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSlice } from "../../../../../annotator/store";
+import { imageViewerSlice } from "../../../../../annotator/store";
 import { selectedCategorySelector } from "../../../../../store/selectors";
 
 type HideOrShowCategoryMenuItemProps = {
@@ -23,7 +23,7 @@ export const HideOrShowCategoryMenuItem = ({
 
   const onClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     dispatch(
-      applicationSlice.actions.setCategoryVisibility({
+      imageViewerSlice.actions.setCategoryVisibility({
         category: category,
         visible: !category.visible,
       })

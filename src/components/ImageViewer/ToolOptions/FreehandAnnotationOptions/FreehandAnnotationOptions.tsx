@@ -3,14 +3,14 @@ import React from "react";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
 import { useDispatch, useSelector } from "react-redux";
 import { penSelectionBrushSizeSelector } from "../../../../store/selectors/penSelectionBrushSizeSelector";
-import { applicationSlice } from "../../../../annotator/store";
+import { imageViewerSlice } from "../../../../store/slices";
 
 export const FreehandAnnotationOptions = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ export const FreehandAnnotationOptions = () => {
   const onChange = (event: any, changed: number | number[]) => {
     const payload = { penSelectionBrushSize: changed as number };
 
-    dispatch(applicationSlice.actions.setPenSelectionBrushSize(payload));
+    dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
   };
   const t = useTranslation();
   return (

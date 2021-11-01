@@ -11,13 +11,13 @@ import {
   CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
 } from "../../../../../icons";
-import { applicationSlice } from "../../../../../annotator/store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { ChannelType } from "../../../../../types/ChannelType";
 import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 type ColorAdjustmentSlidersProp = {
   updateDisplayedValues: (values: Array<Array<number>>) => void;
@@ -68,7 +68,7 @@ export const ChannelsList = ({
       }
     );
     dispatch(
-      applicationSlice.actions.setChannels({
+      imageViewerSlice.actions.setChannels({
         channels: updatedChannels,
       })
     );
@@ -91,7 +91,7 @@ export const ChannelsList = ({
       copiedChannels[index] = { ...copiedChannels[index], visible: false };
     }
     dispatch(
-      applicationSlice.actions.setChannels({
+      imageViewerSlice.actions.setChannels({
         channels: copiedChannels,
       })
     );

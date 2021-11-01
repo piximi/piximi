@@ -2,8 +2,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { applicationSlice } from "../../../../annotator/store/slices";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
+import { imageViewerSlice } from "../../../../store/slices";
 
 export const ResetButton = () => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ export const ResetButton = () => {
 
   const onResetClick = () => {
     dispatch(
-      applicationSlice.actions.setStagePosition({
+      imageViewerSlice.actions.setStagePosition({
         stagePosition: { x: 0, y: 0 },
       })
     );

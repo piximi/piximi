@@ -8,12 +8,16 @@ import {
 import logger from "redux-logger";
 import createSagaMiddleware from "redux-saga";
 import { rootSaga } from "../sagas";
+import * as Sentry from "@sentry/react";
+import thunk from "redux-thunk";
 
 export const saga = createSagaMiddleware();
 
-const enhancers: StoreEnhancer[] = [];
+const sentryReduxEnhancer = Sentry.createReduxEnhancer({});
 
-const middleware: Middleware[] = [logger, saga];
+const enhancers: StoreEnhancer[] = [sentryReduxEnhancer];
+
+const middleware: Middleware[] = [logger, saga, thunk];
 
 const preloadedState = {};
 

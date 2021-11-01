@@ -2,7 +2,7 @@ import Divider from "@mui/material/Divider";
 import React from "react";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 export const EllipticalAnnotationOptions = () => {

@@ -21,8 +21,8 @@ import { CategoryMenu } from "../CategoryMenu";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../EditCategoryDialog";
 import { useDialog } from "../../../../annotator/hooks";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
-import { applicationSlice, setActiveImage } from "../../../../annotator/store";
+import { useTranslation } from "../../../../hooks/useTranslation";
+import { imageViewerSlice, setActiveImage } from "../../../../annotator/store";
 import {
   Chip,
   Dialog,
@@ -121,7 +121,7 @@ export const CategoriesList = () => {
     category: Category
   ) => {
     dispatch(
-      applicationSlice.actions.setSelectedCategory({
+      imageViewerSlice.actions.setSelectedCategory({
         selectedCategory: category.id,
       })
     );
@@ -132,7 +132,7 @@ export const CategoriesList = () => {
     category: Category
   ) => {
     dispatch(
-      applicationSlice.actions.setSelectedCategory({
+      imageViewerSlice.actions.setSelectedCategory({
         selectedCategory: category.id,
       })
     );
@@ -170,17 +170,17 @@ export const CategoriesList = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        applicationSlice.actions.deleteImageInstances({
+        imageViewerSlice.actions.deleteImageInstances({
           ids: selectedAnnotationsIds,
         })
       );
       dispatch(
-        applicationSlice.actions.setSelectedCategory({
+        imageViewerSlice.actions.setSelectedCategory({
           selectedCategory: "00000000-0000-0000-0000-000000000000",
         })
       );
       dispatch(
-        applicationSlice.actions.setSelectedAnnotations({
+        imageViewerSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
           selectedAnnotation: undefined,
         })
@@ -196,7 +196,7 @@ export const CategoriesList = () => {
       dispatch(setActiveImage({ image: image.id }));
 
       dispatch(
-        applicationSlice.actions.setSelectedAnnotations({
+        imageViewerSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
           selectedAnnotation: undefined,
         })

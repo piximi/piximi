@@ -4,8 +4,8 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useDispatch, useSelector } from "react-redux";
-import { applicationSlice } from "../../../../annotator/store";
-import { useTranslation } from "../../../../annotator/hooks/useTranslation";
+import { imageViewerSlice } from "../../../../store/slices";
+import { useTranslation } from "../../../../hooks/useTranslation";
 import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import {
   saveAnnotationsAsLabelMatrix,
@@ -40,7 +40,7 @@ export const ImageMenu = ({
   ) => {
     if (!currentImageId) return;
     dispatch(
-      applicationSlice.actions.deleteAllImageInstances({
+      imageViewerSlice.actions.deleteAllImageInstances({
         imageId: currentImageId,
       })
     );
@@ -49,7 +49,7 @@ export const ImageMenu = ({
 
   const onDeleteImage = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!currentImageId) return;
-    dispatch(applicationSlice.actions.deleteImage({ id: currentImageId }));
+    dispatch(imageViewerSlice.actions.deleteImage({ id: currentImageId }));
     onCloseImageMenu(event);
   };
 
