@@ -1,4 +1,8 @@
 import { ImageViewer } from "../../types/ImageViewer";
-export const exposureSelector = (imageViewer: ImageViewer) => {
+export const exposureSelector = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}) => {
   return imageViewer.exposure;
 };

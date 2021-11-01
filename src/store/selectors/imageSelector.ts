@@ -1,7 +1,11 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { ImageViewerImage } from "../../types/ImageViewerImage";
 
-export const imageSelector = (imageViewer: ImageViewer) => {
+export const imageSelector = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}) => {
   if (!imageViewer.images.length) return;
 
   const image = imageViewer.images.find((image: ImageViewerImage) => {

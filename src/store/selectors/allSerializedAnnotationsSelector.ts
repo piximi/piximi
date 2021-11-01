@@ -4,9 +4,11 @@ import { Category } from "../../types/Category";
 import { ImageViewerImage } from "../../types/ImageViewerImage";
 import { SerializedFileType } from "../../types/SerializedFileType";
 
-export const allSerializedAnnotationsSelector = (
-  imageViewer: ImageViewer
-): Array<SerializedFileType> => {
+export const allSerializedAnnotationsSelector = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}): Array<SerializedFileType> => {
   if (!imageViewer.images.length) return [];
 
   return imageViewer.images.map((image: ImageViewerImage) => {
