@@ -6,7 +6,6 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { useDispatch } from "react-redux";
-import { imageViewerSlice } from "../../../../annotator/store/slices";
 import { ResetButton } from "./ResetButton";
 
 export const HandToolOptions = () => {

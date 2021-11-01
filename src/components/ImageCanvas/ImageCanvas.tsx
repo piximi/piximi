@@ -18,14 +18,14 @@ export const ImageCanvas = ({ image }: ImageCanvasProps) => {
 
       const context = ref.current.getContext("2d");
       const background = new Image();
-      background.src = image.originalSrc;
+      background.src = image.src;
       background.onload = () => {
         if (context) {
           context.drawImage(background, 0, 0);
         }
       };
     }
-  }, [image.originalSrc]);
+  }, [image.src]);
 
   return <canvas className={classes.backgroundCanvas} ref={ref} />;
 };

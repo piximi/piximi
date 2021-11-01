@@ -1,5 +1,5 @@
-import { ZoomToolOptionsType } from "../../../types/ZoomToolOptionsType";
-import { ToolOptionsStateType } from "../../../types/ToolOptionsStateType";
+import { ZoomToolOptionsType } from "../../types/ZoomToolOptionsType";
+import { ToolOptionsStateType } from "../../types/ToolOptionsStateType";
 
 export const zoomToolOptionsSelector = ({
   toolOptions,

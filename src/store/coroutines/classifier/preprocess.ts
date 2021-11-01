@@ -78,7 +78,7 @@ export const generator = (
       });
 
       yield {
-        xs: image.originalSrc,
+        xs: image.src,
         ys: ys,
       };
 

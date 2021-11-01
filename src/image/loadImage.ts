@@ -1,8 +1,8 @@
 import { Image } from "../types/Image";
 
 const loadPiximiImage = (image: Image): HTMLImageElement => {
-  if (image.originalSrc.endsWith(".png")) {
-    Promise.resolve(loadPiximiPngImage(image.originalSrc));
+  if (image.src.endsWith(".png")) {
+    Promise.resolve(loadPiximiPngImage(image.src));
   }
   return getPiximiImage(image);
 };
@@ -10,7 +10,7 @@ const loadPiximiImage = (image: Image): HTMLImageElement => {
 const getPiximiImage = (image: Image) => {
   const img = new Image(224, 224);
   img.crossOrigin = "anonymous";
-  img.originalSrc = image.originalSrc;
+  img.src = image.src;
   return img;
 };
 
@@ -23,6 +23,6 @@ const loadPiximiPngImage = (dataset_url: string): Promise<HTMLImageElement> => {
     img.onload = () => resolve(img);
     img.onerror = reject;
     img.crossOrigin = "anonymous";
-    img.originalSrc = src;
+    img.src = src;
   });
 };

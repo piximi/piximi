@@ -10,5 +10,5 @@ export const imageOriginalSrcSelector = (imageViewer: ImageViewer) => {
 
   if (!image) return;
 
-  return image.originalSrc;
+  return image.src;
 };

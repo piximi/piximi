@@ -167,7 +167,7 @@ const findCategoryIndex = (
 };
 
 export const tensorImageData = async (image: Image) => {
-  const data = await ImageJS.Image.load(image.originalSrc);
+  const data = await ImageJS.Image.load(image.src);
 
   return tensorflow.tidy(() => {
     return tensorflow.browser

@@ -1,4 +1,4 @@
 import { ImageViewer } from "../../types/ImageViewer";
 export const brightnessSelector = (imageViewer: ImageViewer) => {
-  return ImageViewerbrightness;
+  return imageViewer.brightness;
 };

@@ -14,7 +14,7 @@ const dummyImage: Image = {
   categoryId: "00000000-0000-0000-0000-000000000000",
   instances: [],
   name: "nuclei",
-  originalSrc: nuclei,
+  src: nuclei,
   shape: {
     height: 256,
     width: 256,
@@ -122,7 +122,7 @@ export const projectSlice = createSlice({
             planes: serializedImage.imagePlanes,
             frames: serializedImage.imageFrames,
           },
-          originalSrc: serializedImage.imageData,
+          src: serializedImage.imageData,
         };
 
         newImages.push(image);
@@ -158,7 +158,7 @@ export const projectSlice = createSlice({
             planes: serializedImage.imagePlanes,
             frames: serializedImage.imageFrames,
           },
-          originalSrc: serializedImage.imageData,
+          src: serializedImage.imageData,
         };
 
         newImages.push(image);

@@ -7,5 +7,5 @@ export const zoomSelectionSelector = (
   maximum: { x: number; y: number } | undefined;
   selecting: boolean;
 } => {
-  return ImageViewerzoomSelection;
+  return imageViewer.zoomSelection;
 };

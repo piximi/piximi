@@ -55,7 +55,6 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
               instances: [],
               name: file.name,
               shape: shape,
-              originalSrc: imageDataURL,
               src: imageDataURL,
             };
 
