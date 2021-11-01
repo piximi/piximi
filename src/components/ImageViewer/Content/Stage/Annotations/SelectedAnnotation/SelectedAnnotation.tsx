@@ -47,15 +47,15 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
   }, [annotation.mask, fill]);
 
   return (
-      <ReactKonva.Image
-        image={imageMask}
-        id={annotation.id}
-        scale={{ x: stageScale, y: stageScale }}
-        key={annotation.id}
-        x={annotation.boundingBox[0] * stageScale}
-        y={annotation.boundingBox[1] * stageScale}
-        width={annotation.boundingBox[2] - annotation.boundingBox[0]}
-        height={annotation.boundingBox[3] - annotation.boundingBox[1]}
-      />
+    <ReactKonva.Image
+      image={imageMask}
+      id={annotation.id}
+      scale={{ x: stageScale, y: stageScale }}
+      key={annotation.id}
+      x={annotation.boundingBox[0] * stageScale}
+      y={annotation.boundingBox[1] * stageScale}
+      width={annotation.boundingBox[2] - annotation.boundingBox[0]}
+      height={annotation.boundingBox[3] - annotation.boundingBox[1]}
+    />
   );
 };
