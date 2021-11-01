@@ -16,10 +16,6 @@ import {
   zoomSelectionSelector,
 } from "../../../../../store/selectors";
 import {
-  imageViewerSlice,
-  setSelectedAnnotations,
-} from "../../../../../annotator/store";
-import {
   batch,
   Provider,
   ReactReduxContext,
@@ -31,7 +27,7 @@ import {
   useCursor,
   useHandTool,
   useZoom,
-} from "../../../../../annotator/hooks";
+} from "../../../../../hooks";
 import { AnnotationType } from "../../../../../types/AnnotationType";
 import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
@@ -72,6 +68,10 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
+import {
+  imageViewerSlice,
+  setSelectedAnnotations,
+} from "../../../../../store/slices";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -191,8 +191,8 @@ export const Stage = () => {
     annotationTool.deselect();
 
     batch(() => {
-      dispatch(applicationSlice.actions.setAnnotating({ annotating: false }));
-      dispatch(applicationSlice.actions.setAnnotated({ annotated: false }));
+      dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
+      dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
     });
 
     if (!selectedAnnotation) return;
@@ -246,7 +246,7 @@ export const Stage = () => {
 
     if (!annotated || !annotationTool) return;
 
-    dispatch(applicationSlice.actions.setAnnotating({ annotating: false }));
+    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
 
     if (!annotationTool.annotated) return;
 
@@ -310,7 +310,7 @@ export const Stage = () => {
     if (!selectedAnnotation) return;
 
     dispatch(
-      applicationSlice.actions.setSelectedAnnotations({
+      imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: updatedAnnotations,
         selectedAnnotation: {
           ...selectedAnnotation,
@@ -325,7 +325,7 @@ export const Stage = () => {
 
     if (annotationTool.annotated) {
       dispatch(
-        applicationSlice.actions.setAnnotated({
+        imageViewerSlice.actions.setAnnotated({
           annotated: annotationTool.annotated,
         })
       );
@@ -336,7 +336,7 @@ export const Stage = () => {
 
     if (annotationTool.annotating)
       dispatch(
-        applicationSlice.actions.setAnnotating({
+        imageViewerSlice.actions.setAnnotating({
           annotating: annotationTool.annotating,
         })
       );
@@ -485,12 +485,12 @@ export const Stage = () => {
       } else {
         if (annotated) {
           deselectAnnotation();
-          dispatch(applicationSlice.actions.setAnnotated({ annotated: false }));
+          dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
         }
 
         if (selectionMode === AnnotationModeType.New) {
           dispatch(
-            applicationSlice.actions.setSelectedAnnotations({
+            imageViewerSlice.actions.setSelectedAnnotations({
               selectedAnnotations: [],
               selectedAnnotation: undefined,
             })
@@ -640,7 +640,7 @@ export const Stage = () => {
     if (!annotations || !annotationTool || annotationTool.annotating) return;
 
     dispatch(
-      applicationSlice.actions.setImageInstances({
+      imageViewerSlice.actions.setImageInstances({
         instances: [...unselectedAnnotations, ...selectedAnnotations],
       })
     );
@@ -649,11 +649,11 @@ export const Stage = () => {
 
     deselectAnnotation();
 
-    dispatch(applicationSlice.actions.setAnnotated({ annotated: false }));
+    dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
-        applicationSlice.actions.setSelectionMode({
+        imageViewerSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );
@@ -701,7 +701,7 @@ export const Stage = () => {
     "backspace, delete",
     () => {
       dispatch(
-        applicationSlice.actions.deleteImageInstances({
+        imageViewerSlice.actions.deleteImageInstances({
           ids: selectedAnnotationsIds,
         })
       );

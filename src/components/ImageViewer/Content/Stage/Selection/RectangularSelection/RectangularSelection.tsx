@@ -1,7 +1,7 @@
 import { RectangularAnnotationTool } from "../../../../../../annotator/image/Tool";
 import * as ReactKonva from "react-konva";
 import React from "react";
-import { useMarchingAnts } from "../../../../../../annotator/hooks";
+import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../../store/selectors";
 

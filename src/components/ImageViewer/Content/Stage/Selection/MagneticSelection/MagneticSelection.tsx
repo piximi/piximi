@@ -1,7 +1,7 @@
 import * as ReactKonva from "react-konva";
 import React from "react";
 import { MagneticAnnotationTool } from "../../../../../../annotator/image/Tool";
-import { useMarchingAnts } from "../../../../../../annotator/hooks";
+import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../../store/selectors";
 

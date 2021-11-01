@@ -5,13 +5,6 @@ import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
-import {
-  addImages,
-  imageViewerSlice,
-  setActiveImage,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../annotator/store";
 import { Content } from "../Content";
 import { ThemeProvider } from "@mui/styles";
 import { useStyles } from "./ImageViewer.css";
@@ -21,6 +14,13 @@ import { ShapeType } from "../../../types/ShapeType";
 import { loadLayersModelThunk } from "../../../annotator/store/thunks";
 import { ToolType } from "../../../types/ToolType";
 import { v4 } from "uuid";
+import {
+  addImages,
+  imageViewerSlice,
+  setActiveImage,
+  setOperation,
+  setSelectedAnnotations,
+} from "../../../store/slices";
 
 type ImageViewerProps = {
   image?: ImageViewerImage;

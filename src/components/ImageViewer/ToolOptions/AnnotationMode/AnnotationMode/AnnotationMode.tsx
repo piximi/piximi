@@ -7,7 +7,6 @@ import React from "react";
 import RadioGroup from "@mui/material/RadioGroup";
 import { useDispatch, useSelector } from "react-redux";
 import { selectionModeSelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../annotator/store";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import ListSubheader from "@mui/material/ListSubheader";
 import { NewTooltip } from "../NewTooltip";
@@ -16,6 +15,7 @@ import { SubtractTooltip } from "../SubtractTooltip";
 import { IntersectionTooltip } from "../IntersectionTooltip";
 import { RadioCheckedIcon, RadioUncheckedIcon } from "../../../../../icons";
 import { useTranslation } from "../../../../../hooks/useTranslation";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();

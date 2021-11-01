@@ -20,9 +20,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryMenu } from "../CategoryMenu";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../EditCategoryDialog";
-import { useDialog } from "../../../../annotator/hooks";
+import { useDialog } from "../../../../hooks";
 import { useTranslation } from "../../../../hooks/useTranslation";
-import { imageViewerSlice, setActiveImage } from "../../../../annotator/store";
 import {
   Chip,
   Dialog,
@@ -69,6 +68,7 @@ import { ChangingAnnotationsHelpDialog } from "../../Help/HelpDialog/ChangingAnn
 import { SavingProjectHelpDialog } from "../../Help/HelpDialog/SavingProjectHelpDialog";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
+import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
 
 export const CategoriesList = () => {
   const classes = useStyles();

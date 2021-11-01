@@ -6,7 +6,6 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice } from "../../../../../annotator/store";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
@@ -14,6 +13,7 @@ import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import Slider from "@mui/material/Slider";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 const LightnessListItem = ({ name }: { name: string }) => {
   const t = useTranslation();

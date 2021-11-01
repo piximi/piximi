@@ -3,17 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToolType } from "../../types/ToolType";
 import { ZoomModeType } from "../../types/ZoomModeType";
 import {
-  setOffset,
-  setStageScale,
-  setZoomSelection,
-} from "../../annotator/store";
-import {
   stageScaleSelector,
   toolTypeSelector,
   zoomSelectionSelector,
   zoomToolOptionsSelector,
 } from "../../store/selectors";
 import { scaledImageWidthSelector } from "../../store/selectors/scaledImageWidthSelector";
+import { setOffset, setStageScale, setZoomSelection } from "../../store/slices";
 
 export const useZoom = () => {
   const delta = 10;

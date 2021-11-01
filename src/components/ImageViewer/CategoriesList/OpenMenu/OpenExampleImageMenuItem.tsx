@@ -1,8 +1,8 @@
-import { useDialog } from "../../../../annotator/hooks/useDialog";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { ExampleImageDialog } from "../ExampleImageDialog";
 import React from "react";
+import { useDialog } from "../../../../hooks";
 
 type OpenExampleImageMenuItemProps = {
   popupState: any;

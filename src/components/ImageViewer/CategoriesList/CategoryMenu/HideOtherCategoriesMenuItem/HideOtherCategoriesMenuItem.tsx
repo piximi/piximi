@@ -3,12 +3,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";
-import { imageViewerSlice } from "../../../../../annotator/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   categoriesSelector,
   selectedCategorySelector,
 } from "../../../../../store/selectors";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (

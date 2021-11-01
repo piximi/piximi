@@ -67,7 +67,7 @@ const initialCategories =
         },
       ];
 
-const initialState: ImageViewerImage = {
+const initialState: ImageViewer = {
   annotated: false,
   annotating: false,
   boundingClientRect: new DOMRect(),
@@ -131,7 +131,7 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer-application",
   reducers: {
     addImages(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ newImages: Array<ImageViewerImage> }>
     ) {
       //we look for image name duplicates and append number if such duplicates are found
@@ -153,7 +153,7 @@ export const imageViewerSlice = createSlice({
       state.images.push(...updatedImages);
     },
     clearCategoryAnnotations(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ category: Category }>
     ) {
       for (let image of state.images) {
@@ -165,17 +165,14 @@ export const imageViewerSlice = createSlice({
       }
     },
     deleteCategory(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ category: Category }>
     ) {
       state.categories = state.categories.filter(
         (category: Category) => category.id !== action.payload.category.id
       );
     },
-    deleteImage(
-      state: ImageViewerImage,
-      action: PayloadAction<{ id: string }>
-    ) {
+    deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
         (image: ImageViewerImage) => image.id !== action.payload.id
       );
@@ -188,7 +185,7 @@ export const imageViewerSlice = createSlice({
       }
     },
     deleteAllInstances(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ id: string }>
     ) {
       //deletes all instances across all images
@@ -197,7 +194,7 @@ export const imageViewerSlice = createSlice({
       });
     },
     deleteAllImageInstances(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ imageId: string }>
     ) {
       //deletes all instances across a given image
@@ -209,7 +206,7 @@ export const imageViewerSlice = createSlice({
     },
     deleteImageInstances(
       //deletes given instance on active image
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ ids: Array<string> }>
     ) {
       if (!state.activeImageId) return;
@@ -226,7 +223,7 @@ export const imageViewerSlice = createSlice({
       });
     },
     openAnnotations(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ file: SerializedFileType }>
     ) {
       /*
@@ -265,37 +262,37 @@ export const imageViewerSlice = createSlice({
       state.images.push(...[loaded]);
     },
     setAnnotated(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ annotated: boolean }>
     ) {
       state.annotated = action.payload.annotated;
     },
     setAnnotating(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ annotating: boolean }>
     ) {
       state.annotating = action.payload.annotating;
     },
     setBoundingClientRect(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ boundingClientRect: DOMRect }>
     ) {
       state.boundingClientRect = action.payload.boundingClientRect;
     },
     setBrightness(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ brightness: number }>
     ) {
       state.brightness = action.payload.brightness;
     },
     setCategories(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
       state.categories = action.payload.categories;
     },
     setCategoryVisibility(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ category: Category; visible: boolean }>
     ) {
       const category = _.find(state.categories, (category) => {
@@ -311,28 +308,28 @@ export const imageViewerSlice = createSlice({
       ];
     },
     setContrast(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ contrast: number }>
     ) {
       state.contrast = action.payload.contrast;
     },
     setCurrentIndex(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ currentIndex: number }>
     ) {
       state.currentIndex = action.payload.currentIndex;
     },
     setExposure(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ exposure: number }>
     ) {
       state.exposure = action.payload.exposure;
     },
-    setHue(state: ImageViewerImage, action: PayloadAction<{ hue: number }>) {
+    setHue(state: ImageViewer, action: PayloadAction<{ hue: number }>) {
       state.hue = action.payload.hue;
     },
     setActiveImage(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ image: string }>
     ) {
       state.activeImageId = action.payload.image;
@@ -350,7 +347,7 @@ export const imageViewerSlice = createSlice({
       state.channels = defaultChannels;
     },
     setImageInstances(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ instances: Array<AnnotationType> }>
     ) {
       if (!state.activeImageId) return;
@@ -364,10 +361,7 @@ export const imageViewerSlice = createSlice({
         }
       });
     },
-    setImageSrc(
-      state: ImageViewerImage,
-      action: PayloadAction<{ src: string }>
-    ) {
+    setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
       state.images = state.images.map((image: ImageViewerImage) => {
         if (state.activeImageId !== image.id) {
@@ -378,13 +372,13 @@ export const imageViewerSlice = createSlice({
       });
     },
     setImages(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ images: Array<ImageViewerImage> }>
     ) {
       state.images = action.payload.images;
     },
     setChannels(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{
         channels: Array<ChannelType>;
       }>
@@ -392,7 +386,7 @@ export const imageViewerSlice = createSlice({
       state.channels = action.payload.channels;
     },
     setCursor(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{
         cursor: string;
       }>
@@ -400,37 +394,37 @@ export const imageViewerSlice = createSlice({
       state.cursor = action.payload.cursor;
     },
     setInvertMode(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ invertMode: boolean }>
     ) {
       state.invertMode = action.payload.invertMode;
     },
     setLanguage(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ language: LanguageType }>
     ) {
       state.language = action.payload.language;
     },
     setOffset(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ offset: { x: number; y: number } }>
     ) {
       state.offset = action.payload.offset;
     },
     setOperation(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ operation: ToolType }>
     ) {
       state.toolType = action.payload.operation;
     },
     setPenSelectionBrushSize(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ penSelectionBrushSize: number }>
     ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
     setPointerSelection(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{
         pointerSelection: {
           dragging: boolean;
@@ -443,25 +437,25 @@ export const imageViewerSlice = createSlice({
       state.pointerSelection = action.payload.pointerSelection;
     },
     setQuickSelectionBrushSize(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ quickSelectionBrushSize: number }>
     ) {
       state.quickSelectionBrushSize = action.payload.quickSelectionBrushSize;
     },
     setSaturation(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ saturation: number }>
     ) {
       state.saturation = action.payload.saturation;
     },
     setSelectedCategory(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ selectedCategory: string }>
     ) {
       state.selectedCategory = action.payload.selectedCategory;
     },
     setSelectedAnnotations(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{
         selectedAnnotations: Array<AnnotationType>;
         selectedAnnotation: AnnotationType | undefined;
@@ -471,49 +465,49 @@ export const imageViewerSlice = createSlice({
       state.selectedAnnotation = action.payload.selectedAnnotation;
     },
     setSelectionMode(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ selectionMode: AnnotationModeType }>
     ) {
       state.selectionMode = action.payload.selectionMode;
     },
     setStageHeight(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ stageHeight: number }>
     ) {
       state.stageHeight = action.payload.stageHeight;
     },
     setStagePosition(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ stagePosition: { x: number; y: number } }>
     ) {
       state.stagePosition = action.payload.stagePosition;
     },
     setStageScale(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ stageScale: number }>
     ) {
       state.stageScale = action.payload.stageScale;
     },
     setStageWidth(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ stageWidth: number }>
     ) {
       state.stageWidth = action.payload.stageWidth;
     },
     setSoundEnabled(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ soundEnabled: boolean }>
     ) {
       state.soundEnabled = action.payload.soundEnabled;
     },
     setVibrance(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{ vibrance: number }>
     ) {
       state.vibrance = action.payload.vibrance;
     },
     setZoomSelection(
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<{
         zoomSelection: {
           dragging: boolean;
@@ -528,7 +522,7 @@ export const imageViewerSlice = createSlice({
   },
   extraReducers: {
     "thunks/loadLayersModel/fulfilled": (
-      state: ImageViewerImage,
+      state: ImageViewer,
       action: PayloadAction<tensorflow.LayersModel>
     ) => {
       console.info(action.payload);

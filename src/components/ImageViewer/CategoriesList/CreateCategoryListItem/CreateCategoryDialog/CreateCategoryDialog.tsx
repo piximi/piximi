@@ -11,12 +11,12 @@ import Grid from "@mui/material/Grid";
 import { useStyles } from "./CreateCategoryDialog.css";
 import { ColorResult } from "react-color";
 import { sample } from "underscore";
-import { imageViewerSlice } from "../../../../../annotator/store";
 import { v4 } from "uuid";
 import { Category } from "../../../../../types/Category";
 import { categoriesSelector } from "../../../../../store/selectors";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 const COLORS = [
   "#f44336",

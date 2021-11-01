@@ -4,8 +4,8 @@ import Typography from "@mui/material/Typography";
 import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice } from "../../../../../annotator/store";
 import { selectedCategorySelector } from "../../../../../store/selectors";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;

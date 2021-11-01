@@ -9,7 +9,7 @@ import { selectedAnnotationSelector } from "../../../../../store/selectors/selec
 import { decode, encode } from "../../../../../annotator/image/rle";
 import * as ImageJS from "image-js";
 import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
-import { useCursor } from "../../../../../annotator/hooks";
+import { useCursor } from "../../../../../hooks";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
 import useSound from "use-sound";

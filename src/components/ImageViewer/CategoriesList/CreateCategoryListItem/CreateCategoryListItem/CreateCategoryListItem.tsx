@@ -4,7 +4,7 @@ import ListItemText from "@mui/material/ListItemText";
 import AddIcon from "@mui/icons-material/Add";
 import React from "react";
 import { CreateCategoryDialog } from "../CreateCategoryDialog";
-import { useDialog } from "../../../../../annotator/hooks";
+import { useDialog } from "../../../../../hooks";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 
 export const CreateCategoryListItem = () => {

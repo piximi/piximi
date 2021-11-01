@@ -6,11 +6,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { ZoomModeType } from "../../../../types/ZoomModeType";
-import {
-  setOffset,
-  setStageScale,
-  setZoomToolOptions,
-} from "../../../../annotator/store";
 import Checkbox from "@mui/material/Checkbox";
 import {
   imageSelector,
@@ -36,6 +31,8 @@ import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import { offsetSelector } from "../../../../store/selectors/offsetSelector";
 import { ResetButton } from "../HandToolOptions/ResetButton";
+import { setOffset, setStageScale } from "../../../../store/slices";
+import { setZoomToolOptions } from "../../../../store/slices/toolOptionsSlice";
 
 export const ZoomOptions = () => {
   const dispatch = useDispatch();
