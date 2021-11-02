@@ -1,7 +1,4 @@
 import { test } from "@jest/globals";
-import { LassoAnnotationTool } from "./LassoAnnotationTool";
-import { Category } from "../../../../../types/Category";
-import * as ImageJS from "image-js";
 
 test("deselect", () => {
   expect(true).toBe(true);

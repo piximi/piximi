@@ -27,10 +27,6 @@ export const ChannelsList = ({
 }: ColorAdjustmentSlidersProp) => {
   const [open, setOpen] = React.useState(true);
 
-  const onClick = () => {
-    setOpen(!open);
-  };
-
   const dispatch = useDispatch();
 
   const channels = useSelector(channelsSelector);

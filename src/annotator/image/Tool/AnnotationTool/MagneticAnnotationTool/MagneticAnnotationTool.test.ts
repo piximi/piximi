@@ -1,6 +1,4 @@
 import { test } from "@jest/globals";
-import { MagneticAnnotationTool } from "./MagneticAnnotationTool";
-import { Image } from "image-js";
 
 test("deselect", () => {
   expect(true).toBe(true);

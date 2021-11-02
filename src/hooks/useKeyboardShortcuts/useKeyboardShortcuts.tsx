@@ -1,10 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { ToolType } from "../../types/ToolType";
-import {
-  createdCategoriesSelector,
-  toolTypeSelector,
-} from "../../store/selectors";
+import { createdCategoriesSelector } from "../../store/selectors";
 import { useHotkeys } from "react-hotkeys-hook";
 import { setOperation, setSelectedCategory } from "../../store/slices";
 
@@ -12,7 +9,6 @@ export const useKeyboardShortcuts = () => {
   const dispatch = useDispatch();
 
   const categories = useSelector(createdCategoriesSelector);
-  const toolType = useSelector(toolTypeSelector);
 
   // /*
   // Undo operation (Ctrl+z)

@@ -1,7 +1,4 @@
-import { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 import { test } from "@jest/globals";
-import { Category } from "../../../../../types/Category";
-import * as ImageJS from "image-js";
 
 test("deselect", () => {
   expect(true).toBe(true);

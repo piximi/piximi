@@ -1,6 +1,5 @@
 import Divider from "@mui/material/Divider";
 import React from "react";
-import { SampleList } from "../SampleList";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";

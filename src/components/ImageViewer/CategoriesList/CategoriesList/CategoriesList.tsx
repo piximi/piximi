@@ -448,86 +448,86 @@ const CreateCategoryListItem = () => {
 /*
  * WARNING: This list item and its dialog box is not used anymore as it is been replaced with the HelpDrawer component.
  * */
-
-const HelpListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  const {
-    onClose: onCloseOpenImagesHelpDialog,
-    onOpen: onOpenOpenImagesHelpDialog,
-    open: openOpenImagesHelpDialog,
-  } = useDialog();
-
-  const {
-    onClose: onCloseManipulatingCanvasHelpDialog,
-    onOpen: onOpenManipulatingCanvasHelpDialog,
-    open: openManipulatingCanvasHelpDialog,
-  } = useDialog();
-
-  const {
-    onClose: onCloseMakeAnnotationsHelpDialog,
-    onOpen: onOpenMakeAnnotationsHelpDialog,
-    open: openMakeAnnotationsHelpDialog,
-  } = useDialog();
-
-  const {
-    onClose: onCloseChangingAnnotationsHelpDialog,
-    onOpen: onOpenChangingAnnotationsHelpDialog,
-    open: openChangingAnnotationsHelpDialog,
-  } = useDialog();
-
-  const {
-    onClose: onCloseSavingProjectHelpDialog,
-    onOpen: onOpenSavingProjectHelpDialog,
-    open: openSavingProjectHelpDialog,
-  } = useDialog();
-
-  return (
-    <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <HelpIcon />
-        </ListItemIcon>
-
-        <ListItemText primary="Help" />
-      </ListItem>
-
-      <HelpDrawer />
-
-      {/*<HelpDialog*/}
-      {/*  onClose={onClose}*/}
-      {/*  open={open}*/}
-      {/*  onOpenOpenImagesHelpDialog={onOpenOpenImagesHelpDialog}*/}
-      {/*  onOpenMakeAnnotationsHelpDialog={onOpenMakeAnnotationsHelpDialog}*/}
-      {/*  onOpenManipulatingCanvasHelpDialog={onOpenManipulatingCanvasHelpDialog}*/}
-      {/*  onOpenChangingAnnotationsHelpDialog={*/}
-      {/*    onOpenChangingAnnotationsHelpDialog*/}
-      {/*  }*/}
-      {/*  onOpenSavingProjectHelpDialog={onOpenSavingProjectHelpDialog}*/}
-      {/*/>*/}
-      {/*<OpenImageHelpDialog*/}
-      {/*  onClose={onCloseOpenImagesHelpDialog}*/}
-      {/*  open={openOpenImagesHelpDialog}*/}
-      {/*/>*/}
-      {/*<MakeAnnotationsHelpDialog*/}
-      {/*  onClose={onCloseMakeAnnotationsHelpDialog}*/}
-      {/*  open={openMakeAnnotationsHelpDialog}*/}
-      {/*/>*/}
-      {/*<ManipulateCanvasHelpDialog*/}
-      {/*  onClose={onCloseManipulatingCanvasHelpDialog}*/}
-      {/*  open={openManipulatingCanvasHelpDialog}*/}
-      {/*/>*/}
-      {/*<ChangingAnnotationsHelpDialog*/}
-      {/*  onClose={onCloseChangingAnnotationsHelpDialog}*/}
-      {/*  open={openChangingAnnotationsHelpDialog}*/}
-      {/*/>*/}
-      {/*<SavingProjectHelpDialog*/}
-      {/*  onClose={onCloseSavingProjectHelpDialog}*/}
-      {/*  open={openSavingProjectHelpDialog}*/}
-      {/*/>*/}
-    </>
-  );
-};
+//
+// const HelpListItem = () => {
+//   const { onClose, onOpen, open } = useDialog();
+//
+//   const {
+//     onClose: onCloseOpenImagesHelpDialog,
+//     onOpen: onOpenOpenImagesHelpDialog,
+//     open: openOpenImagesHelpDialog,
+//   } = useDialog();
+//
+//   const {
+//     onClose: onCloseManipulatingCanvasHelpDialog,
+//     onOpen: onOpenManipulatingCanvasHelpDialog,
+//     open: openManipulatingCanvasHelpDialog,
+//   } = useDialog();
+//
+//   const {
+//     onClose: onCloseMakeAnnotationsHelpDialog,
+//     onOpen: onOpenMakeAnnotationsHelpDialog,
+//     open: openMakeAnnotationsHelpDialog,
+//   } = useDialog();
+//
+//   const {
+//     onClose: onCloseChangingAnnotationsHelpDialog,
+//     onOpen: onOpenChangingAnnotationsHelpDialog,
+//     open: openChangingAnnotationsHelpDialog,
+//   } = useDialog();
+//
+//   const {
+//     onClose: onCloseSavingProjectHelpDialog,
+//     onOpen: onOpenSavingProjectHelpDialog,
+//     open: openSavingProjectHelpDialog,
+//   } = useDialog();
+//
+//   return (
+//     <>
+//       <ListItem button onClick={onOpen}>
+//         <ListItemIcon>
+//           <HelpIcon />
+//         </ListItemIcon>
+//
+//         <ListItemText primary="Help" />
+//       </ListItem>
+//
+//       <HelpDrawer />
+//
+//       {/*<HelpDialog*/}
+//       {/*  onClose={onClose}*/}
+//       {/*  open={open}*/}
+//       {/*  onOpenOpenImagesHelpDialog={onOpenOpenImagesHelpDialog}*/}
+//       {/*  onOpenMakeAnnotationsHelpDialog={onOpenMakeAnnotationsHelpDialog}*/}
+//       {/*  onOpenManipulatingCanvasHelpDialog={onOpenManipulatingCanvasHelpDialog}*/}
+//       {/*  onOpenChangingAnnotationsHelpDialog={*/}
+//       {/*    onOpenChangingAnnotationsHelpDialog*/}
+//       {/*  }*/}
+//       {/*  onOpenSavingProjectHelpDialog={onOpenSavingProjectHelpDialog}*/}
+//       {/*/>*/}
+//       {/*<OpenImageHelpDialog*/}
+//       {/*  onClose={onCloseOpenImagesHelpDialog}*/}
+//       {/*  open={openOpenImagesHelpDialog}*/}
+//       {/*/>*/}
+//       {/*<MakeAnnotationsHelpDialog*/}
+//       {/*  onClose={onCloseMakeAnnotationsHelpDialog}*/}
+//       {/*  open={openMakeAnnotationsHelpDialog}*/}
+//       {/*/>*/}
+//       {/*<ManipulateCanvasHelpDialog*/}
+//       {/*  onClose={onCloseManipulatingCanvasHelpDialog}*/}
+//       {/*  open={openManipulatingCanvasHelpDialog}*/}
+//       {/*/>*/}
+//       {/*<ChangingAnnotationsHelpDialog*/}
+//       {/*  onClose={onCloseChangingAnnotationsHelpDialog}*/}
+//       {/*  open={openChangingAnnotationsHelpDialog}*/}
+//       {/*/>*/}
+//       {/*<SavingProjectHelpDialog*/}
+//       {/*  onClose={onCloseSavingProjectHelpDialog}*/}
+//       {/*  open={openSavingProjectHelpDialog}*/}
+//       {/*/>*/}
+//     </>
+//   );
+// };
 
 const OpenListItem = () => {
   return (

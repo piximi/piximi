@@ -183,61 +183,6 @@ export const ZoomOptions = () => {
     dispatch(setZoomToolOptions(payload));
   };
 
-  const marks = [
-    {
-      value: 0.000625,
-      label: "-1600%",
-    },
-    {
-      value: 0.00125,
-      label: "-800%",
-    },
-    {
-      value: 0.0025,
-      label: "-400%",
-    },
-    {
-      value: 0.005,
-      label: "-200%",
-    },
-    {
-      value: 0.05,
-      label: "-150%",
-    },
-    {
-      value: 0.25,
-      label: "-100%",
-    },
-    {
-      value: 0.5,
-      label: "50%",
-    },
-    {
-      value: 1,
-      label: "100%",
-    },
-    {
-      value: 1.5,
-      label: "150%",
-    },
-    {
-      value: 2,
-      label: "200%",
-    },
-    {
-      value: 4,
-      label: "400%",
-    },
-    {
-      value: 8,
-      label: "800%",
-    },
-    {
-      value: 16,
-      label: "1600%",
-    },
-  ];
-
   const onSliderChange = (value: number) => {
     dispatch(setStageScale({ stageScale: value }));
   };
