@@ -23,12 +23,15 @@ export const Transformers = ({ transformPosition }: TransformersProps) => {
     <>
       {selectedAnnotationsIds.map((annotationId, idx) => {
         return (
-          <div key={annotationId}>
-            <Transformer
-              transformPosition={transformPosition}
-              annotationId={annotationId}
-            />
-          </div>
+          <>
+            {/*// @ts-ignore */}
+            <React.Fragment key={annotationId}>
+              <Transformer
+                transformPosition={transformPosition}
+                annotationId={annotationId}
+              />
+            </React.Fragment>
+          </>
         );
       })}
     </>
