@@ -5,6 +5,8 @@ import { classifierSelector } from "../../store/selectors";
 import { bindMenu } from "material-ui-popup-state";
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";
+import { fittedSelector } from "../../store/selectors/fittedSelector";
+import { modelNameSelector } from "../../store/selectors/modelNameSelector";
 
 type SaveMenuProps = {
   popupState: any;
@@ -14,6 +16,10 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
   const classifier = useSelector(classifierSelector);
 
   const serializedProject = useSelector(serializedProjectSelector);
+
+  const fitted = useSelector(fittedSelector);
+
+  const modelName = useSelector(modelNameSelector);
 
   const onSaveProjectClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
@@ -31,6 +37,10 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
     saveAs(data, `${serializedProject.name}.json`);
   };
 
+  const onSaveClassifierClick = async () => {
+    await fitted.save(`downloads://${modelName}`);
+  };
+
   return (
     <Menu {...bindMenu(popupState)}>
       <MenuList dense variant="menu">
@@ -38,7 +48,7 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
 
         <Divider />
 
-        <MenuItem onClick={() => {}}>Save classifier</MenuItem>
+        <MenuItem onClick={onSaveClassifierClick}>Save classifier</MenuItem>
       </MenuList>
     </Menu>
   );
