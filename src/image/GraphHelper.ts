@@ -1,4 +1,4 @@
-import createGraph, { Graph, Node, NodeId } from "ngraph.graph";
+import createGraph, { Graph, Node } from "ngraph.graph";
 import { getIdx } from "./imageHelper";
 import { DataArray } from "image-js";
 import { aStar } from "ngraph.path";

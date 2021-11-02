@@ -6,9 +6,6 @@ import {
   toolTypeSelector,
 } from "../../store/selectors";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionCreators } from "redux-undo";
-import { AnnotationModeType } from "../../types/AnnotationModeType";
-import hotkeys from "hotkeys-js";
 import { setOperation, setSelectedCategory } from "../../store/slices";
 
 export const useKeyboardShortcuts = () => {

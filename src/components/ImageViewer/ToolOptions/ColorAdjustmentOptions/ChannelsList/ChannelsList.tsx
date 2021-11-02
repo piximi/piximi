@@ -1,10 +1,7 @@
-import List from "@mui/material/List";
-import ListSubheader from "@mui/material/ListSubheader";
 import { ListItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useCallback } from "react";
 import Slider from "@mui/material/Slider";
-import Collapse from "@mui/material/Collapse";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
 import {

@@ -1,7 +1,6 @@
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
 import {

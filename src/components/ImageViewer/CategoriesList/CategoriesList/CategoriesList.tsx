@@ -10,7 +10,7 @@ import {
   selectedCategorySelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
-import { useDispatch, useSelector, batch } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useStyles } from "./CategoriesList.css";
 import { CollapsibleList } from "../CollapsibleList";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
@@ -48,8 +48,6 @@ import FeedbackIcon from "@mui/icons-material/Feedback";
 import HelpIcon from "@mui/icons-material/Help";
 import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
-import DescriptionIcon from "@mui/icons-material/Description";
 import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
 import { ImageViewerImage } from "../../../../types/ImageViewerImage";
@@ -60,12 +58,6 @@ import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
-import { HelpDialog } from "../../Help/HelpDialog/HelpDialog";
-import { OpenImageHelpDialog } from "../../Help/HelpDialog/OpenImageHelpDialog";
-import { MakeAnnotationsHelpDialog } from "../../Help/HelpDialog/MakeAnnotationsHelpDialog";
-import { ManipulateCanvasHelpDialog } from "../../Help/HelpDialog/ManipulateCanvasHelpDialog";
-import { ChangingAnnotationsHelpDialog } from "../../Help/HelpDialog/ChangingAnnotationsHelpDialog";
-import { SavingProjectHelpDialog } from "../../Help/HelpDialog/SavingProjectHelpDialog";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import { imageViewerSlice, setActiveImage } from "../../../../store/slices";

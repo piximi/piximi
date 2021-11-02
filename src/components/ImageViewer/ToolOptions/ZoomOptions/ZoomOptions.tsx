@@ -17,7 +17,6 @@ import {
 import ListSubheader from "@mui/material/ListSubheader";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import {
-  CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
   RadioCheckedIcon,
   RadioUncheckedIcon,
@@ -238,12 +237,6 @@ export const ZoomOptions = () => {
       label: "1600%",
     },
   ];
-
-  const valueLabelFormat = (value: number) => {
-    if (value < 0 || value >= marks.length) return;
-
-    return marks[value].label;
-  };
 
   const onSliderChange = (value: number) => {
     dispatch(setStageScale({ stageScale: value }));

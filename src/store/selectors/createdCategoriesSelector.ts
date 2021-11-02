@@ -1,4 +1,3 @@
-import { ImageViewer } from "../../types/ImageViewer";
 import { Category } from "../../types/Category";
 import { sortBy } from "underscore";
 import { Project } from "../../types/Project";

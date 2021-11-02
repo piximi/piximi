@@ -1,5 +1,4 @@
 import { AnnotationTool } from "../AnnotationTool";
-import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
 
 export class RectangularAnnotationTool extends AnnotationTool {

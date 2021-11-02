@@ -8,10 +8,7 @@ import {
 } from "../../../../store/selectors";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import JSZip from "jszip";
-import {
-  saveAnnotationsAsLabeledSemanticSegmentationMasks,
-  saveAnnotationsAsLabelMatrix,
-} from "../../../../image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
 
 type SaveAnnotationsMenuItemProps = {

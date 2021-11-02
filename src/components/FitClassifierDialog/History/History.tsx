@@ -1,5 +1,4 @@
 import * as React from "react";
-import { makeStyles } from "@mui/material";
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
 import { Grid, Typography } from "@mui/material";
 import { useStyles } from "./History.css";

@@ -1,7 +1,7 @@
 import { AnnotationTool } from "../AnnotationTool";
 import * as _ from "lodash";
 import * as ImageJS from "image-js";
-import { decode, encode } from "../../../rle";
+import { encode } from "../../../rle";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: { x: number; y: number };

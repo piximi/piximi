@@ -3,19 +3,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import React, { ReactElement, useState } from "react";
 import SvgIcon from "@mui/material/SvgIcon";
 import Typography from "@mui/material/Typography";
-import {
-  Button,
-  Card,
-  CardActionArea,
-  CardActions,
-  CardContent,
-  CardHeader,
-  IconButton,
-} from "@mui/material";
+import { Card, CardActionArea, CardContent, Tooltip } from "@mui/material";
 import { useStyles } from "./Tool.css";
-import CancelIcon from "@mui/icons-material/Cancel";
-import { Tooltip } from "@mui/material";
-import { HelpWindowToolTitle } from "../../Help/HelpDialog/HelpWindowToolTitle";
 import { ToolBarToolTitle } from "./ToolBarToolTitle";
 
 type TooltipCardProps = {

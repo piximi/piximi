@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ToolType } from "../../types/ToolType";
 import { useSelector } from "react-redux";
 import { toolTypeSelector } from "../../store/selectors";
-import { useHotkeys } from "react-hotkeys-hook";
 
 export const useHandTool = () => {
   const toolType = useSelector(toolTypeSelector);

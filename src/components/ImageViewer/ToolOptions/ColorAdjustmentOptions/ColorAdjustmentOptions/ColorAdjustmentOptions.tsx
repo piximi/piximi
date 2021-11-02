@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -11,80 +11,7 @@ import { ChannelsList } from "../ChannelsList";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
-import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
-import Slider from "@mui/material/Slider";
 import { imageViewerSlice } from "../../../../../store/slices";
-
-const LightnessListItem = ({ name }: { name: string }) => {
-  const t = useTranslation();
-
-  return (
-    <ListItem alignItems="flex-start" dense>
-      <ListItemText
-        primary={t(name)}
-        secondary={
-          <Slider
-            defaultValue={0}
-            valueLabelDisplay="auto"
-            step={1}
-            marks
-            min={-200}
-            max={200}
-          />
-        }
-      />
-    </ListItem>
-  );
-};
-
-const LightnessList = () => {
-  const t = useTranslation();
-
-  return (
-    <CollapsibleList closed dense primary={t("Lightness")}>
-      <LightnessListItem name="Exposure" />
-      <LightnessListItem name="Highlights" />
-      <LightnessListItem name="Shadows" />
-      <LightnessListItem name="Brightness" />
-      <LightnessListItem name="Contrast" />
-      <LightnessListItem name="Black Point" />
-    </CollapsibleList>
-  );
-};
-
-const HueAndSaturationListItem = ({ name }: { name: string }) => {
-  const t = useTranslation();
-
-  return (
-    <ListItem alignItems="flex-start" dense>
-      <ListItemText
-        primary={t(name)}
-        secondary={
-          <Slider
-            defaultValue={0}
-            valueLabelDisplay="auto"
-            step={1}
-            marks
-            min={-200}
-            max={200}
-          />
-        }
-      />
-    </ListItem>
-  );
-};
-
-const HueAndSaturationList = () => {
-  const t = useTranslation();
-
-  return (
-    <CollapsibleList closed dense primary={t("Hue & Saturation")}>
-      <HueAndSaturationListItem name="Hue" />
-      <HueAndSaturationListItem name="Saturation" />
-      <HueAndSaturationListItem name="Vibrance" />
-    </CollapsibleList>
-  );
-};
 
 export function createIntensityFilter(channels: ChannelType[]) {
   return function (imageData: { data: any }) {

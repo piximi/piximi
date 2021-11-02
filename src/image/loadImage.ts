@@ -1,11 +1,11 @@
 import { Image } from "../types/Image";
 
-const loadPiximiImage = (image: Image): HTMLImageElement => {
-  if (image.src.endsWith(".png")) {
-    Promise.resolve(loadPiximiPngImage(image.src));
-  }
-  return getPiximiImage(image);
-};
+// const loadPiximiImage = (image: Image): HTMLImageElement => {
+//   if (image.src.endsWith(".png")) {
+//     Promise.resolve(loadPiximiPngImage(image.src));
+//   }
+//   return getPiximiImage(image);
+// };
 
 const getPiximiImage = (image: Image) => {
   const img = new Image(224, 224);

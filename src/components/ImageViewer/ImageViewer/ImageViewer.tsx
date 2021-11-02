@@ -11,7 +11,6 @@ import { useStyles } from "./ImageViewer.css";
 import { theme } from "./theme";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../types/ShapeType";
-import { loadLayersModelThunk } from "../../../annotator/store/thunks";
 import { ToolType } from "../../../types/ToolType";
 import { v4 } from "uuid";
 import {

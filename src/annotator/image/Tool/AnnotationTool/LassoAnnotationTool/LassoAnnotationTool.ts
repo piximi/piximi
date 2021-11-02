@@ -1,5 +1,4 @@
 import { AnnotationTool } from "../AnnotationTool";
-import * as _ from "lodash";
 import { encode } from "../../../rle";
 
 export class LassoAnnotationTool extends AnnotationTool {

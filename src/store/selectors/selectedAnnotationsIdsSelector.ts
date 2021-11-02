@@ -1,6 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
-import { Project } from "../../types/Project";
 
 export const selectedAnnotationsIdsSelector = ({
   imageViewer,

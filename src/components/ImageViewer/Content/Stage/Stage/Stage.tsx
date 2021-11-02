@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
-  imageOriginalSrcSelector,
   invertModeSelector,
   selectedCategorySelector,
   selectionModeSelector,
@@ -66,7 +65,6 @@ import { usePointer } from "../../../../../hooks/usePointer/usePointer";
 import { pointerSelectionSelector } from "../../../../../store/selectors/pointerSelectionSelector";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 import {
   imageViewerSlice,
@@ -77,8 +75,6 @@ export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
 
-  const src = useSelector(imageOriginalSrcSelector);
-
   const selectingRef = useRef<Konva.Line | null>(null);
 
   const toolType = useSelector(toolTypeSelector);
@@ -88,8 +84,6 @@ export const Stage = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
-
-  const channels = useSelector(channelsSelector);
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
