@@ -1,9 +1,10 @@
 import { combineReducers } from "redux";
 import {
-  applicationSlice,
-  classifierSlice,
   imageViewerSlice,
+  classifierSlice,
   projectSlice,
+  applicationSlice,
+  toolOptionsSlice,
 } from "../slices";
 
 const reducers = {
@@ -11,6 +12,7 @@ const reducers = {
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
   settings: applicationSlice.reducer,
+  toolOptions: toolOptionsSlice.reducer,
 };
 
 export const reducer = combineReducers(reducers);

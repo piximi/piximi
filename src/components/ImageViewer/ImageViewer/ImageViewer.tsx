@@ -1,0 +1,133 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { CssBaseline, Dialog } from "@mui/material";
+import { ImageViewerImage } from "../../../types/ImageViewerImage";
+import { batch, useDispatch } from "react-redux";
+import { CategoriesList } from "../CategoriesList";
+import { ToolOptions } from "../ToolOptions";
+import { Tools } from "../Tools";
+import { Content } from "../Content";
+import { ThemeProvider } from "@mui/styles";
+import { useStyles } from "./ImageViewer.css";
+import { theme } from "./theme";
+import * as ImageJS from "image-js";
+import { ShapeType } from "../../../types/ShapeType";
+import { loadLayersModelThunk } from "../../../annotator/store/thunks";
+import { ToolType } from "../../../types/ToolType";
+import { v4 } from "uuid";
+import {
+  addImages,
+  imageViewerSlice,
+  setActiveImage,
+  setOperation,
+  setSelectedAnnotations,
+} from "../../../store/slices";
+
+type ImageViewerProps = {
+  image?: ImageViewerImage;
+  onClose: () => void;
+  open: boolean;
+};
+
+export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
+  const dispatch = useDispatch();
+  //
+  // useEffect(() => {
+  //   const path =
+  //     "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
+  //
+  //   dispatch(loadLayersModelThunk({ name: "foo", path: path }));
+  // });
+
+  useEffect(() => {
+    if (image) {
+      dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
+    }
+  }, [dispatch, image]);
+
+  const classes = useStyles();
+
+  const [, setDropped] = useState<File[]>([]);
+
+  const onDrop = useCallback(
+    (item) => {
+      if (item) {
+        for (let i = 0; i < item.files.length; i++) {
+          const file = item.files[i];
+
+          file.arrayBuffer().then((buffer: any) => {
+            ImageJS.Image.load(buffer).then((image) => {
+              const shape: ShapeType = {
+                channels: image.components,
+                frames: 1,
+                height: image.height,
+                planes: 1,
+                width: image.width,
+              };
+
+              const imageDataURL = image.toDataURL("image/png", {
+                useCanvas: true,
+              });
+
+              const loaded: ImageViewerImage = {
+                avatar: image
+                  .resize({ width: 50 })
+                  .toDataURL("image/png", { useCanvas: true }),
+                id: v4(),
+                annotations: [],
+                name: file.name,
+                shape: shape,
+                originalSrc: imageDataURL,
+                src: imageDataURL,
+              };
+
+              dispatch(addImages({ newImages: [loaded] }));
+
+              if (i === 0) {
+                batch(() => {
+                  dispatch(
+                    setActiveImage({
+                      image: loaded.id,
+                    })
+                  );
+
+                  dispatch(
+                    setSelectedAnnotations({
+                      selectedAnnotations: [],
+                      selectedAnnotation: undefined,
+                    })
+                  );
+
+                  dispatch(
+                    setOperation({ operation: ToolType.RectangularAnnotation })
+                  );
+                });
+              }
+            });
+          });
+        }
+      }
+    },
+    [setDropped]
+  );
+
+  return (
+    <>
+      {/*// @ts-ignore */}
+      <ThemeProvider theme={theme}>
+        <Dialog fullScreen open={open} onClose={onClose}>
+          <div className={classes.root}>
+            <CssBaseline />
+
+            <CategoriesList />
+
+            <Content onDrop={onDrop} />
+
+            <ToolOptions />
+
+            <Tools />
+          </div>
+        </Dialog>
+      </ThemeProvider>
+    </>
+  );
+};

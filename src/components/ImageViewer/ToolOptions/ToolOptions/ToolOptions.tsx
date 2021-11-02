@@ -1,0 +1,283 @@
+import Drawer from "@mui/material/Drawer";
+import React from "react";
+import { useStyles } from "./ToolOptions.css";
+import {
+  ColorAdjustmentIcon,
+  ColorSelectionIcon,
+  EllipticalSelectionIcon,
+  HandIcon,
+  LassoSelectionIcon,
+  MagneticSelectionIcon,
+  ObjectSelectionIcon,
+  PenSelectionIcon,
+  PolygonalSelectionIcon,
+  QuickSelectionIcon,
+  RectangularSelectionIcon,
+  ZoomIcon,
+} from "../../../../icons";
+import { ToolType } from "../../../../types/ToolType";
+import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
+import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
+import { FreehandAnnotationOptions } from "../FreehandAnnotationOptions";
+import { LassoAnnotationOptions } from "../LassoAnnotationOptions";
+import { PolygonalAnnotationOptions } from "../PolygonalAnnotationOptions";
+import { MagneticAnnotationOptions } from "../MagneticAnnotationOptions";
+import { ColorAnnotationOptions } from "../ColorAnnotationOptions";
+import { QuickAnnotationOptions } from "../QuickAnnotationOptions";
+import { ObjectAnnotationOptions } from "../ObjectAnnotationOptions";
+import { ZoomOptions } from "../ZoomOptions";
+import { useSelector } from "react-redux";
+import { toolTypeSelector } from "../../../../store/selectors";
+import { useTranslation } from "react-i18next";
+import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
+import Box from "@mui/material/Box";
+import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
+import { PointerSelectionOptions } from "../PointerSelectionOptions";
+
+export const ToolOptions = () => {
+  const classes = useStyles();
+
+  const { t } = useTranslation();
+
+  const activeOperation = useSelector(toolTypeSelector);
+
+  // @ts-ignore
+  const operations = [
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorAdjustmentIcon />
+        </>
+      ),
+      method: ToolType.ColorAdjustment,
+      name: t("Color adjustment"),
+      options: <ColorAdjustmentOptions />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <RectangularSelectionIcon />
+        </>
+      ),
+      method: ToolType.RectangularAnnotation,
+      name: "Rectangular selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <RectangularAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <EllipticalSelectionIcon />
+        </>
+      ),
+      method: ToolType.EllipticalAnnotation,
+      name: "Elliptical selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <EllipticalAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <PenSelectionIcon />
+        </>
+      ),
+      method: ToolType.PenAnnotation,
+      name: "Pen selection",
+      options: <FreehandAnnotationOptions />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <LassoSelectionIcon />
+        </>
+      ),
+      method: ToolType.LassoAnnotation,
+      name: "Lasso selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <LassoAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <PolygonalSelectionIcon />
+        </>
+      ),
+      method: ToolType.PolygonalAnnotation,
+      name: "Polygonal selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <PolygonalAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <MagneticSelectionIcon />
+        </>
+      ),
+      method: ToolType.MagneticAnnotation,
+      name: "Magnetic selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <MagneticAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorSelectionIcon />
+        </>
+      ),
+      method: ToolType.ColorAnnotation,
+      name: "Color selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ColorAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <QuickSelectionIcon />
+        </>
+      ),
+      method: ToolType.QuickAnnotation,
+      name: "Quick selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <QuickAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectSelectionIcon />
+        </>
+      ),
+      method: ToolType.ObjectAnnotation,
+      name: "Object selection",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectAnnotationOptions />
+        </>
+      ),
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <HandIcon />
+        </>
+      ),
+      method: ToolType.Hand,
+      name: "Hand",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <HandToolOptions />
+        </>
+      ),
+    },
+    {
+      description: "Description of zoom here.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ZoomIcon />
+        </>
+      ),
+      method: ToolType.Zoom,
+      name: "Zoom",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <ZoomOptions />
+        </>
+      ),
+    },
+    {
+      description: "Description of pointer here.",
+      icon: (
+        <>
+          {/*// @ts-ignore */}
+          <ObjectSelectionIcon />
+        </>
+      ),
+      method: ToolType.Pointer,
+      name: "Pointer",
+      options: (
+        <>
+          {/*// @ts-ignore */}
+          <PointerSelectionOptions />
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <Drawer
+      anchor="right"
+      className={classes.options}
+      classes={{ paper: classes.settingsPaper }}
+      variant="permanent"
+    >
+      <Box
+        style={{ paddingTop: 60 }}
+        className={classes.toolbar}
+        display="flex"
+        justifyContent="flex-end"
+        px={8}
+      />
+
+      {
+        operations[
+          operations.findIndex(
+            (operation) => operation.method === activeOperation
+          )
+        ].options
+      }
+    </Drawer>
+  );
+};

@@ -29,9 +29,40 @@ export {
 
 export {
   imageViewerSlice,
-  setImageViewerImage,
-  setImageViewerOperation,
-  setImageViewerSelectionMode,
+  addImages,
+  deleteAllInstances,
+  deleteAllImageInstances,
+  setAnnotated,
+  setAnnotating,
+  setBoundingClientRect,
+  setBrightness,
+  setCategories,
+  setCategoryVisibility,
+  setChannels,
+  setContrast,
+  setCurrentIndex,
+  setCursor,
+  setExposure,
+  setHue,
+  setActiveImage,
+  setImages,
+  setImageInstances,
+  setInvertMode,
+  setOffset,
+  setOperation,
+  setPenSelectionBrushSize,
+  setPointerSelection,
+  setQuickSelectionBrushSize,
+  setSaturation,
+  setSelectedAnnotations,
+  setSelectionMode,
+  setSelectedCategory,
+  setStageHeight,
+  setStagePosition,
+  setStageScale,
+  setStageWidth,
+  setVibrance,
+  setZoomSelection,
 } from "./imageViewerSlice";
 
 export {
@@ -46,3 +77,5 @@ export {
   updateImageCategories,
   updateOtherCategoryVisibility,
 } from "./projectSlice";
+
+export { toolOptionsSlice } from "./toolOptionsSlice";

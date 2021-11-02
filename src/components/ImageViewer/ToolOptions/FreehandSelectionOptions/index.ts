@@ -1,0 +1,1 @@
+export { FreehandSelectionOptions } from "./FreehandSelectionOptions";
