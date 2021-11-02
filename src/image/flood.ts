@@ -271,7 +271,7 @@ export const floodPixels = ({
   image.overlay.setPixelXY(x, y, [255, 255, 255, 255]);
   return image.overlay.toDataURL();
 };
-
+//
 // export const flood = ({
 //   x,
 //   y,

@@ -1,4 +1,3 @@
-import "jest";
 import { Point } from "./Point";
 
 test("equalsTo", () => {

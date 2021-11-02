@@ -12,8 +12,8 @@ test("foo", async () => {
     id: "",
     instances: [],
     name: "foo.png",
-    shape: { width: 512, channels: 3, height: 512 },
-    originalSrc: "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg",
+    shape: { width: 512, channels: 3, height: 512, frames: 1, planes: 1 },
+    src: "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg",
   };
 
   const src =
