@@ -2,12 +2,12 @@ import { Dialog, DialogContent } from "@mui/material";
 import * as React from "react";
 import * as tf from "@tensorflow/tfjs";
 import { PredictSegmenterDialogAppBar } from "../PredictSegmenterDialogAppBar";
-import { DialogTransition } from "../DialogTransition";
 import { useStyles } from "./PredictSegmenterDialog.css";
 import Container from "@mui/material/Container";
 import { useSelector } from "react-redux";
 import { imagesSelector } from "../../../store/selectors";
 import * as ImageJS from "image-js";
+import { DialogTransition } from "../../DialogTransition";
 
 const overlayLabels = (imageData: Uint8Array, labelData: Uint8Array) => {
   const labelOpacity = 0.3;

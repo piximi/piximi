@@ -7,9 +7,9 @@ import {
   TextField,
   Theme,
 } from "@mui/material";
-import { rescaleOptionsSelector } from "../../../store/selectors/rescaleOptionsSelector";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../store/slices";
+import { classifierSlice } from "../../store/slices";
+import { rescaleOptionsSelector } from "../../store/selectors/rescaleOptionsSelector";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

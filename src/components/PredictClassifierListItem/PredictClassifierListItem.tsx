@@ -1,14 +1,15 @@
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import React from "react";
-import { useImage } from "../../hooks/useImage/useImage";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
+import { useDialog } from "../../hooks";
+import { PredictClassifierDialog } from "../PredictClassifierDialog";
 
 export const PredictClassifierListItem = () => {
-  const image = useImage();
+  const { onClose, onOpen, open } = useDialog();
 
-  if (!image) return <></>;
-
-  const onPredictClick = () => {};
+  const onPredictClick = () => {
+    onOpen();
+  };
 
   return (
     <>
@@ -19,6 +20,11 @@ export const PredictClassifierListItem = () => {
 
         <ListItemText primary="Predict" />
       </ListItem>
+      <PredictClassifierDialog
+        openedDialog={open}
+        openedDrawer={true}
+        closeDialog={onClose}
+      />
     </>
   );
 };

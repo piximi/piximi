@@ -76,6 +76,9 @@ export const classifierSlice = createSlice({
     ) {
       state.opening = true;
     },
+    predict(state, action: PayloadAction<{}>) {
+      state.predicting = true;
+    },
     preprocess(
       state,
       action: PayloadAction<{
