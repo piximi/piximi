@@ -3,15 +3,22 @@ import { LayersModel } from "@tensorflow/tfjs";
 
 export const predict = async (
   opened: LayersModel,
-  data: tensorflow.data.Dataset<tensorflow.Tensor>
+  data: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    id: string;
+  }>
 ) => {
-  data.forEachAsync((input: tensorflow.Tensor) => {
+  const results: { [id: string]: string } = {};
+
+  data.forEachAsync((item: { xs: tensorflow.Tensor; id: string }) => {
+    const input = item.xs;
     const y = opened.predict(input.expandDims());
-    console.info("Prediction ,", y);
-    debugger;
+
+    //Code for converting that to a certain category ID
+
+    // results[item.id] = computedId
+    console.info("Prediction ,", y, item.id);
   });
 
-  // const y = opened.predict(data);
-
-  return "";
+  return results;
 };

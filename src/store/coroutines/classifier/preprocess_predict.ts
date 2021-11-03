@@ -7,9 +7,12 @@ import { RescaleOptions } from "../../../types/RescaleOptions";
 export const decodeImage = async (
   channels: number,
   rescale: boolean,
-  item: string //dataURL
-): Promise<tensorflow.Tensor> => {
-  const fetched = await tensorflow.util.fetch(item);
+  item: {
+    xs: string; //dataURL
+    id: string;
+  }
+): Promise<{ xs: tensorflow.Tensor; id: string }> => {
+  const fetched = await tensorflow.util.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
@@ -24,21 +27,24 @@ export const decodeImage = async (
   }
 
   return new Promise((resolve) => {
-    return resolve(xs);
+    return resolve({ ...item, xs: xs });
   });
 };
 
 export const resize = async (
   inputShape: Shape,
-  xs: tensorflow.Tensor
-): Promise<tensorflow.Tensor> => {
-  const resized = tensorflow.image.resizeBilinear(xs as tensorflow.Tensor3D, [
-    inputShape.height,
-    inputShape.width,
-  ]);
+  item: {
+    xs: tensorflow.Tensor;
+    id: string;
+  }
+): Promise<{ xs: tensorflow.Tensor; id: string }> => {
+  const resized = tensorflow.image.resizeBilinear(
+    item.xs as tensorflow.Tensor3D,
+    [inputShape.height, inputShape.width]
+  );
 
   return new Promise((resolve) => {
-    return resolve(resized);
+    return resolve({ ...item, xs: resized });
   });
 };
 
@@ -51,7 +57,10 @@ export const generator = (images: Array<Image>) => {
     while (index < count) {
       const image = images[index];
 
-      yield image.src;
+      yield {
+        xs: image.src,
+        id: image.id,
+      };
 
       index++;
     }
@@ -62,7 +71,12 @@ export const preprocess_predict = async (
   images: Array<Image>,
   inputShape: Shape,
   rescaleOptions: RescaleOptions
-): Promise<tensorflow.data.Dataset<tensorflow.Tensor>> => {
+): Promise<
+  tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    id: string;
+  }>
+> => {
   const data = tensorflow.data
     .generator(generator(images))
     .mapAsync(
