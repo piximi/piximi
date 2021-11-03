@@ -52,6 +52,8 @@ export const generator = (images: Array<Image>) => {
       const image = images[index];
 
       yield image.src;
+
+      index++;
     }
   };
 };

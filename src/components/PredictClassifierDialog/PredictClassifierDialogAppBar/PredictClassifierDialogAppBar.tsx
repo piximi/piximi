@@ -40,12 +40,6 @@ export const PredictClassifierDialogAppBar = (props: any) => {
 
   const compiled = useSelector(compiledSelector);
 
-  const onStopFitting = () => {
-    if (!compiled) return;
-    compiled.stopTraining = true;
-    dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
-  };
-
   return (
     <AppBar className={classes.appBar}>
       <Toolbar>
