@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
