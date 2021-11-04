@@ -1,6 +1,7 @@
 import {
   FormControl,
   FormHelperText,
+  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -11,8 +12,11 @@ import { Task } from "../../types/Task";
 import { projectSlice } from "../../store/slices";
 import * as React from "react";
 import { trainFlagSelector } from "../../store/selectors/trainFlagSelector";
+import { useStyles } from "./TaskSelect.css";
 
 export const TaskSelect = () => {
+  const classes = useStyles();
+
   const task = useSelector(taskSelector);
   const trainFlag = useSelector(trainFlagSelector);
 
@@ -28,6 +32,8 @@ export const TaskSelect = () => {
   };
 
   const dispatch = useDispatch();
+
+  const modelType: string = task === Task.Classify ? "classifier" : "segmenter";
 
   const onTaskSelect = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement;
@@ -55,11 +61,13 @@ export const TaskSelect = () => {
 
   return (
     <>
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
+      <FormControl className={classes.taskSelector} size={"small"}>
+        <InputLabel id="demo-simple-select-label">Task?</InputLabel>
         <Select
-          labelId="demo-simple-select-helper-label"
-          id="demo-simple-select-helper"
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
           value={parsedTaskMap[task]}
+          label={"Task?"}
           onChange={onTaskSelect}
         >
           <MenuItem value={parsedTaskMap[Task.Classify]}>Classify</MenuItem>
@@ -68,22 +76,23 @@ export const TaskSelect = () => {
             Annotate
           </MenuItem>
         </Select>
-        <FormHelperText>Task</FormHelperText>
       </FormControl>
       {task !== Task.Annotate && (
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <FormControl className={classes.trainFlagSelector} size={"small"}>
+          <InputLabel id="demo-simple-select-label">
+            Apply existing {modelType} or train new one?
+          </InputLabel>
           <Select
             value={parsedTrainFlagMap[trainFlag]}
             onChange={onTrainFlagSelect}
             displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
+            label={"Apply existing {modelType} or train new one?"}
           >
-            <MenuItem value={"apply"}>Apply Classifier</MenuItem>
+            <MenuItem value={"apply"}>Apply {modelType}</MenuItem>
             <MenuItem disabled value={"train"}>
               Train Classifier
             </MenuItem>
           </Select>
-          <FormHelperText>Do you have a pre-trained network?</FormHelperText>
         </FormControl>
       )}
     </>
