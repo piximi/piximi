@@ -7,6 +7,7 @@ import { useStyles } from "./ApplicationToolbar.css";
 import { Slider, Toolbar } from "@mui/material";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import { TaskSelect } from "../TaskSelect/TaskSelect";
 
 export const ApplicationToolbar = () => {
   const classes = useStyles();
@@ -33,6 +34,7 @@ export const ApplicationToolbar = () => {
   return (
     <Toolbar>
       <Logo />
+      <TaskSelect />
       <div className={classes.grow} />
       <ZoomOutIcon className={classes.zoomIcon} />
       <Slider

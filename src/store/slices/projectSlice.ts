@@ -8,6 +8,7 @@ import { BoundingBox } from "../../types/BoundingBox";
 import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { SerializedImageType } from "../../types/SerializedImageType";
+import { Task } from "../../types/Task";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
@@ -35,6 +36,8 @@ const initialState: Project = {
   ],
   images: [dummyImage],
   name: "Untitled project",
+  task: Task.Classify,
+  trainFlag: 0,
 };
 
 export const projectSlice = createSlice({
@@ -244,6 +247,15 @@ export const projectSlice = createSlice({
           state.images[index].categoryId = action.payload.categoryIds[idx];
         }
       });
+    },
+    updateTask(state: Project, action: PayloadAction<{ task: Task }>) {
+      state.task = action.payload.task;
+    },
+    updateTrainFlag(
+      state: Project,
+      action: PayloadAction<{ trainFlag: number }>
+    ) {
+      state.trainFlag = action.payload.trainFlag;
     },
   },
 });
