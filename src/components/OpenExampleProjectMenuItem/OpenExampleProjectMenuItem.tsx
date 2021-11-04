@@ -34,8 +34,6 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   return (
-    <MenuItem onClick={onClickExampleProject}>
-      Open example project (mnist)
-    </MenuItem>
+    <MenuItem onClick={onClickExampleProject}>Open MNIST project</MenuItem>
   );
 };

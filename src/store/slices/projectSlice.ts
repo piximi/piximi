@@ -232,6 +232,19 @@ export const projectSlice = createSlice({
         }
       });
     },
+    updateImagesCategories(
+      state: Project,
+      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = findIndex(state.images, (image: Image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryIds[idx];
+        }
+      });
+    },
   },
 });
 
