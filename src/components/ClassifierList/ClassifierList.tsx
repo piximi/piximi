@@ -11,6 +11,7 @@ import {
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
+import { PredictClassifierListItem } from "../PredictClassifierListItem";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -32,13 +33,7 @@ export const ClassifierList = () => {
 
         <Collapse in={collapsed} timeout="auto" unmountOnExit>
           <List component="div" dense disablePadding>
-            <ListItem button disabled>
-              <ListItemIcon>
-                <LabelImportantIcon />
-              </ListItemIcon>
-
-              <ListItemText primary="Predict" />
-            </ListItem>
+            <PredictClassifierListItem />
 
             <FitClassifierListItem />
 

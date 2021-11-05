@@ -1,4 +1,3 @@
-import { RescalingForm } from "../RescalingForm/RescalingForm";
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { RescalingForm } from "../RescalingForm/RescalingForm";
 
 type PreprocessingSettingsListItemProps = {
   closeDialog: () => void;

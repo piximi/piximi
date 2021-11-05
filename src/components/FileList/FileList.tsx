@@ -7,7 +7,7 @@ import { List } from "@mui/material";
 export const FileList = () => {
   return (
     <List dense>
-      <NewClassifierListItem />
+      {/*<NewClassifierListItem />*/}
 
       <OpenListItem />
 

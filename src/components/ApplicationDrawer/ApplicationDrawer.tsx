@@ -1,7 +1,6 @@
 import { FileList } from "../FileList";
 import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
-import { SegmenterList } from "../SegmenterList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
 import { useStyles } from "./ApplicationDrawer.css";
@@ -29,7 +28,7 @@ export const ApplicationDrawer = () => {
       <Divider />
 
       <ClassifierList />
-      <SegmenterList />
+      {/*<SegmenterList />*/}
 
       <Divider />
 
