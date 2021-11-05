@@ -1,15 +1,9 @@
-import { FileList } from "../FileList";
-import { CategoriesList } from "../CategoriesList";
-import { ClassifierList } from "../ClassifierList";
-import { SegmenterList } from "../SegmenterList";
-import { ApplicationList } from "../ApplicationList";
 import React from "react";
 import { useStyles } from "./ModelDrawer.css";
-import { Divider, Drawer } from "@mui/material";
+import { Drawer } from "@mui/material";
 import { taskSelector } from "../../store/selectors/taskSelector";
 import { useSelector } from "react-redux";
-import { Task } from "../../types/Task";
-import Box from "@mui/material/Box";
+import { ClassifierOptions } from "../ClassifierOptions/ClassifierOptions";
 
 export const ModelDrawer = () => {
   const classes = useStyles();
@@ -24,7 +18,7 @@ export const ModelDrawer = () => {
       open
       variant="persistent"
     >
-      {/*<div className={classes.drawerHeader} />*/}
+      <ClassifierOptions />
     </Drawer>
   );
 };

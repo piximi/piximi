@@ -56,7 +56,8 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   drawerPaper: {
     zIndex: 0,
-    width: theme.spacing(32),
+    width: theme.spacing(48),
+    paddingTop: theme.spacing(8),
   },
   fileInput: {
     display: "none",
