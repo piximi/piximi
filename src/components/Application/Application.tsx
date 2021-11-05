@@ -4,6 +4,8 @@ import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
 import { useStyles } from "./Application.css";
+import { ModelDrawer } from "../ModelDrawer";
+import { ModelIconsDrawer } from "../ModelIconsDrawer";
 
 export const Application = () => {
   const classes = useStyles();
@@ -16,6 +18,9 @@ export const Application = () => {
       <ApplicationDrawer />
 
       <ImageGrid />
+
+      <ModelDrawer />
+      <ModelIconsDrawer />
     </Box>
   );
 };

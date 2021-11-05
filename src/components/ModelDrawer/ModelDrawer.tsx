@@ -4,45 +4,27 @@ import { ClassifierList } from "../ClassifierList";
 import { SegmenterList } from "../SegmenterList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
-import { useStyles } from "./ApplicationDrawer.css";
+import { useStyles } from "./ModelDrawer.css";
 import { Divider, Drawer } from "@mui/material";
 import { taskSelector } from "../../store/selectors/taskSelector";
 import { useSelector } from "react-redux";
 import { Task } from "../../types/Task";
+import Box from "@mui/material/Box";
 
-export const ApplicationDrawer = () => {
+export const ModelDrawer = () => {
   const classes = useStyles();
 
   const task = useSelector(taskSelector);
 
   return (
     <Drawer
-      anchor="left"
+      anchor="right"
       className={classes.drawer}
       classes={{ paper: classes.drawerPaper }}
       open
       variant="persistent"
     >
-      <div className={classes.drawerHeader} />
-
-      <FileList />
-
-      <Divider />
-
-      <CategoriesList />
-
-      {task !== Task.Classify && (
-        <>
-          <Divider />
-
-          <ClassifierList />
-          <SegmenterList />
-        </>
-      )}
-
-      <Divider />
-
-      <ApplicationList />
+      {/*<div className={classes.drawerHeader} />*/}
     </Drawer>
   );
 };
