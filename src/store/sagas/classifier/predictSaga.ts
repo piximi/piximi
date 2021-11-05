@@ -25,11 +25,7 @@ export function* predictSaga(action: any): any {
 
   const images = yield select(uncategorizedImagesSelector);
 
-  const data = yield preprocess_predict(
-    images,
-    architectureOptions.inputShape,
-    rescaleOptions
-  );
+  const data = yield preprocess_predict(images, rescaleOptions);
 
   const { imageIds, categoryIds } = yield predictCategories(
     opened,

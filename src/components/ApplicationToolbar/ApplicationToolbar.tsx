@@ -4,17 +4,9 @@ import { Logo } from "../Logo";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { useStyles } from "./ApplicationToolbar.css";
-import {
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Slider,
-  Toolbar,
-} from "@mui/material";
+import { Slider, Toolbar } from "@mui/material";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
-import { TaskSelect } from "../TaskSelect/TaskSelect";
-import SettingsIcon from "@mui/icons-material/Settings";
 
 export const ApplicationToolbar = () => {
   const classes = useStyles();
@@ -41,7 +33,7 @@ export const ApplicationToolbar = () => {
   return (
     <Toolbar>
       <Logo />
-      <TaskSelect />
+      {/*<TaskSelect />*/}
       <div className={classes.grow} />
       <ZoomOutIcon className={classes.zoomIcon} />
       <Slider

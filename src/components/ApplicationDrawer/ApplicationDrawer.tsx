@@ -6,14 +6,9 @@ import { ApplicationList } from "../ApplicationList";
 import React from "react";
 import { useStyles } from "./ApplicationDrawer.css";
 import { Divider, Drawer } from "@mui/material";
-import { taskSelector } from "../../store/selectors/taskSelector";
-import { useSelector } from "react-redux";
-import { Task } from "../../types/Task";
 
 export const ApplicationDrawer = () => {
   const classes = useStyles();
-
-  const task = useSelector(taskSelector);
 
   return (
     <Drawer
@@ -31,14 +26,10 @@ export const ApplicationDrawer = () => {
 
       <CategoriesList />
 
-      {task !== Task.Classify && (
-        <>
-          <Divider />
+      <Divider />
 
-          <ClassifierList />
-          <SegmenterList />
-        </>
-      )}
+      <ClassifierList />
+      <SegmenterList />
 
       <Divider />
 
