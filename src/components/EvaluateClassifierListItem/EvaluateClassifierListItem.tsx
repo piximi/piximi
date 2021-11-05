@@ -12,7 +12,7 @@ export const EvaluateClassifierListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={onEvaluateClick}>
+      <ListItem disabled button onClick={onEvaluateClick}>
         <ListItemIcon>
           <BarChartIcon />
         </ListItemIcon>

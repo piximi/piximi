@@ -5,6 +5,8 @@ import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import React from "react";
 import { useDialog } from "../../hooks";
 import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
+import { IconButton } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export const FitClassifierListItem = () => {
   const { onClose, onOpen, open } = useDialog();
@@ -15,12 +17,15 @@ export const FitClassifierListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={onFitClick}>
+      <ListItem onClick={() => {}}>
         <ListItemIcon>
           <ScatterPlotIcon />
         </ListItemIcon>
 
         <ListItemText primary="Fit" />
+        <IconButton edge="end" onClick={onFitClick}>
+          <SettingsIcon />
+        </IconButton>
       </ListItem>
       <FitClassifierDialog
         openedDialog={open}

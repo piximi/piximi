@@ -1,30 +1,28 @@
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import React from "react";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
-import { useDialog } from "../../hooks";
-import { PredictClassifierDialog } from "../PredictClassifierDialog";
+import IconButton from "@mui/material/IconButton";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { useDispatch } from "react-redux";
+import { classifierSlice } from "../../store/slices";
 
 export const PredictClassifierListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  const onPredictClick = () => {
-    onOpen();
+  const dispatch = useDispatch();
+  const onPredict = async () => {
+    dispatch(classifierSlice.actions.predict({}));
   };
 
   return (
     <>
-      <ListItem button onClick={onPredictClick}>
+      <ListItem>
         <ListItemIcon>
           <LabelImportantIcon />
         </ListItemIcon>
-
         <ListItemText primary="Predict" />
+        <IconButton onClick={onPredict} edge="end">
+          <PlayArrowIcon />
+        </IconButton>
       </ListItem>
-      <PredictClassifierDialog
-        openedDialog={open}
-        openedDrawer={true}
-        closeDialog={onClose}
-      />
     </>
   );
 };
