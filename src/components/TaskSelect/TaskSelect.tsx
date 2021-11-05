@@ -1,4 +1,6 @@
 import {
+  Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -8,10 +10,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { taskSelector } from "../../store/selectors/taskSelector";
 import { Task } from "../../types/Task";
-import { projectSlice } from "../../store/slices";
+import { classifierSlice, projectSlice } from "../../store/slices";
 import * as React from "react";
 import { trainFlagSelector } from "../../store/selectors/trainFlagSelector";
 import { useStyles } from "./TaskSelect.css";
+import IconButton from "@mui/material/IconButton";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { Alert } from "@mui/lab";
 
 export const TaskSelect = () => {
   const classes = useStyles();
@@ -58,6 +63,10 @@ export const TaskSelect = () => {
     }
   };
 
+  const onPredict = async () => {
+    dispatch(classifierSlice.actions.predict({}));
+  };
+
   return (
     <>
       <FormControl className={classes.taskSelector} size={"small"}>
@@ -94,6 +103,17 @@ export const TaskSelect = () => {
           </Select>
         </FormControl>
       )}
+      <FormControl className={classes.trainFlagSelector} size={"small"}>
+        <Box>
+          <Button color="inherit" onClick={onPredict}>
+            <IconButton color="inherit">
+              <PlayArrowIcon />
+            </IconButton>
+            Run Classifier
+          </Button>
+          {/*<Alert severity="error">Please upload your "trained.zip" file first!</Alert>*/}
+        </Box>
+      </FormControl>
     </>
   );
 };

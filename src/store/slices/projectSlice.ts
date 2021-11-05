@@ -173,7 +173,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
-      state.categories = action.payload.categories;
+      state.categories = [...state.categories, ...action.payload.categories];
     },
     setImages(state: Project, action: PayloadAction<{ images: Array<Image> }>) {
       state.images = action.payload.images;

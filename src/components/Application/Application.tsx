@@ -18,7 +18,7 @@ export const Application = () => {
 
       <ImageGrid />
 
-      <ModelDrawer />
+      {/*<ModelDrawer />*/}
     </Box>
   );
 };
