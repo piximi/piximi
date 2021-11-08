@@ -39,7 +39,7 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
       tf.io.browserFiles([jsonFile, weightsFile])
     );
 
-    dispatch(classifierSlice.actions.updateOpened({ opened: model })); //TODO this should also update fitted (.predict() expects a fitted model.)
+    dispatch(classifierSlice.actions.updateOpened({ opened: model }));
   };
 
   return (

@@ -141,7 +141,7 @@ export const DatasetSettingsListItem = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {}} //TODO implement this (see initalizeDataset function) (this should populate the data field and validation data field of your classifier)
+            onClick={() => {}} //TODO implement this (see initalizeDataset function) (this should separate new train and val dataset)
           >
             Initialize Dataset
           </Button>

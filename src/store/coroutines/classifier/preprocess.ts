@@ -72,7 +72,7 @@ export const generator = (
 
       // eslint-disable-next-line array-callback-return
       const ys = categories.findIndex((category: Category) => {
-        if (category.id !== "00000000-0000-0000-0000-00000000000") {
+        if (category.id !== "00000000-0000-0000-0000-000000000000") {
           return category.id === image.categoryId;
         }
       });
@@ -88,7 +88,8 @@ export const generator = (
 };
 
 export const preprocess = async (
-  images: Array<Image>,
+  trainImages: Array<Image>,
+  valImages: Array<Image>,
   categories: Array<Category>,
   inputShape: Shape,
   rescaleOptions: RescaleOptions,
@@ -103,8 +104,8 @@ export const preprocess = async (
     ys: tensorflow.Tensor;
   }>;
 }> => {
-  const allData = tensorflow.data
-    .generator(generator(images, categories))
+  const trainData = tensorflow.data
+    .generator(generator(trainImages, categories))
     .map(decodeCategory(categories.length))
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
@@ -112,11 +113,14 @@ export const preprocess = async (
     .mapAsync(resize.bind(null, inputShape))
     .shuffle(32);
 
-  //separate into train and val datasets
-  const valDataLength = Math.round((1 - trainingPercentage) * images.length);
-
-  const valData = allData.take(valDataLength);
-  const trainData = allData.skip(valDataLength);
+  const valData = tensorflow.data
+    .generator(generator(valImages, categories))
+    .map(decodeCategory(categories.length))
+    .mapAsync(
+      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
+    )
+    .mapAsync(resize.bind(null, inputShape))
+    .shuffle(32);
 
   return { val: valData, train: trainData };
 };
