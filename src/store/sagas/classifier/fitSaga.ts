@@ -14,6 +14,8 @@ import {
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
+import { trainImagesSelector } from "../../selectors/trainImagesSelector";
+import { valImagesSelector } from "../../selectors/valImagesSelector";
 
 export function* fitSaga(action: any): any {
   //TODO: there are some redundancies between fitSaga and openSaga/preprocessSaga. Should we be calling openSaga
@@ -49,12 +51,15 @@ export function* fitSaga(action: any): any {
   let data = yield select(dataSelector);
 
   if (!data) {
-    const images = yield select(categorizedImagesSelector);
-
     const categories = yield select(createdCategoriesSelector);
 
+    const trainImages = yield select(trainImagesSelector);
+
+    const valImages = yield select(valImagesSelector);
+
     data = yield preprocess(
-      images,
+      trainImages,
+      valImages,
       categories,
       architectureOptions.inputShape,
       rescaleOptions,

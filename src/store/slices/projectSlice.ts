@@ -255,6 +255,19 @@ export const projectSlice = createSlice({
         }
       });
     },
+    updateImagesPartition(
+      state: Project,
+      action: PayloadAction<{ ids: Array<string>; partition: number }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = findIndex(state.images, (image: Image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].partition = action.payload.partition;
+        }
+      });
+    },
     updateTask(state: Project, action: PayloadAction<{ task: Task }>) {
       state.task = action.payload.task;
     },

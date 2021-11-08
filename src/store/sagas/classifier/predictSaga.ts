@@ -20,9 +20,11 @@ export function* predictSaga(action: any): any {
 
   const categories = yield select(createdCategoriesSelector);
 
-  const images = yield select(testImagesSelector);
+  const testImages = yield select(testImagesSelector);
 
-  const data = yield preprocess_predict(images, rescaleOptions);
+  if (!testImages.length) return;
+
+  const data = yield preprocess_predict(testImages, rescaleOptions);
 
   const { imageIds, categoryIds } = yield predictCategories(
     model,

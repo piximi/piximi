@@ -8,10 +8,13 @@ import {
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
+import { trainImagesSelector } from "../../selectors/trainImagesSelector";
+import { valImagesSelector } from "../../selectors/valImagesSelector";
 
 export function* preprocessSaga(): any {
-  const images = yield select(categorizedImagesSelector);
+  const trainImages = yield select(trainImagesSelector);
 
+  const valImages = yield select(valImagesSelector);
   const categories = yield select(createdCategoriesSelector);
 
   const architectureOptions = yield select(architectureOptionsSelector);
@@ -21,7 +24,8 @@ export function* preprocessSaga(): any {
   const trainingPercentage = yield select(trainingPercentageSelector);
 
   const data = yield preprocess(
-    images,
+    trainImages,
+    valImages,
     categories,
     architectureOptions.inputShape,
     rescaleOptions,
