@@ -8,17 +8,22 @@ import {
   createdCategoriesSelector,
   unknownCategorySelector,
 } from "../../store/selectors";
+import { predictedCategoriesSelector } from "../../store/selectors/predictedCategoriesSelector";
 
 export const CategoriesList = () => {
   const categories = useSelector(createdCategoriesSelector);
+  const predictedCategories = useSelector(predictedCategoriesSelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 
   return (
     <CollapsibleList primary="Categories">
       {categories.map((category: Category) => {
-        return <CategoryListItem category={category} key={category.id} />;
+        return <CategoryListItem category={category} id={category.id} />;
       })}
-      <CategoryListItem category={unknownCategory} key={unknownCategory.id} />
+      {predictedCategories.map((category: Category) => {
+        return <CategoryListItem category={category} id={"p-" + category.id} />;
+      })}
+      <CategoryListItem category={unknownCategory} id={unknownCategory.id} />
       <CreateCategoryListItem />
     </CollapsibleList>
   );

@@ -20,9 +20,10 @@ import {
 
 type CategoryListItemProps = {
   category: Category;
+  id: string;
 };
 
-export const CategoryListItem = ({ category }: CategoryListItemProps) => {
+export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
   const {
     onClose: onCloseDeleteCategoryDialog,
     onOpen: onOpenDeleteCategoryDialog,
@@ -51,11 +52,11 @@ export const CategoryListItem = ({ category }: CategoryListItemProps) => {
 
   return (
     <>
-      <ListItem dense key={category.id} id={category.id}>
+      <ListItem dense key={id} id={id}>
         <CategoryListItemCheckbox category={category} />
 
         <ListItemText
-          id={category.id}
+          id={id}
           primary={category.name}
           primaryTypographyProps={{ noWrap: true }}
         />
