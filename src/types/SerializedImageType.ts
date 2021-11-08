@@ -11,5 +11,6 @@ export type SerializedImageType = {
   imageId: string;
   imagePlanes: number;
   imageWidth: number;
+  imagePartition: number;
   annotations: Array<Instance>;
 };

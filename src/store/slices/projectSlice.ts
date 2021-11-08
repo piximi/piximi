@@ -23,6 +23,7 @@ const dummyImage: Image = {
     planes: 1,
     frames: 1,
   },
+  partition: 2,
 };
 
 const initialState: Project = {
@@ -117,7 +118,7 @@ export const projectSlice = createSlice({
           id: serializedImage.imageId,
           instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
           name: serializedImage.imageFilename,
-          partition: 0,
+          partition: serializedImage.imagePartition,
           shape: {
             width: serializedImage.imageWidth,
             height: serializedImage.imageHeight,
@@ -153,7 +154,7 @@ export const projectSlice = createSlice({
           id: serializedImage.imageId,
           instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
           name: serializedImage.imageFilename,
-          partition: 0,
+          partition: serializedImage.imagePartition,
           shape: {
             width: serializedImage.imageWidth,
             height: serializedImage.imageHeight,
@@ -232,6 +233,12 @@ export const projectSlice = createSlice({
         });
         if (index >= 0) {
           state.images[index].categoryId = action.payload.categoryId;
+          if (
+            action.payload.categoryId === "00000000-0000-0000-0000-000000000000"
+          ) {
+            //If assigned category is unknown, then this image is moved to test set
+            state.images[index].partition = 2;
+          }
         }
       });
     },

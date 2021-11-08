@@ -23,6 +23,7 @@ export const serializedProjectSelector = ({
       imageId: image.id,
       imagePlanes: image.shape.planes,
       imageWidth: image.shape.width,
+      imagePartition: image.partition,
       annotations: [],
     };
   });
