@@ -3,9 +3,9 @@ import { Theme } from "@mui/material";
 
 export const useStyles = makeStyles((theme: Theme) => ({
   taskSelector: {
-    minWidth: 140,
+    minWidth: 250,
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(24),
+    marginLeft: theme.spacing(4),
   },
   trainFlagSelector: {
     minWidth: 320,
