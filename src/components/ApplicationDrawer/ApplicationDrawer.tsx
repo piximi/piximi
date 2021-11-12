@@ -1,12 +1,12 @@
 import { FileList } from "../FileList";
 import { CategoriesList } from "../CategoriesList";
-import { ClassifierList } from "../ClassifierList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
 import { useStyles } from "./ApplicationDrawer.css";
 import { Divider, Drawer } from "@mui/material";
 import { ClassifierListItem } from "../ClassifierListItem";
 import { SegmenterListItem } from "../SegmenterListItem";
+import { AnnotatorListItem } from "../AnnotatorListItem";
 
 export const ApplicationDrawer = () => {
   const classes = useStyles();
@@ -35,6 +35,10 @@ export const ApplicationDrawer = () => {
       <Divider />
 
       <SegmenterListItem />
+
+      <Divider />
+
+      <AnnotatorListItem />
 
       <Divider />
 

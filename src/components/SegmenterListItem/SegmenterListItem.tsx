@@ -4,7 +4,7 @@ import { ListItem, ListItemText } from "@mui/material";
 export const SegmenterListItem = () => {
   return (
     <>
-      <ListItem button onClick={() => {}}>
+      <ListItem button disabled onClick={() => {}}>
         <ListItemText primary="Segmenter" />
       </ListItem>
     </>
