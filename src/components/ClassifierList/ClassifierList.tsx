@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import { PredictClassifierListItem } from "../PredictClassifierListItem";
 
 export const ClassifierList = () => {
