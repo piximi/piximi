@@ -42,3 +42,22 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Docker
+
+To run as a docker container, clone the repo, build the image and run it:
+
+```
+git clone https://github.com/piximi/prototype
+docker build -t <image_name> prototype/
+docker run -p 3000:3000 --name <container_name> <image_name>
+```
+
+Alternatively, download the pre-built image and run it directly from Docker Hub:
+
+```
+docker run -p 3000:3000 --name piximi gnodar01/piximi:0.1.0
+```
+
+
+
