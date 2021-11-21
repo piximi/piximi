@@ -1,11 +1,14 @@
-# Use node latest LTS
-FROM node:16.13.0
-
-# Copy source code
-COPY . /app
+# Use node 16 (LTS, latest), debian 11 (slim)
+FROM node:16.13-bullseye-slim
 
 # Change working directory
-WORKDIR /app
+WORKDIR /piximi
+
+# Make module binaries available (e.g. react-scripts)
+ENV PATH="./node_modules/.bin:$PATH"
+
+# Copy source code
+COPY . .
 
 # Install dependencies
 RUN yarn install
@@ -21,4 +24,4 @@ EXPOSE 3000
 
 # Launch application
 # CMD ["yarn", "run", "BROWSER=none", "react-scripts", "start"]
-CMD ["yarn", "run", "react-scripts", "start"]
+CMD ["react-scripts", "start"]
