@@ -6,7 +6,7 @@ import {
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
-import { applicationSlice } from "../../store/slices";
+import { applicationSlice, imageViewerSlice } from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,6 +24,8 @@ import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageViewer } from "../ImageViewer";
+import { Image } from "../../types/Image";
+import { ImageViewerImage } from "../../types/ImageViewerImage";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -48,6 +50,27 @@ export const ImageGridAppBar = () => {
   };
 
   const onOpenAnnotatorDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+    const selected = selectedImages.map((id: string) => {
+      const projectImage = images.find((image: Image) => {
+        return image.id === id;
+      });
+
+      const annotatorImage: ImageViewerImage = {
+        avatar: projectImage!.src,
+        id: projectImage!.id,
+        annotations: [],
+        name: projectImage!.name,
+        shape: projectImage!.shape,
+        originalSrc: projectImage!.src,
+        src: projectImage!.src,
+      };
+
+      return annotatorImage; //TDO cast as imageViewerImage type
+    });
+
+    if (!selected) return;
+
+    dispatch(imageViewerSlice.actions.setImages({ images: selected }));
     setOpenAnnotatorDialog(true);
   };
 

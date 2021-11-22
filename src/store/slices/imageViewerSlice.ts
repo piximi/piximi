@@ -376,6 +376,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ images: Array<ImageViewerImage> }>
     ) {
       state.images = action.payload.images;
+      state.activeImageId = action.payload.images[0].id;
     },
     setChannels(
       state: ImageViewer,
