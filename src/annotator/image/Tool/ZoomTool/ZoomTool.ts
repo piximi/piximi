@@ -2,7 +2,7 @@ import { Tool } from "../Tool";
 import { ZoomModeType } from "../../../../types/ZoomModeType";
 import * as _ from "lodash";
 import numeral from "numeral";
-import { KonvaEventObject } from "konva/types/Node";
+import { KonvaEventObject } from "konva/lib/Node";
 import * as ImageJS from "image-js";
 
 export class ZoomTool extends Tool {
