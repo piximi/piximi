@@ -1,4 +1,4 @@
-import { KonvaEventObject } from "konva/types/Node";
+import { KonvaEventObject } from "konva/lib/Node";
 import { useDispatch, useSelector } from "react-redux";
 import { ToolType } from "../../types/ToolType";
 import { ZoomModeType } from "../../types/ZoomModeType";
