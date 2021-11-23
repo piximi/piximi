@@ -7,11 +7,12 @@ WORKDIR /piximi
 # Make module binaries available (e.g. react-scripts)
 ENV PATH="./node_modules/.bin:$PATH"
 
+# Install dependencies
+COPY package.json .
+RUN yarn install
+
 # Copy source code
 COPY . .
-
-# Install dependencies
-RUN yarn install
 
 # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
 ENV GENERATE_SOURCEMAP false
