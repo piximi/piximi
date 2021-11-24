@@ -1,9 +1,10 @@
 import * as React from "react";
 import { CirclePicker, ColorResult } from "react-color";
 import { useStyles } from "../Application/Application.css";
-import { COLORS } from "../../store";
+import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
 import { Avatar, IconButton, Popover } from "@mui/material";
 import { Label } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
 type ColorIconButtonProps = {
   color: string;
@@ -12,6 +13,8 @@ type ColorIconButtonProps = {
 
 export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
   const classes = useStyles();
+
+  const availableColors = useSelector(availableColorsSelector);
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
@@ -54,7 +57,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
         }}
       >
         <div className={classes.colorPicker}>
-          <CirclePicker colors={COLORS} onChange={onChange} />
+          <CirclePicker colors={availableColors} onChange={onChange} />
         </div>
       </Popover>
     </>

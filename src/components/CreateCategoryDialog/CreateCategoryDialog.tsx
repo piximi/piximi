@@ -1,11 +1,11 @@
 import React, { ChangeEvent, useState } from "react";
-import { useDispatch } from "react-redux";
-import { COLORS } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "../Application/Application.css";
 import { ColorResult } from "react-color";
 import { sample } from "underscore";
 import { createCategory } from "../../store/slices";
+import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
 import {
   Button,
   Dialog,
@@ -27,7 +27,8 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const [color, setColor] = React.useState<string>(sample(COLORS)!);
+  const availableColors = useSelector(availableColorsSelector);
+  const [color, setColor] = React.useState<string>(sample(availableColors)!);
 
   const [name, setName] = useState<string>("");
 
@@ -38,7 +39,7 @@ export const CreateCategoryDialog = ({
 
     onClose();
 
-    setColor(sample(COLORS)!);
+    setColor(sample(availableColors)!);
   };
 
   const onColorChange = (color: ColorResult) => {
