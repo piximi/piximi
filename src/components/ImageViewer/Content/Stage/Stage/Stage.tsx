@@ -754,11 +754,9 @@ export const Stage = () => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactReduxContext.Consumer>
         {({ store }) => (
           <>
-            {/*// @ts-ignore */}
             <ReactKonva.Stage
               draggable={draggable}
               height={stageHeight}
@@ -771,10 +769,8 @@ export const Stage = () => {
               width={stageWidth}
             >
               <Provider store={store}>
-                {/*// @ts-ignore */}
                 <DndProvider backend={HTML5Backend}>
                   <Layer>
-                    {/*// @ts-ignore */}
                     <Image ref={imageRef} />
 
                     <ZoomSelection />

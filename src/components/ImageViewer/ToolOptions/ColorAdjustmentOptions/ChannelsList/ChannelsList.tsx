@@ -105,13 +105,11 @@ export const ChannelsList = ({
             edge="start"
             icon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxUncheckedIcon />
               </>
             }
             checkedIcon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxCheckedIcon />
               </>
             }

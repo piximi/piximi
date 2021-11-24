@@ -63,13 +63,11 @@ export const AnnotationMode = () => {
                 edge="start"
                 icon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioUncheckedIcon />
                   </>
                 }
                 checkedIcon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioCheckedIcon />
                   </>
                 }
@@ -94,13 +92,11 @@ export const AnnotationMode = () => {
                 edge="start"
                 icon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioUncheckedIcon />
                   </>
                 }
                 checkedIcon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioCheckedIcon />
                   </>
                 }
@@ -127,13 +123,11 @@ export const AnnotationMode = () => {
                 edge="start"
                 icon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioUncheckedIcon />
                   </>
                 }
                 checkedIcon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioCheckedIcon />
                   </>
                 }
@@ -160,13 +154,11 @@ export const AnnotationMode = () => {
                 edge="start"
                 icon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioUncheckedIcon />
                   </>
                 }
                 checkedIcon={
                   <>
-                    {/*// @ts-ignore */}
                     <RadioCheckedIcon />
                   </>
                 }

@@ -44,7 +44,6 @@ export const PenAnnotationToolTip = ({
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Ellipse
         radiusX={penSelectionBrushSize}
         radiusY={penSelectionBrushSize}

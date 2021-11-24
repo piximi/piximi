@@ -48,7 +48,6 @@ export const Layer = ({ children }: LayerProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Layer
         imageSmoothingEnabled={false}
         offset={offset}

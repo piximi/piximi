@@ -29,7 +29,6 @@ export const InvertAnnotation = () => {
         <ListItemIcon>
           <SvgIcon>
             <>
-              {/*// @ts-ignore */}
               <InvertSelectionIcon />
             </>
           </SvgIcon>

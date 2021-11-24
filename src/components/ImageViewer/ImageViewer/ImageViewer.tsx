@@ -111,7 +111,6 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ThemeProvider theme={theme}>
         <Dialog fullScreen open={open} onClose={onClose}>
           <div className={classes.root}>

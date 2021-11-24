@@ -75,7 +75,6 @@ export const PointerSelectionOptions = () => {
           <ListItemIcon>
             <SvgIcon>
               <>
-                {/*// @ts-ignore */}
                 <InvertSelectionIcon />
               </>
             </SvgIcon>
@@ -87,7 +86,6 @@ export const PointerSelectionOptions = () => {
           <ListItemIcon>
             <SvgIcon>
               <>
-                {/*// @ts-ignore */}
                 <InvertSelectionIcon />
               </>
             </SvgIcon>

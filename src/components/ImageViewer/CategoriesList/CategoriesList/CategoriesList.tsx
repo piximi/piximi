@@ -532,7 +532,6 @@ const CreateCategoryListItem = () => {
 const OpenListItem = () => {
   return (
     <>
-      {/*// @ts-ignore */}
       <PopupState variant="popover">
         {(popupState) => (
           <>
@@ -557,7 +556,6 @@ const SaveListItem = () => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <PopupState variant="popover">
         {(popupState) => (
           <>

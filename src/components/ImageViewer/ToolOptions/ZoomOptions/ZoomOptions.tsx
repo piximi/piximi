@@ -252,13 +252,11 @@ export const ZoomOptions = () => {
                   edge="start"
                   icon={
                     <>
-                      {/*// @ts-ignore */}
                       <RadioUncheckedIcon />
                     </>
                   }
                   checkedIcon={
                     <>
-                      {/*// @ts-ignore */}
                       <RadioCheckedIcon />
                     </>
                   }
@@ -281,13 +279,11 @@ export const ZoomOptions = () => {
                   edge="start"
                   icon={
                     <>
-                      {/*// @ts-ignore */}
                       <RadioUncheckedIcon />
                     </>
                   }
                   checkedIcon={
                     <>
-                      {/*// @ts-ignore */}
                       <RadioCheckedIcon />
                     </>
                   }
@@ -306,20 +302,17 @@ export const ZoomOptions = () => {
 
       <ListItem button dense onClick={onAutomaticCenteringChange}>
         <ListItemIcon>
-          {/*// @ts-ignore */}
           <Checkbox
             checked={options.automaticCentering}
             disableRipple
             edge="start"
             icon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxUncheckedIcon />
               </>
             }
             checkedIcon={
               <>
-                {/*// @ts-ignore */}
                 <RadioCheckedIcon />
               </>
             }

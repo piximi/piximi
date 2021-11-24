@@ -27,9 +27,7 @@ export const QuickSelection = ({ operator }: QuickSelectionProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Image
           image={image}
           scale={{ x: stageScale, y: stageScale }}

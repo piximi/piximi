@@ -67,7 +67,6 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   if (!src) {
     return (
       <>
-        {/*// @ts-ignore */}
         <ReactKonva.Text
           x={
             boundingClientRect.x +
@@ -86,7 +85,6 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Image
         height={height}
         image={image}
