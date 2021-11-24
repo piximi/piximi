@@ -23,9 +23,7 @@ export const ColorSelection = ({ operator }: ColorSelectionProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Image
           image={image}
           scale={{ x: stageScale, y: stageScale }}

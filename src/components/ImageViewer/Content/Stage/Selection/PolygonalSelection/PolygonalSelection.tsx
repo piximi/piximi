@@ -18,9 +18,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Circle
           fill="white"
           radius={3}
@@ -32,7 +30,6 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
 
         {operator.anchor && (
           <>
-            {/*// @ts-ignore */}
             <ReactKonva.Circle
               fill="black"
               radius={3}
@@ -43,14 +40,12 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
             />
           </>
         )}
-        {/*// @ts-ignore */}
         <ReactKonva.Line
           points={operator.buffer}
           scale={{ x: stageScale, y: stageScale }}
           stroke="black"
           strokeWidth={1 / stageScale}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Line
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}

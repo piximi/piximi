@@ -47,7 +47,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <ColorAdjustmentIcon />
         </>
       ),
@@ -59,7 +58,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <RectangularSelectionIcon />
         </>
       ),
@@ -67,7 +65,6 @@ export const ToolOptions = () => {
       name: "Rectangular selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <RectangularAnnotationOptions />
         </>
       ),
@@ -76,7 +73,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <EllipticalSelectionIcon />
         </>
       ),
@@ -84,7 +80,6 @@ export const ToolOptions = () => {
       name: "Elliptical selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <EllipticalAnnotationOptions />
         </>
       ),
@@ -93,7 +88,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <PenSelectionIcon />
         </>
       ),
@@ -105,7 +99,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <LassoSelectionIcon />
         </>
       ),
@@ -113,7 +106,6 @@ export const ToolOptions = () => {
       name: "Lasso selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <LassoAnnotationOptions />
         </>
       ),
@@ -122,7 +114,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <PolygonalSelectionIcon />
         </>
       ),
@@ -130,7 +121,6 @@ export const ToolOptions = () => {
       name: "Polygonal selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <PolygonalAnnotationOptions />
         </>
       ),
@@ -139,7 +129,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <MagneticSelectionIcon />
         </>
       ),
@@ -147,7 +136,6 @@ export const ToolOptions = () => {
       name: "Magnetic selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <MagneticAnnotationOptions />
         </>
       ),
@@ -156,7 +144,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <ColorSelectionIcon />
         </>
       ),
@@ -164,7 +151,6 @@ export const ToolOptions = () => {
       name: "Color selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <ColorAnnotationOptions />
         </>
       ),
@@ -173,7 +159,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <QuickSelectionIcon />
         </>
       ),
@@ -181,7 +166,6 @@ export const ToolOptions = () => {
       name: "Quick selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <QuickAnnotationOptions />
         </>
       ),
@@ -190,7 +174,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <ObjectSelectionIcon />
         </>
       ),
@@ -198,7 +181,6 @@ export const ToolOptions = () => {
       name: "Object selection",
       options: (
         <>
-          {/*// @ts-ignore */}
           <ObjectAnnotationOptions />
         </>
       ),
@@ -207,7 +189,6 @@ export const ToolOptions = () => {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <HandIcon />
         </>
       ),
@@ -215,7 +196,6 @@ export const ToolOptions = () => {
       name: "Hand",
       options: (
         <>
-          {/*// @ts-ignore */}
           <HandToolOptions />
         </>
       ),
@@ -224,7 +204,6 @@ export const ToolOptions = () => {
       description: "Description of zoom here.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <ZoomIcon />
         </>
       ),
@@ -232,7 +211,6 @@ export const ToolOptions = () => {
       name: "Zoom",
       options: (
         <>
-          {/*// @ts-ignore */}
           <ZoomOptions />
         </>
       ),
@@ -241,7 +219,6 @@ export const ToolOptions = () => {
       description: "Description of pointer here.",
       icon: (
         <>
-          {/*// @ts-ignore */}
           <ObjectSelectionIcon />
         </>
       ),
@@ -249,7 +226,6 @@ export const ToolOptions = () => {
       name: "Pointer",
       options: (
         <>
-          {/*// @ts-ignore */}
           <PointerSelectionOptions />
         </>
       ),

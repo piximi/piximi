@@ -23,7 +23,6 @@ export const ManipulatingCanvasContent = () => {
     <>
       <br />
       <HelpWindowToolTitle toolName={"Hand tool"} letter={"H"}>
-        {/*// @ts-ignore */}
         <HandIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -34,7 +33,6 @@ export const ManipulatingCanvasContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Zoom tool"} letter={"Z"}>
-        {/*// @ts-ignore */}
         <ZoomIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -52,7 +50,6 @@ export const ManipulatingCanvasContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Intensity adjustment"} letter={"I"}>
-        {/*// @ts-ignore */}
         <ColorAdjustmentIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -170,7 +167,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Rectangular annotation"} letter={"R"}>
-        {/*// @ts-ignore */}
         <RectangularSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -181,7 +177,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Elliptical annotation"} letter={"E"}>
-        {/*// @ts-ignore */}
         <EllipticalSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -192,7 +187,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Pen annotation"} letter={"D"}>
-        {/*// @ts-ignore */}
         <PenSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -204,7 +198,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Lasso annotation"} letter={"L"}>
-        {/*// @ts-ignore */}
         <LassoSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -215,7 +208,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Polygonal annotation"} letter={"P"}>
-        {/*// @ts-ignore */}
         <PolygonalSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -227,7 +219,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Magnetic annotation"} letter={"M"}>
-        {/*// @ts-ignore */}
         <MagneticSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -239,7 +230,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Color annotation"} letter={"C"}>
-        {/*// @ts-ignore */}
         <ColorSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -251,7 +241,6 @@ export const MakingNewAnnotationsHelpContent = () => {
       <Divider />
       <br />
       <HelpWindowToolTitle toolName={"Quick annotation"} letter={"Q"}>
-        {/*// @ts-ignore */}
         <QuickSelectionIcon />
       </HelpWindowToolTitle>
       <Typography>
@@ -268,7 +257,6 @@ export const ChangingAnnotationsHelpContent = () => {
     <>
       <br />
       <HelpWindowToolTitle toolName={"Select tool"} letter={"S"}>
-        {/*// @ts-ignore */}
         <SelectionIcon />
       </HelpWindowToolTitle>
       <Typography>

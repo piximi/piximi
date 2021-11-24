@@ -12,9 +12,7 @@ export const PenSelection = ({ operator }: PenSelectionProps) => {
   const stageScale = useSelector(stageScaleSelector);
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Line
           points={operator.buffer}
           lineJoin="round"

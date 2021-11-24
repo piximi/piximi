@@ -15,9 +15,7 @@ export const ZoomSelection = ({}) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4, 2]}
           dashOffset={-dashOffset}
@@ -28,7 +26,6 @@ export const ZoomSelection = ({}) => {
           x={minimum.x}
           y={minimum.y}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4, 2]}
           dashOffset={-dashOffset}

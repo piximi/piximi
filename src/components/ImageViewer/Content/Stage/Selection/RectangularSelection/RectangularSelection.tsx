@@ -23,9 +23,7 @@ export const RectangularSelection = ({
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
@@ -37,7 +35,6 @@ export const RectangularSelection = ({
           x={x}
           y={y}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}

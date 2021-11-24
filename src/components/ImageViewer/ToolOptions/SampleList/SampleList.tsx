@@ -37,13 +37,11 @@ export const SampleList = () => {
             edge="start"
             icon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxUncheckedIcon />
               </>
             }
             checkedIcon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxCheckedIcon />
               </>
             }
@@ -62,13 +60,11 @@ export const SampleList = () => {
             edge="start"
             icon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxUncheckedIcon />
               </>
             }
             checkedIcon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxCheckedIcon />
               </>
             }
@@ -87,13 +83,11 @@ export const SampleList = () => {
             edge="start"
             icon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxUncheckedIcon />
               </>
             }
             checkedIcon={
               <>
-                {/*// @ts-ignore */}
                 <CheckboxCheckedIcon />
               </>
             }
