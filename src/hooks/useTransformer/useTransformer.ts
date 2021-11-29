@@ -1,6 +1,6 @@
 import React, { RefObject } from "react";
-import { Transformer } from "konva/types/shapes/Transformer";
-import { Shape } from "konva/types/Shape";
+import { Transformer } from "konva/lib/shapes/Transformer";
+import { Shape } from "konva/lib/Shape";
 
 export const useTransformer = (
   ref: RefObject<Shape>,

@@ -41,9 +41,7 @@ export const ColorAnnotationToolTip = ({
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Line
           points={[
             toolTipPosition.x,
@@ -55,7 +53,6 @@ export const ColorAnnotationToolTip = ({
           strokeWidth={1}
           stroke="white"
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Label
           position={{
             x: toolTipPosition.x * stageScale,
@@ -63,9 +60,7 @@ export const ColorAnnotationToolTip = ({
           }}
           opacity={0.75}
         >
-          {/*// @ts-ignore */}
           <ReactKonva.Tag fill={"black"} />
-          {/*// @ts-ignore */}
           <ReactKonva.Text
             fill={"white"}
             fontSize={12}

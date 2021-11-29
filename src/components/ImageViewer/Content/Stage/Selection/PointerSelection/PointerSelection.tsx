@@ -22,7 +22,6 @@ export const PointerSelection = () => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Rect
         dash={[4, 2]}
         dashOffset={-dashOffset}

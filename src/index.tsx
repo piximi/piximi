@@ -14,10 +14,8 @@ const theme = createTheme();
 
 ReactDOM.render(
   <Provider store={productionStore}>
-    {/*// @ts-ignore */}
     <ThemeProvider theme={theme}>
       <StyledEngineProvider injectFirst>
-        {/*// @ts-ignore */}
         <DndProvider backend={HTML5Backend}>
           <Application />
         </DndProvider>

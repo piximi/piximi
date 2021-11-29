@@ -51,7 +51,7 @@ import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/s
 import { Transformers } from "../Transformers/Transformers";
 import { useWindowFocusHandler } from "../../../../../hooks/useWindowFocusHandler/useWindowFocusHandler";
 import { stagePositionSelector } from "../../../../../store/selectors/stagePositionSelector";
-import { KonvaEventObject } from "konva/types/Node";
+import { KonvaEventObject } from "konva/lib/Node";
 import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
 import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
@@ -163,7 +163,8 @@ export const Stage = () => {
   const deselectAllTransformers = () => {
     if (!stageRef || !stageRef.current) return;
 
-    const transformers = stageRef.current.find("Transformer").toArray();
+    // const transformers = stageRef.current.find("Transformer").toArray();
+    const transformers = stageRef.current.find("Transformer");
     transformers.forEach((tr: any) => {
       (tr as Konva.Transformer).detach();
       (tr as Konva.Transformer).getLayer()?.batchDraw();
@@ -753,11 +754,9 @@ export const Stage = () => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactReduxContext.Consumer>
         {({ store }) => (
           <>
-            {/*// @ts-ignore */}
             <ReactKonva.Stage
               draggable={draggable}
               height={stageHeight}
@@ -770,10 +769,8 @@ export const Stage = () => {
               width={stageWidth}
             >
               <Provider store={store}>
-                {/*// @ts-ignore */}
                 <DndProvider backend={HTML5Backend}>
                   <Layer>
-                    {/*// @ts-ignore */}
                     <Image ref={imageRef} />
 
                     <ZoomSelection />

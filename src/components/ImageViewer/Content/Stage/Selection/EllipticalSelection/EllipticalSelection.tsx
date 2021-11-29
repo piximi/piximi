@@ -21,9 +21,7 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Ellipse
           dash={[4, 2]}
           dashOffset={-dashOffset}
@@ -35,7 +33,6 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
           x={x}
           y={y}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Ellipse
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}

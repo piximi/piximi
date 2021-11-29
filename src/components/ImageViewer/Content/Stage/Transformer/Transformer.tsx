@@ -383,9 +383,7 @@ export const Transformer = ({
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Transformer
           boundBoxFunc={boundingBoxFunc}
           onTransform={onTransform}
@@ -397,9 +395,7 @@ export const Transformer = ({
         />
         {selectedAnnotation && selectedAnnotations.length === 1 && (
           <>
-            {/*// @ts-ignore */}
             <ReactKonva.Group>
-              {/*// @ts-ignore */}
               <ReactKonva.Label
                 position={{
                   x: posX - 58,
@@ -410,7 +406,6 @@ export const Transformer = ({
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
               >
-                {/*// @ts-ignore */}
                 <ReactKonva.Tag
                   cornerRadius={3}
                   fill={"darkgreen"}
@@ -419,7 +414,6 @@ export const Transformer = ({
                   shadowBlur={10}
                   shadowOffset={{ x: 5, y: 5 }}
                 />
-                {/*// @ts-ignore */}
                 <ReactKonva.Text
                   fill={"white"}
                   fontSize={14}
@@ -427,7 +421,6 @@ export const Transformer = ({
                   text={"Confirm"}
                 />
               </ReactKonva.Label>
-              {/*// @ts-ignore */}
               <ReactKonva.Label
                 position={{
                   x: posX - 52,
@@ -438,7 +431,6 @@ export const Transformer = ({
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
               >
-                {/*// @ts-ignore */}
                 <ReactKonva.Tag
                   cornerRadius={3}
                   fill={"darkred"}
@@ -447,7 +439,6 @@ export const Transformer = ({
                   shadowBlur={10}
                   shadowOffset={{ x: 5, y: 5 }}
                 />
-                {/*// @ts-ignore */}
                 <ReactKonva.Text
                   fill={"white"}
                   fontSize={14}

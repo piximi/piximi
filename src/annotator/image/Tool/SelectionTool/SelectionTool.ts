@@ -1,5 +1,5 @@
 import { Tool } from "../Tool";
-import { KonvaEventObject } from "konva/types/Node";
+import { KonvaEventObject } from "konva/lib/Node";
 
 export class SelectionTool extends Tool {
   onClick = (event: KonvaEventObject<MouseEvent>) => {};

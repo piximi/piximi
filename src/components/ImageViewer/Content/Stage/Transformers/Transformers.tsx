@@ -24,7 +24,6 @@ export const Transformers = ({ transformPosition }: TransformersProps) => {
       {selectedAnnotationsIds.map((annotationId, idx) => {
         return (
           <>
-            {/*// @ts-ignore */}
             <React.Fragment key={annotationId}>
               <Transformer
                 transformPosition={transformPosition}

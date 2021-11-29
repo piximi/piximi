@@ -23,9 +23,7 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
@@ -37,7 +35,6 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
           x={x}
           y={y}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Rect
           dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
@@ -49,7 +46,6 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
           x={x}
           y={y}
         />
-        {/*// @ts-ignore */}
         <ReactKonva.Line
           scale={{ x: stageScale, y: stageScale }}
           stroke="white"

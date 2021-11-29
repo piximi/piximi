@@ -54,9 +54,7 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Group>
-        {/*// @ts-ignore */}
         <ReactKonva.Image
           id={annotation.id}
           image={imageMask}
