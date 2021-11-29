@@ -1,5 +1,4 @@
 import { makeStyles } from "@mui/styles";
-import texture from "../../../../images/texture.png";
 import { Theme } from "@mui/material";
 
 const settingsWidth = 240;
@@ -28,7 +27,6 @@ export const useStyles = makeStyles((theme: Theme) => ({
     boxShadow: "inset 0 0 16px #000000",
   },
   toolbar: {
-    backgroundImage: `url(${texture})`,
     ...theme.mixins.toolbar,
   },
   settingsToolbar: {

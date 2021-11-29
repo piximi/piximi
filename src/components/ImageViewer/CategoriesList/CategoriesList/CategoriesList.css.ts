@@ -1,5 +1,4 @@
 import { makeStyles } from "@mui/styles";
-import texture from "../../../../images/texture.png";
 import { Theme } from "@mui/material";
 
 export const useStyles = makeStyles((theme: Theme) => ({
@@ -27,6 +26,5 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   toolbar: {
     ...theme.mixins.toolbar,
-    backgroundImage: `url(${texture})`,
   },
 }));
