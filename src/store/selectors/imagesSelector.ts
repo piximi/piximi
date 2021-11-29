@@ -1,10 +1,10 @@
-import { ImageViewer } from "../../types/ImageViewer";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
+import { Project } from "../../types/Project";
 
 export const imagesSelector = ({
-  imageViewer,
+  project,
 }: {
-  imageViewer: ImageViewer;
-}): Array<ImageViewerImage> => {
-  return imageViewer.images;
+  project: Project;
+}): Array<Image> => {
+  return project.images;
 };

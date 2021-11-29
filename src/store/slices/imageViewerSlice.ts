@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Category } from "../../types/Category";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
@@ -24,6 +24,7 @@ const initialImage =
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
         annotations: [],
         name: "example.png",
+        partition: 2,
         shape: {
           channels: 3,
           frames: 1,
@@ -132,23 +133,21 @@ export const imageViewerSlice = createSlice({
   reducers: {
     addImages(
       state: ImageViewer,
-      action: PayloadAction<{ newImages: Array<ImageViewerImage> }>
+      action: PayloadAction<{ newImages: Array<Image> }>
     ) {
       //we look for image name duplicates and append number if such duplicates are found
-      const imageNames = state.images.map((image: ImageViewerImage) => {
+      const imageNames = state.images.map((image: Image) => {
         return image.name.split(".")[0];
       });
-      const updatedImages = action.payload.newImages.map(
-        (image: ImageViewerImage) => {
-          const initialName = image.name.split(".")[0]; //get name before file extension
-          //add filename extension to updatedName
-          const updatedName =
-            replaceDuplicateName(initialName, imageNames) +
-            "." +
-            image.name.split(".")[1];
-          return { ...image, name: updatedName };
-        }
-      );
+      const updatedImages = action.payload.newImages.map((image: Image) => {
+        const initialName = image.name.split(".")[0]; //get name before file extension
+        //add filename extension to updatedName
+        const updatedName =
+          replaceDuplicateName(initialName, imageNames) +
+          "." +
+          image.name.split(".")[1];
+        return { ...image, name: updatedName };
+      });
 
       state.images.push(...updatedImages);
     },
@@ -174,7 +173,7 @@ export const imageViewerSlice = createSlice({
     },
     deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
-        (image: ImageViewerImage) => image.id !== action.payload.id
+        (image: Image) => image.id !== action.payload.id
       );
       if (!state.images.length) state.activeImageId = undefined;
       else if (
@@ -189,7 +188,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ id: string }>
     ) {
       //deletes all instances across all images
-      state.images = state.images.map((image: ImageViewerImage) => {
+      state.images = state.images.map((image: Image) => {
         return { ...image, annotations: [] };
       });
     },
@@ -198,7 +197,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ imageId: string }>
     ) {
       //deletes all instances across a given image
-      state.images = state.images.map((image: ImageViewerImage) => {
+      state.images = state.images.map((image: Image) => {
         if (image.id === action.payload.imageId) {
           return { ...image, annotations: [] };
         } else return image;
@@ -211,7 +210,7 @@ export const imageViewerSlice = createSlice({
     ) {
       if (!state.activeImageId) return;
 
-      state.images = state.images.map((image: ImageViewerImage) => {
+      state.images = state.images.map((image: Image) => {
         if (image.id === state.activeImageId) {
           const updatedAnnotations = image.annotations.filter(
             (annotation: AnnotationType) => {
@@ -243,13 +242,13 @@ export const imageViewerSlice = createSlice({
         }
       );
 
-      const loaded: ImageViewerImage = {
-        avatar: action.payload.file.imageData,
+      const loaded: Image = {
         id: action.payload.file.imageId,
         src: action.payload.file.imageData,
         originalSrc: action.payload.file.imageData,
         name: action.payload.file.imageFilename,
         annotations: annotations,
+        partition: 2,
         shape: {
           channels: action.payload.file.imageChannels,
           frames: action.payload.file.imageFrames,
@@ -333,7 +332,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ image: string }>
     ) {
       state.activeImageId = action.payload.image;
-      const activeImage = state.images.find((image: ImageViewerImage) => {
+      const activeImage = state.images.find((image: Image) => {
         return image.id === action.payload.image;
       });
       if (!activeImage) return;
@@ -346,24 +345,9 @@ export const imageViewerSlice = createSlice({
       }
       state.channels = defaultChannels;
     },
-    setImageInstances(
-      state: ImageViewer,
-      action: PayloadAction<{ instances: Array<AnnotationType> }>
-    ) {
-      if (!state.activeImageId) return;
-
-      //update corresponding image object in array of Images stored in state
-      state.images = state.images.map((image: ImageViewerImage) => {
-        if (state.activeImageId !== image.id) {
-          return image;
-        } else {
-          return { ...image, annotations: action.payload.instances };
-        }
-      });
-    },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
-      state.images = state.images.map((image: ImageViewerImage) => {
+      state.images = state.images.map((image: Image) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
@@ -373,7 +357,7 @@ export const imageViewerSlice = createSlice({
     },
     setImages(
       state: ImageViewer,
-      action: PayloadAction<{ images: Array<ImageViewerImage> }>
+      action: PayloadAction<{ images: Array<Image> }>
     ) {
       state.images = action.payload.images;
       state.activeImageId = action.payload.images[0].id;
@@ -550,7 +534,6 @@ export const {
   setCursor,
   setExposure,
   setHue,
-  setImageInstances,
   setImages,
   setInvertMode,
   setLanguage,

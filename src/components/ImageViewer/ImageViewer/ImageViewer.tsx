@@ -20,9 +20,10 @@ import {
   setOperation,
   setSelectedAnnotations,
 } from "../../../store/slices";
+import { Image } from "../../../types/Image";
 
 type ImageViewerProps = {
-  image?: ImageViewerImage;
+  image?: Image;
   onClose: () => void;
   open: boolean;
 };
@@ -67,13 +68,11 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
                 useCanvas: true,
               });
 
-              const loaded: ImageViewerImage = {
-                avatar: image
-                  .resize({ width: 50 })
-                  .toDataURL("image/png", { useCanvas: true }),
+              const loaded: Image = {
                 id: v4(),
                 annotations: [],
                 name: file.name,
+                partition: 2,
                 shape: shape,
                 originalSrc: imageDataURL,
                 src: imageDataURL,

@@ -6,12 +6,13 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "../../../../types/AnnotationType";
-import { imageViewerSlice } from "../../../../store/slices";
+import { imageViewerSlice, projectSlice } from "../../../../store/slices";
 import {
   imageInstancesSelector,
   selectedCategorySelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
+import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 
 type DeleteCategoryDialogProps = {
   onClose: () => void;
@@ -29,6 +30,8 @@ export const DeleteCategoryDialog = ({
   const selections = useSelector(imageInstancesSelector);
 
   const unknownCategory = useSelector(unknownCategorySelector);
+
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const onDelete = () => {
     dispatch(
@@ -48,9 +51,12 @@ export const DeleteCategoryDialog = ({
       }
     });
 
+    if (!activeImageId) return;
+
     dispatch(
-      imageViewerSlice.actions.setImageInstances({
+      projectSlice.actions.setImageInstances({
         instances: instances as Array<AnnotationType>,
+        imageId: activeImageId,
       })
     );
 

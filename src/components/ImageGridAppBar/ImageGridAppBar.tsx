@@ -25,7 +25,6 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageViewer } from "../ImageViewer";
 import { Image } from "../../types/Image";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -55,11 +54,11 @@ export const ImageGridAppBar = () => {
         return image.id === id;
       });
 
-      const annotatorImage: ImageViewerImage = {
-        avatar: projectImage!.src,
+      const annotatorImage: Image = {
         id: projectImage!.id,
         annotations: [],
         name: projectImage!.name,
+        partition: 2,
         shape: projectImage!.shape,
         originalSrc: projectImage!.src,
         src: projectImage!.src,

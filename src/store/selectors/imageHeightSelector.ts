@@ -1,14 +1,17 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
+import { Project } from "../../types/Project";
 
 export const imageHeightSelector = ({
   imageViewer,
+  project,
 }: {
   imageViewer: ImageViewer;
+  project: Project;
 }) => {
-  if (!imageViewer.images.length || !imageViewer.activeImageId) return;
+  if (!project.images.length || !imageViewer.activeImageId) return;
 
-  const image = imageViewer.images.find((image: ImageViewerImage) => {
+  const image = project.images.find((image: Image) => {
     return image.id === imageViewer.activeImageId;
   });
 

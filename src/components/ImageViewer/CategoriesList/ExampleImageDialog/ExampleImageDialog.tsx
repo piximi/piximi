@@ -21,12 +21,15 @@ import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
 import {
   imageViewerSlice,
+  projectSlice,
   setActiveImage,
   setChannels,
   setImages,
   setOperation,
   setSelectedAnnotations,
 } from "../../../../store/slices";
+import { Image } from "../../../../types/Image";
+import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -40,6 +43,8 @@ export const ExampleImageDialog = ({
   const dispatch = useDispatch();
 
   const images = useSelector(imagesSelector);
+
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const categories_in = useSelector(categoriesSelector);
 
@@ -91,13 +96,13 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
-    const example: ImageViewerImage = {
-      avatar: data as string,
+    const example: Image = {
       id: v4(),
       annotations: [],
       name: name,
       shape: shape,
       originalSrc: data as string,
+      partition: 2,
       src: data as string,
     };
 
@@ -143,9 +148,12 @@ export const ExampleImageDialog = ({
         })
       );
 
+      if (!activeImageId) return;
+
       dispatch(
-        imageViewerSlice.actions.setImageInstances({
+        projectSlice.actions.setImageInstances({
           instances: newAnnotations,
+          imageId: activeImageId,
         })
       );
       dispatch(

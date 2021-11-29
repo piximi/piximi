@@ -1,17 +1,20 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
 import { Category } from "../../types/Category";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
 import { SerializedFileType } from "../../types/SerializedFileType";
+import { Project } from "../../types/Project";
 
 export const allSerializedAnnotationsSelector = ({
   imageViewer,
+  project,
 }: {
   imageViewer: ImageViewer;
+  project: Project;
 }): Array<SerializedFileType> => {
-  if (!imageViewer.images.length) return [];
+  if (!project.images.length) return [];
 
-  return imageViewer.images.map((image: ImageViewerImage) => {
+  return project.images.map((image: Image) => {
     const columns = {
       imageChannels: image.shape.channels,
       imageChecksum: "",

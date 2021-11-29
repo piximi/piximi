@@ -46,7 +46,6 @@ export {
   setHue,
   setActiveImage,
   setImages,
-  setImageInstances,
   setInvertMode,
   setOffset,
   setOperation,

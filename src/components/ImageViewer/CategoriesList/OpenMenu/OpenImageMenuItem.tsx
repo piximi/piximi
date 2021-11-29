@@ -11,6 +11,7 @@ import {
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
+import { Image } from "../../../../types/Image";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -46,15 +47,13 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
               useCanvas: true,
             });
 
-            const loaded: ImageViewerImage = {
-              avatar: image
-                .resize({ width: 50 })
-                .toDataURL("image/png", { useCanvas: true }),
+            const loaded: Image = {
               id: v4(),
               annotations: [],
               name: file.name,
               shape: shape,
               originalSrc: imageDataURL,
+              partition: 2,
               src: imageDataURL,
             };
 

@@ -50,7 +50,6 @@ import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
@@ -61,6 +60,7 @@ import { OpenMenu } from "../OpenMenu/OpenMenu";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import { Image } from "../../../../types/Image";
 
 export const CategoriesList = () => {
   const classes = useStyles();
@@ -137,7 +137,7 @@ export const CategoriesList = () => {
 
   const onImageMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    image: ImageViewerImage
+    image: Image
   ) => {
     onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
@@ -149,7 +149,7 @@ export const CategoriesList = () => {
 
   const onClearAllAnnotations = () => {
     const existingAnnotations = images
-      .map((image: ImageViewerImage) => {
+      .map((image: Image) => {
         return [...image.annotations];
       })
       .flat();
@@ -182,7 +182,7 @@ export const CategoriesList = () => {
 
   const onImageItemClick = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: ImageViewerImage
+    image: Image
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
@@ -232,7 +232,7 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Images")}>
-        {images.map((image: ImageViewerImage) => {
+        {images.map((image: Image) => {
           return (
             <div key={image.id}>
               <ListItem
@@ -246,7 +246,7 @@ export const CategoriesList = () => {
                 <ListItemAvatar>
                   <Avatar
                     alt={image.name}
-                    src={image.avatar}
+                    src={image.originalSrc}
                     variant={"square"}
                   />
                 </ListItemAvatar>

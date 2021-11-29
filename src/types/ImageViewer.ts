@@ -5,6 +5,7 @@ import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { ChannelType } from "./ChannelType";
+import { Image } from "./Image";
 
 export type ImageViewer = {
   annotated: boolean;
@@ -20,7 +21,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
-  images: Array<ImageViewerImage>;
+  images: Array<Image>;
   invertMode: boolean;
   language: LanguageType;
   offset: { x: number; y: number };

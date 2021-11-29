@@ -68,8 +68,10 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 import {
   imageViewerSlice,
+  projectSlice,
   setSelectedAnnotations,
 } from "../../../../../store/slices";
+import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -95,6 +97,8 @@ export const Stage = () => {
 
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
+
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const [currentPosition, setCurrentPosition] = useState<{
     x: number;
@@ -634,9 +638,12 @@ export const Stage = () => {
   const confirmAnnotations = () => {
     if (!annotations || !annotationTool || annotationTool.annotating) return;
 
+    if (!activeImageId) return;
+
     dispatch(
-      imageViewerSlice.actions.setImageInstances({
+      projectSlice.actions.setImageInstances({
         instances: [...unselectedAnnotations, ...selectedAnnotations],
+        imageId: activeImageId,
       })
     );
 
