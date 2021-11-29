@@ -74,9 +74,7 @@ export const PointerSelectionOptions = () => {
         <ListItem button onClick={onSelectAll} dense>
           <ListItemIcon>
             <SvgIcon>
-              <>
-                <InvertSelectionIcon />
-              </>
+              <InvertSelectionIcon />
             </SvgIcon>
           </ListItemIcon>
 
@@ -85,9 +83,7 @@ export const PointerSelectionOptions = () => {
         <ListItem button onClick={onSelectNone} dense>
           <ListItemIcon>
             <SvgIcon>
-              <>
-                <InvertSelectionIcon />
-              </>
+              <InvertSelectionIcon />
             </SvgIcon>
           </ListItemIcon>
 

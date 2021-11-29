@@ -7,12 +7,10 @@ export const ApplicationAppBar = () => {
   const classes = useStyles();
 
   return (
-    <>
-      <div className={classes.grow}>
-        <AppBar className={classes.appBar} color="inherit" position="fixed">
-          <ApplicationToolbar />
-        </AppBar>
-      </div>
-    </>
+    <div className={classes.grow}>
+      <AppBar className={classes.appBar} color="inherit" position="fixed">
+        <ApplicationToolbar />
+      </AppBar>
+    </div>
   );
 };

@@ -64,45 +64,43 @@ export const ImageGrid = () => {
   };
 
   return (
-    <>
-      <main className={classes.main}>
-        <Container className={classes.container} maxWidth={false}>
-          <ImageList
-            className={classes.gridList}
-            cols={Math.floor(6 / scaleFactor)}
-            rowHeight={"auto"}
-          >
-            {images.slice(0, max_images).map((image: Image) => (
-              <ImageListItem
-                key={image.id}
-                onClick={() => onSelectImage(image)}
-                style={getSize(scaleFactor)}
-                className={getSelectionStatus(image.id)}
-              >
-                <img alt="" src={image.src} className={classes.imageTile} />
-                <ImageListItemBar
-                  position="top"
-                  sx={{
-                    background: "transparent",
-                  }}
-                  actionIcon={
-                    <LabelIcon
-                      sx={{
-                        color: getColor(image),
-                        marginLeft: "8px",
-                        marginTop: "8px",
-                      }}
-                    />
-                  }
-                  actionPosition="left"
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
+    <main className={classes.main}>
+      <Container className={classes.container} maxWidth={false}>
+        <ImageList
+          className={classes.gridList}
+          cols={Math.floor(6 / scaleFactor)}
+          rowHeight={"auto"}
+        >
+          {images.slice(0, max_images).map((image: Image) => (
+            <ImageListItem
+              key={image.id}
+              onClick={() => onSelectImage(image)}
+              style={getSize(scaleFactor)}
+              className={getSelectionStatus(image.id)}
+            >
+              <img alt="" src={image.src} className={classes.imageTile} />
+              <ImageListItemBar
+                position="top"
+                sx={{
+                  background: "transparent",
+                }}
+                actionIcon={
+                  <LabelIcon
+                    sx={{
+                      color: getColor(image),
+                      marginLeft: "8px",
+                      marginTop: "8px",
+                    }}
+                  />
+                }
+                actionPosition="left"
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
 
-          <ImageGridAppBar />
-        </Container>
-      </main>
-    </>
+        <ImageGridAppBar />
+      </Container>
+    </main>
   );
 };
