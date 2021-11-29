@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { CssBaseline, Dialog } from "@mui/material";
-import { ImageViewerImage } from "../../../types/ImageViewerImage";
+import { CssBaseline, Dialog, DialogContent } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
@@ -112,17 +111,19 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
     <>
       <ThemeProvider theme={theme}>
         <Dialog fullScreen open={open} onClose={onClose}>
-          <div className={classes.root}>
-            <CssBaseline />
+          <DialogContent>
+            <div className={classes.root}>
+              <CssBaseline />
 
-            <CategoriesList />
+              <CategoriesList closeDialog={onClose} />
 
-            <Content onDrop={onDrop} />
+              <Content onDrop={onDrop} />
 
-            <ToolOptions />
+              <ToolOptions />
 
-            <Tools />
-          </div>
+              <Tools />
+            </div>
+          </DialogContent>
         </Dialog>
       </ThemeProvider>
     </>

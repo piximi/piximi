@@ -31,6 +31,7 @@ import {
   DialogTitle,
   Divider,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import List from "@mui/material/List";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -61,8 +62,11 @@ import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
+import { ArrowBack } from "@mui/icons-material";
 
-export const CategoriesList = () => {
+export const CategoriesList = (props: any) => {
+  const { closeDialog } = props;
+
   const classes = useStyles();
 
   const createdCategories = useSelector(createdCategoriesSelector);
@@ -216,6 +220,16 @@ export const CategoriesList = () => {
 
       <AppBar className={classes.appBar} color="default">
         <Toolbar>
+          <Tooltip title="Close Dialog" placement="bottom">
+            <IconButton
+              edge="start"
+              onClick={closeDialog}
+              aria-label="Close"
+              href={""}
+            >
+              <ArrowBack />
+            </IconButton>
+          </Tooltip>
           <Typography variant="h6" color="inherit">
             Piximi Annotator
           </Typography>
