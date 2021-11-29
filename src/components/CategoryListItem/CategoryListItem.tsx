@@ -51,7 +51,7 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
   const classes = useStyles();
 
   return (
-    <>
+    <React.Fragment>
       <ListItem dense key={id} id={id}>
         <CategoryListItemCheckbox category={category} />
 
@@ -96,6 +96,6 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
         onCloseDialog={onCloseEditCategoryDialog}
         openDialog={openEditCategoryDialog}
       />
-    </>
+    </React.Fragment>
   );
 };

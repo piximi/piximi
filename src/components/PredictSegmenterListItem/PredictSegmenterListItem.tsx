@@ -123,7 +123,7 @@ export const PredictSegmenterListItem = () => {
 
   const { onClose, onOpen, open } = useDialog();
 
-  if (!image) return <></>;
+  if (!image) return <React.Fragment />;
 
   const onPredictClick = () => {
     console.info("Clicked on predict! ");

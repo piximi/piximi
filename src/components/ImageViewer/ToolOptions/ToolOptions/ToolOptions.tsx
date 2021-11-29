@@ -45,168 +45,84 @@ export const ToolOptions = () => {
   const operations = [
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <ColorAdjustmentIcon />
-        </>
-      ),
+      icon: <ColorAdjustmentIcon />,
       method: ToolType.ColorAdjustment,
       name: t("Color adjustment"),
       options: <ColorAdjustmentOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <RectangularSelectionIcon />
-        </>
-      ),
+      icon: <RectangularSelectionIcon />,
       method: ToolType.RectangularAnnotation,
       name: "Rectangular selection",
-      options: (
-        <>
-          <RectangularAnnotationOptions />
-        </>
-      ),
+      options: <RectangularAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <EllipticalSelectionIcon />
-        </>
-      ),
+      icon: <EllipticalSelectionIcon />,
       method: ToolType.EllipticalAnnotation,
       name: "Elliptical selection",
-      options: (
-        <>
-          <EllipticalAnnotationOptions />
-        </>
-      ),
+      options: <EllipticalAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <PenSelectionIcon />
-        </>
-      ),
+      icon: <PenSelectionIcon />,
       method: ToolType.PenAnnotation,
       name: "Pen selection",
       options: <FreehandAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <LassoSelectionIcon />
-        </>
-      ),
+      icon: <LassoSelectionIcon />,
       method: ToolType.LassoAnnotation,
       name: "Lasso selection",
-      options: (
-        <>
-          <LassoAnnotationOptions />
-        </>
-      ),
+      options: <LassoAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <PolygonalSelectionIcon />
-        </>
-      ),
+      icon: <PolygonalSelectionIcon />,
       method: ToolType.PolygonalAnnotation,
       name: "Polygonal selection",
-      options: (
-        <>
-          <PolygonalAnnotationOptions />
-        </>
-      ),
+      options: <PolygonalAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <MagneticSelectionIcon />
-        </>
-      ),
+      icon: <MagneticSelectionIcon />,
       method: ToolType.MagneticAnnotation,
       name: "Magnetic selection",
-      options: (
-        <>
-          <MagneticAnnotationOptions />
-        </>
-      ),
+      options: <MagneticAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <ColorSelectionIcon />
-        </>
-      ),
+      icon: <ColorSelectionIcon />,
       method: ToolType.ColorAnnotation,
       name: "Color selection",
-      options: (
-        <>
-          <ColorAnnotationOptions />
-        </>
-      ),
+      options: <ColorAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <QuickSelectionIcon />
-        </>
-      ),
+      icon: <QuickSelectionIcon />,
       method: ToolType.QuickAnnotation,
       name: "Quick selection",
-      options: (
-        <>
-          <QuickAnnotationOptions />
-        </>
-      ),
+      options: <QuickAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <ObjectSelectionIcon />
-        </>
-      ),
+      icon: <ObjectSelectionIcon />,
       method: ToolType.ObjectAnnotation,
       name: "Object selection",
-      options: (
-        <>
-          <ObjectAnnotationOptions />
-        </>
-      ),
+      options: <ObjectAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
-      icon: (
-        <>
-          <HandIcon />
-        </>
-      ),
+      icon: <HandIcon />,
       method: ToolType.Hand,
       name: "Hand",
-      options: (
-        <>
-          <HandToolOptions />
-        </>
-      ),
+      options: <HandToolOptions />,
     },
     {
       description: "Description of zoom here.",
-      icon: (
-        <>
-          <ZoomIcon />
-        </>
-      ),
+      icon: <ZoomIcon />,
       method: ToolType.Zoom,
       name: "Zoom",
       options: (

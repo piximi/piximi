@@ -531,23 +531,21 @@ const CreateCategoryListItem = () => {
 
 const OpenListItem = () => {
   return (
-    <>
-      <PopupState variant="popover">
-        {(popupState) => (
-          <>
-            <ListItem button {...bindTrigger(popupState)}>
-              <ListItemIcon>
-                <FolderOpenIcon />
-              </ListItemIcon>
+    <PopupState variant="popover">
+      {(popupState) => (
+        <>
+          <ListItem button {...bindTrigger(popupState)}>
+            <ListItemIcon>
+              <FolderOpenIcon />
+            </ListItemIcon>
 
-              <ListItemText primary="Open" />
-            </ListItem>
+            <ListItemText primary="Open" />
+          </ListItem>
 
-            <OpenMenu popupState={popupState} />
-          </>
-        )}
-      </PopupState>
-    </>
+          <OpenMenu popupState={popupState} />
+        </>
+      )}
+    </PopupState>
   );
 };
 

@@ -61,16 +61,8 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={
-                  <>
-                    <RadioUncheckedIcon />
-                  </>
-                }
-                checkedIcon={
-                  <>
-                    <RadioCheckedIcon />
-                  </>
-                }
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
                 value={AnnotationModeType.New}
               />
@@ -90,16 +82,8 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={
-                  <>
-                    <RadioUncheckedIcon />
-                  </>
-                }
-                checkedIcon={
-                  <>
-                    <RadioCheckedIcon />
-                  </>
-                }
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
                 value={AnnotationModeType.Add}
               />
@@ -121,16 +105,8 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={
-                  <>
-                    <RadioUncheckedIcon />
-                  </>
-                }
-                checkedIcon={
-                  <>
-                    <RadioCheckedIcon />
-                  </>
-                }
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
                 value={AnnotationModeType.Subtract}
               />
@@ -152,16 +128,8 @@ export const AnnotationMode = () => {
               <Radio
                 disableRipple
                 edge="start"
-                icon={
-                  <>
-                    <RadioUncheckedIcon />
-                  </>
-                }
-                checkedIcon={
-                  <>
-                    <RadioCheckedIcon />
-                  </>
-                }
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
                 tabIndex={-1}
                 value={AnnotationModeType.Intersect}
               />

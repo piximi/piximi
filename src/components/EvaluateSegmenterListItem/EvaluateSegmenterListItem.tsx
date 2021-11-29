@@ -9,21 +9,19 @@ function BarChartIcon() {
 export const EvaluateSegmenterListItem = () => {
   const image = useImage();
 
-  if (!image) return <></>;
+  if (!image) return <React.Fragment />;
 
   const onEvaluateClick = () => {
     console.info("Clicked on evaluate! ");
   };
 
   return (
-    <>
-      <ListItem button onClick={onEvaluateClick}>
-        <ListItemIcon>
-          <BarChartIcon />
-        </ListItemIcon>
+    <ListItem button onClick={onEvaluateClick}>
+      <ListItemIcon>
+        <BarChartIcon />
+      </ListItemIcon>
 
-        <ListItemText primary="Evaluate" />
-      </ListItem>
-    </>
+      <ListItemText primary="Evaluate" />
+    </ListItem>
   );
 };

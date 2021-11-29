@@ -7,12 +7,10 @@ type SubtractTooltipProps = {
 
 export const SubtractTooltip = ({ children }: SubtractTooltipProps) => {
   const content = (
-    <>
-      <p>
-        Subtracting an area removes the area you label from an existing
-        annotation.
-      </p>
-    </>
+    <p>
+      Subtracting an area removes the area you label from an existing
+      annotation.
+    </p>
   );
 
   return (

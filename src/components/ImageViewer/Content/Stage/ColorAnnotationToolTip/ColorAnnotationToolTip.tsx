@@ -36,7 +36,7 @@ export const ColorAnnotationToolTip = ({
   if (toolType !== ToolType.ColorAnnotation) return <></>;
 
   if (!annotating || annotated || !toolTipPosition || !initialPosition) {
-    return <></>;
+    return <React.Fragment />;
   }
 
   return (

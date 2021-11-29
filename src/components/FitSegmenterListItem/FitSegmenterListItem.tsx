@@ -6,14 +6,12 @@ export const FitSegmenterListItem = () => {
   const onFitClick = () => {};
 
   return (
-    <>
-      <ListItem button onClick={onFitClick}>
-        <ListItemIcon>
-          <ScatterPlotIcon />
-        </ListItemIcon>
+    <ListItem button onClick={onFitClick}>
+      <ListItemIcon>
+        <ScatterPlotIcon />
+      </ListItemIcon>
 
-        <ListItemText primary="Fit" />
-      </ListItem>
-    </>
+      <ListItemText primary="Fit" />
+    </ListItem>
   );
 };

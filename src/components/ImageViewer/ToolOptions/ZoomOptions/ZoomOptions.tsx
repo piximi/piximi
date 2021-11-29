@@ -250,16 +250,8 @@ export const ZoomOptions = () => {
                 <Radio
                   disableRipple
                   edge="start"
-                  icon={
-                    <>
-                      <RadioUncheckedIcon />
-                    </>
-                  }
-                  checkedIcon={
-                    <>
-                      <RadioCheckedIcon />
-                    </>
-                  }
+                  icon={<RadioUncheckedIcon />}
+                  checkedIcon={<RadioCheckedIcon />}
                   tabIndex={-1}
                   value={ZoomModeType.In}
                 />
@@ -277,16 +269,8 @@ export const ZoomOptions = () => {
                 <Radio
                   disableRipple
                   edge="start"
-                  icon={
-                    <>
-                      <RadioUncheckedIcon />
-                    </>
-                  }
-                  checkedIcon={
-                    <>
-                      <RadioCheckedIcon />
-                    </>
-                  }
+                  icon={<RadioUncheckedIcon />}
+                  checkedIcon={<RadioCheckedIcon />}
                   tabIndex={-1}
                   value={ZoomModeType.Out}
                 />
@@ -306,16 +290,8 @@ export const ZoomOptions = () => {
             checked={options.automaticCentering}
             disableRipple
             edge="start"
-            icon={
-              <>
-                <CheckboxUncheckedIcon />
-              </>
-            }
-            checkedIcon={
-              <>
-                <RadioCheckedIcon />
-              </>
-            }
+            icon={<CheckboxUncheckedIcon />}
+            checkedIcon={<RadioCheckedIcon />}
             tabIndex={-1}
           />
         </ListItemIcon>

@@ -21,26 +21,24 @@ export const ClassifierList = () => {
   };
 
   return (
-    <>
-      <List dense>
-        <ListItem button dense onClick={onCollapseClick}>
-          <ListItemIcon>
-            {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </ListItemIcon>
+    <List dense>
+      <ListItem button dense onClick={onCollapseClick}>
+        <ListItemIcon>
+          {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </ListItemIcon>
 
-          <ListItemText primary="Classifier" />
-        </ListItem>
+        <ListItemText primary="Classifier" />
+      </ListItem>
 
-        <Collapse in={collapsed} timeout="auto" unmountOnExit>
-          <List component="div" dense disablePadding>
-            <PredictClassifierListItem />
+      <Collapse in={collapsed} timeout="auto" unmountOnExit>
+        <List component="div" dense disablePadding>
+          <PredictClassifierListItem />
 
-            <FitClassifierListItem />
+          <FitClassifierListItem />
 
-            <EvaluateClassifierListItem />
-          </List>
-        </Collapse>
-      </List>
-    </>
+          <EvaluateClassifierListItem />
+        </List>
+      </Collapse>
+    </List>
   );
 };

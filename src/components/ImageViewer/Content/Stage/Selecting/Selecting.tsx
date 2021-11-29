@@ -21,11 +21,7 @@ export const Selecting = ({ tool }: SelectingProps) => {
   const toolType = useSelector(toolTypeSelector);
 
   if ((annotated || !annotating) && toolType !== ToolType.QuickAnnotation)
-    return <></>;
+    return <React.Fragment />;
 
-  return (
-    <>
-      <Selection tool={tool} toolType={toolType} />
-    </>
-  );
+  return <Selection tool={tool} toolType={toolType} />;
 };
