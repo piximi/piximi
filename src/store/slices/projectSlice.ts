@@ -237,8 +237,10 @@ export const projectSlice = createSlice({
           if (
             action.payload.categoryId === "00000000-0000-0000-0000-000000000000"
           ) {
-            //If assigned category is unknown, then this image is moved to test set
+            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
             state.images[index].partition = Partition.Inference;
+          } else {
+            state.images[index].partition = Partition.Training;
           }
         }
       });
