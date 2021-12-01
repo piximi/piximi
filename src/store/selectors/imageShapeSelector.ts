@@ -1,17 +1,14 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { Image } from "../../types/Image";
-import { Project } from "../../types/Project";
 
 export const imageShapeSelector = ({
   imageViewer,
-  project,
 }: {
   imageViewer: ImageViewer;
-  project: Project;
 }) => {
-  if (!project.images.length) return;
+  if (!imageViewer.images.length) return;
 
-  const image = project.images.find((image: Image) => {
+  const image = imageViewer.images.find((image: Image) => {
     return image.id === imageViewer.activeImageId;
   });
 

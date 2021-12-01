@@ -54,7 +54,7 @@ export const DeleteCategoryDialog = ({
     if (!activeImageId) return;
 
     dispatch(
-      projectSlice.actions.setImageInstances({
+      imageViewerSlice.actions.setImageInstances({
         instances: instances as Array<AnnotationType>,
         imageId: activeImageId,
       })

@@ -8,6 +8,7 @@ import {
   createdCategoriesSelector,
   imageSelector,
   selectedCategorySelector,
+  selectedImagesSelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -46,7 +47,6 @@ import Box from "@mui/material/Box";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";
-import HelpIcon from "@mui/icons-material/Help";
 import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
@@ -60,9 +60,14 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import {
+  imageViewerSlice,
+  projectSlice,
+  setActiveImage,
+} from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { ArrowBack } from "@mui/icons-material";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
 export const CategoriesList = (props: any) => {
   const { closeDialog } = props;
@@ -77,7 +82,10 @@ export const CategoriesList = (props: any) => {
 
   const categoryCounts = useSelector(categoryCountsSelector);
 
-  const images = useSelector(imagesSelector);
+  const annotatorImages = useSelector(annotatorImagesSelector);
+  const projectImages = useSelector(imagesSelector);
+  const selectedImages = useSelector(selectedImagesSelector);
+
   const currentImage = useSelector(imageSelector);
 
   const dispatch = useDispatch();
@@ -111,6 +119,21 @@ export const CategoriesList = (props: any) => {
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
   );
+
+  /*
+  When going back to project, replace images with those that have updated annotations
+   */
+  const onCloseDialog = () => {
+    const unselectedImages = projectImages.filter((image: Image) => {
+      return !selectedImages.includes(image.id);
+    });
+    dispatch(
+      projectSlice.actions.setImages({
+        images: [...unselectedImages, ...annotatorImages],
+      })
+    );
+    closeDialog();
+  };
 
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
@@ -152,7 +175,7 @@ export const CategoriesList = (props: any) => {
   };
 
   const onClearAllAnnotations = () => {
-    const existingAnnotations = images
+    const existingAnnotations = annotatorImages
       .map((image: Image) => {
         return [...image.annotations];
       })
@@ -220,10 +243,10 @@ export const CategoriesList = (props: any) => {
 
       <AppBar className={classes.appBar} color="default">
         <Toolbar>
-          <Tooltip title="Close Dialog" placement="bottom">
+          <Tooltip title="Back to project" placement="bottom">
             <IconButton
               edge="start"
-              onClick={closeDialog}
+              onClick={onCloseDialog}
               aria-label="Close"
               href={""}
             >
@@ -246,7 +269,7 @@ export const CategoriesList = (props: any) => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Images")}>
-        {images.map((image: Image) => {
+        {annotatorImages.map((image: Image) => {
           return (
             <div key={image.id}>
               <ListItem

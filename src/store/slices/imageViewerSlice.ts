@@ -4,7 +4,6 @@ import { Image } from "../../types/Image";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
-import * as _ from "lodash";
 import colorImage from "../../images/cell-painting.png";
 import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
@@ -16,6 +15,7 @@ import {
   importSerializedAnnotations,
   replaceDuplicateName,
 } from "../../image/imageHelper";
+import { Project } from "../../types/Project";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -36,37 +36,6 @@ const initialImage =
         src: colorImage,
       }
     : undefined;
-
-const initialCategories =
-  process.env.NODE_ENV === "development"
-    ? [
-        {
-          color: "#AAAAAA",
-          id: "00000000-0000-0000-0000-000000000000",
-          name: "Unknown",
-          visible: true,
-        },
-        {
-          color: "#a08cd2",
-          id: "00000000-0000-0000-0000-000000000001",
-          name: "Cell membrane",
-          visible: true,
-        },
-        {
-          color: "#b8ddf3",
-          id: "00000000-0000-0000-0000-000000000002",
-          name: "Cell nucleus",
-          visible: true,
-        },
-      ]
-    : [
-        {
-          color: "#AAAAAA",
-          id: "00000000-0000-0000-0000-000000000000",
-          name: "Unknown",
-          visible: true,
-        },
-      ];
 
 const initialState: ImageViewer = {
   annotated: false,
@@ -354,6 +323,22 @@ export const imageViewerSlice = createSlice({
     ) {
       state.invertMode = action.payload.invertMode;
     },
+    setImageInstances(
+      state: ImageViewer,
+      action: PayloadAction<{
+        instances: Array<AnnotationType>;
+        imageId: string;
+      }>
+    ) {
+      //update corresponding image object in array of Images stored in state
+      state.images = state.images.map((image: Image) => {
+        if (action.payload.imageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, annotations: action.payload.instances };
+        }
+      });
+    },
     setLanguage(
       state: ImageViewer,
       action: PayloadAction<{ language: LanguageType }>
@@ -489,7 +474,6 @@ export const {
   addImages,
   deleteAllInstances,
   deleteImage,
-  deleteAllImageInstances,
   openAnnotations,
   setActiveImage,
   setAnnotating,

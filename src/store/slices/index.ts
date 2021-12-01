@@ -31,7 +31,6 @@ export {
   imageViewerSlice,
   addImages,
   deleteAllInstances,
-  deleteAllImageInstances,
   setAnnotated,
   setAnnotating,
   setBoundingClientRect,

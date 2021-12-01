@@ -61,7 +61,7 @@ export const ImageGridAppBar = () => {
 
       const annotatorImage: Image = {
         id: projectImage!.id,
-        annotations: [],
+        annotations: projectImage!.annotations,
         name: projectImage!.name,
         partition: 2,
         shape: projectImage!.shape,

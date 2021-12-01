@@ -9,7 +9,6 @@ import malaria from "../../../../images/malaria.png";
 import cellpainting from "../../../../images/cell-painting.png";
 import { ChannelType } from "../../../../types/ChannelType";
 import { ToolType } from "../../../../types/ToolType";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import * as malariaAnnotations from "../../../../images/malaria.json";
@@ -20,7 +19,6 @@ import { Category } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
 import {
-  imageViewerSlice,
   projectSlice,
   setActiveImage,
   setChannels,
@@ -43,8 +41,6 @@ export const ExampleImageDialog = ({
   const dispatch = useDispatch();
 
   const images = useSelector(imagesSelector);
-
-  const activeImageId = useSelector(activeImageIdSelector);
 
   const categories_in = useSelector(categoriesSelector);
 
@@ -96,16 +92,6 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
-    const example: Image = {
-      id: v4(),
-      annotations: [],
-      name: name,
-      shape: shape,
-      originalSrc: data as string,
-      partition: 2,
-      src: data as string,
-    };
-
     let channels: Array<ChannelType> = [];
     for (let i = 0; i < shape.channels; i++) {
       channels.push({ visible: true, range: [0, 255] });
@@ -128,6 +114,16 @@ export const ExampleImageDialog = ({
       }
     );
 
+    const example: Image = {
+      id: v4(),
+      annotations: newAnnotations,
+      name: name,
+      shape: shape,
+      originalSrc: data as string,
+      partition: 2,
+      src: data as string,
+    };
+
     batch(() => {
       dispatch(setImages({ images: [...images, example] }));
 
@@ -148,14 +144,6 @@ export const ExampleImageDialog = ({
         })
       );
 
-      if (!activeImageId) return;
-
-      dispatch(
-        projectSlice.actions.setImageInstances({
-          instances: newAnnotations,
-          imageId: activeImageId,
-        })
-      );
       dispatch(
         projectSlice.actions.setCategories({
           categories: updatedCategories,

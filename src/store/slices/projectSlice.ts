@@ -61,22 +61,6 @@ export const projectSlice = createSlice({
     createImage(state: Project, action: PayloadAction<{ image: Image }>) {
       state.images.push(action.payload.image);
     },
-    setImageInstances(
-      state: Project,
-      action: PayloadAction<{
-        instances: Array<AnnotationType>;
-        imageId: string;
-      }>
-    ) {
-      //update corresponding image object in array of Images stored in state
-      state.images = state.images.map((image: Image) => {
-        if (action.payload.imageId !== image.id) {
-          return image;
-        } else {
-          return { ...image, annotations: action.payload.instances };
-        }
-      });
-    },
     createProject(state: Project, action: PayloadAction<{ project: Project }>) {
       state.categories = action.payload.project.categories;
       state.name = action.payload.project.name;
@@ -282,7 +266,6 @@ export const {
   createImage,
   createProject,
   deleteCategory,
-  setImageInstances,
   updateCategory,
   updateCategoryVisibility,
   updateImageCategories,

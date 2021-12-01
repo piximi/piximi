@@ -641,7 +641,7 @@ export const Stage = () => {
     if (!activeImageId) return;
 
     dispatch(
-      projectSlice.actions.setImageInstances({
+      imageViewerSlice.actions.setImageInstances({
         instances: [...unselectedAnnotations, ...selectedAnnotations],
         imageId: activeImageId,
       })

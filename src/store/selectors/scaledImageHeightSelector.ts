@@ -4,14 +4,12 @@ import { Project } from "../../types/Project";
 
 export const scaledImageHeightSelector = ({
   imageViewer,
-  project,
 }: {
   imageViewer: ImageViewer;
-  project: Project;
 }) => {
-  if (!project.images.length) return;
+  if (!imageViewer.images.length) return;
 
-  const image = project.images.filter((image: Image) => {
+  const image = imageViewer.images.filter((image: Image) => {
     return image.id === imageViewer.activeImageId;
   })[0];
 

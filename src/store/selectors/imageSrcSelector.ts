@@ -4,14 +4,12 @@ import { Project } from "../../types/Project";
 
 export const imageSrcSelector = ({
   imageViewer,
-  project,
 }: {
   imageViewer: ImageViewer;
-  project: Project;
 }) => {
-  if (!project.images.length) return;
+  if (!imageViewer.images.length) return;
 
-  const image = project.images.find((image: Image) => {
+  const image = imageViewer.images.find((image: Image) => {
     return image.id === imageViewer.activeImageId;
   });
 
