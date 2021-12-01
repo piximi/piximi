@@ -4,7 +4,7 @@ import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/Optimize
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice, projectSlice } from "../../../store/slices";
-import { Dialog, DialogContent, List } from "@mui/material";
+import { Alert, Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DialogTransition } from "../../DialogTransition";
@@ -15,6 +15,7 @@ import {
 import { Image } from "../../../types/Image";
 import * as _ from "lodash";
 import { Partition } from "../../../types/Partition";
+import { useEffect, useState } from "react";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -25,8 +26,15 @@ type FitClassifierDialogProps = {
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const { closeDialog, openedDialog, openedDrawer } = props;
 
+  const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
+    useState<boolean>(false);
+
   const trainingPercentage = useSelector(trainingPercentageSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
+
+  useEffect(() => {
+    setNoCategorizedImagesAlert(categorizedImages.length === 0);
+  }, [categorizedImages]);
 
   const dispatch = useDispatch();
 
@@ -85,7 +93,14 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         closeDialog={closeDialog}
         fit={onFit}
         openedDrawer={openedDrawer}
+        disableFitting={noCategorizedImagesAlert}
       />
+
+      {noCategorizedImagesAlert ? (
+        <Alert severity="info">{"Please label images to train a model."}</Alert>
+      ) : (
+        <></>
+      )}
 
       <DialogContent>
         <List dense>
