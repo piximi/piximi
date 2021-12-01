@@ -14,6 +14,7 @@ import { Shape } from "../../types/Shape";
 import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
 import { v4 } from "uuid";
+import { Partition } from "../../types/Partition";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -54,7 +55,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
               id: v4(),
               instances: [],
               name: file.name,
-              partition: 2,
+              partition: Partition.Inference,
               shape: shape,
               src: imageDataURL,
             };

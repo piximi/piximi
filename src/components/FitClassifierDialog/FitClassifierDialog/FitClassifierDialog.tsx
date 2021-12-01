@@ -14,6 +14,7 @@ import {
 } from "../../../store/selectors";
 import { Image } from "../../../types/Image";
 import * as _ from "lodash";
+import { Partition } from "../../../types/Partition";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -49,13 +50,13 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     dispatch(
       projectSlice.actions.updateImagesPartition({
         ids: trainDataIds,
-        partition: 0,
+        partition: Partition.Training,
       })
     );
     dispatch(
       projectSlice.actions.updateImagesPartition({
         ids: valDataIds,
-        partition: 1,
+        partition: Partition.Validation,
       })
     );
 
