@@ -1,5 +1,3 @@
-import { Category } from "./Category";
-import { ImageViewerImage } from "./ImageViewerImage";
 import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
@@ -12,7 +10,6 @@ export type ImageViewer = {
   annotating: boolean;
   boundingClientRect: DOMRect;
   brightness: number;
-  categories: Array<Category>;
   channels: Array<ChannelType>;
   contrast: number;
   currentIndex: number;

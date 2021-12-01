@@ -16,7 +16,7 @@ import { Category } from "../../../../../types/Category";
 import { categoriesSelector } from "../../../../../store/selectors";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
-import { imageViewerSlice } from "../../../../../store/slices";
+import { imageViewerSlice, projectSlice } from "../../../../../store/slices";
 
 const COLORS = [
   "#f44336",
@@ -73,7 +73,7 @@ export const CreateCategoryDialog = ({
     };
 
     dispatch(
-      imageViewerSlice.actions.setCategories({
+      projectSlice.actions.setCategories({
         categories: [...categories, category],
       })
     );

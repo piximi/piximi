@@ -110,7 +110,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Dialog fullScreen open={open} onClose={onClose}>
+        <Dialog disableEscapeKeyDown fullScreen open={open} onClose={onClose}>
           <DialogContent>
             <div className={classes.root}>
               <CssBaseline />

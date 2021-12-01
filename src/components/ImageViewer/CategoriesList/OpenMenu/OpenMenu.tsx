@@ -12,7 +12,7 @@ type OpenMenuProps = {
 export const OpenMenu = ({ popupState }: OpenMenuProps) => {
   return (
     <Menu {...bindMenu(popupState)}>
-      <OpenImageMenuItem popupState={popupState} />
+      {/*<OpenImageMenuItem popupState={popupState} />*/}
 
       <OpenProjectFileMenuItem popupState={popupState} />
 

@@ -36,8 +36,6 @@ export {
   setAnnotating,
   setBoundingClientRect,
   setBrightness,
-  setCategories,
-  setCategoryVisibility,
   setChannels,
   setContrast,
   setCurrentIndex,

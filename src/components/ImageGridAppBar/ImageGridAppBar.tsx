@@ -1,12 +1,17 @@
 import React from "react";
 import { useStyles } from "./ImageGridAppBar.css";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
-import { applicationSlice, imageViewerSlice } from "../../store/slices";
+import {
+  applicationSlice,
+  imageViewerSlice,
+  setActiveImage,
+  setSelectedAnnotations,
+} from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -49,7 +54,7 @@ export const ImageGridAppBar = () => {
   };
 
   const onOpenAnnotatorDialog = (event: React.MouseEvent<HTMLDivElement>) => {
-    const selected = selectedImages.map((id: string) => {
+    const selected = selectedImages.map((id: string, idx: number) => {
       const projectImage = images.find((image: Image) => {
         return image.id === id;
       });
@@ -64,12 +69,29 @@ export const ImageGridAppBar = () => {
         src: projectImage!.src,
       };
 
-      return annotatorImage; //TDO cast as imageViewerImage type
+      if (idx === 0) {
+        batch(() => {
+          dispatch(
+            setActiveImage({
+              image: annotatorImage.id,
+            })
+          );
+          dispatch(
+            setSelectedAnnotations({
+              selectedAnnotations: [],
+              selectedAnnotation: undefined,
+            })
+          );
+        });
+      }
+
+      return annotatorImage;
     });
 
     if (!selected) return;
 
     dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+
     setOpenAnnotatorDialog(true);
   };
 

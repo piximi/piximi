@@ -10,7 +10,7 @@ import { useTranslation } from "../../../../../hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { imagesSelector } from "../../../../../store/selectors/imagesSelector";
 import { selectedCategorySelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
+import { imageViewerSlice, projectSlice } from "../../../../../store/slices";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -64,9 +64,7 @@ export const CategoryMenu = ({
           })
         );
 
-        dispatch(
-          imageViewerSlice.actions.deleteCategory({ category: category })
-        );
+        dispatch(projectSlice.actions.deleteCategory({ id: category.id }));
       });
     }
     onCloseCategoryMenu(event);

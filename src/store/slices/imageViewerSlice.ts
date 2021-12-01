@@ -73,7 +73,6 @@ const initialState: ImageViewer = {
   annotating: false,
   boundingClientRect: new DOMRect(),
   brightness: 0,
-  categories: initialCategories.length > 0 ? initialCategories : [],
   channels: [
     //R, G, and B channels by default
     {
@@ -163,14 +162,6 @@ export const imageViewerSlice = createSlice({
         );
       }
     },
-    deleteCategory(
-      state: ImageViewer,
-      action: PayloadAction<{ category: Category }>
-    ) {
-      state.categories = state.categories.filter(
-        (category: Category) => category.id !== action.payload.category.id
-      );
-    },
     deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
         (image: Image) => image.id !== action.payload.id
@@ -229,15 +220,16 @@ export const imageViewerSlice = createSlice({
        * NOTE: The correct image to annotate is found by looking at the
        * imageFilename property in the imported annotation file. -- Alice
        */
+      //FIXME this could should actually be in projectSlice
       if (!state.activeImageId) return;
 
       const annotations = action.payload.file.annotations.map(
         (annotation: SerializedAnnotationType): AnnotationType => {
           const { annotation_out, categories } = importSerializedAnnotations(
             annotation,
-            state.categories
+            [] //FIXME this should be state.categories
           );
-          state.categories = categories;
+          // state.categories = categories; //FIXME, uncomment
           return annotation_out;
         }
       );
@@ -283,28 +275,6 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ brightness: number }>
     ) {
       state.brightness = action.payload.brightness;
-    },
-    setCategories(
-      state: ImageViewer,
-      action: PayloadAction<{ categories: Array<Category> }>
-    ) {
-      state.categories = action.payload.categories;
-    },
-    setCategoryVisibility(
-      state: ImageViewer,
-      action: PayloadAction<{ category: Category; visible: boolean }>
-    ) {
-      const category = _.find(state.categories, (category) => {
-        return category.id === action.payload.category.id;
-      });
-      if (!category) return;
-      category.visible = action.payload.visible;
-      state.categories = [
-        ...state.categories.filter((category) => {
-          return category.id !== action.payload.category.id;
-        }),
-        category,
-      ];
     },
     setContrast(
       state: ImageViewer,
@@ -517,17 +487,15 @@ export const imageViewerSlice = createSlice({
 
 export const {
   addImages,
-  deleteCategory,
   deleteAllInstances,
   deleteImage,
   deleteAllImageInstances,
+  openAnnotations,
   setActiveImage,
   setAnnotating,
   setAnnotated,
   setBoundingClientRect,
   setBrightness,
-  setCategories,
-  setCategoryVisibility,
   setChannels,
   setContrast,
   setCurrentIndex,

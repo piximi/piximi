@@ -157,7 +157,7 @@ export const ExampleImageDialog = ({
         })
       );
       dispatch(
-        imageViewerSlice.actions.setCategories({
+        projectSlice.actions.setCategories({
           categories: updatedCategories,
         })
       );

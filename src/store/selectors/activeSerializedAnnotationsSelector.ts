@@ -35,11 +35,11 @@ export const activeSerializedAnnotationsSelector = ({
 
   const serializedAnnotations: Array<SerializedAnnotationType> =
     image.annotations.map((annotation: AnnotationType) => {
-      const index = imageViewer.categories.findIndex((category: Category) => {
+      const index = project.categories.findIndex((category: Category) => {
         return category.id === annotation.categoryId;
       });
 
-      const category = imageViewer.categories[index];
+      const category = project.categories[index];
 
       return {
         annotationBoundingBoxHeight: annotation.boundingBox[3],

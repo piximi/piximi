@@ -5,7 +5,7 @@ import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
 import { selectedCategorySelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
+import { projectSlice } from "../../../../../store/slices";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;
@@ -23,8 +23,8 @@ export const HideOrShowCategoryMenuItem = ({
 
   const onClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     dispatch(
-      imageViewerSlice.actions.setCategoryVisibility({
-        category: category,
+      projectSlice.actions.updateCategoryVisibility({
+        id: category.id,
         visible: !category.visible,
       })
     );

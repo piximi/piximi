@@ -60,7 +60,7 @@ export const DeleteCategoryDialog = ({
       })
     );
 
-    dispatch(imageViewerSlice.actions.deleteCategory({ category: category }));
+    dispatch(projectSlice.actions.deleteCategory({ id: category.id }));
 
     onClose();
   };

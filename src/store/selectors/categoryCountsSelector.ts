@@ -1,14 +1,7 @@
-import { ImageViewer } from "../../types/ImageViewer";
 import { Project } from "../../types/Project";
-export const categoryCountsSelector = ({
-  imageViewer,
-  project,
-}: {
-  imageViewer: ImageViewer;
-  project: Project;
-}) => {
+export const categoryCountsSelector = ({ project }: { project: Project }) => {
   const catDict: { [id: string]: number } = {};
-  for (let category of imageViewer.categories) {
+  for (let category of project.categories) {
     catDict[category.id] = 0;
   }
   for (let image of project.images) {
