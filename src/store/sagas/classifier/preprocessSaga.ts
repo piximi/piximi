@@ -2,7 +2,6 @@ import { put, select } from "redux-saga/effects";
 import { preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
-  categorizedImagesSelector,
   createdCategoriesSelector,
   trainingPercentageSelector,
 } from "../../selectors";

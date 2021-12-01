@@ -16,7 +16,6 @@ import { trainFlagSelector } from "../../store/selectors/trainFlagSelector";
 import { useStyles } from "./TaskSelect.css";
 import IconButton from "@mui/material/IconButton";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Alert } from "@mui/lab";
 
 export const TaskSelect = () => {
   const classes = useStyles();

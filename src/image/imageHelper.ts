@@ -112,9 +112,10 @@ export const getOverlappingAnnotations = (
               Math.round(position.y - boundingBox[1])
             )[0]
           )
-            return annotation;
+            return true;
         }
       }
+      return false;
     }
   );
   return overlappingAnnotations.map((annotation: AnnotationType) => {

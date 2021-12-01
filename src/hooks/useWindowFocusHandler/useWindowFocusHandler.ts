@@ -23,5 +23,5 @@ export const useWindowFocusHandler = () => {
       // window.removeEventListener('focus', onFocus);
       window.removeEventListener("blur", onBlur);
     };
-  }, []);
+  });
 };
