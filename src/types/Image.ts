@@ -1,5 +1,6 @@
 import { Shape } from "./Shape";
 import { Instance } from "./Instance";
+import { Partition } from "./Partition";
 
 export type Image = {
   categoryId?: string;
@@ -8,5 +9,5 @@ export type Image = {
   src: string;
   shape: Shape;
   instances: Array<Instance>;
-  partition: number;
+  partition: Partition;
 };

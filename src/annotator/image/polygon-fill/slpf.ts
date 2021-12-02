@@ -30,7 +30,7 @@ export function slpf(points: Array<Array<number>>, img: ImageJS.Image) {
     removeEdges(yScan, AET);
     AET.sort((e1, e2) => {
       const cmp = getXofYMin(e1) - getXofYMin(e2);
-      return cmp == 0 ? getXofYMax(e1) - getXofYMax(e2) : cmp;
+      return cmp === 0 ? getXofYMax(e1) - getXofYMax(e2) : cmp;
     });
     // fill spans on scanline
     const spans = getSpans(yScan, AET);

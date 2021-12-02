@@ -1,4 +1,4 @@
-// import { flood } from "./flood";
+import "./flood";
 
 test("flood", () => {
   const canvas = document.createElement("canvas") as HTMLCanvasElement;

@@ -62,5 +62,5 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
         })
       );
     }
-  }, [boundingClientRect, dispatch, stageWidth, image?.shape]);
+  }, [boundingClientRect, dispatch, stageWidth, image, stageHeight]);
 };
