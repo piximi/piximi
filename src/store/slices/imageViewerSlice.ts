@@ -16,6 +16,7 @@ import {
   replaceDuplicateName,
 } from "../../image/imageHelper";
 import * as _ from "lodash";
+import { Partition } from "../../types/Partition";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -24,7 +25,7 @@ const initialImage =
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
         annotations: [],
         name: "example.png",
-        partition: 2,
+        partition: Partition.Inference,
         shape: {
           channels: 3,
           frames: 1,
@@ -248,7 +249,7 @@ export const imageViewerSlice = createSlice({
         originalSrc: action.payload.file.imageData,
         name: action.payload.file.imageFilename,
         annotations: annotations,
-        partition: 2,
+        partition: Partition.Inference,
         shape: {
           channels: action.payload.file.imageChannels,
           frames: action.payload.file.imageFrames,

@@ -1,5 +1,5 @@
 import { Shape } from "./Shape";
-import { Instance } from "./Instance";
+import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 
 export type Image = {
@@ -7,7 +7,8 @@ export type Image = {
   id: string;
   name: string;
   src: string;
+  originalSrc: string;
   shape: Shape;
-  instances: Array<Instance>;
+  annotations: Array<AnnotationType>;
   partition: Partition;
 };

@@ -12,6 +12,7 @@ import {
   setSelectedAnnotations,
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
+import { Partition } from "../../../../types/Partition";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -53,7 +54,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
               name: file.name,
               shape: shape,
               originalSrc: imageDataURL,
-              partition: 2,
+              partition: Partition.Inference,
               src: imageDataURL,
             };
 

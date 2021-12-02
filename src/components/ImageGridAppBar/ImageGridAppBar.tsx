@@ -30,6 +30,7 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageViewer } from "../ImageViewer";
 import { Image } from "../../types/Image";
+import { Partition } from "../../types/Partition";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -63,7 +64,7 @@ export const ImageGridAppBar = () => {
         id: projectImage!.id,
         annotations: projectImage!.annotations,
         name: projectImage!.name,
-        partition: 2,
+        partition: Partition.Inference,
         shape: projectImage!.shape,
         originalSrc: projectImage!.src,
         src: projectImage!.src,

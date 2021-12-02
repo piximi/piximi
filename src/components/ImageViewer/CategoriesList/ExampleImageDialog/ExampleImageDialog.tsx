@@ -29,6 +29,7 @@ import {
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
+import { Partition } from "../../../../types/Partition";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -121,7 +122,7 @@ export const ExampleImageDialog = ({
       name: name,
       shape: shape,
       originalSrc: data as string,
-      partition: 2,
+      partition: Partition.Inference,
       src: data as string,
     };
 

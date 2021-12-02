@@ -20,6 +20,7 @@ import {
   setSelectedAnnotations,
 } from "../../../store/slices";
 import { Image } from "../../../types/Image";
+import { Partition } from "../../../types/Partition";
 
 type ImageViewerProps = {
   image?: Image;
@@ -71,7 +72,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
                 id: v4(),
                 annotations: [],
                 name: file.name,
-                partition: 2,
+                partition: Partition.Inference,
                 shape: shape,
                 originalSrc: imageDataURL,
                 src: imageDataURL,
