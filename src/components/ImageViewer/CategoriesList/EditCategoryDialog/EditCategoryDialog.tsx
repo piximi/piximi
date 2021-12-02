@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "./EditCategoryDialog.css";
 import { Category } from "../../../../types/Category";
-import { imageViewerSlice, projectSlice } from "../../../../store/slices";
+import { imageViewerSlice } from "../../../../store/slices";
 import {
   categoriesSelector,
   selectedCategorySelector,

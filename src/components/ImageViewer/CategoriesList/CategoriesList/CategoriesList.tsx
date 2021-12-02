@@ -130,7 +130,7 @@ export const CategoriesList = (props: any) => {
     });
     dispatch(
       projectSlice.actions.setImages({
-        images: [...unselectedImages, ...annotatorImages],
+        images: [...annotatorImages, ...unselectedImages],
       })
     );
     closeDialog();
