@@ -4,12 +4,14 @@ import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { ChannelType } from "./ChannelType";
 import { Image } from "./Image";
+import { Category } from "./Category";
 
 export type ImageViewer = {
   annotated: boolean;
   annotating: boolean;
   boundingClientRect: DOMRect;
   brightness: number;
+  categories: Array<Category>;
   channels: Array<ChannelType>;
   contrast: number;
   currentIndex: number;

@@ -73,7 +73,7 @@ export const CreateCategoryDialog = ({
     };
 
     dispatch(
-      projectSlice.actions.setCategories({
+      imageViewerSlice.actions.setCategories({
         categories: [...categories, category],
       })
     );

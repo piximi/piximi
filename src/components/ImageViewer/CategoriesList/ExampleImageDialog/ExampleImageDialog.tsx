@@ -19,6 +19,7 @@ import { Category } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
 import {
+  imageViewerSlice,
   projectSlice,
   setActiveImage,
   setChannels,
@@ -145,7 +146,7 @@ export const ExampleImageDialog = ({
       );
 
       dispatch(
-        projectSlice.actions.setCategories({
+        imageViewerSlice.actions.setCategories({
           categories: updatedCategories,
         })
       );

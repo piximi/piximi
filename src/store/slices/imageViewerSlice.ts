@@ -15,7 +15,7 @@ import {
   importSerializedAnnotations,
   replaceDuplicateName,
 } from "../../image/imageHelper";
-import { Project } from "../../types/Project";
+import * as _ from "lodash";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -37,11 +37,43 @@ const initialImage =
       }
     : undefined;
 
+const initialCategories =
+  process.env.NODE_ENV === "development"
+    ? [
+        {
+          color: "#AAAAAA",
+          id: "00000000-0000-0000-0000-000000000000",
+          name: "Unknown",
+          visible: true,
+        },
+        {
+          color: "#a08cd2",
+          id: "00000000-0000-0000-0000-000000000001",
+          name: "Cell membrane",
+          visible: true,
+        },
+        {
+          color: "#b8ddf3",
+          id: "00000000-0000-0000-0000-000000000002",
+          name: "Cell nucleus",
+          visible: true,
+        },
+      ]
+    : [
+        {
+          color: "#AAAAAA",
+          id: "00000000-0000-0000-0000-000000000000",
+          name: "Unknown",
+          visible: true,
+        },
+      ];
+
 const initialState: ImageViewer = {
   annotated: false,
   annotating: false,
   boundingClientRect: new DOMRect(),
   brightness: 0,
+  categories: initialCategories.length > 0 ? initialCategories : [],
   channels: [
     //R, G, and B channels by default
     {
@@ -131,6 +163,14 @@ export const imageViewerSlice = createSlice({
         );
       }
     },
+    deleteCategory(
+      state: ImageViewer,
+      action: PayloadAction<{ category: Category }>
+    ) {
+      state.categories = state.categories.filter(
+        (category: Category) => category.id !== action.payload.category.id
+      );
+    },
     deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
         (image: Image) => image.id !== action.payload.id
@@ -189,7 +229,6 @@ export const imageViewerSlice = createSlice({
        * NOTE: The correct image to annotate is found by looking at the
        * imageFilename property in the imported annotation file. -- Alice
        */
-      //FIXME this could should actually be in projectSlice
       if (!state.activeImageId) return;
 
       const annotations = action.payload.file.annotations.map(
@@ -198,7 +237,7 @@ export const imageViewerSlice = createSlice({
             annotation,
             [] //FIXME this should be state.categories
           );
-          // state.categories = categories; //FIXME, uncomment
+          state.categories = categories; //FIXME, uncomment
           return annotation_out;
         }
       );
@@ -244,6 +283,28 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ brightness: number }>
     ) {
       state.brightness = action.payload.brightness;
+    },
+    setCategories(
+      state: ImageViewer,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      state.categories = action.payload.categories;
+    },
+    setCategoryVisibility(
+      state: ImageViewer,
+      action: PayloadAction<{ category: Category; visible: boolean }>
+    ) {
+      const category = _.find(state.categories, (category) => {
+        return category.id === action.payload.category.id;
+      });
+      if (!category) return;
+      category.visible = action.payload.visible;
+      state.categories = [
+        ...state.categories.filter((category) => {
+          return category.id !== action.payload.category.id;
+        }),
+        category,
+      ];
     },
     setContrast(
       state: ImageViewer,
@@ -472,6 +533,7 @@ export const imageViewerSlice = createSlice({
 
 export const {
   addImages,
+  deleteCategory,
   deleteAllInstances,
   deleteImage,
   openAnnotations,
@@ -480,6 +542,8 @@ export const {
   setAnnotated,
   setBoundingClientRect,
   setBrightness,
+  setCategories,
+  setCategoryVisibility,
   setChannels,
   setContrast,
   setCurrentIndex,

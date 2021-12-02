@@ -68,13 +68,14 @@ import {
 import { Image } from "../../../../types/Image";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
 
 export const CategoriesList = (props: any) => {
   const { closeDialog } = props;
 
   const classes = useStyles();
 
-  const createdCategories = useSelector(createdCategoriesSelector);
+  const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 

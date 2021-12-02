@@ -4,18 +4,15 @@ import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
-import { Project } from "../../types/Project";
 
 export const activeSerializedAnnotationsSelector = ({
   imageViewer,
-  project,
 }: {
   imageViewer: ImageViewer;
-  project: Project;
 }): SerializedFileType | undefined => {
-  if (!project.images.length) return undefined;
+  if (!imageViewer.images.length) return undefined;
 
-  const image = project.images.find((image: Image) => {
+  const image = imageViewer.images.find((image: Image) => {
     return image.id === imageViewer.activeImageId;
   });
 
@@ -35,11 +32,11 @@ export const activeSerializedAnnotationsSelector = ({
 
   const serializedAnnotations: Array<SerializedAnnotationType> =
     image.annotations.map((annotation: AnnotationType) => {
-      const index = project.categories.findIndex((category: Category) => {
+      const index = imageViewer.categories.findIndex((category: Category) => {
         return category.id === annotation.categoryId;
       });
 
-      const category = project.categories[index];
+      const category = imageViewer.categories[index];
 
       return {
         annotationBoundingBoxHeight: annotation.boundingBox[3],

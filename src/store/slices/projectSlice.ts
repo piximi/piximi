@@ -70,12 +70,12 @@ export const projectSlice = createSlice({
       state.categories = filter(state.categories, (category: Category) => {
         return category.id !== action.payload.id;
       });
-      // state.images = state.images.map((image: Image) => {
-      //   if (image.categoryId === action.payload.id) {
-      //     image.categoryId = "00000000-0000-0000-0000-000000000000";
-      //   }
-      //   return image;
-      // });
+      state.images = state.images.map((image: Image) => {
+        if (image.categoryId === action.payload.id) {
+          image.categoryId = "00000000-0000-0000-0000-000000000000";
+        }
+        return image;
+      });
     },
     deleteImages(
       state: Project,

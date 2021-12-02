@@ -64,7 +64,9 @@ export const CategoryMenu = ({
           })
         );
 
-        dispatch(projectSlice.actions.deleteCategory({ id: category.id }));
+        dispatch(
+          imageViewerSlice.actions.deleteCategory({ category: category })
+        );
       });
     }
     onCloseCategoryMenu(event);

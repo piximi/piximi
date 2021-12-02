@@ -12,13 +12,14 @@ import { imageWidthSelector } from "../../../../../../store/selectors/imageWidth
 import { imageHeightSelector } from "../../../../../../store/selectors/imageHeightSelector";
 import { toRGBA } from "../../../../../../annotator/image";
 import { colorOverlayROI } from "../../../../../../image/imageHelper";
+import { annotatorCategoriesSelector } from "../../../../../../store/selectors/annotatorCategoriesSelector";
 
 type AnnotationProps = {
   annotation: AnnotationType;
 };
 
 export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(annotatorCategoriesSelector);
   const stageScale = useSelector(stageScaleSelector);
 
   const imageWidth = useSelector(imageWidthSelector);

@@ -7,7 +7,7 @@ import {
   categoriesSelector,
   selectedCategorySelector,
 } from "../../../../../store/selectors";
-import { projectSlice } from "../../../../../store/slices";
+import { imageViewerSlice, projectSlice } from "../../../../../store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (
@@ -28,8 +28,8 @@ export const HideOtherCategoriesMenuItem = ({
     for (let cat of categories) {
       if (category.id != cat.id) {
         dispatch(
-          projectSlice.actions.updateCategoryVisibility({
-            id: cat.id,
+          imageViewerSlice.actions.setCategoryVisibility({
+            category: cat,
             visible: false,
           })
         );

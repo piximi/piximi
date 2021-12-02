@@ -1,10 +1,10 @@
-import { Project } from "../../types/Project";
+import { ImageViewer } from "../../types/ImageViewer";
 export const visibleCategoriesSelector = ({
-  project,
+  imageViewer,
 }: {
-  project: Project;
+  imageViewer: ImageViewer;
 }) => {
-  return project.categories
+  return imageViewer.categories
     .filter((category) => category.visible)
     .map((category) => {
       return category.id;
