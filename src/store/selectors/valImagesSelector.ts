@@ -8,6 +8,6 @@ export const valImagesSelector = ({
   project: Project;
 }): Array<Image> => {
   return project.images.filter((image: Image) => {
-    return image.partition === Partition.Training;
+    return image.partition === Partition.Validation;
   });
 };
