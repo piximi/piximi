@@ -5,7 +5,7 @@ import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import { Category } from "../../../../types/Category";
 import { useDispatch } from "react-redux";
-import { imageViewerSlice, projectSlice } from "../../../../store/slices";
+import { imageViewerSlice } from "../../../../store/slices";
 
 type CategoryListItemCheckboxProps = {
   category: Category;

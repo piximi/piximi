@@ -68,7 +68,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 import {
   imageViewerSlice,
-  projectSlice,
   setSelectedAnnotations,
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";

@@ -20,7 +20,6 @@ import { imageHeightSelector } from "../../../../../store/selectors/imageHeightS
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
 import {
   imageViewerSlice,
-  projectSlice,
   setSelectedAnnotations,
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";

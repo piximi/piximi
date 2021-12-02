@@ -7,7 +7,7 @@ import {
   categoriesSelector,
   selectedCategorySelector,
 } from "../../../../../store/selectors";
-import { imageViewerSlice, projectSlice } from "../../../../../store/slices";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (

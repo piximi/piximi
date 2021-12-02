@@ -4,10 +4,7 @@ import * as ReactKonva from "react-konva";
 import React, { useEffect, useState } from "react";
 import { AnnotationType } from "../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
-import {
-  categoriesSelector,
-  stageScaleSelector,
-} from "../../../../../../store/selectors";
+import { stageScaleSelector } from "../../../../../../store/selectors";
 import { imageWidthSelector } from "../../../../../../store/selectors/imageWidthSelector";
 import { imageHeightSelector } from "../../../../../../store/selectors/imageHeightSelector";
 import { toRGBA } from "../../../../../../annotator/image";

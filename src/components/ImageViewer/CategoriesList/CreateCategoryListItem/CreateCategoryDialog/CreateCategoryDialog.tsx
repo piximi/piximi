@@ -16,7 +16,7 @@ import { Category } from "../../../../../types/Category";
 import { categoriesSelector } from "../../../../../store/selectors";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
-import { imageViewerSlice, projectSlice } from "../../../../../store/slices";
+import { imageViewerSlice } from "../../../../../store/slices";
 
 const COLORS = [
   "#f44336",

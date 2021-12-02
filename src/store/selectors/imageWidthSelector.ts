@@ -1,6 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { Image } from "../../types/Image";
-import { Project } from "../../types/Project";
 
 export const imageWidthSelector = ({
   imageViewer,

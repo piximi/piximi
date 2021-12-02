@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { Category } from "../../../../types/Category";
 import {
   categoryCountsSelector,
-  createdCategoriesSelector,
   imageSelector,
   selectedCategorySelector,
   selectedImagesSelector,

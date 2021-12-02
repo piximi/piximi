@@ -2,7 +2,6 @@ import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../../types/ShapeType";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";

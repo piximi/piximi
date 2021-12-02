@@ -4,7 +4,7 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice, projectSlice } from "../../../../store/slices";
+import { imageViewerSlice } from "../../../../store/slices";
 import { useTranslation } from "../../../../hooks/useTranslation";
 import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import {
@@ -16,7 +16,6 @@ import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { categoriesSelector } from "../../../../store/selectors";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { Divider } from "@mui/material";
 import { Image } from "../../../../types/Image";
 

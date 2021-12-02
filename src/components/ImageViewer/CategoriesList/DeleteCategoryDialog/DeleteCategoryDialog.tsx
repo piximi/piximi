@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "../../../../types/AnnotationType";
-import { imageViewerSlice, projectSlice } from "../../../../store/slices";
+import { imageViewerSlice } from "../../../../store/slices";
 import {
   imageInstancesSelector,
   selectedCategorySelector,

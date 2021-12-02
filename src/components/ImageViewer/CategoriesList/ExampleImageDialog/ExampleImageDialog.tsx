@@ -20,7 +20,6 @@ import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
 import {
   imageViewerSlice,
-  projectSlice,
   setActiveImage,
   setChannels,
   setImages,
@@ -28,7 +27,6 @@ import {
   setSelectedAnnotations,
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
-import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import { Partition } from "../../../../types/Partition";
 
 type ExampleImageDialogProps = {
