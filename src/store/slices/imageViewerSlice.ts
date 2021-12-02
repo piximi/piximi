@@ -235,9 +235,9 @@ export const imageViewerSlice = createSlice({
         (annotation: SerializedAnnotationType): AnnotationType => {
           const { annotation_out, categories } = importSerializedAnnotations(
             annotation,
-            [] //FIXME this should be state.categories
+            state.categories
           );
-          state.categories = categories; //FIXME, uncomment
+          state.categories = categories;
           return annotation_out;
         }
       );
@@ -360,6 +360,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ images: Array<Image> }>
     ) {
       state.images = action.payload.images;
+      if (!action.payload.images.length) return;
       state.activeImageId = action.payload.images[0].id;
     },
     setChannels(
