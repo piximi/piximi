@@ -1,21 +1,10 @@
-import "jest";
 import { Node } from "ngraph.graph";
-import { Image as ImageType } from "../types/Image";
 import { Image } from "image-js";
 import { fromIdxToCoord, makeGraph } from "./GraphHelper";
 import { aStar } from "ngraph.path";
 
 test("foo", async () => {
   // fetch an example image
-
-  const image: ImageType = {
-    id: "",
-    annotations: [],
-    name: "foo.png",
-    shape: { width: 512, channels: 3, height: 512, frames: 1, planes: 1 },
-    src: "https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg",
-  };
-
   const src =
     "data:image/gif;base64,R0lGODlhCwALAIAAAAAA3pn/ZiH5BAEAAAEALAAAAAALAAsAAAIUhA+hkcuO4lmNVindo7qyrIXiGBYAOw==";
 

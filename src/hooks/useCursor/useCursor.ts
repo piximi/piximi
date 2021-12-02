@@ -27,5 +27,5 @@ export const useCursor = () => {
 
         break;
     }
-  }, [toolType]);
+  }, [dispatch, toolType]);
 };

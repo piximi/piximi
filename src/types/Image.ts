@@ -1,13 +1,13 @@
 import { Shape } from "./Shape";
-import { AnnotationType } from "./AnnotationType";
+import { Instance } from "./Instance";
+import { Partition } from "./Partition";
 
 export type Image = {
   categoryId?: string;
   id: string;
   name: string;
   src: string;
-  originalSrc: string;
   shape: Shape;
-  annotations: Array<AnnotationType>;
-  partition: number;
+  instances: Array<Instance>;
+  partition: Partition;
 };

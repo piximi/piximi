@@ -1,5 +1,6 @@
 import { Project } from "../../types/Project";
 import { Image } from "../../types/Image";
+import { Partition } from "../../types/Partition";
 
 export const valImagesSelector = ({
   project,
@@ -7,6 +8,6 @@ export const valImagesSelector = ({
   project: Project;
 }): Array<Image> => {
   return project.images.filter((image: Image) => {
-    return image.partition === 1;
+    return image.partition === Partition.Validation;
   });
 };

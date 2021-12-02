@@ -7,8 +7,7 @@ import { filter, findIndex } from "underscore";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
-import { ImageViewer } from "../../types/ImageViewer";
-import { AnnotationType } from "../../types/AnnotationType";
+import { Partition } from "../../types/Partition";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
@@ -24,7 +23,7 @@ const dummyImage: Image = {
     planes: 1,
     frames: 1,
   },
-  partition: 2,
+  partition: Partition.Inference,
 };
 
 const initialState: Project = {
@@ -132,7 +131,7 @@ export const projectSlice = createSlice({
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
-          annotations: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          annotations: serializedImage.annotations, //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
           shape: {
@@ -155,7 +154,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
-      state.categories = action.payload.categories;
+      state.categories = [...state.categories, ...action.payload.categories];
     },
     setImages(state: Project, action: PayloadAction<{ images: Array<Image> }>) {
       state.images = action.payload.images;
@@ -217,8 +216,10 @@ export const projectSlice = createSlice({
           if (
             action.payload.categoryId === "00000000-0000-0000-0000-000000000000"
           ) {
-            //If assigned category is unknown, then this image is moved to test set
-            state.images[index].partition = 2;
+            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
+            state.images[index].partition = Partition.Inference;
+          } else {
+            state.images[index].partition = Partition.Training;
           }
         }
       });
@@ -238,7 +239,7 @@ export const projectSlice = createSlice({
     },
     updateImagesPartition(
       state: Project,
-      action: PayloadAction<{ ids: Array<string>; partition: number }>
+      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
         const index = findIndex(state.images, (image: Image) => {

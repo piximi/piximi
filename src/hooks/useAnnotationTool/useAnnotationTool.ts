@@ -97,7 +97,13 @@ export const useAnnotationTool = () => {
 
         return;
     }
-  }, [operation, image]);
+  }, [
+    operation,
+    image,
+    penSelectionBrushSize,
+    stageScale,
+    quickSelectionBrushSize,
+  ]);
 
   return [operator];
 };

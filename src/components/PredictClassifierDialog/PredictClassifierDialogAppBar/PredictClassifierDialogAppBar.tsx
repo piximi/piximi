@@ -5,11 +5,7 @@ import {
   ArrowBack,
   PlayCircleOutline,
   ReplayRounded,
-  Stop,
 } from "@mui/icons-material";
-import { compiledSelector } from "../../../store/selectors";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../store/slices";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,10 +31,6 @@ export const PredictClassifierDialogAppBar = (props: any) => {
   const { closeDialog, fit } = props;
 
   const classes = useStyles({});
-
-  const dispatch = useDispatch();
-
-  const compiled = useSelector(compiledSelector);
 
   return (
     <AppBar className={classes.appBar}>

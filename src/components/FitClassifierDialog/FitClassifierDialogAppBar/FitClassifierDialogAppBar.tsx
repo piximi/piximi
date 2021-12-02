@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const FitClassifierDialogAppBar = (props: any) => {
-  const { closeDialog, fit } = props;
+  const { closeDialog, fit, disableFitting } = props;
 
   const classes = useStyles({});
 
@@ -62,10 +62,24 @@ export const FitClassifierDialogAppBar = (props: any) => {
         </Tooltip>
         <div className={classes.grow} />
 
-        <Tooltip title="Fit the model" placement="bottom">
-          <IconButton className={classes.button} onClick={fit} href={""}>
-            <PlayCircleOutline />
-          </IconButton>
+        <Tooltip
+          title={
+            disableFitting
+              ? "Plaese label images before fitting a model."
+              : "Fit the model"
+          }
+          placement="bottom"
+        >
+          <span>
+            <IconButton
+              className={classes.button}
+              onClick={fit}
+              href={""}
+              disabled={disableFitting}
+            >
+              <PlayCircleOutline />
+            </IconButton>
+          </span>
         </Tooltip>
 
         <Tooltip title="Stop fitting the model" placement="bottom">
