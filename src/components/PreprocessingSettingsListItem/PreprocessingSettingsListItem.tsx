@@ -75,6 +75,7 @@ export const PreprocessingSettingsListItem = ({
   return (
     <>
       <ListItem
+        disabled
         button
         onClick={onPreprocessingListClick}
         style={{ padding: "12px 0px" }}
