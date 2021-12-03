@@ -45,7 +45,6 @@ const initialState: Classifier = {
   },
   saving: false,
   trainingPercentage: 0.75,
-  testPercentage: 0.25,
 };
 
 export const classifierSlice = createSlice({
@@ -226,14 +225,6 @@ export const classifierSlice = createSlice({
 
       state.trainingPercentage = trainingPercentage;
     },
-    updateTestPercentage(
-      state,
-      action: PayloadAction<{ testPercentage: number }>
-    ) {
-      const { testPercentage } = action.payload;
-
-      state.testPercentage = testPercentage;
-    },
   },
 });
 
@@ -253,5 +244,4 @@ export const {
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,
-  updateTestPercentage,
 } = classifierSlice.actions;

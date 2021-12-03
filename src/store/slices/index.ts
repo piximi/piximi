@@ -24,7 +24,6 @@ export {
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,
-  updateTestPercentage,
 } from "./classifierSlice";
 
 export {
