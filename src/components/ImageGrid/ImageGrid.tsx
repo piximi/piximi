@@ -17,8 +17,14 @@ import {
   ImageListItemBar,
 } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
+import { DropTargetMonitor, useDrop } from "react-dnd";
+import { NativeTypes } from "react-dnd-html5-backend";
 
-export const ImageGrid = () => {
+type ImageGridProps = {
+  onDrop: (item: { files: any[] }) => void;
+};
+
+export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const dispatch = useDispatch();
 
   const images = useSelector(visibleImagesSelector);
@@ -27,6 +33,22 @@ export const ImageGrid = () => {
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
   const max_images = 1000; //number of images from the project that we'll show
+
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: [NativeTypes.FILE],
+      drop(item: { files: any[] }) {
+        if (onDrop) {
+          onDrop(item);
+        }
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    []
+  );
 
   const onSelectImage = (image: Image) => {
     if (selectedImages.includes(image.id)) {
@@ -64,43 +86,51 @@ export const ImageGrid = () => {
   };
 
   return (
-    <main className={classes.main}>
-      <Container className={classes.container} maxWidth={false}>
-        <ImageList
-          className={classes.gridList}
-          cols={Math.floor(6 / scaleFactor)}
-          rowHeight={"auto"}
-        >
-          {images.slice(0, max_images).map((image: Image) => (
-            <ImageListItem
-              key={image.id}
-              onClick={() => onSelectImage(image)}
-              style={getSize(scaleFactor)}
-              className={getSelectionStatus(image.id)}
-            >
-              <img alt="" src={image.src} className={classes.imageTile} />
-              <ImageListItemBar
-                position="top"
-                sx={{
-                  background: "transparent",
-                }}
-                actionIcon={
-                  <LabelIcon
-                    sx={{
-                      color: getColor(image),
-                      marginLeft: "8px",
-                      marginTop: "8px",
-                    }}
-                  />
-                }
-                actionPosition="left"
-              />
-            </ImageListItem>
-          ))}
-        </ImageList>
+    <main
+      ref={drop}
+      className={classes.main}
+      style={{
+        border: isOver ? "5px solid blue" : "",
+      }}
+    >
+      <div>
+        <Container className={classes.container} maxWidth={false}>
+          <ImageList
+            className={classes.gridList}
+            cols={Math.floor(6 / scaleFactor)}
+            rowHeight={"auto"}
+          >
+            {images.slice(0, max_images).map((image: Image) => (
+              <ImageListItem
+                key={image.id}
+                onClick={() => onSelectImage(image)}
+                style={getSize(scaleFactor)}
+                className={getSelectionStatus(image.id)}
+              >
+                <img alt="" src={image.src} className={classes.imageTile} />
+                <ImageListItemBar
+                  position="top"
+                  sx={{
+                    background: "transparent",
+                  }}
+                  actionIcon={
+                    <LabelIcon
+                      sx={{
+                        color: getColor(image),
+                        marginLeft: "8px",
+                        marginTop: "8px",
+                      }}
+                    />
+                  }
+                  actionPosition="left"
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
 
-        <ImageGridAppBar />
-      </Container>
+          <ImageGridAppBar />
+        </Container>
+      </div>
     </main>
   );
 };
