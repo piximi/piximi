@@ -69,6 +69,7 @@ import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
 import { Partition } from "../../../../types/Partition";
+import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 
 export const CategoriesList = (props: any) => {
   const { closeDialog } = props;
@@ -115,6 +116,12 @@ export const CategoriesList = (props: any) => {
     open: openDeleteAllAnnotationsDialog,
   } = useDialog();
 
+  const {
+    onClose: onCloseExitAnnotatorDialog,
+    onOpen: onOpenExitAnnotatorDialog,
+    open: openExitAnnotatorDialog,
+  } = useDialog();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
@@ -147,6 +154,7 @@ export const CategoriesList = (props: any) => {
       })
     );
 
+    onCloseExitAnnotatorDialog();
     closeDialog();
   };
 
@@ -258,11 +266,11 @@ export const CategoriesList = (props: any) => {
 
       <AppBar className={classes.appBar} color="default">
         <Toolbar>
-          <Tooltip title="Back to project" placement="bottom">
+          <Tooltip title="Save and return to project" placement="bottom">
             <IconButton
               edge="start"
-              onClick={onCloseDialog}
-              aria-label="Close"
+              onClick={onOpenExitAnnotatorDialog}
+              aria-label="Exit Annotator"
               href={""}
             >
               <ArrowBack />
@@ -273,6 +281,12 @@ export const CategoriesList = (props: any) => {
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <ExitAnnotatorDialog
+        onConfirm={onCloseDialog}
+        onClose={onCloseExitAnnotatorDialog}
+        open={openExitAnnotatorDialog}
+      />
 
       <Divider />
 
