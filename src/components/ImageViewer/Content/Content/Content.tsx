@@ -16,7 +16,7 @@ export const Content = ({ onDrop }: ContentProps) => {
 
   useBoundingClientRect(ref);
 
-  const [, drop] = useDrop(
+  const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [NativeTypes.FILE],
       drop(item: { files: any[] }) {
@@ -44,7 +44,13 @@ export const Content = ({ onDrop }: ContentProps) => {
 
       {/*<Divider />*/}
 
-      <main className={classes.content} ref={ref}>
+      <main
+        className={classes.content}
+        ref={ref}
+        style={{
+          border: isOver ? "5px solid blue" : "",
+        }}
+      >
         <div ref={drop}>
           <Stage />
         </div>
