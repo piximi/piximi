@@ -68,6 +68,7 @@ import { Image } from "../../../../types/Image";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
+import { Partition } from "../../../../types/Partition";
 
 export const CategoriesList = (props: any) => {
   const { closeDialog } = props;
@@ -127,11 +128,25 @@ export const CategoriesList = (props: any) => {
     const unselectedImages = projectImages.filter((image: Image) => {
       return !selectedImages.includes(image.id);
     });
+
+    //We update partition to TRAINING for the annotated images
+    const updatedAnnotatorImages = annotatorImages.map((image: Image) => {
+      let partition: Partition;
+      if (image.annotations.length > 0) {
+        //only update if image actually has annotations
+        partition = Partition.Training;
+      } else {
+        partition = Partition.Inference;
+      }
+      return { ...image, partition: partition };
+    });
+
     dispatch(
       projectSlice.actions.setImages({
-        images: [...annotatorImages, ...unselectedImages],
+        images: [...updatedAnnotatorImages, ...unselectedImages],
       })
     );
+
     closeDialog();
   };
 
