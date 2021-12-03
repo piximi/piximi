@@ -34,7 +34,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
 
   const max_images = 1000; //number of images from the project that we'll show
 
-  const [, drop] = useDrop(
+  const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [NativeTypes.FILE],
       drop(item: { files: any[] }) {
@@ -86,7 +86,13 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   };
 
   return (
-    <main ref={drop} className={classes.main}>
+    <main
+      ref={drop}
+      className={classes.main}
+      style={{
+        border: isOver ? "5px solid blue" : "",
+      }}
+    >
       <div>
         <Container className={classes.container} maxWidth={false}>
           <ImageList
