@@ -1,5 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
 
 export const scaledImageHeightSelector = ({
   imageViewer,
@@ -8,7 +8,7 @@ export const scaledImageHeightSelector = ({
 }) => {
   if (!imageViewer.images.length) return;
 
-  const image = imageViewer.images.filter((image: ImageViewerImage) => {
+  const image = imageViewer.images.filter((image: Image) => {
     return image.id === imageViewer.activeImageId;
   })[0];
 

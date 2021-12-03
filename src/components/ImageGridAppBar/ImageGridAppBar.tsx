@@ -1,12 +1,17 @@
 import React from "react";
 import { useStyles } from "./ImageGridAppBar.css";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
-import { applicationSlice } from "../../store/slices";
+import {
+  applicationSlice,
+  imageViewerSlice,
+  setActiveImage,
+  setSelectedAnnotations,
+} from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,6 +29,8 @@ import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageViewer } from "../ImageViewer";
+import { Image } from "../../types/Image";
+import { Partition } from "../../types/Partition";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -48,6 +55,44 @@ export const ImageGridAppBar = () => {
   };
 
   const onOpenAnnotatorDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+    const selected = selectedImages.map((id: string, idx: number) => {
+      const projectImage = images.find((image: Image) => {
+        return image.id === id;
+      });
+
+      const annotatorImage: Image = {
+        id: projectImage!.id,
+        annotations: projectImage!.annotations,
+        name: projectImage!.name,
+        partition: Partition.Inference,
+        shape: projectImage!.shape,
+        originalSrc: projectImage!.src,
+        src: projectImage!.src,
+      };
+
+      if (idx === 0) {
+        batch(() => {
+          dispatch(
+            setActiveImage({
+              image: annotatorImage.id,
+            })
+          );
+          dispatch(
+            setSelectedAnnotations({
+              selectedAnnotations: [],
+              selectedAnnotation: undefined,
+            })
+          );
+        });
+      }
+
+      return annotatorImage;
+    });
+
+    if (!selected) return;
+
+    dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+
     setOpenAnnotatorDialog(true);
   };
 

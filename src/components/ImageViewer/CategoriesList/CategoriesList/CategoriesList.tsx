@@ -5,9 +5,9 @@ import React, { useState } from "react";
 import { Category } from "../../../../types/Category";
 import {
   categoryCountsSelector,
-  createdCategoriesSelector,
   imageSelector,
   selectedCategorySelector,
+  selectedImagesSelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -31,6 +31,7 @@ import {
   DialogTitle,
   Divider,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import List from "@mui/material/List";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -45,12 +46,10 @@ import Box from "@mui/material/Box";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";
-import HelpIcon from "@mui/icons-material/Help";
 import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
@@ -60,12 +59,24 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import {
+  imageViewerSlice,
+  projectSlice,
+  setActiveImage,
+} from "../../../../store/slices";
+import { Image } from "../../../../types/Image";
+import { ArrowBack } from "@mui/icons-material";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
+import { Partition } from "../../../../types/Partition";
+import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 
-export const CategoriesList = () => {
+export const CategoriesList = (props: any) => {
+  const { closeDialog } = props;
+
   const classes = useStyles();
 
-  const createdCategories = useSelector(createdCategoriesSelector);
+  const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 
@@ -73,7 +84,10 @@ export const CategoriesList = () => {
 
   const categoryCounts = useSelector(categoryCountsSelector);
 
-  const images = useSelector(imagesSelector);
+  const annotatorImages = useSelector(annotatorImagesSelector);
+  const projectImages = useSelector(imagesSelector);
+  const selectedImages = useSelector(selectedImagesSelector);
+
   const currentImage = useSelector(imageSelector);
 
   const dispatch = useDispatch();
@@ -102,11 +116,47 @@ export const CategoriesList = () => {
     open: openDeleteAllAnnotationsDialog,
   } = useDialog();
 
+  const {
+    onClose: onCloseExitAnnotatorDialog,
+    onOpen: onOpenExitAnnotatorDialog,
+    open: openExitAnnotatorDialog,
+  } = useDialog();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
   );
+
+  /*
+  When going back to project, replace images with those that have updated annotations
+   */
+  const onCloseDialog = () => {
+    const unselectedImages = projectImages.filter((image: Image) => {
+      return !selectedImages.includes(image.id);
+    });
+
+    //We update partition to TRAINING for the annotated images
+    const updatedAnnotatorImages = annotatorImages.map((image: Image) => {
+      let partition: Partition;
+      if (image.annotations.length > 0) {
+        //only update if image actually has annotations
+        partition = Partition.Training;
+      } else {
+        partition = Partition.Inference;
+      }
+      return { ...image, partition: partition };
+    });
+
+    dispatch(
+      projectSlice.actions.setImages({
+        images: [...updatedAnnotatorImages, ...unselectedImages],
+      })
+    );
+
+    onCloseExitAnnotatorDialog();
+    closeDialog();
+  };
 
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
@@ -137,7 +187,7 @@ export const CategoriesList = () => {
 
   const onImageMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    image: ImageViewerImage
+    image: Image
   ) => {
     onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
@@ -148,8 +198,8 @@ export const CategoriesList = () => {
   };
 
   const onClearAllAnnotations = () => {
-    const existingAnnotations = images
-      .map((image: ImageViewerImage) => {
+    const existingAnnotations = annotatorImages
+      .map((image: Image) => {
         return [...image.annotations];
       })
       .flat();
@@ -182,7 +232,7 @@ export const CategoriesList = () => {
 
   const onImageItemClick = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: ImageViewerImage
+    image: Image
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
@@ -216,11 +266,27 @@ export const CategoriesList = () => {
 
       <AppBar className={classes.appBar} color="default">
         <Toolbar>
+          <Tooltip title="Save and return to project" placement="bottom">
+            <IconButton
+              edge="start"
+              onClick={onOpenExitAnnotatorDialog}
+              aria-label="Exit Annotator"
+              href={""}
+            >
+              <ArrowBack />
+            </IconButton>
+          </Tooltip>
           <Typography variant="h6" color="inherit">
             Piximi Annotator
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <ExitAnnotatorDialog
+        onConfirm={onCloseDialog}
+        onClose={onCloseExitAnnotatorDialog}
+        open={openExitAnnotatorDialog}
+      />
 
       <Divider />
 
@@ -232,7 +298,7 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Images")}>
-        {images.map((image: ImageViewerImage) => {
+        {annotatorImages.map((image: Image) => {
           return (
             <div key={image.id}>
               <ListItem
@@ -246,7 +312,7 @@ export const CategoriesList = () => {
                 <ListItemAvatar>
                   <Avatar
                     alt={image.name}
-                    src={image.avatar}
+                    src={image.originalSrc}
                     variant={"square"}
                   />
                 </ListItemAvatar>

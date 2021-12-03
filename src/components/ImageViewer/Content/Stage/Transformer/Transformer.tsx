@@ -22,6 +22,7 @@ import {
   imageViewerSlice,
   setSelectedAnnotations,
 } from "../../../../../store/slices";
+import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 
 type box = {
   x: number;
@@ -53,6 +54,8 @@ export const Transformer = ({
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
 
   const transformerRef = useRef<Konva.Transformer | null>(null);
+
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const dispatch = useDispatch();
 
@@ -318,9 +321,12 @@ export const Transformer = ({
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
+    if (!activeImageId) return;
+
     dispatch(
       imageViewerSlice.actions.setImageInstances({
         instances: [...unselectedAnnotations, ...selectedAnnotations],
+        imageId: activeImageId,
       })
     );
 

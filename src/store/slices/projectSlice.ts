@@ -4,8 +4,6 @@ import { Category } from "../../types/Category";
 import { v4 } from "uuid";
 import { Image } from "../../types/Image";
 import { filter, findIndex } from "underscore";
-import { BoundingBox } from "../../types/BoundingBox";
-import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
@@ -14,8 +12,9 @@ import { Partition } from "../../types/Partition";
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
   categoryId: "00000000-0000-0000-0000-000000000000",
-  instances: [],
+  annotations: [],
   name: "nuclei",
+  originalSrc: nuclei,
   src: nuclei,
   shape: {
     height: 256,
@@ -61,28 +60,6 @@ export const projectSlice = createSlice({
     createImage(state: Project, action: PayloadAction<{ image: Image }>) {
       state.images.push(action.payload.image);
     },
-    createImageInstance(
-      state: Project,
-      action: PayloadAction<{
-        boundingBox: BoundingBox;
-        categoryId: string;
-        id: string;
-        mask: string;
-      }>
-    ) {
-      const instance: Instance = {
-        boundingBox: action.payload.boundingBox,
-        categoryId: action.payload.categoryId,
-        mask: action.payload.mask,
-      };
-      const index = findIndex(state.images, (image: Image) => {
-        return image.id === action.payload.id;
-      });
-      state.images[index].instances = [
-        ...state.images[index].instances,
-        instance,
-      ];
-    },
     createProject(state: Project, action: PayloadAction<{ project: Project }>) {
       state.categories = action.payload.project.categories;
       state.name = action.payload.project.name;
@@ -117,7 +94,7 @@ export const projectSlice = createSlice({
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
-          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
           shape: {
@@ -127,6 +104,7 @@ export const projectSlice = createSlice({
             planes: serializedImage.imagePlanes,
             frames: serializedImage.imageFrames,
           },
+          originalSrc: serializedImage.imageData,
           src: serializedImage.imageData,
         };
 
@@ -153,7 +131,7 @@ export const projectSlice = createSlice({
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
-          instances: [], //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          annotations: serializedImage.annotations, //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
           shape: {
@@ -163,6 +141,7 @@ export const projectSlice = createSlice({
             planes: serializedImage.imagePlanes,
             frames: serializedImage.imageFrames,
           },
+          originalSrc: serializedImage.imageData,
           src: serializedImage.imageData,
         };
 
@@ -286,7 +265,6 @@ export const projectSlice = createSlice({
 export const {
   createCategory,
   createImage,
-  createImageInstance,
   createProject,
   deleteCategory,
   updateCategory,

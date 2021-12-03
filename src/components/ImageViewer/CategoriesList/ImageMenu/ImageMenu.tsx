@@ -16,8 +16,8 @@ import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { categoriesSelector } from "../../../../store/selectors";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { Divider } from "@mui/material";
+import { Image } from "../../../../types/Image";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -61,7 +61,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageViewerImage) => {
+    const activeImage = images.find((image: Image) => {
       return image.id === currentImageId;
     });
 
@@ -84,7 +84,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageViewerImage) => {
+    const activeImage = images.find((image: Image) => {
       return image.id === currentImageId;
     });
 
@@ -103,7 +103,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageViewerImage) => {
+    const activeImage = images.find((image: Image) => {
       return image.id === currentImageId;
     });
 
@@ -126,7 +126,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageViewerImage) => {
+    const activeImage = images.find((image: Image) => {
       return image.id === currentImageId;
     });
 
@@ -147,7 +147,7 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageViewerImage) => {
+    const activeImage = images.find((image: Image) => {
       return image.id === currentImageId;
     });
 

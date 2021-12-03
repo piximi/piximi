@@ -1,4 +1,4 @@
-import { Instance } from "./Instance";
+import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 
 export type SerializedImageType = {
@@ -13,5 +13,5 @@ export type SerializedImageType = {
   imagePlanes: number;
   imageWidth: number;
   imagePartition: Partition;
-  annotations: Array<Instance>;
+  annotations: Array<AnnotationType>;
 };

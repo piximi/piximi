@@ -4,9 +4,9 @@ import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";
 import { isoLines } from "marchingsquares";
 import { Category } from "../types/Category";
-import { ImageViewerImage } from "../types/ImageViewerImage";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { saveAs } from "file-saver";
+import { Image as ImageType } from "../types/Image";
 
 export const connectPoints = (
   coordinates: Array<Array<number>>,
@@ -277,11 +277,11 @@ const hexToRgb = (hex: string) => {
 };
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
-  images: Array<ImageViewerImage>,
+  images: Array<ImageType>,
   categories: Array<Category>,
   zip: any
 ): any => {
-  images.forEach((current: ImageViewerImage) => {
+  images.forEach((current: ImageType) => {
     current.annotations.forEach((annotation: AnnotationType) => {
       const fullLabelImage = new ImageJS.Image(
         current.shape.width,
@@ -341,11 +341,11 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
-  images: Array<ImageViewerImage>,
+  images: Array<ImageType>,
   categories: Array<Category>,
   zip: any
 ): any => {
-  images.forEach((current: ImageViewerImage) => {
+  images.forEach((current: ImageType) => {
     const fullLabelImage = new ImageJS.Image(
       current.shape.width,
       current.shape.height,
@@ -401,14 +401,14 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabelMatrix = (
-  images: Array<ImageViewerImage>,
+  images: Array<ImageType>,
   categories: Array<Category>,
   zip: any,
   random: boolean = false,
   binary: boolean = false
 ): Array<Promise<unknown>> => {
   return images
-    .map((current: ImageViewerImage) => {
+    .map((current: ImageType) => {
       return categories.map((category: Category) => {
         return new Promise((resolve, reject) => {
           const fullLabelImage = new ImageJS.Image(

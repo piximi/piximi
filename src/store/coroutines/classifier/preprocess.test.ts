@@ -42,8 +42,9 @@ const images: Array<Image> = [
   {
     categoryId: "00000000-0000-0000-0000-00000000001",
     id: "00000000-0000-0000-0001-00000000000",
-    instances: [],
+    annotations: [],
     name: "",
+    originalSrc: "https://picsum.photos/seed/piximi/224",
     src: "https://picsum.photos/seed/piximi/224",
     partition: Partition.Training,
     shape: inputShape,

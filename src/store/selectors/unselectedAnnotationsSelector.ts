@@ -1,6 +1,6 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
-import { ImageViewerImage } from "../../types/ImageViewerImage";
+import { Image } from "../../types/Image";
 
 export const unselectedAnnotationsSelector = ({
   imageViewer,
@@ -9,7 +9,7 @@ export const unselectedAnnotationsSelector = ({
 }): Array<AnnotationType> => {
   if (!imageViewer.images.length) return [];
 
-  const image = imageViewer.images.find((image: ImageViewerImage) => {
+  const image = imageViewer.images.find((image: Image) => {
     return image.id === imageViewer.activeImageId;
   });
 

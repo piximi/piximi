@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { CssBaseline, Dialog } from "@mui/material";
-import { ImageViewerImage } from "../../../types/ImageViewerImage";
+import { CssBaseline, Dialog, DialogContent } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
@@ -20,9 +19,11 @@ import {
   setOperation,
   setSelectedAnnotations,
 } from "../../../store/slices";
+import { Image } from "../../../types/Image";
+import { Partition } from "../../../types/Partition";
 
 type ImageViewerProps = {
-  image?: ImageViewerImage;
+  image?: Image;
   onClose: () => void;
   open: boolean;
 };
@@ -67,13 +68,11 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
                 useCanvas: true,
               });
 
-              const loaded: ImageViewerImage = {
-                avatar: image
-                  .resize({ width: 50 })
-                  .toDataURL("image/png", { useCanvas: true }),
+              const loaded: Image = {
                 id: v4(),
                 annotations: [],
                 name: file.name,
+                partition: Partition.Inference,
                 shape: shape,
                 originalSrc: imageDataURL,
                 src: imageDataURL,
@@ -112,18 +111,20 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Dialog fullScreen open={open} onClose={onClose}>
-          <div className={classes.root}>
-            <CssBaseline />
+        <Dialog disableEscapeKeyDown fullScreen open={open} onClose={onClose}>
+          <DialogContent>
+            <div className={classes.root}>
+              <CssBaseline />
 
-            <CategoriesList />
+              <CategoriesList closeDialog={onClose} />
 
-            <Content onDrop={onDrop} />
+              <Content onDrop={onDrop} />
 
-            <ToolOptions />
+              <ToolOptions />
 
-            <Tools />
-          </div>
+              <Tools />
+            </div>
+          </DialogContent>
         </Dialog>
       </ThemeProvider>
     </>

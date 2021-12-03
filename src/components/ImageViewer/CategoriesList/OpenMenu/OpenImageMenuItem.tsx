@@ -2,7 +2,6 @@ import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../../types/ShapeType";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 } from "uuid";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
@@ -11,6 +10,8 @@ import {
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
+import { Image } from "../../../../types/Image";
+import { Partition } from "../../../../types/Partition";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -46,15 +47,13 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
               useCanvas: true,
             });
 
-            const loaded: ImageViewerImage = {
-              avatar: image
-                .resize({ width: 50 })
-                .toDataURL("image/png", { useCanvas: true }),
+            const loaded: Image = {
               id: v4(),
               annotations: [],
               name: file.name,
               shape: shape,
               originalSrc: imageDataURL,
+              partition: Partition.Inference,
               src: imageDataURL,
             };
 
