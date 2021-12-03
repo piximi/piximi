@@ -131,7 +131,7 @@ export const projectSlice = createSlice({
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
-          annotations: serializedImage.annotations, //TODO implement this once we have imported the Annotation Type from Annotator into Piximi classifier
+          annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
           shape: {

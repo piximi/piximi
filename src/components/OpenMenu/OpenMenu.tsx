@@ -25,7 +25,8 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
     if (!event.currentTarget.files) return;
 
     let weightsFile, jsonFile;
-    //TODO Check that that correct files were selected (one .bin, one .json -- throw error if not). Make sure to add instructions for user.
+    // TODO #131 Check that that correct files were selected (one .bin, one .json -- throw error if not). Make sure to add instructions for user.
+    // Allow user to open either a project or classifier or both.
 
     if (event.currentTarget.files[0].name.includes(".bin")) {
       weightsFile = event.currentTarget.files[0];

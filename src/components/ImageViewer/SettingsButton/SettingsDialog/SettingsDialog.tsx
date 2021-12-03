@@ -3,9 +3,9 @@ import {
   AppBar,
   Dialog,
   FormControlLabel,
-  InputLabel,
   Select,
   SelectChangeEvent,
+  FormHelperText,
 } from "@mui/material";
 import DialogContent from "@mui/material/DialogContent";
 import FormControl from "@mui/material/FormControl";
@@ -24,12 +24,14 @@ import { useStyles } from "./SettingsDialog.css";
 import Toolbar from "@mui/material/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
+import _ from "lodash";
 
 type SettingsDialogProps = {
   onClose: () => void;
   open: boolean;
 };
 
+// TODO: #133 Move (language) settings from Annotator to Classifier view
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -40,7 +42,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const onLanguageChange = (event: SelectChangeEvent) => {
     dispatch(
       imageViewerSlice.actions.setLanguage({
-        language: event.target.value as unknown as LanguageType,
+        language: event.target.value as LanguageType,
       })
     );
   };
@@ -80,27 +82,19 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
               <Grid item xs={12}>
                 <Grid container item xs={4}>
                   <FormControl color="primary" fullWidth>
-                    <InputLabel shrink id="settings-language">
-                      Language
-                    </InputLabel>
-
+                    <FormHelperText>Language</FormHelperText>
                     <Select
-                      id="settings-language-label"
-                      labelId="settings-language"
                       onChange={onLanguageChange}
-                      value={language as unknown as string} //FIXME this might not work
+                      value={language}
+                      inputProps={{ "aria-label": "Without label" }}
                     >
-                      <MenuItem value={LanguageType.English}>English</MenuItem>
-                      {/*<MenuItem value={LanguageType.Arabic}>Arabic<Arabic/MenuItem>*/}
-                      <MenuItem value={LanguageType.Farsi}>Farsi</MenuItem>
-                      {/*<MenuItem value={LanguageType.Finnish}>Finnish</MenuItem>*/}
-                      <MenuItem value={LanguageType.French}>French</MenuItem>
-                      {/*<MenuItem value={LanguageType.German}>German</MenuItem>*/}
-                      {/*<MenuItem value={LanguageType.Hindi}>Hindi</MenuItem>*/}
-                      {/*<MenuItem value={LanguageType.Hungarian}>*/}
-                      {/*  Hungarian*/}
-                      {/*</MenuItem>*/}
-                      {/*<MenuItem value={LanguageType.Spanish}>Spanish</MenuItem>*/}
+                      {_.map(LanguageType, (v, k) => {
+                        return (
+                          <MenuItem dense key={k} value={v}>
+                            {v}
+                          </MenuItem>
+                        );
+                      })}
                     </Select>
                   </FormControl>
                 </Grid>
