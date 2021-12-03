@@ -86,8 +86,8 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   };
 
   return (
-    <main className={classes.main}>
-      <div ref={drop}>
+    <main ref={drop} className={classes.main}>
+      <div>
         <Container className={classes.container} maxWidth={false}>
           <ImageList
             className={classes.gridList}
