@@ -44,7 +44,7 @@ const initialState: Classifier = {
     rescaleMinMax: { min: 0, max: 1 },
   },
   saving: false,
-  trainingPercentage: 0.5,
+  trainingPercentage: 0.75,
   testPercentage: 0.25,
 };
 
