@@ -8,9 +8,10 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import IconButton from "@mui/material/IconButton";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
 
 export const UnknownCategoryListItem = () => {
-  const id = "00000000-0000-0000-0000-000000000000";
+  const id = UNKNOWN_CATEGORY_ID;
 
   return (
     <>

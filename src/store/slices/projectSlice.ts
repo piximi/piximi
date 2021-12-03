@@ -1,6 +1,6 @@
 import { Project } from "../../types/Project";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Category } from "../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { v4 } from "uuid";
 import { Image } from "../../types/Image";
 import { filter, findIndex } from "underscore";
@@ -11,7 +11,7 @@ import { Partition } from "../../types/Partition";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
-  categoryId: "00000000-0000-0000-0000-000000000000",
+  categoryId: UNKNOWN_CATEGORY_ID,
   annotations: [],
   name: "nuclei",
   originalSrc: nuclei,
@@ -30,7 +30,7 @@ const initialState: Project = {
   categories: [
     {
       color: "#AAAAAA",
-      id: "00000000-0000-0000-0000-000000000000",
+      id: UNKNOWN_CATEGORY_ID,
       name: "Unknown",
       visible: true,
     },
@@ -71,7 +71,7 @@ export const projectSlice = createSlice({
       });
       state.images = state.images.map((image: Image) => {
         if (image.categoryId === action.payload.id) {
-          image.categoryId = "00000000-0000-0000-0000-000000000000";
+          image.categoryId = UNKNOWN_CATEGORY_ID;
         }
         return image;
       });
@@ -213,9 +213,7 @@ export const projectSlice = createSlice({
         });
         if (index >= 0) {
           state.images[index].categoryId = action.payload.categoryId;
-          if (
-            action.payload.categoryId === "00000000-0000-0000-0000-000000000000"
-          ) {
+          if (action.payload.categoryId === UNKNOWN_CATEGORY_ID) {
             //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
             state.images[index].partition = Partition.Inference;
           } else {

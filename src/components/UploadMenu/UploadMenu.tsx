@@ -15,6 +15,7 @@ import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
 import { v4 } from "uuid";
 import { Partition } from "../../types/Partition";
+import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -51,7 +52,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
             });
 
             const loaded: Image = {
-              categoryId: "00000000-0000-0000-0000-000000000000",
+              categoryId: UNKNOWN_CATEGORY_ID,
               id: v4(),
               annotations: [],
               name: file.name,

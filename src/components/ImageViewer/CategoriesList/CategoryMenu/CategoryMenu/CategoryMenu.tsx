@@ -11,6 +11,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { imagesSelector } from "../../../../../store/selectors/imagesSelector";
 import { selectedCategorySelector } from "../../../../../store/selectors";
 import { imageViewerSlice } from "../../../../../store/slices";
+import { UNKNOWN_CATEGORY_ID } from "../../../../../types/Category";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -60,7 +61,7 @@ export const CategoryMenu = ({
       batch(() => {
         dispatch(
           imageViewerSlice.actions.setSelectedCategory({
-            selectedCategory: "00000000-0000-0000-0000-000000000000",
+            selectedCategory: UNKNOWN_CATEGORY_ID,
           })
         );
 
@@ -117,7 +118,7 @@ export const CategoryMenu = ({
           <Typography variant="inherit">{t("Clear Annotations")}</Typography>
         </MenuItem>
 
-        {category.id !== "00000000-0000-0000-0000-000000000000" && (
+        {category.id !== UNKNOWN_CATEGORY_ID && (
           <MenuItem onClick={onOpenDeleteCategoryDialogClick}>
             <Typography variant="inherit">{t("Delete category")}</Typography>
           </MenuItem>

@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch } from "react-redux";
 import { imageViewerSlice } from "../../../../store/slices";
+import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 
 type DeleteAllAnnotationsDialogProps = {
   onClose: () => void;
@@ -23,7 +24,7 @@ export const DeleteAllAnnotationsDialog = ({
       dispatch(imageViewerSlice.actions.deleteAllInstances({ id: "" }));
       dispatch(
         imageViewerSlice.actions.setSelectedCategory({
-          selectedCategory: "00000000-0000-0000-0000-000000000000",
+          selectedCategory: UNKNOWN_CATEGORY_ID,
         })
       );
     });

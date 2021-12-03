@@ -13,6 +13,7 @@ import {
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
+import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 
 type DeleteCategoryDialogProps = {
   onClose: () => void;
@@ -36,7 +37,7 @@ export const DeleteCategoryDialog = ({
   const onDelete = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedCategory({
-        selectedCategory: "00000000-0000-0000-0000-000000000000",
+        selectedCategory: UNKNOWN_CATEGORY_ID,
       })
     );
 
@@ -44,7 +45,7 @@ export const DeleteCategoryDialog = ({
       if (instance.categoryId === category.id) {
         return {
           ...instance,
-          categoryId: "00000000-0000-0000-0000-000000000000",
+          categoryId: UNKNOWN_CATEGORY_ID,
         };
       } else {
         return instance;

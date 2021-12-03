@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Category } from "../../types/Category";
 import { Image } from "../../types/Image";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
@@ -43,7 +43,7 @@ const initialCategories =
     ? [
         {
           color: "#AAAAAA",
-          id: "00000000-0000-0000-0000-000000000000",
+          id: UNKNOWN_CATEGORY_ID,
           name: "Unknown",
           visible: true,
         },
@@ -63,7 +63,7 @@ const initialCategories =
     : [
         {
           color: "#AAAAAA",
-          id: "00000000-0000-0000-0000-000000000000",
+          id: UNKNOWN_CATEGORY_ID,
           name: "Unknown",
           visible: true,
         },
@@ -111,7 +111,7 @@ const initialState: ImageViewer = {
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
-  selectedCategory: "00000000-0000-0000-0000-000000000000",
+  selectedCategory: UNKNOWN_CATEGORY_ID,
   selectionMode: AnnotationModeType.New,
   soundEnabled: true,
   stageHeight: 1000,

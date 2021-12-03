@@ -1,6 +1,7 @@
 import { Project } from "../../types/Project";
 import { Image } from "../../types/Image";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
+import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
 
 export const serializedProjectSelector = ({
   project,
@@ -10,7 +11,7 @@ export const serializedProjectSelector = ({
   const serializedImages = project.images.map((image: Image) => {
     const categoryId = image.categoryId
       ? image.categoryId
-      : "00000000-0000-0000-0000-000000000000";
+      : UNKNOWN_CATEGORY_ID;
 
     return {
       imageCategoryId: categoryId,

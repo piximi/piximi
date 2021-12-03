@@ -1,6 +1,6 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import { Category } from "../../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 import { Image } from "../../../types/Image";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
@@ -72,7 +72,7 @@ export const generator = (
 
       // eslint-disable-next-line array-callback-return
       const ys = categories.findIndex((category: Category) => {
-        if (category.id !== "00000000-0000-0000-0000-000000000000") {
+        if (category.id !== UNKNOWN_CATEGORY_ID) {
           return category.id === image.categoryId;
         }
       });

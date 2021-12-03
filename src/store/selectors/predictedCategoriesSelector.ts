@@ -1,6 +1,6 @@
 import { Project } from "../../types/Project";
 import { Image } from "../../types/Image";
-import { Category } from "../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { sortBy } from "underscore";
 import { Partition } from "../../types/Partition";
 
@@ -15,7 +15,7 @@ export const predictedCategoriesSelector = ({
     if (
       image.partition === Partition.Inference &&
       image.categoryId &&
-      image.categoryId !== "00000000-0000-0000-0000-000000000000"
+      image.categoryId !== UNKNOWN_CATEGORY_ID
     ) {
       //case where neural net assigned a category to test images
 
