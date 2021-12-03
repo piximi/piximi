@@ -22,6 +22,7 @@ const initialImage =
   process.env.NODE_ENV === "development"
     ? {
         avatar: colorImage,
+        categoryId: UNKNOWN_CATEGORY_ID,
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
         annotations: [],
         name: "example.png",
@@ -244,6 +245,7 @@ export const imageViewerSlice = createSlice({
       );
 
       const loaded: Image = {
+        categoryId: UNKNOWN_CATEGORY_ID,
         id: action.payload.file.imageId,
         src: action.payload.file.imageData,
         originalSrc: action.payload.file.imageData,

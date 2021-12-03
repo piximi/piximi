@@ -3,7 +3,7 @@ import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 
 export type Image = {
-  categoryId?: string;
+  categoryId: string;
   id: string;
   name: string;
   src: string;
