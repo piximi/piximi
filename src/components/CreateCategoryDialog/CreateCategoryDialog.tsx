@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "../Application/Application.css";
 import { ColorResult } from "react-color";
-import { sample } from "underscore";
+import { sample } from "lodash";
 import { createCategory } from "../../store/slices";
 import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
 import { categoriesSelector } from "../../store/selectors/categoriesSelector";

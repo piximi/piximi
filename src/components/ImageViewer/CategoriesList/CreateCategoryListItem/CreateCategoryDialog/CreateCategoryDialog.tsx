@@ -10,7 +10,7 @@ import { ColorIcon } from "../../ColorIcon";
 import Grid from "@mui/material/Grid";
 import { useStyles } from "./CreateCategoryDialog.css";
 import { ColorResult } from "react-color";
-import { sample } from "underscore";
+import { sample } from "lodash";
 import { v4 } from "uuid";
 import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";

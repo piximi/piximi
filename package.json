@@ -29,7 +29,6 @@
     "clsx": "^1.1.1",
     "numeral": "^2.0.6",
     "i18next": "19.0.0",
-    "underscore": "^1.12.0",
     "use-dropbox-chooser": "^0.0.5",
     "use-image": "^1.0.7",
     "use-sound": "^4.0.1",
@@ -63,7 +62,6 @@
     "@types/react-redux": "^7.1.13",
     "@types/react-vis": "^1.11.10",
     "@types/redux-logger": "^3.0.8",
-    "@types/underscore": "^1.10.24",
     "@types/uuid": "^8.3.3"
   },
   "devDependencies": {

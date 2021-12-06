@@ -1,5 +1,5 @@
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { sortBy } from "underscore";
+import { sortBy } from "lodash";
 import { Project } from "../../types/Project";
 
 export const createdCategoriesSelector = ({
