@@ -22,7 +22,6 @@
     "@tensorflow/tfjs-vis": "^1.5.1",
     "konva": "^8.3.0",
     "lodash": "^4.17.20",
-    "three": "^0.134.0",
     "file-saver": "^2.0.5",
     "image-js": "^0.31.3",
     "jszip": "^3.7.1",
