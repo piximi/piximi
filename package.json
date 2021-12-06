@@ -26,7 +26,6 @@
     "file-saver": "^2.0.5",
     "image-js": "^0.31.3",
     "jszip": "^3.7.1",
-    "clsx": "^1.1.1",
     "numeral": "^2.0.6",
     "i18next": "19.0.0",
     "use-dropbox-chooser": "^0.0.5",
