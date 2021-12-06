@@ -107,7 +107,7 @@ import { LabelImportant } from "@mui/icons-material";
 //       }
 //     }
 //
-//     const [width, height] = [216, 216]; //FIXME this should not be hard coded
+//     const [width, height] = [216, 216]; //This should not be hard coded
 //
 //     //look at image
 //     const result = new ImageJS.Image(width, height, colorData, {

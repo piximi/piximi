@@ -2,7 +2,7 @@ import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
-import { Category } from "../../../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import {
   categoryCountsSelector,
   imageSelector,
@@ -218,7 +218,7 @@ export const CategoriesList = (props: any) => {
       );
       dispatch(
         imageViewerSlice.actions.setSelectedCategory({
-          selectedCategory: "00000000-0000-0000-0000-000000000000",
+          selectedCategory: UNKNOWN_CATEGORY_ID,
         })
       );
       dispatch(

@@ -1,5 +1,5 @@
 import React from "react";
-import { Category } from "../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
@@ -57,7 +57,7 @@ export const CategoryMenu = ({
           onCloseCategoryMenu={onCloseCategoryMenu}
         />
 
-        {category.id !== "00000000-0000-0000-0000-000000000000" && (
+        {category.id !== UNKNOWN_CATEGORY_ID && (
           <div>
             <Divider />
 

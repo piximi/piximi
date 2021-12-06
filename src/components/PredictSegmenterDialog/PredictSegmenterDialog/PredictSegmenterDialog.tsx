@@ -29,7 +29,7 @@ const overlayLabels = (imageData: Uint8Array, labelData: Uint8Array) => {
     }
   }
 
-  const [width, height] = [216, 216]; //FIXME this should not be hard coded
+  const [width, height] = [216, 216]; // This should not be hard coded
 
   //look at image
   const overlay = new ImageJS.Image(width, height, colorData, {
@@ -79,7 +79,7 @@ export const PredictSegmenterDialog = (
   const [imageData, setImageData] = React.useState<string>(images[0].src);
 
   const predictTensorflowModel = async () => {
-    const image = images[0]; //FIXME: in the future, ask the user to select an image
+    const image = images[0]; // In the future, ask the user to select an image
 
     const MOBILENET_MODEL_PATH =
       // tslint:disable-next-line:max-line-length

@@ -15,7 +15,7 @@ import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
 import { AnnotationType } from "../../../../types/AnnotationType";
 import { SerializedAnnotationType } from "../../../../types/SerializedAnnotationType";
-import { Category } from "../../../../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import { importSerializedAnnotations } from "../../../../image/imageHelper";
 import {
@@ -115,6 +115,7 @@ export const ExampleImageDialog = ({
     );
 
     const example: Image = {
+      categoryId: UNKNOWN_CATEGORY_ID,
       id: v4(),
       annotations: newAnnotations,
       name: name,

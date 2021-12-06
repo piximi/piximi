@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
-import { testPercentageSelector } from "../../../store/selectors/testPercentageSelector";
 import { trainingPercentageSelector } from "../../../store/selectors";
 import { classifierSlice } from "../../../store/slices";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
-  Button,
   Collapse,
   Grid,
   ListItem,
@@ -15,14 +13,12 @@ import {
   ListItemText,
   TextField,
   Theme,
-  Tooltip,
   Typography,
 } from "@mui/material";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     textField: {
-      // marginLeft: theme.spacing(1),
       marginRight: theme.spacing(1),
       flexBasis: 300,
       width: "100%",
@@ -33,26 +29,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export const DatasetSettingsListItem = () => {
   const classes = useStyles();
 
-  // assign each image to train- test- or validation- set
-  //FIXME bring that back
-  //
-  // const initializeDatasets = () => {
-  //   // if (datasetInitialized) {
-  //   //   return;
-  //   // }
-  //   // var partitions: number[] = [];
-  //   // images.forEach((image: Images) => {
-  //   //   const setItentifier = assignToSet();
-  //   //   partitions.push(setItentifier);
-  //   // });
-  //   // // setImagesPartition(partitions);
-  //   // setDatasetInitialized(true);
-  // };
-
-  // function valuetext(value: any) {
-  //   return `${value}%`;
-  // }
-
   const dispatch = useDispatch();
 
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
@@ -62,18 +38,7 @@ export const DatasetSettingsListItem = () => {
     setCollapsedDatasetSettingsList(!collapsedDatasetSettingsList);
   };
 
-  const testPercentage = useSelector(testPercentageSelector);
   const trainingPercentage = useSelector(trainingPercentageSelector);
-
-  const onTestPercentageChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const testPercentage = Number(target.value);
-    dispatch(
-      classifierSlice.actions.updateTestPercentage({
-        testPercentage: testPercentage,
-      })
-    );
-  };
 
   const onTrainPercentageChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
@@ -105,47 +70,22 @@ export const DatasetSettingsListItem = () => {
       <Collapse in={collapsedDatasetSettingsList} timeout="auto" unmountOnExit>
         <div style={{ padding: "12px 0px", width: "300" }}>
           <Typography id="range-slider" gutterBottom>
-            How much data should go to test set?
-          </Typography>
-
-          <Grid item xs={2}>
-            <TextField
-              id="test-split"
-              label="Test percentage (%)"
-              className={classes.textField}
-              value={testPercentage}
-              margin="normal"
-              onChange={onTestPercentageChange}
-              type="number"
-            />
-          </Grid>
-        </div>
-        <div style={{ padding: "12px 0px", width: "300" }}>
-          <Typography id="range-slider" gutterBottom>
-            How much of the left dataset should be used for training? (and the
-            rest for validation)
+            What fraction of the labeled images should be used for training?
+            (The rest is used for validation)
           </Typography>
           <Grid item xs={2}>
             <TextField
               id="test-split"
-              label="Train percentage (%)"
+              label="Train percentage"
               className={classes.textField}
               value={trainingPercentage}
               margin="normal"
               onChange={onTrainPercentageChange}
               type="number"
+              inputProps={{ min: 0, max: 1, step: 0.01 }}
             />
           </Grid>
         </div>
-        <Tooltip title="Initialize dataset" placement="bottom">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {}} //TODO implement this (see initalizeDataset function) (this should separate new train and val dataset)
-          >
-            Initialize Dataset
-          </Button>
-        </Tooltip>
       </Collapse>
     </>
   );

@@ -48,5 +48,4 @@ export type Classifier = {
   rescaleOptions: RescaleOptions;
   saving: boolean;
   trainingPercentage: number;
-  testPercentage: number;
 };

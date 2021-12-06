@@ -13,10 +13,10 @@ import { ColorResult } from "react-color";
 import { sample } from "underscore";
 import { v4 } from "uuid";
 import { Category } from "../../../../../types/Category";
-import { categoriesSelector } from "../../../../../store/selectors";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
 import { imageViewerSlice } from "../../../../../store/slices";
+import { annotatorCategoriesSelector } from "../../../../../store/selectors/annotatorCategoriesSelector";
 
 const COLORS = [
   "#f44336",
@@ -50,7 +50,7 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(annotatorCategoriesSelector);
 
   const [color, setColor] = React.useState<string>(sample(COLORS)!);
 

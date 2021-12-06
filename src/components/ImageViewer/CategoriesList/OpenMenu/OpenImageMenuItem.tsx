@@ -12,6 +12,7 @@ import {
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
+import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -48,6 +49,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
             });
 
             const loaded: Image = {
+              categoryId: UNKNOWN_CATEGORY_ID,
               id: v4(),
               annotations: [],
               name: file.name,

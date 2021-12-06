@@ -44,7 +44,6 @@ export const PreprocessingSettingsListItem = ({
   //   setPaddingOption2(!paddingOption2);
   // };
 
-  //TODO implement this (when clicking, we should be doing the preprocessing in the background) -- set it to processed so that it's not re-done in the Saga
   // Skeleton
   // const onPreprocessingClick = async (
   //   lowerPercentile: number,
@@ -75,6 +74,7 @@ export const PreprocessingSettingsListItem = ({
   return (
     <>
       <ListItem
+        disabled
         button
         onClick={onPreprocessingListClick}
         style={{ padding: "12px 0px" }}

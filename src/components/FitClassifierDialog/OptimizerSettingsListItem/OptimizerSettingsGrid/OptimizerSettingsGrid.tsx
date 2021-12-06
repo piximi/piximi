@@ -174,7 +174,7 @@ export const OptimizerSettingsGrid = () => {
           <Grid item xs={4}>
             <FormHelperText>Loss Function</FormHelperText>
             <Select
-              value={lossFunction as string} //TODO fix so that multiple lossFunctions are shown, if we do have multiple loss functions
+              value={lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
               onChange={onLossFunctionChange}
               className={classes.select}
               displayEmpty

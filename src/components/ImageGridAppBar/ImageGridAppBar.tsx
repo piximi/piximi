@@ -61,6 +61,7 @@ export const ImageGridAppBar = () => {
       });
 
       const annotatorImage: Image = {
+        categoryId: projectImage!.categoryId,
         id: projectImage!.id,
         annotations: projectImage!.annotations,
         name: projectImage!.name,
