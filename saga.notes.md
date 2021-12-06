@@ -7,7 +7,7 @@
 );
 ```
 
-```src/stores/store/productionStore.ts
+```src/store/stores/productionStore.ts
   export const saga = createSagaMiddleware();
 
   const middleware: Middleware[] = [logger, saga, thunk];
