@@ -11,7 +11,7 @@ import { theme } from "./theme";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../types/ShapeType";
 import { ToolType } from "../../../types/ToolType";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import {
   addImages,
   imageViewerSlice,
@@ -71,7 +71,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
 
               const loaded: Image = {
                 categoryId: UNKNOWN_CATEGORY_ID,
-                id: v4(),
+                id: uuidv4(),
                 annotations: [],
                 name: file.name,
                 partition: Partition.Inference,

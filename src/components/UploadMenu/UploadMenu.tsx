@@ -13,7 +13,7 @@ import { DropboxMenuItem } from "../DropboxMenuItem";
 import { Shape } from "../../types/Shape";
 import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../../types/Partition";
 import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
 
@@ -53,7 +53,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
             const loaded: Image = {
               categoryId: UNKNOWN_CATEGORY_ID,
-              id: v4(),
+              id: uuidv4(),
               annotations: [],
               name: file.name,
               partition: Partition.Inference,

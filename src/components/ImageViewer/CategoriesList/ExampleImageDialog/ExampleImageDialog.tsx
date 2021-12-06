@@ -9,7 +9,8 @@ import malaria from "../../../../images/malaria.png";
 import cellpainting from "../../../../images/cell-painting.png";
 import { ChannelType } from "../../../../types/ChannelType";
 import { ToolType } from "../../../../types/ToolType";
-import { v4 } from "uuid";
+import { ImageViewerImage } from "../../../../types/ImageViewerImage";
+import { v4 as uuidv4 } from "uuid";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
@@ -92,6 +93,16 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
+    const example: ImageViewerImage = {
+      avatar: data as string,
+      id: uuidv4(),
+      annotations: [],
+      name: name,
+      shape: shape,
+      originalSrc: data as string,
+      src: data as string,
+    };
+
     let channels: Array<ChannelType> = [];
     for (let i = 0; i < shape.channels; i++) {
       channels.push({ visible: true, range: [0, 255] });
@@ -116,7 +127,7 @@ export const ExampleImageDialog = ({
 
     const example: Image = {
       categoryId: UNKNOWN_CATEGORY_ID,
-      id: v4(),
+      id: uuidv4(),
       annotations: newAnnotations,
       name: name,
       shape: shape,

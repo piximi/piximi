@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import { connectPoints, drawLine } from "../../../../../image/imageHelper";
 import { simplify } from "../../../simplify/simplify";
 import { slpf } from "../../../polygon-fill/slpf";
-import * as uuid from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { decode, encode } from "../../../rle";
 import { Tool } from "../../Tool";
 
@@ -420,7 +420,7 @@ export abstract class AnnotationTool extends Tool {
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
-      id: uuid.v4(),
+      id: uuidv4(),
       mask: this.mask,
     };
   }

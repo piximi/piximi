@@ -11,7 +11,7 @@ import Grid from "@mui/material/Grid";
 import { useStyles } from "./CreateCategoryDialog.css";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { Category } from "../../../../../types/Category";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { replaceDuplicateName } from "../../../../../image/imageHelper";
@@ -67,7 +67,7 @@ export const CreateCategoryDialog = ({
 
     const category: Category = {
       color: color,
-      id: v4().toString(),
+      id: uuidv4().toString(),
       name: updatedName,
       visible: true,
     };
