@@ -11,10 +11,8 @@ import { ColorIcon } from "../ColorIcon";
 import { useStyles } from "./EditCategoryDialog.css";
 import { Category } from "../../../../types/Category";
 import { imageViewerSlice } from "../../../../store/slices";
-import {
-  categoriesSelector,
-  selectedCategorySelector,
-} from "../../../../store/selectors";
+import { selectedCategorySelector } from "../../../../store/selectors";
+import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
 
 type EditCategoryDialogProps = {
   onCloseDialog: () => void;
@@ -48,7 +46,7 @@ export const EditCategoryDialog = ({
     setName(event.target.value);
   };
 
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(annotatorCategoriesSelector);
 
   const onEdit = () => {
     const updatedCategories = categories?.map((v: Category) => {
