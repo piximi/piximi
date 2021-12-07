@@ -28,7 +28,7 @@ import ViewComfyIcon from "@mui/icons-material/ViewComfy";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import { ImageViewer } from "../ImageViewer";
+import { ImageViewer } from "../annotator";
 import { Image } from "../../types/Image";
 import { Partition } from "../../types/Partition";
 
