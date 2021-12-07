@@ -2,7 +2,7 @@ import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../../types/ShapeType";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import {
@@ -50,7 +50,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
 
             const loaded: Image = {
               categoryId: UNKNOWN_CATEGORY_ID,
-              id: v4(),
+              id: uuidv4(),
               annotations: [],
               name: file.name,
               shape: shape,

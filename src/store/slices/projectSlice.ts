@@ -1,9 +1,11 @@
 import { Project } from "../../types/Project";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { Image } from "../../types/Image";
-import { filter, findIndex } from "underscore";
+import { filter, findIndex } from "lodash";
+import { BoundingBox } from "../../types/BoundingBox";
+import { Instance } from "../../types/Instance";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
@@ -51,7 +53,7 @@ export const projectSlice = createSlice({
     ) {
       const category: Category = {
         color: action.payload.color,
-        id: v4().toString(),
+        id: uuidv4().toString(),
         name: action.payload.name,
         visible: true,
       };
