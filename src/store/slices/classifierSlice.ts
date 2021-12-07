@@ -32,7 +32,7 @@ const initialState: Classifier = {
   preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  modelName: "ResNet",
+  modelName: "SimpleCNN",
   modelMultiplier: "0.0",
   modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],

@@ -17,7 +17,6 @@ import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 
 const modelArchitecture = {
   SimpleCNN: "SimpleCNN",
-  ResNet: "ResNet",
 };
 
 export const ArchitectureSettingsGrid = () => {
