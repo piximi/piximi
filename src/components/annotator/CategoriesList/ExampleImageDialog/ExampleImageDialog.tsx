@@ -93,16 +93,6 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
-    const example: ImageViewerImage = {
-      avatar: data as string,
-      id: uuidv4(),
-      annotations: [],
-      name: name,
-      shape: shape,
-      originalSrc: data as string,
-      src: data as string,
-    };
-
     let channels: Array<ChannelType> = [];
     for (let i = 0; i < shape.channels; i++) {
       channels.push({ visible: true, range: [0, 255] });

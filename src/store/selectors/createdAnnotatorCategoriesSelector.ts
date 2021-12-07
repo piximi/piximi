@@ -1,5 +1,5 @@
 import { Category } from "../../types/Category";
-import { sortBy } from "underscore";
+import { sortBy } from "lodash";
 import { ImageViewer } from "../../types/ImageViewer";
 
 export const createdAnnotatorCategoriesSelector = ({
