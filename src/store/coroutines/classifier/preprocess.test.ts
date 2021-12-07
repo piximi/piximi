@@ -21,8 +21,6 @@ const rescaleOptions: RescaleOptions = {
   rescaleMinMax: { min: 2, max: 5 },
 };
 
-const trainingPercentage = 0.85;
-
 const categories: Array<Category> = [
   {
     color: "",
@@ -57,8 +55,7 @@ it("preprocess", async () => {
     images,
     categories,
     inputShape,
-    rescaleOptions,
-    trainingPercentage
+    rescaleOptions
   );
 
   const items = await preprocessed.train.toArrayForTest();

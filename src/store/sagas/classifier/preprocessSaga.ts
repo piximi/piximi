@@ -1,10 +1,7 @@
 import { put, select } from "redux-saga/effects";
 import { preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
-import {
-  createdCategoriesSelector,
-  trainingPercentageSelector,
-} from "../../selectors";
+import { createdCategoriesSelector } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { trainImagesSelector } from "../../selectors/trainImagesSelector";
@@ -20,15 +17,12 @@ export function* preprocessSaga(): any {
 
   const rescaleOptions = yield select(rescaleOptionsSelector);
 
-  const trainingPercentage = yield select(trainingPercentageSelector);
-
   const data = yield preprocess(
     trainImages,
     valImages,
     categories,
     architectureOptions.inputShape,
-    rescaleOptions,
-    trainingPercentage
+    rescaleOptions
   );
 
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));

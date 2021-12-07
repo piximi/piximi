@@ -2,14 +2,10 @@ import { put, select } from "redux-saga/effects";
 import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
-  compiledSelector,
   compileOptionsSelector,
   createdCategoriesCountSelector,
   createdCategoriesSelector,
-  dataSelector,
   fitOptionsSelector,
-  openedSelector,
-  trainingPercentageSelector,
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
@@ -17,56 +13,38 @@ import { trainImagesSelector } from "../../selectors/trainImagesSelector";
 import { valImagesSelector } from "../../selectors/valImagesSelector";
 
 export function* fitSaga(action: any): any {
-  //TODO: there are some redundancies between fitSaga and openSaga/preprocessSaga. Should we be calling openSaga
-  //or compileSaga or preprocessSaga prior to calling fitSaga?
-
   const { onEpochEnd } = action.payload;
 
   const architectureOptions = yield select(architectureOptionsSelector);
 
   const rescaleOptions = yield select(rescaleOptionsSelector);
 
-  const trainingPercentage = yield select(trainingPercentageSelector);
-
   const classes = yield select(createdCategoriesCountSelector);
 
-  let opened = yield select(openedSelector);
+  const opened = yield open(architectureOptions, classes);
+  yield put(classifierSlice.actions.updateOpened({ opened: opened }));
 
-  if (!opened) {
-    opened = yield open(architectureOptions, classes);
-    yield put(classifierSlice.actions.updateOpened({ opened: opened }));
-  }
+  const compileOptions = yield select(compileOptionsSelector);
 
-  let compiled = yield select(compiledSelector);
+  const compiled = yield compile(opened, compileOptions);
 
-  if (!compiled) {
-    const compileOptions = yield select(compileOptionsSelector);
+  yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
 
-    compiled = yield compile(opened, compileOptions);
+  const categories = yield select(createdCategoriesSelector);
 
-    yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
-  }
+  const trainImages = yield select(trainImagesSelector);
 
-  let data = yield select(dataSelector);
+  const valImages = yield select(valImagesSelector);
 
-  if (!data) {
-    const categories = yield select(createdCategoriesSelector);
+  const data = yield preprocess(
+    trainImages,
+    valImages,
+    categories,
+    architectureOptions.inputShape,
+    rescaleOptions
+  );
 
-    const trainImages = yield select(trainImagesSelector);
-
-    const valImages = yield select(valImagesSelector);
-
-    data = yield preprocess(
-      trainImages,
-      valImages,
-      categories,
-      architectureOptions.inputShape,
-      rescaleOptions,
-      trainingPercentage
-    );
-
-    yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
-  }
+  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
   const options = yield select(fitOptionsSelector);
 
