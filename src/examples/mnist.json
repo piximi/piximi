@@ -1,6 +1,5 @@
 {
   "classifier": {
-    "compiling": false,
     "evaluating": false,
     "inputShape": {
       "height": 28,
@@ -17,24 +16,20 @@
       "train_data_size": 6500,
       "shuffle": true
     },
-    "fitting": true,
-    "preprocessing": false,
+    "fitting": false,
     "learningRate": 0.001,
     "lossFunction": "Categorical cross entropy",
     "modelName": "SimpleCNN",
     "modelMultiplier": "0.0",
     "modelVersion": "1",
     "metrics": ["Categorical accuracy"],
-    "opening": false,
     "optimizationAlgorithm": "Adam",
     "predicting": false,
     "rescaleOptions": {
       "rescale": true,
       "rescaleMinMax": { "min": 0, "max": 1 }
     },
-    "saving": false,
     "trainingPercentage": 0.85,
-    "testPercentage": 0.25,
     "history": {
       "validationData": null,
       "params": {

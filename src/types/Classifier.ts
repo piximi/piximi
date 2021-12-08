@@ -15,7 +15,6 @@ import { RescaleOptions } from "./RescaleOptions";
 
 export type Classifier = {
   compiled?: LayersModel;
-  compiling: boolean;
   data?:
     | tensorflow.data.Dataset<{
         xs: tensorflow.Tensor;
@@ -28,7 +27,6 @@ export type Classifier = {
   fitted?: LayersModel;
   fitting: boolean;
   inputShape: Shape;
-  preprocessing: boolean;
   history?: History;
   learningRate: number;
   lossFunction:
@@ -41,11 +39,9 @@ export type Classifier = {
   modelMultiplier: string;
   modelVersion: string;
   opened?: LayersModel;
-  opening: boolean;
   optimizationAlgorithm: OptimizationAlgorithm;
   predicting: boolean;
   predictions?: Tensor;
   rescaleOptions: RescaleOptions;
-  saving: boolean;
   trainingPercentage: number;
 };

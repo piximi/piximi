@@ -5,15 +5,11 @@ import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import * as tensorflow from "@tensorflow/tfjs";
 import { History, LayersModel } from "@tensorflow/tfjs";
-import { CompileOptions } from "../../types/CompileOptions";
-import { Image } from "../../types/Image";
-import { Category } from "../../types/Category";
 import { Shape } from "../../types/Shape";
 import { ArchitectureOptions } from "../../types/ArchitectureOptions";
 import { RescaleOptions } from "../../types/RescaleOptions";
 
 const initialState: Classifier = {
-  compiling: false,
   evaluating: false,
   inputShape: {
     height: 256,
@@ -29,21 +25,18 @@ const initialState: Classifier = {
     shuffle: true,
   },
   fitting: false,
-  preprocessing: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
   modelName: "SimpleCNN",
   modelMultiplier: "0.0",
   modelVersion: "3",
   metrics: [Metric.CategoricalAccuracy],
-  opening: false,
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
   rescaleOptions: {
     rescale: true,
     rescaleMinMax: { min: 0, max: 1 },
   },
-  saving: false,
   trainingPercentage: 0.75,
 };
 
@@ -51,12 +44,6 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
-    compile(
-      state,
-      action: PayloadAction<{ opened: LayersModel; options: CompileOptions }>
-    ) {
-      state.compiling = true;
-    },
     fit(
       state,
       action: PayloadAction<{
@@ -65,27 +52,8 @@ export const classifierSlice = createSlice({
     ) {
       state.fitting = true;
     },
-    open(
-      state,
-      action: PayloadAction<{
-        pathname: string;
-        classes: number;
-        units: number;
-      }>
-    ) {
-      state.opening = true;
-    },
     predict(state, action: PayloadAction<{}>) {
       state.predicting = true;
-    },
-    preprocess(
-      state,
-      action: PayloadAction<{
-        images: Array<Image>;
-        categories: Array<Category>;
-      }>
-    ) {
-      state.preprocessing = true;
     },
     setClassifier(
       state,
@@ -109,16 +77,12 @@ export const classifierSlice = createSlice({
       state.trainingPercentage = classifier.trainingPercentage;
 
       //initialize all others to false/undefined, since we are essentially initializing a new classifier
-      state.compiling = classifier.compiling;
-      state.evaluating = classifier.evaluating;
+      state.evaluating = false;
       state.evaluations = classifier.evaluations;
-      state.fitting = classifier.fitting;
+      state.fitting = false;
       state.history = classifier.history;
-      state.opening = classifier.opening;
-      state.predicting = classifier.predicting;
+      state.predicting = false;
       state.predictions = classifier.predictions;
-      state.preprocessing = classifier.preprocessing;
-      state.saving = classifier.saving;
     },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
@@ -129,8 +93,6 @@ export const classifierSlice = createSlice({
       const { compiled } = action.payload;
 
       state.compiled = compiled;
-
-      state.compiling = false;
     },
     updateEpochs(state, action: PayloadAction<{ epochs: number }>) {
       const { epochs } = action.payload;
@@ -143,11 +105,11 @@ export const classifierSlice = createSlice({
     ) {
       const { fitted, status } = action.payload;
 
-      state.compiling = false;
-
       state.fitted = fitted;
 
       state.history = status;
+
+      state.fitting = false;
     },
     updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
       state.inputShape = action.payload.inputShape;
@@ -185,8 +147,6 @@ export const classifierSlice = createSlice({
       const { opened } = action.payload;
 
       state.opened = opened;
-
-      state.opening = false;
     },
     updateOptimizationAlgorithm(
       state,
@@ -208,8 +168,6 @@ export const classifierSlice = createSlice({
       const { data } = action.payload;
 
       state.data = data;
-
-      state.preprocessing = false;
     },
     updateRescaleOptions(
       state,
@@ -229,10 +187,7 @@ export const classifierSlice = createSlice({
 });
 
 export const {
-  compile,
   fit,
-  open,
-  preprocess,
   updateBatchSize,
   updateCompiled,
   updateEpochs,
