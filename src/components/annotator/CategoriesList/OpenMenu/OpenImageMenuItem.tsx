@@ -74,16 +74,13 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
         file.arrayBuffer().then((buffer) => {
           ImageJS.Image.load(buffer).then((image) => {
             if (Array.isArray(image)) {
+              let activeImageId: string;
               //case where we have a z-stack of images
               let images: Array<Image> = [];
               for (let j = 0; j < image.length; j++) {
                 curr = createImage(image[j], file.name);
                 if (i === 0 && j === 0) {
-                  dispatch(
-                    setActiveImage({
-                      image: curr.id,
-                    })
-                  );
+                  activeImageId = curr.id;
                 }
                 images.push(curr);
               }
@@ -96,7 +93,10 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
                   images[j] = { ...images[j], nextImage: images[j + 1].id };
                 }
               }
-              dispatch(addImages({ newImages: images }));
+              batch(() => {
+                dispatch(addImages({ newImages: images }));
+                if (i === 0) dispatch(setActiveImage({ image: activeImageId }));
+              });
             } else {
               //Case where a 2D image was loaded
               curr = createImage(image, file.name);
