@@ -80,14 +80,16 @@ export const FitClassifierDialogAppBar = (props: any) => {
         </Tooltip>
 
         <Tooltip title="Stop fitting the model" placement="bottom">
-          <IconButton
-            className={classes.button}
-            onClick={onStopFitting}
-            href={""}
-            disabled={!training}
-          >
-            <Stop />
-          </IconButton>
+          <span>
+            <IconButton
+              className={classes.button}
+              onClick={onStopFitting}
+              href={""}
+              disabled={!training}
+            >
+              <Stop />
+            </IconButton>
+          </span>
         </Tooltip>
       </Toolbar>
     </AppBar>
