@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { MenuItem } from "@mui/material";
 import * as mnistProject from "../../examples/mnist.json";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
+import { Classifier } from "../../types/Classifier";
 
 type OpenExampleProjectMenuItemProps = {
   popupState: any;
@@ -15,7 +16,7 @@ export const OpenExampleProjectMenuItem = ({
   const dispatch = useDispatch();
 
   const project = mnistProject.project as SerializedProjectType;
-  const classifier = mnistProject.classifier as any;
+  const classifier = mnistProject.classifier as Classifier;
 
   const onClickExampleProject = async () => {
     popupState.close();
