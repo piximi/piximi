@@ -1,15 +1,11 @@
 import * as React from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import { AppBar, IconButton, Theme, Toolbar, Tooltip } from "@mui/material";
-import {
-  ArrowBack,
-  PlayCircleOutline,
-  ReplayRounded,
-  Stop,
-} from "@mui/icons-material";
+import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { compiledSelector } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
+import { trainingFlagSelector } from "../../../store/selectors/trainingFlagSelector";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,6 +35,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
   const dispatch = useDispatch();
 
   const compiled = useSelector(compiledSelector);
+  const training = useSelector(trainingFlagSelector);
 
   const onStopFitting = () => {
     if (!compiled) return;
@@ -87,18 +84,11 @@ export const FitClassifierDialogAppBar = (props: any) => {
             className={classes.button}
             onClick={onStopFitting}
             href={""}
+            disabled={!training}
           >
             <Stop />
           </IconButton>
         </Tooltip>
-        <IconButton
-          disabled
-          className={classes.button}
-          onClick={closeDialog}
-          href={""}
-        >
-          <ReplayRounded />
-        </IconButton>
       </Toolbar>
     </AppBar>
   );
