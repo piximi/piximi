@@ -119,7 +119,7 @@ export const ChannelsList = ({
         <ListItemText primary={name} />
         <Slider
           key={index}
-          disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO style slider when disabled mode
+          disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
           style={{ width: "60%" }}
           value={displayedValue}
           max={255}

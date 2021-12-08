@@ -48,7 +48,7 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
     dispatch(setStageWidth({ stageWidth: boundingClientRect.width }));
     if (!image || !image.shape) return;
 
-    //FIXME it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
+    //FIXME #136 it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
     if (image.shape.height / stageHeight > image.shape.width / stageWidth) {
       dispatch(
         setStageScale({
