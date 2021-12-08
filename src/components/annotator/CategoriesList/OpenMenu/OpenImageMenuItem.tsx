@@ -10,9 +10,9 @@ import {
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
-import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
 import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+import { Image } from "../../../../types/Image";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -20,6 +20,33 @@ type OpenImageMenuItemProps = {
 
 export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
   const dispatch = useDispatch();
+
+  const createImage = (image: ImageJS.Image, filename: string) => {
+    const shape: ShapeType = {
+      channels: image.components,
+      frames: 1,
+      height: image.height,
+      planes: 1,
+      width: image.width,
+    };
+
+    const imageDataURL = image.toDataURL("image/png", {
+      useCanvas: true,
+    });
+
+    const loaded: Image = {
+      categoryId: UNKNOWN_CATEGORY_ID,
+      id: uuidv4(),
+      annotations: [],
+      name: filename,
+      shape: shape,
+      originalSrc: imageDataURL,
+      partition: Partition.Inference,
+      src: imageDataURL,
+    };
+
+    return loaded;
+  };
 
   const onOpenImage = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -31,50 +58,58 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
 
     if (event.currentTarget.files) {
       for (let i = 0; i < event.currentTarget.files.length; i++) {
+        if (i === 0) {
+          dispatch(
+            setSelectedAnnotations({
+              selectedAnnotations: [],
+              selectedAnnotation: undefined,
+            })
+          );
+        }
+
         const file = event.currentTarget.files[i];
+
+        let curr: Image;
 
         file.arrayBuffer().then((buffer) => {
           ImageJS.Image.load(buffer).then((image) => {
-            //check whether name already exists
-            const shape: ShapeType = {
-              channels: image.components,
-              frames: 1,
-              height: image.height,
-              planes: 1,
-              width: image.width,
-            };
+            if (Array.isArray(image)) {
+              //case where we have a z-stack of images
+              let images: Array<Image> = [];
+              for (let j = 0; j < image.length; j++) {
+                curr = createImage(image[j], file.name);
+                if (i === 0 && j === 0) {
+                  dispatch(
+                    setActiveImage({
+                      image: curr.id,
+                    })
+                  );
+                }
+                images.push(curr);
+              }
+              //Assign previous and next image references to each image
+              for (let j = 0; j < images.length; j++) {
+                if (j > 0) {
+                  images[j] = { ...images[j], prevImage: images[j - 1].id };
+                }
+                if (j < images.length - 1) {
+                  images[j] = { ...images[j], nextImage: images[j + 1].id };
+                }
+              }
+              dispatch(addImages({ newImages: images }));
+            } else {
+              //Case where a 2D image was loaded
+              curr = createImage(image, file.name);
 
-            const imageDataURL = image.toDataURL("image/png", {
-              useCanvas: true,
-            });
-
-            const loaded: Image = {
-              categoryId: UNKNOWN_CATEGORY_ID,
-              id: uuidv4(),
-              annotations: [],
-              name: file.name,
-              shape: shape,
-              originalSrc: imageDataURL,
-              partition: Partition.Inference,
-              src: imageDataURL,
-            };
-
-            dispatch(addImages({ newImages: [loaded] }));
-
-            if (i === 0) {
               batch(() => {
-                dispatch(
-                  setActiveImage({
-                    image: loaded.id,
-                  })
-                );
-
-                dispatch(
-                  setSelectedAnnotations({
-                    selectedAnnotations: [],
-                    selectedAnnotation: undefined,
-                  })
-                );
+                if (i === 0) {
+                  dispatch(
+                    setActiveImage({
+                      image: curr.id,
+                    })
+                  );
+                }
+                dispatch(addImages({ newImages: [curr] }));
               });
             }
           });
