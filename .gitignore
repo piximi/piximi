@@ -16,3 +16,4 @@ yarn-error.log*
 *.notes.txt
 *.notes.md
 .vscode
+yarn.lock
