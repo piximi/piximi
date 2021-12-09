@@ -26,7 +26,7 @@ export const HideOtherCategoriesMenuItem = ({
 
   const onClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     for (let cat of categories) {
-      if (category.id != cat.id) {
+      if (category.id !== cat.id) {
         dispatch(
           imageViewerSlice.actions.setCategoryVisibility({
             category: cat,
