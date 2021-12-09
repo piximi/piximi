@@ -23,7 +23,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   } {
     const data = this.image.getRGBAData();
 
-    const { count, map, superpixels } = slic(
+    const { superpixels } = slic(
       data,
       this.image.width,
       this.image.height,
