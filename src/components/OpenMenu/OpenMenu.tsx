@@ -1,48 +1,14 @@
-import React from "react";
-import { Divider, ListItemText, Menu, MenuItem, MenuList } from "@mui/material";
+import { Divider, Menu, MenuList } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import * as tf from "@tensorflow/tfjs";
-import { useDispatch } from "react-redux";
-import { classifierSlice } from "../../store/slices";
+import { OpenClassifierMenuItem } from "../OpenClassifierMenuItem";
 
 type OpenMenuProps = {
   popupState: any;
 };
 
 export const OpenMenu = ({ popupState }: OpenMenuProps) => {
-  const dispatch = useDispatch();
-
-  const onOpenClassifierClick = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    close: () => void
-  ) => {
-    event.persist();
-
-    close();
-
-    if (!event.currentTarget.files) return;
-
-    let weightsFile, jsonFile;
-    // TODO #131 Check that that correct files were selected (one .bin, one .json -- throw error if not). Make sure to add instructions for user.
-    // Allow user to open either a project or classifier or both.
-
-    if (event.currentTarget.files[0].name.includes(".bin")) {
-      weightsFile = event.currentTarget.files[0];
-      jsonFile = event.currentTarget.files[1];
-    } else {
-      weightsFile = event.currentTarget.files[1];
-      jsonFile = event.currentTarget.files[0];
-    }
-
-    const model = await tf.loadLayersModel(
-      tf.io.browserFiles([jsonFile, weightsFile])
-    );
-
-    dispatch(classifierSlice.actions.updateOpened({ opened: model }));
-  };
-
   return (
     <Menu {...bindMenu(popupState)}>
       <MenuList dense variant="menu">
@@ -50,19 +16,7 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
         <OpenExampleProjectMenuItem popupState={popupState} />
         <Divider />
 
-        <MenuItem component="label">
-          <ListItemText primary="Open classifier" />
-          <input
-            accept="application/json|.bin"
-            hidden
-            multiple
-            id="open-project-file"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              onOpenClassifierClick(event, popupState.close)
-            }
-            type="file"
-          />
-        </MenuItem>
+        <OpenClassifierMenuItem popupState={popupState} />
       </MenuList>
     </Menu>
   );
