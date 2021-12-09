@@ -2,10 +2,93 @@ import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";
-import { Category } from "../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../types/Category";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { saveAs } from "file-saver";
+import { ShapeType } from "../types/ShapeType";
+import { v4 as uuidv4 } from "uuid";
+import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
+
+export const convertFileToImages = async (
+  file: File
+): Promise<Array<ImageType>> => {
+  /**
+   * Returns image array to be provided to dispatch
+   * **/
+  return new Promise((resolve, reject) => {
+    return file.arrayBuffer().then((buffer) => {
+      ImageJS.Image.load(buffer).then((image) => {
+        if (Array.isArray(image)) {
+          resolve(createImageJSStackToImageArray(image, file.name));
+        } else {
+          resolve([convertImageJStoImage(image, file.name)]);
+        }
+      });
+    });
+  });
+};
+
+export const convertImageJStoImage = (
+  image: ImageJS.Image,
+  filename: string
+): ImageType => {
+  /**
+   * Given an ImageJS Image object, construct appropriate Image type. Return Image.
+   * returns: the image of Image type
+   * **/
+  const shape: ShapeType = {
+    channels: image.components,
+    frames: 1,
+    height: image.height,
+    planes: 1,
+    width: image.width,
+  };
+
+  const imageDataURL = image.toDataURL("image/png", {
+    useCanvas: true,
+  });
+
+  const loaded: ImageType = {
+    categoryId: UNKNOWN_CATEGORY_ID,
+    id: uuidv4(),
+    annotations: [],
+    name: filename,
+    shape: shape,
+    originalSrc: imageDataURL,
+    partition: Partition.Inference,
+    src: imageDataURL,
+  };
+
+  return loaded;
+};
+
+export const createImageJSStackToImageArray = (
+  stack: Array<ImageJS.Image>,
+  filename: string
+): Array<ImageType> => {
+  /**
+   * Given an ImageJS stack, iterate over it and return array of images of type Image
+   * **/
+  let curr: ImageType;
+  //case where we have a z-stack of images
+  let images: Array<ImageType> = [];
+  for (let j = 0; j < stack.length; j++) {
+    curr = convertImageJStoImage(stack[j], filename);
+
+    images.push(curr);
+  }
+  //Assign previous and next image references to each image
+  for (let j = 0; j < images.length; j++) {
+    if (j > 0) {
+      images[j] = { ...images[j], prevImage: images[j - 1].id };
+    }
+    if (j < images.length - 1) {
+      images[j] = { ...images[j], nextImage: images[j + 1].id };
+    }
+  }
+  return images;
+};
 
 export const connectPoints = (
   coordinates: Array<Array<number>>,

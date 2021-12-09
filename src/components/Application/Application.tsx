@@ -11,6 +11,7 @@ import { Partition } from "../../types/Partition";
 import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { Shape } from "../../types/Shape";
+import { convertFileToImages } from "../../image/imageHelper";
 
 export const Application = () => {
   const classes = useStyles();
@@ -19,40 +20,17 @@ export const Application = () => {
   const [, setDropped] = useState<File[]>([]);
 
   const onDrop = useCallback(
-    (item) => {
+    async (item) => {
       if (item) {
         for (let i = 0; i < item.files.length; i++) {
           const file = item.files[i];
 
-          file.arrayBuffer().then((buffer: any) => {
-            ImageJS.Image.load(buffer).then((image) => {
-              //check whether name already exists
-              const shape: Shape = {
-                channels: image.components,
-                frames: 1,
-                height: image.height,
-                planes: 1,
-                width: image.width,
-              };
+          const images = await convertFileToImages(file);
 
-              const imageDataURL = image.toDataURL("image/png", {
-                useCanvas: true,
-              });
-
-              const loaded: Image = {
-                categoryId: "00000000-0000-0000-0000-000000000000",
-                id: v4(),
-                annotations: [],
-                name: file.name,
-                partition: Partition.Inference,
-                shape: shape,
-                originalSrc: imageDataURL,
-                src: imageDataURL,
-              };
-
-              dispatch(createImage({ image: loaded }));
-            });
-          });
+          //if length of images is > 1, then the user selected a z-stack --> only show center image
+          dispatch(
+            createImage({ image: images[Math.floor(images.length / 2)] })
+          );
         }
       }
     },

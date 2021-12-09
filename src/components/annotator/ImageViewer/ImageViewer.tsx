@@ -22,6 +22,7 @@ import {
 import { Image } from "../../../types/Image";
 import { Partition } from "../../../types/Partition";
 import { UNKNOWN_CATEGORY_ID } from "../../../types/Category";
+import { convertFileToImages } from "../../../image/imageHelper";
 
 type ImageViewerProps = {
   image?: Image;
@@ -50,59 +51,21 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
   const [, setDropped] = useState<File[]>([]);
 
   const onDrop = useCallback(
-    (item) => {
+    async (item) => {
       if (item) {
         for (let i = 0; i < item.files.length; i++) {
-          const file = item.files[i];
-
-          file.arrayBuffer().then((buffer: any) => {
-            ImageJS.Image.load(buffer).then((image) => {
-              const shape: ShapeType = {
-                channels: image.components,
-                frames: 1,
-                height: image.height,
-                planes: 1,
-                width: image.width,
-              };
-
-              const imageDataURL = image.toDataURL("image/png", {
-                useCanvas: true,
-              });
-
-              const loaded: Image = {
-                categoryId: UNKNOWN_CATEGORY_ID,
-                id: uuidv4(),
-                annotations: [],
-                name: file.name,
-                partition: Partition.Inference,
-                shape: shape,
-                originalSrc: imageDataURL,
-                src: imageDataURL,
-              };
-
-              dispatch(addImages({ newImages: [loaded] }));
-
-              if (i === 0) {
-                batch(() => {
-                  dispatch(
-                    setActiveImage({
-                      image: loaded.id,
-                    })
-                  );
-
-                  dispatch(
-                    setSelectedAnnotations({
-                      selectedAnnotations: [],
-                      selectedAnnotation: undefined,
-                    })
-                  );
-
-                  dispatch(
-                    setOperation({ operation: ToolType.RectangularAnnotation })
-                  );
-                });
-              }
-            });
+          if (i === 0) {
+            dispatch(
+              setSelectedAnnotations({
+                selectedAnnotations: [],
+                selectedAnnotation: undefined,
+              })
+            );
+          }
+          const images = await convertFileToImages(item.files[i]);
+          batch(() => {
+            dispatch(addImages({ newImages: images }));
+            if (i === 0) dispatch(setActiveImage({ image: images[0].id }));
           });
         }
       }
