@@ -16,6 +16,7 @@ export const OpenProjectMenuItem = ({
     event: React.ChangeEvent<HTMLInputElement>,
     close: () => void
   ) => {
+    popupState.close();
     event.persist();
 
     close();
