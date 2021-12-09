@@ -19,6 +19,7 @@ export const OpenClassifierMenuItem = ({
     event: React.ChangeEvent<HTMLInputElement>,
     close: () => void
   ) => {
+    popupState.close();
     event.persist();
 
     close();
