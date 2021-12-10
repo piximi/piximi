@@ -1,14 +1,17 @@
-import { Divider, Menu, MenuList } from "@mui/material";
+import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenClassifierMenuItem } from "../OpenClassifierMenuItem";
+import { OpenClassifierDialog } from "../OpenClassifierDialog";
+import { useDialog } from "../../hooks";
 
 type OpenMenuProps = {
   popupState: any;
 };
 
 export const OpenMenu = ({ popupState }: OpenMenuProps) => {
+  const { onClose, onOpen, open } = useDialog();
+
   return (
     <Menu {...bindMenu(popupState)}>
       <MenuList dense variant="menu">
@@ -16,8 +19,14 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
         <OpenExampleProjectMenuItem popupState={popupState} />
         <Divider />
 
-        <OpenClassifierMenuItem popupState={popupState} />
+        <MenuItem onClick={onOpen}>Open classifier</MenuItem>
       </MenuList>
+
+      <OpenClassifierDialog
+        onClose={onClose}
+        open={open}
+        popupState={popupState}
+      />
     </Menu>
   );
 };
