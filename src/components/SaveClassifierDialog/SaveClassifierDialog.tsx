@@ -1,0 +1,89 @@
+import { ChangeEvent, useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+} from "@mui/material";
+import { fittedSelector } from "../../store/selectors/fittedSelector";
+import { modelNameSelector } from "../../store/selectors/modelNameSelector";
+
+type SaveClassifierDialogProps = {
+  onClose: () => void;
+  open: boolean;
+  popupState: any;
+};
+
+export const SaveClassifierDialog = ({
+  onClose,
+  open,
+  popupState,
+}: SaveClassifierDialogProps) => {
+  const fitted = useSelector(fittedSelector);
+
+  const modelName = useSelector(modelNameSelector);
+
+  const [classifierName, setClassifierName] = useState<string>(modelName);
+
+  const noFittedModel = fitted ? false : true;
+
+  const onCancel = () => {
+    onClose();
+  };
+
+  const onSaveClassifierClick = async () => {
+    await fitted.save(`downloads://${classifierName}`);
+
+    onClose();
+    popupState.close();
+  };
+
+  const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setClassifierName(event.target.value);
+  };
+
+  return (
+    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
+      <DialogTitle>Save Classifier</DialogTitle>
+
+      <DialogContent>
+        <Grid container spacing={1}>
+          <Grid item xs={10}>
+            <TextField
+              autoFocus
+              fullWidth
+              id="name"
+              label="Classifier name"
+              margin="dense"
+              onChange={onNameChange}
+              helperText={
+                noFittedModel
+                  ? "There is no trained model that could be saved."
+                  : ""
+              }
+              error={noFittedModel}
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onCancel} color="primary">
+          Cancel
+        </Button>
+
+        <Button
+          onClick={onSaveClassifierClick}
+          color="primary"
+          disabled={noFittedModel}
+        >
+          Save Classifier
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
