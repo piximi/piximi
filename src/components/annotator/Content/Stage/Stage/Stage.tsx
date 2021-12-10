@@ -758,6 +758,8 @@ export const Stage = () => {
 
   const { draggable } = useHandTool();
 
+  // re. use of Consumer -> Stage -> Provider
+  // https://github.com/konvajs/react-konva/issues/311
   return (
     <>
       <ReactReduxContext.Consumer>
