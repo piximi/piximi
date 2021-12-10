@@ -64,7 +64,7 @@ export const OpenProjectMenuItem = ({
 
   return (
     <MenuItem component="label">
-      <ListItemText primary="Open project file" />
+      <ListItemText primary="Open project" />
       <input
         accept="application/json"
         hidden
