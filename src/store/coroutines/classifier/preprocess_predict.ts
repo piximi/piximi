@@ -69,20 +69,20 @@ export const generator = (images: Array<Image>) => {
 
 export const preprocess_predict = async (
   images: Array<Image>,
-  rescaleOptions: RescaleOptions
+  rescaleOptions: RescaleOptions,
+  inputShape: Shape
 ): Promise<
   tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     id: string;
   }>
 > => {
-  const imageShape = images[0].shape;
   const data = tensorflow.data
     .generator(generator(images))
     .mapAsync(
-      decodeImage.bind(null, imageShape.channels, rescaleOptions.rescale)
+      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
-    .mapAsync(resize.bind(null, imageShape));
+    .mapAsync(resize.bind(null, inputShape));
 
   return data;
 };
