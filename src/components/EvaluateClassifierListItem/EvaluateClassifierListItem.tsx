@@ -1,22 +1,46 @@
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import React from "react";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import { useImage } from "../../hooks/useImage/useImage";
+import {
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import { useStyles } from "../ClassifierList/classifierListTooltip.css";
 
-export const EvaluateClassifierListItem = () => {
-  const image = useImage();
+type EvaluateClassifierListItemProbs = {
+  disabled: boolean;
+};
 
-  if (!image) return <React.Fragment />;
-
+export const EvaluateClassifierListItem = ({
+  disabled,
+}: EvaluateClassifierListItemProbs) => {
   const onEvaluateClick = () => {};
 
-  return (
-    <ListItem disabled button onClick={onEvaluateClick}>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
+  const classes = useStyles();
 
-      <ListItemText primary="Evaluate" />
-    </ListItem>
+  return (
+    <>
+      <Tooltip
+        classes={{
+          tooltip: classes.customTooltip,
+          arrow: classes.customArrow,
+        }}
+        title={disabled ? "train or open a model before evaluation" : ""}
+        placement="right"
+        arrow
+      >
+        <ListItem disabled={disabled}>
+          <ListItemIcon>
+            <AssessmentIcon />
+          </ListItemIcon>
+          <ListItemText primary="Evaluate" />
+          <IconButton onClick={onEvaluateClick} edge="end" disabled={disabled}>
+            <KeyboardArrowRightIcon />
+          </IconButton>
+        </ListItem>
+      </Tooltip>
+    </>
   );
 };
