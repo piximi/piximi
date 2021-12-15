@@ -31,7 +31,7 @@ export const ColorAnnotationToolTip = ({
   useEffect(() => {
     if (!toolTipPosition) return;
     setText(`Tolerance: ${tolerance}`);
-  }, [toolTipPosition]);
+  }, [toolTipPosition, tolerance]);
 
   if (toolType !== ToolType.ColorAnnotation) return <></>;
 
