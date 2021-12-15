@@ -6,8 +6,11 @@ import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import * as tensorflow from "@tensorflow/tfjs";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
-import { ArchitectureOptions } from "../../types/ArchitectureOptions";
 import { RescaleOptions } from "../../types/RescaleOptions";
+import {
+  availableModels,
+  ClassifierModelProps,
+} from "../../types/ClassifierModelType";
 
 const initialState: Classifier = {
   evaluating: false,
@@ -27,9 +30,7 @@ const initialState: Classifier = {
   fitting: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  modelName: "SimpleCNN",
-  modelMultiplier: "0.0",
-  modelVersion: "3",
+  selectedModel: availableModels[0],
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
@@ -68,15 +69,12 @@ export const classifierSlice = createSlice({
       state.learningRate = classifier.learningRate;
       state.lossFunction = classifier.lossFunction;
       state.metrics = classifier.metrics;
-      state.model = classifier.model;
-      state.modelName = classifier.modelName;
-      state.modelVersion = classifier.modelVersion;
-      state.modelMultiplier = classifier.modelMultiplier;
 
       state.optimizationAlgorithm = classifier.optimizationAlgorithm;
       state.trainingPercentage = classifier.trainingPercentage;
 
       //initialize all others to false/undefined, since we are essentially initializing a new classifier
+      state.selectedModel = availableModels[0];
       state.evaluating = false;
       state.evaluations = classifier.evaluations;
       state.fitting = false;
@@ -111,6 +109,11 @@ export const classifierSlice = createSlice({
 
       state.fitting = false;
     },
+    addFitted(state, action: PayloadAction<{ fitted: LayersModel }>) {
+      const { fitted } = action.payload;
+
+      state.fitted = fitted;
+    },
     updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
       state.inputShape = action.payload.inputShape;
     },
@@ -132,21 +135,25 @@ export const classifierSlice = createSlice({
 
       state.metrics = metrics;
     },
-    updateModel(
+    updateSelectedModel(
       state,
-      action: PayloadAction<{ modelOptions: ArchitectureOptions }>
+      action: PayloadAction<{ model: ClassifierModelProps }>
     ) {
-      state.modelName = action.payload.modelOptions.modelName;
-      state.modelVersion = action.payload.modelOptions.modelVersion;
-      state.modelMultiplier = action.payload.modelOptions.modelMultiplier;
+      state.selectedModel = action.payload.model;
     },
-    updateModelName(state, action: PayloadAction<{ modelName: string }>) {
-      state.modelName = action.payload.modelName;
-    },
-    updateOpened(state, action: PayloadAction<{ opened: LayersModel }>) {
-      const { opened } = action.payload;
-
-      state.opened = opened;
+    uploadUserSelectedModel(
+      state,
+      action: PayloadAction<{
+        inputShape: Shape;
+        modelSelection: ClassifierModelProps;
+        model: LayersModel;
+      }>
+    ) {
+      state.inputShape = action.payload.inputShape;
+      state.fitted = action.payload.model;
+      state.compiled = action.payload.model;
+      state.selectedModel = action.payload.modelSelection;
+      state.userUploadedModel = action.payload.modelSelection;
     },
     updateOptimizationAlgorithm(
       state,
@@ -195,7 +202,6 @@ export const {
   updateLearningRate,
   updateLossFunction,
   updateMetrics,
-  updateOpened,
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,

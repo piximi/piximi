@@ -2,6 +2,7 @@ import { put, select } from "redux-saga/effects";
 import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { classifierSlice } from "../../slices";
 import {
+  compiledSelector,
   compileOptionsSelector,
   createdCategoriesCountSelector,
   createdCategoriesSelector,
@@ -18,6 +19,7 @@ import { CompileOptions } from "../../../types/CompileOptions";
 import { Category } from "../../../types/Category";
 import { Image } from "../../../types/Image";
 import { FitOptions } from "../../../types/FitOptions";
+import { ModelType } from "../../../types/ClassifierModelType";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
@@ -25,31 +27,29 @@ export function* fitSaga(action: any): any {
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
   );
-
-  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
-
   const classes: number = yield select(createdCategoriesCountSelector);
 
-  const opened: tensorflow.LayersModel = yield open(
-    architectureOptions,
-    classes
-  );
-  yield put(classifierSlice.actions.updateOpened({ opened: opened }));
+  var model: tensorflow.LayersModel;
+  if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
+    model = yield select(compiledSelector);
+  } else {
+    model = yield open(architectureOptions, classes);
+  }
 
   const compileOptions: CompileOptions = yield select(compileOptionsSelector);
-
-  const compiled: tensorflow.LayersModel = yield compile(
-    opened,
+  const compiledModel: tensorflow.LayersModel = yield compile(
+    model,
     compileOptions
   );
 
-  yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+  yield put(
+    classifierSlice.actions.updateCompiled({ compiled: compiledModel })
+  );
 
   const categories: Category[] = yield select(createdCategoriesSelector);
-
   const trainImages: Image[] = yield select(trainImagesSelector);
-
   const valImages: Image[] = yield select(valImagesSelector);
+  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
   const data = yield preprocess(
     trainImages,
@@ -63,7 +63,12 @@ export function* fitSaga(action: any): any {
 
   const options: FitOptions = yield select(fitOptionsSelector);
 
-  const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
+  const { fitted, status } = yield fit(
+    compiledModel,
+    data,
+    options,
+    onEpochEnd
+  );
 
   const payload = { fitted: fitted, status: status };
 

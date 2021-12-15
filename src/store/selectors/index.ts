@@ -30,7 +30,6 @@ export { compiledSelector } from "./compiledSelector";
 export { createdCategoriesCountSelector } from "./createdCategoriesCountSelector";
 export { dataSelector } from "./dataSelector";
 export { fitOptionsSelector } from "./fitOptionsSelector";
-export { openedSelector } from "./openedSelector";
 export { trainingPercentageSelector } from "./trainingPercentageSelector";
 export { compileOptionsSelector } from "./compileOptionsSelector";
 export { imagesSelector } from "./imagesSelector";

@@ -8,8 +8,6 @@ export const architectureOptionsSelector = ({
 }): ArchitectureOptions => {
   return {
     inputShape: classifier.inputShape,
-    modelMultiplier: classifier.modelMultiplier,
-    modelName: classifier.modelName,
-    modelVersion: classifier.modelVersion,
+    selectedModel: classifier.selectedModel,
   };
 };
