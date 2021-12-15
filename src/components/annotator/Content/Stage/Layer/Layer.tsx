@@ -44,6 +44,7 @@ export const Layer = ({ children }: LayerProps) => {
     } else {
       setPosition({ x: stageWidth / 2, y: stageHeight / 2 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- zoomSelection.dragging not a dependency
   }, [automaticCentering, stageWidth, stageHeight, imageWidth, imageHeight]);
 
   return (
