@@ -17,7 +17,6 @@ export {
   updateLearningRate,
   updateLossFunction,
   updateMetrics,
-  updateOpened,
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,

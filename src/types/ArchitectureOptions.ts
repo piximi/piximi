@@ -1,8 +1,7 @@
+import { ClassifierModelProps } from "./ClassifierModelType";
 import { Shape } from "./Shape";
 
 export type ArchitectureOptions = {
-  modelName: string;
-  modelVersion: string;
-  modelMultiplier: string;
+  selectedModel: ClassifierModelProps;
   inputShape: Shape;
 };

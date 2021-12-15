@@ -1,13 +1,14 @@
 import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
-import { simpleCNN } from "../../../components/FitClassifierDialog/FitClassifierDialog/networks";
+import { ModelType } from "../../../types/ClassifierModelType";
+import { simpleCNN } from "../models/simpleCNN";
 
 export const open = async (
   modelOptions: ArchitectureOptions,
   classes: number
 ) => {
-  if (modelOptions.modelName === "SimpleCNN") {
+  if (modelOptions.selectedModel.modelType === ModelType.SimpleCNN) {
     return simpleCNN(modelOptions.inputShape, classes);
   } else {
-    return simpleCNN(modelOptions.inputShape, classes); //default is simpleCNNs
+    alert("Invalid model selected!");
   }
 };

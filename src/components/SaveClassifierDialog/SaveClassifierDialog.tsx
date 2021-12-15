@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { modelNameSelector } from "../../store/selectors/modelNameSelector";
+import { selectedModelSelector } from "../../store/selectors/selectedModelSelector";
 
 type SaveClassifierDialogProps = {
   onClose: () => void;
@@ -25,9 +25,11 @@ export const SaveClassifierDialog = ({
 }: SaveClassifierDialogProps) => {
   const fitted = useSelector(fittedSelector);
 
-  const modelName = useSelector(modelNameSelector);
+  const selectedModel = useSelector(selectedModelSelector);
 
-  const [classifierName, setClassifierName] = useState<string>(modelName);
+  const [classifierName, setClassifierName] = useState<string>(
+    selectedModel.modelName
+  );
 
   const noFittedModel = fitted ? false : true;
 
