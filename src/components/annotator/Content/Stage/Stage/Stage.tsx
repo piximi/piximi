@@ -209,6 +209,12 @@ export const Stage = () => {
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
 
+  /* Note: this is a good example of when all dependencies should
+     _not_ be included in the dependency array
+     for example if annotationTool is included, then every time
+     the user switches tools, inversion will occur,
+     which is clearly a bad thing -- Nodar
+  */
   useEffect(() => {
     if (!annotationTool) return;
 
@@ -235,6 +241,7 @@ export const Stage = () => {
         },
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invertMode]);
 
   useEffect(() => {
