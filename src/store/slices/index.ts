@@ -42,7 +42,6 @@ export {
   setHue,
   setActiveImage,
   setImages,
-  setInvertMode,
   setOffset,
   setOperation,
   setPenSelectionBrushSize,

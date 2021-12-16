@@ -98,7 +98,6 @@ const initialState: ImageViewer = {
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
   images: initialImage ? [initialImage] : [],
-  invertMode: false,
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 32,
@@ -382,12 +381,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
-    setInvertMode(
-      state: ImageViewer,
-      action: PayloadAction<{ invertMode: boolean }>
-    ) {
-      state.invertMode = action.payload.invertMode;
-    },
     setImageInstances(
       state: ImageViewer,
       action: PayloadAction<{
@@ -555,7 +548,6 @@ export const {
   setExposure,
   setHue,
   setImages,
-  setInvertMode,
   setLanguage,
   setOffset,
   setOperation,

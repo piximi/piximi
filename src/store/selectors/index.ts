@@ -13,7 +13,6 @@ export { imageInstancesSelector } from "./imageInstancesSelector";
 export { imageNameSelector } from "./imageNameSelector";
 export { imageSelector } from "./imageSelector";
 export { imageOriginalSrcSelector } from "./imageOriginalSrcSelector";
-export { invertModeSelector } from "./invertModeSelector";
 export { saturationSelector } from "./saturationSelector";
 export { selectedCategorySelector } from "./selectedCategorySelector";
 export { selectionModeSelector } from "./selectionModeSelector";

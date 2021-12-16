@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
-  invertModeSelector,
   selectedCategorySelector,
   selectionModeSelector,
   stageHeightSelector,
@@ -80,7 +79,6 @@ export const Stage = () => {
 
   const toolType = useSelector(toolTypeSelector);
 
-  const invertMode = useSelector(invertModeSelector);
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
@@ -208,41 +206,6 @@ export const Stage = () => {
     if (!stageRef || !stageRef.current) return;
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
-
-  /* Note: this is a good example of when all dependencies should
-     _not_ be included in the dependency array
-     for example if annotationTool is included, then every time
-     the user switches tools, inversion will occur,
-     which is clearly a bad thing -- Nodar
-  */
-  useEffect(() => {
-    if (!annotationTool) return;
-
-    if (!selectedAnnotation || !selectedAnnotation.mask) return;
-
-    const [invertedMask, invertedBoundingBox] = annotationTool.invert(
-      selectedAnnotation.mask,
-      selectedAnnotation.boundingBox
-    );
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...selectedAnnotation,
-            boundingBox: invertedBoundingBox,
-            mask: invertedMask,
-          },
-        ],
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          boundingBox: invertedBoundingBox,
-          mask: invertedMask,
-        },
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [invertMode]);
 
   useEffect(() => {
     if (toolType === ToolType.Zoom) return;
@@ -765,8 +728,9 @@ export const Stage = () => {
 
   const { draggable } = useHandTool();
 
-  // re. use of Consumer -> Stage -> Provider
-  // https://github.com/konvajs/react-konva/issues/311
+  /* re. use of Consumer -> Stage -> Provider
+    https://github.com/konvajs/react-konva/issues/311
+   */
   return (
     <>
       <ReactReduxContext.Consumer>

@@ -21,7 +21,6 @@ export type ImageViewer = {
   hue: number;
   activeImageId?: string;
   images: Array<Image>;
-  invertMode: boolean;
   language: LanguageType;
   offset: { x: number; y: number };
   penSelectionBrushSize: number;
