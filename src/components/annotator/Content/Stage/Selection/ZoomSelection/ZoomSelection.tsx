@@ -4,7 +4,7 @@ import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
 import { zoomSelectionSelector } from "../../../../../../store/selectors";
 
-export const ZoomSelection = ({}) => {
+export const ZoomSelection = () => {
   const dashOffset = useMarchingAnts();
 
   const { dragging, minimum, maximum, selecting } = useSelector(
