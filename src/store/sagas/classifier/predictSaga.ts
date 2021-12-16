@@ -7,6 +7,7 @@ import { predictCategories } from "../../coroutines/classifier/predictCategories
 import { testImagesSelector } from "../../selectors/testImagesSelector";
 import { fittedSelector } from "../../selectors/fittedSelector";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
+import { Category } from "../../../types/Category";
 
 export function* predictSaga(action: any): any {
   const rescaleOptions = yield select(rescaleOptionsSelector);
@@ -15,12 +16,20 @@ export function* predictSaga(action: any): any {
 
   const architectureOptions = yield select(architectureOptionsSelector);
 
-  const categories = yield select(createdCategoriesSelector);
+  const categories: Category[] = yield select(createdCategoriesSelector);
 
   const testImages = yield select(testImagesSelector);
 
   if (!testImages.length) {
     alert("No unlabled images to predict!");
+    return;
+  }
+
+  const outputLayerSize = model.outputs[0].shape[1] as number;
+  if (outputLayerSize !== categories.length) {
+    alert(
+      "The output shape of your model does not correspond to the number of categories!"
+    );
     return;
   }
 
