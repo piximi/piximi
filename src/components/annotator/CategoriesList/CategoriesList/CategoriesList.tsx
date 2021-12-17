@@ -163,8 +163,8 @@ export const CategoriesList = (props: any) => {
     category: Category
   ) => {
     dispatch(
-      imageViewerSlice.actions.setSelectedCategory({
-        selectedCategory: category.id,
+      imageViewerSlice.actions.setSelectedCategoryId({
+        selectedCategoryId: category.id,
       })
     );
   };
@@ -174,8 +174,8 @@ export const CategoriesList = (props: any) => {
     category: Category
   ) => {
     dispatch(
-      imageViewerSlice.actions.setSelectedCategory({
-        selectedCategory: category.id,
+      imageViewerSlice.actions.setSelectedCategoryId({
+        selectedCategoryId: category.id,
       })
     );
     setAnchorEl(event.currentTarget);
@@ -217,8 +217,8 @@ export const CategoriesList = (props: any) => {
         })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedCategory({
-          selectedCategory: UNKNOWN_CATEGORY_ID,
+        imageViewerSlice.actions.setSelectedCategoryId({
+          selectedCategoryId: UNKNOWN_CATEGORY_ID,
         })
       );
       dispatch(

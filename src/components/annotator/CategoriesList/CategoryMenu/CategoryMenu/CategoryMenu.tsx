@@ -60,8 +60,8 @@ export const CategoryMenu = ({
     else {
       batch(() => {
         dispatch(
-          imageViewerSlice.actions.setSelectedCategory({
-            selectedCategory: UNKNOWN_CATEGORY_ID,
+          imageViewerSlice.actions.setSelectedCategoryId({
+            selectedCategoryId: UNKNOWN_CATEGORY_ID,
           })
         );
 

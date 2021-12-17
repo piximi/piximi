@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToolType } from "../../types/ToolType";
 import { createdCategoriesSelector } from "../../store/selectors";
 import { useHotkeys } from "react-hotkeys-hook";
-import { setOperation, setSelectedCategory } from "../../store/slices";
+import { setOperation, setSelectedCategoryId } from "../../store/slices";
 
 export const useKeyboardShortcuts = () => {
   const dispatch = useDispatch();
@@ -121,7 +121,9 @@ export const useKeyboardShortcuts = () => {
 
     if (!selectedCategory) return;
 
-    dispatch(setSelectedCategory({ selectedCategory: selectedCategory.id }));
+    dispatch(
+      setSelectedCategoryId({ selectedCategoryId: selectedCategory.id })
+    );
   });
 
   /*

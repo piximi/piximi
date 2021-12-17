@@ -50,7 +50,7 @@ export {
   setSaturation,
   setSelectedAnnotations,
   setSelectionMode,
-  setSelectedCategory,
+  setSelectedCategoryId,
   setStageHeight,
   setStagePosition,
   setStageScale,

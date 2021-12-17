@@ -34,7 +34,7 @@ export type ImageViewer = {
   saturation: number;
   selectedAnnotations: Array<AnnotationType>;
   selectedAnnotation: AnnotationType | undefined;
-  selectedCategory: string;
+  selectedCategoryId: string;
   selectionMode: AnnotationModeType;
   soundEnabled: boolean;
   stageHeight: number;
