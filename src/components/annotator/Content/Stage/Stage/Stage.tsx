@@ -71,7 +71,6 @@ import {
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 
 export const Stage = () => {
-  const [counter, setCounter] = useState(0);
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
 
