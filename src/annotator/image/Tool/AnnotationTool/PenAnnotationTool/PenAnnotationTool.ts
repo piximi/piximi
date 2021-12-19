@@ -107,6 +107,7 @@ export class PenAnnotationTool extends AnnotationTool {
     this._mask = encode(this.circlesData);
   }
 
+  // TODO: Doesn't need to be async? Should be a constructor? -- Nodar
   static async setup(image: ImageJS.Image, brushSize: number) {
     const operator = new PenAnnotationTool(image);
 

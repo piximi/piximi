@@ -26,7 +26,6 @@ import {
   useHandTool,
   useZoom,
 } from "../../../../../hooks";
-import { AnnotationType } from "../../../../../types/AnnotationType";
 import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import { Image } from "../Image";
@@ -188,7 +187,12 @@ export const Stage = () => {
 
     batch(() => {
       dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-      dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
+      dispatch(
+        imageViewerSlice.actions.setAnnotated({
+          annotated: false,
+          annotationTool,
+        })
+      );
     });
 
     if (!selectedAnnotation) return;
@@ -208,93 +212,13 @@ export const Stage = () => {
   }, [cursor]);
 
   useEffect(() => {
-    if (toolType === ToolType.Zoom) return;
-
-    if (selectionMode === AnnotationModeType.New) return;
-
-    if (!annotated || !annotationTool) return;
-
-    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-
-    if (!annotationTool.annotated) return;
-
-    let combinedMask, combinedBoundingBox;
-
-    if (!selectedAnnotation) return;
-
-    if (selectionMode === AnnotationModeType.Add) {
-      [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Subtract) {
-      [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Intersect) {
-      [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    }
-
-    annotationTool.mask = combinedMask;
-
-    annotationTool.boundingBox = combinedBoundingBox;
-
-    if (!annotationTool.boundingBox || !annotationTool.mask) return;
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...selectedAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            mask: annotationTool.mask,
-          },
-        ],
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          boundingBox: annotationTool.boundingBox,
-          mask: annotationTool.mask,
-        },
-      })
-    );
-  }, [annotated]);
-
-  useEffect(() => {
-    if (!selectedAnnotationsIds) return;
-
-    if (!annotations) return;
-
-    const updatedAnnotations = _.map(
-      selectedAnnotations,
-      (annotation: AnnotationType) => {
-        return { ...annotation, categoryId: selectedCategory.id };
-      }
-    );
-
-    if (!selectedAnnotation) return;
-
-    dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: updatedAnnotations,
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          categoryId: selectedCategory.id,
-        },
-      })
-    );
-  }, [selectedCategory]);
-
-  useEffect(() => {
     if (!annotationTool) return;
 
     if (annotationTool.annotated) {
       dispatch(
         imageViewerSlice.actions.setAnnotated({
           annotated: annotationTool.annotated,
+          annotationTool,
         })
       );
 
@@ -327,25 +251,6 @@ export const Stage = () => {
       annotationTool.update(Math.round(quickSelectionBrushSize / stageScale));
     }
   }, [quickSelectionBrushSize]);
-
-  useEffect(() => {
-    if (!annotated) return;
-
-    if (!annotationTool) return;
-
-    annotationTool.annotate(selectedCategory);
-
-    if (!annotationTool.annotation) return;
-
-    if (selectionMode !== AnnotationModeType.New) return;
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [annotationTool.annotation],
-        selectedAnnotation: annotationTool.annotation,
-      })
-    );
-  }, [annotated]);
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
@@ -392,6 +297,7 @@ export const Stage = () => {
   const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
     if (
       !event.target.getParent() ||
+      // TODO: shouldn't be using string for className here -- Nodar
       event.target.getParent().className === "Transformer"
     )
       return;
@@ -453,7 +359,12 @@ export const Stage = () => {
       } else {
         if (annotated) {
           deselectAnnotation();
-          dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
+          dispatch(
+            imageViewerSlice.actions.setAnnotated({
+              annotated: false,
+              annotationTool,
+            })
+          );
         }
 
         if (selectionMode === AnnotationModeType.New) {
@@ -620,7 +531,12 @@ export const Stage = () => {
 
     deselectAnnotation();
 
-    dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
+    dispatch(
+      imageViewerSlice.actions.setAnnotated({
+        annotated: false,
+        annotationTool,
+      })
+    );
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(

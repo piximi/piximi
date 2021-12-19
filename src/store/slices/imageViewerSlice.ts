@@ -17,6 +17,7 @@ import {
 } from "../../image/imageHelper";
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
+import { AnnotationTool } from "../../annotator/image/Tool";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -111,7 +112,7 @@ const initialState: ImageViewer = {
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
-  selectedCategory: UNKNOWN_CATEGORY_ID,
+  selectedCategoryId: UNKNOWN_CATEGORY_ID,
   selectionMode: AnnotationModeType.New,
   soundEnabled: true,
   stageHeight: 1000,
@@ -264,7 +265,10 @@ export const imageViewerSlice = createSlice({
     },
     setAnnotated(
       state: ImageViewer,
-      action: PayloadAction<{ annotated: boolean }>
+      action: PayloadAction<{
+        annotated: boolean;
+        annotationTool: AnnotationTool | undefined;
+      }>
     ) {
       state.annotated = action.payload.annotated;
     },
@@ -446,11 +450,11 @@ export const imageViewerSlice = createSlice({
     ) {
       state.saturation = action.payload.saturation;
     },
-    setSelectedCategory(
+    setSelectedCategoryId(
       state: ImageViewer,
-      action: PayloadAction<{ selectedCategory: string }>
+      action: PayloadAction<{ selectedCategoryId: string }>
     ) {
-      state.selectedCategory = action.payload.selectedCategory;
+      state.selectedCategoryId = action.payload.selectedCategoryId;
     },
     setSelectedAnnotations(
       state: ImageViewer,
@@ -557,7 +561,7 @@ export const {
   setSaturation,
   setSelectedAnnotations,
   setSelectionMode,
-  setSelectedCategory,
+  setSelectedCategoryId,
   setSoundEnabled,
   setStageHeight,
   setStagePosition,
