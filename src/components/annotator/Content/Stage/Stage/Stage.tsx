@@ -319,12 +319,7 @@ export const Stage = () => {
 
       if (!relative) return;
 
-      if (
-        saveLabelRef &&
-        saveLabelRef.current &&
-        saveLabelRef.current.getText() &&
-        clearLabelRef.current
-      ) {
+      if (saveLabelRef?.current?.getText() && clearLabelRef.current) {
         //do not proceed with mouse down events if user has clicked on Save Annotation button
         if (
           (relative.x <
