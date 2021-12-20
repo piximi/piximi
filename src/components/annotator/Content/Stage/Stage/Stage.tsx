@@ -362,12 +362,7 @@ export const Stage = () => {
         }
 
         if (selectionMode === AnnotationModeType.New) {
-          dispatch(
-            imageViewerSlice.actions.setSelectedAnnotations({
-              selectedAnnotations: [],
-              selectedAnnotation: undefined,
-            })
-          );
+          deselectAllAnnotations();
         }
 
         if (!annotationTool) return;
