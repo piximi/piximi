@@ -181,10 +181,6 @@ export const Stage = () => {
   };
 
   const deselectAnnotation = () => {
-    if (!annotationTool) return;
-
-    annotationTool.deselect();
-
     batch(() => {
       dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
       dispatch(
@@ -194,6 +190,10 @@ export const Stage = () => {
         })
       );
     });
+
+    if (!annotationTool) return;
+
+    annotationTool.deselect();
 
     if (!selectedAnnotation) return;
 
@@ -359,12 +359,6 @@ export const Stage = () => {
       } else {
         if (annotated) {
           deselectAnnotation();
-          dispatch(
-            imageViewerSlice.actions.setAnnotated({
-              annotated: false,
-              annotationTool,
-            })
-          );
         }
 
         if (selectionMode === AnnotationModeType.New) {
@@ -530,13 +524,6 @@ export const Stage = () => {
     if (soundEnabled) playCreateAnnotationSoundEffect();
 
     deselectAnnotation();
-
-    dispatch(
-      imageViewerSlice.actions.setAnnotated({
-        annotated: false,
-        annotationTool,
-      })
-    );
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
