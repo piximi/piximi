@@ -9,7 +9,7 @@ import { scaledImageHeightSelector } from "../../../../../store/selectors/scaled
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
-  annotating?: boolean;
+  annotating: boolean;
 };
 export const PenAnnotationToolTip = ({
   annotating,
