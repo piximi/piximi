@@ -1,5 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   anchor?: { x: number; y: number };
@@ -8,8 +9,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   points: Array<number> = [];
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Blank;
 
     this.annotation = undefined;
 
@@ -20,10 +20,10 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (this.buffer && this.buffer.length === 0) {
-      this.annotating = true;
+      this.annotationState = AnnotationStateType.Annotating;
 
       if (!this.origin) {
         this.origin = position;
@@ -32,7 +32,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (this.anchor) {
       if (
@@ -57,7 +57,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (
       this.connected(position) &&
@@ -73,8 +73,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
         this.origin.y,
       ];
 
-      this.annotated = true;
-      this.annotating = false;
+      this.annotationState = AnnotationStateType.Annotated;
 
       this.points = this.buffer;
 

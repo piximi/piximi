@@ -1,5 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class RectangularAnnotationTool extends AnnotationTool {
   origin?: { x: number; y: number };
@@ -13,8 +14,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Blank;
 
     this.origin = undefined;
 
@@ -23,12 +23,12 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (!this.width) {
       this.origin = position;
 
-      this.annotating = true;
+      this.annotationState = AnnotationStateType.Annotating;
     } else {
       this.resize(position);
 
@@ -40,19 +40,19 @@ export class RectangularAnnotationTool extends AnnotationTool {
       if (!mask) return;
       this._mask = encode(new Uint8Array(mask));
 
-      this.annotated = true;
-      this.annotating = false;
+      this.annotationState = AnnotationStateType.Annotated;
     }
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
+
     if (this.width) {
       this.points = this.convertToPoints();
 
@@ -62,8 +62,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
       if (!mask) return;
       this._mask = encode(new Uint8Array(mask));
 
-      this.annotated = true;
-      this.annotating = false;
+      this.annotationState = AnnotationStateType.Annotated;
     }
   }
 

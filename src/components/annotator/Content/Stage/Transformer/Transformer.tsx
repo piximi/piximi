@@ -24,6 +24,7 @@ import {
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationTool } from "../../../../../annotator/image/Tool";
 
 type box = {
   x: number;
@@ -42,11 +43,13 @@ type TransformerProps = {
     y: number;
   }) => { x: number; y: number } | undefined;
   annotationId: string;
+  annotationTool?: AnnotationTool;
 };
 
 export const Transformer = ({
   transformPosition,
   annotationId,
+  annotationTool,
 }: TransformerProps) => {
   const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
 
@@ -334,10 +337,11 @@ export const Transformer = ({
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
 
+    // TODO [annotation] wrong assumption? do nothing? set to annotated?
     dispatch(
       imageViewerSlice.actions.setAnnotationState({
         annotationState: AnnotationStateType.Blank,
-        annotationTool: undefined,
+        annotationTool: annotationTool,
       })
     );
 

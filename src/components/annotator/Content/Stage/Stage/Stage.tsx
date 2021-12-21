@@ -211,7 +211,7 @@ export const Stage = () => {
   useEffect(() => {
     if (!annotationTool) return;
 
-    if (annotationTool.annotated) {
+    if (annotationTool.annotationState === AnnotationStateType.Annotated) {
       dispatch(
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
@@ -221,14 +221,16 @@ export const Stage = () => {
 
       if (selectionMode !== AnnotationModeType.New) return;
       annotationTool.annotate(selectedCategory);
-    } else if (annotationTool.annotating)
+    } else if (
+      annotationTool.annotationState === AnnotationStateType.Annotating
+    )
       dispatch(
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotating,
           annotationTool,
         })
       );
-  }, [annotationTool?.annotated, annotationTool?.annotating]);
+  }, [annotationTool?.annotationState]);
 
   useEffect(() => {
     if (toolType === ToolType.PenAnnotation) {
@@ -437,6 +439,7 @@ export const Stage = () => {
     const throttled = _.throttle(func, 5);
     return () => throttled();
   }, [
+    annotationState, // TODO [annotation] remove
     annotationTool,
     pointerDragging,
     pointerSelecting,
@@ -494,7 +497,12 @@ export const Stage = () => {
   ]);
 
   const confirmAnnotations = () => {
-    if (!annotations || !annotationTool || annotationTool.annotating) return;
+    if (
+      !annotations ||
+      !annotationTool ||
+      annotationTool.annotationState === AnnotationStateType.Annotating
+    )
+      return;
 
     if (!activeImageId) return;
 
@@ -530,7 +538,7 @@ export const Stage = () => {
     [
       annotations,
       annotationTool,
-      annotationTool?.annotating,
+      annotationTool?.annotationState,
       dispatch,
       selectedAnnotations,
       unselectedAnnotations,
@@ -656,6 +664,7 @@ export const Stage = () => {
 
                     <Transformers
                       transformPosition={getRelativePointerPosition}
+                      annotationTool={annotationTool}
                     />
 
                     <ColorAnnotationToolTip

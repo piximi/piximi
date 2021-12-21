@@ -8,12 +8,12 @@ import { slpf } from "../../../polygon-fill/slpf";
 import { v4 as uuidv4 } from "uuid";
 import { decode, encode } from "../../../rle";
 import { Tool } from "../../Tool";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export abstract class AnnotationTool extends Tool {
   manager: ImageJS.RoiManager;
   points?: Array<number> = [];
-  annotated: boolean = false;
-  annotating: boolean = false;
+  annotationState = AnnotationStateType.Blank;
   annotation?: AnnotationType;
 
   anchor?: { x: number; y: number } = undefined;
@@ -120,7 +120,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   connect() {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (!this.anchor || !this.origin) return;
 
@@ -155,8 +155,7 @@ export abstract class AnnotationTool extends Tool {
     this.origin = undefined;
     this.buffer = [];
 
-    this.annotated = true;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Annotated;
   }
 
   /*

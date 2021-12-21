@@ -18,8 +18,11 @@ export function* annotationStateChangeSaga({
     annotationTool: AnnotationTool | undefined;
   };
 }): any {
-  if (annotationState !== AnnotationStateType.Annotated || !annotationTool)
-    return;
+  if (!annotationTool) return;
+
+  if (annotationState === AnnotationStateType.Blank) annotationTool.deselect();
+
+  if (annotationState !== AnnotationStateType.Annotated) return;
 
   const selectionMode = yield select(selectionModeSelector);
 
@@ -42,7 +45,8 @@ export function* annotationStateChangeSaga({
 
     const selectedAnnotation = yield select(selectedAnnotationSelector);
 
-    if (!annotationTool.annotated) return;
+    if (annotationTool.annotationState !== AnnotationStateType.Annotated)
+      return;
 
     let combinedMask, combinedBoundingBox;
 

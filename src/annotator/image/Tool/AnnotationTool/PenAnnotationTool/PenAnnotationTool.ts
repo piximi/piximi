@@ -3,6 +3,7 @@ import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { connectPoints } from "../../../../../image/imageHelper";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
@@ -68,8 +69,7 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Blank;
 
     this.circlesData = undefined;
     this.buffer = [];
@@ -78,25 +78,23 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    this.annotating = true;
+    this.annotationState = AnnotationStateType.Annotating;
 
     this.buffer = [...this.buffer, position.x, position.y];
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     this.buffer = [...this.buffer, position.x, position.y];
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
-    this.annotated = true;
-
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Annotated;
 
     this.points = this.buffer;
 

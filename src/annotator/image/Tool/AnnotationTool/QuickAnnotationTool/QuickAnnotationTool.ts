@@ -3,6 +3,7 @@ import { slic } from "../../../slic";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
 import * as _ from "lodash";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class QuickAnnotationTool extends AnnotationTool {
   brushsize?: number;
@@ -34,8 +35,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Blank;
 
     this.colorMasks = undefined;
     this.currentSuperpixels.clear();
@@ -44,7 +44,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (!this.currentMask) {
       this.currentMask = new ImageJS.Image(
@@ -57,7 +57,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
     if (!this.superpixels) return;
 
-    this.annotating = true;
+    this.annotationState = AnnotationStateType.Annotating;
   }
 
   onMouseMove(position: { x: number; y: number }) {
@@ -71,7 +71,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
     this.lastSuperpixel = superpixel;
 
-    if (!this.annotating) {
+    if (this.annotationState !== AnnotationStateType.Annotating) {
       this.currentSuperpixels.clear();
 
       this.currentMask = new ImageJS.Image(
@@ -90,7 +90,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (!this.currentMask) return;
 
@@ -123,8 +123,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     //compute mask
     this._mask = encode(Uint8Array.from(thresholded));
 
-    this.annotated = true;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Annotated;
   }
 
   static setup(image: ImageJS.Image, brushsize: number) {
