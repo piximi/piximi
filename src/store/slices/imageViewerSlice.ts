@@ -4,6 +4,7 @@ import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
+import { AnnotationStateType } from "../../types/AnnotationStateType";
 import colorImage from "../../images/cell-painting.png";
 import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
@@ -72,8 +73,7 @@ const initialCategories =
       ];
 
 const initialState: ImageViewer = {
-  annotated: false,
-  annotating: false,
+  annotationState: AnnotationStateType.Blank,
   boundingClientRect: new DOMRect(),
   brightness: 0,
   categories: initialCategories.length > 0 ? initialCategories : [],
@@ -263,20 +263,14 @@ export const imageViewerSlice = createSlice({
 
       state.images.push(...[loaded]);
     },
-    setAnnotated(
+    setAnnotationState(
       state: ImageViewer,
       action: PayloadAction<{
-        annotated: boolean;
+        annotationState: AnnotationStateType;
         annotationTool: AnnotationTool | undefined;
       }>
     ) {
-      state.annotated = action.payload.annotated;
-    },
-    setAnnotating(
-      state: ImageViewer,
-      action: PayloadAction<{ annotating: boolean }>
-    ) {
-      state.annotating = action.payload.annotating;
+      state.annotationState = action.payload.annotationState;
     },
     setBoundingClientRect(
       state: ImageViewer,
@@ -539,8 +533,7 @@ export const {
   deleteImage,
   openAnnotations,
   setActiveImage,
-  setAnnotating,
-  setAnnotated,
+  setAnnotationState,
   setBoundingClientRect,
   setBrightness,
   setCategories,

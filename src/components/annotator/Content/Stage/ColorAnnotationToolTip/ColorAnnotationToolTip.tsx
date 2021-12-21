@@ -1,13 +1,13 @@
 import * as ReactKonva from "react-konva";
 import React, { useEffect, useState } from "react";
 import {
-  annotatingSelector,
   stageScaleSelector,
   toolTypeSelector,
 } from "../../../../../store/selectors";
 import { useSelector } from "react-redux";
 import { ToolType } from "../../../../../types/ToolType";
-import { annotatedSelector } from "../../../../../store/selectors/annotatedSelector";
+import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };
@@ -25,8 +25,7 @@ export const ColorAnnotationToolTip = ({
 
   const stageScale = useSelector(stageScaleSelector);
 
-  const annotated = useSelector(annotatedSelector);
-  const annotating = useSelector(annotatingSelector);
+  const annotationState = useSelector(annotationStateSelector);
 
   useEffect(() => {
     if (!toolTipPosition) return;
@@ -35,7 +34,11 @@ export const ColorAnnotationToolTip = ({
 
   if (toolType !== ToolType.ColorAnnotation) return <></>;
 
-  if (!annotating || annotated || !toolTipPosition || !initialPosition) {
+  if (
+    annotationState !== AnnotationStateType.Annotating ||
+    !toolTipPosition ||
+    !initialPosition
+  ) {
     return <React.Fragment />;
   }
 

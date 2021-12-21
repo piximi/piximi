@@ -23,6 +23,7 @@ import {
   setSelectedAnnotations,
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 type box = {
   x: number;
@@ -332,7 +333,14 @@ export const Transformer = ({
 
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
-    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
+
+    dispatch(
+      imageViewerSlice.actions.setAnnotationState({
+        annotationState: AnnotationStateType.Blank,
+        annotationTool: undefined,
+      })
+    );
+
     dispatch(
       imageViewerSlice.actions.setSelectionMode({
         selectionMode: AnnotationModeType.New,

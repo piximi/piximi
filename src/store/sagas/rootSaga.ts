@@ -1,5 +1,8 @@
 import { all, fork } from "redux-saga/effects";
-import { watchAnnotatedSaga, watchSelectedCategorySaga } from "./annotator";
+import {
+  watchAnnotationStateChangeSaga,
+  watchSelectedCategorySaga,
+} from "./annotator";
 import {
   watchCompileSaga,
   watchFitSaga,
@@ -18,7 +21,7 @@ export function* rootSaga() {
   ];
 
   const annotaterEffects = [
-    fork(watchAnnotatedSaga),
+    fork(watchAnnotationStateChangeSaga),
     fork(watchSelectedCategorySaga),
   ];
 

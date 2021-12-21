@@ -1,5 +1,5 @@
 export { classifierSelector } from "./classifierSelector";
-export { annotatingSelector } from "./annotatingSelector";
+export { annotationStateSelector } from "./annotationStateSelector";
 export { boundingClientRectSelector } from "./boundingClientRectSelector";
 export { brightnessSelector } from "./brightnessSelector";
 export { categoryCountsSelector } from "./categoryCountsSelector";

@@ -14,7 +14,6 @@ import {
   zoomSelectionSelector,
 } from "../../../../../store/selectors";
 import {
-  batch,
   Provider,
   ReactReduxContext,
   useDispatch,
@@ -30,7 +29,8 @@ import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/pe
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
-import { annotatedSelector } from "../../../../../store/selectors/annotatedSelector";
+import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 import {
   ColorAnnotationTool,
   ObjectAnnotationTool,
@@ -128,7 +128,7 @@ export const Stage = () => {
 
   const annotations = useSelector(imageInstancesSelector);
 
-  const annotated = useSelector(annotatedSelector);
+  const annotationState = useSelector(annotationStateSelector);
 
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
 
@@ -181,15 +181,12 @@ export const Stage = () => {
   };
 
   const deselectAnnotation = () => {
-    batch(() => {
-      dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-      dispatch(
-        imageViewerSlice.actions.setAnnotated({
-          annotated: false,
-          annotationTool,
-        })
-      );
-    });
+    dispatch(
+      imageViewerSlice.actions.setAnnotationState({
+        annotationState: AnnotationStateType.Blank,
+        annotationTool,
+      })
+    );
 
     if (!annotationTool) return;
 
@@ -216,24 +213,21 @@ export const Stage = () => {
 
     if (annotationTool.annotated) {
       dispatch(
-        imageViewerSlice.actions.setAnnotated({
-          annotated: annotationTool.annotated,
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Annotated,
           annotationTool,
         })
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
       annotationTool.annotate(selectedCategory);
-    }
-
-    if (annotationTool.annotating)
+    } else if (annotationTool.annotating)
       dispatch(
-        imageViewerSlice.actions.setAnnotating({
-          annotating: annotationTool.annotating,
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Annotating,
+          annotationTool,
         })
       );
-
-    if (selectionMode === AnnotationModeType.New) return;
   }, [annotationTool?.annotated, annotationTool?.annotating]);
 
   useEffect(() => {
@@ -352,7 +346,7 @@ export const Stage = () => {
       if (toolType === ToolType.Zoom) {
         onZoomMouseDown(relative);
       } else {
-        if (annotated) {
+        if (annotationState === AnnotationStateType.Annotated) {
           deselectAnnotation();
         }
 
@@ -370,7 +364,7 @@ export const Stage = () => {
     const throttled = _.throttle(func, 5);
     return () => throttled();
   }, [
-    annotated,
+    annotationState,
     annotationTool,
     saveLabelRef,
     pointerDragging,

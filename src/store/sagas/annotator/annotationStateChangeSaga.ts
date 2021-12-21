@@ -1,19 +1,25 @@
 import { put, select } from "redux-saga/effects";
 import { imageViewerSlice } from "../../slices";
-import { selectedCategorySelector, toolTypeSelector } from "../../selectors";
-import { selectionModeSelector } from "../../selectors";
-import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSelector";
-import { ToolType } from "../../../types/ToolType";
-import { AnnotationModeType } from "../../../types/AnnotationModeType";
 import { AnnotationTool } from "../../../annotator/image/Tool";
+import { AnnotationModeType } from "../../../types/AnnotationModeType";
+import { AnnotationStateType } from "../../../types/AnnotationStateType";
+import { ToolType } from "../../../types/ToolType";
+import { selectionModeSelector } from "../../selectors";
+import { selectedCategorySelector } from "../../selectors";
+import { toolTypeSelector } from "../../selectors";
+import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSelector";
 
-export function* annotatedSaga({
-  payload: { annotated, annotationTool },
+export function* annotationStateChangeSaga({
+  payload: { annotationState, annotationTool },
 }: {
   type: string;
-  payload: { annotated: boolean; annotationTool: AnnotationTool | undefined };
+  payload: {
+    annotationState: AnnotationStateType;
+    annotationTool: AnnotationTool | undefined;
+  };
 }): any {
-  if (!annotated || !annotationTool) return;
+  if (annotationState !== AnnotationStateType.Annotated || !annotationTool)
+    return;
 
   const selectionMode = yield select(selectionModeSelector);
 
@@ -35,8 +41,6 @@ export function* annotatedSaga({
     if (toolType === ToolType.Zoom) return;
 
     const selectedAnnotation = yield select(selectedAnnotationSelector);
-
-    yield put(imageViewerSlice.actions.setAnnotating({ annotating: false }));
 
     if (!annotationTool.annotated) return;
 
