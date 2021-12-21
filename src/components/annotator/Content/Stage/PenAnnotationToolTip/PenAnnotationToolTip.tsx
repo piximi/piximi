@@ -2,7 +2,6 @@ import React from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
-import { AnnotationTool } from "../../../../../annotator/image/Tool/AnnotationTool/AnnotationTool";
 import { toolTypeSelector } from "../../../../../store/selectors";
 import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
 import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
@@ -10,11 +9,10 @@ import { scaledImageHeightSelector } from "../../../../../store/selectors/scaled
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
-
-  annotationTool?: AnnotationTool;
+  annotating?: boolean;
 };
 export const PenAnnotationToolTip = ({
-  annotationTool,
+  annotating,
   currentPosition,
 }: PenAnnotationToolTipProps) => {
   const toolType = useSelector(toolTypeSelector);
@@ -25,10 +23,9 @@ export const PenAnnotationToolTip = ({
   const imageHeight = useSelector(scaledImageHeightSelector);
 
   if (
-    !currentPosition ||
-    !annotationTool ||
-    annotationTool.annotating ||
     toolType !== ToolType.PenAnnotation ||
+    annotating ||
+    !currentPosition ||
     !imageWidth ||
     !imageHeight
   )

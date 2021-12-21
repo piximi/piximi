@@ -646,6 +646,9 @@ export const Stage = () => {
                     <PenAnnotationToolTip
                       currentPosition={currentPosition}
                       annotationTool={annotationTool}
+                      annotating={
+                        annotationState === AnnotationStateType.Annotating
+                      }
                     />
 
                     <PointerSelection />
