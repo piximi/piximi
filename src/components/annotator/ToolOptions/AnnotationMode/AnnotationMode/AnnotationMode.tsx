@@ -1,12 +1,15 @@
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Radio from "@mui/material/Radio";
 import React from "react";
 import RadioGroup from "@mui/material/RadioGroup";
 import { useDispatch, useSelector } from "react-redux";
-import { selectionModeSelector } from "../../../../../store/selectors";
+import {
+  annotationStateSelector,
+  selectionModeSelector,
+} from "../../../../../store/selectors";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import ListSubheader from "@mui/material/ListSubheader";
 import { NewTooltip } from "../NewTooltip";
@@ -16,11 +19,14 @@ import { IntersectionTooltip } from "../IntersectionTooltip";
 import { RadioCheckedIcon, RadioUncheckedIcon } from "../../../../../icons";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { imageViewerSlice } from "../../../../../store/slices";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();
 
   const annotationMode = useSelector(selectionModeSelector);
+
+  const annotationState = useSelector(annotationStateSelector);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const payload = {
@@ -52,8 +58,7 @@ export const AnnotationMode = () => {
         }
       >
         <NewTooltip>
-          <ListItem
-            button
+          <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
           >
@@ -69,14 +74,14 @@ export const AnnotationMode = () => {
             </ListItemIcon>
 
             <ListItemText primary={t("New annotation")} />
-          </ListItem>
+          </ListItemButton>
         </NewTooltip>
 
         <AddTooltip>
-          <ListItem
-            button
+          <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
+            disabled={annotationState === AnnotationStateType.Blank}
           >
             <ListItemIcon>
               <Radio
@@ -90,16 +95,16 @@ export const AnnotationMode = () => {
             </ListItemIcon>
 
             <ListItemText primary={t("Add area")} />
-          </ListItem>
+          </ListItemButton>
         </AddTooltip>
 
         <SubtractTooltip>
-          <ListItem
-            button
+          <ListItemButton
             dense
             onClick={(event) =>
               onClickLabel(event, AnnotationModeType.Subtract)
             }
+            disabled={annotationState === AnnotationStateType.Blank}
           >
             <ListItemIcon>
               <Radio
@@ -113,16 +118,16 @@ export const AnnotationMode = () => {
             </ListItemIcon>
 
             <ListItemText primary={t("Subtract area")} />
-          </ListItem>
+          </ListItemButton>
         </SubtractTooltip>
 
         <IntersectionTooltip>
-          <ListItem
-            button
+          <ListItemButton
             dense
             onClick={(event) =>
               onClickLabel(event, AnnotationModeType.Intersect)
             }
+            disabled={annotationState === AnnotationStateType.Blank}
           >
             <ListItemIcon>
               <Radio
@@ -136,7 +141,7 @@ export const AnnotationMode = () => {
             </ListItemIcon>
 
             <ListItemText primary={t("Intersection")} />
-          </ListItem>
+          </ListItemButton>
         </IntersectionTooltip>
       </List>
     </RadioGroup>

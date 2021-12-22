@@ -337,7 +337,7 @@ export const Transformer = ({
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
 
-    // TODO [annotation] wrong assumption? do nothing? set to annotated?
+    // TODO [annotation] wrong assumption? do nothing? set to annotated
     dispatch(
       imageViewerSlice.actions.setAnnotationState({
         annotationState: AnnotationStateType.Blank,
@@ -350,6 +350,7 @@ export const Transformer = ({
         selectionMode: AnnotationModeType.New,
       })
     );
+
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [],
@@ -364,6 +365,20 @@ export const Transformer = ({
   ) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
+
+    dispatch(
+      imageViewerSlice.actions.setAnnotationState({
+        annotationState: AnnotationStateType.Blank,
+        annotationTool: annotationTool,
+      })
+    );
+
+    dispatch(
+      imageViewerSlice.actions.setSelectionMode({
+        selectionMode: AnnotationModeType.New,
+      })
+    );
+
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [],
