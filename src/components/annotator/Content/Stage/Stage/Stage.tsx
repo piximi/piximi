@@ -208,10 +208,20 @@ export const Stage = () => {
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
 
-  useEffect(() => {
-    if (!annotationTool) return;
+  const onAnnotating = useMemo(() => {
+    const func = () => {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Annotating,
+          annotationTool,
+        })
+      );
+    };
+    return func;
+  }, [annotationTool, dispatch]);
 
-    if (annotationTool.annotationState === AnnotationStateType.Annotated) {
+  const onAnnotated = useMemo(() => {
+    const func = () => {
       dispatch(
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
@@ -220,17 +230,16 @@ export const Stage = () => {
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool.annotate(selectedCategory);
-    } else if (
-      annotationTool.annotationState === AnnotationStateType.Annotating
-    )
-      dispatch(
-        imageViewerSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Annotating,
-          annotationTool,
-        })
-      );
-  }, [annotationTool?.annotationState]);
+      annotationTool?.annotate(selectedCategory);
+    };
+    return func;
+  }, [annotationTool, selectedCategory, selectionMode, dispatch]);
+
+  useEffect(() => {
+    if (!annotationTool) return;
+    annotationTool.registerOnAnnotatedHandler(onAnnotated);
+    annotationTool.registerOnAnnotatingHandler(onAnnotating);
+  }, [annotationTool, onAnnotated, onAnnotating]);
 
   useEffect(() => {
     if (toolType === ToolType.PenAnnotation) {

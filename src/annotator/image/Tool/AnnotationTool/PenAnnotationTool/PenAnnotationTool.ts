@@ -80,9 +80,9 @@ export class PenAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    this.annotationState = AnnotationStateType.Annotating;
-
     this.buffer = [...this.buffer, position.x, position.y];
+
+    this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
@@ -94,8 +94,6 @@ export class PenAnnotationTool extends AnnotationTool {
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
-    this.annotationState = AnnotationStateType.Annotated;
-
     this.points = this.buffer;
 
     this.computeCircleData(); //this will set the bounding box as well
@@ -103,6 +101,8 @@ export class PenAnnotationTool extends AnnotationTool {
     if (!this.circlesData) return [];
 
     this._mask = encode(this.circlesData);
+
+    this.setAnnotated();
   }
 
   // TODO: Doesn't need to be async? Should be a constructor? -- Nodar

@@ -57,7 +57,7 @@ export class QuickAnnotationTool extends AnnotationTool {
 
     if (!this.superpixels) return;
 
-    this.annotationState = AnnotationStateType.Annotating;
+    this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
@@ -123,7 +123,7 @@ export class QuickAnnotationTool extends AnnotationTool {
     //compute mask
     this._mask = encode(Uint8Array.from(thresholded));
 
-    this.annotationState = AnnotationStateType.Annotated;
+    this.setAnnotated();
   }
 
   static setup(image: ImageJS.Image, brushsize: number) {

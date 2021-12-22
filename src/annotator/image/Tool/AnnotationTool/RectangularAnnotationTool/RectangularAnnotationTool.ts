@@ -28,7 +28,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
     if (!this.width) {
       this.origin = position;
 
-      this.annotationState = AnnotationStateType.Annotating;
+      this.setAnnotating();
     } else {
       this.resize(position);
 
@@ -40,7 +40,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
       if (!mask) return;
       this._mask = encode(new Uint8Array(mask));
 
-      this.annotationState = AnnotationStateType.Annotated;
+      this.setAnnotated();
     }
   }
 
@@ -62,7 +62,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
       if (!mask) return;
       this._mask = encode(new Uint8Array(mask));
 
-      this.annotationState = AnnotationStateType.Annotated;
+      this.setAnnotated();
     }
   }
 

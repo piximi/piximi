@@ -46,7 +46,6 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    this.annotationState = AnnotationStateType.Annotating;
     this.tolerance = 1;
     this.maxTol = 0;
     this.initialPosition = position;
@@ -86,6 +85,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.seen.add(idx);
 
     this.updateOverlay(position);
+    this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
@@ -144,7 +144,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     // @ts-ignore
     this._mask = encode(imgMask.data as Uint8Array);
 
-    this.annotationState = AnnotationStateType.Annotated;
+    this.setAnnotated();
   }
 
   private static colorOverlay(

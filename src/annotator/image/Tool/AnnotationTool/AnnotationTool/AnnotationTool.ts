@@ -15,6 +15,8 @@ export abstract class AnnotationTool extends Tool {
   points?: Array<number> = [];
   annotationState = AnnotationStateType.Blank;
   annotation?: AnnotationType;
+  onAnnotating?: () => void;
+  onAnnotated?: () => void;
 
   anchor?: { x: number; y: number } = undefined;
   origin?: { x: number; y: number } = undefined;
@@ -422,5 +424,27 @@ export abstract class AnnotationTool extends Tool {
       id: uuidv4(),
       mask: this.mask,
     };
+  }
+
+  registerOnAnnotatingHandler(handler: () => void): void {
+    this.onAnnotating = handler;
+  }
+
+  registerOnAnnotatedHandler(handler: () => void): void {
+    this.onAnnotated = handler;
+  }
+
+  setAnnotating() {
+    this.annotationState = AnnotationStateType.Annotating;
+    if (this.onAnnotating) {
+      this.onAnnotating();
+    }
+  }
+
+  setAnnotated() {
+    this.annotationState = AnnotationStateType.Annotated;
+    if (this.onAnnotated) {
+      this.onAnnotated();
+    }
   }
 }

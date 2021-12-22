@@ -23,7 +23,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     if (!this.radius) {
       this.origin = position;
 
-      this.annotationState = AnnotationStateType.Annotating;
+      this.setAnnotating();
     }
   }
 
@@ -37,8 +37,6 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (this.radius) {
-      this.annotationState = AnnotationStateType.Annotated;
-
       this.points = this.convertToPoints();
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
@@ -48,6 +46,8 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       if (!mask) return;
 
       this._mask = encode(mask);
+
+      this.setAnnotated();
     }
   }
 

@@ -55,8 +55,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   private async predict() {
     if (!this.image || !this.origin || !this.width || !this.height) return;
 
-    this.annotationState = AnnotationStateType.Annotated;
-
     const width = Math.round(this.width);
     const height = Math.round(this.height);
 
@@ -138,8 +136,9 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       // @ts-ignore
       this._mask = encode(thresholded);
 
-      this.annotationState = AnnotationStateType.Annotated;
       this.width = undefined;
     }
+
+    this.setAnnotated();
   }
 }
