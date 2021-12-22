@@ -1,7 +1,14 @@
 import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
-import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
@@ -11,7 +18,6 @@ import {
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
-  zoomSelectionSelector,
 } from "../../../../../store/selectors";
 import {
   Provider,
@@ -60,7 +66,6 @@ import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
 import { usePointer } from "../../../../../hooks/usePointer/usePointer";
-import { pointerSelectionSelector } from "../../../../../store/selectors/pointerSelectionSelector";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
@@ -132,13 +137,6 @@ export const Stage = () => {
 
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
 
-  const { dragging: zoomDragging, selecting: zoomSelecting } = useSelector(
-    zoomSelectionSelector
-  );
-
-  const { dragging: pointerDragging, selecting: pointerSelecting } =
-    useSelector(pointerSelectionSelector);
-
   useWindowFocusHandler();
 
   const [playCreateAnnotationSoundEffect] = useSound(
@@ -171,16 +169,16 @@ export const Stage = () => {
     });
   };
 
-  const deselectAllAnnotations = () => {
+  const deselectAllAnnotations = useCallback(() => {
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [],
         selectedAnnotation: undefined,
       })
     );
-  };
+  }, [dispatch]);
 
-  const deselectAnnotation = () => {
+  const deselectAnnotation = useCallback(() => {
     dispatch(
       imageViewerSlice.actions.setAnnotationState({
         annotationState: AnnotationStateType.Blank,
@@ -198,7 +196,7 @@ export const Stage = () => {
 
     const transformerId = "tr-".concat(selectedAnnotation.id);
     detachTransformer(transformerId);
-  };
+  }, [annotationTool, selectedAnnotation, dispatch]);
 
   const cursor = useSelector(cursorSelector);
   useCursor();
@@ -247,6 +245,7 @@ export const Stage = () => {
       // @ts-ignore
       annotationTool.brushSize = penSelectionBrushSize / stageScale;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [penSelectionBrushSize]);
 
   useEffect(() => {
@@ -255,6 +254,7 @@ export const Stage = () => {
       //@ts-ignore
       annotationTool.update(Math.round(quickSelectionBrushSize / stageScale));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quickSelectionBrushSize]);
 
   useEffect(() => {
@@ -378,12 +378,13 @@ export const Stage = () => {
     annotationState,
     annotationTool,
     saveLabelRef,
-    pointerDragging,
-    pointerSelecting,
     selectionMode,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    deselectAllAnnotations,
+    deselectAnnotation,
+    onPointerMouseDown,
+    onZoomMouseDown,
+    stageScale,
   ]);
 
   const onMouseMove = useMemo(() => {
@@ -448,13 +449,13 @@ export const Stage = () => {
     const throttled = _.throttle(func, 5);
     return () => throttled();
   }, [
-    annotationState, // TODO [annotation] remove
     annotationTool,
-    pointerDragging,
-    pointerSelecting,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    onPointerMouseMove,
+    onZoomMouseMove,
+    scaledImageHeight,
+    scaledImageWidth,
+    stageScale,
   ]);
 
   const onMouseUp = useMemo(() => {
@@ -498,11 +499,12 @@ export const Stage = () => {
     return () => throttled();
   }, [
     annotationTool,
-    pointerDragging,
-    pointerSelecting,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    onPointerMouseUp,
+    onZoomMouseUp,
+    scaledImageHeight,
+    scaledImageWidth,
+    stageScale,
   ]);
 
   const confirmAnnotations = () => {
@@ -620,7 +622,7 @@ export const Stage = () => {
 
     deselectAllTransformers();
     deselectAllAnnotations();
-  }, [annotations?.length]);
+  }, [annotations?.length, annotations, deselectAllAnnotations]);
 
   const [tool, setTool] = useState<Tool>();
 

@@ -8,6 +8,7 @@ import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSe
 import { selectedCategorySelector } from "../../selectors/selectedCategorySelector";
 import { AnnotationType } from "../../../types/AnnotationType";
 
+// eslint-disable-next-line no-empty-pattern
 export function* selectedCategorySaga({}: {
   type: string;
   payload: { selectedCategoryId: string };
