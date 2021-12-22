@@ -1,4 +1,12 @@
-import { FormControl, Grid, TextField, InputBase } from "@mui/material";
+import {
+  FormControl,
+  Grid,
+  TextField,
+  InputBase,
+  Alert,
+  Theme,
+  Dialog,
+} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +21,18 @@ import {
 import { SyntheticEvent } from "react";
 import { uploadedModelSelector } from "../../../../store/selectors/uploadedModelSelector";
 
+//import { createStyles, makeStyles } from "@mui/styles";
+
+// const useStyles = makeStyles((theme: Theme) =>
+//   createStyles({
+//     textField: {
+//       marginRight: theme.spacing(1),
+//       flexBasis: 300,
+//       width: "100%",
+//     },
+//   })
+// );
+
 export const ArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(architectureOptionsSelector);
   const userUploadedModel = useSelector(uploadedModelSelector);
@@ -20,6 +40,11 @@ export const ArchitectureSettingsGrid = () => {
 
   const [selectedModel, setSelectedModel] =
     React.useState<ClassifierModelProps>(architectureOptions.selectedModel);
+
+  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
+    React.useState<boolean>(false);
+  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
+    React.useState<string>("");
 
   const dispatch = useDispatch();
 
@@ -31,12 +56,37 @@ export const ArchitectureSettingsGrid = () => {
     modelOptions.push(userUploadedModel);
   }
 
-  const onModelNameChange = (
+  React.useEffect(() => {
+    if (selectedModel.requiredChannels) {
+      setFixedNumberOfChannels(true);
+      setFixedNumberOfChannelsHelperText(
+        `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
+      );
+    } else {
+      setFixedNumberOfChannels(false);
+      setFixedNumberOfChannelsHelperText("");
+    }
+  }, [selectedModel]);
+
+  const onSelectedModelChange = (
     event: SyntheticEvent<Element, Event>,
     value: ClassifierModelProps | null
   ) => {
     const selectedModel = value as ClassifierModelProps;
     setSelectedModel(selectedModel);
+
+    // if the selected model requires a specific number of input channels, dispatch that number to the store
+    if (selectedModel.requiredChannels) {
+      dispatch(
+        classifierSlice.actions.updateInputShape({
+          inputShape: {
+            ...inputShape,
+            channels: selectedModel.requiredChannels,
+          },
+        })
+      );
+    }
+
     dispatch(
       classifierSlice.actions.updateSelectedModel({ model: selectedModel })
     );
@@ -65,6 +115,7 @@ export const ArchitectureSettingsGrid = () => {
   const onChannelsChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
     const channels = Number(target.value);
+
     dispatch(
       classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, channels: channels },
@@ -79,7 +130,7 @@ export const ArchitectureSettingsGrid = () => {
           <Autocomplete
             disableClearable={true}
             options={modelOptions}
-            onChange={onModelNameChange}
+            onChange={onSelectedModelChange}
             getOptionLabel={(option: ClassifierModelProps) => option.modelName}
             sx={{ width: 300 }}
             renderInput={(params) => (
@@ -120,7 +171,18 @@ export const ArchitectureSettingsGrid = () => {
             value={inputShape.channels}
             onChange={onChannelsChange}
             type="number"
+            disabled={fixedNumberOfChannels}
           />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={1}>
+        <Grid item xs={3} marginTop={1}>
+          {fixedNumberOfChannels ? (
+            <Alert severity="info">{fixedNumberOfChannelsHelperText}</Alert>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Grid>
     </FormControl>
