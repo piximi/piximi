@@ -1,10 +1,12 @@
 export enum ModelType {
   SimpleCNN,
+  MobileNet,
   UserUploaded,
 }
 
 type ModelProps = {
   modelName: string;
+  requiredChannels?: number;
   modelType: ModelType;
 };
 
@@ -20,5 +22,10 @@ export const availableModels: ClassifierModelProps[] = [
   {
     modelName: "SimpleCNN",
     modelType: ModelType.SimpleCNN,
+  },
+  {
+    modelName: "MobileNet",
+    requiredChannels: 3,
+    modelType: ModelType.MobileNet,
   },
 ];
