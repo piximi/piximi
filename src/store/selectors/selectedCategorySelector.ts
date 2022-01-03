@@ -8,7 +8,7 @@ export const selectedCategorySelector = ({
   imageViewer: ImageViewer;
 }): Category => {
   const category = _.find(imageViewer.categories, (category: Category) => {
-    return category.id === imageViewer.selectedCategory;
+    return category.id === imageViewer.selectedCategoryId;
   });
 
   return category!;

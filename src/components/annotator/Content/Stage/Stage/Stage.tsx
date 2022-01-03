@@ -1,21 +1,25 @@
 import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
-import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
-  invertModeSelector,
   selectedCategorySelector,
   selectionModeSelector,
   stageHeightSelector,
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
-  zoomSelectionSelector,
 } from "../../../../../store/selectors";
 import {
-  batch,
   Provider,
   ReactReduxContext,
   useDispatch,
@@ -27,12 +31,12 @@ import {
   useHandTool,
   useZoom,
 } from "../../../../../hooks";
-import { AnnotationType } from "../../../../../types/AnnotationType";
 import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
 import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
-import { annotatedSelector } from "../../../../../store/selectors/annotatedSelector";
+import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 import {
   ColorAnnotationTool,
   ObjectAnnotationTool,
@@ -62,7 +66,6 @@ import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
 import { usePointer } from "../../../../../hooks/usePointer/usePointer";
-import { pointerSelectionSelector } from "../../../../../store/selectors/pointerSelectionSelector";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
@@ -80,7 +83,6 @@ export const Stage = () => {
 
   const toolType = useSelector(toolTypeSelector);
 
-  const invertMode = useSelector(invertModeSelector);
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
@@ -131,16 +133,9 @@ export const Stage = () => {
 
   const annotations = useSelector(imageInstancesSelector);
 
-  const annotated = useSelector(annotatedSelector);
+  const annotationState = useSelector(annotationStateSelector);
 
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
-
-  const { dragging: zoomDragging, selecting: zoomSelecting } = useSelector(
-    zoomSelectionSelector
-  );
-
-  const { dragging: pointerDragging, selecting: pointerSelecting } =
-    useSelector(pointerSelectionSelector);
 
   useWindowFocusHandler();
 
@@ -174,24 +169,26 @@ export const Stage = () => {
     });
   };
 
-  const deselectAllAnnotations = () => {
+  const deselectAllAnnotations = useCallback(() => {
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [],
         selectedAnnotation: undefined,
       })
     );
-  };
+  }, [dispatch]);
 
-  const deselectAnnotation = () => {
+  const deselectAnnotation = useCallback(() => {
+    dispatch(
+      imageViewerSlice.actions.setAnnotationState({
+        annotationState: AnnotationStateType.Blank,
+        annotationTool,
+      })
+    );
+
     if (!annotationTool) return;
 
     annotationTool.deselect();
-
-    batch(() => {
-      dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-      dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
-    });
 
     if (!selectedAnnotation) return;
 
@@ -199,7 +196,7 @@ export const Stage = () => {
 
     const transformerId = "tr-".concat(selectedAnnotation.id);
     detachTransformer(transformerId);
-  };
+  }, [annotationTool, selectedAnnotation, dispatch]);
 
   const cursor = useSelector(cursorSelector);
   useCursor();
@@ -209,138 +206,38 @@ export const Stage = () => {
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
 
-  useEffect(() => {
-    if (!annotationTool) return;
-
-    if (!selectedAnnotation || !selectedAnnotation.mask) return;
-
-    const [invertedMask, invertedBoundingBox] = annotationTool.invert(
-      selectedAnnotation.mask,
-      selectedAnnotation.boundingBox
-    );
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...selectedAnnotation,
-            boundingBox: invertedBoundingBox,
-            mask: invertedMask,
-          },
-        ],
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          boundingBox: invertedBoundingBox,
-          mask: invertedMask,
-        },
-      })
-    );
-  }, [invertMode]);
-
-  useEffect(() => {
-    if (toolType === ToolType.Zoom) return;
-
-    if (selectionMode === AnnotationModeType.New) return;
-
-    if (!annotated || !annotationTool) return;
-
-    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-
-    if (!annotationTool.annotated) return;
-
-    let combinedMask, combinedBoundingBox;
-
-    if (!selectedAnnotation) return;
-
-    if (selectionMode === AnnotationModeType.Add) {
-      [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Subtract) {
-      [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Intersect) {
-      [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    }
-
-    annotationTool.mask = combinedMask;
-
-    annotationTool.boundingBox = combinedBoundingBox;
-
-    if (!annotationTool.boundingBox || !annotationTool.mask) return;
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...selectedAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            mask: annotationTool.mask,
-          },
-        ],
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          boundingBox: annotationTool.boundingBox,
-          mask: annotationTool.mask,
-        },
-      })
-    );
-  }, [annotated]);
-
-  useEffect(() => {
-    if (!selectedAnnotationsIds) return;
-
-    if (!annotations) return;
-
-    const updatedAnnotations = _.map(
-      selectedAnnotations,
-      (annotation: AnnotationType) => {
-        return { ...annotation, categoryId: selectedCategory.id };
-      }
-    );
-
-    if (!selectedAnnotation) return;
-
-    dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: updatedAnnotations,
-        selectedAnnotation: {
-          ...selectedAnnotation,
-          categoryId: selectedCategory.id,
-        },
-      })
-    );
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    if (!annotationTool) return;
-
-    if (annotationTool.annotated) {
+  const onAnnotating = useMemo(() => {
+    const func = () => {
       dispatch(
-        imageViewerSlice.actions.setAnnotated({
-          annotated: annotationTool.annotated,
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Annotating,
+          annotationTool,
+        })
+      );
+    };
+    return func;
+  }, [annotationTool, dispatch]);
+
+  const onAnnotated = useMemo(() => {
+    const func = () => {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Annotated,
+          annotationTool,
         })
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool.annotate(selectedCategory);
-    }
+      annotationTool?.annotate(selectedCategory);
+    };
+    return func;
+  }, [annotationTool, selectedCategory, selectionMode, dispatch]);
 
-    if (annotationTool.annotating)
-      dispatch(
-        imageViewerSlice.actions.setAnnotating({
-          annotating: annotationTool.annotating,
-        })
-      );
-
-    if (selectionMode === AnnotationModeType.New) return;
-  }, [annotationTool?.annotated, annotationTool?.annotating]);
+  useEffect(() => {
+    if (!annotationTool) return;
+    annotationTool.registerOnAnnotatedHandler(onAnnotated);
+    annotationTool.registerOnAnnotatingHandler(onAnnotating);
+  }, [annotationTool, onAnnotated, onAnnotating]);
 
   useEffect(() => {
     if (toolType === ToolType.PenAnnotation) {
@@ -348,6 +245,7 @@ export const Stage = () => {
       // @ts-ignore
       annotationTool.brushSize = penSelectionBrushSize / stageScale;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [penSelectionBrushSize]);
 
   useEffect(() => {
@@ -356,26 +254,8 @@ export const Stage = () => {
       //@ts-ignore
       annotationTool.update(Math.round(quickSelectionBrushSize / stageScale));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quickSelectionBrushSize]);
-
-  useEffect(() => {
-    if (!annotated) return;
-
-    if (!annotationTool) return;
-
-    annotationTool.annotate(selectedCategory);
-
-    if (!annotationTool.annotation) return;
-
-    if (selectionMode !== AnnotationModeType.New) return;
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [annotationTool.annotation],
-        selectedAnnotation: annotationTool.annotation,
-      })
-    );
-  }, [annotated]);
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
@@ -422,6 +302,7 @@ export const Stage = () => {
   const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
     if (
       !event.target.getParent() ||
+      // TODO: shouldn't be using string for className here -- Nodar
       event.target.getParent().className === "Transformer"
     )
       return;
@@ -443,12 +324,7 @@ export const Stage = () => {
 
       if (!relative) return;
 
-      if (
-        saveLabelRef &&
-        saveLabelRef.current &&
-        saveLabelRef.current.getText() &&
-        clearLabelRef.current
-      ) {
+      if (saveLabelRef?.current?.getText() && clearLabelRef.current) {
         //do not proceed with mouse down events if user has clicked on Save Annotation button
         if (
           (relative.x <
@@ -481,18 +357,12 @@ export const Stage = () => {
       if (toolType === ToolType.Zoom) {
         onZoomMouseDown(relative);
       } else {
-        if (annotated) {
+        if (annotationState === AnnotationStateType.Annotated) {
           deselectAnnotation();
-          dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
         }
 
         if (selectionMode === AnnotationModeType.New) {
-          dispatch(
-            imageViewerSlice.actions.setSelectedAnnotations({
-              selectedAnnotations: [],
-              selectedAnnotation: undefined,
-            })
-          );
+          deselectAllAnnotations();
         }
 
         if (!annotationTool) return;
@@ -505,15 +375,16 @@ export const Stage = () => {
     const throttled = _.throttle(func, 5);
     return () => throttled();
   }, [
-    annotated,
+    annotationState,
     annotationTool,
     saveLabelRef,
-    pointerDragging,
-    pointerSelecting,
     selectionMode,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    deselectAllAnnotations,
+    deselectAnnotation,
+    onPointerMouseDown,
+    onZoomMouseDown,
+    stageScale,
   ]);
 
   const onMouseMove = useMemo(() => {
@@ -579,11 +450,12 @@ export const Stage = () => {
     return () => throttled();
   }, [
     annotationTool,
-    pointerDragging,
-    pointerSelecting,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    onPointerMouseMove,
+    onZoomMouseMove,
+    scaledImageHeight,
+    scaledImageWidth,
+    stageScale,
   ]);
 
   const onMouseUp = useMemo(() => {
@@ -627,15 +499,21 @@ export const Stage = () => {
     return () => throttled();
   }, [
     annotationTool,
-    pointerDragging,
-    pointerSelecting,
     toolType,
-    zoomDragging,
-    zoomSelecting,
+    onPointerMouseUp,
+    onZoomMouseUp,
+    scaledImageHeight,
+    scaledImageWidth,
+    stageScale,
   ]);
 
   const confirmAnnotations = () => {
-    if (!annotations || !annotationTool || annotationTool.annotating) return;
+    if (
+      !annotations ||
+      !annotationTool ||
+      annotationTool.annotationState === AnnotationStateType.Annotating
+    )
+      return;
 
     if (!activeImageId) return;
 
@@ -649,8 +527,6 @@ export const Stage = () => {
     if (soundEnabled) playCreateAnnotationSoundEffect();
 
     deselectAnnotation();
-
-    dispatch(imageViewerSlice.actions.setAnnotated({ annotated: false }));
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
@@ -673,7 +549,7 @@ export const Stage = () => {
     [
       annotations,
       annotationTool,
-      annotationTool?.annotating,
+      annotationTool?.annotationState,
       dispatch,
       selectedAnnotations,
       unselectedAnnotations,
@@ -746,7 +622,7 @@ export const Stage = () => {
 
     deselectAllTransformers();
     deselectAllAnnotations();
-  }, [annotations?.length]);
+  }, [annotations?.length, annotations, deselectAllAnnotations]);
 
   const [tool, setTool] = useState<Tool>();
 
@@ -758,6 +634,9 @@ export const Stage = () => {
 
   const { draggable } = useHandTool();
 
+  /* re. use of Consumer -> Stage -> Provider
+    https://github.com/konvajs/react-konva/issues/311
+   */
   return (
     <>
       <ReactReduxContext.Consumer>
@@ -785,7 +664,9 @@ export const Stage = () => {
 
                     <PenAnnotationToolTip
                       currentPosition={currentPosition}
-                      annotationTool={annotationTool}
+                      annotating={
+                        annotationState === AnnotationStateType.Annotating
+                      }
                     />
 
                     <PointerSelection />
@@ -794,6 +675,7 @@ export const Stage = () => {
 
                     <Transformers
                       transformPosition={getRelativePointerPosition}
+                      annotationTool={annotationTool}
                     />
 
                     <ColorAnnotationToolTip

@@ -8,13 +8,15 @@ import { slpf } from "../../../polygon-fill/slpf";
 import { v4 as uuidv4 } from "uuid";
 import { decode, encode } from "../../../rle";
 import { Tool } from "../../Tool";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export abstract class AnnotationTool extends Tool {
   manager: ImageJS.RoiManager;
   points?: Array<number> = [];
-  annotated: boolean = false;
-  annotating: boolean = false;
+  annotationState = AnnotationStateType.Blank;
   annotation?: AnnotationType;
+  onAnnotating?: () => void;
+  onAnnotated?: () => void;
 
   anchor?: { x: number; y: number } = undefined;
   origin?: { x: number; y: number } = undefined;
@@ -120,7 +122,7 @@ export abstract class AnnotationTool extends Tool {
   }
 
   connect() {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (!this.anchor || !this.origin) return;
 
@@ -155,8 +157,7 @@ export abstract class AnnotationTool extends Tool {
     this.origin = undefined;
     this.buffer = [];
 
-    this.annotated = true;
-    this.annotating = false;
+    this.annotationState = AnnotationStateType.Annotated;
   }
 
   /*
@@ -423,5 +424,27 @@ export abstract class AnnotationTool extends Tool {
       id: uuidv4(),
       mask: this.mask,
     };
+  }
+
+  registerOnAnnotatingHandler(handler: () => void): void {
+    this.onAnnotating = handler;
+  }
+
+  registerOnAnnotatedHandler(handler: () => void): void {
+    this.onAnnotated = handler;
+  }
+
+  setAnnotating() {
+    this.annotationState = AnnotationStateType.Annotating;
+    if (this.onAnnotating) {
+      this.onAnnotating();
+    }
+  }
+
+  setAnnotated() {
+    this.annotationState = AnnotationStateType.Annotated;
+    if (this.onAnnotated) {
+      this.onAnnotated();
+    }
   }
 }

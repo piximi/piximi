@@ -1,12 +1,18 @@
 import { all, fork } from "redux-saga/effects";
-import { watchCompileSaga } from "./classifier";
-import { watchFitSaga } from "./classifier";
-import { watchPreprocessSaga } from "./classifier";
-import { watchOpenSaga } from "./classifier";
+import {
+  watchAnnotationStateChangeSaga,
+  watchSelectedCategorySaga,
+} from "./annotator";
+import {
+  watchCompileSaga,
+  watchFitSaga,
+  watchPreprocessSaga,
+  watchOpenSaga,
+} from "./classifier";
 import { watchPredictSaga } from "./classifier/watchPredictSaga";
 
 export function* rootSaga() {
-  const effects = [
+  const classifierEffects = [
     fork(watchCompileSaga),
     fork(watchFitSaga),
     fork(watchPredictSaga),
@@ -14,5 +20,10 @@ export function* rootSaga() {
     fork(watchOpenSaga),
   ];
 
-  yield all(effects);
+  const annotaterEffects = [
+    fork(watchAnnotationStateChangeSaga),
+    fork(watchSelectedCategorySaga),
+  ];
+
+  yield all([...classifierEffects, ...annotaterEffects]);
 }

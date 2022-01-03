@@ -42,7 +42,7 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
     );
     if (!overlayMask) return;
     setImageMask(overlayMask);
-  }, [annotation.mask, fill]);
+  }, [annotation.mask, fill, annotation.boundingBox, imageHeight, imageWidth]);
 
   return (
     <>

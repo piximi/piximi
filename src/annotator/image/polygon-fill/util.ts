@@ -36,7 +36,7 @@ export function pointsToEdges(points: Array<Array<number>>) {
   for (let i = 0; i < points.length; i++) {
     const p2 = points[i];
     // ignore horizontal edges
-    if (p1[1] != p2[1]) edges.push([p1, p2]);
+    if (p1[1] !== p2[1]) edges.push([p1, p2]);
     p1 = p2;
   }
   return edges;

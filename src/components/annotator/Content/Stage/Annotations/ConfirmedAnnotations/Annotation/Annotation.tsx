@@ -46,7 +46,7 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
         color
       )
     );
-  }, [annotation.mask, fill]);
+  }, [annotation.mask, fill, annotation.boundingBox, imageWidth, imageHeight]);
 
   if (!annotation) return <></>;
 

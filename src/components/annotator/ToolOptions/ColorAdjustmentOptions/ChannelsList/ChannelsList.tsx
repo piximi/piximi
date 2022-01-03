@@ -25,8 +25,6 @@ export const ChannelsList = ({
   displayedValues,
   updateDisplayedValues,
 }: ColorAdjustmentSlidersProp) => {
-  const [open, setOpen] = React.useState(true);
-
   const dispatch = useDispatch();
 
   const channels = useSelector(channelsSelector);
@@ -50,24 +48,29 @@ export const ChannelsList = ({
     handler(copiedValues);
   };
 
-  const updateIntensityRanges = (values: Array<Array<number>>) => {
-    const copiedValues = [...values].map((range: Array<number>) => {
-      return [...range];
-    });
+  const handler = useCallback(
+    (values: Array<Array<number>>) => {
+      const updateIntensityRanges = () => {
+        const copiedValues = [...values].map((range: Array<number>) => {
+          return [...range];
+        });
 
-    const updatedChannels = channels.map(
-      (channel: ChannelType, index: number) => {
-        return { ...channel, range: copiedValues[index] };
-      }
-    );
-    dispatch(
-      imageViewerSlice.actions.setChannels({
-        channels: updatedChannels,
-      })
-    );
-  };
+        const updatedChannels = channels.map(
+          (channel: ChannelType, index: number) => {
+            return { ...channel, range: copiedValues[index] };
+          }
+        );
 
-  const handler = useCallback(debounce(updateIntensityRanges, 100), [channels]);
+        dispatch(
+          imageViewerSlice.actions.setChannels({
+            channels: updatedChannels,
+          })
+        );
+      };
+      return debounce(updateIntensityRanges, 100);
+    },
+    [channels, dispatch]
+  );
 
   const onCheckboxChanged = (index: number) => () => {
     const current = visibleChannelsIndices.indexOf(index);

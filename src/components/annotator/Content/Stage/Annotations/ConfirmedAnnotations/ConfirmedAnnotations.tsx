@@ -28,7 +28,12 @@ export const ConfirmedAnnotations = () => {
         visibleCategories.includes(annotation.categoryId)
       )
     );
-  }, [annotations, selectedAnnotations, visibleCategories]);
+  }, [
+    annotations,
+    selectedAnnotations,
+    visibleCategories,
+    unselectedAnnotations,
+  ]);
 
   return (
     <>

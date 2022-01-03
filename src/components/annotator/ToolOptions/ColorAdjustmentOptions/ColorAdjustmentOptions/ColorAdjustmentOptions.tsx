@@ -72,7 +72,7 @@ export const ColorAdjustmentOptions = () => {
     setDisplayedValues(
       channels.map((channel: ChannelType) => [...channel.range])
     );
-  }, [originalSrc]);
+  }, [originalSrc, imageShape, channels]);
 
   const onResetChannelsClick = () => {
     if (!imageShape) return;

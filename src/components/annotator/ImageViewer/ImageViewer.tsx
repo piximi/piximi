@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { CssBaseline, Dialog, DialogContent } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
@@ -46,8 +46,6 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
   }, [dispatch, image]);
 
   const classes = useStyles();
-
-  const [, setDropped] = useState<File[]>([]);
 
   const onDrop = useCallback(
     (item) => {
@@ -107,7 +105,7 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
         }
       }
     },
-    [setDropped]
+    [dispatch]
   );
 
   return (

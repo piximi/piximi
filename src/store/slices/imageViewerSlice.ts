@@ -4,6 +4,7 @@ import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
+import { AnnotationStateType } from "../../types/AnnotationStateType";
 import colorImage from "../../images/cell-painting.png";
 import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
@@ -17,6 +18,7 @@ import {
 } from "../../image/imageHelper";
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
+import { AnnotationTool } from "../../annotator/image/Tool";
 
 const initialImage =
   process.env.NODE_ENV === "development"
@@ -71,8 +73,7 @@ const initialCategories =
       ];
 
 const initialState: ImageViewer = {
-  annotated: false,
-  annotating: false,
+  annotationState: AnnotationStateType.Blank,
   boundingClientRect: new DOMRect(),
   brightness: 0,
   categories: initialCategories.length > 0 ? initialCategories : [],
@@ -98,7 +99,6 @@ const initialState: ImageViewer = {
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
   images: initialImage ? [initialImage] : [],
-  invertMode: false,
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 32,
@@ -112,7 +112,7 @@ const initialState: ImageViewer = {
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
-  selectedCategory: UNKNOWN_CATEGORY_ID,
+  selectedCategoryId: UNKNOWN_CATEGORY_ID,
   selectionMode: AnnotationModeType.New,
   soundEnabled: true,
   stageHeight: 1000,
@@ -263,17 +263,14 @@ export const imageViewerSlice = createSlice({
 
       state.images.push(...[loaded]);
     },
-    setAnnotated(
+    setAnnotationState(
       state: ImageViewer,
-      action: PayloadAction<{ annotated: boolean }>
+      action: PayloadAction<{
+        annotationState: AnnotationStateType;
+        annotationTool: AnnotationTool | undefined;
+      }>
     ) {
-      state.annotated = action.payload.annotated;
-    },
-    setAnnotating(
-      state: ImageViewer,
-      action: PayloadAction<{ annotating: boolean }>
-    ) {
-      state.annotating = action.payload.annotating;
+      state.annotationState = action.payload.annotationState;
     },
     setBoundingClientRect(
       state: ImageViewer,
@@ -382,12 +379,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
-    setInvertMode(
-      state: ImageViewer,
-      action: PayloadAction<{ invertMode: boolean }>
-    ) {
-      state.invertMode = action.payload.invertMode;
-    },
     setImageInstances(
       state: ImageViewer,
       action: PayloadAction<{
@@ -453,11 +444,11 @@ export const imageViewerSlice = createSlice({
     ) {
       state.saturation = action.payload.saturation;
     },
-    setSelectedCategory(
+    setSelectedCategoryId(
       state: ImageViewer,
-      action: PayloadAction<{ selectedCategory: string }>
+      action: PayloadAction<{ selectedCategoryId: string }>
     ) {
-      state.selectedCategory = action.payload.selectedCategory;
+      state.selectedCategoryId = action.payload.selectedCategoryId;
     },
     setSelectedAnnotations(
       state: ImageViewer,
@@ -542,8 +533,7 @@ export const {
   deleteImage,
   openAnnotations,
   setActiveImage,
-  setAnnotating,
-  setAnnotated,
+  setAnnotationState,
   setBoundingClientRect,
   setBrightness,
   setCategories,
@@ -555,7 +545,6 @@ export const {
   setExposure,
   setHue,
   setImages,
-  setInvertMode,
   setLanguage,
   setOffset,
   setOperation,
@@ -565,7 +554,7 @@ export const {
   setSaturation,
   setSelectedAnnotations,
   setSelectionMode,
-  setSelectedCategory,
+  setSelectedCategoryId,
   setSoundEnabled,
   setStageHeight,
   setStagePosition,

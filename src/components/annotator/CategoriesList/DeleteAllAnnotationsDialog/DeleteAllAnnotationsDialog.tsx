@@ -23,8 +23,8 @@ export const DeleteAllAnnotationsDialog = ({
     batch(() => {
       dispatch(imageViewerSlice.actions.deleteAllInstances({ id: "" }));
       dispatch(
-        imageViewerSlice.actions.setSelectedCategory({
-          selectedCategory: UNKNOWN_CATEGORY_ID,
+        imageViewerSlice.actions.setSelectedCategoryId({
+          selectedCategoryId: UNKNOWN_CATEGORY_ID,
         })
       );
     });

@@ -2,13 +2,13 @@ import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
+import { AnnotationStateType } from "./AnnotationStateType";
 import { ChannelType } from "./ChannelType";
 import { Image } from "./Image";
 import { Category } from "./Category";
 
 export type ImageViewer = {
-  annotated: boolean;
-  annotating: boolean;
+  annotationState: AnnotationStateType;
   boundingClientRect: DOMRect;
   brightness: number;
   categories: Array<Category>;
@@ -21,7 +21,6 @@ export type ImageViewer = {
   hue: number;
   activeImageId?: string;
   images: Array<Image>;
-  invertMode: boolean;
   language: LanguageType;
   offset: { x: number; y: number };
   penSelectionBrushSize: number;
@@ -35,7 +34,7 @@ export type ImageViewer = {
   saturation: number;
   selectedAnnotations: Array<AnnotationType>;
   selectedAnnotation: AnnotationType | undefined;
-  selectedCategory: string;
+  selectedCategoryId: string;
   selectionMode: AnnotationModeType;
   soundEnabled: boolean;
   stageHeight: number;
