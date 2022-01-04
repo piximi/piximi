@@ -5,7 +5,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
 } from "@mui/material";
 import * as _ from "lodash";
 import * as React from "react";
@@ -18,6 +17,7 @@ import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
+import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
 
 const optimizationAlgorithms = {
   Adadelta: "Adadelta",
@@ -49,16 +49,18 @@ export const OptimizerSettingsGrid = () => {
   const lossFunction = useSelector(lossFunctionSelector);
   const learningRate = useSelector(learningRateSelector);
 
-  const onBatchSizeChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const batchSize = Number(target.value);
+  const dispatchBatchSize = (batchSize: number) => {
     dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
   };
 
-  const onEpochsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const epochs = Number(target.value);
-    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
+  const dispatchLearningRate = (learningRate: number) => {
+    dispatch(
+      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
+    );
+  };
+
+  const dispatchEpochs = (arg: number) => {
+    dispatch(classifierSlice.actions.updateEpochs({ epochs: arg }));
   };
 
   const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
@@ -89,15 +91,6 @@ export const OptimizerSettingsGrid = () => {
       classifierSlice.actions.updateOptimizationAlgorithm({
         optimizationAlgorithm: selectedAlgorithm(),
       })
-    );
-  };
-
-  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const learningRate = Number(target.value);
-
-    dispatch(
-      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
     );
   };
 
@@ -158,13 +151,13 @@ export const OptimizerSettingsGrid = () => {
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <TextField
+            <CustomNumberTextField
               id="learning-rate"
               label="Learning rate"
-              className={classes.textField}
               value={learningRate}
-              onChange={onLearningRateChange}
-              type="number"
+              dispatchCallBack={dispatchLearningRate}
+              min={0}
+              enableFloat={true}
             />
           </Grid>
         </Grid>
@@ -192,26 +185,22 @@ export const OptimizerSettingsGrid = () => {
         </Grid>
         <Grid container direction={"row"} spacing={2}>
           <Grid item xs={2}>
-            <TextField
+            <CustomNumberTextField
               id="batch-size"
               label="Batch size"
-              className={classes.textField}
               value={fitOptions.batchSize}
-              onChange={onBatchSizeChange}
-              type="number"
-              margin="normal"
+              dispatchCallBack={dispatchBatchSize}
+              min={1}
             />
           </Grid>
 
           <Grid item xs={2}>
-            <TextField
+            <CustomNumberTextField
               id="epochs"
               label="Epochs"
-              className={classes.textField}
               value={fitOptions.epochs}
-              onChange={onEpochsChange}
-              margin="normal"
-              type="number"
+              dispatchCallBack={dispatchEpochs}
+              min={1}
             />
           </Grid>
         </Grid>

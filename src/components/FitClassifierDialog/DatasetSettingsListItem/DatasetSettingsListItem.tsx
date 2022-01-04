@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { createStyles, makeStyles } from "@mui/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { trainingPercentageSelector } from "../../../store/selectors";
 import { classifierSlice } from "../../../store/slices";
@@ -11,24 +10,11 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  TextField,
-  Theme,
   Typography,
 } from "@mui/material";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    textField: {
-      marginRight: theme.spacing(1),
-      flexBasis: 300,
-      width: "100%",
-    },
-  })
-);
+import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
 
 export const DatasetSettingsListItem = () => {
-  const classes = useStyles();
-
   const dispatch = useDispatch();
 
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
@@ -40,9 +26,7 @@ export const DatasetSettingsListItem = () => {
 
   const trainingPercentage = useSelector(trainingPercentageSelector);
 
-  const onTrainPercentageChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const trainPercentage = Number(target.value);
+  const dispatchTrainingPercentage = (trainPercentage: number) => {
     dispatch(
       classifierSlice.actions.updateTrainingPercentage({
         trainingPercentage: trainPercentage,
@@ -74,15 +58,14 @@ export const DatasetSettingsListItem = () => {
             (The rest is used for validation)
           </Typography>
           <Grid item xs={2}>
-            <TextField
+            <CustomNumberTextField
               id="test-split"
               label="Train percentage"
-              className={classes.textField}
               value={trainingPercentage}
-              margin="normal"
-              onChange={onTrainPercentageChange}
-              type="number"
-              inputProps={{ min: 0, max: 1, step: 0.01 }}
+              dispatchCallBack={dispatchTrainingPercentage}
+              min={0}
+              max={1}
+              enableFloat={true}
             />
           </Grid>
         </div>
