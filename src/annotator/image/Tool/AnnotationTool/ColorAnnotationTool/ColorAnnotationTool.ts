@@ -105,6 +105,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
     if (!this.roiManager || !this.roiMask) return;
 
     // @ts-ignore
