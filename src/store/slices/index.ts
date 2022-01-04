@@ -9,10 +9,7 @@ export {
 
 export {
   classifierSlice,
-  compile,
   fit,
-  open,
-  preprocess,
   updateBatchSize,
   updateCompiled,
   updateEpochs,
@@ -20,7 +17,6 @@ export {
   updateLearningRate,
   updateLossFunction,
   updateMetrics,
-  updateOpened,
   updateOptimizationAlgorithm,
   updatePreprocessed,
   updateTrainingPercentage,

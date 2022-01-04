@@ -16,6 +16,7 @@ export const OpenProjectMenuItem = ({
     event: React.ChangeEvent<HTMLInputElement>,
     close: () => void
   ) => {
+    popupState.close();
     event.persist();
 
     close();
@@ -30,21 +31,31 @@ export const OpenProjectMenuItem = ({
       if (event.target && event.target.result) {
         const project = JSON.parse(event.target.result as string);
 
-        //Open project
-        dispatch(
-          projectSlice.actions.openProject({
-            images: project.project.serializedImages,
-            categories: project.project.categories,
-            name: project.project.name,
-          })
-        );
+        try {
+          //Open project
+          dispatch(
+            projectSlice.actions.openProject({
+              images: project.project.serializedImages,
+              categories: project.project.categories,
+              name: project.project.name,
+            })
+          );
 
-        //Open Classifier options
-        dispatch(
-          classifierSlice.actions.setClassifier({
-            classifier: project.classifier,
-          })
-        );
+          //Open Classifier options
+          dispatch(
+            classifierSlice.actions.setClassifier({
+              classifier: project.classifier,
+            })
+          );
+        } catch (err) {
+          const error: Error = err as Error;
+          alert(
+            "Error while opening the project file: " +
+              error.name +
+              "\n" +
+              error.message
+          );
+        }
       }
     };
 
@@ -53,7 +64,7 @@ export const OpenProjectMenuItem = ({
 
   return (
     <MenuItem component="label">
-      <ListItemText primary="Open project file" />
+      <ListItemText primary="Open project" />
       <input
         accept="application/json"
         hidden

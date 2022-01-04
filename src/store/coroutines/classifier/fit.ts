@@ -52,7 +52,6 @@ export const fit = async (
   );
 
   //Visualization
-  // TODO eventually move this to the Architecture Settings component
   const container = document.getElementById("tfvis-container") as HTMLElement;
   tfvis.show.modelSummary(container, compiled);
 

@@ -1,24 +1,31 @@
-import React from "react";
 import { classifierSlice, projectSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { MenuItem } from "@mui/material";
-import * as mnistProject from "../../examples/mnist.json";
+import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
+import { Classifier } from "../../types/Classifier";
 
 type OpenExampleProjectMenuItemProps = {
+  exampleProject: any;
+  primary: string;
   popupState: any;
+  onClose: any;
 };
 
 export const OpenExampleProjectMenuItem = ({
+  exampleProject,
+  primary,
   popupState,
+  onClose,
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
-
-  const project = mnistProject.project as SerializedProjectType;
-  const classifier = mnistProject.classifier as any;
+  const projectIcon = exampleProject.project.serializedImages[0].imageData;
 
   const onClickExampleProject = async () => {
+    const project = exampleProject.project as SerializedProjectType;
+    const classifier = exampleProject.classifier as Classifier;
+
     popupState.close();
+    onClose();
 
     dispatch(
       projectSlice.actions.openProject({
@@ -36,6 +43,12 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   return (
-    <MenuItem onClick={onClickExampleProject}>Open MNIST project</MenuItem>
+    <ListItem button onClick={onClickExampleProject}>
+      <ListItemAvatar>
+        <Avatar src={projectIcon}></Avatar>
+      </ListItemAvatar>
+
+      <ListItemText primary={primary} />
+    </ListItem>
   );
 };

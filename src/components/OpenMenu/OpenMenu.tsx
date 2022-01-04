@@ -1,69 +1,49 @@
-import React from "react";
-import { Divider, ListItemText, Menu, MenuItem, MenuList } from "@mui/material";
+import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state";
-import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import * as tf from "@tensorflow/tfjs";
-import { useDispatch } from "react-redux";
-import { classifierSlice } from "../../store/slices";
+import { OpenClassifierDialog } from "../OpenClassifierDialog";
+import { useDialog } from "../../hooks";
+import { OpenExampleClassifierDialog } from "../OpenExampleClassifierDialog/OpenExampleClassifierDialog";
 
 type OpenMenuProps = {
   popupState: any;
 };
 
 export const OpenMenu = ({ popupState }: OpenMenuProps) => {
-  const dispatch = useDispatch();
-
-  const onOpenClassifierClick = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    close: () => void
-  ) => {
-    event.persist();
-
-    close();
-
-    if (!event.currentTarget.files) return;
-
-    let weightsFile, jsonFile;
-    // TODO #131 Check that that correct files were selected (one .bin, one .json -- throw error if not). Make sure to add instructions for user.
-    // Allow user to open either a project or classifier or both.
-
-    if (event.currentTarget.files[0].name.includes(".bin")) {
-      weightsFile = event.currentTarget.files[0];
-      jsonFile = event.currentTarget.files[1];
-    } else {
-      weightsFile = event.currentTarget.files[1];
-      jsonFile = event.currentTarget.files[0];
-    }
-
-    const model = await tf.loadLayersModel(
-      tf.io.browserFiles([jsonFile, weightsFile])
-    );
-
-    dispatch(classifierSlice.actions.updateOpened({ opened: model }));
-  };
+  const {
+    onClose: onCloseClassifierDialog,
+    onOpen: onOpenClassifierDialog,
+    open: openClassifierDialog,
+  } = useDialog();
+  const {
+    onClose: onCloseExampleClassifierDialog,
+    onOpen: onOpenExampleClassifierDialog,
+    open: openExampleClassifier,
+  } = useDialog();
 
   return (
     <Menu {...bindMenu(popupState)}>
       <MenuList dense variant="menu">
         <OpenProjectMenuItem popupState={popupState} />
-        <OpenExampleProjectMenuItem popupState={popupState} />
+        <MenuItem onClick={onOpenExampleClassifierDialog}>
+          Open example project
+        </MenuItem>
         <Divider />
 
-        <MenuItem component="label">
-          <ListItemText primary="Open classifier" />
-          <input
-            accept="application/json|.bin"
-            hidden
-            multiple
-            id="open-project-file"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              onOpenClassifierClick(event, popupState.close)
-            }
-            type="file"
-          />
-        </MenuItem>
+        <MenuItem onClick={onOpenClassifierDialog}>Open classifier</MenuItem>
       </MenuList>
+
+      <OpenExampleClassifierDialog
+        onClose={onCloseExampleClassifierDialog}
+        open={openExampleClassifier}
+        popupState={popupState}
+      />
+
+      <OpenClassifierDialog
+        onClose={onCloseClassifierDialog}
+        open={openClassifierDialog}
+        popupState={popupState}
+      />
     </Menu>
   );
 };

@@ -28,6 +28,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
+  const [showWarning, setShowWarning] = useState<boolean>(true);
 
   const trainingPercentage = useSelector(trainingPercentageSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
@@ -96,8 +97,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         disableFitting={noCategorizedImagesAlert}
       />
 
-      {noCategorizedImagesAlert ? (
-        <Alert severity="info">{"Please label images to train a model."}</Alert>
+      {noCategorizedImagesAlert && showWarning ? (
+        <Alert
+          onClose={() => {
+            setShowWarning(false);
+          }}
+          severity="info"
+        >
+          {"Please label images to train a model."}
+        </Alert>
       ) : (
         <></>
       )}

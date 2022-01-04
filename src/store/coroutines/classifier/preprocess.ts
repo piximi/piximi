@@ -92,8 +92,7 @@ export const preprocess = async (
   valImages: Array<Image>,
   categories: Array<Category>,
   inputShape: Shape,
-  rescaleOptions: RescaleOptions,
-  trainingPercentage: number
+  rescaleOptions: RescaleOptions
 ): Promise<{
   val: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;

@@ -18,37 +18,7 @@ export const Architecture = () => {
           value={"MobileNet"}
         >
           <MenuItem disabled value={"MobileNet"}>
-            {architectureOptions.modelName}
-          </MenuItem>
-        </TextField>
-      </Grid>
-
-      <Grid item xs={3}>
-        <TextField
-          fullWidth
-          helperText="&nbsp;"
-          id="version"
-          label="Version"
-          select
-          value={architectureOptions.modelVersion}
-        >
-          <MenuItem disabled value={architectureOptions.modelVersion}>
-            {architectureOptions.modelVersion}
-          </MenuItem>
-        </TextField>
-      </Grid>
-
-      <Grid item xs={3}>
-        <TextField
-          fullWidth
-          helperText="&nbsp;"
-          id="multiplier"
-          label="Multiplier"
-          select
-          value={architectureOptions.modelMultiplier}
-        >
-          <MenuItem disabled value={architectureOptions.modelMultiplier}>
-            {architectureOptions.modelMultiplier}
+            {architectureOptions.selectedModel.modelName}
           </MenuItem>
         </TextField>
       </Grid>
