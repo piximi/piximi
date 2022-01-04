@@ -57,11 +57,11 @@ export class MagneticAnnotationTool extends AnnotationTool {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (this.buffer && this.buffer.length === 0) {
-      this.annotationState = AnnotationStateType.Annotating;
-
       if (!this.origin) {
         this.origin = position;
       }
+
+      this.setAnnotating();
     }
   }
 
@@ -145,8 +145,6 @@ export class MagneticAnnotationTool extends AnnotationTool {
         this.origin.y,
       ];
 
-      this.annotationState = AnnotationStateType.Annotated;
-
       this.points = this.buffer;
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
@@ -161,6 +159,8 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this._mask = encode(maskImage.data);
 
       this.buffer = [];
+
+      this.setAnnotated();
 
       return;
     }
