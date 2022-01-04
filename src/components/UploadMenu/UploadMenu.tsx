@@ -10,16 +10,7 @@ import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "../DropboxMenuItem";
-import { Shape } from "../../types/Shape";
-import * as ImageJS from "image-js";
-import { Image } from "../../types/Image";
-import { v4 as uuidv4 } from "uuid";
-import { Partition } from "../../types/Partition";
-import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import {
-  convertFileToImages,
-  convertImageJStoImage,
-} from "../../image/imageHelper";
+import { convertFileToImages } from "../../image/imageHelper";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;

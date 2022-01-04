@@ -1,14 +1,7 @@
-import {
-  FormControl,
-  Grid,
-  TextField,
-  InputBase,
-  Alert,
-  Theme,
-  Dialog,
-} from "@mui/material";
+import { Alert, FormControl, Grid, TextField } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
+import { SyntheticEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { architectureOptionsSelector } from "../../../../store/selectors/architectureOptionsSelector";
@@ -18,7 +11,6 @@ import {
   availableModels,
   ClassifierModelProps,
 } from "../../../../types/ClassifierModelType";
-import { SyntheticEvent } from "react";
 import { uploadedModelSelector } from "../../../../store/selectors/uploadedModelSelector";
 
 //import { createStyles, makeStyles } from "@mui/styles";

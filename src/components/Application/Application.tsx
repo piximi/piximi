@@ -4,13 +4,8 @@ import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
 import { useStyles } from "./Application.css";
-import * as ImageJS from "image-js";
-import { Image } from "../../types/Image";
-import { v4 } from "uuid";
-import { Partition } from "../../types/Partition";
 import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { Shape } from "../../types/Shape";
 import { convertFileToImages } from "../../image/imageHelper";
 
 export const Application = () => {

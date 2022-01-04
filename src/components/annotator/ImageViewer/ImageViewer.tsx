@@ -8,20 +8,13 @@ import { Content } from "../Content";
 import { ThemeProvider } from "@mui/styles";
 import { useStyles } from "./ImageViewer.css";
 import { theme } from "./theme";
-import * as ImageJS from "image-js";
-import { ShapeType } from "../../../types/ShapeType";
-import { ToolType } from "../../../types/ToolType";
-import { v4 as uuidv4 } from "uuid";
 import {
   addImages,
   imageViewerSlice,
   setActiveImage,
-  setOperation,
   setSelectedAnnotations,
 } from "../../../store/slices";
 import { Image } from "../../../types/Image";
-import { Partition } from "../../../types/Partition";
-import { UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 import { convertFileToImages } from "../../../image/imageHelper";
 
 type ImageViewerProps = {
