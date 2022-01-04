@@ -23,12 +23,12 @@ export class LassoAnnotationTool extends AnnotationTool {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (this.buffer && this.buffer.length === 0) {
-      this.annotationState = AnnotationStateType.Annotating;
-
       if (!this.origin) {
         this.origin = position;
         this.buffer = [...this.buffer, position.x, position.y];
       }
+
+      this.setAnnotating();
     }
   }
 
@@ -69,8 +69,6 @@ export class LassoAnnotationTool extends AnnotationTool {
         this.origin.y,
       ];
 
-      this.annotationState = AnnotationStateType.Annotated;
-
       this.points = this.buffer;
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
 
@@ -84,6 +82,8 @@ export class LassoAnnotationTool extends AnnotationTool {
       this._mask = encode(maskImage.data);
 
       this.buffer = [];
+
+      this.setAnnotated();
     }
 
     if (this.anchor) {
