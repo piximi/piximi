@@ -9,7 +9,7 @@ import malaria from "../../../../images/malaria.png";
 import cellpainting from "../../../../images/cell-painting.png";
 import { ChannelType } from "../../../../types/ChannelType";
 import { ToolType } from "../../../../types/ToolType";
-import { ImageViewerImage } from "../../../../types/ImageViewerImage";
+// import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 as uuidv4 } from "uuid";
 import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import * as malariaAnnotations from "../../../../images/malaria.json";

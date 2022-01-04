@@ -2,6 +2,7 @@ import { AnnotationTool } from "../AnnotationTool";
 import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: { x: number; y: number };
@@ -9,38 +10,33 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   radius?: { x: number; y: number };
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
-
     this.center = undefined;
     this.origin = undefined;
     this.radius = undefined;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     if (!this.radius) {
       this.origin = position;
 
-      this.annotating = true;
+      this.setAnnotating();
     }
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotated) return;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (this.radius) {
-      this.annotated = true;
-
-      this.annotating = false;
-
       this.points = this.convertToPoints();
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
@@ -50,6 +46,8 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       if (!mask) return;
 
       this._mask = encode(mask);
+
+      this.setAnnotated();
     }
   }
 

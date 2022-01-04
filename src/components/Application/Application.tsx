@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
@@ -17,8 +17,6 @@ export const Application = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const [, setDropped] = useState<File[]>([]);
-
   const onDrop = useCallback(
     async (item) => {
       if (item) {
@@ -34,7 +32,7 @@ export const Application = () => {
         }
       }
     },
-    [dispatch, setDropped]
+    [dispatch]
   );
 
   return (

@@ -23,6 +23,8 @@ import {
   setSelectedAnnotations,
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationTool } from "../../../../../annotator/image/Tool";
 
 type box = {
   x: number;
@@ -41,11 +43,13 @@ type TransformerProps = {
     y: number;
   }) => { x: number; y: number } | undefined;
   annotationId: string;
+  annotationTool?: AnnotationTool;
 };
 
 export const Transformer = ({
   transformPosition,
   annotationId,
+  annotationTool,
 }: TransformerProps) => {
   const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
 
@@ -317,6 +321,32 @@ export const Transformer = ({
     );
   };
 
+  const clearAnnotations = () => {
+    if (annotationTool) {
+      annotationTool.deselect();
+    } else {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Blank,
+          annotationTool: annotationTool,
+        })
+      );
+    }
+
+    dispatch(
+      imageViewerSlice.actions.setSelectionMode({
+        selectionMode: AnnotationModeType.New,
+      })
+    );
+
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [],
+        selectedAnnotation: undefined,
+      })
+    );
+  };
+
   const onSaveAnnotationClick = (event: Konva.KonvaEventObject<MouseEvent>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
@@ -332,18 +362,8 @@ export const Transformer = ({
 
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
-    dispatch(imageViewerSlice.actions.setAnnotating({ annotating: false }));
-    dispatch(
-      imageViewerSlice.actions.setSelectionMode({
-        selectionMode: AnnotationModeType.New,
-      })
-    );
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
+
+    clearAnnotations();
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
@@ -352,12 +372,8 @@ export const Transformer = ({
   ) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
+
+    clearAnnotations();
     if (soundEnabled) playDeleteAnnotationSoundEffect();
   };
 

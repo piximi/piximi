@@ -79,8 +79,8 @@ export const CreateCategoryDialog = ({
     );
 
     dispatch(
-      imageViewerSlice.actions.setSelectedCategory({
-        selectedCategory: category.id,
+      imageViewerSlice.actions.setSelectedCategoryId({
+        selectedCategoryId: category.id,
       })
     );
 

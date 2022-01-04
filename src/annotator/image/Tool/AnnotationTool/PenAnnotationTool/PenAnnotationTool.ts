@@ -3,6 +3,7 @@ import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { connectPoints } from "../../../../../image/imageHelper";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
@@ -68,35 +69,30 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
-
     this.circlesData = undefined;
     this.buffer = [];
     this.outline = [];
     this.points = [];
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    if (this.annotated) return;
-
-    this.annotating = true;
+    if (this.annotationState === AnnotationStateType.Annotated) return;
 
     this.buffer = [...this.buffer, position.x, position.y];
+
+    this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     this.buffer = [...this.buffer, position.x, position.y];
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotated || !this.annotating) return;
-
-    this.annotated = true;
-
-    this.annotating = false;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     this.points = this.buffer;
 
@@ -105,8 +101,11 @@ export class PenAnnotationTool extends AnnotationTool {
     if (!this.circlesData) return [];
 
     this._mask = encode(this.circlesData);
+
+    this.setAnnotated();
   }
 
+  // TODO: Doesn't need to be async? Should be a constructor? -- Nodar
   static async setup(image: ImageJS.Image, brushSize: number) {
     const operator = new PenAnnotationTool(image);
 

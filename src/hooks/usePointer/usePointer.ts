@@ -23,7 +23,7 @@ import {
   imageViewerSlice,
   setPointerSelection,
   setSelectedAnnotations,
-  setSelectedCategory,
+  setSelectedCategoryId,
 } from "../../store/slices";
 
 export const usePointer = () => {
@@ -171,8 +171,8 @@ export const usePointer = () => {
               })
             );
             dispatch(
-              setSelectedCategory({
-                selectedCategory: annotationsInBox[0].categoryId,
+              setSelectedCategoryId({
+                selectedCategoryId: annotationsInBox[0].categoryId,
               })
             );
           });
@@ -264,8 +264,8 @@ export const usePointer = () => {
           })
         );
         dispatch(
-          setSelectedCategory({
-            selectedCategory: currentAnnotation.categoryId,
+          setSelectedCategoryId({
+            selectedCategoryId: currentAnnotation.categoryId,
           })
         );
       });

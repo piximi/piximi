@@ -54,7 +54,7 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
       // @ts-ignore
       ref?.current.cache();
     }
-  }, [channels, stageScale]);
+  }, [channels, stageScale, ref]);
 
   useEffect(() => {
     // @ts-ignore
@@ -62,7 +62,7 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
     setFilters([]);
     // @ts-ignore
     ref?.current.clearCache();
-  }, [image]);
+  }, [image, ref]);
 
   if (!src) {
     return (

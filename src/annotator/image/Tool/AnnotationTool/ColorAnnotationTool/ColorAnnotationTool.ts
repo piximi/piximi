@@ -3,6 +3,7 @@ import { doFlood, makeFloodMap } from "../../../flood";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
 import PriorityQueue from "ts-priority-queue";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class ColorAnnotationTool extends AnnotationTool {
   roiContour?: ImageJS.Image;
@@ -25,9 +26,6 @@ export class ColorAnnotationTool extends AnnotationTool {
   seen: Set<number> = new Set();
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
-
     this.overlayData = "";
 
     this.roiManager = undefined;
@@ -43,11 +41,11 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.toleranceQueue.clear();
     this.seen.clear();
     this.maxTol = 0;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    this.annotated = false;
-    this.annotating = true;
     this.tolerance = 1;
     this.maxTol = 0;
     this.initialPosition = position;
@@ -87,10 +85,11 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.seen.add(idx);
 
     this.updateOverlay(position);
+    this.setAnnotating();
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (this.annotating) {
+    if (this.annotationState === AnnotationStateType.Annotating) {
       const diff = Math.ceil(
         Math.hypot(
           position.x - this.initialPosition!.x,
@@ -106,6 +105,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
     if (!this.roiManager || !this.roiMask) return;
 
     // @ts-ignore
@@ -145,8 +145,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     // @ts-ignore
     this._mask = encode(imgMask.data as Uint8Array);
 
-    this.annotated = true;
-    this.annotating = false;
+    this.setAnnotated();
   }
 
   private static colorOverlay(

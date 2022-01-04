@@ -6,71 +6,69 @@ import {
   compileOptionsSelector,
   createdCategoriesCountSelector,
   createdCategoriesSelector,
-  dataSelector,
   fitOptionsSelector,
-  openedSelector,
-  trainingPercentageSelector,
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { trainImagesSelector } from "../../selectors/trainImagesSelector";
 import { valImagesSelector } from "../../selectors/valImagesSelector";
+import * as tensorflow from "@tensorflow/tfjs";
+import { RescaleOptions } from "../../../types/RescaleOptions";
+import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
+import { CompileOptions } from "../../../types/CompileOptions";
+import { Category } from "../../../types/Category";
+import { Image } from "../../../types/Image";
+import { FitOptions } from "../../../types/FitOptions";
+import { ModelType } from "../../../types/ClassifierModelType";
 
 export function* fitSaga(action: any): any {
-  //TODO: there are some redundancies between fitSaga and openSaga/preprocessSaga. Should we be calling openSaga
-  //or compileSaga or preprocessSaga prior to calling fitSaga?
-
   const { onEpochEnd } = action.payload;
 
-  const architectureOptions = yield select(architectureOptionsSelector);
+  const architectureOptions: ArchitectureOptions = yield select(
+    architectureOptionsSelector
+  );
+  const classes: number = yield select(createdCategoriesCountSelector);
 
-  const rescaleOptions = yield select(rescaleOptionsSelector);
-
-  const trainingPercentage = yield select(trainingPercentageSelector);
-
-  const classes = yield select(createdCategoriesCountSelector);
-
-  let opened = yield select(openedSelector);
-
-  if (!opened) {
-    opened = yield open(architectureOptions, classes);
-    yield put(classifierSlice.actions.updateOpened({ opened: opened }));
+  var model: tensorflow.LayersModel;
+  if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
+    model = yield select(compiledSelector);
+  } else {
+    model = yield open(architectureOptions, classes);
   }
 
-  let compiled = yield select(compiledSelector);
+  const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+  const compiledModel: tensorflow.LayersModel = yield compile(
+    model,
+    compileOptions
+  );
 
-  if (!compiled) {
-    const compileOptions = yield select(compileOptionsSelector);
+  yield put(
+    classifierSlice.actions.updateCompiled({ compiled: compiledModel })
+  );
 
-    compiled = yield compile(opened, compileOptions);
+  const categories: Category[] = yield select(createdCategoriesSelector);
+  const trainImages: Image[] = yield select(trainImagesSelector);
+  const valImages: Image[] = yield select(valImagesSelector);
+  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
-    yield put(classifierSlice.actions.updateCompiled({ compiled: compiled }));
-  }
+  const data = yield preprocess(
+    trainImages,
+    valImages,
+    categories,
+    architectureOptions.inputShape,
+    rescaleOptions
+  );
 
-  let data = yield select(dataSelector);
+  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
-  if (!data) {
-    const categories = yield select(createdCategoriesSelector);
+  const options: FitOptions = yield select(fitOptionsSelector);
 
-    const trainImages = yield select(trainImagesSelector);
-
-    const valImages = yield select(valImagesSelector);
-
-    data = yield preprocess(
-      trainImages,
-      valImages,
-      categories,
-      architectureOptions.inputShape,
-      rescaleOptions,
-      trainingPercentage
-    );
-
-    yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
-  }
-
-  const options = yield select(fitOptionsSelector);
-
-  const { fitted, status } = yield fit(compiled, data, options, onEpochEnd);
+  const { fitted, status } = yield fit(
+    compiledModel,
+    data,
+    options,
+    onEpochEnd
+  );
 
   const payload = { fitted: fitted, status: status };
 

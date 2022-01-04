@@ -2,23 +2,21 @@ import { useStyles } from "./ImageGrid.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Image } from "../../types/Image";
 import {
-  categoriesSelector,
   selectedImagesSelector,
   visibleImagesSelector,
 } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
 import { ImageGridAppBar } from "../ImageGridAppBar";
-import { Category } from "../../types/Category";
 import {
   Container,
   ImageList,
   ImageListItem,
   ImageListItemBar,
 } from "@mui/material";
-import LabelIcon from "@mui/icons-material/Label";
 import { DropTargetMonitor, useDrop } from "react-dnd";
 import { NativeTypes } from "react-dnd-html5-backend";
+import { ImageIconLabel } from "./imageIconLabel";
 
 type ImageGridProps = {
   onDrop: (item: { files: any[] }) => void;
@@ -28,7 +26,6 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const dispatch = useDispatch();
 
   const images = useSelector(visibleImagesSelector);
-  const categories = useSelector(categoriesSelector);
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
@@ -61,12 +58,6 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const classes = useStyles();
 
   const scaleFactor = useSelector(tileSizeSelector);
-
-  const getColor = (image: Image) => {
-    return categories.find((category: Category) => {
-      return category.id === image.categoryId;
-    })?.color;
-  };
 
   const getSize = (scaleFactor: number) => {
     const width = (220 * scaleFactor).toString() + "px";
@@ -113,15 +104,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
                   sx={{
                     background: "transparent",
                   }}
-                  actionIcon={
-                    <LabelIcon
-                      sx={{
-                        color: getColor(image),
-                        marginLeft: "8px",
-                        marginTop: "8px",
-                      }}
-                    />
-                  }
+                  actionIcon={<ImageIconLabel image={image} />}
                   actionPosition="left"
                 />
               </ImageListItem>

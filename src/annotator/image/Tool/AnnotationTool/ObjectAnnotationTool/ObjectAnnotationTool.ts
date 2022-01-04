@@ -3,6 +3,7 @@ import * as ImageJS from "image-js";
 import * as tensorflow from "@tensorflow/tfjs";
 import * as _ from "lodash";
 import { encode } from "../../../rle";
+import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: tensorflow.LayersModel;
@@ -14,9 +15,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   output?: ImageJS.Image;
 
   deselect() {
-    this.annotated = false;
-    this.annotating = false;
-
     this.prediction = undefined;
     this.points = [];
     this.roi = undefined;
@@ -25,10 +23,12 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
     this.origin = undefined;
     this.width = undefined;
+
+    this.setBlank();
   }
 
   async onMouseUp(position: { x: number; y: number }) {
-    if (!this.annotating || this.annotated) return;
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     await this.predict();
   }
@@ -54,8 +54,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
   private async predict() {
     if (!this.image || !this.origin || !this.width || !this.height) return;
-
-    this.annotating = false;
 
     const width = Math.round(this.width);
     const height = Math.round(this.height);
@@ -138,8 +136,9 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       // @ts-ignore
       this._mask = encode(thresholded);
 
-      this.annotated = true;
       this.width = undefined;
     }
+
+    this.setAnnotated();
   }
 }

@@ -61,7 +61,7 @@ export class Graph {
           if (vertexCost === undefined || vertexCost > totalCost) {
             costs[vertex] = totalCost;
             addToOpen(totalCost, vertex);
-            // TODO: node might be undefined
+            // TODO #143 node might be undefined
             predecessors[vertex] = node!;
           }
         }
@@ -134,14 +134,4 @@ export class Graph {
       return this.findShortestPath(this.map, this.toArray(arguments, 0));
     }
   }
-
-  // _findShortestPath(map: object[], start: any[], end: any) {
-  //     if (Object.prototype.toString.call(start) === '[object Array]') {
-  //         return this._findShortestPath(map, start);
-  //     } else if (arguments.length === 3) {
-  //         return this._findShortestPath(map, [start, end]);
-  //     } else {
-  //         return this._findShortestPath(map, toArray(arguments, 1));
-  //     }
-  // }
 }
