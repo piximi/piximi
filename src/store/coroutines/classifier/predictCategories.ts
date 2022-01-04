@@ -3,7 +3,7 @@ import { LayersModel } from "@tensorflow/tfjs";
 import { Category } from "../../../types/Category";
 
 export const predictCategories = async (
-  opened: LayersModel,
+  model: LayersModel,
   data: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     id: string;
@@ -15,10 +15,10 @@ export const predictCategories = async (
 
   await data.forEachAsync((item: { xs: tensorflow.Tensor; id: string }) => {
     const input = item.xs;
-    const y = opened.predict(input.expandDims()); //gives vector of probabilities
+    const y = model.predict(input.expandDims()); //gives vector of probabilities
 
     //convert to index
-    //get corresponding categories[index] in sorted (!) categories array, get category ID
+    //get corresponding categories[index] in categories array, get category ID
     const idx = tensorflow.argMax(y as tensorflow.Tensor, 1).dataSync()[0];
 
     imageIds.push(item.id);

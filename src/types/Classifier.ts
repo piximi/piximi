@@ -12,10 +12,10 @@ import { FitOptions } from "./FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
 import { RescaleOptions } from "./RescaleOptions";
+import { ClassifierModelProps } from "./ClassifierModelType";
 
 export type Classifier = {
   compiled?: LayersModel;
-  compiling: boolean;
   data?:
     | tensorflow.data.Dataset<{
         xs: tensorflow.Tensor;
@@ -28,7 +28,6 @@ export type Classifier = {
   fitted?: LayersModel;
   fitting: boolean;
   inputShape: Shape;
-  preprocessing: boolean;
   history?: History;
   learningRate: number;
   lossFunction:
@@ -36,16 +35,11 @@ export type Classifier = {
     | Array<LossFunction>
     | { [outputName: string]: LossFunction };
   metrics: Array<Metric>;
-  model?: LayersModel;
-  modelName: string;
-  modelMultiplier: string;
-  modelVersion: string;
-  opened?: LayersModel;
-  opening: boolean;
+  selectedModel: ClassifierModelProps;
+  userUploadedModel?: ClassifierModelProps;
   optimizationAlgorithm: OptimizationAlgorithm;
   predicting: boolean;
   predictions?: Tensor;
   rescaleOptions: RescaleOptions;
-  saving: boolean;
   trainingPercentage: number;
 };

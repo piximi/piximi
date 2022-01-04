@@ -3,22 +3,11 @@ import {
   watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
 } from "./annotator";
-import {
-  watchCompileSaga,
-  watchFitSaga,
-  watchPreprocessSaga,
-  watchOpenSaga,
-} from "./classifier";
+import { watchFitSaga } from "./classifier";
 import { watchPredictSaga } from "./classifier/watchPredictSaga";
 
 export function* rootSaga() {
-  const classifierEffects = [
-    fork(watchCompileSaga),
-    fork(watchFitSaga),
-    fork(watchPredictSaga),
-    fork(watchPreprocessSaga),
-    fork(watchOpenSaga),
-  ];
+  const classifierEffects = [fork(watchFitSaga), fork(watchPredictSaga)];
 
   const annotaterEffects = [
     fork(watchAnnotationStateChangeSaga),
