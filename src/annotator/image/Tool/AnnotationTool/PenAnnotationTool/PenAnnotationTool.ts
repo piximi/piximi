@@ -69,12 +69,12 @@ export class PenAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.circlesData = undefined;
     this.buffer = [];
     this.outline = [];
     this.points = [];
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

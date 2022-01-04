@@ -35,12 +35,12 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.colorMasks = undefined;
     this.currentSuperpixels.clear();
     this.lastSuperpixel = 0;
     this.currentMask = undefined;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

@@ -14,12 +14,12 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.origin = undefined;
 
     this.width = undefined;
     this.height = undefined;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

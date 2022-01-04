@@ -26,8 +26,6 @@ export class ColorAnnotationTool extends AnnotationTool {
   seen: Set<number> = new Set();
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.overlayData = "";
 
     this.roiManager = undefined;
@@ -43,6 +41,8 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.toleranceQueue.clear();
     this.seen.clear();
     this.maxTol = 0;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

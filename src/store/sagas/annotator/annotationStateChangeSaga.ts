@@ -20,8 +20,6 @@ export function* annotationStateChangeSaga({
 }): any {
   if (!annotationTool) return;
 
-  if (annotationState === AnnotationStateType.Blank) annotationTool.deselect();
-
   if (annotationState !== AnnotationStateType.Annotated) return;
 
   const selectionMode = yield select(selectionModeSelector);

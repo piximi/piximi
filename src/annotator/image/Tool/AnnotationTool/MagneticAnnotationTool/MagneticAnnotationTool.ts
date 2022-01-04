@@ -41,8 +41,6 @@ export class MagneticAnnotationTool extends AnnotationTool {
   }
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.annotation = undefined;
 
     this.anchor = undefined;
@@ -51,6 +49,8 @@ export class MagneticAnnotationTool extends AnnotationTool {
     this.origin = undefined;
     this.points = [];
     this.previous = [];
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

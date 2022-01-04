@@ -10,11 +10,11 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   radius?: { x: number; y: number };
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.center = undefined;
     this.origin = undefined;
     this.radius = undefined;
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

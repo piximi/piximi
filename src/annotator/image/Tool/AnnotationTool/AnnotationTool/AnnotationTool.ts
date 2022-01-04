@@ -17,6 +17,7 @@ export abstract class AnnotationTool extends Tool {
   annotation?: AnnotationType;
   onAnnotating?: () => void;
   onAnnotated?: () => void;
+  onDeselect?: () => void;
 
   anchor?: { x: number; y: number } = undefined;
   origin?: { x: number; y: number } = undefined;
@@ -157,7 +158,7 @@ export abstract class AnnotationTool extends Tool {
     this.origin = undefined;
     this.buffer = [];
 
-    this.annotationState = AnnotationStateType.Annotated;
+    this.setAnnotated();
   }
 
   /*
@@ -434,6 +435,10 @@ export abstract class AnnotationTool extends Tool {
     this.onAnnotated = handler;
   }
 
+  registerOnDeselectHandler(handler: () => void): void {
+    this.onDeselect = handler;
+  }
+
   setAnnotating() {
     this.annotationState = AnnotationStateType.Annotating;
     if (this.onAnnotating) {
@@ -445,6 +450,13 @@ export abstract class AnnotationTool extends Tool {
     this.annotationState = AnnotationStateType.Annotated;
     if (this.onAnnotated) {
       this.onAnnotated();
+    }
+  }
+
+  setBlank() {
+    this.annotationState = AnnotationStateType.Blank;
+    if (this.onDeselect) {
+      this.onDeselect();
     }
   }
 }

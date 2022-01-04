@@ -321,6 +321,32 @@ export const Transformer = ({
     );
   };
 
+  const clearAnnotations = () => {
+    if (annotationTool) {
+      annotationTool.deselect();
+    } else {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Blank,
+          annotationTool: annotationTool,
+        })
+      );
+    }
+
+    dispatch(
+      imageViewerSlice.actions.setSelectionMode({
+        selectionMode: AnnotationModeType.New,
+      })
+    );
+
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [],
+        selectedAnnotation: undefined,
+      })
+    );
+  };
+
   const onSaveAnnotationClick = (event: Konva.KonvaEventObject<MouseEvent>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
@@ -337,26 +363,7 @@ export const Transformer = ({
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
 
-    // TODO [annotation] wrong assumption? do nothing? set to annotated
-    dispatch(
-      imageViewerSlice.actions.setAnnotationState({
-        annotationState: AnnotationStateType.Blank,
-        annotationTool: annotationTool,
-      })
-    );
-
-    dispatch(
-      imageViewerSlice.actions.setSelectionMode({
-        selectionMode: AnnotationModeType.New,
-      })
-    );
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
+    clearAnnotations();
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
@@ -366,25 +373,7 @@ export const Transformer = ({
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
-    dispatch(
-      imageViewerSlice.actions.setAnnotationState({
-        annotationState: AnnotationStateType.Blank,
-        annotationTool: annotationTool,
-      })
-    );
-
-    dispatch(
-      imageViewerSlice.actions.setSelectionMode({
-        selectionMode: AnnotationModeType.New,
-      })
-    );
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
+    clearAnnotations();
     if (soundEnabled) playDeleteAnnotationSoundEffect();
   };
 

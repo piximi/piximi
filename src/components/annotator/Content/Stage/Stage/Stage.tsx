@@ -179,14 +179,16 @@ export const Stage = () => {
   }, [dispatch]);
 
   const deselectAnnotation = useCallback(() => {
-    dispatch(
-      imageViewerSlice.actions.setAnnotationState({
-        annotationState: AnnotationStateType.Blank,
-        annotationTool,
-      })
-    );
+    if (!annotationTool) {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Blank,
+          annotationTool,
+        })
+      );
 
-    if (!annotationTool) return;
+      return;
+    }
 
     annotationTool.deselect();
 
@@ -233,11 +235,24 @@ export const Stage = () => {
     return func;
   }, [annotationTool, selectedCategory, selectionMode, dispatch]);
 
+  const onDeselect = useMemo(() => {
+    const func = () => {
+      dispatch(
+        imageViewerSlice.actions.setAnnotationState({
+          annotationState: AnnotationStateType.Blank,
+          annotationTool,
+        })
+      );
+    };
+    return func;
+  }, [annotationTool, dispatch]);
+
   useEffect(() => {
     if (!annotationTool) return;
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
-  }, [annotationTool, onAnnotated, onAnnotating]);
+    annotationTool.registerOnDeselectHandler(onDeselect);
+  }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
 
   useEffect(() => {
     if (toolType === ToolType.PenAnnotation) {

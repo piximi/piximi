@@ -9,14 +9,14 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   points: Array<number> = [];
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.annotation = undefined;
 
     this.anchor = undefined;
     this.buffer = [];
     this.origin = undefined;
     this.points = [];
+
+    this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {

@@ -15,8 +15,6 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
   output?: ImageJS.Image;
 
   deselect() {
-    this.annotationState = AnnotationStateType.Blank;
-
     this.prediction = undefined;
     this.points = [];
     this.roi = undefined;
@@ -25,6 +23,8 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
 
     this.origin = undefined;
     this.width = undefined;
+
+    this.setBlank();
   }
 
   async onMouseUp(position: { x: number; y: number }) {
