@@ -5,11 +5,10 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { makeStyles } from "@mui/styles";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "../../hooks/useTranslation";
 import { MenuList } from "@mui/material";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
@@ -31,7 +30,7 @@ export const OpenExampleClassifierDialog = (
 ) => {
   const classes = useStyles({});
 
-  const { t: translation } = useTranslation();
+  const t = useTranslation();
   const { open, onClose, popupState } = props;
 
   const closeMenueAndDialog = () => {
@@ -42,9 +41,7 @@ export const OpenExampleClassifierDialog = (
     // @ts-ignore
     <Dialog fullWidth maxWidth="sm" open={open}>
       <DialogTitle className={classes.dialogTitle}>
-        <Typography variant="h6">
-          {translation("Open example project")}
-        </Typography>
+        {t("Open example project")}
         <IconButton
           aria-label="Close"
           className={classes.closeButton}
