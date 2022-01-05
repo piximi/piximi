@@ -13,7 +13,7 @@ export const StackSlider = () => {
     return activeImageId === image.id;
   });
   if (activeImage) {
-    console.info(activeImage.shape.planes);
+    // console.info(activeImage.shape.planes);
   }
 
   return <Slider defaultValue={30} aria-label="Disabled slider" />;

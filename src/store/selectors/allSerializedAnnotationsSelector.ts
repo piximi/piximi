@@ -13,9 +13,10 @@ export const allSerializedAnnotationsSelector = ({
 
   return imageViewer.images.map((image: Image) => {
     const columns = {
+      imageActivePlane: image.activePlane,
       imageChannels: image.shape.channels,
       imageChecksum: "",
-      imageData: image.src,
+      imageData: [image.src],
       imageFilename: image.name,
       imageFrames: image.shape.frames,
       imageHeight: image.shape.height,

@@ -38,11 +38,12 @@ const categories: Array<Category> = [
 
 const images: Array<Image> = [
   {
+    activePlane: 0,
     categoryId: "00000000-0000-0000-0000-00000000001",
     id: "00000000-0000-0000-0001-00000000000",
     annotations: [],
     name: "",
-    originalSrc: "https://picsum.photos/seed/piximi/224",
+    originalSrc: ["https://picsum.photos/seed/piximi/224"],
     src: "https://picsum.photos/seed/piximi/224",
     partition: Partition.Training,
     shape: inputShape,

@@ -7,7 +7,7 @@ import {
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
-import { convertFileToImages } from "../../../../image/imageHelper";
+import { convertFileToImage } from "../../../../image/imageHelper";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -36,10 +36,10 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
           })
         );
       }
-      const images = await convertFileToImages(files[i]);
+      const image = await convertFileToImage(files[i]);
       batch(() => {
-        dispatch(addImages({ newImages: images }));
-        if (i === 0) dispatch(setActiveImage({ image: images[0].id }));
+        dispatch(addImages({ newImages: [image] }));
+        if (i === 0) dispatch(setActiveImage({ image: image.id }));
       });
     }
   };

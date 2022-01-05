@@ -10,7 +10,7 @@ import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "../DropboxMenuItem";
-import { convertFileToImages } from "../../image/imageHelper";
+import { convertFileToImage } from "../../image/imageHelper";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -35,10 +35,10 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      const images = await convertFileToImages(file);
+      const image = await convertFileToImage(file);
 
       //if length of images is > 1, then the user selected a z-stack --> only show center image
-      dispatch(createImage({ image: images[Math.floor(images.length / 2)] }));
+      dispatch(createImage({ image: image }));
     }
   };
 

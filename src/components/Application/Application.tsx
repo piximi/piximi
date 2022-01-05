@@ -6,7 +6,7 @@ import { Box, CssBaseline } from "@mui/material";
 import { useStyles } from "./Application.css";
 import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { convertFileToImages } from "../../image/imageHelper";
+import { convertFileToImage } from "../../image/imageHelper";
 
 export const Application = () => {
   const classes = useStyles();
@@ -18,12 +18,10 @@ export const Application = () => {
         for (let i = 0; i < item.files.length; i++) {
           const file = item.files[i];
 
-          const images = await convertFileToImages(file);
+          const image = await convertFileToImage(file);
 
           //if length of images is > 1, then the user selected a z-stack --> only show center image
-          dispatch(
-            createImage({ image: images[Math.floor(images.length / 2)] })
-          );
+          dispatch(createImage({ image: image }));
         }
       }
     },

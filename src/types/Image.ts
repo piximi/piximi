@@ -6,10 +6,9 @@ export type Image = {
   categoryId: string;
   id: string;
   name: string;
-  nextImage?: string; //id ref to next image in z-stack, if any
-  prevImage?: string; //id ref to prev image in z-stack, if any
+  activePlane: number; //where we are in the z-stack array
   src: string;
-  originalSrc: string;
+  originalSrc: Array<string>; //array to account for possibility of z-stack
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;

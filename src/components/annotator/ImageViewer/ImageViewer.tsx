@@ -15,7 +15,7 @@ import {
   setSelectedAnnotations,
 } from "../../../store/slices";
 import { Image } from "../../../types/Image";
-import { convertFileToImages } from "../../../image/imageHelper";
+import { convertFileToImage } from "../../../image/imageHelper";
 
 type ImageViewerProps = {
   image?: Image;
@@ -53,10 +53,10 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
               })
             );
           }
-          const images = await convertFileToImages(item.files[i]);
+          const image = await convertFileToImage(item.files[i]);
           batch(() => {
-            dispatch(addImages({ newImages: images }));
-            if (i === 0) dispatch(setActiveImage({ image: images[0].id }));
+            dispatch(addImages({ newImages: [image] }));
+            if (i === 0) dispatch(setActiveImage({ image: image.id }));
           });
         }
       }
