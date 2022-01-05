@@ -1,20 +1,41 @@
-import { Slider } from "@mui/material";
-import React from "react";
-import { useSelector } from "react-redux";
-import { activeImageIdSelector } from "../../../store/selectors/activeImageIdSelector";
-import { annotatorImagesSelector } from "../../../store/selectors/annotatorImagesSelector";
-import { Image } from "../../../types/Image";
+import { Slider, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { activeImageSelector } from "../../../store/selectors/activeImageSelector";
+import { imageViewerSlice } from "../../../store/slices";
 
 export const StackSlider = () => {
-  const activeImageId = useSelector(activeImageIdSelector);
-  const images = useSelector(annotatorImagesSelector);
+  const activeImage = useSelector(activeImageSelector);
+  const dispatch = useDispatch();
 
-  const activeImage = images.find((image: Image) => {
-    return activeImageId === image.id;
-  });
-  if (activeImage) {
-    // console.info(activeImage.shape.planes);
-  }
+  const [value, setValue] = useState(activeImage?.activePlane);
 
-  return <Slider defaultValue={30} aria-label="Disabled slider" />;
+  if (!activeImage || activeImage!.shape.planes === 1)
+    return <React.Fragment />;
+
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    if (typeof newValue === "number") {
+      setValue(newValue);
+      const src = activeImage.originalSrc[newValue - 1];
+      dispatch(imageViewerSlice.actions.setImageSrc({ src: src }));
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <Typography id="non-linear-slider" gutterBottom>
+        Z plane: {value}
+      </Typography>
+      <Slider
+        aria-label="z-plane"
+        onChange={handleChange}
+        value={value}
+        valueLabelDisplay="auto"
+        step={1}
+        marks
+        min={1}
+        max={activeImage!.shape.planes}
+      />
+    </React.Fragment>
+  );
 };

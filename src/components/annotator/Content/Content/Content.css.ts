@@ -7,6 +7,8 @@ export const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: "red",
     boxShadow: "none",
     left: theme.spacing(32),
+    paddingRight: theme.spacing(52),
+    paddingLeft: theme.spacing(1),
     position: "absolute",
     opacity: "50%",
   },
