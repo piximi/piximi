@@ -1,4 +1,4 @@
-import { styles } from "./OpenExampleClassifierDialog.css";
+import { styles } from "./OpenExampleProjectDialog.css";
 import {
   Dialog,
   DialogActions,
@@ -12,6 +12,11 @@ import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { MenuList } from "@mui/material";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
+import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
+
+import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
+import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
+import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
 
 const useStyles = makeStyles(styles);
 
@@ -29,10 +34,6 @@ export const OpenExampleClassifierDialog = (
   const { t: translation } = useTranslation();
   const { open, onClose, popupState } = props;
 
-  const mnistExampleProject = require("../../exampleProjects/mnist.json");
-  const cElegansExampleProject = require("../../exampleProjects/C-elegans.json");
-  const humanU2OSCellsExampleProject = require("../../exampleProjects/Human-U2OS-cells-transfluor_BBBC016.json");
-
   const closeMenueAndDialog = () => {
     onClose();
   };
@@ -42,7 +43,7 @@ export const OpenExampleClassifierDialog = (
     <Dialog fullWidth maxWidth="sm" open={open}>
       <DialogTitle className={classes.dialogTitle}>
         <Typography variant="h6">
-          {translation("Open example classifier")}
+          {translation("Open example project")}
         </Typography>
         <IconButton
           aria-label="Close"
@@ -55,20 +56,23 @@ export const OpenExampleClassifierDialog = (
       <DialogContent classes={{ root: classes.dialogContent }}>
         <MenuList>
           <OpenExampleProjectMenuItem
-            exampleProject={mnistExampleProject}
-            primary={"Open MNIST example project"}
+            exampleProject={ExampleProject.Mnist}
+            projectName={"Open MNIST example project"}
+            projectIcon={mnistExampleProjectIcon}
             popupState={popupState}
             onClose={onClose}
           />
           <OpenExampleProjectMenuItem
-            exampleProject={cElegansExampleProject}
-            primary={"Open C. elegans example project"}
+            exampleProject={ExampleProject.CElegans}
+            projectName={"Open C. elegans example project"}
+            projectIcon={cElegansExampleProjectIcon}
             popupState={popupState}
             onClose={onClose}
           />
           <OpenExampleProjectMenuItem
-            exampleProject={humanU2OSCellsExampleProject}
-            primary={"Open human U2OS-cells example project"}
+            exampleProject={ExampleProject.HumanU2OSCells}
+            projectName={"Open human U2OS-cells example project"}
+            projectIcon={humanU2OSCellsExampleProjectIcon}
             popupState={popupState}
             onClose={onClose}
           />
