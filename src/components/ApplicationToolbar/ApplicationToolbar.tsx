@@ -33,7 +33,6 @@ export const ApplicationToolbar = () => {
   return (
     <Toolbar>
       <Logo />
-      {/*<TaskSelect />*/}
       <div className={classes.grow} />
       <ZoomOutIcon className={classes.zoomIcon} />
       <Slider
