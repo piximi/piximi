@@ -20,7 +20,7 @@ export const ClassifierList = () => {
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] = React.useState<string>(
-    "Disabled while not trained model."
+    "disabled: no trained model"
   );
 
   const fitted = useSelector(fittedSelector);
@@ -29,7 +29,7 @@ export const ClassifierList = () => {
   useEffect(() => {
     if (training) {
       setDisabled(true);
-      setHelperText("Disabled while training.");
+      setHelperText("disabled during training.");
     } else {
     }
   }, [training]);
