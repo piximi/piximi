@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useStyles } from "./ImageGridAppBar.css";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
@@ -28,18 +29,17 @@ import ViewComfyIcon from "@mui/icons-material/ViewComfy";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import { ImageViewer } from "../annotator";
 import { Image } from "../../types/Image";
 import { Partition } from "../../types/Partition";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
+
   const images = useSelector(visibleImagesSelector);
 
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
-
-  const [openAnnotatorDialog, setOpenAnnotatorDialog] = React.useState(false);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -93,12 +93,7 @@ export const ImageGridAppBar = () => {
     if (!selected) return;
 
     dispatch(imageViewerSlice.actions.setImages({ images: selected }));
-
-    setOpenAnnotatorDialog(true);
-  };
-
-  const onCloseAnnotatorDialog = () => {
-    setOpenAnnotatorDialog(false);
+    navigate("/annotator");
   };
 
   const classes = useStyles();
@@ -158,13 +153,6 @@ export const ImageGridAppBar = () => {
           </Toolbar>
         </AppBar>
       </Slide>
-
-      {/*{Array.isArray(selectedImages) && selectedImages.length ? (*/}
-      <ImageViewer
-        open={openAnnotatorDialog}
-        onClose={onCloseAnnotatorDialog}
-      />
-      {/*) : null}*/}
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
