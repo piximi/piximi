@@ -3,7 +3,7 @@ import { bindMenu } from "material-ui-popup-state";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
 import { OpenClassifierDialog } from "../OpenClassifierDialog";
 import { useDialog } from "../../hooks";
-import { OpenExampleClassifierDialog } from "../OpenExampleClassifierDialog/OpenExampleClassifierDialog";
+import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
 
 type OpenMenuProps = {
   popupState: any;

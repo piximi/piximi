@@ -11,10 +11,12 @@ import { useStyles } from "../ClassifierList/classifierListTooltip.css";
 
 type EvaluateClassifierListItemProbs = {
   disabled: boolean;
+  helperText: string;
 };
 
 export const EvaluateClassifierListItem = ({
   disabled,
+  helperText,
 }: EvaluateClassifierListItemProbs) => {
   const onEvaluateClick = () => {};
 
@@ -27,7 +29,7 @@ export const EvaluateClassifierListItem = ({
           tooltip: classes.customTooltip,
           arrow: classes.customArrow,
         }}
-        title={disabled ? "train or open a model before evaluation" : ""}
+        title={disabled ? helperText : ""}
         placement="right"
         arrow
       >

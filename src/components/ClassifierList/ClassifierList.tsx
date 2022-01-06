@@ -13,18 +13,30 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { PredictClassifierListItem } from "../PredictClassifierListItem";
 import { useSelector } from "react-redux";
 import { fittedSelector } from "../../store/selectors/fittedSelector";
+import { trainingFlagSelector } from "../../store/selectors/trainingFlagSelector";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(false);
-  const [noFittedModel, setNoFittedModel] = React.useState<boolean>(true);
+
+  const [disabled, setDisabled] = React.useState<boolean>(true);
+  const [helperText, setHelperText] = React.useState<string>(
+    "disabled: no trained model"
+  );
 
   const fitted = useSelector(fittedSelector);
+  const training = useSelector(trainingFlagSelector);
+
+  useEffect(() => {
+    if (training) {
+      setDisabled(true);
+      setHelperText("disabled during training.");
+    } else {
+    }
+  }, [training]);
 
   useEffect(() => {
     if (fitted) {
-      setNoFittedModel(false);
-    } else {
-      setNoFittedModel(true);
+      setDisabled(false);
     }
   }, [fitted]);
 
@@ -46,9 +58,15 @@ export const ClassifierList = () => {
         <List component="div" dense disablePadding>
           <FitClassifierListItem />
 
-          <PredictClassifierListItem disabled={noFittedModel} />
+          <PredictClassifierListItem
+            disabled={disabled}
+            helperText={helperText}
+          />
 
-          <EvaluateClassifierListItem disabled={noFittedModel} />
+          <EvaluateClassifierListItem
+            disabled={disabled}
+            helperText={helperText}
+          />
         </List>
       </Collapse>
     </List>

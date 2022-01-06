@@ -3,26 +3,49 @@ import { useDispatch } from "react-redux";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
+import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
 type OpenExampleProjectMenuItemProps = {
-  exampleProject: any;
-  primary: string;
+  exampleProject: ExampleProject;
+  projectName: string;
+  projectIcon: string;
   popupState: any;
   onClose: any;
 };
 
 export const OpenExampleProjectMenuItem = ({
   exampleProject,
-  primary,
+  projectName,
+  projectIcon,
   popupState,
   onClose,
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
-  const projectIcon = exampleProject.project.serializedImages[0].imageData;
 
   const onClickExampleProject = async () => {
-    const project = exampleProject.project as SerializedProjectType;
-    const classifier = exampleProject.classifier as Classifier;
+    var exampleProjectJson: any;
+    switch (exampleProject) {
+      case ExampleProject.Mnist:
+        exampleProjectJson = await import(
+          "data/exampleProjects/mnistExampleProject.json"
+        );
+        break;
+      case ExampleProject.CElegans:
+        exampleProjectJson = await import(
+          "data/exampleProjects/cElegansExampleProject.json"
+        );
+        break;
+      case ExampleProject.HumanU2OSCells:
+        exampleProjectJson = await import(
+          "data/exampleProjects/humanU2OSCellsExampleProject.json"
+        );
+        break;
+      default:
+        return;
+    }
+
+    const project = exampleProjectJson.project as SerializedProjectType;
+    const classifier = exampleProjectJson.classifier as Classifier;
 
     popupState.close();
     onClose();
@@ -48,7 +71,7 @@ export const OpenExampleProjectMenuItem = ({
         <Avatar src={projectIcon}></Avatar>
       </ListItemAvatar>
 
-      <ListItemText primary={primary} />
+      <ListItemText primary={projectName} />
     </ListItem>
   );
 };
