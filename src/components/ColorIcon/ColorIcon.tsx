@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CirclePicker, ColorResult } from "react-color";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "../MainView/MainView.css";
 import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
 import { Avatar, IconButton, Popover } from "@mui/material";
 import { Label } from "@mui/icons-material";

@@ -4,7 +4,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "../MainView/MainView.css";
 
 type SettingsDialogProps = {
   onClose: () => void;
