@@ -6,9 +6,12 @@ import { Annotation } from "./Annotation";
 import { imageInstancesSelector } from "../../../../../../store/selectors";
 import { selectedAnnotationsSelector } from "../../../../../../store/selectors/selectedAnnotationsSelector";
 import { unselectedAnnotationsSelector } from "../../../../../../store/selectors/unselectedAnnotationsSelector";
+import { activeImagePlaneSelector } from "../../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ConfirmedAnnotations = () => {
   const annotations = useSelector(imageInstancesSelector);
+
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
 
@@ -24,9 +27,12 @@ export const ConfirmedAnnotations = () => {
     if (!annotations) return;
 
     setVisibleAnnotations(
-      unselectedAnnotations.filter((annotation: AnnotationType) =>
-        visibleCategories.includes(annotation.categoryId)
-      )
+      unselectedAnnotations.filter((annotation: AnnotationType) => {
+        return (
+          visibleCategories.includes(annotation.categoryId) &&
+          annotation.plane === activeImagePlane
+        );
+      })
     );
   }, [
     annotations,
