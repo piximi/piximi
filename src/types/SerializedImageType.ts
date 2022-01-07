@@ -2,7 +2,6 @@ import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 
 export type SerializedImageType = {
-  imageActivePlane: number;
   imageCategoryId: string;
   imageChannels: number;
   imageChecksum: string;

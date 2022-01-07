@@ -14,7 +14,6 @@ export const serializedProjectSelector = ({
       : UNKNOWN_CATEGORY_ID;
 
     return {
-      imageActivePlane: image.activePlane,
       imageCategoryId: categoryId,
       imageChannels: image.shape.channels,
       imageChecksum: "",

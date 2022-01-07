@@ -67,7 +67,6 @@ export const convertImageJStoImage = (
   };
 
   return {
-    activePlane: Math.floor(nplanes / 2),
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     annotations: [],

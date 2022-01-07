@@ -10,7 +10,6 @@ import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
 
 const dummyImage: Image = {
-  activePlane: 0,
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
   categoryId: UNKNOWN_CATEGORY_ID,
   annotations: [],
@@ -93,7 +92,6 @@ export const projectSlice = createSlice({
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
-          activePlane: serializedImage.imageActivePlane,
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
           annotations: serializedImage.annotations,
@@ -107,7 +105,9 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData[serializedImage.imageActivePlane],
+          src: serializedImage.imageData[
+            Math.floor(serializedImage.imagePlanes / 2)
+          ],
         };
 
         newImages.push(image);
@@ -131,7 +131,6 @@ export const projectSlice = createSlice({
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
-          activePlane: serializedImage.imageActivePlane,
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
           annotations: serializedImage.annotations,

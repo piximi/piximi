@@ -6,11 +6,5 @@ export const activeImagePlaneSelector = ({
 }: {
   imageViewer: ImageViewer;
 }): number => {
-  const activeImage = imageViewer.images.find((image: Image) => {
-    return imageViewer.activeImageId === image.id;
-  });
-
-  if (!activeImage) return 0;
-
-  return activeImage.activePlane;
+  return imageViewer.activeImagePlane;
 };

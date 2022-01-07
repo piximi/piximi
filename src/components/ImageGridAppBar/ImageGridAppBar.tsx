@@ -61,7 +61,6 @@ export const ImageGridAppBar = () => {
       });
 
       const annotatorImage: Image = {
-        activePlane: projectImage!.activePlane,
         categoryId: projectImage!.categoryId,
         id: projectImage!.id,
         annotations: projectImage!.annotations,

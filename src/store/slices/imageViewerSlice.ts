@@ -99,6 +99,7 @@ const initialState: ImageViewer = {
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
+  activeImagePlane: 0,
   images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -246,7 +247,6 @@ export const imageViewerSlice = createSlice({
       );
 
       const loaded: Image = {
-        activePlane: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         id: action.payload.file.imageId,
         src: action.payload.file.imageData[0],
@@ -346,6 +346,12 @@ export const imageViewerSlice = createSlice({
         });
       }
       state.channels = defaultChannels;
+    },
+    setActiveImagePlane(
+      state: ImageViewer,
+      action: PayloadAction<{ activeImagePlane: number }>
+    ) {
+      state.activeImagePlane = action.payload.activeImagePlane;
     },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
