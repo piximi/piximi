@@ -542,6 +542,7 @@ export const importSerializedAnnotations = (
       categoryId: annotation.annotationCategoryId,
       id: annotation.annotationId,
       mask: mask,
+      plane: annotation.annotationPlane,
     },
     categories: newCategories,
   };

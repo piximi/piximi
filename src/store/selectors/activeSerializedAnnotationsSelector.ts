@@ -48,6 +48,7 @@ export const activeSerializedAnnotationsSelector = ({
         annotationCategoryName: category.name,
         annotationId: annotation.id,
         annotationMask: annotation.mask.join(" "),
+        annotationPlane: annotation.plane,
       };
     });
 

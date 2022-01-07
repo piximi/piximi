@@ -424,6 +424,7 @@ export abstract class AnnotationTool extends Tool {
       categoryId: category.id,
       id: uuidv4(),
       mask: this.mask,
+      plane: 0, //TODO change this
     };
   }
 
