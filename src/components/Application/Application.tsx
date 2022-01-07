@@ -15,8 +15,8 @@ export const Application = () => {
 
   return (
     <Provider store={productionStore}>
-      <ThemeProvider theme={theme}>
-        <StyledEngineProvider injectFirst>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
           <DndProvider backend={HTML5Backend}>
             <BrowserRouter>
               <Routes>
@@ -25,8 +25,8 @@ export const Application = () => {
               </Routes>
             </BrowserRouter>
           </DndProvider>
-        </StyledEngineProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </StyledEngineProvider>
     </Provider>
   );
 };
