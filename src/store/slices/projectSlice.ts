@@ -8,6 +8,7 @@ import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
+import { toImageData } from "../../annotator/image/rle";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
@@ -130,6 +131,9 @@ export const projectSlice = createSlice({
       const newImages: Array<Image> = [];
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const originalSrc = Array.isArray(serializedImage.imageData)
+          ? serializedImage.imageData
+          : [serializedImage.imageData]; //handle case where example projects's images do not correspond to array of strings
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
@@ -144,7 +148,7 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData[0],
+          src: originalSrc[Math.floor(serializedImage.imagePlanes / 2)],
         };
 
         newImages.push(image);
