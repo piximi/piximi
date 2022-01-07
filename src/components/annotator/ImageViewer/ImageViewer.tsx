@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { CssBaseline, Dialog, DialogContent } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
