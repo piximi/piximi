@@ -106,22 +106,17 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
   return (
     <>
-      {/* TODO [routing]: no need to render as dialog component anymore, refactor -- Nodar*/}
-      <Dialog disableEscapeKeyDown fullScreen open={true}>
-        <DialogContent>
-          <div className={classes.root}>
-            <CssBaseline />
+      <div className={classes.root}>
+        <CssBaseline />
 
-            <CategoriesList />
+        <CategoriesList />
 
-            <Content onDrop={onDrop} />
+        <Content onDrop={onDrop} />
 
-            <ToolOptions />
+        <ToolOptions />
 
-            <Tools />
-          </div>
-        </DialogContent>
-      </Dialog>
+        <Tools />
+      </div>
     </>
   );
 };
