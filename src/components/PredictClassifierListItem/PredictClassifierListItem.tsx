@@ -9,10 +9,12 @@ import { useStyles } from "../ClassifierList/classifierListTooltip.css";
 
 type PredictClassifierListItemProbs = {
   disabled: boolean;
+  helperText: string;
 };
 
 export const PredictClassifierListItem = ({
   disabled,
+  helperText,
 }: PredictClassifierListItemProbs) => {
   const dispatch = useDispatch();
 
@@ -29,7 +31,7 @@ export const PredictClassifierListItem = ({
           tooltip: classes.customTooltip,
           arrow: classes.customArrow,
         }}
-        title={disabled ? "train or open a model before prediction" : ""}
+        title={disabled ? helperText : ""}
         placement="right"
         arrow
       >

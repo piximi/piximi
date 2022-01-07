@@ -5,9 +5,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
 } from "@mui/material";
-import * as _ from "lodash";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
@@ -18,26 +16,12 @@ import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
+import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
 
-const optimizationAlgorithms = {
-  Adadelta: "Adadelta",
-  Adagrad: "Adagrad",
-  Adam: "Adam",
-  Adamax: "Adamax",
-  Momentum: "Momentum",
-  RmsProp: "RMSProp",
-  StochasticGradientDescent: "Stochastic gradient descent (SGD)",
-};
-
-const lossFunctions = {
-  AbsoluteDifference: "Absolute difference",
-  CosineDistance: "Cosine distance",
-  Hinge: "Hinge",
-  Huber: "Huber",
-  Log: "Log",
-  MeanSquaredError: "Mean squared error (MSE)",
-  SigmoidCrossEntropy: "Sigmoid cross entropy",
-  CategoricalCrossEntropy: "Categorical cross entropy",
+const enumKeys = <O extends object, K extends keyof O = keyof O>(
+  obj: O
+): K[] => {
+  return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
 };
 
 export const OptimizerSettingsGrid = () => {
@@ -49,86 +33,38 @@ export const OptimizerSettingsGrid = () => {
   const lossFunction = useSelector(lossFunctionSelector);
   const learningRate = useSelector(learningRateSelector);
 
-  const onBatchSizeChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const batchSize = Number(target.value);
+  const dispatchBatchSize = (batchSize: number) => {
     dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
   };
 
-  const onEpochsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const epochs = Number(target.value);
-    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
-  };
-
-  const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
-    const target = event.target as HTMLInputElement; //target.value is string
-
-    const selectedAlgorithm = () => {
-      switch (target.value) {
-        case "Adadelta":
-          return OptimizationAlgorithm.Adadelta;
-        case "Adagrad":
-          return OptimizationAlgorithm.Adagrad;
-        case "Adam":
-          return OptimizationAlgorithm.Adam;
-        case "Adamax":
-          return OptimizationAlgorithm.Adamax;
-        case "Momentum":
-          return OptimizationAlgorithm.Momentum;
-        case "RMSProp":
-          return OptimizationAlgorithm.RMSProp;
-        case "Stochastic gradient descent (SGD)":
-          return OptimizationAlgorithm.StochasticGradientDescent;
-        default:
-          return OptimizationAlgorithm.Adam;
-      }
-    };
-
-    dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: selectedAlgorithm(),
-      })
-    );
-  };
-
-  const onLearningRateChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const learningRate = Number(target.value);
-
+  const dispatchLearningRate = (learningRate: number) => {
     dispatch(
       classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
     );
   };
 
+  const dispatchEpochs = (arg: number) => {
+    dispatch(classifierSlice.actions.updateEpochs({ epochs: arg }));
+  };
+
+  const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
+    const target = event.target as HTMLInputElement; //target.value is string
+    const optimizationAlgorithm = target.value as OptimizationAlgorithm;
+
+    dispatch(
+      classifierSlice.actions.updateOptimizationAlgorithm({
+        optimizationAlgorithm: optimizationAlgorithm,
+      })
+    );
+  };
+
   const onLossFunctionChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
+    const lossFunction = target.value as LossFunction;
 
-    const selectedLossFunction = () => {
-      switch (target.value) {
-        case "Absolute difference":
-          return LossFunction.AbsoluteDifference;
-        case "Cosine distance":
-          return LossFunction.CosineDistance;
-        case "Hinge":
-          return LossFunction.Hinge;
-        case "Huber":
-          return LossFunction.Huber;
-        case "Log":
-          return LossFunction.Log;
-        case "Mean squared error (MSE)":
-          return LossFunction.MeanSquaredError;
-        case "Sigmoid cross entropy":
-          return LossFunction.SigmoidCrossEntropy;
-        case "Categorical cross entropy":
-          return LossFunction.CategoricalCrossEntropy;
-        default:
-          return LossFunction.CategoricalCrossEntropy;
-      }
-    };
     dispatch(
       classifierSlice.actions.updateLossFunction({
-        lossFunction: selectedLossFunction(),
+        lossFunction: lossFunction,
       })
     );
   };
@@ -146,10 +82,10 @@ export const OptimizerSettingsGrid = () => {
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
             >
-              {_.map(optimizationAlgorithms, (v, k) => {
+              {enumKeys(OptimizationAlgorithm).map((k) => {
                 return (
-                  <MenuItem dense key={k} value={v}>
-                    {v}
+                  <MenuItem key={k} value={OptimizationAlgorithm[k]}>
+                    {OptimizationAlgorithm[k]}
                   </MenuItem>
                 );
               })}
@@ -158,13 +94,13 @@ export const OptimizerSettingsGrid = () => {
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <TextField
+            <CustomNumberTextField
               id="learning-rate"
               label="Learning rate"
-              className={classes.textField}
               value={learningRate}
-              onChange={onLearningRateChange}
-              type="number"
+              dispatchCallBack={dispatchLearningRate}
+              min={0}
+              enableFloat={true}
             />
           </Grid>
         </Grid>
@@ -180,10 +116,10 @@ export const OptimizerSettingsGrid = () => {
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
             >
-              {_.map(lossFunctions, (v, k) => {
+              {enumKeys(LossFunction).map((k) => {
                 return (
-                  <MenuItem dense key={k} value={v}>
-                    {v}
+                  <MenuItem key={k} value={LossFunction[k]}>
+                    {LossFunction[k]}
                   </MenuItem>
                 );
               })}
@@ -192,26 +128,22 @@ export const OptimizerSettingsGrid = () => {
         </Grid>
         <Grid container direction={"row"} spacing={2}>
           <Grid item xs={2}>
-            <TextField
+            <CustomNumberTextField
               id="batch-size"
               label="Batch size"
-              className={classes.textField}
               value={fitOptions.batchSize}
-              onChange={onBatchSizeChange}
-              type="number"
-              margin="normal"
+              dispatchCallBack={dispatchBatchSize}
+              min={1}
             />
           </Grid>
 
           <Grid item xs={2}>
-            <TextField
+            <CustomNumberTextField
               id="epochs"
               label="Epochs"
-              className={classes.textField}
               value={fitOptions.epochs}
-              onChange={onEpochsChange}
-              margin="normal"
-              type="number"
+              dispatchCallBack={dispatchEpochs}
+              min={1}
             />
           </Grid>
         </Grid>

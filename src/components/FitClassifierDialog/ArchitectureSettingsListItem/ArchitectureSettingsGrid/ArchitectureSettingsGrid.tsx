@@ -1,7 +1,6 @@
-import { Alert, FormControl, Grid, TextField } from "@mui/material";
+import { FormControl, Grid, TextField, Alert } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
-import { SyntheticEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { architectureOptionsSelector } from "../../../../store/selectors/architectureOptionsSelector";
@@ -11,19 +10,9 @@ import {
   availableModels,
   ClassifierModelProps,
 } from "../../../../types/ClassifierModelType";
+import { SyntheticEvent } from "react";
 import { uploadedModelSelector } from "../../../../store/selectors/uploadedModelSelector";
-
-//import { createStyles, makeStyles } from "@mui/styles";
-
-// const useStyles = makeStyles((theme: Theme) =>
-//   createStyles({
-//     textField: {
-//       marginRight: theme.spacing(1),
-//       flexBasis: 300,
-//       width: "100%",
-//     },
-//   })
-// );
+import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
 
 export const ArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(architectureOptionsSelector);
@@ -84,19 +73,15 @@ export const ArchitectureSettingsGrid = () => {
     );
   };
 
-  const onRowsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const rows = Number(target.value);
+  const dispatchRows = (height: number) => {
     dispatch(
       classifierSlice.actions.updateInputShape({
-        inputShape: { ...inputShape, height: rows },
+        inputShape: { ...inputShape, height: height },
       })
     );
   };
 
-  const onColsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const cols = Number(target.value);
+  const dispatchCols = (cols: number) => {
     dispatch(
       classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, width: cols },
@@ -104,10 +89,7 @@ export const ArchitectureSettingsGrid = () => {
     );
   };
 
-  const onChannelsChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    const channels = Number(target.value);
-
+  const dispatchChannels = (channels: number) => {
     dispatch(
       classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, channels: channels },
@@ -138,32 +120,30 @@ export const ArchitectureSettingsGrid = () => {
       </Grid>
       <Grid container direction={"row"} spacing={2}>
         <Grid item xs={1}>
-          <TextField
+          <CustomNumberTextField
             id="shape-rows"
             label="Input rows"
-            className={classes.textField}
             value={inputShape.height}
-            onChange={onRowsChange}
+            dispatchCallBack={dispatchRows}
+            min={1}
           />
         </Grid>
         <Grid item xs={1}>
-          <TextField
+          <CustomNumberTextField
             id="shape-cols"
             label="Input cols"
-            className={classes.textField}
             value={inputShape.width}
-            onChange={onColsChange}
+            dispatchCallBack={dispatchCols}
+            min={1}
           />
         </Grid>
         <Grid item xs={1}>
-          <TextField
+          <CustomNumberTextField
             id="shape-channels"
             label="Input channels"
-            className={classes.textField}
             value={inputShape.channels}
-            onChange={onChannelsChange}
-            type="number"
-            disabled={fixedNumberOfChannels}
+            dispatchCallBack={dispatchChannels}
+            min={1}
           />
         </Grid>
       </Grid>
