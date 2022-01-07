@@ -16,6 +16,22 @@ export const MainView = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  const onUnload = (e: any) => {
+    if (process.env.NODE_ENV === "development") {
+      return;
+    } else {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to exit?");
+    }
+  };
+
+  React.useEffect(() => {
+    window.addEventListener("beforeunload", onUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onUnload);
+    };
+  }, []);
+
   const onDrop = useCallback(
     (item) => {
       if (item) {
