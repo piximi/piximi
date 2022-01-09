@@ -15,7 +15,7 @@ export const theme = createTheme({
     MuiListItem: {
       styleOverrides: {
         root: {
-          "&$selected": {
+          "&.Mui-selected": {
             backgroundColor: "rgba(60, 61, 62)",
           },
         },
