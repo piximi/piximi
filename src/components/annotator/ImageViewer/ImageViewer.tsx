@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect } from "react";
-import { CssBaseline, Dialog, DialogContent } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { ThemeProvider } from "@mui/styles";
 import { useStyles } from "./ImageViewer.css";
-import { theme } from "./theme";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../types/ShapeType";
 import { ToolType } from "../../../types/ToolType";
@@ -25,11 +23,9 @@ import { UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 
 type ImageViewerProps = {
   image?: Image;
-  onClose: () => void;
-  open: boolean;
 };
 
-export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
+export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
   //
   // useEffect(() => {
@@ -110,23 +106,17 @@ export const ImageViewer = ({ image, onClose, open }: ImageViewerProps) => {
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <Dialog disableEscapeKeyDown fullScreen open={open} onClose={onClose}>
-          <DialogContent>
-            <div className={classes.root}>
-              <CssBaseline />
+      <div className={classes.root}>
+        <CssBaseline />
 
-              <CategoriesList closeDialog={onClose} />
+        <CategoriesList />
 
-              <Content onDrop={onDrop} />
+        <Content onDrop={onDrop} />
 
-              <ToolOptions />
+        <ToolOptions />
 
-              <Tools />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </ThemeProvider>
+        <Tools />
+      </div>
     </>
   );
 };
