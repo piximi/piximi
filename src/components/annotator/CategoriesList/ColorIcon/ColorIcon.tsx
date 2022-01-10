@@ -1,9 +1,8 @@
 import { Label } from "@mui/icons-material";
 import * as React from "react";
-import { Avatar, IconButton } from "@mui/material";
+import { Avatar, IconButton, Box } from "@mui/material";
 import Popover from "@mui/material/Popover";
 import { CirclePicker, ColorResult } from "react-color";
-import { useStyles } from "./ColorIcon.css";
 
 export const COLORS = [
   "#000000",
@@ -29,8 +28,6 @@ type ColorIconButtonProps = {
 };
 
 export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
-  const classes = useStyles();
-
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
 
@@ -52,8 +49,8 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
   return (
     <>
       <IconButton onClick={onOpenColorPicker}>
-        <Avatar style={{ backgroundColor: "#F3F3F3" }}>
-          <Label style={{ color: color }} />
+        <Avatar sx={{ backgroundColor: "#F3F3F3" }}>
+          <Label sx={{ color: color }} />
         </Avatar>
       </IconButton>
       <Popover
@@ -70,9 +67,9 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
           horizontal: "center",
         }}
       >
-        <div className={classes.colorPicker}>
+        <Box sx={{ margin: "16px" }}>
           <CirclePicker colors={COLORS} onChange={onChange} />
-        </div>
+        </Box>
       </Popover>
     </>
   );
