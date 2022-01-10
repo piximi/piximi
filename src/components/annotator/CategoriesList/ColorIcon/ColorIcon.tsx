@@ -5,25 +5,22 @@ import Popover from "@mui/material/Popover";
 import { CirclePicker, ColorResult } from "react-color";
 import { useStyles } from "./ColorIcon.css";
 
-const COLORS = [
-  "#f44336",
-  "#e91e63",
-  "#9c27b0",
-  "#673ab7",
-  "#3f51b5",
-  "#2196f3",
-  "#03a9f4",
-  "#00bcd4",
-  "#009688",
-  "#4caf50",
-  "#8bc34a",
-  "#cddc39",
-  "#ffeb3b",
-  "#ffc107",
-  "#ff9800",
-  "#ff5722",
-  "#795548",
-  "#607d8b",
+export const COLORS = [
+  "#000000",
+  "#004949",
+  "#009292",
+  "#ff6db6",
+  "#ffb6db",
+  "#490092",
+  "#006ddb",
+  "#b66dff",
+  "#6db6ff",
+  "#b6dbff",
+  "#920000",
+  "#924900",
+  "#db6d00",
+  "#24ff24",
+  "#ffff6d",
 ];
 
 type ColorIconButtonProps = {

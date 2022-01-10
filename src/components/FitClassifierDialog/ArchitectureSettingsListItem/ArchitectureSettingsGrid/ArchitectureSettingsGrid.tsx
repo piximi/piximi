@@ -144,6 +144,7 @@ export const ArchitectureSettingsGrid = () => {
             value={inputShape.channels}
             dispatchCallBack={dispatchChannels}
             min={1}
+            disabled={fixedNumberOfChannels}
           />
         </Grid>
       </Grid>

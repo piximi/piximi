@@ -13,6 +13,7 @@ type CustomNumberTextFieldProps = {
   min?: number;
   max?: number;
   enableFloat?: boolean;
+  disabled?: boolean;
 };
 
 /**
@@ -23,6 +24,7 @@ type CustomNumberTextFieldProps = {
  * @param {number} [min=Number.MIN_SAFE_INTEGER]
  * @param {number} [max=Number.MIN_SAFE_INTEGER]
  * @param {boolean} [enableFloat=false] allow floating point values
+ * @param {boolean} [disabled=false] disable the input field
  * @returns
  */
 export const CustomNumberTextField = ({
@@ -33,6 +35,7 @@ export const CustomNumberTextField = ({
   min = Number.MIN_SAFE_INTEGER,
   max = Number.MAX_SAFE_INTEGER,
   enableFloat = false,
+  disabled = false,
 }: CustomNumberTextFieldProps) => {
   const classes = useStyles();
   const [valueString, setValueString] = React.useState<string>(
@@ -69,6 +72,7 @@ export const CustomNumberTextField = ({
       type="text"
       margin="normal"
       autoComplete="off"
+      disabled={disabled}
     />
   );
 };
