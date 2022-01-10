@@ -36,12 +36,14 @@ export const convertImageJStoImage = (
   let height: number;
   let width: number;
   let imageData: Array<string> = [];
+  let channels: number;
 
   if (Array.isArray(image)) {
     //case where user uploaded a z-stack
     nplanes = image.length;
     height = image[0].height;
     width = image[0].width;
+    channels = image[0].components;
     for (let j = 0; j < nplanes; j++) {
       imageData.push(
         image[j].toDataURL("image/png", {
@@ -57,9 +59,11 @@ export const convertImageJStoImage = (
     ];
     height = image.height;
     width = image.width;
+    channels = image.components;
   }
+
   const shape: ShapeType = {
-    channels: image.components,
+    channels: channels,
     frames: 1,
     height: height,
     planes: nplanes,
