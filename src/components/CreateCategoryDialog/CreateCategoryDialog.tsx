@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "../MainView/MainView.css";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
 import { createCategory } from "../../store/slices";

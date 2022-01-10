@@ -1,5 +1,5 @@
 import React from "react";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "../MainView/MainView.css";
 import { ClassifierSettingsDialogTabContext } from "../ClassifierSettingsDialogTabContext";
 import { Container, DialogContent } from "@mui/material";
 

@@ -9,7 +9,7 @@ import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { State } from "../../types/State";
 import { Image } from "../../types/Image";
-import { useStyles } from "../Application/Application.css";
+import { useStyles } from "../MainView/MainView.css";
 import {
   Chip,
   IconButton,
