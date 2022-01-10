@@ -29,6 +29,7 @@ import {
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -41,7 +42,7 @@ export const ExampleImageDialog = ({
 }: ExampleImageDialogProps) => {
   const dispatch = useDispatch();
 
-  const images = useSelector(imagesSelector);
+  const images = useSelector(annotatorImagesSelector);
 
   const categories_in = useSelector(categoriesSelector);
 

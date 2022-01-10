@@ -530,6 +530,12 @@ export const importSerializedAnnotations = (
     newCategories = [...newCategories, category];
   }
 
+  let annotationPlane = annotation.annotationPlane;
+
+  if (!annotationPlane) {
+    annotationPlane = 0;
+  }
+
   return {
     annotation_out: {
       boundingBox: [
@@ -541,7 +547,7 @@ export const importSerializedAnnotations = (
       categoryId: annotation.annotationCategoryId,
       id: annotation.annotationId,
       mask: mask,
-      plane: annotation.annotationPlane,
+      plane: annotationPlane,
     },
     categories: newCategories,
   };
