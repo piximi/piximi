@@ -252,8 +252,17 @@ export const CategoriesList = () => {
   return (
     <Drawer
       anchor="left"
-      className={classes.drawer}
-      classes={{ paper: classes.paper }}
+      // className={classes.drawer}
+      // classes={{ paper: classes.paper }}
+      sx={{
+        flexShrink: 0,
+        width: (theme) => theme.spacing(32),
+        "& .MuiDrawer-paper": {
+          boxShadow: "inset 0 0 16px #000000",
+          width: (theme) => theme.spacing(32),
+          zIndex: 0,
+        },
+      }}
       open
       variant="persistent"
     >
@@ -482,6 +491,7 @@ export const CategoriesList = () => {
         <HelpDrawer />
         <SettingsListItem />
         <SendFeedbackListItem />
+        //{" "}
       </List>
     </Drawer>
   );
