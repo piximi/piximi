@@ -12,7 +12,6 @@ import {
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useStyles } from "./CategoriesList.css";
 import { CollapsibleList } from "../CollapsibleList";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
@@ -73,8 +72,6 @@ import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 
 export const CategoriesList = () => {
-  const classes = useStyles();
-
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const unknownCategory = useSelector(unknownCategorySelector);
@@ -252,8 +249,6 @@ export const CategoriesList = () => {
   return (
     <Drawer
       anchor="left"
-      // className={classes.drawer}
-      // classes={{ paper: classes.paper }}
       sx={{
         flexShrink: 0,
         width: (theme) => theme.spacing(32),
@@ -268,13 +263,23 @@ export const CategoriesList = () => {
     >
       <Box
         style={{ paddingTop: 60 }}
-        className={classes.toolbar}
+        sx={(theme) => ({
+          ...theme.mixins.toolbar,
+        })}
         display="flex"
         justifyContent="flex-end"
         px={8}
       />
 
-      <AppBar className={classes.appBar} color="default">
+      <AppBar
+        color="default"
+        sx={{
+          backgroundColor: "rgba(0, 0, 0, 0)",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          boxShadow: "none",
+          position: "absolute",
+        }}
+      >
         <Toolbar>
           <Tooltip title="Save and return to project" placement="bottom">
             <IconButton
@@ -491,7 +496,6 @@ export const CategoriesList = () => {
         <HelpDrawer />
         <SettingsListItem />
         <SendFeedbackListItem />
-        //{" "}
       </List>
     </Drawer>
   );
@@ -654,8 +658,6 @@ const SendFeedbackDialog = ({
   open,
   onSend,
 }: SendFeedbackDialogProps) => {
-  const classes = useStyles();
-
   const t = useTranslation();
 
   const [input, setInput] = useState("");
@@ -670,12 +672,15 @@ const SendFeedbackDialog = ({
       <DialogTitle>{t("Send feedback")}</DialogTitle>
 
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText
+          sx={{
+            "& a": { color: "deepskyblue" },
+          }}
+        >
           {t(
             "Use this form to report issues with Piximi via our GitHub page, or visit"
           )}{" "}
           <a
-            className={classes.a}
             href="https://forum.image.sc/tag/piximi"
             target="_blank"
             rel="noreferrer"
