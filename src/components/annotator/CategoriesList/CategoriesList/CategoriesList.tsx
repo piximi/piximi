@@ -2,6 +2,7 @@ import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import {
   categoryCountsSelector,
@@ -71,9 +72,7 @@ import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/
 import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 
-export const CategoriesList = (props: any) => {
-  const { closeDialog } = props;
-
+export const CategoriesList = () => {
   const classes = useStyles();
 
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -91,6 +90,8 @@ export const CategoriesList = (props: any) => {
   const currentImage = useSelector(imageSelector);
 
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const {
     onClose: onCloseDeleteCategoryDialog,
@@ -155,7 +156,7 @@ export const CategoriesList = (props: any) => {
     );
 
     onCloseExitAnnotatorDialog();
-    closeDialog();
+    navigate("/");
   };
 
   const onCategoryClick = (

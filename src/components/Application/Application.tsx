@@ -1,58 +1,32 @@
-import React, { useCallback } from "react";
-import { ApplicationDrawer } from "../ApplicationDrawer";
-import { ImageGrid } from "../ImageGrid";
-import { ApplicationAppBar } from "../ApplicationAppBar";
-import { Box, CssBaseline } from "@mui/material";
-import { useStyles } from "./Application.css";
-import { createImage } from "../../store/slices";
-import { useDispatch } from "react-redux";
-import { convertFileToImage } from "../../image/imageHelper";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { ThemeProvider } from "@mui/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
+import { productionStore } from "../../store/stores";
+import { MainView } from "../MainView";
+import { AnnotatorView } from "../annotator";
 
 export const Application = () => {
-  const classes = useStyles();
-  const dispatch = useDispatch();
-
-  const onUnload = (e: any) => {
-    if (process.env.NODE_ENV === "development") {
-      return;
-    } else {
-      e.preventDefault();
-      return (e.returnValue = "Are you sure you want to exit?");
-    }
-  };
-
-  React.useEffect(() => {
-    window.addEventListener("beforeunload", onUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onUnload);
-    };
-  }, []);
-
-  const onDrop = useCallback(
-    async (item) => {
-      if (item) {
-        for (let i = 0; i < item.files.length; i++) {
-          const file = item.files[i];
-
-          const image = await convertFileToImage(file);
-
-          //if length of images is > 1, then the user selected a z-stack --> only show center image
-          dispatch(createImage({ image: image }));
-        }
-      }
-    },
-    [dispatch]
-  );
+  const theme = createTheme();
 
   return (
-    <Box className={classes.body}>
-      <CssBaseline />
-
-      <ApplicationAppBar />
-
-      <ApplicationDrawer />
-
-      <ImageGrid onDrop={onDrop} />
-    </Box>
+    <Provider store={productionStore}>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <DndProvider backend={HTML5Backend}>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<MainView />} />
+                <Route path="annotator" element={<AnnotatorView />} />
+              </Routes>
+            </BrowserRouter>
+          </DndProvider>
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </Provider>
   );
 };

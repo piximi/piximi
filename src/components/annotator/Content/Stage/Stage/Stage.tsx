@@ -19,12 +19,7 @@ import {
   stageWidthSelector,
   toolTypeSelector,
 } from "../../../../../store/selectors";
-import {
-  Provider,
-  ReactReduxContext,
-  useDispatch,
-  useSelector,
-} from "react-redux";
+import { Provider, useDispatch, useSelector, useStore } from "react-redux";
 import {
   useAnnotationTool,
   useCursor,
@@ -657,68 +652,67 @@ export const Stage = () => {
 
   const { draggable } = useHandTool();
 
-  /* re. use of Consumer -> Stage -> Provider
-    https://github.com/konvajs/react-konva/issues/311
+  /*
+    Konva's Stage is implemented such that its children are not connected,
+    and the store is no longer available to them, so we need to reinject
+    it to the Provider as a child of Stage.
+    See: https://github.com/konvajs/react-konva/issues/311
+    Discussion linked to above recommends use of
+    ReactReduxContext.Consumer -> Stage -> Provider pattern,
+    but that is not a publi API and may break in the future:
+    https://react-redux.js.org/using-react-redux/accessing-store#using-reactreduxcontext-directly
+    Here useStore() is utilized instead of getting the store
+    from ReactReduxContext.Consumer, which has the same result, but is safer.
    */
+  const store = useStore();
+
   return (
-    <>
-      <ReactReduxContext.Consumer>
-        {({ store }) => (
-          <>
-            <ReactKonva.Stage
-              draggable={draggable}
-              height={stageHeight}
-              onMouseDown={(evt) => onMouseDown(evt)}
-              onMouseMove={onMouseMove}
-              onMouseUp={onMouseUp}
-              onWheel={onZoomWheel}
-              position={stagePosition}
-              ref={stageRef}
-              width={stageWidth}
-            >
-              <Provider store={store}>
-                <DndProvider backend={HTML5Backend}>
-                  <Layer>
-                    <Image ref={imageRef} />
+    <ReactKonva.Stage
+      draggable={draggable}
+      height={stageHeight}
+      onMouseDown={(evt) => onMouseDown(evt)}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onWheel={onZoomWheel}
+      position={stagePosition}
+      ref={stageRef}
+      width={stageWidth}
+    >
+      <Provider store={store}>
+        <DndProvider backend={HTML5Backend}>
+          <Layer>
+            <Image ref={imageRef} />
 
-                    <ZoomSelection />
+            <ZoomSelection />
 
-                    <Selecting tool={tool!} />
+            <Selecting tool={tool!} />
 
-                    <PenAnnotationToolTip
-                      currentPosition={currentPosition}
-                      annotating={
-                        annotationState === AnnotationStateType.Annotating
-                      }
-                    />
+            <PenAnnotationToolTip
+              currentPosition={currentPosition}
+              annotating={annotationState === AnnotationStateType.Annotating}
+            />
 
-                    <PointerSelection />
+            <PointerSelection />
 
-                    <Annotations />
+            <Annotations />
 
-                    <Transformers
-                      transformPosition={getRelativePointerPosition}
-                      annotationTool={annotationTool}
-                    />
+            <Transformers
+              transformPosition={getRelativePointerPosition}
+              annotationTool={annotationTool}
+            />
 
-                    <ColorAnnotationToolTip
-                      toolTipPosition={
-                        (annotationTool as ColorAnnotationTool)?.toolTipPosition
-                      }
-                      initialPosition={
-                        (annotationTool as ColorAnnotationTool)?.initialPosition
-                      }
-                      tolerance={
-                        (annotationTool as ColorAnnotationTool)?.tolerance
-                      }
-                    />
-                  </Layer>
-                </DndProvider>
-              </Provider>
-            </ReactKonva.Stage>
-          </>
-        )}
-      </ReactReduxContext.Consumer>
-    </>
+            <ColorAnnotationToolTip
+              toolTipPosition={
+                (annotationTool as ColorAnnotationTool)?.toolTipPosition
+              }
+              initialPosition={
+                (annotationTool as ColorAnnotationTool)?.initialPosition
+              }
+              tolerance={(annotationTool as ColorAnnotationTool)?.tolerance}
+            />
+          </Layer>
+        </DndProvider>
+      </Provider>
+    </ReactKonva.Stage>
   );
 };
