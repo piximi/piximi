@@ -19,7 +19,7 @@ import IconButton from "@mui/material/IconButton";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryMenu } from "../CategoryMenu";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import { EditCategoryDialog } from "../EditCategoryDialog";
+import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
 import { useDialog } from "../../../../hooks";
 import { useTranslation } from "../../../../hooks/useTranslation";
 import {
@@ -48,7 +48,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
-import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
+import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
