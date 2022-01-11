@@ -40,11 +40,6 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
   });
 
   useEffect(() => {
-    if (!boundingClientRect) return;
-    dispatch(setBoundingClientRect({ boundingClientRect: boundingClientRect }));
-  }, [boundingClientRect, dispatch]);
-
-  useEffect(() => {
     dispatch(setStageWidth({ stageWidth: boundingClientRect.width }));
   }, [boundingClientRect.width, dispatch]);
 
