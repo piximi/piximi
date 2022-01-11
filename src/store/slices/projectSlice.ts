@@ -8,7 +8,6 @@ import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
-import { toImageData } from "../../annotator/image/rle";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",

@@ -11,7 +11,6 @@ import { ChannelType } from "../../../../types/ChannelType";
 import { ToolType } from "../../../../types/ToolType";
 // import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 as uuidv4 } from "uuid";
-import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
 import { AnnotationType } from "../../../../types/AnnotationType";

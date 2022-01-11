@@ -35,6 +35,7 @@ export const ConfirmedAnnotations = () => {
       })
     );
   }, [
+    activeImagePlane,
     annotations,
     selectedAnnotations,
     visibleCategories,

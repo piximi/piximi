@@ -1,10 +1,4 @@
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Slider,
-  Typography,
-} from "@mui/material";
+import { List, ListItem, ListItemText, Slider } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
