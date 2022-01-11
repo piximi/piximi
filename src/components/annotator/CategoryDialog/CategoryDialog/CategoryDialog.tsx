@@ -47,68 +47,68 @@ export const CategoryDialog = ({
 
   const t = useTranslation();
 
-  let dialogConfirm: JSX.Element;
-  if (onSubmit) {
-    dialogConfirm = (
+  const DialogConfirm = () => {
+    return onSubmit ? (
       <Button onClick={onConfirm} color="primary" type="submit">
         {t(action)}
       </Button>
-    );
-  } else {
-    dialogConfirm = (
+    ) : (
       <Button onClick={onConfirm} color="primary">
         {t(action)}
       </Button>
     );
-  }
+  };
 
-  const dialogBody = (
-    <>
-      <DialogTitle>{t(title)}</DialogTitle>
+  const DialogBody = () => {
+    return (
+      <>
+        <DialogTitle>{t(title)}</DialogTitle>
 
-      <DialogContent sx={{ paddingLeft: "0 !important" }}>
-        <Box sx={{ margin: (theme) => theme.spacing(1) }}>
-          <Grid container spacing={1}>
-            <Grid item xs={2}>
-              <ColorIcon color={color} onColorChange={onColorChange} />
+        <DialogContent sx={{ paddingLeft: "0 !important" }}>
+          <Box sx={{ margin: (theme) => theme.spacing(1) }}>
+            <Grid container spacing={1}>
+              <Grid item xs={2}>
+                <ColorIcon color={color} onColorChange={onColorChange} />
+              </Grid>
+              <Grid item xs={10}>
+                <TextField
+                  autoFocus
+                  fullWidth
+                  id="name"
+                  label={t("Name")}
+                  margin="dense"
+                  onChange={onNameChange}
+                  value={name}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={10}>
-              <TextField
-                autoFocus
-                fullWidth
-                id="name"
-                label={t("Name")}
-                margin="dense"
-                onChange={onNameChange}
-                value={name}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-      </DialogContent>
+          </Box>
+        </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onCloseDialog} color="primary">
-          {t("Cancel")}
-        </Button>
+        <DialogActions>
+          <Button onClick={onCloseDialog} color="primary">
+            {t("Cancel")}
+          </Button>
 
-        {dialogConfirm}
-      </DialogActions>
-    </>
-  );
-
-  let dialogBodyWrap: JSX.Element;
-  if (onSubmit) {
-    dialogBodyWrap = (
-      <form onSubmit={(event) => onSubmit(event)}>{dialogBody}</form>
+          <DialogConfirm />
+        </DialogActions>
+      </>
     );
-  } else {
-    dialogBodyWrap = dialogBody;
-  }
+  };
+
+  const DialogOuter = () => {
+    return onSubmit ? (
+      <form onSubmit={(event) => onSubmit(event)}>
+        <DialogBody />
+      </form>
+    ) : (
+      <DialogBody />
+    );
+  };
 
   return (
     <Dialog fullWidth onClose={onCloseDialog} open={openDialog}>
-      {dialogBodyWrap}
+      <DialogOuter />
     </Dialog>
   );
 };
