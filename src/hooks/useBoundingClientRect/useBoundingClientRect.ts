@@ -46,6 +46,9 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
 
   useEffect(() => {
     dispatch(setStageWidth({ stageWidth: boundingClientRect.width }));
+  }, [boundingClientRect.width, dispatch]);
+
+  useEffect(() => {
     if (!image || !image.shape) return;
 
     //FIXME #136 it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
@@ -62,5 +65,5 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
         })
       );
     }
-  }, [boundingClientRect, dispatch, stageWidth, image, stageHeight]);
+  }, [image, stageWidth, stageHeight, dispatch]);
 };
