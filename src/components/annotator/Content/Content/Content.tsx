@@ -4,6 +4,7 @@ import { useStyles } from "./Content.css";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { DropTargetMonitor, useDrop } from "react-dnd";
 import { useBoundingClientRect } from "../../../../hooks/useBoundingClientRect";
+import { styled } from "@mui/material/styles";
 
 type ContentProps = {
   onDrop: (item: { files: any[] }) => void;
@@ -12,7 +13,7 @@ type ContentProps = {
 export const Content = ({ onDrop }: ContentProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const classes = useStyles();
+  // const classes = useStyles();
 
   useBoundingClientRect(ref);
 
@@ -32,6 +33,27 @@ export const Content = ({ onDrop }: ContentProps) => {
     []
   );
 
+  const MainWrapper = ({ children }: { children: JSX.Element }) => {
+    return <main ref={ref}>{children}</main>;
+  };
+
+  // const StyledMainWrapper = styled(MainWrapper)(({ theme }) => ({
+  //   backgroundColor: theme.palette.background.default,
+  //   width: "20%",
+  //   border: isOver ? "5px solid blue" : "",
+  // }));
+
+  const StyledMainWrapper = styled(MainWrapper)({
+    width: "20%",
+  });
+
+  const MyComponent = styled("main")({
+    color: "darkslategray",
+    backgroundColor: "aliceblue",
+    padding: 8,
+    borderRadius: 4,
+  });
+
   return (
     <>
       {/*<AppBar className={classes.appBar} color="default">*/}
@@ -44,7 +66,15 @@ export const Content = ({ onDrop }: ContentProps) => {
 
       {/*<Divider />*/}
 
-      <main
+      <MyComponent>Styled div</MyComponent>
+
+      {/* <StyledMainWrapper>
+        <div ref={drop}>
+          <Stage />
+        </div>
+      </StyledMainWrapper> */}
+
+      {/* <main
         className={classes.content}
         ref={ref}
         style={{
@@ -54,7 +84,7 @@ export const Content = ({ onDrop }: ContentProps) => {
         <div ref={drop}>
           <Stage />
         </div>
-      </main>
+      </main> */}
     </>
   );
 };
