@@ -1,11 +1,17 @@
-import { Slider, Typography } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Slider,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { activeImageSelector } from "../../../store/selectors/activeImageSelector";
-import { imageViewerSlice } from "../../../store/slices";
-import { activeImagePlaneSelector } from "../../../store/selectors/activeImagePlaneSelector";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
+import { imageViewerSlice } from "../../../../../store/slices";
 
-export const StackSlider = () => {
+export const ZStackSlider = () => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
@@ -30,19 +36,24 @@ export const StackSlider = () => {
 
   return (
     <React.Fragment>
-      <Typography id="non-linear-slider" gutterBottom>
-        Z plane: {value}
-      </Typography>
-      <Slider
-        aria-label="z-plane"
-        onChange={handleChange}
-        value={value}
-        valueLabelDisplay="auto"
-        step={1}
-        marks
-        min={0}
-        max={activeImage!.shape.planes - 1}
-      />
+      <List dense>
+        <ListItem>
+          <ListItemText>Z plane: {value}</ListItemText>
+        </ListItem>
+
+        <ListItem>
+          <Slider
+            aria-label="z-plane"
+            onChange={handleChange}
+            value={value}
+            valueLabelDisplay="auto"
+            step={1}
+            marks
+            min={0}
+            max={activeImage!.shape.planes - 1}
+          />
+        </ListItem>
+      </List>
     </React.Fragment>
   );
 };

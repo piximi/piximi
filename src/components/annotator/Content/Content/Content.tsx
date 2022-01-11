@@ -4,8 +4,6 @@ import { useStyles } from "./Content.css";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { DropTargetMonitor, useDrop } from "react-dnd";
 import { useBoundingClientRect } from "../../../../hooks/useBoundingClientRect";
-import { AppBar, Divider } from "@mui/material";
-import { StackSlider } from "../../StackSlider";
 
 type ContentProps = {
   onDrop: (item: { files: any[] }) => void;
@@ -36,11 +34,15 @@ export const Content = ({ onDrop }: ContentProps) => {
 
   return (
     <>
-      <AppBar className={classes.appBar}>
-        <StackSlider />
-      </AppBar>
+      {/*<AppBar className={classes.appBar} color="default">*/}
+      {/*  <Toolbar>*/}
+      {/*    <Typography variant="h6" color="inherit">*/}
+      {/*      &nbsp;*/}
+      {/*    </Typography>*/}
+      {/*  </Toolbar>*/}
+      {/*</AppBar>*/}
 
-      <Divider />
+      {/*<Divider />*/}
 
       <main
         className={classes.content}
