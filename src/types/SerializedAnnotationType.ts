@@ -8,4 +8,5 @@ export type SerializedAnnotationType = {
   annotationCategoryName: string;
   annotationId: string;
   annotationMask: string;
+  annotationPlane: number;
 };

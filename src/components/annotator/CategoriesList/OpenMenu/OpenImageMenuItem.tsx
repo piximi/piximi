@@ -1,8 +1,5 @@
 import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
-import * as ImageJS from "image-js";
-import { ShapeType } from "../../../../types/ShapeType";
-import { v4 as uuidv4 } from "uuid";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import {
@@ -10,9 +7,7 @@ import {
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
-import { Image } from "../../../../types/Image";
-import { Partition } from "../../../../types/Partition";
-import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+import { convertFileToImage } from "../../../../image/imageHelper";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -21,65 +16,31 @@ type OpenImageMenuItemProps = {
 export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onOpenImage = (
+  const onOpenImage = async (
     event: React.ChangeEvent<HTMLInputElement>,
     onClose: () => void
   ) => {
     onClose();
-
     event.persist();
 
-    if (event.currentTarget.files) {
-      for (let i = 0; i < event.currentTarget.files.length; i++) {
-        const file = event.currentTarget.files[i];
+    if (!event.currentTarget.files) return;
 
-        file.arrayBuffer().then((buffer) => {
-          ImageJS.Image.load(buffer).then((image) => {
-            //check whether name already exists
-            const shape: ShapeType = {
-              channels: image.components,
-              frames: 1,
-              height: image.height,
-              planes: 1,
-              width: image.width,
-            };
+    const files = event.currentTarget.files;
 
-            const imageDataURL = image.toDataURL("image/png", {
-              useCanvas: true,
-            });
-
-            const loaded: Image = {
-              categoryId: UNKNOWN_CATEGORY_ID,
-              id: uuidv4(),
-              annotations: [],
-              name: file.name,
-              shape: shape,
-              originalSrc: imageDataURL,
-              partition: Partition.Inference,
-              src: imageDataURL,
-            };
-
-            dispatch(addImages({ newImages: [loaded] }));
-
-            if (i === 0) {
-              batch(() => {
-                dispatch(
-                  setActiveImage({
-                    image: loaded.id,
-                  })
-                );
-
-                dispatch(
-                  setSelectedAnnotations({
-                    selectedAnnotations: [],
-                    selectedAnnotation: undefined,
-                  })
-                );
-              });
-            }
-          });
-        });
+    for (let i = 0; i < files.length; i++) {
+      if (i === 0) {
+        dispatch(
+          setSelectedAnnotations({
+            selectedAnnotations: [],
+            selectedAnnotation: undefined,
+          })
+        );
       }
+      const image = await convertFileToImage(files[i]);
+      batch(() => {
+        dispatch(addImages({ newImages: [image] }));
+        if (i === 0) dispatch(setActiveImage({ image: image.id }));
+      });
     }
   };
 

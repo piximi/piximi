@@ -69,6 +69,7 @@ import {
   setSelectedAnnotations,
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -95,6 +96,7 @@ export const Stage = () => {
   const clearLabelRef = useRef<Konva.Label>();
 
   const activeImageId = useSelector(activeImageIdSelector);
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const [currentPosition, setCurrentPosition] = useState<{
     x: number;
@@ -225,10 +227,16 @@ export const Stage = () => {
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool?.annotate(selectedCategory);
+      annotationTool?.annotate(selectedCategory, activeImagePlane);
     };
     return func;
-  }, [annotationTool, selectedCategory, selectionMode, dispatch]);
+  }, [
+    annotationTool,
+    selectedCategory,
+    activeImagePlane,
+    selectionMode,
+    dispatch,
+  ]);
 
   const onDeselect = useMemo(() => {
     const func = () => {

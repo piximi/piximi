@@ -5,7 +5,7 @@ export type SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
   imageChecksum: string;
-  imageData: string;
+  imageData: Array<string>;
   imageFilename: string;
   imageFrames: number;
   imageHeight: number;

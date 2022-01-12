@@ -23,6 +23,7 @@ import { AnnotationTool } from "../../annotator/image/Tool";
 const initialImage =
   process.env.NODE_ENV === "development"
     ? {
+        activePlane: 0,
         avatar: colorImage,
         categoryId: UNKNOWN_CATEGORY_ID,
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
@@ -36,7 +37,7 @@ const initialImage =
           planes: 1,
           width: 512,
         },
-        originalSrc: colorImage,
+        originalSrc: [colorImage],
         src: colorImage,
       }
     : undefined;
@@ -98,6 +99,7 @@ const initialState: ImageViewer = {
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
+  activeImagePlane: 0,
   images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -247,7 +249,7 @@ export const imageViewerSlice = createSlice({
       const loaded: Image = {
         categoryId: UNKNOWN_CATEGORY_ID,
         id: action.payload.file.imageId,
-        src: action.payload.file.imageData,
+        src: action.payload.file.imageData[0],
         originalSrc: action.payload.file.imageData,
         name: action.payload.file.imageFilename,
         annotations: annotations,
@@ -344,6 +346,12 @@ export const imageViewerSlice = createSlice({
         });
       }
       state.channels = defaultChannels;
+    },
+    setActiveImagePlane(
+      state: ImageViewer,
+      action: PayloadAction<{ activeImagePlane: number }>
+    ) {
+      state.activeImagePlane = action.payload.activeImagePlane;
     },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;

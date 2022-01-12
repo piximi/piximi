@@ -416,7 +416,7 @@ export abstract class AnnotationTool extends Tool {
 
   abstract onMouseUp(position: { x: number; y: number }): void;
 
-  annotate(category: Category): void {
+  annotate(category: Category, plane: number): void {
     if (!this.boundingBox || !this.mask) return;
 
     this.annotation = {
@@ -424,6 +424,7 @@ export abstract class AnnotationTool extends Tool {
       categoryId: category.id,
       id: uuidv4(),
       mask: this.mask,
+      plane: plane,
     };
   }
 

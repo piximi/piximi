@@ -8,6 +8,7 @@ import { selectionModeSelector } from "../../selectors";
 import { selectedCategorySelector } from "../../selectors";
 import { toolTypeSelector } from "../../selectors";
 import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSelector";
+import { activeImagePlaneSelector } from "../../selectors/activeImagePlaneSelector";
 
 export function* annotationStateChangeSaga({
   payload: { annotationState, annotationTool },
@@ -23,11 +24,12 @@ export function* annotationStateChangeSaga({
   if (annotationState !== AnnotationStateType.Annotated) return;
 
   const selectionMode = yield select(selectionModeSelector);
+  const activeImagePlane = yield select(activeImagePlaneSelector);
 
   if (selectionMode === AnnotationModeType.New) {
     const selectedCategory = yield select(selectedCategorySelector);
 
-    annotationTool.annotate(selectedCategory);
+    annotationTool.annotate(selectedCategory, activeImagePlane);
 
     if (!annotationTool.annotation) return;
 
@@ -92,6 +94,6 @@ export function* annotationStateChangeSaga({
 
     const selectedCategory = yield select(selectedCategorySelector);
 
-    annotationTool.annotate(selectedCategory);
+    annotationTool.annotate(selectedCategory, activeImagePlane);
   }
 }

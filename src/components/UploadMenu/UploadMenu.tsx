@@ -10,12 +10,7 @@ import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "../DropboxMenuItem";
-import { Shape } from "../../types/Shape";
-import * as ImageJS from "image-js";
-import { Image } from "../../types/Image";
-import { v4 as uuidv4 } from "uuid";
-import { Partition } from "../../types/Partition";
-import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import { convertFileToImage } from "../../image/imageHelper";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -27,45 +22,23 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   const dispatch = useDispatch();
   const classes = useStyles();
 
-  const onUploadFromComputerChange = (
+  const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     onClose(event);
     event.persist();
-    if (event.currentTarget.files) {
-      for (let i = 0; i < event.currentTarget.files.length; i++) {
-        const file = event.currentTarget.files[i];
 
-        file.arrayBuffer().then((buffer) => {
-          ImageJS.Image.load(buffer).then((image) => {
-            //check whether name already exists
-            const shape: Shape = {
-              channels: image.components,
-              frames: 1,
-              height: image.height,
-              planes: 1,
-              width: image.width,
-            };
+    if (!event.currentTarget.files) return;
 
-            const imageDataURL = image.toDataURL("image/png", {
-              useCanvas: true,
-            });
+    const files = event.currentTarget.files;
 
-            const loaded: Image = {
-              categoryId: UNKNOWN_CATEGORY_ID,
-              id: uuidv4(),
-              annotations: [],
-              name: file.name,
-              partition: Partition.Inference,
-              shape: shape,
-              originalSrc: imageDataURL,
-              src: imageDataURL,
-            };
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-            dispatch(createImage({ image: loaded }));
-          });
-        });
-      }
+      const image = await convertFileToImage(file);
+
+      //if length of images is > 1, then the user selected a z-stack --> only show center image
+      dispatch(createImage({ image: image }));
     }
   };
 

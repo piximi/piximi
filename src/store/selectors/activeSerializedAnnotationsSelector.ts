@@ -21,7 +21,7 @@ export const activeSerializedAnnotationsSelector = ({
   const columns = {
     imageChannels: image.shape.channels,
     imageChecksum: "",
-    imageData: image.src,
+    imageData: [image.src],
     imageFilename: image.name,
     imageFrames: image.shape.frames,
     imageHeight: image.shape.height,
@@ -48,6 +48,7 @@ export const activeSerializedAnnotationsSelector = ({
         annotationCategoryName: category.name,
         annotationId: annotation.id,
         annotationMask: annotation.mask.join(" "),
+        annotationPlane: annotation.plane,
       };
     });
 
