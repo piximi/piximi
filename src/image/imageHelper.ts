@@ -12,7 +12,7 @@ import { Image as ImageType } from "../types/Image";
 
 export const convertFileToImage = async (file: File): Promise<ImageType> => {
   /**
-   * Returns image array to be provided to dispatch
+   * Returns image to be provided to dispatch
    * **/
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
