@@ -6,6 +6,7 @@ import {
   Select,
   SelectChangeEvent,
   FormHelperText,
+  Box,
 } from "@mui/material";
 import DialogContent from "@mui/material/DialogContent";
 import FormControl from "@mui/material/FormControl";
@@ -15,12 +16,11 @@ import FormGroup from "@mui/material/FormGroup";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
-import { LanguageType } from "../../../../types/LanguageType";
+import { LanguageType } from "../../../types/LanguageType";
 import { useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice } from "../../../../store/slices";
-import { languageSelector } from "../../../../store/selectors/languageSelector";
-import { soundEnabledSelector } from "../../../../store/selectors/soundEnabledSelector";
-import { useStyles } from "./SettingsDialog.css";
+import { imageViewerSlice } from "../../../store/slices";
+import { languageSelector } from "../../../store/selectors/languageSelector";
+import { soundEnabledSelector } from "../../../store/selectors/soundEnabledSelector";
 import Toolbar from "@mui/material/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
@@ -33,7 +33,6 @@ type SettingsDialogProps = {
 
 // TODO: #133 Move (language) settings from Annotator to Classifier view
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   const language = useSelector(languageSelector);
@@ -59,9 +58,9 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   // @ts-ignore
   return (
     <Dialog fullScreen onClose={onClose} open={open}>
-      <AppBar className={classes.appBar} color="inherit" position="fixed">
+      <AppBar sx={{ flexGrow: 1 }} color="inherit" position="fixed">
         <Toolbar>
-          <Typography className={classes.title} variant="h6">
+          <Typography sx={{ flexGrow: 1 }} variant="h6">
             Settings
           </Typography>
 
@@ -71,9 +70,9 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
         </Toolbar>
       </AppBar>
 
-      <div className={classes.toolbar} />
+      <Box sx={(theme) => ({ ...theme.mixins.toolbar })} />
 
-      <DialogContent className={classes.content}>
+      <DialogContent sx={{ marginTop: (theme) => theme.spacing(2) }}>
         <Grid container spacing={2}>
           <Grid item xs={3} />
 

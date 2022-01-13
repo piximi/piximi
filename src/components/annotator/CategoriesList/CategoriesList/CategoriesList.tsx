@@ -46,7 +46,7 @@ import Box from "@mui/material/Box";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";
-import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
+import { SettingsDialog } from "../../SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
