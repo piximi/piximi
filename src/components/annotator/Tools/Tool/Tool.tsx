@@ -4,7 +4,6 @@ import React, { ReactElement, useState } from "react";
 import SvgIcon from "@mui/material/SvgIcon";
 import Typography from "@mui/material/Typography";
 import { Card, CardActionArea, CardContent, Tooltip } from "@mui/material";
-import { useStyles } from "./Tool.css";
 import { ToolBarToolTitle } from "./ToolBarToolTitle";
 
 type TooltipCardProps = {
@@ -20,8 +19,6 @@ type ToolProps = {
 };
 
 export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
-  const classes = useStyles();
-
   let description: string | ReactElement;
 
   switch (name) {
@@ -90,44 +87,19 @@ export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
   }
 
   return (
-    <Card className={classes.card} raised variant="outlined">
+    <Card sx={{ width: 210 }} raised variant="outlined">
       <CardActionArea>
-        <div>
-          {/*<CardHeader*/}
-          {/*  action={*/}
-          {/*    <IconButton onClick={onClose}>*/}
-          {/*      <CancelIcon />*/}
-          {/*    </IconButton>*/}
-          {/*  }*/}
-          {/*  className={classes.cardHeader}*/}
-          {/*/>*/}
-
-          {/*<CardMedia className={classes.cardMedia} image={image} />*/}
-        </div>
-
         <CardContent>
-          {/*<Typography gutterBottom variant="h6" component="h2">*/}
-          {/*  {name}*/}
-          {/*</Typography>*/}
-
           <Typography variant="body2" color="textSecondary" component="p">
             {description}
           </Typography>
         </CardContent>
       </CardActionArea>
-
-      {/*<CardActions>*/}
-      {/*  <Button size="small" color="primary">*/}
-      {/*    Learn More*/}
-      {/*  </Button>*/}
-      {/*</CardActions>*/}
     </Card>
   );
 };
 
 export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
-  const classes = useStyles();
-
   const [open, setOpen] = useState<boolean>(false);
 
   const onClose = () => {
@@ -140,13 +112,18 @@ export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
 
   return (
     <Tooltip
-      classes={{ tooltip: classes.tooltip }}
+      // can't use "sx" prop directly to access tooltip
+      // see: https://github.com/mui-org/material-ui/issues/28679
+      componentsProps={{
+        tooltip: {
+          sx: { backgroundColor: "transparent", maxWidth: "none" },
+        },
+      }}
       onClose={onClose}
       onOpen={onOpen}
       open={open}
       placement="left"
       title={<TooltipCard name={name} onClose={onClose} />}
-      // title={"test"}
     >
       <ListItem button onClick={onClick} selected={selected}>
         <ListItemIcon>
@@ -154,10 +131,5 @@ export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
         </ListItemIcon>
       </ListItem>
     </Tooltip>
-    // <ListItem button onClick={onClick} selected={selected}>
-    //   <ListItemIcon>
-    //     <SvgIcon fontSize="small">{children}</SvgIcon>
-    //   </ListItemIcon>
-    // </ListItem>
   );
 };
