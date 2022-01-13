@@ -70,6 +70,7 @@ import { annotatorImagesSelector } from "../../../../store/selectors/annotatorIm
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
 import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -261,16 +262,6 @@ export const CategoriesList = () => {
       open
       variant="persistent"
     >
-      <Box
-        style={{ paddingTop: 60 }}
-        sx={(theme) => ({
-          ...theme.mixins.toolbar,
-        })}
-        display="flex"
-        justifyContent="flex-end"
-        px={8}
-      />
-
       <AppBar
         color="default"
         sx={{
@@ -296,6 +287,8 @@ export const CategoriesList = () => {
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <AppBarOffset />
 
       <ExitAnnotatorDialog
         onConfirm={onCloseDialog}

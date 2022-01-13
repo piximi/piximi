@@ -32,6 +32,7 @@ import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
 import Box from "@mui/material/Box";
 import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "../PointerSelectionOptions";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const ToolOptions = () => {
   const { t } = useTranslation();
@@ -159,13 +160,7 @@ export const ToolOptions = () => {
       }}
       variant="permanent"
     >
-      <Box
-        style={{ paddingTop: 60 }}
-        sx={(theme) => ({ ...theme.mixins.toolbar })}
-        display="flex"
-        justifyContent="flex-end"
-        px={8}
-      />
+      <AppBarOffset />
 
       {
         operations[

@@ -25,6 +25,7 @@ import Toolbar from "@mui/material/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import _ from "lodash";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -70,7 +71,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
         </Toolbar>
       </AppBar>
 
-      <Box sx={(theme) => ({ ...theme.mixins.toolbar })} />
+      <AppBarOffset />
 
       <DialogContent sx={{ marginTop: (theme) => theme.spacing(2) }}>
         <Grid container spacing={2}>
