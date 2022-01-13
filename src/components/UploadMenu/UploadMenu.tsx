@@ -1,21 +1,20 @@
 import React from "react";
 import { Menu } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
-import { useStyles } from "./UploadMenu.css";
 import { useDispatch } from "react-redux";
 import { createImage } from "../../store/slices";
-import { DropboxMenuItem } from "../DropboxMenuItem";
+import { DropboxMenuItem } from "./DropboxMenuItem";
 import { Shape } from "../../types/Shape";
 import * as ImageJS from "image-js";
 import { Image } from "../../types/Image";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../../types/Partition";
 import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import { StyledMenuItem } from "./StyledMenuItem";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -25,7 +24,6 @@ type UploadMenuProps = {
 
 export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   const dispatch = useDispatch();
-  const classes = useStyles();
 
   const onUploadFromComputerChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -88,20 +86,28 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         open={Boolean(anchorEl)}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <ListSubheader className={classes.subheader}>Upload from</ListSubheader>
+        <ListSubheader
+          sx={{
+            color: "#80868b",
+            margin: "16px",
+            letterSpacing: ".07272727em",
+            fontSize: ".6875rem",
+            fontWeight: 500,
+            lineHeight: "1rem",
+            textTransform: "uppercase",
+            maxWidth: 320,
+          }}
+        >
+          Upload from
+        </ListSubheader>
 
         <label htmlFor="upload-images">
-          <MenuItem
-            className={classes.item}
-            component="span"
-            dense
-            onClick={onClose}
-          >
+          <StyledMenuItem component="span" dense onClick={onClose}>
             <ListItemIcon>
               <ComputerIcon />
             </ListItemIcon>
             <ListItemText primary="Computer" />
-          </MenuItem>
+          </StyledMenuItem>
         </label>
 
         <DropboxMenuItem onClose={onClose} />

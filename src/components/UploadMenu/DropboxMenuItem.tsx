@@ -1,8 +1,8 @@
 import React from "react";
-import { useStyles } from "./DropboxMenuItem.css";
 import useDropboxChooser from "use-dropbox-chooser";
-import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
+import { ListItemIcon, ListItemText } from "@mui/material";
 import ComputerIcon from "@mui/icons-material/Computer";
+import { StyledMenuItem } from "./StyledMenuItem";
 
 type DropboxMenuItemProps = {
   onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
@@ -10,8 +10,6 @@ type DropboxMenuItemProps = {
 
 export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
   // const dispatch = useDispatch();
-
-  const classes = useStyles();
 
   const { open } = useDropboxChooser({
     appKey: "tetle78x244mpkz",
@@ -26,11 +24,11 @@ export const DropboxMenuItem = ({ onClose }: DropboxMenuItemProps) => {
   });
 
   return (
-    <MenuItem className={classes.item} component="span" dense onClick={open}>
+    <StyledMenuItem component="span" dense onClick={open}>
       <ListItemIcon>
         <ComputerIcon />
       </ListItemIcon>
       <ListItemText primary="Dropbox" />
-    </MenuItem>
+    </StyledMenuItem>
   );
 };
