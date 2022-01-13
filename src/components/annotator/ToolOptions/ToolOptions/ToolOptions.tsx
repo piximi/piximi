@@ -29,7 +29,6 @@ import { useSelector } from "react-redux";
 import { toolTypeSelector } from "../../../../store/selectors";
 import { useTranslation } from "react-i18next";
 import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
-import Box from "@mui/material/Box";
 import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "../PointerSelectionOptions";
 import { AppBarOffset } from "components/styled/AppBarOffset";

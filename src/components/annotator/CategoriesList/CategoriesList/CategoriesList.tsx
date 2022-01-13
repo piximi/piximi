@@ -42,7 +42,6 @@ import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";

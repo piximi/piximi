@@ -6,7 +6,6 @@ import {
   Select,
   SelectChangeEvent,
   FormHelperText,
-  Box,
 } from "@mui/material";
 import DialogContent from "@mui/material/DialogContent";
 import FormControl from "@mui/material/FormControl";
