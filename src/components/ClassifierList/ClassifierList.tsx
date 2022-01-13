@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
-import { FitClassifierListItem } from "../FitClassifierListItem";
-import { EvaluateClassifierListItem } from "../EvaluateClassifierListItem";
+import {
+  FitClassifierListItem,
+  PredictClassifierListItem,
+  EvaluateClassifierListItem,
+} from "../ClassifierListItems";
 import {
   Collapse,
   List,
@@ -10,7 +13,6 @@ import {
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { PredictClassifierListItem } from "../PredictClassifierListItem";
 import { useSelector } from "react-redux";
 import { fittedSelector } from "../../store/selectors/fittedSelector";
 import { trainingFlagSelector } from "../../store/selectors/trainingFlagSelector";
