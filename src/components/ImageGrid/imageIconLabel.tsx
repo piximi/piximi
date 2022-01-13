@@ -8,11 +8,11 @@ import { Image } from "../../types/Image";
 import { Partition } from "../../types/Partition";
 import { categoriesSelector } from "../../store/selectors/categoriesSelector";
 
-type ImageIconLabelProbs = {
+type ImageIconLabelProps = {
   image: Image;
 };
 
-export const ImageIconLabel = ({ image }: ImageIconLabelProbs) => {
+export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
   const categories = useSelector(categoriesSelector);
 
   const color = categories.find((category: Category) => {
