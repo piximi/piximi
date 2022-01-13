@@ -1,6 +1,5 @@
 import { TextField } from "@mui/material";
 import * as React from "react";
-import { useStyles } from "./CustomNumberTextFiel.css";
 
 const intRegExpr = new RegExp("^[0-9]+$");
 const floatRegExpr = new RegExp("^[0-9]+(.[0-9]*)?$");
@@ -37,7 +36,6 @@ export const CustomNumberTextField = ({
   enableFloat = false,
   disabled = false,
 }: CustomNumberTextFieldProps) => {
-  const classes = useStyles();
   const [valueString, setValueString] = React.useState<string>(
     value.toString()
   );
@@ -66,7 +64,12 @@ export const CustomNumberTextField = ({
     <TextField
       id={id}
       label={label}
-      className={classes.textField}
+      sx={(theme) => ({
+        marginRight: theme.spacing(1),
+        flexBasis: 300,
+        marginTop: theme.spacing(2.75),
+        width: "100%",
+      })}
       value={valueString}
       onChange={onInputChange}
       type="text"
