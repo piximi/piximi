@@ -106,7 +106,10 @@ export const useStyles = makeStyles((theme: Theme) => ({
   progress: {
     width: "100%",
   },
-  settingsDialogAppBar: {},
+  settingsDialogAppBar: {
+    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+    boxShadow: "none",
+  },
   slider: {
     padding: theme.spacing(3),
   },

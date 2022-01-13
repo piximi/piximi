@@ -59,7 +59,15 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   // @ts-ignore
   return (
     <Dialog fullScreen onClose={onClose} open={open}>
-      <AppBar sx={{ flexGrow: 1 }} color="inherit" position="fixed">
+      <AppBar
+        sx={{
+          flexGrow: 1,
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          boxShadow: "none",
+        }}
+        color="inherit"
+        position="fixed"
+      >
         <Toolbar>
           <Typography sx={{ flexGrow: 1 }} variant="h6">
             Settings
