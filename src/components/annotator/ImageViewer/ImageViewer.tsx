@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect } from "react";
-import { CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { batch, useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { useStyles } from "./ImageViewer.css";
 import * as ImageJS from "image-js";
 import { ShapeType } from "../../../types/ShapeType";
 import { ToolType } from "../../../types/ToolType";
@@ -40,8 +39,6 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
       dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
     }
   }, [dispatch, image]);
-
-  const classes = useStyles();
 
   const onDrop = useCallback(
     (item) => {
@@ -105,18 +102,16 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
   );
 
   return (
-    <>
-      <div className={classes.root}>
-        <CssBaseline />
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
 
-        <CategoriesList />
+      <CategoriesList />
 
-        <Content onDrop={onDrop} />
+      <Content onDrop={onDrop} />
 
-        <ToolOptions />
+      <ToolOptions />
 
-        <Tools />
-      </div>
-    </>
+      <Tools />
+    </Box>
   );
 };
