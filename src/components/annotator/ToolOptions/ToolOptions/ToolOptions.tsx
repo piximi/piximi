@@ -155,7 +155,6 @@ export const ToolOptions = () => {
         "& .MuiDrawer-paper": {
           width: 240,
           right: 56,
-          boxShadow: "inset 0 0 16px #000000",
         },
       }}
       variant="permanent"

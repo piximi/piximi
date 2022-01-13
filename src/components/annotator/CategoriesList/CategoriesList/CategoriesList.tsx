@@ -254,7 +254,6 @@ export const CategoriesList = () => {
         flexShrink: 0,
         width: (theme) => theme.spacing(32),
         "& > .MuiDrawer-paper": {
-          boxShadow: "inset 0 0 16px #000000",
           width: (theme) => theme.spacing(32),
           zIndex: 0,
         },
