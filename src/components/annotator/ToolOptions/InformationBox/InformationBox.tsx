@@ -2,7 +2,6 @@ import React from "react";
 import { Typography } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import { useStyles } from "./InformationBox.css";
 
 type InformationBoxProps = {
   description: string;
@@ -10,10 +9,16 @@ type InformationBoxProps = {
 };
 
 export const InformationBox = ({ description, name }: InformationBoxProps) => {
-  const classes = useStyles();
-
   return (
-    <AppBar className={classes.appBar} color="default">
+    <AppBar
+      sx={{
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+        boxShadow: "none",
+        position: "absolute",
+      }}
+      color="default"
+    >
       <Toolbar disableGutters={true}>
         <Typography variant="h6" color="inherit">
           &nbsp;
