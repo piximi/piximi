@@ -3,21 +3,25 @@ import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
-import { useStyles } from "./ApplicationDrawer.css";
 import { Divider, Drawer } from "@mui/material";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const ApplicationDrawer = () => {
-  const classes = useStyles();
-
   return (
     <Drawer
       anchor="left"
-      className={classes.drawer}
-      classes={{ paper: classes.drawerPaper }}
+      sx={{
+        flexShrink: 0,
+        width: (theme) => theme.spacing(32),
+        "& > 	.MuiDrawer-paper": {
+          zIndex: 0,
+          width: (theme) => theme.spacing(32),
+        },
+      }}
       open
       variant="persistent"
     >
-      <div className={classes.drawerHeader} />
+      <AppBarOffset />
 
       <FileList />
 
