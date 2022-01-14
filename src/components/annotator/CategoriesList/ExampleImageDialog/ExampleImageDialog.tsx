@@ -11,7 +11,6 @@ import { ChannelType } from "../../../../types/ChannelType";
 import { ToolType } from "../../../../types/ToolType";
 // import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 as uuidv4 } from "uuid";
-import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
 import { AnnotationType } from "../../../../types/AnnotationType";
@@ -29,6 +28,7 @@ import {
 } from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -41,7 +41,7 @@ export const ExampleImageDialog = ({
 }: ExampleImageDialogProps) => {
   const dispatch = useDispatch();
 
-  const images = useSelector(imagesSelector);
+  const images = useSelector(annotatorImagesSelector);
 
   const categories_in = useSelector(categoriesSelector);
 
@@ -121,7 +121,7 @@ export const ExampleImageDialog = ({
       annotations: newAnnotations,
       name: name,
       shape: shape,
-      originalSrc: data as string,
+      originalSrc: [data as string],
       partition: Partition.Inference,
       src: data as string,
     };

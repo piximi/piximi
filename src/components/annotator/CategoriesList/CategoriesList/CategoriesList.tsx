@@ -318,7 +318,7 @@ export const CategoriesList = () => {
                 <ListItemAvatar>
                   <Avatar
                     alt={image.name}
-                    src={image.originalSrc}
+                    src={image.originalSrc[Math.floor(image.shape.planes / 2)]}
                     variant={"square"}
                   />
                 </ListItemAvatar>

@@ -3,4 +3,5 @@ export type AnnotationType = {
   categoryId: string;
   id: string;
   mask: Array<number>;
+  plane: number;
 };

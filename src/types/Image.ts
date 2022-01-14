@@ -7,7 +7,7 @@ export type Image = {
   id: string;
   name: string;
   src: string;
-  originalSrc: string;
+  originalSrc: Array<string>; //array to account for possibility of z-stack
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;

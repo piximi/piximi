@@ -35,6 +35,10 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const normalizeFont = 1300;
 
   useEffect(() => {
+    console.info(width, height);
+  }, [width, height]);
+
+  useEffect(() => {
     // @ts-ignore
     if (!ref || !ref.current) return;
     const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB

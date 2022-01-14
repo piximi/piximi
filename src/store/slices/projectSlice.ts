@@ -14,7 +14,7 @@ const dummyImage: Image = {
   categoryId: UNKNOWN_CATEGORY_ID,
   annotations: [],
   name: "nuclei",
-  originalSrc: nuclei,
+  originalSrc: [nuclei],
   src: nuclei,
   shape: {
     height: 256,
@@ -105,7 +105,9 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData,
+          src: serializedImage.imageData[
+            Math.floor(serializedImage.imagePlanes / 2)
+          ],
         };
 
         newImages.push(image);
@@ -128,6 +130,9 @@ export const projectSlice = createSlice({
       const newImages: Array<Image> = [];
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
+        const originalSrc = Array.isArray(serializedImage.imageData)
+          ? serializedImage.imageData
+          : [serializedImage.imageData]; //handle case where example projects's images do not correspond to array of strings
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,
@@ -142,7 +147,7 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData,
+          src: originalSrc[Math.floor(serializedImage.imagePlanes / 2)],
         };
 
         newImages.push(image);

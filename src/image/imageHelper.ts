@@ -2,10 +2,85 @@ import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";
-import { Category } from "../types/Category";
+import { Category, UNKNOWN_CATEGORY_ID } from "../types/Category";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { saveAs } from "file-saver";
+import { ShapeType } from "../types/ShapeType";
+import { v4 as uuidv4 } from "uuid";
+import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
+
+export const convertFileToImage = async (file: File): Promise<ImageType> => {
+  /**
+   * Returns image to be provided to dispatch
+   * **/
+  return new Promise((resolve, reject) => {
+    return file.arrayBuffer().then((buffer) => {
+      ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
+        resolve(convertImageJStoImage(image, file.name));
+      });
+    });
+  });
+};
+
+export const convertImageJStoImage = (
+  image: ImageJS.Image,
+  filename: string
+): ImageType => {
+  /**
+   * Given an ImageJS Image object, construct appropriate Image type. Return Image.
+   * returns: the image of Image type
+   * **/
+
+  let nplanes = 1;
+  let height: number;
+  let width: number;
+  let imageData: Array<string> = [];
+  let channels: number;
+
+  if (Array.isArray(image)) {
+    //case where user uploaded a z-stack
+    nplanes = image.length;
+    height = image[0].height;
+    width = image[0].width;
+    channels = image[0].components;
+    for (let j = 0; j < nplanes; j++) {
+      imageData.push(
+        image[j].toDataURL("image/png", {
+          useCanvas: true,
+        })
+      );
+    }
+  } else {
+    imageData = [
+      image.toDataURL("image/png", {
+        useCanvas: true,
+      }),
+    ];
+    height = image.height;
+    width = image.width;
+    channels = image.components;
+  }
+
+  const shape: ShapeType = {
+    channels: channels,
+    frames: 1,
+    height: height,
+    planes: nplanes,
+    width: width,
+  };
+
+  return {
+    categoryId: UNKNOWN_CATEGORY_ID,
+    id: uuidv4(),
+    annotations: [],
+    name: filename,
+    shape: shape,
+    originalSrc: imageData,
+    partition: Partition.Inference,
+    src: imageData[Math.floor(nplanes / 2)],
+  };
+};
 
 export const connectPoints = (
   coordinates: Array<Array<number>>,
@@ -459,6 +534,12 @@ export const importSerializedAnnotations = (
     newCategories = [...newCategories, category];
   }
 
+  let annotationPlane = annotation.annotationPlane;
+
+  if (!annotationPlane) {
+    annotationPlane = 0;
+  }
+
   return {
     annotation_out: {
       boundingBox: [
@@ -470,6 +551,7 @@ export const importSerializedAnnotations = (
       categoryId: annotation.annotationCategoryId,
       id: annotation.annotationId,
       mask: mask,
+      plane: annotationPlane,
     },
     categories: newCategories,
   };

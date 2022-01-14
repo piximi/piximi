@@ -67,7 +67,7 @@ export const ImageGridAppBar = () => {
         name: projectImage!.name,
         partition: Partition.Inference,
         shape: projectImage!.shape,
-        originalSrc: projectImage!.src,
+        originalSrc: projectImage!.originalSrc,
         src: projectImage!.src,
       };
 

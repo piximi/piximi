@@ -20,6 +20,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
+  activeImagePlane: number;
   images: Array<Image>;
   language: LanguageType;
   offset: { x: number; y: number };
