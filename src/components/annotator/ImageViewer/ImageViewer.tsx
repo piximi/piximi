@@ -5,9 +5,6 @@ import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import * as ImageJS from "image-js";
-import { ShapeType } from "../../../types/ShapeType";
-
 import { ToolType } from "../../../types/ToolType";
 import {
   addImages,
