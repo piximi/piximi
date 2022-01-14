@@ -1,8 +1,8 @@
 # Piximi
 
-Piximi is a free, open source web app for performing image understanding tasks. It’s written by by dozens of engineers and scientists from institutions like the Biological Research Centre Szeged, Broad Institute of MIT and Harvard, Chan Zuckerberg Initiative, ETH Zurich, and FIMM Helsinki. 
+Piximi is a free, open source web app for performing image understanding tasks. It’s written by by dozens of engineers and scientists from institutions like the Biological Research Centre Szeged, Broad Institute of MIT and Harvard, Chan Zuckerberg Initiative, ETH Zurich, and FIMM Helsinki.
 
-Piximi's target users are computational or non-computational scientists interested in image analysis from fields like astronomy, biology, and medicine. 
+Piximi's target users are computational or non-computational scientists interested in image analysis from fields like astronomy, biology, and medicine.
 
 # Development
 
@@ -44,11 +44,12 @@ docker build -t <image_name> prototype/
 docker run -p 3000:3000 --name <container_name> <image_name>
 ```
 
+If you encounter the following message:
+` The build failed because the process exited too early. This probably means the system ran out of memory or someone called ``kill -9`` on the process. `
+and you are running Docker Desktop, you will need to increase memory resources. `8GB` memory should be sufficient.
+
 Alternatively, download the pre-built image and run it directly from Docker Hub:
 
 ```
 docker run -p 3000:3000 --name piximi gnodar01/piximi:0.1.0
 ```
-
-
-

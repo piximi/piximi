@@ -1,5 +1,10 @@
 # Use node 16 (LTS, latest), debian 11 (slim)
-FROM node:16.13-bullseye-slim
+# FROM node:16.13-bullseye-slim
+
+# Use python 3.8, node 16 (LTS, latest), debian 11 (slim)
+FROM nikolaik/python-nodejs:python3.8-nodejs16-bullseye
+
+ENV PYTHON="/usr/local/bin/python"
 
 # Change working directory
 WORKDIR /piximi
@@ -18,7 +23,8 @@ COPY . .
 ENV GENERATE_SOURCEMAP false
 
 # Build the project
-RUN yarn run build
+# RUN yarn run build
+RUN NODE_OPTIONS="--max-old-space-size=8192" yarn build
 
 # Expose API port to the outside
 EXPOSE 3000
