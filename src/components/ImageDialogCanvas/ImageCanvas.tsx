@@ -1,14 +1,12 @@
 import React, { useRef } from "react";
-import { useStyles } from "../ImageDialogCanvas/ImageDialogCanvas.css";
 import { Image as ImageType } from "../../types/Image";
+import { StyleBackgroundCanvas } from "./StyledImageCanvasComponents";
 
 type ImageCanvasProps = {
   image: ImageType;
 };
 
 export const ImageCanvas = ({ image }: ImageCanvasProps) => {
-  const classes = useStyles();
-
   const ref = useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
@@ -27,5 +25,5 @@ export const ImageCanvas = ({ image }: ImageCanvasProps) => {
     }
   }, [image.src]);
 
-  return <canvas className={classes.backgroundCanvas} ref={ref} />;
+  return <StyleBackgroundCanvas ref={ref} />;
 };

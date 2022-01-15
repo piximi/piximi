@@ -1,14 +1,12 @@
 import React, { useRef } from "react";
-import { useStyles } from "../ImageDialogCanvas/ImageDialogCanvas.css";
 import { Image } from "../../types/Image";
+import { StyledMasksCanvas } from "./StyledImageCanvasComponents";
 
 type LabelCanvasProps = {
   image: Image;
 };
 
 export const LabelCanvas = ({ image }: LabelCanvasProps) => {
-  const classes = useStyles();
-
   const ref = useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
@@ -18,5 +16,5 @@ export const LabelCanvas = ({ image }: LabelCanvasProps) => {
     }
   }, [image.shape]);
 
-  return <canvas className={classes.masksCanvas} ref={ref} />;
+  return <StyledMasksCanvas ref={ref} />;
 };
