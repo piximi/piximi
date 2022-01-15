@@ -1,5 +1,4 @@
 import { Tooltip } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import LabelIcon from "@mui/icons-material/Label";
 import { useSelector } from "react-redux";
@@ -29,18 +28,6 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
     marginTop: "8px",
   };
 
-  const useStyles = makeStyles(() => ({
-    iconLabelTooltip: {
-      borderRadius: 2,
-      backgroundColor: color,
-    },
-    customArrow: {
-      color: color,
-    },
-  }));
-
-  const classes = useStyles();
-
   const predictedLabel =
     image.partition === Partition.Inference &&
     image.categoryId !== UNKNOWN_CATEGORY_ID;
@@ -51,9 +38,20 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
         title={categoryName}
         placement="right"
         arrow
-        classes={{
-          tooltip: classes.iconLabelTooltip,
-          arrow: classes.customArrow,
+        // can't use "sx" prop directly to access tooltip
+        // see: https://github.com/mui-org/material-ui/issues/28679
+        componentsProps={{
+          tooltip: {
+            sx: {
+              borderRadius: 2,
+              backgroundColor: color,
+            },
+          },
+          arrow: {
+            sx: {
+              color: color,
+            },
+          },
         }}
       >
         {predictedLabel ? (
