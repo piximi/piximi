@@ -1,11 +1,11 @@
 import {
-  FormControl,
   FormHelperText,
   Grid,
   MenuItem,
   Select,
   SelectChangeEvent,
 } from "@mui/material";
+import { StyledFormControl } from "../../StyledFormControl";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
@@ -13,7 +13,6 @@ import { LossFunction } from "../../../../types/LossFunction";
 import { fitOptionsSelector } from "../../../../store/selectors";
 import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
-import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
 import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
@@ -25,7 +24,6 @@ const enumKeys = <O extends object, K extends keyof O = keyof O>(
 };
 
 export const OptimizerSettingsGrid = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   const fitOptions = useSelector(fitOptionsSelector);
@@ -71,16 +69,21 @@ export const OptimizerSettingsGrid = () => {
 
   return (
     <>
-      <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
+      <StyledFormControl>
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <FormHelperText>Optimization Algorithm</FormHelperText>
             <Select
               value={optimizationAlgorithm as string}
               onChange={onOptimizationAlgorithmChange}
-              className={classes.select}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
+              sx={(theme) => ({
+                flexBasis: 300,
+                width: "100%",
+                marginRight: theme.spacing(1),
+                marginTop: theme.spacing(0),
+              })}
             >
               {enumKeys(OptimizationAlgorithm).map((k) => {
                 return (
@@ -104,17 +107,22 @@ export const OptimizerSettingsGrid = () => {
             />
           </Grid>
         </Grid>
-      </FormControl>
-      <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
+      </StyledFormControl>
+      <StyledFormControl>
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <FormHelperText>Loss Function</FormHelperText>
             <Select
               value={lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
               onChange={onLossFunctionChange}
-              className={classes.select}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
+              sx={(theme) => ({
+                flexBasis: 300,
+                width: "100%",
+                marginRight: theme.spacing(1),
+                marginTop: theme.spacing(0),
+              })}
             >
               {enumKeys(LossFunction).map((k) => {
                 return (
@@ -147,7 +155,7 @@ export const OptimizerSettingsGrid = () => {
             />
           </Grid>
         </Grid>
-      </FormControl>
+      </StyledFormControl>
     </>
   );
 };
