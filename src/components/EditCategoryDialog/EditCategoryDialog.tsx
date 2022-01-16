@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
-import { useStyles } from "../MainView/MainView.css";
 import { Category } from "../../types/Category";
 import { updateCategory } from "../../store/slices";
 import {
@@ -26,8 +25,6 @@ export const EditCategoryDialog = ({
   openDialog,
 }: EditCategoryDialogProps) => {
   const dispatch = useDispatch();
-
-  const classes = useStyles();
 
   const [color, setColor] = useState<string>(category.color);
 
@@ -60,7 +57,7 @@ export const EditCategoryDialog = ({
       <DialogContent>
         <div>
           <Grid container spacing={1}>
-            <Grid item xs={2} className={classes.createCategoryDialogItem}>
+            <Grid item xs={2}>
               <ColorIcon color={color} onColorChange={onColorChange} />
             </Grid>
             <Grid item xs={10}>

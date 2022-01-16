@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
-import { useStyles } from "../MainView/MainView.css";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
 import { createCategory } from "../../store/slices";
@@ -16,6 +15,7 @@ import {
   DialogTitle,
   Grid,
   TextField,
+  Box,
 } from "@mui/material";
 
 type CreateCategoryDialogProps = {
@@ -38,8 +38,6 @@ export const CreateCategoryDialog = ({
   const [name, setName] = useState<string>("");
   const [errorHelperText, setErrorHelperText] = useState<string>("");
   const [invalidName, setInvalidName] = useState<boolean>(false);
-
-  const classes = useStyles();
 
   const onCloseDialog = () => {
     setErrorHelperText("");
@@ -90,10 +88,10 @@ export const CreateCategoryDialog = ({
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
       <DialogTitle>Create category</DialogTitle>
 
-      <DialogContent className={classes.createCategoryDialogContent}>
-        <div className={classes.createCategoryDialogGrid}>
+      <DialogContent sx={{ paddingLeft: "0 !important" }}>
+        <Box sx={{ margin: (theme) => theme.spacing(1) }}>
           <Grid container spacing={1}>
-            <Grid item xs={2} className={classes.createCategoryDialogItem}>
+            <Grid item xs={2}>
               <ColorIcon color={color} onColorChange={onColorChange} />
             </Grid>
             <Grid item xs={10}>
@@ -109,7 +107,7 @@ export const CreateCategoryDialog = ({
               />
             </Grid>
           </Grid>
-        </div>
+        </Box>
       </DialogContent>
 
       <DialogActions>
