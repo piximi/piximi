@@ -1,20 +1,18 @@
 import React from "react";
-import { useStyles } from "./ImageDialogCanvas.css";
 import { Image } from "../../types/Image";
-import { ImageCanvas } from "../ImageCanvas";
-import { LabelCanvas } from "../LabelCanvas";
+import { ImageCanvas } from "./ImageCanvas";
+import { LabelCanvas } from "./LabelCanvas";
+import { StyledStage } from "./StyledImageCanvasComponents";
 
 type ImageDialogCanvasProps = {
   image: Image;
 };
 
 export const ImageDialogCanvas = ({ image }: ImageDialogCanvasProps) => {
-  const classes = useStyles();
-
   return (
-    <div className={classes.stage}>
+    <StyledStage>
       <ImageCanvas image={image} />
       <LabelCanvas image={image} />
-    </div>
+    </StyledStage>
   );
 };

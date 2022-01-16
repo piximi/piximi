@@ -1,8 +1,7 @@
 import * as React from "react";
 import { CirclePicker, ColorResult } from "react-color";
-import { useStyles } from "../MainView/MainView.css";
 import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
-import { Avatar, IconButton, Popover } from "@mui/material";
+import { Avatar, IconButton, Popover, Box } from "@mui/material";
 import { Label } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 
@@ -12,8 +11,6 @@ type ColorIconButtonProps = {
 };
 
 export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
-  const classes = useStyles();
-
   const availableColors = useSelector(availableColorsSelector);
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
@@ -38,8 +35,8 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
   return (
     <React.Fragment>
       <IconButton onClick={onOpenColorPicker}>
-        <Avatar style={{ backgroundColor: "#F3F3F3" }}>
-          <Label style={{ color: color }} />
+        <Avatar sx={{ backgroundColor: "#F3F3F3" }}>
+          <Label sx={{ color: color }} />
         </Avatar>
       </IconButton>
       <Popover
@@ -56,9 +53,9 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
           horizontal: "center",
         }}
       >
-        <div className={classes.colorPicker}>
+        <Box sx={{ margin: "16px" }}>
           <CirclePicker colors={availableColors} onChange={onChange} />
-        </div>
+        </Box>
       </Popover>
     </React.Fragment>
   );

@@ -12,7 +12,6 @@ import {
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useStyles } from "./CategoriesList.css";
 import { CollapsibleList } from "../CollapsibleList";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
@@ -20,7 +19,7 @@ import IconButton from "@mui/material/IconButton";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryMenu } from "../CategoryMenu";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import { EditCategoryDialog } from "../EditCategoryDialog";
+import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
 import { useDialog } from "../../../../hooks";
 import { useTranslation } from "../../../../hooks/useTranslation";
 import {
@@ -43,13 +42,12 @@ import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
 import FeedbackIcon from "@mui/icons-material/Feedback";
-import { SettingsDialog } from "../../SettingsButton/SettingsDialog";
+import { SettingsDialog } from "../../SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
-import { CreateCategoryDialog } from "../CreateCategoryListItem/CreateCategoryDialog";
+import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
@@ -71,10 +69,9 @@ import { annotatorImagesSelector } from "../../../../store/selectors/annotatorIm
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
 import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const CategoriesList = () => {
-  const classes = useStyles();
-
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const unknownCategory = useSelector(unknownCategorySelector);
@@ -252,20 +249,26 @@ export const CategoriesList = () => {
   return (
     <Drawer
       anchor="left"
-      className={classes.drawer}
-      classes={{ paper: classes.paper }}
+      sx={{
+        flexShrink: 0,
+        width: (theme) => theme.spacing(32),
+        "& > .MuiDrawer-paper": {
+          width: (theme) => theme.spacing(32),
+          zIndex: 0,
+        },
+      }}
       open
       variant="persistent"
     >
-      <Box
-        style={{ paddingTop: 60 }}
-        className={classes.toolbar}
-        display="flex"
-        justifyContent="flex-end"
-        px={8}
-      />
-
-      <AppBar className={classes.appBar} color="default">
+      <AppBar
+        color="default"
+        sx={{
+          backgroundColor: "rgba(0, 0, 0, 0)",
+          // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          boxShadow: "none",
+          position: "absolute",
+        }}
+      >
         <Toolbar>
           <Tooltip title="Save and return to project" placement="bottom">
             <IconButton
@@ -282,6 +285,8 @@ export const CategoriesList = () => {
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <AppBarOffset />
 
       <ExitAnnotatorDialog
         onConfirm={onCloseDialog}
@@ -644,8 +649,6 @@ const SendFeedbackDialog = ({
   open,
   onSend,
 }: SendFeedbackDialogProps) => {
-  const classes = useStyles();
-
   const t = useTranslation();
 
   const [input, setInput] = useState("");
@@ -660,12 +663,15 @@ const SendFeedbackDialog = ({
       <DialogTitle>{t("Send feedback")}</DialogTitle>
 
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText
+          sx={{
+            "& a": { color: "deepskyblue" },
+          }}
+        >
           {t(
             "Use this form to report issues with Piximi via our GitHub page, or visit"
           )}{" "}
           <a
-            className={classes.a}
             href="https://forum.image.sc/tag/piximi"
             target="_blank"
             rel="noreferrer"

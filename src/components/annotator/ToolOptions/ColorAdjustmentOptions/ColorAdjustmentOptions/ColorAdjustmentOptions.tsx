@@ -12,7 +12,7 @@ import { channelsSelector } from "../../../../../store/selectors/intensityRangeS
 import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
-import { ZStackSlider } from "../ZStackSlider/ZStackSlider";
+import { ZStackSlider } from "../ZStackSlider";
 
 export function createIntensityFilter(channels: ChannelType[]) {
   return function (imageData: { data: any }) {

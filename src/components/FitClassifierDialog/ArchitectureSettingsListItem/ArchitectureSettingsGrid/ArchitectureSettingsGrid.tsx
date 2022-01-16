@@ -1,11 +1,11 @@
-import { FormControl, Grid, TextField, Alert } from "@mui/material";
+import { Grid, TextField, Alert } from "@mui/material";
+import { StyledFormControl } from "../../StyledFormControl";
 import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
 import { architectureOptionsSelector } from "../../../../store/selectors/architectureOptionsSelector";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
-import { useStyles } from "../../FitClassifierDialog/FitClassifierDialog.css";
 import {
   availableModels,
   ClassifierModelProps,
@@ -28,8 +28,6 @@ export const ArchitectureSettingsGrid = () => {
     React.useState<string>("");
 
   const dispatch = useDispatch();
-
-  const classes = useStyles();
 
   const modelOptions: ClassifierModelProps[] = availableModels.slice();
 
@@ -98,7 +96,7 @@ export const ArchitectureSettingsGrid = () => {
   };
 
   return (
-    <FormControl className={classes.container} sx={{ m: 1, minWidth: 120 }}>
+    <StyledFormControl>
       <Grid container spacing={2}>
         <Grid item xs={2}>
           <Autocomplete
@@ -158,6 +156,6 @@ export const ArchitectureSettingsGrid = () => {
           )}
         </Grid>
       </Grid>
-    </FormControl>
+    </StyledFormControl>
   );
 };

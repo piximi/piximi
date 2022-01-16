@@ -1,1 +1,0 @@
-export { LabelCanvas } from "./LabelCanvas";

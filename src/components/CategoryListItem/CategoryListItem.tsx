@@ -9,7 +9,6 @@ import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { State } from "../../types/State";
 import { Image } from "../../types/Image";
-import { useStyles } from "../MainView/MainView.css";
 import {
   Chip,
   IconButton,
@@ -48,8 +47,6 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
     }).length;
   });
 
-  const classes = useStyles();
-
   return (
     <React.Fragment>
       <ListItem dense key={id} id={id}>
@@ -64,8 +61,14 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
         <Chip
           label={imageCount}
           size="small"
-          className={classes.chip}
-          style={{ backgroundColor: category.color }}
+          // className={classes.chip}
+          sx={{
+            height: "20px",
+            borderWidth: "2px",
+            fontSize: "0.875rem",
+            color: "white",
+            backgroundColor: category.color,
+          }}
         />
 
         <ListItemSecondaryAction>

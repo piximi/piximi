@@ -49,7 +49,7 @@ export const ManipulatingCanvasContent = () => {
       <br />
       <Divider />
       <br />
-      <HelpWindowToolTitle toolName={"Intensity adjustment"} letter={"I"}>
+      <HelpWindowToolTitle toolName={"Color adjustment"} letter={"I"}>
         <ColorAdjustmentIcon />
       </HelpWindowToolTitle>
       <Typography>

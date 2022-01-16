@@ -4,7 +4,6 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { useStyles } from "../MainView/MainView.css";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -12,11 +11,14 @@ type SettingsDialogProps = {
 };
 
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
-  const classes = useStyles();
-
   return (
     <Dialog fullScreen onClose={onClose} open={open}>
-      <AppBar className={classes.settingsDialogAppBar}>
+      <AppBar
+        sx={{
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          boxShadow: "none",
+        }}
+      >
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose}>
             <CloseIcon />

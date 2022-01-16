@@ -3,13 +3,11 @@ import { UploadButton } from "../UploadButton";
 import { Logo } from "../Logo";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { useStyles } from "./ApplicationToolbar.css";
-import { Slider, Toolbar } from "@mui/material";
+import { Slider, Toolbar, Box } from "@mui/material";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 
 export const ApplicationToolbar = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const [value, setValue] = React.useState<number>(1);
   const onChange = (event: Event, newValue: number | number[]) => {
@@ -33,17 +31,28 @@ export const ApplicationToolbar = () => {
   return (
     <Toolbar>
       <Logo />
-      <div className={classes.grow} />
-      <ZoomOutIcon className={classes.zoomIcon} />
+      {/*<TaskSelect />*/}
+      <Box sx={{ flexGrow: 1 }} />
+      <ZoomOutIcon
+        sx={(theme) => ({
+          marginLeft: theme.spacing(1),
+          marginRight: theme.spacing(1),
+        })}
+      />
       <Slider
         value={value}
         min={0.6}
         max={4}
         step={0.1}
         onChange={onChange}
-        className={classes.zoomSlider}
+        sx={{ width: "10%" }}
       />
-      <ZoomInIcon className={classes.zoomIcon} />
+      <ZoomInIcon
+        sx={(theme) => ({
+          marginLeft: theme.spacing(1),
+          marginRight: theme.spacing(1),
+        })}
+      />
       {/*<SearchInput />*/}
       <UploadButton />
     </Toolbar>

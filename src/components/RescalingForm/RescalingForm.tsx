@@ -1,77 +1,16 @@
 import * as React from "react";
-import { createStyles, makeStyles } from "@mui/styles";
 import {
   Checkbox,
   FormControlLabel,
   Grid,
   TextField,
-  Theme,
+  styled,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../store/slices";
 import { rescaleOptionsSelector } from "../../store/selectors/rescaleOptionsSelector";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    expansionPanel: {
-      boxShadow: "none",
-    },
-    leftIcon: {
-      marginRight: theme.spacing(1),
-    },
-    rightIcon: {
-      marginLeft: theme.spacing(1),
-    },
-    button: {
-      marginRight: theme.spacing(1),
-    },
-    grow: {
-      flexGrow: 1,
-    },
-    form: {},
-    appBar: {
-      position: "relative",
-      backgroundColor: "transparent",
-      boxShadow: "none",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    },
-    container: {
-      // width: '100%',
-      display: "flex",
-      flexWrap: "wrap",
-    },
-    root: {
-      zIndex: 1100,
-    },
-    paper: {
-      zIndex: 1100,
-    },
-    paperFullScreen: {
-      left: "280px",
-    },
-    menu: {
-      // width: 200,
-    },
-    textField: {
-      // marginLeft: theme.spacing(1),
-      marginRight: theme.spacing(1),
-      flexBasis: 300,
-      width: "100%",
-    },
-    title: {
-      marginLeft: theme.spacing(2),
-      flex: 1,
-    },
-    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-  })
-);
-
 export const RescalingForm = () => {
-  const classes = useStyles({});
-
   const rescaleOptions = useSelector(rescaleOptionsSelector);
   const dispatch = useDispatch();
 
@@ -116,8 +55,21 @@ export const RescalingForm = () => {
     );
   };
 
+  const StyledForm = styled("form")({
+    // width: '100%',
+    display: "flex",
+    flexWrap: "wrap",
+  });
+
+  const StyledTextField = styled(TextField)(({ theme }) => ({
+    // marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    flexBasis: 300,
+    width: "100%",
+  }));
+
   return (
-    <form className={classes.container} noValidate autoComplete="off">
+    <StyledForm noValidate autoComplete="off">
       <Grid container spacing={2}>
         <Grid item xs={2}>
           <FormControlLabel
@@ -133,10 +85,9 @@ export const RescalingForm = () => {
           />
         </Grid>
         <Grid item xs={2}>
-          <TextField
+          <StyledTextField
             id="minimum"
             label="Minimum pixel value"
-            className={classes.textField}
             disabled={disabled}
             value={rescaleOptions.rescaleMinMax.min}
             onChange={onMinChange}
@@ -147,10 +98,9 @@ export const RescalingForm = () => {
         </Grid>
 
         <Grid item xs={2}>
-          <TextField
+          <StyledTextField
             id="maximum"
             label="Maximum pixel value"
-            className={classes.textField}
             disabled={disabled}
             value={rescaleOptions.rescaleMinMax.max}
             onChange={onMaxChange}
@@ -160,6 +110,6 @@ export const RescalingForm = () => {
           />
         </Grid>
       </Grid>
-    </form>
+    </StyledForm>
   );
 };

@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useStyles } from "./ImageGridAppBar.css";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
@@ -24,6 +23,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  Box,
 } from "@mui/material";
 import ViewComfyIcon from "@mui/icons-material/ViewComfy";
 import GestureIcon from "@mui/icons-material/Gesture";
@@ -96,8 +96,6 @@ export const ImageGridAppBar = () => {
     navigate("/annotator");
   };
 
-  const classes = useStyles();
-
   const selectAllImages = () => {
     const newSelected = images.map((image) => image.id);
     dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
@@ -113,7 +111,7 @@ export const ImageGridAppBar = () => {
         <AppBar color="inherit" position="fixed">
           <Toolbar>
             <IconButton
-              className={classes.closeButton}
+              sx={{ marginRight: (theme) => theme.spacing(2) }}
               edge="start"
               color="inherit"
               onClick={selectNoImages}
@@ -121,11 +119,11 @@ export const ImageGridAppBar = () => {
               <ClearIcon />
             </IconButton>
 
-            <Typography className={classes.count}>
+            <Typography sx={{ flexGrow: 1 }}>
               {selectedImages.length} selected images
             </Typography>
 
-            <div style={{ flexGrow: 1 }} />
+            <Box sx={{ flexGrow: 1 }} />
 
             <Chip
               avatar={<LabelOutlinedIcon color="inherit" />}

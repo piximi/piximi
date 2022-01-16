@@ -1,6 +1,5 @@
 import Drawer from "@mui/material/Drawer";
 import React from "react";
-import { useStyles } from "./ToolOptions.css";
 import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
@@ -30,13 +29,11 @@ import { useSelector } from "react-redux";
 import { toolTypeSelector } from "../../../../store/selectors";
 import { useTranslation } from "react-i18next";
 import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
-import Box from "@mui/material/Box";
 import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "../PointerSelectionOptions";
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const ToolOptions = () => {
-  const classes = useStyles();
-
   const { t } = useTranslation();
 
   const activeOperation = useSelector(toolTypeSelector);
@@ -151,17 +148,17 @@ export const ToolOptions = () => {
   return (
     <Drawer
       anchor="right"
-      className={classes.options}
-      classes={{ paper: classes.settingsPaper }}
+      sx={{
+        width: 240,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: 240,
+          right: 56,
+        },
+      }}
       variant="permanent"
     >
-      <Box
-        style={{ paddingTop: 60 }}
-        className={classes.toolbar}
-        display="flex"
-        justifyContent="flex-end"
-        px={8}
-      />
+      <AppBarOffset />
 
       {
         operations[

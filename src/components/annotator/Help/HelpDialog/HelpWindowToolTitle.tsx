@@ -1,4 +1,3 @@
-import { useStyles } from "./HelpDialog.css";
 import Typography from "@mui/material/Typography";
 import { KeyboardKey } from "./KeyboardKey";
 import React from "react";
@@ -15,10 +14,8 @@ export const HelpWindowToolTitle = ({
   toolName,
   letter,
 }: ToolTitleProps) => {
-  const classes = useStyles();
-
   return (
-    <div className={classes.title}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
       <HelpWindowToolIcon>{children}</HelpWindowToolIcon>
       <Typography>
         <Box fontWeight="fontWeightBold">{toolName}</Box>
@@ -28,6 +25,6 @@ export const HelpWindowToolTitle = ({
       <Typography>+</Typography>
       <KeyboardKey letter={letter} />
       <Typography>)</Typography>
-    </div>
+    </Box>
   );
 };

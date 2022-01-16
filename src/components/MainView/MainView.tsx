@@ -3,13 +3,11 @@ import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
-import { useStyles } from "./MainView.css";
 import { createImage } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { convertFileToImage } from "../../image/imageHelper";
 
 export const MainView = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   const onUnload = (e: any) => {
@@ -41,7 +39,7 @@ export const MainView = () => {
   );
 
   return (
-    <Box className={classes.body}>
+    <Box sx={{ height: "100vh" }}>
       <CssBaseline />
 
       <ApplicationAppBar />

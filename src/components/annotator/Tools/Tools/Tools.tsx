@@ -2,7 +2,6 @@ import Drawer from "@mui/material/Drawer";
 import React from "react";
 import { ToolType as OperationType } from "../../../../types/ToolType";
 import { Tool } from "../Tool";
-import { useStyles } from "./Tools.css";
 import { useDispatch, useSelector } from "react-redux";
 import { toolTypeSelector } from "../../../../store/selectors";
 import { imageViewerSlice } from "../../../../store/slices";
@@ -23,8 +22,6 @@ import {
 import { useTranslation } from "../../../../hooks/useTranslation";
 
 export const Tools = () => {
-  const classes = useStyles();
-
   const dispatch = useDispatch();
 
   const activeOperation = useSelector(toolTypeSelector);
@@ -34,8 +31,14 @@ export const Tools = () => {
   return (
     <Drawer
       anchor="right"
-      className={classes.drawer}
-      classes={{ paper: classes.paper }}
+      sx={{
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+        width: 56,
+        "& > .MuiDrawer-paper": {
+          width: 56,
+        },
+      }}
       variant="permanent"
     >
       <br />

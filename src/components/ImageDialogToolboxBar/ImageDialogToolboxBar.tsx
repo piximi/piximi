@@ -1,17 +1,14 @@
-import { AppBar, Button, Toolbar } from "@mui/material";
+import React from "react";
+import { AppBar, Button, Toolbar, Box } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import BrushIcon from "@mui/icons-material/Brush";
 import Crop32Icon from "@mui/icons-material/Crop32";
-import React from "react";
-import { useStyles } from "./ImageDialogToolboxBar.css";
 import IconButton from "@mui/material/IconButton";
 import PanToolIcon from "@mui/icons-material/PanTool";
 
 export const ImageDialogToolboxBar = () => {
-  const classes = useStyles();
-
   return (
-    <div className={classes.imageDialogToolboxBar}>
+    <Box sx={{ flexGrow: 1, paddingBottom: "50px;" }}>
       <AppBar position="sticky" color="inherit">
         <Toolbar>
           <Typography color="inherit" style={{ paddingRight: 20 }} />
@@ -21,13 +18,13 @@ export const ImageDialogToolboxBar = () => {
           <IconButton color="inherit" onClick={() => {}}>
             <Crop32Icon />
           </IconButton>
-          <div className={classes.grow} />
+          <Box sx={{ flexGrow: 1 }} />
           <IconButton color="inherit" onClick={() => {}}>
             <PanToolIcon />
           </IconButton>
           <Button />
         </Toolbar>
       </AppBar>
-    </div>
+    </Box>
   );
 };

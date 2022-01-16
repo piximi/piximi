@@ -1,5 +1,4 @@
 import React, { ReactElement } from "react";
-import { useStyles } from "./ImageProcessingDrawer.css";
 import {
   Divider,
   Drawer,
@@ -7,6 +6,7 @@ import {
   Input,
   Slider,
   Typography,
+  Box,
 } from "@mui/material";
 import { VolumeUp } from "@mui/icons-material";
 
@@ -16,8 +16,6 @@ type SliderWithInputFieldProps = {
 };
 
 const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
-  const classes = useStyles();
-
   const [value, setValue] = React.useState<
     number | string | Array<number | string>
   >(30);
@@ -39,7 +37,11 @@ const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
   };
 
   return (
-    <div className={classes.slider}>
+    <Box
+      sx={{
+        padding: (theme) => theme.spacing(3),
+      }}
+    >
       <Typography id="input-slider" gutterBottom>
         {name}
       </Typography>
@@ -54,7 +56,7 @@ const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
         </Grid>
         <Grid item>
           <Input
-            className={classes.sliderInput}
+            sx={{ width: 42 }}
             value={value}
             margin="dense"
             onChange={onInputChange}
@@ -69,21 +71,32 @@ const SliderWithInputField = ({ icon, name }: SliderWithInputFieldProps) => {
           />
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
 export const ImageProcessingDrawer = () => {
-  const classes = useStyles();
-
   return (
     <Drawer
       anchor="right"
-      className={classes.drawer}
-      classes={{ paper: classes.drawerPaper }}
+      sx={{
+        flexShrink: 0,
+        width: (theme) => theme.spacing(32),
+        "& > .MuiDrawer-paper": {
+          width: (theme) => theme.spacing(32),
+          zIndex: 0,
+        },
+      }}
       variant="permanent"
     >
-      <div className={classes.drawerHeader} />
+      <Box
+        sx={(theme) => ({
+          ...theme.mixins.toolbar,
+          alignItems: "center",
+          display: "flex",
+          paddingLeft: theme.spacing(3),
+        })}
+      />
       <Divider />
       <SliderWithInputField icon={<VolumeUp />} name="Brightness" />
     </Drawer>

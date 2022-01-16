@@ -1,36 +1,13 @@
 import * as React from "react";
-import { createStyles, makeStyles } from "@mui/styles";
-import { AppBar, IconButton, Theme, Toolbar, Tooltip } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { compiledSelector } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { trainingFlagSelector } from "../../../store/selectors/trainingFlagSelector";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    leftIcon: {
-      marginRight: theme.spacing(1),
-    },
-    button: {},
-    grow: {
-      flexGrow: 1,
-    },
-    appBar: {
-      position: "relative",
-      backgroundColor: "transparent",
-      boxShadow: "none",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    },
-    appBarShift: {},
-    appBarShiftLeft: {},
-  })
-);
-
 export const FitClassifierDialogAppBar = (props: any) => {
   const { closeDialog, fit, disableFitting } = props;
-
-  const classes = useStyles({});
 
   const dispatch = useDispatch();
 
@@ -44,7 +21,14 @@ export const FitClassifierDialogAppBar = (props: any) => {
   };
 
   return (
-    <AppBar className={classes.appBar}>
+    <AppBar
+      sx={{
+        position: "relative",
+        backgroundColor: "transparent",
+        boxShadow: "none",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+      }}
+    >
       <Toolbar>
         <Tooltip title="Close Dialog" placement="bottom">
           <IconButton
@@ -57,7 +41,8 @@ export const FitClassifierDialogAppBar = (props: any) => {
             <ArrowBack />
           </IconButton>
         </Tooltip>
-        <div className={classes.grow} />
+
+        <Box sx={{ flexGrow: 1 }} />
 
         <Tooltip
           title={
@@ -68,12 +53,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
           placement="bottom"
         >
           <span>
-            <IconButton
-              className={classes.button}
-              onClick={fit}
-              href={""}
-              disabled={disableFitting}
-            >
+            <IconButton onClick={fit} href={""} disabled={disableFitting}>
               <PlayCircleOutline />
             </IconButton>
           </span>
@@ -81,12 +61,7 @@ export const FitClassifierDialogAppBar = (props: any) => {
 
         <Tooltip title="Stop fitting the model" placement="bottom">
           <span>
-            <IconButton
-              className={classes.button}
-              onClick={onStopFitting}
-              href={""}
-              disabled={!training}
-            >
+            <IconButton onClick={onStopFitting} href={""} disabled={!training}>
               <Stop />
             </IconButton>
           </span>
