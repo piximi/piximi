@@ -1,4 +1,3 @@
-import { styles } from "./OpenExampleProjectDialog.css";
 import {
   Dialog,
   DialogActions,
@@ -7,7 +6,6 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { makeStyles } from "@mui/styles";
 import { useTranslation } from "../../hooks/useTranslation";
 import { MenuList } from "@mui/material";
 import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
@@ -16,8 +14,6 @@ import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
-
-const useStyles = makeStyles(styles);
 
 type OpenExampleClassifierDialogProps = {
   open: boolean;
@@ -28,8 +24,6 @@ type OpenExampleClassifierDialogProps = {
 export const OpenExampleClassifierDialog = (
   props: OpenExampleClassifierDialogProps
 ) => {
-  const classes = useStyles({});
-
   const t = useTranslation();
   const { open, onClose, popupState } = props;
 
@@ -40,17 +34,34 @@ export const OpenExampleClassifierDialog = (
   return (
     // @ts-ignore
     <Dialog fullWidth maxWidth="sm" open={open}>
-      <DialogTitle className={classes.dialogTitle}>
+      <DialogTitle
+        sx={{
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          margin: 0,
+          padding: (theme) => theme.spacing(2),
+        }}
+      >
         {t("Open example project")}
         <IconButton
           aria-label="Close"
-          className={classes.closeButton}
+          sx={(theme) => ({
+            color: theme.palette.grey[500],
+            position: "absolute",
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+          })}
           onClick={closeMenueAndDialog}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent classes={{ root: classes.dialogContent }}>
+      <DialogContent
+        sx={{
+          borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+          margin: 0,
+          padding: (theme) => theme.spacing(1),
+        }}
+      >
         <MenuList>
           <OpenExampleProjectMenuItem
             exampleProject={ExampleProject.Mnist}
