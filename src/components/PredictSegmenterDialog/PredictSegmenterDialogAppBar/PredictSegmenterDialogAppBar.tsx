@@ -1,6 +1,5 @@
 import * as React from "react";
 import { ArrowBack, PlayCircleOutline } from "@mui/icons-material";
-import { useStyles } from "./PredictSegmentorDialogAppBar.css";
 import { AppBar, IconButton, Toolbar, Tooltip } from "@mui/material";
 
 type DialogAppBarProps = {
@@ -11,10 +10,15 @@ type DialogAppBarProps = {
 export const PredictSegmenterDialogAppBar = (props: DialogAppBarProps) => {
   const { closeDialog, evaluate } = props;
 
-  const classes = useStyles();
-
   return (
-    <AppBar className={classes.appBar}>
+    <AppBar
+      sx={{
+        position: "relative",
+        backgroundColor: "transparent",
+        boxShadow: "none",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+      }}
+    >
       <Toolbar>
         <Tooltip title="Close Dialog" placement="bottom">
           <IconButton
@@ -29,7 +33,7 @@ export const PredictSegmenterDialogAppBar = (props: DialogAppBarProps) => {
         </Tooltip>
 
         <Tooltip title="Evaluate the model" placement="bottom">
-          <IconButton className={classes.button} onClick={evaluate} href={""}>
+          <IconButton onClick={evaluate} href={""}>
             <PlayCircleOutline />
           </IconButton>
         </Tooltip>
