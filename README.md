@@ -10,6 +10,10 @@ Piximi's target users are computational or non-computational scientists interest
 
 In the project directory, you can run:
 
+### `yarn install`
+
+Install all project dependencies.
+
 ### `yarn start`
 
 Runs the app in the development mode.<br />
