@@ -1,39 +1,31 @@
 import * as React from "react";
-import { createStyles, makeStyles } from "@mui/styles";
-import { AppBar, IconButton, Theme, Toolbar, Tooltip } from "@mui/material";
+import { createStyles } from "@mui/styles";
+import {
+  AppBar,
+  IconButton,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Box,
+} from "@mui/material";
 import {
   ArrowBack,
   PlayCircleOutline,
   ReplayRounded,
 } from "@mui/icons-material";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    leftIcon: {
-      marginRight: theme.spacing(1),
-    },
-    button: {},
-    grow: {
-      flexGrow: 1,
-    },
-    appBar: {
-      position: "relative",
-      backgroundColor: "transparent",
-      boxShadow: "none",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    },
-    appBarShift: {},
-    appBarShiftLeft: {},
-  })
-);
-
 export const PredictClassifierDialogAppBar = (props: any) => {
   const { closeDialog, fit } = props;
 
-  const classes = useStyles({});
-
   return (
-    <AppBar className={classes.appBar}>
+    <AppBar
+      sx={{
+        position: "relative",
+        backgroundColor: "transparent",
+        boxShadow: "none",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+      }}
+    >
       <Toolbar>
         <Tooltip title="Close Dialog" placement="bottom">
           <IconButton
@@ -46,20 +38,16 @@ export const PredictClassifierDialogAppBar = (props: any) => {
             <ArrowBack />
           </IconButton>
         </Tooltip>
-        <div className={classes.grow} />
+
+        <Box sx={{ flexGrow: 1 }} />
 
         <Tooltip title="Predict the model" placement="bottom">
-          <IconButton className={classes.button} onClick={fit} href={""}>
+          <IconButton onClick={fit} href={""}>
             <PlayCircleOutline />
           </IconButton>
         </Tooltip>
 
-        <IconButton
-          disabled
-          className={classes.button}
-          onClick={closeDialog}
-          href={""}
-        >
+        <IconButton disabled onClick={closeDialog} href={""}>
           <ReplayRounded />
         </IconButton>
       </Toolbar>
