@@ -1,8 +1,7 @@
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, Box } from "@mui/material";
 import * as React from "react";
 import * as tf from "@tensorflow/tfjs";
 import { PredictSegmenterDialogAppBar } from "../PredictSegmenterDialogAppBar";
-import { useStyles } from "./PredictSegmenterDialog.css";
 import Container from "@mui/material/Container";
 import { useSelector } from "react-redux";
 import { imagesSelector } from "../../../store/selectors";
@@ -70,8 +69,6 @@ type EvaluateClassifierDialogProps = {
 export const PredictSegmenterDialog = (
   props: EvaluateClassifierDialogProps
 ) => {
-  const classes = useStyles({});
-
   const { closeDialog, openedDialog } = props;
 
   const images = useSelector(imagesSelector);
@@ -140,15 +137,32 @@ export const PredictSegmenterDialog = (
         evaluate={onPredict}
       />
       <div>
-        <Container className={classes.container} maxWidth={"sm"}>
-          <img alt="" src={imageData} className={classes.imageTile} />
+        <Container
+          sx={(theme) => ({
+            paddingBottom: theme.spacing(8),
+            paddingTop: theme.spacing(8),
+          })}
+          maxWidth={"sm"}
+        >
+          <Box
+            component="img"
+            alt=""
+            src={imageData}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              top: 0,
+              transform: "none",
+            }}
+          />
         </Container>
       </div>
 
-      <DialogContent style={{ padding: "0px", margin: "12px" }}>
-        <div
+      <DialogContent sx={{ padding: "0px", margin: "12px" }}>
+        <Box
           id="tfjs-visor-container"
-          style={{
+          sx={{
             position: "absolute",
             height: "100%",
             width: "100%",
