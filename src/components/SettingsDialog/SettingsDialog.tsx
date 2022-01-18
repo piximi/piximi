@@ -73,7 +73,11 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
                   }
                 />
               }
-              label="Dark Mode"
+              label={
+                <Typography variant="h6">
+                  {themeMode === ThemeMode.Dark ? "Dark Mode" : "Light Mode"}
+                </Typography>
+              }
             />
           </FormGroup>
         </Container>
