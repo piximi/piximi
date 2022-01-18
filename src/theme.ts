@@ -1,12 +1,18 @@
 import { createTheme } from "@mui/material/styles";
 
-/*
-This file is the old "theme.ts" file, and is no longer used.
-We do eventually want to support a toggle that will enable a dark mode,
-so keeping this around until that is implemented.  -- Nodar
-*/
+export const lightTheme = createTheme({
+  components: {
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: 36,
+        },
+      },
+    },
+  },
+});
 
-export const darktheme = createTheme({
+export const darkTheme = createTheme({
   components: {
     MuiDrawer: {
       styleOverrides: {
@@ -17,7 +23,7 @@ export const darktheme = createTheme({
           borderLeft: "1px solid rgba(16, 16, 16)",
         },
         paper: {
-          boxShadow: "inset 0 0 16px #000000",
+          // boxShadow: "inset 0 0 16px #000000",
         },
       },
     },

@@ -5,6 +5,7 @@ export {
   deselectImage,
   deselectImages,
   clearSelectedImages,
+  setThemeMode,
 } from "./applicationSlice";
 
 export {
