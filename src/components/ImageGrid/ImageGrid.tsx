@@ -17,7 +17,6 @@ import {
 import { DropTargetMonitor, useDrop } from "react-dnd";
 import { NativeTypes } from "react-dnd-html5-backend";
 import { ImageIconLabel } from "./ImageIconLabel";
-import { Theme, styled } from "@mui/material/styles";
 
 type ImageGridProps = {
   onDrop: (item: { files: any[] }) => void;
@@ -75,73 +74,71 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
       : { border: "none" };
   };
 
-  const StyledMain = styled("main")(({ theme }: { theme: Theme }) => ({
-    flexGrow: 1,
-    height: "100%",
-    paddingTop: theme.spacing(3),
-    marginLeft: theme.spacing(32),
-    transition: theme.transitions.create("margin", {
-      duration: theme.transitions.duration.enteringScreen,
-      easing: theme.transitions.easing.easeOut,
-    }),
-  }));
-
   return (
-    <StyledMain
+    <Box
+      component="main"
       ref={drop}
+      sx={(theme) => ({
+        flexGrow: 1,
+        height: "100%",
+        paddingTop: theme.spacing(3),
+        marginLeft: theme.spacing(32),
+        transition: theme.transitions.create("margin", {
+          duration: theme.transitions.duration.enteringScreen,
+          easing: theme.transitions.easing.easeOut,
+        }),
+      })}
       style={{
         border: isOver ? "5px solid blue" : "",
       }}
     >
-      <div>
-        <Container
-          sx={(theme) => ({
-            paddingBottom: theme.spacing(8),
-            paddingTop: theme.spacing(8),
-            height: "100%",
-          })}
-          maxWidth={false}
+      <Container
+        sx={(theme) => ({
+          paddingBottom: theme.spacing(8),
+          paddingTop: theme.spacing(8),
+          height: "100%",
+        })}
+        maxWidth={false}
+      >
+        <ImageList
+          sx={{ transform: "translateZ(0)", height: "100%" }}
+          cols={Math.floor(6 / scaleFactor)}
+          rowHeight={"auto"}
         >
-          <ImageList
-            sx={{ transform: "translateZ(0)", height: "100%" }}
-            cols={Math.floor(6 / scaleFactor)}
-            rowHeight={"auto"}
-          >
-            {images.slice(0, max_images).map((image: Image) => (
-              <ImageListItem
-                key={image.id}
-                onClick={() => onSelectImage(image)}
-                style={getSize(scaleFactor)}
-                sx={getSelectionStatus(image.id)}
-              >
-                <Box
-                  component="img"
-                  alt=""
-                  src={image.src}
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    top: 0,
-                    transform: "none",
-                  }}
-                />
+          {images.slice(0, max_images).map((image: Image) => (
+            <ImageListItem
+              key={image.id}
+              onClick={() => onSelectImage(image)}
+              style={getSize(scaleFactor)}
+              sx={getSelectionStatus(image.id)}
+            >
+              <Box
+                component="img"
+                alt=""
+                src={image.src}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  top: 0,
+                  transform: "none",
+                }}
+              />
 
-                <ImageListItemBar
-                  position="top"
-                  sx={{
-                    background: "transparent",
-                  }}
-                  actionIcon={<ImageIconLabel image={image} />}
-                  actionPosition="left"
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
+              <ImageListItemBar
+                position="top"
+                actionIcon={<ImageIconLabel image={image} />}
+                actionPosition="left"
+                sx={{
+                  background: "transparent",
+                }}
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
 
-          <ImageGridAppBar />
-        </Container>
-      </div>
-    </StyledMain>
+        <ImageGridAppBar />
+      </Container>
+    </Box>
   );
 };
