@@ -7,7 +7,7 @@ export type Image = {
   id: string;
   name: string;
   src: string;
-  originalSrc: Array<string>; //array to account for possibility of z-stack
+  originalSrc: Array<string>; //TODO this will be come Array<Array<number>> to account for Z x C x M x N dimension
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;

@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";
@@ -9,6 +8,69 @@ import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
+import * as _ from "lodash";
+
+export const convertDataToRGBImage = (
+  data: Array<Array<number>>,
+  colors: Array<Array<number>>,
+  rows: number,
+  columns: number
+): string => {
+  /**
+   * Given an matrix of numbers of shape C x MN (image data), assign colors to channels and convert to RGB image
+   * returns the data URI of that RGB image, to be displayed on canvas
+   * **/
+  const summedChannels: Array<Array<number>> = new Array(rows * columns).fill([
+    0, 0, 0,
+  ]);
+
+  //iterate through each channel
+  for (let i = 0; i < data.length; i++) {
+    const channel: Array<number> = data[i];
+    const max = 255; //TODO is it okay to assume 8-bit for now
+    channel.forEach((value: number, j: number) => {
+      //iterate through each pixel
+      const red = (colors[i][0] * value) / max + summedChannels[j][0];
+      const green = (colors[i][1] * value) / max + summedChannels[j][1];
+      const blue = (colors[i][2] * value) / max + summedChannels[j][2];
+      summedChannels.push([red / 255, green / 255, blue / 255]); //TODO here we divide by 255, but look at more evolved
+      // better normalization function here: https://github.com/broadinstitute/DavidStirling_Projects/blob/master/Python%20Scripts/Average_Cell_Visualisation/visualise_single_cells_clean.ipynb
+    });
+  }
+
+  const rgbData: Array<number> = _.flatten(summedChannels);
+  const img: ImageJS.Image = new ImageJS.Image(columns, rows, rgbData, {
+    components: 3,
+  });
+  return img.toDataURL("image/png", {
+    useCanvas: true,
+  });
+};
+
+export const extractChannelsFromSrcImage = (
+  flattened: Uint8Array,
+  channels: number,
+  pixels: number
+): Array<Array<number>> => {
+  /**
+   * Given a flattened data array from RGB imageJ Image of type [channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately and return that
+   * **/
+  const results = [];
+  for (let k = 0; k < channels; k++) {
+    results.push(new Array(pixels).fill(0)); //initialize channels
+  }
+
+  let i = 0; //iterate over all flattened data
+  while (i < flattened.length) {
+    let j = 0;
+    while (j < channels) {
+      results[j][i / channels] = flattened[i + j];
+      j += 1;
+    }
+    i += j;
+  }
+  return results;
+};
 
 export const convertFileToImage = async (file: File): Promise<ImageType> => {
   /**
@@ -44,6 +106,7 @@ export const convertImageJStoImage = (
     height = image[0].height;
     width = image[0].width;
     channels = image[0].components;
+
     for (let j = 0; j < nplanes; j++) {
       imageData.push(
         image[j].toDataURL("image/png", {
@@ -52,6 +115,14 @@ export const convertImageJStoImage = (
       );
     }
   } else {
+    //TDOD tmp debug code, uncomment//
+    const channelsData = extractChannelsFromSrcImage(
+      image.data as Uint8Array,
+      3,
+      image.height * image.width
+    );
+    debugger;
+
     imageData = [
       image.toDataURL("image/png", {
         useCanvas: true,
