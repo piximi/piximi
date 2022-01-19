@@ -14,16 +14,14 @@ type ImageIconLabelProps = {
 export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
   const categories = useSelector(categoriesSelector);
 
-  const color = categories.find((category: Category) => {
-    return category.id === image.categoryId;
-  })?.color as string;
-
-  const categoryName = categories.find((category: Category) => {
-    return category.id === image.categoryId;
-  })?.name as string;
+  const { color: categoryColor, name: categoryName } = categories.find(
+    (category: Category) => {
+      return category.id === image.categoryId;
+    }
+  ) ?? { color: "undefined", name: "undefined" };
 
   const actionIconStyle = {
-    color: color,
+    color: categoryColor,
     marginLeft: "8px",
     marginTop: "8px",
   };
@@ -33,33 +31,31 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
     image.categoryId !== UNKNOWN_CATEGORY_ID;
 
   return (
-    <>
-      <Tooltip
-        title={categoryName}
-        placement="right"
-        arrow
-        // can't use "sx" prop directly to access tooltip
-        // see: https://github.com/mui-org/material-ui/issues/28679
-        componentsProps={{
-          tooltip: {
-            sx: {
-              borderRadius: 2,
-              backgroundColor: color,
-            },
+    <Tooltip
+      title={categoryName}
+      placement="right"
+      arrow
+      // can't use "sx" prop directly to access tooltip
+      // see: https://github.com/mui-org/material-ui/issues/28679
+      componentsProps={{
+        tooltip: {
+          sx: {
+            borderRadius: 2,
+            backgroundColor: categoryColor,
           },
-          arrow: {
-            sx: {
-              color: color,
-            },
+        },
+        arrow: {
+          sx: {
+            color: categoryColor,
           },
-        }}
-      >
-        {predictedLabel ? (
-          <LabelImportantIcon sx={actionIconStyle} />
-        ) : (
-          <LabelIcon sx={actionIconStyle} />
-        )}
-      </Tooltip>
-    </>
+        },
+      }}
+    >
+      {predictedLabel ? (
+        <LabelImportantIcon sx={actionIconStyle} />
+      ) : (
+        <LabelIcon sx={actionIconStyle} />
+      )}
+    </Tooltip>
   );
 };
