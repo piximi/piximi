@@ -38,11 +38,19 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
       annotation.boundingBox,
       imageWidth,
       imageHeight,
-      color
+      color,
+      stageScale
     );
     if (!overlayMask) return;
     setImageMask(overlayMask);
-  }, [annotation.mask, fill, annotation.boundingBox, imageHeight, imageWidth]);
+  }, [
+    annotation.mask,
+    fill,
+    annotation.boundingBox,
+    imageHeight,
+    imageWidth,
+    stageScale,
+  ]);
 
   return (
     <>
@@ -50,12 +58,15 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
       <ReactKonva.Image
         image={imageMask}
         id={annotation.id}
-        scale={{ x: stageScale, y: stageScale }}
         key={annotation.id}
         x={annotation.boundingBox[0] * stageScale}
         y={annotation.boundingBox[1] * stageScale}
-        width={annotation.boundingBox[2] - annotation.boundingBox[0]}
-        height={annotation.boundingBox[3] - annotation.boundingBox[1]}
+        width={Math.round(
+          (annotation.boundingBox[2] - annotation.boundingBox[0]) * stageScale
+        )}
+        height={Math.round(
+          (annotation.boundingBox[3] - annotation.boundingBox[1]) * stageScale
+        )}
       />
     </>
   );
