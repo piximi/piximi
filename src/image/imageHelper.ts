@@ -23,23 +23,49 @@ export const convertDataToRGBImage = (
   const summedChannels: Array<Array<number>> = new Array(rows * columns).fill([
     0, 0, 0,
   ]);
+  const mappedChannel: Array<Array<number>> = new Array(rows * columns).fill([
+    0, 0, 0,
+  ]);
+  const mappedChannels = [];
 
   //iterate through each channel
   for (let i = 0; i < data.length; i++) {
+    //for each channel
     const channel: Array<number> = data[i];
     const max = 255; //TODO is it okay to assume 8-bit for now
     channel.forEach((value: number, j: number) => {
       //iterate through each pixel
-      const red = (colors[i][0] * value) / max + summedChannels[j][0];
-      const green = (colors[i][1] * value) / max + summedChannels[j][1];
-      const blue = (colors[i][2] * value) / max + summedChannels[j][2];
-      summedChannels.push([red / 255, green / 255, blue / 255]); //TODO here we divide by 255, but look at more evolved
-      // better normalization function here: https://github.com/broadinstitute/DavidStirling_Projects/blob/master/Python%20Scripts/Average_Cell_Visualisation/visualise_single_cells_clean.ipynb
+      const red: number = (colors[i][0] * value) / max;
+      const green: number = (colors[i][1] * value) / max;
+      const blue: number = (colors[i][2] * value) / max;
+      mappedChannel[j] = [red, green, blue];
     });
+    mappedChannels.push(mappedChannel);
   }
 
-  const rgbData: Array<number> = _.flatten(summedChannels);
-  const img: ImageJS.Image = new ImageJS.Image(columns, rows, rgbData, {
+  for (let j = 0; j < rows * columns; j++) {
+    // for each pixel j
+    for (let i = 0; i < mappedChannels.length; i++) {
+      //for each channel
+      summedChannels[j] = [
+        summedChannels[j][0] + mappedChannels[i][j][0],
+        summedChannels[j][1] + mappedChannels[i][j][1],
+        summedChannels[j][2] + mappedChannels[i][j][2],
+      ];
+    }
+  }
+
+  //TODO summedChannels needs to be normalized as: https://github.com/broadinstitute/DavidStirling_Projects/blob/master/Python%20Scripts/Average_Cell_Visualisation/visualise_single_cells_clean.ipynb
+  //right now this is just a simplified version
+  const flattened: Array<number> = _.flatten(summedChannels);
+  const min = _.min(flattened);
+  const max = _.max(flattened);
+  if (!max || !min) return "";
+  for (let j = 0; j < flattened.length; j++) {
+    flattened[j] = (flattened[j] - min) / (max - min);
+  }
+
+  const img: ImageJS.Image = new ImageJS.Image(columns, rows, flattened, {
     components: 3,
   });
   return img.toDataURL("image/png", {
