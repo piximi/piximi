@@ -6,6 +6,10 @@ FROM node:16.13-bullseye-slim
 # FROM nikolaik/python-nodejs:python3.8-nodejs16-bullseye
 # ENV PYTHON="/usr/local/bin/python"
 
+RUN apk -U upgrade \
+  && apk add --no-cache \
+    git
+
 # Change working directory
 WORKDIR /piximi
 
