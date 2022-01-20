@@ -214,13 +214,16 @@ export const getAnnotationsInBox = (
 
 /*
  * From encoded mask data, get the decoded data and return results as an HTMLImageElement to be used by Konva.Image
+ * Warning: the mask produced from the decoded data is scaled to fit the stage.
+ *          when creating an image from mask, the original width/height should be scaled by the same scale factor
  */
 export const colorOverlayROI = (
   encodedMask: Array<number>,
   boundingBox: [number, number, number, number],
   imageWidth: number,
   imageHeight: number,
-  color: Array<number>
+  color: Array<number>,
+  scalingFactor: number
 ): HTMLImageElement | undefined => {
   if (!encodedMask) return undefined;
 
@@ -238,19 +241,19 @@ export const colorOverlayROI = (
   const croppedImage = new ImageJS.Image(boxWidth, boxHeight, decodedData, {
     components: 1,
     alpha: 0,
-  });
+  }).resize({ factor: scalingFactor });
 
   const colorROIImage = new ImageJS.Image(boxWidth, boxHeight, {
     components: 3,
     alpha: 1,
-  });
+  }).resize({ factor: scalingFactor });
 
   const checkNeighbors = (
     arr: ImageJS.Image,
     x: number,
     y: number
   ): boolean => {
-    if (x === 0 || x === boxWidth - 1) return true;
+    if (x === 0 || x === croppedImage.width - 1) return true;
     for (let [dx, dy] of [
       [0, 1],
       [1, 0],
