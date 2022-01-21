@@ -21,7 +21,8 @@ import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
 
 const initialImage =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV === "development" ||
+  process.env.NODE_ENV === "production"
     ? {
         activePlane: 0,
         avatar: colorImage,
@@ -43,7 +44,8 @@ const initialImage =
     : undefined;
 
 const initialCategories =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV === "development" ||
+  process.env.NODE_ENV === "production"
     ? [
         {
           color: "#AAAAAA",
