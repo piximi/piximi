@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - run: echo $GITHUB_SHA >> public/index.html
+      - run: echo $GITHUB_SHA >> commit_ref.txt
       - uses: ./
         env:
           BUILD_DIR: build/

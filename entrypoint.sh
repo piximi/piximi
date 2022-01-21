@@ -10,11 +10,11 @@ cd $GITHUB_WORKSPACE
 
 
 echo "#################################################"
-echo "Running yarn install"
+echo "Running yarn install..."
 yarn install
 
 echo "#################################################"
-echo "Running yarn build"
+echo "Running yarn build..."
 yarn run build
 
 echo "#################################################"
