@@ -10,22 +10,22 @@ import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
 import * as _ from "lodash";
 
-export const convertDataToRGBImage = (
+export const mapChannelsToRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Array<number>>,
   rows: number,
   columns: number
 ): string => {
   /**
-   * Given an matrix of numbers of shape C x MN (image data), assign colors to channels and convert to RGB image
+   * Given an matrix of numbers of shape C x MN (image data for each channel), assign colors to channels and convert to RGB image
    * returns the data URI of that RGB image, to be displayed on canvas
+   * data: the channels data
+   * colors: the colors to be assigned to each channel
    * **/
   const summedChannels: Array<Array<number>> = new Array(rows * columns).fill([
     0, 0, 0,
   ]);
-  const mappedChannel: Array<Array<number>> = new Array(rows * columns).fill([
-    0, 0, 0,
-  ]);
+
   const mappedChannels = [];
 
   //iterate through each channel
@@ -33,12 +33,13 @@ export const convertDataToRGBImage = (
     //for each channel
     const channel: Array<number> = data[i];
     const max = 255; //TODO is it okay to assume 8-bit for now
+    const mappedChannel: Array<Array<number>> = [];
     channel.forEach((value: number, j: number) => {
       //iterate through each pixel
       const red: number = (colors[i][0] * value) / max;
       const green: number = (colors[i][1] * value) / max;
       const blue: number = (colors[i][2] * value) / max;
-      mappedChannel[j] = [red, green, blue];
+      mappedChannel.push([red, green, blue]);
     });
     mappedChannels.push(mappedChannel);
   }
@@ -46,28 +47,34 @@ export const convertDataToRGBImage = (
   for (let j = 0; j < rows * columns; j++) {
     // for each pixel j
     for (let i = 0; i < mappedChannels.length; i++) {
-      //for each channel
+      //for each channel i
       summedChannels[j] = [
-        summedChannels[j][0] + mappedChannels[i][j][0],
-        summedChannels[j][1] + mappedChannels[i][j][1],
-        summedChannels[j][2] + mappedChannels[i][j][2],
+        Math.min(summedChannels[j][0] + mappedChannels[i][j][0], 255),
+        Math.min(summedChannels[j][1] + mappedChannels[i][j][1], 255),
+        Math.min(summedChannels[j][2] + mappedChannels[i][j][2], 255),
       ];
     }
   }
 
+  //TODO, above we cap to 255, but maybe it must be nromalized as (see github link below)
   //TODO summedChannels needs to be normalized as: https://github.com/broadinstitute/DavidStirling_Projects/blob/master/Python%20Scripts/Average_Cell_Visualisation/visualise_single_cells_clean.ipynb
   //right now this is just a simplified version
   const flattened: Array<number> = _.flatten(summedChannels);
-  const min = _.min(flattened);
-  const max = _.max(flattened);
-  if (!max || !min) return "";
-  for (let j = 0; j < flattened.length; j++) {
-    flattened[j] = (flattened[j] - min) / (max - min);
-  }
+  //TODO fix this
+  // const min = 0;
+  // const max = 255;
+  // // const min = _.min(flattened);
+  // // const max = _.max(flattened);
+  // // if (!max || !min) return "";
+  // for (let j = 0; j < flattened.length; j++) {
+  //   flattened[j] = (flattened[j] - min) / (max - min);
+  // }
 
   const img: ImageJS.Image = new ImageJS.Image(columns, rows, flattened, {
     components: 3,
+    alpha: 0,
   });
+
   return img.toDataURL("image/png", {
     useCanvas: true,
   });
@@ -141,13 +148,17 @@ export const convertImageJStoImage = (
       );
     }
   } else {
-    //TDOD tmp debug code, uncomment//
-    const channelsData = extractChannelsFromSrcImage(
-      image.data as Uint8Array,
-      3,
-      image.height * image.width
-    );
-    debugger;
+    //TODO tmp debug code, uncomment//
+    // const channelsData = extractChannelsFromSrcImage(
+    //   image.data as Uint8Array,
+    //   3,
+    //   image.height * image.width
+    // );
+    // const colors = [[255, 255, 0], [0, 255, 0], [255, 255, 0]];
+    // const uri = mapChannelsToRGBImage(channelsData, colors, image.height, image.width );
+    // console.info(uri)
+    // debugger;
+    //TODO remove this debug code
 
     imageData = [
       image.toDataURL("image/png", {
