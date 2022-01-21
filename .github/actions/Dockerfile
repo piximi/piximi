@@ -20,7 +20,7 @@ ENV PATH="./node_modules/.bin:$PATH"
 ENV NODE_ENV="production"
 
 # Copy deploy script
-COPY entrypoint.sh /entrypoint.sh
+COPY ../../entrypoint.sh /entrypoint.sh
 
 # Install dependencies
 COPY ../../package.json .
