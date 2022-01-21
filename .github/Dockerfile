@@ -38,7 +38,7 @@ RUN yarn run build
 # RUN NODE_OPTIONS="--max-old-space-size=8192" yarn build
 
 # Expose API port to the outside
-EXPOSE 3000
+# EXPOSE 3000
 
 # Launch application
 # CMD ["yarn", "run", "BROWSER=none", "react-scripts", "start"]
