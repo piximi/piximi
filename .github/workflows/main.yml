@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: echo $GITHUB_SHA >> public/index.html
-      - uses: ./.github/actions/
+      - uses: ./
         env:
           BUILD_DIR: build/
           GH_PAT: ${{ secrets.GH_PAT }}
