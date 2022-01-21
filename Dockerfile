@@ -22,6 +22,10 @@ ENV NODE_ENV="production"
 # Copy deploy script
 COPY entrypoint.sh /entrypoint.sh
 
+RUN echo $GITHUB_WORKSPACE
+
+RUN pwd
+
 # Install dependencies
 # COPY package.json .
 # RUN yarn install
