@@ -1,0 +1,6 @@
+name: "Deploy to GitHub Pages via Container"
+author: "Nodar Gogoberidze"
+description: "Docker Container Action using GH-specific Dockerfile, and custom Deploy Script to push to GH Pages Branch"
+runs:
+  using: "docker"
+  image: "./.github/Dockerfile"
