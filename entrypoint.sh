@@ -4,6 +4,10 @@
 
 set -e
 
+ls -al .
+
+ls -al ..
+
 echo "#################################################"
 echo "Changing directory to 'BUILD_DIR' $BUILD_DIR ..."
 cd $BUILD_DIR
