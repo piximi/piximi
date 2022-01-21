@@ -20,20 +20,20 @@ ENV PATH="./node_modules/.bin:$PATH"
 ENV NODE_ENV="production"
 
 # Copy deploy script
-COPY entrypoint.sh .
+# COPY entrypoint.sh /entrypoint.sh
 
 # Install dependencies
-COPY package.json .
-RUN yarn install
+# COPY package.json .
+# RUN yarn install
 
 # Copy source code
-COPY . .
+# COPY . .
 
 # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
 ENV GENERATE_SOURCEMAP false
 
 # Build the project
-RUN yarn run build
+# RUN yarn run build
 # RUN NODE_OPTIONS="--max-old-space-size=8192" yarn build
 
 # Expose API port to the outside
@@ -42,4 +42,4 @@ RUN yarn run build
 # Launch application
 # CMD ["yarn", "run", "BROWSER=none", "react-scripts", "start"]
 # CMD ["react-scripts", "start"]
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

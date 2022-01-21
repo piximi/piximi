@@ -14,6 +14,8 @@ ls -al ../..
 
 ls -al /
 
+exit 555
+
 echo "#################################################"
 echo "Changing directory to 'BUILD_DIR' $BUILD_DIR ..."
 cd $BUILD_DIR
