@@ -23,11 +23,11 @@ ENV NODE_ENV="production"
 COPY entrypoint.sh /entrypoint.sh
 
 # Install dependencies
-COPY package.json .
+COPY ../../package.json .
 RUN yarn install
 
 # Copy source code
-COPY . .
+COPY ../../. .
 
 # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
 ENV GENERATE_SOURCEMAP false
