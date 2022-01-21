@@ -18,6 +18,7 @@ export const serializedProjectSelector = ({
       imageChannels: image.shape.channels,
       imageChecksum: "",
       imageData: image.originalSrc,
+      imageSrc: image.src,
       imageFilename: image.name,
       imageFrames: image.shape.frames,
       imageHeight: image.shape.height,

@@ -42,7 +42,7 @@ const images: Array<Image> = [
     id: "00000000-0000-0000-0001-00000000000",
     annotations: [],
     name: "",
-    originalSrc: ["https://picsum.photos/seed/piximi/224"],
+    originalSrc: [],
     src: "https://picsum.photos/seed/piximi/224",
     partition: Partition.Training,
     shape: inputShape,

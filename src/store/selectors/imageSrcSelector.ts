@@ -12,7 +12,7 @@ export const imageSrcSelector = ({
     return image.id === imageViewer.activeImageId;
   });
 
-  if (!image) return;
+  if (!image) return "";
 
   return image.src;
 };

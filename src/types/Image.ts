@@ -7,7 +7,7 @@ export type Image = {
   id: string;
   name: string;
   src: string;
-  originalSrc: Array<string>; //TODO this will be come Array<Array<number>> to account for Z x C x M x N dimension
+  originalSrc: Array<Array<Array<number>>>; //TODO explain this
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;

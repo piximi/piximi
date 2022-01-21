@@ -316,11 +316,7 @@ export const CategoriesList = () => {
                 selected={image.id === currentImage?.id}
               >
                 <ListItemAvatar>
-                  <Avatar
-                    alt={image.name}
-                    src={image.originalSrc[Math.floor(image.shape.planes / 2)]}
-                    variant={"square"}
-                  />
+                  <Avatar alt={image.name} src={image.src} variant={"square"} />
                 </ListItemAvatar>
                 <ListItemText
                   id={image.id}

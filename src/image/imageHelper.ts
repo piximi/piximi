@@ -9,6 +9,22 @@ import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
 import * as _ from "lodash";
+import { DEFAULT_COLORS } from "../types/Colors";
+
+export const mapChannelstoDefaultColorImage = (
+  data: Array<Array<number>>,
+  rows: number,
+  columns: number
+): string => {
+  const colors = DEFAULT_COLORS;
+  const n_channels = data.length;
+  return mapChannelsToRGBImage(
+    data,
+    colors.slice(0, n_channels),
+    columns,
+    rows
+  );
+};
 
 export const mapChannelsToRGBImage = (
   data: Array<Array<number>>,
@@ -80,7 +96,11 @@ export const mapChannelsToRGBImage = (
   });
 };
 
-export const extractChannelsFromSrcImage = (
+export const extractChannelsFromURIImage = () => {
+  //TODO implement this
+};
+
+export const extractChannelsFromFlattenedArray = (
   flattened: Uint8Array,
   channels: number,
   pixels: number
@@ -130,8 +150,9 @@ export const convertImageJStoImage = (
   let nplanes = 1;
   let height: number;
   let width: number;
-  let imageData: Array<string> = [];
+  let channelsData: Array<Array<Array<number>>> = [];
   let channels: number;
+  let imageSrc: string;
 
   if (Array.isArray(image)) {
     //case where user uploaded a z-stack
@@ -141,30 +162,31 @@ export const convertImageJStoImage = (
     channels = image[0].components;
 
     for (let j = 0; j < nplanes; j++) {
-      imageData.push(
-        image[j].toDataURL("image/png", {
-          useCanvas: true,
-        })
+      channelsData.push(
+        extractChannelsFromFlattenedArray(
+          image[j].data as Uint8Array,
+          3,
+          image[j].height * image[j].width
+        )
       );
     }
-  } else {
-    //TODO tmp debug code, uncomment//
-    // const channelsData = extractChannelsFromSrcImage(
-    //   image.data as Uint8Array,
-    //   3,
-    //   image.height * image.width
-    // );
-    // const colors = [[255, 255, 0], [0, 255, 0], [255, 255, 0]];
-    // const uri = mapChannelsToRGBImage(channelsData, colors, image.height, image.width );
-    // console.info(uri)
-    // debugger;
-    //TODO remove this debug code
 
-    imageData = [
-      image.toDataURL("image/png", {
-        useCanvas: true,
-      }),
+    const middleChannelData = channelsData[Math.floor(nplanes / 2)];
+    imageSrc = mapChannelstoDefaultColorImage(middleChannelData, height, width);
+  } else {
+    channelsData = [
+      extractChannelsFromFlattenedArray(
+        image.data as Uint8Array,
+        image.components,
+        image.height * image.width
+      ),
     ];
+
+    imageSrc = mapChannelstoDefaultColorImage(
+      channelsData[0],
+      image.height,
+      image.width
+    );
     height = image.height;
     width = image.width;
     channels = image.components;
@@ -184,9 +206,9 @@ export const convertImageJStoImage = (
     annotations: [],
     name: filename,
     shape: shape,
-    originalSrc: imageData,
+    originalSrc: channelsData,
     partition: Partition.Inference,
-    src: imageData[Math.floor(nplanes / 2)],
+    src: imageSrc,
   };
 };
 

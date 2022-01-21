@@ -100,7 +100,7 @@ const initialState: ImageViewer = {
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
   activeImagePlane: 0,
-  images: initialImage ? [initialImage] : [],
+  images: initialImage ? [] : [], //TODO fixme
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 32,
@@ -249,7 +249,7 @@ export const imageViewerSlice = createSlice({
       const loaded: Image = {
         categoryId: UNKNOWN_CATEGORY_ID,
         id: action.payload.file.imageId,
-        src: action.payload.file.imageData[0],
+        src: action.payload.file.imageSrc,
         originalSrc: action.payload.file.imageData,
         name: action.payload.file.imageFilename,
         annotations: annotations,

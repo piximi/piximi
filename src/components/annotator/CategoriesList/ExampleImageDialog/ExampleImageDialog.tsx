@@ -121,7 +121,7 @@ export const ExampleImageDialog = ({
       annotations: newAnnotations,
       name: name,
       shape: shape,
-      originalSrc: [data as string],
+      originalSrc: [], //TODO fix this
       partition: Partition.Inference,
       src: data as string,
     };

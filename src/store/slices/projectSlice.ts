@@ -14,7 +14,7 @@ const dummyImage: Image = {
   categoryId: UNKNOWN_CATEGORY_ID,
   annotations: [],
   name: "nuclei",
-  originalSrc: [nuclei],
+  originalSrc: [], //TODO fixme
   src: nuclei,
   shape: {
     height: 256,
@@ -105,9 +105,7 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData[
-            Math.floor(serializedImage.imagePlanes / 2)
-          ],
+          src: serializedImage.imageSrc,
         };
 
         newImages.push(image);
@@ -147,7 +145,7 @@ export const projectSlice = createSlice({
             frames: serializedImage.imageFrames,
           },
           originalSrc: serializedImage.imageData,
-          src: originalSrc[Math.floor(serializedImage.imagePlanes / 2)],
+          src: serializedImage.imageSrc,
         };
 
         newImages.push(image);
