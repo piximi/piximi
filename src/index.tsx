@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import * as serviceWorker from "./serviceWorker";
+// import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -16,4 +16,4 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-serviceWorker.register();
+// serviceWorker.register();
