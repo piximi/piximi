@@ -6,8 +6,8 @@ FROM node:16.13-bullseye-slim
 # FROM nikolaik/python-nodejs:python3.8-nodejs16-bullseye
 # ENV PYTHON="/usr/local/bin/python"
 
-RUN sudo apt update \
-  && sudo apt install git
+RUN apt update \
+  && apt -y install git
 
 # Change working directory
 # disable for Github: https://docs.github.com/en/actions/creating-actions/dockerfile-support-for-github-actions
