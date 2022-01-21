@@ -20,7 +20,7 @@ ENV PATH="./node_modules/.bin:$PATH"
 ENV NODE_ENV="production"
 
 # Copy deploy script
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh .
 
 # Install dependencies
 COPY package.json .
@@ -42,4 +42,4 @@ RUN yarn run build
 # Launch application
 # CMD ["yarn", "run", "BROWSER=none", "react-scripts", "start"]
 # CMD ["react-scripts", "start"]
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

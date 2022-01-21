@@ -4,6 +4,8 @@
 
 set -e
 
+pwd
+
 ls -al .
 
 ls -al ..
