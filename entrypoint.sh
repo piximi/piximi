@@ -4,15 +4,18 @@
 
 set -e
 
-pwd
+echo "#################################################"
+echo "Changing directory to 'GITHUB_WORKSPACE' $GITHUB_WORKSPACE ..."
+cd $GITHUB_WORKSPACE
 
-ls -al .
 
-ls -al ..
+echo "#################################################"
+echo "Running yarn install"
+yarn install
 
-ls -al ../..
-
-exit 555
+echo "#################################################"
+echo "Running yarn build"
+yarn run build
 
 echo "#################################################"
 echo "Changing directory to 'BUILD_DIR' $BUILD_DIR ..."
