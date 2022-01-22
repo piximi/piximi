@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
@@ -35,7 +35,7 @@ import { Partition } from "../../types/Partition";
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const images = useSelector(visibleImagesSelector);
 
@@ -93,7 +93,7 @@ export const ImageGridAppBar = () => {
     if (!selected) return;
 
     dispatch(imageViewerSlice.actions.setImages({ images: selected }));
-    navigate("/annotator");
+    // navigate("/annotator");
   };
 
   const selectAllImages = () => {

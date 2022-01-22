@@ -2,7 +2,7 @@ import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import {
   categoryCountsSelector,
@@ -88,7 +88,7 @@ export const CategoriesList = () => {
 
   const dispatch = useDispatch();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const {
     onClose: onCloseDeleteCategoryDialog,
@@ -153,7 +153,7 @@ export const CategoriesList = () => {
     );
 
     onCloseExitAnnotatorDialog();
-    navigate("/");
+    // navigate("/");
   };
 
   const onCategoryClick = (
