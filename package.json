@@ -75,7 +75,7 @@
     "start": "BROWSER='chrome' react-scripts start",
     "test": "react-scripts test",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build -r git@github.com:gnodar01/pix_test.git -b gh-pages"
   },
   "browserslist": {
     "production": [
