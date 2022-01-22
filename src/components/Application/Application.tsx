@@ -12,12 +12,13 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <BrowserRouter>
+        <MainView />
+        {/* <BrowserRouter>
           <Routes>
             <Route path="/" element={<MainView />} />
             <Route path="annotator" element={<AnnotatorView />} />
           </Routes>
-        </BrowserRouter>
+        </BrowserRouter> */}
       </ThemeProvider>
     </StyledEngineProvider>
   );
