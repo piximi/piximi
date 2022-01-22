@@ -2,7 +2,7 @@
   "name": "piximi",
   "license": "BSD-3-Clause",
   "version": "0.1.0",
-  "homepage": "https://gnodar01.github.io/pix_test",
+  "homepage": "https://gnodar01.github.io/piximi",
   "dependencies": {
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",

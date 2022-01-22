@@ -13,7 +13,7 @@ export const Application = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <BrowserRouter
-          basename={process.env.NODE_ENV === "production" ? "/pix_test" : "/"}
+          basename={process.env.NODE_ENV === "production" ? "/piximi" : "/"}
         >
           <Routes>
             <Route path="/" element={<MainView />} />
