@@ -1,6 +1,5 @@
 import React from "react";
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { StyledEngineProvider } from "@mui/material/styles";
 import { MainView } from "../MainView";
@@ -13,14 +12,14 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        {/* <BrowserRouter> */}
-        <HashRouter>
+        <BrowserRouter
+          basename={process.env.NODE_ENV === "production" ? "/pix_test" : "/"}
+        >
           <Routes>
             <Route path="/" element={<MainView />} />
             <Route path="annotator" element={<AnnotatorView />} />
           </Routes>
-        </HashRouter>
-        {/* </BrowserRouter> */}
+        </BrowserRouter>
       </ThemeProvider>
     </StyledEngineProvider>
   );
