@@ -13,7 +13,6 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <MainView />
         {/* <BrowserRouter> */}
         <HashRouter>
           <Routes>
