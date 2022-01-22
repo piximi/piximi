@@ -19,7 +19,7 @@ jobs:
       - name: Install Packages
         run: yarn install
       - name: Build page
-        run: yarn run build
+        run: yarn build
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
