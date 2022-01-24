@@ -43,10 +43,18 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
         annotation.boundingBox,
         imageWidth,
         imageHeight,
-        color
+        color,
+        stageScale
       )
     );
-  }, [annotation.mask, fill, annotation.boundingBox, imageWidth, imageHeight]);
+  }, [
+    annotation.mask,
+    fill,
+    annotation.boundingBox,
+    imageWidth,
+    imageHeight,
+    stageScale,
+  ]);
 
   if (!annotation) return <></>;
 
@@ -56,7 +64,6 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
         <ReactKonva.Image
           id={annotation.id}
           image={imageMask}
-          scale={{ x: stageScale, y: stageScale }}
           x={annotation.boundingBox[0] * stageScale}
           y={annotation.boundingBox[1] * stageScale}
         />

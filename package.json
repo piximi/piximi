@@ -2,6 +2,7 @@
   "name": "piximi",
   "license": "BSD-3-Clause",
   "version": "0.1.0",
+  "homepage": "https://piximi.github.io/prototype",
   "dependencies": {
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",
@@ -68,7 +69,7 @@
     "prettier": "^2.2.1"
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
     "eject": "react-scripts eject",
     "start": "BROWSER='chrome' react-scripts start",
     "test": "react-scripts test"

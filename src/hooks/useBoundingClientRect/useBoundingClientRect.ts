@@ -44,7 +44,7 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
   }, [boundingClientRect.width, dispatch]);
 
   useEffect(() => {
-    if (!image || !image.shape) return;
+    if (!image?.shape) return;
 
     //FIXME #136 it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
     if (image.shape.height / stageHeight > image.shape.width / stageWidth) {
@@ -60,5 +60,5 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
         })
       );
     }
-  }, [image, stageWidth, stageHeight, dispatch]);
+  }, [image?.shape, stageWidth, stageHeight, dispatch]);
 };
