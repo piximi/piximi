@@ -8,7 +8,6 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useDialog } from "../../hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { EvaluateClassifierDialog } from "components/EvaluateClassifierDialog/EvaluateClassifierDialog";
-import { useEffect } from "react";
 import { Category } from "types/Category";
 import { createdCategoriesSelector } from "store/selectors";
 import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
@@ -28,14 +27,10 @@ export const EvaluateClassifierListItem = (props: EvaluateClassifierListItemProb
   const evaluationResult = useSelector(evaluationResultSelector);
 
   const onEvaluateClick = async () => {
-    dispatch(classifierSlice.actions.evaluate({}));
+    dispatch(
+      classifierSlice.actions.evaluate({ onOpenEvaluateDialog: onOpen })
+    );
   };
-
-  useEffect(() => {
-    if (evaluationResult.accuracy !== -1) {
-      onOpen();
-    }
-  }, [evaluationResult]);
 
   return (
     <>
