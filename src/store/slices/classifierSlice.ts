@@ -11,6 +11,7 @@ import {
   availableModels,
   ClassifierModelProps,
 } from "../../types/ClassifierModelType";
+import { EvaluationResultType } from "types/EvaluationResultType";
 
 const initialState: Classifier = {
   evaluating: false,
@@ -39,6 +40,13 @@ const initialState: Classifier = {
     rescaleMinMax: { min: 0, max: 1 },
   },
   trainingPercentage: 0.75,
+  evaluationResult: {
+    confusionMatrix: [],
+    accuracy: -1,
+    crossEntropy: -1,
+    precision: -1,
+    recall: -1,
+  },
 };
 
 export const classifierSlice = createSlice({
@@ -56,6 +64,7 @@ export const classifierSlice = createSlice({
     predict(state, action: PayloadAction<{}>) {
       state.predicting = true;
     },
+    evaluate(state, action: PayloadAction<{}>) {},
     setClassifier(
       state,
       action: PayloadAction<{
@@ -189,6 +198,14 @@ export const classifierSlice = createSlice({
       const { trainingPercentage } = action.payload;
 
       state.trainingPercentage = trainingPercentage;
+    },
+    updateEvaluationResult(
+      state,
+      action: PayloadAction<{ evaluationResult: EvaluationResultType }>
+    ) {
+      const { evaluationResult } = action.payload;
+
+      state.evaluationResult = evaluationResult;
     },
   },
 });
