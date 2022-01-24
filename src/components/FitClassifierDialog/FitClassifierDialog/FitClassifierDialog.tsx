@@ -10,6 +10,7 @@ import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListIt
 import { DialogTransition } from "../../DialogTransition";
 import {
   categorizedImagesSelector,
+  compiledSelector,
   trainingPercentageSelector,
 } from "../../../store/selectors";
 import { Image } from "../../../types/Image";
@@ -17,6 +18,7 @@ import * as _ from "lodash";
 import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
+import { ModelSummaryTable } from "./ModelSummery/ModelSummary";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -47,6 +49,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const trainingPercentage = useSelector(trainingPercentageSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
+  const compiledModel = useSelector(compiledSelector);
 
   useEffect(() => {
     setNoCategorizedImagesAlert(categorizedImages.length === 0);
@@ -181,6 +184,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           </div>
         ) : (
           <></>
+        )}
+
+        {compiledModel && (
+          <div>
+            <ModelSummaryTable compiledModel={compiledModel} />
+          </div>
         )}
 
         <div id={"tfvis-container"} />
