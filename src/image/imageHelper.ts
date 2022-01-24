@@ -11,22 +11,19 @@ import { Image as ImageType } from "../types/Image";
 import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/Colors";
 
-export const mapChannelstoDefaultColorImage = (
+export const mapChannelsToDefaultColorImage = (
   data: Array<Array<number>>,
   rows: number,
   columns: number
-): string => {
-  const colors = DEFAULT_COLORS;
+) => {
+  //TODO write docs (this function is used on new image loading, we use default colors to map image)
+  const defaultColors = DEFAULT_COLORS;
   const n_channels = data.length;
-  return mapChannelsToRGBImage(
-    data,
-    colors.slice(0, n_channels),
-    columns,
-    rows
-  );
+  const colors = defaultColors.slice(0, n_channels);
+  return mapChannelstoSpecifiedRGBImage(data, colors, rows, columns);
 };
 
-export const mapChannelsToRGBImage = (
+export const mapChannelstoSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Array<number>>,
   rows: number,
@@ -37,7 +34,9 @@ export const mapChannelsToRGBImage = (
    * returns the data URI of that RGB image, to be displayed on canvas
    * data: the channels data
    * colors: the colors to be assigned to each channel
+   * returns a URI image for display
    * **/
+
   const summedChannels: Array<Array<number>> = new Array(rows * columns).fill([
     0, 0, 0,
   ]);
@@ -108,6 +107,11 @@ export const extractChannelsFromFlattenedArray = (
   /**
    * Given a flattened data array from RGB imageJ Image of type [channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately and return that
    * **/
+  if (channels === 1) {
+    //if greyscale, leave array as is, no need to extract, individual channel values
+    return [Array.from(flattened)];
+  }
+
   const results = [];
   for (let k = 0; k < channels; k++) {
     results.push(new Array(pixels).fill(0)); //initialize channels
@@ -138,6 +142,24 @@ export const convertFileToImage = async (file: File): Promise<ImageType> => {
   });
 };
 
+export const convertImageDataToURI = (
+  width: number,
+  height: number,
+  data: Array<number>,
+  components: number,
+  alpha: 0 | 1 | undefined
+) => {
+  ///TODO write doc
+  const img: ImageJS.Image = new ImageJS.Image(width, height, data, {
+    components: components,
+    alpha: alpha ? alpha : 0,
+  });
+
+  return img.toDataURL("image/png", {
+    useCanvas: true,
+  });
+};
+
 export const convertImageJStoImage = (
   image: ImageJS.Image,
   filename: string
@@ -165,14 +187,33 @@ export const convertImageJStoImage = (
       channelsData.push(
         extractChannelsFromFlattenedArray(
           image[j].data as Uint8Array,
-          3,
+          channels,
           image[j].height * image[j].width
         )
       );
     }
 
-    const middleChannelData = channelsData[Math.floor(nplanes / 2)];
-    imageSrc = mapChannelstoDefaultColorImage(middleChannelData, height, width);
+    const middleIndex = Math.floor(nplanes / 2);
+
+    if (
+      image[middleIndex].components === 1 ||
+      image[middleIndex].components === 3
+    ) {
+      //Assume greyscale image
+      imageSrc = convertImageDataToURI(
+        image[middleIndex].width,
+        image[middleIndex].height,
+        image[middleIndex].data,
+        image[middleIndex].components,
+        image[middleIndex].alpha
+      );
+    } else {
+      imageSrc = mapChannelsToDefaultColorImage(
+        channelsData[middleIndex],
+        height,
+        width
+      );
+    }
   } else {
     channelsData = [
       extractChannelsFromFlattenedArray(
@@ -182,11 +223,26 @@ export const convertImageJStoImage = (
       ),
     ];
 
-    imageSrc = mapChannelstoDefaultColorImage(
-      channelsData[0],
-      image.height,
-      image.width
-    );
+    if (image.components === 1 || image.components === 3) {
+      //Assume greyscale image
+
+      imageSrc = convertImageDataToURI(
+        image.width,
+        image.height,
+        Array.from(image.data),
+        image.components,
+        image.alpha
+      );
+    } else {
+      //handling case where user uploaded a multi-channel image that is channels not 1 or 3 (not greyscale or RGB)
+      //TODO if a color palette has already been specified by user, apply this color palette instead of using defualt color pallete?
+      imageSrc = mapChannelsToDefaultColorImage(
+        channelsData[0],
+        image.height,
+        image.width
+      );
+    }
+
     height = image.height;
     width = image.width;
     channels = image.components;

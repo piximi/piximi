@@ -5,7 +5,10 @@ import { activeImagePlaneSelector } from "../../../../../store/selectors/activeI
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { DEFAULT_COLORS } from "../../../../../types/Colors";
-import { mapChannelsToRGBImage } from "../../../../../image/imageHelper";
+import {
+  convertImageDataToURI,
+  mapChannelstoSpecifiedRGBImage,
+} from "../../../../../image/imageHelper";
 
 export const ZStackSlider = () => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
@@ -21,15 +24,30 @@ export const ZStackSlider = () => {
     if (typeof newValue === "number") {
       setValue(newValue);
       const imageData = activeImage.originalSrc[newValue];
-      const colors = DEFAULT_COLORS; //TODO this should actually be imageViewers.colors., which is the color mapping specified by user (once you add that to state)
+      let imageSrc: string;
+
+      if (activeImage.shape.channels === 1) {
+        //if greyscale image, no need for any color re-mapping
+        imageSrc = convertImageDataToURI(
+          activeImage.shape.width,
+          activeImage.shape.height,
+          imageData[0],
+          1,
+          0
+        );
+      } else {
+        const colors = DEFAULT_COLORS; //TODO this should actually be imageViewers.colors., which is the color mapping specified by user (once you add that to state)
+        imageSrc = mapChannelstoSpecifiedRGBImage(
+          imageData,
+          colors,
+          activeImage.shape.height,
+          activeImage.shape.width
+        );
+      }
+
       dispatch(
         imageViewerSlice.actions.setImageSrc({
-          src: mapChannelsToRGBImage(
-            imageData,
-            colors,
-            activeImage.shape.height,
-            activeImage.shape.width
-          ),
+          src: imageSrc,
         })
       );
       dispatch(
