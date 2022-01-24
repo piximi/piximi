@@ -1,15 +1,15 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 export const useDialog = () => {
   const [open, setOpen] = useState(false);
 
-  const onClose = useCallback(() => {
-    setOpen(!open);
-  }, [open]);
+  const onClose = () => {
+    setOpen(false);
+  };
 
-  const onOpen = useCallback(() => {
-    setOpen(!open);
-  }, [open]);
+  const onOpen = () => {
+    setOpen(true);
+  };
 
   return { onClose, onOpen, open };
 };
