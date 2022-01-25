@@ -13,31 +13,7 @@ import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
-
-export function createIntensityFilter(channels: ChannelType[]) {
-  return function (imageData: { data: any }) {
-    let data = imageData.data;
-    const scaleIntensity = (channel: ChannelType, pixel: number) => {
-      if (!channel.visible) return 0;
-      if (pixel < channel.range[0]) return 0;
-      if (pixel >= channel.range[1]) return 255;
-      return (
-        255 *
-        ((pixel - channel.range[0]) / (channel.range[1] - channel.range[0]))
-      );
-    };
-
-    for (let i = 0; i < data.length; i += 4) {
-      // red
-      data[i] = scaleIntensity(channels[0], data[i]);
-      // green
-      data[i + 1] = scaleIntensity(channels[1], data[i + 1]);
-      // blue
-      data[i + 2] = scaleIntensity(channels[2], data[i + 2]);
-    }
-    return data;
-  };
-}
+import { DEFAULT_COLORS } from "../../../../../types/Colors";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
@@ -58,6 +34,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
     for (let i = 0; i < components; i++) {
       defaultChannels.push({
+        color: DEFAULT_COLORS[i],
         range: [0, 255],
         visible: true,
       });

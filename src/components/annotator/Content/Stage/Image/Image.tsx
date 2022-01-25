@@ -11,7 +11,7 @@ import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledI
 import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
 import { imageSrcSelector } from "../../../../../store/selectors/imageSrcSelector";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
-import { createIntensityFilter } from "../../../ToolOptions/ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
+// import { createIntensityFilter } from "../../../ToolOptions/ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
 import { ChannelType } from "../../../../../types/ChannelType";
 import { isEqual } from "lodash";
 
@@ -38,27 +38,27 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
     console.info(width, height);
   }, [width, height]);
 
-  useEffect(() => {
-    // @ts-ignore
-    if (!ref || !ref.current) return;
-    const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
-    for (let i = 0; i < channels.length; i++) {
-      defaultChannels.push({
-        range: [0, 255],
-        visible: true,
-      });
-    }
-    if (isEqual(channels, defaultChannels)) {
-      setFilters([]);
-      // @ts-ignore
-      ref?.current.clearCache();
-    } else {
-      const IntensityFilter = createIntensityFilter(channels);
-      setFilters([IntensityFilter]);
-      // @ts-ignore
-      ref?.current.cache();
-    }
-  }, [channels, stageScale, ref]);
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   if (!ref || !ref.current) return;
+  //   const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
+  //   for (let i = 0; i < channels.length; i++) {
+  //     defaultChannels.push({
+  //       range: [0, 255],
+  //       visible: true,
+  //     });
+  //   }
+  //   if (isEqual(channels, defaultChannels)) {
+  //     setFilters([]);
+  //     // @ts-ignore
+  //     ref?.current.clearCache();
+  //   } else {
+  //     const IntensityFilter = createIntensityFilter(channels);
+  //     setFilters([IntensityFilter]);
+  //     // @ts-ignore
+  //     ref?.current.cache();
+  //   }
+  // }, [channels, stageScale, ref]);
 
   useEffect(() => {
     // @ts-ignore

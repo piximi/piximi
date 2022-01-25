@@ -8,13 +8,17 @@ import {
   CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
 } from "../../../../../icons";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { ChannelType } from "../../../../../types/ChannelType";
 import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
+import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 
 type ColorAdjustmentSlidersProp = {
   updateDisplayedValues: (values: Array<Array<number>>) => void;
@@ -30,6 +34,10 @@ export const ChannelsList = ({
   const channels = useSelector(channelsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
+
+  const originalData = useSelector(imageOriginalSrcSelector);
+
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const visibleChannelsIndices = channels
     .map((channel: ChannelType, idx) => channel.visible)
@@ -50,7 +58,7 @@ export const ChannelsList = ({
 
   const handler = useCallback(
     (values: Array<Array<number>>) => {
-      const updateIntensityRanges = () => {
+      const updateIntensityRanges = (values: Array<Array<number>>) => {
         const copiedValues = [...values].map((range: Array<number>) => {
           return [...range];
         });
@@ -67,30 +75,96 @@ export const ChannelsList = ({
           })
         );
       };
+      updateIntensityRanges(values);
       return debounce(updateIntensityRanges, 100);
     },
     [channels, dispatch]
   );
 
+  const handleSliderChangeCommitted = () => {
+    if (!originalData || !imageShape) return;
+
+    const modifiedData: Array<Array<number>> = [];
+
+    const arrayLength = originalData[activeImagePlane][0].length;
+
+    channels.forEach((channel: ChannelType, j: number) => {
+      if (!channel.visible) {
+        modifiedData[j] = new Array(arrayLength).fill(0);
+      } else {
+        modifiedData[j] = originalData[activeImagePlane][j].map(
+          (pixel: number) => {
+            if (pixel < channel.range[0]) return 0;
+            if (pixel >= channel.range[1]) return 255;
+            return (
+              255 *
+              ((pixel - channel.range[0]) /
+                (channel.range[1] - channel.range[0]))
+            );
+          }
+        );
+      }
+    });
+
+    const colors = channels.map((channel: ChannelType) => {
+      return channel.color;
+    });
+    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      modifiedData,
+      colors,
+      imageShape.height,
+      imageShape.width
+    );
+    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+  };
+
   const onCheckboxChanged = (index: number) => () => {
     const current = visibleChannelsIndices.indexOf(index);
 
-    const updated = [...visibleChannelsIndices];
+    const visibles = [...visibleChannelsIndices];
 
     const copiedChannels = [...channels];
 
     if (current === -1) {
-      updated.push(index);
+      visibles.push(index);
       copiedChannels[index] = { ...copiedChannels[index], visible: true };
     } else {
-      updated.splice(current, 1);
+      visibles.splice(current, 1);
       copiedChannels[index] = { ...copiedChannels[index], visible: false };
     }
-    dispatch(
-      imageViewerSlice.actions.setChannels({
-        channels: copiedChannels,
-      })
-    );
+
+    batch(() => {
+      dispatch(
+        imageViewerSlice.actions.setChannels({
+          channels: copiedChannels,
+        })
+      );
+
+      if (!originalData || !imageShape) return;
+
+      const arrayLength = originalData[activeImagePlane][0].length;
+      const modifiedData = originalData[activeImagePlane].map(
+        (arr: Array<number>, i: number) => {
+          if (visibles.includes(i)) {
+            return arr;
+          } else {
+            return new Array(arrayLength).fill(0);
+          }
+        }
+      );
+
+      const colors = channels.map((channel: ChannelType) => {
+        return channel.color;
+      });
+      const modifiedURI = mapChannelstoSpecifiedRGBImage(
+        modifiedData,
+        colors,
+        imageShape.height,
+        imageShape.width
+      );
+
+      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    });
   };
 
   const colorAdjustmentSlider = (
@@ -129,6 +203,7 @@ export const ChannelsList = ({
           onChange={(event, value: number | number[]) =>
             handleSliderChange(index, event, value)
           }
+          onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
         />

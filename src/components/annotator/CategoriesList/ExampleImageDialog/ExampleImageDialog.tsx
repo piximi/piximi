@@ -29,6 +29,7 @@ import {
 import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { DEFAULT_COLORS } from "../../../../types/Colors";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -95,7 +96,11 @@ export const ExampleImageDialog = ({
 
     let channels: Array<ChannelType> = [];
     for (let i = 0; i < shape.channels; i++) {
-      channels.push({ visible: true, range: [0, 255] });
+      channels.push({
+        color: DEFAULT_COLORS[i],
+        visible: true,
+        range: [0, 255],
+      });
     }
 
     const newAnnotations: Array<AnnotationType> = [];

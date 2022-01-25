@@ -19,6 +19,7 @@ import {
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
+import { DEFAULT_COLORS } from "../../types/Colors";
 
 const initialImage =
   process.env.NODE_ENV === "development" ||
@@ -83,14 +84,17 @@ const initialState: ImageViewer = {
   channels: [
     //R, G, and B channels by default
     {
+      color: [255, 0, 0],
       range: [0, 255],
       visible: true,
     },
     {
+      color: [0, 255, 0],
       range: [0, 255],
       visible: true,
     },
     {
+      color: [0, 0, 255],
       range: [0, 255],
       visible: true,
     },
@@ -343,6 +347,7 @@ export const imageViewerSlice = createSlice({
       const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
       for (let i = 0; i < activeImage.shape.channels; i++) {
         defaultChannels.push({
+          color: DEFAULT_COLORS[i],
           range: [0, 255],
           visible: true,
         });
@@ -354,6 +359,21 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ activeImagePlane: number }>
     ) {
       state.activeImagePlane = action.payload.activeImagePlane;
+    },
+    setImageOriginalSrc(
+      state: ImageViewer,
+      action: PayloadAction<{ originalSrc: Array<Array<number>> }>
+    ) {
+      if (!state.activeImageId) return;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId !== image.id) {
+          return image;
+        } else {
+          const imageData = [...image.originalSrc];
+          imageData[state.activeImagePlane] = action.payload.originalSrc;
+          return { ...image, originalSrc: imageData };
+        }
+      });
     },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
