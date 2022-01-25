@@ -1,11 +1,10 @@
-import { LayersModel } from "@tensorflow/tfjs";
 import * as tensorflow from "@tensorflow/tfjs";
 import { EvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
 import { Image } from "../../../types/Image";
 
 export const evaluate = async (
-  model: LayersModel,
+  model: tensorflow.LayersModel,
   validationData: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     id: string;
@@ -50,40 +49,36 @@ export const evaluate = async (
 
   const probabilities2DTensor = tensorflow.tensor2d(probabilities);
 
-  var accuracy: number;
-  var crossEntropy: number;
+  var accuracy: number[];
+  var crossEntropy: number[];
   if (numberOfClasses === 2) {
-    accuracy = tensorflow.metrics
+    accuracy = (await tensorflow.metrics
       .binaryAccuracy(oneHotLabels, oneHotPredictions)
-      .dataSync()[0];
-    crossEntropy = tensorflow.metrics
+      .array()) as number[];
+    crossEntropy = (await tensorflow.metrics
       .binaryCrossentropy(oneHotLabels, probabilities2DTensor)
-      .dataSync()[0];
+      .array()) as number[];
   } else {
-    accuracy = tensorflow.metrics
+    accuracy = (await tensorflow.metrics
       .categoricalAccuracy(oneHotLabels, probabilities2DTensor)
-      .dataSync()[0];
-    console.log(
-      tensorflow.metrics
-        .categoricalAccuracy(oneHotLabels, probabilities2DTensor)
-        .print()
-    );
-    crossEntropy = tensorflow.metrics
+      .array()) as number[];
+    crossEntropy = (await tensorflow.metrics
       .categoricalCrossentropy(oneHotLabels, probabilities2DTensor)
-      .dataSync()[0];
+      .array()) as number[];
   }
 
-  const precision = tensorflow.metrics
+  const precision = (await tensorflow.metrics
     .precision(oneHotLabels, oneHotPredictions)
-    .dataSync()[0];
-  const recall = tensorflow.metrics
+    .array()) as number;
+  const recall = (await tensorflow.metrics
     .recall(oneHotLabels, oneHotPredictions)
-    .dataSync()[0];
+    .array()) as number;
 
   return {
     confusionMatrix: confusionMatrix,
-    accuracy: accuracy,
-    crossEntropy: crossEntropy,
+    accuracy: accuracy.reduce((a, b) => a + b) / validationImages.length,
+    crossEntropy:
+      crossEntropy.reduce((a, b) => a + b) / validationImages.length,
     precision: precision,
     recall: recall,
   };
