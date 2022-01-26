@@ -128,9 +128,6 @@ export const projectSlice = createSlice({
       const newImages: Array<Image> = [];
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
-        const originalSrc = Array.isArray(serializedImage.imageData)
-          ? serializedImage.imageData
-          : [serializedImage.imageData]; //handle case where example projects's images do not correspond to array of strings
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
           id: serializedImage.imageId,

@@ -14,13 +14,17 @@ import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSel
 import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
 import { DEFAULT_COLORS } from "../../../../../types/Colors";
+import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  const originalData = useSelector(imageOriginalSrcSelector);
+
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
@@ -43,14 +47,14 @@ export const ColorAdjustmentOptions = () => {
   };
 
   useEffect(() => {
-    if (!originalSrc) return;
+    if (!originalData) return;
 
     if (!imageShape) return;
 
     setDisplayedValues(
       channels.map((channel: ChannelType) => [...channel.range])
     );
-  }, [originalSrc, imageShape, channels]);
+  }, [originalData, imageShape, channels]);
 
   const onResetChannelsClick = () => {
     if (!imageShape) return;
@@ -63,6 +67,16 @@ export const ColorAdjustmentOptions = () => {
     setDisplayedValues(
       defaultChannels.map((channel: ChannelType) => [...channel.range])
     );
+
+    if (!originalData || !imageShape) return;
+
+    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      originalData[activeImagePlane],
+      channels,
+      imageShape.height,
+      imageShape.width
+    );
+    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
   const updateDisplayedValues = (values: Array<Array<number>>) => {
