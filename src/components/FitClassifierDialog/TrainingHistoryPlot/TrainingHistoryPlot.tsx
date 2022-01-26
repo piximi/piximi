@@ -1,5 +1,5 @@
 import { Container, Typography } from "@mui/material";
-import { ResponsiveLine, Serie } from "@nivo/line";
+import { ResponsiveLine } from "@nivo/line";
 
 type TrainingHistoryPlotProbs = {
   metric: string;
@@ -16,13 +16,13 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProbs) => {
     dynamicYRange = false,
   } = props;
 
-  const trainingData: Serie = {
+  const trainingData = {
     id: `${metric}`,
     color: "#DC3220",
     data: trainingValues,
   };
 
-  const validationData: Serie = {
+  const validationData = {
     id: `validation ${metric}`,
     color: "#005AB5",
     data: validationValues,

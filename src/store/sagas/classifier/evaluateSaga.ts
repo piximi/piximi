@@ -12,7 +12,7 @@ import { EvaluationResultType } from "types/EvaluationResultType";
 import { evaluate } from "store/coroutines/classifier/evaluate";
 
 export function* evaluateSaga(action: any): any {
-  const { onOpenEvaluateDialog } = action.payload;
+  const { setOpenEvaluateDialog } = action.payload;
 
   const model = yield select(fittedSelector);
   const validationImages = yield select(valImagesSelector);
@@ -52,5 +52,5 @@ export function* evaluateSaga(action: any): any {
     })
   );
 
-  onOpenEvaluateDialog();
+  setOpenEvaluateDialog();
 }

@@ -18,7 +18,7 @@ import * as _ from "lodash";
 import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
-import { ModelSummaryTable } from "./ModelSummery/ModelSummary";
+import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -58,18 +58,18 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
-    const epoch_ = ++epoch;
+    const epochCount = epoch + 1;
     setTrainingAccuracy((prevState) =>
-      prevState.concat({ x: epoch_, y: logs.categoricalAccuracy })
+      prevState.concat({ x: epochCount, y: logs.categoricalAccuracy })
     );
     setValidationAccuracy((prevState) =>
-      prevState.concat({ x: epoch_, y: logs.val_categoricalAccuracy })
+      prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
     );
     setTrainingLoss((prevState) =>
-      prevState.concat({ x: epoch_, y: logs.loss })
+      prevState.concat({ x: epochCount, y: logs.loss })
     );
     setValidationLoss((prevState) =>
-      prevState.concat({ x: epoch_, y: logs.val_loss })
+      prevState.concat({ x: epochCount, y: logs.val_loss })
     );
 
     setShowPlots(true);
@@ -140,7 +140,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         disableFitting={noCategorizedImagesAlert}
       />
 
-      {noCategorizedImagesAlert && showWarning ? (
+      {noCategorizedImagesAlert && showWarning && (
         <Alert
           onClose={() => {
             setShowWarning(false);
@@ -149,8 +149,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         >
           {"Please label images to train a model."}
         </Alert>
-      ) : (
-        <></>
       )}
 
       <DialogContent>
@@ -167,7 +165,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           <DatasetSettingsListItem />
         </List>
 
-        {showPlots ? (
+        {showPlots && (
           <div>
             <TrainingHistoryPlot
               metric={"accuracy"}
@@ -182,8 +180,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
               dynamicYRange={true}
             />
           </div>
-        ) : (
-          <></>
         )}
 
         {compiledModel && (
@@ -191,8 +187,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             <ModelSummaryTable compiledModel={compiledModel} />
           </div>
         )}
-
-        <div id={"tfvis-container"} />
       </DialogContent>
     </Dialog>
   );

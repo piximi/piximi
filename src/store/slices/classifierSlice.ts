@@ -67,7 +67,7 @@ export const classifierSlice = createSlice({
     evaluate(
       state,
       action: PayloadAction<{
-        onOpenEvaluateDialog: () => void;
+        setOpenEvaluateDialog: () => void;
       }>
     ) {},
     setClassifier(

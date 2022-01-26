@@ -1,8 +1,4 @@
-import {
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { IconButton, ListItemIcon, ListItemText } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useDialog } from "../../hooks";
@@ -14,12 +10,14 @@ import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
 import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
 import { classifierSlice } from "store/slices";
 
-type EvaluateClassifierListItemProbs = {
+type EvaluateClassifierListItemProps = {
   disabled: boolean;
   helperText: string;
 };
 
-export const EvaluateClassifierListItem = (props: EvaluateClassifierListItemProbs) => {
+export const EvaluateClassifierListItem = (
+  props: EvaluateClassifierListItemProps
+) => {
   const { onClose, onOpen, open } = useDialog();
   const dispatch = useDispatch();
 
@@ -28,7 +26,7 @@ export const EvaluateClassifierListItem = (props: EvaluateClassifierListItemProb
 
   const onEvaluateClick = async () => {
     dispatch(
-      classifierSlice.actions.evaluate({ onOpenEvaluateDialog: onOpen })
+      classifierSlice.actions.evaluate({ setOpenEvaluateDialog: onOpen })
     );
   };
 
@@ -39,11 +37,11 @@ export const EvaluateClassifierListItem = (props: EvaluateClassifierListItemProb
           <AssessmentIcon />
         </ListItemIcon>
         <ListItemText primary="Evaluate" />
-        <IconButton 
+        <IconButton
           onClick={onEvaluateClick}
           edge="end"
           disabled={props.disabled}
-          >
+        >
           <KeyboardArrowRightIcon />
         </IconButton>
       </DisabledClassifierListItem>

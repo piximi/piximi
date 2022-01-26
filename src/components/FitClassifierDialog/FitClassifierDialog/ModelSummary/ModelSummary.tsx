@@ -76,7 +76,7 @@ export const ModelSummaryTable = (props: ModelSummaryTableProbs) => {
         Model summery
       </Typography>
 
-      <TableContainer sx={{ maxHeight: 400, maxWidth: 800 }}>
+      <TableContainer sx={{ maxHeight: 400, width: 900 }}>
         <Table
           stickyHeader
           aria-label="sticky table"
