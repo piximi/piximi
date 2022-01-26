@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
-import { DEFAULT_COLORS } from "../../../../../types/Colors";
 import {
   convertImageDataToURI,
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 
 export const ZStackSlider = () => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
+  const channels = useSelector(channelsSelector);
 
   const [value, setValue] = useState(activeImagePlane);
 
@@ -36,10 +37,9 @@ export const ZStackSlider = () => {
           0
         );
       } else {
-        const colors = DEFAULT_COLORS; //TODO this should actually be imageViewers.colors., which is the color mapping specified by user (once you add that to state)
         imageSrc = mapChannelstoSpecifiedRGBImage(
           imageData,
-          colors,
+          channels,
           activeImage.shape.height,
           activeImage.shape.width
         );

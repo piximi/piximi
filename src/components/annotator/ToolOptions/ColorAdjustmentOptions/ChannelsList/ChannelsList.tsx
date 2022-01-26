@@ -84,34 +84,9 @@ export const ChannelsList = ({
   const handleSliderChangeCommitted = () => {
     if (!originalData || !imageShape) return;
 
-    const modifiedData: Array<Array<number>> = [];
-
-    const arrayLength = originalData[activeImagePlane][0].length;
-
-    channels.forEach((channel: ChannelType, j: number) => {
-      if (!channel.visible) {
-        modifiedData[j] = new Array(arrayLength).fill(0);
-      } else {
-        modifiedData[j] = originalData[activeImagePlane][j].map(
-          (pixel: number) => {
-            if (pixel < channel.range[0]) return 0;
-            if (pixel >= channel.range[1]) return 255;
-            return (
-              255 *
-              ((pixel - channel.range[0]) /
-                (channel.range[1] - channel.range[0]))
-            );
-          }
-        );
-      }
-    });
-
-    const colors = channels.map((channel: ChannelType) => {
-      return channel.color;
-    });
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
-      modifiedData,
-      colors,
+      originalData[activeImagePlane],
+      channels,
       imageShape.height,
       imageShape.width
     );
@@ -153,12 +128,9 @@ export const ChannelsList = ({
         }
       );
 
-      const colors = channels.map((channel: ChannelType) => {
-        return channel.color;
-      });
       const modifiedURI = mapChannelstoSpecifiedRGBImage(
         modifiedData,
-        colors,
+        copiedChannels,
         imageShape.height,
         imageShape.width
       );

@@ -10,6 +10,7 @@ import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
 import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/Colors";
+import { ChannelType } from "../types/ChannelType";
 
 export const mapChannelsToDefaultColorImage = (
   data: Array<Array<number>>,
@@ -20,12 +21,15 @@ export const mapChannelsToDefaultColorImage = (
   const defaultColors = DEFAULT_COLORS;
   const n_channels = data.length;
   const colors = defaultColors.slice(0, n_channels);
-  return mapChannelstoSpecifiedRGBImage(data, colors, rows, columns);
+  const channels = colors.map((color: Array<number>) => {
+    return { visible: true, range: [0, 255], color };
+  });
+  return mapChannelstoSpecifiedRGBImage(data, channels, rows, columns);
 };
 
 export const mapChannelstoSpecifiedRGBImage = (
   data: Array<Array<number>>,
-  colors: Array<Array<number>>,
+  colors: Array<ChannelType>,
   rows: number,
   columns: number
 ): string => {
@@ -43,19 +47,55 @@ export const mapChannelstoSpecifiedRGBImage = (
 
   const mappedChannels = [];
 
+  // channels.forEach((channel: ChannelType, j: number) => {
+  //   if (!channel.visible) {
+  //     modifiedData[j] = new Array(arrayLength).fill(0);
+  //   } else {
+  //     modifiedData[j] = originalData[activeImagePlane][j].map(
+  //         (pixel: number) => {
+  //           if (pixel < channel.range[0]) return 0;
+  //           if (pixel >= channel.range[1]) return 255;
+  //           return (
+  //               255 *
+  //               ((pixel - channel.range[0]) /
+  //                   (channel.range[1] - channel.range[0]))
+  //           );
+  //         }
+  //     );
+  //   }
+  // });
+
   //iterate through each channel
-  for (let i = 0; i < data.length; i++) {
+  for (let channel_idx = 0; channel_idx < data.length; channel_idx++) {
+    const color = colors[channel_idx];
+
     //for each channel
-    const channel: Array<number> = data[i];
+    const channelData: Array<number> = data[channel_idx];
     const max = 255; //TODO is it okay to assume 8-bit for now
-    const mappedChannel: Array<Array<number>> = [];
-    channel.forEach((value: number, j: number) => {
-      //iterate through each pixel
-      const red: number = (colors[i][0] * value) / max;
-      const green: number = (colors[i][1] * value) / max;
-      const blue: number = (colors[i][2] * value) / max;
-      mappedChannel.push([red, green, blue]);
-    });
+    let mappedChannel: Array<Array<number>> = [];
+
+    if (!color.visible) {
+      mappedChannel = new Array(channelData.length).fill([0, 0, 0]);
+    } else {
+      channelData.forEach((pixel: number, j: number) => {
+        let mapped_pixel: number = pixel;
+        if (pixel < color.range[0]) {
+          mapped_pixel = 0;
+        } else if (pixel >= color.range[1]) {
+          mapped_pixel = 255;
+        } else {
+          mapped_pixel =
+            255 *
+            ((pixel - color.range[0]) / (color.range[1] - color.range[0]));
+        }
+        //iterate through each pixel
+        const red: number = (color.color[0] * mapped_pixel) / max;
+        const green: number = (color.color[1] * mapped_pixel) / max;
+        const blue: number = (color.color[2] * mapped_pixel) / max;
+        mappedChannel.push([red, green, blue]);
+      });
+    }
+
     mappedChannels.push(mappedChannel);
   }
 

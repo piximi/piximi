@@ -3,7 +3,17 @@ import { Grid, IconButton, Menu } from "@mui/material";
 import LensIcon from "@mui/icons-material/Lens";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { DEFAULT_COLORS } from "../../../../../types/Colors";
-import { rgbToHex } from "../../../../../image/imageHelper";
+import {
+  mapChannelstoSpecifiedRGBImage,
+  rgbToHex,
+} from "../../../../../image/imageHelper";
+import { imageViewerSlice } from "../../../../../store/slices";
+import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
+import { useDispatch, useSelector } from "react-redux";
+import { ChannelType } from "../../../../../types/ChannelType";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 
 type PaletteProps = {
   channelIdx: number;
@@ -13,7 +23,18 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
   const default_colors = DEFAULT_COLORS;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
   const open = Boolean(anchorEl);
+
+  const colors = useSelector(channelsSelector);
+
+  const originalData = useSelector(imageOriginalSrcSelector);
+
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
+
+  const imageShape = useSelector(imageShapeSelector);
+
+  const dispatch = useDispatch();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -27,10 +48,26 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     event:
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLButtonElement>,
-    color: Array<number>
+    newColor: Array<number>
   ) => {
-    //TODO obtain the channel index (a number), and update with color passed to function
-    console.info(color, channelIdx);
+    const updatedColors: Array<ChannelType> = colors.map(
+      (color: ChannelType, i: number) => {
+        return i === channelIdx ? { ...color, color: newColor } : color;
+      }
+    );
+
+    dispatch(imageViewerSlice.actions.setChannels({ channels: updatedColors }));
+
+    if (!originalData || !imageShape) return;
+
+    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      originalData[activeImagePlane],
+      updatedColors,
+      imageShape.height,
+      imageShape.width
+    );
+    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+
     handleClose();
   };
 
