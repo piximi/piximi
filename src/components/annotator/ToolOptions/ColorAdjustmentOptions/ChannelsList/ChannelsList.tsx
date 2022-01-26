@@ -16,9 +16,9 @@ import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSel
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
-import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
+import { Palette } from "../Palette";
 
 type ColorAdjustmentSlidersProp = {
   updateDisplayedValues: (values: Array<Array<number>>) => void;
@@ -197,7 +197,7 @@ export const ChannelsList = ({
         <Slider
           key={index}
           disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
-          style={{ width: "60%" }}
+          sx={{ width: "50%" }}
           value={displayedValue}
           max={255}
           onChange={(event, value: number | number[]) =>
@@ -207,6 +207,7 @@ export const ChannelsList = ({
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
         />
+        <Palette channelIdx={index} />
       </ListItem>
     );
   };
@@ -215,8 +216,12 @@ export const ChannelsList = ({
     if (!imageShape) return;
     const sliders = [];
 
-    const names =
-      imageShape.channels === 1 ? ["Grey"] : ["Red", "Green", "Blue"];
+    const names: Array<string> = [];
+
+    for (let i = 0; i < imageShape.channels; i++) {
+      names.push(`Ch. ${i}`);
+    }
+
     for (let i = 0; i < imageShape.channels; i++) {
       sliders.push(colorAdjustmentSlider(i, names[i], displayedValues[i]));
     }

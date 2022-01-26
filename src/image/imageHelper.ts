@@ -501,6 +501,20 @@ const hexToRgb = (hex: string) => {
     : null;
 };
 
+export const rgbToHex = (rgb: Array<number>) => {
+  return (
+    "#" +
+    componentToHex(rgb[0]) +
+    componentToHex(rgb[1]) +
+    componentToHex(rgb[2])
+  );
+};
+
+const componentToHex = (c: number) => {
+  var hex = c.toString(16);
+  return hex.length === 1 ? "0" + hex : hex;
+};
+
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   images: Array<ImageType>,
   categories: Array<Category>,
