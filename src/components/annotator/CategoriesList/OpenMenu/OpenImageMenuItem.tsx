@@ -4,12 +4,10 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import {
   addImages,
-  imageViewerSlice,
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
 import { convertFileToImage } from "../../../../image/imageHelper";
-import { DEFAULT_COLORS } from "../../../../types/Colors";
 
 type OpenImageMenuItemProps = {
   popupState: any;

@@ -1,6 +1,6 @@
 import { ListItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import Slider from "@mui/material/Slider";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
@@ -20,9 +20,7 @@ import { activeImagePlaneSelector } from "../../../../../store/selectors/activeI
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
 
-type ColorAdjustmentSlidersProp = {};
-
-export const ChannelsList = ({}: ColorAdjustmentSlidersProp) => {
+export const ChannelsList = () => {
   const dispatch = useDispatch();
 
   const channels = useSelector(channelsSelector);
@@ -176,33 +174,13 @@ export const ChannelsList = ({}: ColorAdjustmentSlidersProp) => {
     );
   };
 
-  const allSliders = () => {
-    if (!imageShape) return;
-    const sliders = [];
-
-    const names: Array<string> = [];
-
-    for (let i = 0; i < imageShape.channels; i++) {
-      names.push(`Ch. ${i}`);
-    }
-
-    for (let i = 0; i < imageShape.channels; i++) {
-      sliders.push(colorAdjustmentSlider(i, names[i]));
-    }
-
-    return sliders;
-  };
-
   return (
     <CollapsibleList closed dense primary="Channels">
-      {/*{allSliders}*/}
       {Array(channels.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);
         })}
-      {/*{colorAdjustmentSlider(0, "Tests")}*/}
-      {/*{colorAdjustmentSlider(1, "Tests2")}*/}
     </CollapsibleList>
   );
 };

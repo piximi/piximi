@@ -33,7 +33,7 @@ export const ColorAdjustmentOptions = () => {
       defaultChannels.push({
         color: DEFAULT_COLORS[i],
         range: [0, 255],
-        visible: true,
+        visible: !(components > 3 && i > 0),
       });
     }
     return defaultChannels;
