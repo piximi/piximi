@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -8,7 +8,6 @@ import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
@@ -28,12 +27,6 @@ export const ColorAdjustmentOptions = () => {
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const channels = useSelector(channelsSelector);
-
-  const [displayedValues, setDisplayedValues] = useState<Array<Array<number>>>(
-    channels.map((channel: ChannelType) => [...channel.range])
-  ); //we keep that state variable here and pass it to slider so that visible slider ranges can change accordingly
-
   const generateDefaultChannels = (components: number) => {
     const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
     for (let i = 0; i < components; i++) {
@@ -46,41 +39,26 @@ export const ColorAdjustmentOptions = () => {
     return defaultChannels;
   };
 
-  useEffect(() => {
-    if (!originalData) return;
-
-    if (!imageShape) return;
-
-    setDisplayedValues(
-      channels.map((channel: ChannelType) => [...channel.range])
-    );
-  }, [originalData, imageShape, channels]);
-
   const onResetChannelsClick = () => {
     if (!imageShape) return;
+
     const defaultChannels = generateDefaultChannels(imageShape.channels);
+
     dispatch(
       imageViewerSlice.actions.setChannels({
         channels: defaultChannels,
       })
-    );
-    setDisplayedValues(
-      defaultChannels.map((channel: ChannelType) => [...channel.range])
     );
 
     if (!originalData || !imageShape) return;
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
       originalData[activeImagePlane],
-      channels,
+      defaultChannels,
       imageShape.height,
       imageShape.width
     );
     dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-  };
-
-  const updateDisplayedValues = (values: Array<Array<number>>) => {
-    setDisplayedValues(values);
   };
 
   return (
