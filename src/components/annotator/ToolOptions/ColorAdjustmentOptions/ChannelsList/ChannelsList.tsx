@@ -1,6 +1,6 @@
 import { ListItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import Slider from "@mui/material/Slider";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
@@ -20,15 +20,9 @@ import { activeImagePlaneSelector } from "../../../../../store/selectors/activeI
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
 
-type ColorAdjustmentSlidersProp = {
-  updateDisplayedValues: (values: Array<Array<number>>) => void;
-  displayedValues: Array<Array<number>>;
-};
+type ColorAdjustmentSlidersProp = {};
 
-export const ChannelsList = ({
-  displayedValues,
-  updateDisplayedValues,
-}: ColorAdjustmentSlidersProp) => {
+export const ChannelsList = ({}: ColorAdjustmentSlidersProp) => {
   const dispatch = useDispatch();
 
   const channels = useSelector(channelsSelector);
@@ -48,12 +42,14 @@ export const ChannelsList = ({
     event: any,
     newValue: number | number[]
   ) => {
-    const copiedValues = [...displayedValues].map((range: Array<number>) => {
-      return [...range];
+    const oldValues = channels.map((channel: ChannelType, i: number) => {
+      if (i === idx) {
+        return newValue as Array<number>;
+      } else {
+        return channel.range;
+      }
     });
-    copiedValues[idx] = newValue as Array<number>;
-    updateDisplayedValues(copiedValues);
-    handler(copiedValues);
+    handler(oldValues);
   };
 
   const handler = useCallback(
@@ -139,11 +135,7 @@ export const ChannelsList = ({
     });
   };
 
-  const colorAdjustmentSlider = (
-    index: number,
-    name: string,
-    displayedValue: Array<number>
-  ) => {
+  const colorAdjustmentSlider = (index: number, name: string) => {
     return (
       <ListItem dense key={index}>
         <ListItemIcon>
@@ -170,7 +162,7 @@ export const ChannelsList = ({
           key={index}
           disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
           sx={{ width: "50%" }}
-          value={displayedValue}
+          value={channels[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(index, event, value)
@@ -184,7 +176,7 @@ export const ChannelsList = ({
     );
   };
 
-  const allSliders = (displayedValues: Array<Array<number>>) => {
+  const allSliders = () => {
     if (!imageShape) return;
     const sliders = [];
 
@@ -195,14 +187,22 @@ export const ChannelsList = ({
     }
 
     for (let i = 0; i < imageShape.channels; i++) {
-      sliders.push(colorAdjustmentSlider(i, names[i], displayedValues[i]));
+      sliders.push(colorAdjustmentSlider(i, names[i]));
     }
+
     return sliders;
   };
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {allSliders(displayedValues)}
+      {/*{allSliders}*/}
+      {Array(channels.length)
+        .fill(0)
+        .map((_, i) => {
+          return colorAdjustmentSlider(i, `Ch. ${i}`);
+        })}
+      {/*{colorAdjustmentSlider(0, "Tests")}*/}
+      {/*{colorAdjustmentSlider(1, "Tests2")}*/}
     </CollapsibleList>
   );
 };

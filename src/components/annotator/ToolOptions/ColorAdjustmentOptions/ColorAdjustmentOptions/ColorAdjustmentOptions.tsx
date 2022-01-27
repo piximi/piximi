@@ -35,7 +35,7 @@ export const ColorAdjustmentOptions = () => {
   ); //we keep that state variable here and pass it to slider so that visible slider ranges can change accordingly
 
   const generateDefaultChannels = (components: number) => {
-    const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
+    const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
     for (let i = 0; i < components; i++) {
       defaultChannels.push({
         color: DEFAULT_COLORS[i],
@@ -93,10 +93,7 @@ export const ColorAdjustmentOptions = () => {
 
       <Divider />
 
-      <ChannelsList
-        displayedValues={displayedValues}
-        updateDisplayedValues={updateDisplayedValues}
-      />
+      <ChannelsList />
 
       <Divider />
 
