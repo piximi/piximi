@@ -149,6 +149,7 @@ export const extractChannelsFromFlattenedArray = (
    * **/
   if (channels === 1) {
     //if greyscale, leave array as is, no need to extract, individual channel values
+    //TODO maybe all images should be converted to RGB, and "greyscale" means replicated R, G, and B channels
     return [Array.from(flattened)];
   }
 
@@ -169,14 +170,17 @@ export const extractChannelsFromFlattenedArray = (
   return results;
 };
 
-export const convertFileToImage = async (file: File): Promise<ImageType> => {
+export const convertFileToImage = async (
+  file: File,
+  dimension_order?: string
+): Promise<ImageType> => {
   /**
    * Returns image to be provided to dispatch
    * **/
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
       ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        resolve(convertImageJStoImage(image, file.name));
+        resolve(convertImageJStoImage(image, file.name, dimension_order));
       });
     });
   });
@@ -202,7 +206,8 @@ export const convertImageDataToURI = (
 
 export const convertImageJStoImage = (
   image: ImageJS.Image,
-  filename: string
+  filename: string,
+  dimension_order?: string
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type. Return Image.
@@ -217,44 +222,79 @@ export const convertImageJStoImage = (
   let imageSrc: string;
 
   if (Array.isArray(image)) {
-    //case where user uploaded a z-stack
-    nplanes = image.length;
+    //Two possible cases here: either user uploaded z-stack or uploaded multi-channel image (dimension CYZ)
+
     height = image[0].height;
     width = image[0].width;
-    channels = image[0].components;
 
-    for (let j = 0; j < nplanes; j++) {
-      channelsData.push(
-        extractChannelsFromFlattenedArray(
-          image[j].data as Uint8Array,
-          channels,
-          image[j].height * image[j].width
-        )
-      );
-    }
+    if (dimension_order === "depth_first") {
+      //user uploaded multi-channel image
+      nplanes = image.length;
 
-    const middleIndex = Math.floor(nplanes / 2);
+      channels = image[0].components;
 
-    if (
-      image[middleIndex].components === 1 ||
-      image[middleIndex].components === 3
-    ) {
-      //Assume greyscale image
-      imageSrc = convertImageDataToURI(
-        image[middleIndex].width,
-        image[middleIndex].height,
-        image[middleIndex].data,
-        image[middleIndex].components,
-        image[middleIndex].alpha
-      );
+      for (let j = 0; j < nplanes; j++) {
+        channelsData.push(
+          extractChannelsFromFlattenedArray(
+            image[j].data as Uint8Array,
+            channels,
+            image[j].height * image[j].width
+          )
+        );
+      }
+
+      const middleIndex = Math.floor(nplanes / 2);
+
+      if (
+        image[middleIndex].components === 1 ||
+        image[middleIndex].components === 3
+      ) {
+        //Assume greyscale image
+        imageSrc = convertImageDataToURI(
+          image[middleIndex].width,
+          image[middleIndex].height,
+          image[middleIndex].data,
+          image[middleIndex].components,
+          image[middleIndex].alpha
+        );
+      } else {
+        imageSrc = mapChannelsToDefaultColorImage(
+          channelsData[middleIndex],
+          height,
+          width
+        );
+      }
     } else {
-      imageSrc = mapChannelsToDefaultColorImage(
-        channelsData[middleIndex],
-        height,
-        width
+      //user uploaded multi-channel image
+      channels = image.length;
+
+      const tmp: Array<Array<number>> = [];
+
+      for (let j = 0; j < channels; j++) {
+        //iterate over each image (which is a channel), push to array
+        tmp.push(
+          extractChannelsFromFlattenedArray(
+            image[j].data as Uint8Array,
+            image[j].components,
+            height * width
+          )[0]
+        );
+      }
+
+      channelsData.push(tmp);
+
+      const idx = 0; //the channel we choose to show as image preview
+
+      imageSrc = convertImageDataToURI(
+        image[idx].width,
+        image[idx].height,
+        Array.from(image[idx].data),
+        image[idx].components,
+        image[idx].alpha
       );
     }
   } else {
+    //Case where image of dimension YXC was uploaded, C is probably just 1 (grayscale) or 3 (RGB)
     channelsData = [
       extractChannelsFromFlattenedArray(
         image.data as Uint8Array,

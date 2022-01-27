@@ -7,7 +7,7 @@ export type Image = {
   id: string;
   name: string;
   src: string;
-  originalSrc: Array<Array<Array<number>>>; //TODO explain this;
+  originalSrc: Array<Array<Array<number>>>; //TODO explain this (Z x C x mn) where mxn image;
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;

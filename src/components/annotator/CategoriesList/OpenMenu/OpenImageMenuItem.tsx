@@ -4,10 +4,12 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import {
   addImages,
+  imageViewerSlice,
   setActiveImage,
   setSelectedAnnotations,
 } from "../../../../store/slices";
 import { convertFileToImage } from "../../../../image/imageHelper";
+import { DEFAULT_COLORS } from "../../../../types/Colors";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -36,7 +38,10 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
           })
         );
       }
-      const image = await convertFileToImage(files[i]);
+      const dimension_order = "channels_first"; //TODO at some point (obviously) we don't want this to be hard coded
+
+      const image = await convertFileToImage(files[i], dimension_order);
+
       batch(() => {
         dispatch(addImages({ newImages: [image] }));
         if (i === 0) dispatch(setActiveImage({ image: image.id }));
