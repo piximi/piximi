@@ -70,6 +70,7 @@ import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/
 import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 import { AppBarOffset } from "components/styled/AppBarOffset";
+import { generateDefaultChannels } from "../../../../image/imageHelper";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -234,6 +235,12 @@ export const CategoriesList = () => {
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
+
+      dispatch(
+        imageViewerSlice.actions.setChannels({
+          channels: generateDefaultChannels(image.shape.channels),
+        })
+      );
 
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({

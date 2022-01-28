@@ -309,8 +309,6 @@ export const convertImageJStoImage = (
     channels = image.components;
     nplanes = 1;
 
-    console.info(image.data.length);
-
     channelsData = [
       extractChannelsFromFlattenedArray(
         image.data as Uint8Array,
@@ -346,6 +344,25 @@ export const convertImageJStoImage = (
     partition: Partition.Inference,
     src: imageSrc,
   };
+};
+
+export const generateDefaultChannels = (components: number) => {
+  let defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
+  if (components === 1) {
+    defaultChannels = [
+      { color: [255, 255, 255], range: [0, 255], visible: true },
+    ];
+  } else {
+    for (let i = 0; i < components; i++) {
+      defaultChannels.push({
+        color: DEFAULT_COLORS[i],
+        range: [0, 255],
+        visible: !(components > 3 && i > 0),
+      });
+    }
+  }
+
+  return defaultChannels;
 };
 
 export const connectPoints = (

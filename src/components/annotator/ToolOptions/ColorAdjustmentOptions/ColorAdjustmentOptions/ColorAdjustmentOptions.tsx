@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -8,12 +8,13 @@ import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
-import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
-import { DEFAULT_COLORS } from "../../../../../types/Colors";
-import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
+import {
+  generateDefaultChannels,
+  mapChannelstoSpecifiedRGBImage,
+} from "../../../../../image/imageHelper";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ColorAdjustmentOptions = () => {
@@ -26,25 +27,6 @@ export const ColorAdjustmentOptions = () => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const imageShape = useSelector(imageShapeSelector);
-
-  const generateDefaultChannels = (components: number) => {
-    let defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
-    if (components === 1) {
-      defaultChannels = [
-        { color: [255, 255, 255], range: [0, 255], visible: true },
-      ];
-    } else {
-      for (let i = 0; i < components; i++) {
-        defaultChannels.push({
-          color: DEFAULT_COLORS[i],
-          range: [0, 255],
-          visible: !(components > 3 && i > 0),
-        });
-      }
-    }
-
-    return defaultChannels;
-  };
 
   const onResetChannelsClick = () => {
     if (!imageShape) return;
@@ -69,9 +51,9 @@ export const ColorAdjustmentOptions = () => {
     dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
-  useEffect(() => {
-    onResetChannelsClick();
-  }, [onResetChannelsClick]);
+  // useEffect(() => {
+  //   onResetChannelsClick();
+  // }, [onResetChannelsClick]);
 
   return (
     <>

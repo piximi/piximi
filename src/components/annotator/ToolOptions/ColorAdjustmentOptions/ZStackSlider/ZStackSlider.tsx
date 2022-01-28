@@ -4,10 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
-import {
-  convertImageDataToURI,
-  mapChannelstoSpecifiedRGBImage,
-} from "../../../../../image/imageHelper";
+import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 
 export const ZStackSlider = () => {
@@ -25,25 +22,13 @@ export const ZStackSlider = () => {
     if (typeof newValue === "number") {
       setValue(newValue);
       const imageData = activeImage.originalSrc[newValue];
-      let imageSrc: string;
 
-      if (activeImage.shape.channels === 1) {
-        //if greyscale image, no need for any color re-mapping
-        imageSrc = convertImageDataToURI(
-          activeImage.shape.width,
-          activeImage.shape.height,
-          imageData[0],
-          1,
-          0
-        );
-      } else {
-        imageSrc = mapChannelstoSpecifiedRGBImage(
-          imageData,
-          channels,
-          activeImage.shape.height,
-          activeImage.shape.width
-        );
-      }
+      const imageSrc = mapChannelstoSpecifiedRGBImage(
+        imageData,
+        channels,
+        activeImage.shape.height,
+        activeImage.shape.width
+      );
 
       dispatch(
         imageViewerSlice.actions.setImageSrc({

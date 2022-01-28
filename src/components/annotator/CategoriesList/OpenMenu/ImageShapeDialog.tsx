@@ -4,13 +4,16 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { convertFilesToImages } from "../../../../image/imageHelper";
+import {
+  convertFileToImage,
+  generateDefaultChannels,
+} from "../../../../image/imageHelper";
 import { useDispatch } from "react-redux";
-import { addImages } from "../../../../store/slices";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "../../../../icons";
 import { Button, DialogActions, TextField } from "@mui/material";
+import { imageViewerSlice } from "../../../../store/slices";
 
 export interface ImageShapeDialogProps {
   files: FileList;
@@ -28,9 +31,18 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   const onClick = async () => {
     onClose();
 
-    const newImages = await convertFilesToImages(files, isStack);
-
-    dispatch(addImages({ newImages: newImages }));
+    for (let i = 0; i < files.length; i++) {
+      const image = await convertFileToImage(files[i], isStack);
+      dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
+      if (i === 0) {
+        dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
+        dispatch(
+          imageViewerSlice.actions.setChannels({
+            channels: generateDefaultChannels(image.shape.channels),
+          })
+        );
+      }
+    }
   };
 
   return (

@@ -19,7 +19,6 @@ import {
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
-import { DEFAULT_COLORS } from "../../types/Colors";
 
 const initialImage =
   process.env.NODE_ENV === "development" ||
@@ -104,7 +103,7 @@ const initialState: ImageViewer = {
   contrast: 0,
   exposure: 0,
   hue: 0,
-  activeImageId: initialImage ? initialImage.id : undefined,
+  activeImageId: undefined, //TODO fixme this should be: initialImage ? initialImage.id : undefined -- but it caused errors if you have it defined, and there is no initialImage (which we dont for now)
   activeImagePlane: 0,
   images: initialImage ? [] : [], //TODO fixme
   language: LanguageType.English,
@@ -150,12 +149,8 @@ export const imageViewerSlice = createSlice({
         return image.name.split(".")[0];
       });
 
-      let activeImageId: string | undefined = state.activeImageId;
-
       const updatedImages = action.payload.newImages.map(
         (image: Image, i: number) => {
-          if (!state.images.length && i === 0) activeImageId = image.id;
-
           const initialName = image.name.split(".")[0]; //get name before file extension
           //add filename extension to updatedName
           const updatedName =
@@ -169,8 +164,6 @@ export const imageViewerSlice = createSlice({
       state.selectedAnnotations = [];
 
       state.images.push(...updatedImages);
-
-      state.activeImageId = activeImageId;
     },
     clearCategoryAnnotations(
       state: ImageViewer,
@@ -351,19 +344,19 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ image: string }>
     ) {
       state.activeImageId = action.payload.image;
-      const activeImage = state.images.find((image: Image) => {
-        return image.id === action.payload.image;
-      });
-      if (!activeImage) return;
-      const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
-      for (let i = 0; i < activeImage.shape.channels; i++) {
-        defaultChannels.push({
-          color: DEFAULT_COLORS[i],
-          range: [0, 255],
-          visible: !(i > 0 && activeImage.shape.channels > 3), //if multi-channel image, only show the first channel. User can toggle on the other components if desired.
-        });
-      }
-      state.channels = defaultChannels;
+      // const activeImage = state.images.find((image: Image) => {
+      //   return image.id === action.payload.image;
+      // });
+      // if (!activeImage) return;
+      // const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
+      // for (let i = 0; i < activeImage.shape.channels; i++) {
+      //   defaultChannels.push({
+      //     color: DEFAULT_COLORS[i],
+      //     range: [0, 255],
+      //     visible: !(i > 0 && activeImage.shape.channels > 3), //if multi-channel image, only show the first channel. User can toggle on the other components if desired.
+      //   });
+      // }
+      // state.channels = defaultChannels;
     },
     setActiveImagePlane(
       state: ImageViewer,
