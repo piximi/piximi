@@ -1,65 +1,53 @@
-import { batch, useDispatch } from "react-redux";
 import React, { ChangeEvent } from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import {
-  addImages,
-  setActiveImage,
-  setSelectedAnnotations,
-} from "../../../../store/slices";
-import { convertFileToImage } from "../../../../image/imageHelper";
+import { DimensionsOrderDialog } from "./DimensionsOrderDialog";
 
 type OpenImageMenuItemProps = {
   popupState: any;
 };
 
 export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
-  const dispatch = useDispatch();
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
+    React.useState(false);
 
-  const onOpenImage = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    onClose: () => void
-  ) => {
-    onClose();
+  const handleClose = () => {
+    setOpenDimensionsDialogBox(false);
+    popupState.close();
+  };
+
+  const [files, setFiles] = React.useState<FileList>();
+
+  const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.persist();
 
     if (!event.currentTarget.files) return;
 
-    const files = event.currentTarget.files;
+    setFiles(event.currentTarget.files);
 
-    for (let i = 0; i < files.length; i++) {
-      if (i === 0) {
-        dispatch(
-          setSelectedAnnotations({
-            selectedAnnotations: [],
-            selectedAnnotation: undefined,
-          })
-        );
-      }
-      const dimension_order = "channels_first"; //TODO at some point (obviously) we don't want this to be hard coded
-
-      const image = await convertFileToImage(files[i], dimension_order);
-
-      batch(() => {
-        dispatch(addImages({ newImages: [image] }));
-        if (i === 0) dispatch(setActiveImage({ image: image.id }));
-      });
-    }
+    setOpenDimensionsDialogBox(true); //open dialog box
   };
 
   return (
-    <MenuItem component="label">
-      <ListItemText primary="Open new image" />
-      <input
-        accept="image/*"
-        hidden
-        multiple
-        id="open-image"
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          onOpenImage(event, popupState.close)
-        }
-        type="file"
+    <React.Fragment>
+      <MenuItem component="label">
+        <ListItemText primary="Open new image" />
+        <input
+          accept="image/*"
+          hidden
+          multiple
+          id="open-image"
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onOpenImage(event)
+          }
+          type="file"
+        />
+      </MenuItem>
+      <DimensionsOrderDialog
+        files={files!}
+        open={openDimensionsDialogBox}
+        onClose={handleClose}
       />
-    </MenuItem>
+    </React.Fragment>
   );
 };

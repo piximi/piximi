@@ -20,6 +20,7 @@ import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
 import { DEFAULT_COLORS } from "../../types/Colors";
+import { DimensionOrder } from "../../types/DimensionOrder";
 
 const initialImage =
   process.env.NODE_ENV === "development" ||
@@ -102,6 +103,7 @@ const initialState: ImageViewer = {
   currentIndex: 0,
   cursor: "default",
   contrast: 0,
+  dimensionOrder: DimensionOrder.YXC,
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
