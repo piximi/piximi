@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import { DimensionsOrderDialog } from "./DimensionsOrderDialog";
+import { ImageShapeDialog } from "./ImageShapeDialog";
 
 type OpenImageMenuItemProps = {
   popupState: any;
@@ -43,7 +43,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
           type="file"
         />
       </MenuItem>
-      <DimensionsOrderDialog
+      <ImageShapeDialog
         files={files!}
         open={openDimensionsDialogBox}
         onClose={handleClose}

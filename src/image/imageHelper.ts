@@ -47,24 +47,6 @@ export const mapChannelstoSpecifiedRGBImage = (
 
   const mappedChannels = [];
 
-  // channels.forEach((channel: ChannelType, j: number) => {
-  //   if (!channel.visible) {
-  //     modifiedData[j] = new Array(arrayLength).fill(0);
-  //   } else {
-  //     modifiedData[j] = originalData[activeImagePlane][j].map(
-  //         (pixel: number) => {
-  //           if (pixel < channel.range[0]) return 0;
-  //           if (pixel >= channel.range[1]) return 255;
-  //           return (
-  //               255 *
-  //               ((pixel - channel.range[0]) /
-  //                   (channel.range[1] - channel.range[0]))
-  //           );
-  //         }
-  //     );
-  //   }
-  // });
-
   //iterate through each channel
   for (let channel_idx = 0; channel_idx < data.length; channel_idx++) {
     const color = colors[channel_idx];
@@ -145,11 +127,11 @@ export const extractChannelsFromFlattenedArray = (
   pixels: number
 ): Array<Array<number>> => {
   /**
-   * Given a flattened data array from RGB imageJ Image of type [channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately and return that
+   * Given a flattened data array from greyscale ir RGB imageJ Image[channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately
+   * as array.
    * **/
   if (channels === 1) {
     //if greyscale, leave array as is, no need to extract, individual channel values
-    //TODO maybe all images should be converted to RGB, and "greyscale" means replicated R, G, and B channels
     return [Array.from(flattened)];
   }
 
@@ -172,7 +154,7 @@ export const extractChannelsFromFlattenedArray = (
 
 export const convertFileToImage = async (
   file: File,
-  dimension_order?: string
+  z_stack?: boolean
 ): Promise<ImageType> => {
   /**
    * Returns image to be provided to dispatch
@@ -180,7 +162,45 @@ export const convertFileToImage = async (
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
       ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        resolve(convertImageJStoImage(image, file.name, dimension_order));
+        resolve(convertImageJStoImage(image, file.name, z_stack));
+      });
+    });
+  });
+};
+
+export const convertFilesToImages = async (
+  files: FileList,
+  is_stack?: boolean
+) => {
+  /**
+   * Give File List, iterate over each files, get image, and return list of images to update
+   * **/
+  const newImages: Array<ImageType> = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const image = await convertFileToImage(files[i], is_stack);
+    newImages.push(image);
+  }
+
+  return newImages;
+};
+
+export const isArrayOfImages = async (
+  file: File,
+  callback: () => void
+): Promise<boolean> => {
+  /**
+   * Checks whether the selected file corresponds to an array of images. In which case we need clarification from user whether this image is a z-stack or not.
+   * **/
+  return new Promise((resolve, reject) => {
+    return file.arrayBuffer().then((buffer) => {
+      ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
+        if (Array.isArray(image)) {
+          callback();
+          resolve(true);
+        } else {
+          resolve(false);
+        }
       });
     });
   });
@@ -207,7 +227,7 @@ export const convertImageDataToURI = (
 export const convertImageJStoImage = (
   image: ImageJS.Image,
   filename: string,
-  dimension_order?: string
+  z_stack?: boolean
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type. Return Image.
@@ -219,21 +239,20 @@ export const convertImageJStoImage = (
   let width: number;
   let channelsData: Array<Array<Array<number>>> = [];
   let channels: number;
+
   let imageSrc: string;
 
   if (Array.isArray(image)) {
-    //Two possible cases here: either user uploaded z-stack or uploaded multi-channel image (dimension CYZ)
-
     height = image[0].height;
     width = image[0].width;
 
-    if (dimension_order === "depth_first") {
-      //user uploaded multi-channel image
+    if (z_stack) {
+      //user uploaded z stack image: assuming dimensions ZXYC
       nplanes = image.length;
 
-      channels = image[0].components;
+      channels = image[0].components; //this will be either 1 (greyscale) or 3 (rgb)
 
-      for (let j = 0; j < nplanes; j++) {
+      for (let j = 0; j < image.length; j++) {
         channelsData.push(
           extractChannelsFromFlattenedArray(
             image[j].data as Uint8Array,
@@ -243,30 +262,19 @@ export const convertImageJStoImage = (
         );
       }
 
-      const middleIndex = Math.floor(nplanes / 2);
-
-      if (
-        image[middleIndex].components === 1 ||
-        image[middleIndex].components === 3
-      ) {
-        //Assume greyscale image
-        imageSrc = convertImageDataToURI(
-          image[middleIndex].width,
-          image[middleIndex].height,
-          image[middleIndex].data,
-          image[middleIndex].components,
-          image[middleIndex].alpha
-        );
-      } else {
-        imageSrc = mapChannelsToDefaultColorImage(
-          channelsData[middleIndex],
-          height,
-          width
-        );
-      }
+      //make imageSrc using middle image
+      const middleIndex = Math.floor(image.length / 2);
+      imageSrc = convertImageDataToURI(
+        width,
+        height,
+        image[middleIndex].data,
+        channels,
+        image[middleIndex].alpha
+      );
     } else {
-      //user uploaded multi-channel image
+      //user has uploaded a multi-channel image (CXY), which was loaded as an array of images (one channel per image).
       channels = image.length;
+      nplanes = 1;
 
       const tmp: Array<Array<number>> = [];
 
@@ -275,7 +283,7 @@ export const convertImageJStoImage = (
         tmp.push(
           extractChannelsFromFlattenedArray(
             image[j].data as Uint8Array,
-            image[j].components,
+            1,
             height * width
           )[0]
         );
@@ -283,18 +291,26 @@ export const convertImageJStoImage = (
 
       channelsData.push(tmp);
 
-      const idx = 0; //the channel we choose to show as image preview
+      const idx = 0; //the channel we choose ton show as image preview
 
       imageSrc = convertImageDataToURI(
         image[idx].width,
         image[idx].height,
         Array.from(image[idx].data),
-        image[idx].components,
+        1,
         image[idx].alpha
       );
     }
   } else {
-    //Case where image of dimension YXC was uploaded, C is probably just 1 (grayscale) or 3 (RGB)
+    //Case where image of dimension YXC was uploaded, C is  just 1 (grayscale) or 3 (RGB)
+
+    height = image.height;
+    width = image.width;
+    channels = image.components;
+    nplanes = 1;
+
+    console.info(image.data.length);
+
     channelsData = [
       extractChannelsFromFlattenedArray(
         image.data as Uint8Array,
@@ -303,29 +319,13 @@ export const convertImageJStoImage = (
       ),
     ];
 
-    if (image.components === 1 || image.components === 3) {
-      //Assume greyscale image
-
-      imageSrc = convertImageDataToURI(
-        image.width,
-        image.height,
-        Array.from(image.data),
-        image.components,
-        image.alpha
-      );
-    } else {
-      //handling case where user uploaded a multi-channel image that is channels not 1 or 3 (not greyscale or RGB)
-      //TODO if a color palette has already been specified by user, apply this color palette instead of using defualt color pallete?
-      imageSrc = mapChannelsToDefaultColorImage(
-        channelsData[0],
-        image.height,
-        image.width
-      );
-    }
-
-    height = image.height;
-    width = image.width;
-    channels = image.components;
+    imageSrc = convertImageDataToURI(
+      width,
+      height,
+      Array.from(image.data),
+      channels,
+      image.alpha
+    );
   }
 
   const shape: ShapeType = {

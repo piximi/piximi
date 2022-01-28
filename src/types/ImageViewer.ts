@@ -17,7 +17,6 @@ export type ImageViewer = {
   currentIndex: number;
   currentPosition?: { x: number; y: number };
   cursor: string;
-  dimensionOrder: string;
   exposure: number;
   hue: number;
   activeImageId?: string;

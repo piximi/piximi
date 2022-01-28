@@ -20,7 +20,6 @@ import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
 import { DEFAULT_COLORS } from "../../types/Colors";
-import { DimensionOrder } from "../../types/DimensionOrder";
 
 const initialImage =
   process.env.NODE_ENV === "development" ||
@@ -103,7 +102,6 @@ const initialState: ImageViewer = {
   currentIndex: 0,
   cursor: "default",
   contrast: 0,
-  dimensionOrder: DimensionOrder.YXC,
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
@@ -151,17 +149,28 @@ export const imageViewerSlice = createSlice({
       const imageNames = state.images.map((image: Image) => {
         return image.name.split(".")[0];
       });
-      const updatedImages = action.payload.newImages.map((image: Image) => {
-        const initialName = image.name.split(".")[0]; //get name before file extension
-        //add filename extension to updatedName
-        const updatedName =
-          replaceDuplicateName(initialName, imageNames) +
-          "." +
-          image.name.split(".")[1];
-        return { ...image, name: updatedName };
-      });
+
+      let activeImageId: string | undefined = state.activeImageId;
+
+      const updatedImages = action.payload.newImages.map(
+        (image: Image, i: number) => {
+          if (!state.images.length && i === 0) activeImageId = image.id;
+
+          const initialName = image.name.split(".")[0]; //get name before file extension
+          //add filename extension to updatedName
+          const updatedName =
+            replaceDuplicateName(initialName, imageNames) +
+            "." +
+            image.name.split(".")[1];
+          return { ...image, name: updatedName };
+        }
+      );
+
+      state.selectedAnnotations = [];
 
       state.images.push(...updatedImages);
+
+      state.activeImageId = activeImageId;
     },
     clearCategoryAnnotations(
       state: ImageViewer,

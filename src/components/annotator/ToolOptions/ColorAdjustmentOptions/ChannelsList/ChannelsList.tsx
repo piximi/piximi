@@ -142,16 +142,8 @@ export const ChannelsList = () => {
             checked={visibleChannelsIndices.indexOf(index) !== -1}
             disableRipple
             edge="start"
-            icon={
-              <>
-                <CheckboxUncheckedIcon />
-              </>
-            }
-            checkedIcon={
-              <>
-                <CheckboxCheckedIcon />
-              </>
-            }
+            icon={<CheckboxUncheckedIcon />}
+            checkedIcon={<CheckboxCheckedIcon />}
             tabIndex={-1}
           />
         </ListItemIcon>

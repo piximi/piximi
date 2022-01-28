@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -58,8 +58,13 @@ export const ColorAdjustmentOptions = () => {
       imageShape.height,
       imageShape.width
     );
+
     dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
+
+  useEffect(() => {
+    onResetChannelsClick();
+  }, [onResetChannelsClick]);
 
   return (
     <>
