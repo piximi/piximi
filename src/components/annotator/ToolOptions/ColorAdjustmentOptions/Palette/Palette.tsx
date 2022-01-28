@@ -122,6 +122,9 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
           <Grid container item>
             <FormRow colors={default_colors.slice(3, 6)} />
           </Grid>
+          <Grid container item>
+            <ColorIcon color={[255, 255, 255]} />
+          </Grid>
         </Grid>
       </Menu>
     </React.Fragment>

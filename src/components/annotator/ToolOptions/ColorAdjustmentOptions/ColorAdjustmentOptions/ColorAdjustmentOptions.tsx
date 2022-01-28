@@ -28,14 +28,21 @@ export const ColorAdjustmentOptions = () => {
   const imageShape = useSelector(imageShapeSelector);
 
   const generateDefaultChannels = (components: number) => {
-    const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
-    for (let i = 0; i < components; i++) {
-      defaultChannels.push({
-        color: DEFAULT_COLORS[i],
-        range: [0, 255],
-        visible: !(components > 3 && i > 0),
-      });
+    let defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
+    if (components === 1) {
+      defaultChannels = [
+        { color: [255, 255, 255], range: [0, 255], visible: true },
+      ];
+    } else {
+      for (let i = 0; i < components; i++) {
+        defaultChannels.push({
+          color: DEFAULT_COLORS[i],
+          range: [0, 255],
+          visible: !(components > 3 && i > 0),
+        });
+      }
     }
+
     return defaultChannels;
   };
 
