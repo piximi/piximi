@@ -124,6 +124,7 @@ export const extractChannelsFromURIImage = () => {
 export const extractChannelsFromFlattenedArray = (
   flattened: Uint8Array,
   channels: number,
+  alpha: number,
   pixels: number
 ): Array<Array<number>> => {
   /**
@@ -144,10 +145,10 @@ export const extractChannelsFromFlattenedArray = (
   while (i < flattened.length) {
     let j = 0;
     while (j < channels) {
-      results[j][i / channels] = flattened[i + j];
+      results[j][i / (channels + alpha)] = flattened[i + j];
       j += 1;
     }
-    i += j;
+    i += channels + alpha;
   }
   return results;
 };
@@ -257,6 +258,7 @@ export const convertImageJStoImage = (
           extractChannelsFromFlattenedArray(
             image[j].data as Uint8Array,
             channels,
+            image[j].alpha,
             image[j].height * image[j].width
           )
         );
@@ -284,6 +286,7 @@ export const convertImageJStoImage = (
           extractChannelsFromFlattenedArray(
             image[j].data as Uint8Array,
             1,
+            image[j].alpha,
             height * width
           )[0]
         );
@@ -313,6 +316,7 @@ export const convertImageJStoImage = (
       extractChannelsFromFlattenedArray(
         image.data as Uint8Array,
         image.components,
+        image.alpha,
         image.height * image.width
       ),
     ];
