@@ -2,18 +2,18 @@ import React from "react";
 import { Grid, IconButton, Menu } from "@mui/material";
 import LensIcon from "@mui/icons-material/Lens";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { DEFAULT_COLORS } from "../../../../../types/Colors";
+import { DEFAULT_COLORS } from "../../../../../types/DefaultColors";
 import {
   mapChannelstoSpecifiedRGBImage,
   rgbToHex,
 } from "../../../../../image/imageHelper";
 import { imageViewerSlice } from "../../../../../store/slices";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
 import { useDispatch, useSelector } from "react-redux";
-import { ChannelType } from "../../../../../types/ChannelType";
+import { Color } from "../../../../../types/Color";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
+import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
 type PaletteProps = {
   channelIdx: number;
@@ -26,7 +26,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
 
   const open = Boolean(anchorEl);
 
-  const colors = useSelector(channelsSelector);
+  const colors = useSelector(activeImageColorsSelector);
 
   const originalData = useSelector(imageOriginalSrcSelector);
 
@@ -50,13 +50,15 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
       | React.MouseEvent<HTMLButtonElement>,
     newColor: Array<number>
   ) => {
-    const updatedColors: Array<ChannelType> = colors.map(
-      (color: ChannelType, i: number) => {
+    const updatedColors: Array<Color> = colors.map(
+      (color: Color, i: number) => {
         return i === channelIdx ? { ...color, color: newColor } : color;
       }
     );
 
-    dispatch(imageViewerSlice.actions.setChannels({ channels: updatedColors }));
+    dispatch(
+      imageViewerSlice.actions.setImageColors({ colors: updatedColors })
+    );
 
     if (!originalData || !imageShape) return;
 

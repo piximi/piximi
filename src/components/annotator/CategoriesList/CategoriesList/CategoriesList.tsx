@@ -237,12 +237,6 @@ export const CategoriesList = () => {
       dispatch(setActiveImage({ image: image.id }));
 
       dispatch(
-        imageViewerSlice.actions.setChannels({
-          channels: generateDefaultChannels(image.shape.channels),
-        })
-      );
-
-      dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
           selectedAnnotation: undefined,

@@ -10,10 +10,12 @@ import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
 import { ImageViewer } from "../../types/ImageViewer";
 import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
-import { ChannelType } from "../../types/ChannelType";
+import { Color } from "../../types/Color";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import {
+  generateDefaultChannels,
   importSerializedAnnotations,
+  mapChannelstoSpecifiedRGBImage,
   replaceDuplicateName,
 } from "../../image/imageHelper";
 import * as _ from "lodash";
@@ -80,7 +82,7 @@ const initialState: ImageViewer = {
   boundingClientRect: new DOMRect(),
   brightness: 0,
   categories: initialCategories.length > 0 ? initialCategories : [],
-  channels: [
+  currentColors: [
     //R, G, and B channels by default
     {
       color: [255, 0, 0],
@@ -258,6 +260,7 @@ export const imageViewerSlice = createSlice({
 
       const loaded: Image = {
         categoryId: UNKNOWN_CATEGORY_ID,
+        colors: generateDefaultChannels(action.payload.file.imageChannels),
         id: action.payload.file.imageId,
         src: action.payload.file.imageSrc,
         originalSrc: action.payload.file.imageData,
@@ -364,6 +367,19 @@ export const imageViewerSlice = createSlice({
     ) {
       state.activeImagePlane = action.payload.activeImagePlane;
     },
+    setImageColors(
+      state: ImageViewer,
+      action: PayloadAction<{ colors: Array<Color> }>
+    ) {
+      if (!state.activeImageId) return;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, colors: action.payload.colors };
+        }
+      });
+    },
     setImageOriginalSrc(
       state: ImageViewer,
       action: PayloadAction<{ originalSrc: Array<Array<number>> }>
@@ -397,13 +413,30 @@ export const imageViewerSlice = createSlice({
       if (!action.payload.images.length) return;
       state.activeImageId = action.payload.images[0].id;
     },
-    setChannels(
+    setCurrentColors(
       state: ImageViewer,
       action: PayloadAction<{
-        channels: Array<ChannelType>;
+        currentColors: Array<Color>;
       }>
     ) {
-      state.channels = action.payload.channels;
+      state.currentColors = action.payload.currentColors;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId === image.id) {
+          return image;
+        } else {
+          const updatedSrc = mapChannelstoSpecifiedRGBImage(
+            image.originalSrc[0],
+            action.payload.currentColors,
+            image.shape.height,
+            image.shape.width
+          );
+          return {
+            ...image,
+            colors: action.payload.currentColors,
+            src: updatedSrc,
+          };
+        }
+      });
     },
     setCursor(
       state: ImageViewer,
@@ -572,7 +605,7 @@ export const {
   setBrightness,
   setCategories,
   setCategoryVisibility,
-  setChannels,
+  setCurrentColors,
   setContrast,
   setCurrentIndex,
   setCursor,

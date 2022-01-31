@@ -30,7 +30,7 @@ export {
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,
-  setChannels,
+  setCurrentColors,
   setContrast,
   setCurrentIndex,
   setCursor,

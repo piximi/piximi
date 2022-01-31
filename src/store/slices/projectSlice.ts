@@ -8,10 +8,12 @@ import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2
 import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
+import { generateDefaultChannels } from "../../image/imageHelper";
 
 const dummyImage: Image = {
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
   categoryId: UNKNOWN_CATEGORY_ID,
+  colors: generateDefaultChannels(3),
   annotations: [],
   name: "nuclei",
   originalSrc: [], //TODO fixme
@@ -93,6 +95,7 @@ export const projectSlice = createSlice({
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
+          colors: generateDefaultChannels(serializedImage.imageChannels),
           id: serializedImage.imageId,
           annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
@@ -130,6 +133,7 @@ export const projectSlice = createSlice({
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
+          colors: generateDefaultChannels(serializedImage.imageChannels),
           id: serializedImage.imageId,
           annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,

@@ -36,11 +36,6 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
       dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
       if (i === 0) {
         dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
-        dispatch(
-          imageViewerSlice.actions.setChannels({
-            channels: generateDefaultChannels(image.shape.channels),
-          })
-        );
       }
     }
   };

@@ -3,7 +3,7 @@ import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
-import { ChannelType } from "./ChannelType";
+import { Color } from "./Color";
 import { Image } from "./Image";
 import { Category } from "./Category";
 
@@ -12,7 +12,7 @@ export type ImageViewer = {
   boundingClientRect: DOMRect;
   brightness: number;
   categories: Array<Category>;
-  channels: Array<ChannelType>;
+  currentColors: Array<Color>;
   contrast: number;
   currentIndex: number;
   currentPosition?: { x: number; y: number };

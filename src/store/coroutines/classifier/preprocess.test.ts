@@ -5,6 +5,7 @@ import { Image } from "../../../types/Image";
 import { Partition } from "../../../types/Partition";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
+import { generateDefaultChannels } from "../../../image/imageHelper";
 
 jest.setTimeout(50000);
 
@@ -39,6 +40,7 @@ const categories: Array<Category> = [
 const images: Array<Image> = [
   {
     categoryId: "00000000-0000-0000-0000-00000000001",
+    colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0001-00000000000",
     annotations: [],
     name: "",

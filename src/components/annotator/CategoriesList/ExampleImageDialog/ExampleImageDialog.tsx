@@ -7,7 +7,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import malaria from "../../../../images/malaria.png";
 import cellpainting from "../../../../images/cell-painting.png";
-import { ChannelType } from "../../../../types/ChannelType";
+import { Color } from "../../../../types/Color";
 import { ToolType } from "../../../../types/ToolType";
 // import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 as uuidv4 } from "uuid";
@@ -17,11 +17,14 @@ import { AnnotationType } from "../../../../types/AnnotationType";
 import { SerializedAnnotationType } from "../../../../types/SerializedAnnotationType";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
-import { importSerializedAnnotations } from "../../../../image/imageHelper";
+import {
+  generateDefaultChannels,
+  importSerializedAnnotations,
+} from "../../../../image/imageHelper";
 import {
   imageViewerSlice,
   setActiveImage,
-  setChannels,
+  setCurrentColors,
   setImages,
   setOperation,
   setSelectedAnnotations,
@@ -29,7 +32,7 @@ import {
 import { Image } from "../../../../types/Image";
 import { Partition } from "../../../../types/Partition";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
-import { DEFAULT_COLORS } from "../../../../types/Colors";
+import { DEFAULT_COLORS } from "../../../../types/DefaultColors";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -94,7 +97,7 @@ export const ExampleImageDialog = ({
   }) => {
     onClose();
 
-    let channels: Array<ChannelType> = [];
+    let channels: Array<Color> = [];
     for (let i = 0; i < shape.channels; i++) {
       channels.push({
         color: DEFAULT_COLORS[i],
@@ -120,14 +123,17 @@ export const ExampleImageDialog = ({
       }
     );
 
+    const defaultColors = generateDefaultChannels(shape.channels);
+
     const example: Image = {
-      categoryId: UNKNOWN_CATEGORY_ID,
-      id: uuidv4(),
       annotations: newAnnotations,
+      categoryId: UNKNOWN_CATEGORY_ID,
+      colors: defaultColors,
+      id: uuidv4(),
       name: name,
-      shape: shape,
       originalSrc: [], //TODO fix this
       partition: Partition.Inference,
+      shape: shape,
       src: data as string,
     };
 
@@ -139,8 +145,6 @@ export const ExampleImageDialog = ({
           image: example.id,
         })
       );
-
-      dispatch(setChannels({ channels }));
 
       dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
 

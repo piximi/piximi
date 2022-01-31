@@ -16,6 +16,7 @@ import {
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { ApplyColorsButton } from "../ApplyColorsButton";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
@@ -34,8 +35,8 @@ export const ColorAdjustmentOptions = () => {
     const defaultChannels = generateDefaultChannels(imageShape.channels);
 
     dispatch(
-      imageViewerSlice.actions.setChannels({
-        channels: defaultChannels,
+      imageViewerSlice.actions.setImageColors({
+        colors: defaultChannels,
       })
     );
 
@@ -71,8 +72,9 @@ export const ColorAdjustmentOptions = () => {
 
       <List dense>
         <ListItem button onClick={onResetChannelsClick}>
-          <ListItemText>{t("Reset")}</ListItemText>
+          <ListItemText>{t("Reset colors")}</ListItemText>
         </ListItem>
+        <ApplyColorsButton />
       </List>
     </>
   );

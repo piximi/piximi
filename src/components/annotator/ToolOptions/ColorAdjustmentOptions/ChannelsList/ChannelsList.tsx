@@ -9,8 +9,7 @@ import {
   CheckboxUncheckedIcon,
 } from "../../../../../icons";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
-import { ChannelType } from "../../../../../types/ChannelType";
+import { Color } from "../../../../../types/Color";
 import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
@@ -19,11 +18,12 @@ import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
+import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const channels = useSelector(channelsSelector);
+  const activeImageColors = useSelector(activeImageColorsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
@@ -31,8 +31,8 @@ export const ChannelsList = () => {
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
-  const visibleChannelsIndices = channels
-    .map((channel: ChannelType, idx) => channel.visible)
+  const visibleChannelsIndices = activeImageColors
+    .map((channel: Color, idx) => channel.visible)
     .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), []);
 
   const handleSliderChange = (
@@ -40,7 +40,7 @@ export const ChannelsList = () => {
     event: any,
     newValue: number | number[]
   ) => {
-    const oldValues = channels.map((channel: ChannelType, i: number) => {
+    const oldValues = activeImageColors.map((channel: Color, i: number) => {
       if (i === idx) {
         return newValue as Array<number>;
       } else {
@@ -57,22 +57,22 @@ export const ChannelsList = () => {
           return [...range];
         });
 
-        const updatedChannels = channels.map(
-          (channel: ChannelType, index: number) => {
+        const updatedChannels = activeImageColors.map(
+          (channel: Color, index: number) => {
             return { ...channel, range: copiedValues[index] };
           }
         );
 
         dispatch(
-          imageViewerSlice.actions.setChannels({
-            channels: updatedChannels,
+          imageViewerSlice.actions.setImageColors({
+            colors: updatedChannels,
           })
         );
       };
       updateIntensityRanges(values);
       return debounce(updateIntensityRanges, 100);
     },
-    [channels, dispatch]
+    [activeImageColors, dispatch]
   );
 
   const handleSliderChangeCommitted = () => {
@@ -80,11 +80,13 @@ export const ChannelsList = () => {
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
       originalData[activeImagePlane],
-      channels,
+      activeImageColors,
       imageShape.height,
       imageShape.width
     );
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    batch(() => {
+      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    });
   };
 
   const onCheckboxChanged = (index: number) => () => {
@@ -92,7 +94,7 @@ export const ChannelsList = () => {
 
     const visibles = [...visibleChannelsIndices];
 
-    const copiedChannels = [...channels];
+    const copiedChannels = [...activeImageColors];
 
     if (current === -1) {
       visibles.push(index);
@@ -104,8 +106,8 @@ export const ChannelsList = () => {
 
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setChannels({
-          channels: copiedChannels,
+        imageViewerSlice.actions.setImageColors({
+          colors: copiedChannels,
         })
       );
 
@@ -152,7 +154,7 @@ export const ChannelsList = () => {
           key={index}
           disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
           sx={{ width: "50%" }}
-          value={channels[index].range}
+          value={activeImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(index, event, value)
@@ -168,7 +170,7 @@ export const ChannelsList = () => {
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {Array(channels.length)
+      {Array(activeImageColors.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);

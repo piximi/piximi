@@ -9,8 +9,8 @@ import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
 import * as _ from "lodash";
-import { DEFAULT_COLORS } from "../types/Colors";
-import { ChannelType } from "../types/ChannelType";
+import { DEFAULT_COLORS } from "../types/DefaultColors";
+import { Color } from "../types/Color";
 
 export const mapChannelsToDefaultColorImage = (
   data: Array<Array<number>>,
@@ -29,7 +29,7 @@ export const mapChannelsToDefaultColorImage = (
 
 export const mapChannelstoSpecifiedRGBImage = (
   data: Array<Array<number>>,
-  colors: Array<ChannelType>,
+  colors: Array<Color>,
   rows: number,
   columns: number
 ): string => {
@@ -339,19 +339,25 @@ export const convertImageJStoImage = (
   };
 
   return {
+    annotations: [],
+    colors: generateDefaultChannels(shape.channels),
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
-    annotations: [],
     name: filename,
-    shape: shape,
     originalSrc: channelsData,
     partition: Partition.Inference,
+    shape: shape,
     src: imageSrc,
   };
 };
 
-export const generateDefaultChannels = (components: number) => {
-  let defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
+export const generateDefaultChannels = (components: number): Array<Color> => {
+  /**
+   * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
+   * green to the second channel, etc.. (see DefaultColors type)
+   * If image is greyscale, we assign the white color to that one channel.
+   * **/
+  let defaultChannels: Array<Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
   if (components === 1) {
     defaultChannels = [
       { color: [255, 255, 255], range: [0, 255], visible: true },
@@ -361,7 +367,7 @@ export const generateDefaultChannels = (components: number) => {
       defaultChannels.push({
         color: DEFAULT_COLORS[i],
         range: [0, 255],
-        visible: !(components > 3 && i > 0),
+        visible: !(components > 3 && i > 0), //if image is multi-channel and c > 3, only show the first channel as default (user can then toggle / untoggle the other channels if desired).
       });
     }
   }
