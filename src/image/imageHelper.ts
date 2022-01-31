@@ -155,6 +155,7 @@ export const extractChannelsFromFlattenedArray = (
 
 export const convertFileToImage = async (
   file: File,
+  colors: Array<Color> | undefined,
   z_stack?: boolean
 ): Promise<ImageType> => {
   /**
@@ -163,7 +164,7 @@ export const convertFileToImage = async (
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
       ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        resolve(convertImageJStoImage(image, file.name, z_stack));
+        resolve(convertImageJStoImage(image, file.name, colors, z_stack));
       });
     });
   });
@@ -171,6 +172,7 @@ export const convertFileToImage = async (
 
 export const convertFilesToImages = async (
   files: FileList,
+  colors: Array<Color>,
   is_stack?: boolean
 ) => {
   /**
@@ -179,7 +181,7 @@ export const convertFilesToImages = async (
   const newImages: Array<ImageType> = [];
 
   for (let i = 0; i < files.length; i++) {
-    const image = await convertFileToImage(files[i], is_stack);
+    const image = await convertFileToImage(files[i], colors, is_stack);
     newImages.push(image);
   }
 
@@ -228,6 +230,7 @@ export const convertImageDataToURI = (
 export const convertImageJStoImage = (
   image: ImageJS.Image,
   filename: string,
+  colors: Array<Color> | undefined,
   z_stack?: boolean
 ): ImageType => {
   /**
@@ -266,13 +269,23 @@ export const convertImageJStoImage = (
 
       //make imageSrc using middle image
       const middleIndex = Math.floor(image.length / 2);
-      imageSrc = convertImageDataToURI(
-        width,
-        height,
-        image[middleIndex].data,
-        channels,
-        image[middleIndex].alpha
-      );
+
+      if (colors) {
+        imageSrc = mapChannelstoSpecifiedRGBImage(
+          channelsData[middleIndex],
+          colors,
+          height,
+          width
+        );
+      } else {
+        imageSrc = convertImageDataToURI(
+          width,
+          height,
+          image[middleIndex].data,
+          channels,
+          image[middleIndex].alpha
+        );
+      }
     } else {
       //user has uploaded a multi-channel image (CXY), which was loaded as an array of images (one channel per image).
       channels = image.length;
@@ -294,15 +307,24 @@ export const convertImageJStoImage = (
 
       channelsData.push(tmp);
 
-      const idx = 0; //the channel we choose ton show as image preview
+      const idx = 0; //the channel we choose ton show as image
 
-      imageSrc = convertImageDataToURI(
-        image[idx].width,
-        image[idx].height,
-        Array.from(image[idx].data),
-        1,
-        image[idx].alpha
-      );
+      if (colors) {
+        imageSrc = mapChannelstoSpecifiedRGBImage(
+          tmp,
+          colors,
+          image[idx].height,
+          image[idx].width
+        );
+      } else {
+        imageSrc = convertImageDataToURI(
+          image[idx].width,
+          image[idx].height,
+          Array.from(image[idx].data),
+          1,
+          image[idx].alpha
+        );
+      }
     }
   } else {
     //Case where image of dimension YXC was uploaded, C is  just 1 (grayscale) or 3 (RGB)
@@ -321,13 +343,22 @@ export const convertImageJStoImage = (
       ),
     ];
 
-    imageSrc = convertImageDataToURI(
-      width,
-      height,
-      Array.from(image.data),
-      channels,
-      image.alpha
-    );
+    if (colors) {
+      imageSrc = mapChannelstoSpecifiedRGBImage(
+        channelsData[0],
+        colors,
+        height,
+        width
+      );
+    } else {
+      imageSrc = convertImageDataToURI(
+        width,
+        height,
+        Array.from(image.data),
+        channels,
+        image.alpha
+      );
+    }
   }
 
   const shape: ShapeType = {
@@ -338,9 +369,13 @@ export const convertImageJStoImage = (
     width: width,
   };
 
+  if (!colors) {
+    colors = generateDefaultChannels(shape.channels);
+  }
+
   return {
     annotations: [],
-    colors: generateDefaultChannels(shape.channels),
+    colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     name: filename,

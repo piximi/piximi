@@ -5,13 +5,13 @@ import { activeImagePlaneSelector } from "../../../../../store/selectors/activeI
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
-import { currentColorsSelector } from "../../../../../store/selectors/currentColorsSelector";
+import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
 export const ZStackSlider = () => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
-  const channels = useSelector(currentColorsSelector);
+  const channels = useSelector(activeImageColorsSelector);
 
   const [value, setValue] = useState(activeImagePlane);
 

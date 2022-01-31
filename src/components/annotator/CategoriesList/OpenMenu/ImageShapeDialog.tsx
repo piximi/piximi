@@ -8,12 +8,13 @@ import {
   convertFileToImage,
   generateDefaultChannels,
 } from "../../../../image/imageHelper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "../../../../icons";
 import { Button, DialogActions, TextField } from "@mui/material";
 import { imageViewerSlice } from "../../../../store/slices";
+import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
 
 export interface ImageShapeDialogProps {
   files: FileList;
@@ -24,6 +25,8 @@ export interface ImageShapeDialogProps {
 export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   const dispatch = useDispatch();
 
+  const colors = useSelector(currentColorsSelector);
+
   const [isStack, setIsStack] = React.useState<boolean>(false);
 
   const { files, open, onClose } = props;
@@ -32,7 +35,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
     onClose();
 
     for (let i = 0; i < files.length; i++) {
-      const image = await convertFileToImage(files[i], isStack);
+      const image = await convertFileToImage(files[i], colors, isStack);
       dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
       if (i === 0) {
         dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));

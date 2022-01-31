@@ -5,11 +5,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "./DropboxMenuItem";
 import { convertFileToImage } from "../../image/imageHelper";
 import { StyledMenuItem } from "./StyledMenuItem";
+import { currentColorsSelector } from "../../store/selectors/currentColorsSelector";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -19,6 +20,7 @@ type UploadMenuProps = {
 
 export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   const dispatch = useDispatch();
+  const colors = useSelector(currentColorsSelector);
 
   const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -33,7 +35,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      const image = await convertFileToImage(file);
+      const image = await convertFileToImage(file, colors);
 
       //if length of images is > 1, then the user selected a z-stack --> only show center image
       dispatch(createImage({ image: image }));

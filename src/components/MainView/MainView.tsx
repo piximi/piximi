@@ -4,11 +4,14 @@ import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
 import { createImage } from "../../store/slices";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { convertFileToImage } from "../../image/imageHelper";
+import { currentColorsSelector } from "../../store/selectors/currentColorsSelector";
 
 export const MainView = () => {
   const dispatch = useDispatch();
+
+  const colors = useSelector(currentColorsSelector);
 
   const onUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
@@ -30,7 +33,7 @@ export const MainView = () => {
     async (item) => {
       if (item) {
         for (let i = 0; i < item.files.length; i++) {
-          const image = await convertFileToImage(item.files[i]);
+          const image = await convertFileToImage(item.files[i], colors);
           dispatch(createImage({ image: image }));
         }
       }

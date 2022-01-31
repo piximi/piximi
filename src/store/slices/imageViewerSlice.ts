@@ -82,24 +82,7 @@ const initialState: ImageViewer = {
   boundingClientRect: new DOMRect(),
   brightness: 0,
   categories: initialCategories.length > 0 ? initialCategories : [],
-  currentColors: [
-    //R, G, and B channels by default
-    {
-      color: [255, 0, 0],
-      range: [0, 255],
-      visible: true,
-    },
-    {
-      color: [0, 255, 0],
-      range: [0, 255],
-      visible: true,
-    },
-    {
-      color: [0, 0, 255],
-      range: [0, 255],
-      visible: true,
-    },
-  ],
+  currentColors: undefined,
   currentIndex: 0,
   cursor: "default",
   contrast: 0,

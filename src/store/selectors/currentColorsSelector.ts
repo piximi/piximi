@@ -5,6 +5,6 @@ export const currentColorsSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
-}): Array<Color> => {
+}): Array<Color> | undefined => {
   return imageViewer.currentColors;
 };

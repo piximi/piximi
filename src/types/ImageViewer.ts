@@ -12,7 +12,7 @@ export type ImageViewer = {
   boundingClientRect: DOMRect;
   brightness: number;
   categories: Array<Category>;
-  currentColors: Array<Color>;
+  currentColors: Array<Color> | undefined;
   contrast: number;
   currentIndex: number;
   currentPosition?: { x: number; y: number };
