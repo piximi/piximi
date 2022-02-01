@@ -4,10 +4,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import { StyledEngineProvider } from "@mui/material/styles";
 import { MainView } from "../MainView";
 import { AnnotatorView } from "../annotator";
-import { usePreferredTheme } from "hooks/useTheme/usePreferredTheme";
+import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
 
 export const Application = () => {
-  const theme = usePreferredTheme();
+  const theme = usePreferredMuiTheme();
 
   return (
     <StyledEngineProvider injectFirst>

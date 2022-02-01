@@ -1,5 +1,6 @@
 import { Container, Typography } from "@mui/material";
 import { ResponsiveLine } from "@nivo/line";
+import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 
 type TrainingHistoryPlotProbs = {
   metric: string;
@@ -16,13 +17,13 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProbs) => {
     dynamicYRange = false,
   } = props;
 
-  const trainingData = {
+  const trainingData: any = {
     id: `${metric}`,
     color: "#DC3220",
     data: trainingValues,
   };
 
-  const validationData = {
+  const validationData: any = {
     id: `validation ${metric}`,
     color: "#005AB5",
     data: validationValues,
@@ -31,13 +32,17 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProbs) => {
   const min = dynamicYRange ? "auto" : 0;
   const max = dynamicYRange ? "auto" : 1;
 
+  const nivoTheme = usePreferredNivoTheme();
+
   return (
     <Container sx={{ height: 350, mb: 5 }}>
-      <Typography align={"center"} variant="body2">
+      <Typography align={"center"} variant="body1">
         Training history - {metric} on epoch end
       </Typography>
       <ResponsiveLine
         data={[trainingData, validationData]}
+        theme={nivoTheme}
+        lineWidth={3}
         margin={{ top: 10, right: 150, bottom: 80, left: 70 }}
         xScale={{ type: "point" }}
         yScale={{

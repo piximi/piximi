@@ -71,12 +71,12 @@ export const ModelSummaryTable = (props: ModelSummaryTableProbs) => {
   const modelSummary = getModelSummary(compiledModel);
 
   return (
-    <Container>
+    <Container sx={{ maxHeight: 400, width: 900 }}>
       <Typography align={"center"} variant="body1">
         Model summery
       </Typography>
 
-      <TableContainer sx={{ maxHeight: 400, width: 900 }}>
+      <TableContainer sx={{ maxHeight: 300, width: 900 }}>
         <Table
           stickyHeader
           aria-label="sticky table"

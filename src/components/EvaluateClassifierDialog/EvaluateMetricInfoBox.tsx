@@ -20,28 +20,41 @@ export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProbs) => {
       }}
     >
       <Box
-        sx={{
-          backgroundColor: "#0080ff",
+        sx={(theme) => ({
+          backgroundColor: theme.palette.info.light,
           display: "flex",
           flexDirection: "column",
           alignItems: { xs: "center", md: "flex-start" },
           m: 3,
           width: 180,
           borderRadius: 2,
-        }}
+        })}
       >
         <Box
           component="span"
-          sx={{ fontSize: 20, color: "#1034a6", mt: 1, pl: 1, pr: 1 }}
+          sx={(theme) => ({
+            fontSize: 20,
+            color: theme.palette.info.dark,
+            mt: 1,
+            pl: 1,
+            pr: 1,
+          })}
         >
           {metric}:
         </Box>
-        <Box component="span" sx={{ fontSize: 18, color: "#D3D3D3", pl: 1 }}>
+        <Box
+          component="span"
+          sx={(theme) => ({
+            fontSize: 18,
+            color: theme.palette.background.default,
+            pl: 1,
+          })}
+        >
           {value.toFixed(3)}
         </Box>
         <IconButton
           aria-label="info"
-          sx={{ color: "#D3D3D3" }}
+          sx={(theme) => ({ color: theme.palette.background.default })}
           onClick={() => window.open(link)}
         >
           <InfoIcon />
