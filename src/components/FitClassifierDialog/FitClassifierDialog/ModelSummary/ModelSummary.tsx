@@ -73,7 +73,7 @@ export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
   return (
     <Container sx={{ maxHeight: 400, width: 900 }}>
       <Typography align={"center"} variant="body1">
-        Model summery
+        Model Summary
       </Typography>
 
       <TableContainer sx={{ maxHeight: 300, width: 900 }}>
