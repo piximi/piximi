@@ -386,6 +386,34 @@ export const convertImageJStoImage = (
   };
 };
 
+export const convertURIToImageData = (URI: string) => {
+  /**
+   * From data URI to flattened image data
+   * **/
+
+  return new Promise(function (resolve, reject) {
+    if (URI == null) return reject();
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    var image = new Image();
+
+    image.addEventListener(
+      "load",
+      function () {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        if (context) {
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(context.getImageData(0, 0, canvas.width, canvas.height));
+        }
+      },
+      false
+    );
+
+    image.src = URI;
+  });
+};
+
 export const generateDefaultChannels = (components: number): Array<Color> => {
   /**
    * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,

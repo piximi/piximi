@@ -18,6 +18,8 @@ import { SerializedAnnotationType } from "../../../../types/SerializedAnnotation
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import {
+  convertURIToImageData,
+  extractChannelsFromFlattenedArray,
   generateDefaultChannels,
   importSerializedAnnotations,
 } from "../../../../image/imageHelper";
@@ -125,41 +127,50 @@ export const ExampleImageDialog = ({
 
     const defaultColors = generateDefaultChannels(shape.channels);
 
-    const example: Image = {
-      annotations: newAnnotations,
-      categoryId: UNKNOWN_CATEGORY_ID,
-      colors: defaultColors,
-      id: uuidv4(),
-      name: name,
-      originalSrc: [], //TODO fix this
-      partition: Partition.Inference,
-      shape: shape,
-      src: data as string,
-    };
-
-    batch(() => {
-      dispatch(setImages({ images: [...images, example] }));
-
-      dispatch(
-        setActiveImage({
-          image: example.id,
-        })
+    convertURIToImageData(data as string).then((imageData: any) => {
+      const originalSrc = extractChannelsFromFlattenedArray(
+        imageData.data,
+        shape.channels,
+        1,
+        shape.width * shape.height
       );
 
-      dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+      const example: Image = {
+        annotations: newAnnotations,
+        categoryId: UNKNOWN_CATEGORY_ID,
+        colors: defaultColors,
+        id: uuidv4(),
+        name: name,
+        originalSrc: [originalSrc],
+        partition: Partition.Inference,
+        shape: shape,
+        src: data as string,
+      };
 
-      dispatch(
-        setSelectedAnnotations({
-          selectedAnnotations: [],
-          selectedAnnotation: undefined,
-        })
-      );
+      batch(() => {
+        dispatch(setImages({ images: [...images, example] }));
 
-      dispatch(
-        imageViewerSlice.actions.setCategories({
-          categories: updatedCategories,
-        })
-      );
+        dispatch(
+          setActiveImage({
+            image: example.id,
+          })
+        );
+
+        dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+
+        dispatch(
+          setSelectedAnnotations({
+            selectedAnnotations: [],
+            selectedAnnotation: undefined,
+          })
+        );
+
+        dispatch(
+          imageViewerSlice.actions.setCategories({
+            categories: updatedCategories,
+          })
+        );
+      });
     });
   };
 
