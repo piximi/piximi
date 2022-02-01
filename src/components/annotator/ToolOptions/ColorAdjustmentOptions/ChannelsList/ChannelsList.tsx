@@ -16,7 +16,10 @@ import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
-import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
+import {
+  mapChannelstoSpecifiedRGBImage,
+  rgbToHex,
+} from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
@@ -153,7 +156,12 @@ export const ChannelsList = () => {
         <Slider
           key={index}
           disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
-          sx={{ width: "50%" }}
+          sx={{
+            width: "50%",
+            "& .MuiSlider-track": {
+              color: rgbToHex(activeImageColors[index].color),
+            },
+          }}
           value={activeImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
