@@ -47,16 +47,16 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: "layerName", label: "Layer name", minWidth: 170 },
-  { id: "outputShape", label: "outputshape", minWidth: 100 },
+  { id: "layerName", label: "Layer Name", minWidth: 170 },
+  { id: "outputShape", label: "Output Shape", minWidth: 100 },
   {
     id: "parameters",
-    label: "#of parameters",
+    label: "# of Parameters",
     minWidth: 100,
   },
   {
     id: "trainable",
-    label: "trainable",
+    label: "Trainable",
     minWidth: 40,
   },
 ];
