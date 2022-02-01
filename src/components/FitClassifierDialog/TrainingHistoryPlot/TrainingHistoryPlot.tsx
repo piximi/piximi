@@ -2,7 +2,7 @@ import { Container, Typography } from "@mui/material";
 import { ResponsiveLine } from "@nivo/line";
 import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 
-type TrainingHistoryPlotProbs = {
+type TrainingHistoryPlotProps = {
   metric: string;
   trainingValues: { x: number; y: number }[];
   validationValues: { x: number; y: number }[];
