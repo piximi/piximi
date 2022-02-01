@@ -9,7 +9,7 @@ type TrainingHistoryPlotProps = {
   dynamicYRange?: boolean;
 };
 
-export const TrainingHistoryPlot = (props: TrainingHistoryPlotProbs) => {
+export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
   const {
     metric,
     trainingValues,
