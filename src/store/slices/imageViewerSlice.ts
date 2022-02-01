@@ -22,13 +22,12 @@ import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
 
-const initialImage =
+const initialImage: Image | undefined =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV === "production"
     ? {
-        activePlane: 0,
-        avatar: colorImage,
         categoryId: UNKNOWN_CATEGORY_ID,
+        colors: generateDefaultChannels(3),
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
         annotations: [],
         name: "example.png",
@@ -40,7 +39,7 @@ const initialImage =
           planes: 1,
           width: 512,
         },
-        originalSrc: [colorImage],
+        originalSrc: [],
         src: colorImage,
       }
     : undefined;
@@ -88,9 +87,9 @@ const initialState: ImageViewer = {
   contrast: 0,
   exposure: 0,
   hue: 0,
-  activeImageId: undefined, //TODO fixme this should be: initialImage ? initialImage.id : undefined -- but it caused errors if you have it defined, and there is no initialImage (which we dont for now)
+  activeImageId: initialImage ? initialImage.id : undefined,
   activeImagePlane: 0,
-  images: initialImage ? [] : [], //TODO fixme
+  images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 32,

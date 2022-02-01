@@ -16,6 +16,7 @@ type ToolProps = {
   name: string;
   onClick: () => void;
   selected: boolean;
+  disabled?: boolean;
 };
 
 export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
@@ -99,7 +100,13 @@ export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
   );
 };
 
-export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
+export const Tool = ({
+  children,
+  name,
+  onClick,
+  selected,
+  disabled,
+}: ToolProps) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const onClose = () => {
@@ -125,7 +132,12 @@ export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
       placement="left"
       title={<TooltipCard name={name} onClose={onClose} />}
     >
-      <ListItem button onClick={onClick} selected={selected}>
+      <ListItem
+        disabled={!!disabled}
+        button
+        onClick={onClick}
+        selected={selected}
+      >
         <ListItemIcon>
           <SvgIcon fontSize="small">{children}</SvgIcon>
         </ListItemIcon>
