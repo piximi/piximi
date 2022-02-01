@@ -1,7 +1,7 @@
 import { Box, IconButton } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
-type EvaluateMetricInfoBoxProbs = {
+type EvaluateMetricInfoBoxProps = {
   metric: string;
   value: number;
   link: string;
