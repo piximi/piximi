@@ -65,7 +65,7 @@ type ModelSummaryTableProbs = {
   compiledModel: tensorflow.LayersModel;
 };
 
-export const ModelSummaryTable = (props: ModelSummaryTableProbs) => {
+export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
   const { compiledModel } = props;
 
   const modelSummary = getModelSummary(compiledModel);
