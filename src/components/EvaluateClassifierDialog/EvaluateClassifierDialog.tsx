@@ -18,6 +18,7 @@ type EvaluateClassifierDialogProps = {
   crossEntropy: number;
   precision: number;
   recall: number;
+  f1Score: number;
 };
 
 export const EvaluateClassifierDialog = (
@@ -32,6 +33,7 @@ export const EvaluateClassifierDialog = (
     crossEntropy,
     precision,
     recall,
+    f1Score,
   } = props;
 
   return (
@@ -80,6 +82,8 @@ export const EvaluateClassifierDialog = (
               link="https://en.wikipedia.org/wiki/Cross_entropy"
             />
           </Grid>
+        </Grid>
+        <Grid container spacing={2}>
           <Grid item xs={3}>
             <EvaluateMetricInfoBox
               metric={"Precision"}
@@ -92,6 +96,13 @@ export const EvaluateClassifierDialog = (
               metric={"Recall"}
               value={recall}
               link="https://en.wikipedia.org/wiki/Precision_and_recall"
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <EvaluateMetricInfoBox
+              metric={"F1-score"}
+              value={f1Score}
+              link="https://en.wikipedia.org/wiki/F-score"
             />
           </Grid>
         </Grid>

@@ -74,6 +74,8 @@ export const evaluate = async (
     .recall(oneHotLabels, oneHotPredictions)
     .array()) as number;
 
+  const f1Score = (2 * (precision * recall)) / (precision + recall);
+
   return {
     confusionMatrix: confusionMatrix,
     accuracy: accuracy.reduce((a, b) => a + b) / validationImages.length,
@@ -81,5 +83,6 @@ export const evaluate = async (
       crossEntropy.reduce((a, b) => a + b) / validationImages.length,
     precision: precision,
     recall: recall,
+    f1Score: f1Score,
   };
 };

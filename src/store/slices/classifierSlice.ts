@@ -46,6 +46,7 @@ const initialState: Classifier = {
     crossEntropy: -1,
     precision: -1,
     recall: -1,
+    f1Score: -1,
   },
 };
 

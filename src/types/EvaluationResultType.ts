@@ -4,4 +4,5 @@ export type EvaluationResultType = {
   crossEntropy: number;
   precision: number;
   recall: number;
+  f1Score: number;
 };

@@ -55,6 +55,7 @@ export const EvaluateClassifierListItem = (
         crossEntropy={evaluationResult.crossEntropy}
         precision={evaluationResult.precision}
         recall={evaluationResult.recall}
+        f1Score={evaluationResult.f1Score}
       />
     </>
   );
