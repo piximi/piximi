@@ -7,7 +7,7 @@ type EvaluateMetricInfoBoxProps = {
   link: string;
 };
 
-export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProbs) => {
+export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProps) => {
   const { metric, value, link } = props;
 
   return (
