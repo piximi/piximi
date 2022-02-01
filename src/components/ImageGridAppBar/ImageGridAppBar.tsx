@@ -31,7 +31,6 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Image } from "../../types/Image";
 import { Partition } from "../../types/Partition";
-import { generateDefaultChannels } from "../../image/imageHelper";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -61,13 +60,9 @@ export const ImageGridAppBar = () => {
         return image.id === id;
       });
 
-      const defaultColors = generateDefaultChannels(
-        projectImage!.shape.channels
-      );
-
       const annotatorImage: Image = {
         categoryId: projectImage!.categoryId,
-        colors: defaultColors,
+        colors: projectImage!.colors,
         id: projectImage!.id,
         annotations: projectImage!.annotations,
         name: projectImage!.name,
