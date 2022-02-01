@@ -4,9 +4,9 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { ThemeMode } from "types/ThemeMode";
 import { themeModeSelector } from "store/selectors/themeModeSelector";
 import { setThemeMode } from "store/slices";
-import { lightTheme, darkTheme } from "theme";
+import { lightTheme, darkTheme } from "themes/muiTheme";
 
-export const usePreferredTheme = () => {
+export const usePreferredMuiTheme = () => {
   const dispatch = useDispatch();
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
