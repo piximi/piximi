@@ -61,7 +61,7 @@ const columns: readonly Column[] = [
   },
 ];
 
-type ModelSummaryTableProbs = {
+type ModelSummaryTableProps = {
   compiledModel: tensorflow.LayersModel;
 };
 
