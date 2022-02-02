@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -12,22 +12,30 @@ import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSel
 import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
 import {
+  convertImageURIsToImageData,
   generateDefaultChannels,
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { ApplyColorsButton } from "../ApplyColorsButton";
+import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const originalData = useSelector(imageOriginalSrcSelector);
+  const originalSrc = useSelector(imageOriginalSrcSelector);
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
+  const activeImageId = useSelector(activeImageIdSelector);
+
   const imageShape = useSelector(imageShapeSelector);
+
+  const [originalData, setOriginalData] = React.useState<
+    Array<Array<Array<number>>>
+  >([]);
 
   const onResetChannelsClick = () => {
     if (!imageShape) return;
@@ -40,7 +48,7 @@ export const ColorAdjustmentOptions = () => {
       })
     );
 
-    if (!originalData || !imageShape) return;
+    if (!originalSrc || !imageShape) return;
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
       originalData[activeImagePlane],
@@ -52,9 +60,20 @@ export const ColorAdjustmentOptions = () => {
     dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
-  // useEffect(() => {
-  //   onResetChannelsClick();
-  // }, [onResetChannelsClick]);
+  useEffect(() => {
+    if (!activeImageId) return;
+
+    const fetchData = async () => {
+      if (!originalSrc) return;
+
+      return await convertImageURIsToImageData(originalSrc);
+    };
+
+    fetchData().then((data: Array<Array<Array<number>>> | undefined) => {
+      if (!data) return;
+      setOriginalData(data);
+    });
+  }, [activeImageId, originalSrc]);
 
   return (
     <>
@@ -62,11 +81,11 @@ export const ColorAdjustmentOptions = () => {
 
       <Divider />
 
-      <ZStackSlider />
+      <ZStackSlider originalData={originalData} />
 
       <Divider />
 
-      <ChannelsList />
+      <ChannelsList originalData={originalData} />
 
       <Divider />
 

@@ -34,8 +34,8 @@ export const mapChannelstoSpecifiedRGBImage = (
   columns: number
 ): string => {
   /**
-   * Given an matrix of numbers of shape C x MN (image data for each channel), assign colors to channels and convert to RGB image
-   * returns the data URI of that RGB image, to be displayed on canvas
+   * Given an matrix of numbers of shape C x MN (flattened image data for each channel), assign colors to channels and convert to RGB image,
+   * returns the new data URI of that RGB image, to be displayed on canvas
    * data: the channels data
    * colors: the colors to be assigned to each channel
    * returns a URI image for display
@@ -128,7 +128,7 @@ export const extractChannelsFromFlattenedArray = (
   pixels: number
 ): Array<Array<number>> => {
   /**
-   * Given a flattened data array from greyscale ir RGB imageJ Image[channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately
+   * Given a flattened data array from greyscale or RGB imageJ Image[channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately
    * as array.
    * **/
   if (channels === 1) {
@@ -241,10 +241,11 @@ export const convertImageJStoImage = (
   let nplanes = 1;
   let height: number;
   let width: number;
-  let channelsData: Array<Array<Array<number>>> = [];
   let channels: number;
 
   let imageSrc: string;
+
+  let originalURIs: Array<Array<string>> = [];
 
   if (Array.isArray(image)) {
     height = image[0].height;
@@ -256,75 +257,76 @@ export const convertImageJStoImage = (
 
       channels = image[0].components; //this will be either 1 (greyscale) or 3 (rgb)
 
+      const currentColors = colors ? colors : generateDefaultChannels(channels);
+
       for (let j = 0; j < image.length; j++) {
-        channelsData.push(
-          extractChannelsFromFlattenedArray(
-            image[j].data as Uint8Array,
-            channels,
-            image[j].alpha,
-            image[j].height * image[j].width
-          )
-        );
-      }
-
-      //make imageSrc using middle image
-      const middleIndex = Math.floor(image.length / 2);
-
-      if (colors) {
-        imageSrc = mapChannelstoSpecifiedRGBImage(
-          channelsData[middleIndex],
-          colors,
-          height,
-          width
-        );
-      } else {
-        imageSrc = convertImageDataToURI(
-          width,
-          height,
-          image[middleIndex].data,
+        // for each plane... extract channels array
+        const sliceURI: Array<string> = [];
+        const channelsData = extractChannelsFromFlattenedArray(
+          image[j].data,
           channels,
-          image[middleIndex].alpha
+          image[j].alpha,
+          height * width
         );
+
+        if (j === Math.floor(image.length / 2)) {
+          //if middle plane, display this plane as current imageSrc (by default)
+          imageSrc = mapChannelstoSpecifiedRGBImage(
+            channelsData,
+            currentColors,
+            height,
+            width
+          );
+        }
+
+        for (let i = 0; i < channelsData.length; i++) {
+          // for each channel array... make URI image
+          const channelURI = convertImageDataToURI(
+            width,
+            height,
+            channelsData[i],
+            1,
+            0
+          );
+          sliceURI.push(channelURI);
+        }
+        originalURIs.push(sliceURI);
       }
     } else {
       //user has uploaded a multi-channel image (CXY), which was loaded as an array of images (one channel per image).
       channels = image.length;
       nplanes = 1;
+      const currentColors = colors ? colors : generateDefaultChannels(1);
 
-      const tmp: Array<Array<number>> = [];
+      const sliceURI: Array<string> = [];
 
+      const channelsData: Array<Array<number>> = []; //used for computing URI to be displayed
+
+      //for each channel j.. get corresponding "greyscale" URI simply by accessing image[j].data
       for (let j = 0; j < channels; j++) {
-        //iterate over each image (which is a channel), push to array
-        tmp.push(
-          extractChannelsFromFlattenedArray(
-            image[j].data as Uint8Array,
-            1,
-            image[j].alpha,
-            height * width
-          )[0]
+        const channelURI = convertImageDataToURI(
+          width,
+          height,
+          image[j].data,
+          1,
+          0
         );
+        channelsData.push(image[j].data);
+        sliceURI.push(channelURI);
       }
 
-      channelsData.push(tmp);
+      originalURIs.push(sliceURI);
 
       const idx = 0; //the channel we choose ton show as image
 
-      if (colors) {
-        imageSrc = mapChannelstoSpecifiedRGBImage(
-          tmp,
-          colors,
-          image[idx].height,
-          image[idx].width
-        );
-      } else {
-        imageSrc = convertImageDataToURI(
-          image[idx].width,
-          image[idx].height,
-          Array.from(image[idx].data),
-          1,
-          image[idx].alpha
-        );
-      }
+      const currentChannelsData = colors ? channelsData : [channelsData[0]]; //default is to only show the first channel, until user applies color scheme
+
+      imageSrc = mapChannelstoSpecifiedRGBImage(
+        currentChannelsData,
+        currentColors,
+        image[idx].height,
+        image[idx].width
+      );
     }
   } else {
     //Case where image of dimension YXC was uploaded, C is  just 1 (grayscale) or 3 (RGB)
@@ -334,31 +336,33 @@ export const convertImageJStoImage = (
     channels = image.components;
     nplanes = 1;
 
-    channelsData = [
-      extractChannelsFromFlattenedArray(
-        image.data as Uint8Array,
-        image.components,
-        image.alpha,
-        image.height * image.width
-      ),
+    const currentColors = colors ? colors : generateDefaultChannels(channels);
+
+    const channelData = extractChannelsFromFlattenedArray(
+      image.data as Uint8Array,
+      image.components,
+      image.alpha,
+      image.height * image.width
+    );
+
+    originalURIs = [
+      channelData.map((channelData: Array<number>) => {
+        return convertImageDataToURI(
+          image.height,
+          image.width,
+          channelData,
+          1,
+          0
+        );
+      }),
     ];
 
-    if (colors) {
-      imageSrc = mapChannelstoSpecifiedRGBImage(
-        channelsData[0],
-        colors,
-        height,
-        width
-      );
-    } else {
-      imageSrc = convertImageDataToURI(
-        width,
-        height,
-        Array.from(image.data),
-        channels,
-        image.alpha
-      );
-    }
+    imageSrc = mapChannelstoSpecifiedRGBImage(
+      channelData,
+      currentColors,
+      height,
+      width
+    );
   }
 
   const shape: ShapeType = {
@@ -379,14 +383,46 @@ export const convertImageJStoImage = (
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
-    originalSrc: channelsData,
+    originalSrc: originalURIs,
     partition: Partition.Inference,
     shape: shape,
-    src: imageSrc,
+    src: imageSrc!,
   };
 };
 
-export const convertURIToImageData = (URI: string) => {
+export const convertImageURIsToImageData = async (
+  originalSrc: Array<Array<string>>
+): Promise<Array<Array<Array<number>>>> => {
+  /**
+   * From arrays of encoded URIs for Z x C x X x Y image, extract the correspond data arrray.
+   * Used for color adjustment of image.
+   * **/
+  const originalData: Array<Array<Array<number>>> = [];
+
+  for (let i = 0; i < originalSrc.length; i++) {
+    //z-slice dimension
+    const sliceData: Array<Array<number>> = [];
+    for (let j = 0; j < originalSrc[i].length; j++) {
+      const channelData = await convertURIToImageData(originalSrc[i][j]);
+      sliceData.push(toGreyscale(Array.from(channelData.data)));
+    }
+    originalData.push(sliceData);
+  }
+
+  return originalData;
+};
+
+const toGreyscale = (pixels: Array<number>): Array<number> => {
+  /***
+   * The data URIs we extract are saved as "RGB" values with an alpha channel, but each URI
+   * actually corresponds to a single channel. We only need to extract the first "red" value, that's our intensity for that pixel for that channel.
+   * ***/
+  return pixels.filter(function (_, i) {
+    return i % 4 === 0;
+  });
+};
+
+export const convertURIToImageData = (URI: string): Promise<ImageData> => {
   /**
    * From data URI to flattened image data
    * **/

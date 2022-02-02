@@ -14,7 +14,6 @@ import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
-import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import {
   mapChannelstoSpecifiedRGBImage,
@@ -23,14 +22,16 @@ import {
 import { Palette } from "../Palette";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
-export const ChannelsList = () => {
+type ChannelsListProps = {
+  originalData: Array<Array<Array<number>>>;
+};
+
+export const ChannelsList = ({ originalData }: ChannelsListProps) => {
   const dispatch = useDispatch();
 
   const activeImageColors = useSelector(activeImageColorsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
-
-  const originalData = useSelector(imageOriginalSrcSelector);
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
@@ -171,7 +172,7 @@ export const ChannelsList = () => {
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
         />
-        <Palette channelIdx={index} />
+        <Palette originalData={originalData} channelIdx={index} />
       </ListItem>
     );
   };

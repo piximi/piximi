@@ -15,7 +15,6 @@ import { SerializedFileType } from "../../types/SerializedFileType";
 import {
   generateDefaultChannels,
   importSerializedAnnotations,
-  mapChannelstoSpecifiedRGBImage,
   replaceDuplicateName,
 } from "../../image/imageHelper";
 import * as _ from "lodash";
@@ -364,7 +363,7 @@ export const imageViewerSlice = createSlice({
     },
     setImageOriginalSrc(
       state: ImageViewer,
-      action: PayloadAction<{ originalSrc: Array<Array<number>> }>
+      action: PayloadAction<{ originalSrc: Array<string> }>
     ) {
       if (!state.activeImageId) return;
       state.images = state.images.map((image: Image) => {
@@ -392,8 +391,8 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ images: Array<Image> }>
     ) {
       state.images = action.payload.images;
-      if (!action.payload.images.length) return;
-      state.activeImageId = action.payload.images[0].id;
+      // if (!action.payload.images.length) return;
+      // state.activeImageId = action.payload.images[0].id;
     },
     setCurrentColors(
       state: ImageViewer,
@@ -402,23 +401,6 @@ export const imageViewerSlice = createSlice({
       }>
     ) {
       state.currentColors = action.payload.currentColors;
-      state.images = state.images.map((image: Image) => {
-        if (state.activeImageId === image.id) {
-          return image;
-        } else {
-          const updatedSrc = mapChannelstoSpecifiedRGBImage(
-            image.originalSrc[0],
-            action.payload.currentColors,
-            image.shape.height,
-            image.shape.width
-          );
-          return {
-            ...image,
-            colors: action.payload.currentColors,
-            src: updatedSrc,
-          };
-        }
-      });
     },
     setCursor(
       state: ImageViewer,

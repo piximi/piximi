@@ -7,7 +7,11 @@ import { imageViewerSlice } from "../../../../../store/slices";
 import { mapChannelstoSpecifiedRGBImage } from "../../../../../image/imageHelper";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 
-export const ZStackSlider = () => {
+type ZStackSliderProps = {
+  originalData: Array<Array<Array<number>>>;
+};
+
+export const ZStackSlider = ({ originalData }: ZStackSliderProps) => {
   const activeImagePlane = useSelector(activeImagePlaneSelector);
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
@@ -21,7 +25,7 @@ export const ZStackSlider = () => {
   const handleChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       setValue(newValue);
-      const imageData = activeImage.originalSrc[newValue];
+      const imageData = originalData[newValue];
 
       const imageSrc = mapChannelstoSpecifiedRGBImage(
         imageData,

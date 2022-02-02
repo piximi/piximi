@@ -17,9 +17,10 @@ import { activeImageColorsSelector } from "../../../../../store/selectors/active
 
 type PaletteProps = {
   channelIdx: number;
+  originalData: Array<Array<Array<number>>>;
 };
 
-export const Palette = ({ channelIdx }: PaletteProps) => {
+export const Palette = ({ channelIdx, originalData }: PaletteProps) => {
   const default_colors = DEFAULT_COLORS;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -27,8 +28,6 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
   const open = Boolean(anchorEl);
 
   const colors = useSelector(activeImageColorsSelector);
-
-  const originalData = useSelector(imageOriginalSrcSelector);
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 

@@ -26,7 +26,6 @@ import {
 import {
   imageViewerSlice,
   setActiveImage,
-  setCurrentColors,
   setImages,
   setOperation,
   setSelectedAnnotations,
@@ -141,7 +140,7 @@ export const ExampleImageDialog = ({
         colors: defaultColors,
         id: uuidv4(),
         name: name,
-        originalSrc: [originalSrc],
+        originalSrc: [], //TODO refactoring
         partition: Partition.Inference,
         shape: shape,
         src: data as string,

@@ -9,7 +9,7 @@ export type Image = {
   colors: Array<Color>;
   id: string;
   name: string;
-  originalSrc: Array<Array<Array<number>>>; //TODO explain this (Z x C x mn) where mxn image;
+  originalSrc: Array<Array<string>>; //TODO explain this (Z x C x mn) where mxn image;
   partition: Partition;
   shape: Shape;
   src: string;
