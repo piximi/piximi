@@ -9,7 +9,6 @@ import malaria from "../../../../images/malaria.png";
 import cellpainting from "../../../../images/cell-painting.png";
 import { Color } from "../../../../types/Color";
 import { ToolType } from "../../../../types/ToolType";
-// import { ImageViewerImage } from "../../../../types/ImageViewerImage";
 import { v4 as uuidv4 } from "uuid";
 import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
@@ -18,8 +17,7 @@ import { SerializedAnnotationType } from "../../../../types/SerializedAnnotation
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import {
-  convertURIToImageData,
-  extractChannelsFromFlattenedArray,
+  convertSrcURIToOriginalSrcURIs,
   generateDefaultChannels,
   importSerializedAnnotations,
 } from "../../../../image/imageHelper";
@@ -83,7 +81,7 @@ export const ExampleImageDialog = ({
     },
   ];
 
-  const onClick = ({
+  const onClick = async ({
     data,
     description,
     name,
@@ -126,50 +124,46 @@ export const ExampleImageDialog = ({
 
     const defaultColors = generateDefaultChannels(shape.channels);
 
-    convertURIToImageData(data as string).then((imageData: any) => {
-      const originalSrc = extractChannelsFromFlattenedArray(
-        imageData.data,
-        shape.channels,
-        1,
-        shape.width * shape.height
+    const sliceData = await convertSrcURIToOriginalSrcURIs(
+      data as string,
+      shape
+    );
+
+    const example: Image = {
+      annotations: newAnnotations,
+      categoryId: UNKNOWN_CATEGORY_ID,
+      colors: defaultColors,
+      id: uuidv4(),
+      name: name,
+      originalSrc: [sliceData],
+      partition: Partition.Inference,
+      shape: shape,
+      src: data as string,
+    };
+
+    batch(() => {
+      dispatch(setImages({ images: [...images, example] }));
+
+      dispatch(
+        setActiveImage({
+          image: example.id,
+        })
       );
 
-      const example: Image = {
-        annotations: newAnnotations,
-        categoryId: UNKNOWN_CATEGORY_ID,
-        colors: defaultColors,
-        id: uuidv4(),
-        name: name,
-        originalSrc: [], //TODO refactoring
-        partition: Partition.Inference,
-        shape: shape,
-        src: data as string,
-      };
+      dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
 
-      batch(() => {
-        dispatch(setImages({ images: [...images, example] }));
+      dispatch(
+        setSelectedAnnotations({
+          selectedAnnotations: [],
+          selectedAnnotation: undefined,
+        })
+      );
 
-        dispatch(
-          setActiveImage({
-            image: example.id,
-          })
-        );
-
-        dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
-
-        dispatch(
-          setSelectedAnnotations({
-            selectedAnnotations: [],
-            selectedAnnotation: undefined,
-          })
-        );
-
-        dispatch(
-          imageViewerSlice.actions.setCategories({
-            categories: updatedCategories,
-          })
-        );
-      });
+      dispatch(
+        imageViewerSlice.actions.setCategories({
+          categories: updatedCategories,
+        })
+      );
     });
   };
 

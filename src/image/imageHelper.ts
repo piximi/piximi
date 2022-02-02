@@ -215,7 +215,7 @@ export const convertImageDataToURI = (
   data: Array<number>,
   components: number,
   alpha: 0 | 1 | undefined
-) => {
+): string => {
   ///TODO write doc
   const img: ImageJS.Image = new ImageJS.Image(width, height, data, {
     components: components,
@@ -403,8 +403,10 @@ export const convertImageURIsToImageData = async (
     //z-slice dimension
     const sliceData: Array<Array<number>> = [];
     for (let j = 0; j < originalSrc[i].length; j++) {
-      const channelData = await convertURIToImageData(originalSrc[i][j]);
-      sliceData.push(toGreyscale(Array.from(channelData.data)));
+      const channelData = await convertURIToGreyscaleImageData(
+        originalSrc[i][j]
+      );
+      sliceData.push(channelData);
     }
     originalData.push(sliceData);
   }
@@ -422,7 +424,33 @@ const toGreyscale = (pixels: Array<number>): Array<number> => {
   });
 };
 
-export const convertURIToImageData = (URI: string): Promise<ImageData> => {
+export const convertSrcURIToOriginalSrcURIs = async (
+  src: string,
+  shape: ShapeType
+): Promise<Array<string>> => {
+  /**
+   * Given a src URI (the image being displayed), extract R, G, B URIs
+   * **/
+  const flattenedData = await convertURIToRGBImageData(src);
+  const channelData = extractChannelsFromFlattenedArray(
+    Uint8Array.from(flattenedData.data),
+    shape.channels,
+    1,
+    shape.width * shape.height
+  );
+  return Promise.all(
+    channelData.map((channel: Array<number>) => {
+      return convertImageDataToURI(shape.width, shape.height, channel, 1, 0);
+    })
+  );
+};
+
+export const convertURIToGreyscaleImageData = async (URI: string) => {
+  const rgbData = await convertURIToRGBImageData(URI);
+  return toGreyscale(Array.from(rgbData.data));
+};
+
+export const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
   /**
    * From data URI to flattened image data
    * **/

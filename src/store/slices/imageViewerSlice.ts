@@ -20,6 +20,15 @@ import {
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
+import { Shape } from "../../types/Shape";
+
+const initialImageShape: Shape = {
+  channels: 3,
+  frames: 1,
+  height: 512,
+  planes: 1,
+  width: 512,
+};
 
 const initialImage: Image | undefined =
   process.env.NODE_ENV === "development" ||
@@ -31,13 +40,7 @@ const initialImage: Image | undefined =
         annotations: [],
         name: "example.png",
         partition: Partition.Inference,
-        shape: {
-          channels: 3,
-          frames: 1,
-          height: 512,
-          planes: 1,
-          width: 512,
-        },
+        shape: initialImageShape,
         originalSrc: [],
         src: colorImage,
       }

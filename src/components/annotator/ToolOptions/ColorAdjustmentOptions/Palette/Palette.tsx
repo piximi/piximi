@@ -10,7 +10,6 @@ import {
 import { imageViewerSlice } from "../../../../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import { Color } from "../../../../../types/Color";
-import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";

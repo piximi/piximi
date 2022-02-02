@@ -3,10 +3,7 @@ import React from "react";
 import { ToolType as OperationType } from "../../../../types/ToolType";
 import { Tool } from "../Tool";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  imageOriginalSrcSelector,
-  toolTypeSelector,
-} from "../../../../store/selectors";
+import { toolTypeSelector } from "../../../../store/selectors";
 import { imageViewerSlice } from "../../../../store/slices";
 import {
   ColorAdjustmentIcon,
@@ -30,14 +27,6 @@ export const Tools = () => {
   const activeOperation = useSelector(toolTypeSelector);
 
   const t = useTranslation();
-
-  const activeImageData = useSelector(imageOriginalSrcSelector);
-  const disableColorAdjustment =
-    activeImageData?.length === 0 || !activeImageData;
-  //FIXME: we currently disable the Color Adjustment Tool if no image data has been parsed by the image (and thus the tool cannot be applied).
-  // This may currently happen when we select an example image from the available example images, for which we only have the display
-  // URI and not the actual channel data. We also don't have data for the default CellPainting data.
-  // Once we actually get the data, we won't need to disable the Color Adjustment tool.
 
   return (
     <Drawer
@@ -83,7 +72,6 @@ export const Tools = () => {
 
       <Tool
         name={t("Color Adjustment")}
-        disabled={disableColorAdjustment}
         onClick={() => {
           dispatch(
             imageViewerSlice.actions.setOperation({
