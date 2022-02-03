@@ -8,10 +8,10 @@ export type SerializedImageType = {
   imageData: Array<string>;
   imageFilename: string;
   imageFrames: number;
-  imageHeight: number;
+  imageHeight: number; // TODO, issue #236: remove
   imageId: string;
   imagePlanes: number;
-  imageWidth: number;
+  imageWidth: number; // TODO, issue #236: remove
   imagePartition: Partition;
   annotations: Array<AnnotationType>;
 };
