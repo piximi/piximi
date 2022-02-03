@@ -13,14 +13,11 @@ import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
 import {
   convertImageURIsToImageData,
-  convertSrcURIToOriginalSrcURIs,
   generateDefaultChannels,
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { ApplyColorsButton } from "../ApplyColorsButton";
-import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
-import { imageSrcSelector } from "../../../../../store/selectors/imageSrcSelector";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
@@ -29,11 +26,7 @@ export const ColorAdjustmentOptions = () => {
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  const src = useSelector(imageSrcSelector);
-
   const activeImagePlane = useSelector(activeImagePlaneSelector);
-
-  const activeImageId = useSelector(activeImageIdSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
@@ -65,29 +58,17 @@ export const ColorAdjustmentOptions = () => {
   };
 
   useEffect(() => {
-    if (!activeImageId) return;
-
     const fetchData = async () => {
       if (!originalSrc) return;
 
-      let originalURIs: Array<Array<string>> = [];
-
-      if (!originalSrc.length && src && imageShape) {
-        //if nothing in originalSrc, attempt to compute it from src -- this makes the assumption of RGB image
-        const sliceData = await convertSrcURIToOriginalSrcURIs(src, imageShape);
-        originalURIs = [sliceData];
-      } else {
-        originalURIs = originalSrc;
-      }
-
-      return await convertImageURIsToImageData(originalURIs);
+      return await convertImageURIsToImageData(originalSrc);
     };
 
     fetchData().then((data: Array<Array<Array<number>>> | undefined) => {
       if (!data) return;
       setOriginalData(data);
     });
-  }, [activeImageId, originalSrc]);
+  }, [originalSrc]);
 
   return (
     <>

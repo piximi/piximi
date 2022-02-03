@@ -156,7 +156,8 @@ export const extractChannelsFromFlattenedArray = (
 export const convertFileToImage = async (
   file: File,
   colors: Array<Color> | undefined,
-  z_stack?: boolean
+  slices: number,
+  channels: number
 ): Promise<ImageType> => {
   /**
    * Returns image to be provided to dispatch
@@ -164,47 +165,7 @@ export const convertFileToImage = async (
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
       ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        // resolve(convertImageJStoImage(image, file.name, colors, z_stack));
-        resolve(convertToImage(image, file.name, colors));
-      });
-    });
-  });
-};
-
-export const convertFilesToImages = async (
-  files: FileList,
-  colors: Array<Color>,
-  is_stack?: boolean
-) => {
-  /**
-   * Give File List, iterate over each files, get image, and return list of images to update
-   * **/
-  const newImages: Array<ImageType> = [];
-
-  for (let i = 0; i < files.length; i++) {
-    const image = await convertFileToImage(files[i], colors, is_stack);
-    newImages.push(image);
-  }
-
-  return newImages;
-};
-
-export const isArrayOfImages = async (
-  file: File,
-  callback: () => void
-): Promise<boolean> => {
-  /**
-   * Checks whether the selected file corresponds to an array of images. In which case we need clarification from user whether this image is a z-stack or not.
-   * **/
-  return new Promise((resolve, reject) => {
-    return file.arrayBuffer().then((buffer) => {
-      ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        if (Array.isArray(image)) {
-          callback();
-          resolve(true);
-        } else {
-          resolve(false);
-        }
+        resolve(convertToImage(image, file.name, colors, slices, channels));
       });
     });
   });
@@ -231,15 +192,17 @@ const convertImageDataToURI = (
 const convertToImage = (
   image: ImageJS.Image,
   filename: string,
-  currentColors: Array<Color> | undefined
+  currentColors: Array<Color> | undefined,
+  slices: number,
+  components: number
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type.
    * returns: the image of Image type
    * **/
 
-  let z = 60; //TODO this should be specified by the user (can we guess it)?
-  let c = 3; //TODO this should be specified by the user (can we guess it?)
+  let z = slices;
+  let c = components;
 
   const originalURIs: Array<Array<string>> = [];
 

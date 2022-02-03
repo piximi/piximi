@@ -35,7 +35,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      const image = await convertFileToImage(file, colors);
+      const image = await convertFileToImage(file, colors, 1, 3); //todo fix: use dialog box
 
       //if length of images is > 1, then the user selected a z-stack --> only show center image
       dispatch(createImage({ image: image }));

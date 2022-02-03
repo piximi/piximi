@@ -1,18 +1,9 @@
 import * as React from "react";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import {
-  convertFileToImage,
-  generateDefaultChannels,
-} from "../../../../image/imageHelper";
+import { convertFileToImage } from "../../../../image/imageHelper";
 import { useDispatch, useSelector } from "react-redux";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Checkbox from "@mui/material/Checkbox";
-import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "../../../../icons";
-import { Button, DialogActions, TextField } from "@mui/material";
+import { Box, Button, DialogActions, TextField } from "@mui/material";
 import { imageViewerSlice } from "../../../../store/slices";
 import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
 
@@ -27,15 +18,28 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
 
   const colors = useSelector(currentColorsSelector);
 
-  const [isStack, setIsStack] = React.useState<boolean>(false);
-
   const { files, open, onClose } = props;
+
+  const handleChannelsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChannels(parseInt(event.target.value));
+  };
+  const handleSlicesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSlices(parseInt(event.target.value));
+  };
+
+  const [channels, setChannels] = React.useState<number>(3);
+  const [slices, setSlices] = React.useState<number>(1);
 
   const onClick = async () => {
     onClose();
 
     for (let i = 0; i < files.length; i++) {
-      const image = await convertFileToImage(files[i], colors, isStack);
+      const image = await convertFileToImage(
+        files[i],
+        colors,
+        slices,
+        channels
+      );
       dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
       if (i === 0) {
         dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
@@ -46,32 +50,35 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   return (
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>Tell us about your image: </DialogTitle>
-      <List dense>
-        <ListItem>
-          <ListItemIcon>
-            <Checkbox
-              onClick={
-                isStack ? () => setIsStack(false) : () => setIsStack(true)
-              }
-              checked={isStack}
-              icon={<CheckboxUncheckedIcon />}
-              checkedIcon={<CheckboxCheckedIcon />}
-            />
-          </ListItemIcon>
-          <ListItemText primary={"Is image a z-stack?"} />
-        </ListItem>
-        <ListItem>
-          <TextField
-            required
-            disabled={!isStack}
-            id="outlined-required"
-            label="Slices (z)"
-          />
-        </ListItem>
-        <ListItem>
-          <TextField required id="outlined-required" label="Channels (c)" />
-        </ListItem>
-      </List>
+      <Box
+        component="form"
+        sx={{
+          "& .MuiTextField-root": { m: 1, width: "25ch" },
+        }}
+        noValidate
+        autoComplete="off"
+      >
+        <TextField
+          InputLabelProps={{
+            shrink: true,
+          }}
+          id="outlined-required"
+          type="number"
+          label="Slices (z)"
+          value={slices}
+          onChange={handleSlicesChange}
+        />
+        <TextField
+          InputLabelProps={{
+            shrink: true,
+          }}
+          id="outlined-required"
+          type="number"
+          label="Channels (c)"
+          value={channels}
+          onChange={handleChannelsChange}
+        />
+      </Box>
       <DialogActions>
         <Button onClick={onClick} autoFocus>
           OK

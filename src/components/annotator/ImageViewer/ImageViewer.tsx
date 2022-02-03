@@ -42,7 +42,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     async (item) => {
       if (item) {
         for (let i = 0; i < item.files.length; i++) {
-          const image = await convertFileToImage(item.files[i], colors);
+          const image = await convertFileToImage(item.files[i], colors, 1, 3); //TODO fix: use dialog box
           dispatch(addImages({ newImages: [image] }));
 
           if (i === 0) {
@@ -68,7 +68,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
         }
       }
     },
-    [dispatch]
+    [colors, dispatch]
   );
 
   return (
