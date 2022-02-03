@@ -11,7 +11,7 @@ export type SerializedImageType = {
   imageHeight: number;
   imageId: string;
   imagePlanes: number;
-  imageWidth: number; // TODO, issue #236: remove
+  imageWidth: number;
   imagePartition: Partition;
   annotations: Array<AnnotationType>;
 };
