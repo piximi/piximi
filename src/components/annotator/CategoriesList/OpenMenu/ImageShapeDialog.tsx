@@ -4,8 +4,13 @@ import Dialog from "@mui/material/Dialog";
 import { convertFileToImage } from "../../../../image/imageHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, DialogActions, TextField } from "@mui/material";
-import { imageViewerSlice } from "../../../../store/slices";
+import {
+  imageViewerSlice,
+  setOperation,
+  setSelectedAnnotations,
+} from "../../../../store/slices";
 import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
+import { ToolType } from "../../../../types/ToolType";
 
 export interface ImageShapeDialogProps {
   files: FileList;
@@ -43,6 +48,14 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
       dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
       if (i === 0) {
         dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
+        dispatch(
+          setSelectedAnnotations({
+            selectedAnnotations: [],
+            selectedAnnotation: undefined,
+          })
+        );
+
+        dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
       }
     }
   };
