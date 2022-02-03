@@ -9,8 +9,8 @@ export type Image = {
   colors: Array<Color>;
   id: string;
   name: string;
-  originalSrc: Array<Array<string>>; //TODO explain this (Z x C x mn) where mxn image;
+  originalSrc: Array<Array<string>>; //We keep track of the URIs for each channel, for each slice (used for color adjustment)
   partition: Partition;
   shape: Shape;
-  src: string;
+  src: string; // The URI to be displayed on the canvas
 };
