@@ -13,6 +13,7 @@ import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
 import { RescaleOptions } from "./RescaleOptions";
 import { ClassifierModelProps } from "./ClassifierModelType";
+import { EvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
   compiled?: LayersModel;
@@ -42,4 +43,5 @@ export type Classifier = {
   predictions?: Tensor;
   rescaleOptions: RescaleOptions;
   trainingPercentage: number;
+  evaluationResult: EvaluationResultType;
 };

@@ -10,12 +10,15 @@ import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListIt
 import { DialogTransition } from "../../DialogTransition";
 import {
   categorizedImagesSelector,
+  compiledSelector,
   trainingPercentageSelector,
 } from "../../../store/selectors";
 import { Image } from "../../../types/Image";
 import * as _ from "lodash";
 import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
+import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
+import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -29,9 +32,24 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(true);
+  const [showPlots, setShowPlots] = useState<boolean>(false);
+
+  const [trainingAccuracy, setTrainingAccuracy] = useState<
+    { x: number; y: number }[]
+  >([]);
+  const [validationAccuracy, setValidationAccuracy] = useState<
+    { x: number; y: number }[]
+  >([]);
+  const [trainingLoss, setTrainingLoss] = useState<{ x: number; y: number }[]>(
+    []
+  );
+  const [validationLoss, setValidationLoss] = useState<
+    { x: number; y: number }[]
+  >([]);
 
   const trainingPercentage = useSelector(trainingPercentageSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
+  const compiledModel = useSelector(compiledSelector);
 
   useEffect(() => {
     setNoCategorizedImagesAlert(categorizedImages.length === 0);
@@ -39,7 +57,35 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const dispatch = useDispatch();
 
+  const trainingHistoryCallback = (epoch: number, logs: any) => {
+    const epochCount = epoch + 1;
+    setTrainingAccuracy((prevState) =>
+      prevState.concat({ x: epochCount, y: logs.categoricalAccuracy })
+    );
+    setValidationAccuracy((prevState) =>
+      prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
+    );
+    setTrainingLoss((prevState) =>
+      prevState.concat({ x: epochCount, y: logs.loss })
+    );
+    setValidationLoss((prevState) =>
+      prevState.concat({ x: epochCount, y: logs.val_loss })
+    );
+
+    setShowPlots(true);
+  };
+
+  const cleanUpStates = () => {
+    setTrainingAccuracy([]);
+    setValidationAccuracy([]);
+    setTrainingLoss([]);
+    setValidationLoss([]);
+    setShowPlots(false);
+  };
+
   const onFit = async () => {
+    cleanUpStates();
+
     //first assign train and val partition to all categorized images
     const categorizedImagesIds = _.shuffle(categorizedImages).map(
       (image: Image) => {
@@ -71,10 +117,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
     dispatch(
       classifierSlice.actions.fit({
-        onEpochEnd: (epoch: number, logs: any) => {
-          console.info(logs);
-          console.info(epoch + ":" + logs.loss);
-        },
+        onEpochEnd: trainingHistoryCallback,
       })
     );
   };
@@ -97,7 +140,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         disableFitting={noCategorizedImagesAlert}
       />
 
-      {noCategorizedImagesAlert && showWarning ? (
+      {noCategorizedImagesAlert && showWarning && (
         <Alert
           onClose={() => {
             setShowWarning(false);
@@ -106,8 +149,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         >
           {"Please label images to train a model."}
         </Alert>
-      ) : (
-        <></>
       )}
 
       <DialogContent>
@@ -123,7 +164,29 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
           <DatasetSettingsListItem />
         </List>
-        <div id={"tfvis-container"} />
+
+        {showPlots && (
+          <div>
+            <TrainingHistoryPlot
+              metric={"accuracy"}
+              trainingValues={trainingAccuracy}
+              validationValues={validationAccuracy}
+            />
+
+            <TrainingHistoryPlot
+              metric={"loss"}
+              trainingValues={trainingLoss}
+              validationValues={validationLoss}
+              dynamicYRange={true}
+            />
+          </div>
+        )}
+
+        {compiledModel && (
+          <div>
+            <ModelSummaryTable compiledModel={compiledModel} />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
