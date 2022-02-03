@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect } from "react";
 import { Box, CssBaseline } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
 import { imageViewerSlice } from "../../../store/slices";
 import { Image } from "../../../types/Image";
-import { currentColorsSelector } from "../../../store/selectors/currentColorsSelector";
 import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 
 type ImageViewerProps = {
@@ -16,7 +15,6 @@ type ImageViewerProps = {
 
 export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
-  const colors = useSelector(currentColorsSelector);
 
   const [files, setFiles] = React.useState<FileList>();
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
