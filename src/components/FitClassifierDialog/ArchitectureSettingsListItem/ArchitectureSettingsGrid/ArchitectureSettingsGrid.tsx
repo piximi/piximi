@@ -149,10 +149,8 @@ export const ArchitectureSettingsGrid = () => {
 
       <Grid container spacing={1}>
         <Grid item xs={3} marginTop={1}>
-          {fixedNumberOfChannels ? (
+          {fixedNumberOfChannels && (
             <Alert severity="info">{fixedNumberOfChannelsHelperText}</Alert>
-          ) : (
-            <></>
           )}
         </Grid>
       </Grid>

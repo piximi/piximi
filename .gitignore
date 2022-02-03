@@ -17,3 +17,5 @@ yarn-error.log*
 *.notes.md
 .vscode
 package-lock.json
+stories
+.storybook
