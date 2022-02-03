@@ -210,7 +210,7 @@ const convertToImage = (
   const channels: number = Array.isArray(image)
     ? image.length / z
     : image.components;
-  const displayedIdx: number = z > 1 ? Math.floor(input.length / 2) : 0;
+  const displayedIdx: number = 0;
   const colors = currentColors ? currentColors : generateDefaultChannels(c);
   const height = input[0].height;
   const width = input[0].width;
@@ -262,7 +262,7 @@ const convertToImage = (
         j += 1;
       }
 
-      if (i >= displayedIdx && !displayedData.length) {
+      if (i === displayedIdx) {
         displayedData = sliceData;
       }
 

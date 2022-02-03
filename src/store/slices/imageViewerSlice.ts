@@ -244,7 +244,9 @@ export const imageViewerSlice = createSlice({
 
       const loaded: Image = {
         categoryId: UNKNOWN_CATEGORY_ID,
-        colors: generateDefaultChannels(action.payload.file.imageChannels),
+        colors: action.payload.file.imageColors
+          ? action.payload.file.imageColors
+          : generateDefaultChannels(action.payload.file.imageChannels),
         id: action.payload.file.imageId,
         src: action.payload.file.imageSrc,
         originalSrc: action.payload.file.imageData,
@@ -567,6 +569,7 @@ export const {
   deleteImage,
   openAnnotations,
   setActiveImage,
+  setActiveImagePlane,
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,

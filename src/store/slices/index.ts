@@ -27,6 +27,7 @@ export {
   imageViewerSlice,
   addImages,
   deleteAllInstances,
+  setActiveImagePlane,
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,
