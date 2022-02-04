@@ -62,7 +62,7 @@ export const ImageGridAppBar = () => {
 
       const annotatorImage: Image = {
         ...projectImage!,
-        partition: Partition.Inference,
+        partition: Partition.Inference, // TODO: incorrect if previously annotated
       };
 
       if (idx === 0) {
