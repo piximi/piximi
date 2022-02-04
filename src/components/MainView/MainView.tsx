@@ -3,15 +3,17 @@ import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
-import { createImage } from "../../store/slices";
-import { useDispatch, useSelector } from "react-redux";
-import { convertFileToImage } from "../../image/imageHelper";
-import { currentColorsSelector } from "../../store/selectors/currentColorsSelector";
+import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
 
 export const MainView = () => {
-  const dispatch = useDispatch();
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
+    React.useState(false);
 
-  const colors = useSelector(currentColorsSelector);
+  const handleClose = () => {
+    setOpenDimensionsDialogBox(false);
+  };
+
+  const [files, setFiles] = React.useState<FileList>();
 
   const onUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
@@ -29,17 +31,12 @@ export const MainView = () => {
     };
   }, []);
 
-  const onDrop = useCallback(
-    async (item) => {
-      if (item) {
-        for (let i = 0; i < item.files.length; i++) {
-          const image = await convertFileToImage(item.files[i], colors, 1, 3); //todo fix: use dialog box
-          dispatch(createImage({ image: image }));
-        }
-      }
-    },
-    [dispatch, colors]
-  );
+  const onDrop = useCallback(async (item) => {
+    if (item) {
+      setFiles(item.files);
+      setOpenDimensionsDialogBox(true); //open dialog box
+    }
+  }, []);
 
   return (
     <Box sx={{ height: "100vh" }}>
@@ -50,6 +47,13 @@ export const MainView = () => {
       <ApplicationDrawer />
 
       <ImageGrid onDrop={onDrop} />
+
+      <ImageShapeDialog
+        files={files!}
+        open={openDimensionsDialogBox}
+        onClose={handleClose}
+        isUploadedFromAnnotator={false}
+      />
     </Box>
   );
 };

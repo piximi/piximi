@@ -57,6 +57,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
         files={files!}
         open={openDimensionsDialogBox}
         onClose={handleClose}
+        isUploadedFromAnnotator={true}
       />
 
       <ToolOptions />

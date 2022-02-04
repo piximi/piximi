@@ -5,6 +5,7 @@ import { convertFileToImage } from "../../../../image/imageHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, DialogActions, TextField } from "@mui/material";
 import {
+  createImage,
   imageViewerSlice,
   setOperation,
   setSelectedAnnotations,
@@ -16,6 +17,7 @@ export interface ImageShapeDialogProps {
   files: FileList;
   open: boolean;
   onClose: () => void;
+  isUploadedFromAnnotator: boolean;
 }
 
 export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
@@ -23,7 +25,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
 
   const colors = useSelector(currentColorsSelector);
 
-  const { files, open, onClose } = props;
+  const { files, open, onClose, isUploadedFromAnnotator } = props;
 
   const handleChannelsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChannels(parseInt(event.target.value));
@@ -35,7 +37,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   const [channels, setChannels] = React.useState<number>(3);
   const [slices, setSlices] = React.useState<number>(1);
 
-  const onClick = async () => {
+  const onConfirm = async () => {
     onClose();
 
     for (let i = 0; i < files.length; i++) {
@@ -45,17 +47,25 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
         slices,
         channels
       );
-      dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
-      if (i === 0) {
-        dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
-        dispatch(
-          setSelectedAnnotations({
-            selectedAnnotations: [],
-            selectedAnnotation: undefined,
-          })
-        );
+      if (isUploadedFromAnnotator) {
+        //if image is uplpoaded from the annotator, we add image to annotator state
+        dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
+        if (i === 0) {
+          dispatch(
+            imageViewerSlice.actions.setActiveImage({ image: image.id })
+          );
+          dispatch(
+            setSelectedAnnotations({
+              selectedAnnotations: [],
+              selectedAnnotation: undefined,
+            })
+          );
 
-        dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+          dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+        }
+      } else {
+        //otherwise, we add image to project state
+        dispatch(createImage({ image: image }));
       }
     }
   };
@@ -93,7 +103,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
         />
       </Box>
       <DialogActions>
-        <Button onClick={onClick} autoFocus>
+        <Button onClick={onConfirm} autoFocus>
           OK
         </Button>
       </DialogActions>

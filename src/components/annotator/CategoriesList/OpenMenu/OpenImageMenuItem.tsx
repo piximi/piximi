@@ -47,6 +47,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
         files={files!}
         open={openDimensionsDialogBox}
         onClose={handleClose}
+        isUploadedFromAnnotator={true}
       />
     </React.Fragment>
   );
