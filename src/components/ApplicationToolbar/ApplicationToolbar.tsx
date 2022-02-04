@@ -6,10 +6,12 @@ import { useDispatch } from "react-redux";
 import { Slider, Toolbar, Box } from "@mui/material";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import { ImageSortSelection } from "components/ImageSortSelection/ImageSortSelection";
 
 export const ApplicationToolbar = () => {
   const dispatch = useDispatch();
   const [value, setValue] = React.useState<number>(1);
+
   const onChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
@@ -18,21 +20,13 @@ export const ApplicationToolbar = () => {
       })
     );
   };
-  // const onChangeCommitted = (
-  //   event: React.ChangeEvent<{}>,
-  //   newValue: number | number[]
-  // ) => {
-  //   dispatch(
-  //     applicationSlice.actions.updateTileSize({
-  //       newValue: newValue as number,
-  //     })
-  //   );
-  // };
+
   return (
     <Toolbar>
       <Logo />
       {/*<TaskSelect />*/}
       <Box sx={{ flexGrow: 1 }} />
+      <ImageSortSelection />
       <ZoomOutIcon
         sx={(theme) => ({
           marginLeft: theme.spacing(1),
