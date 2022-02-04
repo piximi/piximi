@@ -1,10 +1,12 @@
 import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
+import { Color } from "./Color";
 
 export type SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
   imageChecksum: string;
+  imageColors: Array<Color>;
   imageData: Array<Array<string>>;
   imageSrc: string;
   imageFilename: string;

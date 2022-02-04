@@ -133,7 +133,9 @@ export const projectSlice = createSlice({
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
           categoryId: serializedImage.imageCategoryId,
-          colors: generateDefaultChannels(serializedImage.imageChannels),
+          colors: serializedImage.imageColors
+            ? serializedImage.imageColors
+            : generateDefaultChannels(serializedImage.imageChannels),
           id: serializedImage.imageId,
           annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
