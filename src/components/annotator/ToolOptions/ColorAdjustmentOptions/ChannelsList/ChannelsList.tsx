@@ -16,17 +16,15 @@ import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import {
+  convertImageURIsToImageData,
   mapChannelstoSpecifiedRGBImage,
   rgbToHex,
 } from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 
-type ChannelsListProps = {
-  originalData: Array<Array<Array<number>>>;
-};
-
-export const ChannelsList = ({ originalData }: ChannelsListProps) => {
+export const ChannelsList = () => {
   const dispatch = useDispatch();
 
   const activeImageColors = useSelector(activeImageColorsSelector);
@@ -34,6 +32,8 @@ export const ChannelsList = ({ originalData }: ChannelsListProps) => {
   const imageShape = useSelector(imageShapeSelector);
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
+
+  const originalSrc = useSelector(imageOriginalSrcSelector);
 
   const visibleChannelsIndices = activeImageColors
     .map((channel: Color, idx) => channel.visible)
@@ -79,11 +79,15 @@ export const ChannelsList = ({ originalData }: ChannelsListProps) => {
     [activeImageColors, dispatch]
   );
 
-  const handleSliderChangeCommitted = () => {
-    if (!originalData || !imageShape) return;
+  const handleSliderChangeCommitted = async () => {
+    if (!originalSrc || !imageShape) return;
+
+    const originalData = await convertImageURIsToImageData([
+      originalSrc[activeImagePlane],
+    ]);
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
-      originalData[activeImagePlane],
+      originalData[0],
       activeImageColors,
       imageShape.height,
       imageShape.width
@@ -108,17 +112,21 @@ export const ChannelsList = ({ originalData }: ChannelsListProps) => {
       copiedChannels[index] = { ...copiedChannels[index], visible: false };
     }
 
-    batch(() => {
+    batch(async () => {
       dispatch(
         imageViewerSlice.actions.setImageColors({
           colors: copiedChannels,
         })
       );
 
-      if (!originalData || !imageShape) return;
+      if (!originalSrc || !imageShape) return;
 
-      const arrayLength = originalData[activeImagePlane][0].length;
-      const modifiedData = originalData[activeImagePlane].map(
+      const originalData = await convertImageURIsToImageData([
+        originalSrc[activeImagePlane],
+      ]);
+
+      const arrayLength = originalData[0][0].length;
+      const modifiedData = originalData[0].map(
         (arr: Array<number>, i: number) => {
           if (visibles.includes(i)) {
             return arr;
@@ -172,7 +180,7 @@ export const ChannelsList = ({ originalData }: ChannelsListProps) => {
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
         />
-        <Palette originalData={originalData} channelIdx={index} />
+        <Palette channelIdx={index} />
       </ListItem>
     );
   };

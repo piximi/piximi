@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -24,17 +24,13 @@ export const ColorAdjustmentOptions = () => {
 
   const dispatch = useDispatch();
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
-
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const [originalData, setOriginalData] = React.useState<
-    Array<Array<Array<number>>>
-  >([]);
+  const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  const onResetChannelsClick = () => {
+  const onResetChannelsClick = async () => {
     if (!imageShape) return;
 
     const defaultChannels = generateDefaultChannels(imageShape.channels);
@@ -47,8 +43,12 @@ export const ColorAdjustmentOptions = () => {
 
     if (!originalSrc || !imageShape) return;
 
+    const originalData = await convertImageURIsToImageData([
+      originalSrc[activeImagePlane],
+    ]);
+
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
-      originalData[activeImagePlane],
+      originalData[0],
       defaultChannels,
       imageShape.height,
       imageShape.width
@@ -57,30 +57,17 @@ export const ColorAdjustmentOptions = () => {
     dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!originalSrc) return;
-
-      return await convertImageURIsToImageData(originalSrc);
-    };
-
-    fetchData().then((data: Array<Array<Array<number>>> | undefined) => {
-      if (!data) return;
-      setOriginalData(data);
-    });
-  }, [originalSrc]);
-
   return (
     <>
       <InformationBox description="…" name={t("Color adjustment")} />
 
       <Divider />
 
-      <ZStackSlider originalData={originalData} />
+      <ZStackSlider />
 
       <Divider />
 
-      <ChannelsList originalData={originalData} />
+      <ChannelsList />
 
       <Divider />
 

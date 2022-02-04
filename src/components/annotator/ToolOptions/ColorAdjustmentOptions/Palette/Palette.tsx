@@ -4,6 +4,7 @@ import LensIcon from "@mui/icons-material/Lens";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { DEFAULT_COLORS } from "../../../../../types/DefaultColors";
 import {
+  convertImageURIsToImageData,
   mapChannelstoSpecifiedRGBImage,
   rgbToHex,
 } from "../../../../../image/imageHelper";
@@ -13,13 +14,13 @@ import { Color } from "../../../../../types/Color";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 
 type PaletteProps = {
   channelIdx: number;
-  originalData: Array<Array<Array<number>>>;
 };
 
-export const Palette = ({ channelIdx, originalData }: PaletteProps) => {
+export const Palette = ({ channelIdx }: PaletteProps) => {
   const default_colors = DEFAULT_COLORS;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -32,6 +33,8 @@ export const Palette = ({ channelIdx, originalData }: PaletteProps) => {
 
   const imageShape = useSelector(imageShapeSelector);
 
+  const originalSrc = useSelector(imageOriginalSrcSelector);
+
   const dispatch = useDispatch();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -42,7 +45,7 @@ export const Palette = ({ channelIdx, originalData }: PaletteProps) => {
     setAnchorEl(null);
   };
 
-  const assignColor = (
+  const assignColor = async (
     event:
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLButtonElement>,
@@ -58,10 +61,14 @@ export const Palette = ({ channelIdx, originalData }: PaletteProps) => {
       imageViewerSlice.actions.setImageColors({ colors: updatedColors })
     );
 
-    if (!originalData || !imageShape) return;
+    if (!originalSrc || !imageShape) return;
+
+    const originalData = await convertImageURIsToImageData([
+      originalSrc[activeImagePlane],
+    ]);
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
-      originalData[activeImagePlane],
+      originalData[0],
       updatedColors,
       imageShape.height,
       imageShape.width

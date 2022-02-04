@@ -38,7 +38,7 @@ export const ApplyColorsButton = () => {
             ]);
 
             const modifiedURI = mapChannelstoSpecifiedRGBImage(
-              originalData[activeImagePlane],
+              originalData[0],
               activeImageColors,
               image.shape.height,
               image.shape.width
