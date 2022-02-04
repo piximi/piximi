@@ -68,14 +68,13 @@ export const convertFileToImage = async (file: File): Promise<ImageType> => {
 };
 
 export const convertImageJStoImage = (
-  image: ImageJS.Image,
+  image: ImageJS.Image | ImageJS.Stack,
   filename: string
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type. Return Image.
    * returns: the image of Image type
    * **/
-
   let nplanes = 1;
   let height: number;
   let width: number;
