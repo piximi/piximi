@@ -9,6 +9,50 @@ import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
+import { SerializedImageType } from "types/SerializedImageType";
+
+export const deserializeImages = async (
+  serializedImages: Array<SerializedImageType>
+) => {
+  const deserializedImages: Array<ImageType> = [];
+
+  for (const serializedImage of serializedImages) {
+    let nPlanes: number;
+    let referenceImageData: string | Array<string>;
+    let originalSrc: Array<string>;
+
+    if (Array.isArray(serializedImage.imageData)) {
+      nPlanes = serializedImage.imageData.length;
+      referenceImageData = serializedImage.imageData[0];
+      originalSrc = serializedImage.imageData;
+    } else {
+      nPlanes = 1;
+      referenceImageData = serializedImage.imageData;
+      originalSrc = [serializedImage.imageData]; // handle case where example projects's images do not correspond to array of strings
+    }
+
+    let referenceImage = await ImageJS.Image.load(referenceImageData);
+
+    deserializedImages.push({
+      categoryId: serializedImage.imageCategoryId,
+      id: serializedImage.imageId,
+      annotations: serializedImage.annotations,
+      name: serializedImage.imageFilename,
+      partition: serializedImage.imagePartition,
+      shape: {
+        width: referenceImage.width,
+        height: referenceImage.height,
+        channels: referenceImage.components,
+        planes: nPlanes,
+        frames: serializedImage.imageFrames,
+      },
+      originalSrc: originalSrc,
+      src: originalSrc[Math.floor(nPlanes / 2)],
+    });
+  }
+
+  return deserializedImages;
+};
 
 export const convertFileToImage = async (file: File): Promise<ImageType> => {
   /**
@@ -24,14 +68,13 @@ export const convertFileToImage = async (file: File): Promise<ImageType> => {
 };
 
 export const convertImageJStoImage = (
-  image: ImageJS.Image,
+  image: ImageJS.Image | ImageJS.Stack,
   filename: string
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type. Return Image.
    * returns: the image of Image type
    * **/
-
   let nplanes = 1;
   let height: number;
   let width: number;
