@@ -4,6 +4,7 @@ import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
+import { deserializeImages } from "image/imageHelper";
 
 type OpenExampleProjectMenuItemProps = {
   exampleProject: ExampleProject;
@@ -46,13 +47,14 @@ export const OpenExampleProjectMenuItem = ({
 
     const project = exampleProjectJson.project as SerializedProjectType;
     const classifier = exampleProjectJson.classifier as Classifier;
+    const images = await deserializeImages(project.serializedImages);
 
     popupState.close();
     onClose();
 
     dispatch(
       projectSlice.actions.openProject({
-        images: project.serializedImages,
+        images: images,
         categories: project.categories,
         name: project.name,
       })
