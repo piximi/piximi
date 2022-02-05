@@ -1,5 +1,5 @@
 import React, { SyntheticEvent } from "react";
-import { FormControl, Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import { availableImageSortKeys, ImageSortKeyType } from "types/ImageSortType";
 import { projectSlice } from "store/slices";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +19,9 @@ export const ImageSortSelection = () => {
     setSelectedImageSortKey(selectedSortKey);
 
     dispatch(
-      projectSlice.actions.updateImageSortKey({ imageSortKey: selectedSortKey })
+      projectSlice.actions.sortImagesBySelectedKey({
+        imageSortKey: selectedSortKey,
+      })
     );
   };
 

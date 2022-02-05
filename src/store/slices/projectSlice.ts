@@ -264,11 +264,14 @@ export const projectSlice = createSlice({
     ) {
       state.trainFlag = action.payload.trainFlag;
     },
-    updateImageSortKey(
+    sortImagesBySelectedKey(
       state: Project,
       action: PayloadAction<{ imageSortKey: ImageSortKeyType }>
     ) {
-      state.imageSortKey = action.payload.imageSortKey;
+      const selectedSortKey = action.payload.imageSortKey;
+      state.imageSortKey = selectedSortKey;
+
+      state.images.sort(selectedSortKey.comparerFunction);
     },
   },
 });
