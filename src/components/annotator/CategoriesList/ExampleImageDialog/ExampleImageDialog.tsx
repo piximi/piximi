@@ -17,7 +17,6 @@ import { SerializedAnnotationType } from "../../../../types/SerializedAnnotation
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { categoriesSelector } from "../../../../store/selectors";
 import {
-  convertSrcURIToOriginalSrcURIs,
   generateDefaultChannels,
   importSerializedAnnotations,
 } from "../../../../image/imageHelper";
@@ -124,11 +123,6 @@ export const ExampleImageDialog = ({
 
     const defaultColors = generateDefaultChannels(shape.channels);
 
-    const sliceData = await convertSrcURIToOriginalSrcURIs(
-      data as string,
-      shape
-    );
-
     const example: Image = {
       activeSlice: 0,
       annotations: newAnnotations,
@@ -136,7 +130,7 @@ export const ExampleImageDialog = ({
       colors: defaultColors,
       id: uuidv4(),
       name: name,
-      originalSrc: [sliceData],
+      originalSrc: project[0].imageData,
       partition: Partition.Inference,
       shape: shape,
       src: data as string,

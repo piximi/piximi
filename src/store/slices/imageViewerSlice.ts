@@ -21,6 +21,7 @@ import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
 import { Shape } from "../../types/Shape";
+import * as cellpaintingAnnotations from "../../images/cellpainting.json";
 
 const initialImageShape: Shape = {
   channels: 3,
@@ -42,7 +43,7 @@ const initialImage: Image | undefined =
         name: "example.png",
         partition: Partition.Inference,
         shape: initialImageShape,
-        originalSrc: [],
+        originalSrc: (cellpaintingAnnotations as any).default[0].imageData,
         src: colorImage,
       }
     : undefined;
