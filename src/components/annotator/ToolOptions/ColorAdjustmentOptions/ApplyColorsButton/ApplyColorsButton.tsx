@@ -33,6 +33,10 @@ export const ApplyColorsButton = () => {
           if (image.id === activeImageId) {
             return image; //don't do anything, the imageSrc has already been updated on slider change / toggling
           } else {
+            if (image.shape.channels !== activeImageColors.length) {
+              //if mismatch between image size and desired colors, don't do anything on the image
+              return image;
+            }
             const originalData = await convertImageURIsToImageData([
               image.originalSrc[activeImagePlane],
             ]);

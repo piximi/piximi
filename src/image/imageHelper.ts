@@ -13,21 +13,6 @@ import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
 
-export const mapChannelsToDefaultColorImage = (
-  data: Array<Array<number>>,
-  rows: number,
-  columns: number
-) => {
-  //TODO write docs (this function is used on new image loading, we use default colors to map image)
-  const defaultColors = DEFAULT_COLORS;
-  const n_channels = data.length;
-  const colors = defaultColors.slice(0, n_channels);
-  const channels = colors.map((color: Array<number>) => {
-    return { visible: true, range: [0, 255], color };
-  });
-  return mapChannelstoSpecifiedRGBImage(data, channels, rows, columns);
-};
-
 export const mapChannelstoSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Color>,
@@ -54,7 +39,7 @@ export const mapChannelstoSpecifiedRGBImage = (
 
     //for each channel
     const channelData: Array<number> = data[channel_idx];
-    const max = 255; //TODO is it okay to assume 8-bit for now
+    const max = 255;
     let mappedChannel: Array<Array<number>> = [];
 
     if (!color.visible) {
@@ -87,26 +72,14 @@ export const mapChannelstoSpecifiedRGBImage = (
     for (let i = 0; i < mappedChannels.length; i++) {
       //for each channel i
       summedChannels[j] = [
-        Math.min(summedChannels[j][0] + mappedChannels[i][j][0], 255),
+        Math.min(summedChannels[j][0] + mappedChannels[i][j][0], 255), //cap each channel to 255
         Math.min(summedChannels[j][1] + mappedChannels[i][j][1], 255),
         Math.min(summedChannels[j][2] + mappedChannels[i][j][2], 255),
       ];
     }
   }
 
-  //TODO, above we cap to 255, but maybe it must be nromalized as (see github link below)
-  //TODO summedChannels needs to be normalized as: https://github.com/broadinstitute/DavidStirling_Projects/blob/master/Python%20Scripts/Average_Cell_Visualisation/visualise_single_cells_clean.ipynb
-  //right now this is just a simplified version
   const flattened: Array<number> = _.flatten(summedChannels);
-  //TODO fix this
-  // const min = 0;
-  // const max = 255;
-  // // const min = _.min(flattened);
-  // // const max = _.max(flattened);
-  // // if (!max || !min) return "";
-  // for (let j = 0; j < flattened.length; j++) {
-  //   flattened[j] = (flattened[j] - min) / (max - min);
-  // }
 
   const img: ImageJS.Image = new ImageJS.Image(columns, rows, flattened, {
     components: 3,
@@ -116,10 +89,6 @@ export const mapChannelstoSpecifiedRGBImage = (
   return img.toDataURL("image/png", {
     useCanvas: true,
   });
-};
-
-export const extractChannelsFromURIImage = () => {
-  //TODO implement this
 };
 
 export const extractChannelsFromFlattenedArray = (
@@ -226,7 +195,9 @@ const convertImageDataToURI = (
   components: number,
   alpha: 0 | 1 | undefined
 ): string => {
-  ///TODO write doc
+  /**
+   * Given channel data, convert to the corresponding encoded image URI.
+   * **/
   const img: ImageJS.Image = new ImageJS.Image(width, height, data, {
     components: components,
     alpha: alpha ? alpha : 0,

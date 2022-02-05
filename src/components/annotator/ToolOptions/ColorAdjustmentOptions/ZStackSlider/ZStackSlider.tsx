@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
@@ -47,29 +47,6 @@ export const ZStackSlider = () => {
           activeImagePlane: newValue,
         })
       );
-
-      //TODO: the below works, but I'm trying something else
-
-      // setValue(newValue);
-      // const imageData = originalData[newValue];
-      //
-      // const imageSrc = mapChannelstoSpecifiedRGBImage(
-      //   imageData,
-      //   channels,
-      //   activeImage.shape.height,
-      //   activeImage.shape.width
-      // );
-      //
-      // dispatch(
-      //   imageViewerSlice.actions.setImageSrc({
-      //     src: imageSrc,
-      //   })
-      // );
-      // dispatch(
-      //   imageViewerSlice.actions.setActiveImagePlane({
-      //     activeImagePlane: newValue,
-      //   })
-      // );
     }
   };
 

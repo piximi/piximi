@@ -16,7 +16,7 @@ const dummyImage: Image = {
   colors: generateDefaultChannels(3),
   annotations: [],
   name: "nuclei",
-  originalSrc: [], //TODO fixme
+  originalSrc: [],
   src: nuclei,
   shape: {
     height: 256,
