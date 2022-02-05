@@ -61,6 +61,7 @@ export const ImageGridAppBar = () => {
       });
 
       const annotatorImage: Image = {
+        activeSlice: 0,
         categoryId: projectImage!.categoryId,
         colors: projectImage!.colors,
         id: projectImage!.id,

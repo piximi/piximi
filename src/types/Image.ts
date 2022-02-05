@@ -5,6 +5,7 @@ import { Color } from "./Color";
 
 export type Image = {
   annotations: Array<AnnotationType>;
+  activeSlice: number;
   categoryId: string;
   colors: Array<Color>;
   id: string;

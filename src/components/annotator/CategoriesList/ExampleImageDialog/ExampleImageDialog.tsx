@@ -130,6 +130,7 @@ export const ExampleImageDialog = ({
     );
 
     const example: Image = {
+      activeSlice: 0,
       annotations: newAnnotations,
       categoryId: UNKNOWN_CATEGORY_ID,
       colors: defaultColors,

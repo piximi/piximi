@@ -236,7 +236,7 @@ export const CategoriesList = () => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
 
-      dispatch(setActiveImagePlane({ activeImagePlane: 0 }));
+      dispatch(setActiveImagePlane({ activeImagePlane: image.activeSlice }));
 
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({

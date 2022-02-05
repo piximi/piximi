@@ -34,6 +34,7 @@ const initialImage: Image | undefined =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV === "production"
     ? {
+        activeSlice: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: generateDefaultChannels(3),
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
@@ -90,7 +91,6 @@ const initialState: ImageViewer = {
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
-  activeImagePlane: 0,
   images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -243,6 +243,7 @@ export const imageViewerSlice = createSlice({
       );
 
       const loaded: Image = {
+        activeSlice: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: action.payload.file.imageColors
           ? action.payload.file.imageColors
@@ -351,7 +352,14 @@ export const imageViewerSlice = createSlice({
       state: ImageViewer,
       action: PayloadAction<{ activeImagePlane: number }>
     ) {
-      state.activeImagePlane = action.payload.activeImagePlane;
+      if (!state.activeImageId) return;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, activeSlice: action.payload.activeImagePlane };
+        }
+      });
     },
     setImageColors(
       state: ImageViewer,
@@ -363,21 +371,6 @@ export const imageViewerSlice = createSlice({
           return image;
         } else {
           return { ...image, colors: action.payload.colors };
-        }
-      });
-    },
-    setImageOriginalSrc(
-      state: ImageViewer,
-      action: PayloadAction<{ originalSrc: Array<string> }>
-    ) {
-      if (!state.activeImageId) return;
-      state.images = state.images.map((image: Image) => {
-        if (state.activeImageId !== image.id) {
-          return image;
-        } else {
-          const imageData = [...image.originalSrc];
-          imageData[state.activeImagePlane] = action.payload.originalSrc;
-          return { ...image, originalSrc: imageData };
         }
       });
     },

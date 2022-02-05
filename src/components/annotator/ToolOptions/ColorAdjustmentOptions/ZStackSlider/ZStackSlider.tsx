@@ -1,7 +1,6 @@
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { activeImageSelector } from "../../../../../store/selectors/activeImageSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import {
@@ -10,14 +9,13 @@ import {
 } from "../../../../../image/imageHelper";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ZStackSlider = () => {
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
   const channels = useSelector(activeImageColorsSelector);
-
-  const [value, setValue] = useState(activeImagePlane);
+  const activeSlice = useSelector(activeImagePlaneSelector);
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
@@ -27,8 +25,6 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       if (!originalSrc) return;
-
-      setValue(newValue);
 
       const planeData = await convertImageURIsToImageData([
         originalSrc[newValue],
@@ -81,14 +77,14 @@ export const ZStackSlider = () => {
     <React.Fragment>
       <List dense>
         <ListItem>
-          <ListItemText>Z plane: {value}</ListItemText>
+          <ListItemText>Z plane: {activeSlice}</ListItemText>
         </ListItem>
 
         <ListItem>
           <Slider
             aria-label="z-plane"
             onChange={handleChange}
-            value={value}
+            value={activeSlice}
             valueLabelDisplay="auto"
             step={1}
             marks

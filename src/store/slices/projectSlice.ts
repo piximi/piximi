@@ -11,6 +11,7 @@ import { Partition } from "../../types/Partition";
 import { generateDefaultChannels } from "../../image/imageHelper";
 
 const dummyImage: Image = {
+  activeSlice: 0,
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
   categoryId: UNKNOWN_CATEGORY_ID,
   colors: generateDefaultChannels(3),
@@ -94,6 +95,7 @@ export const projectSlice = createSlice({
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
+          activeSlice: 0,
           categoryId: serializedImage.imageCategoryId,
           colors: generateDefaultChannels(serializedImage.imageChannels),
           id: serializedImage.imageId,
@@ -132,6 +134,7 @@ export const projectSlice = createSlice({
 
       action.payload.images.forEach((serializedImage: SerializedImageType) => {
         const image: Image = {
+          activeSlice: 0,
           categoryId: serializedImage.imageCategoryId,
           colors: serializedImage.imageColors
             ? serializedImage.imageColors

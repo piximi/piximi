@@ -280,6 +280,7 @@ const convertToImage = (
   );
 
   return {
+    activeSlice: 0,
     annotations: [],
     colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,
