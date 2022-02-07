@@ -1,15 +1,22 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { ListItemText, MenuItem } from "@mui/material";
-import { classifierSlice, projectSlice } from "../../store/slices";
+import {
+  applicationSlice,
+  classifierSlice,
+  projectSlice,
+} from "../../store/slices";
+import { SerializedProjectType } from "types/SerializedProjectType";
+import { Classifier } from "types/Classifier";
+import { deserializeImages } from "image/imageHelper";
 
-type OpenExampleProjectMenuItemProps = {
+type OpenProjectMenuItemProps = {
   popupState: any;
 };
 
 export const OpenProjectMenuItem = ({
   popupState,
-}: OpenExampleProjectMenuItemProps) => {
+}: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
   const onOpenProjectFile = (
@@ -29,22 +36,27 @@ export const OpenProjectMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
-        const project = JSON.parse(event.target.result as string);
+        const projectJSON = JSON.parse(event.target.result as string);
+        const project: SerializedProjectType = projectJSON.project;
+        const classifier: Classifier = projectJSON.classifier;
+        const images = await deserializeImages(project.serializedImages);
 
         try {
+          dispatch(applicationSlice.actions.clearSelectedImages());
+
           //Open project
           dispatch(
             projectSlice.actions.openProject({
-              images: project.project.serializedImages,
-              categories: project.project.categories,
-              name: project.project.name,
+              images: images,
+              categories: project.categories,
+              name: project.name,
             })
           );
 
           //Open Classifier options
           dispatch(
             classifierSlice.actions.setClassifier({
-              classifier: project.classifier,
+              classifier: classifier,
             })
           );
         } catch (err) {

@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Image } from "../../types/Image";
 import { filter, findIndex } from "lodash";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
-import { SerializedImageType } from "../../types/SerializedImageType";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
@@ -87,78 +86,17 @@ export const projectSlice = createSlice({
         return !action.payload.ids.includes(image.id);
       });
     },
-    openImages(
-      state: Project,
-      action: PayloadAction<{ images: Array<SerializedImageType> }>
-    ) {
-      const newImages: Array<Image> = [];
-
-      action.payload.images.forEach((serializedImage: SerializedImageType) => {
-        const image: Image = {
-          categoryId: serializedImage.imageCategoryId,
-          id: serializedImage.imageId,
-          annotations: serializedImage.annotations,
-          name: serializedImage.imageFilename,
-          partition: serializedImage.imagePartition,
-          visible: true,
-          shape: {
-            width: serializedImage.imageWidth,
-            height: serializedImage.imageHeight,
-            channels: serializedImage.imageChannels,
-            planes: serializedImage.imagePlanes,
-            frames: serializedImage.imageFrames,
-          },
-          originalSrc: serializedImage.imageData,
-          src: serializedImage.imageData[
-            Math.floor(serializedImage.imagePlanes / 2)
-          ],
-        };
-
-        newImages.push(image);
-      });
-
-      state.images = newImages;
-    },
     openProject(
       state: Project,
       action: PayloadAction<{
-        images: Array<SerializedImageType>;
+        images: Array<Image>;
         name: string;
         categories: Array<Category>;
       }>
     ) {
       state.categories = action.payload.categories;
       state.name = action.payload.name;
-
-      //Open images
-      const newImages: Array<Image> = [];
-
-      action.payload.images.forEach((serializedImage: SerializedImageType) => {
-        const originalSrc = Array.isArray(serializedImage.imageData)
-          ? serializedImage.imageData
-          : [serializedImage.imageData]; //handle case where example projects's images do not correspond to array of strings
-        const image: Image = {
-          categoryId: serializedImage.imageCategoryId,
-          id: serializedImage.imageId,
-          annotations: serializedImage.annotations,
-          name: serializedImage.imageFilename,
-          partition: serializedImage.imagePartition,
-          visible: true,
-          shape: {
-            width: serializedImage.imageWidth,
-            height: serializedImage.imageHeight,
-            channels: serializedImage.imageChannels,
-            planes: serializedImage.imagePlanes,
-            frames: serializedImage.imageFrames,
-          },
-          originalSrc: serializedImage.imageData,
-          src: originalSrc[Math.floor(serializedImage.imagePlanes / 2)],
-        };
-
-        newImages.push(image);
-      });
-
-      state.images = newImages;
+      state.images = action.payload.images;
     },
     setCategories(
       state: Project,

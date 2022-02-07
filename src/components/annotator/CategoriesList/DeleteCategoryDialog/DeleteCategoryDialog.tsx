@@ -4,16 +4,16 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "../../../../types/AnnotationType";
 import { imageViewerSlice } from "../../../../store/slices";
 import {
-  imageInstancesSelector,
   selectedCategorySelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
-import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+import { Image } from "../../../../types/Image";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
 type DeleteCategoryDialogProps = {
   onClose: () => void;
@@ -28,41 +28,39 @@ export const DeleteCategoryDialog = ({
 
   const category = useSelector(selectedCategorySelector);
 
-  const selections = useSelector(imageInstancesSelector);
-
   const unknownCategory = useSelector(unknownCategorySelector);
 
-  const activeImageId = useSelector(activeImageIdSelector);
+  const images = useSelector(annotatorImagesSelector);
 
   const onDelete = () => {
-    dispatch(
-      imageViewerSlice.actions.setSelectedCategoryId({
-        selectedCategoryId: UNKNOWN_CATEGORY_ID,
-      })
-    );
+    images.forEach((image: Image) => {
+      const instances = image.annotations.map((instance: AnnotationType) => {
+        if (instance.categoryId === category.id) {
+          return {
+            ...instance,
+            categoryId: UNKNOWN_CATEGORY_ID,
+          };
+        } else {
+          return instance;
+        }
+      });
 
-    const instances = selections?.map((instance: AnnotationType) => {
-      if (instance.categoryId === category.id) {
-        return {
-          ...instance,
-          categoryId: UNKNOWN_CATEGORY_ID,
-        };
-      } else {
-        return instance;
-      }
+      dispatch(
+        imageViewerSlice.actions.setImageInstances({
+          instances: instances as Array<AnnotationType>,
+          imageId: image.id,
+        })
+      );
     });
 
-    if (!activeImageId) return;
-
-    dispatch(
-      imageViewerSlice.actions.setImageInstances({
-        instances: instances as Array<AnnotationType>,
-        imageId: activeImageId,
-      })
-    );
-
-    dispatch(imageViewerSlice.actions.deleteCategory({ category: category }));
-
+    batch(() => {
+      dispatch(imageViewerSlice.actions.deleteCategory({ category: category }));
+      dispatch(
+        imageViewerSlice.actions.setSelectedCategoryId({
+          selectedCategoryId: UNKNOWN_CATEGORY_ID,
+        })
+      );
+    });
     onClose();
   };
 
@@ -81,7 +79,7 @@ export const DeleteCategoryDialog = ({
         </Button>
 
         <Button onClick={onDelete} color="primary">
-          Delete
+          Delete category
         </Button>
       </DialogActions>
     </Dialog>
