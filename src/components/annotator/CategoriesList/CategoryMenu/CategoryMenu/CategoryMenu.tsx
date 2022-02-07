@@ -8,10 +8,10 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "../../../../../hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { imagesSelector } from "../../../../../store/selectors/imagesSelector";
 import { selectedCategorySelector } from "../../../../../store/selectors";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { UNKNOWN_CATEGORY_ID } from "../../../../../types/Category";
+import { annotatorImagesSelector } from "../../../../../store/selectors/annotatorImagesSelector";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -33,7 +33,7 @@ export const CategoryMenu = ({
   onOpenEditCategoryDialog,
   onOpenClearCategoryDialog,
 }: CategoryMenuProps) => {
-  const images = useSelector(imagesSelector);
+  const images = useSelector(annotatorImagesSelector);
 
   const dispatch = useDispatch();
 

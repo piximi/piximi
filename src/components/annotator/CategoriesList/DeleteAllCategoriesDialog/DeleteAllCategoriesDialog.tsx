@@ -7,26 +7,21 @@ import Button from "@mui/material/Button";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "../../../../types/AnnotationType";
 import { imageViewerSlice } from "../../../../store/slices";
-import {
-  selectedCategorySelector,
-  unknownCategorySelector,
-} from "../../../../store/selectors";
+import { unknownCategorySelector } from "../../../../store/selectors";
 import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import { Image } from "../../../../types/Image";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
-type DeleteCategoryDialogProps = {
+type DeleteAllCategoriesDialogProps = {
   onClose: () => void;
   open: boolean;
 };
 
-export const DeleteCategoryDialog = ({
+export const DeleteAllCategoriesDialog = ({
   onClose,
   open,
-}: DeleteCategoryDialogProps) => {
+}: DeleteAllCategoriesDialogProps) => {
   const dispatch = useDispatch();
-
-  const category = useSelector(selectedCategorySelector);
 
   const unknownCategory = useSelector(unknownCategorySelector);
 
@@ -35,16 +30,11 @@ export const DeleteCategoryDialog = ({
   const onDelete = () => {
     images.forEach((image: Image) => {
       const instances = image.annotations.map((instance: AnnotationType) => {
-        if (instance.categoryId === category.id) {
-          return {
-            ...instance,
-            categoryId: UNKNOWN_CATEGORY_ID,
-          };
-        } else {
-          return instance;
-        }
+        return {
+          ...instance,
+          categoryId: UNKNOWN_CATEGORY_ID,
+        };
       });
-
       dispatch(
         imageViewerSlice.actions.setImageInstances({
           instances: instances as Array<AnnotationType>,
@@ -54,10 +44,22 @@ export const DeleteCategoryDialog = ({
     });
 
     batch(() => {
-      dispatch(imageViewerSlice.actions.deleteCategory({ category: category }));
+      const unknownCategory = {
+        color: "#AAAAAA",
+        id: UNKNOWN_CATEGORY_ID,
+        name: "Unknown",
+        visible: true,
+      };
+
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: UNKNOWN_CATEGORY_ID,
+          selectedCategoryId: unknownCategory.id,
+        })
+      );
+
+      dispatch(
+        imageViewerSlice.actions.setCategories({
+          categories: [unknownCategory],
         })
       );
     });
@@ -66,11 +68,11 @@ export const DeleteCategoryDialog = ({
 
   return (
     <Dialog fullWidth onClose={onClose} open={open}>
-      <DialogTitle>Delete "{category.name}" category?</DialogTitle>
+      <DialogTitle>Delete all categories?</DialogTitle>
 
       <DialogContent>
-        Annotations categorized as "{category.name}" will not be deleted and
-        instead will be labeled as "{unknownCategory.name}".
+        Annotations will not be deleted and instead will be labeled as "
+        {unknownCategory.name}".
       </DialogContent>
 
       <DialogActions>

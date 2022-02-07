@@ -70,6 +70,8 @@ import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/
 import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 import { AppBarOffset } from "components/styled/AppBarOffset";
+import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
+import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -94,6 +96,12 @@ export const CategoriesList = () => {
     onClose: onCloseDeleteCategoryDialog,
     onOpen: onOpenDeleteCategoryDialog,
     open: openDeleteCategoryDialog,
+  } = useDialog();
+
+  const {
+    onClose: onCloseDeleteAllCategoriesDialog,
+    onOpen: onOpenDeleteAllCategoriesDialog,
+    open: openDeleteAllCategoriesDialog,
   } = useDialog();
 
   const {
@@ -452,6 +460,13 @@ export const CategoriesList = () => {
         />
 
         <CreateCategoryListItem />
+        <DeleteAllCategoriesListItem
+          onOpenDeleteAllCategoriesDialog={onOpenDeleteAllCategoriesDialog}
+        />
+        <DeleteAllCategoriesDialog
+          onClose={onCloseDeleteAllCategoriesDialog}
+          open={openDeleteAllCategoriesDialog}
+        />
       </CollapsibleList>
 
       <Divider />
