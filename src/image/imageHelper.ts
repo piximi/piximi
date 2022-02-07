@@ -78,6 +78,7 @@ export const convertImageJStoImage = (
     shape: shape,
     originalSrc: imageData,
     partition: Partition.Inference,
+    visible: true,
     src: imageData[Math.floor(nplanes / 2)],
   };
 };

@@ -11,4 +11,5 @@ export type Image = {
   shape: Shape;
   annotations: Array<AnnotationType>;
   partition: Partition;
+  visible: boolean;
 };

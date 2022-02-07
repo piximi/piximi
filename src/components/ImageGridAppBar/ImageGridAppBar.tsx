@@ -66,6 +66,7 @@ export const ImageGridAppBar = () => {
         annotations: projectImage!.annotations,
         name: projectImage!.name,
         partition: Partition.Inference,
+        visible: true,
         shape: projectImage!.shape,
         originalSrc: projectImage!.originalSrc,
         src: projectImage!.src,

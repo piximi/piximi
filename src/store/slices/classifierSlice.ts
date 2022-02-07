@@ -35,6 +35,7 @@ const initialState: Classifier = {
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
+  predicted: false,
   rescaleOptions: {
     rescale: true,
     rescaleMinMax: { min: 0, max: 1 },
@@ -155,6 +156,9 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{ model: ClassifierModelProps }>
     ) {
       state.selectedModel = action.payload.model;
+    },
+    updatePredicted(state, action: PayloadAction<{ predicted: boolean }>) {
+      state.predicted = action.payload.predicted;
     },
     uploadUserSelectedModel(
       state,

@@ -25,6 +25,7 @@ const dummyImage: Image = {
     frames: 1,
   },
   partition: Partition.Inference,
+  visible: true,
 };
 
 const initialState: Project = {
@@ -99,6 +100,7 @@ export const projectSlice = createSlice({
           annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
+          visible: true,
           shape: {
             width: serializedImage.imageWidth,
             height: serializedImage.imageHeight,
@@ -141,6 +143,7 @@ export const projectSlice = createSlice({
           annotations: serializedImage.annotations,
           name: serializedImage.imageFilename,
           partition: serializedImage.imagePartition,
+          visible: true,
           shape: {
             width: serializedImage.imageWidth,
             height: serializedImage.imageHeight,
@@ -198,6 +201,23 @@ export const projectSlice = createSlice({
       for (let category of categories) {
         category.visible = false;
       }
+    },
+    updateLabeledImagesVisibility(
+      state: Project,
+      action: PayloadAction<{ visibility: boolean }>
+    ) {
+      state.images.forEach((image: Image) => {
+        if (image.partition !== Partition.Inference) {
+          image.visible = action.payload.visibility;
+        }
+      });
+    },
+    clearPredictions(state: Project, action: PayloadAction<{}>) {
+      state.images.forEach((image: Image) => {
+        if (image.partition === Partition.Inference) {
+          image.categoryId = UNKNOWN_CATEGORY_ID;
+        }
+      });
     },
     updateImageCategory(
       state: Project,

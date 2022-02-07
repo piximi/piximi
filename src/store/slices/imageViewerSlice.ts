@@ -31,6 +31,7 @@ const initialImage =
         annotations: [],
         name: "example.png",
         partition: Partition.Inference,
+        visible: true,
         shape: {
           channels: 3,
           frames: 1,
@@ -256,6 +257,7 @@ export const imageViewerSlice = createSlice({
         name: action.payload.file.imageFilename,
         annotations: annotations,
         partition: Partition.Inference,
+        visible: true,
         shape: {
           channels: action.payload.file.imageChannels,
           frames: action.payload.file.imageFrames,

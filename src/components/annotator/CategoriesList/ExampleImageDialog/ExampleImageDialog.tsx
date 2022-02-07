@@ -123,6 +123,7 @@ export const ExampleImageDialog = ({
       shape: shape,
       originalSrc: [data as string],
       partition: Partition.Inference,
+      visible: true,
       src: data as string,
     };
 
