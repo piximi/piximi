@@ -1,4 +1,8 @@
-import { classifierSlice, projectSlice } from "../../store/slices";
+import {
+  applicationSlice,
+  classifierSlice,
+  projectSlice,
+} from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
@@ -51,6 +55,8 @@ export const OpenExampleProjectMenuItem = ({
 
     popupState.close();
     onClose();
+
+    dispatch(applicationSlice.actions.clearSelectedImages());
 
     dispatch(
       projectSlice.actions.openProject({

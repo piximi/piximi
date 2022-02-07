@@ -8,7 +8,6 @@ import {
   categoryCountsSelector,
   imageSelector,
   selectedCategorySelector,
-  selectedImagesSelector,
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -51,7 +50,6 @@ import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog"
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
-import { imagesSelector } from "../../../../store/selectors/imagesSelector";
 import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
@@ -60,7 +58,6 @@ import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import {
   imageViewerSlice,
-  projectSlice,
   setActiveImage,
   setActiveImagePlane,
 } from "../../../../store/slices";
@@ -68,9 +65,10 @@ import { Image } from "../../../../types/Image";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
-import { Partition } from "../../../../types/Partition";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 import { AppBarOffset } from "components/styled/AppBarOffset";
+import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
+import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -81,11 +79,9 @@ export const CategoriesList = () => {
 
   const categoryCounts = useSelector(categoryCountsSelector);
 
-  const annotatorImages = useSelector(annotatorImagesSelector);
-  const projectImages = useSelector(imagesSelector);
-  const selectedImages = useSelector(selectedImagesSelector);
-
   const currentImage = useSelector(imageSelector);
+
+  const annotatorImages = useSelector(annotatorImagesSelector);
 
   const dispatch = useDispatch();
 
@@ -95,6 +91,12 @@ export const CategoriesList = () => {
     onClose: onCloseDeleteCategoryDialog,
     onOpen: onOpenDeleteCategoryDialog,
     open: openDeleteCategoryDialog,
+  } = useDialog();
+
+  const {
+    onClose: onCloseDeleteAllCategoriesDialog,
+    onOpen: onOpenDeleteAllCategoriesDialog,
+    open: openDeleteAllCategoriesDialog,
   } = useDialog();
 
   const {
@@ -127,32 +129,7 @@ export const CategoriesList = () => {
     null
   );
 
-  /*
-  When going back to project, replace images with those that have updated annotations
-   */
-  const onCloseDialog = () => {
-    const unselectedImages = projectImages.filter((image: Image) => {
-      return !selectedImages.includes(image.id);
-    });
-
-    //We update partition to TRAINING for the annotated images
-    const updatedAnnotatorImages = annotatorImages.map((image: Image) => {
-      let partition: Partition;
-      if (image.annotations.length > 0) {
-        //only update if image actually has annotations
-        partition = Partition.Training;
-      } else {
-        partition = Partition.Inference;
-      }
-      return { ...image, partition: partition };
-    });
-
-    dispatch(
-      projectSlice.actions.setImages({
-        images: [...updatedAnnotatorImages, ...unselectedImages],
-      })
-    );
-
+  const onReturnToMainProject = () => {
     onCloseExitAnnotatorDialog();
     navigate("/");
   };
@@ -292,7 +269,7 @@ export const CategoriesList = () => {
       <AppBarOffset />
 
       <ExitAnnotatorDialog
-        onConfirm={onCloseDialog}
+        onReturnToProject={onReturnToMainProject}
         onClose={onCloseExitAnnotatorDialog}
         open={openExitAnnotatorDialog}
       />
@@ -455,6 +432,13 @@ export const CategoriesList = () => {
         />
 
         <CreateCategoryListItem />
+        <DeleteAllCategoriesListItem
+          onOpenDeleteAllCategoriesDialog={onOpenDeleteAllCategoriesDialog}
+        />
+        <DeleteAllCategoriesDialog
+          onClose={onCloseDeleteAllCategoriesDialog}
+          open={openDeleteAllCategoriesDialog}
+        />
       </CollapsibleList>
 
       <Divider />
