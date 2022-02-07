@@ -1,7 +1,11 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { ListItemText, MenuItem } from "@mui/material";
-import { classifierSlice, projectSlice } from "../../store/slices";
+import {
+  applicationSlice,
+  classifierSlice,
+  projectSlice,
+} from "../../store/slices";
 import { SerializedProjectType } from "types/SerializedProjectType";
 import { Classifier } from "types/Classifier";
 import { deserializeImages } from "image/imageHelper";
@@ -38,6 +42,8 @@ export const OpenProjectMenuItem = ({
         const images = await deserializeImages(project.serializedImages);
 
         try {
+          dispatch(applicationSlice.actions.clearSelectedImages());
+
           //Open project
           dispatch(
             projectSlice.actions.openProject({
