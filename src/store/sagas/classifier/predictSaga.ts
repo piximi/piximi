@@ -1,5 +1,5 @@
 import { put, select } from "redux-saga/effects";
-import { projectSlice } from "../../slices";
+import { classifierSlice, projectSlice } from "../../slices";
 import { createdCategoriesSelector } from "../../selectors";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { preprocess_predict } from "../../coroutines/classifier/preprocess_predict";
@@ -49,6 +49,12 @@ export function* predictSaga(action: any): any {
     projectSlice.actions.updateImagesCategories({
       ids: imageIds,
       categoryIds: categoryIds,
+    })
+  );
+
+  yield put(
+    classifierSlice.actions.updatePredicted({
+      predicted: true,
     })
   );
 }
