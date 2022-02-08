@@ -8,7 +8,11 @@ import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/imageHelper";
+import {
+  convertSrcURIToOriginalSrcURIs,
+  deserializeImages,
+  generateDefaultChannels,
+} from "image/imageHelper";
 
 type OpenExampleProjectMenuItemProps = {
   exampleProject: ExampleProject;
@@ -58,9 +62,45 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
+    // @ts-ignore
+    const updatedImages = await Promise.all(
+      images.map(async (image: any) => {
+        const uri = image.originalSrc[0];
+
+        //Compute the actual src and originalSrc of example projects from the single RGB URI we have
+        // @ts-ignore
+        const uris = await convertSrcURIToOriginalSrcURIs(uri, image.shape);
+
+        if (exampleProject === ExampleProject.CElegans) {
+          return {
+            ...image,
+            shape: { ...image.shape, channels: 2 },
+            colors: generateDefaultChannels(2),
+            originalSrc: [uris.slice(0, 2)],
+            src: uri,
+          }; //for worms project, we keep red and green
+        } else if (exampleProject === ExampleProject.HumanU2OSCells) {
+          return {
+            ...image,
+            shape: { ...image.shape, channels: 2 },
+            colors: generateDefaultChannels(3).slice(1, 3),
+            originalSrc: [uris.slice(1, 3)],
+            src: uri,
+          }; //for human cells project, we keep green and blue
+        } else {
+          return {
+            ...image,
+            shape: { ...image.shape, channels: 1 },
+            originalSrc: [[uris[0]]],
+            src: uris[0],
+          }; //for mnist we only keep the red channel, that's our greyscale
+        }
+      })
+    );
+
     dispatch(
       projectSlice.actions.openProject({
-        images: images,
+        images: updatedImages,
         categories: project.categories,
         name: project.name,
       })
