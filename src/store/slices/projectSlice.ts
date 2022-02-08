@@ -8,6 +8,7 @@ import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
 import { generateDefaultChannels } from "../../image/imageHelper";
+import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 
 const dummyImage: Image = {
   activeSlice: 0,
@@ -26,6 +27,7 @@ const dummyImage: Image = {
     frames: 1,
   },
   partition: Partition.Inference,
+  visible: true,
 };
 
 const initialState: Project = {
@@ -41,6 +43,7 @@ const initialState: Project = {
   name: "Untitled project",
   task: Task.Classify,
   trainFlag: 0,
+  imageSortKey: defaultImageSortKey,
 };
 
 export const projectSlice = createSlice({
@@ -140,6 +143,23 @@ export const projectSlice = createSlice({
         category.visible = false;
       }
     },
+    updateLabeledImagesVisibility(
+      state: Project,
+      action: PayloadAction<{ visibility: boolean }>
+    ) {
+      state.images.forEach((image: Image) => {
+        if (image.partition !== Partition.Inference) {
+          image.visible = action.payload.visibility;
+        }
+      });
+    },
+    clearPredictions(state: Project, action: PayloadAction<{}>) {
+      state.images.forEach((image: Image) => {
+        if (image.partition === Partition.Inference) {
+          image.categoryId = UNKNOWN_CATEGORY_ID;
+        }
+      });
+    },
     updateImageCategory(
       state: Project,
       action: PayloadAction<{ id: string; categoryId: string }>
@@ -204,6 +224,15 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ trainFlag: number }>
     ) {
       state.trainFlag = action.payload.trainFlag;
+    },
+    sortImagesBySelectedKey(
+      state: Project,
+      action: PayloadAction<{ imageSortKey: ImageSortKeyType }>
+    ) {
+      const selectedSortKey = action.payload.imageSortKey;
+      state.imageSortKey = selectedSortKey;
+
+      state.images.sort(selectedSortKey.comparerFunction);
     },
   },
 });

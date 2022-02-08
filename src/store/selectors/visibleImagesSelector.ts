@@ -7,10 +7,14 @@ export const visibleImagesSelector = ({
 }: {
   project: Project;
 }): Array<Image> => {
-  return project.images.filter((image: Image) => {
+  const visibleImages = project.images.filter((image: Image) => {
     const category = project.categories.find((c: Category) => {
       return c.id === image.categoryId;
     });
     return category ? category.visible : true;
+  });
+
+  return visibleImages.filter((image: Image) => {
+    return image.visible;
   });
 };

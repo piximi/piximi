@@ -155,6 +155,7 @@ export const deserializeImages = async (
       annotations: serializedImage.annotations,
       name: serializedImage.imageFilename,
       partition: serializedImage.imagePartition,
+      visible: true,
       shape: {
         width: referenceImage.width,
         height: referenceImage.height,
@@ -309,6 +310,7 @@ const convertToImage = (
       width: width,
     },
     src: displayedURI,
+    visible: true,
   };
 };
 

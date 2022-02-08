@@ -41,6 +41,7 @@ export type Classifier = {
   optimizationAlgorithm: OptimizationAlgorithm;
   predicting: boolean;
   predictions?: Tensor;
+  predicted: boolean;
   rescaleOptions: RescaleOptions;
   trainingPercentage: number;
   evaluationResult: EvaluationResultType;

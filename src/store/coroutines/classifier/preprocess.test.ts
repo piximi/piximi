@@ -48,6 +48,7 @@ const images: Array<Image> = [
     originalSrc: [],
     src: "https://picsum.photos/seed/piximi/224",
     partition: Partition.Training,
+    visible: true,
     shape: inputShape,
   },
 ];

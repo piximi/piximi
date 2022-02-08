@@ -42,6 +42,7 @@ const initialImage: Image | undefined =
         annotations: [],
         name: "example.png",
         partition: Partition.Inference,
+        visible: true,
         shape: initialImageShape,
         originalSrc: (cellpaintingAnnotations as any).default[0].imageData,
         src: colorImage,
@@ -255,6 +256,7 @@ export const imageViewerSlice = createSlice({
         name: action.payload.file.imageFilename,
         annotations: annotations,
         partition: Partition.Inference,
+        visible: true,
         shape: {
           channels: action.payload.file.imageChannels,
           frames: action.payload.file.imageFrames,

@@ -133,6 +133,7 @@ export const ExampleImageDialog = ({
       originalSrc: project[0].imageData,
       partition: Partition.Inference,
       shape: shape,
+      visible: true,
       src: data as string,
     };
 

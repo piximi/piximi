@@ -12,6 +12,7 @@ export type Image = {
   name: string;
   originalSrc: Array<Array<string>>; //We keep track of the URIs for each channel, for each slice (used for color adjustment)
   partition: Partition;
+  visible: boolean;
   shape: Shape;
   src: string; // The URI to be displayed on the canvas
 };
