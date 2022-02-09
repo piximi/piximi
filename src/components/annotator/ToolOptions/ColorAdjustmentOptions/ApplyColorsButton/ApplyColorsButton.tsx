@@ -37,9 +37,9 @@ export const ApplyColorsButton = () => {
               //if mismatch between image size and desired colors, don't do anything on the image
               return image;
             }
-            const originalData = await convertImageURIsToImageData([
-              image.originalSrc[activeImagePlane],
-            ]);
+            const originalData = await convertImageURIsToImageData(
+              new Array(image.originalSrc[activeImagePlane])
+            );
 
             const modifiedURI = mapChannelstoSpecifiedRGBImage(
               originalData[0],
