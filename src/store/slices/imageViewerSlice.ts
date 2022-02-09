@@ -337,19 +337,6 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ image: string }>
     ) {
       state.activeImageId = action.payload.image;
-      // const activeImage = state.images.find((image: Image) => {
-      //   return image.id === action.payload.image;
-      // });
-      // if (!activeImage) return;
-      // const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
-      // for (let i = 0; i < activeImage.shape.channels; i++) {
-      //   defaultChannels.push({
-      //     color: DEFAULT_COLORS[i],
-      //     range: [0, 255],
-      //     visible: !(i > 0 && activeImage.shape.channels > 3), //if multi-channel image, only show the first channel. User can toggle on the other components if desired.
-      //   });
-      // }
-      // state.channels = defaultChannels;
     },
     setActiveImagePlane(
       state: ImageViewer,
