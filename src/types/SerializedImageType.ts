@@ -5,7 +5,6 @@ import { Color } from "./Color";
 export type SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
-  imageChecksum: string;
   imageColors: Array<Color>;
   imageData: Array<Array<string>>;
   imageSrc: string;

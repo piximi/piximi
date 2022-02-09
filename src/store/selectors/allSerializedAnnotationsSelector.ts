@@ -14,7 +14,6 @@ export const allSerializedAnnotationsSelector = ({
   return imageViewer.images.map((image: Image) => {
     const columns = {
       imageChannels: image.shape.channels,
-      imageChecksum: "",
       imageColors: image.colors,
       imageData: image.originalSrc,
       imageSrc: image.src,

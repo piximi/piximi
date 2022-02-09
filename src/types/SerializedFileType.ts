@@ -3,7 +3,6 @@ import { Color } from "./Color";
 
 export type SerializedFileType = {
   imageChannels: number;
-  imageChecksum: string;
   imageColors: Array<Color>;
   imageData: Array<Array<string>>;
   imageSrc: string;
