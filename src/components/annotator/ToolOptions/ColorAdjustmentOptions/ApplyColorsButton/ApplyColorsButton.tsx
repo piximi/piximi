@@ -32,24 +32,25 @@ export const ApplyColorsButton = () => {
         images.map(async (image: Image) => {
           if (image.id === activeImageId) {
             return image; //don't do anything, the imageSrc has already been updated on slider change / toggling
-          } else {
-            if (image.shape.channels !== activeImageColors.length) {
-              //if mismatch between image size and desired colors, don't do anything on the image
-              return image;
-            }
-            const originalData = await convertImageURIsToImageData(
-              new Array(image.originalSrc[activeImagePlane])
-            );
-
-            const modifiedURI = mapChannelstoSpecifiedRGBImage(
-              originalData[0],
-              activeImageColors,
-              image.shape.height,
-              image.shape.width
-            );
-
-            return { ...image, colors: activeImageColors, src: modifiedURI };
           }
+
+          if (image.shape.channels !== activeImageColors.length) {
+            //if mismatch between image size and desired colors, don't do anything on the image
+            return image;
+          }
+
+          const originalData = await convertImageURIsToImageData(
+            new Array(image.originalSrc[activeImagePlane])
+          );
+
+          const modifiedURI = mapChannelstoSpecifiedRGBImage(
+            originalData[0],
+            activeImageColors,
+            image.shape.height,
+            image.shape.width
+          );
+
+          return { ...image, colors: activeImageColors, src: modifiedURI };
         })
       );
     };
