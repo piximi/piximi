@@ -54,7 +54,7 @@ export const ImageGridAppBar = () => {
     setCategoryMenuAnchorEl(null);
   };
 
-  const onOpenAnnotatorDialog = (event: React.MouseEvent<HTMLDivElement>) => {
+  const onOpenAnnotator = (event: React.MouseEvent<HTMLDivElement>) => {
     const selected = selectedImages.map((id: string, idx: number) => {
       const projectImage = images.find((image: Image) => {
         return image.id === id;
@@ -130,7 +130,7 @@ export const ImageGridAppBar = () => {
             <Chip
               avatar={<GestureIcon color="inherit" />}
               label="Annotate"
-              onClick={onOpenAnnotatorDialog}
+              onClick={onOpenAnnotator}
               variant="outlined"
             />
 
