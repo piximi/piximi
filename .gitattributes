@@ -1,2 +1,0 @@
-src/data/*.json filter=lfs diff=lfs merge=lfs -text
-src/data/exampleProjects/*.json filter=lfs diff=lfs merge=lfs -text
