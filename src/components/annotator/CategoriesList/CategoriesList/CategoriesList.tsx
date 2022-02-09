@@ -56,7 +56,11 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import {
+  imageViewerSlice,
+  setActiveImage,
+  setActiveImagePlane,
+} from "../../../../store/slices";
 import { Image } from "../../../../types/Image";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
@@ -208,6 +212,8 @@ export const CategoriesList = () => {
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
+
+      dispatch(setActiveImagePlane({ activeImagePlane: image.activeSlice }));
 
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({

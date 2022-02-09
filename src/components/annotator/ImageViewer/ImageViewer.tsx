@@ -1,20 +1,13 @@
 import React, { useCallback, useEffect } from "react";
 import { Box, CssBaseline } from "@mui/material";
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { ToolType } from "../../../types/ToolType";
-import {
-  addImages,
-  imageViewerSlice,
-  setActiveImage,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../store/slices";
+import { imageViewerSlice } from "../../../store/slices";
 import { Image } from "../../../types/Image";
-import { convertFileToImage } from "../../../image/imageHelper";
+import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 
 type ImageViewerProps = {
   image?: Image;
@@ -22,6 +15,15 @@ type ImageViewerProps = {
 
 export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
+
+  const [files, setFiles] = React.useState<FileList>();
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
+    React.useState(false);
+
+  const handleClose = () => {
+    setOpenDimensionsDialogBox(false);
+  };
+
   //
   // useEffect(() => {
   //   const path =
@@ -36,38 +38,12 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     }
   }, [dispatch, image]);
 
-  const onDrop = useCallback(
-    async (item) => {
-      if (item) {
-        for (let i = 0; i < item.files.length; i++) {
-          const image = await convertFileToImage(item.files[i]);
-          dispatch(addImages({ newImages: [image] }));
-
-          if (i === 0) {
-            batch(() => {
-              dispatch(
-                setActiveImage({
-                  image: image.id,
-                })
-              );
-
-              dispatch(
-                setSelectedAnnotations({
-                  selectedAnnotations: [],
-                  selectedAnnotation: undefined,
-                })
-              );
-
-              dispatch(
-                setOperation({ operation: ToolType.RectangularAnnotation })
-              );
-            });
-          }
-        }
-      }
-    },
-    [dispatch]
-  );
+  const onDrop = useCallback(async (item) => {
+    if (item) {
+      setFiles(item.files);
+      setOpenDimensionsDialogBox(true); //open dialog box
+    }
+  }, []);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -76,6 +52,13 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
       <CategoriesList />
 
       <Content onDrop={onDrop} />
+
+      <ImageShapeDialog
+        files={files!}
+        open={openDimensionsDialogBox}
+        onClose={handleClose}
+        isUploadedFromAnnotator={true}
+      />
 
       <ToolOptions />
 

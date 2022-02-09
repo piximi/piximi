@@ -10,36 +10,41 @@ import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
 import { ImageViewer } from "../../types/ImageViewer";
 import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
-import { ChannelType } from "../../types/ChannelType";
+import { Color } from "../../types/Color";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import {
+  generateDefaultChannels,
   importSerializedAnnotations,
   replaceDuplicateName,
 } from "../../image/imageHelper";
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
+import { Shape } from "../../types/Shape";
+import * as cellpaintingAnnotations from "../../images/cellpainting.json";
 
-const initialImage =
+const initialImageShape: Shape = {
+  channels: 3,
+  frames: 1,
+  height: 512,
+  planes: 1,
+  width: 512,
+};
+
+const initialImage: Image | undefined =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV === "production"
     ? {
-        activePlane: 0,
-        avatar: colorImage,
+        activeSlice: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
+        colors: generateDefaultChannels(3),
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
         annotations: [],
         name: "example.png",
         partition: Partition.Inference,
         visible: true,
-        shape: {
-          channels: 3,
-          frames: 1,
-          height: 512,
-          planes: 1,
-          width: 512,
-        },
-        originalSrc: [colorImage],
+        shape: initialImageShape,
+        originalSrc: (cellpaintingAnnotations as any).default[0].imageData,
         src: colorImage,
       }
     : undefined;
@@ -81,28 +86,13 @@ const initialState: ImageViewer = {
   boundingClientRect: new DOMRect(),
   brightness: 0,
   categories: initialCategories.length > 0 ? initialCategories : [],
-  channels: [
-    //R, G, and B channels by default
-    {
-      range: [0, 255],
-      visible: true,
-    },
-    {
-      range: [0, 255],
-      visible: true,
-    },
-    {
-      range: [0, 255],
-      visible: true,
-    },
-  ],
+  currentColors: undefined,
   currentIndex: 0,
   cursor: "default",
   contrast: 0,
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
-  activeImagePlane: 0,
   images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -146,15 +136,20 @@ export const imageViewerSlice = createSlice({
       const imageNames = state.images.map((image: Image) => {
         return image.name.split(".")[0];
       });
-      const updatedImages = action.payload.newImages.map((image: Image) => {
-        const initialName = image.name.split(".")[0]; //get name before file extension
-        //add filename extension to updatedName
-        const updatedName =
-          replaceDuplicateName(initialName, imageNames) +
-          "." +
-          image.name.split(".")[1];
-        return { ...image, name: updatedName };
-      });
+
+      const updatedImages = action.payload.newImages.map(
+        (image: Image, i: number) => {
+          const initialName = image.name.split(".")[0]; //get name before file extension
+          //add filename extension to updatedName
+          const updatedName =
+            replaceDuplicateName(initialName, imageNames) +
+            "." +
+            image.name.split(".")[1];
+          return { ...image, name: updatedName };
+        }
+      );
+
+      state.selectedAnnotations = [];
 
       state.images.push(...updatedImages);
     },
@@ -250,9 +245,13 @@ export const imageViewerSlice = createSlice({
       );
 
       const loaded: Image = {
+        activeSlice: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
+        colors: action.payload.file.imageColors
+          ? action.payload.file.imageColors
+          : generateDefaultChannels(action.payload.file.imageChannels),
         id: action.payload.file.imageId,
-        src: action.payload.file.imageData[0],
+        src: action.payload.file.imageSrc,
         originalSrc: action.payload.file.imageData,
         name: action.payload.file.imageFilename,
         annotations: annotations,
@@ -338,24 +337,32 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ image: string }>
     ) {
       state.activeImageId = action.payload.image;
-      const activeImage = state.images.find((image: Image) => {
-        return image.id === action.payload.image;
-      });
-      if (!activeImage) return;
-      const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
-      for (let i = 0; i < activeImage.shape.channels; i++) {
-        defaultChannels.push({
-          range: [0, 255],
-          visible: true,
-        });
-      }
-      state.channels = defaultChannels;
     },
     setActiveImagePlane(
       state: ImageViewer,
       action: PayloadAction<{ activeImagePlane: number }>
     ) {
-      state.activeImagePlane = action.payload.activeImagePlane;
+      if (!state.activeImageId) return;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, activeSlice: action.payload.activeImagePlane };
+        }
+      });
+    },
+    setImageColors(
+      state: ImageViewer,
+      action: PayloadAction<{ colors: Array<Color> }>
+    ) {
+      if (!state.activeImageId) return;
+      state.images = state.images.map((image: Image) => {
+        if (state.activeImageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, colors: action.payload.colors };
+        }
+      });
     },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
@@ -372,16 +379,14 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ images: Array<Image> }>
     ) {
       state.images = action.payload.images;
-      if (!action.payload.images.length) return;
-      state.activeImageId = action.payload.images[0].id;
     },
-    setChannels(
+    setCurrentColors(
       state: ImageViewer,
       action: PayloadAction<{
-        channels: Array<ChannelType>;
+        currentColors: Array<Color>;
       }>
     ) {
-      state.channels = action.payload.channels;
+      state.currentColors = action.payload.currentColors;
     },
     setCursor(
       state: ImageViewer,
@@ -545,12 +550,13 @@ export const {
   deleteImage,
   openAnnotations,
   setActiveImage,
+  setActiveImagePlane,
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,
   setCategories,
   setCategoryVisibility,
-  setChannels,
+  setCurrentColors,
   setContrast,
   setCurrentIndex,
   setCursor,

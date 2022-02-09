@@ -21,7 +21,9 @@ export const activeSerializedAnnotationsSelector = ({
   const columns = {
     imageChannels: image.shape.channels,
     imageChecksum: "",
-    imageData: [image.src],
+    imageColors: image.colors,
+    imageData: image.originalSrc,
+    imageSrc: image.src,
     imageFilename: image.name,
     imageFrames: image.shape.frames,
     imageHeight: image.shape.height,

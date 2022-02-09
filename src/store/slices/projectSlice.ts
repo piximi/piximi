@@ -7,14 +7,17 @@ import { filter, findIndex } from "lodash";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
+import { generateDefaultChannels } from "../../image/imageHelper";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 
 const dummyImage: Image = {
+  activeSlice: 0,
   id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
   categoryId: UNKNOWN_CATEGORY_ID,
+  colors: generateDefaultChannels(3),
   annotations: [],
   name: "nuclei",
-  originalSrc: [nuclei],
+  originalSrc: [],
   src: nuclei,
   shape: {
     height: 256,

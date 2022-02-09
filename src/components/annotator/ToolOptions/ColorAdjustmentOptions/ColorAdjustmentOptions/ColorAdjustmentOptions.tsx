@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { InformationBox } from "../../InformationBox";
 import Divider from "@mui/material/Divider";
 import { useTranslation } from "../../../../../hooks/useTranslation";
@@ -8,88 +8,53 @@ import ListItemText from "@mui/material/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
 import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { ChannelsList } from "../ChannelsList";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
-import { ChannelType } from "../../../../../types/ChannelType";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { ZStackSlider } from "../ZStackSlider";
-
-export function createIntensityFilter(channels: ChannelType[]) {
-  return function (imageData: { data: any }) {
-    let data = imageData.data;
-    const scaleIntensity = (channel: ChannelType, pixel: number) => {
-      if (!channel.visible) return 0;
-      if (pixel < channel.range[0]) return 0;
-      if (pixel >= channel.range[1]) return 255;
-      return (
-        255 *
-        ((pixel - channel.range[0]) / (channel.range[1] - channel.range[0]))
-      );
-    };
-
-    for (let i = 0; i < data.length; i += 4) {
-      // red
-      data[i] = scaleIntensity(channels[0], data[i]);
-      // green
-      data[i + 1] = scaleIntensity(channels[1], data[i + 1]);
-      // blue
-      data[i + 2] = scaleIntensity(channels[2], data[i + 2]);
-    }
-    return data;
-  };
-}
+import {
+  convertImageURIsToImageData,
+  generateDefaultChannels,
+  mapChannelstoSpecifiedRGBImage,
+} from "../../../../../image/imageHelper";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { ApplyColorsButton } from "../ApplyColorsButton";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const channels = useSelector(channelsSelector);
+  const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  const [displayedValues, setDisplayedValues] = useState<Array<Array<number>>>(
-    channels.map((channel: ChannelType) => [...channel.range])
-  ); //we keep that state variable here and pass it to slider so that visible slider ranges can change accordingly
-
-  const generateDefaultChannels = (components: number) => {
-    const defaultChannels: Array<ChannelType> = []; //number of channels depends on whether image is greyscale or RGB
-    for (let i = 0; i < components; i++) {
-      defaultChannels.push({
-        range: [0, 255],
-        visible: true,
-      });
-    }
-    return defaultChannels;
-  };
-
-  useEffect(() => {
-    if (!originalSrc) return;
-
+  const onResetChannelsClick = async () => {
     if (!imageShape) return;
 
-    setDisplayedValues(
-      channels.map((channel: ChannelType) => [...channel.range])
-    );
-  }, [originalSrc, imageShape, channels]);
-
-  const onResetChannelsClick = () => {
-    if (!imageShape) return;
     const defaultChannels = generateDefaultChannels(imageShape.channels);
+
     dispatch(
-      imageViewerSlice.actions.setChannels({
-        channels: defaultChannels,
+      imageViewerSlice.actions.setImageColors({
+        colors: defaultChannels,
       })
     );
-    setDisplayedValues(
-      defaultChannels.map((channel: ChannelType) => [...channel.range])
-    );
-  };
 
-  const updateDisplayedValues = (values: Array<Array<number>>) => {
-    setDisplayedValues(values);
+    if (!originalSrc || !imageShape) return;
+
+    const originalData = await convertImageURIsToImageData([
+      originalSrc[activeImagePlane],
+    ]);
+
+    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      originalData[0],
+      defaultChannels,
+      imageShape.height,
+      imageShape.width
+    );
+
+    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
   return (
@@ -102,17 +67,15 @@ export const ColorAdjustmentOptions = () => {
 
       <Divider />
 
-      <ChannelsList
-        displayedValues={displayedValues}
-        updateDisplayedValues={updateDisplayedValues}
-      />
+      <ChannelsList />
 
       <Divider />
 
       <List dense>
         <ListItem button onClick={onResetChannelsClick}>
-          <ListItemText>{t("Reset")}</ListItemText>
+          <ListItemText>{t("Reset colors")}</ListItemText>
         </ListItem>
+        <ApplyColorsButton />
       </List>
     </>
   );

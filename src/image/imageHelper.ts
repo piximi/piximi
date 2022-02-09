@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";
@@ -9,7 +8,120 @@ import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { Image as ImageType } from "../types/Image";
+import * as _ from "lodash";
+import { DEFAULT_COLORS } from "../types/DefaultColors";
+import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
+
+export const mapChannelstoSpecifiedRGBImage = (
+  data: Array<Array<number>>,
+  colors: Array<Color>,
+  rows: number,
+  columns: number
+): string => {
+  /**
+   * Given an matrix of numbers of shape C x MN (flattened image data for each channel), assign colors to channels and convert to RGB image,
+   * returns the new data URI of that RGB image, to be displayed on canvas
+   * data: the channels data
+   * colors: the colors to be assigned to each channel
+   * returns a URI image for display
+   * **/
+
+  const summedChannels: Array<Array<number>> = new Array(rows * columns).fill([
+    0, 0, 0,
+  ]);
+
+  const mappedChannels = [];
+
+  //iterate through each channel
+  for (let channel_idx = 0; channel_idx < data.length; channel_idx++) {
+    const color = colors[channel_idx];
+
+    //for each channel
+    const channelData: Array<number> = data[channel_idx];
+    const max = 255;
+    let mappedChannel: Array<Array<number>> = [];
+
+    if (!color.visible) {
+      mappedChannel = new Array(channelData.length).fill([0, 0, 0]);
+    } else {
+      channelData.forEach((pixel: number, j: number) => {
+        let mapped_pixel: number = pixel;
+        if (pixel < color.range[0]) {
+          mapped_pixel = 0;
+        } else if (pixel >= color.range[1]) {
+          mapped_pixel = 255;
+        } else {
+          mapped_pixel =
+            255 *
+            ((pixel - color.range[0]) / (color.range[1] - color.range[0]));
+        }
+        //iterate through each pixel
+        const red: number = (color.color[0] * mapped_pixel) / max;
+        const green: number = (color.color[1] * mapped_pixel) / max;
+        const blue: number = (color.color[2] * mapped_pixel) / max;
+        mappedChannel.push([red, green, blue]);
+      });
+    }
+
+    mappedChannels.push(mappedChannel);
+  }
+
+  for (let j = 0; j < rows * columns; j++) {
+    // for each pixel j
+    for (let i = 0; i < mappedChannels.length; i++) {
+      //for each channel i
+      summedChannels[j] = [
+        Math.min(summedChannels[j][0] + mappedChannels[i][j][0], 255), //cap each channel to 255
+        Math.min(summedChannels[j][1] + mappedChannels[i][j][1], 255),
+        Math.min(summedChannels[j][2] + mappedChannels[i][j][2], 255),
+      ];
+    }
+  }
+
+  const flattened: Array<number> = _.flatten(summedChannels);
+
+  const img: ImageJS.Image = new ImageJS.Image(columns, rows, flattened, {
+    components: 3,
+    alpha: 0,
+  });
+
+  return img.toDataURL("image/png", {
+    useCanvas: true,
+  });
+};
+
+export const extractChannelsFromFlattenedArray = (
+  flattened: Uint8Array,
+  channels: number,
+  alpha: number,
+  pixels: number
+): Array<Array<number>> => {
+  /**
+   * Given a flattened data array from greyscale or RGB imageJ Image[channel1_pix1, channel2_pix1, channel3_pix1, channel1_pix2, channel2_pix2, channel3_pix2, etc....], extract each channel separately
+   * as array.
+   * **/
+  if (channels === 1) {
+    //if greyscale, leave array as is, no need to extract, individual channel values
+    return [Array.from(flattened)];
+  }
+
+  const results = [];
+  for (let k = 0; k < channels; k++) {
+    results.push(new Array(pixels).fill(0)); //initialize channels
+  }
+
+  let i = 0; //iterate over all flattened data
+  while (i < flattened.length) {
+    let j = 0;
+    while (j < channels) {
+      results[j][i / (channels + alpha)] = flattened[i + j];
+      j += 1;
+    }
+    i += channels + alpha;
+  }
+  return results;
+};
 
 export const deserializeImages = async (
   serializedImages: Array<SerializedImageType>
@@ -19,22 +131,26 @@ export const deserializeImages = async (
   for (const serializedImage of serializedImages) {
     let nPlanes: number;
     let referenceImageData: string | Array<string>;
-    let originalSrc: Array<string>;
+    let originalSrc: Array<Array<string>>;
 
     if (Array.isArray(serializedImage.imageData)) {
       nPlanes = serializedImage.imageData.length;
-      referenceImageData = serializedImage.imageData[0];
+      referenceImageData = serializedImage.imageData[0][0];
       originalSrc = serializedImage.imageData;
     } else {
       nPlanes = 1;
       referenceImageData = serializedImage.imageData;
-      originalSrc = [serializedImage.imageData]; // handle case where example projects's images do not correspond to array of strings
+      originalSrc = [serializedImage.imageData]; // handle case where  do not corresexample projects's imagespond to array of strings
     }
 
     let referenceImage = await ImageJS.Image.load(referenceImageData);
 
     deserializedImages.push({
+      activeSlice: 0,
       categoryId: serializedImage.imageCategoryId,
+      colors: serializedImage.imageColors
+        ? serializedImage.imageColors
+        : generateDefaultChannels(serializedImage.imageChannels),
       id: serializedImage.imageId,
       annotations: serializedImage.annotations,
       name: serializedImage.imageFilename,
@@ -48,83 +164,266 @@ export const deserializeImages = async (
         frames: serializedImage.imageFrames,
       },
       originalSrc: originalSrc,
-      src: originalSrc[Math.floor(nPlanes / 2)],
+      src: serializedImage.imageSrc,
     });
   }
 
   return deserializedImages;
 };
 
-export const convertFileToImage = async (file: File): Promise<ImageType> => {
+export const convertFileToImage = async (
+  file: File,
+  colors: Array<Color> | undefined,
+  slices: number,
+  channels: number
+): Promise<ImageType> => {
   /**
    * Returns image to be provided to dispatch
    * **/
   return new Promise((resolve, reject) => {
     return file.arrayBuffer().then((buffer) => {
       ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        resolve(convertImageJStoImage(image, file.name));
+        resolve(convertToImage(image, file.name, colors, slices, channels));
       });
     });
   });
 };
 
-export const convertImageJStoImage = (
+const convertImageDataToURI = (
+  width: number,
+  height: number,
+  data: Array<number>,
+  components: number,
+  alpha: 0 | 1 | undefined
+): string => {
+  /**
+   * Given channel data, convert to the corresponding encoded image URI.
+   * **/
+  const img: ImageJS.Image = new ImageJS.Image(width, height, data, {
+    components: components,
+    alpha: alpha ? alpha : 0,
+  });
+
+  return img.toDataURL("image/png", {
+    useCanvas: true,
+  });
+};
+
+const convertToImage = (
   image: ImageJS.Image | ImageJS.Stack,
-  filename: string
+  filename: string,
+  currentColors: Array<Color> | undefined,
+  slices: number,
+  components: number
 ): ImageType => {
   /**
-   * Given an ImageJS Image object, construct appropriate Image type. Return Image.
+   * Given an ImageJS Image object, construct appropriate Image type.
    * returns: the image of Image type
    * **/
-  let nplanes = 1;
-  let height: number;
-  let width: number;
-  let imageData: Array<string> = [];
-  let channels: number;
 
-  if (Array.isArray(image)) {
-    //case where user uploaded a z-stack
-    nplanes = image.length;
-    height = image[0].height;
-    width = image[0].width;
-    channels = image[0].components;
-    for (let j = 0; j < nplanes; j++) {
-      imageData.push(
-        image[j].toDataURL("image/png", {
-          useCanvas: true,
-        })
-      );
-    }
+  let z = slices;
+  let c = components;
+
+  const originalURIs: Array<Array<string>> = [];
+
+  const input: Array<ImageJS.Image> = Array.isArray(image) ? image : [image];
+  const channels: number = Array.isArray(image)
+    ? image.length / z
+    : image.components;
+  const displayedIdx: number = 0;
+  const colors = currentColors ? currentColors : generateDefaultChannels(c);
+  const height = input[0].height;
+  const width = input[0].width;
+
+  let displayedData: Array<Array<number>> = [];
+
+  if (z === 1 && c === 3) {
+    //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
+
+    displayedData = extractChannelsFromFlattenedArray(
+      input[0].data as Uint8Array,
+      input[0].components,
+      input[0].alpha,
+      height * width
+    );
+
+    originalURIs.push(
+      displayedData.map((channelData: Array<number>) => {
+        return convertImageDataToURI(height, width, channelData, 1, 0);
+      })
+    );
   } else {
-    imageData = [
-      image.toDataURL("image/png", {
-        useCanvas: true,
-      }),
-    ];
-    height = image.height;
-    width = image.width;
-    channels = image.components;
+    //a greyscale or multi-channel, or hyper-stack image was uploaded -- go through each image (which each corresponds to a channel)
+    let i = 0;
+
+    while (i + c <= input.length) {
+      let sliceData: Array<Array<number>> = [];
+      let sliceURI: Array<string> = [];
+
+      let j = i;
+
+      while (j < i + c) {
+        //go through slice of n channels
+        sliceData.push(Array.from(input[j].data)); //populate array of data
+        const channelURI = convertImageDataToURI(
+          width,
+          height,
+          Array.from(input[j].data),
+          1,
+          0
+        );
+        sliceURI.push(channelURI);
+        j += 1;
+      }
+
+      if (i === displayedIdx) {
+        displayedData = sliceData;
+      }
+
+      originalURIs.push(sliceURI);
+
+      i += c;
+    }
   }
 
-  const shape: ShapeType = {
-    channels: channels,
-    frames: 1,
-    height: height,
-    planes: nplanes,
-    width: width,
-  };
+  const displayedURI = mapChannelstoSpecifiedRGBImage(
+    displayedData!,
+    colors,
+    height,
+    width
+  );
 
   return {
+    activeSlice: 0,
+    annotations: [],
+    colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
-    annotations: [],
     name: filename,
-    shape: shape,
-    originalSrc: imageData,
+    originalSrc: originalURIs,
     partition: Partition.Inference,
+    shape: {
+      channels: channels,
+      frames: 1,
+      height: height,
+      planes: z,
+      width: width,
+    },
+    src: displayedURI,
     visible: true,
-    src: imageData[Math.floor(nplanes / 2)],
   };
+};
+
+export const convertImageURIsToImageData = async (
+  originalSrc: Array<Array<string>>
+): Promise<Array<Array<Array<number>>>> => {
+  /**
+   * From arrays of encoded URIs for Z x C x X x Y image, extract the correspond data arrray.
+   * Used for color adjustment of image.
+   * **/
+  const originalData: Array<Array<Array<number>>> = [];
+
+  for (let i = 0; i < originalSrc.length; i++) {
+    //z-slice dimension
+    const sliceData: Array<Array<number>> = [];
+    for (let j = 0; j < originalSrc[i].length; j++) {
+      const channelData = await convertURIToGreyscaleImageData(
+        originalSrc[i][j]
+      );
+      sliceData.push(channelData);
+    }
+    originalData.push(sliceData);
+  }
+
+  return originalData;
+};
+
+const toGreyscale = (pixels: Array<number>): Array<number> => {
+  /***
+   * The data URIs we extract are saved as "RGB" values with an alpha channel, but each URI
+   * actually corresponds to a single channel. We only need to extract the first "red" value, that's our intensity for that pixel for that channel.
+   * ***/
+  return pixels.filter(function (_, i) {
+    return i % 4 === 0;
+  });
+};
+
+export const convertSrcURIToOriginalSrcURIs = async (
+  src: string,
+  shape: ShapeType
+): Promise<Array<string>> => {
+  /**
+   * Given a src URI (the image being displayed), extract R, G, B URIs
+   * **/
+  const flattenedData = await convertURIToRGBImageData(src);
+  const channelData = extractChannelsFromFlattenedArray(
+    Uint8Array.from(flattenedData.data),
+    shape.channels,
+    1,
+    shape.width * shape.height
+  );
+  return Promise.all(
+    channelData.map((channel: Array<number>) => {
+      return convertImageDataToURI(shape.width, shape.height, channel, 1, 0);
+    })
+  );
+};
+
+const convertURIToGreyscaleImageData = async (URI: string) => {
+  const rgbData = await convertURIToRGBImageData(URI);
+  return toGreyscale(Array.from(rgbData.data));
+};
+
+const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
+  /**
+   * From data URI to flattened image data
+   * **/
+
+  return new Promise(function (resolve, reject) {
+    if (URI == null) return reject();
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    var image = new Image();
+
+    image.addEventListener(
+      "load",
+      function () {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        if (context) {
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(context.getImageData(0, 0, canvas.width, canvas.height));
+        }
+      },
+      false
+    );
+
+    image.src = URI;
+  });
+};
+
+export const generateDefaultChannels = (components: number): Array<Color> => {
+  /**
+   * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
+   * green to the second channel, etc.. (see DefaultColors type)
+   * If image is greyscale, we assign the white color to that one channel.
+   * **/
+  let defaultChannels: Array<Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
+  if (components === 1) {
+    defaultChannels = [
+      { color: [255, 255, 255], range: [0, 255], visible: true },
+    ];
+  } else {
+    for (let i = 0; i < components; i++) {
+      defaultChannels.push({
+        color: DEFAULT_COLORS[i],
+        range: [0, 255],
+        visible: !(components > 3 && i > 0), //if image is multi-channel and c > 3, only show the first channel as default (user can then toggle / untoggle the other channels if desired).
+      });
+    }
+  }
+
+  return defaultChannels;
 };
 
 export const connectPoints = (
@@ -358,6 +657,20 @@ const hexToRgb = (hex: string) => {
         b: parseInt(result[3], 16),
       }
     : null;
+};
+
+export const rgbToHex = (rgb: Array<number>) => {
+  return (
+    "#" +
+    componentToHex(rgb[0]) +
+    componentToHex(rgb[1]) +
+    componentToHex(rgb[2])
+  );
+};
+
+const componentToHex = (c: number) => {
+  var hex = c.toString(16);
+  return hex.length === 1 ? "0" + hex : hex;
 };
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (

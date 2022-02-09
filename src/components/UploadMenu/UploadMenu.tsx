@@ -5,11 +5,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
-import { useDispatch } from "react-redux";
-import { createImage } from "../../store/slices";
 import { DropboxMenuItem } from "./DropboxMenuItem";
-import { convertFileToImage } from "../../image/imageHelper";
 import { StyledMenuItem } from "./StyledMenuItem";
+import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -18,26 +16,27 @@ type UploadMenuProps = {
 };
 
 export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
-  const dispatch = useDispatch();
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
+    React.useState(false);
+
+  const handleClose = () => {
+    setOpenDimensionsDialogBox(false);
+  };
+
+  const [files, setFiles] = React.useState<FileList>();
 
   const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    onClose(event);
     event.persist();
 
     if (!event.currentTarget.files) return;
 
-    const files = event.currentTarget.files;
+    setFiles(event.currentTarget.files);
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    setOpenDimensionsDialogBox(true); //open dialog box
 
-      const image = await convertFileToImage(file);
-
-      //if length of images is > 1, then the user selected a z-stack --> only show center image
-      dispatch(createImage({ image: image }));
-    }
+    onClose(event);
   };
 
   return (
@@ -85,6 +84,12 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
         <DropboxMenuItem onClose={onClose} />
       </Menu>
+      <ImageShapeDialog
+        files={files!}
+        open={openDimensionsDialogBox}
+        onClose={handleClose}
+        isUploadedFromAnnotator={false}
+      />
     </>
   );
 };

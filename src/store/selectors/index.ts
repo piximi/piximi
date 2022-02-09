@@ -12,6 +12,7 @@ export { imageAspectRatioSelector } from "./imageAspectRatioSelector";
 export { imageInstancesSelector } from "./imageInstancesSelector";
 export { imageNameSelector } from "./imageNameSelector";
 export { imageSelector } from "./imageSelector";
+export { imageViewerImagesSelector } from "./imageViewerImagesSelector";
 export { imageOriginalSrcSelector } from "./imageOriginalSrcSelector";
 export { saturationSelector } from "./saturationSelector";
 export { selectedCategorySelector } from "./selectedCategorySelector";

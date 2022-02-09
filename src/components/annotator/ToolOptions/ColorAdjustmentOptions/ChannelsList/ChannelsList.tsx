@@ -8,31 +8,35 @@ import {
   CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
 } from "../../../../../icons";
-import { useDispatch, useSelector } from "react-redux";
-import { channelsSelector } from "../../../../../store/selectors/intensityRangeSelector";
-import { ChannelType } from "../../../../../types/ChannelType";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { Color } from "../../../../../types/Color";
 import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
 import { CollapsibleList } from "../../../CategoriesList/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
+import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import {
+  convertImageURIsToImageData,
+  mapChannelstoSpecifiedRGBImage,
+  rgbToHex,
+} from "../../../../../image/imageHelper";
+import { Palette } from "../Palette";
+import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
+import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 
-type ColorAdjustmentSlidersProp = {
-  updateDisplayedValues: (values: Array<Array<number>>) => void;
-  displayedValues: Array<Array<number>>;
-};
-
-export const ChannelsList = ({
-  displayedValues,
-  updateDisplayedValues,
-}: ColorAdjustmentSlidersProp) => {
+export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const channels = useSelector(channelsSelector);
+  const activeImageColors = useSelector(activeImageColorsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const visibleChannelsIndices = channels
-    .map((channel: ChannelType, idx) => channel.visible)
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
+
+  const originalSrc = useSelector(imageOriginalSrcSelector);
+
+  const visibleChannelsIndices = activeImageColors
+    .map((channel: Color, idx) => channel.visible)
     .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), []);
 
   const handleSliderChange = (
@@ -40,64 +44,110 @@ export const ChannelsList = ({
     event: any,
     newValue: number | number[]
   ) => {
-    const copiedValues = [...displayedValues].map((range: Array<number>) => {
-      return [...range];
+    const oldValues = activeImageColors.map((channel: Color, i: number) => {
+      if (i === idx) {
+        return newValue as Array<number>;
+      } else {
+        return channel.range;
+      }
     });
-    copiedValues[idx] = newValue as Array<number>;
-    updateDisplayedValues(copiedValues);
-    handler(copiedValues);
+    handler(oldValues);
   };
 
   const handler = useCallback(
     (values: Array<Array<number>>) => {
-      const updateIntensityRanges = () => {
+      const updateIntensityRanges = (values: Array<Array<number>>) => {
         const copiedValues = [...values].map((range: Array<number>) => {
           return [...range];
         });
 
-        const updatedChannels = channels.map(
-          (channel: ChannelType, index: number) => {
+        const updatedChannels = activeImageColors.map(
+          (channel: Color, index: number) => {
             return { ...channel, range: copiedValues[index] };
           }
         );
 
         dispatch(
-          imageViewerSlice.actions.setChannels({
-            channels: updatedChannels,
+          imageViewerSlice.actions.setImageColors({
+            colors: updatedChannels,
           })
         );
       };
+      updateIntensityRanges(values);
       return debounce(updateIntensityRanges, 100);
     },
-    [channels, dispatch]
+    [activeImageColors, dispatch]
   );
+
+  const handleSliderChangeCommitted = async () => {
+    if (!originalSrc || !imageShape) return;
+
+    const originalData = await convertImageURIsToImageData([
+      originalSrc[activeImagePlane],
+    ]);
+
+    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      originalData[0],
+      activeImageColors,
+      imageShape.height,
+      imageShape.width
+    );
+    batch(() => {
+      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    });
+  };
 
   const onCheckboxChanged = (index: number) => () => {
     const current = visibleChannelsIndices.indexOf(index);
 
-    const updated = [...visibleChannelsIndices];
+    const visibles = [...visibleChannelsIndices];
 
-    const copiedChannels = [...channels];
+    const copiedChannels = [...activeImageColors];
 
     if (current === -1) {
-      updated.push(index);
+      visibles.push(index);
       copiedChannels[index] = { ...copiedChannels[index], visible: true };
     } else {
-      updated.splice(current, 1);
+      visibles.splice(current, 1);
       copiedChannels[index] = { ...copiedChannels[index], visible: false };
     }
-    dispatch(
-      imageViewerSlice.actions.setChannels({
-        channels: copiedChannels,
-      })
-    );
+
+    batch(async () => {
+      dispatch(
+        imageViewerSlice.actions.setImageColors({
+          colors: copiedChannels,
+        })
+      );
+
+      if (!originalSrc || !imageShape) return;
+
+      const originalData = await convertImageURIsToImageData([
+        originalSrc[activeImagePlane],
+      ]);
+
+      const arrayLength = originalData[0][0].length;
+      const modifiedData = originalData[0].map(
+        (arr: Array<number>, i: number) => {
+          if (visibles.includes(i)) {
+            return arr;
+          } else {
+            return new Array(arrayLength).fill(0);
+          }
+        }
+      );
+
+      const modifiedURI = mapChannelstoSpecifiedRGBImage(
+        modifiedData,
+        copiedChannels,
+        imageShape.height,
+        imageShape.width
+      );
+
+      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    });
   };
 
-  const colorAdjustmentSlider = (
-    index: number,
-    name: string,
-    displayedValue: Array<number>
-  ) => {
+  const colorAdjustmentSlider = (index: number, name: string) => {
     return (
       <ListItem dense key={index}>
         <ListItemIcon>
@@ -106,16 +156,8 @@ export const ChannelsList = ({
             checked={visibleChannelsIndices.indexOf(index) !== -1}
             disableRipple
             edge="start"
-            icon={
-              <>
-                <CheckboxUncheckedIcon />
-              </>
-            }
-            checkedIcon={
-              <>
-                <CheckboxCheckedIcon />
-              </>
-            }
+            icon={<CheckboxUncheckedIcon />}
+            checkedIcon={<CheckboxCheckedIcon />}
             tabIndex={-1}
           />
         </ListItemIcon>
@@ -123,34 +165,33 @@ export const ChannelsList = ({
         <Slider
           key={index}
           disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
-          style={{ width: "60%" }}
-          value={displayedValue}
+          sx={{
+            width: "50%",
+            "& .MuiSlider-track": {
+              color: rgbToHex(activeImageColors[index].color),
+            },
+          }}
+          value={activeImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(index, event, value)
           }
+          onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
         />
+        <Palette channelIdx={index} />
       </ListItem>
     );
   };
 
-  const allSliders = (displayedValues: Array<Array<number>>) => {
-    if (!imageShape) return;
-    const sliders = [];
-
-    const names =
-      imageShape.channels === 1 ? ["Grey"] : ["Red", "Green", "Blue"];
-    for (let i = 0; i < imageShape.channels; i++) {
-      sliders.push(colorAdjustmentSlider(i, names[i], displayedValues[i]));
-    }
-    return sliders;
-  };
-
   return (
     <CollapsibleList closed dense primary="Channels">
-      {allSliders(displayedValues)}
+      {Array(activeImageColors.length)
+        .fill(0)
+        .map((_, i) => {
+          return colorAdjustmentSlider(i, `Ch. ${i}`);
+        })}
     </CollapsibleList>
   );
 };
