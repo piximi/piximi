@@ -379,8 +379,6 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ images: Array<Image> }>
     ) {
       state.images = action.payload.images;
-      // if (!action.payload.images.length) return;
-      // state.activeImageId = action.payload.images[0].id;
     },
     setCurrentColors(
       state: ImageViewer,
