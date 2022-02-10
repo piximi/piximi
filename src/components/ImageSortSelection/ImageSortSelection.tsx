@@ -1,6 +1,10 @@
 import React, { SyntheticEvent } from "react";
 import { Autocomplete, TextField } from "@mui/material";
-import { availableImageSortKeys, ImageSortKeyType } from "types/ImageSortType";
+import {
+  availableImageSortKeys,
+  ImageSortKeyType,
+  ImageSortKey,
+} from "types/ImageSortType";
 import { projectSlice } from "store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import { imageSortKeySelector } from "store/selectors/imageSortKeySelector";
@@ -33,6 +37,10 @@ export const ImageSortSelection = () => {
         disableClearable={true}
         options={availableImageSortKeys}
         onChange={onImageSortKeyChange}
+        isOptionEqualToValue={(option, value) =>
+          option.imageSortKey === value.imageSortKey ||
+          ImageSortKey.None === value.imageSortKey
+        }
         getOptionLabel={(option: ImageSortKeyType) => option.imageSortKeyName}
         renderInput={(params) => (
           <TextField {...params} autoComplete="off" label="Order images by:" />
