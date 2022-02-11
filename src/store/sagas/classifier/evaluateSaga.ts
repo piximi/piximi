@@ -12,8 +12,6 @@ import { EvaluationResultType } from "types/EvaluationResultType";
 import { evaluate } from "store/coroutines/classifier/evaluate";
 
 export function* evaluateSaga(action: any): any {
-  const { setOpenEvaluateDialog } = action.payload;
-
   const model = yield select(fittedSelector);
   const validationImages = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
@@ -52,5 +50,9 @@ export function* evaluateSaga(action: any): any {
     })
   );
 
-  setOpenEvaluateDialog();
+  yield put(
+    classifierSlice.actions.updateEvaluating({
+      evaluating: false,
+    })
+  );
 }
