@@ -15,7 +15,7 @@ export const ZStackSlider = () => {
   const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
   const channels = useSelector(activeImageColorsSelector);
-  const activeSlice = useSelector(activeImagePlaneSelector);
+  const activePlane = useSelector(activeImagePlaneSelector);
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
@@ -54,14 +54,14 @@ export const ZStackSlider = () => {
     <React.Fragment>
       <List dense>
         <ListItem>
-          <ListItemText>Z plane: {activeSlice}</ListItemText>
+          <ListItemText>Z plane: {activePlane}</ListItemText>
         </ListItem>
 
         <ListItem>
           <Slider
             aria-label="z-plane"
             onChange={handleChange}
-            value={activeSlice}
+            value={activePlane}
             valueLabelDisplay="auto"
             step={1}
             marks

@@ -3,12 +3,12 @@ import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import LabelIcon from "@mui/icons-material/Label";
 import { useSelector } from "react-redux";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Partition } from "../../types/Partition";
 import { categoriesSelector } from "../../store/selectors/categoriesSelector";
 
 type ImageIconLabelProps = {
-  image: Image;
+  image: ImageType;
 };
 
 export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {

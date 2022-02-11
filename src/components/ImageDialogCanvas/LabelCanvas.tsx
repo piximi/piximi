@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { StyledMasksCanvas } from "./StyledImageCanvasComponents";
 
 type LabelCanvasProps = {
-  image: Image;
+  image: ImageType;
 };
 
 export const LabelCanvas = ({ image }: LabelCanvasProps) => {

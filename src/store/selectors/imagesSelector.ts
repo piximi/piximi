@@ -1,10 +1,10 @@
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Project } from "../../types/Project";
 
 export const imagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<Image> => {
+}): Array<ImageType> => {
   return project.images;
 };

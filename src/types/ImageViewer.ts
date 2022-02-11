@@ -4,7 +4,7 @@ import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
 import { Color } from "./Color";
-import { Image } from "./Image";
+import { ImageType } from "./ImageType";
 import { Category } from "./Category";
 
 export type ImageViewer = {

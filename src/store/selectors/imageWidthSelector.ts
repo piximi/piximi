@@ -1,5 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 
 export const imageWidthSelector = ({
   imageViewer,
@@ -8,7 +8,7 @@ export const imageWidthSelector = ({
 }) => {
   if (!imageViewer.images.length || !imageViewer.activeImageId) return;
 
-  const image = imageViewer.images.filter((image: Image) => {
+  const image = imageViewer.images.filter((image: ImageType) => {
     return image.id === imageViewer.activeImageId;
   })[0];
 

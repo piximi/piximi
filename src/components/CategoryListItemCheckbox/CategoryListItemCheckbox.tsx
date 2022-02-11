@@ -3,7 +3,7 @@ import { Category } from "../../types/Category";
 import { useDispatch, useSelector } from "react-redux";
 import { deselectImages, updateCategoryVisibility } from "../../store/slices";
 import { visibleImagesSelector } from "../../store/selectors";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Checkbox, ListItemIcon } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
@@ -29,10 +29,10 @@ export const CategoryListItemCheckbox = ({
       dispatch(
         deselectImages({
           ids: images
-            .filter((image: Image) => {
+            .filter((image: ImageType) => {
               return image.categoryId === category.id;
             })
-            .map((image: Image) => image.id),
+            .map((image: ImageType) => image.id),
         })
       );
     }

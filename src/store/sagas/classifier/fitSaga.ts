@@ -17,7 +17,7 @@ import { RescaleOptions } from "../../../types/RescaleOptions";
 import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { Category } from "../../../types/Category";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { FitOptions } from "../../../types/FitOptions";
 import { ModelType } from "../../../types/ClassifierModelType";
 
@@ -47,8 +47,8 @@ export function* fitSaga(action: any): any {
   );
 
   const categories: Category[] = yield select(createdCategoriesSelector);
-  const trainImages: Image[] = yield select(trainImagesSelector);
-  const valImages: Image[] = yield select(valImagesSelector);
+  const trainImages: ImageType[] = yield select(trainImagesSelector);
+  const valImages: ImageType[] = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
   const data = yield preprocess(

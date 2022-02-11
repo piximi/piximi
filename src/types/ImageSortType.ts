@@ -1,4 +1,4 @@
-import { Image } from "./Image";
+import { ImageType } from "./ImageType";
 
 enum ImageSortKey {
   None,

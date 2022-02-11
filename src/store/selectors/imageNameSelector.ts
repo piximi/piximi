@@ -1,5 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Project } from "../../types/Project";
 
 export const imageNameSelector = ({
@@ -11,7 +11,7 @@ export const imageNameSelector = ({
 }) => {
   if (!project.images.length) return;
 
-  const image = project.images.find((image: Image) => {
+  const image = project.images.find((image: ImageType) => {
     return image.id === imageViewer.activeImageId;
   });
 

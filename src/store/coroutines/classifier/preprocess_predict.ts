@@ -1,6 +1,6 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 
@@ -48,7 +48,7 @@ export const resize = async (
   });
 };
 
-export const generator = (images: Array<Image>) => {
+export const generator = (images: Array<ImageType>) => {
   const count = images.length;
 
   return function* () {
@@ -68,7 +68,7 @@ export const generator = (images: Array<Image>) => {
 };
 
 export const preprocess_predict = async (
-  images: Array<Image>,
+  images: Array<ImageType>,
   rescaleOptions: RescaleOptions,
   inputShape: Shape
 ): Promise<

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import {
   selectedImagesSelector,
   visibleImagesSelector,
@@ -47,7 +47,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
     []
   );
 
-  const onSelectImage = (image: Image) => {
+  const onSelectImage = (image: ImageType) => {
     if (selectedImages.includes(image.id)) {
       dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
     } else {
@@ -105,7 +105,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
           cols={Math.floor(6 / scaleFactor)}
           rowHeight={"auto"}
         >
-          {images.slice(0, max_images).map((image: Image) => (
+          {images.slice(0, max_images).map((image: ImageType) => (
             <ImageListItem
               key={image.id}
               onClick={() => onSelectImage(image)}

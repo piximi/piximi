@@ -10,7 +10,7 @@ import {
 } from "../../../../../image/imageHelper";
 import { imageViewerImagesSelector } from "../../../../../store/selectors";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
-import { Image } from "../../../../../types/Image";
+import { ImageType } from "../../../../../types/ImageType";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ApplyColorsButton = () => {
@@ -27,9 +27,9 @@ export const ApplyColorsButton = () => {
       })
     );
 
-    const getUpdatedImages = async (): Promise<Array<Image>> => {
+    const getUpdatedImages = async (): Promise<Array<ImageType>> => {
       return Promise.all(
-        images.map(async (image: Image) => {
+        images.map(async (image: ImageType) => {
           if (image.id === activeImageId) {
             return image; //don't do anything, the imageSrc has already been updated on slider change / toggling
           }
@@ -55,7 +55,7 @@ export const ApplyColorsButton = () => {
       );
     };
 
-    getUpdatedImages().then((updatedImages: Array<Image>) => {
+    getUpdatedImages().then((updatedImages: Array<ImageType>) => {
       dispatch(imageViewerSlice.actions.setImages({ images: updatedImages }));
     });
   };

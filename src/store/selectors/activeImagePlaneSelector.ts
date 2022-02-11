@@ -1,16 +1,16 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 
 export const activeImagePlaneSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
 }): number => {
-  const activeImage = imageViewer.images.find((image: Image) => {
+  const activeImage = imageViewer.images.find((image: ImageType) => {
     return imageViewer.activeImageId === image.id;
   });
 
   if (!activeImage) return 0;
 
-  return activeImage.activeSlice;
+  return activeImage.activePlane;
 };

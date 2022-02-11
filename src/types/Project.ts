@@ -1,5 +1,5 @@
 import { Category } from "./Category";
-import { Image } from "./Image";
+import { ImageType } from "./ImageType";
 import { ImageSortKeyType } from "./ImageSortType";
 import { Task } from "./Task";
 

@@ -1,13 +1,13 @@
 import { Project } from "../../types/Project";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Partition } from "../../types/Partition";
 
 export const trainImagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<Image> => {
-  return project.images.filter((image: Image) => {
+}): Array<ImageType> => {
+  return project.images.filter((image: ImageType) => {
     return image.partition === Partition.Training;
   });
 };

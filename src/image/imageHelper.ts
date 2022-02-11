@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
-import { Image as ImageType } from "../types/Image";
+import { ImageType } from "../types/ImageType";
 import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
@@ -146,7 +146,7 @@ export const deserializeImages = async (
     let referenceImage = await ImageJS.Image.load(referenceImageData);
 
     deserializedImages.push({
-      activeSlice: 0,
+      activePlane: 0,
       categoryId: serializedImage.imageCategoryId,
       colors: serializedImage.imageColors
         ? serializedImage.imageColors
@@ -294,7 +294,7 @@ const convertToImage = (
   );
 
   return {
-    activeSlice: 0,
+    activePlane: 0,
     annotations: [],
     colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,

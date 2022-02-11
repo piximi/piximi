@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
@@ -35,7 +35,7 @@ const initialImage: Image | undefined =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV === "production"
     ? {
-        activeSlice: 0,
+        activePlane: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: generateDefaultChannels(3),
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
@@ -245,7 +245,7 @@ export const imageViewerSlice = createSlice({
       );
 
       const loaded: Image = {
-        activeSlice: 0,
+        activePlane: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: action.payload.file.imageColors
           ? action.payload.file.imageColors
@@ -347,7 +347,7 @@ export const imageViewerSlice = createSlice({
         if (state.activeImageId !== image.id) {
           return image;
         } else {
-          return { ...image, activeSlice: action.payload.activeImagePlane };
+          return { ...image, activePlane: action.payload.activeImagePlane };
         }
       });
     },
