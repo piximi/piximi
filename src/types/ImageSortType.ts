@@ -1,6 +1,6 @@
 import { Image } from "./Image";
 
-enum ImageSortKey {
+export enum ImageSortKey {
   None,
   FileName,
   Category,

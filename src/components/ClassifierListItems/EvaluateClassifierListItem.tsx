@@ -1,4 +1,9 @@
-import { IconButton, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  CircularProgress,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useDialog } from "../../hooks";
@@ -9,6 +14,8 @@ import { createdCategoriesSelector } from "store/selectors";
 import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
 import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
 import { classifierSlice } from "store/slices";
+import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
+import React, { useEffect } from "react";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;
@@ -23,12 +30,19 @@ export const EvaluateClassifierListItem = (
 
   const categories: Category[] = useSelector(createdCategoriesSelector);
   const evaluationResult = useSelector(evaluationResultSelector);
+  const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
+  const evaluationFlag = useSelector(evaluationFlagSelector);
 
   const onEvaluateClick = async () => {
-    dispatch(
-      classifierSlice.actions.evaluate({ setOpenEvaluateDialog: onOpen })
-    );
+    dispatch(classifierSlice.actions.evaluate({}));
   };
+
+  useEffect(() => {
+    if (isEvaluating && !evaluationFlag) {
+      onOpen();
+    }
+    setIsEvaluating(evaluationFlag);
+  }, [evaluationFlag, isEvaluating, onOpen]);
 
   return (
     <>
@@ -37,13 +51,18 @@ export const EvaluateClassifierListItem = (
           <AssessmentIcon />
         </ListItemIcon>
         <ListItemText primary="Evaluate" />
-        <IconButton
-          onClick={onEvaluateClick}
-          edge="end"
-          disabled={props.disabled}
-        >
-          <KeyboardArrowRightIcon />
-        </IconButton>
+
+        {isEvaluating ? (
+          <CircularProgress disableShrink size={20} />
+        ) : (
+          <IconButton
+            onClick={onEvaluateClick}
+            edge="end"
+            disabled={props.disabled}
+          >
+            <KeyboardArrowRightIcon />
+          </IconButton>
+        )}
       </DisabledClassifierListItem>
 
       <EvaluateClassifierDialog

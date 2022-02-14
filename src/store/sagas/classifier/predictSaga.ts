@@ -21,7 +21,7 @@ export function* predictSaga(action: any): any {
   const testImages = yield select(testImagesSelector);
 
   if (!testImages.length) {
-    alert("No unlabled images to predict!");
+    alert("No unlabeled images to predict!");
     return;
   }
 
@@ -55,6 +55,12 @@ export function* predictSaga(action: any): any {
   yield put(
     classifierSlice.actions.updatePredicted({
       predicted: true,
+    })
+  );
+
+  yield put(
+    classifierSlice.actions.updatePredicting({
+      predicting: false,
     })
   );
 }

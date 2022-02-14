@@ -66,12 +66,9 @@ export const classifierSlice = createSlice({
     predict(state, action: PayloadAction<{}>) {
       state.predicting = true;
     },
-    evaluate(
-      state,
-      action: PayloadAction<{
-        setOpenEvaluateDialog: () => void;
-      }>
-    ) {},
+    evaluate(state, action: PayloadAction<{}>) {
+      state.evaluating = true;
+    },
     setClassifier(
       state,
       action: PayloadAction<{
@@ -208,6 +205,16 @@ export const classifierSlice = createSlice({
       const { trainingPercentage } = action.payload;
 
       state.trainingPercentage = trainingPercentage;
+    },
+    updateEvaluating(state, action: PayloadAction<{ evaluating: boolean }>) {
+      const { evaluating } = action.payload;
+
+      state.evaluating = evaluating;
+    },
+    updatePredicting(state, action: PayloadAction<{ predicting: boolean }>) {
+      const { predicting } = action.payload;
+
+      state.predicting = predicting;
     },
     updateEvaluationResult(
       state,

@@ -4,7 +4,13 @@ import {
   projectSlice,
 } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import {
+  Avatar,
+  CircularProgress,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
@@ -13,6 +19,7 @@ import {
   deserializeImages,
   generateDefaultChannels,
 } from "image/imageHelper";
+import React from "react";
 
 type OpenExampleProjectMenuItemProps = {
   exampleProject: ExampleProject;
@@ -31,7 +38,17 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onClickExampleProject = async () => {
+  const [exampleClassifierIsLoading, setExampleClassifierIsLoading] =
+    React.useState(false);
+
+  const onClickExampleProject = () => {
+    setExampleClassifierIsLoading(true);
+    setTimeout(() => {
+      openExampleProject();
+    }, 20);
+  };
+
+  const openExampleProject = async () => {
     var exampleProjectJson: any;
     switch (exampleProject) {
       case ExampleProject.Mnist:
@@ -56,9 +73,6 @@ export const OpenExampleProjectMenuItem = ({
     const project = exampleProjectJson.project as SerializedProjectType;
     const classifier = exampleProjectJson.classifier as Classifier;
     const images = await deserializeImages(project.serializedImages);
-
-    popupState.close();
-    onClose();
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
@@ -111,6 +125,9 @@ export const OpenExampleProjectMenuItem = ({
         classifier: classifier,
       })
     );
+
+    onClose();
+    popupState.close();
   };
 
   return (
@@ -120,6 +137,8 @@ export const OpenExampleProjectMenuItem = ({
       </ListItemAvatar>
 
       <ListItemText primary={projectName} />
+
+      {exampleClassifierIsLoading && <CircularProgress disableShrink />}
     </ListItem>
   );
 };
