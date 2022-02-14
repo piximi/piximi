@@ -20,7 +20,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
-  images: Array<Image>;
+  images: Array<ImageType>;
   language: LanguageType;
   offset: { x: number; y: number };
   penSelectionBrushSize: number;
