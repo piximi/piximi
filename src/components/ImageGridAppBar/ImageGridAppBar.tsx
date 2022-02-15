@@ -25,7 +25,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import ViewComfyIcon from "@mui/icons-material/ViewComfy";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -44,7 +44,11 @@ export const ImageGridAppBar = () => {
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
-  const { onClose, onOpen, open } = useDialog();
+  const {
+    onClose: onCloseDeleteImagesDialog,
+    onOpen: onOpenDeleteImagesDialog,
+    open: openDeleteImagesDialog,
+  } = useDialog();
 
   const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     setCategoryMenuAnchorEl(event.currentTarget);
@@ -96,7 +100,7 @@ export const ImageGridAppBar = () => {
     dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
   };
 
-  const selectNoImages = () => {
+  const unselectImages = () => {
     dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
@@ -109,7 +113,7 @@ export const ImageGridAppBar = () => {
               sx={{ marginRight: (theme) => theme.spacing(2) }}
               edge="start"
               color="inherit"
-              onClick={selectNoImages}
+              onClick={unselectImages}
             >
               <ClearIcon />
             </IconButton>
@@ -122,7 +126,7 @@ export const ImageGridAppBar = () => {
 
             <Chip
               avatar={<LabelOutlinedIcon color="inherit" />}
-              label="Categorise"
+              label="Categorize"
               onClick={onOpenCategoriesMenu}
               variant="outlined"
               style={{ marginRight: 15 }}
@@ -134,12 +138,14 @@ export const ImageGridAppBar = () => {
               variant="outlined"
             />
 
-            <IconButton color="inherit" onClick={selectAllImages}>
-              <ViewComfyIcon />
-            </IconButton>
+            <Tooltip title="Select all images">
+              <IconButton color="inherit" onClick={selectAllImages}>
+                <SelectAllIcon />
+              </IconButton>
+            </Tooltip>
 
-            <Tooltip title="Delete">
-              <IconButton color="inherit" onClick={onOpen}>
+            <Tooltip title="Delete selected images">
+              <IconButton color="inherit" onClick={onOpenDeleteImagesDialog}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -155,8 +161,8 @@ export const ImageGridAppBar = () => {
 
       <DeleteImagesDialog
         imageIds={selectedImages}
-        onClose={onClose}
-        open={open}
+        onClose={onCloseDeleteImagesDialog}
+        open={openDeleteImagesDialog}
       />
     </>
   );
