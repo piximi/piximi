@@ -38,7 +38,6 @@ export const EvaluateClassifierDialog = (
 
   return (
     <Dialog
-      disableEscapeKeyDown
       onClose={closeDialog}
       open={openedDialog}
       fullWidth
