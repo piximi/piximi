@@ -15,6 +15,11 @@ export const CategoriesList = () => {
 
   return (
     <CollapsibleList primary="Categories">
+      <CategoryListItem
+        category={unknownCategory}
+        key={unknownCategory.id}
+        id={unknownCategory.id}
+      />
       {categories.map((category: Category) => {
         return (
           <CategoryListItem
@@ -24,11 +29,6 @@ export const CategoriesList = () => {
           />
         );
       })}
-      <CategoryListItem
-        category={unknownCategory}
-        key={unknownCategory.id}
-        id={unknownCategory.id}
-      />
       <CreateCategoryListItem />
     </CollapsibleList>
   );

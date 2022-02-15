@@ -328,50 +328,6 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Categories")}>
-        {createdCategories.map((category: Category) => {
-          return (
-            <div key={category.id}>
-              <ListItem
-                button
-                id={category.id}
-                onClick={(event) => onCategoryClick(event, category)}
-                selected={category.id === selectedCategory.id}
-              >
-                <CategoryListItemCheckbox category={category} />
-
-                <ListItemText
-                  id={category.id}
-                  primary={category.name}
-                  primaryTypographyProps={{ noWrap: true }}
-                />
-                {categoryCounts[category.id] !== 0 && (
-                  <Chip label={categoryCounts[category.id]} size="small" />
-                )}
-
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => onCategoryMenuOpen(event, category)}
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-
-              <CategoryMenu
-                anchorElCategoryMenu={anchorEl}
-                onCloseCategoryMenu={onCategoryMenuClose}
-                onOpenCategoryMenu={(event) =>
-                  onCategoryMenuOpen(event, category)
-                }
-                onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
-                onOpenEditCategoryDialog={onOpenEditCategoryDialog}
-                onOpenClearCategoryDialog={onOpenClearCategoryDialog}
-                openCategoryMenu={Boolean(anchorEl)}
-              />
-            </div>
-          );
-        })}
         {unknownCategory && (
           <div key={unknownCategory.id}>
             <ListItem
@@ -415,6 +371,51 @@ export const CategoriesList = () => {
             />
           </div>
         )}
+
+        {createdCategories.map((category: Category, idx: number) => {
+          return (
+            <div key={idx}>
+              <ListItem
+                button
+                id={String(idx)}
+                onClick={(event) => onCategoryClick(event, category)}
+                selected={category.id === selectedCategory.id}
+              >
+                <CategoryListItemCheckbox category={category} />
+
+                <ListItemText
+                  id={String(idx)}
+                  primary={category.name}
+                  primaryTypographyProps={{ noWrap: true }}
+                />
+                {categoryCounts[category.id] !== 0 && (
+                  <Chip label={categoryCounts[category.id]} size="small" />
+                )}
+
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    onClick={(event) => onCategoryMenuOpen(event, category)}
+                  >
+                    <MoreHorizIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+
+              <CategoryMenu
+                anchorElCategoryMenu={anchorEl}
+                onCloseCategoryMenu={onCategoryMenuClose}
+                onOpenCategoryMenu={(event) =>
+                  onCategoryMenuOpen(event, category)
+                }
+                onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
+                onOpenEditCategoryDialog={onOpenEditCategoryDialog}
+                onOpenClearCategoryDialog={onOpenClearCategoryDialog}
+                openCategoryMenu={Boolean(anchorEl)}
+              />
+            </div>
+          );
+        })}
 
         <DeleteCategoryDialog
           onClose={onCloseDeleteCategoryDialog}
