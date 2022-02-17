@@ -179,7 +179,7 @@ export const deserializeImages = async (
       shape: {
         width: referenceImage.width,
         height: referenceImage.height,
-        channels: referenceImage.components, // typically: 3 if RGB, else 1
+        channels: originalSrc[defaultPlane].length,
         planes: nPlanes,
         frames: serializedImage.imageFrames,
       },
