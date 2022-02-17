@@ -31,6 +31,8 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Image } from "../../types/Image";
 import { Partition } from "../../types/Partition";
+import { useHotkeys } from "react-hotkeys-hook";
+import { KeyboardKey } from "components/annotator/Help/HelpDialog/KeyboardKey";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -43,6 +45,14 @@ export const ImageGridAppBar = () => {
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
+
+  const [showImageGridAppBar, setShowImageGridAppBar] =
+    React.useState<boolean>(false);
+  React.useEffect(() => {
+    selectedImages.length > 0
+      ? setShowImageGridAppBar(true)
+      : setShowImageGridAppBar(false);
+  }, [selectedImages]);
 
   const {
     onClose: onCloseDeleteImagesDialog,
@@ -58,7 +68,7 @@ export const ImageGridAppBar = () => {
     setCategoryMenuAnchorEl(null);
   };
 
-  const onOpenAnnotator = (event: React.MouseEvent<HTMLDivElement>) => {
+  const onOpenAnnotator = () => {
     const selected = selectedImages.map((id: string, idx: number) => {
       const projectImage = images.find((image: Image) => {
         return image.id === id;
@@ -104,19 +114,60 @@ export const ImageGridAppBar = () => {
     dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
+  useHotkeys("esc", () => unselectImages(), { enabled: showImageGridAppBar });
+  useHotkeys("backspace, delete", () => onOpenDeleteImagesDialog(), {
+    enabled: showImageGridAppBar,
+  });
+
+  const tooltipTitle = (
+    tooltip: string,
+    firstKey: string,
+    secondKey?: string
+  ) => {
+    return (
+      <Box
+        sx={{ display: "flex", alignItems: "center", typography: "caption" }}
+      >
+        <Typography variant="caption">{tooltip}</Typography>
+        <Typography variant="caption" style={{ marginLeft: "5px" }}>
+          (
+        </Typography>
+        {secondKey && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              typography: "caption",
+            }}
+          >
+            <KeyboardKey letter={firstKey} />
+            <Typography variant="caption">+</Typography>
+          </Box>
+        )}
+        <KeyboardKey letter={secondKey ? secondKey : firstKey} />
+        <Typography variant="caption">)</Typography>
+      </Box>
+    );
+  };
+
   return (
     <>
-      <Slide appear={false} direction="down" in={selectedImages.length > 0}>
+      <Slide appear={false} direction="down" in={showImageGridAppBar}>
         <AppBar color="inherit" position="fixed">
           <Toolbar>
-            <IconButton
-              sx={{ marginRight: (theme) => theme.spacing(2) }}
-              edge="start"
-              color="inherit"
-              onClick={unselectImages}
+            <Tooltip
+              placement="bottom"
+              title={tooltipTitle("Unselect images", "esc")}
             >
-              <ClearIcon />
-            </IconButton>
+              <IconButton
+                sx={{ marginRight: (theme) => theme.spacing(2) }}
+                edge="start"
+                color="inherit"
+                onClick={unselectImages}
+              >
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
 
             <Typography sx={{ flexGrow: 1 }}>
               {selectedImages.length} selected images
@@ -138,13 +189,19 @@ export const ImageGridAppBar = () => {
               variant="outlined"
             />
 
-            <Tooltip title="Select all images">
+            <Tooltip
+              placement="bottom"
+              title={tooltipTitle("Select all images", "control", "a")}
+            >
               <IconButton color="inherit" onClick={selectAllImages}>
                 <SelectAllIcon />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Delete selected images">
+            <Tooltip
+              placement="bottom"
+              title={tooltipTitle("Delete selected images", "delete")}
+            >
               <IconButton color="inherit" onClick={onOpenDeleteImagesDialog}>
                 <DeleteIcon />
               </IconButton>
