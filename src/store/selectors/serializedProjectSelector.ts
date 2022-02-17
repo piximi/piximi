@@ -18,7 +18,7 @@ export const serializedProjectSelector = ({
       imageChannels: image.shape.channels,
       imageColors: image.colors,
       imageData: image.originalSrc,
-      imageSrc: image.src,
+      imageSrc: image.src, // TODO: keep this for larger saved projects, or delete it for slower load times
       imageFilename: image.name,
       imageFrames: image.shape.frames,
       imageHeight: image.shape.height,
