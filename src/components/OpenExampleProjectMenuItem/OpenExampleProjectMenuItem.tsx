@@ -48,7 +48,7 @@ export const OpenExampleProjectMenuItem = ({
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectJson = await import(
-          "data/exampleProjects/humanU2OSCellsExampleProject.json"
+          "data/exampleProjects/updated_humanU2OSCellsExampleProject.json"
         );
         break;
       default:
