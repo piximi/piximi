@@ -43,12 +43,12 @@ export const OpenExampleProjectMenuItem = ({
         break;
       case ExampleProject.CElegans:
         exampleProjectJson = await import(
-          "data/exampleProjects/updated_cElegansExampleProject.json"
+          "data/exampleProjects/cElegansExampleProject.json"
         );
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectJson = await import(
-          "data/exampleProjects/updated_humanU2OSCellsExampleProject.json"
+          "data/exampleProjects/humanU2OSCellsExampleProject.json"
         );
         break;
       default:
