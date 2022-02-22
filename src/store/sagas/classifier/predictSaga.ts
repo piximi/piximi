@@ -8,32 +8,60 @@ import { testImagesSelector } from "../../selectors/testImagesSelector";
 import { fittedSelector } from "../../selectors/fittedSelector";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { Category } from "../../../types/Category";
+import { RescaleOptions } from "types/RescaleOptions";
+import { ArchitectureOptions } from "types/ArchitectureOptions";
+import { Image } from "../../../types/Image";
+import * as tensorflow from "@tensorflow/tfjs";
 
 export function* predictSaga(action: any): any {
-  const rescaleOptions = yield select(rescaleOptionsSelector);
+  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
   let model = yield select(fittedSelector);
 
-  const architectureOptions = yield select(architectureOptionsSelector);
+  const architectureOptions: ArchitectureOptions = yield select(
+    architectureOptionsSelector
+  );
 
   const categories: Category[] = yield select(createdCategoriesSelector);
 
-  const testImages = yield select(testImagesSelector);
+  const testImages: Array<Image> = yield select(testImagesSelector);
+
+  const outputLayerSize = model.outputs[0].shape[1] as number;
 
   if (!testImages.length) {
     alert("No unlabeled images to predict!");
-    return;
-  }
-
-  const outputLayerSize = model.outputs[0].shape[1] as number;
-  if (outputLayerSize !== categories.length) {
+  } else if (outputLayerSize !== categories.length) {
     alert(
       "The output shape of your model does not correspond to the number of categories!"
     );
-    return;
+  } else {
+    yield runPrediction(
+      testImages,
+      rescaleOptions,
+      architectureOptions,
+      model,
+      categories
+    );
   }
 
-  const data = yield preprocess_predict(
+  yield put(
+    classifierSlice.actions.updatePredicting({
+      predicting: false,
+    })
+  );
+}
+
+function* runPrediction(
+  testImages: Array<Image>,
+  rescaleOptions: RescaleOptions,
+  architectureOptions: ArchitectureOptions,
+  model: tensorflow.LayersModel,
+  categories: Array<Category>
+) {
+  const data: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor<tensorflow.Rank>;
+    id: string;
+  }> = yield preprocess_predict(
     testImages,
     rescaleOptions,
     architectureOptions.inputShape
@@ -55,12 +83,6 @@ export function* predictSaga(action: any): any {
   yield put(
     classifierSlice.actions.updatePredicted({
       predicted: true,
-    })
-  );
-
-  yield put(
-    classifierSlice.actions.updatePredicting({
-      predicting: false,
     })
   );
 }

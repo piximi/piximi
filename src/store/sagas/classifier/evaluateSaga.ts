@@ -1,37 +1,64 @@
-import { put, select } from "redux-saga/effects";
-import { classifierSlice } from "../../slices";
-import { createdCategoriesSelector } from "../../selectors";
-import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { preprocess_predict } from "../../coroutines/classifier/preprocess_predict";
-import { fittedSelector } from "../../selectors/fittedSelector";
-import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
+import { ArchitectureOptions } from "types/ArchitectureOptions";
 import { Category } from "../../../types/Category";
-import { valImagesSelector } from "store/selectors/valImagesSelector";
-import { RescaleOptions } from "types/RescaleOptions";
 import { EvaluationResultType } from "types/EvaluationResultType";
+import { Image } from "../../../types/Image";
+import { RescaleOptions } from "types/RescaleOptions";
+import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
+import { createdCategoriesSelector } from "../../selectors";
+import { fittedSelector } from "../../selectors/fittedSelector";
+import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
+import { valImagesSelector } from "store/selectors/valImagesSelector";
+import { classifierSlice } from "../../slices";
 import { evaluate } from "store/coroutines/classifier/evaluate";
+import * as tensorflow from "@tensorflow/tfjs";
+import { put, select } from "redux-saga/effects";
 
 export function* evaluateSaga(action: any): any {
-  const model = yield select(fittedSelector);
-  const validationImages = yield select(valImagesSelector);
+  const model: tensorflow.LayersModel = yield select(fittedSelector);
+  const validationImages: Array<Image> = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
-  const architectureOptions = yield select(architectureOptionsSelector);
-  const categories: Category[] = yield select(createdCategoriesSelector);
+  const architectureOptions: ArchitectureOptions = yield select(
+    architectureOptionsSelector
+  );
+  const categories: Array<Category> = yield select(createdCategoriesSelector);
+
+  const outputLayerSize = model.outputs[0].shape[1] as number;
 
   if (validationImages.length === 0) {
     alert("Validation set is empty!");
-    return;
-  }
-
-  const outputLayerSize = model.outputs[0].shape[1] as number;
-  if (outputLayerSize !== categories.length) {
+  } else if (outputLayerSize !== categories.length) {
     alert(
       "The output shape of your model does not correspond to the number of categories!"
     );
-    return;
+  } else {
+    yield runEvaluation(
+      validationImages,
+      rescaleOptions,
+      architectureOptions,
+      model,
+      categories
+    );
   }
 
-  const validationData = yield preprocess_predict(
+  yield put(
+    classifierSlice.actions.updateEvaluating({
+      evaluating: false,
+    })
+  );
+}
+
+function* runEvaluation(
+  validationImages: Array<Image>,
+  rescaleOptions: RescaleOptions,
+  architectureOptions: ArchitectureOptions,
+  model: tensorflow.LayersModel,
+  categories: Array<Category>
+) {
+  const validationData: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor<tensorflow.Rank>;
+    id: string;
+  }> = yield preprocess_predict(
     validationImages,
     rescaleOptions,
     architectureOptions.inputShape
@@ -47,12 +74,6 @@ export function* evaluateSaga(action: any): any {
   yield put(
     classifierSlice.actions.updateEvaluationResult({
       evaluationResult,
-    })
-  );
-
-  yield put(
-    classifierSlice.actions.updateEvaluating({
-      evaluating: false,
     })
   );
 }
