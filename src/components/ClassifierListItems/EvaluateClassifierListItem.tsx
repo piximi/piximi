@@ -1,10 +1,9 @@
 import {
   CircularProgress,
-  IconButton,
+  ListItem,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useDialog } from "../../hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +15,7 @@ import { evaluationResultSelector } from "store/selectors/evaluationResultSelect
 import { classifierSlice } from "store/slices";
 import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
 import React, { useEffect } from "react";
+import { useTranslation } from "hooks/useTranslation";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;
@@ -27,13 +27,17 @@ export const EvaluateClassifierListItem = (
 ) => {
   const { onClose, onOpen, open } = useDialog();
   const dispatch = useDispatch();
+  const t = useTranslation();
 
   const categories: Category[] = useSelector(createdCategoriesSelector);
   const evaluationResult = useSelector(evaluationResultSelector);
   const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
   const evaluationFlag = useSelector(evaluationFlagSelector);
 
-  const onEvaluateClick = async () => {
+  const onEvaluate = async () => {
+    if (isEvaluating) {
+      return;
+    }
     dispatch(classifierSlice.actions.evaluate({}));
   };
 
@@ -47,22 +51,14 @@ export const EvaluateClassifierListItem = (
   return (
     <>
       <DisabledClassifierListItem {...props}>
-        <ListItemIcon>
-          <AssessmentIcon />
-        </ListItemIcon>
-        <ListItemText primary="Evaluate" />
+        <ListItem button onClick={onEvaluate} disablePadding>
+          <ListItemIcon>
+            <AssessmentIcon />
+          </ListItemIcon>
+          <ListItemText primary={t("Evaluate")} />
+        </ListItem>
 
-        {isEvaluating ? (
-          <CircularProgress disableShrink size={20} />
-        ) : (
-          <IconButton
-            onClick={onEvaluateClick}
-            edge="end"
-            disabled={props.disabled}
-          >
-            <KeyboardArrowRightIcon />
-          </IconButton>
-        )}
+        {isEvaluating && <CircularProgress disableShrink size={20} />}
       </DisabledClassifierListItem>
 
       <EvaluateClassifierDialog
