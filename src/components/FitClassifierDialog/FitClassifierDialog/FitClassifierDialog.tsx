@@ -133,7 +133,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   return (
     // @ts-ignore
     <Dialog
-      disableEscapeKeyDown
       fullScreen
       onClose={closeDialog}
       open={openedDialog}

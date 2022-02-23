@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { fittedSelector } from "../../store/selectors/fittedSelector";
 import { selectedModelSelector } from "../../store/selectors/selectedModelSelector";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type SaveClassifierDialogProps = {
   onClose: () => void;
@@ -33,10 +34,6 @@ export const SaveClassifierDialog = ({
 
   const noFittedModel = fitted ? false : true;
 
-  const onCancel = () => {
-    onClose();
-  };
-
   const onSaveClassifierClick = async () => {
     await fitted.save(`downloads://${classifierName}`);
 
@@ -47,6 +44,15 @@ export const SaveClassifierDialog = ({
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setClassifierName(event.target.value);
   };
+
+  useHotkeys(
+    "enter",
+    () => {
+      onSaveClassifierClick();
+    },
+    { enabled: open },
+    [onSaveClassifierClick]
+  );
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
@@ -74,7 +80,7 @@ export const SaveClassifierDialog = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onCancel} color="primary">
+        <Button onClick={onClose} color="primary">
           Cancel
         </Button>
 

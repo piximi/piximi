@@ -44,7 +44,7 @@ import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-
 import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
-import { useKeyboardShortcuts } from "../../../../../hooks/useKeyboardShortcuts";
+import { useAnnotatorKeyboardShortcuts } from "../../../../../hooks/useKeyboardShortcuts";
 import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
 import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
 import { Transformers } from "../Transformers/Transformers";
@@ -648,7 +648,7 @@ export const Stage = () => {
     setTool(annotationTool);
   }, [annotationTool, toolType]);
 
-  useKeyboardShortcuts();
+  useAnnotatorKeyboardShortcuts();
 
   const { draggable } = useHandTool();
 

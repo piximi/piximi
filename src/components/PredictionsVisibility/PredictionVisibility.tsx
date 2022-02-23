@@ -1,17 +1,20 @@
 import React from "react";
-import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import { classifierSlice, projectSlice } from "store/slices";
 import { useDispatch } from "react-redux";
-import DeleteIcon from "@mui/icons-material/Delete";
+import ClearIcon from "@mui/icons-material/Clear";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useTranslation } from "hooks/useTranslation";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();
 
   const [showLabeledImages, setShowLabeledImages] = React.useState(true);
 
-  const toggleShowLabeledImages = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const t = useTranslation();
+
+  const toggleShowLabeledImages = () => {
     const updatedShowLabeledImages = !showLabeledImages;
 
     setShowLabeledImages(updatedShowLabeledImages);
@@ -22,7 +25,7 @@ export const PredictionVisibility = () => {
     );
   };
 
-  const onClearPredictionsClick = () => {
+  const clearPredictions = () => {
     dispatch(projectSlice.actions.clearPredictions({}));
 
     if (!showLabeledImages) {
@@ -37,25 +40,21 @@ export const PredictionVisibility = () => {
 
   return (
     <>
-      <FormGroup>
-        <FormControlLabel
-          label="Hide labeled images"
-          control={
-            <Checkbox
-              checked={!showLabeledImages}
-              onChange={toggleShowLabeledImages}
-            />
-          }
+      <ListItem button onClick={clearPredictions}>
+        <ListItemText primary={t("Clear predictions")} />
+        <ListItemIcon>
+          <ClearIcon />
+        </ListItemIcon>
+      </ListItem>
+
+      <ListItem button onClick={toggleShowLabeledImages}>
+        <ListItemText
+          primary={t(`${showLabeledImages ? "Hide" : "Show"} labeled images`)}
         />
-      </FormGroup>
-      <Button
-        sx={{ mr: 5 }}
-        variant="outlined"
-        startIcon={<DeleteIcon />}
-        onClick={onClearPredictionsClick}
-      >
-        Clear predictions
-      </Button>
+        <ListItemIcon>
+          {showLabeledImages ? <VisibilityOffIcon /> : <VisibilityIcon />}
+        </ListItemIcon>
+      </ListItem>
     </>
   );
 };
