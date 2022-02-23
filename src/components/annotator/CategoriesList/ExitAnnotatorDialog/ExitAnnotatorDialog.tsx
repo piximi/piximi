@@ -5,7 +5,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { ImageType } from "../../../../types/ImageType";
-import { Partition } from "../../../../types/Partition";
 import { projectSlice } from "../../../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -35,21 +34,9 @@ export const ExitAnnotatorDialog = ({
       return !selectedImages.includes(image.id);
     });
 
-    //We update partition to TRAINING for the annotated images
-    const updatedAnnotatorImages = annotatorImages.map((image: ImageType) => {
-      let partition: Partition;
-      if (image.annotations.length > 0) {
-        //only update if image actually has annotations
-        partition = Partition.Training;
-      } else {
-        partition = Partition.Inference;
-      }
-      return { ...image, partition: partition };
-    });
-
     dispatch(
       projectSlice.actions.setImages({
-        images: [...updatedAnnotatorImages, ...unselectedImages],
+        images: [...annotatorImages, ...unselectedImages],
       })
     );
 

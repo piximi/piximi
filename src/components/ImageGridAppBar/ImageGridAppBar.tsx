@@ -77,7 +77,6 @@ export const ImageGridAppBar = () => {
       const annotatorImage: ImageType = {
         ...projectImage!,
         activePlane: 0,
-        partition: Partition.Inference,
       };
 
       if (idx === 0) {
