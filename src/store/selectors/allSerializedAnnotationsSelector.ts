@@ -1,6 +1,6 @@
 import { AnnotationType } from "../../types/AnnotationType";
 import { Category } from "../../types/Category";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import { ImageViewer } from "../../types/ImageViewer";
 
@@ -11,10 +11,9 @@ export const allSerializedAnnotationsSelector = ({
 }): Array<SerializedFileType> => {
   if (!imageViewer.images.length) return [];
 
-  return imageViewer.images.map((image: Image) => {
+  return imageViewer.images.map((image: ImageType) => {
     const columns = {
       imageChannels: image.shape.channels,
-      imageChecksum: "",
       imageColors: image.colors,
       imageData: image.originalSrc,
       imageSrc: image.src,

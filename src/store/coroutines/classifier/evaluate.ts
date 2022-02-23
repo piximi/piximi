@@ -1,7 +1,7 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import { EvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 
 export const evaluate = async (
   model: tensorflow.LayersModel,
@@ -9,7 +9,7 @@ export const evaluate = async (
     xs: tensorflow.Tensor;
     id: string;
   }>,
-  validationImages: Image[],
+  validationImages: ImageType[],
   categories: Category[]
 ): Promise<EvaluationResultType> => {
   const validationDataArray = await validationData.toArray();
@@ -29,7 +29,7 @@ export const evaluate = async (
   const categoryIDs = categories.map((c: Category) => c.id);
   const numberOfClasses = categoryIDs.length;
   const imageCategoryIDs = validationImages.map(
-    (image: Image) => image.categoryId
+    (image: ImageType) => image.categoryId
   );
   const labels = imageCategoryIDs.map((id: string) =>
     categoryIDs.findIndex((categoryID: string) => {

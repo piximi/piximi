@@ -8,7 +8,7 @@ import { applicationSlice } from "store/slices/applicationSlice";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDispatch, useSelector } from "react-redux";
 import { visibleImagesSelector } from "store/selectors";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 
 export const MainView = () => {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ export const MainView = () => {
 
   const images = useSelector(visibleImagesSelector);
   const selectAllImages = () => {
-    const newSelected = images.map((image: Image) => image.id);
+    const newSelected = images.map((image: ImageType) => image.id);
     dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
   };
 

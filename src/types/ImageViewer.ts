@@ -4,7 +4,7 @@ import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
 import { Color } from "./Color";
-import { Image } from "./Image";
+import { ImageType } from "./ImageType";
 import { Category } from "./Category";
 
 export type ImageViewer = {
@@ -20,7 +20,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
-  images: Array<Image>;
+  images: Array<ImageType>;
   language: LanguageType;
   offset: { x: number; y: number };
   penSelectionBrushSize: number;

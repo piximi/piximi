@@ -1,4 +1,4 @@
-import { Image } from "./Image";
+import { ImageType } from "./ImageType";
 
 export enum ImageSortKey {
   None,
@@ -9,7 +9,7 @@ export enum ImageSortKey {
 export type ImageSortKeyType = {
   imageSortKeyName: string;
   imageSortKey: ImageSortKey;
-  comparerFunction: (a: Image, b: Image) => number;
+  comparerFunction: (a: ImageType, b: ImageType) => number;
 };
 
 export const defaultImageSortKey: ImageSortKeyType = {

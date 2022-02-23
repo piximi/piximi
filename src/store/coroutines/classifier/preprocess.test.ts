@@ -1,7 +1,7 @@
 import "@tensorflow/tfjs-node";
 import { preprocess } from "./preprocess";
 import { Category } from "../../../types/Category";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { Partition } from "../../../types/Partition";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
@@ -37,9 +37,9 @@ const categories: Array<Category> = [
   },
 ];
 
-const images: Array<Image> = [
+const images: Array<ImageType> = [
   {
-    activeSlice: 0,
+    activePlane: 0,
     categoryId: "00000000-0000-0000-0000-00000000001",
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0001-00000000000",

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
@@ -31,11 +31,11 @@ const initialImageShape: Shape = {
   width: 512,
 };
 
-const initialImage: Image | undefined =
+const initialImage: ImageType | undefined =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV === "production"
     ? {
-        activeSlice: 0,
+        activePlane: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: generateDefaultChannels(3),
         id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
@@ -130,15 +130,15 @@ export const imageViewerSlice = createSlice({
   reducers: {
     addImages(
       state: ImageViewer,
-      action: PayloadAction<{ newImages: Array<Image> }>
+      action: PayloadAction<{ newImages: Array<ImageType> }>
     ) {
       //we look for image name duplicates and append number if such duplicates are found
-      const imageNames = state.images.map((image: Image) => {
+      const imageNames = state.images.map((image: ImageType) => {
         return image.name.split(".")[0];
       });
 
       const updatedImages = action.payload.newImages.map(
-        (image: Image, i: number) => {
+        (image: ImageType, i: number) => {
           const initialName = image.name.split(".")[0]; //get name before file extension
           //add filename extension to updatedName
           const updatedName =
@@ -175,7 +175,7 @@ export const imageViewerSlice = createSlice({
     },
     deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
-        (image: Image) => image.id !== action.payload.id
+        (image: ImageType) => image.id !== action.payload.id
       );
       if (!state.images.length) state.activeImageId = undefined;
       else if (
@@ -190,7 +190,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ id: string }>
     ) {
       //deletes all instances across all images
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         return { ...image, annotations: [] };
       });
     },
@@ -199,7 +199,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ imageId: string }>
     ) {
       //deletes all instances across a given image
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (image.id === action.payload.imageId) {
           return { ...image, annotations: [] };
         } else return image;
@@ -212,7 +212,7 @@ export const imageViewerSlice = createSlice({
     ) {
       if (!state.activeImageId) return;
 
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (image.id === state.activeImageId) {
           const updatedAnnotations = image.annotations.filter(
             (annotation: AnnotationType) => {
@@ -244,8 +244,8 @@ export const imageViewerSlice = createSlice({
         }
       );
 
-      const loaded: Image = {
-        activeSlice: 0,
+      const loaded: ImageType = {
+        activePlane: 0,
         categoryId: UNKNOWN_CATEGORY_ID,
         colors: action.payload.file.imageColors
           ? action.payload.file.imageColors
@@ -343,11 +343,11 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ activeImagePlane: number }>
     ) {
       if (!state.activeImageId) return;
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
-          return { ...image, activeSlice: action.payload.activeImagePlane };
+          return { ...image, activePlane: action.payload.activeImagePlane };
         }
       });
     },
@@ -356,7 +356,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ colors: Array<Color> }>
     ) {
       if (!state.activeImageId) return;
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
@@ -366,7 +366,7 @@ export const imageViewerSlice = createSlice({
     },
     setImageSrc(state: ImageViewer, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
@@ -376,7 +376,7 @@ export const imageViewerSlice = createSlice({
     },
     setImages(
       state: ImageViewer,
-      action: PayloadAction<{ images: Array<Image> }>
+      action: PayloadAction<{ images: Array<ImageType> }>
     ) {
       state.images = action.payload.images;
     },
@@ -404,7 +404,7 @@ export const imageViewerSlice = createSlice({
       }>
     ) {
       //update corresponding image object in array of Images stored in state
-      state.images = state.images.map((image: Image) => {
+      state.images = state.images.map((image: ImageType) => {
         if (action.payload.imageId !== image.id) {
           return image;
         } else {

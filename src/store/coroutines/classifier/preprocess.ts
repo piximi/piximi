@@ -1,7 +1,7 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 
@@ -59,7 +59,7 @@ export const resize = async (
 };
 
 export const generator = (
-  images: Array<Image>,
+  images: Array<ImageType>,
   categories: Array<Category>
 ) => {
   const count = images.length;
@@ -88,8 +88,8 @@ export const generator = (
 };
 
 export const preprocess = async (
-  trainImages: Array<Image>,
-  valImages: Array<Image>,
+  trainImages: Array<ImageType>,
+  valImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   rescaleOptions: RescaleOptions

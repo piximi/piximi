@@ -12,7 +12,7 @@ import {
   unknownCategorySelector,
 } from "../../../../store/selectors";
 import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
-import { Image } from "../../../../types/Image";
+import { ImageType } from "../../../../types/ImageType";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
 type DeleteCategoryDialogProps = {
@@ -33,7 +33,7 @@ export const DeleteCategoryDialog = ({
   const images = useSelector(annotatorImagesSelector);
 
   const onDelete = () => {
-    images.forEach((image: Image) => {
+    images.forEach((image: ImageType) => {
       const instances = image.annotations.map((instance: AnnotationType) => {
         if (instance.categoryId === category.id) {
           return {

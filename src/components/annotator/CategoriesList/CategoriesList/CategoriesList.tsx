@@ -61,7 +61,7 @@ import {
   setActiveImage,
   setActiveImagePlane,
 } from "../../../../store/slices";
-import { Image } from "../../../../types/Image";
+import { ImageType } from "../../../../types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
@@ -163,7 +163,7 @@ export const CategoriesList = () => {
 
   const onImageMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
-    image: Image
+    image: ImageType
   ) => {
     onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
@@ -175,7 +175,7 @@ export const CategoriesList = () => {
 
   const onClearAllAnnotations = () => {
     const existingAnnotations = annotatorImages
-      .map((image: Image) => {
+      .map((image: ImageType) => {
         return [...image.annotations];
       })
       .flat();
@@ -208,12 +208,12 @@ export const CategoriesList = () => {
 
   const onImageItemClick = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: Image
+    image: ImageType
   ) => {
     batch(() => {
       dispatch(setActiveImage({ image: image.id }));
 
-      dispatch(setActiveImagePlane({ activeImagePlane: image.activeSlice }));
+      dispatch(setActiveImagePlane({ activeImagePlane: image.activePlane }));
 
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({
@@ -284,7 +284,7 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Images")}>
-        {annotatorImages.map((image: Image) => {
+        {annotatorImages.map((image: ImageType) => {
           return (
             <div key={image.id}>
               <ListItem

@@ -8,7 +8,7 @@ import { EditCategoryDialog } from "../EditCategoryDialog";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { State } from "../../types/State";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import {
   Chip,
   IconButton,
@@ -42,7 +42,7 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
   } = useMenu();
 
   const imageCount = useSelector((state: State) => {
-    return state.project.images.filter((image: Image) => {
+    return state.project.images.filter((image: ImageType) => {
       return image.categoryId === category.id;
     }).length;
   });

@@ -1,12 +1,12 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 
 export const activeImageSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
-}): Image | undefined => {
-  const activeImage = imageViewer.images.find((image: Image) => {
+}): ImageType | undefined => {
+  const activeImage = imageViewer.images.find((image: ImageType) => {
     return imageViewer.activeImageId === image.id;
   });
 

@@ -6,11 +6,11 @@ import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
 import { imageViewerSlice } from "../../../store/slices";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 
 type ImageViewerProps = {
-  image?: Image;
+  image?: ImageType;
 };
 
 export const ImageViewer = ({ image }: ImageViewerProps) => {

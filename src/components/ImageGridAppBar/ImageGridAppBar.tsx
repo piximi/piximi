@@ -29,7 +29,7 @@ import SelectAllIcon from "@mui/icons-material/SelectAll";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { Partition } from "../../types/Partition";
 import { useHotkeys } from "react-hotkeys-hook";
 import { KeyboardKey } from "components/annotator/Help/HelpDialog/KeyboardKey";
@@ -70,13 +70,13 @@ export const ImageGridAppBar = () => {
 
   const onOpenAnnotator = () => {
     const selected = selectedImages.map((id: string, idx: number) => {
-      const projectImage = images.find((image: Image) => {
+      const projectImage = images.find((image: ImageType) => {
         return image.id === id;
       });
 
-      const annotatorImage: Image = {
+      const annotatorImage: ImageType = {
         ...projectImage!,
-        activeSlice: 0,
+        activePlane: 0,
         partition: Partition.Inference,
       };
 

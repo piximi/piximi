@@ -27,7 +27,7 @@ import {
   setOperation,
   setSelectedAnnotations,
 } from "../../../../store/slices";
-import { Image } from "../../../../types/Image";
+import { ImageType } from "../../../../types/ImageType";
 import { Partition } from "../../../../types/Partition";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { DEFAULT_COLORS } from "../../../../types/DefaultColors";
@@ -123,8 +123,8 @@ export const ExampleImageDialog = ({
 
     const defaultColors = generateDefaultChannels(shape.channels);
 
-    const example: Image = {
-      activeSlice: 0,
+    const example: ImageType = {
+      activePlane: 0,
       annotations: newAnnotations,
       categoryId: UNKNOWN_CATEGORY_ID,
       colors: defaultColors,

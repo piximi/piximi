@@ -3,9 +3,9 @@ import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 import { Color } from "./Color";
 
-export type Image = {
+export type ImageType = {
   annotations: Array<AnnotationType>;
-  activeSlice: number;
+  activePlane: number;
   categoryId: string;
   colors: Array<Color>;
   id: string;

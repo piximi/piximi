@@ -1,10 +1,10 @@
-import { Image } from "../../types/Image";
+import { ImageType } from "../../types/ImageType";
 import { ImageViewer } from "../../types/ImageViewer";
 
 export const annotatorImagesSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
-}): Array<Image> => {
+}): Array<ImageType> => {
   return imageViewer.images;
 };

@@ -13,7 +13,7 @@ import {
   compiledSelector,
   trainingPercentageSelector,
 } from "../../../store/selectors";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import * as _ from "lodash";
 import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
@@ -95,7 +95,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
     //first assign train and val partition to all categorized images
     const categorizedImagesIds = _.shuffle(categorizedImages).map(
-      (image: Image) => {
+      (image: ImageType) => {
         return image.id;
       }
     );

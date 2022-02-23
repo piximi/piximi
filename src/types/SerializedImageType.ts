@@ -5,10 +5,9 @@ import { Color } from "./Color";
 export type SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
-  imageChecksum: string;
-  imageColors: Array<Color>;
+  imageColors: Array<Color>; // if missing: imageHelper.generateDefaultChannels(serializedImage.imageChannels)
   imageData: Array<Array<string>>;
-  imageSrc: string;
+  imageSrc: string; // missing -- NG
   imageFilename: string;
   imageFrames: number;
   imageHeight: number;

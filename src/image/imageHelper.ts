@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
-import { Image as ImageType } from "../types/Image";
+import { ImageType } from "../types/ImageType";
 import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
@@ -129,24 +129,45 @@ export const deserializeImages = async (
   const deserializedImages: Array<ImageType> = [];
 
   for (const serializedImage of serializedImages) {
-    let nPlanes: number;
-    let referenceImageData: string | Array<string>;
-    let originalSrc: Array<Array<string>>;
+    let originalSrc = serializedImage.imageData;
 
-    if (Array.isArray(serializedImage.imageData)) {
-      nPlanes = serializedImage.imageData.length;
-      referenceImageData = serializedImage.imageData[0][0];
-      originalSrc = serializedImage.imageData;
-    } else {
-      nPlanes = 1;
-      referenceImageData = serializedImage.imageData;
-      originalSrc = [serializedImage.imageData]; // handle case where  do not corresexample projects's imagespond to array of strings
+    if (!Array.isArray(originalSrc) || !Array.isArray(originalSrc[0])) {
+      throw new Error("imageData must be a 2-D array");
     }
 
+    const defaultPlane = 0;
+    let nPlanes = serializedImage.imageData.length;
+    let referenceImageData = originalSrc[defaultPlane][0];
     let referenceImage = await ImageJS.Image.load(referenceImageData);
 
+    let src: string;
+    if (serializedImage.imageSrc) {
+      src = serializedImage.imageSrc;
+    } else {
+      // construct image src from 1, 2, or 3 channels from the first z-slice
+      src =
+        originalSrc[defaultPlane].length === 1
+          ? originalSrc[defaultPlane][0]
+          : originalSrc[defaultPlane].length === 2
+          ? await convertDataArrayToRGBSource(
+              [originalSrc[defaultPlane][0], originalSrc[defaultPlane][1]],
+              referenceImage.width,
+              referenceImage.height
+            )
+          : await convertDataArrayToRGBSource(
+              // use first 3 channels of z-slice
+              [
+                originalSrc[defaultPlane][0],
+                originalSrc[defaultPlane][1],
+                originalSrc[defaultPlane][2],
+              ],
+              referenceImage.width,
+              referenceImage.height
+            );
+    }
+
     deserializedImages.push({
-      activeSlice: 0,
+      activePlane: defaultPlane,
       categoryId: serializedImage.imageCategoryId,
       colors: serializedImage.imageColors
         ? serializedImage.imageColors
@@ -159,16 +180,81 @@ export const deserializeImages = async (
       shape: {
         width: referenceImage.width,
         height: referenceImage.height,
-        channels: referenceImage.components,
+        channels: originalSrc[defaultPlane].length,
         planes: nPlanes,
         frames: serializedImage.imageFrames,
       },
       originalSrc: originalSrc,
-      src: serializedImage.imageSrc,
+      src: src,
     });
   }
 
   return deserializedImages;
+};
+
+/*
+  Takes in 3 data URLs, for the Red, Green, Blue channels, respectively
+  Returns a single data RGB image data URL
+ */
+export const convertDataArrayToRGBSource = async (
+  channels: Array<string>,
+  width: number,
+  height: number
+): Promise<string> => {
+  if (channels.length !== 2 && channels.length !== 3) {
+    throw new Error(
+      "Channels Data URL array must contain twor or three Data URLs"
+    );
+  }
+
+  let redChannelPromise = ImageJS.Image.load(channels[0]);
+  let greenChannelPromise = ImageJS.Image.load(channels[1]);
+  let blueChannelPromise =
+    channels.length === 2 // if no blue channel, construct a "blank" image object
+      ? new Promise<ImageJS.Image>((resolve) =>
+          resolve(
+            new ImageJS.Image(width, height, {
+              components: 1,
+              alpha: 0,
+            })
+          )
+        )
+      : ImageJS.Image.load(channels[2]);
+
+  return Promise.all([
+    redChannelPromise,
+    greenChannelPromise,
+    blueChannelPromise,
+  ]).then((channelImages) => {
+    const redChannel = channelImages[0];
+
+    let typedData: Uint8Array | Uint16Array;
+    if (redChannel.bitDepth === 8) {
+      typedData = new Uint8Array(redChannel.data.length * 3);
+    } else if (redChannel.bitDepth === 16) {
+      typedData = new Uint16Array(redChannel.data.length * 3);
+    } else {
+      throw new Error(
+        `A bit depth of ${redChannel.bitDepth} is not allowed. Must be 8 or 16`
+      );
+    }
+
+    // interleave the data from each of the individual channels
+    // typedData will hold: [r_0, g_0, b_0, r_1, g_1, b_1, ...]
+    for (let i = 0; i < channelImages.length; i++) {
+      for (let j = 0; j < redChannel.data.length; j++) {
+        typedData[channelImages.length * j + i] = channelImages[i].data[j];
+      }
+    }
+
+    // construct rgb image object from interleaved data
+    const rgbImage = new ImageJS.Image(width, height, typedData, {
+      components: 3,
+      alpha: 0,
+    });
+
+    return rgbImage.toDataURL();
+  });
 };
 
 export const convertFileToImage = async (
@@ -294,7 +380,7 @@ const convertToImage = (
   );
 
   return {
-    activeSlice: 0,
+    activePlane: 0,
     annotations: [],
     colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,

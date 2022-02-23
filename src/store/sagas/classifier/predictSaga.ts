@@ -10,7 +10,7 @@ import { architectureOptionsSelector } from "../../selectors/architectureOptions
 import { Category } from "../../../types/Category";
 import { RescaleOptions } from "types/RescaleOptions";
 import { ArchitectureOptions } from "types/ArchitectureOptions";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import * as tensorflow from "@tensorflow/tfjs";
 
 export function* predictSaga(action: any): any {
@@ -24,7 +24,7 @@ export function* predictSaga(action: any): any {
 
   const categories: Category[] = yield select(createdCategoriesSelector);
 
-  const testImages: Array<Image> = yield select(testImagesSelector);
+  const testImages: Array<ImageType> = yield select(testImagesSelector);
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
@@ -52,7 +52,7 @@ export function* predictSaga(action: any): any {
 }
 
 function* runPrediction(
-  testImages: Array<Image>,
+  testImages: Array<ImageType>,
   rescaleOptions: RescaleOptions,
   architectureOptions: ArchitectureOptions,
   model: tensorflow.LayersModel,
