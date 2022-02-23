@@ -792,7 +792,7 @@
         "imageId": "04231c76-badd-43db-9fe8-d4e0c05dd163",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -996,7 +996,7 @@
         "imageId": "9d535d8b-fb07-498a-8e5b-3ac03666db74",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -1200,7 +1200,7 @@
         "imageId": "89843f18-cc4c-4791-a2c9-4721769755b7",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -1217,7 +1217,7 @@
         "imageId": "029b6eeb-62dc-4a09-aad7-572b2d23bab4",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -1540,7 +1540,7 @@
         "imageId": "4870deb8-2125-466d-8022-88a4b2882cb2",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -1948,7 +1948,7 @@
         "imageId": "86c96dbc-bcbc-42cf-b022-183d746c52f9",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -1999,7 +1999,7 @@
         "imageId": "11c0a9c1-11d7-408c-951c-2d84256b3887",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2118,7 +2118,7 @@
         "imageId": "da6498e2-5c98-48ca-859a-89e6fdb9a92b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2237,7 +2237,7 @@
         "imageId": "297daf61-8a56-41d9-a42b-152b42b871a7",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2288,7 +2288,7 @@
         "imageId": "b3529f79-27c0-4de5-86c3-040e763ea4af",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2526,7 +2526,7 @@
         "imageId": "2115644a-2fb2-4ff4-9d32-2ffc4f2cca16",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2696,7 +2696,7 @@
         "imageId": "7578413a-6bcb-4113-9cc6-060a71033382",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2781,7 +2781,7 @@
         "imageId": "106fb556-cb70-4485-b299-eb2f5d436c8a",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -2900,7 +2900,7 @@
         "imageId": "fc91b040-9762-4f0a-9565-130c2b02b292",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3121,7 +3121,7 @@
         "imageId": "275c3ec6-a0c0-4776-a32b-e0bf7049f40f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3138,7 +3138,7 @@
         "imageId": "9bae4553-c4e0-4454-97e6-8d8d8a40f61b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3206,7 +3206,7 @@
         "imageId": "9c48bfc0-6534-4869-855e-a2b14859ef45",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3257,7 +3257,7 @@
         "imageId": "0f9f124c-c969-4851-ae28-18ff7438968c",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3393,7 +3393,7 @@
         "imageId": "00dbcec1-e3be-4fda-9de5-5bfe817aefe5",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3512,7 +3512,7 @@
         "imageId": "ed2f1869-b2f2-499c-94fe-bbd8109c543a",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3648,7 +3648,7 @@
         "imageId": "966acfc4-9a6e-487d-98c0-c97f5bc58e75",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3682,7 +3682,7 @@
         "imageId": "35dfd2f6-70c3-45fb-97bf-4777edd9261b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3767,7 +3767,7 @@
         "imageId": "cb45164c-a901-4449-b12d-b6949314e2df",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -3801,7 +3801,7 @@
         "imageId": "c64429c8-5889-43ca-99ae-837dd26c3c02",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4056,7 +4056,7 @@
         "imageId": "e61c718f-39ca-4b3e-8fb1-01ebf780f909",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4532,7 +4532,7 @@
         "imageId": "e0ec7fa8-1425-45ed-b32b-23823c9d6a20",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4566,7 +4566,7 @@
         "imageId": "8de7c4b0-ece8-418a-b140-ba424cd4452b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4702,7 +4702,7 @@
         "imageId": "69619769-23e1-4d30-a14b-a464e9085fb9",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4838,7 +4838,7 @@
         "imageId": "62bedf38-6613-47f2-ba63-8ddd0658b83f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -4923,7 +4923,7 @@
         "imageId": "0cc2bece-c246-4a85-8681-76e12e020628",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5161,7 +5161,7 @@
         "imageId": "30f4e992-0f54-47f6-83c3-9b342ffeda68",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5246,7 +5246,7 @@
         "imageId": "53b873ee-5ec4-402b-a621-72fdc7b309b0",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5382,7 +5382,7 @@
         "imageId": "508f4481-6f65-4a7f-86bd-a5db6c7a5158",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5450,7 +5450,7 @@
         "imageId": "900499fc-9cad-4c9a-8111-b6f2505fe7cd",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5467,7 +5467,7 @@
         "imageId": "ff534342-bf59-4bc4-90f6-66e09811be2b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5637,7 +5637,7 @@
         "imageId": "9a9bff07-988d-4492-861d-87bbb37f961e",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5654,7 +5654,7 @@
         "imageId": "3f8b6770-c375-44df-b17a-603ef704c8da",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -5943,7 +5943,7 @@
         "imageId": "2457cc26-64da-4cd0-b7ca-bb59bd459271",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6011,7 +6011,7 @@
         "imageId": "16977855-0b6e-4db5-a30e-bc43d3619bad",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6062,7 +6062,7 @@
         "imageId": "8ed2ee57-0448-4a4d-a040-731d04214e04",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6130,7 +6130,7 @@
         "imageId": "2b0af9a6-b387-42ad-9adf-6e1b696feede",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6147,7 +6147,7 @@
         "imageId": "ad5084f7-e6f3-41fb-8c3b-8741d36ddaba",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6300,7 +6300,7 @@
         "imageId": "b46dd495-2063-41b8-982c-37ecd05f0fbe",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6334,7 +6334,7 @@
         "imageId": "a69dd314-f74a-4c49-b9d4-e36a1ad9a3b0",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6419,7 +6419,7 @@
         "imageId": "67c614ae-44c2-41b5-a545-2018be452c3f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6470,7 +6470,7 @@
         "imageId": "c8d11be0-b63f-4775-9093-e68f5cc5e628",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6504,7 +6504,7 @@
         "imageId": "63e3d72b-c983-4641-b858-2b7875308597",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6521,7 +6521,7 @@
         "imageId": "82cf014e-090b-4ab8-80e6-9bcd55204e19",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6538,7 +6538,7 @@
         "imageId": "fee4869f-6a1b-4547-8dbd-e81fb2b4876b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6725,7 +6725,7 @@
         "imageId": "78a93ee1-0cfb-4ebf-b9e3-bd0c895b0c72",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -6997,7 +6997,7 @@
         "imageId": "0cb8d3ed-59f1-4fa2-ad1b-6921bbbedfda",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7235,7 +7235,7 @@
         "imageId": "3252612d-94ca-49f3-9176-32e13e100004",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7252,7 +7252,7 @@
         "imageId": "32e71686-3009-4130-8f73-721b8f63a77f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7388,7 +7388,7 @@
         "imageId": "0202e5e9-6262-48fa-958b-830006f49b02",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7456,7 +7456,7 @@
         "imageId": "3eeb29e8-d2b7-4701-9262-0620b98afc0b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7490,7 +7490,7 @@
         "imageId": "d6db6e14-c9a4-4b7f-9917-fc5b6da46c97",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7507,7 +7507,7 @@
         "imageId": "1c8c3fd4-e9ea-4393-87ac-f74bb85c8eee",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7575,7 +7575,7 @@
         "imageId": "05cb59ae-d98e-44f2-924a-4ba063e0f9ea",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7592,7 +7592,7 @@
         "imageId": "99391c15-4187-461e-a259-0b2add5af146",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7677,7 +7677,7 @@
         "imageId": "569b02c5-db79-419a-84ce-f9acee27c2b9",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7711,7 +7711,7 @@
         "imageId": "eb1a48c3-9e29-4661-9717-5a3a98bd78dd",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -7898,7 +7898,7 @@
         "imageId": "66a65ff7-2c0f-49bf-9d8f-f73f6dbf692f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8000,7 +8000,7 @@
         "imageId": "579b4adf-beae-4046-9d9a-552e73a68e20",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8051,7 +8051,7 @@
         "imageId": "a4dc22a9-4e55-46a9-9a2c-3dd4d898410b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8068,7 +8068,7 @@
         "imageId": "91d5bd84-55bb-4712-be2f-64119d5dae0b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8136,7 +8136,7 @@
         "imageId": "9f634da9-4c58-440e-b244-8ecb4412e42a",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8442,7 +8442,7 @@
         "imageId": "16e4ed2b-666e-41cb-8617-74a2a493247b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8595,7 +8595,7 @@
         "imageId": "f96ed1c5-a206-4783-91c6-97d840af2a6b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -8901,7 +8901,7 @@
         "imageId": "4ab40640-c176-4816-aecf-b5d1cee265bd",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9190,7 +9190,7 @@
         "imageId": "b350c60d-4b97-4dc5-b21d-2c4efc4706fc",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9207,7 +9207,7 @@
         "imageId": "e8e76919-22f8-44f5-9976-827561cf2867",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9360,7 +9360,7 @@
         "imageId": "ab9a64a3-d0a1-410b-8794-e363f5506834",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9462,7 +9462,7 @@
         "imageId": "4cc12697-ad7d-44e6-bf6c-df93dd5e9197",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9666,7 +9666,7 @@
         "imageId": "806de723-3330-4987-a2b2-b96193af3bac",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -9921,7 +9921,7 @@
         "imageId": "6458a36a-a46b-4747-8093-99e3a41a62eb",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10023,7 +10023,7 @@
         "imageId": "746581c0-6f07-4685-8b57-b8773c52b197",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10108,7 +10108,7 @@
         "imageId": "484d4f74-ceaf-4470-89b9-a870c9600547",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10176,7 +10176,7 @@
         "imageId": "bf6bdbbb-1c76-4d8a-a2e1-adb69a1cd41b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10244,7 +10244,7 @@
         "imageId": "f3187ace-491f-473d-8d2e-239c202bf72f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10261,7 +10261,7 @@
         "imageId": "0906a6e9-872d-4eb6-9bdf-c723a4f7e2fb",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10278,7 +10278,7 @@
         "imageId": "14a6b5d8-983f-4bd8-8ce9-d3e26fc8d19c",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10295,7 +10295,7 @@
         "imageId": "4944cd01-6c4c-4413-94b1-f22291543522",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10414,7 +10414,7 @@
         "imageId": "0f8d902d-bedf-4710-b046-8b6646843bc5",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10431,7 +10431,7 @@
         "imageId": "286247b6-805f-4097-a387-65be758f48b6",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10448,7 +10448,7 @@
         "imageId": "f93a83b3-954c-49d9-99de-4c4864e67b0e",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10703,7 +10703,7 @@
         "imageId": "28b4533e-f5ee-4bac-95d6-458445a0534d",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10788,7 +10788,7 @@
         "imageId": "3973aa80-5217-4df9-9f93-a5b81cad54e5",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -10975,7 +10975,7 @@
         "imageId": "34a2223a-d31a-4c47-a109-2e1378772416",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11111,7 +11111,7 @@
         "imageId": "d98c5a9c-617e-4085-bdba-ce87783443e4",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11366,7 +11366,7 @@
         "imageId": "6da03d4d-791b-46ef-96b3-a7c58e296f89",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11468,7 +11468,7 @@
         "imageId": "50dec352-8f98-4b1e-a00c-b85f09cae065",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11485,7 +11485,7 @@
         "imageId": "4ae45fe2-39e2-4991-97f8-77b01ebcda7d",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11536,7 +11536,7 @@
         "imageId": "a6f85bd5-4db4-4cd1-a252-2370aed9f470",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11655,7 +11655,7 @@
         "imageId": "a22e9455-c23e-4b67-a1cc-cb3109e208f3",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11757,7 +11757,7 @@
         "imageId": "6a9bcf0e-115b-42e8-a7f9-fe43c93e50dd",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -11944,7 +11944,7 @@
         "imageId": "2cabf420-cd93-4abc-ae5b-5e302597a97b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -12131,7 +12131,7 @@
         "imageId": "97e2fa88-f102-4410-95a4-8c2abaafaed2",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -12267,7 +12267,7 @@
         "imageId": "82694590-48ba-4ad0-86e4-077255840dc3",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -12403,7 +12403,7 @@
         "imageId": "99c5b56f-ec57-422e-a598-dc23f8249386",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -12879,7 +12879,7 @@
         "imageId": "2daf3ac4-d910-4c4c-94c9-5c92eaeedf95",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -12998,7 +12998,7 @@
         "imageId": "0a9afb99-9cff-40e3-864c-39249201c3ce",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13015,7 +13015,7 @@
         "imageId": "5f913768-6bf3-4edb-8017-e4928c86a751",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13185,7 +13185,7 @@
         "imageId": "fa47d870-8962-45b4-9318-decae7ee6e57",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13355,7 +13355,7 @@
         "imageId": "82ee2d4a-ca84-460c-8706-97cabcb8e4b3",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13423,7 +13423,7 @@
         "imageId": "bd38e6c4-02e7-4fd7-8071-e8d6f2b109c2",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13440,7 +13440,7 @@
         "imageId": "1c87ce59-3dca-4bf0-8c4b-adc8be5e5073",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13508,7 +13508,7 @@
         "imageId": "a7e98aea-4e20-4f7a-a457-6e52bdf1ff17",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13559,7 +13559,7 @@
         "imageId": "0d822e31-37a8-4042-9793-b8e6898ace0c",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13610,7 +13610,7 @@
         "imageId": "7dd98911-c226-404c-ad8e-07cf94cb4a3d",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13644,7 +13644,7 @@
         "imageId": "f68f9b7e-d264-4d11-ac87-21608816ec7e",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13780,7 +13780,7 @@
         "imageId": "719a8c25-dc58-4f33-9696-2cf1279bd7c1",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13831,7 +13831,7 @@
         "imageId": "1d83c854-6987-4ba5-8770-f3003d536508",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -13916,7 +13916,7 @@
         "imageId": "f207d53a-2493-4b39-b79f-384c91aad917",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14188,7 +14188,7 @@
         "imageId": "4e2a9b98-5e9a-45c8-bed0-1a690ae5ad85",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14358,7 +14358,7 @@
         "imageId": "a7301349-5a72-4d05-816b-7cd49d5e140e",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14409,7 +14409,7 @@
         "imageId": "0e89f7c1-b5b3-44e5-9721-d3cd5a4b647b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14511,7 +14511,7 @@
         "imageId": "d74d437c-8e5d-488d-aecd-c4cba1416476",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14596,7 +14596,7 @@
         "imageId": "0231daae-714f-45b5-8a25-d260116c3529",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14766,7 +14766,7 @@
         "imageId": "48133efe-aa9e-47fb-85a5-1cc7f54455d6",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14936,7 +14936,7 @@
         "imageId": "65014004-87d3-4d02-a270-327b3c888303",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -14953,7 +14953,7 @@
         "imageId": "b16525a5-71cc-44da-8b3a-7129bc17ce9f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15089,7 +15089,7 @@
         "imageId": "326ba5a2-a222-44ed-986d-7faf86ee0d57",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15123,7 +15123,7 @@
         "imageId": "8edc32f6-6563-46f4-8904-78399bda7fe4",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15140,7 +15140,7 @@
         "imageId": "b795418e-794a-4dc0-a513-c5f9b11ec6e6",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15208,7 +15208,7 @@
         "imageId": "9c4872a3-ac6f-483e-a4e1-ac1e1accd625",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15361,7 +15361,7 @@
         "imageId": "559b77a3-0de3-40c7-b67d-a1019aa2b0e2",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15463,7 +15463,7 @@
         "imageId": "72de2288-7d13-410d-ad0b-31bd8fa1d9d2",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15599,7 +15599,7 @@
         "imageId": "c091edfd-858f-4560-96b0-52e5cb6c9d57",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15752,7 +15752,7 @@
         "imageId": "2ea24af8-04b4-481e-a0d5-0a3b483296f8",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -15769,7 +15769,7 @@
         "imageId": "5b7a34b9-53f7-4232-b6b0-2ef194c25aec",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16007,7 +16007,7 @@
         "imageId": "802e41df-6f60-483f-8f7d-ec88efe05103",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16126,7 +16126,7 @@
         "imageId": "da581c53-134b-4fbb-a7fb-9f99c346c16b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16194,7 +16194,7 @@
         "imageId": "39a2bb7a-4ff9-4bb1-a912-a18399470b41",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16279,7 +16279,7 @@
         "imageId": "a51c0b0a-a27f-44b4-9061-61b805d78e20",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16296,7 +16296,7 @@
         "imageId": "97f2e233-9a38-4955-be99-63c0b5feb329",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16432,7 +16432,7 @@
         "imageId": "98cf4ea1-3cfe-47d1-af40-9f914a69518b",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16687,7 +16687,7 @@
         "imageId": "72e981af-ed1c-41ea-b74b-82a7ac05723f",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16738,7 +16738,7 @@
         "imageId": "dcf27411-f756-4bda-8349-515d33a33599",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16789,7 +16789,7 @@
         "imageId": "bb45c49e-623d-4bf2-8895-4fcfce16f7ee",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16942,7 +16942,7 @@
         "imageId": "cb454f72-bf18-4af7-b0a7-164babf49d71",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
@@ -16993,7 +16993,7 @@
         "imageId": "0bc36c2c-6b61-4668-8fec-bd2ed8a03047",
         "imagePlanes": 1,
         "imageWidth": 28,
-        "imagePartition": "Training",
+        "imagePartition": "Validation",
         "annotations": []
       },
       {
