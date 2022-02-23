@@ -30,7 +30,6 @@ import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageType } from "../../types/ImageType";
-import { Partition } from "../../types/Partition";
 import { useHotkeys } from "react-hotkeys-hook";
 import { KeyboardKey } from "components/annotator/Help/HelpDialog/KeyboardKey";
 
