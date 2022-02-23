@@ -17,6 +17,7 @@ import {
   TextField,
   Box,
 } from "@mui/material";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;
@@ -83,6 +84,15 @@ export const CreateCategoryDialog = ({
     setInvalidName(!validInput);
     return validInput;
   };
+
+  useHotkeys(
+    "enter",
+    () => {
+      onCreate();
+    },
+    { enabled: open },
+    [onCreate]
+  );
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>

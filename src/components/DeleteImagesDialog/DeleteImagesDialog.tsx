@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useDispatch } from "react-redux";
 import { applicationSlice, projectSlice } from "../../store/slices";
 
@@ -28,8 +28,17 @@ export const DeleteImagesDialog = ({
     onClose();
   };
 
+  useHotkeys(
+    "enter",
+    () => {
+      onDelete();
+    },
+    { enabled: open },
+    [onDelete]
+  );
+
   return (
-    <Dialog fullWidth onClose={onClose} open={open}>
+    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
       <DialogTitle>
         Delete {imageIds.length} image{imageIds.length > 1 && "s"}?
       </DialogTitle>

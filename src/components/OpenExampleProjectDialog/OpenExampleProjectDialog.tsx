@@ -32,7 +32,7 @@ export const OpenExampleClassifierDialog = (
   };
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={open}>
+    <Dialog fullWidth maxWidth="sm" open={open} onClose={closeMenuAndDialog}>
       <DialogTitle
         sx={{
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,

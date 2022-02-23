@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { LayersModel } from "@tensorflow/tfjs";
 import { ModelType } from "../../types/ClassifierModelType";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type OpenClassifierDialogProps = {
   onClose: any;
@@ -127,9 +128,9 @@ export const OpenClassifierDialog = ({
     }
   };
 
-  const onCancel = () => {
-    onClose();
-  };
+  useHotkeys("enter", () => dispatchModelToStore(), { enabled: open }, [
+    dispatchModelToStore,
+  ]);
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
@@ -148,7 +149,7 @@ export const OpenClassifierDialog = ({
 
       <DialogContent>
         <Typography gutterBottom>
-          Tensowflow requires a .json files containing the model description as
+          Tensorflow requires a .json files containing the model description as
           well as the corresponding model weights (.bin file).
         </Typography>
       </DialogContent>
@@ -165,7 +166,7 @@ export const OpenClassifierDialog = ({
       {fileError ? <Alert severity="error">{fileErrorMessage}</Alert> : <></>}
 
       <DialogActions>
-        <Button onClick={onCancel} color="primary">
+        <Button onClick={onClose} color="primary">
           Cancel
         </Button>
 

@@ -12,6 +12,7 @@ import {
 import saveAs from "file-saver";
 import { classifierSelector } from "../../store/selectors";
 import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -58,6 +59,15 @@ export const SaveProjectDialog = ({
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setProjectName(event.target.value);
   };
+
+  useHotkeys(
+    "enter",
+    () => {
+      onSaveProjectClick();
+    },
+    { enabled: open },
+    [onSaveProjectClick]
+  );
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
