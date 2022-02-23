@@ -2,7 +2,7 @@ import { preprocess_predict } from "../../coroutines/classifier/preprocess_predi
 import { ArchitectureOptions } from "types/ArchitectureOptions";
 import { Category } from "../../../types/Category";
 import { EvaluationResultType } from "types/EvaluationResultType";
-import { Image } from "../../../types/Image";
+import { ImageType } from "../../../types/ImageType";
 import { RescaleOptions } from "types/RescaleOptions";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { createdCategoriesSelector } from "../../selectors";
@@ -16,7 +16,7 @@ import { put, select } from "redux-saga/effects";
 
 export function* evaluateSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(fittedSelector);
-  const validationImages: Array<Image> = yield select(valImagesSelector);
+  const validationImages: Array<ImageType> = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
@@ -49,7 +49,7 @@ export function* evaluateSaga(action: any): any {
 }
 
 function* runEvaluation(
-  validationImages: Array<Image>,
+  validationImages: Array<ImageType>,
   rescaleOptions: RescaleOptions,
   architectureOptions: ArchitectureOptions,
   model: tensorflow.LayersModel,
