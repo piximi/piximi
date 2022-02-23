@@ -1,14 +1,26 @@
-import * as React from "react";
 import { AppBar, Box, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { compiledSelector } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { trainingFlagSelector } from "../../../store/selectors/trainingFlagSelector";
+import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
-export const FitClassifierDialogAppBar = (props: any) => {
-  const { closeDialog, fit, disableFitting } = props;
+type FitClassifierDialogAppBarProps = {
+  closeDialog: any;
+  fit: any;
+  disableFitting: boolean;
+  epochs: number;
+  currentEpoch: number;
+};
 
+export const FitClassifierDialogAppBar = ({
+  closeDialog,
+  fit,
+  disableFitting,
+  epochs,
+  currentEpoch,
+}: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
 
   const compiled = useSelector(compiledSelector);
@@ -44,10 +56,17 @@ export const FitClassifierDialogAppBar = (props: any) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
+        {training && (
+          <FitClassifierProgressBar
+            epochs={epochs}
+            currentEpoch={currentEpoch}
+          />
+        )}
+
         <Tooltip
           title={
             disableFitting
-              ? "Plaese label images before fitting a model."
+              ? "Please label images before fitting a model."
               : "Fit the model"
           }
           placement="bottom"

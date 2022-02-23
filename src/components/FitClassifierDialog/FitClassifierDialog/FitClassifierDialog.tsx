@@ -19,15 +19,17 @@ import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
+import { epochsSelector } from "store/selectors/epochsSelector";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
-  openedDrawer: boolean;
 };
 
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
-  const { closeDialog, openedDialog, openedDrawer } = props;
+  const { closeDialog, openedDialog } = props;
+
+  const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
@@ -51,6 +53,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const categorizedImages = useSelector(categorizedImagesSelector);
   const compiledModel = useSelector(compiledSelector);
 
+  const epochs = useSelector(epochsSelector);
+
   useEffect(() => {
     setNoCategorizedImagesAlert(categorizedImages.length === 0);
   }, [categorizedImages]);
@@ -59,6 +63,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
+    setCurrentEpoch(epochCount);
     setTrainingAccuracy((prevState) =>
       prevState.concat({ x: epochCount, y: logs.categoricalAccuracy })
     );
@@ -81,6 +86,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setTrainingLoss([]);
     setValidationLoss([]);
     setShowPlots(false);
+
+    setCurrentEpoch(0);
   };
 
   const onFit = async () => {
@@ -136,8 +143,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       <FitClassifierDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        openedDrawer={openedDrawer}
         disableFitting={noCategorizedImagesAlert}
+        epochs={epochs}
+        currentEpoch={currentEpoch}
       />
 
       {noCategorizedImagesAlert && showWarning && (

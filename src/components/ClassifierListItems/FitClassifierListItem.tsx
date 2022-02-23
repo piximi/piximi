@@ -27,11 +27,7 @@ export const FitClassifierListItem = () => {
           <SettingsIcon />
         </IconButton>
       </ListItem>
-      <FitClassifierDialog
-        openedDialog={open}
-        openedDrawer={true}
-        closeDialog={onClose}
-      />
+      <FitClassifierDialog openedDialog={open} closeDialog={onClose} />
     </>
   );
 };

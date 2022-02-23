@@ -4,7 +4,13 @@ import {
   projectSlice,
 } from "../../store/slices";
 import { useDispatch } from "react-redux";
-import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import {
+  Avatar,
+  CircularProgress,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
@@ -15,6 +21,7 @@ import {
 } from "image/imageHelper";
 import { SerializedImageType } from "types/SerializedImageType";
 import { ImageType } from "types/ImageType";
+import React from "react";
 
 type OpenExampleProjectMenuItemProps = {
   exampleProject: ExampleProject;
@@ -33,7 +40,17 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onClickExampleProject = async () => {
+  const [exampleClassifierIsLoading, setExampleClassifierIsLoading] =
+    React.useState(false);
+
+  const onClickExampleProject = () => {
+    setExampleClassifierIsLoading(true);
+    setTimeout(() => {
+      openExampleProject();
+    }, 20);
+  };
+
+  const openExampleProject = async () => {
     var exampleProjectJson: any;
     switch (exampleProject) {
       case ExampleProject.Mnist:
@@ -61,9 +78,6 @@ export const OpenExampleProjectMenuItem = ({
       project.serializedImages as Array<SerializedImageType>
     );
 
-    popupState.close();
-    onClose();
-
     dispatch(applicationSlice.actions.clearSelectedImages());
 
     dispatch(
@@ -79,6 +93,9 @@ export const OpenExampleProjectMenuItem = ({
         classifier: classifier,
       })
     );
+
+    onClose();
+    popupState.close();
   };
 
   return (
@@ -88,6 +105,8 @@ export const OpenExampleProjectMenuItem = ({
       </ListItemAvatar>
 
       <ListItemText primary={projectName} />
+
+      {exampleClassifierIsLoading && <CircularProgress disableShrink />}
     </ListItem>
   );
 };

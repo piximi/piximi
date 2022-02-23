@@ -27,12 +27,11 @@ export const OpenExampleClassifierDialog = (
   const t = useTranslation();
   const { open, onClose, popupState } = props;
 
-  const closeMenueAndDialog = () => {
+  const closeMenuAndDialog = () => {
     onClose();
   };
 
   return (
-    // @ts-ignore
     <Dialog fullWidth maxWidth="sm" open={open}>
       <DialogTitle
         sx={{
@@ -50,7 +49,7 @@ export const OpenExampleClassifierDialog = (
             right: theme.spacing(1),
             top: theme.spacing(1),
           })}
-          onClick={closeMenueAndDialog}
+          onClick={closeMenuAndDialog}
         >
           <CloseIcon />
         </IconButton>

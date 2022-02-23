@@ -62,7 +62,7 @@ export const ApplyColorsButton = () => {
 
   return (
     <ListItem button onClick={onApplyColorsClick}>
-      <ListItemText>{"Apply to all opened and future images"}</ListItemText>
+      <ListItemText>{"Apply to all images open in annotator"}</ListItemText>
     </ListItem>
   );
 };
