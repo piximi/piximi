@@ -14,13 +14,8 @@ import {
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import {
-  convertSrcURIToOriginalSrcURIs,
-  deserializeImages,
-  generateDefaultChannels,
-} from "image/imageHelper";
+import { deserializeImages } from "image/imageHelper";
 import { SerializedImageType } from "types/SerializedImageType";
-import { ImageType } from "types/ImageType";
 import React from "react";
 
 type OpenExampleProjectMenuItemProps = {

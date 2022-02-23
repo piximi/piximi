@@ -132,7 +132,7 @@ export const deserializeImages = async (
     let originalSrc = serializedImage.imageData;
 
     if (!Array.isArray(originalSrc) || !Array.isArray(originalSrc[0])) {
-      throw "imageData must be a 2-D array";
+      throw new Error("imageData must be a 2-D array");
     }
 
     const defaultPlane = 0;
@@ -140,11 +140,12 @@ export const deserializeImages = async (
     let referenceImageData = originalSrc[defaultPlane][0];
     let referenceImage = await ImageJS.Image.load(referenceImageData);
 
+    let src: string;
     if (serializedImage.imageSrc) {
-      var src = serializedImage.imageSrc;
+      src = serializedImage.imageSrc;
     } else {
       // construct image src from 1, 2, or 3 channels from the first z-slice
-      var src =
+      src =
         originalSrc[defaultPlane].length === 1
           ? originalSrc[defaultPlane][0]
           : originalSrc[defaultPlane].length === 2
@@ -201,7 +202,9 @@ export const convertDataArrayToRGBSource = async (
   height: number
 ): Promise<string> => {
   if (channels.length !== 2 && channels.length !== 3) {
-    throw "Channels Data URL array must contain twor or three Data URLs";
+    throw new Error(
+      "Channels Data URL array must contain twor or three Data URLs"
+    );
   }
 
   let redChannelPromise = ImageJS.Image.load(channels[0]);
@@ -231,7 +234,9 @@ export const convertDataArrayToRGBSource = async (
     } else if (redChannel.bitDepth === 16) {
       typedData = new Uint16Array(redChannel.data.length * 3);
     } else {
-      throw `A bit depth of ${redChannel.bitDepth} is not allowed. Must be 8 or 16`;
+      throw new Error(
+        `A bit depth of ${redChannel.bitDepth} is not allowed. Must be 8 or 16`
+      );
     }
 
     // interleave the data from each of the individual channels
