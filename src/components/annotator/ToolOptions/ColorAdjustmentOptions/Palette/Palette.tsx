@@ -63,9 +63,9 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
 
     if (!originalSrc || !imageShape) return;
 
-    const originalData = await convertImageURIsToImageData([
-      originalSrc[activeImagePlane],
-    ]);
+    const originalData = await convertImageURIsToImageData(
+      new Array(originalSrc[activeImagePlane])
+    );
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
       originalData[0],
