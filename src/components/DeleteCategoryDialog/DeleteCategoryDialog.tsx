@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import { useDispatch } from "react-redux";
 import { Category } from "../../types/Category";
 import { deleteCategory } from "../../store/slices";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type DeleteCategoryDialogProps = {
   category: Category;
@@ -26,6 +27,15 @@ export const DeleteCategoryDialog = ({
 
     onClose();
   };
+
+  useHotkeys(
+    "enter",
+    () => {
+      onDelete();
+    },
+    { enabled: open },
+    [onDelete]
+  );
 
   return (
     <Dialog fullWidth onClose={onClose} open={open}>

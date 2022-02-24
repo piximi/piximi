@@ -96,8 +96,8 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
 
       <EditCategoryDialog
         category={category}
-        onCloseDialog={onCloseEditCategoryDialog}
-        openDialog={openEditCategoryDialog}
+        onClose={onCloseEditCategoryDialog}
+        open={openEditCategoryDialog}
       />
     </React.Fragment>
   );
