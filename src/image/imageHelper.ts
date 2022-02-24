@@ -143,6 +143,20 @@ export const deserializeImages = async (
     let src: string;
     if (serializedImage.imageSrc) {
       src = serializedImage.imageSrc;
+    } else if (
+      serializedImage.imageColors &&
+      serializedImage.imageColors.length > 0
+    ) {
+      const originalData = await convertImageURIsToImageData(
+        new Array(originalSrc[defaultPlane])
+      );
+
+      src = mapChannelstoSpecifiedRGBImage(
+        originalData[0],
+        serializedImage.imageColors,
+        referenceImage.height,
+        referenceImage.width
+      );
     } else {
       // construct image src from 1, 2, or 3 channels from the first z-slice
       src =
