@@ -1,20 +1,18 @@
-import { Project } from "../../types/Project";
-import { ImageType } from "../../types/ImageType";
-import { Category } from "../../types/Category";
+import { createSelector } from "@reduxjs/toolkit";
+import { ImageType } from "types/ImageType";
+import { Category } from "types/Category";
+import { categoriesSelector, imagesSelector } from ".";
 
-export const visibleImagesSelector = ({
-  project,
-}: {
-  project: Project;
-}): Array<ImageType> => {
-  const visibleImages = project.images.filter((image: ImageType) => {
-    const category = project.categories.find((c: Category) => {
-      return c.id === image.categoryId;
+export const visibleImagesSelector = createSelector(
+  [imagesSelector, categoriesSelector],
+  (images, categories) => {
+    const visibleCategoryImages = images.filter((image: ImageType) => {
+      const category = categories.find(
+        (c: Category) => c.id === image.categoryId
+      );
+      return category ? category.visible : true;
     });
-    return category ? category.visible : true;
-  });
 
-  return visibleImages.filter((image: ImageType) => {
-    return image.visible;
-  });
-};
+    return visibleCategoryImages.filter((image: ImageType) => image.visible);
+  }
+);
