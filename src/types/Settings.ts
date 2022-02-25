@@ -4,4 +4,5 @@ export type Settings = {
   tileSize: number;
   selectedImages: Array<string>;
   themeMode: ThemeMode;
+  imageSelectionColor: string;
 };

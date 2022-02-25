@@ -3,6 +3,7 @@ import { ImageType } from "../../types/ImageType";
 import {
   selectedImagesSelector,
   visibleImagesSelector,
+  imageSelectionColorSelector,
 } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
@@ -26,70 +27,74 @@ type ImageGridProps = {
 type ImageGridItemProps = {
   image: ImageType;
   selected: boolean;
+  selectionColor: string;
 };
 
-const ImageGridItem = memo(({ image, selected }: ImageGridItemProps) => {
-  const dispatch = useDispatch();
-  const scaleFactor = useSelector(tileSizeSelector);
+const ImageGridItem = memo(
+  ({ image, selected, selectionColor }: ImageGridItemProps) => {
+    const dispatch = useDispatch();
+    const scaleFactor = useSelector(tileSizeSelector);
 
-  const getSize = (scaleFactor: number) => {
-    const width = (220 * scaleFactor).toString() + "px";
-    const height = (220 * scaleFactor).toString() + "px";
+    const getSize = (scaleFactor: number) => {
+      const width = (220 * scaleFactor).toString() + "px";
+      const height = (220 * scaleFactor).toString() + "px";
 
-    return {
-      width: width,
-      height: height,
-      margin: "2px",
+      return {
+        width: width,
+        height: height,
+        margin: "2px",
+      };
     };
-  };
 
-  const getSelectionStatus = () => {
-    return selected
-      ? { border: "solid 5px green", borderRadius: "6px" }
-      : { border: "none" };
-  };
+    const getSelectionStatus = () => {
+      return selected
+        ? { border: `solid 5px ${selectionColor}`, borderRadius: "6px" }
+        : { border: "none" };
+    };
 
-  const onSelectImage = (image: ImageType) => {
-    if (selected) {
-      dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
-    } else {
-      dispatch(applicationSlice.actions.selectImage({ id: image.id }));
-    }
-  };
+    const onSelectImage = (image: ImageType) => {
+      if (selected) {
+        dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
+      } else {
+        dispatch(applicationSlice.actions.selectImage({ id: image.id }));
+      }
+    };
 
-  return (
-    <ImageListItem
-      onClick={() => onSelectImage(image)}
-      style={getSize(scaleFactor)}
-      sx={getSelectionStatus()}
-    >
-      <Box
-        component="img"
-        alt=""
-        src={image.src}
-        sx={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          top: 0,
-          transform: "none",
-        }}
-      />
+    return (
+      <ImageListItem
+        onClick={() => onSelectImage(image)}
+        style={getSize(scaleFactor)}
+        sx={getSelectionStatus()}
+      >
+        <Box
+          component="img"
+          alt=""
+          src={image.src}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            top: 0,
+            transform: "none",
+          }}
+        />
 
-      <ImageListItemBar
-        position="top"
-        actionIcon={<ImageIconLabel image={image} />}
-        actionPosition="left"
-        sx={{
-          background: "transparent",
-        }}
-      />
-    </ImageListItem>
-  );
-});
+        <ImageListItemBar
+          position="top"
+          actionIcon={<ImageIconLabel image={image} />}
+          actionPosition="left"
+          sx={{
+            background: "transparent",
+          }}
+        />
+      </ImageListItem>
+    );
+  }
+);
 
 export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const images = useSelector(visibleImagesSelector);
+  const imageSelectionColor = useSelector(imageSelectionColorSelector);
   const selectedImages = useSelector(selectedImagesSelector);
   const scaleFactor = useSelector(tileSizeSelector);
   const max_images = 1000; //number of images from the project that we'll show
@@ -145,6 +150,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
             <ImageGridItem
               image={image}
               selected={selectedImages.includes(image.id)}
+              selectionColor={imageSelectionColor}
               key={image.id}
             />
           ))}

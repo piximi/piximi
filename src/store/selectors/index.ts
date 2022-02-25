@@ -35,3 +35,4 @@ export { compileOptionsSelector } from "./compileOptionsSelector";
 export { imagesSelector } from "./imagesSelector";
 export { selectedImagesSelector } from "./selectedImagesSelector";
 export { visibleImagesSelector } from "./visibleImagesSelector";
+export { imageSelectionColorSelector } from "./imageSelectionColorSelector";
