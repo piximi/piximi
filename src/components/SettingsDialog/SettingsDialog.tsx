@@ -5,21 +5,30 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import PaletteIcon from "@mui/icons-material/Palette";
 import {
   Container,
   DialogContent,
   FormControlLabel,
   FormGroup,
   Switch,
+  Grid,
+  Popover,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 import { useDispatch, useSelector } from "react-redux";
-import { themeModeSelector } from "store/selectors/themeModeSelector";
+import {
+  themeModeSelector,
+  imageSelectionColorSelector,
+  availableColorsSelector,
+} from "store/selectors";
 import { setThemeMode } from "store/slices";
 import { ThemeMode } from "types/ThemeMode";
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
+import { BlockPicker, ColorResult } from "react-color";
+import { applicationSlice } from "store/slices";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -29,9 +38,33 @@ type SettingsDialogProps = {
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const dispatch = useDispatch();
   const themeMode = useSelector(themeModeSelector);
+  const imageSelectionColor = useSelector(imageSelectionColorSelector);
+  const availableColors = useSelector(availableColorsSelector);
 
   const onToggle = (mode: ThemeMode) => {
     dispatch(setThemeMode({ mode }));
+  };
+
+  const onColorChange = (color: ColorResult) => {
+    console.log("did change");
+    dispatch(
+      applicationSlice.actions.setImageSelectionColor({
+        selectionColor: color.hex,
+      })
+    );
+  };
+
+  const [colorMenuAnchorEl, setColorMenuAnchorEl] =
+    React.useState<null | HTMLButtonElement>(null);
+
+  const colorPopupOpen = Boolean(colorMenuAnchorEl);
+
+  const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setColorMenuAnchorEl(event.currentTarget);
+  };
+
+  const onCloseColorPicker = () => {
+    setColorMenuAnchorEl(null);
   };
 
   return (
@@ -59,27 +92,63 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
       <DialogContent sx={{ marginTop: (theme) => theme.spacing(2) }}>
         <Container maxWidth="md">
-          <FormGroup>
-            <FormControlLabel
-              control={
-                <MaterialUISwitch
-                  checked={themeMode === ThemeMode.Dark}
-                  onChange={() =>
-                    onToggle(
-                      themeMode === ThemeMode.Dark
-                        ? ThemeMode.Light
-                        : ThemeMode.Dark
-                    )
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <MaterialUISwitch
+                      checked={themeMode === ThemeMode.Dark}
+                      onChange={() =>
+                        onToggle(
+                          themeMode === ThemeMode.Dark
+                            ? ThemeMode.Light
+                            : ThemeMode.Dark
+                        )
+                      }
+                    />
+                  }
+                  label={
+                    <Typography variant="h6">
+                      {themeMode === ThemeMode.Dark
+                        ? "Dark Mode"
+                        : "Light Mode"}
+                    </Typography>
                   }
                 />
-              }
-              label={
-                <Typography variant="h6">
-                  {themeMode === ThemeMode.Dark ? "Dark Mode" : "Light Mode"}
-                </Typography>
-              }
-            />
-          </FormGroup>
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6">
+                <IconButton onClick={onOpenColorPicker} edge="start">
+                  <PaletteIcon
+                    sx={{ color: imageSelectionColor, fontSize: 40 }}
+                  />
+                </IconButton>
+                Image Selection Color
+              </Typography>
+              <Popover
+                id="image-color-selection-menu"
+                open={colorPopupOpen}
+                anchorEl={colorMenuAnchorEl}
+                onClose={onCloseColorPicker}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
+              >
+                <BlockPicker
+                  color={imageSelectionColor}
+                  onChangeComplete={onColorChange}
+                  colors={availableColors}
+                />
+              </Popover>
+            </Grid>
+          </Grid>
         </Container>
       </DialogContent>
     </Dialog>

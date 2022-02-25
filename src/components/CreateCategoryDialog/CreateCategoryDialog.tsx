@@ -4,7 +4,7 @@ import { ColorIcon } from "../ColorIcon";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
 import { createCategory } from "../../store/slices";
-import { availableColorsSelector } from "../../store/selectors/availableColorsSelecor";
+import { availableColorsSelector } from "../../store/selectors/availableColorsSelector";
 import { categoriesSelector } from "../../store/selectors/categoriesSelector";
 import { Category } from "../../types/Category";
 import {

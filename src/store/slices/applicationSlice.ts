@@ -6,7 +6,7 @@ const initialState: Settings = {
   selectedImages: [],
   tileSize: 1,
   themeMode: ThemeMode.Light,
-  imageSelectionColor: "#4caf50",
+  imageSelectionColor: "#FF6DB6",
 };
 
 export const applicationSlice = createSlice({
