@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -9,18 +9,15 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import {
   Container,
   DialogContent,
-  FormControlLabel,
-  FormGroup,
   Switch,
   Grid,
   Popover,
   TextField,
   Stack,
-  Box,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AppBarOffset } from "components/styled/AppBarOffset";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import {
   themeModeSelector,
   imageSelectionColorSelector,
@@ -40,8 +37,35 @@ type SettingsDialogProps = {
 };
 
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
+  const dispatch = useDispatch();
+
+  const initialSelectionSize = useSelector(imageSelectionSizeSelector);
+  const initialSelectionColor = useSelector(imageSelectionColorSelector);
+
+  const [selectionSize, setSelectionSize] =
+    useState<number>(initialSelectionSize);
+
+  const [selectionColor, setSelectionColor] = useState<string>(
+    initialSelectionColor
+  );
+
+  const preClose = () => {
+    batch(() => {
+      dispatch(
+        applicationSlice.actions.setImageSelectionSize({ selectionSize })
+      );
+      dispatch(
+        applicationSlice.actions.setImageSelectionColor({
+          selectionColor,
+        })
+      );
+    });
+
+    onClose();
+  };
+
   return (
-    <Dialog fullScreen onClose={onClose} open={open}>
+    <Dialog fullScreen onClose={preClose} open={open}>
       <AppBar
         sx={{
           borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -55,7 +79,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
             Settings
           </Typography>
 
-          <IconButton onClick={onClose}>
+          <IconButton onClick={preClose}>
             <CloseIcon />
           </IconButton>
         </Toolbar>
@@ -72,8 +96,8 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
             }}
           >
             <ThemeModeToggle />
-            <SelectionSize />
-            <ColorPalette />
+            <SelectionSize {...{ selectionSize, setSelectionSize }} />
+            <ColorPalette {...{ selectionColor, setSelectionColor }} />
           </Stack>
         </Container>
       </DialogContent>
@@ -155,18 +179,19 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const SelectionSize = () => {
-  const dispatch = useDispatch();
-  const selectionSize = useSelector(imageSelectionSizeSelector);
-
+const SelectionSize = ({
+  selectionSize,
+  setSelectionSize,
+}: {
+  selectionSize: number;
+  setSelectionSize(newSize: number): void;
+}) => {
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     let size = parseInt(event.target.value);
     if (!size) return;
     size = size < 0 ? 0 : size;
 
-    dispatch(
-      applicationSlice.actions.setImageSelectionSize({ selectionSize: size })
-    );
+    setSelectionSize(size);
   };
 
   return (
@@ -191,19 +216,14 @@ const SelectionSize = () => {
   );
 };
 
-const ColorPalette = () => {
-  const dispatch = useDispatch();
-
-  const imageSelectionColor = useSelector(imageSelectionColorSelector);
+const ColorPalette = ({
+  selectionColor,
+  setSelectionColor,
+}: {
+  selectionColor: string;
+  setSelectionColor(newColor: string): void;
+}) => {
   const availableColors = useSelector(availableColorsSelector);
-
-  const onColorChange = (color: ColorResult) => {
-    dispatch(
-      applicationSlice.actions.setImageSelectionColor({
-        selectionColor: color.hex,
-      })
-    );
-  };
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
@@ -229,7 +249,7 @@ const ColorPalette = () => {
           edge="start"
           sx={{ marginLeft: 0 }}
         >
-          <PaletteIcon sx={{ color: imageSelectionColor, fontSize: 40 }} />
+          <PaletteIcon sx={{ color: selectionColor, fontSize: 40 }} />
         </IconButton>
       </Grid>
       <Popover
@@ -247,8 +267,10 @@ const ColorPalette = () => {
         }}
       >
         <BlockPicker
-          color={imageSelectionColor}
-          onChangeComplete={onColorChange}
+          color={selectionColor}
+          onChangeComplete={(color: ColorResult) =>
+            setSelectionColor(color.hex)
+          }
           colors={availableColors}
         />
       </Popover>
