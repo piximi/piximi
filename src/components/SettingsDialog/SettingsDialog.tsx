@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,6 +14,7 @@ import {
   Switch,
   Grid,
   Popover,
+  TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AppBarOffset } from "components/styled/AppBarOffset";
@@ -22,6 +23,7 @@ import {
   themeModeSelector,
   imageSelectionColorSelector,
   availableColorsSelector,
+  imageSelectionSizeSelector,
 } from "store/selectors";
 import { setThemeMode } from "store/slices";
 import { ThemeMode } from "types/ThemeMode";
@@ -64,6 +66,9 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <ThemeModeToggle />
+            </Grid>
+            <Grid item xs={12}>
+              <SelectionSize />
             </Grid>
             <Grid item xs={12}>
               <ColorPalette />
@@ -150,6 +155,38 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     borderRadius: 20 / 2,
   },
 }));
+
+const SelectionSize = () => {
+  const dispatch = useDispatch();
+  const selectionSize = useSelector(imageSelectionSizeSelector);
+
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let size = parseInt(event.target.value);
+    if (!size) return;
+    size = size < 0 ? 0 : size;
+
+    dispatch(
+      applicationSlice.actions.setImageSelectionSize({ selectionSize: size })
+    );
+  };
+
+  return (
+    <Typography variant="h6" sx={{ marginLeft: "44px" }}>
+      Image Selection Size
+      <TextField
+        id="outlined-number"
+        label="Pixels"
+        defaultValue={selectionSize}
+        onChange={onChange}
+        type="number"
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        InputLabelProps={{ shrink: true }}
+        size="small"
+        sx={{ maxWidth: "80px", marginLeft: "10px" }}
+      />
+    </Typography>
+  );
+};
 
 const ColorPalette = () => {
   const dispatch = useDispatch();

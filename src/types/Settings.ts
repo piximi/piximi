@@ -5,4 +5,5 @@ export type Settings = {
   selectedImages: Array<string>;
   themeMode: ThemeMode;
   imageSelectionColor: string;
+  imageSelectionSize: number;
 };

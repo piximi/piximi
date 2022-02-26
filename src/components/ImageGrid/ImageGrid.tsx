@@ -4,6 +4,7 @@ import {
   selectedImagesSelector,
   visibleImagesSelector,
   imageSelectionColorSelector,
+  imageSelectionSizeSelector,
 } from "../../store/selectors";
 import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
 import { applicationSlice } from "../../store/slices";
@@ -28,10 +29,11 @@ type ImageGridItemProps = {
   image: ImageType;
   selected: boolean;
   selectionColor: string;
+  selectionSize: number;
 };
 
 const ImageGridItem = memo(
-  ({ image, selected, selectionColor }: ImageGridItemProps) => {
+  ({ image, selected, selectionColor, selectionSize }: ImageGridItemProps) => {
     const dispatch = useDispatch();
     const scaleFactor = useSelector(tileSizeSelector);
 
@@ -48,7 +50,10 @@ const ImageGridItem = memo(
 
     const getSelectionStatus = () => {
       return selected
-        ? { border: `solid 5px ${selectionColor}`, borderRadius: "6px" }
+        ? {
+            border: `solid ${selectionSize}px ${selectionColor}`,
+            borderRadius: `${selectionSize}px`,
+          }
         : { border: "none" };
     };
 
@@ -95,6 +100,7 @@ const ImageGridItem = memo(
 export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const images = useSelector(visibleImagesSelector);
   const imageSelectionColor = useSelector(imageSelectionColorSelector);
+  const imageSelectionSize = useSelector(imageSelectionSizeSelector);
   const selectedImages = useSelector(selectedImagesSelector);
   const scaleFactor = useSelector(tileSizeSelector);
   const max_images = 1000; //number of images from the project that we'll show
@@ -151,6 +157,7 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
               image={image}
               selected={selectedImages.includes(image.id)}
               selectionColor={imageSelectionColor}
+              selectionSize={imageSelectionSize}
               key={image.id}
             />
           ))}
