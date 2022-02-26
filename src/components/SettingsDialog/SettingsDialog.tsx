@@ -15,6 +15,8 @@ import {
   Grid,
   Popover,
   TextField,
+  Stack,
+  Box,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AppBarOffset } from "components/styled/AppBarOffset";
@@ -63,17 +65,16 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
       <DialogContent sx={{ marginTop: (theme) => theme.spacing(2) }}>
         <Container maxWidth="md">
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <ThemeModeToggle />
-            </Grid>
-            <Grid item xs={12}>
-              <SelectionSize />
-            </Grid>
-            <Grid item xs={12}>
-              <ColorPalette />
-            </Grid>
-          </Grid>
+          <Stack
+            spacing={3}
+            sx={{
+              ".MuiGrid-root:first-child": { marginLeft: "0px" },
+            }}
+          >
+            <ThemeModeToggle />
+            <SelectionSize />
+            <ColorPalette />
+          </Stack>
         </Container>
       </DialogContent>
     </Dialog>
@@ -90,25 +91,23 @@ const ThemeModeToggle = () => {
   };
 
   return (
-    <FormGroup>
-      <FormControlLabel
-        control={
-          <MaterialUISwitch
-            checked={themeMode === ThemeMode.Dark}
-            onChange={() =>
-              onToggle(
-                themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark
-              )
-            }
-          />
-        }
-        label={
-          <Typography variant="h6">
-            {themeMode === ThemeMode.Dark ? "Dark Mode" : "Light Mode"}
-          </Typography>
-        }
-      />
-    </FormGroup>
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <Typography variant="h6">
+          {themeMode === ThemeMode.Dark ? "Dark Mode" : "Light Mode"}
+        </Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <MaterialUISwitch
+          checked={themeMode === ThemeMode.Dark}
+          onChange={() =>
+            onToggle(
+              themeMode === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark
+            )
+          }
+        />
+      </Grid>
+    </Grid>
   );
 };
 
@@ -171,20 +170,24 @@ const SelectionSize = () => {
   };
 
   return (
-    <Typography variant="h6" sx={{ marginLeft: "44px" }}>
-      Image Selection Size
-      <TextField
-        id="outlined-number"
-        label="Pixels"
-        defaultValue={selectionSize}
-        onChange={onChange}
-        type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        InputLabelProps={{ shrink: true }}
-        size="small"
-        sx={{ maxWidth: "80px", marginLeft: "10px" }}
-      />
-    </Typography>
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <Typography variant="h6">Image Selection Size</Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          id="outlined-number"
+          label="Pixels"
+          defaultValue={selectionSize}
+          onChange={onChange}
+          type="number"
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          InputLabelProps={{ shrink: true }}
+          size="small"
+          sx={{ maxWidth: "80px", marginLeft: "10px" }}
+        />
+      </Grid>
+    </Grid>
   );
 };
 
@@ -216,13 +219,19 @@ const ColorPalette = () => {
   };
 
   return (
-    <>
-      <Typography variant="h6">
-        <IconButton onClick={onOpenColorPicker} edge="start">
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <Typography variant="h6">Image Selection Color</Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <IconButton
+          onClick={onOpenColorPicker}
+          edge="start"
+          sx={{ marginLeft: 0 }}
+        >
           <PaletteIcon sx={{ color: imageSelectionColor, fontSize: 40 }} />
         </IconButton>
-        Image Selection Color
-      </Typography>
+      </Grid>
       <Popover
         id="image-color-selection-menu"
         open={colorPopupOpen}
@@ -243,6 +252,6 @@ const ColorPalette = () => {
           colors={availableColors}
         />
       </Popover>
-    </>
+    </Grid>
   );
 };
