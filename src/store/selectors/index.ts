@@ -35,3 +35,7 @@ export { compileOptionsSelector } from "./compileOptionsSelector";
 export { imagesSelector } from "./imagesSelector";
 export { selectedImagesSelector } from "./selectedImagesSelector";
 export { visibleImagesSelector } from "./visibleImagesSelector";
+export { imageSelectionColorSelector } from "./imageSelectionColorSelector";
+export { themeModeSelector } from "./themeModeSelector";
+export { availableColorsSelector } from "./availableColorsSelector";
+export { imageSelectionSizeSelector } from "./imageSelectionSizeSelector";

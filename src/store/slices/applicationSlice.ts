@@ -6,6 +6,8 @@ const initialState: Settings = {
   selectedImages: [],
   tileSize: 1,
   themeMode: ThemeMode.Light,
+  imageSelectionColor: "#FF6DB6",
+  imageSelectionSize: 5,
 };
 
 export const applicationSlice = createSlice({
@@ -52,6 +54,18 @@ export const applicationSlice = createSlice({
     },
     setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
       state.themeMode = action.payload.mode;
+    },
+    setImageSelectionColor(
+      state: Settings,
+      action: PayloadAction<{ selectionColor: string }>
+    ) {
+      state.imageSelectionColor = action.payload.selectionColor;
+    },
+    setImageSelectionSize(
+      state: Settings,
+      action: PayloadAction<{ selectionSize: number }>
+    ) {
+      state.imageSelectionSize = action.payload.selectionSize;
     },
   },
 });
