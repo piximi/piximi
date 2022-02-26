@@ -1,10 +1,9 @@
-import * as React from "react";
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice, projectSlice } from "../../../store/slices";
-import { Alert, Dialog, DialogContent, List } from "@mui/material";
+import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DialogTransition } from "../../DialogTransition";
@@ -20,6 +19,8 @@ import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
+import { AlertStateType, AlertType } from "types/AlertStateType";
+import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -33,6 +34,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
+  const [alertState, setAlertState] = useState<AlertStateType>({
+    alertType: AlertType.Info,
+    name: "No labeled images",
+    description: "Please label images to train a model.",
+  });
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
@@ -129,9 +135,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     );
   };
 
-  // specifies interface
   return (
-    // @ts-ignore
     <Dialog
       fullScreen
       onClose={closeDialog}
@@ -148,14 +152,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       />
 
       {noCategorizedImagesAlert && showWarning && (
-        <Alert
-          onClose={() => {
-            setShowWarning(false);
-          }}
-          severity="info"
-        >
-          {"Please label images to train a model."}
-        </Alert>
+        <AlertDialog
+          setShowAlertDialog={setShowWarning}
+          alertState={alertState}
+        />
       )}
 
       <DialogContent>

@@ -12,6 +12,7 @@ import {
   ClassifierModelProps,
 } from "../../types/ClassifierModelType";
 import { EvaluationResultType } from "types/EvaluationResultType";
+import { AlertStateType, defaultAlert } from "types/AlertStateType";
 
 const initialState: Classifier = {
   evaluating: false,
@@ -59,6 +60,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         onEpochEnd: any;
+        errorCallback: any;
       }>
     ) {
       state.fitting = true;
@@ -120,6 +122,9 @@ export const classifierSlice = createSlice({
 
       state.history = status;
 
+      state.fitting = false;
+    },
+    updateFitting(state, action: PayloadAction<{ fitting: boolean }>) {
       state.fitting = false;
     },
     addFitted(state, action: PayloadAction<{ fitted: LayersModel }>) {

@@ -48,6 +48,7 @@ export const AlertDialog = ({
         setShowCreateGitHubIssue(true);
         setIssueDescription(
           alertState.description +
+            "\n\n**Steps to reproduce:**\n" +
             "\n\n**Stacktrace:**\n" +
             alertState.stackTrace
         );
@@ -138,12 +139,6 @@ export const AlertDialog = ({
           <Typography sx={{ pl: 3, pb: 1 }}>
             {alertState.description}
           </Typography>
-
-          {alertState.stackTrace && (
-            <Typography sx={{ pl: 3, pb: 1 }}>
-              {alertState.stackTrace}
-            </Typography>
-          )}
         </Box>
       </Collapse>
     </div>

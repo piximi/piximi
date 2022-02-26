@@ -12,3 +12,9 @@ export type AlertStateType = {
   component?: string;
   stackTrace?: string;
 };
+
+export const defaultAlert: AlertStateType = {
+  alertType: AlertType.None,
+  name: "None",
+  description: "",
+};
