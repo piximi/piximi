@@ -92,7 +92,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
           <Stack
             spacing={3}
             sx={{
-              ".MuiGrid-root:first-child": { marginLeft: "0px" },
+              ".MuiGrid-root:first-of-type": { marginLeft: "0px" },
             }}
           >
             <ThemeModeToggle />
