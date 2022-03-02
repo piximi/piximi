@@ -21,56 +21,62 @@ import { ImageType } from "../../../types/ImageType";
 import { FitOptions } from "../../../types/FitOptions";
 import { ModelType } from "../../../types/ClassifierModelType";
 
+import { errCo } from "../../coroutines/classifier/errCo";
+
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  const architectureOptions: ArchitectureOptions = yield select(
-    architectureOptionsSelector
-  );
-  const classes: number = yield select(createdCategoriesCountSelector);
+  console.log("in fit saga");
 
-  var model: tensorflow.LayersModel;
-  if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
-    model = yield select(compiledSelector);
-  } else {
-    model = yield open(architectureOptions, classes);
-  }
+  yield errCo();
 
-  const compileOptions: CompileOptions = yield select(compileOptionsSelector);
-  const compiledModel: tensorflow.LayersModel = yield compile(
-    model,
-    compileOptions
-  );
+  // const architectureOptions: ArchitectureOptions = yield select(
+  //   architectureOptionsSelector
+  // );
+  // const classes: number = yield select(createdCategoriesCountSelector);
 
-  yield put(
-    classifierSlice.actions.updateCompiled({ compiled: compiledModel })
-  );
+  // var model: tensorflow.LayersModel;
+  // if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
+  //   model = yield select(compiledSelector);
+  // } else {
+  //   model = yield open(architectureOptions, classes);
+  // }
 
-  const categories: Category[] = yield select(createdCategoriesSelector);
-  const trainImages: ImageType[] = yield select(trainImagesSelector);
-  const valImages: ImageType[] = yield select(valImagesSelector);
-  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
+  // const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+  // const compiledModel: tensorflow.LayersModel = yield compile(
+  //   model,
+  //   compileOptions
+  // );
 
-  const data = yield preprocess(
-    trainImages,
-    valImages,
-    categories,
-    architectureOptions.inputShape,
-    rescaleOptions
-  );
+  // yield put(
+  //   classifierSlice.actions.updateCompiled({ compiled: compiledModel })
+  // );
 
-  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
+  // const categories: Category[] = yield select(createdCategoriesSelector);
+  // const trainImages: ImageType[] = yield select(trainImagesSelector);
+  // const valImages: ImageType[] = yield select(valImagesSelector);
+  // const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
-  const options: FitOptions = yield select(fitOptionsSelector);
+  // const data = yield preprocess(
+  //   trainImages,
+  //   valImages,
+  //   categories,
+  //   architectureOptions.inputShape,
+  //   rescaleOptions
+  // );
 
-  const { fitted, status } = yield fit(
-    compiledModel,
-    data,
-    options,
-    onEpochEnd
-  );
+  // yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
-  const payload = { fitted: fitted, status: status };
+  // const options: FitOptions = yield select(fitOptionsSelector);
 
-  yield put(classifierSlice.actions.updateFitted(payload));
+  // const { fitted, status } = yield fit(
+  //   compiledModel,
+  //   data,
+  //   options,
+  //   onEpochEnd
+  // );
+
+  // const payload = { fitted: fitted, status: status };
+
+  // yield put(classifierSlice.actions.updateFitted(payload));
 }

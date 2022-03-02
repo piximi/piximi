@@ -55,6 +55,12 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
+    doLog(state, action: PayloadAction<{ message: string }>) {
+      console.log(
+        "in classifier slice doLog reducer; message is:",
+        action.payload.message
+      );
+    },
     fit(
       state,
       action: PayloadAction<{
