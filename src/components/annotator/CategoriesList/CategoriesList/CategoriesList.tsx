@@ -32,7 +32,6 @@ import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { SettingsDialog } from "../../SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
@@ -42,7 +41,7 @@ import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
-import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
+import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import {
   imageViewerSlice,
@@ -457,9 +456,8 @@ export const CategoriesList = () => {
       <Divider />
 
       <List dense>
-        <SettingsListItem />
         <SendFeedbackListItem />
-        <HelpDrawer />
+        <AnnotatorHelpDrawer />
       </List>
     </Drawer>
   );
@@ -523,25 +521,6 @@ const SaveListItem = () => {
           </>
         )}
       </PopupState>
-    </>
-  );
-};
-
-const SettingsListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  const t = useTranslation();
-
-  return (
-    <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-
-        <ListItemText primary={t("Settings")} />
-      </ListItem>
-      <SettingsDialog onClose={onClose} open={open} />
     </>
   );
 };

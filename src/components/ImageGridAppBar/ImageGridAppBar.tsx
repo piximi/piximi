@@ -31,7 +31,7 @@ import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { ImageType } from "../../types/ImageType";
 import { useHotkeys } from "react-hotkeys-hook";
-import { KeyboardKey } from "components/annotator/Help/HelpDialog/KeyboardKey";
+import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
