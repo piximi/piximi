@@ -39,7 +39,7 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                           letter={subTopic.tootleTitle.letter}
                         />
                       ) : (
-                        <Typography>
+                        <Typography component={"span"}>
                           <Box fontWeight="fontWeightBold">
                             {subTopic.subtitle}
                           </Box>
@@ -49,7 +49,9 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                         (description: string, descriptionIndex: number) => {
                           return (
                             <div key={descriptionIndex}>
-                              <Typography>{description}</Typography>
+                              <Typography component={"span"}>
+                                {description}
+                              </Typography>
                               <br />
                             </div>
                           );

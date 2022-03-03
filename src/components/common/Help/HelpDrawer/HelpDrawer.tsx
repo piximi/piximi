@@ -81,3 +81,15 @@ export default function HelpDrawer({
     </div>
   );
 }
+
+export const FallBackHelpDrawer = () => {
+  return (
+    <ListItem disabled>
+      <ListItemIcon>
+        <HelpIcon />
+      </ListItemIcon>
+
+      <ListItemText primary="Help" />
+    </ListItem>
+  );
+};
