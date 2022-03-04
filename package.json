@@ -81,7 +81,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
     "eject": "react-scripts eject",
-    "start": "BROWSER='chrome' react-scripts start",
+    "start": "BROWSER='none' react-scripts start",
     "test": "react-scripts test",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
