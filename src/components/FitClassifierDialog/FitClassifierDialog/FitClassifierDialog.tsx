@@ -33,18 +33,23 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
+
   const [showWarning, setShowWarning] = useState<boolean>(true);
+
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
     { x: number; y: number }[]
   >([]);
+
   const [validationAccuracy, setValidationAccuracy] = useState<
     { x: number; y: number }[]
   >([]);
+
   const [trainingLoss, setTrainingLoss] = useState<{ x: number; y: number }[]>(
     []
   );
+
   const [validationLoss, setValidationLoss] = useState<
     { x: number; y: number }[]
   >([]);
