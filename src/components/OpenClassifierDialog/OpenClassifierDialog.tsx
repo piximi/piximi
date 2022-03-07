@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -19,6 +18,8 @@ import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { LayersModel } from "@tensorflow/tfjs";
 import { ModelType } from "../../types/ClassifierModelType";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
 type OpenClassifierDialogProps = {
   onClose: any;
@@ -42,8 +43,9 @@ export const OpenClassifierDialog = ({
     frames: 1,
   });
 
-  const [fileError, setFileError] = React.useState<boolean>(false);
-  const [fileErrorMessage, setFileErrorMessage] = React.useState<string>("");
+  const [alertState, setAlertState] =
+    React.useState<AlertStateType>(defaultAlert);
+  const [showFileError, setShowFileError] = React.useState<boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -59,8 +61,13 @@ export const OpenClassifierDialog = ({
       })
     );
 
-    onClose();
+    closeDialog();
     popupState.close();
+  };
+
+  const closeDialog = () => {
+    setShowFileError(false);
+    onClose();
   };
 
   const onClassifierFilesSelected = async (
@@ -81,24 +88,41 @@ export const OpenClassifierDialog = ({
       jsonFile = event.currentTarget.files[0];
     }
 
-    // make sure the weight file required in the json has the correct name
-    const jsonFileContent = await jsonFile.text();
+    var newJsonFile: File;
+    try {
+      // make sure the weight file required in the json has the correct name
+      const jsonFileContent = await jsonFile.text();
 
-    const weightFileName = weightsFile.name;
-    const weightFileNameReplaceString =
-      'paths":["./' +
-      weightFileName.substring(0, weightFileName.length - 4) +
-      '.bin"]';
+      const weightFileName = weightsFile.name;
+      const weightFileNameReplaceString =
+        'paths":["./' +
+        weightFileName.substring(0, weightFileName.length - 4) +
+        '.bin"]';
 
-    const regegPattern = new RegExp('paths":\\["./(.)*weights.bin"]');
-    const updatedJsonFileContent = jsonFileContent.replace(
-      regegPattern,
-      weightFileNameReplaceString
-    );
+      const regexPattern = new RegExp('paths":\\["./(.)*weights.bin"]');
+      const updatedJsonFileContent = jsonFileContent.replace(
+        regexPattern,
+        weightFileNameReplaceString
+      );
 
-    var newJsonFile = new File([updatedJsonFileContent], jsonFile.name, {
-      type: jsonFile.type,
-    });
+      newJsonFile = new File([updatedJsonFileContent], jsonFile.name, {
+        type: jsonFile.type,
+      });
+    } catch (err) {
+      const error: Error = err as Error;
+
+      setAlertState({
+        alertType: AlertType.Warning,
+        name: "Error reading the classifier files",
+        description:
+          "Couldn't parse classifier files:\n" +
+          error.name +
+          "\n" +
+          error.message,
+      });
+      setShowFileError(true);
+      return;
+    }
 
     try {
       const model = await tf.loadLayersModel(
@@ -121,10 +145,13 @@ export const OpenClassifierDialog = ({
     } catch (err) {
       const error: Error = err as Error;
 
-      setFileErrorMessage(
-        "Invalid files selected:\n" + error.name + "\n" + error.message
-      );
-      setFileError(true);
+      setAlertState({
+        alertType: AlertType.Warning,
+        name: "Failed to load tensorflow model",
+        description:
+          "Invalid files selected:\n" + error.name + "\n" + error.message,
+      });
+      setShowFileError(true);
     }
   };
 
@@ -133,7 +160,7 @@ export const OpenClassifierDialog = ({
   ]);
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
+    <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
       <DialogTitle>Open classifier</DialogTitle>
 
       <input
@@ -146,6 +173,13 @@ export const OpenClassifierDialog = ({
           onClassifierFilesSelected(event)
         }
       />
+
+      {showFileError && (
+        <AlertDialog
+          setShowAlertDialog={setShowFileError}
+          alertState={alertState}
+        />
+      )}
 
       <DialogContent>
         <Typography gutterBottom>
@@ -163,10 +197,8 @@ export const OpenClassifierDialog = ({
         </MenuItem>
       </label>
 
-      {fileError ? <Alert severity="error">{fileErrorMessage}</Alert> : <></>}
-
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={closeDialog} color="primary">
           Cancel
         </Button>
 
