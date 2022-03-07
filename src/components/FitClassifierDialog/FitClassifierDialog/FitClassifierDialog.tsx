@@ -19,8 +19,9 @@ import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
-import { AlertStateType, AlertType } from "types/AlertStateType";
+import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { alertStateSelector } from "store/selectors/alertStateSelector";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -34,12 +35,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
     useState<boolean>(false);
-  const [alertState, setAlertState] = useState<AlertStateType>({
-    alertType: AlertType.Info,
-    name: "No labeled images",
-    description: "Please label images to train a model.",
-  });
-  const [showWarning, setShowWarning] = useState<boolean>(true);
+  const [localAlertState, setLocalAlertState] =
+    useState<AlertStateType>(defaultAlert);
+  const [showWarning, setShowWarning] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
@@ -58,12 +56,33 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const trainingPercentage = useSelector(trainingPercentageSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
   const compiledModel = useSelector(compiledSelector);
+  const alertState = useSelector(alertStateSelector);
 
   const epochs = useSelector(epochsSelector);
 
   useEffect(() => {
-    setNoCategorizedImagesAlert(categorizedImages.length === 0);
-  }, [categorizedImages]);
+    if (categorizedImages.length === 0) {
+      setLocalAlertState({
+        alertType: AlertType.Info,
+        name: "No labeled images",
+        description: "Please label images to train a model.",
+      });
+      setNoCategorizedImagesAlert(true);
+      setShowWarning(true);
+    } else {
+      if (noCategorizedImagesAlert) {
+        setShowWarning(false);
+      }
+      setNoCategorizedImagesAlert(false);
+    }
+  }, [categorizedImages, noCategorizedImagesAlert]);
+
+  useEffect(() => {
+    if (alertState.alertType !== AlertType.None) {
+      setLocalAlertState(alertState);
+      setShowWarning(true);
+    }
+  }, [alertState]);
 
   const dispatch = useDispatch();
 
@@ -151,10 +170,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         currentEpoch={currentEpoch}
       />
 
-      {noCategorizedImagesAlert && showWarning && (
+      {showWarning && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
-          alertState={alertState}
+          alertState={localAlertState}
         />
       )}
 
