@@ -9,6 +9,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useDispatch, useSelector } from "react-redux";
 import { visibleImagesSelector } from "store/selectors";
 import { ImageType } from "../../types/ImageType";
+import { ErrorBoundary } from "react-error-boundary";
+import { AlertType } from "types/AlertStateType";
+import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
 export const MainView = () => {
   const dispatch = useDispatch();
@@ -30,6 +33,29 @@ export const MainView = () => {
       return (e.returnValue = "Are you sure you want to exit?");
     }
   };
+
+  const handleError = useCallback(
+    (e: any) => {
+      dispatch(
+        applicationSlice.actions.updateAlertState({
+          alertState: {
+            alertType: AlertType.Error,
+            name: e.message,
+            description: e.error.message,
+            stackTrace: e.error.stack,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
+
+  React.useEffect(() => {
+    window.addEventListener("error", handleError);
+    return () => {
+      window.removeEventListener("error", handleError);
+    };
+  }, [handleError]);
 
   React.useEffect(() => {
     window.addEventListener("beforeunload", onUnload);
@@ -58,23 +84,27 @@ export const MainView = () => {
   ) as React.MutableRefObject<HTMLDivElement>;
 
   return (
-    <div ref={selectAllImagesHotkeyRef} tabIndex={-1}>
-      <Box sx={{ height: "100vh" }}>
-        <CssBaseline />
+    <div>
+      <ErrorBoundary FallbackComponent={FallBackDialog}>
+        <div ref={selectAllImagesHotkeyRef} tabIndex={-1}>
+          <Box sx={{ height: "100vh" }}>
+            <CssBaseline />
 
-        <ApplicationAppBar />
+            <ApplicationAppBar />
 
-        <ApplicationDrawer />
+            <ApplicationDrawer />
 
-        <ImageGrid onDrop={onDrop} />
+            <ImageGrid onDrop={onDrop} />
 
-        <ImageShapeDialog
-          files={files!}
-          open={openDimensionsDialogBox}
-          onClose={handleClose}
-          isUploadedFromAnnotator={false}
-        />
-      </Box>
+            <ImageShapeDialog
+              files={files!}
+              open={openDimensionsDialogBox}
+              onClose={handleClose}
+              isUploadedFromAnnotator={false}
+            />
+          </Box>
+        </div>
+      </ErrorBoundary>
     </div>
   );
 };
