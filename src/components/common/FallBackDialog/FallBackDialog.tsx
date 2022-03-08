@@ -21,6 +21,8 @@ import { SaveClassifierDialog } from "components/SaveClassifierDialog/SaveClassi
 import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
 import { useDialog } from "hooks/useDialog/useDialog";
 import React from "react";
+import { useLocation } from "react-router-dom";
+import { SaveAnnotationProjectDialog } from "components/annotator/CategoriesList/SaveMenu/SaveAnnotationProjectDialog";
 
 const popupState = {
   close: () => {},
@@ -37,6 +39,15 @@ export const FallBackDialog = (props: any) => {
     onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
   } = useDialog();
+
+  const {
+    onClose: onSaveAnnotationProjectDialogClose,
+    onOpen: onSaveAnnotationProjectDialogOpen,
+    open: openAnnotationSaveProjectDialog,
+  } = useDialog();
+
+  const routPath = useLocation().pathname;
+  const inAnnotator = routPath === "/annotator";
 
   const {
     onClose: onSaveClassifierDialogClose,
@@ -171,6 +182,14 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
             Save classifier
           </Button>
+          {inAnnotator && (
+            <Button
+              variant="outlined"
+              onClick={onSaveAnnotationProjectDialogOpen}
+            >
+              Save Annotations
+            </Button>
+          )}
         </Stack>
 
         <SaveProjectDialog
@@ -182,6 +201,12 @@ export const FallBackDialog = (props: any) => {
         <SaveClassifierDialog
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
+          popupState={popupState}
+        />
+
+        <SaveAnnotationProjectDialog
+          onClose={onSaveAnnotationProjectDialogClose}
+          open={openAnnotationSaveProjectDialog}
           popupState={popupState}
         />
       </DialogContent>
