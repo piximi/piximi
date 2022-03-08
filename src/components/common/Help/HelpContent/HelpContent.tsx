@@ -21,9 +21,10 @@ export type HelpTopic = {
 export const HelpContent = (helpContent: Array<HelpTopic>) => {
   return (
     <div>
-      {helpContent.map((helpContent: HelpTopic) => {
+      {helpContent.map((helpContent: HelpTopic, idx: number) => {
         return (
           <CollapsibleHelpContent
+            key={idx}
             primary={helpContent.topic}
             closed={false}
             dense={true}

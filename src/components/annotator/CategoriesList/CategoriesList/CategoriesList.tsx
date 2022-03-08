@@ -31,7 +31,6 @@ import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
-import SettingsIcon from "@mui/icons-material/Settings";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";

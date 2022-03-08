@@ -14,11 +14,6 @@ import {
   Popover,
   TextField,
   Stack,
-  FormControl,
-  FormHelperText,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AppBarOffset } from "components/styled/AppBarOffset";
@@ -38,9 +33,6 @@ import VolumeOff from "icons/VolumeOff.svg";
 import { BlockPicker, ColorResult } from "react-color";
 import { applicationSlice } from "store/slices";
 import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
-import _ from "lodash";
-import { LanguageType } from "types/LanguageType";
-import { languageSelector } from "store/selectors/languageSelector";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -118,46 +110,46 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   );
 };
 
-const LanguageSettings = () => {
-  const dispatch = useDispatch();
+// const LanguageSettings = () => {
+//   const dispatch = useDispatch();
 
-  const language = useSelector(languageSelector);
+//   const language = useSelector(languageSelector);
 
-  const onLanguageChange = (event: SelectChangeEvent) => {
-    dispatch(
-      imageViewerSlice.actions.setLanguage({
-        language: event.target.value as LanguageType,
-      })
-    );
-  };
+//   const onLanguageChange = (event: SelectChangeEvent) => {
+//     dispatch(
+//       imageViewerSlice.actions.setLanguage({
+//         language: event.target.value as LanguageType,
+//       })
+//     );
+//   };
 
-  return (
-    <Grid item xs={6}>
-      <Grid container>
-        <Grid item xs={12}>
-          <Grid container item xs={4}>
-            <FormControl color="primary" fullWidth>
-              <FormHelperText>Language</FormHelperText>
-              <Select
-                onChange={onLanguageChange}
-                value={language}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                {_.map(LanguageType, (v, k) => {
-                  return (
-                    <MenuItem dense key={k} value={v}>
-                      {v}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
-  );
-};
+//   return (
+//     <Grid item xs={6}>
+//       <Grid container>
+//         <Grid item xs={12}>
+//           <Grid container item xs={4}>
+//             <FormControl color="primary" fullWidth>
+//               <FormHelperText>Language</FormHelperText>
+//               <Select
+//                 onChange={onLanguageChange}
+//                 value={language}
+//                 inputProps={{ "aria-label": "Without label" }}
+//               >
+//                 {_.map(LanguageType, (v, k) => {
+//                   return (
+//                     <MenuItem dense key={k} value={v}>
+//                       {v}
+//                     </MenuItem>
+//                   );
+//                 })}
+//               </Select>
+//             </FormControl>
+//           </Grid>
+//         </Grid>
+//       </Grid>
+//     </Grid>
+//   );
+// };
 
 const SoundSettings = () => {
   const dispatch = useDispatch();
