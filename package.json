@@ -81,6 +81,7 @@
   },
   "scripts": {
     "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
+    "build-local": "PUBLIC_URL=/ NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
     "eject": "react-scripts eject",
     "start": "BROWSER='chrome' react-scripts start",
     "test": "react-scripts test",
