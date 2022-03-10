@@ -1,6 +1,6 @@
 {
   "name": "piximi",
-  "license": "BSD-3-Clause",
+  "license": "BSD-style license",
   "version": "0.1.0",
   "homepage": "https://piximi.github.io/prototype",
   "dependencies": {
