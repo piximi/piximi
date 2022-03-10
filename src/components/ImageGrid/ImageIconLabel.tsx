@@ -1,6 +1,7 @@
-import { Tooltip } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import LabelIcon from "@mui/icons-material/Label";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useSelector } from "react-redux";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { ImageType } from "../../types/ImageType";
@@ -26,36 +27,73 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
     marginTop: "8px",
   };
 
+  const infoIconTooltip = () => {
+    return (
+      <div>
+        {`file name: ${image.name}`}
+        <br></br>
+        {`shape: ${image.shape.width} x ${image.shape.height}`}
+        <br></br>
+        {`channels: ${image.shape.channels}`}
+        <br></br>
+        {`z-slices: ${image.shape.planes}`}
+      </div>
+    );
+  };
+
   const predictedLabel =
     image.partition === Partition.Inference &&
     image.categoryId !== UNKNOWN_CATEGORY_ID;
 
   return (
-    <Tooltip
-      title={categoryName}
-      placement="right"
-      arrow
-      // can't use "sx" prop directly to access tooltip
-      // see: https://github.com/mui-org/material-ui/issues/28679
-      componentsProps={{
-        tooltip: {
-          sx: {
-            borderRadius: 2,
-            backgroundColor: categoryColor,
+    <>
+      <Tooltip
+        title={categoryName}
+        placement="right"
+        arrow
+        componentsProps={{
+          tooltip: {
+            sx: {
+              borderRadius: 2,
+              backgroundColor: categoryColor,
+            },
           },
-        },
-        arrow: {
-          sx: {
-            color: categoryColor,
+          arrow: {
+            sx: {
+              color: categoryColor,
+            },
           },
-        },
-      }}
-    >
-      {predictedLabel ? (
-        <LabelImportantIcon sx={actionIconStyle} />
-      ) : (
-        <LabelIcon sx={actionIconStyle} />
-      )}
-    </Tooltip>
+        }}
+      >
+        {predictedLabel ? (
+          <LabelImportantIcon sx={actionIconStyle} />
+        ) : (
+          <LabelIcon sx={actionIconStyle} />
+        )}
+      </Tooltip>
+
+      <Box sx={{ flexGrow: 1 }} />
+
+      <Tooltip
+        title={infoIconTooltip()}
+        placement="right"
+        arrow
+        componentsProps={{
+          tooltip: {
+            sx: {
+              borderRadius: 2,
+              backgroundColor: categoryColor,
+            },
+          },
+          arrow: {
+            sx: {
+              color: categoryColor,
+            },
+          },
+        }}
+      >
+        <InfoOutlinedIcon sx={actionIconStyle} />
+      </Tooltip>
+    </>
   );
 };
