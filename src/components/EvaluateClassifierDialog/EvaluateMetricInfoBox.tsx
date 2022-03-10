@@ -25,15 +25,15 @@ export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProps) => {
           display: "flex",
           flexDirection: "column",
           alignItems: { xs: "center", md: "flex-start" },
-          m: 3,
-          width: 180,
+          m: 1,
+          width: 130,
           borderRadius: 2,
         })}
       >
         <Box
           component="span"
           sx={(theme) => ({
-            fontSize: 20,
+            fontSize: 16,
             color: theme.palette.info.dark,
             mt: 1,
             pl: 1,
@@ -45,7 +45,7 @@ export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProps) => {
         <Box
           component="span"
           sx={(theme) => ({
-            fontSize: 18,
+            fontSize: 15,
             color: theme.palette.background.default,
             pl: 1,
           })}
@@ -53,11 +53,12 @@ export const EvaluateMetricInfoBox = (props: EvaluateMetricInfoBoxProps) => {
           {value.toFixed(3)}
         </Box>
         <IconButton
+          size="small"
           aria-label="info"
           sx={(theme) => ({ color: theme.palette.background.default })}
           onClick={() => window.open(link)}
         >
-          <InfoIcon />
+          <InfoIcon fontSize="small" />
         </IconButton>
       </Box>
     </Box>
