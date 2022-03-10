@@ -21,6 +21,7 @@ import { ImageType } from "../../../types/ImageType";
 import { FitOptions } from "../../../types/FitOptions";
 import { ModelType } from "../../../types/ClassifierModelType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
@@ -36,8 +37,8 @@ export function* fitSaga(action: any): any {
   } else {
     try {
       model = yield open(architectureOptions, classes);
-    } catch (err) {
-      yield handleError(err as Error, "Failed to create tensorflow model");
+    } catch (error) {
+      yield handleError(error as Error, "Failed to create tensorflow model");
       return;
     }
   }
@@ -46,8 +47,8 @@ export function* fitSaga(action: any): any {
   var compiledModel: tensorflow.LayersModel;
   try {
     compiledModel = yield compile(model, compileOptions);
-  } catch (err) {
-    yield handleError(err as Error, "Failed to compile tensorflow model");
+  } catch (error) {
+    yield handleError(error as Error, "Failed to compile tensorflow model");
     return;
   }
 
@@ -68,8 +69,8 @@ export function* fitSaga(action: any): any {
       architectureOptions.inputShape,
       rescaleOptions
     );
-  } catch (err) {
-    yield handleError(err as Error, "Error in preprocessing");
+  } catch (error) {
+    yield handleError(error as Error, "Error in preprocessing");
     return;
   }
 
@@ -84,8 +85,8 @@ export function* fitSaga(action: any): any {
       options,
       onEpochEnd
     );
-  } catch (err) {
-    yield handleError(err as Error, "Error in in training the model");
+  } catch (error) {
+    yield handleError(error as Error, "Error in in training the model");
     return;
   }
 
@@ -94,12 +95,14 @@ export function* fitSaga(action: any): any {
   yield put(classifierSlice.actions.updateFitted(payload));
 }
 
-function* handleError(error: Error, errorName: string) {
+function* handleError(error: Error, errorName: string): any {
+  const stackTrace = yield getStackTraceFromError(error);
+
   const alertState: AlertStateType = {
     alertType: AlertType.Error,
     name: errorName,
-    description: `${error.name}\n${error.message}`,
-    stackTrace: error.stack,
+    description: `${error.name}:\n${error.message}`,
+    stackTrace: stackTrace,
   };
 
   yield put(

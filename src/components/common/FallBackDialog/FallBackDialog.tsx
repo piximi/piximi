@@ -23,6 +23,7 @@ import { useDialog } from "hooks/useDialog/useDialog";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { SaveAnnotationProjectDialog } from "components/annotator/CategoriesList/SaveMenu/SaveAnnotationProjectDialog";
+import StackTrace from "stacktrace-js";
 
 const popupState = {
   close: () => {},
@@ -30,9 +31,24 @@ const popupState = {
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
-  var stackTrace = error.stack;
 
   const [expanded, setExpanded] = React.useState(false);
+
+  const [stackTrace, setStackTrace] = React.useState<string | undefined>(
+    error.stack
+  );
+
+  React.useEffect(() => {
+    if (error.stack) {
+      StackTrace.fromError(error)
+        .then((stacktrace) => {
+          setStackTrace(
+            stacktrace.map((stackFrame) => stackFrame.toString()).join("\n")
+          );
+        })
+        .catch((err) => console.log("could not resolve stacktrace", err));
+    }
+  }, [error]);
 
   const {
     onClose: onSaveProjectDialogClose,

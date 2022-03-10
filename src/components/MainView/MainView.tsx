@@ -12,6 +12,7 @@ import { ImageType } from "../../types/ImageType";
 import { ErrorBoundary } from "react-error-boundary";
 import { AlertType } from "types/AlertStateType";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export const MainView = () => {
   const dispatch = useDispatch();
@@ -35,14 +36,16 @@ export const MainView = () => {
   };
 
   const handleError = useCallback(
-    (e: any) => {
+    async (e: any) => {
+      var error = e.error as Error;
+      const stackTrace = await getStackTraceFromError(error);
       dispatch(
         applicationSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
-            name: e.message,
-            description: e.error.message,
-            stackTrace: e.error.stack,
+            name: error.name,
+            description: error.message,
+            stackTrace: stackTrace,
           },
         })
       );

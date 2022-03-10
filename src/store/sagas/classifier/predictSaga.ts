@@ -13,6 +13,7 @@ import { ArchitectureOptions } from "types/ArchitectureOptions";
 import { ImageType } from "../../../types/ImageType";
 import * as tensorflow from "@tensorflow/tfjs";
 import { AlertStateType, AlertType } from "types/AlertStateType";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* predictSaga(action: any): any {
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
@@ -81,21 +82,11 @@ function* runPrediction(
       rescaleOptions,
       architectureOptions.inputShape
     );
-  } catch (err) {
-    var error = err as Error;
-    const alertState: AlertStateType = {
-      alertType: AlertType.Error,
-      name: "Error in preprocessing the inference data",
-      description: `${error.name}\n${error.message}`,
-      stackTrace: error.stack,
-    };
-
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: alertState,
-      })
+  } catch (error) {
+    yield handleError(
+      error as Error,
+      "Error in preprocessing the inference data"
     );
-
     return;
   }
 
@@ -105,21 +96,8 @@ function* runPrediction(
       data,
       categories
     ); //returns an array of Image ID and an array of corresponding categories ID
-  } catch (err) {
-    error = err as Error;
-    const alertState: AlertStateType = {
-      alertType: AlertType.Error,
-      name: "Error predicting the inference data",
-      description: `${error.name}\n${error.message}`,
-      stackTrace: error.stack,
-    };
-
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: alertState,
-      })
-    );
-
+  } catch (error) {
+    yield handleError(error as Error, "Error predicting the inference data");
     return;
   }
 
@@ -133,6 +111,23 @@ function* runPrediction(
   yield put(
     classifierSlice.actions.updatePredicted({
       predicted: true,
+    })
+  );
+}
+
+function* handleError(error: Error, name: string): any {
+  const stackTrace = yield getStackTraceFromError(error);
+
+  const alertState: AlertStateType = {
+    alertType: AlertType.Error,
+    name: name,
+    description: `${error.name}:\n${error.message}`,
+    stackTrace: stackTrace,
+  };
+
+  yield put(
+    applicationSlice.actions.updateAlertState({
+      alertState: alertState,
     })
   );
 }

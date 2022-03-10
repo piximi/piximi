@@ -14,6 +14,7 @@ import { evaluate } from "store/coroutines/classifier/evaluate";
 import * as tensorflow from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
 import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* evaluateSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(fittedSelector);
@@ -83,19 +84,10 @@ function* runEvaluation(
       rescaleOptions,
       architectureOptions.inputShape
     );
-  } catch (err) {
-    var error = err as Error;
-    const alertState: AlertStateType = {
-      alertType: AlertType.Error,
-      name: "Error in preprocessing the  validation data",
-      description: `${error.name}\n${error.message}`,
-      stackTrace: error.stack,
-    };
-
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: alertState,
-      })
+  } catch (error) {
+    yield handleError(
+      error as Error,
+      "Error in preprocessing the validation data"
     );
     return;
   }
@@ -107,26 +99,31 @@ function* runEvaluation(
       validationImages,
       categories
     );
-  } catch (err) {
-    error = err as Error;
-    const alertState: AlertStateType = {
-      alertType: AlertType.Error,
-      name: "Error computing the evaluation results",
-      description: `${error.name}\n${error.message}`,
-      stackTrace: error.stack,
-    };
-
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: alertState,
-      })
-    );
+  } catch (error) {
+    yield handleError(error as Error, "Error computing the evaluation results");
     return;
   }
 
   yield put(
     classifierSlice.actions.updateEvaluationResult({
       evaluationResult,
+    })
+  );
+}
+
+function* handleError(error: Error, name: string): any {
+  const stackTrace = yield getStackTraceFromError(error);
+
+  const alertState: AlertStateType = {
+    alertType: AlertType.Error,
+    name: name,
+    description: `${error.name}:\n${error.message}`,
+    stackTrace: stackTrace,
+  };
+
+  yield put(
+    applicationSlice.actions.updateAlertState({
+      alertState: alertState,
     })
   );
 }
