@@ -280,13 +280,17 @@ export const convertFileToImage = async (
   /**
    * Returns image to be provided to dispatch
    * **/
-  return new Promise((resolve, reject) => {
-    return file.arrayBuffer().then((buffer) => {
-      ImageJS.Image.load(buffer).then((image: ImageJS.Image) => {
-        resolve(convertToImage(image, file.name, colors, slices, channels));
-      });
+  return file
+    .arrayBuffer()
+    .then((buffer) => {
+      return ImageJS.Image.load(buffer);
+    })
+    .then((image: ImageJS.Image) => {
+      return convertToImage(image, file.name, colors, slices, channels);
+    })
+    .catch((err) => {
+      throw new Error(err);
     });
-  });
 };
 
 const convertImageDataToURI = (

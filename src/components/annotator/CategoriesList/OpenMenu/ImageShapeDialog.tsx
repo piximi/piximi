@@ -5,6 +5,7 @@ import { convertFileToImage } from "../../../../image/imageHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, DialogActions, TextField } from "@mui/material";
 import {
+  applicationSlice,
   createImage,
   imageViewerSlice,
   setOperation,
@@ -12,6 +13,7 @@ import {
 } from "../../../../store/slices";
 import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
 import { ToolType } from "../../../../types/ToolType";
+import { AlertStateType, AlertType } from "types/AlertStateType";
 
 export interface ImageShapeDialogProps {
   files: FileList;
@@ -41,12 +43,21 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
     onClose();
 
     for (let i = 0; i < files.length; i++) {
-      const image = await convertFileToImage(
-        files[i],
-        colors,
-        slices,
-        channels
-      );
+      let image;
+      try {
+        image = await convertFileToImage(files[i], colors, slices, channels);
+      } catch (err) {
+        const error: Error = err as Error;
+        const warning: AlertStateType = {
+          alertType: AlertType.Warning,
+          name: "Could not convert file to image",
+          description: error.message,
+        };
+        dispatch(
+          applicationSlice.actions.updateAlertState({ alertState: warning })
+        );
+        return;
+      }
       if (isUploadedFromAnnotator) {
         //if image is uplpoaded from the annotator, we add image to annotator state
         dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
