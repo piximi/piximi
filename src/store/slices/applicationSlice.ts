@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
+import { AlertStateType, defaultAlert } from "types/AlertStateType";
 
 const initialState: Settings = {
   selectedImages: [],
@@ -8,6 +9,7 @@ const initialState: Settings = {
   themeMode: ThemeMode.Light,
   imageSelectionColor: "#FF6DB6",
   imageSelectionSize: 5,
+  alertState: defaultAlert,
 };
 
 export const applicationSlice = createSlice({
@@ -67,6 +69,12 @@ export const applicationSlice = createSlice({
     ) {
       state.imageSelectionSize = action.payload.selectionSize;
     },
+    updateAlertState(
+      state,
+      action: PayloadAction<{ alertState: AlertStateType }>
+    ) {
+      state.alertState = action.payload.alertState;
+    },
   },
 });
 
@@ -78,4 +86,5 @@ export const {
   deselectImages,
   clearSelectedImages,
   setThemeMode,
+  updateAlertState,
 } = applicationSlice.actions;

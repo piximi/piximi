@@ -15,7 +15,7 @@ export const open = async (
       return createMobileNet(modelOptions.inputShape, classes);
     }
     default: {
-      alert("Invalid model selected!");
+      throw new Error("Invalid model selected");
     }
   }
 };

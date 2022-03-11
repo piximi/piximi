@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { KeyboardKey } from "../../Help/HelpDialog/KeyboardKey";
+import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 import { Box } from "@mui/material";
 
 type ToolTitleProps = {

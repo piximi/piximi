@@ -24,12 +24,15 @@ import {
   availableColorsSelector,
   imageSelectionSizeSelector,
 } from "store/selectors";
-import { setThemeMode } from "store/slices";
+import { imageViewerSlice, setThemeMode } from "store/slices";
 import { ThemeMode } from "types/ThemeMode";
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
+import VolumeUp from "icons/VolumeUp.svg";
+import VolumeOff from "icons/VolumeOff.svg";
 import { BlockPicker, ColorResult } from "react-color";
 import { applicationSlice } from "store/slices";
+import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -98,10 +101,84 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
             <ThemeModeToggle />
             <SelectionSize {...{ selectionSize, setSelectionSize }} />
             <ColorPalette {...{ selectionColor, setSelectionColor }} />
+            <SoundSettings />
+            {/* <LanguageSettings /> */}
           </Stack>
         </Container>
       </DialogContent>
     </Dialog>
+  );
+};
+
+// const LanguageSettings = () => {
+//   const dispatch = useDispatch();
+
+//   const language = useSelector(languageSelector);
+
+//   const onLanguageChange = (event: SelectChangeEvent) => {
+//     dispatch(
+//       imageViewerSlice.actions.setLanguage({
+//         language: event.target.value as LanguageType,
+//       })
+//     );
+//   };
+
+//   return (
+//     <Grid item xs={6}>
+//       <Grid container>
+//         <Grid item xs={12}>
+//           <Grid container item xs={4}>
+//             <FormControl color="primary" fullWidth>
+//               <FormHelperText>Language</FormHelperText>
+//               <Select
+//                 onChange={onLanguageChange}
+//                 value={language}
+//                 inputProps={{ "aria-label": "Without label" }}
+//               >
+//                 {_.map(LanguageType, (v, k) => {
+//                   return (
+//                     <MenuItem dense key={k} value={v}>
+//                       {v}
+//                     </MenuItem>
+//                   );
+//                 })}
+//               </Select>
+//             </FormControl>
+//           </Grid>
+//         </Grid>
+//       </Grid>
+//     </Grid>
+//   );
+// };
+
+const SoundSettings = () => {
+  const dispatch = useDispatch();
+
+  const soundEnabled = useSelector(soundEnabledSelector);
+
+  const toggleSoundEnabled = () => {
+    dispatch(
+      imageViewerSlice.actions.setSoundEnabled({
+        soundEnabled: !soundEnabled,
+      })
+    );
+  };
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <Typography variant="h6">Sound effects</Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <MaterialUISwitch
+          disable_icon={VolumeOff}
+          enable_icon={VolumeUp}
+          checked={!soundEnabled}
+          onChange={toggleSoundEnabled}
+          name="soundEnabled"
+        />
+      </Grid>
+    </Grid>
   );
 };
 
@@ -123,6 +200,8 @@ const ThemeModeToggle = () => {
       </Grid>
       <Grid item xs={4}>
         <MaterialUISwitch
+          disable_icon={Moon}
+          enable_icon={Sun}
           checked={themeMode === ThemeMode.Dark}
           onChange={() =>
             onToggle(
@@ -135,49 +214,57 @@ const ThemeModeToggle = () => {
   );
 };
 
+type MUISwitchProps = {
+  disable_icon: string;
+  enable_icon: string;
+};
+
 // source: https://mui.com/components/switches/
-const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-  width: 62,
-  height: 34,
-  padding: 7,
-  "& .MuiSwitch-switchBase": {
-    margin: 1,
-    padding: 0,
-    transform: "translateX(6px)",
-    "&.Mui-checked": {
-      color: "#fff",
-      transform: "translateX(22px)",
-      "& .MuiSwitch-thumb:before": {
-        backgroundImage: `url(${Moon})`,
-      },
-      "& + .MuiSwitch-track": {
-        opacity: 1,
-        backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+const MaterialUISwitch = styled(Switch)<MUISwitchProps>(
+  ({ theme, disable_icon, enable_icon }) => ({
+    width: 62,
+    height: 34,
+    padding: 7,
+    "& .MuiSwitch-switchBase": {
+      margin: 1,
+      padding: 0,
+      transform: "translateX(6px)",
+      "&.Mui-checked": {
+        color: "#fff",
+        transform: "translateX(22px)",
+        "& .MuiSwitch-thumb:before": {
+          backgroundImage: `url(${disable_icon})`,
+        },
+        "& + .MuiSwitch-track": {
+          opacity: 1,
+          backgroundColor:
+            theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+        },
       },
     },
-  },
-  "& .MuiSwitch-thumb": {
-    backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#001e3c",
-    width: 32,
-    height: 32,
-    "&:before": {
-      content: "''",
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      left: 0,
-      top: 0,
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "center",
-      backgroundImage: `url(${Sun})`,
+    "& .MuiSwitch-thumb": {
+      backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#001e3c",
+      width: 32,
+      height: 32,
+      "&:before": {
+        content: "''",
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        left: 0,
+        top: 0,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        backgroundImage: `url(${enable_icon})`,
+      },
     },
-  },
-  "& .MuiSwitch-track": {
-    opacity: 1,
-    backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
-    borderRadius: 20 / 2,
-  },
-}));
+    "& .MuiSwitch-track": {
+      opacity: 1,
+      backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+      borderRadius: 20 / 2,
+    },
+  })
+);
 
 const SelectionSize = ({
   selectionSize,

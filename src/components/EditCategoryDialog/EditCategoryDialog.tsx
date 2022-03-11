@@ -12,17 +12,18 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import { useHotkeys } from "react-hotkeys-hook";
 
 type EditCategoryDialogProps = {
   category: Category;
-  onCloseDialog: () => void;
-  openDialog: boolean;
+  onClose: () => void;
+  open: boolean;
 };
 
 export const EditCategoryDialog = ({
   category,
-  onCloseDialog,
-  openDialog,
+  onClose,
+  open,
 }: EditCategoryDialogProps) => {
   const dispatch = useDispatch();
 
@@ -50,8 +51,23 @@ export const EditCategoryDialog = ({
     onCloseDialog();
   };
 
+  const onCloseDialog = () => {
+    setName("");
+
+    onClose();
+  };
+
+  useHotkeys(
+    "enter",
+    () => {
+      onEdit();
+    },
+    { enabled: open },
+    [onEdit]
+  );
+
   return (
-    <Dialog fullWidth onClose={onCloseDialog} open={openDialog}>
+    <Dialog fullWidth onClose={onCloseDialog} open={open}>
       <DialogTitle>Edit category</DialogTitle>
 
       <DialogContent>

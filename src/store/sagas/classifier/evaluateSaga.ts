@@ -9,10 +9,12 @@ import { createdCategoriesSelector } from "../../selectors";
 import { fittedSelector } from "../../selectors/fittedSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { valImagesSelector } from "store/selectors/valImagesSelector";
-import { classifierSlice } from "../../slices";
+import { classifierSlice, applicationSlice } from "../../slices";
 import { evaluate } from "store/coroutines/classifier/evaluate";
 import * as tensorflow from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
+import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* evaluateSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(fittedSelector);
@@ -21,15 +23,33 @@ export function* evaluateSaga(action: any): any {
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
   );
+  yield put(
+    applicationSlice.actions.updateAlertState({ alertState: defaultAlert })
+  );
+
   const categories: Array<Category> = yield select(createdCategoriesSelector);
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
   if (validationImages.length === 0) {
-    alert("Validation set is empty!");
+    yield put(
+      applicationSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Info,
+          name: "Validation set is empty",
+          description: "Cannot evaluate model on empty validation set.",
+        },
+      })
+    );
   } else if (outputLayerSize !== categories.length) {
-    alert(
-      "The output shape of your model does not correspond to the number of categories!"
+    yield put(
+      applicationSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Warning,
+          name: "The output shape of your model does not correspond to the number of categories!",
+          description: `The trained model has an output shape of ${outputLayerSize} but there are ${categories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
+        },
+      })
     );
   } else {
     yield runEvaluation(
@@ -55,25 +75,55 @@ function* runEvaluation(
   model: tensorflow.LayersModel,
   categories: Array<Category>
 ) {
-  const validationData: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank>;
-    id: string;
-  }> = yield preprocess_predict(
-    validationImages,
-    rescaleOptions,
-    architectureOptions.inputShape
-  );
+  try {
+    var validationData: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor<tensorflow.Rank>;
+      id: string;
+    }> = yield preprocess_predict(
+      validationImages,
+      rescaleOptions,
+      architectureOptions.inputShape
+    );
+  } catch (error) {
+    yield handleError(
+      error as Error,
+      "Error in preprocessing the validation data"
+    );
+    return;
+  }
 
-  const evaluationResult: EvaluationResultType = yield evaluate(
-    model,
-    validationData,
-    validationImages,
-    categories
-  );
+  try {
+    var evaluationResult: EvaluationResultType = yield evaluate(
+      model,
+      validationData,
+      validationImages,
+      categories
+    );
+  } catch (error) {
+    yield handleError(error as Error, "Error computing the evaluation results");
+    return;
+  }
 
   yield put(
     classifierSlice.actions.updateEvaluationResult({
       evaluationResult,
+    })
+  );
+}
+
+function* handleError(error: Error, name: string): any {
+  const stackTrace = yield getStackTraceFromError(error);
+
+  const alertState: AlertStateType = {
+    alertType: AlertType.Error,
+    name: name,
+    description: `${error.name}:\n${error.message}`,
+    stackTrace: stackTrace,
+  };
+
+  yield put(
+    applicationSlice.actions.updateAlertState({
+      alertState: alertState,
     })
   );
 }

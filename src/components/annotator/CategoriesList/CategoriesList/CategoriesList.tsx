@@ -1,7 +1,7 @@
 import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
 import {
@@ -21,17 +21,7 @@ import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
 import { useDialog } from "../../../../hooks";
 import { useTranslation } from "../../../../hooks/useTranslation";
-import {
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Chip, Divider, Tooltip } from "@mui/material";
 import List from "@mui/material/List";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -39,12 +29,8 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import SaveIcon from "@mui/icons-material/Save";
 import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
-import SettingsIcon from "@mui/icons-material/Settings";
-import FeedbackIcon from "@mui/icons-material/Feedback";
-import { SettingsDialog } from "../../SettingsDialog";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
@@ -54,7 +40,7 @@ import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
-import HelpDrawer from "../../Help/HelpDrawer/HelpDrawer";
+import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import {
   imageViewerSlice,
@@ -69,6 +55,7 @@ import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
+import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -468,18 +455,11 @@ export const CategoriesList = () => {
       <Divider />
 
       <List dense>
-        <HelpDrawer />
-        <SettingsListItem />
         <SendFeedbackListItem />
+        <AnnotatorHelpDrawer />
       </List>
     </Drawer>
   );
-};
-
-type SendFeedbackDialogProps = {
-  onClose: () => void;
-  open: boolean;
-  onSend: (text: string) => void;
 };
 
 const CreateCategoryListItem = () => {
@@ -500,90 +480,6 @@ const CreateCategoryListItem = () => {
     </>
   );
 };
-
-/*
- * WARNING: This list item and its dialog box is not used anymore as it is been replaced with the HelpDrawer component.
- * */
-//
-// const HelpListItem = () => {
-//   const { onClose, onOpen, open } = useDialog();
-//
-//   const {
-//     onClose: onCloseOpenImagesHelpDialog,
-//     onOpen: onOpenOpenImagesHelpDialog,
-//     open: openOpenImagesHelpDialog,
-//   } = useDialog();
-//
-//   const {
-//     onClose: onCloseManipulatingCanvasHelpDialog,
-//     onOpen: onOpenManipulatingCanvasHelpDialog,
-//     open: openManipulatingCanvasHelpDialog,
-//   } = useDialog();
-//
-//   const {
-//     onClose: onCloseMakeAnnotationsHelpDialog,
-//     onOpen: onOpenMakeAnnotationsHelpDialog,
-//     open: openMakeAnnotationsHelpDialog,
-//   } = useDialog();
-//
-//   const {
-//     onClose: onCloseChangingAnnotationsHelpDialog,
-//     onOpen: onOpenChangingAnnotationsHelpDialog,
-//     open: openChangingAnnotationsHelpDialog,
-//   } = useDialog();
-//
-//   const {
-//     onClose: onCloseSavingProjectHelpDialog,
-//     onOpen: onOpenSavingProjectHelpDialog,
-//     open: openSavingProjectHelpDialog,
-//   } = useDialog();
-//
-//   return (
-//     <>
-//       <ListItem button onClick={onOpen}>
-//         <ListItemIcon>
-//           <HelpIcon />
-//         </ListItemIcon>
-//
-//         <ListItemText primary="Help" />
-//       </ListItem>
-//
-//       <HelpDrawer />
-//
-//       {/*<HelpDialog*/}
-//       {/*  onClose={onClose}*/}
-//       {/*  open={open}*/}
-//       {/*  onOpenOpenImagesHelpDialog={onOpenOpenImagesHelpDialog}*/}
-//       {/*  onOpenMakeAnnotationsHelpDialog={onOpenMakeAnnotationsHelpDialog}*/}
-//       {/*  onOpenManipulatingCanvasHelpDialog={onOpenManipulatingCanvasHelpDialog}*/}
-//       {/*  onOpenChangingAnnotationsHelpDialog={*/}
-//       {/*    onOpenChangingAnnotationsHelpDialog*/}
-//       {/*  }*/}
-//       {/*  onOpenSavingProjectHelpDialog={onOpenSavingProjectHelpDialog}*/}
-//       {/*/>*/}
-//       {/*<OpenImageHelpDialog*/}
-//       {/*  onClose={onCloseOpenImagesHelpDialog}*/}
-//       {/*  open={openOpenImagesHelpDialog}*/}
-//       {/*/>*/}
-//       {/*<MakeAnnotationsHelpDialog*/}
-//       {/*  onClose={onCloseMakeAnnotationsHelpDialog}*/}
-//       {/*  open={openMakeAnnotationsHelpDialog}*/}
-//       {/*/>*/}
-//       {/*<ManipulateCanvasHelpDialog*/}
-//       {/*  onClose={onCloseManipulatingCanvasHelpDialog}*/}
-//       {/*  open={openManipulatingCanvasHelpDialog}*/}
-//       {/*/>*/}
-//       {/*<ChangingAnnotationsHelpDialog*/}
-//       {/*  onClose={onCloseChangingAnnotationsHelpDialog}*/}
-//       {/*  open={openChangingAnnotationsHelpDialog}*/}
-//       {/*/>*/}
-//       {/*<SavingProjectHelpDialog*/}
-//       {/*  onClose={onCloseSavingProjectHelpDialog}*/}
-//       {/*  open={openSavingProjectHelpDialog}*/}
-//       {/*/>*/}
-//     </>
-//   );
-// };
 
 const OpenListItem = () => {
   return (
@@ -624,113 +520,6 @@ const SaveListItem = () => {
           </>
         )}
       </PopupState>
-    </>
-  );
-};
-
-const SendFeedbackDialog = ({
-  onClose,
-  open,
-  onSend,
-}: SendFeedbackDialogProps) => {
-  const t = useTranslation();
-
-  const [input, setInput] = useState("");
-
-  const send = () => {
-    onSend(input);
-    onClose();
-  };
-
-  return (
-    <Dialog onClose={onClose} open={open}>
-      <DialogTitle>{t("Send feedback")}</DialogTitle>
-
-      <DialogContent>
-        <DialogContentText
-          sx={{
-            "& a": { color: "deepskyblue" },
-          }}
-        >
-          {t(
-            "Use this form to report issues with Piximi via our GitHub page, or visit"
-          )}{" "}
-          <a
-            href="https://forum.image.sc/tag/piximi"
-            target="_blank"
-            rel="noreferrer"
-          >
-            forum.image.sc/tag/piximi
-          </a>
-          .
-        </DialogContentText>
-
-        <TextField
-          autoFocus
-          margin="dense"
-          id="feedback"
-          onChange={(e) => setInput(e.target.value)}
-          multiline
-          rows={12}
-          fullWidth
-          variant="filled"
-        />
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-
-        <Button onClick={send} color="primary">
-          Send feedback
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-
-const SendFeedbackListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  const onSend = (text: string) => {
-    const url =
-      "https://github.com/piximi/annotator/issues/new?title=Bug%20Report&labels=bug&body=" +
-      encodeURIComponent(text);
-    window.open(url);
-  };
-
-  const t = useTranslation();
-
-  return (
-    <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <FeedbackIcon />
-        </ListItemIcon>
-
-        <ListItemText primary={t("Send feedback")} />
-      </ListItem>
-      <SendFeedbackDialog onClose={onClose} open={open} onSend={onSend} />
-    </>
-  );
-};
-
-const SettingsListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
-
-  const t = useTranslation();
-
-  return (
-    <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-
-        <ListItemText primary={t("Settings")} />
-      </ListItem>
-      <SettingsDialog onClose={onClose} open={open} />
     </>
   );
 };
