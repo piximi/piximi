@@ -122,6 +122,9 @@ export const classifierSlice = createSlice({
 
       state.fitting = false;
     },
+    updateFitting(state, action: PayloadAction<{ fitting: boolean }>) {
+      state.fitting = false;
+    },
     addFitted(state, action: PayloadAction<{ fitted: LayersModel }>) {
       const { fitted } = action.payload;
 

@@ -27,11 +27,7 @@ export const EditCategoryMenuItem = ({
         <Typography variant="inherit">Edit category</Typography>
       </MenuItem>
 
-      <EditCategoryDialog
-        category={category}
-        onCloseDialog={onClose}
-        openDialog={open}
-      />
+      <EditCategoryDialog category={category} onClose={onClose} open={open} />
     </>
   );
 };

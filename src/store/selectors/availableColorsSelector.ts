@@ -7,8 +7,8 @@ export const availableColorsSelector = ({
 }: {
   project: Project;
 }): string[] => {
-  const usedColors = project.categories.map((catagory: Category) => {
-    return catagory.color;
+  const usedColors = project.categories.map((category: Category) => {
+    return category.color;
   });
   return COLORS.filter((color: string) => !usedColors.includes(color));
 };

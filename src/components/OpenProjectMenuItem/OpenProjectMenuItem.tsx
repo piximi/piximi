@@ -9,6 +9,8 @@ import {
 import { SerializedProjectType } from "types/SerializedProjectType";
 import { Classifier } from "types/Classifier";
 import { deserializeImages } from "image/imageHelper";
+import { AlertStateType, AlertType } from "types/AlertStateType";
+import { ImageType } from "types/ImageType";
 
 type OpenProjectMenuItemProps = {
   popupState: any;
@@ -36,10 +38,26 @@ export const OpenProjectMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
-        const projectJSON = JSON.parse(event.target.result as string);
-        const project: SerializedProjectType = projectJSON.project;
-        const classifier: Classifier = projectJSON.classifier;
-        const images = await deserializeImages(project.serializedImages);
+        var images: Array<ImageType>;
+        var project: SerializedProjectType;
+        var classifier: Classifier;
+        try {
+          const projectJSON = JSON.parse(event.target.result as string);
+          project = projectJSON.project;
+          classifier = projectJSON.classifier;
+          images = await deserializeImages(project.serializedImages);
+        } catch (err) {
+          const error: Error = err as Error;
+          const warning: AlertStateType = {
+            alertType: AlertType.Warning,
+            name: "Could not parse JSON file",
+            description: `Error while parsing the project file: ${error.name}\n${error.message}`,
+          };
+          dispatch(
+            applicationSlice.actions.updateAlertState({ alertState: warning })
+          );
+          return;
+        }
 
         try {
           dispatch(applicationSlice.actions.clearSelectedImages());
@@ -61,11 +79,13 @@ export const OpenProjectMenuItem = ({
           );
         } catch (err) {
           const error: Error = err as Error;
-          alert(
-            "Error while opening the project file: " +
-              error.name +
-              "\n" +
-              error.message
+          const warning: AlertStateType = {
+            alertType: AlertType.Warning,
+            name: "Could not open project file",
+            description: `Error while opening the project file: ${error.name}\n${error.message}`,
+          };
+          dispatch(
+            applicationSlice.actions.updateAlertState({ alertState: warning })
           );
         }
       }

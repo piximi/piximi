@@ -1,0 +1,62 @@
+{
+  "topics": [
+    {
+      "topic": "Opening images",
+      "subtopics": [
+        {
+          "subtitle": "Open image",
+          "descriptions": [
+            "In the left menu, select \"Open image\" to upload images from your local machine or from Dropbox. Select one or multiple image files to open.",
+            "Alternatively, drag and drop the desired image files directly onto the gallery."
+          ]
+        },
+        {
+          "subtitle": "Deleting images",
+          "descriptions": [
+            "Images can be deleted from the workspace at any time by selecting them and clicking \"delete\" on the top right. Selected images can also be deleted by using the \"delete\" hotkey."
+          ]
+        },
+        {
+          "subtitle": "Example projects",
+          "descriptions": [
+            "Take a look at a example project by clicking \"Open example project\" in the \"Open\" menu and selecting a project image of choice! This gives you an example of a collection of labeled images."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Creating categories",
+      "subtopics": [
+        {
+          "subtitle": "Creating a new category",
+          "descriptions": [
+            "Create a new category by clicking on the \"Create category\" button. Once a category is created, its name and color can be changed at any time by selecting its \"Edit category\" menu on the right of the category icon."
+          ]
+        },
+        {
+          "subtitle": "Labeling images",
+          "descriptions": [
+            "To label an image (i.e. assign a category to an image) simply select the image, click \"Categorize\" in the selection bar and choose the correct category. If the desired category does not exist, click \"Create category\" to make a new category."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Saving and opening projects",
+      "subtopics": [
+        {
+          "subtitle": "Saving a project",
+          "descriptions": [
+            "Save all images and assigned categories by clicking on \"Save project file\" in the Save menu on the left toolbar. This will download a .json file that encodes the image data."
+          ]
+        },
+        {
+          "subtitle": "Opening a saved project",
+          "descriptions": [
+            "To open a saved project click \"Open project\" in the Open menu on the left toolbar. Select a .json file that was downloaded when saving an earlier project."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -2,8 +2,9 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Grid,
   IconButton,
+  Stack,
+  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { EvaluateMetricInfoBox } from "./EvaluateMetricInfoBox";
@@ -42,7 +43,7 @@ export const EvaluateClassifierDialog = (
       open={openedDialog}
       fullWidth
       maxWidth="md"
-      sx={{ zIndex: 1203, height: "600px" }}
+      sx={{ zIndex: 1203, height: "700px" }}
     >
       <DialogTitle sx={{ m: 0, p: 2 }}>
         Model Evaluation
@@ -61,50 +62,47 @@ export const EvaluateClassifierDialog = (
       </DialogTitle>
 
       <DialogContent>
-        <ConfusionMatrix
-          classNames={classNames}
-          confusionMatrix={confusionMatrix}
-        />
+        <Stack spacing={1} direction="row">
+          <ConfusionMatrix
+            classNames={classNames}
+            confusionMatrix={confusionMatrix}
+          />
 
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <EvaluateMetricInfoBox
-              metric={"Accuracy"}
-              value={accuracy}
-              link="https://en.wikipedia.org/wiki/Accuracy_and_precision"
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <EvaluateMetricInfoBox
-              metric={"Cross entropy"}
-              value={crossEntropy}
-              link="https://en.wikipedia.org/wiki/Cross_entropy"
-            />
-          </Grid>
-        </Grid>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <EvaluateMetricInfoBox
-              metric={"Precision"}
-              value={precision}
-              link="https://en.wikipedia.org/wiki/Precision_and_recall"
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <EvaluateMetricInfoBox
-              metric={"Recall"}
-              value={recall}
-              link="https://en.wikipedia.org/wiki/Precision_and_recall"
-            />
-          </Grid>
-          <Grid item xs={3}>
+          <Stack spacing={1}>
+            <Typography align={"center"} variant="body1">
+              Evaluation metrics:
+            </Typography>
+            <Stack spacing={1} direction="row">
+              <EvaluateMetricInfoBox
+                metric={"Accuracy"}
+                value={accuracy}
+                link="https://en.wikipedia.org/wiki/Accuracy_and_precision"
+              />
+              <EvaluateMetricInfoBox
+                metric={"Cross entropy"}
+                value={crossEntropy}
+                link="https://en.wikipedia.org/wiki/Cross_entropy"
+              />
+            </Stack>
+            <Stack spacing={1} direction="row">
+              <EvaluateMetricInfoBox
+                metric={"Precision"}
+                value={precision}
+                link="https://en.wikipedia.org/wiki/Precision_and_recall"
+              />
+              <EvaluateMetricInfoBox
+                metric={"Recall"}
+                value={recall}
+                link="https://en.wikipedia.org/wiki/Precision_and_recall"
+              />
+            </Stack>
             <EvaluateMetricInfoBox
               metric={"F1-score"}
               value={f1Score}
               link="https://en.wikipedia.org/wiki/F-score"
             />
-          </Grid>
-        </Grid>
+          </Stack>
+        </Stack>
       </DialogContent>
     </Dialog>
   );

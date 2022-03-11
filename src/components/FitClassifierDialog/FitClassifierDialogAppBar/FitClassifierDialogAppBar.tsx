@@ -35,7 +35,7 @@ export const FitClassifierDialogAppBar = ({
   return (
     <AppBar
       sx={{
-        position: "relative",
+        position: "sticky",
         backgroundColor: "transparent",
         boxShadow: "none",
         borderBottom: "1px solid rgba(0, 0, 0, 0.12)",

@@ -1,0 +1,260 @@
+{
+  "topics": [
+    {
+      "topic": "Opening images",
+      "subtopics": [
+        {
+          "subtitle": "Opening images",
+          "descriptions": [
+            "In the left menu, select \"Open new image\" to select one or multiple image files to open.",
+            "Alternatively, drag and drop the desired image files directly onto the canvas."
+          ]
+        },
+        {
+          "subtitle": "Deleting images",
+          "descriptions": [
+            "Images can be deleted from the workspace at any time by selecting \"Delete image\" on the menu options next to the image thumbnail."
+          ]
+        },
+        {
+          "subtitle": "Example pre-annotated images",
+          "descriptions": [
+            "Take a look at our pre-annotated images by clicking \"Open example image\" and selecting the image of choice!"
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Manipulating the canvas",
+      "subtopics": [
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Hand tool",
+            "letter": "H"
+          },
+          "descriptions": [
+            "Hold and drag to pan the image in the canvas. Click on \"Reset position\" to center the image back onto the canvas."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Zoom tool",
+            "letter": "Z"
+          },
+          "descriptions": [
+            "Use the zoom slider or your mouse wheel to zoom in or out of the image. Alternatively, click on the image to zoom in or out (select the desired zooming mode first)",
+            "To zoom in a particular region of the image, use your mouse to select the rectangular region in which you would like to zoom in. Release the mouse to zoom in the selected region."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Color adjustment",
+            "letter": "I"
+          },
+          "descriptions": [
+            "Filter each color channel by setting new minimum and maximum for each color channel. Untoggle a channel box to disable the channel. Click on \"Reset\" to reset the intensities to their original values."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Creating categories",
+      "subtopics": [
+        {
+          "subtitle": "Creating a new category",
+          "descriptions": [
+            "Create a new category by clicking on the \"Create category\" button. Once a category is created, its name and color can be changed at any time by selecting its \"Edit category\" menu on the right of the category icon."
+          ]
+        },
+        {
+          "subtitle": "Changing the category of an annotation",
+          "descriptions": [
+            "To change the category of an annotation, first select the annotation(s) to be changed and click on the desired new category button in the left toolbar. If the desired category does not exist, click \"Create category\" to make a new category.",
+            "Make sure to press the \"Enter\" key to save the selected annotations with the new category assigned."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Making new annotations",
+      "subtopics": [
+        {
+          "subtitle_": "Creating a new category",
+          "descriptions": [
+            "All annotation tools are accessed from the toolbar to the right of the canvas or by using their keyboard key shortcut.",
+            "Once you an annotation is completed, press \"Enter\" on your keyboard or click on \"confirm\".",
+            "To undo an unconfirmed annotation, press \"Escape\" on your keyboard or click on \"cancel\"."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Rectangular annotation",
+            "letter": "R"
+          },
+          "descriptions": [
+            "Click and drag to start drawing a rectangular annotation (bounding box). Release to close the annotation."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Elliptical annotation",
+            "letter": "E"
+          },
+          "descriptions": [
+            "Click and drag to start drawing an elliptical annotation. Release to close the annotation."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Pen annotation",
+            "letter": "D"
+          },
+          "descriptions": [
+            "Select desired brush size using the brush size slider. Draw over pixels by clicking and dragging over the desired area. Release to close the annotation."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Lasso annotation",
+            "letter": "L"
+          },
+          "descriptions": [
+            "Click and drag cursor around the desired region. Release to automatically close the lasso annotation."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Polygonal annotation",
+            "letter": "P"
+          },
+          "descriptions": [
+            "Click and release to create new anchor points. Close the polygonal annotation either by clicking on its origin point or by hitting enter on your keyboard."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Magnetic annotation",
+            "letter": "M"
+          },
+          "descriptions": [
+            "Click and release to create new anchor points. The tool will automatically snap onto the edges of an object. Close the magnetic annotation by clicking on its origin point."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Color annotation",
+            "letter": "C"
+          },
+          "descriptions": [
+            "Click on a pixel with the color of interest, hold and drag outwards to select a region of similar color intensities near the point. Release to finish the annotation."
+          ]
+        },
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Quick annotation",
+            "letter": "Q"
+          },
+          "descriptions": [
+            "Click and drag to select a region of superpixels. Release to finish the annotation."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Changing existing annotations",
+      "subtopics": [
+        {
+          "subtitle": "",
+          "tootleTitle": {
+            "toolName": "Select tool",
+            "letter": "S"
+          },
+          "descriptions": [
+            "Use the Select tool to select annotations. Click on a desired annotation to select it, and hold shift while clicking other annotations to select multiple annotations. Alternatively, draw a rectangular box around multiple annotations to select multiple annotations at once.",
+            "Click on \"Select all\" in the Selection tool menu to select all existing annotations. To select/unselect annotations of a specific category, toggle/untoggle the corresponding category in the Selection tool menu.",
+            "In the case of overlapping annotations, repeatedly click on the intersecting region of the overlapping annotations until the desired annotation is selected.",
+            "Press the \"Escape\" key to undo changes or to unselect annotations.",
+            "Press the \"Enter\" key to confirm changes to a selected annotation."
+          ]
+        },
+        {
+          "subtitle": "Resizing an annotation",
+          "descriptions": [
+            "Create a new category by clicking on the \"Create category\" button. Once a category is created, its name and color can be changed at any time by selecting its \"Edit category\" menu on the right of the category icon."
+          ]
+        },
+        {
+          "subtitle": "Adding area to an annotation",
+          "descriptions": [
+            "Select the annotation tool to use to add an area and select the \"add area\" selection mode. Draw on the selected annotation with the annotation tool to combine areas together."
+          ]
+        },
+        {
+          "subtitle": "Subtracting an area from an annotation",
+          "descriptions": [
+            "Select the annotation tool to use to subtract an area and select the \"subtract area\" selection mode. Draw on the selected annotation with the annotation tool to subtract an area from the selected annotation."
+          ]
+        },
+        {
+          "subtitle": "Intersection of two annotations",
+          "descriptions": [
+            "Select the annotation tool to use to use for the intersection operation and select the \"intersect\" selection mode. Draw on the selected annotation with the annotation tool and release to obtain the intersection of the two annotations."
+          ]
+        },
+        {
+          "subtitle": "Deleting selected annotations",
+          "descriptions": [
+            "First, use the Select tool to select annotations. To delete one or more selected annotations, press the Delete key or click on \"Clear selected annotations\" in the left toolbar."
+          ]
+        },
+        {
+          "subtitle": "Deleting all annotations for a single image",
+          "descriptions": [
+            "To clear annotations of a particular image, click on the menu to the right of the image thumbnail and select \"Clear annotations\"."
+          ]
+        },
+        {
+          "subtitle": "Deleting all annotations",
+          "descriptions": [
+            "Delete all annotations by clicking \"Clear all annotations\" in the left toolbar. WARNING: This will delete all annotations across all images loaded, not just the active image."
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Saving project and exporting annotations",
+      "subtopics": [
+        {
+          "subtitle": "Saving a project",
+          "descriptions": [
+            "Save all images and their annotations by clicking on \"Save project file\" in the Save menu on the left toolbar. This will download a .json file that encodes the image data and their annotations."
+          ]
+        },
+        {
+          "subtitle": "Opening a saved project",
+          "descriptions": [
+            "To open a saved project and make new annotations or change annotations, Click \"Open project file\" in the Open menu on the left toolbar. Select the .json file that was downloaded when saving an earlier project."
+          ]
+        },
+        {
+          "subtitle": "Exporting annotations",
+          "descriptions": [
+            "To export all annotations simultaneously across all images, use the Save menu on the left toolbar. Otherwise, to export annotations of a single image, click on the corresponding image's submenu to export its annotations.",
+            "Annotations can be exported as color-labeled instance segmentation masks (a single image contains all instances labeled by different colors), binary instance segmentation masks (a single image contains a single instance), color-labeled semantic segmentation masks (a single image contains all categories labeled by different colors), binary semantic segmentation masks (a single image contains a single category with its corresponding instances), or label matrices (a single image contains all instances labeled by an integer)."
+          ]
+        }
+      ]
+    }
+  ]
+}

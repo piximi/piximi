@@ -35,7 +35,7 @@ export const CreateCategoryDialog = ({
     (category: Category) => category.name
   );
 
-  const [color, setColor] = React.useState<string>(sample(availableColors)!);
+  const [color, setColor] = useState<string>(sample(availableColors)!);
   const [name, setName] = useState<string>("");
   const [errorHelperText, setErrorHelperText] = useState<string>("");
   const [invalidName, setInvalidName] = useState<boolean>(false);
@@ -95,7 +95,7 @@ export const CreateCategoryDialog = ({
   );
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
+    <Dialog fullWidth maxWidth="xs" onClose={onCloseDialog} open={open}>
       <DialogTitle>Create category</DialogTitle>
 
       <DialogContent sx={{ paddingLeft: "0 !important" }}>

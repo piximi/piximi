@@ -1,6 +1,5 @@
-import { Container } from "@mui/material";
 import { Typography } from "@mui/material";
-import { ResponsiveHeatMap } from "@nivo/heatmap";
+import { HeatMap } from "@nivo/heatmap";
 import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 
 const getHeatMapData = (confusionMatrix: number[][], classNames: string[]) => {
@@ -30,7 +29,7 @@ type ConfusionMatrixPlotProps = {
 export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
   const { confusionMatrix, classNames } = props;
 
-  const SIZE = 500;
+  const SIZE = 400;
 
   const data = getHeatMapData(confusionMatrix, classNames);
   const maxVal = Math.max(...confusionMatrix.flat());
@@ -38,14 +37,16 @@ export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
   const nivoTheme = usePreferredNivoTheme();
 
   return (
-    <Container sx={{ height: SIZE }}>
+    <div>
       <Typography align={"center"} variant="body1">
-        Confusion matrix
+        Confusion matrix:
       </Typography>
-      <ResponsiveHeatMap
+      <HeatMap
+        width={SIZE}
+        height={SIZE}
         data={data}
         theme={nivoTheme}
-        margin={{ top: 5, right: 40, bottom: 150, left: 40 }}
+        margin={{ top: 5, right: 50, bottom: 50, left: 50 }}
         forceSquare={true}
         axisTop={null}
         axisBottom={{
@@ -74,6 +75,6 @@ export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
         emptyColor="#555555"
         tooltip={(x, y) => <div></div>}
       />
-    </Container>
+    </div>
   );
 };
