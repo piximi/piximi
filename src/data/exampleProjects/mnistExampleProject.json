@@ -17,7 +17,7 @@
       "shuffle": true
     },
     "fitting": false,
-    "learningRate": 0.001,
+    "learningRate": 0.01,
     "lossFunction": "Categorical cross entropy",
     "metrics": ["Categorical accuracy"],
     "optimizationAlgorithm": "Adam",
