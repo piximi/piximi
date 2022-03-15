@@ -90,21 +90,31 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     const epochCount = epoch + 1;
     const trainingEpochIndicator = epochCount - 0.5;
     setCurrentEpoch(epochCount);
-    setTrainingAccuracy((prevState) =>
-      prevState.concat({
-        x: trainingEpochIndicator,
-        y: logs.categoricalAccuracy,
-      })
-    );
-    setValidationAccuracy((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
-    );
-    setTrainingLoss((prevState) =>
-      prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
-    );
-    setValidationLoss((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.val_loss })
-    );
+
+    if (logs.categoricalAccuracy) {
+      setTrainingAccuracy((prevState) =>
+        prevState.concat({
+          x: trainingEpochIndicator,
+          y: logs.categoricalAccuracy,
+        })
+      );
+    }
+    if (logs.val_categoricalAccuracy) {
+      setValidationAccuracy((prevState) =>
+        prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
+      );
+    }
+    if (logs.loss) {
+      setTrainingLoss((prevState) =>
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
+      );
+    }
+
+    if (logs.val_loss) {
+      setValidationLoss((prevState) =>
+        prevState.concat({ x: epochCount, y: logs.val_loss })
+      );
+    }
 
     setShowPlots(true);
   };
