@@ -30,7 +30,11 @@ export const decodeImage = async (
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+  // let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+  let xs: tensorflow.Tensor3D = await tensorflow.browser.fromPixelsAsync(
+    canvas,
+    channels
+  );
 
   if (rescale) {
     xs = xs.div(255); //Because xs is string, values are encoded by uint8array by default
@@ -109,8 +113,7 @@ export const preprocess = async (
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
-    .mapAsync(resize.bind(null, inputShape))
-    .shuffle(32);
+    .mapAsync(resize.bind(null, inputShape));
 
   const valData = tensorflow.data
     .generator(generator(valImages, categories))
@@ -118,8 +121,7 @@ export const preprocess = async (
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
-    .mapAsync(resize.bind(null, inputShape))
-    .shuffle(32);
+    .mapAsync(resize.bind(null, inputShape));
 
   return { val: valData, train: trainData };
 };
