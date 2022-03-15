@@ -88,15 +88,19 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
+    const trainingEpochIndicator = epochCount - 0.5;
     setCurrentEpoch(epochCount);
     setTrainingAccuracy((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.categoricalAccuracy })
+      prevState.concat({
+        x: trainingEpochIndicator,
+        y: logs.categoricalAccuracy,
+      })
     );
     setValidationAccuracy((prevState) =>
       prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
     );
     setTrainingLoss((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.loss })
+      prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
     );
     setValidationLoss((prevState) =>
       prevState.concat({ x: epochCount, y: logs.val_loss })
@@ -195,12 +199,14 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           <div>
             <TrainingHistoryPlot
               metric={"accuracy"}
+              currentEpoch={currentEpoch}
               trainingValues={trainingAccuracy}
               validationValues={validationAccuracy}
             />
 
             <TrainingHistoryPlot
               metric={"loss"}
+              currentEpoch={currentEpoch}
               trainingValues={trainingLoss}
               validationValues={validationLoss}
               dynamicYRange={true}
