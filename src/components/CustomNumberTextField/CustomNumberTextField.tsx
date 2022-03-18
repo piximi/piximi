@@ -1,8 +1,8 @@
 import { TextField } from "@mui/material";
 import * as React from "react";
 
-const intRegExpr = new RegExp("^[0-9]+$");
-const floatRegExpr = new RegExp("^[0-9]+(.[0-9]*)?$");
+const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
+const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
 
 type CustomNumberTextFieldProps = {
   id: string;
@@ -40,23 +40,43 @@ export const CustomNumberTextField = ({
     value.toString()
   );
 
+  const [inputError, setInputError] = React.useState<boolean>(false);
+
   const regExp = enableFloat ? floatRegExpr : intRegExpr;
+
+  var rangeHelperText = ".";
+  if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
+    rangeHelperText = ` between ${min} and ${max}.`;
+  } else if (min !== Number.MIN_SAFE_INTEGER) {
+    rangeHelperText = ` above ${min}.`;
+  } else if (max !== Number.MAX_SAFE_INTEGER) {
+    rangeHelperText = ` below ${max}.`;
+  }
+
+  const errorHelpText = `${label} must be a ${
+    enableFloat ? "floating point" : "integer"
+  } value${rangeHelperText}`;
 
   const onInputChange = (event: React.FormEvent<EventTarget>) => {
     const target = event.target as HTMLInputElement;
     const inputString = target.value;
 
-    if (!regExp.test(target.value)) {
+    setValueString(inputString);
+
+    if (!regExp.test(target.value) || target.value === "") {
+      setInputError(true);
       return;
     }
 
     const arg = Number(inputString);
 
     if (isNaN(arg) || arg < min || arg > max) {
+      setInputError(true);
       return;
     }
 
-    setValueString(inputString);
+    setInputError(false);
+
     dispatchCallBack(arg);
   };
 
@@ -70,6 +90,8 @@ export const CustomNumberTextField = ({
         marginTop: theme.spacing(2.75),
         width: "100%",
       })}
+      error={inputError}
+      helperText={inputError ? errorHelpText : ""}
       value={valueString}
       onChange={onInputChange}
       type="text"
