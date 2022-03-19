@@ -38,9 +38,6 @@ export const EvaluateClassifierListItem = (
   const alertState = useSelector(alertStateSelector);
 
   const onEvaluate = async () => {
-    if (isEvaluating) {
-      return;
-    }
     dispatch(classifierSlice.actions.evaluate({}));
   };
 

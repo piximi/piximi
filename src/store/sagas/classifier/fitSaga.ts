@@ -1,12 +1,14 @@
 import { put, select } from "redux-saga/effects";
 import { compile, fit, open, preprocess } from "../../coroutines/classifier";
-import { applicationSlice, classifierSlice } from "../../slices";
+import { applicationSlice, classifierSlice, projectSlice } from "../../slices";
 import {
+  categorizedImagesSelector,
   compiledSelector,
   compileOptionsSelector,
   createdCategoriesCountSelector,
   createdCategoriesSelector,
   fitOptionsSelector,
+  trainingPercentageSelector,
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
@@ -22,9 +24,44 @@ import { FitOptions } from "../../../types/FitOptions";
 import { ModelType } from "../../../types/ClassifierModelType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
+import _ from "lodash";
+import { Partition } from "types/Partition";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
+
+  const trainingPercentage = yield select(trainingPercentageSelector);
+  const categorizedImages = yield select(categorizedImagesSelector);
+
+  //first assign train and val partition to all categorized images
+  const categorizedImagesIds = _.shuffle(categorizedImages).map(
+    (image: ImageType) => {
+      return image.id;
+    }
+  );
+
+  //separate ids into train and val datasets
+  const trainDataLength = Math.round(
+    trainingPercentage * categorizedImagesIds.length
+  );
+  const valDataLength = categorizedImagesIds.length - trainDataLength;
+
+  const trainDataIds = _.take(categorizedImagesIds, trainDataLength);
+  const valDataIds = _.takeRight(categorizedImagesIds, valDataLength);
+
+  yield put(
+    projectSlice.actions.updateImagesPartition({
+      ids: trainDataIds,
+      partition: Partition.Training,
+    })
+  );
+
+  yield put(
+    projectSlice.actions.updateImagesPartition({
+      ids: valDataIds,
+      partition: Partition.Validation,
+    })
+  );
 
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
