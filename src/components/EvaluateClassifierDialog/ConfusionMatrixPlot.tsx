@@ -29,7 +29,7 @@ type ConfusionMatrixPlotProps = {
 export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
   const { confusionMatrix, classNames } = props;
 
-  const SIZE = 400;
+  const SIZE = classNames.length > 4 ? 500 : 400;
 
   const data = getHeatMapData(confusionMatrix, classNames);
   const maxVal = Math.max(...confusionMatrix.flat());
@@ -46,7 +46,7 @@ export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
         height={SIZE}
         data={data}
         theme={nivoTheme}
-        margin={{ top: 5, right: 50, bottom: 50, left: 50 }}
+        margin={{ top: 5, right: 30, bottom: 100, left: 150 }}
         forceSquare={true}
         axisTop={null}
         axisBottom={{
