@@ -40,6 +40,8 @@ export const CustomNumberTextField = ({
     value.toString()
   );
 
+  const [inputValue, setInputValue] = React.useState<number>(value);
+
   const [inputError, setInputError] = React.useState<boolean>(false);
 
   const regExp = enableFloat ? floatRegExpr : intRegExpr;
@@ -76,13 +78,17 @@ export const CustomNumberTextField = ({
     }
 
     setInputError(false);
+    setInputValue(arg);
+  };
 
-    dispatchCallBack(arg);
+  const dispatchValue = () => {
+    dispatchCallBack(inputValue);
   };
 
   return (
     <TextField
       id={id}
+      onBlur={dispatchValue}
       label={label}
       sx={(theme) => ({
         marginRight: theme.spacing(1),
