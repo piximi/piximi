@@ -13,7 +13,7 @@ import { classifierSlice, applicationSlice } from "../../slices";
 import { evaluate } from "store/coroutines/classifier/evaluate";
 import * as tensorflow from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* evaluateSaga(action: any): any {
@@ -23,9 +23,7 @@ export function* evaluateSaga(action: any): any {
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
   );
-  yield put(
-    applicationSlice.actions.updateAlertState({ alertState: defaultAlert })
-  );
+  yield put(applicationSlice.actions.hideAlertState({}));
 
   const categories: Array<Category> = yield select(createdCategoriesSelector);
 
