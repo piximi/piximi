@@ -61,13 +61,16 @@ export function* fitSaga(action: any): any {
   const valImages: ImageType[] = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
+  const options: FitOptions = yield select(fitOptionsSelector);
+
   try {
     var data = yield preprocess(
       trainImages,
       valImages,
       categories,
       architectureOptions.inputShape,
-      rescaleOptions
+      rescaleOptions,
+      options.batchSize
     );
   } catch (error) {
     yield handleError(error as Error, "Error in preprocessing");
@@ -75,8 +78,6 @@ export function* fitSaga(action: any): any {
   }
 
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
-
-  const options: FitOptions = yield select(fitOptionsSelector);
 
   try {
     var { fitted, status } = yield fit(
@@ -86,7 +87,7 @@ export function* fitSaga(action: any): any {
       onEpochEnd
     );
   } catch (error) {
-    yield handleError(error as Error, "Error in in training the model");
+    yield handleError(error as Error, "Error in training the model");
     return;
   }
 

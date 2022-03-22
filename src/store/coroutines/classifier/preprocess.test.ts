@@ -59,7 +59,8 @@ it("preprocess", async () => {
     images,
     categories,
     inputShape,
-    rescaleOptions
+    rescaleOptions,
+    1
   );
 
   const items = await preprocessed.train.toArrayForTest();

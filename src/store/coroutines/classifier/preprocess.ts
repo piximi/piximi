@@ -1,4 +1,5 @@
 import * as tensorflow from "@tensorflow/tfjs";
+import { DataType } from "@tensorflow/tfjs-core";
 import * as ImageJS from "image-js";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
@@ -9,8 +10,19 @@ export const decodeCategory = (categories: number) => {
   return (item: {
     xs: string;
     ys: number;
-  }): { xs: string; ys: tensorflow.Tensor } => {
-    return { ...item, ys: tensorflow.oneHot(item.ys, categories) };
+    cropIndex?: number;
+  }): {
+    xs: string;
+    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    cropIndex?: number;
+  } => {
+    return {
+      ...item,
+      ys: tensorflow.oneHot(
+        item.ys,
+        categories
+      ) as tensorflow.Tensor<tensorflow.Rank.R1>,
+    };
   };
 };
 
@@ -18,10 +30,15 @@ export const decodeImage = async (
   channels: number,
   rescale: boolean,
   item: {
-    xs: string; //dataURL
-    ys: tensorflow.Tensor;
+    xs: string; // dataURL
+    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    cropIndex?: number;
   }
-): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  cropIndex?: number;
+}> => {
   const fetched = await tensorflow.util.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
@@ -30,14 +47,10 @@ export const decodeImage = async (
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  // let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
-  let xs: tensorflow.Tensor3D = await tensorflow.browser.fromPixelsAsync(
-    canvas,
-    channels
-  );
+  let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
 
   if (rescale) {
-    xs = xs.div(255); //Because xs is string, values are encoded by uint8array by default
+    xs = xs.div(tensorflow.scalar(255)); //Because xs is string, values are encoded by uint8array by default
   }
 
   return new Promise((resolve) => {
@@ -48,21 +61,150 @@ export const decodeImage = async (
 export const resize = async (
   inputShape: Shape,
   item: {
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
+    xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    cropIndex?: number;
   }
-): Promise<{ xs: tensorflow.Tensor; ys: tensorflow.Tensor }> => {
-  const resized = tensorflow.image.resizeBilinear(
-    item.xs as tensorflow.Tensor3D,
-    [inputShape.height, inputShape.width]
-  );
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  cropIndex?: number;
+}> => {
+  const resized = tensorflow.image.resizeBilinear(item.xs, [
+    inputShape.height,
+    inputShape.width,
+  ]);
 
   return new Promise((resolve) => {
     return resolve({ ...item, xs: resized });
   });
 };
 
-export const generator = (
+export const cropResize = async (item: {
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  cropIndex?: number;
+}): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+}> => {
+  /** Testing **/
+  // let samples = await items.xs.array();
+  // samples = samples.slice(0, 1);
+  // const sample = samples[0];
+  // let canvas = document.createElement("canvas");
+  // await tensorflow.browser.toPixels(sample, canvas);
+  // console.log(canvas.toDataURL());
+  /** End Testing */
+  // const boxes = tensorflow.tensor2d(
+  // [
+  // [y1, x1, y2, x2] each standardized, i.e in range [0, 1]
+  // [0.0, 0.0, 0.5, 1.0],
+  // [0.5, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 0.5, 1.0],
+  // [0.5, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 0.5, 1.0],
+  // [0.5, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 0.9, 0.9],
+  // [0.1, 0.1, 1.0, 1.0],
+  // [0.0, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 1.0, 1.0],
+  // [0.0, 0.0, 1.0, 1.0],
+  // ],
+  // undefined, // infer shape from values
+  // [numCrops, 4],
+  // "float32" as DataType
+  // );
+  let cropIndex = item.cropIndex || 0;
+  const cropCoords = [
+    [0.0, 0.0, 1.0, 1.0],
+    [0.0, 0.0, 0.9, 0.9],
+    [0.1, 0.1, 1.0, 1.0],
+  ];
+  const box = tensorflow.tensor2d(
+    [cropCoords[cropIndex]],
+    [1, 4],
+    "float32" as DataType
+  );
+  // const boxInd = tensorflow.tensor1d([0, 0, 0, 0, 0, 0], "int32" as DataType);
+  // const boxInd = tensorflow.tensor1d([0, 0, 0], "int32" as DataType);
+  const boxInd = tensorflow.tensor1d([0], "int32" as DataType);
+  // const cropSize: [number, number] = [28, 28];
+  const cropSize: [number, number] = [item.xs.shape[0], item.xs.shape[1]];
+  const batchedXs = item.xs.expandDims(
+    0
+  ) as tensorflow.Tensor<tensorflow.Rank.R4>;
+  const crop = tensorflow.image
+    .cropAndResize(
+      batchedXs, // needs batchSize in first dim
+      box,
+      boxInd,
+      cropSize,
+      "bilinear"
+    )
+    .reshape([
+      item.xs.shape[0],
+      item.xs.shape[1],
+      item.xs.shape[2],
+    ]) as tensorflow.Tensor<tensorflow.Rank.R3>;
+
+  // let cropArr = await crop.array();
+
+  // const x = tensorflow.tensor2d([1, 2, 3, 4], [1, 4]);
+
+  // let canvas = document.createElement("canvas");
+  // for (const c of cropsArr) {
+  //   await tensorflow.browser.toPixels(c, canvas);
+  //   console.log(canvas.toDataURL());
+  // }
+
+  return new Promise((resolve) => {
+    return resolve({
+      xs: crop,
+      ys: item.ys,
+      // .expandDims(0) // convert to rank 2
+      // .tile([numCrops, 1]), // repeat numCrops times
+    });
+  });
+};
+
+export const trainingGenerator = (
+  images: Array<ImageType>,
+  categories: Array<Category>,
+  numCrops: number
+) => {
+  const count = images.length;
+
+  return function* () {
+    let index = 0;
+    let cropIndex = 0;
+
+    while (index < count) {
+      const image = images[index];
+
+      // eslint-disable-next-line array-callback-return
+      const ys = categories.findIndex((category: Category) => {
+        if (category.id !== UNKNOWN_CATEGORY_ID) {
+          return category.id === image.categoryId;
+        }
+      });
+
+      yield {
+        xs: image.src,
+        ys: ys,
+        cropIndex: cropIndex % numCrops,
+      };
+
+      cropIndex++;
+      if (cropIndex % numCrops === 0) {
+        index++;
+      }
+    }
+  };
+};
+
+export const validationGenerator = (
   images: Array<ImageType>,
   categories: Array<Category>
 ) => {
@@ -91,12 +233,41 @@ export const generator = (
   };
 };
 
+/* Debug Stuff */
+// let limit = 0;
+// const doShow = async (
+//   items: any
+// ): Promise<{
+//   xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+//   ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+// }> => {
+//   const xsData = await items.xs.array();
+//   const ysData = await items.ys.array();
+
+//   let canvas = document.createElement("canvas");
+//   for (const [i, c] of xsData.entries()) {
+//     await tensorflow.browser.toPixels(c, canvas);
+//     if (limit < 10) {
+//       limit++;
+//       console.log(
+//         "class: ",
+//         ysData[i].findIndex((e: any) => e === 1),
+//         canvas.toDataURL()
+//       );
+//     }
+//   }
+
+//   return new Promise((resolve) => resolve(items));
+// };
+/* /Debug Stuff */
+
 export const preprocess = async (
   trainImages: Array<ImageType>,
   valImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
-  rescaleOptions: RescaleOptions
+  rescaleOptions: RescaleOptions,
+  batchSize: number
 ): Promise<{
   val: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
@@ -107,21 +278,28 @@ export const preprocess = async (
     ys: tensorflow.Tensor;
   }>;
 }> => {
-  const trainData = tensorflow.data
-    .generator(generator(trainImages, categories))
+  const numCrops = 3;
+
+  let trainData = tensorflow.data
+    .generator(trainingGenerator(trainImages, categories, numCrops))
     .map(decodeCategory(categories.length))
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
-    .mapAsync(resize.bind(null, inputShape));
+    .mapAsync(resize.bind(null, inputShape))
+    .mapAsync(cropResize.bind(null))
+    .shuffle(batchSize)
+    .batch(batchSize);
+  // .mapAsync((items: any) => doShow(items));  // For debug stuff
 
   const valData = tensorflow.data
-    .generator(generator(valImages, categories))
+    .generator(validationGenerator(valImages, categories))
     .map(decodeCategory(categories.length))
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
     .mapAsync(resize.bind(null, inputShape));
 
+  //@ts-ignore
   return { val: valData, train: trainData };
 };
