@@ -8,11 +8,11 @@ import { RescaleOptions } from "../../../types/RescaleOptions";
 
 export const decodeCategory = (categories: number) => {
   return (item: {
-    xs: string;
+    xs: Array<string>;
     ys: number;
     cropIndex?: number;
   }): {
-    xs: string;
+    xs: Array<string>;
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     cropIndex?: number;
   } => {
@@ -27,10 +27,9 @@ export const decodeCategory = (categories: number) => {
 };
 
 export const decodeImage = async (
-  channels: number,
   rescale: boolean,
   item: {
-    xs: string; // dataURL
+    xs: Array<string>; // [channels, dataURL] from activePlane
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     cropIndex?: number;
   }
@@ -39,22 +38,39 @@ export const decodeImage = async (
   ys: tensorflow.Tensor<tensorflow.Rank.R1>;
   cropIndex?: number;
 }> => {
-  const fetched = await tensorflow.util.fetch(item.xs);
+  const channelPromises: Array<Promise<tensorflow.Tensor2D>> = [];
 
-  const buffer: ArrayBuffer = await fetched.arrayBuffer();
+  for (const channelData of item.xs) {
+    const channelPromise = tensorflow.util
+      .fetch(channelData)
+      .then((fetched) => fetched.arrayBuffer())
+      .then((buffer) => ImageJS.Image.load(buffer))
+      .then((im) => {
+        const canvas = im.getCanvas();
+        let xs: tensorflow.Tensor3D | tensorflow.Tensor2D =
+          tensorflow.browser.fromPixels(canvas, 1);
+        xs = xs.reshape([xs.shape[0], xs.shape[1]]);
 
-  let data: ImageJS.Image = await ImageJS.Image.load(buffer);
+        if (rescale) {
+          xs = xs.div(tensorflow.scalar(255));
+        }
 
-  const canvas: HTMLCanvasElement = data.getCanvas();
+        return xs as tensorflow.Tensor2D;
+      })
+      .catch((err) => {
+        console.error(err);
+        return tensorflow.tensor2d([[]]);
+      });
 
-  let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
-
-  if (rescale) {
-    xs = xs.div(tensorflow.scalar(255)); //Because xs is string, values are encoded by uint8array by default
+    channelPromises.push(channelPromise);
   }
 
-  return new Promise((resolve) => {
-    return resolve({ ...item, xs: xs });
+  return Promise.all(channelPromises).then((channels) => {
+    const xs: tensorflow.Tensor<tensorflow.Rank.R3> = tensorflow.stack(
+      channels,
+      2 // axis to stack on, producing tensor of dims: [height, width, channels]
+    ) as tensorflow.Tensor<tensorflow.Rank.R3>;
+    return { ...item, xs: xs };
   });
 };
 
@@ -191,7 +207,7 @@ export const trainingGenerator = (
       });
 
       yield {
-        xs: image.src,
+        xs: image.originalSrc[image.activePlane],
         ys: ys,
         cropIndex: cropIndex % numCrops,
       };
@@ -224,7 +240,7 @@ export const validationGenerator = (
       });
 
       yield {
-        xs: image.src,
+        xs: image.originalSrc[image.activePlane],
         ys: ys,
       };
 
@@ -283,9 +299,7 @@ export const preprocess = async (
   let trainData = tensorflow.data
     .generator(trainingGenerator(trainImages, categories, numCrops))
     .map(decodeCategory(categories.length))
-    .mapAsync(
-      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
-    )
+    .mapAsync(decodeImage.bind(null, rescaleOptions.rescale))
     .mapAsync(resize.bind(null, inputShape))
     .mapAsync(cropResize.bind(null))
     .shuffle(batchSize)
@@ -295,9 +309,7 @@ export const preprocess = async (
   const valData = tensorflow.data
     .generator(validationGenerator(valImages, categories))
     .map(decodeCategory(categories.length))
-    .mapAsync(
-      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
-    )
+    .mapAsync(decodeImage.bind(null, rescaleOptions.rescale))
     .mapAsync(resize.bind(null, inputShape));
 
   //@ts-ignore
