@@ -8,11 +8,11 @@ import { RescaleOptions } from "../../../types/RescaleOptions";
 
 export const decodeCategory = (categories: number) => {
   return (item: {
-    xs: Array<string>;
+    xs: string | string[];
     ys: number;
     cropIndex?: number;
   }): {
-    xs: Array<string>;
+    xs: string | string[];
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     cropIndex?: number;
   } => {
@@ -26,7 +26,39 @@ export const decodeCategory = (categories: number) => {
   };
 };
 
-export const decodeImage = async (
+export const decodeFromImgSrc = async (
+  channels: number,
+  rescale: boolean,
+  item: {
+    xs: string; // dataURL
+    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    cropIndex?: number;
+  }
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  cropIndex?: number;
+}> => {
+  const fetched = await tensorflow.util.fetch(item.xs);
+
+  const buffer: ArrayBuffer = await fetched.arrayBuffer();
+
+  let data: ImageJS.Image = await ImageJS.Image.load(buffer);
+
+  const canvas: HTMLCanvasElement = data.getCanvas();
+
+  let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+
+  if (rescale) {
+    xs = xs.div(tensorflow.scalar(255)); //Because xs is string, values are encoded by uint8array by default
+  }
+
+  return new Promise((resolve) => {
+    return resolve({ ...item, xs: xs });
+  });
+};
+
+export const decodeFromOriginalSrc = async (
   rescale: boolean,
   item: {
     xs: Array<string>; // [channels, dataURL] from activePlane
@@ -72,6 +104,39 @@ export const decodeImage = async (
     ) as tensorflow.Tensor<tensorflow.Rank.R3>;
     return { ...item, xs: xs };
   });
+};
+
+export const decodeImage = async (
+  channels: number,
+  rescale: boolean,
+  item: {
+    xs: string | string[];
+    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    cropIndex?: number;
+  }
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  cropIndex?: number;
+}> => {
+  return channels === 1 || channels === 3
+    ? decodeFromImgSrc(
+        channels,
+        rescale,
+        item as {
+          xs: string;
+          ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+          cropIndex?: number;
+        }
+      )
+    : decodeFromOriginalSrc(
+        rescale,
+        item as {
+          xs: string[];
+          ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+          cropIndex?: number;
+        }
+      );
 };
 
 export const resize = async (
@@ -206,8 +271,13 @@ export const trainingGenerator = (
         }
       });
 
+      const src =
+        image.shape.channels === 1 || image.shape.channels === 3
+          ? image.src
+          : image.originalSrc[image.activePlane];
+
       yield {
-        xs: image.originalSrc[image.activePlane],
+        xs: src,
         ys: ys,
         cropIndex: cropIndex % numCrops,
       };
@@ -239,8 +309,13 @@ export const validationGenerator = (
         }
       });
 
+      const src =
+        image.shape.channels === 1 || image.shape.channels === 3
+          ? image.src
+          : image.originalSrc[image.activePlane];
+
       yield {
-        xs: image.originalSrc[image.activePlane],
+        xs: src,
         ys: ys,
       };
 
@@ -299,7 +374,9 @@ export const preprocess = async (
   let trainData = tensorflow.data
     .generator(trainingGenerator(trainImages, categories, numCrops))
     .map(decodeCategory(categories.length))
-    .mapAsync(decodeImage.bind(null, rescaleOptions.rescale))
+    .mapAsync(
+      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
+    )
     .mapAsync(resize.bind(null, inputShape))
     .mapAsync(cropResize.bind(null))
     .shuffle(batchSize)
@@ -309,7 +386,9 @@ export const preprocess = async (
   const valData = tensorflow.data
     .generator(validationGenerator(valImages, categories))
     .map(decodeCategory(categories.length))
-    .mapAsync(decodeImage.bind(null, rescaleOptions.rescale))
+    .mapAsync(
+      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
+    )
     .mapAsync(resize.bind(null, inputShape));
 
   //@ts-ignore
