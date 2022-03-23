@@ -325,31 +325,84 @@ export const validationGenerator = (
 };
 
 /* Debug Stuff */
-// let limit = 0;
-// const doShow = async (
-//   items: any
-// ): Promise<{
-//   xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-//   ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-// }> => {
-//   const xsData = await items.xs.array();
-//   const ysData = await items.ys.array();
+let limit = 0;
+const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
+  let canvas = document.createElement("canvas");
+  for (const [i, c] of xsData.entries()) {
+    await tensorflow.browser.toPixels(c, canvas);
+    if (limit < 10) {
+      // limit++;
+      console.log(
+        "class: ",
+        ysData[i].findIndex((e: any) => e === 1),
+        canvas.toDataURL()
+      );
+    }
+  }
+};
 
-//   let canvas = document.createElement("canvas");
-//   for (const [i, c] of xsData.entries()) {
-//     await tensorflow.browser.toPixels(c, canvas);
-//     if (limit < 10) {
-//       limit++;
-//       console.log(
-//         "class: ",
-//         ysData[i].findIndex((e: any) => e === 1),
-//         canvas.toDataURL()
-//       );
-//     }
-//   }
+const doShowFromChannels = async (
+  numChannels: number,
+  items: {
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+  }
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+}> => {
+  let xs3ch: tensorflow.Tensor<tensorflow.Rank.R4>;
+  if (numChannels === 2) {
+    const ch3 = tensorflow.fill(
+      [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
+      0
+    );
+    xs3ch = items.xs.concat(ch3, 3) as tensorflow.Tensor<tensorflow.Rank.R4>;
+  } else {
+    xs3ch = tensorflow.slice(
+      items.xs,
+      [0, 0, 0, 0],
+      [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 3]
+    );
+  }
 
-//   return new Promise((resolve) => resolve(items));
-// };
+  const xsData = xs3ch
+    .mul(tensorflow.scalar(255))
+    .arraySync() as number[][][][];
+  const ysData = items.ys.arraySync();
+  doShowImages(xsData, ysData);
+  return new Promise((resolve) => resolve(items));
+};
+
+const doShowFromBrowser = async (items: {
+  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+}): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+}> => {
+  const xsData = (await items.xs
+    .mul(tensorflow.scalar(255))
+    .array()) as number[][][][];
+  const ysData = await items.ys.array();
+  doShowImages(xsData, ysData);
+  return new Promise((resolve) => resolve(items));
+};
+
+const doShow = async (
+  numChannels: number,
+  items: {
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+  }
+): Promise<{
+  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+}> => {
+  return numChannels === 1 || numChannels === 3
+    ? doShowFromBrowser(items)
+    : doShowFromChannels(numChannels, items);
+};
 /* /Debug Stuff */
 
 export const preprocess = async (
@@ -381,7 +434,7 @@ export const preprocess = async (
     .mapAsync(cropResize.bind(null))
     .shuffle(batchSize)
     .batch(batchSize);
-  // .mapAsync((items: any) => doShow(items));  // For debug stuff
+  // .mapAsync((items: any) => doShow(inputShape.channels, items)); // For debug stuff
 
   const valData = tensorflow.data
     .generator(validationGenerator(valImages, categories))
