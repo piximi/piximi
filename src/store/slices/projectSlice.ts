@@ -77,6 +77,7 @@ export const projectSlice = createSlice({
       state.images = state.images.map((image: ImageType) => {
         if (image.categoryId === action.payload.id) {
           image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.partition = Partition.Inference;
         }
         return image;
       });
