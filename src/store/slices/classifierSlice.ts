@@ -94,6 +94,9 @@ export const classifierSlice = createSlice({
       state.history = classifier.history;
       state.predicting = false;
       state.predictions = classifier.predictions;
+      state.compiled = undefined;
+      state.fitted = undefined;
+      state.userUploadedModel = undefined;
     },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
