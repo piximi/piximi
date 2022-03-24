@@ -11,6 +11,7 @@ import {
   categorizedImagesSelector,
   compiledSelector,
   trainingPercentageSelector,
+  fitOptionsSelector,
 } from "../../../store/selectors";
 import { ImageType } from "../../../types/ImageType";
 import * as _ from "lodash";
@@ -60,6 +61,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const categorizedImages = useSelector(categorizedImagesSelector);
   const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
+  const fitOptions = useSelector(fitOptionsSelector);
 
   const epochs = useSelector(epochsSelector);
 
@@ -122,11 +124,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     cleanUpStates();
 
     //first assign train and val partition to all categorized images
-    const categorizedImagesIds = _.shuffle(categorizedImages).map(
-      (image: ImageType) => {
-        return image.id;
-      }
-    );
+
+    const categorizedImagesIds = (
+      fitOptions.shuffle ? _.shuffle(categorizedImages) : categorizedImages
+    ).map((image: ImageType) => {
+      return image.id;
+    });
 
     //separate ids into train and val datasets
     const trainDataLength = Math.round(

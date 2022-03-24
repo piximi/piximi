@@ -5,6 +5,7 @@ import { ImageType } from "../../../types/ImageType";
 import { Partition } from "../../../types/Partition";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
+import { FitOptions } from "types/FitOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
 
 jest.setTimeout(50000);
@@ -20,6 +21,13 @@ const inputShape: Shape = {
 const rescaleOptions: RescaleOptions = {
   rescale: true,
   rescaleMinMax: { min: 2, max: 5 },
+};
+
+const fitOptions: FitOptions = {
+  epochs: 10,
+  batchSize: 32,
+  initialEpoch: 0,
+  shuffle: true,
 };
 
 const categories: Array<Category> = [
@@ -60,7 +68,7 @@ it("preprocess", async () => {
     categories,
     inputShape,
     rescaleOptions,
-    1
+    fitOptions
   );
 
   const items = await preprocessed.train.toArrayForTest();

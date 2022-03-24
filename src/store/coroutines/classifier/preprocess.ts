@@ -5,6 +5,7 @@ import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
+import { FitOptions } from "types/FitOptions";
 
 export const decodeCategory = (categories: number) => {
   return (item: {
@@ -411,15 +412,15 @@ export const preprocess = async (
   categories: Array<Category>,
   inputShape: Shape,
   rescaleOptions: RescaleOptions,
-  batchSize: number
+  fitOptions: FitOptions
 ): Promise<{
   val: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     ys: tensorflow.Tensor;
   }>;
   train: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
   }>;
 }> => {
   const numCrops = 3;
@@ -431,9 +432,18 @@ export const preprocess = async (
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )
     .mapAsync(resize.bind(null, inputShape))
-    .mapAsync(cropResize.bind(null))
-    .shuffle(batchSize)
-    .batch(batchSize);
+    .mapAsync(cropResize.bind(null));
+
+  if (fitOptions.shuffle) {
+    trainData = trainData.shuffle(fitOptions.batchSize);
+  }
+
+  const trainDataBatched = trainData.batch(
+    fitOptions.batchSize
+  ) as tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+  }>;
   // .mapAsync((items: any) => doShow(inputShape.channels, items)); // For debug stuff
 
   const valData = tensorflow.data
@@ -444,6 +454,5 @@ export const preprocess = async (
     )
     .mapAsync(resize.bind(null, inputShape));
 
-  //@ts-ignore
-  return { val: valData, train: trainData };
+  return { val: valData, train: trainDataBatched };
 };

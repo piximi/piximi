@@ -70,7 +70,7 @@ export function* fitSaga(action: any): any {
       categories,
       architectureOptions.inputShape,
       rescaleOptions,
-      options.batchSize
+      options
     );
   } catch (error) {
     yield handleError(error as Error, "Error in preprocessing");
