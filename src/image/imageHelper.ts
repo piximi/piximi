@@ -332,8 +332,8 @@ const convertToImage = (
     : image.components;
   const displayedIdx: number = 0;
   const colors = currentColors ? currentColors : generateDefaultChannels(c);
-  const height = input[0].height;
   const width = input[0].width;
+  const height = input[0].height;
 
   let displayedData: Array<Array<number>> = [];
 
@@ -344,12 +344,12 @@ const convertToImage = (
       input[0].data as Uint8Array,
       input[0].components,
       input[0].alpha,
-      height * width
+      width * height
     );
 
     originalURIs.push(
       displayedData.map((channelData: Array<number>) => {
-        return convertImageDataToURI(height, width, channelData, 1, 0);
+        return convertImageDataToURI(width, height, channelData, 1, 0);
       })
     );
   } else {
