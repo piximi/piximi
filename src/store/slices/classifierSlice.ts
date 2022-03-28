@@ -55,6 +55,7 @@ export const classifierSlice = createSlice({
   name: "classifier",
   initialState: initialState,
   reducers: {
+    resetClassifier: () => initialState,
     fit(
       state,
       action: PayloadAction<{

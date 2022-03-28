@@ -3,10 +3,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import { NewClassifierDialog } from "../NewClassifierDialog";
+import { NewProjectDialog } from "../NewProjectDialog";
 import { useDialog } from "../../hooks";
 
-export const NewClassifierListItem = () => {
+export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
@@ -16,10 +16,10 @@ export const NewClassifierListItem = () => {
           <AddIcon />
         </ListItemIcon>
 
-        <ListItemText primary="New classifier…" />
+        <ListItemText primary="New project" />
       </ListItem>
 
-      <NewClassifierDialog onClose={onClose} open={open} />
+      <NewProjectDialog onClose={onClose} open={open} />
     </>
   );
 };
