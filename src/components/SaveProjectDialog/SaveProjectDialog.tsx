@@ -82,6 +82,7 @@ export const SaveProjectDialog = ({
               id="name"
               label="Project file name"
               margin="dense"
+              value={projectName}
               onChange={onNameChange}
             />
           </Grid>

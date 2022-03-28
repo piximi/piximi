@@ -55,7 +55,6 @@ export default function HelpDrawer({
         variant={"persistent"}
         anchor={"left"}
         sx={(theme) => ({
-          pt: 200,
           width: theme.spacing(32),
           flexShrink: 0,
           "& > .MuiDrawer-paper": {

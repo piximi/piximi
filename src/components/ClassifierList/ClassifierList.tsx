@@ -31,14 +31,16 @@ export const ClassifierList = () => {
   useEffect(() => {
     if (training) {
       setDisabled(true);
-      setHelperText("disabled during training.");
-    } else {
+      setHelperText("disabled during training");
     }
   }, [training]);
 
   useEffect(() => {
     if (fitted) {
       setDisabled(false);
+    } else {
+      setDisabled(true);
+      setHelperText("disabled: no trained model");
     }
   }, [fitted]);
 

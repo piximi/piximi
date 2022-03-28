@@ -37,6 +37,7 @@ export const MainView = () => {
 
   const handleError = useCallback(
     async (e: any) => {
+      e.preventDefault();
       var error = e.error as Error;
       const stackTrace = await getStackTraceFromError(error);
       dispatch(
@@ -53,12 +54,31 @@ export const MainView = () => {
     [dispatch]
   );
 
+  const handleUncaughtRejection = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+      dispatch(
+        applicationSlice.actions.updateAlertState({
+          alertState: {
+            alertType: AlertType.Error,
+            name: "Uncaught promise rejection",
+            description: String(e.reason.message),
+            stackTrace: String(e.reason.stack),
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
+
   React.useEffect(() => {
     window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUncaughtRejection);
     return () => {
       window.removeEventListener("error", handleError);
+      window.removeEventListener("unhandledrejection", handleUncaughtRejection);
     };
-  }, [handleError]);
+  }, [handleError, handleUncaughtRejection]);
 
   React.useEffect(() => {
     window.addEventListener("beforeunload", onUnload);

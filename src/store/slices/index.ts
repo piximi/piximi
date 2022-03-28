@@ -57,7 +57,7 @@ export {
 } from "./imageViewerSlice";
 
 export {
-  createProject,
+  createNewProject,
   createCategory,
   createImage,
   deleteCategory,

@@ -17,7 +17,6 @@ import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
 import React, { useEffect } from "react";
 import { useTranslation } from "hooks/useTranslation";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { AlertType } from "types/AlertStateType";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;
@@ -38,22 +37,15 @@ export const EvaluateClassifierListItem = (
   const alertState = useSelector(alertStateSelector);
 
   const onEvaluate = async () => {
-    if (isEvaluating) {
-      return;
-    }
     dispatch(classifierSlice.actions.evaluate({}));
   };
 
   useEffect(() => {
-    if (
-      isEvaluating &&
-      !evaluationFlag &&
-      alertState.alertType === AlertType.None
-    ) {
+    if (isEvaluating && !evaluationFlag && !alertState.visible) {
       onOpen();
     }
     setIsEvaluating(evaluationFlag);
-  }, [alertState.alertType, evaluationFlag, isEvaluating, onOpen]);
+  }, [alertState.visible, evaluationFlag, isEvaluating, onOpen]);
 
   return (
     <>

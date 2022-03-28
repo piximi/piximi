@@ -29,7 +29,10 @@ type ConfusionMatrixPlotProps = {
 export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
   const { confusionMatrix, classNames } = props;
 
-  const SIZE = 400;
+  const longestClassName = Math.max(...classNames.map((el) => el.length));
+
+  const SIZE = classNames.length > 4 ? 500 : 400;
+  const PADDING = longestClassName * 6;
 
   const data = getHeatMapData(confusionMatrix, classNames);
   const maxVal = Math.max(...confusionMatrix.flat());
@@ -46,24 +49,32 @@ export const ConfusionMatrix = (props: ConfusionMatrixPlotProps) => {
         height={SIZE}
         data={data}
         theme={nivoTheme}
-        margin={{ top: 5, right: 50, bottom: 50, left: 50 }}
+        margin={{ top: 5, right: 60, bottom: PADDING, left: PADDING + 50 }}
         forceSquare={true}
-        axisTop={null}
         axisBottom={{
-          tickSize: 5,
-          tickPadding: 5,
+          tickSize: 7,
+          tickPadding: 7,
           tickRotation: -90,
+          legendPosition: "middle",
+        }}
+        axisTop={{
+          format: () => "",
+          tickSize: 0,
           legend: "Prediction",
           legendPosition: "middle",
-          legendOffset: 35,
+          legendOffset: -20,
         }}
         axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
+          tickSize: 7,
+          tickPadding: 7,
           tickRotation: 0,
+        }}
+        axisRight={{
+          format: () => "",
+          tickSize: 0,
           legend: "Groudtruth",
           legendPosition: "middle",
-          legendOffset: -35,
+          legendOffset: 20,
         }}
         colors={{
           type: "diverging",

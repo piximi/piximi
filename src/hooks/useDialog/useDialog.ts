@@ -11,8 +11,8 @@ export const useDialog = (closeOnError: boolean = true) => {
 
   React.useEffect(() => {
     if (
-      alertState.alertType !== AlertType.None &&
-      alertState.alertType !== AlertType.Info &&
+      alertState.visible &&
+      alertState.alertType === AlertType.Error &&
       closeOnError
     ) {
       setOpen(false);

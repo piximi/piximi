@@ -4,6 +4,7 @@ import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 
 type TrainingHistoryPlotProps = {
   metric: string;
+  currentEpoch: number;
   trainingValues: { x: number; y: number }[];
   validationValues: { x: number; y: number }[];
   dynamicYRange?: boolean;
@@ -12,6 +13,7 @@ type TrainingHistoryPlotProps = {
 export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
   const {
     metric,
+    currentEpoch,
     trainingValues,
     validationValues,
     dynamicYRange = false,
@@ -29,6 +31,8 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
     data: validationValues,
   };
 
+  const epochRange = Array.from(Array(currentEpoch + 1).keys());
+
   const min = dynamicYRange ? "auto" : 0;
   const max = dynamicYRange ? "auto" : 1;
 
@@ -37,19 +41,20 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
   return (
     <Container sx={{ height: 350, mb: 5 }}>
       <Typography align={"center"} variant="body1">
-        Training history - {metric} on epoch end
+        Training history - {metric} per epoch
       </Typography>
       <ResponsiveLine
         data={[trainingData, validationData]}
         theme={nivoTheme}
         lineWidth={3}
-        margin={{ top: 10, right: 150, bottom: 80, left: 70 }}
-        xScale={{ type: "point" }}
+        margin={{ top: 10, right: 170, bottom: 80, left: 70 }}
+        xScale={{ type: "linear" }}
         yScale={{
           type: "linear",
           min: min,
           max: max,
         }}
+        gridXValues={epochRange}
         yFormat=">-.3f"
         enableSlices={"x"}
         sliceTooltip={({ slice }) => {
@@ -76,10 +81,11 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
         }}
         axisBottom={{
           tickSize: 5,
+          tickValues: epochRange,
           tickPadding: 5,
           tickRotation: 0,
           legend: "epochs",
-          legendOffset: 30,
+          legendOffset: 35,
           legendPosition: "middle",
         }}
         axisLeft={{

@@ -10,7 +10,6 @@ import { ImageType } from "../../../types/ImageType";
 import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { AlertType } from "types/AlertStateType";
 
 type ImageViewerProps = {
   image?: ImageType;
@@ -27,15 +26,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     setOpenDimensionsDialogBox(false);
   };
 
-  const [showAlertDialogs, setShowAlertDialogs] = React.useState(false);
-
   const alertState = useSelector(alertStateSelector);
-
-  React.useEffect(() => {
-    if (alertState.alertType !== AlertType.None) {
-      setShowAlertDialogs(true);
-    }
-  }, [alertState]);
 
   useEffect(() => {
     if (image) {
@@ -52,7 +43,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      {showAlertDialogs && (
+      {alertState.visible && (
         <AppBar
           sx={{
             borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -63,7 +54,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
           position="fixed"
         >
           <AlertDialog
-            setShowAlertDialog={setShowAlertDialogs}
+            //setShowAlertDialog={setShowAlertDialogs}
             alertState={alertState}
           />
         </AppBar>

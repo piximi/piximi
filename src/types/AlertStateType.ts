@@ -1,5 +1,4 @@
 export enum AlertType {
-  None,
   Error,
   Warning,
   Info,
@@ -11,10 +10,12 @@ export type AlertStateType = {
   description: string;
   component?: string;
   stackTrace?: string;
+  visible?: boolean;
 };
 
 export const defaultAlert: AlertStateType = {
-  alertType: AlertType.None,
+  alertType: AlertType.Info,
   name: "None",
-  description: "",
+  description: "default state",
+  visible: false,
 };

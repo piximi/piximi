@@ -27,9 +27,6 @@ export const PredictClassifierListItem = (
   const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
 
   const onPredict = () => {
-    if (isPredicting) {
-      return;
-    }
     dispatch(classifierSlice.actions.predict({}));
   };
 

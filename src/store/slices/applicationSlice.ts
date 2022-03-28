@@ -74,6 +74,10 @@ export const applicationSlice = createSlice({
       action: PayloadAction<{ alertState: AlertStateType }>
     ) {
       state.alertState = action.payload.alertState;
+      state.alertState.visible = true;
+    },
+    hideAlertState(state, action: PayloadAction<{}>) {
+      state.alertState.visible = false;
     },
   },
 });
@@ -87,4 +91,5 @@ export const {
   clearSelectedImages,
   setThemeMode,
   updateAlertState,
+  hideAlertState,
 } = applicationSlice.actions;
