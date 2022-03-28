@@ -24,7 +24,6 @@ export type Classifier = {
       }>
     | Array<Tensor2D>;
   evaluating: boolean;
-  evaluations?: Scalar | Array<Scalar>;
   fitOptions: FitOptions;
   fitted?: LayersModel;
   fitting: boolean;

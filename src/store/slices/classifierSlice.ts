@@ -85,18 +85,39 @@ export const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = classifier.optimizationAlgorithm;
       state.trainingPercentage = classifier.trainingPercentage;
-
-      //initialize all others to false/undefined, since we are essentially initializing a new classifier
-      state.selectedModel = availableModels[0];
-      state.evaluating = false;
-      state.evaluations = classifier.evaluations;
-      state.fitting = false;
       state.history = classifier.history;
-      state.predicting = false;
       state.predictions = classifier.predictions;
+      state.predicted = classifier.predicted;
+      state.rescaleOptions = classifier.rescaleOptions;
+
+      state.selectedModel = availableModels[0];
+      if (classifier.selectedModel) {
+        const selectedModel = classifier.selectedModel;
+        availableModels.forEach((model) => {
+          if (
+            selectedModel.modelType === model.modelType &&
+            selectedModel.modelName === model.modelName
+          ) {
+            state.selectedModel = selectedModel;
+          }
+        });
+      }
+
+      // initialize all others to their default value
+      state.evaluating = false;
+      state.fitting = false;
+      state.predicting = false;
       state.compiled = undefined;
       state.fitted = undefined;
       state.userUploadedModel = undefined;
+      state.evaluationResult = {
+        confusionMatrix: [],
+        accuracy: -1,
+        crossEntropy: -1,
+        precision: -1,
+        recall: -1,
+        f1Score: -1,
+      };
     },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
