@@ -44,6 +44,7 @@ export function* fitSaga(action: any): any {
   }
 
   const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+
   var compiledModel: tensorflow.LayersModel;
   try {
     compiledModel = yield compile(model, compileOptions);
@@ -87,6 +88,7 @@ export function* fitSaga(action: any): any {
       onEpochEnd
     );
   } catch (error) {
+    process.env.NODE_ENV === "development" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
     return;
   }
