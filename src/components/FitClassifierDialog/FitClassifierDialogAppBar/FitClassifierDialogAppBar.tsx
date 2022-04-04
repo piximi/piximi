@@ -1,4 +1,11 @@
-import { AppBar, Box, IconButton, Toolbar, Tooltip } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  Tooltip,
+} from "@mui/material";
 import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { compiledSelector } from "../../../store/selectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,24 +70,35 @@ export const FitClassifierDialogAppBar = ({
           />
         )}
 
-        <Tooltip
-          title={
-            disableFitting
-              ? "Please label images before fitting a model."
-              : "Fit the model"
-          }
-          placement="bottom"
-        >
-          <span>
-            <IconButton onClick={fit} href={""} disabled={disableFitting}>
-              <PlayCircleOutline />
-            </IconButton>
-          </span>
-        </Tooltip>
+        {!training && (
+          <Tooltip
+            title={
+              disableFitting
+                ? "Please label images before fitting a model."
+                : "Fit the model"
+            }
+            placement="bottom"
+          >
+            <span>
+              <Button
+                variant="outlined"
+                onClick={fit}
+                disabled={disableFitting}
+                startIcon={<PlayCircleOutline />}
+              >
+                Fit Classifier
+              </Button>
+            </span>
+          </Tooltip>
+        )}
 
         <Tooltip title="Stop fitting the model" placement="bottom">
           <span>
-            <IconButton onClick={onStopFitting} href={""} disabled={!training}>
+            <IconButton
+              onClick={onStopFitting}
+              disabled={!training}
+              color="primary"
+            >
               <Stop />
             </IconButton>
           </span>
