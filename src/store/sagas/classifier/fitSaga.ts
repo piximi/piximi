@@ -65,7 +65,18 @@ export function* fitSaga(action: any): any {
   const options: FitOptions = yield select(fitOptionsSelector);
 
   try {
-    var data = yield preprocess(
+    var data: {
+      val: tensorflow.data.Dataset<{
+        xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+        ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+        label: tensorflow.Tensor<tensorflow.Rank.R1>;
+      }>;
+      train: tensorflow.data.Dataset<{
+        xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+        ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+        label: tensorflow.Tensor<tensorflow.Rank.R1>;
+      }>;
+    } = yield preprocess(
       trainImages,
       valImages,
       categories,
@@ -74,6 +85,7 @@ export function* fitSaga(action: any): any {
       options
     );
   } catch (error) {
+    process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
     return;
   }
@@ -88,7 +100,7 @@ export function* fitSaga(action: any): any {
       onEpochEnd
     );
   } catch (error) {
-    process.env.NODE_ENV === "development" && console.error(error);
+    process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
     return;
   }

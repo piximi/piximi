@@ -17,12 +17,14 @@ import { EvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
   compiled?: LayersModel;
-  data?:
-    | tensorflow.data.Dataset<{
-        xs: tensorflow.Tensor;
-        ys: tensorflow.Tensor;
-      }>
-    | Array<Tensor2D>;
+  trainDataSet?: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+  }>;
+  valDataSet?: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+  }>;
   evaluating: boolean;
   evaluations?: Scalar | Array<Scalar>;
   fitOptions: FitOptions;

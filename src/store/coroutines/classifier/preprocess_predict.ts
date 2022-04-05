@@ -1,4 +1,11 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import {
+  Tensor,
+  Tensor3D,
+  data as tfdata,
+  util as tfutil,
+  browser as tfbrowser,
+  image as tfimage,
+} from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
@@ -11,8 +18,8 @@ export const decodeImage = async (
     xs: string; //dataURL
     id: string;
   }
-): Promise<{ xs: tensorflow.Tensor; id: string }> => {
-  const fetched = await tensorflow.util.fetch(item.xs);
+): Promise<{ xs: Tensor; id: string }> => {
+  const fetched = await tfutil.fetch(item.xs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
@@ -20,7 +27,7 @@ export const decodeImage = async (
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  let xs: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+  let xs: Tensor3D = tfbrowser.fromPixels(canvas, channels);
 
   if (rescale) {
     xs = xs.div(255); //Because xs is string, values are encoded by uint8array by default
@@ -34,21 +41,21 @@ export const decodeImage = async (
 export const resize = async (
   inputShape: Shape,
   item: {
-    xs: tensorflow.Tensor;
+    xs: Tensor;
     id: string;
   }
-): Promise<{ xs: tensorflow.Tensor; id: string }> => {
-  const resized = tensorflow.image.resizeBilinear(
-    item.xs as tensorflow.Tensor3D,
-    [inputShape.height, inputShape.width]
-  );
+): Promise<{ xs: Tensor; id: string }> => {
+  const resized = tfimage.resizeBilinear(item.xs as Tensor3D, [
+    inputShape.height,
+    inputShape.width,
+  ]);
 
   return new Promise((resolve) => {
     return resolve({ ...item, xs: resized });
   });
 };
 
-export const generator = (images: Array<ImageType>) => {
+export const sampleGenerator = (images: Array<ImageType>) => {
   const count = images.length;
 
   return function* () {
@@ -72,13 +79,13 @@ export const preprocess_predict = async (
   rescaleOptions: RescaleOptions,
   inputShape: Shape
 ): Promise<
-  tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
+  tfdata.Dataset<{
+    xs: Tensor;
     id: string;
   }>
 > => {
-  const data = tensorflow.data
-    .generator(generator(images))
+  const data = tfdata
+    .generator(sampleGenerator(images))
     .mapAsync(
       decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
     )

@@ -1,7 +1,7 @@
 import { Classifier } from "../../types/Classifier";
 import * as tensorflow from "@tensorflow/tfjs";
 
-export const dataSelector = ({
+export const trainDataSelector = ({
   classifier,
 }: {
   classifier: Classifier;
@@ -10,7 +10,6 @@ export const dataSelector = ({
       xs: tensorflow.Tensor;
       ys: tensorflow.Tensor;
     }>
-  | Array<tensorflow.Tensor2D>
   | undefined => {
-  return classifier.data;
+  return classifier.trainDataSet;
 };

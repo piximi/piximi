@@ -1,10 +1,10 @@
 import {
-  Tensor,
-  data as tfdata,
   loadLayersModel,
   io as tfio,
-} from "@tensorflow/tfjs";
-import { setBackend } from "@tensorflow/tfjs-node";
+  memory as tfmemory,
+  time as tftime,
+  profile as tfprofile,
+} from "@tensorflow/tfjs-node";
 import { evaluate } from "./evaluate";
 import { Category } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
@@ -12,14 +12,10 @@ import { Partition } from "../../../types/Partition";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
-import {
-  availableModels,
-  ClassifierModelProps,
-} from "types/ClassifierModelType";
-import { ArchitectureOptions } from "types/ArchitectureOptions";
-import { preprocess_predict } from "store/coroutines/classifier/preprocess_predict";
+import { preprocess } from "store/coroutines/classifier/preprocess";
+import { EvaluationResultType } from "types/EvaluationResultType";
 
-jest.setTimeout(50000);
+jest.setTimeout(100000);
 
 const categories: Array<Category> = [
   // {
@@ -103,18 +99,20 @@ const rescaleOptions: RescaleOptions = {
   rescaleMinMax: { min: 2, max: 5 },
 };
 
-const selectedModel: ClassifierModelProps = availableModels[0]; // simpleCNN
-
-const architectureOptions: ArchitectureOptions = {
-  inputShape: inputShape,
-  selectedModel: selectedModel,
+const fitOptions = {
+  epochs: 2,
+  batchSize: 3,
+  initialEpoch: 0,
+  test_data_size: 3,
+  train_data_size: 3,
+  shuffle: false,
 };
 
 const validationImages: Array<ImageType> = [
   {
     annotations: [],
     activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-000000000003", // 3
+    categoryId: "00000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
     id: "00000000-0000-0000-0001-00000000000",
     colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
@@ -167,12 +165,16 @@ const validationImages: Array<ImageType> = [
 ];
 
 it("evaluate", async () => {
-  await setBackend("tensorflow");
+  // await setBackend("tensorflow");
 
-  const validationData: tfdata.Dataset<{
-    xs: Tensor; // R3;
-    id: string;
-  }> = await preprocess_predict(validationImages, rescaleOptions, inputShape);
+  const { val: validationData } = await preprocess(
+    validationImages,
+    validationImages,
+    categories,
+    inputShape,
+    rescaleOptions,
+    fitOptions
+  );
 
   const fs = require("fs");
   const path = require("path");
@@ -198,29 +200,76 @@ it("evaluate", async () => {
     tfio.browserFiles([jsonFile, weightsFile])
   );
 
-  const res = await evaluate(
-    model,
-    validationData,
-    validationImages,
-    categories
+  console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
+
+  const profile = await tfprofile(async () => {
+    const res = await evaluate(
+      //@ts-ignore
+      model,
+      validationData,
+      validationImages,
+      categories
+    );
+    return res;
+  });
+
+  const result = profile.result as EvaluationResultType;
+
+  console.log(`newBytes: ${profile.newBytes}`);
+  console.log(`newTensors: ${profile.newTensors}`);
+  console.log(`peakBytes: ${profile.peakBytes}`);
+  console.log(
+    `byte usage over all kernels: ${profile.kernels.map(
+      (k) => k.totalBytesSnapshot
+    )}`
   );
 
-  console.log(res);
+  // const time = await tftime(async () => {
+  //   const res = await evaluate(
+  //     //@ts-ignore
+  //     model,
+  //     validationData,
+  //     validationImages,
+  //     categories
+  //   );
+  //   return res;
+  // });
 
-  expect(1).toEqual(1);
+  // console.log(
+  //   `kernelMs: ${time.kernelMs}, wallTimeMs: ${time.wallMs}`
+  // );
+
+  // console.log("---------");
+  // for (const [k, v] of Object.entries(result)) {
+  //   if (k !== "confusionMatrix") {
+  //     console.log(k, v);
+  //   }
+  // }
+
+  const expectedResults = {
+    confusionMatrix: [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    accuracy: 0.6666666666666666,
+    crossEntropy: 1.4029693743335276,
+    precision: 0.6666666865348816,
+    recall: 0.6666666865348816,
+    f1Score: 0.6666666865348816,
+  };
+
+  expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
+  expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
+  expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
+  expect(result.precision).toBeCloseTo(expectedResults.precision, 5);
+  expect(result.recall).toBeCloseTo(expectedResults.recall, 5);
+  expect(result.f1Score).toBeCloseTo(expectedResults.f1Score, 5);
 });
-
-// it("preprocess", async () => {
-//   const preprocessed = await preprocess(
-//     images,
-//     images,
-//     categories,
-//     inputShape,
-//     rescaleOptions,
-//     fitOptions
-//   );
-
-//   const items = await preprocessed.train.toArrayForTest();
-
-//   expect(items[0]["xs"].shape).toEqual([224, 224, 3]);
-// });

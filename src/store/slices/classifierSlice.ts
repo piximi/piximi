@@ -185,15 +185,24 @@ export const classifierSlice = createSlice({
     updatePreprocessed(
       state,
       action: PayloadAction<{
-        data: tensorflow.data.Dataset<{
-          xs: tensorflow.Tensor;
-          ys: tensorflow.Tensor;
-        }>;
+        data: {
+          val: tensorflow.data.Dataset<{
+            xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+            ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+            label: tensorflow.Tensor<tensorflow.Rank.R1>;
+          }>;
+          train: tensorflow.data.Dataset<{
+            xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+            ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+            label: tensorflow.Tensor<tensorflow.Rank.R1>;
+          }>;
+        };
       }>
     ) {
       const { data } = action.payload;
 
-      state.data = data;
+      state.trainDataSet = data.train;
+      state.valDataSet = data.val;
     },
     updateRescaleOptions(
       state,
