@@ -64,14 +64,15 @@ const images: Array<ImageType> = [
 it("preprocess", async () => {
   const preprocessed = await preprocess(
     images,
-    images,
     categories,
     inputShape,
     rescaleOptions,
-    fitOptions
+    fitOptions,
+    { numCrops: 1 }
   );
 
-  const items = await preprocessed.train.toArrayForTest();
+  // future warning: toArrayForTest is undocumented
+  const items = await preprocessed.toArrayForTest();
 
   expect(items[0]["xs"].shape).toEqual([224, 224, 3]);
 });

@@ -5,7 +5,6 @@ import {
   time as tftime,
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
-import { evaluate } from "./evaluate";
 import { Category } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
 import { Partition } from "../../../types/Partition";
@@ -13,7 +12,7 @@ import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
 import { preprocess } from "store/coroutines/classifier/preprocess";
-import { EvaluationResultType } from "types/EvaluationResultType";
+import { predictCategories } from "./predictCategories";
 
 jest.setTimeout(100000);
 
@@ -108,11 +107,11 @@ const fitOptions = {
   shuffle: false,
 };
 
-const validationImages: Array<ImageType> = [
+const inferrenceImages: Array<ImageType> = [
   {
     annotations: [],
     activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
+    categoryId: "00000000-0000-0000-0000-000000000003", // 3
     id: "00000000-0000-0000-0001-00000000000",
     colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
@@ -164,11 +163,11 @@ const validationImages: Array<ImageType> = [
   },
 ];
 
-it("evaluate", async () => {
+it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const validationData = await preprocess(
-    validationImages,
+  const inferrenceData = await preprocess(
+    inferrenceImages,
     categories,
     inputShape,
     rescaleOptions,
@@ -203,17 +202,19 @@ it("evaluate", async () => {
   console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
-    const res = await evaluate(
+    const res = await predictCategories(
       //@ts-ignore
       model,
-      validationData,
-      validationImages,
+      inferrenceData,
       categories
     );
     return res;
   });
 
-  const result = profile.result as EvaluationResultType;
+  const result = profile.result as {
+    imageIds: string[];
+    categoryIds: string[];
+  };
 
   console.log(`newBytes: ${profile.newBytes}`);
   console.log(`newTensors: ${profile.newTensors}`);
@@ -225,11 +226,10 @@ it("evaluate", async () => {
   );
 
   // const time = await tftime(async () => {
-  //   const res = await evaluate(
+  //   const res = await predictCategories(
   //     //@ts-ignore
   //     model,
-  //     validationData,
-  //     validationImages,
+  //     inferrenceData,
   //     categories
   //   );
   //   return res;
@@ -247,29 +247,18 @@ it("evaluate", async () => {
   // }
 
   const expectedResults = {
-    confusionMatrix: [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    imageIds: [
+      "00000000-0000-0000-0001-00000000000",
+      "00000000-0000-0000-0002-00000000000",
+      "00000000-0000-0000-0003-00000000000",
     ],
-    accuracy: 0.6666666666666666,
-    crossEntropy: 1.4029693743335276,
-    precision: 0.6666666865348816,
-    recall: 0.6666666865348816,
-    f1Score: 0.6666666865348816,
+    categoryIds: [
+      "00000000-0000-0000-0000-000000000003",
+      "00000000-0000-0000-0000-000000000008",
+      "00000000-0000-0000-0000-000000000007",
+    ],
   };
 
-  expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
-  expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
-  expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
-  expect(result.precision).toBeCloseTo(expectedResults.precision, 5);
-  expect(result.recall).toBeCloseTo(expectedResults.recall, 5);
-  expect(result.f1Score).toBeCloseTo(expectedResults.f1Score, 5);
+  expect(result.imageIds).toStrictEqual(expectedResults.imageIds);
+  expect(result.categoryIds).toStrictEqual(expectedResults.categoryIds);
 });

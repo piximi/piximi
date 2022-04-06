@@ -20,10 +20,14 @@ export type Classifier = {
   trainDataSet?: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     ys: tensorflow.Tensor;
+    labels: tensorflow.Tensor;
+    ids: tensorflow.Tensor;
   }>;
   valDataSet?: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
     ys: tensorflow.Tensor;
+    labels: tensorflow.Tensor;
+    ids: tensorflow.Tensor;
   }>;
   evaluating: boolean;
   evaluations?: Scalar | Array<Scalar>;

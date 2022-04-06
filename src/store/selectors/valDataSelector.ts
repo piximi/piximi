@@ -9,6 +9,7 @@ export const valDataSelector = ({
   | tensorflow.data.Dataset<{
       xs: tensorflow.Tensor;
       ys: tensorflow.Tensor;
+      labels: tensorflow.Tensor;
     }>
   | undefined => {
   return classifier.valDataSet;

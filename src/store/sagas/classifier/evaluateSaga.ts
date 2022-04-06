@@ -60,7 +60,12 @@ function* runEvaluation(
   categories: Array<Category>
 ) {
   //@ts-ignore
-  const validationData = yield select(valDataSelector);
+  const validationData: tensorflow.data.Dataset<{
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  }> = yield select(valDataSelector);
 
   try {
     var evaluationResult: EvaluationResultType = yield evaluate(

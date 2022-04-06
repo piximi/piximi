@@ -6,9 +6,10 @@ import { ImageType } from "../../../types/ImageType";
 export const evaluate = async (
   model: tensorflow.LayersModel,
   validationData: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    label: tensorflow.Tensor<tensorflow.Rank.R1>;
+    xs: tensorflow.Tensor;
+    ys: tensorflow.Tensor;
+    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>,
   validationImages: ImageType[],
   categories: Category[]
@@ -16,7 +17,7 @@ export const evaluate = async (
   const categoryIDs = categories.map((c: Category) => c.id);
   const numberOfClasses = categoryIDs.length;
 
-  const inferredBatchedTensors = await validationData
+  const inferredBatchTensors = await validationData
     .map((items) => {
       //@ts-ignore
       const batchProbs = model.predict(items.xs);
@@ -28,12 +29,12 @@ export const evaluate = async (
         preds: batchPred,
         predsOneHot: batchPredOneHot, // ŷs
         ys: items.ys,
-        labels: items.label,
+        labels: items.labels,
       };
     })
     .toArray();
 
-  const inferredTensors = inferredBatchedTensors.reduce((prev, curr) => {
+  const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
     return {
       probs: prev.probs.concat(curr.probs),
       preds: prev.preds.concat(curr.preds),

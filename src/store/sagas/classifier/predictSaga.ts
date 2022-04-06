@@ -2,7 +2,6 @@ import { put, select } from "redux-saga/effects";
 import { classifierSlice, projectSlice, applicationSlice } from "../../slices";
 import { createdCategoriesSelector } from "../../selectors";
 import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
-import { preprocess_predict } from "../../coroutines/classifier/preprocess_predict";
 import { predictCategories } from "../../coroutines/classifier/predictCategories";
 import { testImagesSelector } from "../../selectors/testImagesSelector";
 import { fittedSelector } from "../../selectors/fittedSelector";
@@ -14,19 +13,25 @@ import { ImageType } from "../../../types/ImageType";
 import * as tensorflow from "@tensorflow/tfjs";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
+import { preprocess } from "store/coroutines";
+import { Shape } from "types/Shape";
+import { FitOptions } from "types/FitOptions";
+import { fitOptionsSelector } from "../../selectors";
 
 export function* predictSaga(action: any): any {
-  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
+  const testImages: Array<ImageType> = yield select(testImagesSelector);
 
-  let model = yield select(fittedSelector);
+  const categories: Category[] = yield select(createdCategoriesSelector);
 
   const architectureOptions: ArchitectureOptions = yield select(
     architectureOptionsSelector
   );
 
-  const categories: Category[] = yield select(createdCategoriesSelector);
+  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
-  const testImages: Array<ImageType> = yield select(testImagesSelector);
+  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+
+  let model = yield select(fittedSelector);
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
@@ -51,10 +56,12 @@ export function* predictSaga(action: any): any {
   } else {
     yield runPrediction(
       testImages,
+      categories,
+      architectureOptions.inputShape,
       rescaleOptions,
-      architectureOptions,
-      model,
-      categories
+      fitOptions,
+      { numCrops: 1 },
+      model
     );
   }
 
@@ -67,20 +74,27 @@ export function* predictSaga(action: any): any {
 
 function* runPrediction(
   testImages: Array<ImageType>,
+  categories: Array<Category>,
+  inputShape: Shape,
   rescaleOptions: RescaleOptions,
-  architectureOptions: ArchitectureOptions,
-  model: tensorflow.LayersModel,
-  categories: Array<Category>
+  fitOptions: FitOptions,
+  cropOptions: { numCrops: number },
+  model: tensorflow.LayersModel
 ) {
   var data: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank>;
-    id: string;
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>;
   try {
-    data = yield preprocess_predict(
+    data = yield preprocess(
       testImages,
+      categories,
+      inputShape,
       rescaleOptions,
-      architectureOptions.inputShape
+      fitOptions,
+      cropOptions
     );
   } catch (error) {
     yield handleError(

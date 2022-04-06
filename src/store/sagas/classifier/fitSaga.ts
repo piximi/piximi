@@ -61,29 +61,38 @@ export function* fitSaga(action: any): any {
   const trainImages: ImageType[] = yield select(trainImagesSelector);
   const valImages: ImageType[] = yield select(valImagesSelector);
   const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
-
-  const options: FitOptions = yield select(fitOptionsSelector);
+  const fitOptions: FitOptions = yield select(fitOptionsSelector);
 
   try {
-    var data: {
-      val: tensorflow.data.Dataset<{
-        xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-        ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-        label: tensorflow.Tensor<tensorflow.Rank.R1>;
-      }>;
-      train: tensorflow.data.Dataset<{
-        xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-        ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-        label: tensorflow.Tensor<tensorflow.Rank.R1>;
-      }>;
-    } = yield preprocess(
+    const trainData: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    }> = yield preprocess(
       trainImages,
+      categories,
+      architectureOptions.inputShape,
+      rescaleOptions,
+      fitOptions,
+      { numCrops: 1 }
+    );
+
+    const valData: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    }> = yield preprocess(
       valImages,
       categories,
       architectureOptions.inputShape,
       rescaleOptions,
-      options
+      fitOptions,
+      { numCrops: 1 }
     );
+
+    var data = { train: trainData, val: valData };
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
@@ -96,7 +105,7 @@ export function* fitSaga(action: any): any {
     var { fitted, status } = yield fit(
       compiledModel,
       data,
-      options,
+      fitOptions,
       onEpochEnd
     );
   } catch (error) {

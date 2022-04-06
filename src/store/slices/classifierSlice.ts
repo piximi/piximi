@@ -189,12 +189,14 @@ export const classifierSlice = createSlice({
           val: tensorflow.data.Dataset<{
             xs: tensorflow.Tensor<tensorflow.Rank.R4>;
             ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-            label: tensorflow.Tensor<tensorflow.Rank.R1>;
+            labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+            ids: tensorflow.Tensor<tensorflow.Rank.R1>;
           }>;
           train: tensorflow.data.Dataset<{
             xs: tensorflow.Tensor<tensorflow.Rank.R4>;
             ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-            label: tensorflow.Tensor<tensorflow.Rank.R1>;
+            labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+            ids: tensorflow.Tensor<tensorflow.Rank.R1>;
           }>;
         };
       }>
