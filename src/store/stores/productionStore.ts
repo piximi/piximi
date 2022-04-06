@@ -17,7 +17,8 @@ const sentryReduxEnhancer = Sentry.createReduxEnhancer({});
 
 const enhancers: StoreEnhancer[] = [sentryReduxEnhancer];
 
-const middleware: Middleware[] = [logger, saga, thunk];
+let middleware: Middleware[] =
+  process.env.NODE_ENV === "production" ? [saga, thunk] : [logger, saga, thunk];
 
 const preloadedState = {};
 
