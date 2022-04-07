@@ -255,6 +255,8 @@ export const sampleGenerator = (
       const label = categories.findIndex((category: Category) => {
         if (category.id !== UNKNOWN_CATEGORY_ID) {
           return category.id === image.categoryId;
+        } else {
+          return -1;
         }
       });
 
@@ -352,6 +354,7 @@ const doShowFromBrowser = async (items: {
   return new Promise((resolve) => resolve(items));
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const doShow = async (
   numChannels: number,
   items: {

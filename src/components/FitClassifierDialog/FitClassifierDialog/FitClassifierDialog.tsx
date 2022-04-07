@@ -2,7 +2,7 @@ import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice, projectSlice } from "../../../store/slices";
+import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
@@ -11,7 +11,6 @@ import {
   categorizedImagesSelector,
   compiledSelector,
 } from "../../../store/selectors";
-import * as _ from "lodash";
 import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
