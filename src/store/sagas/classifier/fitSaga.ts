@@ -34,7 +34,7 @@ export function* fitSaga(action: any): any {
   const categorizedImages: Array<ImageType> = yield select(
     categorizedImagesSelector
   );
-  const fitOptions: FitOptions = yield fitOptionsSelector;
+  const fitOptions: FitOptions = yield select(fitOptionsSelector);
 
   //first assign train and val partition to all categorized images
   const categorizedImagesIds = (
