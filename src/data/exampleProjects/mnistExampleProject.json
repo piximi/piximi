@@ -17,7 +17,7 @@
       "shuffle": true
     },
     "fitting": false,
-    "learningRate": 0.001,
+    "learningRate": 0.01,
     "lossFunction": "Categorical cross entropy",
     "metrics": ["Categorical accuracy"],
     "optimizationAlgorithm": "Adam",
@@ -17039,21 +17039,9 @@
         "visible": true
       },
       {
-        "color": "#4330B9",
-        "id": "513655a7-1042-4ccb-88e1-f2098c76d958",
-        "name": "9",
-        "visible": true
-      },
-      {
-        "color": "#A0B7D3",
-        "id": "495ca1b1-58c7-4b56-9c60-cc06f83249be",
-        "name": "3",
-        "visible": true
-      },
-      {
-        "color": "#952FB5",
-        "id": "21bc3a0b-f0b2-4b79-be6f-a4f15694ca4d",
-        "name": "8",
+        "color": "#CD6769",
+        "id": "9bbb0091-996f-4025-b020-44e61e7ca992",
+        "name": "0",
         "visible": true
       },
       {
@@ -17063,27 +17051,21 @@
         "visible": true
       },
       {
-        "color": "#0D9347",
-        "id": "5c521ef9-547b-4f3f-8b26-5ae73cc4d998",
-        "name": "4",
-        "visible": true
-      },
-      {
-        "color": "#AD4C68",
-        "id": "cc50123f-7639-4506-9b30-09e31ffc5864",
-        "name": "7",
-        "visible": true
-      },
-      {
-        "color": "#CD6769",
-        "id": "9bbb0091-996f-4025-b020-44e61e7ca992",
-        "name": "0",
-        "visible": true
-      },
-      {
         "color": "#F49FB8",
         "id": "d33329dc-8e54-4f4e-aed3-023b74d4981d",
         "name": "2",
+        "visible": true
+      },
+      {
+        "color": "#A0B7D3",
+        "id": "495ca1b1-58c7-4b56-9c60-cc06f83249be",
+        "name": "3",
+        "visible": true
+      },
+      {
+        "color": "#0D9347",
+        "id": "5c521ef9-547b-4f3f-8b26-5ae73cc4d998",
+        "name": "4",
         "visible": true
       },
       {
@@ -17096,6 +17078,24 @@
         "color": "#D5C49C",
         "id": "fe3a0e65-964a-4fe4-a026-2cfddd7d2143",
         "name": "6",
+        "visible": true
+      },
+      {
+        "color": "#AD4C68",
+        "id": "cc50123f-7639-4506-9b30-09e31ffc5864",
+        "name": "7",
+        "visible": true
+      },
+      {
+        "color": "#952FB5",
+        "id": "21bc3a0b-f0b2-4b79-be6f-a4f15694ca4d",
+        "name": "8",
+        "visible": true
+      },
+      {
+        "color": "#4330B9",
+        "id": "513655a7-1042-4ccb-88e1-f2098c76d958",
+        "name": "9",
         "visible": true
       }
     ],

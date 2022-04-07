@@ -30,7 +30,6 @@ export type Classifier = {
     ids: tensorflow.Tensor;
   }>;
   evaluating: boolean;
-  evaluations?: Scalar | Array<Scalar>;
   fitOptions: FitOptions;
   fitted?: LayersModel;
   fitting: boolean;

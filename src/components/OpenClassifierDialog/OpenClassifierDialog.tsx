@@ -176,7 +176,7 @@ export const OpenClassifierDialog = ({
 
       {showFileError && (
         <AlertDialog
-          setShowAlertDialog={setShowFileError}
+          setShowAlertDialog={() => setShowFileError(false)}
           alertState={alertState}
         />
       )}

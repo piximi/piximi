@@ -48,13 +48,12 @@ export const EditCategoryDialog = ({
       })
     );
 
-    onCloseDialog();
+    onClose();
   };
 
   const onCloseDialog = () => {
-    setName("");
-
     onClose();
+    setName(category.name);
   };
 
   useHotkeys(

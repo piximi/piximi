@@ -10,34 +10,35 @@ export const compile = (
 ) => {
   const compiled = opened;
 
-  const loss = () => {
+  const loss = (): any => {
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {
-        return "absoluteDifference";
+        return tensorflow.losses.absoluteDifference;
       }
       case LossFunction.CategoricalCrossEntropy: {
-        return "categoricalCrossentropy";
+        // 'categoricalCrossentropy' is the string name for 'tf.losses.softmaxCrossEntropy'
+        return tensorflow.losses.softmaxCrossEntropy;
       }
       case LossFunction.CosineDistance: {
-        return "cosineDistance";
+        return tensorflow.losses.cosineDistance;
       }
       case LossFunction.Hinge: {
-        return "hingeLoss";
+        return tensorflow.losses.hingeLoss;
       }
       case LossFunction.Huber: {
-        return "huberLoss";
+        return tensorflow.losses.huberLoss;
       }
       case LossFunction.Log: {
-        return "logLoss";
+        return tensorflow.losses.logLoss;
       }
       case LossFunction.MeanSquaredError: {
-        return "meanSquaredError";
+        return tensorflow.losses.meanSquaredError;
       }
       case LossFunction.SigmoidCrossEntropy: {
-        return "sigmoidCrossEntropy";
+        return tensorflow.losses.sigmoidCrossEntropy;
       }
       default: {
-        return "softmaxCrossEntropy";
+        return tensorflow.losses.softmaxCrossEntropy;
       }
     }
   };

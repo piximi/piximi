@@ -5,6 +5,7 @@ import {
   IconButton,
   Stack,
   Typography,
+  Grid,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { EvaluateMetricInfoBox } from "./EvaluateMetricInfoBox";
@@ -62,14 +63,19 @@ export const EvaluateClassifierDialog = (
       </DialogTitle>
 
       <DialogContent>
-        <Stack spacing={1} direction="row">
+        <Grid
+          container
+          direction="row"
+          justifyContent="space-evenly"
+          alignItems="flex-start"
+        >
           <ConfusionMatrix
             classNames={classNames}
             confusionMatrix={confusionMatrix}
           />
 
-          <Stack spacing={1}>
-            <Typography align={"center"} variant="body1">
+          <div>
+            <Typography align={"center"} variant="body1" sx={{ mb: 2 }}>
               Evaluation metrics:
             </Typography>
             <Stack spacing={1} direction="row">
@@ -101,8 +107,8 @@ export const EvaluateClassifierDialog = (
               value={f1Score}
               link="https://en.wikipedia.org/wiki/F-score"
             />
-          </Stack>
-        </Stack>
+          </div>
+        </Grid>
       </DialogContent>
     </Dialog>
   );

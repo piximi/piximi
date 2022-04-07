@@ -8,16 +8,14 @@ import { classifierSlice, applicationSlice } from "../../slices";
 import { evaluate } from "store/coroutines/classifier/evaluate";
 import * as tensorflow from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
 import { valDataSelector } from "store/selectors";
 
 export function* evaluateSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(fittedSelector);
   const validationImages: Array<ImageType> = yield select(valImagesSelector);
-  yield put(
-    applicationSlice.actions.updateAlertState({ alertState: defaultAlert })
-  );
+  yield put(yield put(applicationSlice.actions.hideAlertState({})));
 
   const categories: Array<Category> = yield select(createdCategoriesSelector);
 

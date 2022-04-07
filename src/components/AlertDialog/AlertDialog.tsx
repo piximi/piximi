@@ -19,16 +19,19 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { createGitHubIssue } from "utils/createGitHubIssue";
 import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
+import { useDispatch } from "react-redux";
+import { applicationSlice } from "store/slices";
 
 type AlertDialogProps = {
-  setShowAlertDialog: (show: boolean) => void;
   alertState: AlertStateType;
+  setShowAlertDialog?: (show: boolean) => void;
 };
 
 export const AlertDialog = ({
-  setShowAlertDialog,
   alertState,
+  setShowAlertDialog = undefined,
 }: AlertDialogProps) => {
+  const dispatch = useDispatch();
   const theme = usePreferredMuiTheme();
 
   const [expanded, setExpanded] = React.useState(false);
@@ -76,6 +79,14 @@ export const AlertDialog = ({
     },
   }));
 
+  const closeAlertDialog = () => {
+    if (setShowAlertDialog) {
+      setShowAlertDialog(false);
+    } else {
+      dispatch(applicationSlice.actions.hideAlertState({}));
+    }
+  };
+
   return (
     <div>
       <StyledToolbar>
@@ -122,7 +133,7 @@ export const AlertDialog = ({
             size="large"
             edge="end"
             color="inherit"
-            onClick={() => setShowAlertDialog(false)}
+            onClick={closeAlertDialog}
           >
             <CloseIcon />
           </IconButton>

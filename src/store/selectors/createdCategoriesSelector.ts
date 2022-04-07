@@ -1,5 +1,4 @@
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { sortBy } from "lodash";
 import { Project } from "../../types/Project";
 
 export const createdCategoriesSelector = ({
@@ -11,5 +10,5 @@ export const createdCategoriesSelector = ({
     return category.id !== UNKNOWN_CATEGORY_ID;
   });
 
-  return sortBy(categories, "name");
+  return categories;
 };

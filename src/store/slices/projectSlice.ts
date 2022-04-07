@@ -65,10 +65,20 @@ export const projectSlice = createSlice({
     createImage(state: Project, action: PayloadAction<{ image: ImageType }>) {
       state.images.push(action.payload.image);
     },
-    createProject(state: Project, action: PayloadAction<{ project: Project }>) {
-      state.categories = action.payload.project.categories;
-      state.name = action.payload.project.name;
-      state.images = action.payload.project.images;
+    createNewProject(state: Project, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
+      state.categories = [
+        {
+          color: "#AAAAAA",
+          id: UNKNOWN_CATEGORY_ID,
+          name: "Unknown",
+          visible: true,
+        },
+      ];
+      state.images = [];
+      state.task = Task.Classify;
+      state.trainFlag = 0;
+      state.imageSortKey = defaultImageSortKey;
     },
     deleteCategory(state: Project, action: PayloadAction<{ id: string }>) {
       state.categories = filter(state.categories, (category: Category) => {
@@ -77,6 +87,7 @@ export const projectSlice = createSlice({
       state.images = state.images.map((image: ImageType) => {
         if (image.categoryId === action.payload.id) {
           image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.partition = Partition.Inference;
         }
         return image;
       });
@@ -243,7 +254,7 @@ export const projectSlice = createSlice({
 export const {
   createCategory,
   createImage,
-  createProject,
+  createNewProject,
   deleteCategory,
   updateCategory,
   updateCategoryVisibility,

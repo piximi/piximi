@@ -10,19 +10,16 @@ import { DialogTransition } from "../../DialogTransition";
 import {
   categorizedImagesSelector,
   compiledSelector,
-  trainingPercentageSelector,
-  fitOptionsSelector,
 } from "../../../store/selectors";
-import { ImageType } from "../../../types/ImageType";
 import * as _ from "lodash";
-import { Partition } from "../../../types/Partition";
 import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -30,15 +27,14 @@ type FitClassifierDialogProps = {
 };
 
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
+  const dispatch = useDispatch();
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
-  const [noCategorizedImagesAlert, setNoCategorizedImagesAlert] =
+  const [showWarning, setShowWarning] = useState<boolean>(true);
+  const [noCategorizedImages, setNoCategorizedImages] =
     useState<boolean>(false);
-  const [localAlertState, setLocalAlertState] =
-    useState<AlertStateType>(defaultAlert);
-  const [showWarning, setShowWarning] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
@@ -57,55 +53,59 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const trainingPercentage = useSelector(trainingPercentageSelector);
+  const currentlyTraining = useSelector(trainingFlagSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
   const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
-  const fitOptions = useSelector(fitOptionsSelector);
 
   const epochs = useSelector(epochsSelector);
 
+  const noLabeledImageAlert: AlertStateType = {
+    alertType: AlertType.Info,
+    name: "No labeled images",
+    description: "Please label images to train a model.",
+  };
+
   useEffect(() => {
     if (categorizedImages.length === 0) {
-      setLocalAlertState({
-        alertType: AlertType.Info,
-        name: "No labeled images",
-        description: "Please label images to train a model.",
-      });
-      setNoCategorizedImagesAlert(true);
-      setShowWarning(true);
-    } else {
-      if (noCategorizedImagesAlert) {
-        setShowWarning(false);
+      setNoCategorizedImages(true);
+      if (!noCategorizedImages) {
+        setShowWarning(true);
       }
-      setNoCategorizedImagesAlert(false);
+    } else {
+      setNoCategorizedImages(false);
     }
-  }, [categorizedImages, noCategorizedImagesAlert]);
-
-  useEffect(() => {
-    if (alertState.alertType !== AlertType.None) {
-      setLocalAlertState(alertState);
-      setShowWarning(true);
-    }
-  }, [alertState]);
-
-  const dispatch = useDispatch();
+  }, [categorizedImages, noCategorizedImages]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
+    const trainingEpochIndicator = epochCount - 0.5;
     setCurrentEpoch(epochCount);
-    setTrainingAccuracy((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.categoricalAccuracy })
-    );
-    setValidationAccuracy((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
-    );
-    setTrainingLoss((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.loss })
-    );
-    setValidationLoss((prevState) =>
-      prevState.concat({ x: epochCount, y: logs.val_loss })
-    );
+
+    if (logs.categoricalAccuracy) {
+      setTrainingAccuracy((prevState) =>
+        prevState.concat({
+          x: trainingEpochIndicator,
+          y: logs.categoricalAccuracy,
+        })
+      );
+    }
+    if (logs.val_categoricalAccuracy) {
+      setValidationAccuracy((prevState) =>
+        prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
+      );
+    }
+    if (logs.loss) {
+      setTrainingLoss((prevState) =>
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
+      );
+    }
+
+    if (logs.val_loss) {
+      setValidationLoss((prevState) =>
+        prevState.concat({ x: epochCount, y: logs.val_loss })
+      );
+    }
 
     setShowPlots(true);
   };
@@ -121,37 +121,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   };
 
   const onFit = async () => {
-    cleanUpStates();
-
-    //first assign train and val partition to all categorized images
-
-    const categorizedImagesIds = (
-      fitOptions.shuffle ? _.shuffle(categorizedImages) : categorizedImages
-    ).map((image: ImageType) => {
-      return image.id;
-    });
-
-    //separate ids into train and val datasets
-    const trainDataLength = Math.round(
-      trainingPercentage * categorizedImagesIds.length
-    );
-    const valDataLength = categorizedImagesIds.length - trainDataLength;
-
-    const trainDataIds = _.take(categorizedImagesIds, trainDataLength);
-    const valDataIds = _.takeRight(categorizedImagesIds, valDataLength);
-
-    dispatch(
-      projectSlice.actions.updateImagesPartition({
-        ids: trainDataIds,
-        partition: Partition.Training,
-      })
-    );
-    dispatch(
-      projectSlice.actions.updateImagesPartition({
-        ids: valDataIds,
-        partition: Partition.Validation,
-      })
-    );
+    if (!currentlyTraining) {
+      cleanUpStates();
+    }
 
     dispatch(
       classifierSlice.actions.fit({
@@ -171,17 +143,19 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       <FitClassifierDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noCategorizedImagesAlert}
+        disableFitting={noCategorizedImages}
         epochs={epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && (
+      {showWarning && noCategorizedImages && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
-          alertState={localAlertState}
+          alertState={noLabeledImageAlert}
         />
       )}
+
+      {alertState.visible && <AlertDialog alertState={alertState} />}
 
       <DialogContent>
         <List dense>
@@ -201,12 +175,14 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           <div>
             <TrainingHistoryPlot
               metric={"accuracy"}
+              currentEpoch={currentEpoch}
               trainingValues={trainingAccuracy}
               validationValues={validationAccuracy}
             />
 
             <TrainingHistoryPlot
               metric={"loss"}
+              currentEpoch={currentEpoch}
               trainingValues={trainingLoss}
               validationValues={validationLoss}
               dynamicYRange={true}
