@@ -28,11 +28,11 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    event.persist();
-
     if (!event.currentTarget.files) return;
 
-    setFiles(event.currentTarget.files);
+    const files = Object.assign([], event.currentTarget.files);
+    event.currentTarget.value = "";
+    setFiles(files);
 
     setOpenDimensionsDialogBox(true); //open dialog box
 
