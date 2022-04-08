@@ -1,8 +1,6 @@
-import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { ImageType } from "../../../../types/ImageType";
 import { projectSlice } from "../../../../store/slices";
@@ -12,6 +10,7 @@ import {
   selectedImagesSelector,
 } from "../../../../store/selectors";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import Stack from "@mui/material/Stack";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;
@@ -47,24 +46,25 @@ export const ExitAnnotatorDialog = ({
     <Dialog onClose={onClose} open={open} maxWidth={"md"}>
       <DialogTitle>Save annotations?</DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ pb: 0 }}>
         Would you like to save these annotations and return to the project page?
+        <br />
         These annotations will be used for training.
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Stay on this page
-        </Button>
+      <Stack direction="column" />
+      <Button onClick={onClose} color="primary">
+        Stay on this page
+      </Button>
 
-        <Button onClick={onReturnToProject} color="primary">
-          Discard changes and return to project
-        </Button>
+      <Button onClick={onReturnToProject} color="primary">
+        Discard changes and return to project
+      </Button>
 
-        <Button onClick={onSaveAnnotations} color="primary">
-          Save annotations and return to project
-        </Button>
-      </DialogActions>
+      <Button onClick={onSaveAnnotations} color="primary">
+        Save annotations and return to project
+      </Button>
+      <Stack />
     </Dialog>
   );
 };
