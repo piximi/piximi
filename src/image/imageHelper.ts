@@ -283,7 +283,7 @@ export const convertFileToImage = async (
   return file
     .arrayBuffer()
     .then((buffer) => {
-      return ImageJS.Image.load(buffer);
+      return ImageJS.Image.load(buffer, { ignorePalette: true });
     })
     .then((image: ImageJS.Image) => {
       return convertToImage(image, file.name, colors, slices, channels);

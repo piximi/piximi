@@ -37,7 +37,7 @@
     "@types/uuid": "^8.3.3",
     "file-saver": "^2.0.5",
     "i18next": "19.0.0",
-    "image-js": "^0.31.3",
+    "image-js": "https://github.com/piximi/image-js",
     "jszip": "^3.7.1",
     "konva": "^8.3.0",
     "lodash": "^4.17.20",
