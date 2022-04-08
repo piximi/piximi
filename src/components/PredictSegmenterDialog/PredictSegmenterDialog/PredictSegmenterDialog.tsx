@@ -98,7 +98,7 @@ export const PredictSegmenterDialog = (
     if (!image) return;
 
     //Resize image to [IMAGE_SIZE, IMAGE_SIZE]
-    const img = await ImageJS.Image.load(image.src);
+    const img = await ImageJS.Image.load(image.src, { ignorePalette: true });
     const resizedImg = img.resize({ width: IMAGE_SIZE, height: IMAGE_SIZE });
 
     const labelData = await forwardPass(resizedImg, IMAGE_SIZE, model);
