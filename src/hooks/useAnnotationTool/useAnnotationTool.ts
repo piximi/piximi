@@ -36,7 +36,7 @@ export const useAnnotationTool = () => {
     if (!src) return;
 
     const loadImage = async () => {
-      const image = await ImageJS.Image.load(src);
+      const image = await ImageJS.Image.load(src, { ignorePalette: true });
       setImage(image);
     };
 

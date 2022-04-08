@@ -51,7 +51,9 @@ export const decodeFromImgSrc = async (
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
-  let data: ImageJS.Image = await ImageJS.Image.load(buffer);
+  let data: ImageJS.Image = await ImageJS.Image.load(buffer, {
+    ignorePalette: true,
+  });
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 

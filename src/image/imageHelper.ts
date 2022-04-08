@@ -138,7 +138,9 @@ export const deserializeImages = async (
     const defaultPlane = 0;
     let nPlanes = serializedImage.imageData.length;
     let referenceImageData = originalSrc[defaultPlane][0];
-    let referenceImage = await ImageJS.Image.load(referenceImageData);
+    let referenceImage = await ImageJS.Image.load(referenceImageData, {
+      ignorePalette: true,
+    });
 
     let src: string;
     if (serializedImage.imageSrc) {
@@ -221,8 +223,12 @@ export const convertDataArrayToRGBSource = async (
     );
   }
 
-  let redChannelPromise = ImageJS.Image.load(channels[0]);
-  let greenChannelPromise = ImageJS.Image.load(channels[1]);
+  let redChannelPromise = ImageJS.Image.load(channels[0], {
+    ignorePalette: true,
+  });
+  let greenChannelPromise = ImageJS.Image.load(channels[1], {
+    ignorePalette: true,
+  });
   let blueChannelPromise =
     channels.length === 2 // if no blue channel, construct a "blank" image object
       ? new Promise<ImageJS.Image>((resolve) =>
@@ -233,7 +239,7 @@ export const convertDataArrayToRGBSource = async (
             })
           )
         )
-      : ImageJS.Image.load(channels[2]);
+      : ImageJS.Image.load(channels[2], { ignorePalette: true });
 
   return Promise.all([
     redChannelPromise,
@@ -283,7 +289,7 @@ export const convertFileToImage = async (
   return file
     .arrayBuffer()
     .then((buffer) => {
-      return ImageJS.Image.load(buffer);
+      return ImageJS.Image.load(buffer, { ignorePalette: true });
     })
     .then((image: ImageJS.Image) => {
       return convertToImage(image, file.name, colors, slices, channels);
