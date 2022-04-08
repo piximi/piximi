@@ -8,7 +8,7 @@ test("foo", async () => {
   const src =
     "data:image/gif;base64,R0lGODlhCwALAIAAAAAA3pn/ZiH5BAEAAAEALAAAAAALAAsAAAIUhA+hkcuO4lmNVindo7qyrIXiGBYAOw==";
 
-  const img = await Image.load(src);
+  const img = await Image.load(src, { ignorePalette: true });
 
   const grey = img.grey();
   const edges = grey.sobelFilter();
