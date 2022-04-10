@@ -9055,7 +9055,7 @@ ignore@^5.1.8, ignore@^5.2.0:
 
 "image-js@https://github.com/piximi/image-js":
   version "0.33.2"
-  resolved "https://github.com/piximi/image-js#e773f891ab81f6d5b3adeeebd99cd6a897a67ad5"
+  resolved "https://github.com/piximi/image-js#0b3fe06aaf6d00087912c8719d8cec9bbe6df3b0"
   dependencies:
     "@swiftcarrot/color-fns" "^3.2.0"
     blob-util "^2.0.2"
