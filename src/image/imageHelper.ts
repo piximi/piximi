@@ -347,7 +347,7 @@ const convertToImage = (
 
   let displayedData: Array<Array<number>> = [];
 
-  if (z === 1 && c === 3) {
+  if (z === 1 && c === 3 && input.length === 1) {
     //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
 
     displayedData = extractChannelsFromFlattenedArray(
