@@ -13,7 +13,7 @@ import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
 
-export const mapChannelstoSpecifiedRGBImage = (
+export const mapChannelsToSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Color>,
   rows: number,
@@ -153,7 +153,7 @@ export const deserializeImages = async (
         new Array(originalSrc[defaultPlane])
       );
 
-      src = mapChannelstoSpecifiedRGBImage(
+      src = mapChannelsToSpecifiedRGBImage(
         originalData[0],
         serializedImage.imageColors,
         referenceImage.height,
@@ -396,7 +396,7 @@ const convertToImage = (
     }
   }
 
-  const displayedURI = mapChannelstoSpecifiedRGBImage(
+  const displayedURI = mapChannelsToSpecifiedRGBImage(
     displayedData!,
     colors,
     height,

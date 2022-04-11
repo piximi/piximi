@@ -5,7 +5,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { DEFAULT_COLORS } from "../../../../../types/DefaultColors";
 import {
   convertImageURIsToImageData,
-  mapChannelstoSpecifiedRGBImage,
+  mapChannelsToSpecifiedRGBImage,
   rgbToHex,
 } from "../../../../../image/imageHelper";
 import { imageViewerSlice } from "../../../../../store/slices";
@@ -69,7 +69,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
       )
     )[0];
 
-    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+    const modifiedURI = mapChannelsToSpecifiedRGBImage(
       activePlaneData,
       updatedColors,
       imageShape.height,

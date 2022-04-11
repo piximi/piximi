@@ -14,7 +14,7 @@ import { ZStackSlider } from "../ZStackSlider";
 import {
   convertImageURIsToImageData,
   generateDefaultChannels,
-  mapChannelstoSpecifiedRGBImage,
+  mapChannelsToSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import { ApplyColorsButton } from "../ApplyColorsButton";
@@ -49,7 +49,7 @@ export const ColorAdjustmentOptions = () => {
       )
     )[0];
 
-    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+    const modifiedURI = mapChannelsToSpecifiedRGBImage(
       activePlaneData,
       defaultChannels,
       imageShape.height,
