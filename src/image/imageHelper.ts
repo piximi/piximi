@@ -341,7 +341,9 @@ const convertToImage = (
     ? image.length / z
     : image.components;
   const displayedIdx: number = 0;
-  const colors = currentColors ? currentColors : generateDefaultChannels(c);
+  const colors = currentColors
+    ? currentColors
+    : generateDefaultChannels(channels);
   const width = input[0].width;
   const height = input[0].height;
 
