@@ -9186,9 +9186,10 @@ ignore@^5.1.8, ignore@^5.2.0:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
 
-"image-js@https://github.com/piximi/image-js":
-  version "0.33.2"
-  resolved "https://github.com/piximi/image-js#e773f891ab81f6d5b3adeeebd99cd6a897a67ad5"
+image-js@^0.34.0:
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/image-js/-/image-js-0.34.0.tgz#59730717d9e6f530a8818c6f0cd69467cb92c5b2"
+  integrity sha512-REGH/VxTU9v96R2jg+84gQhazx8jqT46ieY12lzNzQEL5dMJvWDlIVTEvhmO5BmHG6kHMIb/5kL3LnJnnf8YDQ==
   dependencies:
     "@swiftcarrot/color-fns" "^3.2.0"
     blob-util "^2.0.2"
