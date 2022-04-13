@@ -29,61 +29,61 @@ const categories: Array<Category> = [
   // },
   {
     color: "#CD6769",
-    id: "00000000-0000-0000-0000-000000000000",
+    id: "10000000-0000-0000-0000-000000000000",
     name: "0",
     visible: true,
   },
   {
     color: "#70FF99",
-    id: "00000000-0000-0000-0000-000000000001",
+    id: "10000000-0000-0000-0000-000000000001",
     name: "1",
     visible: true,
   },
   {
     color: "#F49FB8",
-    id: "00000000-0000-0000-0000-000000000002",
+    id: "10000000-0000-0000-0000-000000000002",
     name: "2",
     visible: true,
   },
   {
     color: "#A0B7D3",
-    id: "00000000-0000-0000-0000-000000000003",
+    id: "10000000-0000-0000-0000-000000000003",
     name: "3",
     visible: true,
   },
   {
     color: "#0D9347",
-    id: "00000000-0000-0000-0000-000000000004",
+    id: "10000000-0000-0000-0000-000000000004",
     name: "4",
     visible: true,
   },
   {
     color: "#794BA1",
-    id: "00000000-0000-0000-0000-000000000005",
+    id: "10000000-0000-0000-0000-000000000005",
     name: "5",
     visible: true,
   },
   {
     color: "#D5C49C",
-    id: "00000000-0000-0000-0000-000000000006",
+    id: "10000000-0000-0000-0000-000000000006",
     name: "6",
     visible: true,
   },
   {
     color: "#AD4C68",
-    id: "00000000-0000-0000-0000-000000000007",
+    id: "10000000-0000-0000-0000-000000000007",
     name: "7",
     visible: true,
   },
   {
     color: "#952FB5",
-    id: "00000000-0000-0000-0000-000000000008",
+    id: "10000000-0000-0000-0000-000000000008",
     name: "8",
     visible: true,
   },
   {
     color: "#4330B9",
-    id: "00000000-0000-0000-0000-000000000009",
+    id: "10000000-0000-0000-0000-000000000009",
     name: "9",
     visible: true,
   },
@@ -125,7 +125,7 @@ const validationImages: Array<ImageType> = [
   {
     annotations: [],
     activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
+    categoryId: "10000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
     id: "00000000-0000-0000-0001-00000000000",
     colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
@@ -143,7 +143,7 @@ const validationImages: Array<ImageType> = [
   {
     annotations: [],
     activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-000000000008", // 8
+    categoryId: "10000000-0000-0000-0000-000000000008", // 8
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
     name: "mnist",
@@ -161,7 +161,7 @@ const validationImages: Array<ImageType> = [
   {
     annotations: [],
     activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-000000000007", // 7
+    categoryId: "10000000-0000-0000-0000-000000000007", // 7
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
     name: "mnist",
