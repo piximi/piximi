@@ -7,6 +7,8 @@ import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
+import { CropOptions, CropSchema } from "types/CropOptions";
+import { PreprocessOptions } from "types/PreprocessOptions";
 
 jest.setTimeout(50000);
 
@@ -23,11 +25,21 @@ const rescaleOptions: RescaleOptions = {
   rescaleMinMax: { min: 2, max: 5 },
 };
 
+const cropOptions: CropOptions = {
+  numCrops: 1,
+  cropSchema: CropSchema.Biggest,
+};
+
+const preprocessingOptions: PreprocessOptions = {
+  shuffle: true,
+  rescaleOptions,
+  cropOptions,
+};
+
 const fitOptions: FitOptions = {
   epochs: 10,
   batchSize: 32,
   initialEpoch: 0,
-  shuffle: true,
 };
 
 const categories: Array<Category> = [
@@ -66,9 +78,8 @@ it("preprocess", async () => {
     images,
     categories,
     inputShape,
-    rescaleOptions,
-    fitOptions,
-    { numCrops: 1 }
+    preprocessingOptions,
+    fitOptions
   );
 
   // future warning: toArrayForTest is undocumented

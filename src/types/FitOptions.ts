@@ -4,5 +4,4 @@ export type FitOptions = {
   initialEpoch: number;
   test_data_size?: number;
   train_data_size?: number;
-  shuffle: boolean;
 };

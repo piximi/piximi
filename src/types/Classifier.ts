@@ -1,17 +1,11 @@
-import {
-  History,
-  LayersModel,
-  Scalar,
-  Tensor,
-  Tensor2D,
-} from "@tensorflow/tfjs";
+import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 import { FitOptions } from "./FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
-import { RescaleOptions } from "./RescaleOptions";
+import { PreprocessOptions } from "./PreprocessOptions";
 import { ClassifierModelProps } from "./ClassifierModelType";
 import { EvaluationResultType } from "./EvaluationResultType";
 
@@ -47,7 +41,7 @@ export type Classifier = {
   predicting: boolean;
   predictions?: Tensor;
   predicted: boolean;
-  rescaleOptions: RescaleOptions;
   trainingPercentage: number;
   evaluationResult: EvaluationResultType;
+  preprocessOptions: PreprocessOptions;
 };

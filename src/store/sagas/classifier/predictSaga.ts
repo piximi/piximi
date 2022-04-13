@@ -1,13 +1,12 @@
 import { put, select } from "redux-saga/effects";
 import { classifierSlice, projectSlice, applicationSlice } from "../../slices";
 import { createdCategoriesSelector } from "../../selectors";
-import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
+import { preprocessOptionsSelector } from "../../selectors/preprocessOptionsSelector";
 import { predictCategories } from "../../coroutines/classifier/predictCategories";
 import { testImagesSelector } from "../../selectors/testImagesSelector";
 import { fittedSelector } from "../../selectors/fittedSelector";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
 import { Category } from "../../../types/Category";
-import { RescaleOptions } from "types/RescaleOptions";
 import { ArchitectureOptions } from "types/ArchitectureOptions";
 import { ImageType } from "../../../types/ImageType";
 import * as tensorflow from "@tensorflow/tfjs";
@@ -17,6 +16,7 @@ import { preprocess } from "store/coroutines";
 import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { fitOptionsSelector } from "../../selectors";
+import { PreprocessOptions } from "types/PreprocessOptions";
 
 export function* predictSaga(action: any): any {
   const testImages: Array<ImageType> = yield select(testImagesSelector);
@@ -27,7 +27,9 @@ export function* predictSaga(action: any): any {
     architectureOptionsSelector
   );
 
-  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
+  const preprocessOptions: PreprocessOptions = yield select(
+    preprocessOptionsSelector
+  );
 
   const fitOptions: FitOptions = yield select(fitOptionsSelector);
 
@@ -58,9 +60,8 @@ export function* predictSaga(action: any): any {
       testImages,
       categories,
       architectureOptions.inputShape,
-      rescaleOptions,
+      preprocessOptions,
       fitOptions,
-      { numCrops: 1 },
       model
     );
   }
@@ -76,9 +77,8 @@ function* runPrediction(
   testImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
-  rescaleOptions: RescaleOptions,
+  preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  cropOptions: { numCrops: number },
   model: tensorflow.LayersModel
 ) {
   var data: tensorflow.data.Dataset<{
@@ -92,9 +92,8 @@ function* runPrediction(
       testImages,
       categories,
       inputShape,
-      rescaleOptions,
-      fitOptions,
-      cropOptions
+      preprocessOptions,
+      fitOptions
     );
   } catch (error) {
     yield handleError(

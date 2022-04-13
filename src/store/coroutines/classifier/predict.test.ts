@@ -13,6 +13,9 @@ import { RescaleOptions } from "../../../types/RescaleOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
 import { preprocess } from "store/coroutines/classifier/preprocess";
 import { predictCategories } from "./predictCategories";
+import { FitOptions } from "types/FitOptions";
+import { PreprocessOptions } from "types/PreprocessOptions";
+import { CropOptions, CropSchema } from "types/CropOptions";
 
 jest.setTimeout(100000);
 
@@ -98,13 +101,23 @@ const rescaleOptions: RescaleOptions = {
   rescaleMinMax: { min: 2, max: 5 },
 };
 
-const fitOptions = {
+const cropOptions: CropOptions = {
+  numCrops: 1,
+  cropSchema: CropSchema.Biggest,
+};
+
+const preprocessingOptions: PreprocessOptions = {
+  shuffle: true,
+  rescaleOptions,
+  cropOptions,
+};
+
+const fitOptions: FitOptions = {
   epochs: 2,
   batchSize: 3,
   initialEpoch: 0,
   test_data_size: 3,
   train_data_size: 3,
-  shuffle: false,
 };
 
 const inferrenceImages: Array<ImageType> = [
@@ -170,9 +183,8 @@ it("predict", async () => {
     inferrenceImages,
     categories,
     inputShape,
-    rescaleOptions,
-    fitOptions,
-    { numCrops: 1 }
+    preprocessingOptions,
+    fitOptions
   );
 
   const fs = require("fs");

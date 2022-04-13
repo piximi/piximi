@@ -12,6 +12,7 @@ import {
   ClassifierModelProps,
 } from "../../types/ClassifierModelType";
 import { EvaluationResultType } from "types/EvaluationResultType";
+import { CropSchema } from "types/CropOptions";
 
 const initialState: Classifier = {
   evaluating: false,
@@ -26,7 +27,6 @@ const initialState: Classifier = {
     epochs: 10,
     batchSize: 32,
     initialEpoch: 0,
-    shuffle: true,
   },
   fitting: false,
   learningRate: 0.01,
@@ -36,9 +36,16 @@ const initialState: Classifier = {
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
   predicted: false,
-  rescaleOptions: {
-    rescale: true,
-    rescaleMinMax: { min: 0, max: 1 },
+  preprocessOptions: {
+    shuffle: true,
+    rescaleOptions: {
+      rescale: true,
+      rescaleMinMax: { min: 0, max: 1 },
+    },
+    cropOptions: {
+      numCrops: 1,
+      cropSchema: CropSchema.None,
+    },
   },
   trainingPercentage: 0.75,
   evaluationResult: {
@@ -89,7 +96,7 @@ export const classifierSlice = createSlice({
       state.history = classifier.history;
       state.predictions = classifier.predictions;
       state.predicted = classifier.predicted;
-      state.rescaleOptions = classifier.rescaleOptions;
+      state.preprocessOptions = classifier.preprocessOptions;
 
       state.selectedModel = availableModels[0];
       if (classifier.selectedModel) {
@@ -235,7 +242,7 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{ rescaleOptions: RescaleOptions }>
     ) {
-      state.rescaleOptions = action.payload.rescaleOptions;
+      state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
     },
     updateTrainingPercentage(
       state,

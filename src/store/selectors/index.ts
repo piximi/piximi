@@ -40,3 +40,4 @@ export { imageSelectionColorSelector } from "./imageSelectionColorSelector";
 export { themeModeSelector } from "./themeModeSelector";
 export { availableColorsSelector } from "./availableColorsSelector";
 export { imageSelectionSizeSelector } from "./imageSelectionSizeSelector";
+export { preprocessOptionsSelector } from "./preprocessOptionsSelector";

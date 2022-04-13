@@ -4,8 +4,8 @@ import * as ImageJS from "image-js";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
-import { RescaleOptions } from "../../../types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
+import { PreprocessOptions } from "types/PreprocessOptions";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {
@@ -190,12 +190,14 @@ export const cropResize = async (
   labels: number;
   ids: string;
 }> => {
+  // [y1, x1, y2, x2]
   const cropCoords = [
-    [0.0, 0.0, 1.0, 1.0],
-    [0.0, 0.0, 1.0, 1.0],
-    [0.0, 0.0, 1.0, 1.0],
-    // [0.0, 0.0, 0.9, 0.9],
-    // [0.1, 0.1, 1.0, 1.0],
+    // [0.0, 0.0, 1.0, 1.0],
+    // [0.0, 0.0, 1.0, 1.0],
+    // [0.0, 0.0, 1.0, 1.0],
+    [0.0, 0.0, 0.9, 0.9],
+    [0.1, 0.1, 1.0, 1.0],
+    [0.05, 0.05, 0.95, 0.95],
   ];
 
   const cropSize: [number, number] = [inputShape.height, inputShape.width];
@@ -283,12 +285,37 @@ export const sampleGenerator = (
 };
 
 /* Debug Stuff */
-let limit = 10;
+let limit = 1;
+// xsData: [batchNum, height, width, channel]; ysData: [batchNum, oneHot]
 const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
-  let canvas = document.createElement("canvas");
+  let canvas;
+  if (process.env.NODE_ENV === "test") {
+    const { createCanvas } = require("canvas");
+    canvas = createCanvas(xsData[2].length, xsData[1].length);
+  } else {
+    canvas = document.createElement("canvas");
+    canvas.width = xsData[2].length;
+    canvas.height = xsData[1].length;
+  }
+
   for (const [i, c] of xsData.entries()) {
     try {
-      await tensorflow.browser.toPixels(c, canvas);
+      const channel = tensorflow.tensor3d(c, undefined, "int32");
+      const imageDataArr = await tensorflow.browser.toPixels(channel);
+      channel.dispose();
+      let imageData;
+      if (process.env.NODE_ENV === "test") {
+        const { createImageData } = require("canvas");
+        imageData = createImageData(imageDataArr, xsData[2].length);
+      } else {
+        imageData = new ImageData(
+          imageDataArr,
+          xsData[2].length,
+          xsData[1].length
+        );
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.putImageData(imageData, 0, 0);
     } catch (e) {
       if (process.env.NODE_ENV !== "production") console.error(e);
     }
@@ -350,6 +377,7 @@ const doShowFromBrowser = async (items: {
 }> => {
   const xsData = tensorflow.tidy(() => {
     return items.xs.mul(tensorflow.scalar(255)).arraySync() as number[][][][];
+    // return items.xs.arraySync() as number[][][][];
   });
   const ysData = tensorflow.tidy(() => items.ys.arraySync());
   doShowImages(xsData, ysData);
@@ -369,13 +397,13 @@ const doShow = async (
   ys: tensorflow.Tensor<tensorflow.Rank.R2>;
   labels: tensorflow.Tensor<tensorflow.Rank.R1>;
 }> => {
-  console.log(
-    "perf:",
-    items.xs.shape[0],
-    tensorflow.memory().numTensors,
-    tensorflow.memory().numBytes, // @ts-ignore
-    tensorflow.memory().numBytesInGPU
-  );
+  // console.log(
+  //   "perf:",
+  //   items.xs.shape[0],
+  //   tensorflow.memory().numTensors,
+  //   tensorflow.memory().numBytes, // @ts-ignore
+  //   tensorflow.memory().numBytesInGPU
+  // );
   return numChannels === 1 || numChannels === 3
     ? doShowFromBrowser(items)
     : doShowFromChannels(numChannels, items);
@@ -386,9 +414,8 @@ export const preprocess = async (
   images: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
-  rescaleOptions: RescaleOptions,
-  fitOptions: FitOptions,
-  cropOptions: { numCrops: number }
+  preprocessOptions: PreprocessOptions,
+  fitOptions: FitOptions
 ): Promise<
   tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
@@ -398,26 +425,35 @@ export const preprocess = async (
   }>
 > => {
   let imageData = tensorflow.data
-    .generator(sampleGenerator(images, categories, cropOptions.numCrops))
+    .generator(
+      sampleGenerator(
+        images,
+        categories,
+        preprocessOptions.cropOptions.numCrops
+      )
+    )
     .map(decodeCategory(categories.length))
     .mapAsync(
-      decodeImage.bind(null, inputShape.channels, rescaleOptions.rescale)
+      decodeImage.bind(
+        null,
+        inputShape.channels,
+        preprocessOptions.rescaleOptions.rescale
+      )
     )
     .mapAsync(cropResize.bind(null, inputShape));
 
-  if (fitOptions.shuffle) {
+  if (preprocessOptions.shuffle) {
     imageData = imageData.shuffle(fitOptions.batchSize);
   }
 
-  const imageDataBatched = imageData.batch(
-    fitOptions.batchSize
-  ) as tensorflow.data.Dataset<{
+  const imageDataBatched = imageData
+    .batch(fitOptions.batchSize)
+    .mapAsync((items: any) => doShow(inputShape.channels, items)); // For debug stuff
+
+  return imageDataBatched as tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
     ys: tensorflow.Tensor<tensorflow.Rank.R2>;
     labels: tensorflow.Tensor<tensorflow.Rank.R1>;
     ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>;
-  // .mapAsync((items: any) => doShow(inputShape.channels, items)); // For debug stuff
-
-  return imageDataBatched;
 };
