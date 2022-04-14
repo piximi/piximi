@@ -27,7 +27,7 @@ const rescaleOptions: RescaleOptions = {
 
 const cropOptions: CropOptions = {
   numCrops: 1,
-  cropSchema: CropSchema.Biggest,
+  cropSchema: CropSchema.None,
 };
 
 const preprocessingOptions: PreprocessOptions = {
