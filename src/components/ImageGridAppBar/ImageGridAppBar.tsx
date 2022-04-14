@@ -26,6 +26,7 @@ import {
   Box,
 } from "@mui/material";
 import SelectAllIcon from "@mui/icons-material/SelectAll";
+import DeselectIcon from "@mui/icons-material/Deselect";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -47,11 +48,19 @@ export const ImageGridAppBar = () => {
 
   const [showImageGridAppBar, setShowImageGridAppBar] =
     React.useState<boolean>(false);
+
+  const [showSelectAllButton, setShowSelectAllButton] =
+    React.useState<boolean>(true);
+
   React.useEffect(() => {
     selectedImages.length > 0
       ? setShowImageGridAppBar(true)
       : setShowImageGridAppBar(false);
-  }, [selectedImages]);
+
+    images.length === selectedImages.length
+      ? setShowSelectAllButton(false)
+      : setShowSelectAllButton(true);
+  }, [selectedImages, images]);
 
   const {
     onClose: onCloseDeleteImagesDialog,
@@ -104,11 +113,13 @@ export const ImageGridAppBar = () => {
   };
 
   const selectAllImages = () => {
+    setShowSelectAllButton(false);
     const newSelected = images.map((image) => image.id);
     dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
   };
 
   const unselectImages = () => {
+    setShowSelectAllButton(true);
     dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
@@ -187,14 +198,25 @@ export const ImageGridAppBar = () => {
               variant="outlined"
             />
 
-            <Tooltip
-              placement="bottom"
-              title={tooltipTitle("Select all images", "control", "a")}
-            >
-              <IconButton color="inherit" onClick={selectAllImages}>
-                <SelectAllIcon />
-              </IconButton>
-            </Tooltip>
+            {showSelectAllButton ? (
+              <Tooltip
+                placement="bottom"
+                title={tooltipTitle("Select all images", "control", "a")}
+              >
+                <IconButton color="inherit" onClick={selectAllImages}>
+                  <SelectAllIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip
+                placement="bottom"
+                title={tooltipTitle("Unselect images", "esc")}
+              >
+                <IconButton color="inherit" onClick={unselectImages}>
+                  <DeselectIcon />
+                </IconButton>
+              </Tooltip>
+            )}
 
             <Tooltip
               placement="bottom"
