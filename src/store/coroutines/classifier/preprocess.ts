@@ -6,6 +6,8 @@ import { ImageType } from "../../../types/ImageType";
 import { Shape } from "../../../types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
+import { CropSchema } from "types/CropOptions";
+import { matchedCropPad, padToMatch } from "./cropUtil";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {
@@ -177,6 +179,7 @@ export const decodeImage = async (
 
 export const cropResize = async (
   inputShape: Shape,
+  preprocessOptions: PreprocessOptions,
   item: {
     xs: tensorflow.Tensor<tensorflow.Rank.R3>;
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -190,30 +193,43 @@ export const cropResize = async (
   labels: number;
   ids: string;
 }> => {
-  // [y1, x1, y2, x2]
-  const cropCoords = [
-    // [0.0, 0.0, 1.0, 1.0],
-    // [0.0, 0.0, 1.0, 1.0],
-    [0.0, 0.0, 1.0, 1.0],
-    [0.0, 0.0, 0.9, 0.9],
-    [0.1, 0.1, 1.0, 1.0],
-    [0.05, 0.05, 0.95, 0.95],
-  ];
-
   const cropSize: [number, number] = [inputShape.height, inputShape.width];
 
+  // [y1, x1, y2, x2]
+  let cropCoords: [number, number, number, number];
+  switch (preprocessOptions.cropOptions.cropSchema) {
+    case CropSchema.Match:
+      cropCoords = matchedCropPad({
+        sampleWidth: item.xs.shape[1],
+        sampleHeight: item.xs.shape[0],
+        cropWidth: cropSize[1],
+        cropHeight: cropSize[0],
+      });
+      break;
+    case CropSchema.None:
+      cropCoords = [0.0, 0.0, 1.0, 1.0];
+      break;
+    default:
+      if (process.env.NODE_ENV !== "production") {
+        console.error(
+          "No case for CropSchema:",
+          preprocessOptions.cropOptions.cropSchema
+        );
+      }
+      throw Error("CropSchema has unknown value");
+  }
+
   const crop = tensorflow.tidy(() => {
-    const box = tensorflow.tensor2d(
-      [cropCoords[item.cropIdxs]],
-      [1, 4],
-      "float32" as DataType
-    );
+    const box = tensorflow.tensor2d(cropCoords, [1, 4], "float32" as DataType);
 
     const boxInd = tensorflow.tensor1d([0], "int32" as DataType);
 
-    const batchedXs = item.xs.expandDims(
-      0
-    ) as tensorflow.Tensor<tensorflow.Rank.R4>;
+    const xs =
+      preprocessOptions.cropOptions.cropSchema === CropSchema.Match
+        ? padToMatch(item.xs, { width: cropSize[1], height: cropSize[0] })
+        : item.xs;
+
+    const batchedXs = xs.expandDims(0) as tensorflow.Tensor<tensorflow.Rank.R4>;
 
     return tensorflow.image
       .cropAndResize(
@@ -226,7 +242,7 @@ export const cropResize = async (
       .reshape([
         inputShape.height,
         inputShape.width,
-        item.xs.shape[2], // channels
+        xs.shape[2], // channels
       ]) as tensorflow.Tensor<tensorflow.Rank.R3>;
   });
 
@@ -289,13 +305,15 @@ let limit = 1;
 // xsData: [batchNum, height, width, channel]; ysData: [batchNum, oneHot]
 const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
   let canvas;
+  const refHeight = xsData[0].length;
+  const refWidth = xsData[0][0].length;
   if (process.env.NODE_ENV === "test") {
     const { createCanvas } = require("canvas");
-    canvas = createCanvas(xsData[2].length, xsData[1].length);
+    canvas = createCanvas(refWidth, refHeight);
   } else {
     canvas = document.createElement("canvas");
-    canvas.width = xsData[2].length;
-    canvas.height = xsData[1].length;
+    canvas.width = refWidth;
+    canvas.height = refHeight;
   }
 
   for (const [i, c] of xsData.entries()) {
@@ -306,12 +324,12 @@ const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
       let imageData;
       if (process.env.NODE_ENV === "test") {
         const { createImageData } = require("canvas");
-        imageData = createImageData(imageDataArr, xsData[2].length);
+        imageData = createImageData(imageDataArr, channel.shape[1]);
       } else {
         imageData = new ImageData(
           imageDataArr,
-          xsData[2].length,
-          xsData[1].length
+          channel.shape[1], // width
+          channel.shape[0] // height
         );
       }
       const ctx = canvas.getContext("2d");
@@ -440,7 +458,7 @@ export const preprocess = async (
         preprocessOptions.rescaleOptions.rescale
       )
     )
-    .mapAsync(cropResize.bind(null, inputShape));
+    .mapAsync(cropResize.bind(null, inputShape, preprocessOptions));
 
   if (preprocessOptions.shuffle) {
     imageData = imageData.shuffle(fitOptions.batchSize);
