@@ -8,6 +8,7 @@ import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { CropSchema } from "types/CropOptions";
 import { matchedCropPad, padToMatch } from "./cropUtil";
+import { RescaleOptions } from "types/RescaleOptions";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {
@@ -34,7 +35,7 @@ export const decodeCategory = (numCategories: number) => {
 
 export const decodeFromImgSrc = async (
   channels: number,
-  rescale: boolean,
+  rescaleOptions: RescaleOptions,
   item: {
     srcs: string; // dataURL
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -61,7 +62,7 @@ export const decodeFromImgSrc = async (
 
   let x: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
 
-  if (rescale) {
+  if (rescaleOptions.rescale) {
     const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
     const unscaledx = x;
     x = unscaledx.div(rescaleFactor);
@@ -75,7 +76,7 @@ export const decodeFromImgSrc = async (
 };
 
 export const decodeFromOriginalSrc = async (
-  rescale: boolean,
+  rescaleOptions: RescaleOptions,
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -104,7 +105,7 @@ export const decodeFromOriginalSrc = async (
           return x3d.reshape([x3d.shape[0], x3d.shape[1]]); // 2D: [w, h]
         });
 
-        if (rescale) {
+        if (rescaleOptions.rescale) {
           const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
           const unscaledx = x2d;
           x2d = unscaledx.div(rescaleFactor);
@@ -138,7 +139,7 @@ export const decodeFromOriginalSrc = async (
 
 export const decodeImage = async (
   channels: number,
-  rescale: boolean,
+  rescaleOptions: RescaleOptions,
   item: {
     srcs: string | string[];
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -156,7 +157,7 @@ export const decodeImage = async (
   return channels === 1 || channels === 3
     ? decodeFromImgSrc(
         channels,
-        rescale,
+        rescaleOptions,
         item as {
           srcs: string;
           ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -166,7 +167,7 @@ export const decodeImage = async (
         }
       )
     : decodeFromOriginalSrc(
-        rescale,
+        rescaleOptions,
         item as {
           srcs: string[];
           ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -455,7 +456,7 @@ export const preprocess = async (
       decodeImage.bind(
         null,
         inputShape.channels,
-        preprocessOptions.rescaleOptions.rescale
+        preprocessOptions.rescaleOptions
       )
     )
     .mapAsync(cropResize.bind(null, inputShape, preprocessOptions));

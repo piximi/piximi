@@ -35,7 +35,7 @@ export const RescalingForm = () => {
       classifierSlice.actions.updateRescaleOptions({
         rescaleOptions: {
           ...rescaleOptions,
-          rescaleMinMax: { ...rescaleOptions.rescaleMinMax, max: value },
+          max: value,
         },
       })
     );
@@ -49,7 +49,7 @@ export const RescalingForm = () => {
       classifierSlice.actions.updateRescaleOptions({
         rescaleOptions: {
           ...rescaleOptions,
-          rescaleMinMax: { ...rescaleOptions.rescaleMinMax, min: value },
+          min: value,
         },
       })
     );
@@ -89,7 +89,7 @@ export const RescalingForm = () => {
             id="minimum"
             label="Minimum pixel value"
             disabled={disabled}
-            value={rescaleOptions.rescaleMinMax.min}
+            value={rescaleOptions.min}
             onChange={onMinChange}
             type="number"
             margin="normal"
@@ -102,7 +102,7 @@ export const RescalingForm = () => {
             id="maximum"
             label="Maximum pixel value"
             disabled={disabled}
-            value={rescaleOptions.rescaleMinMax.max}
+            value={rescaleOptions.max}
             onChange={onMaxChange}
             margin="normal"
             type="number"
