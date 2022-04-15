@@ -158,10 +158,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <PreprocessingSettingsListItem
-            closeDialog={closeDialog}
-            openedDialog={openedDialog}
-          />
+          <PreprocessingSettingsListItem />
 
           <ArchitectureSettingsListItem />
 
