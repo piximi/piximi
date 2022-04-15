@@ -41,3 +41,5 @@ export { themeModeSelector } from "./themeModeSelector";
 export { availableColorsSelector } from "./availableColorsSelector";
 export { imageSelectionSizeSelector } from "./imageSelectionSizeSelector";
 export { preprocessOptionsSelector } from "./preprocessOptionsSelector";
+export { rescaleOptionsSelector } from "./rescaleOptionsSelector";
+export { cropOptionsSelector } from "./cropOptionsSelector";

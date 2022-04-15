@@ -16,12 +16,7 @@ import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
 import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
-
-const enumKeys = <O extends object, K extends keyof O = keyof O>(
-  obj: O
-): K[] => {
-  return Object.keys(obj).filter((k) => Number.isNaN(+k)) as K[];
-};
+import { enumKeys } from "utils/enumKeys";
 
 export const OptimizerSettingsGrid = () => {
   const dispatch = useDispatch();

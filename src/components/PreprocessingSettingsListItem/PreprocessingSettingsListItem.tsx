@@ -1,20 +1,10 @@
 import * as React from "react";
 import { useState } from "react";
-import {
-  Button,
-  Checkbox,
-  Collapse,
-  FormControlLabel,
-  FormGroup,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { RescalingForm } from "../RescalingForm/RescalingForm";
+import { RescalingForm } from "./RescalingForm";
+import { CroppingForm } from "./CroppingForm";
 
 export const PreprocessingSettingsListItem = () => {
   const [collapsedPreprocessingList, setCollapsedPreprocessingList] =
@@ -39,15 +29,8 @@ export const PreprocessingSettingsListItem = () => {
         <ListItemText primary="Preprocessing" style={{ fontSize: "1em" }} />
       </ListItem>
       <Collapse in={collapsedPreprocessingList} timeout="auto" unmountOnExit>
-        <Typography id="rescaling" gutterBottom>
-          Pixel Intensity Rescaling
-        </Typography>
-
         <RescalingForm />
-
-        <Typography id="cropping" gutterBottom>
-          Crop Images
-        </Typography>
+        <CroppingForm />
       </Collapse>
     </>
   );

@@ -12,7 +12,7 @@ import {
   ClassifierModelProps,
 } from "../../types/ClassifierModelType";
 import { EvaluationResultType } from "types/EvaluationResultType";
-import { CropSchema } from "types/CropOptions";
+import { CropOptions, CropSchema } from "types/CropOptions";
 
 const initialState: Classifier = {
   evaluating: false,
@@ -243,6 +243,12 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{ rescaleOptions: RescaleOptions }>
     ) {
       state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
+    },
+    updateCropOptions(
+      state,
+      action: PayloadAction<{ cropOptions: CropOptions }>
+    ) {
+      state.preprocessOptions.cropOptions = action.payload.cropOptions;
     },
     updateTrainingPercentage(
       state,
