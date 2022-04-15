@@ -40,8 +40,7 @@ const initialState: Classifier = {
     shuffle: true,
     rescaleOptions: {
       rescale: true,
-      min: 0,
-      max: 1,
+      center: false,
     },
     cropOptions: {
       numCrops: 1,

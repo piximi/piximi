@@ -99,8 +99,7 @@ const inputShape: Shape = {
 
 const rescaleOptions: RescaleOptions = {
   rescale: true,
-  min: 0,
-  max: 1,
+  center: false,
 };
 
 const cropOptions: CropOptions = {

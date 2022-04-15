@@ -27,34 +27,6 @@ export const RescalingForm = () => {
     );
   };
 
-  const onMaxChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    if (!value) return;
-    dispatch(
-      classifierSlice.actions.updateRescaleOptions({
-        rescaleOptions: {
-          ...rescaleOptions,
-          max: value,
-        },
-      })
-    );
-  };
-
-  const onMinChange = (event: React.FormEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    var value = Number(target.value);
-    if (!value) return;
-    dispatch(
-      classifierSlice.actions.updateRescaleOptions({
-        rescaleOptions: {
-          ...rescaleOptions,
-          min: value,
-        },
-      })
-    );
-  };
-
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -82,31 +54,6 @@ export const RescalingForm = () => {
               />
             }
             label="Rescale pixels?"
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <StyledTextField
-            id="minimum"
-            label="Minimum pixel value"
-            disabled={disabled}
-            value={rescaleOptions.min}
-            onChange={onMinChange}
-            type="number"
-            margin="normal"
-            defaultValue="0"
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <StyledTextField
-            id="maximum"
-            label="Maximum pixel value"
-            disabled={disabled}
-            value={rescaleOptions.max}
-            onChange={onMaxChange}
-            margin="normal"
-            type="number"
-            defaultValue="100"
           />
         </Grid>
       </Grid>
