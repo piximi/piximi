@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
+import { StyledFormControl } from "../StyledFormControl";
 
 export const DatasetSettingsListItem = () => {
   const dispatch = useDispatch();
@@ -52,23 +53,25 @@ export const DatasetSettingsListItem = () => {
         <ListItemText primary="Dataset Settings" style={{ fontSize: "1em" }} />
       </ListItem>
       <Collapse in={collapsedDatasetSettingsList} timeout="auto" unmountOnExit>
-        <div style={{ padding: "12px 0px", width: "300" }}>
+        <StyledFormControl>
           <Typography id="range-slider" gutterBottom>
             What fraction of the labeled images should be used for training?
             (The rest is used for validation)
           </Typography>
-          <Grid item xs={2}>
-            <CustomNumberTextField
-              id="test-split"
-              label="Train percentage"
-              value={trainingPercentage}
-              dispatchCallBack={dispatchTrainingPercentage}
-              min={0}
-              max={1}
-              enableFloat={true}
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              <CustomNumberTextField
+                id="test-split"
+                label="Train percentage"
+                value={trainingPercentage}
+                dispatchCallBack={dispatchTrainingPercentage}
+                min={0}
+                max={1}
+                enableFloat={true}
+              />
+            </Grid>
           </Grid>
-        </div>
+        </StyledFormControl>
       </Collapse>
     </>
   );

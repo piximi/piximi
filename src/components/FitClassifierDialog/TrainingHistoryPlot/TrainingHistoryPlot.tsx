@@ -1,6 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import { ResponsiveLine } from "@nivo/line";
 import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
+import _ from "lodash";
 
 type TrainingHistoryPlotProps = {
   metric: string;
@@ -31,7 +32,9 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
     data: validationValues,
   };
 
-  const epochRange = Array.from(Array(currentEpoch + 1).keys());
+  const stepSize = Math.ceil(currentEpoch / 30);
+  const epochRange = _.range(0, currentEpoch + 1, stepSize);
+  const pointSizeAdjustment = Math.floor(currentEpoch / 20);
 
   const min = dynamicYRange ? "auto" : 0;
   const max = dynamicYRange ? "auto" : 1;
@@ -97,7 +100,7 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
           legendPosition: "middle",
         }}
         colors={{ datum: "color" }}
-        pointSize={8}
+        pointSize={8 - pointSizeAdjustment}
         pointColor={{ from: "color" }}
         pointBorderWidth={2}
         pointBorderColor={{ from: "serieColor" }}

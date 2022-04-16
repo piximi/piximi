@@ -14,6 +14,7 @@ import {
 import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
 import { ToolType } from "../../../../types/ToolType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export interface ImageShapeDialogProps {
   files: FileList;
@@ -47,11 +48,13 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
       try {
         image = await convertFileToImage(files[i], colors, slices, channels);
       } catch (err) {
-        const error: Error = err as Error;
+        const error = err as Error;
+        const stackTrace = await getStackTraceFromError(error);
         const warning: AlertStateType = {
-          alertType: AlertType.Warning,
+          alertType: AlertType.Error,
           name: "Could not convert file to image",
           description: error.message,
+          stackTrace: stackTrace,
         };
         dispatch(
           applicationSlice.actions.updateAlertState({ alertState: warning })
