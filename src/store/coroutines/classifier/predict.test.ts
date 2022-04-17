@@ -89,11 +89,11 @@ const categories: Array<Category> = [
 ];
 
 const inputShape: Shape = {
-  width: 28,
   channels: 1,
-  frames: 1,
-  height: 28,
   planes: 1,
+  frames: 1,
+  width: 28,
+  height: 28,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -211,7 +211,7 @@ it("predict", async () => {
     tfio.browserFiles([jsonFile, weightsFile])
   );
 
-  console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
+  // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
     const res = await predictCategories(
@@ -228,14 +228,14 @@ it("predict", async () => {
     categoryIds: string[];
   };
 
-  console.log(`newBytes: ${profile.newBytes}`);
-  console.log(`newTensors: ${profile.newTensors}`);
-  console.log(`peakBytes: ${profile.peakBytes}`);
-  console.log(
-    `byte usage over all kernels: ${profile.kernels.map(
-      (k) => k.totalBytesSnapshot
-    )}`
-  );
+  // console.log(`newBytes: ${profile.newBytes}`);
+  // console.log(`newTensors: ${profile.newTensors}`);
+  // console.log(`peakBytes: ${profile.peakBytes}`);
+  // console.log(
+  //   `byte usage over all kernels: ${profile.kernels.map(
+  //     (k) => k.totalBytesSnapshot
+  //   )}`
+  // );
 
   // const time = await tftime(async () => {
   //   const res = await predictCategories(
@@ -271,6 +271,30 @@ it("predict", async () => {
     ],
   };
 
-  expect(result.imageIds).toStrictEqual(expectedResults.imageIds);
-  expect(result.categoryIds).toStrictEqual(expectedResults.categoryIds);
+  // each image should have a corresponding category
+  expect(result.imageIds.length).toEqual(result.categoryIds.length);
+
+  expect(result.imageIds.length).toEqual(expectedResults.imageIds.length);
+  expect(result.categoryIds.length).toEqual(expectedResults.categoryIds.length);
+
+  expect(result.imageIds).toEqual(
+    expect.arrayContaining(expectedResults.imageIds)
+  );
+  expect(result.categoryIds).toEqual(
+    expect.arrayContaining(expectedResults.categoryIds)
+  );
+
+  // can't guarantee order, but must guarantee each image id has the correct category id
+  for (let i = 0; i < expectedResults.imageIds.length; i++) {
+    let resultImageId = result.imageIds[i];
+    let resultCategoryId = result.categoryIds[i];
+
+    let expectedIdx = expectedResults.imageIds.findIndex(
+      (id) => id === resultImageId
+    );
+
+    expect(resultCategoryId).toStrictEqual(
+      expectedResults.categoryIds[expectedIdx]
+    );
+  }
 });
