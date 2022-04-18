@@ -3,7 +3,6 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
-  TextField,
   styled,
   Typography,
 } from "@mui/material";
@@ -34,13 +33,6 @@ export const RescalingForm = () => {
     display: "flex",
     flexWrap: "wrap",
   });
-
-  const StyledTextField = styled(TextField)(({ theme }) => ({
-    // marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    flexBasis: 300,
-    width: "100%",
-  }));
 
   return (
     <>

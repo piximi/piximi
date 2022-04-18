@@ -305,9 +305,15 @@ export const sampleGenerator = (
 };
 
 /* Debug Stuff */
-let limit = 1;
+let trainLimit = 1;
+let valLimit = 1;
+let infLimit = 1;
 // xsData: [batchNum, height, width, channel]; ysData: [batchNum, oneHot]
-const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
+const doShowImages = async (
+  partition: Partition,
+  xsData: number[][][][],
+  ysData: number[][]
+) => {
   let canvas;
   const refHeight = xsData[0].length;
   const refWidth = xsData[0][0].length;
@@ -341,10 +347,24 @@ const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
     } catch (e) {
       if (process.env.NODE_ENV !== "production") console.error(e);
     }
-    if (limit < 10) {
-      limit++;
+    if (partition === Partition.Training && trainLimit < 5) {
+      trainLimit++;
       console.log(
-        "class: ",
+        "Training, class: ",
+        ysData[i].findIndex((e: any) => e === 1),
+        canvas.toDataURL()
+      );
+    } else if (partition === Partition.Validation && valLimit < 5) {
+      valLimit++;
+      console.log(
+        "Validation, class: ",
+        ysData[i].findIndex((e: any) => e === 1),
+        canvas.toDataURL()
+      );
+    } else if (partition === Partition.Inference && infLimit < 5) {
+      infLimit++;
+      console.log(
+        "Inference, class: ",
         ysData[i].findIndex((e: any) => e === 1),
         canvas.toDataURL()
       );
@@ -354,6 +374,7 @@ const doShowImages = async (xsData: number[][][][], ysData: number[][]) => {
 
 const doShowFromChannels = async (
   numChannels: number,
+  partition: Partition,
   items: {
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
     ys: tensorflow.Tensor<tensorflow.Rank.R2>;
@@ -384,15 +405,18 @@ const doShowFromChannels = async (
   });
   const ysData = tensorflow.tidy(() => items.ys.arraySync());
 
-  doShowImages(xsData, ysData);
+  doShowImages(partition, xsData, ysData);
   return new Promise((resolve) => resolve(items));
 };
 
-const doShowFromBrowser = async (items: {
-  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-  labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-}): Promise<{
+const doShowFromBrowser = async (
+  partition: Partition,
+  items: {
+    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+  }
+): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R4>;
   ys: tensorflow.Tensor<tensorflow.Rank.R2>;
   labels: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -402,13 +426,14 @@ const doShowFromBrowser = async (items: {
     // return items.xs.arraySync() as number[][][][];
   });
   const ysData = tensorflow.tidy(() => items.ys.arraySync());
-  doShowImages(xsData, ysData);
+  doShowImages(partition, xsData, ysData);
   return new Promise((resolve) => resolve(items));
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const doShow = async (
   numChannels: number,
+  partition: Partition,
   items: {
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
     ys: tensorflow.Tensor<tensorflow.Rank.R2>;
@@ -427,8 +452,8 @@ const doShow = async (
   //   tensorflow.memory().numBytesInGPU
   // );
   return numChannels === 1 || numChannels === 3
-    ? doShowFromBrowser(items)
-    : doShowFromChannels(numChannels, items);
+    ? doShowFromBrowser(partition, items)
+    : doShowFromChannels(numChannels, partition, items);
 };
 /* /Debug Stuff */
 
@@ -477,9 +502,10 @@ export const preprocess = async (
     imageData = imageData.shuffle(fitOptions.batchSize);
   }
 
-  const imageDataBatched = imageData
-    .batch(fitOptions.batchSize)
-    .mapAsync((items: any) => doShow(inputShape.channels, items)); // For debug stuff
+  const imageDataBatched = imageData.batch(fitOptions.batchSize);
+  // .mapAsync((items: any) =>
+  //   doShow(inputShape.channels, images[0].partition, items)
+  // ); // For debug stuff
 
   return imageDataBatched as tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
