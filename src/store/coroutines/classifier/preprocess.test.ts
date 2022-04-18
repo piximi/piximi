@@ -5,7 +5,10 @@ import { ImageType } from "../../../types/ImageType";
 import { Partition } from "../../../types/Partition";
 import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
+import { FitOptions } from "types/FitOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
+import { CropOptions, CropSchema } from "types/CropOptions";
+import { PreprocessOptions } from "types/PreprocessOptions";
 
 jest.setTimeout(50000);
 
@@ -19,7 +22,24 @@ const inputShape: Shape = {
 
 const rescaleOptions: RescaleOptions = {
   rescale: true,
-  rescaleMinMax: { min: 2, max: 5 },
+  center: false,
+};
+
+const cropOptions: CropOptions = {
+  numCrops: 1,
+  cropSchema: CropSchema.None,
+};
+
+const preprocessingOptions: PreprocessOptions = {
+  shuffle: true,
+  rescaleOptions,
+  cropOptions,
+};
+
+const fitOptions: FitOptions = {
+  epochs: 10,
+  batchSize: 32,
+  initialEpoch: 0,
 };
 
 const categories: Array<Category> = [
@@ -56,13 +76,14 @@ const images: Array<ImageType> = [
 it("preprocess", async () => {
   const preprocessed = await preprocess(
     images,
-    images,
     categories,
     inputShape,
-    rescaleOptions
+    preprocessingOptions,
+    fitOptions
   );
 
-  const items = await preprocessed.train.toArrayForTest();
+  // future warning: toArrayForTest is undocumented
+  const items = await preprocessed.toArrayForTest();
 
   expect(items[0]["xs"].shape).toEqual([224, 224, 3]);
 });

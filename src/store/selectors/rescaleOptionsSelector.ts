@@ -6,5 +6,5 @@ export const rescaleOptionsSelector = ({
 }: {
   classifier: Classifier;
 }): RescaleOptions => {
-  return classifier.rescaleOptions;
+  return classifier.preprocessOptions.rescaleOptions;
 };

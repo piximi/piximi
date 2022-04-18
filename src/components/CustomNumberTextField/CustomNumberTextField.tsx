@@ -40,6 +40,10 @@ export const CustomNumberTextField = ({
     value.toString()
   );
 
+  React.useEffect(() => {
+    setValueString(value.toString());
+  }, [value]);
+
   const [inputValue, setInputValue] = React.useState<number>(value);
 
   const [inputError, setInputError] = React.useState<boolean>(false);
@@ -50,9 +54,9 @@ export const CustomNumberTextField = ({
   if (min !== Number.MIN_SAFE_INTEGER && max !== Number.MAX_SAFE_INTEGER) {
     rangeHelperText = ` between ${min} and ${max}.`;
   } else if (min !== Number.MIN_SAFE_INTEGER) {
-    rangeHelperText = ` above ${min}.`;
+    rangeHelperText = ` ${min} or above.`;
   } else if (max !== Number.MAX_SAFE_INTEGER) {
-    rangeHelperText = ` below ${max}.`;
+    rangeHelperText = ` ${max} or below.`;
   }
 
   const errorHelpText = `${label} must be a ${

@@ -39,12 +39,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const [trainingAccuracy, setTrainingAccuracy] = useState<
     { x: number; y: number }[]
   >([]);
+
   const [validationAccuracy, setValidationAccuracy] = useState<
     { x: number; y: number }[]
   >([]);
+
   const [trainingLoss, setTrainingLoss] = useState<{ x: number; y: number }[]>(
     []
   );
+
   const [validationLoss, setValidationLoss] = useState<
     { x: number; y: number }[]
   >([]);
@@ -155,10 +158,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <PreprocessingSettingsListItem
-            closeDialog={closeDialog}
-            openedDialog={openedDialog}
-          />
+          <PreprocessingSettingsListItem />
 
           <ArchitectureSettingsListItem />
 

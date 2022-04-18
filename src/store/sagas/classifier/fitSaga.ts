@@ -1,3 +1,5 @@
+import * as tensorflow from "@tensorflow/tfjs";
+import _ from "lodash";
 import { put, select } from "redux-saga/effects";
 import { compile, fit, open, preprocess } from "../../coroutines/classifier";
 import { applicationSlice, classifierSlice, projectSlice } from "../../slices";
@@ -8,14 +10,12 @@ import {
   createdCategoriesCountSelector,
   createdCategoriesSelector,
   fitOptionsSelector,
+  preprocessOptionsSelector,
   trainingPercentageSelector,
 } from "../../selectors";
 import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
-import { rescaleOptionsSelector } from "../../selectors/rescaleOptionsSelector";
 import { trainImagesSelector } from "../../selectors/trainImagesSelector";
 import { valImagesSelector } from "../../selectors/valImagesSelector";
-import * as tensorflow from "@tensorflow/tfjs";
-import { RescaleOptions } from "../../../types/RescaleOptions";
 import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { Category } from "../../../types/Category";
@@ -24,21 +24,29 @@ import { FitOptions } from "../../../types/FitOptions";
 import { ModelType } from "../../../types/ClassifierModelType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
-import _ from "lodash";
 import { Partition } from "types/Partition";
+import { PreprocessOptions } from "types/PreprocessOptions";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  const trainingPercentage = yield select(trainingPercentageSelector);
-  const categorizedImages = yield select(categorizedImagesSelector);
+  const trainingPercentage: number = yield select(trainingPercentageSelector);
+  const categorizedImages: Array<ImageType> = yield select(
+    categorizedImagesSelector
+  );
+  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+  const preprocessingOptions: PreprocessOptions = yield select(
+    preprocessOptionsSelector
+  );
 
   //first assign train and val partition to all categorized images
-  const categorizedImagesIds = _.shuffle(categorizedImages).map(
-    (image: ImageType) => {
-      return image.id;
-    }
-  );
+  const categorizedImagesIds = (
+    preprocessingOptions.shuffle
+      ? _.shuffle(categorizedImages)
+      : categorizedImages
+  ).map((image: ImageType) => {
+    return image.id;
+  });
 
   //separate ids into train and val datasets
   const trainDataLength = Math.round(
@@ -81,6 +89,7 @@ export function* fitSaga(action: any): any {
   }
 
   const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+
   var compiledModel: tensorflow.LayersModel;
   try {
     compiledModel = yield compile(model, compileOptions);
@@ -96,34 +105,53 @@ export function* fitSaga(action: any): any {
   const categories: Category[] = yield select(createdCategoriesSelector);
   const trainImages: ImageType[] = yield select(trainImagesSelector);
   const valImages: ImageType[] = yield select(valImagesSelector);
-  const rescaleOptions: RescaleOptions = yield select(rescaleOptionsSelector);
 
   try {
-    var data = yield preprocess(
+    const trainData: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    }> = yield preprocess(
       trainImages,
+      categories,
+      architectureOptions.inputShape,
+      preprocessingOptions,
+      fitOptions
+    );
+
+    const valData: tensorflow.data.Dataset<{
+      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
+      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
+      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    }> = yield preprocess(
       valImages,
       categories,
       architectureOptions.inputShape,
-      rescaleOptions
+      preprocessingOptions,
+      fitOptions
     );
+
+    var data = { train: trainData, val: valData };
   } catch (error) {
+    process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
     return;
   }
 
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
-  const options: FitOptions = yield select(fitOptionsSelector);
-
   try {
     var { fitted, status } = yield fit(
       compiledModel,
       data,
-      options,
+      fitOptions,
       onEpochEnd
     );
   } catch (error) {
-    yield handleError(error as Error, "Error in in training the model");
+    process.env.NODE_ENV !== "production" && console.error(error);
+    yield handleError(error as Error, "Error in training the model");
     return;
   }
 

@@ -7,63 +7,75 @@ export const evaluate = async (
   model: tensorflow.LayersModel,
   validationData: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
-    id: string;
+    ys: tensorflow.Tensor;
+    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>,
   validationImages: ImageType[],
   categories: Category[]
 ): Promise<EvaluationResultType> => {
-  const validationDataArray = await validationData.toArray();
-  const predictions: number[] = [];
-  const probabilities: any = [];
-  validationDataArray.forEach((item: { xs: tensorflow.Tensor; id: string }) => {
-    const input = item.xs;
-    const y = model.predict(input.expandDims()) as tensorflow.Tensor;
-    const yArr = Array.from(y.dataSync());
-    probabilities.push(yArr);
-
-    const idx = tensorflow.argMax(y as tensorflow.Tensor, 1).dataSync()[0];
-
-    predictions.push(idx);
-  });
-
   const categoryIDs = categories.map((c: Category) => c.id);
   const numberOfClasses = categoryIDs.length;
-  const imageCategoryIDs = validationImages.map(
-    (image: ImageType) => image.categoryId
-  );
-  const labels = imageCategoryIDs.map((id: string) =>
-    categoryIDs.findIndex((categoryID: string) => {
-      return categoryID === id;
-    })
-  );
 
-  const tensorPredictions = tensorflow.tensor1d(predictions);
-  const tensorLabels = tensorflow.tensor1d(labels);
+  const inferredBatchTensors = await validationData
+    .map((items) => {
+      //@ts-ignore
+      const batchProbs = model.predict(items.xs);
+      //@ts-ignore
+      const batchPred = tensorflow.argMax(batchProbs, 1);
+      const batchPredOneHot = tensorflow.oneHot(batchPred, numberOfClasses);
+      return {
+        probs: batchProbs,
+        preds: batchPred,
+        predsOneHot: batchPredOneHot, // ŷs
+        ys: items.ys,
+        labels: items.labels,
+      };
+    })
+    .toArray();
+
+  const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
+    return {
+      probs: prev.probs.concat(curr.probs),
+      preds: prev.preds.concat(curr.preds),
+      predsOneHot: prev.predsOneHot.concat(curr.predsOneHot), // ŷs
+      ys: prev.ys.concat(curr.ys),
+      labels: prev.labels.concat(curr.labels),
+    };
+  });
 
   const confusionMatrix = await tensorflow.math
-    .confusionMatrix(tensorLabels, tensorPredictions, numberOfClasses)
+    .confusionMatrix(
+      inferredTensors.labels,
+      inferredTensors.preds as tensorflow.Tensor1D,
+      numberOfClasses
+    )
     .array();
-
-  const oneHotLabels = tensorflow.oneHot(labels, numberOfClasses);
-  const oneHotPredictions = tensorflow.oneHot(predictions, numberOfClasses);
-
-  const probabilities2DTensor = tensorflow.tensor2d(probabilities);
 
   var accuracy: number[];
   var crossEntropy: number[];
   if (numberOfClasses === 2) {
     accuracy = (await tensorflow.metrics
-      .binaryAccuracy(oneHotLabels, oneHotPredictions)
+      .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
       .array()) as number[];
     crossEntropy = (await tensorflow.metrics
-      .binaryCrossentropy(oneHotLabels, probabilities2DTensor)
+      .binaryCrossentropy(
+        inferredTensors.ys,
+        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+      )
       .array()) as number[];
   } else {
     accuracy = (await tensorflow.metrics
-      .categoricalAccuracy(oneHotLabels, probabilities2DTensor)
+      .categoricalAccuracy(
+        inferredTensors.ys,
+        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+      )
       .array()) as number[];
     crossEntropy = (await tensorflow.metrics
-      .categoricalCrossentropy(oneHotLabels, probabilities2DTensor)
+      .categoricalCrossentropy(
+        inferredTensors.ys,
+        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+      )
       .array()) as number[];
   }
 

@@ -24,13 +24,10 @@ export const fit = async (
       },
     ],
     epochs: options.epochs,
-    validationData: data.val.batch(options.batchSize),
+    validationData: data.val,
   };
 
-  const status = await compiled.fitDataset(
-    data.train.batch(options.batchSize),
-    args
-  );
+  const status = await compiled.fitDataset(data.train, args);
 
   return { fitted: compiled, status: status };
 };

@@ -32,7 +32,6 @@ export const ApplicationDrawer = () => {
       <Divider />
 
       <ClassifierList />
-      {/*<SegmenterList />*/}
 
       <Divider />
 
