@@ -34,24 +34,26 @@ export const matchedCropPad = ({
   sampleHeight,
   cropWidth,
   cropHeight,
+  randomCrop,
 }: {
   sampleWidth: number;
   sampleHeight: number;
   cropWidth: number;
   cropHeight: number;
+  randomCrop: boolean;
 }): [number, number, number, number] => {
   // [y1, x1, y2, x2]
   let cropCoords: [number, number, number, number] = [0.0, 0.0, 1.0, 1.0];
 
   if (sampleHeight > cropHeight) {
     const hRatio = cropHeight / sampleHeight;
-    cropCoords[0] = random(0, 1 - hRatio); // y1 in Random(0, hRatio)
+    cropCoords[0] = randomCrop ? random(0, 1 - hRatio) : (1 - hRatio) / 2; // y1 in Random(0, hRatio) or center
     cropCoords[2] = cropCoords[0] + hRatio; // y2 = y1 + hRatio
   }
 
   if (sampleWidth > cropWidth) {
     const wRatio = cropWidth / sampleWidth;
-    cropCoords[1] = random(0, 1 - wRatio); // x1 in Random(0, wRatio)
+    cropCoords[1] = randomCrop ? random(0, 1 - wRatio) : (1 - wRatio) / 2; // x1 in Random(0, wRatio) or center
     cropCoords[3] = cropCoords[1] + wRatio; // x2 = x1 + wRatio
   }
 

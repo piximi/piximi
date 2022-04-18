@@ -9,6 +9,7 @@ import { PreprocessOptions } from "types/PreprocessOptions";
 import { CropSchema } from "types/CropOptions";
 import { matchedCropPad, padToMatch } from "./cropUtil";
 import { RescaleOptions } from "types/RescaleOptions";
+import { Partition } from "types/Partition";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {
@@ -181,6 +182,7 @@ export const decodeImage = async (
 export const cropResize = async (
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
+  training: boolean,
   item: {
     xs: tensorflow.Tensor<tensorflow.Rank.R3>;
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
@@ -205,6 +207,7 @@ export const cropResize = async (
         sampleHeight: item.xs.shape[0],
         cropWidth: cropSize[1],
         cropHeight: cropSize[0],
+        randomCrop: training && preprocessOptions.cropOptions.numCrops > 1,
       });
       break;
     case CropSchema.None:
@@ -448,7 +451,9 @@ export const preprocess = async (
       sampleGenerator(
         images,
         categories,
-        preprocessOptions.cropOptions.numCrops
+        images[0].partition === Partition.Training
+          ? preprocessOptions.cropOptions.numCrops
+          : 1 // only 1 crop for non-training
       )
     )
     .map(decodeCategory(categories.length))
@@ -459,7 +464,14 @@ export const preprocess = async (
         preprocessOptions.rescaleOptions
       )
     )
-    .mapAsync(cropResize.bind(null, inputShape, preprocessOptions));
+    .mapAsync(
+      cropResize.bind(
+        null,
+        inputShape,
+        preprocessOptions,
+        images[0].partition === Partition.Training
+      )
+    );
 
   if (preprocessOptions.shuffle) {
     imageData = imageData.shuffle(fitOptions.batchSize);

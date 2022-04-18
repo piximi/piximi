@@ -70,13 +70,7 @@ it("padToMatch", async () => {
   expect(paddedAgain).toStrictEqual(expected);
 });
 
-const matchedCropExpectations = (
-  dims: {
-    sampleWidth: number;
-    sampleHeight: number;
-    cropWidth: number;
-    cropHeight: number;
-  },
+const matchedRandomCropExpectations = (
   cropCoords: [number, number, number, number],
   cropCoordsExpected: number[][]
 ) => {
@@ -91,6 +85,34 @@ const matchedCropExpectations = (
 
   expect(cropCoords[3]).toBeGreaterThanOrEqual(cropCoordsExpected[3][0]);
   expect(cropCoords[3]).toBeLessThanOrEqual(cropCoordsExpected[3][1]);
+};
+
+const matchedCenterCropExpectations = (
+  cropCoords: [number, number, number, number],
+  cropCoordsExpected: number[]
+) => {
+  expect(cropCoords[0]).toBe(cropCoordsExpected[0]);
+  expect(cropCoords[1]).toBe(cropCoordsExpected[1]);
+  expect(cropCoords[2]).toBe(cropCoordsExpected[2]);
+  expect(cropCoords[3]).toBe(cropCoordsExpected[3]);
+};
+
+const matchedCropExpectations = (
+  dims: {
+    sampleWidth: number;
+    sampleHeight: number;
+    cropWidth: number;
+    cropHeight: number;
+    randomCrop: boolean;
+  },
+  cropCoords: [number, number, number, number],
+  cropCoordsExpected: number[][] | number[]
+) => {
+  if (dims.randomCrop) {
+    matchedRandomCropExpectations(cropCoords, cropCoordsExpected as number[][]);
+  } else {
+    matchedCenterCropExpectations(cropCoords, cropCoordsExpected as number[]);
+  }
 
   expect(cropCoords[2] - cropCoords[0]).toBeCloseTo(
     dims.cropHeight / dims.sampleHeight,
@@ -102,105 +124,197 @@ const matchedCropExpectations = (
   );
 };
 
-it("matchedCropPad - crop small square from big square", () => {
-  const dims = {
-    sampleWidth: 100,
-    sampleHeight: 100,
-    cropWidth: 50,
-    cropHeight: 50,
-  };
+describe("matchedCropPad - random", () => {
+  it("crop small square from big square", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 100,
+      cropWidth: 50,
+      cropHeight: 50,
+      randomCrop: true,
+    };
 
-  const cropCoords = matchedCropPad(dims);
+    const cropCoords = matchedCropPad(dims);
 
-  const cropCoordsExpected = [
-    [0.0, 0.5],
-    [0.0, 0.5],
-    [0.5, 1.0],
-    [0.5, 1.0],
-  ];
+    const cropCoordsExpected = [
+      [0.0, 0.5],
+      [0.0, 0.5],
+      [0.5, 1.0],
+      [0.5, 1.0],
+    ];
 
-  matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
+
+  it("crop square from wide rectangle", () => {
+    const dims = {
+      sampleWidth: 200,
+      sampleHeight: 100,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: true,
+    };
+
+    const cropCoords = matchedCropPad(dims);
+
+    const cropCoordsExpected = [
+      [0.0, 0.0],
+      [0.0, 0.5],
+      [1.0, 1.0],
+      [0.5, 1.0],
+    ];
+
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
+
+  it("crop square from tall rectangle", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 200,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: true,
+    };
+
+    const cropCoords = matchedCropPad(dims);
+
+    const cropCoordsExpected = [
+      [0.0, 0.5],
+      [0.0, 0.0],
+      [0.5, 1.0],
+      [1.0, 1.0],
+    ];
+
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
+
+  it("crop small wide rectangle from bigger square", () => {
+    const dims = {
+      sampleWidth: 200,
+      sampleHeight: 200,
+      cropWidth: 150,
+      cropHeight: 100,
+      randomCrop: true,
+    };
+
+    const cropCoords = matchedCropPad(dims);
+
+    const cropCoordsExpected = [
+      [0.0, 0.5],
+      [0.0, 0.66666],
+      [0.5, 1.0],
+      [0.66666, 1.0],
+    ];
+
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
+
+  it("crop dims same as sample dims", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 100,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: true,
+    };
+
+    const cropCoords = matchedCropPad(dims);
+
+    const cropCoordsExpected = [
+      [0.0, 0.0],
+      [0.0, 0.0],
+      [1.0, 1.0],
+      [1.0, 1.0],
+    ];
+
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
 });
 
-it("matchedCropPad - crop square from wide rectangle", () => {
-  const dims = {
-    sampleWidth: 200,
-    sampleHeight: 100,
-    cropWidth: 100,
-    cropHeight: 100,
-  };
+describe("matchedCropPad - center", () => {
+  it("crop small square from big square", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 100,
+      cropWidth: 50,
+      cropHeight: 50,
+      randomCrop: false,
+    };
 
-  const cropCoords = matchedCropPad(dims);
+    const cropCoords = matchedCropPad(dims);
 
-  const cropCoordsExpected = [
-    [0.0, 0.0],
-    [0.0, 0.5],
-    [1.0, 1.0],
-    [0.5, 1.0],
-  ];
+    const cropCoordsExpected = [0.25, 0.25, 0.75, 0.75];
 
-  matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
-});
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
 
-it("matchedCropPad - crop square from tall rectangle", () => {
-  const dims = {
-    sampleWidth: 100,
-    sampleHeight: 200,
-    cropWidth: 100,
-    cropHeight: 100,
-  };
+  it("crop square from wide rectangle", () => {
+    const dims = {
+      sampleWidth: 200,
+      sampleHeight: 100,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: false,
+    };
 
-  const cropCoords = matchedCropPad(dims);
+    const cropCoords = matchedCropPad(dims);
 
-  const cropCoordsExpected = [
-    [0.0, 0.5],
-    [0.0, 0.0],
-    [0.5, 1.0],
-    [1.0, 1.0],
-  ];
+    const cropCoordsExpected = [0.0, 0.25, 1.0, 0.75];
 
-  console.log(cropCoords);
-  matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
-});
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
 
-it("matchedCropPad - crop small wide rectangle from bigger square", () => {
-  const dims = {
-    sampleWidth: 200,
-    sampleHeight: 200,
-    cropWidth: 150,
-    cropHeight: 100,
-  };
+  it("crop square from tall rectangle", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 200,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: false,
+    };
 
-  const cropCoords = matchedCropPad(dims);
+    const cropCoords = matchedCropPad(dims);
 
-  const cropCoordsExpected = [
-    [0.0, 0.5],
-    [0.0, 0.66666],
-    [0.5, 1.0],
-    [0.66666, 1.0],
-  ];
+    const cropCoordsExpected = [0.25, 0.0, 0.75, 1.0];
 
-  console.log(cropCoords);
-  matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
-});
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
 
-it("matchedCropPad - crop dims same as sample dims", () => {
-  const dims = {
-    sampleWidth: 100,
-    sampleHeight: 100,
-    cropWidth: 100,
-    cropHeight: 100,
-  };
+  it("crop small wide rectangle from bigger square", () => {
+    const dims = {
+      sampleWidth: 200,
+      sampleHeight: 200,
+      cropWidth: 150,
+      cropHeight: 100,
+      randomCrop: false,
+    };
 
-  const cropCoords = matchedCropPad(dims);
+    const cropCoords = matchedCropPad(dims);
 
-  const cropCoordsExpected = [
-    [0.0, 0.0],
-    [0.0, 0.0],
-    [1.0, 1.0],
-    [1.0, 1.0],
-  ];
+    const cropCoordsExpected = [0.25, 1 / 8, 0.75, 7 / 8];
 
-  console.log(cropCoords);
-  matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
+
+  it("crop dims same as sample dims", () => {
+    const dims = {
+      sampleWidth: 100,
+      sampleHeight: 100,
+      cropWidth: 100,
+      cropHeight: 100,
+      randomCrop: false,
+    };
+
+    const cropCoords = matchedCropPad(dims);
+
+    const cropCoordsExpected = [0.0, 0.0, 1.0, 1.0];
+
+    console.log(cropCoords);
+    matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
+  });
 });
