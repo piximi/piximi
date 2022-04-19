@@ -100,24 +100,6 @@ export const CroppingForm = () => {
           </Grid>
         </Grid>
       </StyledFormControl>
-
-      {/* <StyledForm noValidate autoComplete="off">
-        <Grid container spacing={2}>
-          <Grid item xs={2}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={enabled}
-                  onChange={onCheckboxChange}
-                  name="rescale"
-                  color="primary"
-                />
-              }
-              label="Crop images"
-            />
-          </Grid>
-        </Grid>
-      </StyledForm> */}
     </>
   );
 };
