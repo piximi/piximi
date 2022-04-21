@@ -82,8 +82,14 @@ export const ImageGridAppBar = () => {
         return image.id === id;
       });
 
+      if (!projectImage) {
+        throw Error(
+          `Selected image with id ${id} not found among visible images.`
+        );
+      }
+
       const annotatorImage: ImageType = {
-        ...projectImage!,
+        ...projectImage,
         activePlane: 0,
       };
 
