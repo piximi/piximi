@@ -10,24 +10,23 @@ export const selectedImagesSelector = ({
   project: Project;
   settings: Settings;
 }): Array<string> => {
-  return Array.from(settings.selectedImages).filter((id: string) => {
-    const visibleCategories: Array<string> = project.categories
-      .filter((category: Category) => {
-        return category.visible;
-      })
-      .map((category: Category) => {
-        return category.id;
-      });
+  const visibleCategories: Array<string> = project.categories
+    .filter((category: Category) => {
+      return category.visible;
+    })
+    .map((category: Category) => {
+      return category.id;
+    });
 
-    return project.images
-      .filter((image: ImageType) => {
-        return id === image.id;
-      })
-      .filter((image: ImageType) => {
-        return image.categoryId && visibleCategories.includes(image.categoryId);
-      })
-      .map((image) => {
-        return image.id;
-      });
+  return settings.selectedImages.filter((id: string) => {
+    return (
+      project.images.filter((image: ImageType) => {
+        return (
+          id === image.id &&
+          visibleCategories.includes(image.categoryId) &&
+          image.visible
+        );
+      }).length > 0
+    );
   });
 };
