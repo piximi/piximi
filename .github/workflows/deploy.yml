@@ -30,3 +30,4 @@ jobs:
           user_email: "github-actions[bot]@users.noreply.github.com"
           commit_message: ${{ github.event.head_commit.message }}
           publish_branch: your-branch
+          cname: https://www.piximi.app
