@@ -30,7 +30,7 @@ import DeselectIcon from "@mui/icons-material/Deselect";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import { ImageType } from "../../types/ImageType";
+import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { useHotkeys } from "react-hotkeys-hook";
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
@@ -88,16 +88,21 @@ export const ImageGridAppBar = () => {
         );
       }
 
-      const annotatorImage: ImageType = {
-        ...projectImage,
-        activePlane: 0,
+      const annotatorImage: ShadowImageType = {
+        id: projectImage.id,
+        name: projectImage.name,
+        annotations: projectImage.annotations,
+        src: projectImage.src,
+        activePlane: projectImage.activePlane,
+        shape: projectImage.shape,
+        colors: projectImage.colors,
       };
 
       if (idx === 0) {
         batch(() => {
           dispatch(
             setActiveImage({
-              image: annotatorImage.id,
+              imageId: annotatorImage.id,
             })
           );
           dispatch(

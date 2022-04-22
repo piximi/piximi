@@ -2,15 +2,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import { ImageType } from "../../../../types/ImageType";
+import { ImageType, ShadowImageType } from "../../../../types/ImageType";
 import { projectSlice } from "../../../../store/slices";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  imagesSelector,
-  selectedImagesSelector,
-} from "../../../../store/selectors";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { selectedImagesSelector } from "../../../../store/selectors";
 import Stack from "@mui/material/Stack";
+import _ from "lodash";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;
@@ -24,20 +22,37 @@ export const ExitAnnotatorDialog = ({
   open,
 }: ExitAnnotatorDialogProps) => {
   const dispatch = useDispatch();
-  const projectImages = useSelector(imagesSelector);
-  const selectedImages = useSelector(selectedImagesSelector);
+
   const annotatorImages = useSelector(annotatorImagesSelector);
+  const selectedImagesIds = useSelector(selectedImagesSelector);
 
   const onSaveAnnotations = () => {
-    const unselectedImages = projectImages.filter((image: ImageType) => {
-      return !selectedImages.includes(image.id);
+    const annotatorImagesIds = annotatorImages.map(
+      (image: ShadowImageType) => image.id
+    );
+
+    const modifiedImagesIds = _.intersection(
+      selectedImagesIds,
+      annotatorImagesIds
+    );
+    const deletedImagesIds = _.difference(selectedImagesIds, modifiedImagesIds);
+    const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
+
+    const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
+      return modifiedImagesIds.includes(image.id);
     });
 
-    dispatch(
-      projectSlice.actions.setImages({
-        images: [...annotatorImages, ...unselectedImages],
-      })
-    );
+    const newImages = annotatorImages.filter((image: ShadowImageType) => {
+      return newImagesIds.includes(image.id);
+    }) as Array<ImageType>;
+
+    batch(() => {
+      dispatch(projectSlice.actions.addImages({ images: newImages }));
+      dispatch(projectSlice.actions.deleteImages({ ids: deletedImagesIds }));
+      dispatch(
+        projectSlice.actions.reconcileImages({ images: modifiedImages })
+      );
+    });
 
     onReturnToProject();
   };

@@ -1,20 +1,31 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
 import { Category } from "../../types/Category";
-import { ImageType } from "../../types/ImageType";
+import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
+import { Project } from "types/Project";
 
 export const activeSerializedAnnotationsSelector = ({
   imageViewer,
+  project,
 }: {
   imageViewer: ImageViewer;
+  project: Project;
 }): SerializedFileType | undefined => {
   if (!imageViewer.images.length) return undefined;
 
-  const image = imageViewer.images.find((image: ImageType) => {
-    return image.id === imageViewer.activeImageId;
-  });
+  /*
+    Find full image in project slice, else if not there
+    full image is in imageViewer slice, return from there
+  */
+  const image =
+    project.images.find((image: ImageType) => {
+      return image.id === imageViewer.activeImageId;
+    }) ||
+    (imageViewer.images.find((image: ShadowImageType) => {
+      return image.id === imageViewer.activeImageId;
+    }) as ImageType);
 
   if (!image) return undefined;
 

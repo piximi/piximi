@@ -1,5 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageType } from "../../types/ImageType";
+import { ShadowImageType } from "../../types/ImageType";
 
 export const imageWidthSelector = ({
   imageViewer,
@@ -8,9 +8,11 @@ export const imageWidthSelector = ({
 }) => {
   if (!imageViewer.images.length || !imageViewer.activeImageId) return;
 
-  const image = imageViewer.images.filter((image: ImageType) => {
+  const image = imageViewer.images.find((image: ShadowImageType) => {
     return image.id === imageViewer.activeImageId;
-  })[0];
+  });
+
+  if (!image) return;
 
   return image.shape.width;
 };

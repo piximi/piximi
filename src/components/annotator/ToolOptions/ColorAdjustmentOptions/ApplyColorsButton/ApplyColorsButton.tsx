@@ -8,7 +8,7 @@ import {
   convertImageURIsToImageData,
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
-import { imageViewerImagesSelector } from "../../../../../store/selectors";
+import { imageViewerFullImagesSelector } from "../../../../../store/selectors";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 import { ImageType } from "../../../../../types/ImageType";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
@@ -16,7 +16,7 @@ import { activeImagePlaneSelector } from "../../../../../store/selectors/activeI
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(activeImageColorsSelector);
   const dispatch = useDispatch();
-  const images = useSelector(imageViewerImagesSelector);
+  const images = useSelector(imageViewerFullImagesSelector);
   const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 

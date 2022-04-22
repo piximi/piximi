@@ -66,7 +66,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
         dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
         if (i === 0) {
           dispatch(
-            imageViewerSlice.actions.setActiveImage({ image: image.id })
+            imageViewerSlice.actions.setActiveImage({ imageId: image.id })
           );
           dispatch(
             setSelectedAnnotations({

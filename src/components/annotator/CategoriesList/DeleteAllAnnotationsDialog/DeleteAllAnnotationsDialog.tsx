@@ -21,7 +21,7 @@ export const DeleteAllAnnotationsDialog = ({
 
   const onDelete = () => {
     batch(() => {
-      dispatch(imageViewerSlice.actions.deleteAllInstances({ id: "" }));
+      dispatch(imageViewerSlice.actions.deleteAllInstances());
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_CATEGORY_ID,
@@ -37,7 +37,7 @@ export const DeleteAllAnnotationsDialog = ({
       <DialogTitle>Delete all annotations?</DialogTitle>
 
       <DialogContent>
-        All annotations across all images will be permanently deleted."
+        All annotations across all images will be permanently deleted.
       </DialogContent>
 
       <DialogActions>

@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import { useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "../../../../store/slices";
 import { useTranslation } from "../../../../hooks/useTranslation";
-import { activeImageIdSelector } from "../../../../store/selectors/activeImageIdSelector";
 import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
@@ -14,10 +13,8 @@ import {
 } from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { categoriesSelector } from "../../../../store/selectors";
-import { imagesSelector } from "../../../../store/selectors/imagesSelector";
+import { categoriesSelector, imageSelector } from "../../../../store/selectors";
 import { Divider } from "@mui/material";
-import { ImageType } from "../../../../types/ImageType";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -31,25 +28,26 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  const currentImageId = useSelector(activeImageIdSelector);
+  // const currentImageId = useSelector(activeImageIdSelector);
   const categories = useSelector(categoriesSelector);
-  const images = useSelector(imagesSelector);
+  // const images = useSelector(imagesSelector);
+  const activeImage = useSelector(imageSelector);
 
   const onClearAnnotationsClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
-    if (!currentImageId) return;
+    if (!activeImage) return;
     dispatch(
       imageViewerSlice.actions.deleteAllImageInstances({
-        imageId: currentImageId,
+        imageId: activeImage.id,
       })
     );
     onCloseImageMenu(event);
   };
 
   const onDeleteImage = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (!currentImageId) return;
-    dispatch(imageViewerSlice.actions.deleteImage({ id: currentImageId }));
+    if (!activeImage) return;
+    dispatch(imageViewerSlice.actions.deleteImage({ id: activeImage.id }));
     onCloseImageMenu(event);
   };
 
@@ -60,10 +58,6 @@ export const ImageMenu = ({
     onCloseImageMenu(event);
 
     let zip = new JSZip();
-
-    const activeImage = images.find((image: ImageType) => {
-      return image.id === currentImageId;
-    });
 
     if (!activeImage) return;
 
@@ -84,10 +78,6 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
-      return image.id === currentImageId;
-    });
-
     if (!activeImage) return;
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
@@ -102,10 +92,6 @@ export const ImageMenu = ({
     onCloseImageMenu(event);
 
     let zip = new JSZip();
-
-    const activeImage = images.find((image: ImageType) => {
-      return image.id === currentImageId;
-    });
 
     if (!activeImage) return;
 
@@ -126,10 +112,6 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
-      return image.id === currentImageId;
-    });
-
     if (!activeImage) return;
 
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
@@ -147,14 +129,10 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    const activeImage = images.find((image: ImageType) => {
-      return image.id === currentImageId;
-    });
-
     if (!activeImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix(images, categories, zip, false, true)
+      saveAnnotationsAsLabelMatrix([activeImage], categories, zip, false, true)
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "binary_semantic.zip");

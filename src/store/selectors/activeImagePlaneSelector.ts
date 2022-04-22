@@ -1,12 +1,12 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageType } from "../../types/ImageType";
+import { ShadowImageType } from "../../types/ImageType";
 
 export const activeImagePlaneSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
 }): number => {
-  const activeImage = imageViewer.images.find((image: ImageType) => {
+  const activeImage = imageViewer.images.find((image: ShadowImageType) => {
     return imageViewer.activeImageId === image.id;
   });
 

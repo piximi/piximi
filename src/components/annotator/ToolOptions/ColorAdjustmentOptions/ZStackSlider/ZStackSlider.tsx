@@ -12,8 +12,8 @@ import { imageOriginalSrcSelector } from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ZStackSlider = () => {
-  const activeImage = useSelector(activeImageSelector);
   const dispatch = useDispatch();
+  const activeImage = useSelector(activeImageSelector);
   const channels = useSelector(activeImageColorsSelector);
   const activePlane = useSelector(activeImagePlaneSelector);
 
@@ -26,12 +26,12 @@ export const ZStackSlider = () => {
     if (typeof newValue === "number") {
       if (!originalSrc) return;
 
-      const planeData = await convertImageURIsToImageData([
-        originalSrc[newValue],
-      ]);
+      const planeData = (
+        await convertImageURIsToImageData([originalSrc[newValue]])
+      )[0];
 
       const imageSrc = mapChannelstoSpecifiedRGBImage(
-        planeData[0],
+        planeData,
         channels,
         activeImage.shape.height,
         activeImage.shape.width

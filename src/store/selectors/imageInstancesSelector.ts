@@ -1,5 +1,5 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageType } from "../../types/ImageType";
+import { ShadowImageType } from "../../types/ImageType";
 
 export const imageInstancesSelector = ({
   imageViewer,
@@ -8,7 +8,7 @@ export const imageInstancesSelector = ({
 }) => {
   if (!imageViewer.images.length) return;
 
-  const image = imageViewer.images.find((image: ImageType) => {
+  const image = imageViewer.images.find((image: ShadowImageType) => {
     return image.id === imageViewer.activeImageId;
   });
 

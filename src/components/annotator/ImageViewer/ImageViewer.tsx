@@ -19,6 +19,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = React.useState<FileList>();
+
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
     React.useState(false);
 
@@ -30,7 +31,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
   useEffect(() => {
     if (image) {
-      dispatch(imageViewerSlice.actions.setActiveImage({ image: image.id }));
+      dispatch(imageViewerSlice.actions.setActiveImage({ imageId: image.id }));
     }
   }, [dispatch, image]);
 
