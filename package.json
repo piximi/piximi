@@ -2,7 +2,7 @@
   "name": "piximi",
   "license": "BSD-style license",
   "version": "0.1.0",
-  "homepage": "https://piximi.github.io/prototype",
+  "homepage": "https://www.piximi.app/",
   "dependencies": {
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",

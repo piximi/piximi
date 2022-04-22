@@ -28,8 +28,8 @@ Builds the app for production to the `build` folder.<br />
 To run as a docker container, clone the repo, build the image and run it:
 
 ```
-git clone https://github.com/piximi/prototype
-docker build -t <image_name> prototype/
+git clone https://github.com/piximi/piximi
+docker build -t <image_name> piximi/
 docker run -p 3000:3000 --name <container_name> <image_name>
 ```
 
