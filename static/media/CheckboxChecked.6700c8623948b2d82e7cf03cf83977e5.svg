@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>CheckboxChecked</title>
+    <g id="CheckboxChecked" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Path" transform="translate(-0.000000, -0.000000)">
+            <polygon points="0 0 24.0000001 0 24.0000001 24.0000001 0 24.0000001"></polygon>
+            <path d="M18,20 L6.00000002,20 C4.89500002,20 4.00000002,19.1050001 4.00000002,18 L4.00000002,6.00000002 C4.00000002,4.89500002 4.89500002,4.00000002 6.00000002,4.00000002 L18,4.00000002 C19.1050001,4.00000002 20,4.89500002 20,6.00000002 L20,18 C20,19.1050001 19.1050001,20 18,20 Z" stroke="#323232" stroke-width="1.5" fill="#555555" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline stroke="#E5E5E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" points="16.0000001 10 11 15.0000001 8.00000003 12.0000001"></polyline>
+        </g>
+    </g>
+</svg>
