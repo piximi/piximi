@@ -20,7 +20,7 @@ const dummyImage: ImageType = {
   colors: generateDefaultChannels(3),
   annotations: [],
   name: "nuclei",
-  originalSrc: [],
+  originalSrc: [[nuclei, nuclei, nuclei]],
   src: nuclei,
   shape: {
     height: 256,
