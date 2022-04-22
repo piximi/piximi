@@ -85,7 +85,7 @@ export const FallBackDialog = (props: any) => {
     errorState.stackTrace;
 
   const gitHubIssueUrl =
-    "https://github.com/piximi/prototype/issues/new?title=" +
+    "https://github.com/piximi/piximi/issues/new?title=" +
     encodeURIComponent(errorState.name) +
     "&labels=" +
     "bug" +

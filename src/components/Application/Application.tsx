@@ -12,9 +12,7 @@ export const Application = () => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <BrowserRouter
-          basename={process.env.NODE_ENV === "production" ? "/prototype" : "/"}
-        >
+        <BrowserRouter basename={"/"}>
           <Routes>
             <Route path="/" element={<MainView />} />
             <Route path="annotator" element={<AnnotatorView />} />
