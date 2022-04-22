@@ -30,21 +30,19 @@ export const ApplyColorsButton = () => {
     const getUpdatedImages = async (): Promise<Array<ImageType>> => {
       return Promise.all(
         images.map(async (image: ImageType) => {
-          if (image.id === activeImageId) {
-            return image; //don't do anything, the imageSrc has already been updated on slider change / toggling
-          }
-
           if (image.shape.channels !== activeImageColors.length) {
             //if mismatch between image size and desired colors, don't do anything on the image
             return image;
           }
 
-          const originalData = await convertImageURIsToImageData(
-            new Array(image.originalSrc[activeImagePlane])
-          );
+          const activePlaneData = (
+            await convertImageURIsToImageData(
+              new Array(image.originalSrc[activeImagePlane])
+            )
+          )[0];
 
           const modifiedURI = mapChannelstoSpecifiedRGBImage(
-            originalData[0],
+            activePlaneData,
             activeImageColors,
             image.shape.height,
             image.shape.width

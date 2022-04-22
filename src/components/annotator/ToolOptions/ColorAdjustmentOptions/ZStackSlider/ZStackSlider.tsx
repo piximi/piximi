@@ -26,12 +26,12 @@ export const ZStackSlider = () => {
     if (typeof newValue === "number") {
       if (!originalSrc) return;
 
-      const planeData = (
+      const activePlaneData = (
         await convertImageURIsToImageData([originalSrc[newValue]])
       )[0];
 
       const imageSrc = mapChannelstoSpecifiedRGBImage(
-        planeData,
+        activePlaneData,
         channels,
         activeImage.shape.height,
         activeImage.shape.width
