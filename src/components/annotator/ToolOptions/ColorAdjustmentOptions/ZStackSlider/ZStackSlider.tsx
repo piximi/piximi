@@ -8,7 +8,10 @@ import {
   mapChannelstoSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
-import { imageOriginalSrcSelector } from "../../../../../store/selectors";
+import {
+  imageOriginalSrcSelector,
+  activeImageRenderedSrcsSelector,
+} from "../../../../../store/selectors";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 
 export const ZStackSlider = () => {
@@ -16,6 +19,7 @@ export const ZStackSlider = () => {
   const activeImage = useSelector(activeImageSelector);
   const channels = useSelector(activeImageColorsSelector);
   const activePlane = useSelector(activeImagePlaneSelector);
+  const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
@@ -24,22 +28,24 @@ export const ZStackSlider = () => {
 
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
-      if (!originalSrc) return;
+      if (renderedSrcs.length === 0) return;
+      // if (!originalSrc) return;
 
-      const activePlaneData = (
-        await convertImageURIsToImageData([originalSrc[newValue]])
-      )[0];
+      // const activePlaneData = (
+      //   await convertImageURIsToImageData([originalSrc[newValue]])
+      // )[0];
 
-      const imageSrc = mapChannelstoSpecifiedRGBImage(
-        activePlaneData,
-        channels,
-        activeImage.shape.height,
-        activeImage.shape.width
-      );
+      // const imageSrc = mapChannelstoSpecifiedRGBImage(
+      //   activePlaneData,
+      //   channels,
+      //   activeImage.shape.height,
+      //   activeImage.shape.width
+      // );
 
       dispatch(
         imageViewerSlice.actions.setImageSrc({
-          src: imageSrc,
+          // src: imageSrc,
+          src: renderedSrcs[newValue],
         })
       );
       dispatch(

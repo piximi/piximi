@@ -93,6 +93,7 @@ const initialState: ImageViewer = {
   exposure: 0,
   hue: 0,
   activeImageId: initialImage ? initialImage.id : undefined,
+  activeImageRenderedSrcs: initialImage ? [initialImage.src] : [],
   images: initialImage ? [initialImage] : [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -264,6 +265,14 @@ export const imageViewerSlice = createSlice({
       };
 
       state.images.push(...[loaded]);
+    },
+    setActiveImageRenderedSrcs(
+      state: ImageViewer,
+      action: PayloadAction<{
+        renderedSrcs: Array<string>;
+      }>
+    ) {
+      state.activeImageRenderedSrcs = action.payload.renderedSrcs;
     },
     setAnnotationState(
       state: ImageViewer,

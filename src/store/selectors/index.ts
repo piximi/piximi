@@ -42,3 +42,4 @@ export { imageSelectionSizeSelector } from "./imageSelectionSizeSelector";
 export { preprocessOptionsSelector } from "./preprocessOptionsSelector";
 export { rescaleOptionsSelector } from "./rescaleOptionsSelector";
 export { cropOptionsSelector } from "./cropOptionsSelector";
+export { activeImageRenderedSrcsSelector } from "./activeImageRenderedSrcsSelector";

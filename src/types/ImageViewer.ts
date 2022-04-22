@@ -20,6 +20,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
+  activeImageRenderedSrcs: Array<string>;
   images: Array<ShadowImageType>;
   language: LanguageType;
   offset: { x: number; y: number };
