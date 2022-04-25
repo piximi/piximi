@@ -20,6 +20,19 @@ export function* activeImageIDChangeSaga({
 
   if (!image) return;
 
+  /*
+   * Since converting each plane to image data, and mapping them to RGBs
+   * can take some time, there is a a window of time where the previous
+   * active image will be shown in the annotator. To avoid this, we want
+   * to first set renderedSrcs to just the already rendered image src,
+   * then after prerendering srcs for each plane, we replace it.
+   */
+  yield put(
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({
+      renderedSrcs: [image.src],
+    })
+  );
+
   const planesData: number[][][] = yield convertImageURIsToImageData(
     image.originalSrc
   );
