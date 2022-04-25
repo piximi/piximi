@@ -359,7 +359,7 @@ export const imageViewerSlice = createSlice({
     },
     setImageColors(
       state: ImageViewer,
-      action: PayloadAction<{ colors: Array<Color> }>
+      action: PayloadAction<{ colors: Array<Color>; ignoreRender?: boolean }>
     ) {
       if (!state.activeImageId) return;
       state.images = state.images.map((image: ShadowImageType) => {

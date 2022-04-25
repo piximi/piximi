@@ -1,4 +1,4 @@
-import { put, select } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { Color } from "types/Color";
 import { imageSelector } from "store/selectors";
 import {
@@ -33,7 +33,8 @@ export function* activeImageIDChangeSaga({
     })
   );
 
-  const planesData: number[][][] = yield convertImageURIsToImageData(
+  const planesData: number[][][] = yield call(
+    convertImageURIsToImageData,
     image.originalSrc
   );
 
@@ -52,22 +53,26 @@ export function* activeImageIDChangeSaga({
 }
 
 export function* activeImageColorChangeSaga({
-  payload: { colors },
+  payload: { colors, ignoreRender },
 }: {
   type: string;
   payload: {
     colors: Array<Color>;
+    ignoreRender?: boolean;
   };
 }): any {
+  if (ignoreRender) return;
+
   const image: ImageType | undefined = yield select(imageSelector);
 
   if (!image) return;
 
-  const planesData: number[][][] = yield convertImageURIsToImageData(
+  const planesData: number[][][] = yield call(
+    convertImageURIsToImageData,
     image.originalSrc
   );
 
-  const renderedSrcs = planesData.map((planeData) => {
+  const renderedSrcs = planesData.map((planeData, idx) => {
     return mapChannelstoSpecifiedRGBImage(
       planeData,
       colors,
