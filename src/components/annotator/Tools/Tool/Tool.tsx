@@ -90,7 +90,7 @@ export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
     <Card sx={{ width: 210 }} variant="outlined">
       <CardActionArea>
         <CardContent>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography variant="body2" color="textSecondary" component="span">
             {description}
           </Typography>
         </CardContent>
