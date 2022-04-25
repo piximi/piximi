@@ -23,12 +23,10 @@ export const DeleteAllCategoriesListItem = ({
     //cycle through the annotations to determine if annotations of that category exist
     // show a warning dialog box is they do exist
     let existAnnotations = false;
-    for (let i = 0; i < images.length; i++) {
-      if (!existAnnotations) {
-        for (let j = 0; j < images[i].annotations.length; j++) {
-          if (images[i].annotations[j].categoryId !== UNKNOWN_CATEGORY_ID) {
-            existAnnotations = true;
-          }
+    for (let i = 0; i < images.length && !existAnnotations; i++) {
+      for (let j = 0; j < images[i].annotations.length; j++) {
+        if (images[i].annotations[j].categoryId !== UNKNOWN_CATEGORY_ID) {
+          existAnnotations = true;
         }
       }
     }

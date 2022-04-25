@@ -142,7 +142,7 @@ export const ExampleImageDialog = ({
 
       dispatch(
         setActiveImage({
-          image: example.id,
+          imageId: example.id,
         })
       );
 

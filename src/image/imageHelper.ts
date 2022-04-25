@@ -526,7 +526,7 @@ export const generateDefaultChannels = (components: number): Array<Color> => {
   } else {
     for (let i = 0; i < components; i++) {
       defaultChannels.push({
-        color: DEFAULT_COLORS[i],
+        color: i < DEFAULT_COLORS.length ? DEFAULT_COLORS[i] : [255, 255, 255],
         range: [0, 255],
         visible: !(components > 3 && i > 0), //if image is multi-channel and c > 3, only show the first channel as default (user can then toggle / untoggle the other channels if desired).
       });

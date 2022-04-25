@@ -2,6 +2,8 @@ import { all, fork } from "redux-saga/effects";
 import {
   watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
+  watchActiveImageChangeSaga,
+  watchActiveImageColorsChangeSaga,
 } from "./annotator";
 import { watchFitSaga } from "./classifier";
 import { watchPredictSaga } from "./classifier/watchPredictSaga";
@@ -17,6 +19,8 @@ export function* rootSaga() {
   const annotaterEffects = [
     fork(watchAnnotationStateChangeSaga),
     fork(watchSelectedCategorySaga),
+    fork(watchActiveImageChangeSaga),
+    fork(watchActiveImageColorsChangeSaga),
   ];
 
   yield all([...classifierEffects, ...annotaterEffects]);

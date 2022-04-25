@@ -2,12 +2,15 @@ import { Project } from "../../types/Project";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { v4 as uuidv4 } from "uuid";
-import { ImageType } from "../../types/ImageType";
+import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { filter, findIndex } from "lodash";
 import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
-import { generateDefaultChannels } from "../../image/imageHelper";
+import {
+  generateDefaultChannels,
+  replaceDuplicateName,
+} from "../../image/imageHelper";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 
 const dummyImage: ImageType = {
@@ -17,7 +20,7 @@ const dummyImage: ImageType = {
   colors: generateDefaultChannels(3),
   annotations: [],
   name: "nuclei",
-  originalSrc: [],
+  originalSrc: [[nuclei, nuclei, nuclei]],
   src: nuclei,
   shape: {
     height: 256,
@@ -50,6 +53,12 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
+    addImages(
+      state: Project,
+      action: PayloadAction<{ images: Array<ImageType> }>
+    ) {
+      state.images = state.images.concat(action.payload.images);
+    },
     createCategory(
       state: Project,
       action: PayloadAction<{ name: string; color: string }>
@@ -63,7 +72,19 @@ export const projectSlice = createSlice({
       state.categories.push(category);
     },
     createImage(state: Project, action: PayloadAction<{ image: ImageType }>) {
-      state.images.push(action.payload.image);
+      const currentImageNames = state.images.map((image: ImageType) => {
+        return image.name.split(".")[0];
+      });
+
+      const initialName = action.payload.image.name.split(".")[0];
+      const updatedName =
+        replaceDuplicateName(initialName, currentImageNames) +
+        "." +
+        action.payload.image.name.split(".")[1];
+
+      const newImage = { ...action.payload.image, name: updatedName };
+
+      state.images.push(newImage);
     },
     createNewProject(state: Project, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
@@ -111,6 +132,27 @@ export const projectSlice = createSlice({
       state.categories = action.payload.categories;
       state.name = action.payload.name;
       state.images = action.payload.images;
+    },
+    reconcileImages(
+      state: Project,
+      action: PayloadAction<{
+        images: Array<ShadowImageType>;
+      }>
+    ) {
+      action.payload.images.forEach((shadowImage: ShadowImageType) => {
+        const projectImageIdx = state.images.findIndex((image: ImageType) => {
+          return shadowImage.id === image.id;
+        });
+
+        if (projectImageIdx >= 0) {
+          const projectImage = state.images[projectImageIdx];
+
+          state.images[projectImageIdx] = {
+            ...projectImage,
+            ...shadowImage,
+          };
+        }
+      });
     },
     setCategories(
       state: Project,

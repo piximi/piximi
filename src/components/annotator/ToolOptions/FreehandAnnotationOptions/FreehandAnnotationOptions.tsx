@@ -24,7 +24,9 @@ export const FreehandAnnotationOptions = () => {
 
     dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
   };
+
   const t = useTranslation();
+
   return (
     <>
       <InformationBox description="…" name={t("Freehand annotation")} />

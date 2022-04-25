@@ -1,12 +1,15 @@
 import { ImageViewer } from "../../types/ImageViewer";
-import { ImageType } from "../../types/ImageType";
+import { ShadowImageType } from "../../types/ImageType";
+import { Project } from "types/Project";
 
 export const activeImageSelector = ({
   imageViewer,
+  project,
 }: {
   imageViewer: ImageViewer;
-}): ImageType | undefined => {
-  const activeImage = imageViewer.images.find((image: ImageType) => {
+  project: Project;
+}): ShadowImageType | undefined => {
+  const activeImage = imageViewer.images.find((image: ShadowImageType) => {
     return imageViewer.activeImageId === image.id;
   });
 

@@ -1,17 +1,28 @@
 import { AnnotationType } from "../../types/AnnotationType";
 import { Category } from "../../types/Category";
-import { ImageType } from "../../types/ImageType";
+import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { SerializedFileType } from "../../types/SerializedFileType";
 import { ImageViewer } from "../../types/ImageViewer";
+import { Project } from "types/Project";
 
 export const allSerializedAnnotationsSelector = ({
   imageViewer,
+  project,
 }: {
   imageViewer: ImageViewer;
+  project: Project;
 }): Array<SerializedFileType> => {
   if (!imageViewer.images.length) return [];
 
-  return imageViewer.images.map((image: ImageType) => {
+  return imageViewer.images.map((shadowImage: ShadowImageType) => {
+    /*
+      get full images from project by id if they exist there,
+      else get full image from imageViewer
+    */
+    const image =
+      project.images.find((im: ImageType) => im.id === shadowImage.id) ||
+      (shadowImage as ImageType);
+
     const columns = {
       imageChannels: image.shape.channels,
       imageColors: image.colors,

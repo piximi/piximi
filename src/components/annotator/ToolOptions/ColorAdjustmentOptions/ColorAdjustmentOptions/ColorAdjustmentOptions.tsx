@@ -43,12 +43,14 @@ export const ColorAdjustmentOptions = () => {
 
     if (!originalSrc || !imageShape) return;
 
-    const originalData = await convertImageURIsToImageData([
-      originalSrc[activeImagePlane],
-    ]);
+    const activePlaneData = (
+      await convertImageURIsToImageData(
+        new Array(originalSrc[activeImagePlane])
+      )
+    )[0];
 
     const modifiedURI = mapChannelstoSpecifiedRGBImage(
-      originalData[0],
+      activePlaneData,
       defaultChannels,
       imageShape.height,
       imageShape.width

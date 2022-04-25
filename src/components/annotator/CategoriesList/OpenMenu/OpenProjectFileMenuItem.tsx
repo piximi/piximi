@@ -46,7 +46,7 @@ export const OpenProjectFileMenuItem = ({
             if (index === 0) {
               dispatch(
                 setActiveImage({
-                  image: serializedImage.imageId,
+                  imageId: serializedImage.imageId,
                 })
               );
 

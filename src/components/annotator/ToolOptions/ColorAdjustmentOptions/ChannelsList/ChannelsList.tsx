@@ -70,6 +70,7 @@ export const ChannelsList = () => {
         dispatch(
           imageViewerSlice.actions.setImageColors({
             colors: updatedChannels,
+            ignoreRender: true,
           })
         );
       };
@@ -94,6 +95,12 @@ export const ChannelsList = () => {
     );
     batch(() => {
       dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+      dispatch(
+        imageViewerSlice.actions.setImageColors({
+          colors: activeImageColors,
+          ignoreRender: false,
+        })
+      );
     });
   };
 
@@ -121,9 +128,9 @@ export const ChannelsList = () => {
 
       if (!originalSrc || !imageShape) return;
 
-      const originalData = await convertImageURIsToImageData([
-        originalSrc[activeImagePlane],
-      ]);
+      const originalData = await convertImageURIsToImageData(
+        new Array(originalSrc[activeImagePlane])
+      );
 
       const arrayLength = originalData[0][0].length;
       const modifiedData = originalData[0].map(
