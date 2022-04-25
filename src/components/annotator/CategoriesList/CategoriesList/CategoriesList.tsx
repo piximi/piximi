@@ -222,7 +222,6 @@ export const CategoriesList = () => {
         width: (theme) => theme.spacing(32),
         "& > .MuiDrawer-paper": {
           width: (theme) => theme.spacing(32),
-          zIndex: 0,
         },
       }}
       open
