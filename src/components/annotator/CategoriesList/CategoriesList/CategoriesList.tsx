@@ -56,6 +56,7 @@ import { AppBarOffset } from "components/styled/AppBarOffset";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
+import { LogoIcon } from "components/Logo";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -247,8 +248,9 @@ export const CategoriesList = () => {
               <ArrowBack />
             </IconButton>
           </Tooltip>
-          <Typography variant="h6" color="inherit">
-            Piximi Annotator
+          <LogoIcon width={30} height={30} />
+          <Typography variant="h5" color={"#02aec5"}>
+            Annotator
           </Typography>
         </Toolbar>
       </AppBar>

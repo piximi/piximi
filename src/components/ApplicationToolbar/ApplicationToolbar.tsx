@@ -23,7 +23,7 @@ export const ApplicationToolbar = () => {
 
   return (
     <Toolbar>
-      <Logo />
+      <Logo width={250} height={50} />
       {/*<TaskSelect />*/}
       <Box sx={{ flexGrow: 1 }} />
 

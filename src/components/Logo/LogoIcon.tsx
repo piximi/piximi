@@ -1,13 +1,19 @@
 import React from "react";
 
-export const Logo = ({ width, height }: { width: number; height: number }) => {
+export const LogoIcon = ({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={width}
       height={height}
       version="1.1"
-      viewBox="0 0 209.063 34.957"
+      viewBox="0 0 35.993 34.957"
     >
       <defs>
         <clipPath id="clipPath24744" clipPathUnits="userSpaceOnUse">
@@ -34,22 +40,22 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
         <clipPath id="clipPath24828" clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24840" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24852" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24862" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24874" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24884" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
-        <clipPath id="clipPath24894" clipPathUnits="userSpaceOnUse">
+        <clipPath clipPathUnits="userSpaceOnUse">
           <path d="M0 1765.44h1000V0H0z"></path>
         </clipPath>
         <clipPath id="clipPath24906" clipPathUnits="userSpaceOnUse">
@@ -165,78 +171,6 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
               </g>
             </g>
           </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24840)">
-              <g transform="translate(347.858 1415.282)">
-                <path
-                  fill="#02aec5"
-                  fillOpacity="1"
-                  fillRule="nonzero"
-                  stroke="none"
-                  d="M0 0h4.838c3.987 0 7.156 1.119 9.508 3.36 2.352 2.239 3.528 5.33 3.528 9.273 0 6.629-3.674 9.944-11.02 9.944H0zm44.752 12.767c0-10.976-3.237-19.453-9.71-25.433-6.474-5.981-15.668-8.971-27.583-8.971H0v-32.589h-26.542v98.238H7.459c12.408 0 21.726-2.71 27.953-8.13 6.226-5.421 9.34-13.126 9.34-23.115"
-                ></path>
-              </g>
-            </g>
-          </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24852)">
-              <path
-                fill="#02aec5"
-                fillOpacity="1"
-                fillRule="nonzero"
-                stroke="none"
-                d="M408.266 1459.295h26.676v-98.239h-26.676z"
-              ></path>
-            </g>
-          </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24862)">
-              <g transform="translate(544.671 1361.056)">
-                <path
-                  fill="#02aec5"
-                  fillOpacity="1"
-                  fillRule="nonzero"
-                  stroke="none"
-                  d="M0 0h-30.708l-19.151 30.708L-68.808 0h-30.036l32.59 50.261-30.641 47.978h29.431l17.74-30.372 17.067 30.372h30.305l-31.111-50.06z"
-                ></path>
-              </g>
-            </g>
-          </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24874)">
-              <path
-                fill="#02aec5"
-                fillOpacity="1"
-                fillRule="nonzero"
-                stroke="none"
-                d="M555.691 1459.295h26.675v-98.239h-26.675z"
-              ></path>
-            </g>
-          </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24884)">
-              <path
-                fill="#02aec5"
-                fillOpacity="1"
-                fillRule="nonzero"
-                stroke="none"
-                d="M731.141 1459.295h26.676v-98.239h-26.676z"
-              ></path>
-            </g>
-          </g>
-          <g transform="translate(-185.381 -899.778)">
-            <g clipPath="url(#clipPath24894)">
-              <g transform="translate(713.064 1459.297)">
-                <path
-                  fill="#02aec5"
-                  fillOpacity="1"
-                  fillRule="nonzero"
-                  stroke="none"
-                  d="M0 0v-98.237h-23.775v67.01l-19.03-67.01h-26.612l-19.02 67.01v-67.01h-23.776V0h35.343l20.489-69.747h.539L-35.343 0z"
-                ></path>
-              </g>
-            </g>
-          </g>
           <g transform="translate(-185.383 -701.093)">
             <g clipPath="url(#clipPath24906)">
               <g transform="translate(773.706 1245.92)">
@@ -245,7 +179,8 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
                   fillOpacity="1"
                   fillRule="nonzero"
                   stroke="none"
-                  d="M0 0h-2.502v13.16h-4.502v2.147H4.502V13.16H0z"
+                  strokeWidth="0.352"
+                  d="M-476.277-80.388h-.917v4.455h-1.652v.727h4.22v-.727h-1.65z"
                 ></path>
               </g>
             </g>
@@ -258,7 +193,8 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
                   fillOpacity="1"
                   fillRule="nonzero"
                   stroke="none"
-                  d="M0 0l-4.439 12.784h-.084c.119-1.899.178-3.679.178-5.34V0h-2.272v15.307h3.528L1.162 3.13h.063l4.377 12.177H9.14V0H6.731v7.57c0 .76.02 1.751.058 2.973.039 1.221.072 1.961.1 2.22h-.084L2.209 0z"
+                  strokeWidth="0.352"
+                  d="M-484.804-80.388l-1.628 4.328h-.03c.043-.643.065-1.245.065-1.808v-2.52h-.833v5.182h1.294l1.559-4.122h.023l1.605 4.122h1.297v-5.182h-.883v2.563c0 .257.007.593.021 1.006.014.414.027.664.037.752h-.03l-1.686-4.32z"
                 ></path>
               </g>
             </g>
