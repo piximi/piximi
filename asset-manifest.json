@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "/static/js/main.389c7ada.js",
+    "main.js": "/static/js/main.5c31fd94.js",
     "static/js/608.00407f41.chunk.js": "/static/js/608.00407f41.chunk.js",
     "static/js/280.aba4d3da.chunk.js": "/static/js/280.aba4d3da.chunk.js",
     "static/js/564.664d2ada.chunk.js": "/static/js/564.664d2ada.chunk.js",
@@ -21,11 +21,11 @@
     "static/media/LassoAnnotation.svg": "/static/media/LassoAnnotation.c53651debe68141f2a9d9fbed32fdcb7.svg",
     "static/media/FreehandAnnotation.svg": "/static/media/FreehandAnnotation.ce15dd278166b7212649558d3d7fde69.svg",
     "static/media/Hand.svg": "/static/media/Hand.57521d911b527643018480b27a10f380.svg",
+    "index.html": "/index.html",
     "static/media/RadioChecked.svg": "/static/media/RadioChecked.247674a96a48fd7b15920f68df812b45.svg",
     "static/media/Selection.svg": "/static/media/Selection.4e4701f2a7dea9b04ac6f171250a07fb.svg",
     "static/media/CheckboxChecked.svg": "/static/media/CheckboxChecked.6700c8623948b2d82e7cf03cf83977e5.svg",
     "static/media/PolygonalAnnotation.svg": "/static/media/PolygonalAnnotation.a42ec2259ada5b4ab69c46631521df4e.svg",
-    "index.html": "/index.html",
     "static/media/Zoom.svg": "/static/media/Zoom.58f47de702582186c122dab36be0fb87.svg",
     "static/media/RectangularAnnotation.svg": "/static/media/RectangularAnnotation.3cca93c1a7d6f5a1aa4c839e48a0e6de.svg",
     "static/media/CheckboxUnchecked.svg": "/static/media/CheckboxUnchecked.1714692bcc847baca033f2c6149d1730.svg",
@@ -35,10 +35,10 @@
     "static/media/VolumeOff.svg": "/static/media/VolumeOff.1149786552b52a25580655f2ce3391c1.svg",
     "static/media/VolumeUp.svg": "/static/media/VolumeUp.30de055e122b96e2aa207a710b1bd74a.svg",
     "static/media/Moon.svg": "/static/media/Moon.593035e92f1f02f04668bb75454d1fb3.svg",
-    "main.389c7ada.js.map": "/static/js/main.389c7ada.js.map",
+    "main.5c31fd94.js.map": "/static/js/main.5c31fd94.js.map",
     "793.020791f5.chunk.js.map": "/static/js/793.020791f5.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.389c7ada.js"
+    "static/js/main.5c31fd94.js"
   ]
 }
