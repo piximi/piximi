@@ -1,4 +1,4 @@
-# Piximi
+![Piximi](src/images/Piximi_Logo.png)
 
 Piximi is a free, open source web app for performing image understanding tasks. It’s written by dozens of engineers and scientists from institutions like the Biological Research Centre Szeged, Broad Institute of MIT and Harvard, Chan Zuckerberg Initiative, ETH Zurich, and FIMM Helsinki.
 
