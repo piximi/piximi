@@ -11,7 +11,7 @@ import { Color } from "../../../../types/Color";
 import { ToolType } from "../../../../types/ToolType";
 import { v4 as uuidv4 } from "uuid";
 import * as malariaAnnotations from "../../../../images/malaria.json";
-import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
+import * as cellpaintingAnnotations from "../../../../images/cell-painting.json";
 import { AnnotationType } from "../../../../types/AnnotationType";
 import { SerializedAnnotationType } from "../../../../types/SerializedAnnotationType";
 import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
@@ -47,7 +47,7 @@ export const ExampleImageDialog = ({
 
   const categories_in = useSelector(categoriesSelector);
 
-  const examples = [
+  const exampleImages = [
     {
       name: "malaria.png",
       description:
@@ -80,16 +80,16 @@ export const ExampleImageDialog = ({
     },
   ];
 
-  const onClick = async ({
-    data,
-    description,
+  const openExampleImage = async ({
     name,
-    shape,
+    description,
+    data,
     project,
+    shape,
   }: {
-    data: any;
-    description: string;
     name: string;
+    description: string;
+    data: any;
     project: any;
     shape: ShapeType;
   }) => {
@@ -123,7 +123,7 @@ export const ExampleImageDialog = ({
 
     const defaultColors = generateDefaultChannels(shape.channels);
 
-    const example: ImageType = {
+    const exampleImage: ImageType = {
       activePlane: 0,
       annotations: newAnnotations,
       categoryId: UNKNOWN_CATEGORY_ID,
@@ -138,11 +138,11 @@ export const ExampleImageDialog = ({
     };
 
     batch(() => {
-      dispatch(setImages({ images: [...images, example] }));
+      dispatch(setImages({ images: [...images, exampleImage] }));
 
       dispatch(
         setActiveImage({
-          imageId: example.id,
+          imageId: exampleImage.id,
         })
       );
 
@@ -166,14 +166,14 @@ export const ExampleImageDialog = ({
   return (
     <Dialog open={open} onClose={onClose}>
       <List component="div" role="list">
-        {examples.map((example, index) => {
+        {exampleImages.map((example, index) => {
           return (
             <ListItem
               button
               divider
               key={index}
               role="listitem"
-              onClick={() => onClick(example)}
+              onClick={() => openExampleImage(example)}
             >
               <ListItemText
                 primary={example.name}

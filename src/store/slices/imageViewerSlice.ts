@@ -5,7 +5,6 @@ import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
 import { AnnotationStateType } from "../../types/AnnotationStateType";
-import colorImage from "../../images/cell-painting.png";
 import { LanguageType } from "../../types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
 import { ImageViewer } from "../../types/ImageViewer";
@@ -20,53 +19,25 @@ import {
 import * as _ from "lodash";
 import { Partition } from "../../types/Partition";
 import { AnnotationTool } from "../../annotator/image/Tool";
-import { Shape } from "../../types/Shape";
-import * as cellpaintingAnnotations from "../../images/cellpainting.json";
-
-const initialImageShape: Shape = {
-  channels: 3,
-  frames: 1,
-  height: 512,
-  planes: 1,
-  width: 512,
-};
-
-const initialImage: ShadowImageType | undefined =
-  process.env.NODE_ENV === "development" ||
-  process.env.NODE_ENV === "production"
-    ? {
-        activePlane: 0,
-        categoryId: UNKNOWN_CATEGORY_ID,
-        colors: generateDefaultChannels(3),
-        id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
-        annotations: [],
-        name: "example.png",
-        partition: Partition.Inference,
-        visible: true,
-        shape: initialImageShape,
-        originalSrc: (cellpaintingAnnotations as any).default[0].imageData,
-        src: colorImage,
-      }
-    : undefined;
+import { defaultImage } from "images/defaultImage";
 
 const initialCategories =
-  process.env.NODE_ENV === "development" ||
-  process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === "development"
     ? [
         {
-          color: "#AAAAAA",
+          color: "#920000",
           id: UNKNOWN_CATEGORY_ID,
           name: "Unknown",
           visible: true,
         },
         {
-          color: "#a08cd2",
+          color: "#b66dff",
           id: "00000000-0000-0000-0000-000000000001",
           name: "Cell membrane",
           visible: true,
         },
         {
-          color: "#b8ddf3",
+          color: "#6db6ff",
           id: "00000000-0000-0000-0000-000000000002",
           name: "Cell nucleus",
           visible: true,
@@ -74,7 +45,7 @@ const initialCategories =
       ]
     : [
         {
-          color: "#AAAAAA",
+          color: "#920000",
           id: UNKNOWN_CATEGORY_ID,
           name: "Unknown",
           visible: true,
@@ -92,9 +63,9 @@ const initialState: ImageViewer = {
   contrast: 0,
   exposure: 0,
   hue: 0,
-  activeImageId: initialImage ? initialImage.id : undefined,
-  activeImageRenderedSrcs: initialImage ? [initialImage.src] : [],
-  images: initialImage ? [initialImage] : [],
+  activeImageId: defaultImage.id,
+  activeImageRenderedSrcs: [defaultImage.src],
+  images: [defaultImage],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 32,
