@@ -4,7 +4,7 @@ import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { v4 as uuidv4 } from "uuid";
 import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { filter, findIndex } from "lodash";
-import nuclei from "../../images/317832f90f02c5e916b2ac0f3bcb8da9928d8e400b747b2c68e544e56adacf6b.png";
+import nuclei from "../../images/nuclei.png";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
 import {
