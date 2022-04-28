@@ -2,7 +2,7 @@ import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
 import { ShadowImageType } from "../../types/ImageType";
 import { Shape } from "types/Shape";
-import { Category } from "types/Category";
+import { Category, UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 
 export const selectedAnnotationObjectsSelector = ({
   imageViewer,
@@ -26,7 +26,9 @@ export const selectedAnnotationObjectsSelector = ({
       (category: Category) => category.id === annotation.categoryId
     );
 
-    return annotationCategory ? annotationCategory.color : "#920000";
+    return annotationCategory
+      ? annotationCategory.color
+      : UNKNOWN_ANNOTATION_CATEGORY.id;
   };
 
   return imageViewer.selectedAnnotations.map((annotation: AnnotationType) => {

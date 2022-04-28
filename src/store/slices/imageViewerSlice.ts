@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ShadowImageType } from "types/ImageType";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import {
+  Category,
+  UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_ID,
+} from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
@@ -24,12 +28,7 @@ import { defaultImage } from "images/defaultImage";
 const initialCategories =
   process.env.NODE_ENV === "development"
     ? [
-        {
-          color: "#920000",
-          id: UNKNOWN_CATEGORY_ID,
-          name: "Unknown",
-          visible: true,
-        },
+        UNKNOWN_ANNOTATION_CATEGORY,
         {
           color: "#b66dff",
           id: "00000000-0000-0000-0000-000000000001",
@@ -43,20 +42,13 @@ const initialCategories =
           visible: true,
         },
       ]
-    : [
-        {
-          color: "#920000",
-          id: UNKNOWN_CATEGORY_ID,
-          name: "Unknown",
-          visible: true,
-        },
-      ];
+    : [UNKNOWN_ANNOTATION_CATEGORY];
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
   boundingClientRect: new DOMRect(),
   brightness: 0,
-  categories: initialCategories.length > 0 ? initialCategories : [],
+  categories: initialCategories,
   currentColors: undefined,
   currentIndex: 0,
   cursor: "default",
