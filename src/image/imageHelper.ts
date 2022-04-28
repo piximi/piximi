@@ -319,7 +319,7 @@ const convertImageDataToURI = (
   });
 };
 
-const convertToImage = (
+export const convertToImage = (
   image: ImageJS.Image | ImageJS.Stack,
   filename: string,
   currentColors: Array<Color> | undefined,
@@ -984,6 +984,53 @@ export const saveAnnotationsAsLabelMatrix = (
 };
 
 export const importSerializedAnnotations = (
+  annotation: SerializedAnnotationType,
+  existingCategories: Array<Category>
+): { annotation_out: AnnotationType; categories: Array<Category> } => {
+  const mask = annotation.annotationMask
+    .split(" ")
+    .map((x: string) => parseInt(x));
+
+  let newCategories = existingCategories;
+  //if category does not already exist in state, add it
+  if (
+    !existingCategories
+      .map((category: Category) => category.id)
+      .includes(annotation.annotationCategoryId)
+  ) {
+    const category: Category = {
+      color: annotation.annotationCategoryColor,
+      id: annotation.annotationCategoryId,
+      name: annotation.annotationCategoryName,
+      visible: true,
+    };
+    newCategories = [...newCategories, category];
+  }
+
+  let annotationPlane = annotation.annotationPlane;
+
+  if (!annotationPlane) {
+    annotationPlane = 0;
+  }
+
+  return {
+    annotation_out: {
+      boundingBox: [
+        annotation.annotationBoundingBoxX,
+        annotation.annotationBoundingBoxY,
+        annotation.annotationBoundingBoxWidth,
+        annotation.annotationBoundingBoxHeight,
+      ],
+      categoryId: annotation.annotationCategoryId,
+      id: annotation.annotationId,
+      mask: mask,
+      plane: annotationPlane,
+    },
+    categories: newCategories,
+  };
+};
+
+export const importSerializedAnnotationsTest = (
   annotation: SerializedAnnotationType,
   existingCategories: Array<Category>
 ): { annotation_out: AnnotationType; categories: Array<Category> } => {
