@@ -1,38 +1,32 @@
-import * as _ from "lodash";
-import { Category } from "../../../../../../types/Category";
 import * as ReactKonva from "react-konva";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnnotationType } from "../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../../store/selectors";
-import { imageWidthSelector } from "../../../../../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../../../../store/selectors/imageHeightSelector";
 import { toRGBA } from "../../../../../../annotator/image";
 import { colorOverlayROI } from "../../../../../../image/imageHelper";
-import { annotatorCategoriesSelector } from "../../../../../../store/selectors/annotatorCategoriesSelector";
+import { Shape } from "types/Shape";
 
 type AnnotationProps = {
   annotation: AnnotationType;
+  imageShape: Shape;
+  fillColor: string;
 };
 
-export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
-  const categories = useSelector(annotatorCategoriesSelector);
+export const SelectedAnnotation = ({
+  annotation,
+  imageShape,
+  fillColor,
+}: AnnotationProps) => {
   const stageScale = useSelector(stageScaleSelector);
 
-  const imageWidth = useSelector(imageWidthSelector);
-  const imageHeight = useSelector(imageHeightSelector);
+  const [imageWidth] = useState<number>(imageShape.width);
+  const [imageHeight] = useState<number>(imageShape.height);
 
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
 
-  const fill = _.find(
-    categories,
-    (category: Category) => category.id === annotation.categoryId
-  )?.color;
-
   useEffect(() => {
-    if (!annotation.mask || !imageWidth || !imageHeight) return;
-    if (!fill) return;
-    const color = toRGBA(fill, 0);
+    const color = toRGBA(fillColor, 0);
     const overlayMask = colorOverlayROI(
       annotation.mask,
       annotation.boundingBox,
@@ -45,7 +39,7 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
     setImageMask(overlayMask);
   }, [
     annotation.mask,
-    fill,
+    fillColor,
     annotation.boundingBox,
     imageHeight,
     imageWidth,
@@ -54,7 +48,6 @@ export const SelectedAnnotation = ({ annotation }: AnnotationProps) => {
 
   return (
     <>
-      {/*// @ts-ignore */}
       <ReactKonva.Image
         image={imageMask}
         id={annotation.id}

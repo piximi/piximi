@@ -1,22 +1,22 @@
-import React from "react";
 import { useSelector } from "react-redux";
-import { selectedAnnotationSelector } from "../../../../../../store/selectors/selectedAnnotationSelector";
-import { AnnotationType } from "../../../../../../types/AnnotationType";
-import { selectedAnnotationsSelector } from "../../../../../../store/selectors/selectedAnnotationsSelector";
 import { SelectedAnnotation } from "../SelectedAnnotation/SelectedAnnotation";
+import { selectedAnnotationObjectsSelector } from "store/selectors/selectedAnnotationObjectsSelector";
 
 export const SelectedAnnotations = () => {
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
-
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-
-  if (!selectedAnnotations || !selectedAnnotation) return <></>;
+  const selectedAnnotationObjects = useSelector(
+    selectedAnnotationObjectsSelector
+  );
 
   return (
     <>
-      {selectedAnnotations.map((annotation: AnnotationType) => {
+      {selectedAnnotationObjects.map((annotationObject) => {
         return (
-          <SelectedAnnotation key={annotation.id} annotation={annotation} />
+          <SelectedAnnotation
+            key={annotationObject.annotation.id}
+            annotation={annotationObject.annotation}
+            imageShape={annotationObject.imageShape}
+            fillColor={annotationObject.fillColor}
+          />
         );
       })}
     </>

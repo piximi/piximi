@@ -6,13 +6,15 @@ export const imageInstancesSelector = ({
 }: {
   imageViewer: ImageViewer;
 }) => {
-  if (!imageViewer.images.length) return;
+  if (!imageViewer.images.length) return [];
 
   const image = imageViewer.images.find((image: ShadowImageType) => {
     return image.id === imageViewer.activeImageId;
   });
 
-  if (!image) return;
-
-  return image.annotations;
+  if (!image) {
+    return [];
+  } else {
+    return image.annotations;
+  }
 };
