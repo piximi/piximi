@@ -8,13 +8,9 @@ export const imageInstancesSelector = ({
 }) => {
   if (!imageViewer.images.length) return [];
 
-  const image = imageViewer.images.find((image: ShadowImageType) => {
+  const activeImage = imageViewer.images.find((image: ShadowImageType) => {
     return image.id === imageViewer.activeImageId;
   });
 
-  if (!image) {
-    return [];
-  } else {
-    return image.annotations;
-  }
+  return activeImage ? activeImage?.annotations : [];
 };

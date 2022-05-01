@@ -28,7 +28,7 @@ export const ExportAnnotationsAsLabeledInstancesMenuItem = ({
     popupState.close();
     handleCloseMenu();
 
-    if (!annotations) return;
+    if (!annotations.toLocaleString) return;
 
     let zip = new JSZip();
 

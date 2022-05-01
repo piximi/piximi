@@ -27,7 +27,7 @@ export const ExportAnnotationsAsBinaryInstancesMenuItem = ({
     popupState.close();
     handleCloseMenu();
 
-    if (!annotations) return;
+    if (!annotations.length) return;
 
     let zip = new JSZip();
 
