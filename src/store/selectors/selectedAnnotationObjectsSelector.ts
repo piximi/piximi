@@ -1,41 +1,35 @@
-import { ImageViewer } from "../../types/ImageViewer";
 import { AnnotationType } from "../../types/AnnotationType";
-import { ShadowImageType } from "../../types/ImageType";
-import { Shape } from "types/Shape";
 import { Category, UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+import { createSelector } from "@reduxjs/toolkit";
+import { activeImageSelector } from "./activeImageSelector";
+import { annotatorCategoriesSelector } from "./annotatorCategoriesSelector";
+import { selectedAnnotationsSelector } from "./selectedAnnotationsSelector";
 
-export const selectedAnnotationObjectsSelector = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewer;
-}): Array<{
-  annotation: AnnotationType;
-  imageShape: Shape;
-  fillColor: string;
-}> => {
-  if (!imageViewer.images.length) return [];
+export const selectedAnnotationObjectsSelector = createSelector(
+  [
+    activeImageSelector,
+    annotatorCategoriesSelector,
+    selectedAnnotationsSelector,
+  ],
+  (activeImage, categories, selectedAnnotations) => {
+    if (!activeImage) return [];
 
-  const activeImage = imageViewer.images.find((image: ShadowImageType) => {
-    return image.id === imageViewer.activeImageId;
-  });
+    const getFillColor = (annotation: AnnotationType) => {
+      const annotationCategory = categories.find(
+        (category: Category) => category.id === annotation.categoryId
+      );
 
-  if (!activeImage) return [];
-
-  const getFillColor = (annotation: AnnotationType) => {
-    const annotationCategory = imageViewer.categories.find(
-      (category: Category) => category.id === annotation.categoryId
-    );
-
-    return annotationCategory
-      ? annotationCategory.color
-      : UNKNOWN_ANNOTATION_CATEGORY.id;
-  };
-
-  return imageViewer.selectedAnnotations.map((annotation: AnnotationType) => {
-    return {
-      annotation: annotation,
-      imageShape: activeImage.shape,
-      fillColor: getFillColor(annotation),
+      return annotationCategory
+        ? annotationCategory.color
+        : UNKNOWN_ANNOTATION_CATEGORY.id;
     };
-  });
-};
+
+    return selectedAnnotations.map((annotation: AnnotationType) => {
+      return {
+        annotation: annotation,
+        imageShape: activeImage.shape,
+        fillColor: getFillColor(annotation),
+      };
+    });
+  }
+);
