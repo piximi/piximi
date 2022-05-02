@@ -144,7 +144,7 @@ export const usePointer = () => {
         })
       );
 
-      if (!minimum || !annotations) return;
+      if (!minimum || !annotations.length) return;
 
       const scaledMinimum = {
         x: minimum.x / stageScale,
@@ -210,8 +210,7 @@ export const usePointer = () => {
 
     if (!position) return;
 
-    if (!annotations || !annotations.length || !imageWidth || !imageHeight)
-      return;
+    if (!annotations.length || !imageWidth || !imageHeight) return;
 
     const scaledCurrentPosition = {
       x: position.x / stageScale,

@@ -1,6 +1,6 @@
 import { Project } from "../../types/Project";
 import { Category } from "../../types/Category";
-import { COLORS } from "../../store";
+import { COLORS } from "colorPalette";
 
 export const availableColorsSelector = ({
   project,

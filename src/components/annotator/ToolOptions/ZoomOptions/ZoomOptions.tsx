@@ -66,7 +66,7 @@ export const ZoomOptions = () => {
           ? 0
           : ((image && image.shape ? image.shape.height : 512) * scale) / 2 -
             offset.y,
-    }; // FIXME #134 hardcoded heights and widths before merging with master branch!;
+    };
 
     batch(() => {
       dispatch(setZoomToolOptions(payload));
@@ -101,7 +101,6 @@ export const ZoomOptions = () => {
 
     if (!image || !image.shape) return;
 
-    // FIXME #136 it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
     const imageWidth = image && image.shape ? image.shape.width : 512;
     const imageHeight = image && image.shape ? image.shape.height : 512;
     if (imageHeight / stageHeight > imageWidth / stageWidth) {
@@ -135,7 +134,6 @@ export const ZoomOptions = () => {
 
     if (!image || !image.shape) return;
 
-    // FIXME #136 it seems like we are not currently getting the current stageHeight. It currently stays fixes to the initial state in the redux store.
     const imageWidth = image && image.shape ? image.shape.width : 512;
     const imageHeight = image && image.shape ? image.shape.height : 512;
     if (imageHeight / stageHeight > imageWidth / stageWidth) {

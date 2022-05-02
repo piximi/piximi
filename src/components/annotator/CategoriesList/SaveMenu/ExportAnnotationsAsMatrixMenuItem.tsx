@@ -28,7 +28,7 @@ export const ExportAnnotationsAsMatrixMenuItem = ({
     popupState.close();
     handleCloseMenu();
 
-    if (!annotations) return;
+    if (!annotations.length) return;
 
     let zip = new JSZip();
 

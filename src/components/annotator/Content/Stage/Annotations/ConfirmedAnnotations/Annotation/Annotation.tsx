@@ -1,42 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { Category } from "../../../../../../../types/Category";
+import { useEffect, useState } from "react";
 import * as ReactKonva from "react-konva";
-import * as _ from "lodash";
 import { AnnotationType } from "../../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../../../store/selectors";
 import { colorOverlayROI } from "../../../../../../../image/imageHelper";
-import { imageWidthSelector } from "../../../../../../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../../../../../store/selectors/imageHeightSelector";
 import { toRGBA } from "../../../../../../../annotator/image";
-import { annotatorCategoriesSelector } from "../../../../../../../store/selectors/annotatorCategoriesSelector";
+import { Shape } from "types/Shape";
 
 type AnnotationProps = {
   annotation: AnnotationType;
+  imageShape: Shape;
+  fillColor: string;
 };
 
-export const Annotation = ({ annotation }: AnnotationProps) => {
-  const categories = useSelector(annotatorCategoriesSelector);
+export const Annotation = ({
+  annotation,
+  imageShape,
+  fillColor,
+}: AnnotationProps) => {
   const stageScale = useSelector(stageScaleSelector);
 
-  const imageWidth = useSelector(imageWidthSelector);
-  const imageHeight = useSelector(imageHeightSelector);
+  const [imageWidth] = useState<number>(imageShape.width);
+  const [imageHeight] = useState<number>(imageShape.height);
 
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
 
-  const fill = _.find(
-    categories,
-    (category: Category) => category.id === annotation.categoryId
-  )?.color;
-
   useEffect(() => {
-    if (!annotation.mask || !imageWidth || !imageHeight) return;
-    if (!fill) return;
     const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
     const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
     if (!boxWidth || !boxHeight) return;
     if (Math.round(boxWidth) <= 0 || Math.round(boxHeight) <= 0) return;
-    const color = toRGBA(fill, 0);
+    const color = toRGBA(fillColor, 0);
     setImageMask(
       colorOverlayROI(
         annotation.mask,
@@ -49,14 +43,12 @@ export const Annotation = ({ annotation }: AnnotationProps) => {
     );
   }, [
     annotation.mask,
-    fill,
+    fillColor,
     annotation.boundingBox,
+    stageScale,
     imageWidth,
     imageHeight,
-    stageScale,
   ]);
-
-  if (!annotation) return <></>;
 
   return (
     <>

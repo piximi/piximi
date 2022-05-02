@@ -518,7 +518,7 @@ export const Stage = () => {
 
   const confirmAnnotations = () => {
     if (
-      !annotations ||
+      !annotations.length ||
       !annotationTool ||
       annotationTool.annotationState === AnnotationStateType.Annotating
     )
@@ -625,13 +625,11 @@ export const Stage = () => {
   Detach transformers and selections when all annotations are removed
    */
   useEffect(() => {
-    if (!annotations) return;
-
     if (annotations.length) return;
 
     deselectAllTransformers();
     deselectAllAnnotations();
-  }, [annotations?.length, annotations, deselectAllAnnotations]);
+  }, [annotations, deselectAllAnnotations]);
 
   const [tool, setTool] = useState<Tool>();
 

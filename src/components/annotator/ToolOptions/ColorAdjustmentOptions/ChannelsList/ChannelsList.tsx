@@ -17,7 +17,7 @@ import { imageViewerSlice } from "../../../../../store/slices";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import {
   convertImageURIsToImageData,
-  mapChannelstoSpecifiedRGBImage,
+  mapChannelsToSpecifiedRGBImage,
   rgbToHex,
 } from "../../../../../image/imageHelper";
 import { Palette } from "../Palette";
@@ -87,7 +87,7 @@ export const ChannelsList = () => {
       originalSrc[activeImagePlane],
     ]);
 
-    const modifiedURI = mapChannelstoSpecifiedRGBImage(
+    const modifiedURI = mapChannelsToSpecifiedRGBImage(
       originalData[0],
       activeImageColors,
       imageShape.height,
@@ -107,15 +107,15 @@ export const ChannelsList = () => {
   const onCheckboxChanged = (index: number) => () => {
     const current = visibleChannelsIndices.indexOf(index);
 
-    const visibles = [...visibleChannelsIndices];
+    const visibleChannels = [...visibleChannelsIndices];
 
     const copiedChannels = [...activeImageColors];
 
     if (current === -1) {
-      visibles.push(index);
+      visibleChannels.push(index);
       copiedChannels[index] = { ...copiedChannels[index], visible: true };
     } else {
-      visibles.splice(current, 1);
+      visibleChannels.splice(current, 1);
       copiedChannels[index] = { ...copiedChannels[index], visible: false };
     }
 
@@ -135,7 +135,7 @@ export const ChannelsList = () => {
       const arrayLength = originalData[0][0].length;
       const modifiedData = originalData[0].map(
         (arr: Array<number>, i: number) => {
-          if (visibles.includes(i)) {
+          if (visibleChannels.includes(i)) {
             return arr;
           } else {
             return new Array(arrayLength).fill(0);
@@ -143,7 +143,7 @@ export const ChannelsList = () => {
         }
       );
 
-      const modifiedURI = mapChannelstoSpecifiedRGBImage(
+      const modifiedURI = mapChannelsToSpecifiedRGBImage(
         modifiedData,
         copiedChannels,
         imageShape.height,
@@ -155,12 +155,14 @@ export const ChannelsList = () => {
   };
 
   const colorAdjustmentSlider = (index: number, name: string) => {
+    const isVisible = visibleChannelsIndices.indexOf(index) !== -1;
+
     return (
       <ListItem dense key={index}>
         <ListItemIcon>
           <Checkbox
             onClick={onCheckboxChanged(index)}
-            checked={visibleChannelsIndices.indexOf(index) !== -1}
+            checked={isVisible}
             disableRipple
             edge="start"
             icon={<CheckboxUncheckedIcon />}
@@ -171,11 +173,14 @@ export const ChannelsList = () => {
         <ListItemText primary={name} />
         <Slider
           key={index}
-          disabled={!(visibleChannelsIndices.indexOf(index) !== -1)} //TODO #142 style slider when disabled mode
+          disabled={!isVisible}
           sx={{
             width: "50%",
             "& .MuiSlider-track": {
-              color: rgbToHex(activeImageColors[index].color),
+              color: (theme) =>
+                isVisible
+                  ? rgbToHex(activeImageColors[index].color)
+                  : theme.palette.action.disabled,
             },
           }}
           value={activeImageColors[index].range}

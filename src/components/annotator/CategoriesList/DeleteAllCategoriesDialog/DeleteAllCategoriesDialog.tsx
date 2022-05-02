@@ -8,7 +8,10 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "../../../../types/AnnotationType";
 import { imageViewerSlice } from "../../../../store/slices";
 import { unknownCategorySelector } from "../../../../store/selectors";
-import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+import {
+  UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_ID,
+} from "../../../../types/Category";
 import { ShadowImageType } from "../../../../types/ImageType";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 
@@ -44,22 +47,15 @@ export const DeleteAllCategoriesDialog = ({
     });
 
     batch(() => {
-      const unknownCategory = {
-        color: "#AAAAAA",
-        id: UNKNOWN_CATEGORY_ID,
-        name: "Unknown",
-        visible: true,
-      };
-
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: unknownCategory.id,
+          selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
         })
       );
 
       dispatch(
         imageViewerSlice.actions.setCategories({
-          categories: [unknownCategory],
+          categories: [UNKNOWN_ANNOTATION_CATEGORY],
         })
       );
     });
