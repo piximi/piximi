@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from "react";
@@ -124,6 +125,9 @@ export const Stage = () => {
   } = usePointer();
 
   const [annotationTool] = useAnnotationTool();
+
+  // do not delete! important to force the component to re-render
+  const [, update] = useReducer((x) => x + 1, 0);
 
   const annotations = useSelector(imageInstancesSelector);
 
@@ -383,6 +387,8 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseDown(rawImagePosition);
+
+        update();
       }
     };
     const throttled = _.throttle(func, 5);
@@ -455,6 +461,8 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseMove(rawImagePosition);
+
+        update();
       }
     };
     const throttled = _.throttle(func, 5);
