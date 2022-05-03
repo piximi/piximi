@@ -6,7 +6,7 @@ import { activeImageColorsSelector } from "../../../../../store/selectors/active
 import { imageViewerSlice } from "../../../../../store/slices";
 import {
   convertImageURIsToImageData,
-  mapChannelstoSpecifiedRGBImage,
+  mapChannelsToSpecifiedRGBImage,
 } from "../../../../../image/imageHelper";
 import { imageViewerFullImagesSelector } from "../../../../../store/selectors";
 import { ImageType } from "../../../../../types/ImageType";
@@ -39,7 +39,7 @@ export const ApplyColorsButton = () => {
             )
           )[0];
 
-          const modifiedURI = mapChannelstoSpecifiedRGBImage(
+          const modifiedURI = mapChannelsToSpecifiedRGBImage(
             activePlaneData,
             activeImageColors,
             image.shape.height,

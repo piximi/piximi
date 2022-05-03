@@ -1,36 +1,20 @@
 import Dialog from "@mui/material/Dialog";
-import React from "react";
-import { ShapeType } from "../../../../types/ShapeType";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import malaria from "../../../../images/malaria.png";
-import cellpainting from "../../../../images/cell-painting.png";
-import { Color } from "../../../../types/Color";
-import { ToolType } from "../../../../types/ToolType";
-import { v4 as uuidv4 } from "uuid";
+import cellPainting from "../../../../images/cell-painting.png";
 import * as malariaAnnotations from "../../../../images/malaria.json";
-import * as cellpaintingAnnotations from "../../../../images/cellpainting.json";
-import { AnnotationType } from "../../../../types/AnnotationType";
-import { SerializedAnnotationType } from "../../../../types/SerializedAnnotationType";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
-import { categoriesSelector } from "../../../../store/selectors";
+import * as cellPaintingAnnotations from "../../../../images/cell-painting.json";
 import {
+  convertToImage,
   generateDefaultChannels,
-  importSerializedAnnotations,
 } from "../../../../image/imageHelper";
-import {
-  imageViewerSlice,
-  setActiveImage,
-  setImages,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../../store/slices";
-import { ImageType } from "../../../../types/ImageType";
-import { Partition } from "../../../../types/Partition";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
-import { DEFAULT_COLORS } from "../../../../types/DefaultColors";
+import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import { SerializedFileType } from "types/SerializedFileType";
+import * as ImageJS from "image-js";
+import { v4 as uuidv4 } from "uuid";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -43,121 +27,71 @@ export const ExampleImageDialog = ({
 }: ExampleImageDialogProps) => {
   const dispatch = useDispatch();
 
-  const images = useSelector(annotatorImagesSelector);
-
-  const categories_in = useSelector(categoriesSelector);
-
-  const examples = [
+  const exampleImages = [
     {
-      name: "malaria.png",
+      exampleImageName: "malaria.png",
+      exampleImageData: malaria,
       description:
         "Blood cells infected by malaria and stained with Giemsa reagent. Image from the Broad Bioimage Benchmark Collection, image set BBBC041v1.",
-      data: malaria,
-      project: (malariaAnnotations as any).default,
-      shape: {
-        channels: 3,
-        frames: 1,
-        height: 1200,
-        planes: 1,
-        width: 1600,
-      },
+      exampleImageAnnotations:
+        malariaAnnotations as unknown as SerializedFileType,
     },
     {
-      name: "cell-painting.png",
+      exampleImageName: "cell-painting.png",
+      exampleImageData: cellPainting,
       description:
         "U2OS cells treated with an RNAi reagent (https://iwww.broadinstitute.org/rnai/db/clone/details?cloneId=TRCN0000195467) and stained for a " +
         "cell-painting experiment (Merged; red: Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
         "blue: DNA stained via Hoechst; green: mitochondria stained via MitoTracker).",
-      data: cellpainting,
-      project: (cellpaintingAnnotations as any).default,
-      shape: {
-        channels: 3,
-        frames: 1,
-        height: 512,
-        planes: 1,
-        width: 512,
-      },
+      exampleImageAnnotations:
+        cellPaintingAnnotations as unknown as SerializedFileType,
     },
   ];
 
-  const onClick = async ({
-    data,
-    description,
-    name,
-    shape,
-    project,
+  const openExampleImage = async ({
+    exampleImageName,
+    exampleImageData,
+    exampleImageAnnotations,
   }: {
-    data: any;
-    description: string;
-    name: string;
-    project: any;
-    shape: ShapeType;
+    exampleImageName: string;
+    exampleImageData: any;
+    exampleImageAnnotations: any;
   }) => {
     onClose();
 
-    let channels: Array<Color> = [];
-    for (let i = 0; i < shape.channels; i++) {
-      channels.push({
-        color: DEFAULT_COLORS[i],
-        visible: true,
-        range: [0, 255],
-      });
-    }
+    const serializedExampleImageFile =
+      exampleImageAnnotations[0] as SerializedFileType;
 
-    const newAnnotations: Array<AnnotationType> = [];
-
-    let updatedCategories: Array<Category> = categories_in;
-
-    project[0].annotations.forEach(
-      (serializedAnnotation: SerializedAnnotationType) => {
-        const { annotation_out, categories } = importSerializedAnnotations(
-          serializedAnnotation,
-          updatedCategories
-        );
-
-        updatedCategories = categories;
-
-        newAnnotations.push(annotation_out);
-      }
+    const defaultColors = generateDefaultChannels(
+      serializedExampleImageFile.imageChannels
     );
 
-    const defaultColors = generateDefaultChannels(shape.channels);
+    const exampleImageSrc = exampleImageData as string;
+    const exampleImage = await ImageJS.Image.load(exampleImageSrc, {
+      ignorePalette: true,
+    });
+    const exampleImageTypeObject = convertToImage(
+      exampleImage,
+      exampleImageName,
+      defaultColors,
+      serializedExampleImageFile.imagePlanes,
+      serializedExampleImageFile.imageChannels
+    );
 
-    const example: ImageType = {
-      activePlane: 0,
-      annotations: newAnnotations,
-      categoryId: UNKNOWN_CATEGORY_ID,
-      colors: defaultColors,
-      id: uuidv4(),
-      name: name,
-      originalSrc: project[0].imageData,
-      partition: Partition.Inference,
-      shape: shape,
-      visible: true,
-      src: data as string,
-    };
+    serializedExampleImageFile.imageId = uuidv4();
+    serializedExampleImageFile.imageSrc = exampleImageSrc;
+    serializedExampleImageFile.imageData = exampleImageTypeObject.originalSrc;
 
     batch(() => {
-      dispatch(setImages({ images: [...images, example] }));
+      dispatch(
+        imageViewerSlice.actions.openAnnotations({
+          file: serializedExampleImageFile,
+        })
+      );
 
       dispatch(
         setActiveImage({
-          imageId: example.id,
-        })
-      );
-
-      dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
-
-      dispatch(
-        setSelectedAnnotations({
-          selectedAnnotations: [],
-          selectedAnnotation: undefined,
-        })
-      );
-
-      dispatch(
-        imageViewerSlice.actions.setCategories({
-          categories: updatedCategories,
+          imageId: serializedExampleImageFile.imageId,
         })
       );
     });
@@ -166,18 +100,18 @@ export const ExampleImageDialog = ({
   return (
     <Dialog open={open} onClose={onClose}>
       <List component="div" role="list">
-        {examples.map((example, index) => {
+        {exampleImages.map((exampleImage, index) => {
           return (
             <ListItem
               button
               divider
               key={index}
               role="listitem"
-              onClick={() => onClick(example)}
+              onClick={() => openExampleImage(exampleImage)}
             >
               <ListItemText
-                primary={example.name}
-                secondary={example.description}
+                primary={exampleImage.exampleImageName}
+                secondary={exampleImage.description}
               />
             </ListItem>
           );

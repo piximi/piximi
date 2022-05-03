@@ -4,34 +4,11 @@ import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
 import { v4 as uuidv4 } from "uuid";
 import { ImageType, ShadowImageType } from "../../types/ImageType";
 import { filter, findIndex } from "lodash";
-import nuclei from "../../images/nuclei.png";
 import { Task } from "../../types/Task";
 import { Partition } from "../../types/Partition";
-import {
-  generateDefaultChannels,
-  replaceDuplicateName,
-} from "../../image/imageHelper";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-
-const dummyImage: ImageType = {
-  activePlane: 0,
-  id: "a860a94c-58aa-44eb-88e7-9538cb48be29",
-  categoryId: UNKNOWN_CATEGORY_ID,
-  colors: generateDefaultChannels(3),
-  annotations: [],
-  name: "nuclei",
-  originalSrc: [[nuclei, nuclei, nuclei]],
-  src: nuclei,
-  shape: {
-    height: 256,
-    width: 256,
-    channels: 3,
-    planes: 1,
-    frames: 1,
-  },
-  partition: Partition.Inference,
-  visible: true,
-};
+import { replaceDuplicateName } from "../../image/imageHelper";
+import { defaultImage } from "images/defaultImage";
 
 const initialState: Project = {
   categories: [
@@ -42,7 +19,7 @@ const initialState: Project = {
       visible: true,
     },
   ],
-  images: [dummyImage],
+  images: [defaultImage],
   name: "Untitled project",
   task: Task.Classify,
   trainFlag: 0,

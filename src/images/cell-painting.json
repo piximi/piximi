@@ -1,7 +1,6 @@
 [
   {
     "imageChannels": 3,
-    "imageChecksum": "",
     "imageColors": [
       { "color": [255, 0, 0], "range": [0, 255], "visible": true },
       { "color": [0, 255, 0], "range": [0, 255], "visible": true },

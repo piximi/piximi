@@ -17,7 +17,7 @@ export function* selectedCategorySaga({}: {
   if (!selectedAnnotationsIds) return;
 
   const annotations = yield select(imageInstancesSelector);
-  if (!annotations) return;
+  if (!annotations.length) return;
 
   const selectedAnnotations = yield select(selectedAnnotationsSelector);
   const selectedCategory = yield select(selectedCategorySelector);

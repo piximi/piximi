@@ -3,7 +3,7 @@ import { Color } from "types/Color";
 import { imageSelector } from "store/selectors";
 import {
   convertImageURIsToImageData,
-  mapChannelstoSpecifiedRGBImage,
+  mapChannelsToSpecifiedRGBImage,
 } from "image/imageHelper";
 import { ImageType } from "types/ImageType";
 import { imageViewerSlice } from "store/slices";
@@ -39,7 +39,7 @@ export function* activeImageIDChangeSaga({
   );
 
   const renderedSrcs = planesData.map((planeData) => {
-    return mapChannelstoSpecifiedRGBImage(
+    return mapChannelsToSpecifiedRGBImage(
       planeData,
       image.colors,
       image.shape.height,
@@ -73,7 +73,7 @@ export function* activeImageColorChangeSaga({
   );
 
   const renderedSrcs = planesData.map((planeData, idx) => {
-    return mapChannelstoSpecifiedRGBImage(
+    return mapChannelsToSpecifiedRGBImage(
       planeData,
       colors,
       image.shape.height,

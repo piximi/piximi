@@ -3,12 +3,15 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+import {
+  Category,
+  UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_ID,
+} from "../../../../types/Category";
 import {
   categoryCountsSelector,
   imageSelector,
   selectedCategorySelector,
-  unknownCategorySelector,
 } from "../../../../store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { CollapsibleList } from "../CollapsibleList";
@@ -61,7 +64,7 @@ import { LogoIcon } from "components/Logo";
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
-  const unknownCategory = useSelector(unknownCategorySelector);
+  const unknownCategory = UNKNOWN_ANNOTATION_CATEGORY;
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
 
@@ -222,7 +225,6 @@ export const CategoriesList = () => {
         width: (theme) => theme.spacing(32),
         "& > .MuiDrawer-paper": {
           width: (theme) => theme.spacing(32),
-          zIndex: 0,
         },
       }}
       open
