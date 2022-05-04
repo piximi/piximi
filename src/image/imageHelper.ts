@@ -359,6 +359,10 @@ export const convertToImage = (
 
   let displayedData: Array<Array<number>> = [];
 
+  const channelRange: Array<Array<number>> = [...Array(channels)].map(
+    (e) => []
+  );
+
   if (z === 1 && c === 3 && input.length === 1) {
     //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
 
@@ -370,7 +374,12 @@ export const convertToImage = (
     );
 
     originalURIs.push(
-      displayedData.map((channelData: Array<number>) => {
+      displayedData.map((channelData: Array<number>, idx: number) => {
+        // @ts-ignore - type definition of 'min' is not exposed
+        channelRange[idx].push(input[0].min[idx]);
+        // @ts-ignore - type definition of 'max' is not exposed
+        channelRange[idx].push(input[0].max[idx]);
+
         return convertImageDataToURI(width, height, channelData, 1, 0);
       })
     );
@@ -395,6 +404,11 @@ export const convertToImage = (
           0
         );
         sliceURI.push(channelURI);
+
+        // @ts-ignore - type definition of 'min' is not exposed
+        channelRange[j % c].push(input[j].min);
+        // @ts-ignore - type definition of 'max' is not exposed
+        channelRange[j % c].push(input[j].max);
         j += 1;
       }
 
@@ -406,6 +420,13 @@ export const convertToImage = (
 
       i += c;
     }
+  }
+
+  // set channel range to min and max of the input image
+  for (let i = 0; i < channels; i++) {
+    const channelMin = Math.min(...channelRange[i]);
+    const channelMax = Math.max(...channelRange[i]);
+    colors[i].range = [channelMin, channelMax];
   }
 
   const displayedURI = mapChannelsToSpecifiedRGBImage(
