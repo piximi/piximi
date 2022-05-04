@@ -337,6 +337,16 @@ export const convertToImage = (
   const originalURIs: Array<Array<string>> = [];
 
   const input: Array<ImageJS.Image> = Array.isArray(image) ? image : [image];
+
+  const bitDepth = input[0].bitDepth as number;
+  // downscale images to 8bit if necessarily
+  if (bitDepth !== 8) {
+    for (let i = 0; i < input.length; i++) {
+      // @ts-ignore - type definition of 'colorDepth' is not exposed
+      input[i] = input[i].colorDepth(8);
+    }
+  }
+
   const channels: number = Array.isArray(image)
     ? image.length / z
     : image.components;
