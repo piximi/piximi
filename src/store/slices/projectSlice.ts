@@ -48,20 +48,27 @@ export const projectSlice = createSlice({
       };
       state.categories.push(category);
     },
-    createImage(state: Project, action: PayloadAction<{ image: ImageType }>) {
-      const currentImageNames = state.images.map((image: ImageType) => {
+    uploadImages(
+      state: Project,
+      action: PayloadAction<{ newImages: Array<ImageType> }>
+    ) {
+      const imageNames = state.images.map((image: ShadowImageType) => {
         return image.name.split(".")[0];
       });
 
-      const initialName = action.payload.image.name.split(".")[0];
-      const updatedName =
-        replaceDuplicateName(initialName, currentImageNames) +
-        "." +
-        action.payload.image.name.split(".")[1];
+      const updatedImages = action.payload.newImages.map(
+        (image: ImageType, i: number) => {
+          const initialName = image.name.split(".")[0]; //get name before file extension
+          //add filename extension to updatedName
+          const updatedName =
+            replaceDuplicateName(initialName, imageNames) +
+            "." +
+            image.name.split(".")[1];
+          return { ...image, name: updatedName };
+        }
+      );
 
-      const newImage = { ...action.payload.image, name: updatedName };
-
-      state.images.push(newImage);
+      state.images.push(...updatedImages);
     },
     createNewProject(state: Project, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
@@ -272,7 +279,7 @@ export const projectSlice = createSlice({
 
 export const {
   createCategory,
-  createImage,
+  uploadImages,
   createNewProject,
   deleteCategory,
   updateCategory,

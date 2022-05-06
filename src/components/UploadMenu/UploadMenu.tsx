@@ -8,6 +8,9 @@ import ListSubheader from "@mui/material/ListSubheader";
 import { DropboxMenuItem } from "./DropboxMenuItem";
 import { StyledMenuItem } from "./StyledMenuItem";
 import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
+import { applicationSlice } from "store/slices";
+import { useDispatch } from "react-redux";
+import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -16,6 +19,8 @@ type UploadMenuProps = {
 };
 
 export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
+  const dispatch = useDispatch();
+
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
     React.useState(false);
 
@@ -30,11 +35,26 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
   ) => {
     if (!event.currentTarget.files) return;
 
-    const files = Object.assign([], event.currentTarget.files);
-    event.currentTarget.value = "";
-    setFiles(files);
+    const files: FileList = Object.assign([], event.currentTarget.files);
 
-    setOpenDimensionsDialogBox(true); //open dialog box
+    const imageShapeInfo = await getImageShapeInformation(files[0]);
+
+    if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
+      dispatch(
+        applicationSlice.actions.uploadImages({
+          files: files,
+          channels: 3,
+          slices: 1,
+          imageShapeInfo: imageShapeInfo,
+          isUploadedFromAnnotator: false,
+        })
+      );
+    } else {
+      setOpenDimensionsDialogBox(true);
+    }
+
+    event.target.value = "";
+    setFiles(files);
 
     onClose(event);
   };

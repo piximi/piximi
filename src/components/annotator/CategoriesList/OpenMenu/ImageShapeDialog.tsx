@@ -1,123 +1,105 @@
 import * as React from "react";
+import * as ImageJS from "image-js";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { convertFileToImage } from "../../../../image/imageHelper";
-import { useDispatch, useSelector } from "react-redux";
-import { Box, Button, DialogActions, TextField } from "@mui/material";
-import {
-  applicationSlice,
-  createImage,
-  imageViewerSlice,
-  setOperation,
-  setSelectedAnnotations,
-} from "../../../../store/slices";
-import { currentColorsSelector } from "../../../../store/selectors/currentColorsSelector";
-import { ToolType } from "../../../../types/ToolType";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { ImageShapeEnum } from "../../../../image/imageHelper";
+import { useDispatch } from "react-redux";
+import { Alert, Box, Button, DialogActions } from "@mui/material";
+import { applicationSlice } from "../../../../store/slices";
+import { CustomNumberTextField } from "components/CustomNumberTextField/CustomNumberTextField";
+import { useHotkeys } from "react-hotkeys-hook";
 
-export interface ImageShapeDialogProps {
+type ImageShapeDialogProps = {
   files: FileList;
   open: boolean;
   onClose: () => void;
   isUploadedFromAnnotator: boolean;
-}
+};
 
 export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   const dispatch = useDispatch();
 
-  const colors = useSelector(currentColorsSelector);
+  const [channels, setChannels] = React.useState<number>(3);
 
   const { files, open, onClose, isUploadedFromAnnotator } = props;
 
-  const handleChannelsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChannels(parseInt(event.target.value));
+  const [frames, setFrames] = React.useState<number>(-1);
+  const [invalidImageShape, setInvalidImageShape] =
+    React.useState<boolean>(false);
+
+  const handleChannelsChange = async (channels: number) => {
+    setChannels(channels);
   };
-  const handleSlicesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSlices(parseInt(event.target.value));
-  };
 
-  const [channels, setChannels] = React.useState<number>(3);
-  const [slices, setSlices] = React.useState<number>(1);
+  const uploadImages = async () => {
+    var imageFrames = frames;
+    if (imageFrames === -1) {
+      const image = await files[0].arrayBuffer().then((buffer) => {
+        return ImageJS.Image.load(buffer, { ignorePalette: true });
+      });
 
-  const onConfirm = async () => {
-    onClose();
-
-    for (let i = 0; i < files.length; i++) {
-      let image;
-      try {
-        image = await convertFileToImage(files[i], colors, slices, channels);
-      } catch (err) {
-        const error = err as Error;
-        const stackTrace = await getStackTraceFromError(error);
-        const warning: AlertStateType = {
-          alertType: AlertType.Error,
-          name: "Could not convert file to image",
-          description: error.message,
-          stackTrace: stackTrace,
-        };
-        dispatch(
-          applicationSlice.actions.updateAlertState({ alertState: warning })
-        );
-        return;
-      }
-      if (isUploadedFromAnnotator) {
-        //if image is uplpoaded from the annotator, we add image to annotator state
-        dispatch(imageViewerSlice.actions.addImages({ newImages: [image] }));
-        if (i === 0) {
-          dispatch(
-            imageViewerSlice.actions.setActiveImage({ imageId: image.id })
-          );
-          dispatch(
-            setSelectedAnnotations({
-              selectedAnnotations: [],
-              selectedAnnotation: undefined,
-            })
-          );
-
-          dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
-        }
-      } else {
-        //otherwise, we add image to project state
-        dispatch(createImage({ image: image }));
-      }
+      imageFrames = Array.isArray(image) ? image.length : 1;
+      setFrames(imageFrames);
     }
+
+    const slices = imageFrames / channels;
+
+    if (!Number.isInteger(slices)) {
+      setInvalidImageShape(true);
+      return;
+    }
+    setInvalidImageShape(false);
+
+    dispatch(
+      applicationSlice.actions.uploadImages({
+        files: files,
+        channels: channels,
+        slices: slices,
+        imageShapeInfo: ImageShapeEnum.hyperStackImage,
+        isUploadedFromAnnotator: isUploadedFromAnnotator,
+      })
+    );
+
+    closeDialog();
   };
+
+  const closeDialog = () => {
+    setInvalidImageShape(false);
+    setFrames(-1);
+    onClose();
+  };
+
+  useHotkeys(
+    "enter",
+    () => {
+      uploadImages();
+    },
+    { enabled: open },
+    [uploadImages]
+  );
 
   return (
-    <Dialog onClose={onClose} open={open}>
-      <DialogTitle>Tell us about your image: </DialogTitle>
-      <Box
-        component="form"
-        sx={{
-          "& .MuiTextField-root": { m: 1, width: "25ch" },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        <TextField
-          InputLabelProps={{
-            shrink: true,
-          }}
-          id="outlined-required"
-          type="number"
-          label="Slices (z)"
-          value={slices}
-          onChange={handleSlicesChange}
-        />
-        <TextField
-          InputLabelProps={{
-            shrink: true,
-          }}
-          id="outlined-required"
-          type="number"
+    <Dialog onClose={closeDialog} open={open}>
+      <DialogTitle sx={{ pb: 0 }}>Tell us about your image: </DialogTitle>
+      <Box sx={{ pl: 3, pt: 0, pb: 0, width: "28ch" }}>
+        <CustomNumberTextField
+          id="channels-c"
           label="Channels (c)"
           value={channels}
-          onChange={handleChannelsChange}
+          dispatchCallBack={handleChannelsChange}
+          min={1}
         />
+        {invalidImageShape && (
+          <Alert
+            sx={{ width: "28ch" }}
+            severity="warning"
+          >{`Invalid image shape: Cannot create a ${channels} (c) x ${(
+            frames / channels
+          ).toFixed(2)} (z) image from file.`}</Alert>
+        )}
       </Box>
       <DialogActions>
-        <Button onClick={onConfirm} autoFocus>
+        <Button onClick={uploadImages} autoFocus>
           OK
         </Button>
       </DialogActions>

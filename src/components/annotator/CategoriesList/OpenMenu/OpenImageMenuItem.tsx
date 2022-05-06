@@ -1,13 +1,18 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { ImageShapeDialog } from "./ImageShapeDialog";
+import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { applicationSlice } from "store/slices";
+import { useDispatch } from "react-redux";
 
 type OpenImageMenuItemProps = {
   popupState: any;
 };
 
 export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
+  const dispatch = useDispatch();
+
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
     React.useState(false);
 
@@ -19,13 +24,29 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
   const [files, setFiles] = React.useState<FileList>();
 
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.persist();
-
     if (!event.currentTarget.files) return;
 
-    setFiles(event.currentTarget.files);
+    const files: FileList = Object.assign([], event.currentTarget.files);
 
-    setOpenDimensionsDialogBox(true); //open dialog box
+    const imageShapeInfo = await getImageShapeInformation(files[0]);
+
+    if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
+      dispatch(
+        applicationSlice.actions.uploadImages({
+          files: files,
+          channels: 3,
+          slices: 1,
+          imageShapeInfo: imageShapeInfo,
+          isUploadedFromAnnotator: true,
+        })
+      );
+      popupState.close();
+    } else {
+      setOpenDimensionsDialogBox(true);
+    }
+
+    event.target.value = "";
+    setFiles(files);
   };
 
   return (
@@ -37,9 +58,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
           hidden
           multiple
           id="open-image"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onOpenImage(event)
-          }
+          onChange={onOpenImage}
           type="file"
         />
       </MenuItem>

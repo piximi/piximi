@@ -13,6 +13,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { AlertType } from "types/AlertStateType";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { getStackTraceFromError } from "utils/getStackTrace";
+import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
 
 export const MainView = () => {
   const dispatch = useDispatch();
@@ -87,12 +88,32 @@ export const MainView = () => {
     };
   }, []);
 
-  const onDrop = useCallback(async (item) => {
-    if (item) {
-      setFiles(item.files);
-      setOpenDimensionsDialogBox(true); //open dialog box
-    }
-  }, []);
+  const onDrop = useCallback(
+    async (item) => {
+      if (!item) return;
+
+      const files: FileList = Object.assign([], item.files);
+
+      const imageShapeInfo = await getImageShapeInformation(files[0]);
+
+      if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
+        dispatch(
+          applicationSlice.actions.uploadImages({
+            files: files,
+            channels: 3,
+            slices: 1,
+            imageShapeInfo: imageShapeInfo,
+            isUploadedFromAnnotator: false,
+          })
+        );
+      } else {
+        setOpenDimensionsDialogBox(true);
+      }
+
+      setFiles(files);
+    },
+    [dispatch]
+  );
 
   const images = useSelector(visibleImagesSelector);
   const selectAllImages = () => {

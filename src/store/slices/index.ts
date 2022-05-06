@@ -59,7 +59,7 @@ export {
 export {
   createNewProject,
   createCategory,
-  createImage,
+  uploadImages,
   deleteCategory,
   projectSlice,
   updateCategory,

@@ -8,6 +8,7 @@ import {
 import { watchFitSaga } from "./classifier";
 import { watchPredictSaga } from "./classifier/watchPredictSaga";
 import { watchEvaluateSaga } from "./classifier/watchEvaluateSaga";
+import { watchUploadImagesSaga } from "./application/watchUploadImagesSaga";
 
 export function* rootSaga() {
   const classifierEffects = [
@@ -16,12 +17,14 @@ export function* rootSaga() {
     fork(watchEvaluateSaga),
   ];
 
-  const annotaterEffects = [
+  const applicationEffects = [fork(watchUploadImagesSaga)];
+
+  const annotatorEffects = [
     fork(watchAnnotationStateChangeSaga),
     fork(watchSelectedCategorySaga),
     fork(watchActiveImageChangeSaga),
     fork(watchActiveImageColorsChangeSaga),
   ];
 
-  yield all([...classifierEffects, ...annotaterEffects]);
+  yield all([...classifierEffects, ...annotatorEffects, ...applicationEffects]);
 }

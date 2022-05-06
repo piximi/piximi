@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
+import { ImageShapeEnum } from "image/imageHelper";
 
 const initialState: Settings = {
   selectedImages: [],
@@ -79,6 +80,16 @@ export const applicationSlice = createSlice({
     hideAlertState(state, action: PayloadAction<{}>) {
       state.alertState.visible = false;
     },
+    uploadImages(
+      state,
+      action: PayloadAction<{
+        files: FileList;
+        channels: number;
+        slices: number;
+        imageShapeInfo: ImageShapeEnum;
+        isUploadedFromAnnotator: boolean;
+      }>
+    ) {},
   },
 });
 
@@ -92,4 +103,5 @@ export const {
   setThemeMode,
   updateAlertState,
   hideAlertState,
+  uploadImages,
 } = applicationSlice.actions;

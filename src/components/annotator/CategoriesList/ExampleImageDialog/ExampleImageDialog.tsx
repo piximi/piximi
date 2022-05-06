@@ -71,7 +71,7 @@ export const ExampleImageDialog = ({
       ignorePalette: true,
     });
     const exampleImageTypeObject = convertToImage(
-      exampleImage,
+      [exampleImage],
       exampleImageName,
       defaultColors,
       serializedExampleImageFile.imagePlanes,
