@@ -13,41 +13,41 @@ import {
 } from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { categoriesSelector, imageSelector } from "../../../../store/selectors";
+import { categoriesSelector } from "../../../../store/selectors";
 import { Divider } from "@mui/material";
+import { ImageType } from "types/ImageType";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
+  selectedImage: ImageType;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
 
 export const ImageMenu = ({
   anchorElImageMenu,
+  selectedImage,
   onCloseImageMenu,
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  // const currentImageId = useSelector(activeImageIdSelector);
   const categories = useSelector(categoriesSelector);
-  // const images = useSelector(imagesSelector);
-  const activeImage = useSelector(imageSelector);
 
   const onClearAnnotationsClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
-    if (!activeImage) return;
+    if (!selectedImage) return;
     dispatch(
       imageViewerSlice.actions.deleteAllImageInstances({
-        imageId: activeImage.id,
+        imageId: selectedImage.id,
       })
     );
     onCloseImageMenu(event);
   };
 
   const onDeleteImage = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (!activeImage) return;
-    dispatch(imageViewerSlice.actions.deleteImage({ id: activeImage.id }));
+    if (!selectedImage) return;
+    dispatch(imageViewerSlice.actions.deleteImage({ id: selectedImage.id }));
     onCloseImageMenu(event);
   };
 
@@ -59,10 +59,10 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!activeImage) return;
+    if (!selectedImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix([activeImage], categories, zip, true)
+      saveAnnotationsAsLabelMatrix([selectedImage], categories, zip, true)
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labeled_instances.zip");
@@ -78,10 +78,10 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!activeImage) return;
+    if (!selectedImage) return;
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
-      [activeImage],
+      [selectedImage],
       categories,
       zip
     );
@@ -93,10 +93,10 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!activeImage) return;
+    if (!selectedImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix([activeImage], categories, zip)
+      saveAnnotationsAsLabelMatrix([selectedImage], categories, zip)
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labels.zip");
@@ -112,10 +112,10 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!activeImage) return;
+    if (!selectedImage) return;
 
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
-      [activeImage],
+      [selectedImage],
       categories,
       zip
     );
@@ -129,10 +129,16 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!activeImage) return;
+    if (!selectedImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix([activeImage], categories, zip, false, true)
+      saveAnnotationsAsLabelMatrix(
+        [selectedImage],
+        categories,
+        zip,
+        false,
+        true
+      )
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "binary_semantic.zip");

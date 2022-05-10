@@ -50,7 +50,7 @@ import {
   setActiveImage,
   setActiveImagePlane,
 } from "../../../../store/slices";
-import { ShadowImageType } from "types/ImageType";
+import { ImageType, ShadowImageType } from "types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
@@ -120,6 +120,10 @@ export const CategoriesList = () => {
     null
   );
 
+  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
+    currentImage!
+  );
+
   const onReturnToMainProject = () => {
     onCloseExitAnnotatorDialog();
     navigate("/");
@@ -156,8 +160,8 @@ export const CategoriesList = () => {
     event: React.MouseEvent<HTMLButtonElement>,
     image: ShadowImageType
   ) => {
-    onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
+    setSelectedImage(image as ImageType);
   };
 
   const onImageMenuClose = () => {
@@ -311,6 +315,7 @@ export const CategoriesList = () => {
         })}
         <ImageMenu
           anchorElImageMenu={imageAnchorEl}
+          selectedImage={selectedImage}
           onCloseImageMenu={onImageMenuClose}
           openImageMenu={Boolean(imageAnchorEl)}
         />
