@@ -205,18 +205,7 @@ export const CategoriesList = () => {
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
-    batch(() => {
-      dispatch(setActiveImage({ imageId: image.id }));
-
-      dispatch(setActiveImagePlane({ activeImagePlane: image.activePlane }));
-
-      dispatch(
-        imageViewerSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [],
-          selectedAnnotation: undefined,
-        })
-      );
-    });
+    dispatch(setActiveImage({ imageId: image.id }));
   };
 
   const t = useTranslation();

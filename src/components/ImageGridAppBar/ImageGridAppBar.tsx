@@ -99,19 +99,11 @@ export const ImageGridAppBar = () => {
       };
 
       if (idx === 0) {
-        batch(() => {
-          dispatch(
-            setActiveImage({
-              imageId: annotatorImage.id,
-            })
-          );
-          dispatch(
-            setSelectedAnnotations({
-              selectedAnnotations: [],
-              selectedAnnotation: undefined,
-            })
-          );
-        });
+        dispatch(
+          setActiveImage({
+            imageId: annotatorImage.id,
+          })
+        );
       }
 
       return annotatorImage;
