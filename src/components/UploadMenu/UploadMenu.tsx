@@ -80,7 +80,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
           </StyledMenuItem>
         </label>
 
-        <DropboxMenuItem onClose={onClose} />
+        {/* <DropboxMenuItem onClose={onClose} /> */}
       </Menu>
       <ImageShapeDialog
         files={files!}
