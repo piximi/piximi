@@ -14,6 +14,7 @@ import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
+import BBBC013ModeExampleProjectIcon from "data/exampleProjects/BBBC013ModeExampleProjectIcon.png";
 
 type OpenExampleClassifierDialogProps = {
   open: boolean;
@@ -80,6 +81,13 @@ export const OpenExampleClassifierDialog = (
             exampleProject={ExampleProject.HumanU2OSCells}
             projectName={"Open human U2OS-cells example project"}
             projectIcon={humanU2OSCellsExampleProjectIcon}
+            popupState={popupState}
+            onClose={onClose}
+          />
+          <OpenExampleProjectMenuItem
+            exampleProject={ExampleProject.BBBC013}
+            projectName={"Open Human U2OS cells cytoplasm"}
+            projectIcon={BBBC013ModeExampleProjectIcon}
             popupState={popupState}
             onClose={onClose}
           />
