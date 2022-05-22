@@ -417,7 +417,10 @@ export const convertToImage = (
   for (let i = 0; i < channels; i++) {
     const channelMin = Math.min(...channelRange[i]);
     const channelMax = Math.max(...channelRange[i]);
-    colors[i].range = [channelMin, channelMax];
+
+    if (channelMax !== 0) {
+      colors[i].range = [channelMin, channelMax];
+    }
   }
 
   const displayedURI = mapChannelsToSpecifiedRGBImage(
