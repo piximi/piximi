@@ -10,6 +10,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Typography,
 } from "@mui/material";
 import { SerializedProjectType } from "../../types/SerializedProjectType";
 import { Classifier } from "../../types/Classifier";
@@ -18,18 +19,29 @@ import { deserializeImages } from "image/imageHelper";
 import { SerializedImageType } from "types/SerializedImageType";
 import React from "react";
 
-type OpenExampleProjectMenuItemProps = {
-  exampleProject: ExampleProject;
+type ExampleProjectProps = {
   projectName: string;
+  projectDescription: string;
+  exampleProjectEnum: ExampleProject;
   projectIcon: string;
+  projectSource: {
+    sourceName: string;
+    sourceUrl: string;
+  };
+  license?: {
+    licenseName: string;
+    licenseUrl: string;
+  };
+};
+
+type OpenExampleProjectMenuItemProps = {
+  exampleProject: ExampleProjectProps;
   popupState: any;
   onClose: any;
 };
 
 export const OpenExampleProjectMenuItem = ({
   exampleProject,
-  projectName,
-  projectIcon,
   popupState,
   onClose,
 }: OpenExampleProjectMenuItemProps) => {
@@ -47,7 +59,7 @@ export const OpenExampleProjectMenuItem = ({
 
   const openExampleProject = async () => {
     var exampleProjectJson: any;
-    switch (exampleProject) {
+    switch (exampleProject.exampleProjectEnum) {
       case ExampleProject.Mnist:
         exampleProjectJson = await import(
           "data/exampleProjects/mnistExampleProject.json"
@@ -99,14 +111,53 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   return (
-    <ListItem button onClick={onClickExampleProject}>
-      <ListItemAvatar>
-        <Avatar src={projectIcon}></Avatar>
-      </ListItemAvatar>
+    <>
+      <ListItem button onClick={onClickExampleProject}>
+        <ListItemAvatar>
+          {exampleClassifierIsLoading ? (
+            <CircularProgress disableShrink />
+          ) : (
+            <Avatar src={exampleProject.projectIcon}></Avatar>
+          )}
+        </ListItemAvatar>
 
-      <ListItemText primary={projectName} />
+        <ListItemText
+          primary={
+            <Typography variant="subtitle1">
+              {exampleProject.projectName}
+            </Typography>
+          }
+          secondary={
+            <>
+              <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
+                {exampleProject.projectDescription}
+              </Typography>
 
-      {exampleClassifierIsLoading && <CircularProgress disableShrink />}
-    </ListItem>
+              {"Source: "}
+              <a
+                href={exampleProject.projectSource.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {exampleProject.projectSource.sourceName}
+              </a>
+
+              {exampleProject.license && (
+                <>
+                  {" License: "}
+                  <a
+                    href={exampleProject.license.licenseUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {exampleProject.license.licenseName}
+                  </a>
+                </>
+              )}
+            </>
+          }
+        />
+      </ListItem>
+    </>
   );
 };
