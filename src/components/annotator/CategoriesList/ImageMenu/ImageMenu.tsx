@@ -13,7 +13,7 @@ import {
 } from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { categoriesSelector } from "../../../../store/selectors";
+import { annotationCategorySelector } from "../../../../store/selectors";
 import { Divider } from "@mui/material";
 import { ImageType } from "types/ImageType";
 
@@ -31,7 +31,7 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(annotationCategorySelector);
 
   const onClearAnnotationsClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
