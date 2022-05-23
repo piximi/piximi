@@ -35,6 +35,8 @@
     "@types/react-vis": "^1.11.10",
     "@types/redux-logger": "^3.0.8",
     "@types/uuid": "^8.3.3",
+    "dicom-parser": "^1.8.13",
+    "dicom.ts": "^1.0.5",
     "file-saver": "^2.0.5",
     "i18next": "19.0.0",
     "image-js": "^0.34.0",
