@@ -9,7 +9,7 @@
     },
     "fitOptions": {
       "test_data_size": 1000,
-      "batchSize": 512,
+      "batchSize": 32,
       "initialEpoch": 0,
       "epochs": 10,
       "train_data_size": 6500

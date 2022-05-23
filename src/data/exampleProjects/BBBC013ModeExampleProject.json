@@ -23861,13 +23861,13 @@
     "fitOptions": {
       "epochs": 16,
       "initialEpoch": 0,
-      "batchSize": 8
+      "batchSize": 32
     },
     "inputShape": {
       "frames": 1,
       "planes": 1,
-      "width": 256,
-      "height": 256,
+      "width": 50,
+      "height": 50,
       "channels": 2
     },
     "metrics": ["Categorical accuracy"],
