@@ -45,11 +45,7 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import {
-  imageViewerSlice,
-  setActiveImage,
-  setActiveImagePlane,
-} from "../../../../store/slices";
+import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";

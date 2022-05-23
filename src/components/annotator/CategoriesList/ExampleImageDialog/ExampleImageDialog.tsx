@@ -80,6 +80,7 @@ export const ExampleImageDialog = ({
         {exampleImages.map((exampleImageProject, index) => {
           return (
             <OpenExampleImageMenuItem
+              key={index}
               exampleImageProject={exampleImageProject}
               onClose={onClose}
             />

@@ -77,15 +77,21 @@ export const OpenExampleImageMenuItem = ({
     <ListItem button onClick={openExampleImage}>
       <ListItemText
         primary={
-          <Typography variant="subtitle1">
+          <Typography component="span" variant="subtitle1">
             {exampleImageProject.exampleImageName}
           </Typography>
         }
         secondary={
           <>
-            <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
+            <Typography
+              component="span"
+              variant="body2"
+              style={{ whiteSpace: "pre-line" }}
+            >
               {exampleImageProject.exampleImageDescription}
             </Typography>
+
+            <br></br>
 
             {"Source: "}
             <a

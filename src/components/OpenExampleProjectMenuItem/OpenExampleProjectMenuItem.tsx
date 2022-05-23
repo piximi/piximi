@@ -111,53 +111,57 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   return (
-    <>
-      <ListItem button onClick={onClickExampleProject}>
-        <ListItemAvatar>
-          {exampleClassifierIsLoading ? (
-            <CircularProgress disableShrink />
-          ) : (
-            <Avatar src={exampleProject.projectIcon}></Avatar>
-          )}
-        </ListItemAvatar>
+    <ListItem button onClick={onClickExampleProject}>
+      <ListItemAvatar>
+        {exampleClassifierIsLoading ? (
+          <CircularProgress disableShrink />
+        ) : (
+          <Avatar src={exampleProject.projectIcon}></Avatar>
+        )}
+      </ListItemAvatar>
 
-        <ListItemText
-          primary={
-            <Typography variant="subtitle1">
-              {exampleProject.projectName}
+      <ListItemText
+        primary={
+          <Typography component="span" variant="subtitle1">
+            {exampleProject.projectName}
+          </Typography>
+        }
+        secondary={
+          <>
+            <Typography
+              component="span"
+              variant="body2"
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {exampleProject.projectDescription}
             </Typography>
-          }
-          secondary={
-            <>
-              <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
-                {exampleProject.projectDescription}
-              </Typography>
 
-              {"Source: "}
-              <a
-                href={exampleProject.projectSource.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {exampleProject.projectSource.sourceName}
-              </a>
+            <br></br>
 
-              {exampleProject.license && (
-                <>
-                  {" License: "}
-                  <a
-                    href={exampleProject.license.licenseUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {exampleProject.license.licenseName}
-                  </a>
-                </>
-              )}
-            </>
-          }
-        />
-      </ListItem>
-    </>
+            {"Source: "}
+            <a
+              href={exampleProject.projectSource.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {exampleProject.projectSource.sourceName}
+            </a>
+
+            {exampleProject.license && (
+              <>
+                {" License: "}
+                <a
+                  href={exampleProject.license.licenseUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {exampleProject.license.licenseName}
+                </a>
+              </>
+            )}
+          </>
+        }
+      />
+    </ListItem>
   );
 };

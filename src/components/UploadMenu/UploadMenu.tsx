@@ -5,7 +5,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
-import { DropboxMenuItem } from "./DropboxMenuItem";
 import { StyledMenuItem } from "./StyledMenuItem";
 import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
 import { useUpload } from "hooks/useUpload/useUpload";

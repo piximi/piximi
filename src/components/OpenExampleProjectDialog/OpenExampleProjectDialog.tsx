@@ -128,9 +128,10 @@ export const OpenExampleClassifierDialog = (
         }}
       >
         <List component="div" role="list">
-          {exampleProjects.map((exampleProject) => {
+          {exampleProjects.map((exampleProject, index) => {
             return (
               <OpenExampleProjectMenuItem
+                key={index}
                 exampleProject={exampleProject}
                 popupState={popupState}
                 onClose={onClose}
