@@ -10,18 +10,17 @@ import { CropSchema } from "types/CropOptions";
 import { matchedCropPad, padToMatch } from "./cropUtil";
 import { RescaleOptions } from "types/RescaleOptions";
 import { Partition } from "types/Partition";
+import _ from "lodash";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {
     srcs: string | string[];
     labels: number;
-    cropIdxs: number;
     ids: string;
   }): {
     srcs: string | string[];
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     labels: number;
-    cropIdxs: number;
     ids: string;
   } => {
     return {
@@ -41,14 +40,12 @@ export const decodeFromImgSrc = async (
     srcs: string; // dataURL
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     labels: number;
-    cropIdxs: number;
     ids: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
   ys: tensorflow.Tensor<tensorflow.Rank.R1>;
   labels: number;
-  cropIdxs: number;
   ids: string;
 }> => {
   const fetched = await tensorflow.util.fetch(item.srcs);
@@ -82,14 +79,12 @@ export const decodeFromOriginalSrc = async (
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     labels: number;
-    cropIdxs: number;
     ids: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
   ys: tensorflow.Tensor<tensorflow.Rank.R1>;
   labels: number;
-  cropIdxs: number;
   ids: string;
 }> => {
   const channelPromises: Array<Promise<tensorflow.Tensor2D>> = [];
@@ -145,14 +140,12 @@ export const decodeImage = async (
     srcs: string | string[];
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     labels: number;
-    cropIdxs: number;
     ids: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
   ys: tensorflow.Tensor<tensorflow.Rank.R1>;
   labels: number;
-  cropIdxs: number;
   ids: string;
 }> => {
   return channels === 1 || channels === 3
@@ -163,7 +156,6 @@ export const decodeImage = async (
           srcs: string;
           ys: tensorflow.Tensor<tensorflow.Rank.R1>;
           labels: number;
-          cropIdxs: number;
           ids: string;
         }
       )
@@ -173,7 +165,6 @@ export const decodeImage = async (
           srcs: string[];
           ys: tensorflow.Tensor<tensorflow.Rank.R1>;
           labels: number;
-          cropIdxs: number;
           ids: string;
         }
       );
@@ -187,7 +178,6 @@ export const cropResize = async (
     xs: tensorflow.Tensor<tensorflow.Rank.R3>;
     ys: tensorflow.Tensor<tensorflow.Rank.R1>;
     labels: number;
-    cropIdxs: number;
     ids: string;
   }
 ): Promise<{
@@ -262,16 +252,12 @@ export const cropResize = async (
 
 export const sampleGenerator = (
   images: Array<ImageType>,
-  categories: Array<Category>,
-  numCrops: number
+  categories: Array<Category>
 ) => {
-  if (numCrops <= 0) numCrops = 1;
-
   const count = images.length;
 
   return function* () {
     let index = 0;
-    let cropIndex = 0;
 
     while (index < count) {
       const image = images[index];
@@ -292,14 +278,10 @@ export const sampleGenerator = (
       yield {
         srcs: src,
         labels: label,
-        cropIdxs: cropIndex % numCrops,
         ids: image.id,
       };
 
-      cropIndex++;
-      if (cropIndex % numCrops === 0) {
-        index++;
-      }
+      index++;
     }
   };
 };
@@ -471,16 +453,23 @@ export const preprocess = async (
     ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>
 > => {
-  let imageData = tensorflow.data
-    .generator(
-      sampleGenerator(
-        images,
-        categories,
-        images[0].partition === Partition.Training
-          ? preprocessOptions.cropOptions.numCrops
-          : 1 // only 1 crop for non-training
+  let multipliedImages: Array<ImageType>;
+  if (
+    preprocessOptions.cropOptions.numCrops > 1 &&
+    images[0].partition === Partition.Training &&
+    preprocessOptions.shuffle
+  ) {
+    multipliedImages = _.shuffle(
+      images.flatMap((i) =>
+        Array(preprocessOptions.cropOptions.numCrops).fill(i)
       )
-    )
+    );
+  } else {
+    multipliedImages = images;
+  }
+
+  let imageData = tensorflow.data
+    .generator(sampleGenerator(multipliedImages, categories))
     .map(decodeCategory(categories.length))
     .mapAsync(
       decodeImage.bind(
@@ -497,10 +486,6 @@ export const preprocess = async (
         images[0].partition === Partition.Training
       )
     );
-
-  if (preprocessOptions.shuffle) {
-    imageData = imageData.shuffle(fitOptions.batchSize);
-  }
 
   const imageDataBatched = imageData.batch(fitOptions.batchSize);
   // .mapAsync((items: any) =>
