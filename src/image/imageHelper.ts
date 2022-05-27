@@ -343,102 +343,97 @@ export const convertToImage = (
    * Given an ImageJS Image object, construct appropriate Image type.
    * returns: the image of Image type
    * **/
+  const colors = currentColors
+    ? currentColors
+    : generateDefaultChannels(channels);
 
-  const originalURIs: Array<Array<string>> = [];
+  const isSingleRgbImage = slices === 1 && channels === 3 && input.length === 1;
+  if (isSingleRgbImage)
+    return convertSingleRGBImage(input[0], filename, colors);
+
+  // calculate min/max values per channel
+  const channelMinMaxValues: Array<Array<number>> = [...Array(channels)].map(
+    (e) => [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
+  );
+
+  for (let i = 0; i < input.length; i += channels) {
+    for (let c = 0; c < channels; c++) {
+      const frameIdx = i + c;
+
+      const frameMin = input[frameIdx].min[0];
+      const frameMax = input[frameIdx].max[0];
+
+      if (channelMinMaxValues[c][0] > frameMin) {
+        channelMinMaxValues[c][0] = frameMin;
+      }
+
+      if (channelMinMaxValues[c][1] < frameMax) {
+        channelMinMaxValues[c][1] = frameMax;
+      }
+    }
+  }
 
   const bitDepth = input[0].bitDepth;
   // downscale images to 8bit if necessarily
   if (bitDepth === BitDepth.UINT16) {
-    for (let i = 0; i < input.length; i++) {
-      input[i] = input[i].colorDepth(BitDepth.UINT8);
+    for (let i = 0; i < input.length; i += channels) {
+      for (let c = 0; c < channels; c++) {
+        const frameIdx = i + c;
+        const min = channelMinMaxValues[c][0];
+        const max = channelMinMaxValues[c][1];
+
+        input[frameIdx].data = new Uint8Array(
+          input[frameIdx].data.map((p) =>
+            Math.round(((p - min) / (max - min + 1)) * 256)
+          )
+        );
+        input[frameIdx].bitDepth = BitDepth.UINT8;
+      }
     }
   } else if (bitDepth !== BitDepth.UINT8 && bitDepth !== BitDepth.BINARY) {
     throw Error(`Unsupported bit depth of ${bitDepth}`);
   }
 
   const displayedIdx: number = 0;
-  const colors = currentColors
-    ? currentColors
-    : generateDefaultChannels(channels);
   const width = input[0].width;
   const height = input[0].height;
-
   let displayedData: Array<Array<number>> = [];
+  const originalURIs: Array<Array<string>> = [];
 
-  const channelRange: Array<Array<number>> = [...Array(channels)].map(
-    (e) => []
-  );
+  for (let i = 0; i < input.length; i += channels) {
+    let sliceData: Array<Array<number>> = [];
+    let sliceURI: Array<string> = [];
 
-  if (slices === 1 && channels === 3 && input.length === 1) {
-    //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
+    for (let c = 0; c < channels; c++) {
+      const frameIdx = i + c;
 
-    // min and max values per channel
-    const channelMins = input[0].min;
-    const channelMaxs = input[0].max;
-
-    displayedData = extractChannelsFromFlattenedArray(
-      input[0].data as Uint8Array,
-      input[0].components,
-      input[0].alpha,
-      width * height
-    );
-
-    originalURIs.push(
-      displayedData.map((channelData: Array<number>, idx: number) => {
-        channelRange[idx].push(channelMins[idx]);
-        channelRange[idx].push(channelMaxs[idx]);
-
-        return convertImageDataToURI(width, height, channelData, 1, 0);
-      })
-    );
-  } else {
-    //a greyscale or multi-channel, or hyper-stack image was uploaded -- go through each image (which each corresponds to a channel)
-    let i = 0;
-
-    // loop through z stack, num channels at a time
-    // i + channels := a group of channels in a plane
-    while (i + channels <= input.length) {
-      let sliceData: Array<Array<number>> = [];
-      let sliceURI: Array<string> = [];
-
-      let j = i;
-
-      // loop through each channel
-      // j := channel idx for the current plane's group of channels
-      while (j < i + channels) {
-        //go through slice of n channels
-        sliceData.push(Array.from(input[j].data)); //populate array of data
-        const channelURI = convertImageDataToURI(
-          width,
-          height,
-          Array.from(input[j].data),
-          1,
-          0
-        );
-        sliceURI.push(channelURI);
-
-        channelRange[j % channels].push(input[j].min[0]);
-        channelRange[j % channels].push(input[j].max[0]);
-        j += 1;
-      }
-
-      if (i === displayedIdx) {
-        displayedData = sliceData;
-      }
-
-      originalURIs.push(sliceURI);
-
-      i += channels;
+      sliceData.push(Array.from(input[frameIdx].data)); //populate array of data
+      const channelURI = convertImageDataToURI(
+        width,
+        height,
+        Array.from(input[frameIdx].data),
+        1,
+        0
+      );
+      sliceURI.push(channelURI);
     }
+
+    if (i === displayedIdx) {
+      displayedData = sliceData;
+    }
+
+    originalURIs.push(sliceURI);
   }
 
-  // set channel range to min and max of the input image
-  for (let i = 0; i < channels; i++) {
-    const channelMin = Math.min(...channelRange[i]);
-    const channelMax = Math.max(...channelRange[i]);
-
-    if (channelMax !== 0) {
-      colors[i].range = [channelMin, channelMax];
+  // change the color range only for 8-bit images (16-bit images are mapped tp [0,255])
+  if (bitDepth === BitDepth.UINT8) {
+    for (let c = 0; c < channels; c++) {
+      const channelMin = channelMinMaxValues[c][0];
+      const channelMax = channelMinMaxValues[c][1];
+      // do not set the color range to [0,0]
+      if (channelMax !== 0) {
+        colors[c].range = [channelMin, channelMax];
+      }
     }
   }
 
@@ -463,6 +458,55 @@ export const convertToImage = (
       frames: 1,
       height: height,
       planes: slices,
+      width: width,
+    },
+    src: displayedURI,
+    visible: true,
+  };
+};
+
+const convertSingleRGBImage = (
+  input: ImageJS.Image,
+  filename: string,
+  colors: Array<Color>
+) => {
+  const width = input.width;
+  const height = input.height;
+
+  const displayedData = extractChannelsFromFlattenedArray(
+    input.data as Uint8Array,
+    input.components,
+    input.alpha,
+    width * height
+  );
+
+  const originalURI = displayedData.map(
+    (channelData: Array<number>, idx: number) => {
+      return convertImageDataToURI(width, height, channelData, 1, 0);
+    }
+  );
+
+  const displayedURI = mapChannelsToSpecifiedRGBImage(
+    displayedData,
+    colors,
+    height,
+    width
+  );
+
+  return {
+    activePlane: 0,
+    annotations: [],
+    colors: colors,
+    categoryId: UNKNOWN_CATEGORY_ID,
+    id: uuidv4(),
+    name: filename,
+    originalSrc: [originalURI],
+    partition: Partition.Inference,
+    shape: {
+      channels: 3,
+      frames: 1,
+      height: height,
+      planes: 1,
       width: width,
     },
     src: displayedURI,
