@@ -1,14 +1,7 @@
 import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
@@ -33,11 +26,9 @@ import { Selecting } from "../Selecting";
 import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 import {
-  ColorAnnotationTool,
   ObjectAnnotationTool,
   Tool,
 } from "../../../../../annotator/image/Tool";
-import { ColorAnnotationToolTip } from "../ColorAnnotationToolTip";
 import useSound from "use-sound";
 import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
@@ -125,9 +116,6 @@ export const Stage = () => {
   } = usePointer();
 
   const [annotationTool] = useAnnotationTool();
-
-  // do not delete! important to force the component to re-render
-  const [, update] = useReducer((x) => x + 1, 0);
 
   const annotations = useSelector(imageInstancesSelector);
 
@@ -387,8 +375,6 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseDown(rawImagePosition);
-
-        update();
       }
     };
     const throttled = _.throttle(func, 5);
@@ -461,8 +447,6 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseMove(rawImagePosition);
-
-        update();
       }
     };
     const throttled = _.throttle(func, 5);
@@ -696,16 +680,6 @@ export const Stage = () => {
             <Transformers
               transformPosition={getRelativePointerPosition}
               annotationTool={annotationTool}
-            />
-
-            <ColorAnnotationToolTip
-              toolTipPosition={
-                (annotationTool as ColorAnnotationTool)?.toolTipPosition
-              }
-              initialPosition={
-                (annotationTool as ColorAnnotationTool)?.initialPosition
-              }
-              tolerance={(annotationTool as ColorAnnotationTool)?.tolerance}
             />
           </Layer>
         </DndProvider>

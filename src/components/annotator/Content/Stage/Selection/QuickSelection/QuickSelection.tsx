@@ -1,6 +1,6 @@
 import { QuickAnnotationTool } from "../../../../../../annotator/image/Tool";
 import * as ReactKonva from "react-konva";
-import React, { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { stageScaleSelector } from "../../../../../../store/selectors";
 
@@ -11,15 +11,23 @@ type QuickSelectionProps = {
 export const QuickSelection = ({ operator }: QuickSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
 
-  useEffect(() => {
-    if (!operator.currentMask) return;
+  useLayoutEffect(() => {
+    let timerId: number;
+    const f = () => {
+      timerId = requestAnimationFrame(f);
+      const image = new Image();
+      image.src = operator.currentMask
+        ? operator.currentMask.toDataURL("image/png", {
+            useCanvas: true,
+          })
+        : "";
+      setImage(image);
+    };
 
-    const image = new Image();
-    image.src = operator.currentMask.toDataURL("image/png", {
-      useCanvas: true,
-    });
-    setImage(image);
-  }, [operator.currentMask, operator.lastSuperpixel]);
+    timerId = requestAnimationFrame(f);
+
+    return () => cancelAnimationFrame(timerId);
+  });
 
   const stageScale = useSelector(stageScaleSelector);
 

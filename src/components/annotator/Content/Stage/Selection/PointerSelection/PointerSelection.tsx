@@ -1,15 +1,11 @@
 import * as ReactKonva from "react-konva";
 import React from "react";
-import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
-
 import { pointerSelectionSelector } from "../../../../../../store/selectors/pointerSelectionSelector";
 import { toolTypeSelector } from "../../../../../../store/selectors";
 import { ToolType } from "../../../../../../types/ToolType";
 
 export const PointerSelection = () => {
-  const dashOffset = useMarchingAnts();
-
   const toolType = useSelector(toolTypeSelector);
 
   const { dragging, minimum, maximum, selecting } = useSelector(
@@ -24,7 +20,6 @@ export const PointerSelection = () => {
     <>
       <ReactKonva.Rect
         dash={[4, 2]}
-        dashOffset={-dashOffset}
         height={maximum.y - minimum.y}
         stroke="white"
         strokeWidth={1}
