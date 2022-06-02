@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 import { ShapeType } from "../types/ShapeType";
 import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
-import { ImageType } from "../types/ImageType";
+import { ImageType, ShadowImageType } from "../types/ImageType";
 import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
@@ -874,11 +874,11 @@ const componentToHex = (c: number) => {
 };
 
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
-  images: Array<ImageType>,
+  images: Array<ShadowImageType>,
   categories: Array<Category>,
   zip: any
 ): any => {
-  images.forEach((current: ImageType) => {
+  images.forEach((current: ShadowImageType) => {
     current.annotations.forEach((annotation: AnnotationType) => {
       const fullLabelImage = new ImageJS.Image(
         current.shape.width,
@@ -938,11 +938,11 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
-  images: Array<ImageType>,
+  images: Array<ShadowImageType>,
   categories: Array<Category>,
   zip: any
 ): any => {
-  images.forEach((current: ImageType) => {
+  images.forEach((current: ShadowImageType) => {
     const fullLabelImage = new ImageJS.Image(
       current.shape.width,
       current.shape.height,
@@ -998,14 +998,14 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 };
 
 export const saveAnnotationsAsLabelMatrix = (
-  images: Array<ImageType>,
+  images: Array<ShadowImageType>,
   categories: Array<Category>,
   zip: any,
   random: boolean = false,
   binary: boolean = false
 ): Array<Promise<unknown>> => {
   return images
-    .map((current: ImageType) => {
+    .map((current: ShadowImageType) => {
       return categories.map((category: Category) => {
         return new Promise((resolve, reject) => {
           const fullLabelImage = new ImageJS.Image(
