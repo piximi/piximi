@@ -395,12 +395,16 @@ export const convertToImage = (
     //a greyscale or multi-channel, or hyper-stack image was uploaded -- go through each image (which each corresponds to a channel)
     let i = 0;
 
+    // loop through z stack, num channels at a time
+    // i + channels := a group of channels in a plane
     while (i + channels <= input.length) {
       let sliceData: Array<Array<number>> = [];
       let sliceURI: Array<string> = [];
 
       let j = i;
 
+      // loop through each channel
+      // j := channel idx for the current plane's group of channels
       while (j < i + channels) {
         //go through slice of n channels
         sliceData.push(Array.from(input[j].data)); //populate array of data
@@ -439,7 +443,7 @@ export const convertToImage = (
   }
 
   const displayedURI = mapChannelsToSpecifiedRGBImage(
-    displayedData!,
+    displayedData,
     colors,
     height,
     width

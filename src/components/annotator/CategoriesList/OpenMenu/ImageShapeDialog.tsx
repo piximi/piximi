@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import * as ImageJS from "image-js";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
@@ -16,16 +16,18 @@ type ImageShapeDialogProps = {
   isUploadedFromAnnotator: boolean;
 };
 
-export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
+export const ImageShapeDialog = ({
+  files,
+  open,
+  onClose,
+  isUploadedFromAnnotator,
+}: ImageShapeDialogProps) => {
   const dispatch = useDispatch();
 
-  const [channels, setChannels] = React.useState<number>(3);
+  const [channels, setChannels] = useState<number>(3);
 
-  const { files, open, onClose, isUploadedFromAnnotator } = props;
-
-  const [frames, setFrames] = React.useState<number>(-1);
-  const [invalidImageShape, setInvalidImageShape] =
-    React.useState<boolean>(false);
+  const [frames, setFrames] = useState<number>(-1);
+  const [invalidImageShape, setInvalidImageShape] = useState<boolean>(false);
 
   const handleChannelsChange = async (channels: number) => {
     setChannels(channels);
@@ -34,9 +36,8 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
   const uploadImages = async () => {
     var imageFrames = frames;
     if (imageFrames === -1) {
-      const image = await files[0].arrayBuffer().then((buffer) => {
-        return ImageJS.Image.load(buffer, { ignorePalette: true });
-      });
+      const buffer = await files[0].arrayBuffer();
+      const image = await ImageJS.Image.load(buffer, { ignorePalette: true });
 
       imageFrames = Array.isArray(image) ? image.length : 1;
       setFrames(imageFrames);
