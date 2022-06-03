@@ -89,11 +89,7 @@ export const MainView = () => {
   }, []);
 
   const onDrop = useCallback(
-    async (item) => {
-      if (!item) return;
-
-      const files: FileList = Object.assign([], item.files);
-
+    async (files: FileList) => {
       const imageShapeInfo = await getImageShapeInformation(files[0]);
 
       if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
