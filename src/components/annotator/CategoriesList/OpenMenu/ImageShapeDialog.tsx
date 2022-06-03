@@ -55,7 +55,7 @@ export const ImageShapeDialog = (props: ImageShapeDialogProps) => {
         files: files,
         channels: channels,
         slices: slices,
-        imageShapeInfo: ImageShapeEnum.hyperStackImage,
+        imageShapeInfo: ImageShapeEnum.HyperStackImage,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
       })
     );

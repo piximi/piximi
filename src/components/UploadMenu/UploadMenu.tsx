@@ -39,7 +39,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
     const imageShapeInfo = await getImageShapeInformation(files[0]);
 
-    if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
+    if (imageShapeInfo !== ImageShapeEnum.HyperStackImage) {
       dispatch(
         applicationSlice.actions.uploadImages({
           files: files,

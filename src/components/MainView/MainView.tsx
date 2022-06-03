@@ -92,7 +92,7 @@ export const MainView = () => {
     async (files: FileList) => {
       const imageShapeInfo = await getImageShapeInformation(files[0]);
 
-      if (imageShapeInfo !== ImageShapeEnum.hyperStackImage) {
+      if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
         dispatch(
           applicationSlice.actions.uploadImages({
             files: files,
@@ -102,8 +102,16 @@ export const MainView = () => {
             isUploadedFromAnnotator: false,
           })
         );
-      } else {
+      } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {
         setOpenDimensionsDialogBox(true);
+      } else if (imageShapeInfo === ImageShapeEnum.InvalidImage) {
+        process.env.NODE_ENV !== "production" &&
+          console.warn(
+            "Could not get shape information from first image in file list"
+          );
+      } else {
+        process.env.NODE_ENV !== "production" &&
+          console.warn("Unrecognized ImageShapeEnum value");
       }
 
       setFiles(files);

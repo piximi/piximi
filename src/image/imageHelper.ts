@@ -13,6 +13,21 @@ import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
 
+declare module "image-js" {
+  interface Image {
+    colorDepth(newColorDepth: BitDepth): Image;
+    min(): number[];
+    max(): number[];
+  }
+}
+
+enum BitDepth {
+  BINARY = 1,
+  UINT8 = 8,
+  UINT16 = 16,
+  FLOAT32 = 32,
+}
+
 export const mapChannelsToSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Color>,
@@ -278,23 +293,22 @@ export const convertDataArrayToRGBSource = async (
 };
 
 export enum ImageShapeEnum {
-  singleRGBImage,
-  hyperStackImage,
-  invalidImage,
+  SingleRGBImage,
+  HyperStackImage,
+  InvalidImage,
 }
 
 export const getImageShapeInformation = async (file: File) => {
   try {
-    const image = await file.arrayBuffer().then((buffer) => {
-      return ImageJS.Image.load(buffer, { ignorePalette: true });
-    });
+    const buffer = await file.arrayBuffer();
+    const image = await ImageJS.Image.load(buffer, { ignorePalette: true });
 
     // if the Image-js loads a single image object with 3 components that images is a single-slice RGB
     return image.components === 3 && !Array.isArray(image)
-      ? ImageShapeEnum.singleRGBImage
-      : ImageShapeEnum.hyperStackImage;
+      ? ImageShapeEnum.SingleRGBImage
+      : ImageShapeEnum.HyperStackImage;
   } catch (err) {
-    return ImageShapeEnum.invalidImage;
+    return ImageShapeEnum.InvalidImage;
   }
 };
 
@@ -332,13 +346,14 @@ export const convertToImage = (
 
   const originalURIs: Array<Array<string>> = [];
 
-  const bitDepth = input[0].bitDepth as number;
+  const bitDepth = input[0].bitDepth;
   // downscale images to 8bit if necessarily
-  if (bitDepth !== 8) {
+  if (bitDepth === BitDepth.UINT16) {
     for (let i = 0; i < input.length; i++) {
-      // @ts-ignore - type definition of 'colorDepth' is not exposed
-      input[i] = input[i].colorDepth(8);
+      input[i] = input[i].colorDepth(BitDepth.UINT8);
     }
+  } else if (bitDepth !== BitDepth.UINT8 && bitDepth !== BitDepth.BINARY) {
+    throw Error(`Unsupported bit depth of ${bitDepth}`);
   }
 
   const displayedIdx: number = 0;
@@ -357,6 +372,10 @@ export const convertToImage = (
   if (slices === 1 && channels === 3 && input.length === 1) {
     //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
 
+    // min and max values per channel
+    const channelMins = input[0].min();
+    const channelMaxs = input[0].max();
+
     displayedData = extractChannelsFromFlattenedArray(
       input[0].data as Uint8Array,
       input[0].components,
@@ -366,10 +385,8 @@ export const convertToImage = (
 
     originalURIs.push(
       displayedData.map((channelData: Array<number>, idx: number) => {
-        // @ts-ignore - type definition of 'min' is not exposed
-        channelRange[idx].push(input[0].min[idx]);
-        // @ts-ignore - type definition of 'max' is not exposed
-        channelRange[idx].push(input[0].max[idx]);
+        channelRange[idx].push(channelMins[idx]);
+        channelRange[idx].push(channelMaxs[idx]);
 
         return convertImageDataToURI(width, height, channelData, 1, 0);
       })
@@ -396,10 +413,8 @@ export const convertToImage = (
         );
         sliceURI.push(channelURI);
 
-        // @ts-ignore - type definition of 'min' is not exposed
-        channelRange[j % channels].push(input[j].min);
-        // @ts-ignore - type definition of 'max' is not exposed
-        channelRange[j % channels].push(input[j].max);
+        channelRange[j % channels].push(input[j].min()[0]);
+        channelRange[j % channels].push(input[j].max()[0]);
         j += 1;
       }
 

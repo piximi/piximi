@@ -12,6 +12,11 @@ type ImageFileType = {
   image: Array<ImageJS.Image>;
 };
 
+type ImageFileError = {
+  fileName: string;
+  error: string;
+};
+
 export function* uploadImagesSaga({
   payload: { files, channels, slices, imageShapeInfo, isUploadedFromAnnotator },
 }: {
@@ -23,50 +28,48 @@ export function* uploadImagesSaga({
     isUploadedFromAnnotator: boolean;
   };
 }): any {
-  const invalidImageFiles: Array<string> = [];
+  const colors = yield select(currentColorsSelector);
+  const singleRGBImages = imageShapeInfo === ImageShapeEnum.SingleRGBImage;
+  const invalidImageFiles: Array<ImageFileError> = [];
+  const imagesToUpload: Array<ImageType> = [];
+
   const imageFiles: Array<ImageFileType> = [];
   for (let i = 0; i < files.length; i++) {
     try {
-      const img: ImageJS.Image | ImageJS.Stack = yield files[i]
-        .arrayBuffer()
-        .then((buffer) => {
-          return ImageJS.Image.load(buffer, { ignorePalette: true });
-        });
+      const buffer: ArrayBuffer = yield files[i].arrayBuffer();
+      const img: ImageJS.Image | ImageJS.Stack = yield ImageJS.Image.load(
+        buffer,
+        { ignorePalette: true }
+      );
       const imageFile = {
         image: Array.isArray(img) ? img : [img],
         fileName: files[i].name,
       };
       imageFiles.push(imageFile);
     } catch (err) {
-      invalidImageFiles.push(files[i].name);
+      invalidImageFiles.push({
+        fileName: files[i].name,
+        error: "could not decode",
+      });
     }
   }
 
-  if (invalidImageFiles.length) {
-    const warning: AlertStateType = {
-      alertType: AlertType.Warning,
-      name: "Could not draw image from files",
-      description: `Could not load images from the following files: \n${invalidImageFiles.join(
-        ", "
-      )}`,
-    };
-    yield put(
-      applicationSlice.actions.updateAlertState({ alertState: warning })
-    );
-    return;
-  }
-
-  const colors = yield select(currentColorsSelector);
-
-  const singleRGBImages = imageShapeInfo === ImageShapeEnum.singleRGBImage;
-
-  const skippedImages: Array<string> = [];
-  const imagesToUpload: Array<ImageType> = [];
   for (let i = 0; i < imageFiles.length; i++) {
     const imageObject = imageFiles[i].image;
 
     if (!checkImageShape(imageObject, channels, slices, singleRGBImages)) {
-      skippedImages.push(imageFiles[i].fileName);
+      invalidImageFiles.push({
+        fileName: imageFiles[i].fileName,
+        error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
+      });
+      continue;
+    }
+
+    if (![8, 16].includes(imageObject[0].bitDepth)) {
+      invalidImageFiles.push({
+        fileName: imageFiles[i].fileName,
+        error: `unsupported bit depth of ${imageObject[0].bitDepth}`,
+      });
       continue;
     }
 
@@ -94,6 +97,21 @@ export function* uploadImagesSaga({
     }
   }
 
+  if (invalidImageFiles.length) {
+    const warning: AlertStateType = {
+      alertType: AlertType.Warning,
+      name: "Could not draw image from files",
+      description: `Could not load or resolve images from the following files: ${invalidImageFiles.reduce(
+        (prev, curr) => prev + "\n" + curr.fileName + ": (" + curr.error + ")",
+        ""
+      )}`,
+    };
+    yield put(
+      applicationSlice.actions.updateAlertState({ alertState: warning })
+    );
+    return;
+  }
+
   if (imagesToUpload.length) {
     if (isUploadedFromAnnotator) {
       yield put(
@@ -109,19 +127,6 @@ export function* uploadImagesSaga({
         projectSlice.actions.uploadImages({ newImages: imagesToUpload })
       );
     }
-  }
-
-  if (skippedImages.length) {
-    const warning: AlertStateType = {
-      alertType: AlertType.Warning,
-      name: "Could not resolve Image shape",
-      description: `Could not match the following images to shape ${channels} (c) x ${slices} (z): \n${skippedImages.join(
-        ", "
-      )}`,
-    };
-    yield put(
-      applicationSlice.actions.updateAlertState({ alertState: warning })
-    );
   }
 }
 
