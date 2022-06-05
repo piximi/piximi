@@ -144,12 +144,14 @@ export const MainView = () => {
 
             <ImageGrid onDrop={onDrop} />
 
-            <ImageShapeDialog
-              files={files!}
-              open={openDimensionsDialogBox}
-              onClose={handleClose}
-              isUploadedFromAnnotator={false}
-            />
+            {files?.length && (
+              <ImageShapeDialog
+                files={files}
+                open={openDimensionsDialogBox}
+                onClose={handleClose}
+                isUploadedFromAnnotator={false}
+              />
+            )}
           </Box>
         </div>
       </ErrorBoundary>
