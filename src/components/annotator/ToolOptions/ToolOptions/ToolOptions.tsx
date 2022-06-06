@@ -32,6 +32,7 @@ import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
 import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "../PointerSelectionOptions";
 import { AppBarOffset } from "components/styled/AppBarOffset";
+import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
 
 export const ToolOptions = () => {
   const { t } = useTranslation();
@@ -95,6 +96,13 @@ export const ToolOptions = () => {
       method: ToolType.ColorAnnotation,
       name: "Color selection",
       options: <ColorAnnotationOptions />,
+    },
+    {
+      description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",
+      icon: <RectangularSelectionIcon />,
+      method: ToolType.ThresholdAnnotation,
+      name: "Test selection",
+      options: <ThresholdAnnotationOptions />,
     },
     {
       description: "Nam a facilisis velit, sit amet interdum ante. In sodales.",

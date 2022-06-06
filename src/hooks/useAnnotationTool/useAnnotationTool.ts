@@ -18,6 +18,8 @@ import { stageScaleSelector, toolTypeSelector } from "../../store/selectors";
 import { penSelectionBrushSizeSelector } from "../../store/selectors/penSelectionBrushSizeSelector";
 import { quickSelectionBrushSizeSelector } from "../../store/selectors/quickSelectionBrushSizeSelector";
 import { imageSrcSelector } from "../../store/selectors/imageSrcSelector";
+import { ThresholdAnnotationTool } from "annotator/image/Tool/AnnotationTool/ThresholdAnnotationTool";
+import { thresholdAnnotationValueSelector } from "store/selectors/thresholdAnnotationValueSelector";
 
 export const useAnnotationTool = () => {
   const src = useSelector(imageSrcSelector);
@@ -31,6 +33,8 @@ export const useAnnotationTool = () => {
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
 
   const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
+
+  const threshold = useSelector(thresholdAnnotationValueSelector);
 
   useEffect(() => {
     if (!src) return;
@@ -92,6 +96,11 @@ export const useAnnotationTool = () => {
         setOperator(quickSelectionOperator);
 
         return;
+      case ToolType.ThresholdAnnotation:
+        const thresholdSelectorOperator = ThresholdAnnotationTool.setup(image);
+        setOperator(thresholdSelectorOperator);
+
+        return;
       case ToolType.RectangularAnnotation:
         setOperator(new RectangularAnnotationTool(image));
 
@@ -104,6 +113,12 @@ export const useAnnotationTool = () => {
     stageScale,
     quickSelectionBrushSize,
   ]);
+
+  useEffect(() => {
+    if (operator instanceof ThresholdAnnotationTool) {
+      operator.updateMask(threshold);
+    }
+  }, [operation, operator, threshold]);
 
   return [operator];
 };

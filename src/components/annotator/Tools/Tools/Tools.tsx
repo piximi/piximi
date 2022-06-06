@@ -219,6 +219,20 @@ export const Tools = () => {
         <QuickSelectionIcon />
       </Tool>
 
+      <Tool
+        name="Threshold annotation"
+        onClick={() => {
+          dispatch(
+            imageViewerSlice.actions.setOperation({
+              operation: OperationType.ThresholdAnnotation,
+            })
+          );
+        }}
+        selected={activeOperation === OperationType.ThresholdAnnotation}
+      >
+        <RectangularSelectionIcon />
+      </Tool>
+
       {/*<Tool*/}
       {/*  name={t("Object annotation")}*/}
       {/*  onClick={() => {*/}

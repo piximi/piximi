@@ -81,7 +81,7 @@ export const AnnotationMode = () => {
           <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
-            disabled={annotationState === AnnotationStateType.Blank}
+            //disabled={annotationState === AnnotationStateType.Blank}
           >
             <ListItemIcon>
               <Radio

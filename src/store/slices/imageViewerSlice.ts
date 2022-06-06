@@ -68,6 +68,7 @@ const initialState: ImageViewer = {
     selecting: false,
   },
   quickSelectionBrushSize: 40,
+  thresholdAnnotationValue: 150,
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
@@ -425,6 +426,12 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ quickSelectionBrushSize: number }>
     ) {
       state.quickSelectionBrushSize = action.payload.quickSelectionBrushSize;
+    },
+    setThresholdAnnotationValue(
+      state: ImageViewer,
+      action: PayloadAction<{ thresholdAnnotationValue: number }>
+    ) {
+      state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
     },
     setSaturation(
       state: ImageViewer,

@@ -52,6 +52,10 @@ export const Selection = ({ tool, toolType }: SelectionProps) => {
       return (
         <RectangularSelection operator={tool as RectangularAnnotationTool} />
       );
+    case ToolType.ThresholdAnnotation:
+      return (
+        <RectangularSelection operator={tool as RectangularAnnotationTool} />
+      );
     case ToolType.Zoom:
       return <ZoomSelection />;
     case ToolType.QuickAnnotation:

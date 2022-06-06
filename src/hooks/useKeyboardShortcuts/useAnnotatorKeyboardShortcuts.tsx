@@ -32,17 +32,24 @@ export const useAnnotatorKeyboardShortcuts = () => {
   });
 
   /*
-   * Select color tool (W)
+   * Select color tool (C)
    */
   useHotkeys("shift+c", () => {
     dispatch(setOperation({ operation: ToolType.ColorAnnotation }));
   });
 
   /*
-   * Select quick tool (W)
+   * Select quick tool (Q)
    */
   useHotkeys("shift+q", () => {
     dispatch(setOperation({ operation: ToolType.QuickAnnotation }));
+  });
+
+  /*
+   * Select threshold tool (T)
+   */
+  useHotkeys("shift+t", () => {
+    dispatch(setOperation({ operation: ToolType.ThresholdAnnotation }));
   });
 
   /*
