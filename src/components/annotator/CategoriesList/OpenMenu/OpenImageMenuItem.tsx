@@ -1,31 +1,30 @@
-import React, { ChangeEvent } from "react";
+import React, { useState } from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { ImageShapeDialog } from "./ImageShapeDialog";
+import { useUpload } from "hooks/useUpload/useUpload";
 
 type OpenImageMenuItemProps = {
   popupState: any;
 };
 
 export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
-    React.useState(false);
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
     popupState.close();
   };
 
-  const [files, setFiles] = React.useState<FileList>();
+  const [files, setFiles] = useState<FileList>();
 
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.persist();
-
     if (!event.currentTarget.files) return;
-
-    setFiles(event.currentTarget.files);
-
-    setOpenDimensionsDialogBox(true); //open dialog box
+    const files: FileList = Object.assign([], event.currentTarget.files);
+    await uploadFiles(files);
+    event.target.value = "";
+    setFiles(files);
   };
 
   return (
@@ -37,18 +36,18 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
           hidden
           multiple
           id="open-image"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onOpenImage(event)
-          }
+          onChange={onOpenImage}
           type="file"
         />
       </MenuItem>
-      <ImageShapeDialog
-        files={files!}
-        open={openDimensionsDialogBox}
-        onClose={handleClose}
-        isUploadedFromAnnotator={true}
-      />
+      {files?.length && (
+        <ImageShapeDialog
+          files={files}
+          open={openDimensionsDialogBox}
+          onClose={handleClose}
+          isUploadedFromAnnotator={true}
+        />
+      )}
     </React.Fragment>
   );
 };

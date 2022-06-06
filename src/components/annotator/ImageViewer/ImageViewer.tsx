@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
@@ -10,6 +10,7 @@ import { ImageType } from "../../../types/ImageType";
 import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { useUpload } from "hooks/useUpload/useUpload";
 
 type ImageViewerProps = {
   image?: ImageType;
@@ -18,10 +19,9 @@ type ImageViewerProps = {
 export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
 
-  const [files, setFiles] = React.useState<FileList>();
+  const [files, setFiles] = useState<FileList>();
 
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
-    React.useState(false);
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
@@ -35,12 +35,11 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     }
   }, [dispatch, image]);
 
-  const onDrop = useCallback(async (item) => {
-    if (item) {
-      setFiles(item.files);
-      setOpenDimensionsDialogBox(true); //open dialog box
-    }
-  }, []);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const onDrop = async (files: FileList) => {
+    await uploadFiles(files);
+    setFiles(files);
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -54,10 +53,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
           color="inherit"
           position="fixed"
         >
-          <AlertDialog
-            //setShowAlertDialog={setShowAlertDialogs}
-            alertState={alertState}
-          />
+          <AlertDialog alertState={alertState} />
         </AppBar>
       )}
 

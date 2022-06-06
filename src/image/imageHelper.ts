@@ -13,6 +13,21 @@ import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
 
+declare module "image-js" {
+  interface Image {
+    colorDepth(newColorDepth: BitDepth): Image;
+    min: number[];
+    max: number[];
+  }
+}
+
+enum BitDepth {
+  BINARY = 1,
+  UINT8 = 8,
+  UINT16 = 16,
+  FLOAT32 = 32,
+}
+
 export const mapChannelsToSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Color>,
@@ -277,26 +292,24 @@ export const convertDataArrayToRGBSource = async (
   });
 };
 
-export const convertFileToImage = async (
-  file: File,
-  colors: Array<Color> | undefined,
-  slices: number,
-  channels: number
-): Promise<ImageType> => {
-  /**
-   * Returns image to be provided to dispatch
-   * **/
-  return file
-    .arrayBuffer()
-    .then((buffer) => {
-      return ImageJS.Image.load(buffer, { ignorePalette: true });
-    })
-    .then((image: ImageJS.Image) => {
-      return convertToImage(image, file.name, colors, slices, channels);
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
+export enum ImageShapeEnum {
+  SingleRGBImage,
+  HyperStackImage,
+  InvalidImage,
+}
+
+export const getImageShapeInformation = async (file: File) => {
+  try {
+    const buffer = await file.arrayBuffer();
+    const image = await ImageJS.Image.load(buffer, { ignorePalette: true });
+
+    // if the Image-js loads a single image object with 3 components that images is a single-slice RGB
+    return image.components === 3 && !Array.isArray(image)
+      ? ImageShapeEnum.SingleRGBImage
+      : ImageShapeEnum.HyperStackImage;
+  } catch (err) {
+    return ImageShapeEnum.InvalidImage;
+  }
 };
 
 const convertImageDataToURI = (
@@ -320,26 +333,29 @@ const convertImageDataToURI = (
 };
 
 export const convertToImage = (
-  image: ImageJS.Image | ImageJS.Stack,
+  input: Array<ImageJS.Image>,
   filename: string,
   currentColors: Array<Color> | undefined,
   slices: number,
-  components: number
+  channels: number
 ): ImageType => {
   /**
    * Given an ImageJS Image object, construct appropriate Image type.
    * returns: the image of Image type
    * **/
 
-  let z = slices;
-  let c = components;
-
   const originalURIs: Array<Array<string>> = [];
 
-  const input: Array<ImageJS.Image> = Array.isArray(image) ? image : [image];
-  const channels: number = Array.isArray(image)
-    ? image.length / z
-    : image.components;
+  const bitDepth = input[0].bitDepth;
+  // downscale images to 8bit if necessarily
+  if (bitDepth === BitDepth.UINT16) {
+    for (let i = 0; i < input.length; i++) {
+      input[i] = input[i].colorDepth(BitDepth.UINT8);
+    }
+  } else if (bitDepth !== BitDepth.UINT8 && bitDepth !== BitDepth.BINARY) {
+    throw Error(`Unsupported bit depth of ${bitDepth}`);
+  }
+
   const displayedIdx: number = 0;
   const colors = currentColors
     ? currentColors
@@ -349,8 +365,16 @@ export const convertToImage = (
 
   let displayedData: Array<Array<number>> = [];
 
-  if (z === 1 && c === 3 && input.length === 1) {
+  const channelRange: Array<Array<number>> = [...Array(channels)].map(
+    (e) => []
+  );
+
+  if (slices === 1 && channels === 3 && input.length === 1) {
     //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
+
+    // min and max values per channel
+    const channelMins = input[0].min;
+    const channelMaxs = input[0].max;
 
     displayedData = extractChannelsFromFlattenedArray(
       input[0].data as Uint8Array,
@@ -360,7 +384,10 @@ export const convertToImage = (
     );
 
     originalURIs.push(
-      displayedData.map((channelData: Array<number>) => {
+      displayedData.map((channelData: Array<number>, idx: number) => {
+        channelRange[idx].push(channelMins[idx]);
+        channelRange[idx].push(channelMaxs[idx]);
+
         return convertImageDataToURI(width, height, channelData, 1, 0);
       })
     );
@@ -368,13 +395,17 @@ export const convertToImage = (
     //a greyscale or multi-channel, or hyper-stack image was uploaded -- go through each image (which each corresponds to a channel)
     let i = 0;
 
-    while (i + c <= input.length) {
+    // loop through z stack, num channels at a time
+    // i + channels := a group of channels in a plane
+    while (i + channels <= input.length) {
       let sliceData: Array<Array<number>> = [];
       let sliceURI: Array<string> = [];
 
       let j = i;
 
-      while (j < i + c) {
+      // loop through each channel
+      // j := channel idx for the current plane's group of channels
+      while (j < i + channels) {
         //go through slice of n channels
         sliceData.push(Array.from(input[j].data)); //populate array of data
         const channelURI = convertImageDataToURI(
@@ -385,6 +416,9 @@ export const convertToImage = (
           0
         );
         sliceURI.push(channelURI);
+
+        channelRange[j % channels].push(input[j].min[0]);
+        channelRange[j % channels].push(input[j].max[0]);
         j += 1;
       }
 
@@ -394,12 +428,22 @@ export const convertToImage = (
 
       originalURIs.push(sliceURI);
 
-      i += c;
+      i += channels;
+    }
+  }
+
+  // set channel range to min and max of the input image
+  for (let i = 0; i < channels; i++) {
+    const channelMin = Math.min(...channelRange[i]);
+    const channelMax = Math.max(...channelRange[i]);
+
+    if (channelMax !== 0) {
+      colors[i].range = [channelMin, channelMax];
     }
   }
 
   const displayedURI = mapChannelsToSpecifiedRGBImage(
-    displayedData!,
+    displayedData,
     colors,
     height,
     width
@@ -418,7 +462,7 @@ export const convertToImage = (
       channels: channels,
       frames: 1,
       height: height,
-      planes: z,
+      planes: slices,
       width: width,
     },
     src: displayedURI,

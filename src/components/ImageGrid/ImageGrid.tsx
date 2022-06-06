@@ -16,13 +16,12 @@ import {
   ImageListItemBar,
   Box,
 } from "@mui/material";
-import { DropTargetMonitor, useDrop } from "react-dnd";
-import { NativeTypes } from "react-dnd-html5-backend";
 import { ImageIconLabel } from "./ImageIconLabel";
 import { memo } from "react";
+import { useDndFileDrop } from "hooks/useDndFileDrop/useDndFileDrop";
 
 type ImageGridProps = {
-  onDrop: (item: { files: any[] }) => void;
+  onDrop: (files: FileList) => void;
 };
 
 type ImageGridItemProps = {
@@ -104,27 +103,12 @@ export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const selectedImages = useSelector(selectedImagesSelector);
   const scaleFactor = useSelector(tileSizeSelector);
   const max_images = 1000; //number of images from the project that we'll show
-
-  const [{ isOver }, drop] = useDrop(
-    () => ({
-      accept: [NativeTypes.FILE],
-      drop(item: { files: any[] }) {
-        if (onDrop) {
-          onDrop(item);
-        }
-      },
-      collect: (monitor: DropTargetMonitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-      }),
-    }),
-    []
-  );
+  const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
 
   return (
     <Box
       component="main"
-      ref={drop}
+      ref={dropTarget}
       sx={(theme) => ({
         flexGrow: 1,
         height: "100%",

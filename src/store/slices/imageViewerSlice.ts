@@ -113,8 +113,6 @@ export const imageViewerSlice = createSlice({
         }
       );
 
-      state.selectedAnnotations = [];
-
       state.images.push(...updatedImages);
     },
     clearCategoryAnnotations(
