@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoriesList } from "../CategoriesList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { applicationSlice, imageViewerSlice } from "../../../store/slices";
+import { imageViewerSlice } from "../../../store/slices";
 import { ImageType } from "../../../types/ImageType";
 import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { useUpload } from "hooks/useUpload/useUpload";
 
 type ImageViewerProps = {
   image?: ImageType;
@@ -19,10 +19,9 @@ type ImageViewerProps = {
 export const ImageViewer = ({ image }: ImageViewerProps) => {
   const dispatch = useDispatch();
 
-  const [files, setFiles] = React.useState<FileList>();
+  const [files, setFiles] = useState<FileList>();
 
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
-    React.useState(false);
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
@@ -36,32 +35,11 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     }
   }, [dispatch, image]);
 
-  const onDrop = useCallback(
-    async (item) => {
-      if (!item) return;
-
-      const files: FileList = Object.assign([], item.files);
-
-      const imageShapeInfo = await getImageShapeInformation(files[0]);
-
-      if (imageShapeInfo !== ImageShapeEnum.HyperStackImage) {
-        dispatch(
-          applicationSlice.actions.uploadImages({
-            files: files,
-            channels: 3,
-            slices: 1,
-            imageShapeInfo: imageShapeInfo,
-            isUploadedFromAnnotator: true,
-          })
-        );
-      } else {
-        setOpenDimensionsDialogBox(true);
-      }
-
-      setFiles(files);
-    },
-    [dispatch]
-  );
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const onDrop = async (files: FileList) => {
+    await uploadFiles(files);
+    setFiles(files);
+  };
 
   return (
     <Box sx={{ display: "flex" }}>

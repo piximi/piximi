@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
@@ -13,19 +13,18 @@ import { ErrorBoundary } from "react-error-boundary";
 import { AlertType } from "types/AlertStateType";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { getStackTraceFromError } from "utils/getStackTrace";
-import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { useUpload } from "hooks/useUpload/useUpload";
 
 export const MainView = () => {
   const dispatch = useDispatch();
 
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
-    React.useState(false);
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
   };
 
-  const [files, setFiles] = React.useState<FileList>();
+  const [files, setFiles] = useState<FileList>();
 
   const onUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
@@ -72,7 +71,7 @@ export const MainView = () => {
     [dispatch]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("error", handleError);
     window.addEventListener("unhandledrejection", handleUncaughtRejection);
     return () => {
@@ -81,43 +80,18 @@ export const MainView = () => {
     };
   }, [handleError, handleUncaughtRejection]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("beforeunload", onUnload);
     return () => {
       window.removeEventListener("beforeunload", onUnload);
     };
   }, []);
 
-  const onDrop = useCallback(
-    async (files: FileList) => {
-      const imageShapeInfo = await getImageShapeInformation(files[0]);
-
-      if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
-        dispatch(
-          applicationSlice.actions.uploadImages({
-            files: files,
-            channels: 3,
-            slices: 1,
-            imageShapeInfo: imageShapeInfo,
-            isUploadedFromAnnotator: false,
-          })
-        );
-      } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {
-        setOpenDimensionsDialogBox(true);
-      } else if (imageShapeInfo === ImageShapeEnum.InvalidImage) {
-        process.env.NODE_ENV !== "production" &&
-          console.warn(
-            "Could not get shape information from first image in file list"
-          );
-      } else {
-        process.env.NODE_ENV !== "production" &&
-          console.warn("Unrecognized ImageShapeEnum value");
-      }
-
-      setFiles(files);
-    },
-    [dispatch]
-  );
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const onDrop = async (files: FileList) => {
+    await uploadFiles(files);
+    setFiles(files);
+  };
 
   const images = useSelector(visibleImagesSelector);
   const selectAllImages = () => {

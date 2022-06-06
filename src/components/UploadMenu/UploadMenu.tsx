@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Menu } from "@mui/material";
 import Fade from "@mui/material/Fade";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -8,9 +8,7 @@ import ListSubheader from "@mui/material/ListSubheader";
 import { DropboxMenuItem } from "./DropboxMenuItem";
 import { StyledMenuItem } from "./StyledMenuItem";
 import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
-import { applicationSlice } from "store/slices";
-import { useDispatch } from "react-redux";
-import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { useUpload } from "hooks/useUpload/useUpload";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -19,43 +17,23 @@ type UploadMenuProps = {
 };
 
 export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
-  const dispatch = useDispatch();
-
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] =
-    React.useState(false);
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
   };
 
-  const [files, setFiles] = React.useState<FileList>();
+  const [files, setFiles] = useState<FileList>();
 
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
   const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!event.currentTarget.files) return;
-
     const files: FileList = Object.assign([], event.currentTarget.files);
-
-    const imageShapeInfo = await getImageShapeInformation(files[0]);
-
-    if (imageShapeInfo !== ImageShapeEnum.HyperStackImage) {
-      dispatch(
-        applicationSlice.actions.uploadImages({
-          files: files,
-          channels: 3,
-          slices: 1,
-          imageShapeInfo: imageShapeInfo,
-          isUploadedFromAnnotator: false,
-        })
-      );
-    } else {
-      setOpenDimensionsDialogBox(true);
-    }
-
+    await uploadFiles(files);
     event.target.value = "";
     setFiles(files);
-
     onClose(event);
   };
 

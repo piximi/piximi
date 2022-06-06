@@ -1,5 +1,5 @@
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
-import React, { useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
 import { applicationSlice } from "store/slices";
@@ -46,7 +46,7 @@ export const AnnotatorView = () => {
     [dispatch]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("error", handleError);
     window.addEventListener("unhandledrejection", handleUncaughtRejection);
     return () => {

@@ -1,34 +1,18 @@
 import React, { useRef } from "react";
 import { Stage } from "../Stage";
-import { NativeTypes } from "react-dnd-html5-backend";
-import { DropTargetMonitor, useDrop } from "react-dnd";
 import { useBoundingClientRect } from "../../../../hooks/useBoundingClientRect";
 import { Box } from "@mui/material";
+import { useDndFileDrop } from "hooks/useDndFileDrop/useDndFileDrop";
 
 type ContentProps = {
-  onDrop: (item: { files: any[] }) => void;
+  onDrop: (files: FileList) => void;
 };
 
 export const Content = ({ onDrop }: ContentProps) => {
   const ref = useRef<HTMLDivElement>(null);
-
   useBoundingClientRect(ref);
 
-  const [{ isOver }, drop] = useDrop(
-    () => ({
-      accept: [NativeTypes.FILE],
-      drop(item: { files: any[] }) {
-        if (onDrop) {
-          onDrop(item);
-        }
-      },
-      collect: (monitor: DropTargetMonitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-      }),
-    }),
-    []
-  );
+  const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
 
   return (
     <Box
@@ -39,7 +23,7 @@ export const Content = ({ onDrop }: ContentProps) => {
       })}
       ref={ref}
     >
-      <div ref={drop}>
+      <div ref={dropTarget}>
         <Stage />
       </div>
     </Box>

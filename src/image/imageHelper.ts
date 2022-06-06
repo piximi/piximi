@@ -16,8 +16,8 @@ import { SerializedImageType } from "types/SerializedImageType";
 declare module "image-js" {
   interface Image {
     colorDepth(newColorDepth: BitDepth): Image;
-    min(): number[];
-    max(): number[];
+    min: number[];
+    max: number[];
   }
 }
 
@@ -373,8 +373,8 @@ export const convertToImage = (
     //a single rgb image was uploaded. A separate preprocessing is necessary because r, g, and b channels are kept in the image object itself as opposed to separate individual image objects.
 
     // min and max values per channel
-    const channelMins = input[0].min();
-    const channelMaxs = input[0].max();
+    const channelMins = input[0].min;
+    const channelMaxs = input[0].max;
 
     displayedData = extractChannelsFromFlattenedArray(
       input[0].data as Uint8Array,
@@ -417,8 +417,8 @@ export const convertToImage = (
         );
         sliceURI.push(channelURI);
 
-        channelRange[j % channels].push(input[j].min()[0]);
-        channelRange[j % channels].push(input[j].max()[0]);
+        channelRange[j % channels].push(input[j].min[0]);
+        channelRange[j % channels].push(input[j].max[0]);
         j += 1;
       }
 
