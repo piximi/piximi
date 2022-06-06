@@ -1,4 +1,4 @@
-import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { getImageInformation, ImageShapeEnum } from "image/imageHelper";
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { applicationSlice } from "store/slices";
@@ -10,7 +10,7 @@ export const useUpload = (
 
   return useCallback(
     async (files: FileList) => {
-      const imageShapeInfo = await getImageShapeInformation(files[0]);
+      const imageShapeInfo = await getImageInformation(files[0]);
 
       if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
         dispatch(
@@ -20,6 +20,16 @@ export const useUpload = (
             slices: 1,
             imageShapeInfo: imageShapeInfo,
             isUploadedFromAnnotator: false,
+          })
+        );
+      } else if (imageShapeInfo === ImageShapeEnum.DicomImage) {
+        dispatch(
+          applicationSlice.actions.uploadImages({
+            files: files,
+            channels: 1,
+            slices: 1,
+            imageShapeInfo: imageShapeInfo,
+            isUploadedFromAnnotator: true,
           })
         );
       } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {

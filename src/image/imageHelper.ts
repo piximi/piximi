@@ -293,13 +293,18 @@ export const convertDataArrayToRGBSource = async (
 };
 
 export enum ImageShapeEnum {
+  DicomImage,
   SingleRGBImage,
   HyperStackImage,
   InvalidImage,
 }
 
-export const getImageShapeInformation = async (file: File) => {
+export const getImageInformation = async (file: File) => {
   try {
+    if (file.name.endsWith("dcm") || file.name.endsWith("DICOM")) {
+      return ImageShapeEnum.DicomImage;
+    }
+
     const buffer = await file.arrayBuffer();
     const image = await ImageJS.Image.load(buffer, { ignorePalette: true });
 

@@ -1,5 +1,6 @@
 import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
+import * as DicomParser from "dicom-parser";
 import { projectSlice, applicationSlice, imageViewerSlice } from "../../slices";
 import { ImageType } from "../../../types/ImageType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
@@ -36,15 +37,10 @@ export function* uploadImagesSaga({
   const imageFiles: Array<ImageFileType> = [];
   for (let i = 0; i < files.length; i++) {
     try {
-      const buffer: ArrayBuffer = yield files[i].arrayBuffer();
-      const img: ImageJS.Image | ImageJS.Stack = yield ImageJS.Image.load(
-        buffer,
-        { ignorePalette: true }
+      const imageFile: ImageFileType = yield getImageData(
+        files[i],
+        imageShapeInfo
       );
-      const imageFile = {
-        image: Array.isArray(img) ? img : [img],
-        fileName: files[i].name,
-      };
       imageFiles.push(imageFile);
     } catch (err) {
       invalidImageFiles.push({
@@ -128,6 +124,43 @@ export function* uploadImagesSaga({
       );
     }
   }
+}
+
+function* getImageData(imageFile: File, imageTypeEnum: ImageShapeEnum) {
+  let img: ImageJS.Image | ImageJS.Stack;
+  if (imageTypeEnum === ImageShapeEnum.DicomImage) {
+    const imgArrayBuffer: ArrayBuffer = yield imageFile.arrayBuffer();
+    const imgArray = new Uint8Array(imgArrayBuffer);
+
+    var dicomImgData = DicomParser.parseDicom(imgArray);
+    var pixelDataElement = dicomImgData.elements.x7fe00010;
+
+    const samplesPerPixel = dicomImgData.int16("x00280002");
+    const rows = dicomImgData.int16("x00280010");
+    const columns = dicomImgData.int16("x00280011");
+    const bitsAllocated = dicomImgData.int16("x00280100");
+
+    var pixelData = new Uint16Array(
+      dicomImgData.byteArray.buffer,
+      pixelDataElement.dataOffset,
+      pixelDataElement.length / 2
+    );
+
+    img = new ImageJS.Image(rows, columns, pixelData, {
+      components: samplesPerPixel,
+      bitDepth: bitsAllocated,
+      alpha: 0,
+    });
+  } else {
+    img = yield imageFile.arrayBuffer().then((buffer) => {
+      return ImageJS.Image.load(buffer, { ignorePalette: true });
+    });
+  }
+
+  return {
+    image: Array.isArray(img) ? img : [img],
+    fileName: imageFile.name,
+  };
 }
 
 function checkImageShape(
