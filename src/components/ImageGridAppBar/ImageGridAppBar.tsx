@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import {
   selectedImagesSelector,
@@ -10,7 +10,6 @@ import {
   applicationSlice,
   imageViewerSlice,
   setActiveImage,
-  setSelectedAnnotations,
 } from "../../store/slices";
 import { useDialog } from "../../hooks";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
@@ -99,19 +98,11 @@ export const ImageGridAppBar = () => {
       };
 
       if (idx === 0) {
-        batch(() => {
-          dispatch(
-            setActiveImage({
-              imageId: annotatorImage.id,
-            })
-          );
-          dispatch(
-            setSelectedAnnotations({
-              selectedAnnotations: [],
-              selectedAnnotation: undefined,
-            })
-          );
-        });
+        dispatch(
+          setActiveImage({
+            imageId: annotatorImage.id,
+          })
+        );
       }
 
       return annotatorImage;

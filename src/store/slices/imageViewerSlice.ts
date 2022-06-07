@@ -304,6 +304,10 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ imageId: string }>
     ) {
       state.activeImageId = action.payload.imageId;
+
+      // reset selected annotations
+      state.selectedAnnotations = [];
+      state.selectedAnnotation = undefined;
     },
     setActiveImagePlane(
       state: ImageViewer,

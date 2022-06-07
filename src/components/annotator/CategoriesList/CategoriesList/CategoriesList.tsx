@@ -45,12 +45,8 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import {
-  imageViewerSlice,
-  setActiveImage,
-  setActiveImagePlane,
-} from "../../../../store/slices";
-import { ShadowImageType } from "types/ImageType";
+import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import { ImageType, ShadowImageType } from "types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
@@ -120,6 +116,10 @@ export const CategoriesList = () => {
     null
   );
 
+  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
+    currentImage!
+  );
+
   const onReturnToMainProject = () => {
     onCloseExitAnnotatorDialog();
     navigate("/");
@@ -156,8 +156,8 @@ export const CategoriesList = () => {
     event: React.MouseEvent<HTMLButtonElement>,
     image: ShadowImageType
   ) => {
-    onImageItemClick(event, image);
     setImageAnchorEl(event.currentTarget);
+    setSelectedImage(image as ImageType);
   };
 
   const onImageMenuClose = () => {
@@ -201,18 +201,7 @@ export const CategoriesList = () => {
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
-    batch(() => {
-      dispatch(setActiveImage({ imageId: image.id }));
-
-      dispatch(setActiveImagePlane({ activeImagePlane: image.activePlane }));
-
-      dispatch(
-        imageViewerSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [],
-          selectedAnnotation: undefined,
-        })
-      );
-    });
+    dispatch(setActiveImage({ imageId: image.id }));
   };
 
   const t = useTranslation();
@@ -311,6 +300,7 @@ export const CategoriesList = () => {
         })}
         <ImageMenu
           anchorElImageMenu={imageAnchorEl}
+          selectedImage={selectedImage}
           onCloseImageMenu={onImageMenuClose}
           openImageMenu={Boolean(imageAnchorEl)}
         />

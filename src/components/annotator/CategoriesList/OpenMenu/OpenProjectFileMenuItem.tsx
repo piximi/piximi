@@ -8,7 +8,6 @@ import {
   imageViewerSlice,
   setActiveImage,
   setOperation,
-  setSelectedAnnotations,
 } from "../../../../store/slices";
 
 type OpenAnnotationsMenuItemProps = {
@@ -47,13 +46,6 @@ export const OpenProjectFileMenuItem = ({
               dispatch(
                 setActiveImage({
                   imageId: serializedImage.imageId,
-                })
-              );
-
-              dispatch(
-                setSelectedAnnotations({
-                  selectedAnnotations: [],
-                  selectedAnnotation: undefined,
                 })
               );
 

@@ -1,20 +1,13 @@
 import Dialog from "@mui/material/Dialog";
-import { batch, useDispatch } from "react-redux";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import malaria from "../../../../images/malaria.png";
 import cellPainting from "../../../../images/cell-painting.png";
 import * as malariaAnnotations from "../../../../images/malaria.json";
 import * as cellPaintingAnnotations from "../../../../images/cell-painting.json";
-import {
-  convertToImage,
-  generateDefaultChannels,
-} from "../../../../image/imageHelper";
-import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
 import { SerializedFileType } from "types/SerializedFileType";
-import * as ImageJS from "image-js";
-import { v4 as uuidv4 } from "uuid";
+import { DialogTitle, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -25,95 +18,72 @@ export const ExampleImageDialog = ({
   onClose,
   open,
 }: ExampleImageDialogProps) => {
-  const dispatch = useDispatch();
-
   const exampleImages = [
     {
-      exampleImageName: "malaria.png",
+      exampleImageName: "Malaria infected human blood smears",
       exampleImageData: malaria,
-      description:
-        "Blood cells infected by malaria and stained with Giemsa reagent. Image from the Broad Bioimage Benchmark Collection, image set BBBC041v1.",
+      exampleImageDescription:
+        "Blood cells infected by P. vivax (malaria) and stained with Giemsa reagent.",
       exampleImageAnnotations:
-        malariaAnnotations as unknown as SerializedFileType,
+        malariaAnnotations as unknown as Array<SerializedFileType>,
+      projectSource: {
+        sourceName: "BBBC041v1",
+        sourceUrl: "https://bbbc.broadinstitute.org/BBBC041",
+      },
+      license: {
+        licenseName: "CC-BY-NC-SA-3",
+        licenseUrl: "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+      },
     },
     {
-      exampleImageName: "cell-painting.png",
+      exampleImageName: "U2OS cell-painting experiment",
       exampleImageData: cellPainting,
-      description:
-        "U2OS cells treated with an RNAi reagent (https://iwww.broadinstitute.org/rnai/db/clone/details?cloneId=TRCN0000195467) and stained for a " +
-        "cell-painting experiment (Merged; red: Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
-        "blue: DNA stained via Hoechst; green: mitochondria stained via MitoTracker).",
+      exampleImageDescription:
+        "U2OS cells treated with an RNAi reagent (https://portals.broadinstitute.org/gpp/public/clone/details?cloneId=TRCN0000195467) and stained for a cell-painting experiment.\n" +
+        "Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
+        "Channel 1 (blue): DNA stained via Hoechst; Channel 1 (green): mitochondria stained via MitoTracker",
       exampleImageAnnotations:
-        cellPaintingAnnotations as unknown as SerializedFileType,
+        cellPaintingAnnotations as unknown as Array<SerializedFileType>,
+      projectSource: {
+        sourceName: "Boivin2021.06.22.449195",
+        sourceUrl:
+          "https://www.biorxiv.org/content/10.1101/2021.06.22.449195v1.full.pdf+html",
+      },
     },
   ];
 
-  const openExampleImage = async ({
-    exampleImageName,
-    exampleImageData,
-    exampleImageAnnotations,
-  }: {
-    exampleImageName: string;
-    exampleImageData: any;
-    exampleImageAnnotations: any;
-  }) => {
-    onClose();
-
-    const serializedExampleImageFile =
-      exampleImageAnnotations[0] as SerializedFileType;
-
-    const defaultColors = generateDefaultChannels(
-      serializedExampleImageFile.imageChannels
-    );
-
-    const exampleImageSrc = exampleImageData as string;
-    const exampleImage = await ImageJS.Image.load(exampleImageSrc, {
-      ignorePalette: true,
-    });
-    const exampleImageTypeObject = convertToImage(
-      [exampleImage],
-      exampleImageName,
-      defaultColors,
-      serializedExampleImageFile.imagePlanes,
-      serializedExampleImageFile.imageChannels
-    );
-
-    serializedExampleImageFile.imageId = uuidv4();
-    serializedExampleImageFile.imageSrc = exampleImageSrc;
-    serializedExampleImageFile.imageData = exampleImageTypeObject.originalSrc;
-
-    batch(() => {
-      dispatch(
-        imageViewerSlice.actions.openAnnotations({
-          file: serializedExampleImageFile,
-        })
-      );
-
-      dispatch(
-        setActiveImage({
-          imageId: serializedExampleImageFile.imageId,
-        })
-      );
-    });
-  };
-
   return (
     <Dialog open={open} onClose={onClose}>
+      <DialogTitle
+        sx={{
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          margin: 0,
+          padding: (theme) => theme.spacing(2),
+        }}
+      >
+        {"Open example Annotation project"}
+        <IconButton
+          aria-label="Close"
+          sx={(theme) => ({
+            color: theme.palette.grey[500],
+            position: "absolute",
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+          })}
+          onClick={onClose}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
       <List component="div" role="list">
-        {exampleImages.map((exampleImage, index) => {
+        {exampleImages.map((exampleImageProject, index) => {
           return (
-            <ListItem
-              button
-              divider
+            <OpenExampleImageMenuItem
               key={index}
-              role="listitem"
-              onClick={() => openExampleImage(exampleImage)}
-            >
-              <ListItemText
-                primary={exampleImage.exampleImageName}
-                secondary={exampleImage.description}
-              />
-            </ListItem>
+              exampleImageProject={exampleImageProject}
+              onClose={onClose}
+            />
           );
         })}
       </List>
