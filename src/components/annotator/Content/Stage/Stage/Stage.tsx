@@ -61,6 +61,7 @@ import {
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -85,6 +86,8 @@ export const Stage = () => {
 
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
+
+  const images = useSelector(annotatorImagesSelector);
 
   const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
@@ -557,6 +560,50 @@ export const Stage = () => {
       selectionMode,
       selectedAnnotationsIds,
     ]
+  );
+
+  useHotkeys(
+    "up",
+    () => {
+      if (!activeImageId) {
+        return;
+      }
+
+      const activeImageIdx = images.findIndex(
+        (image) => image.id === activeImageId
+      );
+      if (activeImageIdx < 1) {
+        return;
+      }
+
+      const newActiveImageId = images[activeImageIdx - 1].id;
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+      );
+    },
+    [images, activeImageId]
+  );
+
+  useHotkeys(
+    "down",
+    () => {
+      if (!activeImageId) {
+        return;
+      }
+
+      const activeImageIdx = images.findIndex(
+        (image) => image.id === activeImageId
+      );
+      if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
+        return;
+      }
+
+      const newActiveImageId = images[activeImageIdx + 1].id;
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+      );
+    },
+    [images, activeImageId]
   );
 
   useHotkeys(
