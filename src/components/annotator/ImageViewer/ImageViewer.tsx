@@ -35,7 +35,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
     }
   }, [dispatch, image]);
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onDrop = async (files: FileList) => {
     await uploadFiles(files);
     setFiles(files);

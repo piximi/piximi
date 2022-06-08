@@ -24,7 +24,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
 
   const [files, setFiles] = useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
   const onUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

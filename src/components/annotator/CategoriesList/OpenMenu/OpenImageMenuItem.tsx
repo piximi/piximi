@@ -18,7 +18,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
 
   const [files, setFiles] = React.useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
