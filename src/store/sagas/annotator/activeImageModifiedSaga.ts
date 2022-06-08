@@ -18,7 +18,14 @@ export function* activeImageIDChangeSaga({
 }): any {
   const image: ImageType | undefined = yield select(imageSelector);
 
-  if (!image) return;
+  if (!image) {
+    yield put(
+      imageViewerSlice.actions.setActiveImageRenderedSrcs({
+        renderedSrcs: [],
+      })
+    );
+    return;
+  }
 
   /*
    * Since converting each plane to image data, and mapping them to RGBs

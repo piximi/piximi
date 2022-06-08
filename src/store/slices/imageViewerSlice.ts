@@ -140,13 +140,6 @@ export const imageViewerSlice = createSlice({
       state.images = state.images.filter(
         (image: ShadowImageType) => image.id !== action.payload.id
       );
-      if (!state.images.length) state.activeImageId = undefined;
-      else if (
-        state.activeImageId === action.payload.id &&
-        state.images.length
-      ) {
-        state.activeImageId = state.images[0].id;
-      }
     },
     deleteAllInstances(state: ImageViewer) {
       //deletes all instances across all images
@@ -302,7 +295,7 @@ export const imageViewerSlice = createSlice({
     },
     setActiveImage(
       state: ImageViewer,
-      action: PayloadAction<{ imageId: string }>
+      action: PayloadAction<{ imageId: string | undefined }>
     ) {
       state.activeImageId = action.payload.imageId;
 
