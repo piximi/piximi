@@ -10,6 +10,22 @@ import { ImageViewer } from "../ImageViewer";
 export const AnnotatorView = () => {
   const dispatch = useDispatch();
 
+  const onUnload = (e: any) => {
+    if (process.env.NODE_ENV === "development") {
+      return;
+    } else {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to exit?");
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", onUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onUnload);
+    };
+  }, []);
+
   const handleError = useCallback(
     async (e: any) => {
       e.preventDefault();
