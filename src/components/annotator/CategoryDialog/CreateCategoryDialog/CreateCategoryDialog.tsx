@@ -7,24 +7,7 @@ import { replaceDuplicateName } from "../../../../image/imageHelper";
 import { imageViewerSlice } from "../../../../store/slices";
 import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
 import { CategoryDialog } from "../CategoryDialog";
-
-export const COLORS = [
-  "#000000",
-  "#004949",
-  "#009292",
-  "#ff6db6",
-  "#ffb6db",
-  "#490092",
-  "#006ddb",
-  "#b66dff",
-  "#6db6ff",
-  "#b6dbff",
-  "#920000",
-  "#924900",
-  "#db6d00",
-  "#24ff24",
-  "#ffff6d",
-];
+import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;
@@ -39,7 +22,8 @@ export const CreateCategoryDialog = ({
 
   const categories = useSelector(annotatorCategoriesSelector);
 
-  const [color, setColor] = React.useState<string>(sample(COLORS)!);
+  const availableColors = useSelector(availableAnnotationColorsSelector);
+  const [color, setColor] = React.useState<string>(sample(availableColors)!);
 
   const [name, setName] = useState<string>("");
 
@@ -73,7 +57,7 @@ export const CreateCategoryDialog = ({
 
     onClose();
 
-    setColor(sample(COLORS)!);
+    setColor(sample(availableColors)!);
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {

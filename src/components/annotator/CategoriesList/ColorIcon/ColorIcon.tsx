@@ -3,24 +3,8 @@ import * as React from "react";
 import { Avatar, IconButton, Box } from "@mui/material";
 import Popover from "@mui/material/Popover";
 import { CirclePicker, ColorResult } from "react-color";
-
-export const COLORS = [
-  "#000000",
-  "#004949",
-  "#009292",
-  "#ff6db6",
-  "#ffb6db",
-  "#490092",
-  "#006ddb",
-  "#b66dff",
-  "#6db6ff",
-  "#b6dbff",
-  "#920000",
-  "#924900",
-  "#db6d00",
-  "#24ff24",
-  "#ffff6d",
-];
+import { useSelector } from "react-redux";
+import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
 
 type ColorIconButtonProps = {
   color: string;
@@ -32,6 +16,8 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
     React.useState<null | HTMLButtonElement>(null);
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
+
+  const availableColors = useSelector(availableAnnotationColorsSelector);
 
   const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
     setColorMenuAnchorEl(event.currentTarget);
@@ -68,7 +54,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
         }}
       >
         <Box sx={{ margin: "16px" }}>
-          <CirclePicker colors={COLORS} onChange={onChange} />
+          <CirclePicker colors={availableColors} onChange={onChange} />
         </Box>
       </Popover>
     </>
