@@ -57,6 +57,12 @@ export class PenAnnotationTool extends AnnotationTool {
 
     const rgbMask = ImageJS.Image.fromCanvas(canvas);
 
+    const width = this._boundingBox[2] - this._boundingBox[0];
+    const height = this._boundingBox[3] - this._boundingBox[1];
+    if (width <= 0 || height <= 0) {
+      return;
+    }
+
     const croppedRgbMask = rgbMask.crop({
       x: this._boundingBox[0],
       y: this._boundingBox[1],
