@@ -1,8 +1,8 @@
 import { ImageViewer } from "../../types/ImageViewer";
-export const quickSelectionBrushSizeSelector = ({
+export const quickSelectionRegionSizeSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
 }) => {
-  return imageViewer.quickSelectionBrushSize;
+  return imageViewer.quickSelectionRegionSize;
 };

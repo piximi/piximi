@@ -31,28 +31,41 @@ export const ExitAnnotatorDialog = ({
       (image: ShadowImageType) => image.id
     );
 
-    const modifiedImagesIds = _.intersection(
-      selectedImagesIds,
-      annotatorImagesIds
-    );
-    const deletedImagesIds = _.difference(selectedImagesIds, modifiedImagesIds);
-    const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
-
-    const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
-      return modifiedImagesIds.includes(image.id);
-    });
-
-    const newImages = annotatorImages.filter((image: ShadowImageType) => {
-      return newImagesIds.includes(image.id);
-    }) as Array<ImageType>;
-
-    batch(() => {
-      dispatch(projectSlice.actions.addImages({ images: newImages }));
-      dispatch(projectSlice.actions.deleteImages({ ids: deletedImagesIds }));
+    if (selectedImagesIds.length === 0) {
       dispatch(
-        projectSlice.actions.reconcileImages({ images: modifiedImages })
+        projectSlice.actions.setImages({
+          images: annotatorImages as Array<ImageType>,
+        })
       );
-    });
+    } else {
+      const modifiedImagesIds = _.intersection(
+        selectedImagesIds,
+        annotatorImagesIds
+      );
+      const deletedImagesIds = _.difference(
+        selectedImagesIds,
+        modifiedImagesIds
+      );
+      const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
+
+      const modifiedImages = annotatorImages.filter(
+        (image: ShadowImageType) => {
+          return modifiedImagesIds.includes(image.id);
+        }
+      );
+
+      const newImages = annotatorImages.filter((image: ShadowImageType) => {
+        return newImagesIds.includes(image.id);
+      }) as Array<ImageType>;
+
+      batch(() => {
+        dispatch(projectSlice.actions.addImages({ images: newImages }));
+        dispatch(projectSlice.actions.deleteImages({ ids: deletedImagesIds }));
+        dispatch(
+          projectSlice.actions.reconcileImages({ images: modifiedImages })
+        );
+      });
+    }
 
     onReturnToProject();
   };

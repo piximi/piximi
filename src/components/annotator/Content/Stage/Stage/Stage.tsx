@@ -1,14 +1,7 @@
 import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ToolType } from "../../../../../types/ToolType";
 import {
   imageInstancesSelector,
@@ -33,11 +26,9 @@ import { Selecting } from "../Selecting";
 import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 import {
-  ColorAnnotationTool,
   ObjectAnnotationTool,
   Tool,
 } from "../../../../../annotator/image/Tool";
-import { ColorAnnotationToolTip } from "../ColorAnnotationToolTip";
 import useSound from "use-sound";
 import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
@@ -57,7 +48,7 @@ import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolT
 import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
 import { Annotations } from "../Annotations/Annotations";
 import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
-import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/quickSelectionBrushSizeSelector";
+import { quickSelectionRegionSizeSelector } from "../../../../../store/selectors/quickSelectionRegionSizeSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
 import { usePointer } from "../../../../../hooks/usePointer/usePointer";
@@ -70,6 +61,7 @@ import {
 } from "../../../../../store/slices";
 import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -81,7 +73,7 @@ export const Stage = () => {
 
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
+  const quickSelectionBrushSize = useSelector(quickSelectionRegionSizeSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
@@ -94,6 +86,8 @@ export const Stage = () => {
 
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
+
+  const images = useSelector(annotatorImagesSelector);
 
   const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
@@ -125,9 +119,6 @@ export const Stage = () => {
   } = usePointer();
 
   const [annotationTool] = useAnnotationTool();
-
-  // do not delete! important to force the component to re-render
-  const [, update] = useReducer((x) => x + 1, 0);
 
   const annotations = useSelector(imageInstancesSelector);
 
@@ -387,8 +378,6 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseDown(rawImagePosition);
-
-        update();
       }
     };
     const throttled = _.throttle(func, 5);
@@ -461,8 +450,6 @@ export const Stage = () => {
         if (!annotationTool) return;
 
         annotationTool.onMouseMove(rawImagePosition);
-
-        update();
       }
     };
     const throttled = _.throttle(func, 5);
@@ -576,6 +563,50 @@ export const Stage = () => {
   );
 
   useHotkeys(
+    "up",
+    () => {
+      if (!activeImageId) {
+        return;
+      }
+
+      const activeImageIdx = images.findIndex(
+        (image) => image.id === activeImageId
+      );
+      if (activeImageIdx < 1) {
+        return;
+      }
+
+      const newActiveImageId = images[activeImageIdx - 1].id;
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+      );
+    },
+    [images, activeImageId]
+  );
+
+  useHotkeys(
+    "down",
+    () => {
+      if (!activeImageId) {
+        return;
+      }
+
+      const activeImageIdx = images.findIndex(
+        (image) => image.id === activeImageId
+      );
+      if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
+        return;
+      }
+
+      const newActiveImageId = images[activeImageIdx + 1].id;
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+      );
+    },
+    [images, activeImageId]
+  );
+
+  useHotkeys(
     "enter",
     () => {
       if (
@@ -636,7 +667,6 @@ export const Stage = () => {
     if (annotations.length) return;
 
     deselectAllTransformers();
-    deselectAllAnnotations();
   }, [annotations, deselectAllAnnotations]);
 
   const [tool, setTool] = useState<Tool>();
@@ -696,16 +726,6 @@ export const Stage = () => {
             <Transformers
               transformPosition={getRelativePointerPosition}
               annotationTool={annotationTool}
-            />
-
-            <ColorAnnotationToolTip
-              toolTipPosition={
-                (annotationTool as ColorAnnotationTool)?.toolTipPosition
-              }
-              initialPosition={
-                (annotationTool as ColorAnnotationTool)?.initialPosition
-              }
-              tolerance={(annotationTool as ColorAnnotationTool)?.tolerance}
             />
           </Layer>
         </DndProvider>

@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 export const useMarchingAnts = () => {
   const [dashOffset, setDashOffset] = useState<number>(0);
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setDashOffset(dashOffset + 1);
+  useLayoutEffect(() => {
+    let timerId: number;
+    const f = () => {
+      timerId = requestAnimationFrame(f);
+      setDashOffset((prev) => (prev + 10) % 32);
+    };
 
-      if (dashOffset > 32) {
-        setDashOffset(0);
-      }
-    }, 200);
-    return () => clearTimeout(timer);
+    timerId = requestAnimationFrame(f);
+
+    return () => cancelAnimationFrame(timerId);
   });
 
   return dashOffset;

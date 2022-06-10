@@ -1,16 +1,17 @@
-import { getImageShapeInformation, ImageShapeEnum } from "image/imageHelper";
+import { getImageInformation, ImageShapeEnum } from "image/imageHelper";
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { applicationSlice } from "store/slices";
 
 export const useUpload = (
-  setOpenDimensionsDialogBox: (flag: boolean) => void
+  setOpenDimensionsDialogBox: (flag: boolean) => void,
+  isUploadedFromAnnotator: boolean
 ) => {
   const dispatch = useDispatch();
 
   return useCallback(
     async (files: FileList) => {
-      const imageShapeInfo = await getImageShapeInformation(files[0]);
+      const imageShapeInfo = await getImageInformation(files[0]);
 
       if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
         dispatch(
@@ -19,7 +20,17 @@ export const useUpload = (
             channels: 3,
             slices: 1,
             imageShapeInfo: imageShapeInfo,
-            isUploadedFromAnnotator: false,
+            isUploadedFromAnnotator: isUploadedFromAnnotator,
+          })
+        );
+      } else if (imageShapeInfo === ImageShapeEnum.DicomImage) {
+        dispatch(
+          applicationSlice.actions.uploadImages({
+            files: files,
+            channels: 1,
+            slices: 1,
+            imageShapeInfo: imageShapeInfo,
+            isUploadedFromAnnotator: isUploadedFromAnnotator,
           })
         );
       } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {
@@ -34,6 +45,6 @@ export const useUpload = (
           console.warn("Unrecognized ImageShapeEnum value");
       }
     },
-    [dispatch, setOpenDimensionsDialogBox]
+    [dispatch, isUploadedFromAnnotator, setOpenDimensionsDialogBox]
   );
 };

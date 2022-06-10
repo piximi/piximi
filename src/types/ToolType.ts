@@ -12,4 +12,5 @@ export enum ToolType {
   QuickAnnotation,
   RectangularAnnotation,
   Zoom,
+  ThresholdAnnotation,
 }

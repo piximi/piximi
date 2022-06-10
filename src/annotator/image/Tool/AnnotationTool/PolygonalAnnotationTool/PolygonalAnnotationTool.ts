@@ -76,12 +76,17 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       this.points = this.buffer;
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
+      const width = this._boundingBox[2] - this._boundingBox[0];
+      const height = this._boundingBox[3] - this._boundingBox[1];
+      if (width === 0 || height === 0) {
+        return;
+      }
 
       const maskImage = this.computeMask().crop({
         x: this._boundingBox[0],
         y: this._boundingBox[1],
-        width: this._boundingBox[2] - this._boundingBox[0],
-        height: this._boundingBox[3] - this._boundingBox[1],
+        width: width,
+        height: height,
       });
 
       this._mask = encode(maskImage.data);

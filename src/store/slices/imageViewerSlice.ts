@@ -60,14 +60,15 @@ const initialState: ImageViewer = {
   images: [defaultImage],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
-  penSelectionBrushSize: 32,
+  penSelectionBrushSize: 10,
   pointerSelection: {
     dragging: false,
     minimum: undefined,
     maximum: undefined,
     selecting: false,
   },
-  quickSelectionBrushSize: 40,
+  quickSelectionRegionSize: 40,
+  thresholdAnnotationValue: 150,
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
@@ -139,13 +140,6 @@ export const imageViewerSlice = createSlice({
       state.images = state.images.filter(
         (image: ShadowImageType) => image.id !== action.payload.id
       );
-      if (!state.images.length) state.activeImageId = undefined;
-      else if (
-        state.activeImageId === action.payload.id &&
-        state.images.length
-      ) {
-        state.activeImageId = state.images[0].id;
-      }
     },
     deleteAllInstances(state: ImageViewer) {
       //deletes all instances across all images
@@ -301,7 +295,7 @@ export const imageViewerSlice = createSlice({
     },
     setActiveImage(
       state: ImageViewer,
-      action: PayloadAction<{ imageId: string }>
+      action: PayloadAction<{ imageId: string | undefined }>
     ) {
       state.activeImageId = action.payload.imageId;
 
@@ -424,7 +418,13 @@ export const imageViewerSlice = createSlice({
       state: ImageViewer,
       action: PayloadAction<{ quickSelectionBrushSize: number }>
     ) {
-      state.quickSelectionBrushSize = action.payload.quickSelectionBrushSize;
+      state.quickSelectionRegionSize = action.payload.quickSelectionBrushSize;
+    },
+    setThresholdAnnotationValue(
+      state: ImageViewer,
+      action: PayloadAction<{ thresholdAnnotationValue: number }>
+    ) {
+      state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
     },
     setSaturation(
       state: ImageViewer,

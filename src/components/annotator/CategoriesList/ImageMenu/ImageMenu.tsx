@@ -3,7 +3,7 @@ import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { imageViewerSlice } from "../../../../store/slices";
 import { useTranslation } from "../../../../hooks/useTranslation";
 import {
@@ -16,6 +16,8 @@ import JSZip from "jszip";
 import { annotationCategorySelector } from "../../../../store/selectors";
 import { Divider } from "@mui/material";
 import { ImageType } from "types/ImageType";
+import { activeImageSelector } from "store/selectors/activeImageSelector";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -33,6 +35,9 @@ export const ImageMenu = ({
   const dispatch = useDispatch();
   const categories = useSelector(annotationCategorySelector);
 
+  const images = useSelector(annotatorImagesSelector);
+  const activeImage = useSelector(activeImageSelector);
+
   const onClearAnnotationsClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
@@ -47,7 +52,27 @@ export const ImageMenu = ({
 
   const onDeleteImage = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (!selectedImage) return;
-    dispatch(imageViewerSlice.actions.deleteImage({ id: selectedImage.id }));
+
+    batch(() => {
+      if (activeImage && selectedImage.id === activeImage.id) {
+        let newActiveImageId = undefined;
+        const activeImageIdx = images.findIndex(
+          (image) => image.id === activeImage.id
+        );
+
+        if (images.length > 1) {
+          newActiveImageId =
+            activeImageIdx === 0 ? images[1].id : images[activeImageIdx - 1].id;
+        }
+
+        dispatch(
+          imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+        );
+      }
+
+      dispatch(imageViewerSlice.actions.deleteImage({ id: selectedImage.id }));
+    });
+
     onCloseImageMenu(event);
   };
 

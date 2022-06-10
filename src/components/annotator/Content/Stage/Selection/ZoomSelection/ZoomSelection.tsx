@@ -1,12 +1,9 @@
 import * as ReactKonva from "react-konva";
 import React from "react";
-import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
 import { zoomSelectionSelector } from "../../../../../../store/selectors";
 
 export const ZoomSelection = () => {
-  const dashOffset = useMarchingAnts();
-
   const { dragging, minimum, maximum, selecting } = useSelector(
     zoomSelectionSelector
   );
@@ -18,7 +15,6 @@ export const ZoomSelection = () => {
       <ReactKonva.Group>
         <ReactKonva.Rect
           dash={[4, 2]}
-          dashOffset={-dashOffset}
           height={maximum.y - minimum.y}
           stroke="black"
           strokeWidth={1}
@@ -28,7 +24,7 @@ export const ZoomSelection = () => {
         />
         <ReactKonva.Rect
           dash={[4, 2]}
-          dashOffset={-dashOffset}
+          //dashOffset={-dashOffset}
           height={maximum.y - minimum.y}
           stroke="white"
           strokeWidth={1}

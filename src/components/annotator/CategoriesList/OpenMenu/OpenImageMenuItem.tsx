@@ -16,14 +16,16 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
     popupState.close();
   };
 
-  const [files, setFiles] = useState<FileList>();
+  const [files, setFiles] = React.useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
+
     await uploadFiles(files);
     event.target.value = "";
+    handleClose();
     setFiles(files);
   };
 
@@ -32,7 +34,7 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
       <MenuItem component="label">
         <ListItemText primary="Open new image" />
         <input
-          accept="image/*"
+          accept="image/*,.dcm"
           hidden
           multiple
           id="open-image"

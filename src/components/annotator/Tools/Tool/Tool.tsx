@@ -67,6 +67,11 @@ export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
         <ToolBarToolTitle toolName={"Quick annotation"} letter={"Q"} />
       );
       break;
+    case "Threshold annotation":
+      description = (
+        <ToolBarToolTitle toolName={"Threshold annotation"} letter={"T"} />
+      );
+      break;
     case "Object annotation":
       description =
         "Select a rectangular annotation around a desired object to automatically generate its boundaries.";

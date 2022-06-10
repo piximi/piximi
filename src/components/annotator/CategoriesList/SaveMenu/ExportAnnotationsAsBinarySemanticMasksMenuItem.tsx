@@ -3,10 +3,10 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { useSelector } from "react-redux";
 import {
-  categoriesSelector,
+  annotationCategorySelector,
   imageInstancesSelector,
 } from "../../../../store/selectors";
-import { imagesSelector } from "../../../../store/selectors/imagesSelector";
+import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
 import JSZip from "jszip";
 import { saveAnnotationsAsLabelMatrix } from "../../../../image/imageHelper";
 import { saveAs } from "file-saver";
@@ -21,8 +21,8 @@ export const ExportAnnotationsAsBinarySemanticMasksMenuItem = ({
   handleCloseMenu,
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(imageInstancesSelector);
-  const images = useSelector(imagesSelector);
-  const categories = useSelector(categoriesSelector);
+  const images = useSelector(annotatorImagesSelector);
+  const categories = useSelector(annotationCategorySelector);
 
   const onExport = () => {
     popupState.close();

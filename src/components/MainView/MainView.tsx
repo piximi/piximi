@@ -87,7 +87,7 @@ export const MainView = () => {
     };
   }, []);
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
   const onDrop = async (files: FileList) => {
     await uploadFiles(files);
     setFiles(files);

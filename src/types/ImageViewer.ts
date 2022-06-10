@@ -31,7 +31,8 @@ export type ImageViewer = {
     minimum: { x: number; y: number } | undefined;
     maximum: { x: number; y: number } | undefined;
   };
-  quickSelectionBrushSize: number;
+  quickSelectionRegionSize: number;
+  thresholdAnnotationValue: number;
   saturation: number;
   selectedAnnotations: Array<AnnotationType>;
   selectedAnnotation: AnnotationType | undefined;

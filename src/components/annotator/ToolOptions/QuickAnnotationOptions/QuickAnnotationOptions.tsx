@@ -1,5 +1,5 @@
 import Divider from "@mui/material/Divider";
-import React, { useState } from "react";
+import { useState } from "react";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
@@ -8,16 +8,18 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
-import { quickSelectionBrushSizeSelector } from "../../../../store/selectors/quickSelectionBrushSizeSelector";
+import { quickSelectionRegionSizeSelector } from "../../../../store/selectors/quickSelectionRegionSizeSelector";
 import { imageViewerSlice } from "../../../../store/slices";
 import { useDispatch, useSelector } from "react-redux";
 
 export const QuickAnnotationOptions = () => {
   const t = useTranslation();
 
-  const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
+  const quickSelectionRegionSize = useSelector(
+    quickSelectionRegionSizeSelector
+  );
 
-  const [brushSize, setBrushSize] = useState<number>(quickSelectionBrushSize);
+  const [brushSize, setBrushSize] = useState<number>(quickSelectionRegionSize);
 
   const dispatch = useDispatch();
 
@@ -43,10 +45,10 @@ export const QuickAnnotationOptions = () => {
       <List>
         <ListItem dense>
           <ListItemText
-            primary={"Brush size"}
+            primary={"Region size"}
             secondary={
               <Slider
-                aria-labelledby="quick-selection-brush-size"
+                aria-labelledby="quick-selection-region-size"
                 min={2}
                 onChange={onChange}
                 onChangeCommitted={onChangeCommitted}

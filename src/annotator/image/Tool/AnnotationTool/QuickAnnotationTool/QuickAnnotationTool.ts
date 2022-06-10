@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class QuickAnnotationTool extends AnnotationTool {
-  brushsize?: number;
+  regionSize?: number;
   colorMasks?: Array<string>;
   currentSuperpixels: Set<number> = new Set<number>();
   lastSuperpixel: number = 0;
@@ -28,7 +28,7 @@ export class QuickAnnotationTool extends AnnotationTool {
       data,
       this.image.width,
       this.image.height,
-      this.brushsize
+      this.regionSize
     );
 
     return { superpixels };
@@ -125,16 +125,16 @@ export class QuickAnnotationTool extends AnnotationTool {
     this.setAnnotated();
   }
 
-  static setup(image: ImageJS.Image, brushsize: number) {
+  static setup(image: ImageJS.Image, regionSize: number) {
     const instance = new QuickAnnotationTool(image);
 
-    instance.update(brushsize);
+    instance.update(regionSize);
 
     return instance;
   }
 
-  update(brushsize: number) {
-    this.brushsize = Math.round(brushsize);
+  update(regionSize: number) {
+    this.regionSize = Math.round(regionSize);
 
     const { superpixels } = this.filter();
 
