@@ -667,7 +667,6 @@ export const Stage = () => {
     if (annotations.length) return;
 
     deselectAllTransformers();
-    deselectAllAnnotations();
   }, [annotations, deselectAllAnnotations]);
 
   const [tool, setTool] = useState<Tool>();
