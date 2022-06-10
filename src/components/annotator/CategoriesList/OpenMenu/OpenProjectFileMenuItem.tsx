@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 import React from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
@@ -9,6 +9,7 @@ import {
   setActiveImage,
   setOperation,
 } from "../../../../store/slices";
+import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 
 type OpenAnnotationsMenuItemProps = {
   popupState: any;
@@ -35,31 +36,34 @@ export const OpenProjectFileMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
-        const project = JSON.parse(event.target.result as string);
+        const serializedImages = JSON.parse(event.target.result as string);
 
-        //clear all images
-        dispatch(imageViewerSlice.actions.setImages({ images: [] }));
+        batch(() => {
+          dispatch(imageViewerSlice.actions.setImages({ images: [] }));
+          dispatch(
+            imageViewerSlice.actions.setCategories({
+              categories: [UNKNOWN_ANNOTATION_CATEGORY],
+            })
+          );
 
-        project.forEach(
-          (serializedImage: SerializedFileType, index: number) => {
-            if (index === 0) {
+          serializedImages.forEach(
+            (serializedImage: SerializedFileType, index: number) => {
               dispatch(
-                setActiveImage({
-                  imageId: serializedImage.imageId,
+                imageViewerSlice.actions.openAnnotations({
+                  file: serializedImage,
                 })
               );
-
-              dispatch(
-                setOperation({ operation: ToolType.RectangularAnnotation })
-              );
             }
-            dispatch(
-              imageViewerSlice.actions.openAnnotations({
-                file: serializedImage,
-              })
-            );
-          }
-        );
+          );
+
+          dispatch(
+            setActiveImage({
+              imageId: serializedImages[0].imageId,
+            })
+          );
+
+          dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+        });
       }
     };
 
