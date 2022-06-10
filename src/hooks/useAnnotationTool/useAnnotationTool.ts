@@ -16,7 +16,7 @@ import {
 import { useSelector } from "react-redux";
 import { stageScaleSelector, toolTypeSelector } from "../../store/selectors";
 import { penSelectionBrushSizeSelector } from "../../store/selectors/penSelectionBrushSizeSelector";
-import { quickSelectionBrushSizeSelector } from "../../store/selectors/quickSelectionBrushSizeSelector";
+import { quickSelectionRegionSizeSelector } from "../../store/selectors/quickSelectionRegionSizeSelector";
 import { imageSrcSelector } from "../../store/selectors/imageSrcSelector";
 import { ThresholdAnnotationTool } from "annotator/image/Tool/AnnotationTool/ThresholdAnnotationTool";
 import { thresholdAnnotationValueSelector } from "store/selectors/thresholdAnnotationValueSelector";
@@ -32,7 +32,7 @@ export const useAnnotationTool = () => {
 
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
 
-  const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
+  const quickSelectionBrushSize = useSelector(quickSelectionRegionSizeSelector);
 
   const threshold = useSelector(thresholdAnnotationValueSelector);
 

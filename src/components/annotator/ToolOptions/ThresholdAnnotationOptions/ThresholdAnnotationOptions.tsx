@@ -1,5 +1,5 @@
 import Divider from "@mui/material/Divider";
-import React, { useState } from "react";
+import { useState } from "react";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
@@ -32,6 +32,12 @@ export const ThresholdAnnotationOptions = () => {
         name={t("Threshold annotation")}
       />
 
+      <Divider />
+
+      <AnnotationMode />
+
+      <Divider />
+
       <List>
         <ListItem dense>
           <ListItemText
@@ -49,10 +55,6 @@ export const ThresholdAnnotationOptions = () => {
           />
         </ListItem>
       </List>
-
-      <Divider />
-
-      <AnnotationMode />
 
       <Divider />
 

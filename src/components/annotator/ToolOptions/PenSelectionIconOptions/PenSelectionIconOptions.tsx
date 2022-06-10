@@ -1,5 +1,4 @@
 import Divider from "@mui/material/Divider";
-import React from "react";
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
@@ -12,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { penSelectionBrushSizeSelector } from "../../../../store/selectors/penSelectionBrushSizeSelector";
 import { imageViewerSlice } from "../../../../store/slices";
 
-export const FreehandAnnotationOptions = () => {
+export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();
 
   const penSelectionBrushSizeBrushSize = useSelector(
@@ -43,8 +42,10 @@ export const FreehandAnnotationOptions = () => {
             primary={"Brush size"}
             secondary={
               <Slider
+                valueLabelDisplay="auto"
                 aria-labelledby="pen-selection-brush-size"
-                min={2}
+                min={1}
+                max={25}
                 onChange={onChange}
                 value={penSelectionBrushSizeBrushSize}
               />

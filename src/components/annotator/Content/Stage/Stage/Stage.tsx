@@ -48,7 +48,7 @@ import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolT
 import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
 import { Annotations } from "../Annotations/Annotations";
 import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
-import { quickSelectionBrushSizeSelector } from "../../../../../store/selectors/quickSelectionBrushSizeSelector";
+import { quickSelectionRegionSizeSelector } from "../../../../../store/selectors/quickSelectionRegionSizeSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
 import { usePointer } from "../../../../../hooks/usePointer/usePointer";
@@ -73,7 +73,7 @@ export const Stage = () => {
 
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const quickSelectionBrushSize = useSelector(quickSelectionBrushSizeSelector);
+  const quickSelectionBrushSize = useSelector(quickSelectionRegionSizeSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);

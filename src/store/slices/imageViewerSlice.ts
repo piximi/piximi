@@ -60,14 +60,14 @@ const initialState: ImageViewer = {
   images: [defaultImage],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
-  penSelectionBrushSize: 32,
+  penSelectionBrushSize: 10,
   pointerSelection: {
     dragging: false,
     minimum: undefined,
     maximum: undefined,
     selecting: false,
   },
-  quickSelectionBrushSize: 40,
+  quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   saturation: 0,
   selectedAnnotation: undefined,
@@ -418,7 +418,7 @@ export const imageViewerSlice = createSlice({
       state: ImageViewer,
       action: PayloadAction<{ quickSelectionBrushSize: number }>
     ) {
-      state.quickSelectionBrushSize = action.payload.quickSelectionBrushSize;
+      state.quickSelectionRegionSize = action.payload.quickSelectionBrushSize;
     },
     setThresholdAnnotationValue(
       state: ImageViewer,
