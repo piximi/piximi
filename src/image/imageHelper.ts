@@ -389,7 +389,7 @@ export const convertToImage = (
 
         input[frameIdx].data = new Uint8Array(
           input[frameIdx].data.map((p) =>
-            Math.round(((p - min) / (max - min + 1)) * 256)
+            Math.floor(((p - min) / (max - min + 1)) * 256)
           )
         );
         input[frameIdx].bitDepth = BitDepth.UINT8;
