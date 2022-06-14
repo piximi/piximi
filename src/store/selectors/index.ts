@@ -22,6 +22,7 @@ export { stageScaleSelector } from "./stageScaleSelector";
 export { stageWidthSelector } from "./stageWidthSelector";
 export { toolTypeSelector } from "./toolTypeSelector";
 export { unknownCategorySelector } from "./unknownCategorySelector";
+export { unknownAnnotationCategorySelector } from "./unknownAnnotationCategorySelector";
 export { vibranceSelector } from "./vibranceSelector";
 export { zoomToolOptionsSelector } from "./zoomToolOptionsSelector";
 export { zoomSelectionSelector } from "./zoomSelectionSelector";

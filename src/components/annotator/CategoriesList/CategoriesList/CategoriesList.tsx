@@ -3,16 +3,13 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Category,
-  UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_CATEGORY_ID,
-} from "../../../../types/Category";
+import { Category } from "types/Category";
 import {
   categoryCountsSelector,
   imageSelector,
   selectedCategorySelector,
-} from "../../../../store/selectors";
+  unknownAnnotationCategorySelector,
+} from "store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { CollapsibleList } from "../CollapsibleList";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
@@ -22,8 +19,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryMenu } from "../CategoryMenu";
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
-import { useDialog } from "../../../../hooks";
-import { useTranslation } from "../../../../hooks/useTranslation";
+import { useDialog } from "hooks";
+import { useTranslation } from "hooks/useTranslation";
 import { Chip, Divider, Tooltip } from "@mui/material";
 import List from "@mui/material/List";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -36,7 +33,7 @@ import AppBar from "@mui/material/AppBar";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
-import { selectedAnnotationsIdsSelector } from "../../../../store/selectors/selectedAnnotationsIdsSelector";
+import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { ImageMenu } from "../ImageMenu";
@@ -45,11 +42,11 @@ import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import { imageViewerSlice, setActiveImage } from "../../../../store/slices";
+import { imageViewerSlice, setActiveImage } from "store/slices";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
-import { createdAnnotatorCategoriesSelector } from "../../../../store/selectors/createdAnnotatorCategoriesSelector";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
@@ -59,8 +56,11 @@ import { LogoIcon } from "components/Logo";
 
 export const CategoriesList = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
+  const unknownAnnotationCategory = useSelector(
+    unknownAnnotationCategorySelector
+  );
+
   const selectedCategory = useSelector(selectedCategorySelector);
-  const unknownCategory = UNKNOWN_ANNOTATION_CATEGORY;
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
 
@@ -185,7 +185,7 @@ export const CategoriesList = () => {
       );
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: UNKNOWN_CATEGORY_ID,
+          selectedCategoryId: unknownAnnotationCategory.id,
         })
       );
       dispatch(
@@ -309,29 +309,34 @@ export const CategoriesList = () => {
       <Divider />
 
       <CollapsibleList closed dense primary={t("Categories")}>
-        {unknownCategory && (
-          <div key={unknownCategory.id}>
+        {unknownAnnotationCategory && (
+          <div key={unknownAnnotationCategory.id}>
             <ListItem
               button
-              id={unknownCategory.id}
-              onClick={(event) => onCategoryClick(event, unknownCategory)}
-              selected={unknownCategory.id === selectedCategory.id}
+              id={unknownAnnotationCategory.id}
+              onClick={(event) =>
+                onCategoryClick(event, unknownAnnotationCategory)
+              }
+              selected={unknownAnnotationCategory.id === selectedCategory.id}
             >
-              <CategoryListItemCheckbox category={unknownCategory} />
+              <CategoryListItemCheckbox category={unknownAnnotationCategory} />
 
               <ListItemText
-                id={unknownCategory.id}
-                primary={t(unknownCategory.name)}
+                id={unknownAnnotationCategory.id}
+                primary={t(unknownAnnotationCategory.name)}
                 primaryTypographyProps={{ noWrap: true }}
               />
-              {categoryCounts[unknownCategory.id] !== 0 && (
-                <Chip label={categoryCounts[unknownCategory.id]} size="small" />
+              {categoryCounts[unknownAnnotationCategory.id] !== 0 && (
+                <Chip
+                  label={categoryCounts[unknownAnnotationCategory.id]}
+                  size="small"
+                />
               )}
               <ListItemSecondaryAction>
                 <IconButton
                   edge="end"
                   onClick={(event) =>
-                    onCategoryMenuOpen(event, unknownCategory)
+                    onCategoryMenuOpen(event, unknownAnnotationCategory)
                   }
                 >
                   <MoreHorizIcon />
@@ -343,7 +348,7 @@ export const CategoriesList = () => {
               anchorElCategoryMenu={anchorEl}
               onCloseCategoryMenu={onCategoryMenuClose}
               onOpenCategoryMenu={(event) =>
-                onCategoryMenuOpen(event, unknownCategory)
+                onCategoryMenuOpen(event, unknownAnnotationCategory)
               }
               onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
               onOpenEditCategoryDialog={onOpenEditCategoryDialog}

@@ -1,10 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ShadowImageType } from "types/ImageType";
-import {
-  Category,
-  UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_CATEGORY_ID,
-} from "../../types/Category";
+import { Category, UNKNOWN_ANNOTATION_CATEGORY } from "../../types/Category";
 import { ToolType } from "../../types/ToolType";
 import { AnnotationType } from "../../types/AnnotationType";
 import { AnnotationModeType } from "../../types/AnnotationModeType";
@@ -72,7 +68,7 @@ const initialState: ImageViewer = {
   saturation: 0,
   selectedAnnotation: undefined,
   selectedAnnotations: [],
-  selectedCategoryId: UNKNOWN_CATEGORY_ID,
+  selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
   selectionMode: AnnotationModeType.New,
   soundEnabled: true,
   stageHeight: 1000,
@@ -206,7 +202,7 @@ export const imageViewerSlice = createSlice({
           ? action.payload.file.imageColors
           : generateDefaultChannels(action.payload.file.imageChannels),
         src: action.payload.file.imageSrc,
-        categoryId: UNKNOWN_CATEGORY_ID,
+        categoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
         originalSrc: action.payload.file.imageData,
         partition: Partition.Inference,
         visible: true,

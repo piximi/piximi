@@ -5,15 +5,14 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { AnnotationType } from "../../../../types/AnnotationType";
-import { imageViewerSlice } from "../../../../store/slices";
+import { AnnotationType } from "types/AnnotationType";
+import { imageViewerSlice } from "store/slices";
 import {
   selectedCategorySelector,
-  unknownCategorySelector,
-} from "../../../../store/selectors";
-import { UNKNOWN_CATEGORY_ID } from "../../../../types/Category";
+  unknownAnnotationCategorySelector,
+} from "store/selectors";
 import { ShadowImageType } from "types/ImageType";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type DeleteCategoryDialogProps = {
   onClose: () => void;
@@ -26,19 +25,21 @@ export const DeleteCategoryDialog = ({
 }: DeleteCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const category = useSelector(selectedCategorySelector);
+  const selectedCategory = useSelector(selectedCategorySelector);
 
-  const unknownCategory = useSelector(unknownCategorySelector);
+  const unknownAnnotationCategory = useSelector(
+    unknownAnnotationCategorySelector
+  );
 
   const images = useSelector(annotatorImagesSelector);
 
   const onDelete = () => {
     images.forEach((image: ShadowImageType) => {
       const instances = image.annotations.map((instance: AnnotationType) => {
-        if (instance.categoryId === category.id) {
+        if (instance.categoryId === selectedCategory.id) {
           return {
             ...instance,
-            categoryId: UNKNOWN_CATEGORY_ID,
+            categoryId: unknownAnnotationCategory.id,
           };
         } else {
           return instance;
@@ -54,10 +55,12 @@ export const DeleteCategoryDialog = ({
     });
 
     batch(() => {
-      dispatch(imageViewerSlice.actions.deleteCategory({ category: category }));
+      dispatch(
+        imageViewerSlice.actions.deleteCategory({ category: selectedCategory })
+      );
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: UNKNOWN_CATEGORY_ID,
+          selectedCategoryId: unknownAnnotationCategory.id,
         })
       );
     });
@@ -66,11 +69,11 @@ export const DeleteCategoryDialog = ({
 
   return (
     <Dialog fullWidth onClose={onClose} open={open}>
-      <DialogTitle>Delete "{category.name}" category?</DialogTitle>
+      <DialogTitle>Delete "{selectedCategory.name}" category?</DialogTitle>
 
       <DialogContent>
-        Annotations categorized as "{category.name}" will not be deleted and
-        instead will be labeled as "{unknownCategory.name}".
+        Annotations categorized as "{selectedCategory.name}" will not be deleted
+        and instead will be labeled as "{unknownAnnotationCategory.name}".
       </DialogContent>
 
       <DialogActions>

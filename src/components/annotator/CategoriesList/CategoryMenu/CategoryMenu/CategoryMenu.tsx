@@ -10,7 +10,7 @@ import { useTranslation } from "../../../../../hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { selectedCategorySelector } from "../../../../../store/selectors";
 import { imageViewerSlice } from "../../../../../store/slices";
-import { UNKNOWN_CATEGORY_ID } from "../../../../../types/Category";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "../../../../../types/Category";
 import { annotatorImagesSelector } from "../../../../../store/selectors/annotatorImagesSelector";
 
 type CategoryMenuProps = {
@@ -61,7 +61,7 @@ export const CategoryMenu = ({
       batch(() => {
         dispatch(
           imageViewerSlice.actions.setSelectedCategoryId({
-            selectedCategoryId: UNKNOWN_CATEGORY_ID,
+            selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           })
         );
 
@@ -118,7 +118,7 @@ export const CategoryMenu = ({
           <Typography variant="inherit">{t("Clear Annotations")}</Typography>
         </MenuItem>
 
-        {category.id !== UNKNOWN_CATEGORY_ID && (
+        {category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
           <MenuItem onClick={onOpenDeleteCategoryDialogClick}>
             <Typography variant="inherit">{t("Delete category")}</Typography>
           </MenuItem>
