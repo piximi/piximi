@@ -11,6 +11,10 @@ import { Tool } from "../../Tool";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export abstract class AnnotationTool extends Tool {
+  /**
+   * RoiManager of the annotated image.
+   * https://image-js.github.io/image-js/#roi
+   */
   manager: ImageJS.RoiManager;
   points?: Array<number> = [];
   annotationState = AnnotationStateType.Blank;
@@ -23,6 +27,10 @@ export abstract class AnnotationTool extends Tool {
   origin?: { x: number; y: number } = undefined;
   buffer?: Array<number> = [];
 
+  /**
+   * Coordinates of the annotation bounding box: [x1, y1, x2, y2].
+   * Specified by the top left and bottom right points.
+   */
   protected _boundingBox?: [number, number, number, number];
   protected _mask?: Array<number>;
 
@@ -68,9 +76,12 @@ export abstract class AnnotationTool extends Tool {
     if (y >= boundingBox[3] - boundingBox[1]) return false;
     return true;
   }
-  /*
-   * Adding to a Operator adds any new areas you select to your existing
-   * Operator.
+
+  /**
+   * Add the areas selected by the current AnnotationTool from the selected annotation.
+   * @param encodedMaskData1
+   * @param boundingBox1
+   * @returns Bounding box and mask of the added annotation areas
    */
   add(
     encodedMaskData1: Array<number>,
@@ -88,7 +99,7 @@ export abstract class AnnotationTool extends Tool {
       boundingBox2[2] > boundingBox1[2] ? boundingBox2[2] : boundingBox1[2],
       boundingBox2[3] > boundingBox1[3] ? boundingBox2[3] : boundingBox1[3],
     ] as [number, number, number, number];
-    //
+
     const newBoundingBoxWidth = newBoundingBox[2] - newBoundingBox[0];
     const newBoundingBoxHeight = newBoundingBox[3] - newBoundingBox[1];
 
@@ -161,10 +172,11 @@ export abstract class AnnotationTool extends Tool {
     this.setAnnotated();
   }
 
-  /*
-   * When using the Intersect Operator mode, any currently selected areas you
-   * select over will be kept and any currently selected areas outside your
-   * new Operator will be removed from the Operator.
+  /**
+   * Intersect the areas selected by the current AnnotationTool and the selected annotation.
+   * @param decodedMask1
+   * @param boundingBox1
+   * @returns Bounding box and mask of the intersected annotation areas.
    */
   intersect(
     decodedMask1: Array<number>,
@@ -177,25 +189,36 @@ export abstract class AnnotationTool extends Tool {
 
     const boundingBox2 = this._boundingBox;
 
-    const newBoundingBox = [
+    const intersectionBoundingBox = [
       boundingBox2[0] > boundingBox1[0] ? boundingBox2[0] : boundingBox1[0],
       boundingBox2[1] > boundingBox1[1] ? boundingBox2[1] : boundingBox1[1],
       boundingBox2[2] < boundingBox1[2] ? boundingBox2[2] : boundingBox1[2],
       boundingBox2[3] < boundingBox1[3] ? boundingBox2[3] : boundingBox1[3],
     ] as [number, number, number, number];
 
-    const newBoundingBoxWidth = newBoundingBox[2] - newBoundingBox[0];
-    const newBoundingBoxHeight = newBoundingBox[3] - newBoundingBox[1];
+    const intersectionBoundingBoxWidth =
+      intersectionBoundingBox[2] - intersectionBoundingBox[0];
+    const intersectionBoundingBoxHeight =
+      intersectionBoundingBox[3] - intersectionBoundingBox[1];
+
+    // Check if bounding box is valid: width and height of the intersection must be positive.
+    if (intersectionBoundingBoxWidth < 0 || intersectionBoundingBoxHeight < 0) {
+      return [[], [0, 0, 0, 0]];
+    }
 
     const newMaskData = [];
-    const deltaX1 = boundingBox1[0] - newBoundingBox[0];
-    const deltaY1 = boundingBox1[1] - newBoundingBox[1];
-    const deltaX2 = boundingBox2[0] - newBoundingBox[0];
-    const deltaY2 = boundingBox2[1] - newBoundingBox[1];
+    const deltaX1 = boundingBox1[0] - intersectionBoundingBox[0];
+    const deltaY1 = boundingBox1[1] - intersectionBoundingBox[1];
+    const deltaX2 = boundingBox2[0] - intersectionBoundingBox[0];
+    const deltaY2 = boundingBox2[1] - intersectionBoundingBox[1];
 
-    for (let i = 0; i < newBoundingBoxWidth * newBoundingBoxHeight; i++) {
-      const x = i % newBoundingBoxWidth;
-      const y = Math.floor(i / newBoundingBoxWidth);
+    for (
+      let i = 0;
+      i < intersectionBoundingBoxWidth * intersectionBoundingBoxHeight;
+      i++
+    ) {
+      const x = i % intersectionBoundingBoxWidth;
+      const y = Math.floor(i / intersectionBoundingBoxWidth);
       const b1x = x - deltaX1;
       const b1y = y - deltaY1;
       const b2x = x - deltaX2;
@@ -215,12 +238,17 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    return [encode(Uint8Array.from(newMaskData)), newBoundingBox];
+    if (!newMaskData.length) return [[], [0, 0, 0, 0]];
+
+    return [encode(Uint8Array.from(newMaskData)), intersectionBoundingBox];
   }
 
-  /*
-   * Invert selected mask and compute inverted bounding box coordinates
-   * */
+  /**
+   * Invert the selected annotation area
+   * @param selectedMask
+   * @param selectedBoundingBox
+   * @returns Bounding box and mask of the inverted annotation area
+   */
   invert(
     selectedMask: Array<number>,
     selectedBoundingBox: [number, number, number, number]
@@ -230,7 +258,7 @@ export abstract class AnnotationTool extends Tool {
     const imageWidth = this.image.width;
     const imageHeight = this.image.height;
 
-    //find min and max boundary points when computing the mask
+    // Find min and max boundary points when computing the mask.
     const invertedBoundingBox: [number, number, number, number] = [
       imageWidth,
       imageHeight,
@@ -271,7 +299,7 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    //now crop the mask using the new bounding box
+    // Crop the mask using the new bounding box.
     const croppedInvertedMask = invertedMask.crop({
       x: invertedBoundingBox[0],
       y: invertedBoundingBox[1],
@@ -279,85 +307,102 @@ export abstract class AnnotationTool extends Tool {
       height: invertedBoundingBox[3] - invertedBoundingBox[1],
     });
 
-    const invertedmaskData = encode(Uint8Array.from(croppedInvertedMask.data));
+    const invertedMaskData = encode(Uint8Array.from(croppedInvertedMask.data));
 
-    return [invertedmaskData, invertedBoundingBox];
+    return [invertedMaskData, invertedBoundingBox];
   }
 
-  /*
-   * Subtracting from a Operator deselects the areas you draw over, keeping
-   * the rest of your existing Operator.
+  /**
+   * Subtract the areas selected by the current AnnotationTool (subtrahend) from the selected annotation (minuend).
+   * [Difference = Minuend - Subtrahend]
+   * @param encodedMinuendData
+   * @param minuendBoundingBox
+   * @returns Bounding box and mask of the difference of the annotation areas.
    */
   subtract(
-    encodedMaskData1: Array<number>,
-    boundingBox1: [number, number, number, number]
+    encodedMinuendData: Array<number>,
+    minuendBoundingBox: [number, number, number, number]
   ): [Array<number>, [number, number, number, number]] {
     if (!this._mask || !this._boundingBox) return [[], [0, 0, 0, 0]];
 
-    const maskData1 = decode(encodedMaskData1);
-    const maskData2 = decode(this._mask);
+    // decode the selected annotation data
+    const minuendData = decode(encodedMinuendData);
+    // decode the the subtrahend data
+    const subtrahendData = decode(this._mask);
 
-    const boundingBox2 = this._boundingBox;
+    const subtrahendBoundingBox = this._boundingBox;
 
-    const newBoundingBox = [
-      boundingBox2[2] > boundingBox1[0] &&
-      boundingBox2[0] < boundingBox1[0] &&
-      boundingBox2[1] < boundingBox1[1] &&
-      boundingBox2[3] > boundingBox1[3]
-        ? boundingBox2[2]
-        : boundingBox1[0],
-      boundingBox2[3] > boundingBox1[1] &&
-      boundingBox2[1] < boundingBox1[1] &&
-      boundingBox2[0] < boundingBox1[0] &&
-      boundingBox2[2] > boundingBox1[2]
-        ? boundingBox2[3]
-        : boundingBox1[1],
-      boundingBox2[0] < boundingBox1[2] &&
-      boundingBox2[2] > boundingBox1[2] &&
-      boundingBox2[1] < boundingBox1[1] &&
-      boundingBox2[3] > boundingBox1[3]
-        ? boundingBox2[0]
-        : boundingBox1[2],
-      boundingBox2[1] < boundingBox1[3] &&
-      boundingBox2[3] > boundingBox1[3] &&
-      boundingBox2[0] < boundingBox1[0] &&
-      boundingBox2[2] > boundingBox1[2]
-        ? boundingBox2[1]
-        : boundingBox1[3],
+    const resultingBoundingBox = [
+      subtrahendBoundingBox[2] > minuendBoundingBox[0] &&
+      subtrahendBoundingBox[0] < minuendBoundingBox[0] &&
+      subtrahendBoundingBox[1] < minuendBoundingBox[1] &&
+      subtrahendBoundingBox[3] > minuendBoundingBox[3]
+        ? subtrahendBoundingBox[2]
+        : minuendBoundingBox[0],
+      subtrahendBoundingBox[3] > minuendBoundingBox[1] &&
+      subtrahendBoundingBox[1] < minuendBoundingBox[1] &&
+      subtrahendBoundingBox[0] < minuendBoundingBox[0] &&
+      subtrahendBoundingBox[2] > minuendBoundingBox[2]
+        ? subtrahendBoundingBox[3]
+        : minuendBoundingBox[1],
+      subtrahendBoundingBox[0] < minuendBoundingBox[2] &&
+      subtrahendBoundingBox[2] > minuendBoundingBox[2] &&
+      subtrahendBoundingBox[1] < minuendBoundingBox[1] &&
+      subtrahendBoundingBox[3] > minuendBoundingBox[3]
+        ? subtrahendBoundingBox[0]
+        : minuendBoundingBox[2],
+      subtrahendBoundingBox[1] < minuendBoundingBox[3] &&
+      subtrahendBoundingBox[3] > minuendBoundingBox[3] &&
+      subtrahendBoundingBox[0] < minuendBoundingBox[0] &&
+      subtrahendBoundingBox[2] > minuendBoundingBox[2]
+        ? subtrahendBoundingBox[1]
+        : minuendBoundingBox[3],
     ] as [number, number, number, number];
 
-    const newBoundingBoxWidth = newBoundingBox[2] - newBoundingBox[0];
-    const newBoundingBoxHeight = newBoundingBox[3] - newBoundingBox[1];
+    const resultingBoundingBoxWidth =
+      resultingBoundingBox[2] - resultingBoundingBox[0];
+    const resultingBoundingBoxHeight =
+      resultingBoundingBox[3] - resultingBoundingBox[1];
 
-    const newMaskData = [];
-    const deltaX1 = boundingBox1[0] - newBoundingBox[0];
-    const deltaY1 = boundingBox1[1] - newBoundingBox[1];
-    const deltaX2 = boundingBox2[0] - newBoundingBox[0];
-    const deltaY2 = boundingBox2[1] - newBoundingBox[1];
+    // Check if bounding box is valid: width and height of the intersection must be positive.
+    if (resultingBoundingBoxWidth < 0 || resultingBoundingBoxHeight < 0) {
+      return [[], [0, 0, 0, 0]];
+    }
 
-    for (let i = 0; i < newBoundingBoxWidth * newBoundingBoxHeight; i++) {
-      const x = i % newBoundingBoxWidth;
-      const y = Math.floor(i / newBoundingBoxWidth);
+    const resultingMaskData = [];
+    const deltaX1 = minuendBoundingBox[0] - resultingBoundingBox[0];
+    const deltaY1 = minuendBoundingBox[1] - resultingBoundingBox[1];
+    const deltaX2 = subtrahendBoundingBox[0] - resultingBoundingBox[0];
+    const deltaY2 = subtrahendBoundingBox[1] - resultingBoundingBox[1];
+
+    for (
+      let i = 0;
+      i < resultingBoundingBoxWidth * resultingBoundingBoxHeight;
+      i++
+    ) {
+      const x = i % resultingBoundingBoxWidth;
+      const y = Math.floor(i / resultingBoundingBoxWidth);
       const b1x = x - deltaX1;
       const b1y = y - deltaY1;
       const b2x = x - deltaX2;
       const b2y = y - deltaY2;
 
-      const b1i = b1x + b1y * (boundingBox1[2] - boundingBox1[0]);
-      const b2i = b2x + b2y * (boundingBox2[2] - boundingBox2[0]);
+      const b1i = b1x + b1y * (minuendBoundingBox[2] - minuendBoundingBox[0]);
+      const b2i =
+        b2x + b2y * (subtrahendBoundingBox[2] - subtrahendBoundingBox[0]);
       if (
-        this.inBoundingBox(b1x, b1y, boundingBox1) &&
-        maskData1[b1i] === 255 &&
-        this.inBoundingBox(b2x, b2y, boundingBox2) &&
-        maskData2[b2i] === 255
+        this.inBoundingBox(b1x, b1y, minuendBoundingBox) &&
+        minuendData[b1i] === 255 &&
+        this.inBoundingBox(b2x, b2y, subtrahendBoundingBox) &&
+        subtrahendData[b2i] === 255
       ) {
-        newMaskData.push(0);
+        resultingMaskData.push(0);
       } else {
-        newMaskData.push(maskData1[b1i]);
+        resultingMaskData.push(minuendData[b1i]);
       }
     }
 
-    return [encode(Uint8Array.from(newMaskData)), newBoundingBox];
+    return [encode(Uint8Array.from(resultingMaskData)), resultingBoundingBox];
   }
 
   get boundingBox(): [number, number, number, number] | undefined {
