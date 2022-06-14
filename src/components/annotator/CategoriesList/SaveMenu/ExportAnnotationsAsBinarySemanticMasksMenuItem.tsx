@@ -3,12 +3,12 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { useSelector } from "react-redux";
 import {
-  annotationCategorySelector,
+  annotationCategoriesSelector,
   imageInstancesSelector,
-} from "../../../../store/selectors";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+} from "store/selectors";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import JSZip from "jszip";
-import { saveAnnotationsAsLabelMatrix } from "../../../../image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 import { saveAs } from "file-saver";
 
 type SaveAnnotationsMenuItemProps = {
@@ -22,7 +22,7 @@ export const ExportAnnotationsAsBinarySemanticMasksMenuItem = ({
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(imageInstancesSelector);
   const images = useSelector(annotatorImagesSelector);
-  const categories = useSelector(annotationCategorySelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onExport = () => {
     popupState.close();
@@ -32,7 +32,13 @@ export const ExportAnnotationsAsBinarySemanticMasksMenuItem = ({
 
     let zip = new JSZip();
     Promise.all(
-      saveAnnotationsAsLabelMatrix(images, categories, zip, false, true)
+      saveAnnotationsAsLabelMatrix(
+        images,
+        annotationCategories,
+        zip,
+        false,
+        true
+      )
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "binary_semantics.zip");

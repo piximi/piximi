@@ -3,13 +3,13 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { useSelector } from "react-redux";
 import {
-  annotationCategorySelector,
+  annotationCategoriesSelector,
   imageInstancesSelector,
-} from "../../../../store/selectors";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+} from "store/selectors";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { saveAnnotationsAsLabelMatrix } from "../../../../image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;
@@ -22,7 +22,7 @@ export const ExportAnnotationsAsMatrixMenuItem = ({
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(imageInstancesSelector);
   const images = useSelector(annotatorImagesSelector);
-  const categories = useSelector(annotationCategorySelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onExport = () => {
     popupState.close();
@@ -32,13 +32,13 @@ export const ExportAnnotationsAsMatrixMenuItem = ({
 
     let zip = new JSZip();
 
-    Promise.all(saveAnnotationsAsLabelMatrix(images, categories, zip)).then(
-      () => {
-        zip.generateAsync({ type: "blob" }).then((blob) => {
-          saveAs(blob, "labels.zip");
-        });
-      }
-    );
+    Promise.all(
+      saveAnnotationsAsLabelMatrix(images, annotationCategories, zip)
+    ).then(() => {
+      zip.generateAsync({ type: "blob" }).then((blob) => {
+        saveAs(blob, "labels.zip");
+      });
+    });
   };
 
   return (

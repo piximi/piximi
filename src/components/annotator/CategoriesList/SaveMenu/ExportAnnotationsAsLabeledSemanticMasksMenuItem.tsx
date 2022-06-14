@@ -3,12 +3,12 @@ import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { useSelector } from "react-redux";
 import {
-  annotationCategorySelector,
+  annotationCategoriesSelector,
   imageInstancesSelector,
-} from "../../../../store/selectors";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+} from "store/selectors";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import JSZip from "jszip";
-import { saveAnnotationsAsLabeledSemanticSegmentationMasks } from "../../../../image/imageHelper";
+import { saveAnnotationsAsLabeledSemanticSegmentationMasks } from "image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;
@@ -21,7 +21,7 @@ export const ExportAnnotationsAsLabeledSemanticMasksMenuItem = ({
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(imageInstancesSelector);
   const images = useSelector(annotatorImagesSelector);
-  const categories = useSelector(annotationCategorySelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onExport = () => {
     popupState.close();
@@ -31,7 +31,11 @@ export const ExportAnnotationsAsLabeledSemanticMasksMenuItem = ({
 
     let zip = new JSZip();
 
-    saveAnnotationsAsLabeledSemanticSegmentationMasks(images, categories, zip);
+    saveAnnotationsAsLabeledSemanticSegmentationMasks(
+      images,
+      annotationCategories,
+      zip
+    );
   };
 
   return (

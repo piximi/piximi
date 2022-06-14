@@ -2,12 +2,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToolType } from "../../types/ToolType";
 import { useHotkeys } from "react-hotkeys-hook";
 import { setOperation, setSelectedCategoryId } from "../../store/slices";
-import { annotationCategorySelector } from "store/selectors/annotationCategorySelector";
+import { annotationCategoriesSelector } from "store/selectors/annotationCategoriesSelector";
 
 export const useAnnotatorKeyboardShortcuts = () => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(annotationCategorySelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   /*
    * Select arrange tool (V)
@@ -22,7 +22,7 @@ export const useAnnotatorKeyboardShortcuts = () => {
   useHotkeys("1,2,3,4,5,6,7,8,9", (event: KeyboardEvent) => {
     const index = parseInt(event.key) - 1;
 
-    const selectedCategory = categories[index];
+    const selectedCategory = annotationCategories[index];
 
     if (!selectedCategory) return;
 

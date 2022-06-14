@@ -1,7 +1,7 @@
 import { ImageViewer } from "../../types/ImageViewer";
 import { Category } from "../../types/Category";
 
-export const annotationCategorySelector = ({
+export const annotationCategoriesSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;

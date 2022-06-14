@@ -4,16 +4,16 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { imageViewerSlice } from "../../../../store/slices";
-import { useTranslation } from "../../../../hooks/useTranslation";
+import { imageViewerSlice } from "store/slices";
+import { useTranslation } from "hooks/useTranslation";
 import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-} from "../../../../image/imageHelper";
+} from "image/imageHelper";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { annotationCategorySelector } from "../../../../store/selectors";
+import { annotationCategoriesSelector } from "store/selectors";
 import { Divider } from "@mui/material";
 import { ImageType } from "types/ImageType";
 import { activeImageSelector } from "store/selectors/activeImageSelector";
@@ -33,7 +33,7 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  const categories = useSelector(annotationCategorySelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const images = useSelector(annotatorImagesSelector);
   const activeImage = useSelector(activeImageSelector);
@@ -87,7 +87,12 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix([selectedImage], categories, zip, true)
+      saveAnnotationsAsLabelMatrix(
+        [selectedImage],
+        annotationCategories,
+        zip,
+        true
+      )
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labeled_instances.zip");
@@ -107,7 +112,7 @@ export const ImageMenu = ({
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
       [selectedImage],
-      categories,
+      annotationCategories,
       zip
     );
   };
@@ -121,7 +126,7 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     Promise.all(
-      saveAnnotationsAsLabelMatrix([selectedImage], categories, zip)
+      saveAnnotationsAsLabelMatrix([selectedImage], annotationCategories, zip)
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labels.zip");
@@ -141,7 +146,7 @@ export const ImageMenu = ({
 
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
       [selectedImage],
-      categories,
+      annotationCategories,
       zip
     );
   };
@@ -159,7 +164,7 @@ export const ImageMenu = ({
     Promise.all(
       saveAnnotationsAsLabelMatrix(
         [selectedImage],
-        categories,
+        annotationCategories,
         zip,
         false,
         true
