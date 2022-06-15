@@ -16,6 +16,7 @@ export { imageViewerFullImagesSelector } from "./imageViewerFullImagesSelector";
 export { imageOriginalSrcSelector } from "./imageOriginalSrcSelector";
 export { saturationSelector } from "./saturationSelector";
 export { selectedCategorySelector } from "./selectedCategorySelector";
+export { selectedAnnotationSelector } from "./selectedAnnotationSelector";
 export { selectionModeSelector } from "./selectionModeSelector";
 export { stageHeightSelector } from "./stageHeightSelector";
 export { stageScaleSelector } from "./stageScaleSelector";
