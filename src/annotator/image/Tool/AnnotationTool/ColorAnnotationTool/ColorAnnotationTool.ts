@@ -112,12 +112,9 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.roiManager.fromMask(this.roiMask);
     // @ts-ignore
     this.roiMask = this.roiManager.getMasks()[0];
-
     //@ts-ignore
-    const rois = this.roiManager.getRois();
-    const roi = rois.sort((a: any, b: any) => {
-      return b.surface - a.surface;
-    })[1]; // take the second roi because the first one will be of the size of the image,the second one is the actual largest roi
+    const roi = this.roiManager.getRois()[0];
+
     this._boundingBox = [roi.minX, roi.minY, roi.maxX + 1, roi.maxY + 1];
 
     if (!this.roiMask || !this.boundingBox) return;
