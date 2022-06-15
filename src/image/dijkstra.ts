@@ -44,6 +44,8 @@ export class Graph {
       let key = keys[0];
       let bucket = open[key];
       let node = bucket.shift();
+      if (!node) return undefined;
+
       let currentCost = parseFloat(key);
 
       let adjacentNodes: { [key: string]: number } = node
@@ -61,18 +63,13 @@ export class Graph {
           if (vertexCost === undefined || vertexCost > totalCost) {
             costs[vertex] = totalCost;
             addToOpen(totalCost, vertex);
-            // TODO #143 node might be undefined
-            predecessors[vertex] = node!;
+            predecessors[vertex] = node;
           }
         }
       }
     }
 
-    if (costs[end] === undefined) {
-      return null;
-    } else {
-      return predecessors;
-    }
+    return costs[end] ? predecessors : undefined;
   }
 
   extractShortest(predecessors: { [x: string]: any }, end: any) {
@@ -91,7 +88,7 @@ export class Graph {
   findShortestPath(map: { [key: string]: number }[], nodes: any[]) {
     let start = nodes.shift();
     let end: string | number;
-    let predecessors: {} | null;
+    let predecessors: { [key: string]: string } | undefined;
     const path: any[] = [];
     let shortest: any[];
 
