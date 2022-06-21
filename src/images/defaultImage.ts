@@ -1,5 +1,5 @@
 import { generateDefaultChannels } from "image/imageHelper";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
+import { UNKNOWN_CATEGORY_ID } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
@@ -16,7 +16,7 @@ const initialImageShape: Shape = {
 
 export const defaultImage: ImageType = {
   activePlane: 0,
-  categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+  categoryId: UNKNOWN_CATEGORY_ID,
   colors: generateDefaultChannels(3),
   id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
   annotations: [],
