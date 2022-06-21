@@ -1,13 +1,8 @@
 /*
- (c) 2017, Vladimir Agafonkin
+ © 2013, Vladimir Agafonkin. Released under BSD license.
  Simplify.js, a high-performance JS polyline simplification library
  mourner.github.io/simplify-js
 */
-
-// (function () { 'use strict';
-
-// to suit your point format, run search/replace for '.x' and '.y';
-// for 3D version, see 3d branch (configurability would draw significant performance overhead)
 
 // square distance between 2 points
 function getSqDist(p1: Array<number>, p2: Array<number>) {
@@ -41,7 +36,6 @@ function getSqSegDist(p: Array<number>, p1: Array<number>, p2: Array<number>) {
 
   return dx * dx + dy * dy;
 }
-// rest of the code doesn't care about point format
 
 // basic distance-based simplification
 function simplifyRadialDist(points: Array<Array<number>>, sqTolerance: number) {
@@ -105,28 +99,24 @@ function simplifyDouglasPeucker(
   return simplified;
 }
 
-// both algorithms combined for awesome performance
-export function simplify(
+/**
+ * Polyline simplification using a combination of Douglas-Peucker and Radial Distance algorithm.
+ * @param points Array of points (Polyline).
+ * @param tolerance [default = 1] Affects the amount of simplification (in the same metric as the point coordinates).
+ * @param highestQuality [default = true] Excludes distance-based preprocessing step which leads to highest quality simplification but runs ~10-20 times slower.
+ * @returns Array of simplified points.
+ */
+export function simplifyPolygon(
   points: Array<Array<number>>,
-  tolerance: number,
-  highestQuality: boolean
+  tolerance = 1,
+  highestQuality = true
 ) {
   if (points.length <= 2) return points;
 
-  var sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
+  const sqTolerance = tolerance * tolerance;
 
   points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
   points = simplifyDouglasPeucker(points, sqTolerance);
 
   return points;
 }
-
-// // export as AMD module / Node module / browser or worker variable
-//     if (typeof define === 'function' && define.amd) define(function() { return simplify; });
-//     else if (typeof module !== 'undefined') {
-//         module.exports = simplify;
-//         module.exports.default = simplify;
-//     } else if (typeof self !== 'undefined') self.simplify = simplify;
-//     else window.simplify = simplify;
-
-// })();

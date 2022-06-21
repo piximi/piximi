@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   anchor?: { x: number; y: number };
@@ -76,18 +76,9 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       this.points = this.buffer;
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
-      const width = this._boundingBox[2] - this._boundingBox[0];
-      const height = this._boundingBox[3] - this._boundingBox[1];
-      if (width === 0 || height === 0) {
-        return;
-      }
 
-      const maskImage = this.computeMask().crop({
-        x: this._boundingBox[0],
-        y: this._boundingBox[1],
-        width: width,
-        height: height,
-      });
+      const maskImage = this.computeAnnotationMaskFromPoints();
+      if (!maskImage) return;
 
       this._mask = encode(maskImage.data);
 

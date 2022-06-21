@@ -631,10 +631,7 @@ export const generateDefaultChannels = (components: number): Array<Color> => {
   return defaultChannels;
 };
 
-export const connectPoints = (
-  coordinates: Array<Array<number>>,
-  image: ImageJS.Image
-) => {
+export const connectPoints = (coordinates: Array<Array<number>>) => {
   let connectedPoints: Array<Array<number>> = [];
 
   const foo = _.filter(

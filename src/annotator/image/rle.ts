@@ -1,7 +1,8 @@
-/*
- * Run-length encoding
+/**
+ * Decode a Run-length encoded input array.
+ * @param encoded Run-length encoded input array
+ * @returns The decoded input array
  */
-
 export const decode = (encoded: Array<number>): Uint8ClampedArray => {
   let decoded = [];
 
@@ -18,6 +19,11 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
   return new Uint8ClampedArray(decoded);
 };
 
+/**
+ * Compute the Run-length encoding of the input array.
+ * @param decoded (decoded) input array
+ * @returns Encoded array
+ */
 export const encode = (
   decoded: Uint8Array | Uint8ClampedArray
 ): Array<number> => {

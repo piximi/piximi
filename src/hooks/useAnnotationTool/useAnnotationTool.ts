@@ -32,7 +32,9 @@ export const useAnnotationTool = () => {
 
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
 
-  const quickSelectionBrushSize = useSelector(quickSelectionRegionSizeSelector);
+  const quickSelectionRegionSize = useSelector(
+    quickSelectionRegionSizeSelector
+  );
 
   const threshold = useSelector(thresholdAnnotationValueSelector);
 
@@ -76,12 +78,7 @@ export const useAnnotationTool = () => {
 
         return;
       case ToolType.PenAnnotation:
-        PenAnnotationTool.setup(
-          image,
-          penSelectionBrushSize / (stageScale ? stageScale : 1)
-        ).then((operator: PenAnnotationTool) => {
-          setOperator(operator);
-        });
+        setOperator(new PenAnnotationTool(image));
 
         return;
       case ToolType.PolygonalAnnotation:
@@ -89,16 +86,11 @@ export const useAnnotationTool = () => {
 
         return;
       case ToolType.QuickAnnotation:
-        const quickSelectionOperator = QuickAnnotationTool.setup(
-          image,
-          quickSelectionBrushSize / Math.round(stageScale ? stageScale : 1)
-        );
-        setOperator(quickSelectionOperator);
+        setOperator(new QuickAnnotationTool(image));
 
         return;
       case ToolType.ThresholdAnnotation:
-        const thresholdSelectorOperator = ThresholdAnnotationTool.setup(image);
-        setOperator(thresholdSelectorOperator);
+        setOperator(new ThresholdAnnotationTool(image));
 
         return;
       case ToolType.RectangularAnnotation:
@@ -106,19 +98,24 @@ export const useAnnotationTool = () => {
 
         return;
     }
-  }, [
-    operation,
-    image,
-    penSelectionBrushSize,
-    stageScale,
-    quickSelectionBrushSize,
-  ]);
+  }, [operation, image]);
 
   useEffect(() => {
     if (operator instanceof ThresholdAnnotationTool) {
       operator.updateMask(threshold);
     }
-  }, [operation, operator, threshold]);
+  }, [operator, threshold]);
+
+  useEffect(() => {
+    if (operator instanceof QuickAnnotationTool) {
+      const regionSize =
+        quickSelectionRegionSize / Math.round(stageScale ? stageScale : 1);
+      operator.initializeSuperpixels(regionSize);
+    } else if (operator instanceof PenAnnotationTool) {
+      const brushSize = penSelectionBrushSize / (stageScale ? stageScale : 1);
+      operator.brushSize = Math.round(brushSize);
+    }
+  }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
 
   return [operator];
 };

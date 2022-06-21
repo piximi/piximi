@@ -1,14 +1,14 @@
-import { AnnotationType } from "../../../../../types/AnnotationType";
+import { AnnotationType } from "types/AnnotationType";
 import * as ImageJS from "image-js";
-import { Category } from "../../../../../types/Category";
+import { Category } from "types/Category";
 import * as _ from "lodash";
-import { connectPoints, drawLine } from "../../../../../image/imageHelper";
-import { simplify } from "../../../simplify/simplify";
+import { connectPoints, drawLine } from "image/imageHelper";
+import { simplifyPolygon } from "../../../simplify/simplify";
 import { slpf } from "../../../polygon-fill/slpf";
 import { v4 as uuidv4 } from "uuid";
 import { decode, encode } from "../../../rle";
 import { Tool } from "../../Tool";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -16,23 +16,34 @@ export abstract class AnnotationTool extends Tool {
    * https://image-js.github.io/image-js/#roi
    */
   manager: ImageJS.RoiManager;
+  /**
+   * Polygon that defines the annotation area, array of (x, y) coordinates.
+   */
   points?: Array<number> = [];
+  /**
+   * Coordinates of the annotation bounding box: [x1, y1, x2, y2].
+   * Specifies the top left and bottom right points.
+   */
+  protected _boundingBox?: [number, number, number, number];
+  /**
+   * One-hot encoded mask of the annotation.
+   */
+  protected _mask?: Array<number>;
+  /**
+   * State of the annotation: Blank (not yet annotating), Annotating or Annotated
+   */
   annotationState = AnnotationStateType.Blank;
+  /**
+   * Annotation object of the Tool.
+   */
   annotation?: AnnotationType;
-  onAnnotating?: () => void;
-  onAnnotated?: () => void;
-  onDeselect?: () => void;
-
   anchor?: { x: number; y: number } = undefined;
   origin?: { x: number; y: number } = undefined;
   buffer?: Array<number> = [];
 
-  /**
-   * Coordinates of the annotation bounding box: [x1, y1, x2, y2].
-   * Specified by the top left and bottom right points.
-   */
-  protected _boundingBox?: [number, number, number, number];
-  protected _mask?: Array<number>;
+  onAnnotating?: () => void;
+  onAnnotated?: () => void;
+  onDeselect?: () => void;
 
   constructor(image: ImageJS.Image) {
     super(image);
@@ -53,7 +64,6 @@ export abstract class AnnotationTool extends Tool {
     for (let x = 0; x < maskImage.width; x++) {
       for (let y = 0; y < maskImage.height; y++) {
         const pixel = maskImage.getPixelXY(x, y)[0];
-        // if (x > boundingBox1[2] && pixel > 0) console.info("Not supposed to happen")
         if (pixel === 255) {
           newMaskImage.setPixelXY(
             x + boundingBox[0] - newBoundingBox[0],
@@ -136,9 +146,7 @@ export abstract class AnnotationTool extends Tool {
   connect() {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    if (!this.anchor || !this.origin) return;
-
-    if (!this.buffer) return;
+    if (!this.anchor || !this.origin || !this.buffer) return;
 
     const anchorIndex = _.findLastIndex(this.buffer, (point) => {
       return point === this.anchor!.x;
@@ -154,16 +162,10 @@ export abstract class AnnotationTool extends Tool {
 
     this.points = this.buffer;
 
-    const maskImage = this.computeMask().crop({
-      x: this._boundingBox[0],
-      y: this._boundingBox[1],
-      width: this._boundingBox[2] - this._boundingBox[0],
-      height: this._boundingBox[3] - this._boundingBox[1],
-    });
+    const maskImage = this.computeAnnotationMaskFromPoints();
+    if (!maskImage) return;
 
     this._mask = encode(maskImage.data);
-
-    console.error(maskImage.toDataURL());
 
     this.anchor = undefined;
     this.origin = undefined;
@@ -428,21 +430,48 @@ export abstract class AnnotationTool extends Tool {
     ];
   }
 
-  computeMask() {
-    const maskImage = new ImageJS.Image({
-      width: this.image.width,
-      height: this.image.height,
-      bitDepth: 8,
+  /**
+   * Compute the bounding box of the polygon that defined the annotation.
+   * @returns bounding box [number, number, number, number] or undefined
+   */
+  computeBoundingBox(): [number, number, number, number] | undefined {
+    if (!this.points || !this.points.length) return undefined;
+    return [this.points[0], this.points[1], this.points[4], this.points[5]];
+  }
+
+  /**
+   * Compute the mask image of the annotation polygon from the bounding box and the polygon points.
+   * @returns Mask image of the annotation.
+   */
+  computeAnnotationMaskFromPoints() {
+    const boundingBox = this._boundingBox;
+    if (!boundingBox) return undefined;
+
+    const width = boundingBox[2] - boundingBox[0];
+    const height = boundingBox[3] - boundingBox[1];
+    if (width <= 0 || height <= 0) {
+      return undefined;
+    }
+
+    const coordinates = _.chunk(this.points, 2);
+    const connectedPoints = connectPoints(coordinates); // get coordinates of connected points and draw boundaries of mask
+
+    const simplifiedPoints = simplifyPolygon(connectedPoints);
+    const maskImage = slpf(
+      simplifiedPoints,
+      this.image.width,
+      this.image.height
+    );
+
+    // @ts-ignore: getChannel API is not exposed
+    const greyScaleMask = maskImage.getChannel(0);
+
+    return greyScaleMask.crop({
+      x: boundingBox[0],
+      y: boundingBox[1],
+      width: width,
+      height: height,
     });
-
-    const coords = _.chunk(this.points, 2);
-
-    const connectedPoints = connectPoints(coords, maskImage); // get coordinates of connected points and draw boundaries of mask
-    simplify(connectedPoints, 1, true);
-    slpf(connectedPoints, maskImage);
-
-    //@ts-ignore
-    return maskImage.getChannel(0);
   }
 
   get mask(): Array<number> | undefined {
@@ -461,6 +490,12 @@ export abstract class AnnotationTool extends Tool {
 
   abstract onMouseUp(position: { x: number; y: number }): void;
 
+  /**
+   * Creates and sets the annotation object.
+   * @param category Category of the annotation.
+   * @param plane Index of the image plane that corresponds to the annotation.
+   * @returns
+   */
   annotate(category: Category, plane: number): void {
     if (!this.boundingBox || !this.mask) return;
 

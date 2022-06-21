@@ -1,17 +1,11 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class RectangularAnnotationTool extends AnnotationTool {
   origin?: { x: number; y: number };
-
   width?: number;
   height?: number;
-
-  computeBoundingBox(): [number, number, number, number] | undefined {
-    if (!this.points || !this.points.length) return undefined;
-    return [this.points[0], this.points[1], this.points[4], this.points[5]];
-  }
 
   deselect() {
     this.origin = undefined;
@@ -75,7 +69,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
     let width = this.width;
     let height = this.height;
 
-    //negative height and width may happen if the rectangle was drawn from right to left
+    // Negative height and width may happen if the rectangle was drawn from right to left.
     if (this.width < 0) {
       width = Math.abs(this.width);
       origin.x = this.origin.x - width;
@@ -85,7 +79,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
       origin.y = this.origin.y - height;
     }
 
-    // add corners of the rectangle
+    // Add corners of the bounding box.
     const x1 = Math.round(origin.x);
     const y1 = Math.round(origin.y);
     const x2 = Math.round(origin.x + width);

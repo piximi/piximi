@@ -11,12 +11,28 @@ import {
   pointsToEdges,
 } from "./util";
 
-// Scnaline Polygon Fill
-export function slpf(points: Array<Array<number>>, img: ImageJS.Image) {
-  if (points.length < 3) return;
+/**
+ * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.
+ * @param polygon Polygon that defines the annotation.
+ * @param imageWidth Width of the annotated image.
+ * @param imageHeight Height of the annotated image.
+ * @returns Annotation Mask
+ */
+export function slpf(
+  polygon: Array<Array<number>>,
+  imageWidth: number,
+  imageHeight: number
+) {
+  const maskImage = new ImageJS.Image({
+    width: imageWidth,
+    height: imageHeight,
+    bitDepth: 8,
+  });
+
+  if (polygon.length < 3) return maskImage;
 
   // initialize ET and AET
-  const ET: Array<Array<Array<number>>> = pointsToEdges(points).sort(
+  const ET: Array<Array<Array<number>>> = pointsToEdges(polygon).sort(
     (e1: Array<Array<number>>, e2: Array<Array<number>>) =>
       getYMin(e2) - getYMin(e1)
   );
@@ -34,9 +50,11 @@ export function slpf(points: Array<Array<number>>, img: ImageJS.Image) {
     });
     // fill spans on scanline
     const spans = getSpans(yScan, AET);
-    drawSpans(spans, yScan, img);
+    drawSpans(spans, yScan, maskImage);
     yScan++;
   }
+
+  return maskImage;
 }
 
 // move active edges from ET to AET
