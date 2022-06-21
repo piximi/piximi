@@ -3,7 +3,7 @@ import { getIdx } from "./imageHelper";
 import { DataArray } from "image-js";
 import { aStar } from "ngraph.path";
 
-const validNeighbours = (
+const validNeighbors = (
   x: number,
   y: number,
   height: number,
@@ -12,7 +12,7 @@ const validNeighbours = (
   const xoffsets = [0];
   const yoffsets = [0];
   const output: { x: number; y: number }[] = [];
-  //David will know what to write here
+
   if (x > 0) {
     xoffsets.push(-1);
   }
@@ -51,14 +51,12 @@ export const makeGraph = (
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const startIdx = getIdx(width, 1)(x, y, 0);
-      // TODO #143 Go back to inferring max from actual image data
-      // const cap = Math.max.apply(Math, edges.data);
-      const cap = 255;
+      const cap = Math.max(...Array.from(edges));
       const dist = cap - edges[startIdx];
 
       graph.addNode(startIdx, dist);
 
-      const pixels = validNeighbours(x, y, height, width);
+      const pixels = validNeighbors(x, y, height, width);
 
       for (let pixel of pixels) {
         const idx = getIdx(width, 1)(pixel.x, pixel.y, 0);

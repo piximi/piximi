@@ -14,7 +14,7 @@ import { selectedAnnotationsSelector } from "../../../../store/selectors/selecte
 import { unselectedAnnotationsSelector } from "../../../../store/selectors/unselectedAnnotationsSelector";
 import { Category } from "../../../../types/Category";
 import { CollapsibleList } from "../../CategoriesList/CollapsibleList";
-import { categoriesSelector } from "../../../../store/selectors";
+import { annotationCategoriesSelector } from "../../../../store/selectors";
 import LabelIcon from "@mui/icons-material/Label";
 
 export const PointerSelectionOptions = () => {
@@ -24,7 +24,7 @@ export const PointerSelectionOptions = () => {
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
-  const categories = useSelector(categoriesSelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
@@ -92,8 +92,8 @@ export const PointerSelectionOptions = () => {
       </List>
 
       <Divider />
-      <CollapsibleList closed dense primary={t("Select Category")}>
-        {categories.map((category: Category) => {
+      <CollapsibleList closed dense primary={t("Select by Category")}>
+        {annotationCategories.map((category: Category) => {
           return (
             <ListItem
               button

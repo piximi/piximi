@@ -1,13 +1,13 @@
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "../../../../../hooks/useTranslation";
+import { useTranslation } from "hooks/useTranslation";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  categoriesSelector,
+  annotationCategoriesSelector,
   selectedCategorySelector,
-} from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
+} from "store/selectors";
+import { imageViewerSlice } from "store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (
@@ -18,30 +18,32 @@ type HideOtherCategoriesMenuItemProps = {
 export const HideOtherCategoriesMenuItem = ({
   onCloseCategoryMenu,
 }: HideOtherCategoriesMenuItemProps) => {
-  const categories = useSelector(categoriesSelector);
+  const annotatorCategories = useSelector(annotationCategoriesSelector);
 
-  const category = useSelector(selectedCategorySelector);
+  const selectedCategory = useSelector(selectedCategorySelector);
 
   const dispatch = useDispatch();
 
-  const onClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    for (let cat of categories) {
-      if (category.id !== cat.id) {
+  const onHideOtherCategoriesClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    annotatorCategories.forEach((category) => {
+      if (selectedCategory.id !== category.id) {
         dispatch(
           imageViewerSlice.actions.setCategoryVisibility({
-            category: cat,
+            category: category,
             visible: false,
           })
         );
       }
-    }
+    });
     onCloseCategoryMenu(event);
   };
 
   const t = useTranslation();
 
   return (
-    <MenuItem onClick={onClick}>
+    <MenuItem onClick={onHideOtherCategoriesClick}>
       <Typography variant="inherit">{t("Hide other categories")}</Typography>
     </MenuItem>
   );

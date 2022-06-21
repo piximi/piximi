@@ -67,33 +67,31 @@ export function* annotationStateChangeSaga({
         selectedAnnotation.mask,
         selectedAnnotation.boundingBox
       );
+    } else {
+      return;
     }
 
     annotationTool.mask = combinedMask;
-
     annotationTool.boundingBox = combinedBoundingBox;
 
-    if (!annotationTool.boundingBox || !annotationTool.mask) return;
-
-    yield put(
-      imageViewerSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...selectedAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            mask: annotationTool.mask,
-          },
-        ],
-        selectedAnnotation: {
+    const combinedSelectedAnnotation = annotationTool.mask.length
+      ? {
           ...selectedAnnotation,
           boundingBox: annotationTool.boundingBox,
           mask: annotationTool.mask,
-        },
+        }
+      : undefined;
+
+    yield put(
+      imageViewerSlice.actions.setSelectedAnnotations({
+        selectedAnnotations: [combinedSelectedAnnotation],
+        selectedAnnotation: combinedSelectedAnnotation,
       })
     );
 
-    const selectedCategory = yield select(selectedCategorySelector);
-
-    annotationTool.annotate(selectedCategory, activeImagePlane);
+    if (annotationTool.mask.length) {
+      const selectedCategory = yield select(selectedCategorySelector);
+      annotationTool.annotate(selectedCategory, activeImagePlane);
+    }
   }
 }

@@ -5,15 +5,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { AnnotationType } from "../../../../types/AnnotationType";
-import { imageViewerSlice } from "../../../../store/slices";
-import { unknownCategorySelector } from "../../../../store/selectors";
-import {
-  UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_CATEGORY_ID,
-} from "../../../../types/Category";
-import { ShadowImageType } from "../../../../types/ImageType";
-import { annotatorImagesSelector } from "../../../../store/selectors/annotatorImagesSelector";
+import { AnnotationType } from "types/AnnotationType";
+import { imageViewerSlice } from "store/slices";
+import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+import { ShadowImageType } from "types/ImageType";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type DeleteAllCategoriesDialogProps = {
   onClose: () => void;
@@ -26,8 +22,6 @@ export const DeleteAllCategoriesDialog = ({
 }: DeleteAllCategoriesDialogProps) => {
   const dispatch = useDispatch();
 
-  const unknownCategory = useSelector(unknownCategorySelector);
-
   const images = useSelector(annotatorImagesSelector);
 
   const onDelete = () => {
@@ -35,7 +29,7 @@ export const DeleteAllCategoriesDialog = ({
       const instances = image.annotations.map((instance: AnnotationType) => {
         return {
           ...instance,
-          categoryId: UNKNOWN_CATEGORY_ID,
+          categoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
         };
       });
       dispatch(
@@ -68,7 +62,7 @@ export const DeleteAllCategoriesDialog = ({
 
       <DialogContent>
         Annotations will not be deleted and instead will be labeled as "
-        {unknownCategory.name}".
+        {UNKNOWN_ANNOTATION_CATEGORY.name}".
       </DialogContent>
 
       <DialogActions>

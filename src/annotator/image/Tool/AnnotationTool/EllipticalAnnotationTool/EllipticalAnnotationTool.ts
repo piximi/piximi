@@ -79,8 +79,9 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
     if (!roiWidth || !roiHeight) return undefined;
 
-    //@ts-ignore
+    // @ts-ignore: getChannel API is not exposed
     const imageMask = ImageJS.Image.fromCanvas(canvas).getChannel(3);
+
     const croppedImageMask = new ImageJS.Image(roiWidth, roiHeight, {
       components: 1,
       alpha: 0,

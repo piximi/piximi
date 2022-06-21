@@ -2,7 +2,7 @@ import * as ReactKonva from "react-konva";
 import * as _ from "lodash";
 import Konva from "konva";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ToolType } from "../../../../../types/ToolType";
+import { ToolType } from "types/ToolType";
 import {
   imageInstancesSelector,
   selectedCategorySelector,
@@ -11,56 +11,43 @@ import {
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
-} from "../../../../../store/selectors";
+} from "store/selectors";
 import { Provider, useDispatch, useSelector, useStore } from "react-redux";
-import {
-  useAnnotationTool,
-  useCursor,
-  useHandTool,
-  useZoom,
-} from "../../../../../hooks";
-import { penSelectionBrushSizeSelector } from "../../../../../store/selectors/penSelectionBrushSizeSelector";
-import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
+import { useAnnotationTool, useCursor, useHandTool, useZoom } from "hooks";
+import { AnnotationModeType } from "types/AnnotationModeType";
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
-import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
-import {
-  ObjectAnnotationTool,
-  Tool,
-} from "../../../../../annotator/image/Tool";
+import { annotationStateSelector } from "store/selectors/annotationStateSelector";
+import { AnnotationStateType } from "types/AnnotationStateType";
+import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
 import useSound from "use-sound";
-import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
-import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
+import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
+import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
-import { useAnnotatorKeyboardShortcuts } from "../../../../../hooks/useKeyboardShortcuts";
-import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
-import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
+import { useAnnotatorKeyboardShortcuts } from "hooks/useKeyboardShortcuts";
+import { selectedAnnotationSelector } from "store/selectors/selectedAnnotationSelector";
+import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
 import { Transformers } from "../Transformers/Transformers";
-import { useWindowFocusHandler } from "../../../../../hooks/useWindowFocusHandler/useWindowFocusHandler";
-import { stagePositionSelector } from "../../../../../store/selectors/stagePositionSelector";
+import { useWindowFocusHandler } from "hooks/useWindowFocusHandler/useWindowFocusHandler";
+import { stagePositionSelector } from "store/selectors/stagePositionSelector";
 import { KonvaEventObject } from "konva/lib/Node";
-import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
+import { scaledImageWidthSelector } from "store/selectors/scaledImageWidthSelector";
+import { scaledImageHeightSelector } from "store/selectors/scaledImageHeightSelector";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
-import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
+import { selectedAnnotationsSelector } from "store/selectors/selectedAnnotationsSelector";
 import { Annotations } from "../Annotations/Annotations";
-import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
-import { quickSelectionRegionSizeSelector } from "../../../../../store/selectors/quickSelectionRegionSizeSelector";
+import { unselectedAnnotationsSelector } from "store/selectors/unselectedAnnotationsSelector";
 import { useHotkeys } from "react-hotkeys-hook";
 import { PointerSelection } from "../Selection/PointerSelection";
-import { usePointer } from "../../../../../hooks/usePointer/usePointer";
+import { usePointer } from "hooks/usePointer/usePointer";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
-import {
-  imageViewerSlice,
-  setSelectedAnnotations,
-} from "../../../../../store/slices";
-import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
-import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+import { cursorSelector } from "store/selectors/cursorSelector";
+import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
+import { activeImageIdSelector } from "store/selectors/activeImageIdSelector";
+import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
 import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 export const Stage = () => {
@@ -71,9 +58,7 @@ export const Stage = () => {
 
   const toolType = useSelector(toolTypeSelector);
 
-  const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const quickSelectionBrushSize = useSelector(quickSelectionRegionSizeSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
@@ -248,24 +233,6 @@ export const Stage = () => {
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
     annotationTool.registerOnDeselectHandler(onDeselect);
   }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
-
-  useEffect(() => {
-    if (toolType === ToolType.PenAnnotation) {
-      if (!annotationTool) return;
-      // @ts-ignore
-      annotationTool.brushSize = penSelectionBrushSize / stageScale;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [penSelectionBrushSize]);
-
-  useEffect(() => {
-    if (toolType === ToolType.QuickAnnotation) {
-      if (!annotationTool) return;
-      //@ts-ignore
-      annotationTool.update(Math.round(quickSelectionBrushSize / stageScale));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quickSelectionBrushSize]);
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
@@ -513,13 +480,19 @@ export const Stage = () => {
 
   const confirmAnnotations = () => {
     if (
-      !annotations.length ||
+      !selectedAnnotation ||
       !annotationTool ||
-      annotationTool.annotationState === AnnotationStateType.Annotating
+      annotationTool.annotationState === AnnotationStateType.Annotating ||
+      !activeImageId
     )
       return;
 
-    if (!activeImageId) return;
+    if (
+      toolType === ToolType.PolygonalAnnotation ||
+      toolType === ToolType.LassoAnnotation
+    ) {
+      annotationTool.connect();
+    }
 
     dispatch(
       imageViewerSlice.actions.setImageInstances({
@@ -551,15 +524,57 @@ export const Stage = () => {
       confirmAnnotations();
     },
     [
+      activeImageId,
       annotations,
       annotationTool,
       annotationTool?.annotationState,
-      dispatch,
       selectedAnnotations,
       unselectedAnnotations,
       selectionMode,
       selectedAnnotationsIds,
+      soundEnabled,
+      toolType,
     ]
+  );
+
+  useHotkeys(
+    "escape",
+    () => {
+      if (!annotationTool) return;
+
+      deselectAllAnnotations();
+      deselectAllTransformers();
+
+      if (!_.isEmpty(annotations) && soundEnabled) {
+        playDeleteAnnotationSoundEffect();
+      }
+
+      deselectAnnotation();
+
+      if (toolType !== ToolType.Zoom) return;
+      onZoomDeselect();
+    },
+    [annotations, annotationTool, soundEnabled, toolType]
+  );
+
+  useHotkeys(
+    "backspace, delete",
+    () => {
+      dispatch(
+        imageViewerSlice.actions.deleteImageInstances({
+          ids: selectedAnnotationsIds,
+        })
+      );
+      deselectAllAnnotations();
+      deselectAllTransformers();
+
+      if (!_.isEmpty(annotations) && soundEnabled) {
+        playDeleteAnnotationSoundEffect();
+      }
+
+      deselectAnnotation();
+    },
+    [selectedAnnotationsIds, annotations, soundEnabled]
   );
 
   useHotkeys(
@@ -604,60 +619,6 @@ export const Stage = () => {
       );
     },
     [images, activeImageId]
-  );
-
-  useHotkeys(
-    "enter",
-    () => {
-      if (
-        toolType !== ToolType.PolygonalAnnotation &&
-        toolType !== ToolType.LassoAnnotation
-      )
-        return;
-
-      if (!annotationTool) return;
-
-      annotationTool.connect();
-    },
-    [toolType, annotationTool]
-  );
-
-  useHotkeys(
-    "backspace, delete",
-    () => {
-      dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
-        })
-      );
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
-
-      deselectAnnotation();
-    },
-    [selectedAnnotationsIds, annotations]
-  );
-
-  useHotkeys(
-    "escape",
-    () => {
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
-
-      deselectAnnotation();
-
-      if (toolType !== ToolType.Zoom) return;
-      onZoomDeselect();
-    },
-    [annotations, annotationTool, toolType]
   );
 
   /*/

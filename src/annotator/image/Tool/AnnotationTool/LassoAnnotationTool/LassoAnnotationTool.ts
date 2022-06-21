@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class LassoAnnotationTool extends AnnotationTool {
   anchor?: { x: number; y: number };
@@ -70,14 +70,11 @@ export class LassoAnnotationTool extends AnnotationTool {
       ];
 
       this.points = this.buffer;
+
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
 
-      const maskImage = this.computeMask().crop({
-        x: this._boundingBox[0],
-        y: this._boundingBox[1],
-        width: this._boundingBox[2] - this._boundingBox[0],
-        height: this._boundingBox[3] - this._boundingBox[1],
-      });
+      const maskImage = this.computeAnnotationMaskFromPoints();
+      if (!maskImage) return;
 
       this._mask = encode(maskImage.data);
 
@@ -103,19 +100,5 @@ export class LassoAnnotationTool extends AnnotationTool {
 
       return;
     }
-  }
-
-  private connected(
-    position: { x: number; y: number },
-    threshold: number = 4
-  ): boolean | undefined {
-    if (!this.origin) return undefined;
-
-    const distance = Math.hypot(
-      position.x - this.origin.x,
-      position.y - this.origin.y
-    );
-
-    return distance < threshold;
   }
 }

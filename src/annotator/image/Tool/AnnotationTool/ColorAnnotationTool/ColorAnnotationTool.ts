@@ -3,7 +3,7 @@ import { doFlood, makeFloodMap } from "../../../flood";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
 import PriorityQueue from "ts-priority-queue";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class ColorAnnotationTool extends AnnotationTool {
   roiContour?: ImageJS.Image;
@@ -22,7 +22,6 @@ export class ColorAnnotationTool extends AnnotationTool {
     },
   });
   toolTipPosition?: { x: number; y: number };
-  maxTol: number = 0;
   seen: Set<number> = new Set();
 
   deselect() {
@@ -40,21 +39,19 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.toleranceMap = undefined;
     this.toleranceQueue.clear();
     this.seen.clear();
-    this.maxTol = 0;
 
     this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {
     this.tolerance = 1;
-    this.maxTol = 0;
     this.initialPosition = position;
     this.toolTipPosition = position;
 
     this.toleranceMap = makeFloodMap({
       x: Math.floor(position.x),
       y: Math.floor(position.y),
-      image: this.image!,
+      image: this.image,
     });
 
     const empty = new Array(this.image.height * this.image.width).fill(
@@ -112,12 +109,9 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.roiManager.fromMask(this.roiMask);
     // @ts-ignore
     this.roiMask = this.roiManager.getMasks()[0];
-
     //@ts-ignore
-    const rois = this.roiManager.getRois();
-    const roi = rois.sort((a: any, b: any) => {
-      return b.surface - a.surface;
-    })[1]; // take the second roi because the first one will be of the size of the image,the second one is the actual largest roi
+    const roi = this.roiManager.getRois()[0];
+
     this._boundingBox = [roi.minX, roi.minY, roi.maxX + 1, roi.maxY + 1];
 
     if (!this.roiMask || !this.boundingBox) return;
@@ -142,25 +136,44 @@ export class ColorAnnotationTool extends AnnotationTool {
       }
     }
 
-    // @ts-ignore
     this._mask = encode(imgMask.data as Uint8Array);
 
     this.setAnnotated();
   }
 
-  private static colorOverlay(
+  private updateOverlay(position: { x: number; y: number }) {
+    doFlood({
+      floodMap: this.floodMap!,
+      toleranceMap: this.toleranceMap!,
+      queue: this.toleranceQueue,
+      tolerance: this.tolerance,
+      maxTol: 0,
+      seen: this.seen,
+    });
+    // Make a threshold mask
+    this.roiMask = this.floodMap!.mask({
+      threshold: this.tolerance,
+      invert: true,
+    });
+
+    if (!this.roiMask) return;
+
+    this.overlayData = this.colorOverlay(
+      this.roiMask,
+      this.offset,
+      position,
+      this.image.width,
+      this.image.height
+    );
+  }
+
+  private colorOverlay(
     mask: ImageJS.Image,
     offset: { x: number; y: number },
     position: { x: number; y: number },
     width: number,
-    height: number,
-    color: string
+    height: number
   ) {
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-    const fillColor = [r, g, b, 150];
-
     let overlay = new ImageJS.Image(
       width,
       height,
@@ -172,7 +185,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     for (let x = 0; x < mask.width; x++) {
       for (let y = 0; y < mask.height; y++) {
         if (mask.getBitXY(x, y)) {
-          overlay.setPixelXY(x + offset.x, y + offset.y, fillColor);
+          overlay.setPixelXY(x + offset.x, y + offset.y, [237, 0, 0, 150]);
         }
       }
     }
@@ -181,34 +194,5 @@ export class ColorAnnotationTool extends AnnotationTool {
     overlay.setPixelXY(position.x, position.y, [255, 255, 255, 255]);
 
     return overlay.toDataURL("image/png", { useCanvas: true });
-  }
-
-  private updateOverlay(position: { x: number; y: number }) {
-    if (this.maxTol <= this.tolerance) {
-      doFlood({
-        floodMap: this.floodMap!,
-        toleranceMap: this.toleranceMap!,
-        queue: this.toleranceQueue,
-        tolerance: this.tolerance,
-        maxTol: this.maxTol,
-        seen: this.seen,
-      });
-    }
-    // Make a threshold mask
-    this.roiMask = this.floodMap!.mask({
-      threshold: this.tolerance,
-      invert: true,
-    });
-
-    if (!this.roiMask) return;
-
-    this.overlayData = ColorAnnotationTool.colorOverlay(
-      this.roiMask,
-      this.offset,
-      position,
-      this.image.width,
-      this.image.height,
-      "red"
-    );
   }
 }

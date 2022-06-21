@@ -1,10 +1,10 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { createPathFinder, makeGraph, PiximiGraph } from "../../../GraphHelper";
-import { getIdx } from "../../../../../image/imageHelper";
+import { getIdx } from "image/imageHelper";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class MagneticAnnotationTool extends AnnotationTool {
   anchor?: { x: number; y: number };
@@ -149,12 +149,8 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
 
-      const maskImage = this.computeMask().crop({
-        x: this._boundingBox[0],
-        y: this._boundingBox[1],
-        width: this._boundingBox[2] - this._boundingBox[0],
-        height: this._boundingBox[3] - this._boundingBox[1],
-      });
+      const maskImage = this.computeAnnotationMaskFromPoints();
+      if (!maskImage) return;
 
       this._mask = encode(maskImage.data);
 

@@ -8,18 +8,19 @@ import RadioGroup from "@mui/material/RadioGroup";
 import { useDispatch, useSelector } from "react-redux";
 import {
   annotationStateSelector,
+  selectedAnnotationSelector,
   selectionModeSelector,
-} from "../../../../../store/selectors";
-import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
+} from "store/selectors";
+import { AnnotationModeType } from "types/AnnotationModeType";
 import ListSubheader from "@mui/material/ListSubheader";
 import { NewTooltip } from "../NewTooltip";
 import { AddTooltip } from "../AddTooltip";
 import { SubtractTooltip } from "../SubtractTooltip";
 import { IntersectionTooltip } from "../IntersectionTooltip";
-import { RadioCheckedIcon, RadioUncheckedIcon } from "../../../../../icons";
-import { useTranslation } from "../../../../../hooks/useTranslation";
-import { imageViewerSlice } from "../../../../../store/slices";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
+import { useTranslation } from "hooks/useTranslation";
+import { imageViewerSlice } from "store/slices";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,27 @@ export const AnnotationMode = () => {
   const annotationMode = useSelector(selectionModeSelector);
 
   const annotationState = useSelector(annotationStateSelector);
+
+  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+
+  const [disableAnnotationEdits, setDisabledAnnotationEdit] =
+    React.useState(true);
+
+  React.useEffect(() => {
+    if (
+      selectedAnnotation ||
+      annotationState === AnnotationStateType.Annotated
+    ) {
+      setDisabledAnnotationEdit(false);
+    } else {
+      setDisabledAnnotationEdit(true);
+      dispatch(
+        imageViewerSlice.actions.setSelectionMode({
+          selectionMode: AnnotationModeType.New,
+        })
+      );
+    }
+  }, [selectedAnnotation, annotationState, dispatch]);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const payload = {
@@ -81,7 +103,7 @@ export const AnnotationMode = () => {
           <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
-            //disabled={annotationState === AnnotationStateType.Blank}
+            disabled={disableAnnotationEdits}
           >
             <ListItemIcon>
               <Radio
@@ -104,7 +126,7 @@ export const AnnotationMode = () => {
             onClick={(event) =>
               onClickLabel(event, AnnotationModeType.Subtract)
             }
-            disabled={annotationState === AnnotationStateType.Blank}
+            disabled={disableAnnotationEdits}
           >
             <ListItemIcon>
               <Radio
@@ -127,7 +149,7 @@ export const AnnotationMode = () => {
             onClick={(event) =>
               onClickLabel(event, AnnotationModeType.Intersect)
             }
-            disabled={annotationState === AnnotationStateType.Blank}
+            disabled={disableAnnotationEdits}
           >
             <ListItemIcon>
               <Radio
