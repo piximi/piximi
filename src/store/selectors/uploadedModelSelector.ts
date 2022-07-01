@@ -1,5 +1,5 @@
 import { Classifier } from "../../types/Classifier";
-import { ClassifierModelProps } from "../../types/ClassifierModelType";
+import { ClassifierModelProps } from "../../types/ModelType";
 
 export const uploadedModelSelector = ({
   classifier,

@@ -7,12 +7,12 @@ import { classifierSlice } from "../../../../store/slices";
 import { architectureOptionsSelector } from "../../../../store/selectors/architectureOptionsSelector";
 import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
 import {
-  availableModels,
+  availableClassifierModels,
   ClassifierModelProps,
-} from "../../../../types/ClassifierModelType";
+} from "../../../../types/ModelType";
 import { SyntheticEvent } from "react";
 import { uploadedModelSelector } from "../../../../store/selectors/uploadedModelSelector";
-import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
+import { CustomNumberTextField } from "../../../common/CustomNumberTextField/CustomNumberTextField";
 
 export const ArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(architectureOptionsSelector);
@@ -29,7 +29,8 @@ export const ArchitectureSettingsGrid = () => {
 
   const dispatch = useDispatch();
 
-  const modelOptions: ClassifierModelProps[] = availableModels.slice();
+  const modelOptions: ClassifierModelProps[] =
+    availableClassifierModels.slice();
 
   if (userUploadedModel) {
     modelOptions.push(userUploadedModel);

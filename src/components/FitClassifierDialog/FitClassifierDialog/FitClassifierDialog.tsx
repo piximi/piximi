@@ -1,6 +1,6 @@
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
-import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
+import { OptimizerSettingsListItem } from "../../common/OptimizerSettingsListItem/OptimizerSettingsListItem";
+import { DatasetSettingsListItem } from "../../common/DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
@@ -12,8 +12,8 @@ import {
   compiledSelector,
 } from "../../../store/selectors";
 import { useEffect, useState } from "react";
-import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
-import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
+import { TrainingHistoryPlot } from "../../common/TrainingHistoryPlot";
+import { ModelSummaryTable } from "../../common/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";

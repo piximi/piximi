@@ -7,7 +7,7 @@ type DisabledClassifierListItemProps = {
   children?: React.ReactNode;
 };
 
-export const DisabledClassifierListItem = ({
+export const DisabledListItem = ({
   disabled,
   helperText,
   children,

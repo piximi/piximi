@@ -8,10 +8,10 @@ import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
 import {
-  availableModels,
+  availableClassifierModels,
   ClassifierModelProps,
-} from "../../types/ClassifierModelType";
-import { EvaluationResultType } from "types/EvaluationResultType";
+} from "../../types/ModelType";
+import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
 
 const initialState: Classifier = {
@@ -31,7 +31,7 @@ const initialState: Classifier = {
   fitting: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModel: availableModels[0],
+  selectedModel: availableClassifierModels[0],
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   predicting: false,
@@ -98,10 +98,12 @@ export const classifierSlice = createSlice({
       state.predicted = classifier.predicted;
       state.preprocessOptions = classifier.preprocessOptions;
 
-      state.selectedModel = availableModels[0];
+      state.selectedModel = classifier.selectedModel;
+
+      state.selectedModel = availableClassifierModels[0];
       if (classifier.selectedModel) {
         const selectedModel = classifier.selectedModel;
-        availableModels.forEach((model) => {
+        availableClassifierModels.forEach((model) => {
           if (
             selectedModel.modelType === model.modelType &&
             selectedModel.modelName === model.modelName
@@ -156,11 +158,6 @@ export const classifierSlice = createSlice({
     },
     updateFitting(state, action: PayloadAction<{ fitting: boolean }>) {
       state.fitting = false;
-    },
-    addFitted(state, action: PayloadAction<{ fitted: LayersModel }>) {
-      const { fitted } = action.payload;
-
-      state.fitted = fitted;
     },
     updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
       state.inputShape = action.payload.inputShape;
@@ -270,7 +267,9 @@ export const classifierSlice = createSlice({
     },
     updateEvaluationResult(
       state,
-      action: PayloadAction<{ evaluationResult: EvaluationResultType }>
+      action: PayloadAction<{
+        evaluationResult: ClassifierEvaluationResultType;
+      }>
     ) {
       const { evaluationResult } = action.payload;
 

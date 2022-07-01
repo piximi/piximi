@@ -7,7 +7,7 @@ import {
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../store/slices";
-import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
+import { DisabledListItem } from "../common/DisabledListItem/DisabledListItem";
 import React, { useEffect } from "react";
 import { predictionFlagSelector } from "store/selectors/predictionFlagSelector";
 import { useTranslation } from "hooks/useTranslation";
@@ -37,7 +37,7 @@ export const PredictClassifierListItem = (
   }, [predicting]);
 
   return (
-    <DisabledClassifierListItem {...props}>
+    <DisabledListItem {...props}>
       <ListItem button onClick={onPredict} disablePadding>
         <ListItemIcon>
           <LabelImportantIcon />
@@ -46,6 +46,6 @@ export const PredictClassifierListItem = (
       </ListItem>
 
       {isPredicting && <CircularProgress disableShrink size={20} />}
-    </DisabledClassifierListItem>
+    </DisabledListItem>
   );
 };

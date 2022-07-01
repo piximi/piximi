@@ -23,6 +23,8 @@ export {
   updateTrainingPercentage,
 } from "./classifierSlice";
 
+export { segmenterSlice, fitSegmenter } from "./segmenterSlice";
+
 export {
   imageViewerSlice,
   addImages,

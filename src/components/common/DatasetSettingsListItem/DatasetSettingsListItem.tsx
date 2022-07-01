@@ -12,8 +12,8 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
-import { StyledFormControl } from "../StyledFormControl";
+import { CustomNumberTextField } from "../CustomNumberTextField/CustomNumberTextField";
+import { StyledFormControl } from "../../FitClassifierDialog/StyledFormControl";
 
 export const DatasetSettingsListItem = () => {
   const dispatch = useDispatch();

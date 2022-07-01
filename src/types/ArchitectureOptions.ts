@@ -1,4 +1,4 @@
-import { ClassifierModelProps } from "./ClassifierModelType";
+import { ClassifierModelProps } from "./ModelType";
 import { Shape } from "./Shape";
 
 export type ArchitectureOptions = {

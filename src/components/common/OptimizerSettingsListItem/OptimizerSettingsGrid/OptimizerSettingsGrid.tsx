@@ -5,7 +5,7 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { StyledFormControl } from "../../StyledFormControl";
+import { StyledFormControl } from "../../../FitClassifierDialog/StyledFormControl";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "../../../../store/slices";
@@ -15,7 +15,7 @@ import { learningRateSelector } from "../../../../store/selectors/learningRateSe
 import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
 import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
 import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
-import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
+import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
 import { enumKeys } from "utils/enumKeys";
 
 export const OptimizerSettingsGrid = () => {

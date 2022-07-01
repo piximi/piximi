@@ -6,7 +6,7 @@ import { ImageShapeEnum } from "../../../../image/imageHelper";
 import { useDispatch } from "react-redux";
 import { Alert, Box, Button, DialogActions } from "@mui/material";
 import { applicationSlice } from "../../../../store/slices";
-import { CustomNumberTextField } from "components/CustomNumberTextField/CustomNumberTextField";
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 import { useHotkeys } from "react-hotkeys-hook";
 
 type ImageShapeDialogProps = {

@@ -1,5 +1,5 @@
 import { Category } from "../../../types/Category";
-import { EvaluationResultType } from "types/EvaluationResultType";
+import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { ImageType } from "../../../types/ImageType";
 import { createdCategoriesSelector } from "../../selectors";
 import { fittedSelector } from "../../selectors/fittedSelector";
@@ -66,7 +66,7 @@ function* runEvaluation(
   }> = yield select(valDataSelector);
 
   try {
-    var evaluationResult: EvaluationResultType = yield evaluate(
+    var evaluationResult: ClassifierEvaluationResultType = yield evaluate(
       model,
       validationData,
       validationImages,

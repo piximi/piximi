@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { EvaluateClassifierDialog } from "components/EvaluateClassifierDialog/EvaluateClassifierDialog";
 import { Category } from "types/Category";
 import { createdCategoriesSelector } from "store/selectors";
-import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
+import { DisabledListItem } from "../common/DisabledListItem/DisabledListItem";
 import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
 import { classifierSlice } from "store/slices";
 import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
@@ -49,7 +49,7 @@ export const EvaluateClassifierListItem = (
 
   return (
     <>
-      <DisabledClassifierListItem {...props}>
+      <DisabledListItem {...props}>
         <ListItem button onClick={onEvaluate} disablePadding>
           <ListItemIcon>
             <AssessmentIcon />
@@ -58,7 +58,7 @@ export const EvaluateClassifierListItem = (
         </ListItem>
 
         {isEvaluating && <CircularProgress disableShrink size={20} />}
-      </DisabledClassifierListItem>
+      </DisabledListItem>
 
       <EvaluateClassifierDialog
         openedDialog={open}

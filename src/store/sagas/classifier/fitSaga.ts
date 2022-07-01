@@ -1,7 +1,7 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import _ from "lodash";
 import { put, select } from "redux-saga/effects";
-import { compile, fit, open, preprocess } from "../../coroutines/classifier";
+import { compile, fit, open, preprocess } from "store/coroutines";
 import { applicationSlice, classifierSlice, projectSlice } from "../../slices";
 import {
   categorizedImagesSelector,
@@ -21,7 +21,7 @@ import { CompileOptions } from "../../../types/CompileOptions";
 import { Category } from "../../../types/Category";
 import { ImageType } from "../../../types/ImageType";
 import { FitOptions } from "../../../types/FitOptions";
-import { ModelType } from "../../../types/ClassifierModelType";
+import { ModelType } from "../../../types/ModelType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
 import { Partition } from "types/Partition";

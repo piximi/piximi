@@ -1,10 +1,10 @@
 import { Classifier } from "../../types/Classifier";
-import { EvaluationResultType } from "types/EvaluationResultType";
+import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 
 export const evaluationResultSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): EvaluationResultType => {
+}): ClassifierEvaluationResultType => {
   return classifier.evaluationResult!;
 };
