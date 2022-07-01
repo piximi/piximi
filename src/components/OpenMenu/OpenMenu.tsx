@@ -1,9 +1,14 @@
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state";
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenClassifierDialog } from "../OpenClassifierDialog";
-import { useDialog } from "../../hooks";
+import { ImportTensorflowModelDialog } from "../common/ImportTensorflowModelDialog";
+import { useDialog } from "hooks";
 import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
+import { useDispatch } from "react-redux";
+import { classifierSlice, segmenterSlice } from "store/slices";
+import { Shape } from "types/Shape";
+import { ModelType } from "types/ModelType";
+import { LayersModel } from "@tensorflow/tfjs";
 
 type OpenMenuProps = {
   popupState: any;
@@ -11,15 +16,56 @@ type OpenMenuProps = {
 
 export const OpenMenu = ({ popupState }: OpenMenuProps) => {
   const {
-    onClose: onCloseClassifierDialog,
-    onOpen: onOpenClassifierDialog,
-    open: openClassifierDialog,
+    onClose: onCloseImportClassifierDialog,
+    onOpen: onOpenImportClassifierDialog,
+    open: openImportClassifierDialog,
+  } = useDialog();
+  const {
+    onClose: onCloseImportSegmenterDialog,
+    onOpen: onOpenImportSegmenterDialog,
+    open: openImportSegmenterDialog,
   } = useDialog();
   const {
     onClose: onCloseExampleClassifierDialog,
     onOpen: onOpenExampleClassifierDialog,
     open: openExampleClassifier,
   } = useDialog();
+
+  const dispatch = useDispatch();
+
+  const importClassifierModel = (
+    inputShape: Shape,
+    modelName: string,
+    classifierModel: any
+  ) => {
+    dispatch(
+      classifierSlice.actions.uploadUserSelectedModel({
+        inputShape: inputShape,
+        modelSelection: {
+          modelName: modelName + " - uploaded",
+          modelType: ModelType.UserUploaded,
+        },
+        model: classifierModel as LayersModel,
+      })
+    );
+  };
+
+  const importSegmentationModel = (
+    inputShape: Shape,
+    modelName: string,
+    classifierModel: any
+  ) => {
+    dispatch(
+      segmenterSlice.actions.uploadUserSelectedModel({
+        inputShape: inputShape,
+        modelSelection: {
+          modelName: modelName + " - uploaded",
+          modelType: ModelType.UserUploaded,
+        },
+        model: classifierModel as LayersModel,
+      })
+    );
+  };
 
   return (
     <Menu {...bindMenu(popupState)}>
@@ -30,7 +76,12 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
         </MenuItem>
         <Divider />
 
-        <MenuItem onClick={onOpenClassifierDialog}>Open classifier</MenuItem>
+        <MenuItem onClick={onOpenImportClassifierDialog}>
+          Import classifier model
+        </MenuItem>
+        <MenuItem onClick={onOpenImportSegmenterDialog}>
+          Import Segmentation model
+        </MenuItem>
       </MenuList>
 
       <OpenExampleClassifierDialog
@@ -39,10 +90,20 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
         popupState={popupState}
       />
 
-      <OpenClassifierDialog
-        onClose={onCloseClassifierDialog}
-        open={openClassifierDialog}
+      <ImportTensorflowModelDialog
+        onClose={onCloseImportClassifierDialog}
+        open={openImportClassifierDialog}
         popupState={popupState}
+        modelType={"Classifier"}
+        dispatchFunction={importClassifierModel}
+      />
+
+      <ImportTensorflowModelDialog
+        onClose={onCloseImportSegmenterDialog}
+        open={openImportSegmenterDialog}
+        popupState={popupState}
+        modelType={"Segmentation"}
+        dispatchFunction={importSegmentationModel}
       />
     </Menu>
   );

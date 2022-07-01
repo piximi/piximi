@@ -10,28 +10,33 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { classifierSlice } from "../../store/slices";
-import { Shape } from "../../types/Shape";
+import { Shape } from "types/Shape";
 import * as tf from "@tensorflow/tfjs";
-import { useDispatch } from "react-redux";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { LayersModel } from "@tensorflow/tfjs";
-import { ModelType } from "../../types/ClassifierModelType";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
-type OpenClassifierDialogProps = {
+type ImportTensorflowModelDialogProps = {
   onClose: any;
   open: any;
   popupState: any;
+  modelType: string;
+  dispatchFunction: (
+    inputShape: Shape,
+    modelName: string,
+    classifierModel: any
+  ) => void;
 };
 
-export const OpenClassifierDialog = ({
+export const ImportTensorflowModelDialog = ({
   onClose,
   open,
   popupState,
-}: OpenClassifierDialogProps) => {
+  modelType,
+  dispatchFunction,
+}: ImportTensorflowModelDialogProps) => {
   const [classifierModel, setClassifierModel] = React.useState<LayersModel>();
   const [modelSelected, setModelSelected] = React.useState<boolean>(false);
   const [modelName, setModelName] = React.useState<string>("");
@@ -47,19 +52,8 @@ export const OpenClassifierDialog = ({
     React.useState<AlertStateType>(defaultAlert);
   const [showFileError, setShowFileError] = React.useState<boolean>(false);
 
-  const dispatch = useDispatch();
-
   const dispatchModelToStore = () => {
-    dispatch(
-      classifierSlice.actions.uploadUserSelectedModel({
-        inputShape: inputShape,
-        modelSelection: {
-          modelName: modelName + " - uploaded",
-          modelType: ModelType.UserUploaded,
-        },
-        model: classifierModel as LayersModel,
-      })
-    );
+    dispatchFunction(inputShape, modelName, classifierModel);
 
     closeDialog();
     popupState.close();
@@ -79,54 +73,20 @@ export const OpenClassifierDialog = ({
       return;
     }
 
-    let weightsFile, jsonFile;
-    if (event.currentTarget.files[0].name.includes(".bin")) {
-      weightsFile = event.currentTarget.files[0];
-      jsonFile = event.currentTarget.files[1];
-    } else {
-      weightsFile = event.currentTarget.files[1];
-      jsonFile = event.currentTarget.files[0];
-    }
-
-    var newJsonFile: File;
-    try {
-      // make sure the weight file required in the json has the correct name
-      const jsonFileContent = await jsonFile.text();
-
-      const weightFileName = weightsFile.name;
-      const weightFileNameReplaceString =
-        'paths":["./' +
-        weightFileName.substring(0, weightFileName.length - 4) +
-        '.bin"]';
-
-      const regexPattern = new RegExp('paths":\\["./(.)*weights.bin"]');
-      const updatedJsonFileContent = jsonFileContent.replace(
-        regexPattern,
-        weightFileNameReplaceString
-      );
-
-      newJsonFile = new File([updatedJsonFileContent], jsonFile.name, {
-        type: jsonFile.type,
-      });
-    } catch (err) {
-      const error: Error = err as Error;
-
-      setAlertState({
-        alertType: AlertType.Warning,
-        name: "Error reading the classifier files",
-        description:
-          "Couldn't parse classifier files:\n" +
-          error.name +
-          "\n" +
-          error.message,
-      });
-      setShowFileError(true);
-      return;
+    let weightsFiles: Array<File> = [];
+    let jsonFile = event.currentTarget.files[0];
+    for (let i = 0; i < event.currentTarget.files.length; i++) {
+      const file = event.currentTarget.files[i];
+      if (file.name.endsWith(".json")) {
+        jsonFile = file;
+      } else {
+        weightsFiles.push(file);
+      }
     }
 
     try {
       const model = await tf.loadLayersModel(
-        tf.io.browserFiles([newJsonFile, weightsFile])
+        tf.io.browserFiles([jsonFile, ...weightsFiles])
       );
       setClassifierModel(model);
       setModelSelected(true);
@@ -161,14 +121,14 @@ export const OpenClassifierDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
-      <DialogTitle>Open classifier</DialogTitle>
+      <DialogTitle>Import {modelType} model</DialogTitle>
 
       <input
         accept="application/json|.bin"
         hidden
         type="file"
         multiple
-        id="open-classifier-file"
+        id="open-model-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           onClassifierFilesSelected(event)
         }
@@ -184,16 +144,16 @@ export const OpenClassifierDialog = ({
       <DialogContent>
         <Typography gutterBottom>
           Tensorflow requires a .json files containing the model description as
-          well as the corresponding model weights (.bin file).
+          well as the corresponding model weights (.bin file(s)).
         </Typography>
       </DialogContent>
 
-      <label htmlFor="open-classifier-file">
+      <label htmlFor="open-model-file">
         <MenuItem component="span" dense>
           <ListItemIcon>
             <FileOpenIcon />
           </ListItemIcon>
-          <ListItemText primary="Select classifier files" />
+          <ListItemText primary="Select model files" />
         </MenuItem>
       </label>
 
@@ -207,7 +167,7 @@ export const OpenClassifierDialog = ({
           color="primary"
           disabled={!modelSelected}
         >
-          Open Classifier
+          Open {modelType} model
         </Button>
       </DialogActions>
     </Dialog>
