@@ -256,6 +256,19 @@ export const projectSlice = createSlice({
         }
       });
     },
+    updateSegmentationImagesPartition(
+      state: Project,
+      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = findIndex(state.images, (image: ImageType) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].segmentationPartition = action.payload.partition;
+        }
+      });
+    },
     updateTask(state: Project, action: PayloadAction<{ task: Task }>) {
       state.task = action.payload.task;
     },
@@ -287,4 +300,5 @@ export const {
   updateImageCategories,
   updateImageCategory,
   updateOtherCategoryVisibility,
+  updateSegmentationImagesPartition,
 } = projectSlice.actions;

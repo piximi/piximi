@@ -7,7 +7,7 @@ import {
   classifierSlice,
   projectSlice,
   segmenterSlice,
-} from "../../slices";
+} from "store/slices";
 import {
   compiledSelector,
   compileOptionsSelector,
@@ -16,16 +16,14 @@ import {
   fitOptionsSelector,
   preprocessOptionsSelector,
   trainingPercentageSelector,
-} from "../../selectors";
-import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
-import { trainImagesSelector } from "../../selectors/trainImagesSelector";
-import { valImagesSelector } from "../../selectors/valImagesSelector";
-import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
-import { CompileOptions } from "../../../types/CompileOptions";
-import { Category } from "../../../types/Category";
-import { ImageType } from "../../../types/ImageType";
-import { FitOptions } from "../../../types/FitOptions";
-import { ModelType } from "../../../types/ModelType";
+} from "store/selectors";
+import { architectureOptionsSelector } from "store/selectors/architectureOptionsSelector";
+import { ArchitectureOptions } from "types/ArchitectureOptions";
+import { CompileOptions } from "types/CompileOptions";
+import { Category } from "types/Category";
+import { ImageType } from "types/ImageType";
+import { FitOptions } from "types/FitOptions";
+import { ModelType } from "types/ModelType";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
 import { Partition } from "types/Partition";
@@ -36,6 +34,10 @@ import {
   preprocessSegmentationImages,
   fitSegmenter,
 } from "store/coroutines";
+import {
+  segmentationTrainImagesSelector,
+  segmentationValidationImagesSelector,
+} from "store/selectors/segmenter";
 
 export function* fitSegmenterSaga(action: any): any {
   const { onEpochEnd } = action.payload;
@@ -57,8 +59,7 @@ export function* fitSegmenterSaga(action: any): any {
     return image.id;
   });
 
-  //separate ids into train and val datasets
-  // TODO: Set and select the dataset partitions properly
+  // Separate ids into train and val datasets.
   const trainDataLength = Math.round(
     trainingPercentage * annotatedImagesIds.length
   );
@@ -68,14 +69,14 @@ export function* fitSegmenterSaga(action: any): any {
   const valDataIds = _.takeRight(annotatedImagesIds, valDataLength);
 
   yield put(
-    projectSlice.actions.updateImagesPartition({
+    projectSlice.actions.updateSegmentationImagesPartition({
       ids: trainDataIds,
       partition: Partition.Training,
     })
   );
 
   yield put(
-    projectSlice.actions.updateImagesPartition({
+    projectSlice.actions.updateSegmentationImagesPartition({
       ids: valDataIds,
       partition: Partition.Validation,
     })
@@ -110,9 +111,15 @@ export function* fitSegmenterSaga(action: any): any {
 
   yield put(segmenterSlice.actions.updateCompiled({ compiled: compiledModel }));
 
+  // TODO: Select annotation categories
   const categories: Category[] = yield select(createdCategoriesSelector);
-  const trainImages: ImageType[] = yield select(trainImagesSelector);
-  const valImages: ImageType[] = yield select(valImagesSelector);
+
+  const trainImages: ImageType[] = yield select(
+    segmentationTrainImagesSelector
+  );
+  const valImages: ImageType[] = yield select(
+    segmentationValidationImagesSelector
+  );
 
   try {
     const trainData: tensorflow.data.Dataset<{
@@ -137,7 +144,7 @@ export function* fitSegmenterSaga(action: any): any {
       fitOptions
     );
 
-    var data = { train: trainData, val: valData };
+    var dataset = { train: trainData, val: valData };
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
@@ -147,7 +154,7 @@ export function* fitSegmenterSaga(action: any): any {
   try {
     var { fitted, status: trainingHistory } = yield fitSegmenter(
       compiledModel,
-      data,
+      dataset,
       fitOptions,
       onEpochEnd
     );
