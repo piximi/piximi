@@ -69,6 +69,7 @@ export {
   updateImageCategory,
   updateImageCategories,
   updateOtherCategoryVisibility,
+  setAnnotationCategories,
 } from "./projectSlice";
 
 export { toolOptionsSlice } from "./toolOptionsSlice";

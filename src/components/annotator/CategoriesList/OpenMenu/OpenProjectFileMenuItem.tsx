@@ -2,14 +2,18 @@ import { batch, useDispatch } from "react-redux";
 import React from "react";
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import { SerializedFileType } from "../../../../types/SerializedFileType";
-import { ToolType } from "../../../../types/ToolType";
+import { SerializedFileType } from "types/SerializedFileType";
+import { ToolType } from "types/ToolType";
 import {
   imageViewerSlice,
   setActiveImage,
+  setAnnotationCategories,
   setOperation,
-} from "../../../../store/slices";
+} from "store/slices";
 import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+import { importSerializedAnnotations } from "image/imageHelper";
+import { AnnotationType } from "types/AnnotationType";
+import { SerializedAnnotationType } from "types/SerializedAnnotationType";
 
 type OpenAnnotationsMenuItemProps = {
   popupState: any;
@@ -40,20 +44,33 @@ export const OpenProjectFileMenuItem = ({
 
         batch(() => {
           dispatch(imageViewerSlice.actions.setImages({ images: [] }));
-          dispatch(
-            imageViewerSlice.actions.setCategories({
-              categories: [UNKNOWN_ANNOTATION_CATEGORY],
-            })
-          );
 
+          let updatedAnnotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
           serializedImages.forEach(
             (serializedImage: SerializedFileType, index: number) => {
+              const annotations = serializedImage.annotations.map(
+                (annotation: SerializedAnnotationType): AnnotationType => {
+                  const { annotation_out, categories } =
+                    importSerializedAnnotations(
+                      annotation,
+                      updatedAnnotationCategories
+                    );
+                  updatedAnnotationCategories = categories;
+                  return annotation_out;
+                }
+              );
+
               dispatch(
                 imageViewerSlice.actions.openAnnotations({
-                  file: serializedImage,
+                  imageFile: serializedImage,
+                  annotations: annotations,
                 })
               );
             }
+          );
+
+          dispatch(
+            setAnnotationCategories({ categories: updatedAnnotationCategories })
           );
 
           dispatch(

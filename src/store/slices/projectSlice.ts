@@ -1,14 +1,38 @@
-import { Project } from "../../types/Project";
+import { Project } from "types/Project";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import {
+  Category,
+  UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_ID,
+} from "types/Category";
 import { v4 as uuidv4 } from "uuid";
-import { ImageType, ShadowImageType } from "../../types/ImageType";
+import { ImageType, ShadowImageType } from "types/ImageType";
 import { filter, findIndex } from "lodash";
-import { Task } from "../../types/Task";
-import { Partition } from "../../types/Partition";
+import { Task } from "types/Task";
+import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { replaceDuplicateName } from "../../image/imageHelper";
+import { replaceDuplicateName } from "image/imageHelper";
 import { defaultImage } from "images/defaultImage";
+import _ from "lodash";
+
+const initialAnnotationCategories =
+  process.env.NODE_ENV === "development"
+    ? [
+        UNKNOWN_ANNOTATION_CATEGORY,
+        {
+          color: "#b66dff",
+          id: "00000000-0000-0000-0000-000000000001",
+          name: "Cell membrane",
+          visible: true,
+        },
+        {
+          color: "#6db6ff",
+          id: "00000000-0000-0000-0000-000000000002",
+          name: "Cell nucleus",
+          visible: true,
+        },
+      ]
+    : [UNKNOWN_ANNOTATION_CATEGORY];
 
 const initialState: Project = {
   categories: [
@@ -19,6 +43,7 @@ const initialState: Project = {
       visible: true,
     },
   ],
+  annotationCategories: initialAnnotationCategories,
   images: [defaultImage],
   name: "Untitled project",
   task: Task.Classify,
@@ -80,6 +105,7 @@ export const projectSlice = createSlice({
           visible: true,
         },
       ];
+      state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
       state.images = [];
       state.task = Task.Classify;
       state.trainFlag = 0;
@@ -111,9 +137,11 @@ export const projectSlice = createSlice({
         images: Array<ImageType>;
         name: string;
         categories: Array<Category>;
+        annotationCategories: Array<Category>;
       }>
     ) {
       state.categories = action.payload.categories;
+      state.annotationCategories = action.payload.annotationCategories;
       state.name = action.payload.name;
       state.images = action.payload.images;
     },
@@ -287,6 +315,36 @@ export const projectSlice = createSlice({
 
       state.images.sort(selectedSortKey.comparerFunction);
     },
+    setAnnotationCategories(
+      state: Project,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      state.annotationCategories = action.payload.categories;
+    },
+    deleteAnnotationCategory(
+      state: Project,
+      action: PayloadAction<{ category: Category }>
+    ) {
+      state.annotationCategories = state.annotationCategories.filter(
+        (category: Category) => category.id !== action.payload.category.id
+      );
+    },
+    setAnnotationCategoryVisibility(
+      state: Project,
+      action: PayloadAction<{ category: Category; visible: boolean }>
+    ) {
+      const category = _.find(state.annotationCategories, (category) => {
+        return category.id === action.payload.category.id;
+      });
+      if (!category) return;
+      category.visible = action.payload.visible;
+      state.annotationCategories = [
+        ...state.annotationCategories.filter((category) => {
+          return category.id !== action.payload.category.id;
+        }),
+        category,
+      ];
+    },
   },
 });
 
@@ -301,4 +359,5 @@ export const {
   updateImageCategory,
   updateOtherCategoryVisibility,
   updateSegmentationImagesPartition,
+  setAnnotationCategories,
 } = projectSlice.actions;

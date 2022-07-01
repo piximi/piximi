@@ -6,12 +6,12 @@ import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "../../../../../hooks/useTranslation";
+import { useTranslation } from "hooks/useTranslation";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { selectedCategorySelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "../../../../../types/Category";
-import { annotatorImagesSelector } from "../../../../../store/selectors/annotatorImagesSelector";
+import { selectedCategorySelector } from "store/selectors";
+import { imageViewerSlice, projectSlice } from "store/slices";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
@@ -66,7 +66,7 @@ export const CategoryMenu = ({
         );
 
         dispatch(
-          imageViewerSlice.actions.deleteCategory({ category: category })
+          projectSlice.actions.deleteAnnotationCategory({ category: category })
         );
       });
     }

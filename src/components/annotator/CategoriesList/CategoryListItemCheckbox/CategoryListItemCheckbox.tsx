@@ -3,9 +3,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import { Category } from "../../../../types/Category";
+import { Category } from "types/Category";
 import { useDispatch } from "react-redux";
-import { imageViewerSlice } from "../../../../store/slices";
+import { projectSlice } from "store/slices";
 
 type CategoryListItemCheckboxProps = {
   category: Category;
@@ -18,7 +18,7 @@ export const CategoryListItemCheckbox = ({
 
   const onCheckboxClick = () => {
     dispatch(
-      imageViewerSlice.actions.setCategoryVisibility({
+      projectSlice.actions.setAnnotationCategoryVisibility({
         category: category,
         visible: !category.visible,
       })

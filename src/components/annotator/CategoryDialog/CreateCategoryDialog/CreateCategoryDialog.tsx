@@ -2,10 +2,10 @@ import React, { FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { sample } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { Category } from "../../../../types/Category";
-import { replaceDuplicateName } from "../../../../image/imageHelper";
-import { imageViewerSlice } from "../../../../store/slices";
-import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
+import { Category } from "types/Category";
+import { replaceDuplicateName } from "image/imageHelper";
+import { imageViewerSlice, setAnnotationCategories } from "store/slices";
+import { annotationCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
 import { CategoryDialog } from "../CategoryDialog";
 import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
 
@@ -20,7 +20,7 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(annotatorCategoriesSelector);
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const availableColors = useSelector(availableAnnotationColorsSelector);
   const [color, setColor] = React.useState<string>(sample(availableColors)!);
@@ -29,7 +29,7 @@ export const CreateCategoryDialog = ({
 
   const onCreate = () => {
     const initialName = name ? name : "Unnamed";
-    const categoryNames = categories.map((category: Category) => {
+    const categoryNames = annotationCategories.map((category: Category) => {
       return category.name;
     });
     const updatedName = replaceDuplicateName(initialName, categoryNames);
@@ -42,8 +42,8 @@ export const CreateCategoryDialog = ({
     };
 
     dispatch(
-      imageViewerSlice.actions.setCategories({
-        categories: [...categories, category],
+      setAnnotationCategories({
+        categories: [...annotationCategories, category],
       })
     );
 

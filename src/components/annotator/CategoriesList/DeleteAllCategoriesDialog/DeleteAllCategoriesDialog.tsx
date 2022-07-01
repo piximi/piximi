@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "types/AnnotationType";
-import { imageViewerSlice } from "store/slices";
+import { imageViewerSlice, projectSlice } from "store/slices";
 import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 import { ShadowImageType } from "types/ImageType";
 import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
@@ -48,7 +48,7 @@ export const DeleteAllCategoriesDialog = ({
       );
 
       dispatch(
-        imageViewerSlice.actions.setCategories({
+        projectSlice.actions.setAnnotationCategories({
           categories: [UNKNOWN_ANNOTATION_CATEGORY],
         })
       );

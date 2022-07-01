@@ -67,6 +67,7 @@ export const OpenProjectMenuItem = ({
             projectSlice.actions.openProject({
               images: images,
               categories: project.categories,
+              annotationCategories: project.annotationCategories,
               name: project.name,
             })
           );

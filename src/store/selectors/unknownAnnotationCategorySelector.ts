@@ -1,12 +1,12 @@
 import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
-import { ImageViewer } from "types/ImageViewer";
+import { Project } from "types/Project";
 
 export const unknownAnnotationCategorySelector = ({
-  imageViewer,
+  project,
 }: {
-  imageViewer: ImageViewer;
+  project: Project;
 }) => {
-  return imageViewer.categories.find((category: Category) => {
+  return project.annotationCategories.find((category: Category) => {
     return category.id === UNKNOWN_ANNOTATION_CATEGORY_ID;
   })!;
 };

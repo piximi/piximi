@@ -1,4 +1,4 @@
-import { imageViewerSlice } from "store/slices";
+import { imageViewerSlice, setAnnotationCategories } from "store/slices";
 import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -41,7 +41,7 @@ export const DeleteAllCategoriesListItem = ({
       );
 
       dispatch(
-        imageViewerSlice.actions.setCategories({
+        setAnnotationCategories({
           categories: [UNKNOWN_ANNOTATION_CATEGORY],
         })
       );

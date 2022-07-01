@@ -1,9 +1,9 @@
-import { ImageViewer } from "../../types/ImageViewer";
-import { AnnotationType } from "../../types/AnnotationType";
-import { Category } from "../../types/Category";
-import { ImageType, ShadowImageType } from "../../types/ImageType";
-import { SerializedFileType } from "../../types/SerializedFileType";
-import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
+import { ImageViewer } from "types/ImageViewer";
+import { AnnotationType } from "types/AnnotationType";
+import { Category } from "types/Category";
+import { ImageType, ShadowImageType } from "types/ImageType";
+import { SerializedFileType } from "types/SerializedFileType";
+import { SerializedAnnotationType } from "types/SerializedAnnotationType";
 import { Project } from "types/Project";
 
 export const activeSerializedAnnotationsSelector = ({
@@ -44,11 +44,13 @@ export const activeSerializedAnnotationsSelector = ({
 
   const serializedAnnotations: Array<SerializedAnnotationType> =
     image.annotations.map((annotation: AnnotationType) => {
-      const index = imageViewer.categories.findIndex((category: Category) => {
-        return category.id === annotation.categoryId;
-      });
+      const index = project.annotationCategories.findIndex(
+        (category: Category) => {
+          return category.id === annotation.categoryId;
+        }
+      );
 
-      const category = imageViewer.categories[index];
+      const category = project.annotationCategories[index];
 
       return {
         annotationBoundingBoxHeight: annotation.boundingBox[3],

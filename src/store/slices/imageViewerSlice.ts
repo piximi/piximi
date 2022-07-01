@@ -1,50 +1,31 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ShadowImageType } from "types/ImageType";
-import { Category, UNKNOWN_ANNOTATION_CATEGORY } from "../../types/Category";
-import { ToolType } from "../../types/ToolType";
-import { AnnotationType } from "../../types/AnnotationType";
-import { AnnotationModeType } from "../../types/AnnotationModeType";
-import { AnnotationStateType } from "../../types/AnnotationStateType";
-import { LanguageType } from "../../types/LanguageType";
+import {
+  Category,
+  UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_ID,
+} from "types/Category";
+import { ToolType } from "types/ToolType";
+import { AnnotationType } from "types/AnnotationType";
+import { AnnotationModeType } from "types/AnnotationModeType";
+import { AnnotationStateType } from "types/AnnotationStateType";
+import { LanguageType } from "types/LanguageType";
 import * as tensorflow from "@tensorflow/tfjs";
-import { ImageViewer } from "../../types/ImageViewer";
-import { SerializedAnnotationType } from "../../types/SerializedAnnotationType";
-import { Color } from "../../types/Color";
-import { SerializedFileType } from "../../types/SerializedFileType";
+import { ImageViewer } from "types/ImageViewer";
+import { Color } from "types/Color";
+import { SerializedFileType } from "types/SerializedFileType";
 import {
   generateDefaultChannels,
-  importSerializedAnnotations,
   replaceDuplicateName,
-} from "../../image/imageHelper";
-import * as _ from "lodash";
-import { Partition } from "../../types/Partition";
-import { AnnotationTool } from "../../annotator/image/Tool";
+} from "image/imageHelper";
+import { Partition } from "types/Partition";
+import { AnnotationTool } from "annotator/image/Tool";
 import { defaultImage } from "images/defaultImage";
-
-const initialCategories =
-  process.env.NODE_ENV === "development"
-    ? [
-        UNKNOWN_ANNOTATION_CATEGORY,
-        {
-          color: "#b66dff",
-          id: "00000000-0000-0000-0000-000000000001",
-          name: "Cell membrane",
-          visible: true,
-        },
-        {
-          color: "#6db6ff",
-          id: "00000000-0000-0000-0000-000000000002",
-          name: "Cell nucleus",
-          visible: true,
-        },
-      ]
-    : [UNKNOWN_ANNOTATION_CATEGORY];
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
   boundingClientRect: new DOMRect(),
   brightness: 0,
-  categories: initialCategories,
   currentColors: undefined,
   currentIndex: 0,
   cursor: "default",
@@ -124,14 +105,6 @@ export const imageViewerSlice = createSlice({
         );
       }
     },
-    deleteCategory(
-      state: ImageViewer,
-      action: PayloadAction<{ category: Category }>
-    ) {
-      state.categories = state.categories.filter(
-        (category: Category) => category.id !== action.payload.category.id
-      );
-    },
     deleteImage(state: ImageViewer, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
         (image: ShadowImageType) => image.id !== action.payload.id
@@ -174,48 +147,36 @@ export const imageViewerSlice = createSlice({
     },
     openAnnotations(
       state: ImageViewer,
-      action: PayloadAction<{ file: SerializedFileType }>
+      action: PayloadAction<{
+        imageFile: SerializedFileType;
+        annotations: Array<AnnotationType>;
+      }>
     ) {
-      /*
-       * NOTE: The correct image to annotate is found by looking at the
-       * imageFilename property in the imported annotation file. -- Alice
-       */
       if (!state.activeImageId) return;
 
-      const annotations = action.payload.file.annotations.map(
-        (annotation: SerializedAnnotationType): AnnotationType => {
-          const { annotation_out, categories } = importSerializedAnnotations(
-            annotation,
-            state.categories
-          );
-          state.categories = categories;
-          return annotation_out;
-        }
-      );
-
-      const loaded: ShadowImageType = {
-        id: action.payload.file.imageId,
-        name: action.payload.file.imageFilename,
-        annotations: annotations,
+      const newImage: ShadowImageType = {
+        id: action.payload.imageFile.imageId,
+        name: action.payload.imageFile.imageFilename,
+        annotations: action.payload.annotations,
         activePlane: 0,
-        colors: action.payload.file.imageColors
-          ? action.payload.file.imageColors
-          : generateDefaultChannels(action.payload.file.imageChannels),
-        src: action.payload.file.imageSrc,
-        categoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
-        originalSrc: action.payload.file.imageData,
+        colors: action.payload.imageFile.imageColors
+          ? action.payload.imageFile.imageColors
+          : generateDefaultChannels(action.payload.imageFile.imageChannels),
+        src: action.payload.imageFile.imageSrc,
+        categoryId: UNKNOWN_CATEGORY_ID,
+        originalSrc: action.payload.imageFile.imageData,
         partition: Partition.Inference,
         visible: true,
         shape: {
-          channels: action.payload.file.imageChannels,
-          frames: action.payload.file.imageFrames,
-          height: action.payload.file.imageHeight,
-          planes: action.payload.file.imagePlanes,
-          width: action.payload.file.imageWidth,
+          channels: action.payload.imageFile.imageChannels,
+          frames: action.payload.imageFile.imageFrames,
+          height: action.payload.imageFile.imageHeight,
+          planes: action.payload.imageFile.imagePlanes,
+          width: action.payload.imageFile.imageWidth,
         },
       };
 
-      state.images.push(...[loaded]);
+      state.images.push(...[newImage]);
     },
     setActiveImageRenderedSrcs(
       state: ImageViewer,
@@ -245,28 +206,6 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ brightness: number }>
     ) {
       state.brightness = action.payload.brightness;
-    },
-    setCategories(
-      state: ImageViewer,
-      action: PayloadAction<{ categories: Array<Category> }>
-    ) {
-      state.categories = action.payload.categories;
-    },
-    setCategoryVisibility(
-      state: ImageViewer,
-      action: PayloadAction<{ category: Category; visible: boolean }>
-    ) {
-      const category = _.find(state.categories, (category) => {
-        return category.id === action.payload.category.id;
-      });
-      if (!category) return;
-      category.visible = action.payload.visible;
-      state.categories = [
-        ...state.categories.filter((category) => {
-          return category.id !== action.payload.category.id;
-        }),
-        category,
-      ];
     },
     setContrast(
       state: ImageViewer,
@@ -512,7 +451,6 @@ export const imageViewerSlice = createSlice({
 
 export const {
   addImages,
-  deleteCategory,
   deleteAllInstances,
   deleteImage,
   openAnnotations,
@@ -521,8 +459,6 @@ export const {
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,
-  setCategories,
-  setCategoryVisibility,
   setCurrentColors,
   setContrast,
   setCurrentIndex,

@@ -1,10 +1,21 @@
-import { batch, useDispatch } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { ListItem, ListItemText, Typography } from "@mui/material";
-import { convertToImage, generateDefaultChannels } from "image/imageHelper";
-import { imageViewerSlice, setActiveImage } from "store/slices";
+import {
+  convertToImage,
+  generateDefaultChannels,
+  importSerializedAnnotations,
+} from "image/imageHelper";
+import {
+  imageViewerSlice,
+  setActiveImage,
+  setAnnotationCategories,
+} from "store/slices";
 import { SerializedFileType } from "types/SerializedFileType";
 import * as ImageJS from "image-js";
 import { v4 as uuidv4 } from "uuid";
+import { AnnotationType } from "types/AnnotationType";
+import { SerializedAnnotationType } from "types/SerializedAnnotationType";
+import { annotationCategoriesSelector } from "store/selectors";
 
 type ExampleImageProject = {
   exampleImageName: string;
@@ -31,6 +42,8 @@ export const OpenExampleImageMenuItem = ({
   onClose,
 }: OpenExampleImageMenuItemProps) => {
   const dispatch = useDispatch();
+
+  const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const openExampleImage = async () => {
     onClose();
@@ -59,9 +72,28 @@ export const OpenExampleImageMenuItem = ({
     serializedExampleImageFile.imageData = exampleImageTypeObject.originalSrc;
 
     batch(() => {
+      let updatedAnnotationCategories = annotationCategories;
+      const annotations = serializedExampleImageFile.annotations.map(
+        (annotation: SerializedAnnotationType): AnnotationType => {
+          const { annotation_out, categories } = importSerializedAnnotations(
+            annotation,
+            updatedAnnotationCategories
+          );
+          updatedAnnotationCategories = categories;
+          return annotation_out;
+        }
+      );
+
       dispatch(
         imageViewerSlice.actions.openAnnotations({
-          file: serializedExampleImageFile,
+          imageFile: serializedExampleImageFile,
+          annotations: annotations,
+        })
+      );
+
+      dispatch(
+        setAnnotationCategories({
+          categories: updatedAnnotationCategories,
         })
       );
 

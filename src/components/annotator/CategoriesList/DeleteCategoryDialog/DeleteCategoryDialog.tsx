@@ -6,7 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { AnnotationType } from "types/AnnotationType";
-import { imageViewerSlice } from "store/slices";
+import { imageViewerSlice, projectSlice } from "store/slices";
 import {
   selectedCategorySelector,
   unknownAnnotationCategorySelector,
@@ -56,7 +56,9 @@ export const DeleteCategoryDialog = ({
 
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.deleteCategory({ category: selectedCategory })
+        projectSlice.actions.deleteAnnotationCategory({
+          category: selectedCategory,
+        })
       );
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({

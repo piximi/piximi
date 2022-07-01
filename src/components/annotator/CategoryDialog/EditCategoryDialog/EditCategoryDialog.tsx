@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Category } from "../../../../types/Category";
-import { imageViewerSlice } from "../../../../store/slices";
-import { selectedCategorySelector } from "../../../../store/selectors";
-import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
+import { Category } from "types/Category";
+import { setAnnotationCategories } from "store/slices";
+import { selectedCategorySelector } from "store/selectors";
+import { annotationCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
 import { CategoryDialog } from "../CategoryDialog";
 
 type EditCategoryDialogProps = {
@@ -28,7 +28,7 @@ export const EditCategoryDialog = ({
 
   const [name, setName] = useState<string>(category.name);
 
-  const categories = useSelector(annotatorCategoriesSelector);
+  const categories = useSelector(annotationCategoriesSelector);
 
   const onEdit = () => {
     const updatedCategories = categories?.map((v: Category) => {
@@ -42,9 +42,7 @@ export const EditCategoryDialog = ({
         return v;
       }
     });
-    dispatch(
-      imageViewerSlice.actions.setCategories({ categories: updatedCategories })
-    );
+    dispatch(setAnnotationCategories({ categories: updatedCategories }));
 
     onCloseDialog();
   };

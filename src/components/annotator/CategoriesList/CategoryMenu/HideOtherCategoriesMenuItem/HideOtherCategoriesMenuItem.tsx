@@ -7,7 +7,7 @@ import {
   annotationCategoriesSelector,
   selectedCategorySelector,
 } from "store/selectors";
-import { imageViewerSlice } from "store/slices";
+import { projectSlice } from "store/slices";
 
 type HideOtherCategoriesMenuItemProps = {
   onCloseCategoryMenu: (
@@ -30,7 +30,7 @@ export const HideOtherCategoriesMenuItem = ({
     annotatorCategories.forEach((category) => {
       if (selectedCategory.id !== category.id) {
         dispatch(
-          imageViewerSlice.actions.setCategoryVisibility({
+          projectSlice.actions.setAnnotationCategoryVisibility({
             category: category,
             visible: false,
           })
