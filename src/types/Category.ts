@@ -5,6 +5,11 @@ export type Category = {
   visible: boolean;
 };
 
+export enum CategoryType {
+  ClassifierCategory,
+  AnnotationCategory,
+}
+
 export const UNKNOWN_CATEGORY_ID: string =
   "00000000-0000-0000-0000-000000000000";
 

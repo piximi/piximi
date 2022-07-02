@@ -3,6 +3,7 @@ import { ShadowImageType } from "types/ImageType";
 import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_CATEGORY_ID,
 } from "types/Category";
 import { ToolType } from "types/ToolType";
@@ -296,6 +297,7 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
+    // TODO: Remove
     setImageInstances(
       state: ImageViewer,
       action: PayloadAction<{
@@ -310,6 +312,27 @@ export const imageViewerSlice = createSlice({
         } else {
           return { ...image, annotations: action.payload.instances };
         }
+      });
+    },
+    deleteAnnotationCategory(
+      state: ImageViewer,
+      action: PayloadAction<{ categoryID: string }>
+    ) {
+      state.images = state.images.map((image: ShadowImageType) => {
+        const instances = image.annotations.map(
+          (annotation: AnnotationType) => {
+            if (annotation.categoryId === action.payload.categoryID) {
+              return {
+                ...annotation,
+                categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+              };
+            } else {
+              return annotation;
+            }
+          }
+        );
+
+        return { ...image, annotations: instances };
       });
     },
     setLanguage(
@@ -483,4 +506,5 @@ export const {
   setStageWidth,
   setVibrance,
   setZoomSelection,
+  deleteAnnotationCategory,
 } = imageViewerSlice.actions;

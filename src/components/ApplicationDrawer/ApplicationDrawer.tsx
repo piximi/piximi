@@ -1,5 +1,4 @@
 import { FileList } from "../FileList";
-import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
@@ -25,10 +24,6 @@ export const ApplicationDrawer = () => {
       <AppBarOffset />
 
       <FileList />
-
-      <Divider />
-
-      <CategoriesList />
 
       <Divider />
 

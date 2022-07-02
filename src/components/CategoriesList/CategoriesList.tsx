@@ -1,21 +1,20 @@
 import { CollapsibleList } from "../CollapsibleList";
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { CategoryListItem } from "../CategoryListItem";
-import { Category } from "../../types/Category";
+import { Category, CategoryType } from "types/Category";
 import { CreateCategoryListItem } from "../CreateCategoryListItem";
-import {
-  createdCategoriesSelector,
-  unknownCategorySelector,
-} from "../../store/selectors";
-import { predictedSelector } from "store/selectors/predictedSelector";
 import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
 
-export const CategoriesList = () => {
-  const categories = useSelector(createdCategoriesSelector);
-  const unknownCategory = useSelector(unknownCategorySelector);
+type CategoriesListProps = {
+  categories: Array<Category>;
+  categoryType: CategoryType;
+  unknownCategory: Category;
+  predicted: boolean;
+};
 
-  const predicted = useSelector(predictedSelector);
+export const CategoriesList = (props: CategoriesListProps) => {
+  const { categories, categoryType, unknownCategory, predicted } = props;
+
   const [showPredictionVisibilityMenu, setShowPredictionVisibilityMenu] =
     React.useState<boolean>(true);
 
@@ -26,6 +25,7 @@ export const CategoriesList = () => {
   return (
     <CollapsibleList primary="Categories">
       <CategoryListItem
+        categoryType={categoryType}
         category={unknownCategory}
         key={unknownCategory.id}
         id={unknownCategory.id}
@@ -33,6 +33,7 @@ export const CategoriesList = () => {
       {categories.map((category: Category) => {
         return (
           <CategoryListItem
+            categoryType={categoryType}
             category={category}
             key={category.id}
             id={category.id}
@@ -40,7 +41,8 @@ export const CategoriesList = () => {
         );
       })}
       {showPredictionVisibilityMenu && <PredictionVisibility />}
-      <CreateCategoryListItem />
+
+      <CreateCategoryListItem categoryType={categoryType} />
     </CollapsibleList>
   );
 };

@@ -24,7 +24,7 @@ export const HideOrShowCategoryMenuItem = ({
   const onClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     dispatch(
       projectSlice.actions.setAnnotationCategoryVisibility({
-        category: category,
+        categoryId: category.id,
         visible: !category.visible,
       })
     );

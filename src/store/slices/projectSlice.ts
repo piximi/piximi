@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_CATEGORY_ID,
 } from "types/Category";
 import { v4 as uuidv4 } from "uuid";
@@ -13,7 +14,7 @@ import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { replaceDuplicateName } from "image/imageHelper";
 import { defaultImage } from "images/defaultImage";
-import _ from "lodash";
+import { AnnotationType } from "types/AnnotationType";
 
 const initialAnnotationCategories =
   process.env.NODE_ENV === "development"
@@ -193,10 +194,10 @@ export const projectSlice = createSlice({
     },
     updateCategoryVisibility(
       state: Project,
-      action: PayloadAction<{ id: string; visible: boolean }>
+      action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
       const index = findIndex(state.categories, (category: Category) => {
-        return category.id === action.payload.id;
+        return category.id === action.payload.categoryId;
       });
       state.categories[index].visible = action.payload.visible;
     },
@@ -207,6 +208,20 @@ export const projectSlice = createSlice({
       const categories = filter(state.categories, (category: Category) => {
         return category.id !== action.payload.id;
       });
+      for (let category of categories) {
+        category.visible = false;
+      }
+    },
+    updateOtherAnnotationCategoryVisibility(
+      state: Project,
+      action: PayloadAction<{ id: string }>
+    ) {
+      const categories = filter(
+        state.annotationCategories,
+        (category: Category) => {
+          return category.id !== action.payload.id;
+        }
+      );
       for (let category of categories) {
         category.visible = false;
       }
@@ -321,43 +336,115 @@ export const projectSlice = createSlice({
     ) {
       state.annotationCategories = action.payload.categories;
     },
+    createAnnotationCategory(
+      state: Project,
+      action: PayloadAction<{ name: string; color: string }>
+    ) {
+      const category: Category = {
+        color: action.payload.color,
+        id: uuidv4().toString(),
+        name: action.payload.name,
+        visible: true,
+      };
+      state.annotationCategories.push(category);
+    },
+    updateAnnotationCategory(
+      state: Project,
+      action: PayloadAction<{ id: string; name: string; color: string }>
+    ) {
+      const index = findIndex(
+        state.annotationCategories,
+        (category: Category) => {
+          return category.id === action.payload.id;
+        }
+      );
+      state.annotationCategories[index].name = action.payload.name;
+      state.annotationCategories[index].color = action.payload.color;
+    },
     deleteAnnotationCategory(
       state: Project,
-      action: PayloadAction<{ category: Category }>
+      action: PayloadAction<{ categoryID: string }>
     ) {
       state.annotationCategories = state.annotationCategories.filter(
-        (category: Category) => category.id !== action.payload.category.id
+        (category: Category) => category.id !== action.payload.categoryID
       );
+
+      state.images = state.images.map((image: ImageType) => {
+        const instances = image.annotations.map(
+          (annotation: AnnotationType) => {
+            if (annotation.categoryId === action.payload.categoryID) {
+              return {
+                ...annotation,
+                categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+              };
+            } else {
+              return annotation;
+            }
+          }
+        );
+
+        return { ...image, annotations: instances };
+      });
     },
     setAnnotationCategoryVisibility(
       state: Project,
-      action: PayloadAction<{ category: Category; visible: boolean }>
+      action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const category = _.find(state.annotationCategories, (category) => {
-        return category.id === action.payload.category.id;
+      const index = findIndex(
+        state.annotationCategories,
+        (category: Category) => {
+          return category.id === action.payload.categoryId;
+        }
+      );
+      state.annotationCategories[index].visible = action.payload.visible;
+    },
+    updateImageAnnotations(
+      state: Project,
+      action: PayloadAction<{
+        annotations: Array<AnnotationType>;
+        imageId: string;
+      }>
+    ) {
+      state.images = state.images.map((image: ImageType) => {
+        if (action.payload.imageId !== image.id) {
+          return image;
+        } else {
+          return { ...image, annotations: action.payload.annotations };
+        }
       });
-      if (!category) return;
-      category.visible = action.payload.visible;
-      state.annotationCategories = [
-        ...state.annotationCategories.filter((category) => {
-          return category.id !== action.payload.category.id;
-        }),
-        category,
-      ];
+    },
+    clearAnnotations(
+      state: Project,
+      action: PayloadAction<{ category: Category }>
+    ) {
+      for (let image of state.images) {
+        image.annotations = image.annotations.filter(
+          (annotation: AnnotationType) => {
+            return annotation.categoryId !== action.payload.category.id;
+          }
+        );
+      }
     },
   },
 });
 
 export const {
   createCategory,
+  createAnnotationCategory,
   uploadImages,
   createNewProject,
   deleteCategory,
+  deleteAnnotationCategory,
   updateCategory,
+  updateAnnotationCategory,
   updateCategoryVisibility,
+  setAnnotationCategoryVisibility,
   updateImageCategories,
   updateImageCategory,
   updateOtherCategoryVisibility,
+  updateOtherAnnotationCategoryVisibility,
   updateSegmentationImagesPartition,
   setAnnotationCategories,
+  updateImageAnnotations,
+  clearAnnotations,
 } = projectSlice.actions;

@@ -1,33 +1,43 @@
 import React from "react";
 import { EditCategoryDialog } from "../EditCategoryDialog";
-import { Category } from "../../types/Category";
-import { useDialog } from "../../hooks";
+import { Category, CategoryType } from "types/Category";
+import { useDialog } from "hooks";
 import { MenuItem, Typography } from "@mui/material";
 
 type EditCategoryMenuItemProps = {
   category: Category;
+  categoryType: CategoryType;
   onCloseCategoryMenu: () => void;
 };
 
 export const EditCategoryMenuItem = ({
   category,
+  categoryType,
   onCloseCategoryMenu,
 }: EditCategoryMenuItemProps) => {
-  const { onClose, onOpen, open } = useDialog();
+  const {
+    onClose: onCloseEditCategoryDialog,
+    onOpen: onOpenEditCategoryDialog,
+    open: openEditCategoryDialog,
+  } = useDialog();
 
-  const onClick = () => {
+  const onClose = () => {
+    onCloseEditCategoryDialog();
     onCloseCategoryMenu();
-
-    onOpen();
   };
 
   return (
     <>
-      <MenuItem onClick={onClick}>
+      <MenuItem onClick={onOpenEditCategoryDialog}>
         <Typography variant="inherit">Edit category</Typography>
       </MenuItem>
 
-      <EditCategoryDialog category={category} onClose={onClose} open={open} />
+      <EditCategoryDialog
+        categoryType={categoryType}
+        category={category}
+        onClose={onClose}
+        open={openEditCategoryDialog}
+      />
     </>
   );
 };

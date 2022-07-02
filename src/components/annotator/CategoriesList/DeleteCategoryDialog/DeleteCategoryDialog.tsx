@@ -57,7 +57,7 @@ export const DeleteCategoryDialog = ({
     batch(() => {
       dispatch(
         projectSlice.actions.deleteAnnotationCategory({
-          category: selectedCategory,
+          categoryID: selectedCategory.id,
         })
       );
       dispatch(

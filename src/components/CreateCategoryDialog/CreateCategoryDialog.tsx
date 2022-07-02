@@ -1,12 +1,11 @@
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
-import { createCategory } from "../../store/slices";
-import { availableColorsSelector } from "../../store/selectors/availableColorsSelector";
-import { categoriesSelector } from "../../store/selectors/categoriesSelector";
-import { Category } from "../../types/Category";
+import { availableColorsSelector } from "store/selectors/availableColorsSelector";
+import { categoriesSelector } from "store/selectors/categoriesSelector";
+import { Category, CategoryType } from "types/Category";
 import {
   Button,
   Dialog,
@@ -18,13 +17,17 @@ import {
   Box,
 } from "@mui/material";
 import { useHotkeys } from "react-hotkeys-hook";
+import { createCategory } from "store/slices";
+import { createAnnotationCategory } from "store/slices/projectSlice";
 
 type CreateCategoryDialogProps = {
+  categoryType: CategoryType;
   onClose: () => void;
   open: boolean;
 };
 
 export const CreateCategoryDialog = ({
+  categoryType,
   onClose,
   open,
 }: CreateCategoryDialogProps) => {
@@ -51,7 +54,11 @@ export const CreateCategoryDialog = ({
 
   const onCreate = () => {
     if (validateInput(name)) {
-      dispatch(createCategory({ name: name, color: color }));
+      if (categoryType === CategoryType.ClassifierCategory) {
+        dispatch(createCategory({ name: name, color: color }));
+      } else {
+        dispatch(createAnnotationCategory({ name: name, color: color }));
+      }
 
       onCloseDialog();
     }

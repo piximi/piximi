@@ -66,7 +66,9 @@ export const CategoryMenu = ({
         );
 
         dispatch(
-          projectSlice.actions.deleteAnnotationCategory({ category: category })
+          projectSlice.actions.deleteAnnotationCategory({
+            categoryID: category.id,
+          })
         );
       });
     }

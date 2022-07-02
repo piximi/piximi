@@ -41,7 +41,6 @@ import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { AnnotatorHelpDrawer } from "components/common/Help";
-import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import { imageViewerSlice, setActiveImage } from "store/slices";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { ArrowBack } from "@mui/icons-material";
@@ -413,10 +412,10 @@ export const CategoriesList = () => {
           openDialog={openEditCategoryDialog}
         />
 
-        <ClearCategoryDialog
+        {/* <ClearCategoryDialog
           onClose={onCloseClearCategoryDialog}
           open={openClearCategoryDialog}
-        />
+        /> */}
 
         <CreateCategoryListItem />
         <DeleteAllCategoriesListItem

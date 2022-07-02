@@ -6,6 +6,7 @@ import {
 } from "../SegmenterListItems";
 import {
   Collapse,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -14,10 +15,17 @@ import {
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useSelector } from "react-redux";
-import { fittedSelector } from "../../../store/selectors/fittedSelector";
-import { trainingFlagSelector } from "../../../store/selectors/trainingFlagSelector";
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
+import { unknownAnnotationCategorySelector } from "store/selectors";
+import { CategoriesList } from "components/CategoriesList";
+import { CategoryType } from "types/Category";
 
 export const SegmenterList = () => {
+  const categories = useSelector(createdAnnotatorCategoriesSelector);
+  const unknownCategory = useSelector(unknownAnnotationCategorySelector);
+
   const [collapsed, setCollapsed] = React.useState(false);
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
@@ -59,6 +67,15 @@ export const SegmenterList = () => {
       </ListItem>
 
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
+        <CategoriesList
+          categories={categories}
+          unknownCategory={unknownCategory}
+          predicted={false}
+          categoryType={CategoryType.AnnotationCategory}
+        />
+
+        <Divider />
+
         <List component="div" dense disablePadding>
           <FitSegmenterListItem />
 

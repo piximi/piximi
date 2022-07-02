@@ -19,7 +19,7 @@ export const CategoryListItemCheckbox = ({
   const onCheckboxClick = () => {
     dispatch(
       projectSlice.actions.setAnnotationCategoryVisibility({
-        category: category,
+        categoryId: category.id,
         visible: !category.visible,
       })
     );

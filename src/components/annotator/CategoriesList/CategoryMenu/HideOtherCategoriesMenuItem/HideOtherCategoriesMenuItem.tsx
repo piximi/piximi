@@ -31,7 +31,7 @@ export const HideOtherCategoriesMenuItem = ({
       if (selectedCategory.id !== category.id) {
         dispatch(
           projectSlice.actions.setAnnotationCategoryVisibility({
-            category: category,
+            categoryId: category.id,
             visible: false,
           })
         );

@@ -6,6 +6,7 @@ import {
 } from "../ClassifierListItems";
 import {
   Collapse,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -14,10 +15,22 @@ import {
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useSelector } from "react-redux";
-import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { trainingFlagSelector } from "../../store/selectors/trainingFlagSelector";
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { CategoriesList } from "components/CategoriesList";
+import {
+  createdCategoriesSelector,
+  unknownCategorySelector,
+} from "store/selectors";
+import { predictedSelector } from "store/selectors/predictedSelector";
+import { CategoryType } from "types/Category";
 
 export const ClassifierList = () => {
+  const categories = useSelector(createdCategoriesSelector);
+  const unknownCategory = useSelector(unknownCategorySelector);
+
+  const predicted = useSelector(predictedSelector);
+
   const [collapsed, setCollapsed] = React.useState(false);
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
@@ -59,6 +72,15 @@ export const ClassifierList = () => {
       </ListItem>
 
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
+        <CategoriesList
+          categories={categories}
+          unknownCategory={unknownCategory}
+          predicted={predicted}
+          categoryType={CategoryType.ClassifierCategory}
+        />
+
+        <Divider />
+
         <List component="div" dense disablePadding>
           <FitClassifierListItem />
 
