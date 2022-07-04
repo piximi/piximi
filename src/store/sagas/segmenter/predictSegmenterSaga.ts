@@ -1,41 +1,44 @@
 import { put, select } from "redux-saga/effects";
-import { classifierSlice, projectSlice, applicationSlice } from "../../slices";
-import { createdCategoriesSelector } from "../../selectors";
-import { preprocessOptionsSelector } from "../../selectors/preprocessOptionsSelector";
-import { predictCategories } from "../../coroutines/classifier/predictCategories";
-import { testImagesSelector } from "../../selectors/testImagesSelector";
-import { fittedSelector } from "../../selectors/fittedSelector";
-import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
-import { Category } from "../../../types/Category";
-import { ArchitectureOptions } from "types/ArchitectureOptions";
-import { ImageType } from "../../../types/ImageType";
-import * as tensorflow from "@tensorflow/tfjs";
+import {
+  classifierSlice,
+  applicationSlice,
+  segmenterSlice,
+} from "../../slices";
+import { annotationCategoriesSelector } from "../../selectors";
+import { Category } from "types/Category";
+import { ImageType } from "types/ImageType";
+import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
-import { preprocess } from "store/coroutines";
+import { preprocessSegmentationImages } from "store/coroutines";
 import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
-import { fitOptionsSelector } from "../../selectors";
 import { PreprocessOptions } from "types/PreprocessOptions";
+import {
+  fittedSegmentationModelSelector,
+  segmentationFitOptionsSelector,
+  segmentationInferenceImagesSelector,
+  segmentationPreprocessOptionsSelector,
+  segmentationInputShapeSelector,
+} from "store/selectors/segmenter";
+import { drawAnnotationsFromPredictedSegmentation } from "store/coroutines/segmenter";
 
 export function* predictSegmenterSaga(action: any): any {
-  const testImages: Array<ImageType> = yield select(testImagesSelector);
-
-  const categories: Category[] = yield select(createdCategoriesSelector);
-
-  const architectureOptions: ArchitectureOptions = yield select(
-    architectureOptionsSelector
+  const testImages: Array<ImageType> = yield select(
+    segmentationInferenceImagesSelector
   );
+
+  const categories: Category[] = yield select(annotationCategoriesSelector);
+
+  const inputShape: Shape = yield select(segmentationInputShapeSelector);
 
   const preprocessOptions: PreprocessOptions = yield select(
-    preprocessOptionsSelector
+    segmentationPreprocessOptionsSelector
   );
 
-  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+  const fitOptions: FitOptions = yield select(segmentationFitOptionsSelector);
 
-  let model = yield select(fittedSelector);
-
-  const outputLayerSize = model.outputs[0].shape[1] as number;
+  let model = yield select(fittedSegmentationModelSelector);
 
   if (!testImages.length) {
     applicationSlice.actions.updateAlertState({
@@ -45,21 +48,11 @@ export function* predictSegmenterSaga(action: any): any {
         description: "No unlabeled images to predict.",
       },
     });
-  } else if (outputLayerSize !== categories.length) {
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: {
-          alertType: AlertType.Warning,
-          name: "The output shape of your model does not correspond to the number of categories!",
-          description: `The trained model has an output shape of ${outputLayerSize} but there are ${categories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
-        },
-      })
-    );
   } else {
-    yield runPrediction(
+    yield runSegmentationPrediction(
       testImages,
       categories,
-      architectureOptions.inputShape,
+      inputShape,
       preprocessOptions,
       fitOptions,
       model
@@ -73,22 +66,24 @@ export function* predictSegmenterSaga(action: any): any {
   );
 }
 
-function* runPrediction(
+function* runSegmentationPrediction(
   testImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: tensorflow.LayersModel
+  model: LayersModel
 ) {
-  var data: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  var data: data.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R4>;
+    id: Tensor<Rank.R1>;
   }>;
+  const inferenceImages: Array<ImageType> = yield select(
+    segmentationInferenceImagesSelector
+  );
   try {
-    data = yield preprocess(
+    data = yield preprocessSegmentationImages(
       testImages,
       categories,
       inputShape,
@@ -104,25 +99,22 @@ function* runPrediction(
   }
 
   try {
-    var { imageIds, categoryIds } = yield predictCategories(
+    yield drawAnnotationsFromPredictedSegmentation(
       model,
       data,
+      inferenceImages,
       categories
-    ); //returns an array of Image ID and an array of corresponding categories ID
+    );
   } catch (error) {
-    yield handleError(error as Error, "Error predicting the inference data");
+    yield handleError(
+      error as Error,
+      "Error drawing the annotations on the inference images"
+    );
     return;
   }
 
   yield put(
-    projectSlice.actions.updateImagesCategories({
-      ids: imageIds,
-      categoryIds: categoryIds,
-    })
-  );
-
-  yield put(
-    classifierSlice.actions.updatePredicted({
+    segmenterSlice.actions.updatePredicted({
       predicted: true,
     })
   );

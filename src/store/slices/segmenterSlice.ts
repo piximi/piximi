@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LossFunction } from "types/LossFunction";
 import { Metric } from "types/Metric";
 import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
-import { History, LayersModel } from "@tensorflow/tfjs";
+import { History, LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
 import { Shape } from "types/Shape";
 import { availableSegmenterModels, SegmenterModelProps } from "types/ModelType";
 import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
@@ -24,6 +24,12 @@ const initialState: SegmenterStoreType = {
       cropSchema: CropSchema.None,
     },
   },
+  compileOptions: {
+    learningRate: 0.01,
+    lossFunction: LossFunction.CategoricalCrossEntropy,
+    metrics: [Metric.CategoricalAccuracy],
+    optimizationAlgorithm: OptimizationAlgorithm.Adam,
+  },
   fitOptions: {
     epochs: 10,
     batchSize: 32,
@@ -36,10 +42,6 @@ const initialState: SegmenterStoreType = {
     planes: 1,
     frames: 1,
   },
-  learningRate: 0.01,
-  lossFunction: LossFunction.CategoricalCrossEntropy,
-  metrics: [Metric.CategoricalAccuracy],
-  optimizationAlgorithm: OptimizationAlgorithm.Adam,
   trainingPercentage: 0.75,
   predicted: false,
   evaluationResult: {
@@ -80,13 +82,9 @@ export const segmenterSlice = createSlice({
     ) {
       const { segmenter } = action.payload;
 
+      state.compileOptions = segmenter.compileOptions;
       state.fitOptions = segmenter.fitOptions;
       state.inputShape = segmenter.inputShape;
-      state.learningRate = segmenter.learningRate;
-      state.lossFunction = segmenter.lossFunction;
-      state.metrics = segmenter.metrics;
-
-      state.optimizationAlgorithm = segmenter.optimizationAlgorithm;
       state.trainingPercentage = segmenter.trainingPercentage;
       state.trainingHistory = segmenter.trainingHistory;
       state.predicted = segmenter.predicted;
@@ -127,7 +125,6 @@ export const segmenterSlice = createSlice({
     updateSegmentationEpochs(state, action: PayloadAction<{ epochs: number }>) {
       state.fitOptions.epochs = action.payload.epochs;
     },
-
     updateSegmentationInputShape(
       state,
       action: PayloadAction<{ inputShape: Shape }>
@@ -138,19 +135,19 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{ learningRate: number }>
     ) {
-      state.learningRate = action.payload.learningRate;
+      state.compileOptions.learningRate = action.payload.learningRate;
     },
     updateSegmentationLossFunction(
       state,
       action: PayloadAction<{ lossFunction: LossFunction }>
     ) {
-      state.lossFunction = action.payload.lossFunction;
+      state.compileOptions.lossFunction = action.payload.lossFunction;
     },
     updateSegmentationMetrics(
       state,
       action: PayloadAction<{ metrics: Array<Metric> }>
     ) {
-      state.metrics = action.payload.metrics;
+      state.compileOptions.metrics = action.payload.metrics;
     },
     updateSelectedModel(
       state,
@@ -179,7 +176,8 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{ optimizationAlgorithm: OptimizationAlgorithm }>
     ) {
-      state.optimizationAlgorithm = action.payload.optimizationAlgorithm;
+      state.compileOptions.optimizationAlgorithm =
+        action.payload.optimizationAlgorithm;
     },
     updateSegmentationTrainingPercentage(
       state,
@@ -215,6 +213,28 @@ export const segmenterSlice = createSlice({
     updateEvaluating(state, action: PayloadAction<{ evaluating: boolean }>) {
       state.evaluating = action.payload.evaluating;
     },
+    updatePreprocessedSegmentationData(
+      state,
+      action: PayloadAction<{
+        data: {
+          val: data.Dataset<{
+            xs: Tensor<Rank.R4>;
+            ys: Tensor<Rank.R4>;
+            id: Tensor<Rank.R1>;
+          }>;
+          train: data.Dataset<{
+            xs: Tensor<Rank.R4>;
+            ys: Tensor<Rank.R4>;
+            id: Tensor<Rank.R1>;
+          }>;
+        };
+      }>
+    ) {
+      const { data } = action.payload;
+
+      state.trainDataSet = data.train;
+      state.valDataSet = data.val;
+    },
   },
 });
 
@@ -236,4 +256,5 @@ export const {
   updatePredicted,
   updatePredicting,
   updateEvaluating,
+  updatePreprocessedSegmentationData,
 } = segmenterSlice.actions;

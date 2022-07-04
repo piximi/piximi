@@ -1,12 +1,10 @@
 import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
-
 import { useDispatch, useSelector } from "react-redux";
 import { segmenterSlice } from "store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { categorizedImagesSelector, compiledSelector } from "store/selectors";
 import { useEffect, useState } from "react";
-import { epochsSelector } from "store/selectors/epochsSelector";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
@@ -16,6 +14,13 @@ import { DatasetSettingsListItem } from "components/common/DatasetSettingsListIt
 import { DialogTransition } from "components/DialogTransition";
 import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
+import {
+  segmentationCompileOptionsSelector,
+  segmentationFitOptionsSelector,
+  segmentationTrainingPercentageSelector,
+} from "store/selectors/segmenter";
+import { LossFunction } from "types/LossFunction";
+import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -54,7 +59,60 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
 
-  const epochs = useSelector(epochsSelector);
+  const fitOptions = useSelector(segmentationFitOptionsSelector);
+  const compileOptions = useSelector(segmentationCompileOptionsSelector);
+
+  const trainingPercentage = useSelector(
+    segmentationTrainingPercentageSelector
+  );
+
+  const dispatchBatchSizeCallback = (batchSize: number) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationBatchSize({
+        batchSize: batchSize,
+      })
+    );
+  };
+
+  const dispatchLearningRateCallback = (learningRate: number) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationLearningRate({
+        learningRate: learningRate,
+      })
+    );
+  };
+
+  const dispatchEpochsCallback = (epochs: number) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs })
+    );
+  };
+
+  const dispatchOptimizationAlgorithmCallback = (
+    optimizationAlgorithm: OptimizationAlgorithm
+  ) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationOptimizationAlgorithm({
+        optimizationAlgorithm: optimizationAlgorithm,
+      })
+    );
+  };
+
+  const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationLossFunction({
+        lossFunction: lossFunction,
+      })
+    );
+  };
+
+  const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
+    dispatch(
+      segmenterSlice.actions.updateSegmentationTrainingPercentage({
+        trainingPercentage: trainPercentage,
+      })
+    );
+  };
 
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
@@ -141,7 +199,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
         closeDialog={closeDialog}
         fit={onFit}
         disableFitting={noCategorizedImages}
-        epochs={epochs}
+        epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
@@ -158,9 +216,24 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
         <List dense>
           <SegmenterArchitectureSettingsListItem />
 
-          <OptimizerSettingsListItem />
+          <OptimizerSettingsListItem
+            compileOptions={compileOptions}
+            dispatchLossFunctionCallback={dispatchLossFunctionCallback}
+            dispatchOptimizationAlgorithmCallback={
+              dispatchOptimizationAlgorithmCallback
+            }
+            dispatchEpochsCallback={dispatchEpochsCallback}
+            fitOptions={fitOptions}
+            dispatchBatchSizeCallback={dispatchBatchSizeCallback}
+            dispatchLearningRateCallback={dispatchLearningRateCallback}
+          />
 
-          <DatasetSettingsListItem />
+          <DatasetSettingsListItem
+            trainingPercentage={trainingPercentage}
+            dispatchTrainingPercentageCallback={
+              dispatchTrainingPercentageCallback
+            }
+          />
         </List>
 
         {showPlots && (

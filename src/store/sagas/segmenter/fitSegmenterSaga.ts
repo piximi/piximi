@@ -2,23 +2,9 @@ import * as tensorflow from "@tensorflow/tfjs";
 import _ from "lodash";
 import { put, select } from "redux-saga/effects";
 import { compile } from "store/coroutines";
-import {
-  applicationSlice,
-  classifierSlice,
-  projectSlice,
-  segmenterSlice,
-} from "store/slices";
-import {
-  compiledSelector,
-  compileOptionsSelector,
-  createdCategoriesCountSelector,
-  createdCategoriesSelector,
-  fitOptionsSelector,
-  preprocessOptionsSelector,
-  trainingPercentageSelector,
-} from "store/selectors";
-import { architectureOptionsSelector } from "store/selectors/architectureOptionsSelector";
-import { ArchitectureOptions } from "types/ArchitectureOptions";
+import { applicationSlice, projectSlice, segmenterSlice } from "store/slices";
+import { annotationCategoriesSelector } from "store/selectors";
+import { SegmentationArchitectureOptions } from "types/ArchitectureOptions";
 import { CompileOptions } from "types/CompileOptions";
 import { Category } from "types/Category";
 import { ImageType } from "types/ImageType";
@@ -35,24 +21,31 @@ import {
   fitSegmenter,
 } from "store/coroutines";
 import {
+  compiledSegmentationModelSelector,
+  segmentationArchitectureOptionsSelector,
+  segmentationFitOptionsSelector,
+  segmentationCompileOptionsSelector,
+  segmentationPreprocessOptionsSelector,
   segmentationTrainImagesSelector,
+  segmentationTrainingPercentageSelector,
   segmentationValidationImagesSelector,
 } from "store/selectors/segmenter";
 
 export function* fitSegmenterSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  // TODO: select all information from the segmenter slice
-  const trainingPercentage: number = yield select(trainingPercentageSelector);
+  const trainingPercentage: number = yield select(
+    segmentationTrainingPercentageSelector
+  );
   const annotatedImages: Array<ImageType> = yield select(
     annotatedImagesSelector
   );
-  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+  const fitOptions: FitOptions = yield select(segmentationFitOptionsSelector);
   const preprocessingOptions: PreprocessOptions = yield select(
-    preprocessOptionsSelector
+    segmentationPreprocessOptionsSelector
   );
 
-  //first assign train and val partition to all categorized images
+  // First assign train and val partition to all categorized images.
   const annotatedImagesIds = (
     preprocessingOptions.shuffle ? _.shuffle(annotatedImages) : annotatedImages
   ).map((image: ImageType) => {
@@ -82,24 +75,32 @@ export function* fitSegmenterSaga(action: any): any {
     })
   );
 
-  const architectureOptions: ArchitectureOptions = yield select(
-    architectureOptionsSelector
+  const architectureOptions: SegmentationArchitectureOptions = yield select(
+    segmentationArchitectureOptionsSelector
   );
-  const classes: number = yield select(createdCategoriesCountSelector);
+
+  const annotationCategories: number = yield select(
+    annotationCategoriesSelector
+  );
 
   var model: tensorflow.LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
-    model = yield select(compiledSelector);
+    model = yield select(compiledSegmentationModelSelector);
   } else {
     try {
-      model = yield createSegmentationModel(architectureOptions, classes);
+      model = yield createSegmentationModel(
+        architectureOptions,
+        annotationCategories
+      );
     } catch (error) {
       yield handleError(error as Error, "Failed to create tensorflow model");
       return;
     }
   }
 
-  const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+  const compileOptions: CompileOptions = yield select(
+    segmentationCompileOptionsSelector
+  );
 
   var compiledModel: tensorflow.LayersModel;
   try {
@@ -111,8 +112,7 @@ export function* fitSegmenterSaga(action: any): any {
 
   yield put(segmenterSlice.actions.updateCompiled({ compiled: compiledModel }));
 
-  // TODO: Select annotation categories
-  const categories: Category[] = yield select(createdCategoriesSelector);
+  const categories: Category[] = yield select(annotationCategoriesSelector);
 
   const trainImages: ImageType[] = yield select(
     segmentationTrainImagesSelector
@@ -125,6 +125,7 @@ export function* fitSegmenterSaga(action: any): any {
     const trainData: tensorflow.data.Dataset<{
       xs: tensorflow.Tensor<tensorflow.Rank.R4>;
       ys: tensorflow.Tensor<tensorflow.Rank.R4>;
+      id: tensorflow.Tensor<tensorflow.Rank.R1>;
     }> = yield preprocessSegmentationImages(
       trainImages,
       categories,
@@ -136,6 +137,7 @@ export function* fitSegmenterSaga(action: any): any {
     const valData: tensorflow.data.Dataset<{
       xs: tensorflow.Tensor<tensorflow.Rank.R4>;
       ys: tensorflow.Tensor<tensorflow.Rank.R4>;
+      id: tensorflow.Tensor<tensorflow.Rank.R1>;
     }> = yield preprocessSegmentationImages(
       valImages,
       categories,
@@ -150,6 +152,10 @@ export function* fitSegmenterSaga(action: any): any {
     yield handleError(error as Error, "Error in preprocessing");
     return;
   }
+
+  yield put(
+    segmenterSlice.actions.updatePreprocessedSegmentationData({ data: dataset })
+  );
 
   try {
     var { fitted, status: trainingHistory } = yield fitSegmenter(
@@ -186,7 +192,7 @@ function* handleError(error: Error, errorName: string): any {
   );
 
   yield put(
-    classifierSlice.actions.updateFitting({
+    segmenterSlice.actions.updateFitting({
       fitting: false,
     })
   );

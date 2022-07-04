@@ -6,60 +6,46 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { StyledFormControl } from "../../../FitClassifierDialog/StyledFormControl";
-import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../../store/slices";
-import { LossFunction } from "../../../../types/LossFunction";
-import { fitOptionsSelector } from "../../../../store/selectors";
-import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
-import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
-import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
-import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
+import { LossFunction } from "types/LossFunction";
+import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
 import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
 import { enumKeys } from "utils/enumKeys";
+import { FitOptions } from "types/FitOptions";
+import { CompileOptions } from "types/CompileOptions";
 
-export const OptimizerSettingsGrid = () => {
-  const dispatch = useDispatch();
+export type OptimizerSettingsGridProps = {
+  compileOptions: CompileOptions;
+  dispatchLossFunctionCallback: (lossFunction: LossFunction) => void;
+  dispatchOptimizationAlgorithmCallback: (
+    optimizationAlgorithm: OptimizationAlgorithm
+  ) => void;
+  dispatchLearningRateCallback: (learningRate: number) => void;
+  fitOptions: FitOptions;
+  dispatchBatchSizeCallback: (batchSize: number) => void;
+  dispatchEpochsCallback: (epochs: number) => void;
+};
 
-  const fitOptions = useSelector(fitOptionsSelector);
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
-  const lossFunction = useSelector(lossFunctionSelector);
-  const learningRate = useSelector(learningRateSelector);
-
-  const dispatchBatchSize = (batchSize: number) => {
-    dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
-  };
-
-  const dispatchLearningRate = (learningRate: number) => {
-    dispatch(
-      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
-    );
-  };
-
-  const dispatchEpochs = (arg: number) => {
-    dispatch(classifierSlice.actions.updateEpochs({ epochs: arg }));
-  };
-
+export const OptimizerSettingsGrid = ({
+  compileOptions,
+  dispatchLossFunctionCallback,
+  dispatchOptimizationAlgorithmCallback,
+  dispatchEpochsCallback,
+  fitOptions,
+  dispatchBatchSizeCallback,
+  dispatchLearningRateCallback,
+}: OptimizerSettingsGridProps) => {
   const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
     const optimizationAlgorithm = target.value as OptimizationAlgorithm;
 
-    dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: optimizationAlgorithm,
-      })
-    );
+    dispatchOptimizationAlgorithmCallback(optimizationAlgorithm);
   };
 
   const onLossFunctionChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
     const lossFunction = target.value as LossFunction;
 
-    dispatch(
-      classifierSlice.actions.updateLossFunction({
-        lossFunction: lossFunction,
-      })
-    );
+    dispatchLossFunctionCallback(lossFunction);
   };
 
   return (
@@ -69,7 +55,7 @@ export const OptimizerSettingsGrid = () => {
           <Grid item xs={4}>
             <FormHelperText>Optimization Algorithm</FormHelperText>
             <Select
-              value={optimizationAlgorithm as string}
+              value={compileOptions.optimizationAlgorithm as string}
               onChange={onOptimizationAlgorithmChange}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
@@ -95,8 +81,8 @@ export const OptimizerSettingsGrid = () => {
             <CustomNumberTextField
               id="learning-rate"
               label="Learning rate"
-              value={learningRate}
-              dispatchCallBack={dispatchLearningRate}
+              value={compileOptions.learningRate}
+              dispatchCallBack={dispatchLearningRateCallback}
               min={0}
               enableFloat={true}
             />
@@ -108,7 +94,7 @@ export const OptimizerSettingsGrid = () => {
           <Grid item xs={4}>
             <FormHelperText>Loss Function</FormHelperText>
             <Select
-              value={lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
+              value={compileOptions.lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
               onChange={onLossFunctionChange}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
@@ -135,7 +121,7 @@ export const OptimizerSettingsGrid = () => {
               id="batch-size"
               label="Batch size"
               value={fitOptions.batchSize}
-              dispatchCallBack={dispatchBatchSize}
+              dispatchCallBack={dispatchBatchSizeCallback}
               min={1}
             />
           </Grid>
@@ -145,7 +131,7 @@ export const OptimizerSettingsGrid = () => {
               id="epochs"
               label="Epochs"
               value={fitOptions.epochs}
-              dispatchCallBack={dispatchEpochs}
+              dispatchCallBack={dispatchEpochsCallback}
               min={1}
             />
           </Grid>

@@ -1,25 +1,31 @@
-import { Category } from "../../../types/Category";
-import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
-import { ImageType } from "../../../types/ImageType";
-import { createdCategoriesSelector } from "../../selectors";
-import { fittedSelector } from "../../selectors/fittedSelector";
-import { valImagesSelector } from "store/selectors/valImagesSelector";
-import { classifierSlice, applicationSlice } from "../../slices";
-import { evaluate } from "store/coroutines/classifier/evaluate";
-import * as tensorflow from "@tensorflow/tfjs";
+import { Category } from "types/Category";
+import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
+import { ImageType } from "types/ImageType";
+import { applicationSlice, segmenterSlice } from "../../slices";
+import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { getStackTraceFromError } from "utils/getStackTrace";
-import { valDataSelector } from "store/selectors";
+import {
+  fittedSegmentationModelSelector,
+  segmentationValDataSelector,
+  segmentationValImagesSelector,
+} from "store/selectors/segmenter";
+import { annotationCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
+import { evaluateSegmenter } from "store/coroutines/segmenter";
 
 export function* evaluateSegmenterSaga(action: any): any {
-  const model: tensorflow.LayersModel = yield select(fittedSelector);
-  const validationImages: Array<ImageType> = yield select(valImagesSelector);
+  const model: LayersModel = yield select(fittedSegmentationModelSelector);
+
+  const validationImages: Array<ImageType> = yield select(
+    segmentationValImagesSelector
+  );
+
   yield put(yield put(applicationSlice.actions.hideAlertState({})));
 
-  const categories: Array<Category> = yield select(createdCategoriesSelector);
-
-  const outputLayerSize = model.outputs[0].shape[1] as number;
+  const categories: Array<Category> = yield select(
+    annotationCategoriesSelector
+  );
 
   if (validationImages.length === 0) {
     yield put(
@@ -31,54 +37,43 @@ export function* evaluateSegmenterSaga(action: any): any {
         },
       })
     );
-  } else if (outputLayerSize !== categories.length) {
-    yield put(
-      applicationSlice.actions.updateAlertState({
-        alertState: {
-          alertType: AlertType.Warning,
-          name: "The output shape of your model does not correspond to the number of categories!",
-          description: `The trained model has an output shape of ${outputLayerSize} but there are ${categories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
-        },
-      })
-    );
   } else {
-    yield runEvaluation(validationImages, model, categories);
+    yield runSegmentationEvaluation(validationImages, model, categories);
   }
 
   yield put(
-    classifierSlice.actions.updateEvaluating({
+    segmenterSlice.actions.updateEvaluating({
       evaluating: false,
     })
   );
 }
 
-function* runEvaluation(
+function* runSegmentationEvaluation(
   validationImages: Array<ImageType>,
-  model: tensorflow.LayersModel,
+  model: LayersModel,
   categories: Array<Category>
 ) {
-  //@ts-ignore
-  const validationData: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
-  }> = yield select(valDataSelector);
+  const validationData: data.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R4>;
+    id: Tensor<Rank.R1>;
+  }> = yield select(segmentationValDataSelector);
 
   try {
-    var evaluationResult: ClassifierEvaluationResultType = yield evaluate(
-      model,
-      validationData,
-      validationImages,
-      categories
-    );
+    var evaluationResult: SegmenterEvaluationResultType =
+      yield evaluateSegmenter(
+        model,
+        validationData,
+        validationImages,
+        categories
+      );
   } catch (error) {
     yield handleError(error as Error, "Error computing the evaluation results");
     return;
   }
 
   yield put(
-    classifierSlice.actions.updateEvaluationResult({
+    segmenterSlice.actions.updateSegmentationEvaluationResult({
       evaluationResult,
     })
   );

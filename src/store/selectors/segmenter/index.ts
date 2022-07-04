@@ -1,3 +1,15 @@
 export { annotatedImagesSelector } from "./annotatedImagesSelector";
 export { segmentationTrainImagesSelector } from "./segmentationTrainImagesSelector";
 export { segmentationValidationImagesSelector } from "./segmentationValidationImagesSelector";
+export { segmentationTrainingPercentageSelector } from "./segmentationTrainingPercentageSelector";
+export { segmentationFitOptionsSelector } from "./segmentationFitOptionsSelector";
+export { segmentationCompileOptionsSelector } from "./segmentationCompileOptionsSelector";
+export { segmentationArchitectureOptionsSelector } from "./segmentationArchitectureOptionsSelector";
+export { compiledSegmentationModelSelector } from "./compiledSegmentationModelSelector";
+export { segmentationPreprocessOptionsSelector } from "./segmentationPreprocessOptionsSelector";
+export { fittedSegmentationModelSelector } from "./fittedSegmentationModelSelector";
+export { segmentationValDataSelector } from "./segmentationValDataSelector";
+export { segmentationInferenceImagesSelector } from "./segmentationInferenceImagesSelector";
+export { segmentationValImagesSelector } from "./segmentationValImagesSelector";
+export { userUploadedSegmentationModelSelector } from "./userUploadedSegmentationModelSelector";
+export { segmentationInputShapeSelector } from "./segmentationInputShapeSelector";

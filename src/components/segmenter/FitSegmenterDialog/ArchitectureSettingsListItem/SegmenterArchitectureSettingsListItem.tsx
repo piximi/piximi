@@ -15,7 +15,7 @@ export const SegmenterArchitectureSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
     useState<boolean>(false);
 
-  const onClasssifierSettingsListClick = () => {
+  const onSegmenterSettingsListClick = () => {
     setCollapsedClassifierSettingsList(!collapsedClassifierSettingsList);
   };
 
@@ -29,7 +29,7 @@ export const SegmenterArchitectureSettingsListItem = () => {
     <>
       <ListItem
         button
-        onClick={onClasssifierSettingsListClick}
+        onClick={onSegmenterSettingsListClick}
         style={{ padding: "12px 0px" }}
       >
         <ListItemIcon>

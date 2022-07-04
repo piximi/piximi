@@ -13,16 +13,19 @@ export const drawSegmentationMask = async (
   categories: Array<Category>,
   item: {
     xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+    annotations: AnnotationType[];
+    id: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
   ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+  id: string;
 }> => {
   // TODO: draw the segmentation mask
   // const ys = // segmentation mask
 
   return new Promise((resolve) => {
-    return resolve({ xs: item.xs, ys: item.xs });
+    return resolve({ xs: item.xs, ys: item.xs, id: item.id });
   });
 };
 
@@ -32,9 +35,12 @@ export const decodeFromImgSrc = async (
   item: {
     srcs: string; // dataURL
     annotations: AnnotationType[];
+    id: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  annotations: AnnotationType[];
+  id: string;
 }> => {
   const fetched = await tensorflow.util.fetch(item.srcs);
 
@@ -57,7 +63,7 @@ export const decodeFromImgSrc = async (
   }
 
   return new Promise((resolve) => {
-    return resolve({ xs: x });
+    return resolve({ ...item, xs: x });
   });
 };
 
@@ -66,9 +72,12 @@ export const decodeFromOriginalSrc = async (
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
     annotations: AnnotationType[];
+    id: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  annotations: AnnotationType[];
+  id: string;
 }> => {
   const channelPromises: Array<Promise<tensorflow.Tensor2D>> = [];
 
@@ -112,8 +121,42 @@ export const decodeFromOriginalSrc = async (
       c.dispose();
     }
 
-    return { xs: x };
+    return { ...item, xs: x };
   });
+};
+
+export const decodeImage_ = (
+  channels: number,
+  rescaleOptions: RescaleOptions
+) => {
+  return (item: {
+    srcs: string | string[];
+    annotations: AnnotationType[];
+    id: string;
+  }): Promise<{
+    xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+    annotations: AnnotationType[];
+    id: string;
+  }> => {
+    return channels === 1 || channels === 3
+      ? decodeFromImgSrc(
+          channels,
+          rescaleOptions,
+          item as {
+            srcs: string;
+            annotations: AnnotationType[];
+            id: string;
+          }
+        )
+      : decodeFromOriginalSrc(
+          rescaleOptions,
+          item as {
+            srcs: string[];
+            annotations: AnnotationType[];
+            id: string;
+          }
+        );
+  };
 };
 
 export const decodeImage = async (
@@ -122,9 +165,12 @@ export const decodeImage = async (
   item: {
     srcs: string | string[];
     annotations: AnnotationType[];
+    id: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  annotations: AnnotationType[];
+  id: string;
 }> => {
   return channels === 1 || channels === 3
     ? decodeFromImgSrc(
@@ -133,6 +179,7 @@ export const decodeImage = async (
         item as {
           srcs: string;
           annotations: AnnotationType[];
+          id: string;
         }
       )
     : decodeFromOriginalSrc(
@@ -140,6 +187,7 @@ export const decodeImage = async (
         item as {
           srcs: string[];
           annotations: AnnotationType[];
+          id: string;
         }
       );
 };
@@ -159,6 +207,7 @@ export const sampleGenerator = (images: Array<ImageType>) => {
           : image.originalSrc[image.activePlane];
 
       yield {
+        id: image.id,
         srcs: src,
         annotations: image.annotations,
       };
@@ -173,23 +222,25 @@ export const resize = async (
   item: {
     xs: tensorflow.Tensor<tensorflow.Rank.R3>;
     ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+    id: string;
   }
 ): Promise<{
   xs: tensorflow.Tensor<tensorflow.Rank.R3>;
   ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+  id: string;
 }> => {
   const resizedXs = tensorflow.image.resizeBilinear(
     item.xs as tensorflow.Tensor3D,
     [inputShape.height, inputShape.width]
   );
 
-  const resizedYs = tensorflow.image.resizeBilinear(
-    item.ys as tensorflow.Tensor3D,
-    [inputShape.height, inputShape.width]
-  );
+  // const resizedYs = tensorflow.image.resizeBilinear(
+  //   item.ys as tensorflow.Tensor3D,
+  //   [inputShape.height, inputShape.width]
+  // );
 
   return new Promise((resolve) => {
-    return resolve({ xs: resizedXs, ys: resizedYs });
+    return resolve({ ...item, xs: resizedXs });
   });
 };
 
@@ -356,6 +407,7 @@ export const preprocessSegmentationImages = async (
   tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
     ys: tensorflow.Tensor<tensorflow.Rank.R4>;
+    id: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>
 > => {
   const imageData = tensorflow.data
@@ -378,5 +430,6 @@ export const preprocessSegmentationImages = async (
   return imageDataBatched as tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;
     ys: tensorflow.Tensor<tensorflow.Rank.R4>;
+    id: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>;
 };

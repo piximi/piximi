@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { trainingPercentageSelector } from "../../../store/selectors";
-import { classifierSlice } from "../../../store/slices";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
@@ -15,9 +12,15 @@ import {
 import { CustomNumberTextField } from "../CustomNumberTextField/CustomNumberTextField";
 import { StyledFormControl } from "../../FitClassifierDialog/StyledFormControl";
 
-export const DatasetSettingsListItem = () => {
-  const dispatch = useDispatch();
+type DatasetSettingsListItemProps = {
+  trainingPercentage: number;
+  dispatchTrainingPercentageCallback: (trainPercentage: number) => void;
+};
 
+export const DatasetSettingsListItem = ({
+  trainingPercentage,
+  dispatchTrainingPercentageCallback,
+}: DatasetSettingsListItemProps) => {
   const [collapsedDatasetSettingsList, setCollapsedDatasetSettingsList] =
     useState<boolean>(false);
 
@@ -25,14 +28,8 @@ export const DatasetSettingsListItem = () => {
     setCollapsedDatasetSettingsList(!collapsedDatasetSettingsList);
   };
 
-  const trainingPercentage = useSelector(trainingPercentageSelector);
-
   const dispatchTrainingPercentage = (trainPercentage: number) => {
-    dispatch(
-      classifierSlice.actions.updateTrainingPercentage({
-        trainingPercentage: trainPercentage,
-      })
-    );
+    dispatchTrainingPercentageCallback(trainPercentage);
   };
 
   return (
