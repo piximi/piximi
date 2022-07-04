@@ -6,11 +6,11 @@ import { Tools } from "../Tools";
 import { Content } from "../Content";
 import { imageViewerSlice } from "../../../store/slices";
 import { ImageType } from "../../../types/ImageType";
-import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "../ImageViewerList/OpenMenu/ImageShapeDialog";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { useUpload } from "hooks/useUpload/useUpload";
-import { ImageViewerList } from "../CategoriesList";
+import { ImageViewerDrawer } from "../ImageViewerList";
 
 type ImageViewerProps = {
   image?: ImageType;
@@ -59,7 +59,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
       <CssBaseline />
 
-      <ImageViewerList />
+      <ImageViewerDrawer />
 
       <Content onDrop={onDrop} />
 

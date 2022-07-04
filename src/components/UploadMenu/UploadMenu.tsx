@@ -6,7 +6,7 @@ import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
 import { StyledMenuItem } from "./StyledMenuItem";
-import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "../annotator/ImageViewerList/OpenMenu/ImageShapeDialog";
 import { useUpload } from "hooks/useUpload/useUpload";
 
 type UploadMenuProps = {
