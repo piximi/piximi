@@ -4,6 +4,7 @@ import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
+  UNKNOWN_CATEGORY,
   UNKNOWN_CATEGORY_ID,
 } from "types/Category";
 import { v4 as uuidv4 } from "uuid";
@@ -36,14 +37,7 @@ const initialAnnotationCategories =
     : [UNKNOWN_ANNOTATION_CATEGORY];
 
 const initialState: Project = {
-  categories: [
-    {
-      color: "#AAAAAA",
-      id: UNKNOWN_CATEGORY_ID,
-      name: "Unknown",
-      visible: true,
-    },
-  ],
+  categories: [UNKNOWN_CATEGORY],
   annotationCategories: initialAnnotationCategories,
   images: [defaultImage],
   name: "Untitled project",
@@ -98,14 +92,7 @@ export const projectSlice = createSlice({
     },
     createNewProject(state: Project, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
-      state.categories = [
-        {
-          color: "#AAAAAA",
-          id: UNKNOWN_CATEGORY_ID,
-          name: "Unknown",
-          visible: true,
-        },
-      ];
+      state.categories = [UNKNOWN_CATEGORY];
       state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
       state.images = [];
       state.task = Task.Classify;
@@ -121,6 +108,15 @@ export const projectSlice = createSlice({
           image.categoryId = UNKNOWN_CATEGORY_ID;
           image.partition = Partition.Inference;
         }
+        return image;
+      });
+    },
+    deleteAllCategories(state: Project, action: PayloadAction<{}>) {
+      state.categories = [UNKNOWN_CATEGORY];
+
+      state.images = state.images.map((image: ImageType) => {
+        image.categoryId = UNKNOWN_CATEGORY_ID;
+        image.partition = Partition.Inference;
         return image;
       });
     },
@@ -380,6 +376,22 @@ export const projectSlice = createSlice({
             } else {
               return annotation;
             }
+          }
+        );
+
+        return { ...image, annotations: instances };
+      });
+    },
+    deleteAllAnnotationCategories(state: Project, action: PayloadAction<{}>) {
+      state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
+
+      state.images = state.images.map((image: ImageType) => {
+        const instances = image.annotations.map(
+          (annotation: AnnotationType) => {
+            return {
+              ...annotation,
+              categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+            };
           }
         );
 

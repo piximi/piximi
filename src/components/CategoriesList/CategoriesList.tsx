@@ -4,23 +4,36 @@ import { CategoryListItem } from "../CategoryListItem";
 import { Category, CategoryType } from "types/Category";
 import { CreateCategoryListItem } from "../CreateCategoryListItem";
 import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
+import { DeleteAllCategoriesMenuItem } from "components/DeleteAllCategoriesMenuItem";
 
 type CategoriesListProps = {
-  categories: Array<Category>;
+  createdCategories: Array<Category>;
   categoryType: CategoryType;
   unknownCategory: Category;
   predicted: boolean;
 };
 
 export const CategoriesList = (props: CategoriesListProps) => {
-  const { categories, categoryType, unknownCategory, predicted } = props;
+  const {
+    createdCategories: categories,
+    categoryType,
+    unknownCategory,
+    predicted,
+  } = props;
 
   const [showPredictionVisibilityMenu, setShowPredictionVisibilityMenu] =
+    React.useState<boolean>(true);
+
+  const [showDeleteAllCategoriesIcon, setShowDeleteAllCategoriesIcon] =
     React.useState<boolean>(true);
 
   useEffect(() => {
     setShowPredictionVisibilityMenu(predicted);
   }, [predicted]);
+
+  useEffect(() => {
+    setShowDeleteAllCategoriesIcon(categories.length > 0);
+  }, [categories]);
 
   return (
     <CollapsibleList primary="Categories">
@@ -40,9 +53,14 @@ export const CategoriesList = (props: CategoriesListProps) => {
           />
         );
       })}
+
       {showPredictionVisibilityMenu && <PredictionVisibility />}
 
       <CreateCategoryListItem categoryType={categoryType} />
+
+      {showDeleteAllCategoriesIcon && (
+        <DeleteAllCategoriesMenuItem categoryType={categoryType} />
+      )}
     </CollapsibleList>
   );
 };

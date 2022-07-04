@@ -335,6 +335,23 @@ export const imageViewerSlice = createSlice({
         return { ...image, annotations: instances };
       });
     },
+    deleteAllAnnotationCategories(
+      state: ImageViewer,
+      action: PayloadAction<{}>
+    ) {
+      state.images = state.images.map((image: ShadowImageType) => {
+        const instances = image.annotations.map(
+          (annotation: AnnotationType) => {
+            return {
+              ...annotation,
+              categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+            };
+          }
+        );
+
+        return { ...image, annotations: instances };
+      });
+    },
     setLanguage(
       state: ImageViewer,
       action: PayloadAction<{ language: LanguageType }>

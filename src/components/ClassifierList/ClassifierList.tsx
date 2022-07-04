@@ -73,7 +73,7 @@ export const ClassifierList = () => {
 
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
         <CategoriesList
-          categories={categories}
+          createdCategories={categories}
           unknownCategory={unknownCategory}
           predicted={predicted}
           categoryType={CategoryType.ClassifierCategory}
