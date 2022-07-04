@@ -11,6 +11,7 @@ type CategoriesListProps = {
   categoryType: CategoryType;
   unknownCategory: Category;
   predicted: boolean;
+  onCategoryClickCallBack: (category: Category) => void;
 };
 
 export const CategoriesList = (props: CategoriesListProps) => {
@@ -19,6 +20,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
     categoryType,
     unknownCategory,
     predicted,
+    onCategoryClickCallBack,
   } = props;
 
   const [showPredictionVisibilityMenu, setShowPredictionVisibilityMenu] =
@@ -42,6 +44,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
         category={unknownCategory}
         key={unknownCategory.id}
         id={unknownCategory.id}
+        onCategoryClickCallBack={onCategoryClickCallBack}
       />
       {categories.map((category: Category) => {
         return (
@@ -50,6 +53,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
             category={category}
             key={category.id}
             id={category.id}
+            onCategoryClickCallBack={onCategoryClickCallBack}
           />
         );
       })}

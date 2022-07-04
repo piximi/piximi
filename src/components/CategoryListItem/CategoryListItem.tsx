@@ -13,18 +13,23 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
-import { categoryCountsSelector } from "store/selectors";
+import {
+  categoryCountsSelector,
+  selectedCategorySelector,
+} from "store/selectors";
 
 type CategoryListItemProps = {
   categoryType: CategoryType;
   category: Category;
   id: string;
+  onCategoryClickCallBack: (category: Category) => void;
 };
 
 export const CategoryListItem = ({
   categoryType,
   category,
   id,
+  onCategoryClickCallBack,
 }: CategoryListItemProps) => {
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -36,6 +41,8 @@ export const CategoryListItem = ({
   const onCloseCategoryMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
+
+  const selectedCategory = useSelector(selectedCategorySelector);
 
   const imageCount = useSelector((state: State) => {
     return state.project.images.filter((image: ImageType) => {
@@ -53,9 +60,19 @@ export const CategoryListItem = ({
       : setCount(categoryCounts[category.id]);
   }, [category.id, categoryCounts, categoryType, imageCount]);
 
+  const onCategoryClick = () => {
+    onCategoryClickCallBack(category);
+  };
+
   return (
     <React.Fragment>
-      <ListItem dense key={id} id={id}>
+      <ListItem
+        dense
+        button
+        id={category.id}
+        onClick={onCategoryClick}
+        selected={category.id === selectedCategory.id}
+      >
         <CategoryListItemCheckbox
           category={category}
           categoryType={categoryType}

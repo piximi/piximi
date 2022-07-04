@@ -20,7 +20,7 @@ import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
 import { unknownAnnotationCategorySelector } from "store/selectors";
 import { CategoriesList } from "components/CategoriesList";
-import { CategoryType } from "types/Category";
+import { Category, CategoryType } from "types/Category";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);
@@ -56,6 +56,8 @@ export const SegmenterList = () => {
     setCollapsed(!collapsed);
   };
 
+  const onCategoryClickCallBack = (category: Category) => {};
+
   return (
     <List dense>
       <ListItem button dense onClick={onCollapseClick}>
@@ -72,6 +74,7 @@ export const SegmenterList = () => {
           unknownCategory={unknownCategory}
           predicted={false}
           categoryType={CategoryType.AnnotationCategory}
+          onCategoryClickCallBack={onCategoryClickCallBack}
         />
 
         <Divider />

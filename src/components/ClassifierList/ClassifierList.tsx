@@ -23,7 +23,7 @@ import {
   unknownCategorySelector,
 } from "store/selectors";
 import { predictedSelector } from "store/selectors/predictedSelector";
-import { CategoryType } from "types/Category";
+import { Category, CategoryType } from "types/Category";
 
 export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);
@@ -61,6 +61,8 @@ export const ClassifierList = () => {
     setCollapsed(!collapsed);
   };
 
+  const onCategoryClickCallBack = (category: Category) => {};
+
   return (
     <List dense>
       <ListItem button dense onClick={onCollapseClick}>
@@ -77,6 +79,7 @@ export const ClassifierList = () => {
           unknownCategory={unknownCategory}
           predicted={predicted}
           categoryType={CategoryType.ClassifierCategory}
+          onCategoryClickCallBack={onCategoryClickCallBack}
         />
 
         <Divider />
