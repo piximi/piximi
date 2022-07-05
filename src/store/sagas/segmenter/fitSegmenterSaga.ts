@@ -79,7 +79,7 @@ export function* fitSegmenterSaga(action: any): any {
     segmentationArchitectureOptionsSelector
   );
 
-  const annotationCategories: number = yield select(
+  const annotationCategories: Array<Category> = yield select(
     annotationCategoriesSelector
   );
 
@@ -90,7 +90,7 @@ export function* fitSegmenterSaga(action: any): any {
     try {
       model = yield createSegmentationModel(
         architectureOptions,
-        annotationCategories
+        annotationCategories.length
       );
     } catch (error) {
       yield handleError(error as Error, "Failed to create tensorflow model");

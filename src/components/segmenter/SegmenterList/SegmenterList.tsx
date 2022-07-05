@@ -15,12 +15,14 @@ import {
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useSelector } from "react-redux";
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
 import { unknownAnnotationCategorySelector } from "store/selectors";
 import { CategoriesList } from "components/CategoriesList";
-import { Category, CategoryType } from "types/Category";
+import { CategoryType } from "types/Category";
+import {
+  fittedSegmentationModelSelector,
+  segmentationTrainingFlagSelector,
+} from "store/selectors/segmenter";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);
@@ -33,8 +35,8 @@ export const SegmenterList = () => {
     "disabled: no trained model"
   );
 
-  const fitted = useSelector(fittedSelector);
-  const training = useSelector(trainingFlagSelector);
+  const fitted = useSelector(fittedSegmentationModelSelector);
+  const training = useSelector(segmentationTrainingFlagSelector);
 
   useEffect(() => {
     if (training) {
@@ -56,8 +58,6 @@ export const SegmenterList = () => {
     setCollapsed(!collapsed);
   };
 
-  const onCategoryClickCallBack = (category: Category) => {};
-
   return (
     <List dense>
       <ListItem button dense onClick={onCollapseClick}>
@@ -74,7 +74,9 @@ export const SegmenterList = () => {
           unknownCategory={unknownCategory}
           predicted={false}
           categoryType={CategoryType.AnnotationCategory}
-          onCategoryClickCallBack={onCategoryClickCallBack}
+          onCategoryClickCallBack={() => {
+            return;
+          }}
         />
 
         <Divider />

@@ -8,11 +8,13 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { PlayCircleOutline, Stop } from "@mui/icons-material";
-import { compiledSelector } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { classifierSlice } from "store/slices";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
+import {
+  compiledSegmentationModelSelector,
+  segmentationTrainingFlagSelector,
+} from "store/selectors/segmenter";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;
@@ -31,8 +33,8 @@ export const FitSegmenterDialogAppBar = ({
 }: FitSegmenterDialogAppBarProps) => {
   const dispatch = useDispatch();
 
-  const compiled = useSelector(compiledSelector);
-  const training = useSelector(trainingFlagSelector);
+  const compiled = useSelector(compiledSegmentationModelSelector);
+  const training = useSelector(segmentationTrainingFlagSelector);
 
   const onStopFitting = () => {
     if (!compiled) return;

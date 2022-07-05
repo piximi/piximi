@@ -7,16 +7,19 @@ import {
 
 export const createSegmentationModel = async (
   architectureOptions: SegmentationArchitectureOptions,
-  classes: number
+  numClasses: number
 ) => {
   switch (architectureOptions.selectedModel.modelType) {
     case ModelType.FCNSegmenter: {
-      return createFCNSegmenterModel(architectureOptions.inputShape, classes);
+      return createFCNSegmenterModel(
+        architectureOptions.inputShape,
+        numClasses
+      );
     }
     case ModelType.SimpleFCNSegmenter: {
       return createSimpleFCNSegmenterModel(
         architectureOptions.inputShape,
-        classes
+        numClasses
       );
     }
     default: {

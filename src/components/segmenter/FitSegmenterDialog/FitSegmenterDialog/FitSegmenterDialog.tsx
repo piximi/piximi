@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { segmenterSlice } from "store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
-import { categorizedImagesSelector, compiledSelector } from "store/selectors";
+import { compiledSelector } from "store/selectors";
 import { useEffect, useState } from "react";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
@@ -15,6 +15,7 @@ import { DialogTransition } from "components/DialogTransition";
 import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import {
+  annotatedImagesSelector,
   segmentationCompileOptionsSelector,
   segmentationFitOptionsSelector,
   segmentationTrainingPercentageSelector,
@@ -34,8 +35,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
   const [showWarning, setShowWarning] = useState<boolean>(true);
-  const [noCategorizedImages, setNoCategorizedImages] =
-    useState<boolean>(false);
+  const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
@@ -55,7 +55,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   >([]);
 
   const currentlyTraining = useSelector(trainingFlagSelector);
-  const categorizedImages = useSelector(categorizedImagesSelector);
+  const annotatedImages = useSelector(annotatedImagesSelector);
   const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
 
@@ -121,15 +121,15 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   };
 
   useEffect(() => {
-    if (categorizedImages.length === 0) {
-      setNoCategorizedImages(true);
-      if (!noCategorizedImages) {
+    if (annotatedImages.length === 0) {
+      setNoLabeledImages(true);
+      if (!noLabeledImages) {
         setShowWarning(true);
       }
     } else {
-      setNoCategorizedImages(false);
+      setNoLabeledImages(false);
     }
-  }, [categorizedImages, noCategorizedImages]);
+  }, [annotatedImages, noLabeledImages]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
@@ -198,12 +198,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <FitSegmenterDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noCategorizedImages}
+        disableFitting={noLabeledImages}
         epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noCategorizedImages && (
+      {showWarning && noLabeledImages && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
