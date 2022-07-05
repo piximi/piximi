@@ -1,5 +1,4 @@
 import { ChangeEvent, useState } from "react";
-import { useSelector } from "react-redux";
 import {
   Button,
   Dialog,
@@ -9,33 +8,35 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { selectedModelSelector } from "../../store/selectors/selectedModelSelector";
 import { useHotkeys } from "react-hotkeys-hook";
+import { SegmenterModelProps, ClassifierModelProps } from "types/ModelType";
+import { LayersModel } from "@tensorflow/tfjs";
 
-type SaveClassifierDialogProps = {
+type SaveFittedModelDialogProps = {
+  modelProps: ClassifierModelProps | SegmenterModelProps;
+  fittedModel: LayersModel | undefined;
+  modelTypeString: string;
   onClose: () => void;
   open: boolean;
   popupState: any;
 };
 
-export const SaveClassifierDialog = ({
+export const SaveFittedModelDialog = ({
+  modelProps,
+  fittedModel,
+  modelTypeString,
   onClose,
   open,
   popupState,
-}: SaveClassifierDialogProps) => {
-  const fitted = useSelector(fittedSelector);
-
-  const selectedModel = useSelector(selectedModelSelector);
-
+}: SaveFittedModelDialogProps) => {
   const [classifierName, setClassifierName] = useState<string>(
-    selectedModel.modelName
+    modelProps.modelName
   );
 
-  const noFittedModel = fitted ? false : true;
+  const noFittedModel = fittedModel ? false : true;
 
   const onSaveClassifierClick = async () => {
-    await fitted.save(`downloads://${classifierName}`);
+    await fittedModel!.save(`downloads://${classifierName}`);
 
     onClose();
     popupState.close();
@@ -56,7 +57,7 @@ export const SaveClassifierDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save Classifier</DialogTitle>
+      <DialogTitle>Save {modelTypeString}</DialogTitle>
 
       <DialogContent>
         <Grid container spacing={1}>
@@ -65,7 +66,7 @@ export const SaveClassifierDialog = ({
               autoFocus
               fullWidth
               id="name"
-              label="Classifier name"
+              label={modelTypeString + " name"}
               margin="dense"
               onChange={onNameChange}
               helperText={
@@ -89,7 +90,7 @@ export const SaveClassifierDialog = ({
           color="primary"
           disabled={noFittedModel}
         >
-          Save Classifier
+          Save {modelTypeString}
         </Button>
       </DialogActions>
     </Dialog>
