@@ -13,3 +13,4 @@ export { segmentationInferenceImagesSelector } from "./segmentationInferenceImag
 export { segmentationValImagesSelector } from "./segmentationValImagesSelector";
 export { userUploadedSegmentationModelSelector } from "./userUploadedSegmentationModelSelector";
 export { segmentationInputShapeSelector } from "./segmentationInputShapeSelector";
+export { segmenterSelector } from "./segmenterSelector";
