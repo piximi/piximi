@@ -15,13 +15,7 @@ export const allSerializedAnnotationsSelector = ({
   if (!imageViewer.images.length) return [];
 
   return imageViewer.images.map((shadowImage: ShadowImageType) => {
-    /*
-      get full images from project by id if they exist there,
-      else get full image from imageViewer
-    */
-    const image =
-      project.images.find((im: ImageType) => im.id === shadowImage.id) ||
-      (shadowImage as ImageType);
+    const image = shadowImage as ImageType;
 
     const columns = {
       imageChannels: image.shape.channels,

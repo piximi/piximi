@@ -8,9 +8,9 @@ import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import { useDispatch, useSelector } from "react-redux";
 import { segmenterSlice } from "store/slices";
 import React, { useEffect } from "react";
-import { predictionFlagSelector } from "store/selectors/predictionFlagSelector";
 import { useTranslation } from "hooks/useTranslation";
 import { DisabledListItem } from "components/common/DisabledListItem";
+import { segmentationPredictingFlagSelector } from "store/selectors/segmenter";
 
 type PredictSegmenterListItemProps = {
   disabled: boolean;
@@ -30,7 +30,7 @@ export const PredictSegmenterListItem = (
     dispatch(segmenterSlice.actions.predictSegmenter({}));
   };
 
-  const predicting = useSelector(predictionFlagSelector);
+  const predicting = useSelector(segmentationPredictingFlagSelector);
 
   useEffect(() => {
     setIsPredicting(predicting);

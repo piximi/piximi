@@ -9,9 +9,10 @@ export { compiledSegmentationModelSelector } from "./compiledSegmentationModelSe
 export { segmentationPreprocessOptionsSelector } from "./segmentationPreprocessOptionsSelector";
 export { fittedSegmentationModelSelector } from "./fittedSegmentationModelSelector";
 export { segmentationValDataSelector } from "./segmentationValDataSelector";
-export { segmentationInferenceImagesSelector } from "./segmentationInferenceImagesSelector";
+export { unannotatedImagesSelector } from "./unannotatedImagesSelector";
 export { segmentationValImagesSelector } from "./segmentationValImagesSelector";
 export { userUploadedSegmentationModelSelector } from "./userUploadedSegmentationModelSelector";
 export { segmentationInputShapeSelector } from "./segmentationInputShapeSelector";
 export { segmentationTrainingFlagSelector } from "./segmentationTrainingFlagSelector";
 export { segmenterSelector } from "./segmenterSelector";
+export { segmentationPredictingFlagSelector } from "./segmentationPredictingFlagSelector";

@@ -1,9 +1,5 @@
 import { put, select } from "redux-saga/effects";
-import {
-  classifierSlice,
-  applicationSlice,
-  segmenterSlice,
-} from "../../slices";
+import { applicationSlice, segmenterSlice, projectSlice } from "../../slices";
 import { annotationCategoriesSelector } from "../../selectors";
 import { Category } from "types/Category";
 import { ImageType } from "types/ImageType";
@@ -17,18 +13,29 @@ import { PreprocessOptions } from "types/PreprocessOptions";
 import {
   fittedSegmentationModelSelector,
   segmentationFitOptionsSelector,
-  segmentationInferenceImagesSelector,
   segmentationPreprocessOptionsSelector,
   segmentationInputShapeSelector,
+  unannotatedImagesSelector,
 } from "store/selectors/segmenter";
-import { drawAnnotationsFromPredictedSegmentation } from "store/coroutines/segmenter";
+import { predictSegmentations } from "store/coroutines/segmenter";
+import { Partition } from "types/Partition";
+import { AnnotationType } from "types/AnnotationType";
 
 export function* predictSegmenterSaga(action: any): any {
-  const testImages: Array<ImageType> = yield select(
-    segmentationInferenceImagesSelector
+  const inferenceImages: Array<ImageType> = yield select(
+    unannotatedImagesSelector
   );
 
-  const categories: Category[] = yield select(annotationCategoriesSelector);
+  yield put(
+    projectSlice.actions.updateSegmentationImagesPartition({
+      ids: inferenceImages.map((image) => image.id),
+      partition: Partition.Validation,
+    })
+  );
+
+  const annotationCategories: Category[] = yield select(
+    annotationCategoriesSelector
+  );
 
   const inputShape: Shape = yield select(segmentationInputShapeSelector);
 
@@ -40,18 +47,22 @@ export function* predictSegmenterSaga(action: any): any {
 
   let model = yield select(fittedSegmentationModelSelector);
 
-  if (!testImages.length) {
-    applicationSlice.actions.updateAlertState({
-      alertState: {
-        alertType: AlertType.Info,
-        name: "Inference set is empty",
-        description: "No unlabeled images to predict.",
-      },
-    });
+  const subsetInferenceImages = inferenceImages.slice(0, 10);
+
+  if (!inferenceImages.length) {
+    yield put(
+      applicationSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Info,
+          name: "Inference set is empty",
+          description: "No unlabeled images to predict.",
+        },
+      })
+    );
   } else {
     yield runSegmentationPrediction(
-      testImages,
-      categories,
+      subsetInferenceImages,
+      annotationCategories,
       inputShape,
       preprocessOptions,
       fitOptions,
@@ -60,14 +71,14 @@ export function* predictSegmenterSaga(action: any): any {
   }
 
   yield put(
-    classifierSlice.actions.updatePredicting({
+    segmenterSlice.actions.updatePredicting({
       predicting: false,
     })
   );
 }
 
 function* runSegmentationPrediction(
-  testImages: Array<ImageType>,
+  inferenceImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
@@ -79,12 +90,9 @@ function* runSegmentationPrediction(
     ys: Tensor<Rank.R4>;
     id: Tensor<Rank.R1>;
   }>;
-  const inferenceImages: Array<ImageType> = yield select(
-    segmentationInferenceImagesSelector
-  );
   try {
     data = yield preprocessSegmentationImages(
-      testImages,
+      inferenceImages,
       categories,
       inputShape,
       preprocessOptions,
@@ -98,8 +106,12 @@ function* runSegmentationPrediction(
     return;
   }
 
+  var predictedAnnotations: Array<{
+    annotations: Array<AnnotationType>;
+    imageId: string;
+  }>;
   try {
-    yield drawAnnotationsFromPredictedSegmentation(
+    predictedAnnotations = yield predictSegmentations(
       model,
       data,
       inferenceImages,
@@ -111,6 +123,20 @@ function* runSegmentationPrediction(
       "Error drawing the annotations on the inference images"
     );
     return;
+  }
+
+  var index = 0;
+  while (index < predictedAnnotations.length) {
+    const annotations = predictedAnnotations[index].annotations;
+    if (annotations.length) {
+      yield put(
+        projectSlice.actions.updateImageAnnotations({
+          imageId: predictedAnnotations[index].imageId,
+          annotations: annotations,
+        })
+      );
+    }
+    index++;
   }
 
   yield put(

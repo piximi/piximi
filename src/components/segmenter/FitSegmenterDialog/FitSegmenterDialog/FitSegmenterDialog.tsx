@@ -3,12 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { segmenterSlice } from "store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
-import { compiledSelector } from "store/selectors";
 import { useEffect, useState } from "react";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
 import { DialogTransition } from "components/DialogTransition";
@@ -16,8 +14,10 @@ import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import {
   annotatedImagesSelector,
+  compiledSegmentationModelSelector,
   segmentationCompileOptionsSelector,
   segmentationFitOptionsSelector,
+  segmentationTrainingFlagSelector,
   segmentationTrainingPercentageSelector,
 } from "store/selectors/segmenter";
 import { LossFunction } from "types/LossFunction";
@@ -54,9 +54,9 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(trainingFlagSelector);
+  const currentlyTraining = useSelector(segmentationTrainingFlagSelector);
   const annotatedImages = useSelector(annotatedImagesSelector);
-  const compiledModel = useSelector(compiledSelector);
+  const compiledModel = useSelector(compiledSegmentationModelSelector);
   const alertState = useSelector(alertStateSelector);
 
   const fitOptions = useSelector(segmentationFitOptionsSelector);

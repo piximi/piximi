@@ -85,8 +85,8 @@ export const SegmenterList = () => {
           <FitSegmenterListItem />
 
           <PredictSegmenterListItem
-            disabled={true}
-            helperText={"Not yet implemented."}
+            disabled={disabled}
+            helperText={helperText}
           />
 
           <EvaluateSegmenterListItem

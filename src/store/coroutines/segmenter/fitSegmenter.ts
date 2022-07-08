@@ -18,11 +18,11 @@ export const fitSegmenter = async (
   onEpochEnd: any
 ): Promise<{ fitted: LayersModel; status: History }> => {
   const args = {
-    callbacks: [
-      {
-        onEpochEnd: onEpochEnd,
-      },
-    ],
+    // callbacks: [
+    //   {
+    //     onEpochEnd: onEpochEnd,
+    //   },
+    // ],
     epochs: options.epochs,
     validationData: data.val,
   };

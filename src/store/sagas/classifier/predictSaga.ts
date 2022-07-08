@@ -38,13 +38,15 @@ export function* predictSaga(action: any): any {
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
   if (!testImages.length) {
-    applicationSlice.actions.updateAlertState({
-      alertState: {
-        alertType: AlertType.Info,
-        name: "Inference set is empty",
-        description: "No unlabeled images to predict.",
-      },
-    });
+    yield put(
+      applicationSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Info,
+          name: "Inference set is empty",
+          description: "No unlabeled images to predict.",
+        },
+      })
+    );
   } else if (outputLayerSize !== categories.length) {
     yield put(
       applicationSlice.actions.updateAlertState({

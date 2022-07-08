@@ -9,7 +9,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { PlayCircleOutline, Stop } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/slices";
+import { segmenterSlice } from "store/slices";
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 import {
   compiledSegmentationModelSelector,
@@ -39,7 +39,7 @@ export const FitSegmenterDialogAppBar = ({
   const onStopFitting = () => {
     if (!compiled) return;
     compiled.stopTraining = true;
-    dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+    dispatch(segmenterSlice.actions.updateCompiled({ compiled: compiled }));
   };
 
   return (

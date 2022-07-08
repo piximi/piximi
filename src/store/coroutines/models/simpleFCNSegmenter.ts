@@ -32,26 +32,26 @@ export const createSimpleFCNSegmenterModel = (
       padding: "same",
     })
   );
-  model.add(
-    tensorflow.layers.conv2d({
-      kernelSize: 3,
-      strides: 1,
-      filters: 64,
-      activation: "relu",
-      kernelInitializer: "varianceScaling",
-      padding: "same",
-    })
-  );
-  model.add(
-    tensorflow.layers.conv2d({
-      kernelSize: 3,
-      strides: 1,
-      filters: 64,
-      activation: "relu",
-      kernelInitializer: "varianceScaling",
-      padding: "same",
-    })
-  );
+  // model.add(
+  //   tensorflow.layers.conv2d({
+  //     kernelSize: 3,
+  //     strides: 1,
+  //     filters: 64,
+  //     activation: "relu",
+  //     kernelInitializer: "varianceScaling",
+  //     padding: "same",
+  //   })
+  // );
+  // model.add(
+  //   tensorflow.layers.conv2d({
+  //     kernelSize: 3,
+  //     strides: 1,
+  //     filters: 64,
+  //     activation: "relu",
+  //     kernelInitializer: "varianceScaling",
+  //     padding: "same",
+  //   })
+  // );
   model.add(
     tensorflow.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] })
   );
@@ -67,26 +67,26 @@ export const createSimpleFCNSegmenterModel = (
       padding: "same",
     })
   );
-  model.add(
-    tensorflow.layers.conv2d({
-      kernelSize: 3,
-      strides: 1,
-      filters: 64,
-      activation: "relu",
-      kernelInitializer: "varianceScaling",
-      padding: "same",
-    })
-  );
-  model.add(
-    tensorflow.layers.conv2d({
-      kernelSize: 3,
-      strides: 1,
-      filters: 64,
-      activation: "relu",
-      kernelInitializer: "varianceScaling",
-      padding: "same",
-    })
-  );
+  // model.add(
+  //   tensorflow.layers.conv2d({
+  //     kernelSize: 3,
+  //     strides: 1,
+  //     filters: 64,
+  //     activation: "relu",
+  //     kernelInitializer: "varianceScaling",
+  //     padding: "same",
+  //   })
+  // );
+  // model.add(
+  //   tensorflow.layers.conv2d({
+  //     kernelSize: 3,
+  //     strides: 1,
+  //     filters: 64,
+  //     activation: "relu",
+  //     kernelInitializer: "varianceScaling",
+  //     padding: "same",
+  //   })
+  // );
   model.add(
     tensorflow.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] })
   );
@@ -163,7 +163,7 @@ export const createSimpleFCNSegmenterModel = (
     tensorflow.layers.conv2dTranspose({
       kernelSize: 1,
       strides: 1,
-      filters: imageChannels,
+      filters: numClasses,
       activation: "softmax",
       kernelInitializer: "varianceScaling",
       padding: "same",
