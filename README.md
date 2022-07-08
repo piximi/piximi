@@ -23,6 +23,12 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 Builds the app for production to the `build` folder.<br />
 
+### `yarn test`
+
+Runs the tests. Note that for tests using tensorflow you need to specify the custom environment:
+
+`yarn test --env=./src/store/coroutines/classifier/custom-test-env.js`<br />
+
 ## Docker
 
 To run as a docker container, clone the repo, build the image and run it:
