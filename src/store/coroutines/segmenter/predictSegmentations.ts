@@ -10,7 +10,7 @@ import {
 import { AnnotationType } from "types/AnnotationType";
 import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
 import { ImageType } from "types/ImageType";
-import { encodeSegmentationMask } from "./segmentationMasks";
+import { decodeSegmentationMaskToAnnotations } from "./segmentationMasks";
 
 export const predictSegmentations = async (
   model: LayersModel,
@@ -28,7 +28,7 @@ export const predictSegmentations = async (
   }>
 > => {
   const createdCategories = categories.filter((category) => {
-    return category.id === UNKNOWN_ANNOTATION_CATEGORY_ID;
+    return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
 
   const inferredBatchTensors = await inferenceData
@@ -78,7 +78,7 @@ export const predictSegmentations = async (
       (image) => image.id === imageId
     )?.shape;
 
-    const annotations = encodeSegmentationMask(
+    const annotations = decodeSegmentationMaskToAnnotations(
       createdCategories,
       predictedSegmentationMap,
       imageShape!

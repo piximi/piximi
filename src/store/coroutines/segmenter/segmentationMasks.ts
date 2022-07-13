@@ -4,7 +4,7 @@ import { Category } from "types/Category";
 import { Shape } from "types/Shape";
 import { v4 as uuidv4 } from "uuid";
 
-export const encodeAnnotationsToSegmentationMask = (
+export const encodeAnnotationToSegmentationMask = (
   annotations: AnnotationType[],
   imageShape: Shape,
   createdCategoriesIDs: Array<string>
@@ -51,42 +51,69 @@ export const encodeAnnotationsToSegmentationMask = (
   return segmentationMask;
 };
 
-export const encodeSegmentationMask = (
+export const decodeSegmentationMaskToAnnotations = (
   createdCategories: Array<Category>,
   segmentationMask: Array<Array<number>>,
   imageShape: Shape
 ) => {
   const annotations: Array<AnnotationType> = [];
 
-  createdCategories.forEach((category, idx) => {
-    // The index of the i-th created category is i+1, 0 represents background.
-    const segmentationMaskIdx = idx + 1;
+  const segmentationMasks: Array<Array<Array<number>>> = Array.from(
+    Array(createdCategories.length),
+    () =>
+      Array.from(Array(imageShape.height), () =>
+        Array(imageShape.width).fill(0)
+      )
+  );
 
-    const mask = [];
-    const xCoordinates = [];
-    const yCoordinates = [];
-    for (let i = 0; i < imageShape.height; i++) {
-      for (let j = 0; j < imageShape.width; j++) {
-        if (segmentationMask[i][j] === segmentationMaskIdx) {
-          xCoordinates.push(j);
-          yCoordinates.push(i);
-          mask.push(255);
+  const xCoordinates: Array<Array<number>> = Array.from(
+    Array(createdCategories.length),
+    () => []
+  );
+
+  const yCoordinates: Array<Array<number>> = Array.from(
+    Array(createdCategories.length),
+    () => []
+  );
+
+  // Iterate over the predicted segmentation mask.
+  for (let i = 0; i < imageShape.height; i++) {
+    for (let j = 0; j < imageShape.width; j++) {
+      for (let k = 0; k < createdCategories.length; k++) {
+        if (segmentationMask[i][j] === k + 1) {
+          xCoordinates[k].push(j);
+          yCoordinates[k].push(i);
+          segmentationMasks[k][i][j] = 255;
         } else {
-          mask.push(0);
+          segmentationMasks[k][i][j] = 0;
         }
       }
     }
+  }
 
-    if (xCoordinates.length) {
-      const x1 = Math.min(...xCoordinates);
-      const y1 = Math.min(...yCoordinates);
-      const x2 = Math.max(...xCoordinates);
-      const y2 = Math.max(...yCoordinates);
+  // Iterate over all categories and construct the annotations.
+  createdCategories.forEach((category, k) => {
+    // Check if there is an annotation for the current category.
+    if (xCoordinates[k].length) {
+      const x1 = Math.min(...xCoordinates[k]);
+      const y1 = Math.min(...yCoordinates[k]);
+      const x2 = Math.max(...xCoordinates[k]);
+      const y2 = Math.max(...yCoordinates[k]);
+
+      // Crop the bounding box in the segmentation mask.
+      const croppedMask = segmentationMasks[k]
+        .slice(x1, x2 + 1)
+        .map((row) => row.slice(y1, y2 + 1));
+
+      // Create the run-length encoding of the cropped segmentation mask.
+      const flattenedMask = croppedMask.flat(2) as unknown as Uint8Array;
+      const encodedMask = encode(flattenedMask);
+
       annotations.push({
         boundingBox: [x1, y1, x2, y2],
         categoryId: category.id,
         id: uuidv4(),
-        mask: encode(new Uint8Array(mask)),
+        mask: encodedMask,
         plane: 0,
       });
     }

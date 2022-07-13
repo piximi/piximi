@@ -7,7 +7,7 @@ import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { RescaleOptions } from "types/RescaleOptions";
 import { AnnotationType } from "types/AnnotationType";
-import { encodeAnnotationsToSegmentationMask } from "./segmentationMasks";
+import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 
 export const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
@@ -23,7 +23,7 @@ export const drawSegmentationMask = async (
   id: string;
 }> => {
   const ys = tensorflow.tidy(() => {
-    const segmentationMasks = encodeAnnotationsToSegmentationMask(
+    const segmentationMasks = encodeAnnotationToSegmentationMask(
       item.annotations,
       item.shape,
       createdCategoriesIDs

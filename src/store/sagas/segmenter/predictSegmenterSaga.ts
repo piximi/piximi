@@ -47,8 +47,6 @@ export function* predictSegmenterSaga(action: any): any {
 
   let model = yield select(fittedSegmentationModelSelector);
 
-  const subsetInferenceImages = inferenceImages.slice(0, 10);
-
   if (!inferenceImages.length) {
     yield put(
       applicationSlice.actions.updateAlertState({
@@ -61,7 +59,7 @@ export function* predictSegmenterSaga(action: any): any {
     );
   } else {
     yield runSegmentationPrediction(
-      subsetInferenceImages,
+      inferenceImages,
       annotationCategories,
       inputShape,
       preprocessOptions,
