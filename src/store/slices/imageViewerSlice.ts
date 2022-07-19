@@ -297,7 +297,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
-    // TODO: Remove
     setImageInstances(
       state: ImageViewer,
       action: PayloadAction<{
