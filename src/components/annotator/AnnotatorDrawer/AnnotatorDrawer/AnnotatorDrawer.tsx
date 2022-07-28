@@ -10,7 +10,7 @@ import {
   unknownAnnotationCategorySelector,
 } from "store/selectors";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { CollapsibleList } from "../CollapsibleList";
+import { CollapsibleList } from "../../../common/CollapsibleList";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import IconButton from "@mui/material/IconButton";

@@ -12,7 +12,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { Color } from "../../../../../types/Color";
 import { debounce } from "lodash";
 import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
-import { CollapsibleList } from "../../../AnnotatorDrawer/CollapsibleList";
+import { CollapsibleList } from "../../../../common/CollapsibleList";
 import { imageViewerSlice } from "../../../../../store/slices";
 import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
 import {
