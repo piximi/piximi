@@ -2,7 +2,6 @@ import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Category } from "types/Category";
 import {
   categoryCountsSelector,
@@ -21,15 +20,12 @@ import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
 import { useDialog } from "hooks";
 import { useTranslation } from "hooks/useTranslation";
-import { Chip, Divider, Tooltip } from "@mui/material";
+import { Chip, Divider } from "@mui/material";
 import List from "@mui/material/List";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import SaveIcon from "@mui/icons-material/Save";
-import Typography from "@mui/material/Typography";
-import Toolbar from "@mui/material/Toolbar";
-import AppBar from "@mui/material/AppBar";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
@@ -44,17 +40,14 @@ import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
 import { imageViewerSlice, setActiveImage } from "store/slices";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { ArrowBack } from "@mui/icons-material";
 import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
-import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
-import { AppBarOffset } from "components/styled/AppBarOffset";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
-import { LogoIcon } from "components/Logo";
+import { AnnotatorAppBar } from "components/annotator/AnnotatorAppBar";
 
-export const CategoriesList = () => {
+export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const unknownAnnotationCategory = useSelector(
     unknownAnnotationCategorySelector
@@ -71,8 +64,6 @@ export const CategoriesList = () => {
   const annotatorImages = useSelector(annotatorImagesSelector);
 
   const dispatch = useDispatch();
-
-  const navigate = useNavigate();
 
   const {
     onClose: onCloseDeleteCategoryDialog,
@@ -104,12 +95,6 @@ export const CategoriesList = () => {
     open: openDeleteAllAnnotationsDialog,
   } = useDialog();
 
-  const {
-    onClose: onCloseExitAnnotatorDialog,
-    onOpen: onOpenExitAnnotatorDialog,
-    open: openExitAnnotatorDialog,
-  } = useDialog();
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
@@ -119,11 +104,6 @@ export const CategoriesList = () => {
   const [selectedImage, setSelectedImage] = React.useState<ImageType>(
     currentImage!
   );
-
-  const onReturnToMainProject = () => {
-    onCloseExitAnnotatorDialog();
-    navigate("/");
-  };
 
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
@@ -219,40 +199,7 @@ export const CategoriesList = () => {
       open
       variant="persistent"
     >
-      <AppBar
-        color="default"
-        sx={{
-          backgroundColor: "rgba(0, 0, 0, 0)",
-          // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-          boxShadow: "none",
-          position: "absolute",
-        }}
-      >
-        <Toolbar>
-          <Tooltip title="Save and return to project" placement="bottom">
-            <IconButton
-              edge="start"
-              onClick={onOpenExitAnnotatorDialog}
-              aria-label="Exit Annotator"
-              href={""}
-            >
-              <ArrowBack />
-            </IconButton>
-          </Tooltip>
-          <LogoIcon width={30} height={30} />
-          <Typography variant="h5" color={"#02aec5"}>
-            Annotator
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-      <AppBarOffset />
-
-      <ExitAnnotatorDialog
-        onReturnToProject={onReturnToMainProject}
-        onClose={onCloseExitAnnotatorDialog}
-        open={openExitAnnotatorDialog}
-      />
+      <AnnotatorAppBar />
 
       <Divider />
 

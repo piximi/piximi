@@ -22,7 +22,7 @@ import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialo
 import { useDialog } from "hooks/useDialog/useDialog";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { SaveAnnotationProjectDialog } from "components/annotator/CategoriesList/SaveMenu/SaveAnnotationProjectDialog";
+import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 import StackTrace from "stacktrace-js";
 
 const popupState = {

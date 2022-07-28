@@ -3,7 +3,7 @@ import { ApplicationDrawer } from "../ApplicationDrawer";
 import { ImageGrid } from "../ImageGrid";
 import { ApplicationAppBar } from "../ApplicationAppBar";
 import { Box, CssBaseline } from "@mui/material";
-import { ImageShapeDialog } from "../annotator/CategoriesList/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "../annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 import { applicationSlice } from "store/slices/applicationSlice";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDispatch, useSelector } from "react-redux";

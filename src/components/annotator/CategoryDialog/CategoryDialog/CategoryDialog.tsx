@@ -9,7 +9,7 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { ColorIcon } from "../../CategoriesList/ColorIcon";
+import { ColorIcon } from "../../AnnotatorDrawer/ColorIcon";
 import { useTranslation } from "hooks/useTranslation";
 
 type CategoryDialogProps = {

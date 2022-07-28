@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { CategoriesList } from "../CategoriesList";
+import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
 import { imageViewerSlice } from "../../../store/slices";
 import { ImageType } from "../../../types/ImageType";
-import { ImageShapeDialog } from "../CategoriesList/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { useUpload } from "hooks/useUpload/useUpload";
@@ -59,7 +59,7 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
       <CssBaseline />
 
-      <CategoriesList />
+      <AnnotatorDrawer />
 
       <Content onDrop={onDrop} />
 
