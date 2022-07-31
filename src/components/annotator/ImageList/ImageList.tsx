@@ -1,0 +1,97 @@
+import React from "react";
+import {
+  Avatar,
+  Chip,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
+} from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { CollapsibleList } from "components/common/CollapsibleList";
+import { ImageMenu } from "../AnnotatorDrawer/ImageMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveImage } from "store/slices";
+import { imageSelector } from "store/selectors";
+import { ImageType, ShadowImageType } from "types/ImageType";
+import { useTranslation } from "hooks/useTranslation";
+
+export const ImageList = ({
+  annotatorImages,
+}: {
+  annotatorImages: Array<ShadowImageType>;
+}) => {
+  const currentImage = useSelector(imageSelector);
+  const t = useTranslation();
+  const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
+    null
+  );
+  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
+    currentImage!
+  );
+
+  const dispatch = useDispatch();
+
+  const onImageItemClick = (
+    evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
+    image: ShadowImageType
+  ) => {
+    dispatch(setActiveImage({ imageId: image.id }));
+  };
+  const onImageMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    image: ShadowImageType
+  ) => {
+    setImageAnchorEl(event.currentTarget);
+    setSelectedImage(image as ImageType);
+  };
+
+  const onImageMenuClose = () => {
+    setImageAnchorEl(null);
+  };
+  return (
+    <CollapsibleList closed dense primary={t("Images")}>
+      {annotatorImages.map((image: ShadowImageType) => {
+        return (
+          <div key={image.id}>
+            <ListItem
+              button
+              id={image.id}
+              onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+                onImageItemClick(evt, image)
+              }
+              selected={image.id === currentImage?.id}
+            >
+              <ListItemAvatar>
+                <Avatar alt={image.name} src={image.src} variant={"square"} />
+              </ListItemAvatar>
+              <ListItemText
+                id={image.id}
+                primary={image.name}
+                primaryTypographyProps={{ noWrap: true }}
+              />
+              {image.annotations.length !== 0 && (
+                <Chip label={image.annotations.length} size="small" />
+              )}
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  onClick={(event) => onImageMenuOpen(event, image)}
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          </div>
+        );
+      })}
+      <ImageMenu
+        anchorElImageMenu={imageAnchorEl}
+        selectedImage={selectedImage}
+        onCloseImageMenu={onImageMenuClose}
+        openImageMenu={Boolean(imageAnchorEl)}
+      />
+    </CollapsibleList>
+  );
+};

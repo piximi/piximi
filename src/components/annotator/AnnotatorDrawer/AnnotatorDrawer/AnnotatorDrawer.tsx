@@ -46,6 +46,7 @@ import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
 import { AnnotatorAppBar } from "components/annotator/AnnotatorAppBar";
+import { ImageList } from "components/annotator/ImageList";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -210,48 +211,7 @@ export const AnnotatorDrawer = () => {
 
       <Divider />
 
-      <CollapsibleList closed dense primary={t("Images")}>
-        {annotatorImages.map((image: ShadowImageType) => {
-          return (
-            <div key={image.id}>
-              <ListItem
-                button
-                id={image.id}
-                onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                  onImageItemClick(evt, image)
-                }
-                selected={image.id === currentImage?.id}
-              >
-                <ListItemAvatar>
-                  <Avatar alt={image.name} src={image.src} variant={"square"} />
-                </ListItemAvatar>
-                <ListItemText
-                  id={image.id}
-                  primary={image.name}
-                  primaryTypographyProps={{ noWrap: true }}
-                />
-                {image.annotations.length !== 0 && (
-                  <Chip label={image.annotations.length} size="small" />
-                )}
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => onImageMenuOpen(event, image)}
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            </div>
-          );
-        })}
-        <ImageMenu
-          anchorElImageMenu={imageAnchorEl}
-          selectedImage={selectedImage}
-          onCloseImageMenu={onImageMenuClose}
-          openImageMenu={Boolean(imageAnchorEl)}
-        />
-      </CollapsibleList>
+      <ImageList annotatorImages={annotatorImages} />
 
       <Divider />
 
