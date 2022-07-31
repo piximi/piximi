@@ -1,4 +1,4 @@
-import { CollapsibleList } from "../CollapsibleList";
+import { CollapsibleList } from "../common/CollapsibleList";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { CategoryListItem } from "../CategoryListItem";
@@ -24,7 +24,7 @@ export const CategoriesList = () => {
   }, [predicted]);
 
   return (
-    <CollapsibleList primary="Categories">
+    <CollapsibleList dense primary="Categories">
       <CategoryListItem
         category={unknownCategory}
         key={unknownCategory.id}

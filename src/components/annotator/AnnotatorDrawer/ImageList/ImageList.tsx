@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CollapsibleList } from "components/common/CollapsibleList";
-import { ImageMenu } from "../AnnotatorDrawer/ImageMenu";
+import { ImageMenu } from "../ImageMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveImage } from "store/slices";
 import { imageSelector } from "store/selectors";

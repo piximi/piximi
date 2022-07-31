@@ -5,7 +5,6 @@ import React from "react";
 import { Category } from "types/Category";
 import {
   categoryCountsSelector,
-  imageSelector,
   selectedCategorySelector,
   unknownAnnotationCategorySelector,
 } from "store/selectors";
@@ -30,23 +29,20 @@ import PopupState, { bindTrigger } from "material-ui-popup-state";
 import AddIcon from "@mui/icons-material/Add";
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import { ImageMenu } from "../ImageMenu";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
-import { imageViewerSlice, setActiveImage } from "store/slices";
-import { ImageType, ShadowImageType } from "types/ImageType";
+import { imageViewerSlice } from "store/slices";
+import { ShadowImageType } from "types/ImageType";
 import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
 import { AnnotatorAppBar } from "components/annotator/AnnotatorAppBar";
-import { ImageList } from "components/annotator/ImageList";
+import { ImageList } from "components/annotator/AnnotatorDrawer/ImageList";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
@@ -59,8 +55,6 @@ export const AnnotatorDrawer = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
 
   const categoryCounts = useSelector(categoryCountsSelector);
-
-  const currentImage = useSelector(imageSelector);
 
   const annotatorImages = useSelector(annotatorImagesSelector);
 
@@ -98,14 +92,6 @@ export const AnnotatorDrawer = () => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
-    null
-  );
-
-  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
-    currentImage!
-  );
-
   const onCategoryClick = (
     event: React.MouseEvent<HTMLDivElement>,
     category: Category
@@ -131,18 +117,6 @@ export const AnnotatorDrawer = () => {
 
   const onCategoryMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const onImageMenuOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    image: ShadowImageType
-  ) => {
-    setImageAnchorEl(event.currentTarget);
-    setSelectedImage(image as ImageType);
-  };
-
-  const onImageMenuClose = () => {
-    setImageAnchorEl(null);
   };
 
   const onClearAllAnnotations = () => {
@@ -176,13 +150,6 @@ export const AnnotatorDrawer = () => {
         })
       );
     });
-  };
-
-  const onImageItemClick = (
-    evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: ShadowImageType
-  ) => {
-    dispatch(setActiveImage({ imageId: image.id }));
   };
 
   const t = useTranslation();
