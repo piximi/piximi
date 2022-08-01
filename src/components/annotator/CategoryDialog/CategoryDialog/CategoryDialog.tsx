@@ -9,8 +9,10 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { ColorIcon } from "../../AnnotatorDrawer/ColorIcon";
+
 import { useTranslation } from "hooks/useTranslation";
+
+import { ColorIcon } from "../../AnnotatorDrawer/ColorIcon";
 
 type CategoryDialogProps = {
   onCloseDialog: () => void;

@@ -1,9 +1,12 @@
 import * as React from "react";
 import { useState } from "react";
-import { OptimizerSettingsGrid } from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
+
 import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+import { OptimizerSettingsGrid } from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
 
 export const OptimizerSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =

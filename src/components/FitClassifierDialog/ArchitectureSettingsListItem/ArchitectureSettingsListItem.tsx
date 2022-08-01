@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
+
 import {
   Collapse,
   ListItem,
@@ -8,8 +8,11 @@ import {
   ListItemText,
   styled,
 } from "@mui/material";
+
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
 
 export const ArchitectureSettingsListItem = () => {
   const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =

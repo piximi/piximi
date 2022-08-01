@@ -1,22 +1,30 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   CircularProgress,
   ListItem,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import { useDialog } from "../../hooks";
-import { useDispatch, useSelector } from "react-redux";
-import { EvaluateClassifierDialog } from "components/EvaluateClassifierDialog/EvaluateClassifierDialog";
-import { Category } from "types/Category";
-import { createdCategoriesSelector } from "store/selectors";
-import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
-import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
-import { classifierSlice } from "store/slices";
-import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
-import React, { useEffect } from "react";
+
+import { useDialog } from "hooks";
 import { useTranslation } from "hooks/useTranslation";
+
+import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
+
+import { EvaluateClassifierDialog } from "components/EvaluateClassifierDialog/EvaluateClassifierDialog";
+
+import { createdCategoriesSelector } from "store/selectors";
+import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
+
+import { classifierSlice } from "store/slices";
+
+import { Category } from "types/Category";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;

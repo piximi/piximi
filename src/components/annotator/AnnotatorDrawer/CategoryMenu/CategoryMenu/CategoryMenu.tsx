@@ -1,17 +1,23 @@
 import React from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+
 import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
 import Divider from "@mui/material/Divider";
-import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
-import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "../../../../../hooks/useTranslation";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { selectedCategorySelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "../../../../../types/Category";
-import { annotatorImagesSelector } from "../../../../../store/selectors/annotatorImagesSelector";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
+import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
+
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+import { selectedCategorySelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;

@@ -1,4 +1,5 @@
 import { styled } from "@mui/material/styles";
+
 import MenuItem, { MenuItemProps } from "@mui/material/MenuItem";
 
 type StyledMenuItemProps = MenuItemProps & { component: string };

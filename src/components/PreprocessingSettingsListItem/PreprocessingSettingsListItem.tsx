@@ -1,8 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
+
 import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 import { RescalingForm } from "./RescalingForm";
 import { CroppingForm } from "./CroppingForm";
 

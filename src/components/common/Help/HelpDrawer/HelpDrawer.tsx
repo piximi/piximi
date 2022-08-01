@@ -1,13 +1,16 @@
 import React from "react";
-import Drawer from "@mui/material/Drawer";
-import CloseIcon from "@mui/icons-material/Close";
+
 import { IconButton } from "@mui/material";
+import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import HelpIcon from "@mui/icons-material/Help";
+import CloseIcon from "@mui/icons-material/Close";
 import ListItemText from "@mui/material/ListItemText";
-import { AppBarOffset } from "components/styled/AppBarOffset";
+
 import { HelpContent, HelpTopic } from "../HelpContent/HelpContent";
+
+import { AppBarOffset } from "components/styled/AppBarOffset";
 
 type HelpDrawerProps = {
   helpContent: Array<HelpTopic>;

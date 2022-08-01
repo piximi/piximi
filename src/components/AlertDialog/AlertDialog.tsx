@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+
 import {
   Box,
   Collapse,
@@ -10,6 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
@@ -17,12 +19,13 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { AlertStateType, AlertType } from "types/AlertStateType";
 
-import { createGitHubIssue } from "utils/createGitHubIssue";
 import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
 
 import { applicationSlice } from "store/slices";
+
+import { AlertStateType, AlertType } from "types/AlertStateType";
+import { createGitHubIssue } from "utils/createGitHubIssue";
 
 type AlertDialogProps = {
   alertState: AlertStateType;

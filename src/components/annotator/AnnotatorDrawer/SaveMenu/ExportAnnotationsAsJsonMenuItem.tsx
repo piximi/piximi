@@ -1,9 +1,11 @@
+import React from "react";
 import { useSelector } from "react-redux";
-import { activeSerializedAnnotationsSelector } from "../../../../store/selectors/activeSerializedAnnotationsSelector";
 import { saveAs } from "file-saver";
+
 import { MenuItem } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
-import React from "react";
+
+import { activeSerializedAnnotationsSelector } from "store/selectors/activeSerializedAnnotationsSelector";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import { ArrowBack } from "@mui/icons-material";
 import {
   AppBar,
@@ -9,10 +10,13 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { ExitAnnotatorDialog } from "../AnnotatorDrawer/ExitAnnotatorDialog";
+
 import { LogoIcon } from "components/Logo";
 import { AppBarOffset } from "components/styled/AppBarOffset";
-import { ExitAnnotatorDialog } from "../AnnotatorDrawer/ExitAnnotatorDialog";
-import { useDialog } from "hooks";
 
 export const AnnotatorAppBar = () => {
   const navigate = useNavigate();

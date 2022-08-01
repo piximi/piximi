@@ -1,13 +1,12 @@
-import * as ReactKonva from "react-konva";
 import React, { useEffect, useState } from "react";
-import {
-  stageScaleSelector,
-  toolTypeSelector,
-} from "../../../../../store/selectors";
+import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
-import { ToolType } from "../../../../../types/ToolType";
-import { annotationStateSelector } from "../../../../../store/selectors/annotationStateSelector";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+
+import { stageScaleSelector, toolTypeSelector } from "store/selectors";
+import { annotationStateSelector } from "store/selectors/annotationStateSelector";
+
+import { ToolType } from "types/ToolType";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 type ColorAnnotationToolTipProps = {
   toolTipPosition?: { x: number; y: number };

@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import * as ImageJS from "image-js";
+import { useHotkeys } from "react-hotkeys-hook";
+
+import { Alert, Box, Button, DialogActions } from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { ImageShapeEnum } from "../../../../image/imageHelper";
-import { useDispatch } from "react-redux";
-import { Alert, Box, Button, DialogActions } from "@mui/material";
-import { applicationSlice } from "../../../../store/slices";
-import { CustomNumberTextField } from "components/CustomNumberTextField/CustomNumberTextField";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
+
+import { applicationSlice } from "store/slices";
+
+import { ImageShapeEnum } from "image/imageHelper";
 
 type ImageShapeDialogProps = {
   files: FileList;

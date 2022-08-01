@@ -1,16 +1,21 @@
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
-import { imageViewerSlice } from "../../../../../store/slices";
+
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+
+import { imageViewerFullImagesSelector } from "store/selectors";
+import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
+import { activeImageColorsSelector } from "store/selectors/activeImageColorsSelector";
+
+import { imageViewerSlice } from "store/slices";
+
+import { ImageType } from "types/ImageType";
+
 import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
-} from "../../../../../image/imageHelper";
-import { imageViewerFullImagesSelector } from "../../../../../store/selectors";
-import { ImageType } from "../../../../../types/ImageType";
-import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+} from "image/imageHelper";
 
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(activeImageColorsSelector);

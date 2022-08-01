@@ -1,13 +1,14 @@
 import React from "react";
-import { Selection } from "../Selection";
 import { useSelector } from "react-redux";
-import {
-  annotationStateSelector,
-  toolTypeSelector,
-} from "../../../../../store/selectors";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
-import { Tool } from "../../../../../annotator/image/Tool";
-import { ToolType } from "../../../../../types/ToolType";
+
+import { Selection } from "../Selection";
+
+import { annotationStateSelector, toolTypeSelector } from "store/selectors";
+
+import { AnnotationStateType } from "types/AnnotationStateType";
+import { ToolType } from "types/ToolType";
+
+import { Tool } from "annotator/image/Tool";
 
 type SelectingProps = {
   tool: Tool;

@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   AppBar,
   Box,
@@ -6,12 +8,15 @@ import {
   Toolbar,
   Tooltip,
 } from "@mui/material";
+
 import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
-import { compiledSelector } from "../../../store/selectors";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../store/slices";
-import { trainingFlagSelector } from "../../../store/selectors/trainingFlagSelector";
+
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
+
+import { compiledSelector } from "store/selectors";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+
+import { classifierSlice } from "store/slices";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

@@ -1,13 +1,17 @@
 import React, { SyntheticEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import { Autocomplete, TextField } from "@mui/material";
+
+import { imageSortKeySelector } from "store/selectors/imageSortKeySelector";
+
+import { projectSlice } from "store/slices";
+
 import {
   availableImageSortKeys,
   ImageSortKeyType,
   ImageSortKey,
 } from "types/ImageSortType";
-import { projectSlice } from "store/slices";
-import { useDispatch, useSelector } from "react-redux";
-import { imageSortKeySelector } from "store/selectors/imageSortKeySelector";
 
 export const ImageSortSelection = () => {
   const dispatch = useDispatch();

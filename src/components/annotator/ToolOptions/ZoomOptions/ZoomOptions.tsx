@@ -1,37 +1,45 @@
-import Radio from "@mui/material/Radio";
 import React from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+
 import { RadioGroup } from "@mui/material";
+import Radio from "@mui/material/Radio";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { ZoomModeType } from "../../../../types/ZoomModeType";
 import Checkbox from "@mui/material/Checkbox";
+import ListSubheader from "@mui/material/ListSubheader";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from "@mui/material/Divider";
+import Slider from "@mui/material/Slider";
+import Grid from "@mui/material/Grid";
+
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { InformationBox } from "../InformationBox";
+import { ResetButton } from "../HandToolOptions/ResetButton";
+
 import {
   imageSelector,
   stageHeightSelector,
   stageScaleSelector,
   stageWidthSelector,
   zoomToolOptionsSelector,
-} from "../../../../store/selectors";
-import ListSubheader from "@mui/material/ListSubheader";
-import ListItemIcon from "@mui/material/ListItemIcon";
+} from "store/selectors";
+import { offsetSelector } from "store/selectors/offsetSelector";
+
+import { setOffset, setStageScale } from "store/slices";
+import { setZoomToolOptions } from "store/slices/toolOptionsSlice";
+
+import { ZoomModeType } from "types/ZoomModeType";
+
 import {
   CheckboxUncheckedIcon,
   RadioCheckedIcon,
   RadioUncheckedIcon,
-} from "../../../../icons";
-import { useTranslation } from "../../../../hooks/useTranslation";
-import Divider from "@mui/material/Divider";
-import { InformationBox } from "../InformationBox";
-import Slider from "@mui/material/Slider";
-import Grid from "@mui/material/Grid";
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
-import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import { offsetSelector } from "../../../../store/selectors/offsetSelector";
-import { ResetButton } from "../HandToolOptions/ResetButton";
-import { setOffset, setStageScale } from "../../../../store/slices";
-import { setZoomToolOptions } from "../../../../store/slices/toolOptionsSlice";
+} from "icons";
 
 export const ZoomOptions = () => {
   const dispatch = useDispatch();

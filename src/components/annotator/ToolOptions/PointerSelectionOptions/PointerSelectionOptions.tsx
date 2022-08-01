@@ -1,21 +1,30 @@
-import Divider from "@mui/material/Divider";
 import React from "react";
-import { InformationBox } from "../InformationBox";
-import { useTranslation } from "../../../../hooks/useTranslation";
+import { useDispatch, useSelector } from "react-redux";
+
+import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import SvgIcon from "@mui/material/SvgIcon";
-import { ReactComponent as InvertSelectionIcon } from "../../../../icons/InvertAnnotation.svg";
 import ListItemText from "@mui/material/ListItemText";
-import { imageViewerSlice } from "../../../../store/slices";
-import { useDispatch, useSelector } from "react-redux";
-import { selectedAnnotationsSelector } from "../../../../store/selectors/selectedAnnotationsSelector";
-import { unselectedAnnotationsSelector } from "../../../../store/selectors/unselectedAnnotationsSelector";
-import { Category } from "../../../../types/Category";
-import { CollapsibleList } from "../../../common/CollapsibleList";
-import { annotationCategoriesSelector } from "../../../../store/selectors";
+
 import LabelIcon from "@mui/icons-material/Label";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { InformationBox } from "../InformationBox";
+
+import { CollapsibleList } from "components/common/CollapsibleList";
+
+import { annotationCategoriesSelector } from "store/selectors";
+import { selectedAnnotationsSelector } from "store/selectors/selectedAnnotationsSelector";
+import { unselectedAnnotationsSelector } from "store/selectors/unselectedAnnotationsSelector";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Category } from "types/Category";
+
+import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();

@@ -1,9 +1,12 @@
-import * as ReactKonva from "react-konva";
 import React from "react";
-import { PolygonalAnnotationTool } from "../../../../../../annotator/image/Tool";
-import { useMarchingAnts } from "../../../../../../hooks";
+import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../store/selectors";
+
+import { useMarchingAnts } from "hooks";
+
+import { stageScaleSelector } from "store/selectors";
+
+import { PolygonalAnnotationTool } from "annotator/image/Tool";
 
 type PolygonalSelectionProps = {
   operator: PolygonalAnnotationTool;

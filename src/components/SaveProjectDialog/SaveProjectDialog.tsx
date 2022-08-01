@@ -1,5 +1,8 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
+import saveAs from "file-saver";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -9,10 +12,9 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import saveAs from "file-saver";
-import { classifierSelector } from "../../store/selectors";
-import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { classifierSelector } from "store/selectors";
+import { serializedProjectSelector } from "store/selectors/serializedProjectSelector";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

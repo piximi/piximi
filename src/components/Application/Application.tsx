@@ -2,8 +2,10 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { StyledEngineProvider } from "@mui/material/styles";
+
 import { MainView } from "../MainView";
 import { AnnotatorView } from "../annotator";
+
 import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
 
 export const Application = () => {

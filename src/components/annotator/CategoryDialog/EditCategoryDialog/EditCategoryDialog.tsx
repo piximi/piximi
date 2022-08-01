@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Category } from "../../../../types/Category";
-import { imageViewerSlice } from "../../../../store/slices";
-import { selectedCategorySelector } from "../../../../store/selectors";
-import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
+
 import { CategoryDialog } from "../CategoryDialog";
+
+import { selectedCategorySelector } from "store/selectors";
+import { annotatorCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Category } from "types/Category";
 
 type EditCategoryDialogProps = {
   onCloseDialog: () => void;

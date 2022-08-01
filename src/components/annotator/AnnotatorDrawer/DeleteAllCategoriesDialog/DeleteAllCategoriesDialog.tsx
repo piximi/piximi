@@ -1,15 +1,19 @@
 import React from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { AnnotationType } from "types/AnnotationType";
+
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+
 import { imageViewerSlice } from "store/slices";
+
+import { AnnotationType } from "types/AnnotationType";
 import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 import { ShadowImageType } from "types/ImageType";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type DeleteAllCategoriesDialogProps = {
   onClose: () => void;

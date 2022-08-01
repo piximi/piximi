@@ -1,11 +1,16 @@
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import React, { useEffect, useCallback } from "react";
-import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
-import { applicationSlice } from "store/slices";
-import { AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { ErrorBoundary } from "react-error-boundary";
+
 import { ImageViewer } from "../ImageViewer";
+
+import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+
+import { applicationSlice } from "store/slices";
+
+import { AlertType } from "types/AlertStateType";
+
+import { getStackTraceFromError } from "utils/getStackTrace";
 
 export const AnnotatorView = () => {
   const dispatch = useDispatch();

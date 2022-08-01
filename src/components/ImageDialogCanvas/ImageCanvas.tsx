@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
-import { ImageType } from "../../types/ImageType";
+
 import { StyleBackgroundCanvas } from "./StyledImageCanvasComponents";
+
+import { ImageType } from "types/ImageType";
 
 type ImageCanvasProps = {
   image: ImageType;

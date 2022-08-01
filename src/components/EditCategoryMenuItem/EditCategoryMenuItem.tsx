@@ -1,8 +1,12 @@
 import React from "react";
-import { EditCategoryDialog } from "../EditCategoryDialog";
-import { Category } from "../../types/Category";
-import { useDialog } from "../../hooks";
+
 import { MenuItem, Typography } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { EditCategoryDialog } from "components/EditCategoryDialog";
+
+import { Category } from "types/Category";
 
 type EditCategoryMenuItemProps = {
   category: Category;

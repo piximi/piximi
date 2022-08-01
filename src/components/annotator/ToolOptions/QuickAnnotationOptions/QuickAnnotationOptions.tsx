@@ -1,16 +1,21 @@
-import Divider from "@mui/material/Divider";
 import { useState } from "react";
-import { AnnotationMode } from "../AnnotationMode";
-import { InformationBox } from "../InformationBox";
-import { InvertAnnotation } from "../InvertAnnotation";
-import { useTranslation } from "../../../../hooks/useTranslation";
+import { useDispatch, useSelector } from "react-redux";
+
+import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Slider from "@mui/material/Slider";
-import { quickSelectionRegionSizeSelector } from "../../../../store/selectors/quickSelectionRegionSizeSelector";
-import { imageViewerSlice } from "../../../../store/slices";
-import { useDispatch, useSelector } from "react-redux";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { AnnotationMode } from "../AnnotationMode";
+import { InformationBox } from "../InformationBox";
+import { InvertAnnotation } from "../InvertAnnotation";
+
+import { quickSelectionRegionSizeSelector } from "store/selectors/quickSelectionRegionSizeSelector";
+
+import { imageViewerSlice } from "store/slices";
 
 export const QuickAnnotationOptions = () => {
   const t = useTranslation();

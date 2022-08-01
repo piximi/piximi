@@ -1,12 +1,16 @@
 import React from "react";
-import { Category } from "../../types/Category";
 import { useDispatch, useSelector } from "react-redux";
-import { deselectImages, updateCategoryVisibility } from "../../store/slices";
-import { visibleImagesSelector } from "../../store/selectors";
-import { ImageType } from "../../types/ImageType";
+
 import { Checkbox, ListItemIcon } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+
+import { visibleImagesSelector } from "store/selectors";
+
+import { deselectImages, updateCategoryVisibility } from "store/slices";
+
+import { Category } from "types/Category";
+import { ImageType } from "types/ImageType";
 
 type CategoryListItemCheckboxProps = {
   category: Category;

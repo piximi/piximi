@@ -1,3 +1,5 @@
+import * as tensorflow from "@tensorflow/tfjs";
+
 import {
   Container,
   Table,
@@ -8,7 +10,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import * as tensorflow from "@tensorflow/tfjs";
 
 interface ModelLayerData {
   layerName: string;

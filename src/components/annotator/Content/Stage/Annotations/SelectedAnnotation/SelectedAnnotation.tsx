@@ -1,11 +1,15 @@
-import * as ReactKonva from "react-konva";
 import { useEffect, useState } from "react";
-import { AnnotationType } from "../../../../../../types/AnnotationType";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../store/selectors";
-import { toRGBA } from "../../../../../../annotator/image";
-import { colorOverlayROI } from "../../../../../../image/imageHelper";
+import * as ReactKonva from "react-konva";
+
+import { stageScaleSelector } from "store/selectors";
+
+import { AnnotationType } from "types/AnnotationType";
 import { Shape } from "types/Shape";
+
+import { toRGBA } from "annotator/image";
+
+import { colorOverlayROI } from "image/imageHelper";
 
 type AnnotationProps = {
   annotation: AnnotationType;

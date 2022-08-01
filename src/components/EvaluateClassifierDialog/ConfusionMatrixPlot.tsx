@@ -1,5 +1,7 @@
-import { Typography } from "@mui/material";
 import { HeatMap } from "@nivo/heatmap";
+
+import { Typography } from "@mui/material";
+
 import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 
 const getHeatMapData = (confusionMatrix: number[][], classNames: string[]) => {

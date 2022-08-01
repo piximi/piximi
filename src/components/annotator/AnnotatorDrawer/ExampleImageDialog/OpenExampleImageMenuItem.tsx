@@ -1,10 +1,14 @@
 import { batch, useDispatch } from "react-redux";
-import { ListItem, ListItemText, Typography } from "@mui/material";
-import { convertToImage, generateDefaultChannels } from "image/imageHelper";
-import { imageViewerSlice, setActiveImage } from "store/slices";
-import { SerializedFileType } from "types/SerializedFileType";
 import * as ImageJS from "image-js";
 import { v4 as uuidv4 } from "uuid";
+
+import { ListItem, ListItemText, Typography } from "@mui/material";
+
+import { imageViewerSlice, setActiveImage } from "store/slices";
+
+import { SerializedFileType } from "types/SerializedFileType";
+
+import { convertToImage, generateDefaultChannels } from "image/imageHelper";
 
 type ExampleImageProject = {
   exampleImageName: string;

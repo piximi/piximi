@@ -1,8 +1,10 @@
 import React from "react";
-import { ImageType } from "../../types/ImageType";
+
 import { ImageCanvas } from "./ImageCanvas";
 import { LabelCanvas } from "./LabelCanvas";
 import { StyledStage } from "./StyledImageCanvasComponents";
+
+import { ImageType } from "types/ImageType";
 
 type ImageDialogCanvasProps = {
   image: ImageType;

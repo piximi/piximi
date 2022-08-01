@@ -1,8 +1,11 @@
 import React from "react";
-import { ApplicationToolbar } from "../ApplicationToolbar";
-import { AppBar, Box } from "@mui/material";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { useSelector } from "react-redux";
+
+import { AppBar, Box } from "@mui/material";
+
+import { ApplicationToolbar } from "components/ApplicationToolbar";
+import { AlertDialog } from "components/AlertDialog/AlertDialog";
+
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 
 export const ApplicationAppBar = () => {

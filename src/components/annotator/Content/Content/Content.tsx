@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
-import { Stage } from "../Stage";
-import { useBoundingClientRect } from "../../../../hooks/useBoundingClientRect";
+
 import { Box } from "@mui/material";
+
+import { useBoundingClientRect } from "hooks/useBoundingClientRect";
 import { useDndFileDrop } from "hooks/useDndFileDrop/useDndFileDrop";
+
+import { Stage } from "../Stage";
 
 type ContentProps = {
   onDrop: (files: FileList) => void;

@@ -1,8 +1,11 @@
 import React from "react";
-import { CreateCategoryDialog } from "../CreateCategoryDialog";
-import { useDialog } from "../../hooks";
+
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+
+import { useDialog } from "hooks";
+
+import { CreateCategoryDialog } from "components/CreateCategoryDialog";
 
 export const CreateCategoryListItem = () => {
   const { onClose, onOpen, open } = useDialog();

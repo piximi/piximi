@@ -1,10 +1,14 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
-import { useDispatch, useSelector } from "react-redux";
-import { LossFunction } from "../../types/LossFunction";
-import { classifierSlice } from "../../store/slices";
-import { compileOptionsSelector } from "../../store/selectors";
+
+import { compileOptionsSelector } from "store/selectors";
+
+import { classifierSlice } from "store/slices";
+
+import { LossFunction } from "types/LossFunction";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O

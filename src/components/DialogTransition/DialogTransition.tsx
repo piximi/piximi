@@ -1,4 +1,5 @@
-import * as React from "react";
+import React from "react";
+
 import { TransitionProps } from "@mui/material/transitions";
 import { Slide } from "@mui/material";
 

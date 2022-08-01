@@ -1,16 +1,21 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   CircularProgress,
   ListItem,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../store/slices";
-import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
-import React, { useEffect } from "react";
-import { predictionFlagSelector } from "store/selectors/predictionFlagSelector";
+
 import { useTranslation } from "hooks/useTranslation";
+
+import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
+
+import { predictionFlagSelector } from "store/selectors/predictionFlagSelector";
+import { classifierSlice } from "store/slices";
 
 type PredictClassifierListItemProps = {
   disabled: boolean;

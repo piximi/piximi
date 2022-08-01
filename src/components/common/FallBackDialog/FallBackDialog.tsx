@@ -1,3 +1,7 @@
+import React from "react";
+import { useLocation } from "react-router-dom";
+import StackTrace from "stacktrace-js";
+
 import {
   AppBar,
   Box,
@@ -12,18 +16,20 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+
+import { useDialog } from "hooks/useDialog/useDialog";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { createGitHubIssue } from "utils/createGitHubIssue";
+
 import { SaveClassifierDialog } from "components/SaveClassifierDialog/SaveClassifierDialog";
 import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
-import { useDialog } from "hooks/useDialog/useDialog";
-import React from "react";
-import { useLocation } from "react-router-dom";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
-import StackTrace from "stacktrace-js";
+
+import { AlertStateType, AlertType } from "types/AlertStateType";
+
+import { createGitHubIssue } from "utils/createGitHubIssue";
 
 const popupState = {
   close: () => {},

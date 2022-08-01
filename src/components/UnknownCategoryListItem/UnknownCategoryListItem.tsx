@@ -1,14 +1,17 @@
+import React from "react";
+
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import React from "react";
 import Checkbox from "@mui/material/Checkbox";
-import LabelIcon from "@mui/icons-material/Label";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import IconButton from "@mui/material/IconButton";
+
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import LabelIcon from "@mui/icons-material/Label";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+
+import { UNKNOWN_CATEGORY_ID } from "types/Category";
 
 export const UnknownCategoryListItem = () => {
   const id = UNKNOWN_CATEGORY_ID;

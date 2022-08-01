@@ -1,3 +1,6 @@
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   FormHelperText,
   Grid,
@@ -5,17 +8,21 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
+
 import { StyledFormControl } from "../../StyledFormControl";
-import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../../store/slices";
-import { LossFunction } from "../../../../types/LossFunction";
-import { fitOptionsSelector } from "../../../../store/selectors";
-import { learningRateSelector } from "../../../../store/selectors/learningRateSelector";
-import { OptimizationAlgorithm } from "../../../../types/OptimizationAlgorithm";
-import { optimizationAlgorithmSelector } from "../../../../store/selectors/optimizationAlgorithmSelector";
-import { lossFunctionSelector } from "../../../../store/selectors/lossFunctionSelector";
-import { CustomNumberTextField } from "../../../CustomNumberTextField/CustomNumberTextField";
+
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
+
+import { fitOptionsSelector } from "store/selectors";
+import { learningRateSelector } from "store/selectors/learningRateSelector";
+import { optimizationAlgorithmSelector } from "store/selectors/optimizationAlgorithmSelector";
+import { lossFunctionSelector } from "store/selectors/lossFunctionSelector";
+
+import { classifierSlice } from "store/slices";
+
+import { LossFunction } from "types/LossFunction";
+import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+
 import { enumKeys } from "utils/enumKeys";
 
 export const OptimizerSettingsGrid = () => {

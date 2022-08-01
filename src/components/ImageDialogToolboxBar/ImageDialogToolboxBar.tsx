@@ -1,9 +1,11 @@
 import React from "react";
+
 import { AppBar, Button, Toolbar, Box } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+
 import Typography from "@mui/material/Typography";
 import BrushIcon from "@mui/icons-material/Brush";
 import Crop32Icon from "@mui/icons-material/Crop32";
-import IconButton from "@mui/material/IconButton";
 import PanToolIcon from "@mui/icons-material/PanTool";
 
 export const ImageDialogToolboxBar = () => {

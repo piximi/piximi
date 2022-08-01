@@ -1,5 +1,7 @@
 import React from "react";
+
 import { InputBase, Box } from "@mui/material";
+
 import SearchIcon from "@mui/icons-material/Search";
 
 export const SearchInput = () => {

@@ -1,11 +1,15 @@
 import React from "react";
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import { classifierSlice, projectSlice } from "store/slices";
 import { useDispatch } from "react-redux";
+
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
 import ClearIcon from "@mui/icons-material/Clear";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import { useTranslation } from "hooks/useTranslation";
+
+import { classifierSlice, projectSlice } from "store/slices";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();

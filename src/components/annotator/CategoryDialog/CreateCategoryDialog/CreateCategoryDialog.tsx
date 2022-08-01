@@ -2,12 +2,17 @@ import React, { FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { sample } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { Category } from "../../../../types/Category";
-import { replaceDuplicateName } from "../../../../image/imageHelper";
-import { imageViewerSlice } from "../../../../store/slices";
-import { annotatorCategoriesSelector } from "../../../../store/selectors/annotatorCategoriesSelector";
+
 import { CategoryDialog } from "../CategoryDialog";
+
+import { annotatorCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
 import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Category } from "types/Category";
+
+import { replaceDuplicateName } from "image/imageHelper";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;

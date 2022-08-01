@@ -1,14 +1,18 @@
+import { batch, useDispatch, useSelector } from "react-redux";
+import _ from "lodash";
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import { ImageType, ShadowImageType } from "../../../../types/ImageType";
-import { projectSlice } from "../../../../store/slices";
-import { batch, useDispatch, useSelector } from "react-redux";
-import { selectedImagesSelector } from "../../../../store/selectors";
 import Stack from "@mui/material/Stack";
-import _ from "lodash";
+
 import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+import { selectedImagesSelector } from "store/selectors";
+
+import { projectSlice } from "store/slices";
+
+import { ImageType, ShadowImageType } from "types/ImageType";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;

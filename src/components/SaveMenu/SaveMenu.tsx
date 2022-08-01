@@ -1,8 +1,11 @@
 import { bindMenu } from "material-ui-popup-state";
+
 import { Menu, MenuItem } from "@mui/material";
-import { useDialog } from "../../hooks";
-import { SaveProjectDialog } from "../SaveProjectDialog/SaveProjectDialog";
-import { SaveClassifierDialog } from "../SaveClassifierDialog/SaveClassifierDialog";
+
+import { useDialog } from "hooks";
+
+import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
+import { SaveClassifierDialog } from "components/SaveClassifierDialog/SaveClassifierDialog";
 
 type SaveMenuProps = {
   popupState: any;

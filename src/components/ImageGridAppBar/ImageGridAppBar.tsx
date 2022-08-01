@@ -1,19 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { ImageCategoryMenu } from "../ImageCategoryMenu";
-import {
-  selectedImagesSelector,
-  visibleImagesSelector,
-} from "../../store/selectors";
-import {
-  applicationSlice,
-  imageViewerSlice,
-  setActiveImage,
-} from "../../store/slices";
-import { useDialog } from "../../hooks";
-import { DeleteImagesDialog } from "../DeleteImagesDialog";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   AppBar,
   Chip,
@@ -24,14 +13,29 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 import SelectAllIcon from "@mui/icons-material/SelectAll";
 import DeselectIcon from "@mui/icons-material/Deselect";
 import GestureIcon from "@mui/icons-material/Gesture";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import { ImageType, ShadowImageType } from "../../types/ImageType";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { useDialog } from "hooks";
+
+import { ImageCategoryMenu } from "components/ImageCategoryMenu";
+import { DeleteImagesDialog } from "components/DeleteImagesDialog";
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
+
+import { selectedImagesSelector, visibleImagesSelector } from "store/selectors";
+
+import {
+  applicationSlice,
+  imageViewerSlice,
+  setActiveImage,
+} from "store/slices";
+
+import { ImageType, ShadowImageType } from "types/ImageType";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();

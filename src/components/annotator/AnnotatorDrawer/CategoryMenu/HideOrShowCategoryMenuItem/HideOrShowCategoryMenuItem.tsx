@@ -1,11 +1,16 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { Category } from "../../../../../types/Category";
-import { useTranslation } from "../../../../../hooks/useTranslation";
-import { useDispatch, useSelector } from "react-redux";
-import { selectedCategorySelector } from "../../../../../store/selectors";
-import { imageViewerSlice } from "../../../../../store/slices";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { selectedCategorySelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Category } from "types/Category";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;

@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { trainingPercentageSelector } from "../../../store/selectors";
-import { classifierSlice } from "../../../store/slices";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+
 import {
   Collapse,
   Grid,
@@ -12,8 +9,17 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
+
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+
 import { StyledFormControl } from "../StyledFormControl";
+
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
+
+import { trainingPercentageSelector } from "store/selectors";
+
+import { classifierSlice } from "store/slices";
 
 export const DatasetSettingsListItem = () => {
   const dispatch = useDispatch();

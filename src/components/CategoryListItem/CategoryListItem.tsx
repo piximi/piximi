@@ -1,14 +1,6 @@
 import React from "react";
-import { Category } from "../../types/Category";
-import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
-import { CategoryMenu } from "../CategoryMenu";
-import { useDialog, useMenu } from "../../hooks";
 import { useSelector } from "react-redux";
-import { EditCategoryDialog } from "../EditCategoryDialog";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { State } from "../../types/State";
-import { ImageType } from "../../types/ImageType";
+
 import {
   Chip,
   IconButton,
@@ -16,6 +8,18 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+import { useDialog, useMenu } from "hooks";
+
+import { CategoryListItemCheckbox } from "components/CategoryListItemCheckbox";
+import { CategoryMenu } from "components/CategoryMenu";
+import { EditCategoryDialog } from "components/EditCategoryDialog";
+import { DeleteCategoryDialog } from "components/DeleteCategoryDialog";
+
+import { Category } from "types/Category";
+import { State } from "types/State";
+import { ImageType } from "types/ImageType";
 
 type CategoryListItemProps = {
   category: Category;

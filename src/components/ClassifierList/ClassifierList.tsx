@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  FitClassifierListItem,
-  PredictClassifierListItem,
-  EvaluateClassifierListItem,
-} from "../ClassifierListItems";
+import { useSelector } from "react-redux";
+
 import {
   Collapse,
   List,
@@ -11,11 +8,18 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useSelector } from "react-redux";
-import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { trainingFlagSelector } from "../../store/selectors/trainingFlagSelector";
+
+import {
+  FitClassifierListItem,
+  PredictClassifierListItem,
+  EvaluateClassifierListItem,
+} from "components/ClassifierListItems";
+
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(false);

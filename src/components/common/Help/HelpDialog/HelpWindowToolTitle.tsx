@@ -1,7 +1,9 @@
-import Typography from "@mui/material/Typography";
-import { KeyboardKey } from "./KeyboardKey";
 import React from "react";
+
 import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
+
+import { KeyboardKey } from "./KeyboardKey";
 
 export type ToolTitleProps = {
   toolName: string;

@@ -1,12 +1,17 @@
-import { imageViewerSlice } from "store/slices";
-import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+
 import DeleteIcon from "@mui/icons-material/Delete";
+
+import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+
+import { imageViewerSlice } from "store/slices";
+
+import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 
 type DeleteAllCategoriesListItemProps = {
   onOpenDeleteAllCategoriesDialog: () => void;

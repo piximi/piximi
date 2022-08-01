@@ -1,7 +1,11 @@
 import React from "react";
+
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
 import FeedbackIcon from "@mui/icons-material/Feedback";
+
 import { useDialog } from "hooks";
+
 import { SendFeedbackDialog } from "components/common/SendFeedbackDialog";
 
 export const SendFeedbackListItem = () => {

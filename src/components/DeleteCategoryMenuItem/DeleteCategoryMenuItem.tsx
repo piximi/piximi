@@ -1,9 +1,13 @@
 import React from "react";
+
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { Category } from "../../types/Category";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import { useDialog } from "../../hooks";
+
+import { useDialog } from "hooks";
+
+import { DeleteCategoryDialog } from "components/DeleteCategoryDialog";
+
+import { Category } from "types/Category";
 
 type DeleteCategoryMenuItemProps = {
   category: Category;

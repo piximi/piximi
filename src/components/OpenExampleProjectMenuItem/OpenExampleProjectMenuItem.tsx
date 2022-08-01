@@ -1,9 +1,6 @@
-import {
-  applicationSlice,
-  classifierSlice,
-  projectSlice,
-} from "../../store/slices";
+import React from "react";
 import { useDispatch } from "react-redux";
+
 import {
   Avatar,
   CircularProgress,
@@ -12,12 +9,20 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { SerializedProjectType } from "../../types/SerializedProjectType";
-import { Classifier } from "../../types/Classifier";
-import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/imageHelper";
+
+import {
+  applicationSlice,
+  classifierSlice,
+  projectSlice,
+} from "../../store/slices";
+
 import { SerializedImageType } from "types/SerializedImageType";
-import React from "react";
+import { Classifier } from "types/Classifier";
+import { SerializedProjectType } from "types/SerializedProjectType";
+
+import { deserializeImages } from "image/imageHelper";
+
+import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
 type ExampleProjectProps = {
   projectName: string;

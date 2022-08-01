@@ -1,9 +1,12 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { Category } from "../../types/Category";
-import { useDispatch } from "react-redux";
-import { updateCategoryVisibility } from "../../store/slices";
+
+import { updateCategoryVisibility } from "store/slices";
+
+import { Category } from "types/Category";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;

@@ -1,4 +1,6 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Avatar,
   Chip,
@@ -8,14 +10,20 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
+
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { CollapsibleList } from "components/common/CollapsibleList";
-import { ImageMenu } from "../ImageMenu";
-import { useDispatch, useSelector } from "react-redux";
-import { setActiveImage } from "store/slices";
-import { imageSelector } from "store/selectors";
-import { ImageType, ShadowImageType } from "types/ImageType";
+
 import { useTranslation } from "hooks/useTranslation";
+
+import { ImageMenu } from "../ImageMenu";
+
+import { CollapsibleList } from "components/common/CollapsibleList";
+
+import { imageSelector } from "store/selectors";
+
+import { setActiveImage } from "store/slices";
+
+import { ImageType, ShadowImageType } from "types/ImageType";
 
 export const ImageList = ({
   annotatorImages,

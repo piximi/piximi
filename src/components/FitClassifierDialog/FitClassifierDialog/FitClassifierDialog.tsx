@@ -1,24 +1,27 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Dialog, DialogContent, List } from "@mui/material";
+
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../store/slices";
-import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
-import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
-import { DialogTransition } from "../../DialogTransition";
-import {
-  categorizedImagesSelector,
-  compiledSelector,
-} from "../../../store/selectors";
-import { useEffect, useState } from "react";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
-import { epochsSelector } from "store/selectors/epochsSelector";
-import { AlertStateType, AlertType } from "types/AlertStateType";
+
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { PreprocessingSettingsListItem } from "components/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
+import { DialogTransition } from "components/DialogTransition";
+
+import { categorizedImagesSelector, compiledSelector } from "store/selectors";
+import { epochsSelector } from "store/selectors/epochsSelector";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+
+import { classifierSlice } from "store/slices";
+
+import { AlertStateType, AlertType } from "types/AlertStateType";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;

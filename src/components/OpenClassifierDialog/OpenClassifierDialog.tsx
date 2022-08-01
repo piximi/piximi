@@ -1,4 +1,9 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { useHotkeys } from "react-hotkeys-hook";
+import * as tf from "@tensorflow/tfjs";
+import { LayersModel } from "@tensorflow/tfjs";
+
 import {
   Button,
   Dialog,
@@ -10,16 +15,16 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { classifierSlice } from "../../store/slices";
-import { Shape } from "../../types/Shape";
-import * as tf from "@tensorflow/tfjs";
-import { useDispatch } from "react-redux";
-import FileOpenIcon from "@mui/icons-material/FileOpen";
-import { LayersModel } from "@tensorflow/tfjs";
-import { ModelType } from "../../types/ClassifierModelType";
-import { useHotkeys } from "react-hotkeys-hook";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
+
+import FileOpenIcon from "@mui/icons-material/FileOpen";
+
+import { classifierSlice } from "store/slices";
+
+import { Shape } from "types/Shape";
+import { ModelType } from "types/ClassifierModelType";
+import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
 
 type OpenClassifierDialogProps = {
   onClose: any;

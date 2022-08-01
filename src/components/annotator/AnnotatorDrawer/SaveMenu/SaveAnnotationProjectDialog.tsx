@@ -1,6 +1,8 @@
+import React, { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import { allSerializedAnnotationsSelector } from "../../../../store/selectors/allSerializedAnnotationsSelector";
 import { saveAs } from "file-saver";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -10,8 +12,8 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import React, { ChangeEvent, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { allSerializedAnnotationsSelector } from "store/selectors/allSerializedAnnotationsSelector";
 
 type SaveAnnotationProjectDialogProps = {
   onClose: () => void;

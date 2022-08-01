@@ -1,5 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+
 import { TrainingHistoryPlot } from "./TrainingHistoryPlot";
 
 export default {

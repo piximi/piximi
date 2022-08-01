@@ -1,9 +1,12 @@
-import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { bindMenu } from "material-ui-popup-state";
-import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenClassifierDialog } from "../OpenClassifierDialog";
-import { useDialog } from "../../hooks";
-import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
+
+import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { OpenExampleClassifierDialog } from "components/OpenExampleProjectDialog/OpenExampleProjectDialog";
+import { OpenProjectMenuItem } from "components/OpenProjectMenuItem";
+import { OpenClassifierDialog } from "components/OpenClassifierDialog";
 
 type OpenMenuProps = {
   popupState: any;

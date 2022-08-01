@@ -1,7 +1,10 @@
-import { ListItem, ListItemIcon, ListItemText, Radio } from "@mui/material";
 import React from "react";
-import { Category } from "../../types/Category";
+
+import { ListItem, ListItemIcon, ListItemText, Radio } from "@mui/material";
+
 import LabelIcon from "@mui/icons-material/Label";
+
+import { Category } from "types/Category";
 
 type CategorySelectionItemProps = {
   category: Category;

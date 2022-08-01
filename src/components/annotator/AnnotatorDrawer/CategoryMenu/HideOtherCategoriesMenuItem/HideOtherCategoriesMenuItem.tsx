@@ -1,12 +1,16 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
+
 import { useTranslation } from "hooks/useTranslation";
-import { useDispatch, useSelector } from "react-redux";
+
 import {
   annotationCategoriesSelector,
   selectedCategorySelector,
 } from "store/selectors";
+
 import { imageViewerSlice } from "store/slices";
 
 type HideOtherCategoriesMenuItemProps = {

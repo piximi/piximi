@@ -1,12 +1,9 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ColorIcon } from "../ColorIcon";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
-import { createCategory } from "../../store/slices";
-import { availableColorsSelector } from "../../store/selectors/availableColorsSelector";
-import { categoriesSelector } from "../../store/selectors/categoriesSelector";
-import { Category } from "../../types/Category";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -17,7 +14,14 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { ColorIcon } from "components/ColorIcon";
+
+import { availableColorsSelector } from "store/selectors/availableColorsSelector";
+import { categoriesSelector } from "store/selectors/categoriesSelector";
+import { createCategory } from "store/slices";
+
+import { Category } from "types/Category";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;

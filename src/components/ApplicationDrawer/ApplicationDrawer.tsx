@@ -1,9 +1,11 @@
-import { FileList } from "../FileList";
-import { CategoriesList } from "../CategoriesList";
-import { ClassifierList } from "../ClassifierList";
-import { ApplicationList } from "../ApplicationList";
 import React from "react";
+
 import { Divider, Drawer } from "@mui/material";
+
+import { FileList } from "components/FileList";
+import { CategoriesList } from "components/CategoriesList";
+import { ClassifierList } from "components/ClassifierList";
+import { ApplicationList } from "components/ApplicationList";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
 export const ApplicationDrawer = () => {

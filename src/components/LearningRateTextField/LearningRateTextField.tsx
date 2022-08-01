@@ -1,8 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../store/slices";
-import { compileOptionsSelector } from "../../store/selectors";
+
 import { TextField } from "@mui/material";
+
+import { compileOptionsSelector } from "../../store/selectors";
+
+import { classifierSlice } from "../../store/slices";
 
 export const LearningRateTextField = () => {
   const dispatch = useDispatch();

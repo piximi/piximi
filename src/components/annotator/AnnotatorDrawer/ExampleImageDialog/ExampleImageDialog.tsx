@@ -1,13 +1,16 @@
+import { DialogTitle, IconButton } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import List from "@mui/material/List";
-import malaria from "../../../../images/malaria.png";
-import cellPainting from "../../../../images/cell-painting.png";
-import * as malariaAnnotations from "../../../../images/malaria.json";
-import * as cellPaintingAnnotations from "../../../../images/cell-painting.json";
-import { SerializedFileType } from "types/SerializedFileType";
-import { DialogTitle, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
+
+import { SerializedFileType } from "types/SerializedFileType";
+
+import malaria from "images/malaria.png";
+import cellPainting from "images/cell-painting.png";
+import * as malariaAnnotations from "images/malaria.json";
+import * as cellPaintingAnnotations from "images/cell-painting.json";
 
 type ExampleImageDialogProps = {
   onClose: () => void;

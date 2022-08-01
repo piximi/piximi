@@ -1,9 +1,12 @@
-import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
-import { applicationSlice } from "store/slices";
-import { AlertType } from "types/AlertStateType";
-import { HelpTopic } from "../HelpContent/HelpContent";
+import { ErrorBoundary } from "react-error-boundary";
+
 import HelpDrawer, { FallBackHelpDrawer } from "./HelpDrawer";
+import { HelpTopic } from "../HelpContent/HelpContent";
+
+import { applicationSlice } from "store/slices";
+
+import { AlertType } from "types/AlertStateType";
 
 export const AnnotatorHelpDrawer = () => {
   const dispatch = useDispatch();

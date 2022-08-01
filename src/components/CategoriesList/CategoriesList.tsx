@@ -1,15 +1,19 @@
-import { CollapsibleList } from "../common/CollapsibleList";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { CategoryListItem } from "../CategoryListItem";
-import { Category } from "../../types/Category";
-import { CreateCategoryListItem } from "../CreateCategoryListItem";
+
+import { CategoryListItem } from "components/CategoryListItem";
+import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
+import { CreateCategoryListItem } from "components/CreateCategoryListItem";
+
+import { CollapsibleList } from "components/common/CollapsibleList";
+
 import {
   createdCategoriesSelector,
   unknownCategorySelector,
-} from "../../store/selectors";
+} from "store/selectors";
 import { predictedSelector } from "store/selectors/predictedSelector";
-import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
+
+import { Category } from "types/Category";
 
 export const CategoriesList = () => {
   const categories = useSelector(createdCategoriesSelector);

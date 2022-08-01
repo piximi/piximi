@@ -1,11 +1,13 @@
 import React from "react";
+
+import { Typography } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
+
 import DescriptionIcon from "@mui/icons-material/Description";
-import { Typography } from "@mui/material";
 
 type CollapsibleHelpContentProps = {
   children: any;

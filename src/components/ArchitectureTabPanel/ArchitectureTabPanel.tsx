@@ -1,7 +1,9 @@
 import React from "react";
-import { InputShape } from "../InputShape";
-import { Architecture } from "../Architecture";
+
 import TabPanel from "@mui/lab/TabPanel";
+
+import { InputShape } from "components/InputShape";
+import { Architecture } from "components/Architecture";
 
 export const ArchitectureTabPanel = () => {
   return (

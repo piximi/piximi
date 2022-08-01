@@ -1,8 +1,11 @@
 import React from "react";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
-import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
+
 import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
+
+import { HideOrShowCategoryMenuItem } from "components/HideOrShowCategoryMenuItem";
+import { HideOtherCategoriesMenuItem } from "components/HideOtherCategoriesMenuItem";
+
+import { Category, UNKNOWN_CATEGORY_ID } from "types/Category";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;

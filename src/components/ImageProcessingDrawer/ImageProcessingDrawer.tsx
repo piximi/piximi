@@ -1,4 +1,5 @@
 import React, { ReactElement } from "react";
+
 import {
   Divider,
   Drawer,
@@ -8,6 +9,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+
 import { VolumeUp } from "@mui/icons-material";
 
 type SliderWithInputFieldProps = {

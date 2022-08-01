@@ -1,8 +1,10 @@
-import { QuickAnnotationTool } from "../../../../../../annotator/image/Tool";
-import * as ReactKonva from "react-konva";
 import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../store/selectors";
+import * as ReactKonva from "react-konva";
+
+import { stageScaleSelector } from "store/selectors";
+
+import { QuickAnnotationTool } from "annotator/image/Tool";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;

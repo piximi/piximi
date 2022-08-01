@@ -1,5 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -9,9 +11,9 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { selectedModelSelector } from "../../store/selectors/selectedModelSelector";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { selectedModelSelector } from "store/selectors/selectedModelSelector";
 
 type SaveClassifierDialogProps = {
   onClose: () => void;

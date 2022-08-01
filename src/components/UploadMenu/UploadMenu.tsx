@@ -1,13 +1,18 @@
 import React, { useState } from "react";
+
 import { Menu } from "@mui/material";
 import Fade from "@mui/material/Fade";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ComputerIcon from "@mui/icons-material/Computer";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
-import { StyledMenuItem } from "./StyledMenuItem";
-import { ImageShapeDialog } from "../annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import ListItemIcon from "@mui/material/ListItemIcon";
+
+import ComputerIcon from "@mui/icons-material/Computer";
+
 import { useUpload } from "hooks/useUpload/useUpload";
+
+import { StyledMenuItem } from "./StyledMenuItem";
+
+import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;

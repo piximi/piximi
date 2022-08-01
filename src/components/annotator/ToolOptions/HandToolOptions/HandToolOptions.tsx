@@ -1,8 +1,11 @@
 import React from "react";
-import { InformationBox } from "../InformationBox";
+
 import Divider from "@mui/material/Divider";
-import { useTranslation } from "../../../../hooks/useTranslation";
 import List from "@mui/material/List";
+
+import { useTranslation } from "hooks/useTranslation";
+
+import { InformationBox } from "../InformationBox";
 import { ResetButton } from "./ResetButton";
 
 export const HandToolOptions = () => {

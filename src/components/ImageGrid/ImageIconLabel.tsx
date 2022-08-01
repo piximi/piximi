@@ -1,12 +1,16 @@
+import { useSelector } from "react-redux";
+
 import { Box, Tooltip } from "@mui/material";
+
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 import LabelIcon from "@mui/icons-material/Label";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { useSelector } from "react-redux";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
-import { ImageType } from "../../types/ImageType";
-import { Partition } from "../../types/Partition";
-import { categoriesSelector } from "../../store/selectors/categoriesSelector";
+
+import { categoriesSelector } from "store/selectors/categoriesSelector";
+
+import { Category, UNKNOWN_CATEGORY_ID } from "types/Category";
+import { ImageType } from "types/ImageType";
+import { Partition } from "types/Partition";
 
 type ImageIconLabelProps = {
   image: ImageType;

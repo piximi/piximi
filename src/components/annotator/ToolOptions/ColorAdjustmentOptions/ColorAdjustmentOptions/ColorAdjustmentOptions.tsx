@@ -1,23 +1,29 @@
 import React from "react";
-import { InformationBox } from "../../InformationBox";
+import { useDispatch, useSelector } from "react-redux";
+
 import Divider from "@mui/material/Divider";
-import { useTranslation } from "../../../../../hooks/useTranslation";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { useDispatch, useSelector } from "react-redux";
-import { imageOriginalSrcSelector } from "../../../../../store/selectors";
-import { ChannelsList } from "../ChannelsList";
-import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
-import { imageViewerSlice } from "../../../../../store/slices";
+
+import { useTranslation } from "hooks/useTranslation";
+
 import { ZStackSlider } from "../ZStackSlider";
+import { ApplyColorsButton } from "../ApplyColorsButton";
+import { ChannelsList } from "../ChannelsList";
+import { InformationBox } from "../../InformationBox";
+
+import { imageOriginalSrcSelector } from "store/selectors";
+import { imageShapeSelector } from "store/selectors/imageShapeSelector";
+import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
+
+import { imageViewerSlice } from "store/slices";
+
 import {
   convertImageURIsToImageData,
   generateDefaultChannels,
   mapChannelsToSpecifiedRGBImage,
-} from "../../../../../image/imageHelper";
-import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
-import { ApplyColorsButton } from "../ApplyColorsButton";
+} from "image/imageHelper";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
