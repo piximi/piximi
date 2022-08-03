@@ -3,7 +3,7 @@ import { ResponsiveLine } from "@nivo/line";
 
 import { Container, Typography } from "@mui/material";
 
-import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
+import { usePreferredNivoTheme } from "hooks";
 
 type TrainingHistoryPlotProps = {
   metric: string;

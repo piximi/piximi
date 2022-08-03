@@ -8,7 +8,8 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+import { MoreHoriz as MoreHorizIcon } from "@mui/icons-material";
 
 import { useDialog, useMenu } from "hooks";
 
@@ -17,9 +18,7 @@ import { CategoryMenu } from "components/CategoryMenu";
 import { EditCategoryDialog } from "components/EditCategoryDialog";
 import { DeleteCategoryDialog } from "components/DeleteCategoryDialog";
 
-import { Category } from "types/Category";
-import { State } from "types/State";
-import { ImageType } from "types/ImageType";
+import { Category, ImageType, State } from "types";
 
 type CategoryListItemProps = {
   category: Category;

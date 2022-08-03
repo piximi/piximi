@@ -8,9 +8,9 @@ import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog"
 
 import { applicationSlice } from "store/slices";
 
-import { AlertType } from "types/AlertStateType";
+import { AlertType } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export const AnnotatorView = () => {
   const dispatch = useDispatch();

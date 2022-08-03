@@ -14,13 +14,13 @@ import { StyledFormControl } from "components/FitClassifierDialog/StyledFormCont
 
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 
-import { cropOptionsSelector } from "../../store/selectors";
+import { cropOptionsSelector } from "store/selectors";
 
-import { classifierSlice } from "../../store/slices";
+import { classifierSlice } from "store/slices";
 
-import { CropSchema } from "types/CropOptions";
+import { CropSchema } from "types";
 
-import { enumKeys } from "utils/enumKeys";
+import { enumKeys } from "utils";
 
 export const CroppingForm = () => {
   const cropOptions = useSelector(cropOptionsSelector);

@@ -1,12 +1,19 @@
 import React from "react";
 
-import { AppBar, Button, Toolbar, Box } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
-import Typography from "@mui/material/Typography";
-import BrushIcon from "@mui/icons-material/Brush";
-import Crop32Icon from "@mui/icons-material/Crop32";
-import PanToolIcon from "@mui/icons-material/PanTool";
+import {
+  Brush as BrushIcon,
+  Crop32 as Crop32Icon,
+  PanTool as PanToolIcon,
+} from "@mui/icons-material";
 
 export const ImageDialogToolboxBar = () => {
   return (

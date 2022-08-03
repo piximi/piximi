@@ -1,9 +1,9 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import Drawer from "@mui/material/Drawer";
+import { Drawer } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
@@ -11,7 +11,7 @@ import { toolTypeSelector } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { ToolType as OperationType } from "types/ToolType";
+import { ToolType as OperationType } from "types";
 
 import {
   ColorAdjustmentIcon,

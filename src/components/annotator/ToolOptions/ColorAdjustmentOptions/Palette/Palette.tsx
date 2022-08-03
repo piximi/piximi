@@ -2,18 +2,21 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Grid, IconButton, Menu } from "@mui/material";
-import LensIcon from "@mui/icons-material/Lens";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  Lens as LensIcon,
+  MoreVert as MoreVertIcon,
+} from "@mui/icons-material";
 
-import { imageOriginalSrcSelector } from "store/selectors";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
-import { imageShapeSelector } from "store/selectors/imageShapeSelector";
-import { activeImageColorsSelector } from "store/selectors/activeImageColorsSelector";
+import {
+  activeImageColorsSelector,
+  activeImagePlaneSelector,
+  imageOriginalSrcSelector,
+  imageShapeSelector,
+} from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { DEFAULT_COLORS } from "types/DefaultColors";
-import { Color } from "types/Color";
+import { Color, DEFAULT_COLORS } from "types";
 
 import {
   convertImageURIsToImageData,

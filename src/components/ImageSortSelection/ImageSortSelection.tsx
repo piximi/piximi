@@ -3,15 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Autocomplete, TextField } from "@mui/material";
 
-import { imageSortKeySelector } from "store/selectors/imageSortKeySelector";
+import { imageSortKeySelector } from "store/selectors";
 
 import { projectSlice } from "store/slices";
 
-import {
-  availableImageSortKeys,
-  ImageSortKeyType,
-  ImageSortKey,
-} from "types/ImageSortType";
+import { availableImageSortKeys, ImageSortKeyType, ImageSortKey } from "types";
 
 export const ImageSortSelection = () => {
   const dispatch = useDispatch();

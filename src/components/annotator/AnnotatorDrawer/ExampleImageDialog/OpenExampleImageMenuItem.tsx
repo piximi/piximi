@@ -6,7 +6,7 @@ import { ListItem, ListItemText, Typography } from "@mui/material";
 
 import { imageViewerSlice, setActiveImage } from "store/slices";
 
-import { SerializedFileType } from "types/SerializedFileType";
+import { SerializedFileType } from "types";
 
 import { convertToImage, generateDefaultChannels } from "image/imageHelper";
 

@@ -2,8 +2,7 @@ import React, { useRef } from "react";
 
 import { Box } from "@mui/material";
 
-import { useBoundingClientRect } from "hooks/useBoundingClientRect";
-import { useDndFileDrop } from "hooks/useDndFileDrop/useDndFileDrop";
+import { useBoundingClientRect, useDndFileDrop } from "hooks";
 
 import { Stage } from "../Stage";
 

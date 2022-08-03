@@ -1,15 +1,16 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Checkbox from "@mui/material/Checkbox";
+import { Checkbox, ListItemIcon } from "@mui/material";
 
-import LabelIcon from "@mui/icons-material/Label";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+import {
+  Label as LabelIcon,
+  LabelOutlined as LabelOutlinedIcon,
+} from "@mui/icons-material";
 
 import { imageViewerSlice } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type CategoryListItemCheckboxProps = {
   category: Category;

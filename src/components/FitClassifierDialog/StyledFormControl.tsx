@@ -1,5 +1,4 @@
-import { styled } from "@mui/material/styles";
-import FormControl, { FormControlProps } from "@mui/material/FormControl";
+import { FormControl, FormControlProps, styled } from "@mui/material";
 
 // type StyledFormControlProps = FormControlProps & { component: string };
 

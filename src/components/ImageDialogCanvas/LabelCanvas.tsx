@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 
 import { StyledMasksCanvas } from "./StyledImageCanvasComponents";
 
-import { ImageType } from "types/ImageType";
+import { ImageType } from "types";
 
 type LabelCanvasProps = {
   image: ImageType;

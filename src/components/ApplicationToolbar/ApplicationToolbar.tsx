@@ -2,8 +2,10 @@ import React from "react";
 import { useDispatch } from "react-redux";
 
 import { Slider, Toolbar, Box } from "@mui/material";
-import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import {
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+} from "@mui/icons-material";
 
 import { UploadButton } from "components/UploadButton";
 import { Logo } from "components/Logo";

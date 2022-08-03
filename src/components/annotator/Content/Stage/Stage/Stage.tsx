@@ -9,10 +9,15 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { useAnnotationTool, useCursor, useHandTool, useZoom } from "hooks";
-import { useAnnotatorKeyboardShortcuts } from "hooks/useKeyboardShortcuts";
-import { useWindowFocusHandler } from "hooks/useWindowFocusHandler/useWindowFocusHandler";
-import { usePointer } from "hooks/usePointer/usePointer";
+import {
+  useAnnotatorKeyboardShortcuts,
+  useAnnotationTool,
+  useCursor,
+  useHandTool,
+  usePointer,
+  useWindowFocusHandler,
+  useZoom,
+} from "hooks";
 
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
@@ -21,36 +26,34 @@ import { ZoomSelection } from "../Selection/ZoomSelection";
 import { Transformers } from "../Transformers/Transformers";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
 import { Annotations } from "../Annotations/Annotations";
+import { PointerSelection } from "../Selection/PointerSelection";
 
 import {
+  activeImageIdSelector,
+  activeImagePlaneSelector,
+  annotatorImagesSelector,
+  annotationStateSelector,
+  cursorSelector,
   imageInstancesSelector,
+  scaledImageHeightSelector,
+  scaledImageWidthSelector,
+  selectedAnnotationSelector,
+  selectedAnnotationsIdsSelector,
+  selectedAnnotationsSelector,
   selectedCategorySelector,
   selectionModeSelector,
+  soundEnabledSelector,
   stageHeightSelector,
+  stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
+  unselectedAnnotationsSelector,
 } from "store/selectors";
-import { annotationStateSelector } from "store/selectors/annotationStateSelector";
-import { activeImageIdSelector } from "store/selectors/activeImageIdSelector";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
-import { cursorSelector } from "store/selectors/cursorSelector";
-import { PointerSelection } from "../Selection/PointerSelection";
-import { unselectedAnnotationsSelector } from "store/selectors/unselectedAnnotationsSelector";
-import { selectedAnnotationsSelector } from "store/selectors/selectedAnnotationsSelector";
-import { stagePositionSelector } from "store/selectors/stagePositionSelector";
-import { scaledImageWidthSelector } from "store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "store/selectors/scaledImageHeightSelector";
-import { selectedAnnotationSelector } from "store/selectors/selectedAnnotationSelector";
-import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
-import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
 
 import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
 
-import { AnnotationStateType } from "types/AnnotationStateType";
-import { ToolType } from "types/ToolType";
-import { AnnotationModeType } from "types/AnnotationModeType";
+import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
 import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";

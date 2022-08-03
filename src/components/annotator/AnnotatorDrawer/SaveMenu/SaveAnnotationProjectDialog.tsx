@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import { allSerializedAnnotationsSelector } from "store/selectors/allSerializedAnnotationsSelector";
+import { allSerializedAnnotationsSelector } from "store/selectors";
 
 type SaveAnnotationProjectDialogProps = {
   onClose: () => void;

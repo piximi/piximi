@@ -6,21 +6,21 @@ import * as _ from "lodash";
 import * as ImageJS from "image-js";
 import useSound from "use-sound";
 
-import { stageScaleSelector } from "store/selectors";
-import { selectedAnnotationSelector } from "store/selectors/selectedAnnotationSelector";
-import { selectedAnnotationsSelector } from "store/selectors/selectedAnnotationsSelector";
-import { unselectedAnnotationsSelector } from "store/selectors/unselectedAnnotationsSelector";
-import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
-import { imageWidthSelector } from "store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "store/selectors/imageHeightSelector";
-import { cursorSelector } from "store/selectors/cursorSelector";
-import { activeImageIdSelector } from "store/selectors/activeImageIdSelector";
+import {
+  activeImageIdSelector,
+  cursorSelector,
+  imageHeightSelector,
+  imageWidthSelector,
+  stageScaleSelector,
+  selectedAnnotationSelector,
+  selectedAnnotationsSelector,
+  soundEnabledSelector,
+  unselectedAnnotationsSelector,
+} from "store/selectors";
 
 import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
 
-import { AnnotationStateType } from "types/AnnotationStateType";
-import { AnnotationType } from "types/AnnotationType";
-import { AnnotationModeType } from "types/AnnotationModeType";
+import { AnnotationModeType, AnnotationStateType, AnnotationType } from "types";
 
 import { AnnotationTool } from "annotator/image/Tool";
 import { decode, encode } from "annotator/image/rle";

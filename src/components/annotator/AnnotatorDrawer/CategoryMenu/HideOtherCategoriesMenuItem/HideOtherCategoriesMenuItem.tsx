@@ -1,10 +1,9 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
+import { MenuItem, Typography } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import {
   annotationCategoriesSelector,

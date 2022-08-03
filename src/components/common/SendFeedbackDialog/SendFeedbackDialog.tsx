@@ -10,11 +10,11 @@ import {
   Button,
 } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
-import { AlertType } from "types/AlertStateType";
+import { AlertType } from "types";
 
-import { createGitHubIssue } from "utils/createGitHubIssue";
+import { createGitHubIssue } from "utils";
 
 type SendFeedbackDialogProps = {
   onClose: () => void;

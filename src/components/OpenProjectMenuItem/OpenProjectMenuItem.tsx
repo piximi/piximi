@@ -3,16 +3,15 @@ import { useDispatch } from "react-redux";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import {
-  applicationSlice,
-  classifierSlice,
-  projectSlice,
-} from "../../store/slices";
+import { applicationSlice, classifierSlice, projectSlice } from "store/slices";
 
-import { SerializedProjectType } from "types/SerializedProjectType";
-import { Classifier } from "types/Classifier";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { ImageType } from "types/ImageType";
+import {
+  AlertStateType,
+  AlertType,
+  Classifier,
+  ImageType,
+  SerializedProjectType,
+} from "types";
 
 import { deserializeImages } from "image/imageHelper";
 

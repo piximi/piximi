@@ -1,39 +1,44 @@
 import React from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { RadioGroup } from "@mui/material";
-import Radio from "@mui/material/Radio";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Checkbox from "@mui/material/Checkbox";
-import ListSubheader from "@mui/material/ListSubheader";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Divider from "@mui/material/Divider";
-import Slider from "@mui/material/Slider";
-import Grid from "@mui/material/Grid";
+import {
+  Checkbox,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Radio,
+  RadioGroup,
+  Slider,
+} from "@mui/material";
 
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
-import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import {
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+} from "@mui/icons-material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { InformationBox } from "../InformationBox";
 import { ResetButton } from "../HandToolOptions/ResetButton";
 
 import {
   imageSelector,
+  offsetSelector,
   stageHeightSelector,
   stageScaleSelector,
   stageWidthSelector,
   zoomToolOptionsSelector,
 } from "store/selectors";
-import { offsetSelector } from "store/selectors/offsetSelector";
 
 import { setOffset, setStageScale } from "store/slices";
+
 import { setZoomToolOptions } from "store/slices/toolOptionsSlice";
 
-import { ZoomModeType } from "types/ZoomModeType";
+import { ZoomModeType } from "types";
 
 import {
   CheckboxUncheckedIcon,

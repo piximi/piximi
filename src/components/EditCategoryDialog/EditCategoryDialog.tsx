@@ -16,7 +16,7 @@ import { ColorIcon } from "components/ColorIcon";
 
 import { updateCategory } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type EditCategoryDialogProps = {
   category: Category;

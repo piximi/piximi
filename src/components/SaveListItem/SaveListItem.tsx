@@ -1,9 +1,7 @@
 import React from "react";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
 

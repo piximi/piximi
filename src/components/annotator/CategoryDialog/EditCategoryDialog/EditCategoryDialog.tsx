@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CategoryDialog } from "../CategoryDialog";
 
-import { selectedCategorySelector } from "store/selectors";
-import { annotatorCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
+import {
+  annotatorCategoriesSelector,
+  selectedCategorySelector,
+} from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type EditCategoryDialogProps = {
   onCloseDialog: () => void;

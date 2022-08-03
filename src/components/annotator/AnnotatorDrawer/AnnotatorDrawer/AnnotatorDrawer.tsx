@@ -2,55 +2,59 @@ import React from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import PopupState, { bindTrigger } from "material-ui-popup-state";
-import Drawer from "@mui/material/Drawer";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
-import IconButton from "@mui/material/IconButton";
-import { Chip, Divider } from "@mui/material";
-import List from "@mui/material/List";
-import ListItemIcon from "@mui/material/ListItemIcon";
+import {
+  Chip,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+} from "@mui/material";
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import SaveIcon from "@mui/icons-material/Save";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import AddIcon from "@mui/icons-material/Add";
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  FolderOpen as FolderOpenIcon,
+  MoreHoriz as MoreHorizIcon,
+  Save as SaveIcon,
+} from "@mui/icons-material";
 
-import { useDialog } from "hooks";
-import { useTranslation } from "hooks/useTranslation";
+import { useDialog, useTranslation } from "hooks";
 
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import { CategoryMenu } from "../CategoryMenu";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
-import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
-import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { ClearCategoryDialog } from "../ClearCategoryDialog";
+import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
-import { SaveMenu } from "../SaveMenu/SaveMenu";
-import { OpenMenu } from "../OpenMenu/OpenMenu";
 import { DeleteAllCategoriesListItem } from "../DeleteAllCategoriesListItem";
-import { AnnotatorAppBar } from "../../AnnotatorAppBar";
+import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import { ImageList } from "../ImageList";
+import { OpenMenu } from "../OpenMenu/OpenMenu";
+import { SaveMenu } from "../SaveMenu/SaveMenu";
 
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { AnnotatorAppBar } from "../../AnnotatorAppBar";
+import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
+import { EditCategoryDialog } from "../../CategoryDialog/EditCategoryDialog";
+
 import { AnnotatorHelpDrawer } from "components/common/Help";
+import { CollapsibleList } from "components/common/CollapsibleList";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
 
-import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
-import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
 import {
+  annotatorImagesSelector,
   categoryCountsSelector,
+  createdAnnotatorCategoriesSelector,
+  selectedAnnotationsIdsSelector,
   selectedCategorySelector,
   unknownAnnotationCategorySelector,
 } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { Category } from "types/Category";
-import { ShadowImageType } from "types/ImageType";
+import { Category, ShadowImageType } from "types";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);

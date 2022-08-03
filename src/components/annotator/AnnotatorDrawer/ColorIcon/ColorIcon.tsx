@@ -2,11 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { CirclePicker, ColorResult } from "react-color";
 
+import { Avatar, Box, IconButton, Popover } from "@mui/material";
 import { Label } from "@mui/icons-material";
-import { Avatar, IconButton, Box } from "@mui/material";
-import Popover from "@mui/material/Popover";
 
-import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
+import { availableAnnotationColorsSelector } from "store/selectors";
 
 type ColorIconButtonProps = {
   color: string;

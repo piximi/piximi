@@ -2,14 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 import JSZip from "jszip";
 
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+import { MenuItem, ListItemText } from "@mui/material";
 
 import {
   annotationCategoriesSelector,
+  annotatorImagesSelector,
   imageInstancesSelector,
 } from "store/selectors";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 import { saveAnnotationsAsBinaryInstanceSegmentationMasks } from "image/imageHelper";
 

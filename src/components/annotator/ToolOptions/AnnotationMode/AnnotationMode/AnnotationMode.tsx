@@ -1,15 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import ListSubheader from "@mui/material/ListSubheader";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { NewTooltip } from "../NewTooltip";
 import { AddTooltip } from "../AddTooltip";
@@ -24,8 +26,7 @@ import {
 
 import { imageViewerSlice } from "store/slices";
 
-import { AnnotationStateType } from "types/AnnotationStateType";
-import { AnnotationModeType } from "types/AnnotationModeType";
+import { AnnotationModeType, AnnotationStateType } from "types";
 
 import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 

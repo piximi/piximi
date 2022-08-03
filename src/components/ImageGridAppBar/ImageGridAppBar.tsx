@@ -14,12 +14,14 @@ import {
   Box,
 } from "@mui/material";
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import SelectAllIcon from "@mui/icons-material/SelectAll";
-import DeselectIcon from "@mui/icons-material/Deselect";
-import GestureIcon from "@mui/icons-material/Gesture";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import ClearIcon from "@mui/icons-material/Clear";
+import {
+  Clear as ClearIcon,
+  Delete as DeleteIcon,
+  Deselect as DeselectIcon,
+  Gesture as GestureIcon,
+  LabelOutlined as LabelOutlinedIcon,
+  SelectAll as SelectAllIcon,
+} from "@mui/icons-material";
 
 import { useDialog } from "hooks";
 
@@ -35,7 +37,7 @@ import {
   setActiveImage,
 } from "store/slices";
 
-import { ImageType, ShadowImageType } from "types/ImageType";
+import { ImageType, ShadowImageType } from "types";
 
 export const ImageGridAppBar = () => {
   const dispatch = useDispatch();

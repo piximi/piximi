@@ -12,8 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { selectedModelSelector } from "store/selectors/selectedModelSelector";
+import { fittedSelector, selectedModelSelector } from "store/selectors";
 
 type SaveClassifierDialogProps = {
   onClose: () => void;

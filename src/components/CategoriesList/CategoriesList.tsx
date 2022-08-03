@@ -9,11 +9,11 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
   createdCategoriesSelector,
+  predictedSelector,
   unknownCategorySelector,
 } from "store/selectors";
-import { predictedSelector } from "store/selectors/predictedSelector";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 export const CategoriesList = () => {
   const categories = useSelector(createdCategoriesSelector);

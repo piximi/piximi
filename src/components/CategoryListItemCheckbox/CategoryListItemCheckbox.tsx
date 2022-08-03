@@ -2,8 +2,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Checkbox, ListItemIcon } from "@mui/material";
-import LabelIcon from "@mui/icons-material/Label";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
+
+import {
+  Label as LabelIcon,
+  LabelOutlined as LabelOutlinedIcon,
+} from "@mui/icons-material";
 
 import { visibleImagesSelector } from "store/selectors";
 

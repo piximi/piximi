@@ -14,14 +14,17 @@ import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { PreprocessingSettingsListItem } from "components/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DialogTransition } from "components/DialogTransition";
 
-import { categorizedImagesSelector, compiledSelector } from "store/selectors";
-import { epochsSelector } from "store/selectors/epochsSelector";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import {
+  alertStateSelector,
+  categorizedImagesSelector,
+  compiledSelector,
+  epochsSelector,
+  trainingFlagSelector,
+} from "store/selectors";
 
 import { classifierSlice } from "store/slices";
 
-import { AlertStateType, AlertType } from "types/AlertStateType";
+import { AlertStateType, AlertType } from "types";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;

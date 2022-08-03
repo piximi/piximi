@@ -4,7 +4,7 @@ import { ImageCanvas } from "./ImageCanvas";
 import { LabelCanvas } from "./LabelCanvas";
 import { StyledStage } from "./StyledImageCanvasComponents";
 
-import { ImageType } from "types/ImageType";
+import { ImageType } from "types";
 
 type ImageDialogCanvasProps = {
   image: ImageType;

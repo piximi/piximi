@@ -1,11 +1,10 @@
-import { DialogTitle, IconButton } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import List from "@mui/material/List";
+import { Dialog, DialogTitle, IconButton, List } from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 
-import { SerializedFileType } from "types/SerializedFileType";
+import { SerializedFileType } from "types";
 
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";

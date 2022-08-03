@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { Box, CssBaseline } from "@mui/material";
 
-import { useUpload } from "hooks/useUpload/useUpload";
+import { useUpload } from "hooks";
 
 import { ApplicationDrawer } from "components/ApplicationDrawer";
 import { ImageGrid } from "components/ImageGrid";
@@ -19,10 +19,9 @@ import { visibleImagesSelector } from "store/selectors";
 
 import { applicationSlice } from "store/slices/applicationSlice";
 
-import { ImageType } from "types/ImageType";
-import { AlertType } from "types/AlertStateType";
+import { AlertType, ImageType } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export const MainView = () => {
   const dispatch = useDispatch();

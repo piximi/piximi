@@ -3,39 +3,41 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { BlockPicker, ColorResult } from "react-color";
 
 import {
+  AppBar,
   Container,
+  Dialog,
   DialogContent,
+  IconButton,
   Switch,
   Grid,
   Popover,
   TextField,
+  Toolbar,
+  Typography,
   Stack,
+  styled,
 } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import { styled } from "@mui/material/styles";
 
-import CloseIcon from "@mui/icons-material/Close";
-import PaletteIcon from "@mui/icons-material/Palette";
+import {
+  Close as CloseIcon,
+  Palette as PaletteIcon,
+} from "@mui/icons-material";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
 import {
-  themeModeSelector,
-  imageSelectionColorSelector,
   availableColorsSelector,
+  imageSelectionColorSelector,
   imageSelectionSizeSelector,
+  soundEnabledSelector,
+  themeModeSelector,
 } from "store/selectors";
-import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
 
 import { imageViewerSlice, setThemeMode } from "store/slices";
 
 import { applicationSlice } from "store/slices";
 
-import { ThemeMode } from "types/ThemeMode";
+import { ThemeMode } from "types";
 
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";

@@ -6,7 +6,7 @@ import { AppBar, Box } from "@mui/material";
 import { ApplicationToolbar } from "components/ApplicationToolbar";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
-import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { alertStateSelector } from "store/selectors/";
 
 export const ApplicationAppBar = () => {
   const alertState = useSelector(alertStateSelector);

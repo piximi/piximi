@@ -6,7 +6,7 @@ import { useDialog } from "hooks";
 
 import { EditCategoryDialog } from "components/EditCategoryDialog";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type EditCategoryMenuItemProps = {
   category: Category;

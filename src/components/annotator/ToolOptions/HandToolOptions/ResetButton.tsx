@@ -1,10 +1,9 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemText } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { imageViewerSlice } from "store/slices";
 

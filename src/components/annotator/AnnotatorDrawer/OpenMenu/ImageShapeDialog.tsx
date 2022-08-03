@@ -3,9 +3,14 @@ import { useDispatch } from "react-redux";
 import * as ImageJS from "image-js";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import { Alert, Box, Button, DialogActions } from "@mui/material";
-import DialogTitle from "@mui/material/DialogTitle";
-import Dialog from "@mui/material/Dialog";
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+} from "@mui/material";
 
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 

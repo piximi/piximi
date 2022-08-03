@@ -8,13 +8,14 @@ import {
   ListItemText,
 } from "@mui/material";
 
-import LabelImportantIcon from "@mui/icons-material/LabelImportant";
+import { LabelImportant as LabelImportantIcon } from "@mui/icons-material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
 
-import { predictionFlagSelector } from "store/selectors/predictionFlagSelector";
+import { predictionFlagSelector } from "store/selectors";
+
 import { classifierSlice } from "store/slices";
 
 type PredictClassifierListItemProps = {

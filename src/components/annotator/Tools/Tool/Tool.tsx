@@ -1,10 +1,15 @@
 import React, { ReactElement, useState } from "react";
 
-import { Card, CardActionArea, CardContent, Tooltip } from "@mui/material";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import SvgIcon from "@mui/material/SvgIcon";
-import Typography from "@mui/material/Typography";
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  ListItem,
+  ListItemIcon,
+  SvgIcon,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
 import { ToolBarToolTitle } from "./ToolBarToolTitle";
 

@@ -10,15 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 
-import {
-  applicationSlice,
-  classifierSlice,
-  projectSlice,
-} from "../../store/slices";
+import { applicationSlice, classifierSlice, projectSlice } from "store/slices";
 
-import { SerializedImageType } from "types/SerializedImageType";
-import { Classifier } from "types/Classifier";
-import { SerializedProjectType } from "types/SerializedProjectType";
+import { Classifier, SerializedImageType, SerializedProjectType } from "types";
 
 import { deserializeImages } from "image/imageHelper";
 

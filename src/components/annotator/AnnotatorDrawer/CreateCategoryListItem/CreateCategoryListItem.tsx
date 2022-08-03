@@ -1,12 +1,10 @@
 import React from "react";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 
-import { useDialog } from "hooks";
-import { useTranslation } from "hooks/useTranslation";
+import { useDialog, useTranslation } from "hooks";
 
 import { CreateCategoryDialog } from "../../CategoryDialog/CreateCategoryDialog";
 

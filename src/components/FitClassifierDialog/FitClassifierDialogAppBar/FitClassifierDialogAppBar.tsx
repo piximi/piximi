@@ -13,8 +13,7 @@ import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
-import { compiledSelector } from "store/selectors";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { compiledSelector, trainingFlagSelector } from "store/selectors";
 
 import { classifierSlice } from "store/slices";
 

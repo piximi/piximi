@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import Drawer from "@mui/material/Drawer";
+import { Drawer } from "@mui/material";
 
 import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
 import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
@@ -22,7 +22,7 @@ import { AppBarOffset } from "components/styled/AppBarOffset";
 
 import { toolTypeSelector } from "store/selectors";
 
-import { ToolType } from "types/ToolType";
+import { ToolType } from "types";
 
 import {
   ColorAdjustmentIcon,

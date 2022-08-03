@@ -1,12 +1,14 @@
 import React from "react";
 
-import { IconButton } from "@mui/material";
-import Drawer from "@mui/material/Drawer";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import HelpIcon from "@mui/icons-material/Help";
-import CloseIcon from "@mui/icons-material/Close";
-import ListItemText from "@mui/material/ListItemText";
+import {
+  Drawer,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+
+import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
 import { HelpContent, HelpTopic } from "../HelpContent/HelpContent";
 

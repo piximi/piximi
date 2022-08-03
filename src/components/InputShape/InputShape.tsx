@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { Grid, InputAdornment, TextField } from "@mui/material";
 
-import { architectureOptionsSelector } from "store/selectors/architectureOptionsSelector";
+import { architectureOptionsSelector } from "store/selectors";
 
 export const InputShape = () => {
   const inputShape = useSelector(architectureOptionsSelector).inputShape;

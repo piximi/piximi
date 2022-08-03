@@ -13,7 +13,7 @@ import {
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { ImageMenu } from "../ImageMenu";
 
@@ -23,7 +23,7 @@ import { imageSelector } from "store/selectors";
 
 import { setActiveImage } from "store/slices";
 
-import { ImageType, ShadowImageType } from "types/ImageType";
+import { ImageType, ShadowImageType } from "types";
 
 export const ImageList = ({
   annotatorImages,

@@ -1,9 +1,8 @@
 import React from "react";
 
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
+import { Divider, List } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { InformationBox } from "../InformationBox";
 import { ResetButton } from "./ResetButton";

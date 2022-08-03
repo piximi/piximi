@@ -13,17 +13,18 @@ import { StyledFormControl } from "../../StyledFormControl";
 
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 
-import { fitOptionsSelector } from "store/selectors";
-import { learningRateSelector } from "store/selectors/learningRateSelector";
-import { optimizationAlgorithmSelector } from "store/selectors/optimizationAlgorithmSelector";
-import { lossFunctionSelector } from "store/selectors/lossFunctionSelector";
+import {
+  fitOptionsSelector,
+  learningRateSelector,
+  lossFunctionSelector,
+  optimizationAlgorithmSelector,
+} from "store/selectors";
 
 import { classifierSlice } from "store/slices";
 
-import { LossFunction } from "types/LossFunction";
-import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+import { LossFunction, OptimizationAlgorithm } from "types";
 
-import { enumKeys } from "utils/enumKeys";
+import { enumKeys } from "utils";
 
 export const OptimizerSettingsGrid = () => {
   const dispatch = useDispatch();

@@ -3,14 +3,13 @@ import { useSelector } from "react-redux";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+import { MenuItem, ListItemText } from "@mui/material";
 
 import {
   annotationCategoriesSelector,
+  annotatorImagesSelector,
   imageInstancesSelector,
 } from "store/selectors";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 

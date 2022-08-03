@@ -8,23 +8,24 @@ import {
   ListItemText,
 } from "@mui/material";
 
-import AssessmentIcon from "@mui/icons-material/Assessment";
+import { Assessment as AssessmentIcon } from "@mui/icons-material";
 
-import { useDialog } from "hooks";
-import { useTranslation } from "hooks/useTranslation";
+import { useDialog, useTranslation } from "hooks";
 
 import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
 
 import { EvaluateClassifierDialog } from "components/EvaluateClassifierDialog/EvaluateClassifierDialog";
 
-import { createdCategoriesSelector } from "store/selectors";
-import { evaluationResultSelector } from "store/selectors/evaluationResultSelector";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { evaluationFlagSelector } from "store/selectors/evaluationFlagSelector";
+import {
+  alertStateSelector,
+  createdCategoriesSelector,
+  evaluationFlagSelector,
+  evaluationResultSelector,
+} from "store/selectors";
 
 import { classifierSlice } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;

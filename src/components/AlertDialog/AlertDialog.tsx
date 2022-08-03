@@ -12,20 +12,23 @@ import {
   Typography,
 } from "@mui/material";
 
-import CloseIcon from "@mui/icons-material/Close";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import GitHubIcon from "@mui/icons-material/GitHub";
+import {
+  Close as CloseIcon,
+  ErrorOutline as ErrorOutlineIcon,
+  WarningAmberOutlined as WarningAmberOutlinedIcon,
+  InfoOutlined as InfoOutlinedIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+  GitHub as GitHubIcon,
+} from "@mui/icons-material";
 
-import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
+import { usePreferredMuiTheme } from "hooks";
 
 import { applicationSlice } from "store/slices";
 
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { createGitHubIssue } from "utils/createGitHubIssue";
+import { AlertStateType, AlertType } from "types";
+
+import { createGitHubIssue } from "utils";
 
 type AlertDialogProps = {
   alertState: AlertStateType;

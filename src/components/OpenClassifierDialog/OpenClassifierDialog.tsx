@@ -16,15 +16,19 @@ import {
   Typography,
 } from "@mui/material";
 
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
-
 import FileOpenIcon from "@mui/icons-material/FileOpen";
+
+import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
 import { classifierSlice } from "store/slices";
 
-import { Shape } from "types/Shape";
-import { ModelType } from "types/ClassifierModelType";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+import {
+  AlertStateType,
+  AlertType,
+  defaultAlert,
+  ModelType,
+  Shape,
+} from "types";
 
 type OpenClassifierDialogProps = {
   onClose: any;

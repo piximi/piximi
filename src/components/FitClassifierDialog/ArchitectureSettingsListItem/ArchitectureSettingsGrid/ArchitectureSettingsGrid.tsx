@@ -2,16 +2,18 @@ import * as React from "react";
 import { SyntheticEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Grid, TextField, Alert } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
+import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
 
 import { StyledFormControl } from "../../StyledFormControl";
 
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 
-import { architectureOptionsSelector } from "store/selectors/architectureOptionsSelector";
-import { inputShapeSelector } from "store/selectors/inputShapeSelector";
-import { uploadedModelSelector } from "store/selectors/uploadedModelSelector";
+import {
+  architectureOptionsSelector,
+  inputShapeSelector,
+  uploadedModelSelector,
+} from "store/selectors";
+
 import { classifierSlice } from "store/slices";
 
 import {

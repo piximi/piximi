@@ -1,12 +1,11 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
+import { MenuItem, Typography } from "@mui/material";
 
-import { updateOtherCategoryVisibility } from "../../store/slices";
+import { updateOtherCategoryVisibility } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type HideOtherCategoriesMenuItemProps = {
   category: Category;

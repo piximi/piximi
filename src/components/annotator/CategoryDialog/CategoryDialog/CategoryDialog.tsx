@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { ColorIcon } from "../../AnnotatorDrawer/ColorIcon";
 

@@ -5,12 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import { CategoryDialog } from "../CategoryDialog";
 
-import { annotatorCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
-import { availableAnnotationColorsSelector } from "store/selectors/availableAnnotationColorsSelector";
+import {
+  annotatorCategoriesSelector,
+  availableAnnotationColorsSelector,
+} from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 import { replaceDuplicateName } from "image/imageHelper";
 

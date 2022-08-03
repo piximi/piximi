@@ -20,6 +20,7 @@ export type { Classifier } from "./Classifier";
 
 export type { ClassifierModelProps } from "./ClassifierModelType";
 export { availableModels } from "./ClassifierModelType";
+export { ModelType } from "./ClassifierModelType";
 
 export type { Color } from "./Color";
 
@@ -65,7 +66,7 @@ export { LossFunction } from "./LossFunction";
 
 export { Metric } from "./Metric";
 
-export type { OptimizationAlgorithm } from "./OptimizationAlgorithm";
+export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";
 
@@ -97,8 +98,8 @@ export { ThemeMode } from "./ThemeMode";
 
 export type { ToolOptionsStateType } from "./ToolOptionsStateType";
 
-export type { ToolType } from "./ToolType";
+export { ToolType } from "./ToolType";
 
-export type { ZoomModeType } from "./ZoomModeType";
+export { ZoomModeType } from "./ZoomModeType";
 
 export type { ZoomToolOptionsType } from "./ZoomToolOptionsType";

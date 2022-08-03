@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+import { MenuItem, ListItemText } from "@mui/material";
 
-import { useUpload } from "hooks/useUpload/useUpload";
+import { useUpload } from "hooks";
 
 import { ImageShapeDialog } from "./ImageShapeDialog";
 

@@ -6,7 +6,7 @@ import { HelpTopic } from "../HelpContent/HelpContent";
 
 import { applicationSlice } from "store/slices";
 
-import { AlertType } from "types/AlertStateType";
+import { AlertType } from "types";
 
 export const ClassifierHelpDrawer = () => {
   const dispatch = useDispatch();

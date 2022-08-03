@@ -1,16 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import SvgIcon from "@mui/material/SvgIcon";
-import ListItemText from "@mui/material/ListItemText";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  SvgIcon,
+} from "@mui/material";
 
-import { useAnnotationTool } from "hooks";
-import { useTranslation } from "hooks/useTranslation";
+import { useAnnotationTool, useTranslation } from "hooks";
 
-import { selectedAnnotationSelector } from "store/selectors/selectedAnnotationSelector";
+import { selectedAnnotationSelector } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 

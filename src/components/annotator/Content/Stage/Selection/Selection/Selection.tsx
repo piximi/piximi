@@ -1,7 +1,6 @@
 import React from "react";
 
 import { EllipticalSelection } from "../EllipticalSelection";
-import { ToolType } from "types/ToolType";
 import { LassoSelection } from "../LassoSelection";
 import { MagneticSelection } from "../MagneticSelection";
 import { ObjectSelection } from "../ObjectSelection";
@@ -11,6 +10,8 @@ import { ColorSelection } from "../ColorSelection/ColorSelection";
 import { QuickSelection } from "../QuickSelection/QuickSelection";
 import { PenSelection } from "../PenSelection";
 import { ZoomSelection } from "../ZoomSelection";
+
+import { ToolType } from "types";
 
 import {
   ColorAnnotationTool,

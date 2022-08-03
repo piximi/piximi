@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import Divider from "@mui/material/Divider";
-import { List, ListItem, ListItemText, Slider } from "@mui/material";
+import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { thresholdAnnotationValueSelector } from "store/selectors/thresholdAnnotationValueSelector";
+import { thresholdAnnotationValueSelector } from "store/selectors";
+
 import { imageViewerSlice } from "store/slices";
 
 export const ThresholdAnnotationOptions = () => {

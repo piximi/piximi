@@ -2,7 +2,7 @@ import { HeatMap } from "@nivo/heatmap";
 
 import { Typography } from "@mui/material";
 
-import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
+import { usePreferredNivoTheme } from "hooks";
 
 const getHeatMapData = (confusionMatrix: number[][], classNames: string[]) => {
   const data = [];

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { AppBar, Box, CssBaseline } from "@mui/material";
 
-import { useUpload } from "hooks/useUpload/useUpload";
+import { useUpload } from "hooks";
 
 import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ToolOptions } from "../ToolOptions";
@@ -13,11 +13,11 @@ import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 
-import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { alertStateSelector } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { ImageType } from "types/ImageType";
+import { ImageType } from "types";
 
 type ImageViewerProps = {
   image?: ImageType;

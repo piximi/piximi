@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { activeImageRenderedSrcsSelector } from "store/selectors";
-import { activeImageSelector } from "store/selectors/activeImageSelector";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
+import {
+  activeImagePlaneSelector,
+  activeImageRenderedSrcsSelector,
+  activeImageSelector,
+} from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 

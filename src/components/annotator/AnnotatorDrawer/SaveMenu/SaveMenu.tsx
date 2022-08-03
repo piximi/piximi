@@ -1,10 +1,9 @@
 import React from "react";
 import { bindMenu } from "material-ui-popup-state";
 
-import MenuItem from "@mui/material/MenuItem";
-import { Menu } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog } from "hooks/useDialog/useDialog";
+import { useDialog } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";

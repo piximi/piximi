@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Slider from "@mui/material/Slider";
+import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { quickSelectionRegionSizeSelector } from "store/selectors/quickSelectionRegionSizeSelector";
+import { quickSelectionRegionSizeSelector } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 

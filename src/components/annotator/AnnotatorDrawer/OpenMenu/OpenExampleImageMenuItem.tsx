@@ -1,7 +1,6 @@
 import React from "react";
 
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+import { MenuItem, ListItemText } from "@mui/material";
 
 import { useDialog } from "hooks";
 

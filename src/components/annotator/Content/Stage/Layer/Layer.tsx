@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { scaledImageWidthSelector } from "store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "store/selectors/scaledImageHeightSelector";
 import {
+  offsetSelector,
+  scaledImageHeightSelector,
+  scaledImageWidthSelector,
   stageHeightSelector,
   stageWidthSelector,
   zoomSelectionSelector,
   zoomToolOptionsSelector,
 } from "store/selectors";
-import { offsetSelector } from "store/selectors/offsetSelector";
 
 type LayerProps = {
   children?: React.ReactNode;

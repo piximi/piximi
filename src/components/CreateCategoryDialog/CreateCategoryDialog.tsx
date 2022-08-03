@@ -17,11 +17,11 @@ import {
 
 import { ColorIcon } from "components/ColorIcon";
 
-import { availableColorsSelector } from "store/selectors/availableColorsSelector";
-import { categoriesSelector } from "store/selectors/categoriesSelector";
+import { availableColorsSelector, categoriesSelector } from "store/selectors";
+
 import { createCategory } from "store/slices";
 
-import { Category } from "types/Category";
+import { Category } from "types";
 
 type CreateCategoryDialogProps = {
   onClose: () => void;

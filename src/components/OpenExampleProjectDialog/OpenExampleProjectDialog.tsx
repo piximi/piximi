@@ -9,7 +9,7 @@ import {
 
 import CloseIcon from "@mui/icons-material/Close";
 
-import { useTranslation } from "hooks/useTranslation";
+import { useTranslation } from "hooks";
 
 import { OpenExampleProjectMenuItem } from "components/OpenExampleProjectMenuItem";
 

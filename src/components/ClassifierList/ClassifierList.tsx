@@ -9,8 +9,10 @@ import {
   ListItemText,
 } from "@mui/material";
 
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
 
 import {
   FitClassifierListItem,
@@ -18,8 +20,7 @@ import {
   EvaluateClassifierListItem,
 } from "components/ClassifierListItems";
 
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { fittedSelector, trainingFlagSelector } from "store/selectors";
 
 export const ClassifierList = () => {
   const [collapsed, setCollapsed] = React.useState(false);

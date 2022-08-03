@@ -1,16 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemText } from "@mui/material";
 
-import { imageViewerFullImagesSelector } from "store/selectors";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
-import { activeImageColorsSelector } from "store/selectors/activeImageColorsSelector";
+import {
+  activeImageColorsSelector,
+  activeImagePlaneSelector,
+  imageViewerFullImagesSelector,
+} from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { ImageType } from "types/ImageType";
+import { ImageType } from "types";
 
 import {
   convertImageURIsToImageData,

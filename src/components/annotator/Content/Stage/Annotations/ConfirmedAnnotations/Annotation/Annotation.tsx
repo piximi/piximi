@@ -4,8 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { stageScaleSelector } from "store/selectors";
 
-import { AnnotationType } from "types/AnnotationType";
-import { Shape } from "types/Shape";
+import { AnnotationType, Shape } from "types";
 
 import { toRGBA } from "annotator/image";
 

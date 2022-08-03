@@ -1,17 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
+import { annotatorImagesSelector } from "store/selectors";
 
 import { imageViewerSlice } from "store/slices";
 
-import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+import { UNKNOWN_ANNOTATION_CATEGORY } from "types";
 
 type DeleteAllCategoriesListItemProps = {
   onOpenDeleteAllCategoriesDialog: () => void;

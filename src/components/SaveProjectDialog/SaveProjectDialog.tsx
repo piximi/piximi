@@ -13,8 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import { classifierSelector } from "store/selectors";
-import { serializedProjectSelector } from "store/selectors/serializedProjectSelector";
+import { classifierSelector, serializedProjectSelector } from "store/selectors";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

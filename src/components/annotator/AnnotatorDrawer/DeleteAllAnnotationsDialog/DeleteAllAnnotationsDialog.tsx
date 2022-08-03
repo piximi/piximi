@@ -1,15 +1,17 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
 
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 import { imageViewerSlice } from "store/slices";
 
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
 type DeleteAllAnnotationsDialogProps = {
   onClose: () => void;

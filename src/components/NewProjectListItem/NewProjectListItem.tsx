@@ -1,8 +1,6 @@
 import React from "react";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
