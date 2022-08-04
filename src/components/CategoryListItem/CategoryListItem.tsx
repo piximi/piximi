@@ -15,8 +15,8 @@ import { useDialog, useMenu } from "hooks";
 
 import { CategoryListItemCheckbox } from "components/CategoryListItemCheckbox";
 import { CategoryMenu } from "components/CategoryMenu";
-import { EditCategoryDialog } from "components/EditCategoryDialog";
-import { DeleteCategoryDialog } from "components/DeleteCategoryDialog";
+import { EditCategoryDialog } from "components/dialog/EditCategoryDialog";
+import { DeleteCategoryDialog } from "components/dialog/DeleteCategoryDialog";
 
 import { Category, ImageType, State } from "types";
 

@@ -19,7 +19,7 @@ import {
 
 import { useDialog } from "hooks";
 
-import { CreateCategoryDialog } from "components/CreateCategoryDialog";
+import { CreateCategoryDialog } from "components/dialog/CreateCategoryDialog";
 
 type CollapsibleListProps = {
   children: any;

@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { useDialog } from "hooks";
 
-import { CreateCategoryDialog } from "components/CreateCategoryDialog";
+import { CreateCategoryDialog } from "components/dialog/CreateCategoryDialog";
 
 export const CreateCategoryListItem = () => {
   const { onClose, onOpen, open } = useDialog();

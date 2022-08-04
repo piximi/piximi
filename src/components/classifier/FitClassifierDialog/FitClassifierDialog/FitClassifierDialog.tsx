@@ -11,8 +11,8 @@ import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot"
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 
 import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
-import { PreprocessingSettingsListItem } from "components/classifier/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
-import { DialogTransition } from "components/DialogTransition";
+import { PreprocessingSettingsListItem } from "components/classifier/PreprocessingSettingsListItem";
+import { DialogTransition } from "components/dialog/DialogTransition";
 
 import {
   alertStateSelector,

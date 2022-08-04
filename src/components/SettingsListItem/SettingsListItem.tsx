@@ -6,7 +6,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDialog } from "hooks";
 
-import { SettingsDialog } from "components/SettingsDialog";
+import { SettingsDialog } from "components/dialog/SettingsDialog";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialog();

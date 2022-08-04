@@ -4,7 +4,7 @@ import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { OpenExampleClassifierDialog } from "components/OpenExampleProjectDialog/OpenExampleProjectDialog";
+import { OpenExampleClassifierDialog } from "components/dialog/OpenExampleProjectDialog/OpenExampleProjectDialog";
 import { OpenProjectMenuItem } from "components/OpenProjectMenuItem";
 import { OpenClassifierDialog } from "components/classifier/OpenClassifierDialog";
 

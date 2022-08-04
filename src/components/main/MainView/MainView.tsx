@@ -7,9 +7,9 @@ import { Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
 
-import { ApplicationDrawer } from "components/ApplicationDrawer";
+import { MainDrawer } from "../MainDrawer";
 import { ImageGrid } from "components/ImageGrid";
-import { ApplicationAppBar } from "components/ApplicationAppBar";
+import { MainAppBar } from "../MainAppBar";
 
 import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 
@@ -120,9 +120,9 @@ export const MainView = () => {
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
 
-            <ApplicationAppBar />
+            <MainAppBar />
 
-            <ApplicationDrawer />
+            <MainDrawer />
 
             <ImageGrid onDrop={onDrop} />
 

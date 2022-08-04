@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { useDialog } from "hooks";
 
-import { NewProjectDialog } from "components/NewProjectDialog";
+import { NewProjectDialog } from "components/dialog/NewProjectDialog";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialog();

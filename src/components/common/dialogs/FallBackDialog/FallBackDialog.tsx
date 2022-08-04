@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 
 import { SaveClassifierDialog } from "components/classifier/SaveClassifierDialog/SaveClassifierDialog";
-import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
+import { SaveProjectDialog } from "components/dialog/SaveProjectDialog/SaveProjectDialog";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
 import { AlertStateType, AlertType } from "types";

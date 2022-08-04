@@ -4,7 +4,7 @@ import { Menu, MenuItem } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
+import { SaveProjectDialog } from "components/dialog/SaveProjectDialog/SaveProjectDialog";
 import { SaveClassifierDialog } from "components/classifier/SaveClassifierDialog/SaveClassifierDialog";
 
 type SaveMenuProps = {
