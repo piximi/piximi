@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { AppBar, Box } from "@mui/material";
 
 import { ApplicationToolbar } from "components/ApplicationToolbar";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
 
 import { alertStateSelector } from "store/selectors/";
 

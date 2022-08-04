@@ -13,7 +13,7 @@ import { ApplicationAppBar } from "components/ApplicationAppBar";
 
 import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+import { FallBackDialog } from "components/common/dialogs/FallBackDialog/FallBackDialog";
 
 import { visibleImagesSelector } from "store/selectors";
 

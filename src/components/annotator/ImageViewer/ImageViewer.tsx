@@ -11,7 +11,7 @@ import { Tools } from "../Tools";
 import { Content } from "../Content";
 import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
 
 import { alertStateSelector } from "store/selectors";
 

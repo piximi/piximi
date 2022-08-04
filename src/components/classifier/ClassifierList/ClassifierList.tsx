@@ -18,7 +18,7 @@ import {
   FitClassifierListItem,
   PredictClassifierListItem,
   EvaluateClassifierListItem,
-} from "components/ClassifierListItems";
+} from "components/classifier/ClassifierListItems";
 
 import { fittedSelector, trainingFlagSelector } from "store/selectors";
 

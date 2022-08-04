@@ -12,7 +12,7 @@ import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
 import { HelpContent, HelpTopic } from "../HelpContent/HelpContent";
 
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 type HelpDrawerProps = {
   helpContent: Array<HelpTopic>;

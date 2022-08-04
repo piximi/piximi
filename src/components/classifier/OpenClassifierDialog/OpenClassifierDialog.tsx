@@ -18,7 +18,7 @@ import {
 
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
 
 import { classifierSlice } from "store/slices";
 

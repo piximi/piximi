@@ -1,1 +1,1 @@
-export { Architecture } from "./Architecture";
+export { ArchitectureTabPanel } from "./ArchitectureTabPanel";

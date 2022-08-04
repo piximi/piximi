@@ -4,7 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { ImageViewer } from "../ImageViewer";
 
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+import { FallBackDialog } from "components/common/dialogs/FallBackDialog/FallBackDialog";
 
 import { applicationSlice } from "store/slices";
 

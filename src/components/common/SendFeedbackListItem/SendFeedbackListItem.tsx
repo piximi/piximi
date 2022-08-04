@@ -6,7 +6,7 @@ import FeedbackIcon from "@mui/icons-material/Feedback";
 
 import { useDialog } from "hooks";
 
-import { SendFeedbackDialog } from "components/common/SendFeedbackDialog";
+import { SendFeedbackDialog } from "components/common/dialogs/SendFeedbackDialog";
 
 export const SendFeedbackListItem = () => {
   const { onClose, onOpen, open } = useDialog();

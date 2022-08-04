@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { CategoryListItem } from "components/CategoryListItem";
-import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
+import { PredictionVisibility } from "components/classifier/PredictionsVisibility/PredictionVisibility";
 import { CreateCategoryListItem } from "components/CreateCategoryListItem";
 
 import { CollapsibleList } from "components/common/CollapsibleList";

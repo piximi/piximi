@@ -10,8 +10,8 @@ import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
 import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
-import { PreprocessingSettingsListItem } from "components/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
+import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
+import { PreprocessingSettingsListItem } from "components/classifier/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DialogTransition } from "components/DialogTransition";
 
 import {

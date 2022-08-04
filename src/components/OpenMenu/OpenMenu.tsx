@@ -6,7 +6,7 @@ import { useDialog } from "hooks";
 
 import { OpenExampleClassifierDialog } from "components/OpenExampleProjectDialog/OpenExampleProjectDialog";
 import { OpenProjectMenuItem } from "components/OpenProjectMenuItem";
-import { OpenClassifierDialog } from "components/OpenClassifierDialog";
+import { OpenClassifierDialog } from "components/classifier/OpenClassifierDialog";
 
 type OpenMenuProps = {
   popupState: any;

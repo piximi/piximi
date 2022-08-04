@@ -23,7 +23,7 @@ import {
   Palette as PaletteIcon,
 } from "@mui/icons-material";
 
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 import {
   availableColorsSelector,

@@ -16,7 +16,7 @@ import { useDialog } from "hooks";
 import { ExitAnnotatorDialog } from "../AnnotatorDrawer/ExitAnnotatorDialog";
 
 import { LogoIcon } from "components/Logo";
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 export const AnnotatorAppBar = () => {
   const navigate = useNavigate();

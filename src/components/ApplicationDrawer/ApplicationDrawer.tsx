@@ -4,9 +4,9 @@ import { Divider, Drawer } from "@mui/material";
 
 import { FileList } from "components/FileList";
 import { CategoriesList } from "components/CategoriesList";
-import { ClassifierList } from "components/ClassifierList";
+import { ClassifierList } from "components/classifier/ClassifierList";
 import { ApplicationList } from "components/ApplicationList";
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 export const ApplicationDrawer = () => {
   return (

@@ -18,7 +18,7 @@ import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmen
 import { PointerSelectionOptions } from "../PointerSelectionOptions";
 import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
 
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 import { toolTypeSelector } from "store/selectors";
 
