@@ -1,37 +1,23 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  FormHelperText,
-  Grid,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Grid } from "@mui/material";
 
 import { StyledFormControl } from "../../StyledFormControl";
 
+import { OptimizationAlgorithmFormSelect } from "components/classifier/OptimizationAlgorithmFormSelect";
+import { LossFunctionFormSelect } from "components/classifier/LossFunctionFormSelect";
+
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 
-import {
-  fitOptionsSelector,
-  learningRateSelector,
-  lossFunctionSelector,
-  optimizationAlgorithmSelector,
-} from "store/selectors";
+import { fitOptionsSelector, learningRateSelector } from "store/selectors";
 
 import { classifierSlice } from "store/slices";
-
-import { LossFunction, OptimizationAlgorithm } from "types";
-
-import { enumKeys } from "utils";
 
 export const OptimizerSettingsGrid = () => {
   const dispatch = useDispatch();
 
   const fitOptions = useSelector(fitOptionsSelector);
-  const optimizationAlgorithm = useSelector(optimizationAlgorithmSelector);
-  const lossFunction = useSelector(lossFunctionSelector);
   const learningRate = useSelector(learningRateSelector);
 
   const dispatchBatchSize = (batchSize: number) => {
@@ -43,31 +29,8 @@ export const OptimizerSettingsGrid = () => {
       classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
     );
   };
-
   const dispatchEpochs = (arg: number) => {
     dispatch(classifierSlice.actions.updateEpochs({ epochs: arg }));
-  };
-
-  const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
-    const target = event.target as HTMLInputElement; //target.value is string
-    const optimizationAlgorithm = target.value as OptimizationAlgorithm;
-
-    dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: optimizationAlgorithm,
-      })
-    );
-  };
-
-  const onLossFunctionChange = (event: SelectChangeEvent) => {
-    const target = event.target as HTMLInputElement; //target.value is string
-    const lossFunction = target.value as LossFunction;
-
-    dispatch(
-      classifierSlice.actions.updateLossFunction({
-        lossFunction: lossFunction,
-      })
-    );
   };
 
   return (
@@ -75,27 +38,7 @@ export const OptimizerSettingsGrid = () => {
       <StyledFormControl>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <FormHelperText>Optimization Algorithm</FormHelperText>
-            <Select
-              value={optimizationAlgorithm as string}
-              onChange={onOptimizationAlgorithmChange}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={(theme) => ({
-                flexBasis: 300,
-                width: "100%",
-                marginRight: theme.spacing(1),
-                marginTop: theme.spacing(0),
-              })}
-            >
-              {enumKeys(OptimizationAlgorithm).map((k) => {
-                return (
-                  <MenuItem key={k} value={OptimizationAlgorithm[k]}>
-                    {OptimizationAlgorithm[k]}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            <OptimizationAlgorithmFormSelect />
           </Grid>
         </Grid>
         <Grid container spacing={2}>
@@ -114,27 +57,7 @@ export const OptimizerSettingsGrid = () => {
       <StyledFormControl>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <FormHelperText>Loss Function</FormHelperText>
-            <Select
-              value={lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
-              onChange={onLossFunctionChange}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={(theme) => ({
-                flexBasis: 300,
-                width: "100%",
-                marginRight: theme.spacing(1),
-                marginTop: theme.spacing(0),
-              })}
-            >
-              {enumKeys(LossFunction).map((k) => {
-                return (
-                  <MenuItem key={k} value={LossFunction[k]}>
-                    {LossFunction[k]}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            <LossFunctionFormSelect />
           </Grid>
         </Grid>
         <Grid container direction={"row"} spacing={2}>
