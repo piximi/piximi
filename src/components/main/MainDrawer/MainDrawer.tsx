@@ -2,10 +2,10 @@ import React from "react";
 
 import { Divider, Drawer } from "@mui/material";
 
-import { FileList } from "components/FileList";
-import { CategoriesList } from "components/CategoriesList";
+import { FileList } from "components/file-io/FileList";
+import { CategoriesList } from "components/category/CategoriesList";
 import { ClassifierList } from "components/classifier/ClassifierList";
-import { MainList } from "..//MainList";
+import { MainList } from "../MainList";
 import { AppBarOffset } from "components/common/styled/AppBarOffset";
 
 export const MainDrawer = () => {

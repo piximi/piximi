@@ -10,7 +10,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 
-import { StyledFormControl } from "components/classifier/FitClassifierDialog/StyledFormControl";
+import { StyledFormControl } from "components/classifier/dialogs/FitClassifierDialog/StyledFormControl";
 
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 

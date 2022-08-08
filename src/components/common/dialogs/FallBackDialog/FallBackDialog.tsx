@@ -25,8 +25,8 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { SaveClassifierDialog } from "components/classifier/SaveClassifierDialog/SaveClassifierDialog";
-import { SaveProjectDialog } from "components/dialog/SaveProjectDialog/SaveProjectDialog";
+import { SaveClassifierDialog } from "components/classifier/dialogs/SaveClassifierDialog/SaveClassifierDialog";
+import { SaveProjectDialog } from "components/file-io/dialogs/SaveProjectDialog/SaveProjectDialog";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
 import { AlertStateType, AlertType } from "types";

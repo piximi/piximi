@@ -9,7 +9,7 @@ import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "../../common/dialogs/ImageShapeDialog/ImageShapeDialog";
 
 import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
 

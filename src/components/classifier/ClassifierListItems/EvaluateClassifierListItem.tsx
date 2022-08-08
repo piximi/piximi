@@ -14,7 +14,7 @@ import { useDialog, useTranslation } from "hooks";
 
 import { DisabledClassifierListItem } from "./DisabledClassifierListItem";
 
-import { EvaluateClassifierDialog } from "components/classifier/EvaluateClassifierDialog/EvaluateClassifierDialog";
+import { EvaluateClassifierDialog } from "components/classifier/dialogs/EvaluateClassifierDialog/EvaluateClassifierDialog";
 
 import {
   alertStateSelector,

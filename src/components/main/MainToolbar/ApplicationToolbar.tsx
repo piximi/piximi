@@ -7,9 +7,9 @@ import {
   ZoomOut as ZoomOutIcon,
 } from "@mui/icons-material";
 
-import { UploadButton } from "components/UploadButton";
-import { Logo } from "components/Logo";
-import { ImageSortSelection } from "components/ImageSortSelection/ImageSortSelection";
+import { UploadButton } from "components/main/UploadButton";
+import { Logo } from "components/Application/Logo";
+import { ImageSortSelection } from "components/main/ImageSortSelection/ImageSortSelection";
 
 import { applicationSlice } from "store/slices";
 

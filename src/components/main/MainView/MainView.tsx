@@ -8,10 +8,10 @@ import { Box, CssBaseline } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { MainDrawer } from "../MainDrawer";
-import { ImageGrid } from "components/ImageGrid";
+import { ImageGrid } from "../ImageGrid";
 import { MainAppBar } from "../MainAppBar";
 
-import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "components/common/dialogs/ImageShapeDialog/ImageShapeDialog";
 
 import { FallBackDialog } from "components/common/dialogs/FallBackDialog/FallBackDialog";
 
