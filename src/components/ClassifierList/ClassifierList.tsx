@@ -31,7 +31,7 @@ export const ClassifierList = () => {
 
   const predicted = useSelector(predictedSelector);
 
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(true);
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] = React.useState<string>(
