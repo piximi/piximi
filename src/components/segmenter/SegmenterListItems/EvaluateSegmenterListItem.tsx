@@ -25,6 +25,7 @@ export const EvaluateSegmenterListItem = (
   const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
 
   const onEvaluate = async () => {
+    setIsEvaluating(true);
     dispatch(segmenterSlice.actions.evaluateSegmenter({}));
   };
 
