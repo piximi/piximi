@@ -5,6 +5,7 @@ import { Task } from "./Task";
 
 export type Project = {
   categories: Array<Category>;
+  annotationCategories: Array<Category>;
   name: string;
   images: Array<ImageType>;
   task: Task;

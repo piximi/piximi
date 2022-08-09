@@ -1,10 +1,10 @@
 import { FileList } from "../FileList";
-import { CategoriesList } from "../CategoriesList";
 import { ClassifierList } from "../ClassifierList";
 import { ApplicationList } from "../ApplicationList";
 import React from "react";
 import { Divider, Drawer } from "@mui/material";
 import { AppBarOffset } from "components/styled/AppBarOffset";
+import { SegmenterList } from "components/segmenter/SegmenterList/SegmenterList";
 
 export const ApplicationDrawer = () => {
   return (
@@ -27,11 +27,11 @@ export const ApplicationDrawer = () => {
 
       <Divider />
 
-      <CategoriesList />
+      <ClassifierList />
 
       <Divider />
 
-      <ClassifierList />
+      {process.env.NODE_ENV === "development" && <SegmenterList />}
 
       <Divider />
 

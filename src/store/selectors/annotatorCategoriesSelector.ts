@@ -1,8 +1,9 @@
-import { ImageViewer } from "../../types/ImageViewer";
-export const annotatorCategoriesSelector = ({
-  imageViewer,
+import { Project } from "types/Project";
+
+export const annotationCategoriesSelector = ({
+  project,
 }: {
-  imageViewer: ImageViewer;
+  project: Project;
 }) => {
-  return imageViewer.categories;
+  return project.annotationCategories;
 };

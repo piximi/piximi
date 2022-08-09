@@ -1,14 +1,11 @@
 import React from "react";
-import { Category } from "../../types/Category";
+import { Category, CategoryType } from "types/Category";
 import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
 import { CategoryMenu } from "../CategoryMenu";
-import { useDialog, useMenu } from "../../hooks";
 import { useSelector } from "react-redux";
-import { EditCategoryDialog } from "../EditCategoryDialog";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { State } from "../../types/State";
-import { ImageType } from "../../types/ImageType";
+import { State } from "types/State";
+import { ImageType } from "types/ImageType";
 import {
   Chip,
   IconButton,
@@ -16,30 +13,36 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
+import {
+  categoryCountsSelector,
+  selectedCategorySelector,
+} from "store/selectors";
 
 type CategoryListItemProps = {
+  categoryType: CategoryType;
   category: Category;
   id: string;
+  onCategoryClickCallBack: (category: Category) => void;
 };
 
-export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
-  const {
-    onClose: onCloseDeleteCategoryDialog,
-    onOpen: onOpenDeleteCategoryDialog,
-    open: openDeleteCategoryDialog,
-  } = useDialog();
-  const {
-    onClose: onCloseEditCategoryDialog,
-    onOpen: onOpenEditCategoryDialog,
-    open: openEditCategoryDialog,
-  } = useDialog();
+export const CategoryListItem = ({
+  categoryType,
+  category,
+  id,
+  onCategoryClickCallBack,
+}: CategoryListItemProps) => {
+  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null);
 
-  const {
-    anchorEl: anchorElCategoryMenu,
-    onClose: onCloseCategoryMenu,
-    onOpen: onOpenCategoryMenu,
-    open: openCategoryMenu,
-  } = useMenu();
+  const onOpenCategoryMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setCategoryMenuAnchorEl(event.currentTarget);
+  };
+
+  const onCloseCategoryMenu = () => {
+    setCategoryMenuAnchorEl(null);
+  };
+
+  const selectedCategory = useSelector(selectedCategorySelector);
 
   const imageCount = useSelector((state: State) => {
     return state.project.images.filter((image: ImageType) => {
@@ -47,10 +50,33 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
     }).length;
   });
 
+  const categoryCounts = useSelector(categoryCountsSelector);
+
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    categoryType === CategoryType.ClassifierCategory
+      ? setCount(imageCount)
+      : setCount(categoryCounts[category.id]);
+  }, [category.id, categoryCounts, categoryType, imageCount]);
+
+  const onCategoryClick = () => {
+    onCategoryClickCallBack(category);
+  };
+
   return (
     <React.Fragment>
-      <ListItem dense key={id} id={id}>
-        <CategoryListItemCheckbox category={category} />
+      <ListItem
+        dense
+        button
+        id={category.id}
+        onClick={onCategoryClick}
+        selected={category.id === selectedCategory.id}
+      >
+        <CategoryListItemCheckbox
+          category={category}
+          categoryType={categoryType}
+        />
 
         <ListItemText
           id={id}
@@ -59,9 +85,8 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
         />
 
         <Chip
-          label={imageCount}
+          label={count}
           size="small"
-          // className={classes.chip}
           sx={{
             height: "20px",
             borderWidth: "2px",
@@ -79,25 +104,12 @@ export const CategoryListItem = ({ category, id }: CategoryListItemProps) => {
       </ListItem>
 
       <CategoryMenu
-        anchorElCategoryMenu={anchorElCategoryMenu}
+        anchorElCategoryMenu={categoryMenuAnchorEl}
         category={category}
+        categoryType={categoryType}
         onCloseCategoryMenu={onCloseCategoryMenu}
         onOpenCategoryMenu={onOpenCategoryMenu}
-        onOpenDeleteCategoryDialog={onOpenDeleteCategoryDialog}
-        onOpenEditCategoryDialog={onOpenEditCategoryDialog}
-        openCategoryMenu={openCategoryMenu}
-      />
-
-      <DeleteCategoryDialog
-        category={category}
-        onClose={onCloseDeleteCategoryDialog}
-        open={openDeleteCategoryDialog}
-      />
-
-      <EditCategoryDialog
-        category={category}
-        onClose={onCloseEditCategoryDialog}
-        open={openEditCategoryDialog}
+        openCategoryMenu={Boolean(categoryMenuAnchorEl)}
       />
     </React.Fragment>
   );

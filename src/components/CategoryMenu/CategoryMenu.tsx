@@ -1,43 +1,33 @@
 import React from "react";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import {
+  Category,
+  CategoryType,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
+  UNKNOWN_CATEGORY_ID,
+} from "types/Category";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
-import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
+import { Divider, Menu, MenuList } from "@mui/material";
+import { DeleteCategoryMenuItem } from "components/DeleteCategoryMenuItem";
+import { EditCategoryMenuItem } from "components/EditCategoryMenuItem";
+import { ClearAnnotationMenuItem } from "components/ClearCategoryMenuItem";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
-  onCloseCategoryMenu: (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => void;
+  categoryType: CategoryType;
+  onCloseCategoryMenu: () => void;
   onOpenCategoryMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
   openCategoryMenu: boolean;
-  onOpenDeleteCategoryDialog: () => void;
-  onOpenEditCategoryDialog: () => void;
 };
 
 export const CategoryMenu = ({
   anchorElCategoryMenu,
   category,
+  categoryType,
   onCloseCategoryMenu,
   openCategoryMenu,
-  onOpenDeleteCategoryDialog,
-  onOpenEditCategoryDialog,
 }: CategoryMenuProps) => {
-  const onOpenDeleteCategoryDialogClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    onOpenDeleteCategoryDialog();
-    onCloseCategoryMenu(event);
-  };
-
-  const onOpenEditCategoryDialogClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    onOpenEditCategoryDialog();
-    onCloseCategoryMenu(event);
-  };
-
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
@@ -49,27 +39,41 @@ export const CategoryMenu = ({
       <MenuList dense variant="menu">
         <HideOtherCategoriesMenuItem
           category={category}
+          categoryType={categoryType}
           onCloseCategoryMenu={onCloseCategoryMenu}
         />
 
         <HideOrShowCategoryMenuItem
           category={category}
+          categoryType={categoryType}
           onCloseCategoryMenu={onCloseCategoryMenu}
         />
 
-        {category.id !== UNKNOWN_CATEGORY_ID && (
-          <div>
-            <Divider />
+        {category.id !== UNKNOWN_CATEGORY_ID &&
+          category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
+            <div>
+              <Divider />
 
-            <MenuItem onClick={onOpenEditCategoryDialogClick}>
-              <Typography variant="inherit">Edit category</Typography>
-            </MenuItem>
+              <DeleteCategoryMenuItem
+                category={category}
+                categoryType={categoryType}
+                onCloseCategoryMenu={onCloseCategoryMenu}
+              />
 
-            <MenuItem onClick={onOpenDeleteCategoryDialogClick}>
-              <Typography variant="inherit">Delete category</Typography>
-            </MenuItem>
-          </div>
-        )}
+              <EditCategoryMenuItem
+                category={category}
+                categoryType={categoryType}
+                onCloseCategoryMenu={onCloseCategoryMenu}
+              />
+
+              {categoryType === CategoryType.AnnotationCategory && (
+                <ClearAnnotationMenuItem
+                  category={category}
+                  onCloseCategoryMenu={onCloseCategoryMenu}
+                />
+              )}
+            </div>
+          )}
       </MenuList>
     </Menu>
   );

@@ -1,5 +1,5 @@
 import * as tensorflow from "@tensorflow/tfjs";
-import { EvaluationResultType } from "types/EvaluationResultType";
+import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
 import { ImageType } from "../../../types/ImageType";
 
@@ -13,7 +13,7 @@ export const evaluate = async (
   }>,
   validationImages: ImageType[],
   categories: Category[]
-): Promise<EvaluationResultType> => {
+): Promise<ClassifierEvaluationResultType> => {
   const categoryIDs = categories.map((c: Category) => c.id);
   const numberOfClasses = categoryIDs.length;
 

@@ -13,7 +13,7 @@ import { cropOptionsSelector } from "../../store/selectors";
 import { CropSchema } from "types/CropOptions";
 import { StyledFormControl } from "components/FitClassifierDialog/StyledFormControl";
 import { enumKeys } from "utils/enumKeys";
-import { CustomNumberTextField } from "components/CustomNumberTextField/CustomNumberTextField";
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 
 export const CroppingForm = () => {
   const cropOptions = useSelector(cropOptionsSelector);

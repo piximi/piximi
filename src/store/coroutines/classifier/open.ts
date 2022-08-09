@@ -1,5 +1,5 @@
 import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
-import { ModelType } from "../../../types/ClassifierModelType";
+import { ModelType } from "../../../types/ModelType";
 import { createSimpleCNN } from "../models/simpleCNN";
 import { createMobileNet } from "../models/mobileNet";
 

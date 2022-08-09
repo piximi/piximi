@@ -5,13 +5,11 @@ import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
 import { Color } from "./Color";
 import { ShadowImageType } from "./ImageType";
-import { Category } from "./Category";
 
 export type ImageViewer = {
   annotationState: AnnotationStateType;
   boundingClientRect: DOMRect;
   brightness: number;
-  categories: Array<Category>;
   currentColors: Array<Color> | undefined;
   contrast: number;
   currentIndex: number;

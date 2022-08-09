@@ -23,6 +23,8 @@ export {
   updateTrainingPercentage,
 } from "./classifierSlice";
 
+export { segmenterSlice, fitSegmenter } from "./segmenterSlice";
+
 export {
   imageViewerSlice,
   addImages,
@@ -61,12 +63,17 @@ export {
   createCategory,
   uploadImages,
   deleteCategory,
+  deleteAnnotationCategory,
   projectSlice,
   updateCategory,
+  updateAnnotationCategory,
   updateCategoryVisibility,
+  setAnnotationCategoryVisibility,
   updateImageCategory,
   updateImageCategories,
   updateOtherCategoryVisibility,
+  updateOtherAnnotationCategoryVisibility,
+  setAnnotationCategories,
 } from "./projectSlice";
 
 export { toolOptionsSlice } from "./toolOptionsSlice";

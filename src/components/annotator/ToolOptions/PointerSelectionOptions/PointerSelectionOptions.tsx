@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectedAnnotationsSelector } from "../../../../store/selectors/selectedAnnotationsSelector";
 import { unselectedAnnotationsSelector } from "../../../../store/selectors/unselectedAnnotationsSelector";
 import { Category } from "../../../../types/Category";
-import { CollapsibleList } from "../../CategoriesList/CollapsibleList";
+import { CollapsibleList } from "../../ImageViewerList/CollapsibleList";
 import { annotationCategoriesSelector } from "../../../../store/selectors";
 import LabelIcon from "@mui/icons-material/Label";
 

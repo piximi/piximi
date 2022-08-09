@@ -1,7 +1,6 @@
-import { Project } from "../../types/Project";
-import { ImageType } from "../../types/ImageType";
-import { SerializedProjectType } from "../../types/SerializedProjectType";
-import { UNKNOWN_CATEGORY_ID } from "../../types/Category";
+import { Project } from "types/Project";
+import { ImageType } from "types/ImageType";
+import { SerializedProjectType } from "types/SerializedProjectType";
 
 export const serializedProjectSelector = ({
   project,
@@ -9,12 +8,8 @@ export const serializedProjectSelector = ({
   project: Project;
 }): SerializedProjectType => {
   const serializedImages = project.images.map((image: ImageType) => {
-    const categoryId = image.categoryId
-      ? image.categoryId
-      : UNKNOWN_CATEGORY_ID;
-
     return {
-      imageCategoryId: categoryId,
+      imageCategoryId: image.categoryId,
       imageChannels: image.shape.channels,
       imageColors: image.colors,
       imageData: image.originalSrc,
@@ -30,12 +25,10 @@ export const serializedProjectSelector = ({
     };
   });
 
-  const categories = project.categories;
-  const name = project.name;
-
   return {
     serializedImages: serializedImages,
-    categories: categories,
-    name: name,
+    categories: project.categories,
+    annotationCategories: project.annotationCategories,
+    name: project.name,
   };
 };

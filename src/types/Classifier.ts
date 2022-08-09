@@ -6,8 +6,8 @@ import { FitOptions } from "./FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
-import { ClassifierModelProps } from "./ClassifierModelType";
-import { EvaluationResultType } from "./EvaluationResultType";
+import { ClassifierModelProps } from "./ModelType";
+import { ClassifierEvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
   compiled?: LayersModel;
@@ -42,6 +42,6 @@ export type Classifier = {
   predictions?: Tensor;
   predicted: boolean;
   trainingPercentage: number;
-  evaluationResult: EvaluationResultType;
+  evaluationResult: ClassifierEvaluationResultType;
   preprocessOptions: PreprocessOptions;
 };

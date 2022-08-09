@@ -1,12 +1,16 @@
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { Category } from "../../types/Category";
+import { Category, CategoryType } from "types/Category";
 import { useDispatch } from "react-redux";
-import { updateCategoryVisibility } from "../../store/slices";
+import {
+  setAnnotationCategoryVisibility,
+  updateCategoryVisibility,
+} from "store/slices";
 
 type HideOrShowCategoryMenuItemProps = {
   category: Category;
+  categoryType: CategoryType;
   onCloseCategoryMenu: (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>
   ) => void;
@@ -14,20 +18,30 @@ type HideOrShowCategoryMenuItemProps = {
 
 export const HideOrShowCategoryMenuItem = ({
   category,
+  categoryType,
   onCloseCategoryMenu,
 }: HideOrShowCategoryMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+  const onHideCategory = (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
+    const payload = {
+      categoryId: category.id,
+      visible: !category.visible,
+    };
+
+    if (categoryType === CategoryType.ClassifierCategory) {
+      dispatch(updateCategoryVisibility(payload));
+    } else {
+      dispatch(setAnnotationCategoryVisibility(payload));
+    }
+
     onCloseCategoryMenu(event);
-
-    const payload = { id: category.id, visible: !category.visible };
-
-    dispatch(updateCategoryVisibility(payload));
   };
 
   return (
-    <MenuItem onClick={onClick}>
+    <MenuItem onClick={onHideCategory}>
       <Typography variant="inherit">
         {category.visible ? "Hide" : "Show"} category
       </Typography>

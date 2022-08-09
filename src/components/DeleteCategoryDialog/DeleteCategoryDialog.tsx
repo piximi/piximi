@@ -1,29 +1,28 @@
-import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import { useDispatch } from "react-redux";
-import { Category } from "../../types/Category";
-import { deleteCategory } from "../../store/slices";
+import { Category, CategoryType } from "types/Category";
 import { useHotkeys } from "react-hotkeys-hook";
 
 type DeleteCategoryDialogProps = {
   category: Category;
+  categoryType: CategoryType;
+  deleteCategoryCallback: (categoryID: string) => void;
   onClose: () => void;
   open: boolean;
 };
 
 export const DeleteCategoryDialog = ({
+  categoryType,
   category,
+  deleteCategoryCallback,
   onClose,
   open,
 }: DeleteCategoryDialogProps) => {
-  const dispatch = useDispatch();
-
   const onDelete = () => {
-    dispatch(deleteCategory({ id: category.id }));
+    deleteCategoryCallback(category.id);
 
     onClose();
   };
@@ -42,7 +41,11 @@ export const DeleteCategoryDialog = ({
       <DialogTitle>Delete "{category.name}" category?</DialogTitle>
 
       <DialogContent>
-        Images categorized as "{category.name}" will not be deleted.
+        {categoryType === CategoryType.ClassifierCategory
+          ? "Images"
+          : "Annotations"}{" "}
+        categorized as "{category.name}" will not be deleted and instead will be
+        labeled as "Unknown".
       </DialogContent>
 
       <DialogActions>
