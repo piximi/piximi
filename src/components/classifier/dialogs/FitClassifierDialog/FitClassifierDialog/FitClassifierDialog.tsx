@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Dialog, DialogContent, List } from "@mui/material";
 
+import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
+
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
-import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
 
 import { AlertDialog } from "components/common/dialogs/AlertDialog/AlertDialog";
 import { PreprocessingSettingsListItem } from "components/classifier/PreprocessingSettingsListItem";

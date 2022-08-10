@@ -12,8 +12,7 @@ import { visibleImagesSelector } from "store/selectors";
 
 import { deselectImages, updateCategoryVisibility } from "store/slices";
 
-import { Category } from "types/Category";
-import { ImageType } from "types/ImageType";
+import { Category, ImageType } from "types";
 
 type CategoryListItemCheckboxProps = {
   category: Category;

@@ -3,13 +3,13 @@ import React from "react";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-import { useDialog } from "hooks";
+import { useDialog, useTranslation } from "hooks";
 
 import { CreateCategoryDialog } from "components/category/dialogs/CreateCategoryDialog";
 
 export const CreateCategoryListItem = () => {
   const { onClose, onOpen, open } = useDialog();
-
+  const t = useTranslation();
   return (
     <>
       <ListItem button onClick={onOpen}>
@@ -17,7 +17,7 @@ export const CreateCategoryListItem = () => {
           <AddIcon />
         </ListItemIcon>
 
-        <ListItemText primary="Create category" />
+        <ListItemText primary={t("Create category")} />
       </ListItem>
 
       <CreateCategoryDialog onClose={onClose} open={open} />

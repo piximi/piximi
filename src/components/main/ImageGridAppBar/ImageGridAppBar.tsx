@@ -26,7 +26,7 @@ import {
 import { useDialog } from "hooks";
 
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
-import { DeleteImagesDialog } from "components/main/DeleteImagesDialog";
+import { DeleteImagesDialog } from "components/main/dialogs/DeleteImagesDialog";
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
 import { selectedImagesSelector, visibleImagesSelector } from "store/selectors";
