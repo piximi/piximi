@@ -1,9 +1,10 @@
-import * as ReactKonva from "react-konva";
 import React from "react";
 import { useSelector } from "react-redux";
-import { pointerSelectionSelector } from "../../../../../../store/selectors/pointerSelectionSelector";
-import { toolTypeSelector } from "../../../../../../store/selectors";
-import { ToolType } from "../../../../../../types/ToolType";
+import * as ReactKonva from "react-konva";
+
+import { pointerSelectionSelector, toolTypeSelector } from "store/selectors";
+
+import { ToolType } from "types";
 
 export const PointerSelection = () => {
   const toolType = useSelector(toolTypeSelector);

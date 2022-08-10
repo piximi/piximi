@@ -1,6 +1,6 @@
 import React from "react";
 import { UploadButton } from "../UploadButton";
-import { Logo } from "../Logo";
+import { Logo } from "../Application/Logo";
 import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
 import { Slider, Toolbar, Box } from "@mui/material";

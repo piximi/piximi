@@ -1,7 +1,8 @@
-import * as ReactKonva from "react-konva";
 import React from "react";
 import { useSelector } from "react-redux";
-import { zoomSelectionSelector } from "../../../../../../store/selectors";
+import * as ReactKonva from "react-konva";
+
+import { zoomSelectionSelector } from "store/selectors";
 
 export const ZoomSelection = () => {
   const { dragging, minimum, maximum, selecting } = useSelector(

@@ -1,12 +1,16 @@
 import React from "react";
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
 import { useSelector } from "react-redux";
-import { annotationCategoriesSelector } from "store/selectors";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 import JSZip from "jszip";
-import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 import { saveAs } from "file-saver";
+
+import { MenuItem, ListItemText } from "@mui/material";
+
+import {
+  annotationCategoriesSelector,
+  annotatorImagesSelector,
+} from "store/selectors";
+
+import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

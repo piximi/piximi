@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
+
 import { SelectedAnnotation } from "../SelectedAnnotation/SelectedAnnotation";
-import { selectedAnnotationObjectsSelector } from "store/selectors/selectedAnnotationObjectsSelector";
+
+import { selectedAnnotationObjectsSelector } from "store/selectors";
 
 export const SelectedAnnotations = () => {
   const selectedAnnotationObjects = useSelector(

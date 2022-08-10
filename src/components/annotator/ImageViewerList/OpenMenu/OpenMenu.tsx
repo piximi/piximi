@@ -1,6 +1,8 @@
-import { Divider, Menu } from "@mui/material";
-import { bindMenu } from "material-ui-popup-state";
 import React from "react";
+import { bindMenu } from "material-ui-popup-state";
+
+import { Divider, Menu } from "@mui/material";
+
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
 import { OpenProjectFileMenuItem } from "./OpenProjectFileMenuItem";
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";

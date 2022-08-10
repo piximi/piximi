@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+
+import { AppBar, Box, CssBaseline } from "@mui/material";
+
+import { useUpload } from "hooks";
+
+import { ImageViewerDrawer } from "../ImageViewerList";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 import { Content } from "../Content";
-import { imageViewerSlice } from "../../../store/slices";
-import { ImageType } from "../../../types/ImageType";
 import { ImageShapeDialog } from "../ImageViewerList/OpenMenu/ImageShapeDialog";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { useUpload } from "hooks/useUpload/useUpload";
-import { ImageViewerDrawer } from "../ImageViewerList";
+
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+import { alertStateSelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { ImageType } from "types";
 
 type ImageViewerProps = {
   image?: ImageType;

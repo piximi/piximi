@@ -1,20 +1,28 @@
-import Drawer from "@mui/material/Drawer";
-import { Category, CategoryType } from "types/Category";
-import { unknownAnnotationCategorySelector } from "store/selectors";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider } from "@mui/material";
-import List from "@mui/material/List";
-import { AnnotatorHelpDrawer } from "components/common/Help";
-import { imageViewerSlice } from "store/slices";
-import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
-import { AppBarOffset } from "components/styled/AppBarOffset";
-import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
-import { CategoriesList } from "components/CategoriesList";
-import { ImageViewerAppBar } from "../ImageViewerAppBar";
+
+import { Divider, Drawer, List } from "@mui/material";
+
 import { ImageList } from "../ImageList";
-import { ClearAnnotationsListItem } from "../ClearAnnotations";
 import { OpenListItem } from "../OpenListItem";
 import { SaveListItem } from "../SaveListItem";
+import { ClearAnnotationsListItem } from "../ClearAnnotations";
+import { CategoriesList } from "components/CategoriesList";
+
+import { ImageViewerAppBar } from "../ImageViewerAppBar";
+
+import { AnnotatorHelpDrawer } from "components/common/Help";
+import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
+import { AppBarOffset } from "components/styled/AppBarOffset";
+
+import {
+  createdAnnotatorCategoriesSelector,
+  unknownAnnotationCategorySelector,
+} from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Category, CategoryType } from "types/Category";
 
 export const ImageViewerDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);

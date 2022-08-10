@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
+
+import { ListItemText, MenuItem } from "@mui/material";
+
+import { useUpload } from "hooks";
+
 import { ImageShapeDialog } from "./ImageShapeDialog";
-import { useUpload } from "hooks/useUpload/useUpload";
 
 type OpenImageMenuItemProps = {
   popupState: any;

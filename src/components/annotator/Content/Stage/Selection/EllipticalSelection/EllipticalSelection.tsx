@@ -1,9 +1,12 @@
-import { EllipticalAnnotationTool } from "../../../../../../annotator/image/Tool";
-import * as ReactKonva from "react-konva";
 import React from "react";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../store/selectors";
-import { useMarchingAnts } from "../../../../../../hooks";
+import * as ReactKonva from "react-konva";
+
+import { useMarchingAnts } from "hooks";
+
+import { stageScaleSelector } from "store/selectors";
+
+import { EllipticalAnnotationTool } from "annotator/image/Tool";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;

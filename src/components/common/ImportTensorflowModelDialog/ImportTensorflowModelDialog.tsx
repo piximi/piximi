@@ -16,7 +16,7 @@ import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { LayersModel } from "@tensorflow/tfjs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 type ImportTensorflowModelDialogProps = {
   onClose: any;

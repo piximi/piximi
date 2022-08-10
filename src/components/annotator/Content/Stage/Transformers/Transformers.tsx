@@ -1,9 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { AnnotationTool } from "../../../../../annotator/image/Tool";
-import { selectedAnnotationsIdsSelector } from "../../../../../store/selectors/selectedAnnotationsIdsSelector";
 
 import { Transformer } from "../Transformer/Transformer";
+
+import { selectedAnnotationsIdsSelector } from "store/selectors";
+
+import { AnnotationTool } from "annotator/image/Tool";
 
 type TransformersProps = {
   transformPosition: ({

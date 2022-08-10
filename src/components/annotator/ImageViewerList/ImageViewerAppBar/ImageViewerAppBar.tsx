@@ -1,4 +1,7 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
+
+import { ArrowBack } from "@mui/icons-material";
 import {
   AppBar,
   IconButton,
@@ -6,10 +9,12 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
-import { LogoIcon } from "components/Logo";
+
 import { useDialog } from "hooks";
+
 import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
+
+import { LogoIcon } from "components/Application/Logo";
 
 export const ImageViewerAppBar = () => {
   const {

@@ -1,19 +1,24 @@
-import { batch, useDispatch } from "react-redux";
 import React from "react";
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
-import { SerializedFileType } from "types/SerializedFileType";
-import { ToolType } from "types/ToolType";
+import { batch, useDispatch } from "react-redux";
+
+import { MenuItem, ListItemText } from "@mui/material";
+
 import {
   imageViewerSlice,
   setActiveImage,
   setAnnotationCategories,
   setOperation,
 } from "store/slices";
-import { UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
+
+import {
+  AnnotationType,
+  SerializedFileType,
+  SerializedAnnotationType,
+  ToolType,
+  UNKNOWN_ANNOTATION_CATEGORY,
+} from "types";
+
 import { importSerializedAnnotations } from "image/imageHelper";
-import { AnnotationType } from "types/AnnotationType";
-import { SerializedAnnotationType } from "types/SerializedAnnotationType";
 
 type OpenAnnotationsMenuItemProps = {
   popupState: any;

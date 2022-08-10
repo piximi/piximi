@@ -5,7 +5,7 @@ import { Dialog, DialogContent, List } from "@mui/material";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { useEffect, useState } from "react";
 import { AlertStateType, AlertType } from "types/AlertStateType";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";

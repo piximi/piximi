@@ -1,14 +1,16 @@
-import { Menu } from "@mui/material";
-import { bindMenu } from "material-ui-popup-state";
 import React from "react";
+import { bindMenu } from "material-ui-popup-state";
+
+import { Menu, MenuItem } from "@mui/material";
+
+import { useDialog } from "hooks";
+
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
 import { ExportAnnotationsAsMatrixMenuItem } from "./ExportAnnotationsAsMatrixMenuItem";
 import { ExportAnnotationsAsLabeledSemanticMasksMenuItem } from "./ExportAnnotationsAsLabeledSemanticMasksMenuItem";
-import MenuItem from "@mui/material/MenuItem";
 import { ExportAnnotationsAsBinarySemanticMasksMenuItem } from "./ExportAnnotationsAsBinarySemanticMasksMenuItem";
 import { ExportAnnotationsAsBinaryInstancesMenuItem } from "./ExportAnnotationsAsBinaryInstancesMenuItem";
-import { useDialog } from "hooks/useDialog/useDialog";
 
 type SaveMenuProps = {
   popupState: any;

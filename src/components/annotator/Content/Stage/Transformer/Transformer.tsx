@@ -1,30 +1,31 @@
-import * as ReactKonva from "react-konva";
 import React, { useRef, useState } from "react";
-import * as _ from "lodash";
-import { AnnotationType } from "../../../../../types/AnnotationType";
 import { useDispatch, useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../store/selectors";
 import Konva from "konva";
-import { selectedAnnotationSelector } from "../../../../../store/selectors/selectedAnnotationSelector";
-import { decode, encode } from "../../../../../annotator/image/rle";
+import * as ReactKonva from "react-konva";
+import * as _ from "lodash";
 import * as ImageJS from "image-js";
-import { selectedAnnotationsSelector } from "../../../../../store/selectors/selectedAnnotationsSelector";
-import { AnnotationModeType } from "../../../../../types/AnnotationModeType";
-import { unselectedAnnotationsSelector } from "../../../../../store/selectors/unselectedAnnotationsSelector";
 import useSound from "use-sound";
-import createAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-on.mp3";
-import { soundEnabledSelector } from "../../../../../store/selectors/soundEnabledSelector";
-import deleteAnnotationSoundEffect from "../../../../../annotator/sounds/pop-up-off.mp3";
-import { imageWidthSelector } from "../../../../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../../../../store/selectors/imageHeightSelector";
-import { cursorSelector } from "../../../../../store/selectors/cursorSelector";
+
 import {
-  imageViewerSlice,
-  setSelectedAnnotations,
-} from "../../../../../store/slices";
-import { activeImageIdSelector } from "../../../../../store/selectors/activeImageIdSelector";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
-import { AnnotationTool } from "../../../../../annotator/image/Tool";
+  activeImageIdSelector,
+  cursorSelector,
+  imageHeightSelector,
+  imageWidthSelector,
+  stageScaleSelector,
+  selectedAnnotationSelector,
+  selectedAnnotationsSelector,
+  soundEnabledSelector,
+  unselectedAnnotationsSelector,
+} from "store/selectors";
+
+import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
+
+import { AnnotationModeType, AnnotationStateType, AnnotationType } from "types";
+
+import { AnnotationTool } from "annotator/image/Tool";
+import { decode, encode } from "annotator/image/rle";
+import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 
 type box = {
   x: number;

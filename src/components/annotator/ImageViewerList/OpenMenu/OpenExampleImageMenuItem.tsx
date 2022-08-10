@@ -1,8 +1,10 @@
-import { MenuItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
-import { ExampleImageDialog } from "../ExampleImageDialog";
 import React from "react";
-import { useDialog } from "../../../../hooks";
+
+import { MenuItem, ListItemText } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { ExampleImageDialog } from "../ExampleImageDialog";
 
 type OpenExampleImageMenuItemProps = {
   popupState: any;

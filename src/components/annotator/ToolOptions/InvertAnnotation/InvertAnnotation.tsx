@@ -1,15 +1,21 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "../../../../hooks/useTranslation";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import SvgIcon from "@mui/material/SvgIcon";
-import { ReactComponent as InvertSelectionIcon } from "../../../../icons/InvertAnnotation.svg";
-import ListItemText from "@mui/material/ListItemText";
-import { imageViewerSlice } from "../../../../store/slices";
-import { useAnnotationTool } from "../../../../hooks";
-import { selectedAnnotationSelector } from "../../../../store/selectors/selectedAnnotationSelector";
+
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  SvgIcon,
+} from "@mui/material";
+
+import { useAnnotationTool, useTranslation } from "hooks";
+
+import { selectedAnnotationSelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();

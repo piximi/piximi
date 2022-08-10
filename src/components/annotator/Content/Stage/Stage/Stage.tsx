@@ -1,54 +1,63 @@
-import * as ReactKonva from "react-konva";
-import * as _ from "lodash";
-import Konva from "konva";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ToolType } from "types/ToolType";
+import { Provider, useDispatch, useSelector, useStore } from "react-redux";
+import Konva from "konva";
+import * as ReactKonva from "react-konva";
+import { KonvaEventObject } from "konva/lib/Node";
+import * as _ from "lodash";
+import useSound from "use-sound";
+import { useHotkeys } from "react-hotkeys-hook";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
 import {
+  useAnnotatorKeyboardShortcuts,
+  useAnnotationTool,
+  useCursor,
+  useHandTool,
+  usePointer,
+  useWindowFocusHandler,
+  useZoom,
+} from "hooks";
+
+import { Image } from "../Image";
+import { Selecting } from "../Selecting";
+import { Layer } from "../Layer";
+import { ZoomSelection } from "../Selection/ZoomSelection";
+import { Transformers } from "../Transformers/Transformers";
+import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
+import { Annotations } from "../Annotations/Annotations";
+import { PointerSelection } from "../Selection/PointerSelection";
+
+import {
+  activeImageIdSelector,
+  activeImagePlaneSelector,
+  annotatorImagesSelector,
+  annotationStateSelector,
+  cursorSelector,
   imageInstancesSelector,
+  scaledImageHeightSelector,
+  scaledImageWidthSelector,
+  selectedAnnotationSelector,
+  selectedAnnotationsIdsSelector,
+  selectedAnnotationsSelector,
   selectedCategorySelector,
   selectionModeSelector,
+  soundEnabledSelector,
   stageHeightSelector,
+  stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
+  unselectedAnnotationsSelector,
 } from "store/selectors";
-import { Provider, useDispatch, useSelector, useStore } from "react-redux";
-import { useAnnotationTool, useCursor, useHandTool, useZoom } from "hooks";
-import { AnnotationModeType } from "types/AnnotationModeType";
-import { Image } from "../Image";
-import { Selecting } from "../Selecting";
-import { annotationStateSelector } from "store/selectors/annotationStateSelector";
-import { AnnotationStateType } from "types/AnnotationStateType";
+
+import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
+
+import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
+
 import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
-import useSound from "use-sound";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
-import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
-import { Layer } from "../Layer";
-import { ZoomSelection } from "../Selection/ZoomSelection";
-import { useAnnotatorKeyboardShortcuts } from "hooks/useKeyboardShortcuts";
-import { selectedAnnotationSelector } from "store/selectors/selectedAnnotationSelector";
-import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
-import { Transformers } from "../Transformers/Transformers";
-import { useWindowFocusHandler } from "hooks/useWindowFocusHandler/useWindowFocusHandler";
-import { stagePositionSelector } from "store/selectors/stagePositionSelector";
-import { KonvaEventObject } from "konva/lib/Node";
-import { scaledImageWidthSelector } from "store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "store/selectors/scaledImageHeightSelector";
-import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
-import { selectedAnnotationsSelector } from "store/selectors/selectedAnnotationsSelector";
-import { Annotations } from "../Annotations/Annotations";
-import { unselectedAnnotationsSelector } from "store/selectors/unselectedAnnotationsSelector";
-import { useHotkeys } from "react-hotkeys-hook";
-import { PointerSelection } from "../Selection/PointerSelection";
-import { usePointer } from "hooks/usePointer/usePointer";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { cursorSelector } from "store/selectors/cursorSelector";
-import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
-import { activeImageIdSelector } from "store/selectors/activeImageIdSelector";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);

@@ -1,6 +1,8 @@
+import PopupState, { bindTrigger } from "material-ui-popup-state";
+
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import PopupState, { bindTrigger } from "material-ui-popup-state";
+
 import { OpenMenu } from "../OpenMenu/OpenMenu";
 
 export const OpenListItem = () => {

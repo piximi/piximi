@@ -1,23 +1,27 @@
 import React from "react";
-import Menu from "@mui/material/Menu";
-import MenuList from "@mui/material/MenuList";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
 import { batch, useDispatch, useSelector } from "react-redux";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
+
+import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
+
+import { useTranslation } from "hooks";
+
+import {
+  activeImageSelector,
+  annotationCategoriesSelector,
+  annotatorImagesSelector,
+} from "store/selectors";
+
 import { imageViewerSlice } from "store/slices";
-import { useTranslation } from "hooks/useTranslation";
+
+import { ImageType } from "types";
+
 import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "image/imageHelper";
-import { saveAs } from "file-saver";
-import JSZip from "jszip";
-import { annotationCategoriesSelector } from "store/selectors";
-import { Divider } from "@mui/material";
-import { ImageType } from "types/ImageType";
-import { activeImageSelector } from "store/selectors/activeImageSelector";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;

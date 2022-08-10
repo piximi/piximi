@@ -1,12 +1,15 @@
-import * as ReactKonva from "react-konva";
 import React, { useEffect, useState } from "react";
-import Konva from "konva";
 import { useSelector } from "react-redux";
-import { boundingClientRectSelector } from "../../../../../store/selectors";
-import { scaledImageWidthSelector } from "../../../../../store/selectors/scaledImageWidthSelector";
-import { scaledImageHeightSelector } from "../../../../../store/selectors/scaledImageHeightSelector";
-import { activeImageRenderedSrcsSelector } from "../../../../../store/selectors";
-import { activeImagePlaneSelector } from "store/selectors/activeImagePlaneSelector";
+import * as ReactKonva from "react-konva";
+import Konva from "konva";
+
+import {
+  activeImagePlaneSelector,
+  activeImageRenderedSrcsSelector,
+  scaledImageHeightSelector,
+  scaledImageWidthSelector,
+  boundingClientRectSelector,
+} from "store/selectors";
 
 export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);

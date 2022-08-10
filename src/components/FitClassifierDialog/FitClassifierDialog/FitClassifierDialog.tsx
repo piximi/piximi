@@ -19,7 +19,7 @@ import { TrainingHistoryPlot } from "../../common/TrainingHistoryPlot";
 import { ModelSummaryTable } from "../../common/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
 import { AlertStateType, AlertType } from "types/AlertStateType";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
 import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";

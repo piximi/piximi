@@ -1,9 +1,12 @@
-import * as ReactKonva from "react-konva";
 import React from "react";
-import { MagneticAnnotationTool } from "../../../../../../annotator/image/Tool";
-import { useMarchingAnts } from "../../../../../../hooks";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "../../../../../../store/selectors";
+import * as ReactKonva from "react-konva";
+
+import { useMarchingAnts } from "hooks";
+
+import { stageScaleSelector } from "store/selectors";
+
+import { MagneticAnnotationTool } from "annotator/image/Tool";
 
 type MagneticSelectionProps = {
   operator: MagneticAnnotationTool;

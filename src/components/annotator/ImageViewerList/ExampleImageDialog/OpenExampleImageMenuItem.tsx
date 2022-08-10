@@ -1,21 +1,28 @@
 import { batch, useDispatch, useSelector } from "react-redux";
+import * as ImageJS from "image-js";
+import { v4 as uuidv4 } from "uuid";
+
 import { ListItem, ListItemText, Typography } from "@mui/material";
-import {
-  convertToImage,
-  generateDefaultChannels,
-  importSerializedAnnotations,
-} from "image/imageHelper";
+
+import { annotationCategoriesSelector } from "store/selectors";
+
 import {
   imageViewerSlice,
   setActiveImage,
   setAnnotationCategories,
 } from "store/slices";
-import { SerializedFileType } from "types/SerializedFileType";
-import * as ImageJS from "image-js";
-import { v4 as uuidv4 } from "uuid";
-import { AnnotationType } from "types/AnnotationType";
-import { SerializedAnnotationType } from "types/SerializedAnnotationType";
-import { annotationCategoriesSelector } from "store/selectors";
+
+import {
+  AnnotationType,
+  SerializedAnnotationType,
+  SerializedFileType,
+} from "types";
+
+import {
+  convertToImage,
+  generateDefaultChannels,
+  importSerializedAnnotations,
+} from "image/imageHelper";
 
 type ExampleImageProject = {
   exampleImageName: string;

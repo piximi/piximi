@@ -1,9 +1,11 @@
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useTranslation } from "../../../../hooks/useTranslation";
-import { imageViewerSlice } from "../../../../store/slices";
+
+import { ListItem, ListItemText } from "@mui/material";
+
+import { useTranslation } from "hooks";
+
+import { imageViewerSlice } from "store/slices";
 
 export const ResetButton = () => {
   const dispatch = useDispatch();

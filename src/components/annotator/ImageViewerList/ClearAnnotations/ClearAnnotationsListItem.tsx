@@ -1,14 +1,21 @@
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useDialog } from "hooks";
-import { ShadowImageType } from "types/ImageType";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { unknownAnnotationCategorySelector } from "store/selectors";
-import { annotatorImagesSelector } from "store/selectors/annotatorImagesSelector";
-import { imageViewerSlice } from "store/slices";
-import { useTranslation } from "hooks/useTranslation";
+
+import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
+
+import { useDialog, useTranslation } from "hooks";
+
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
-import { selectedAnnotationsIdsSelector } from "store/selectors/selectedAnnotationsIdsSelector";
+
+import {
+  annotatorImagesSelector,
+  selectedAnnotationsIdsSelector,
+  unknownAnnotationCategorySelector,
+} from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { ShadowImageType } from "types";
 
 export const ClearAnnotationsListItem = () => {
   const dispatch = useDispatch();

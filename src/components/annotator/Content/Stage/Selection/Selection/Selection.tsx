@@ -1,4 +1,18 @@
 import React from "react";
+
+import { EllipticalSelection } from "../EllipticalSelection";
+import { LassoSelection } from "../LassoSelection";
+import { MagneticSelection } from "../MagneticSelection";
+import { ObjectSelection } from "../ObjectSelection";
+import { PolygonalSelection } from "../PolygonalSelection";
+import { RectangularSelection } from "../RectangularSelection";
+import { ColorSelection } from "../ColorSelection/ColorSelection";
+import { QuickSelection } from "../QuickSelection/QuickSelection";
+import { PenSelection } from "../PenSelection";
+import { ZoomSelection } from "../ZoomSelection";
+
+import { ToolType } from "types";
+
 import {
   ColorAnnotationTool,
   EllipticalAnnotationTool,
@@ -10,18 +24,7 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   Tool,
-} from "../../../../../../annotator/image/Tool";
-import { EllipticalSelection } from "../EllipticalSelection";
-import { ToolType } from "../../../../../../types/ToolType";
-import { LassoSelection } from "../LassoSelection";
-import { MagneticSelection } from "../MagneticSelection";
-import { ObjectSelection } from "../ObjectSelection";
-import { PolygonalSelection } from "../PolygonalSelection";
-import { RectangularSelection } from "../RectangularSelection";
-import { ColorSelection } from "../ColorSelection/ColorSelection";
-import { QuickSelection } from "../QuickSelection/QuickSelection";
-import { PenSelection } from "../PenSelection";
-import { ZoomSelection } from "../ZoomSelection";
+} from "annotator/image/Tool";
 
 type SelectionProps = {
   tool?: Tool;

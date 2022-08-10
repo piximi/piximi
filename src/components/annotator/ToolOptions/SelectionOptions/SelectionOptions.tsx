@@ -1,9 +1,13 @@
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import { Typography } from "@mui/material";
+
+import {
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
+
 import { SampleList } from "../SampleList";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
