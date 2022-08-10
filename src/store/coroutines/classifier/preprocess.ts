@@ -252,7 +252,8 @@ export const cropResize = async (
 
 export const sampleGenerator = (
   images: Array<ImageType>,
-  categories: Array<Category>
+  categories: Array<Category>,
+  channels: number
 ) => {
   const count = images.length;
 
@@ -271,7 +272,7 @@ export const sampleGenerator = (
       });
 
       const src =
-        image.shape.channels === 1 || image.shape.channels === 3
+        channels === 1 || channels === 3
           ? image.src
           : image.originalSrc[image.activePlane];
 
@@ -469,7 +470,9 @@ export const preprocess = async (
   }
 
   let imageData = tensorflow.data
-    .generator(sampleGenerator(multipliedImages, categories))
+    .generator(
+      sampleGenerator(multipliedImages, categories, inputShape.channels)
+    )
     .map(decodeCategory(categories.length))
     .mapAsync(
       decodeImage.bind(

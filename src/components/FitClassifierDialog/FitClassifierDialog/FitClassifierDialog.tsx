@@ -1,8 +1,8 @@
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
-import { OptimizerSettingsListItem } from "../OptimizerSettingsListItem/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "../DatasetSettingsListItem/DatasetSettingsListItem";
+import { OptimizerSettingsListItem } from "../../common/OptimizerSettingsListItem/OptimizerSettingsListItem";
+import { DatasetSettingsListItem } from "../../common/DatasetSettingsListItem/DatasetSettingsListItem";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../store/slices";
+import { classifierSlice } from "store/slices";
 import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
@@ -10,15 +10,20 @@ import { DialogTransition } from "../../DialogTransition";
 import {
   categorizedImagesSelector,
   compiledSelector,
-} from "../../../store/selectors";
+  compileOptionsSelector,
+  fitOptionsSelector,
+  trainingPercentageSelector,
+} from "store/selectors";
 import { useEffect, useState } from "react";
-import { TrainingHistoryPlot } from "../TrainingHistoryPlot/TrainingHistoryPlot";
-import { ModelSummaryTable } from "./ModelSummary/ModelSummary";
+import { TrainingHistoryPlot } from "../../common/TrainingHistoryPlot";
+import { ModelSummaryTable } from "../../common/ModelSummary";
 import { epochsSelector } from "store/selectors/epochsSelector";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { AlertDialog } from "components/AlertDialog/AlertDialog";
 import { alertStateSelector } from "store/selectors/alertStateSelector";
 import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+import { LossFunction } from "types/LossFunction";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -57,7 +62,50 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
 
+  const compileOptions = useSelector(compileOptionsSelector);
+  const fitOptions = useSelector(fitOptionsSelector);
   const epochs = useSelector(epochsSelector);
+  const trainingPercentage = useSelector(trainingPercentageSelector);
+
+  const dispatchBatchSizeCallback = (batchSize: number) => {
+    dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
+  };
+
+  const dispatchLearningRateCallback = (learningRate: number) => {
+    dispatch(
+      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
+    );
+  };
+
+  const dispatchEpochsCallback = (epochs: number) => {
+    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
+  };
+
+  const dispatchOptimizationAlgorithmCallback = (
+    optimizationAlgorithm: OptimizationAlgorithm
+  ) => {
+    dispatch(
+      classifierSlice.actions.updateOptimizationAlgorithm({
+        optimizationAlgorithm: optimizationAlgorithm,
+      })
+    );
+  };
+
+  const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
+    dispatch(
+      classifierSlice.actions.updateLossFunction({
+        lossFunction: lossFunction,
+      })
+    );
+  };
+
+  const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
+    dispatch(
+      classifierSlice.actions.updateTrainingPercentage({
+        trainingPercentage: trainPercentage,
+      })
+    );
+  };
 
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
@@ -162,9 +210,24 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
           <ArchitectureSettingsListItem />
 
-          <OptimizerSettingsListItem />
+          <OptimizerSettingsListItem
+            compileOptions={compileOptions}
+            dispatchLossFunctionCallback={dispatchLossFunctionCallback}
+            dispatchOptimizationAlgorithmCallback={
+              dispatchOptimizationAlgorithmCallback
+            }
+            dispatchEpochsCallback={dispatchEpochsCallback}
+            fitOptions={fitOptions}
+            dispatchBatchSizeCallback={dispatchBatchSizeCallback}
+            dispatchLearningRateCallback={dispatchLearningRateCallback}
+          />
 
-          <DatasetSettingsListItem />
+          <DatasetSettingsListItem
+            trainingPercentage={trainingPercentage}
+            dispatchTrainingPercentageCallback={
+              dispatchTrainingPercentageCallback
+            }
+          />
         </List>
 
         {showPlots && (

@@ -1,8 +1,8 @@
-import { AnnotationType } from "../../types/AnnotationType";
-import { Category } from "../../types/Category";
-import { ImageType, ShadowImageType } from "../../types/ImageType";
-import { SerializedFileType } from "../../types/SerializedFileType";
-import { ImageViewer } from "../../types/ImageViewer";
+import { AnnotationType } from "types/AnnotationType";
+import { Category } from "types/Category";
+import { ImageType, ShadowImageType } from "types/ImageType";
+import { SerializedFileType } from "types/SerializedFileType";
+import { ImageViewer } from "types/ImageViewer";
 import { Project } from "types/Project";
 
 export const allSerializedAnnotationsSelector = ({
@@ -15,13 +15,7 @@ export const allSerializedAnnotationsSelector = ({
   if (!imageViewer.images.length) return [];
 
   return imageViewer.images.map((shadowImage: ShadowImageType) => {
-    /*
-      get full images from project by id if they exist there,
-      else get full image from imageViewer
-    */
-    const image =
-      project.images.find((im: ImageType) => im.id === shadowImage.id) ||
-      (shadowImage as ImageType);
+    const image = shadowImage as ImageType;
 
     const columns = {
       imageChannels: image.shape.channels,
@@ -38,11 +32,13 @@ export const allSerializedAnnotationsSelector = ({
 
     const serializedAnnotations = image.annotations.map(
       (annotation: AnnotationType) => {
-        const index = imageViewer.categories.findIndex((category: Category) => {
-          return category.id === annotation.categoryId;
-        });
+        const index = project.annotationCategories.findIndex(
+          (category: Category) => {
+            return category.id === annotation.categoryId;
+          }
+        );
 
-        const category = imageViewer.categories[index];
+        const category = project.annotationCategories[index];
 
         return {
           annotationBoundingBoxHeight: annotation.boundingBox[3],

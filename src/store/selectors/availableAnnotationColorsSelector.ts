@@ -1,13 +1,13 @@
-import { ImageViewer } from "types/ImageViewer";
+import { Project } from "types/Project";
 import { Category } from "types/Category";
 import { COLORS } from "colorPalette";
 
 export const availableAnnotationColorsSelector = ({
-  imageViewer,
+  project,
 }: {
-  imageViewer: ImageViewer;
+  project: Project;
 }): string[] => {
-  const usedColors = imageViewer.categories.map((category: Category) => {
+  const usedColors = project.annotationCategories.map((category: Category) => {
     return category.color;
   });
   return COLORS.filter((color: string) => !usedColors.includes(color));

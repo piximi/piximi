@@ -2,13 +2,13 @@ import { AnnotationType } from "../../types/AnnotationType";
 import { Category, UNKNOWN_ANNOTATION_CATEGORY } from "types/Category";
 import { createSelector } from "@reduxjs/toolkit";
 import { activeImageSelector } from "./activeImageSelector";
-import { annotatorCategoriesSelector } from "./annotatorCategoriesSelector";
+import { annotationCategoriesSelector } from "./annotatorCategoriesSelector";
 import { selectedAnnotationsSelector } from "./selectedAnnotationsSelector";
 
 export const selectedAnnotationObjectsSelector = createSelector(
   [
     activeImageSelector,
-    annotatorCategoriesSelector,
+    annotationCategoriesSelector,
     selectedAnnotationsSelector,
   ],
   (activeImage, categories, selectedAnnotations) => {

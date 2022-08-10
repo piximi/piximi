@@ -17,13 +17,20 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { createGitHubIssue } from "utils/createGitHubIssue";
-import { SaveClassifierDialog } from "components/SaveClassifierDialog/SaveClassifierDialog";
 import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
 import { useDialog } from "hooks/useDialog/useDialog";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { SaveAnnotationProjectDialog } from "components/annotator/CategoriesList/SaveMenu/SaveAnnotationProjectDialog";
+import { SaveAnnotationProjectDialog } from "components/annotator/ImageViewerList/SaveMenu/SaveAnnotationProjectDialog";
 import StackTrace from "stacktrace-js";
+import { useSelector } from "react-redux";
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { selectedModelSelector } from "store/selectors/selectedModelSelector";
+import { SaveFittedModelDialog } from "components/SaveFittedModelDialog";
+import {
+  fittedSegmentationModelSelector,
+  segmentationArchitectureOptionsSelector,
+} from "store/selectors/segmenter";
 
 const popupState = {
   close: () => {},
@@ -70,6 +77,22 @@ export const FallBackDialog = (props: any) => {
     onOpen: onSaveClassifierDialogOpen,
     open: openSaveClassifierDialog,
   } = useDialog();
+
+  const {
+    onClose: onSaveSegmenterDialogClose,
+    onOpen: onSaveSegmenterDialogOpen,
+    open: openSaveSegmenterDialog,
+  } = useDialog();
+
+  const fittedClassifierModel = useSelector(fittedSelector);
+  const selectedClassifierModelProps = useSelector(selectedModelSelector);
+  const fittedClassifier = fittedClassifierModel ? true : false;
+
+  const fittedSegmenterModel = useSelector(fittedSegmentationModelSelector);
+  const selectedSegmenterModelProps = useSelector(
+    segmentationArchitectureOptionsSelector
+  ).selectedModel;
+  const fittedSegmenter = fittedSegmenterModel ? true : false;
 
   const errorState: AlertStateType = {
     alertType: AlertType.Error,
@@ -195,9 +218,16 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-          <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
-            Save classifier
-          </Button>
+          {fittedClassifier && (
+            <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
+              Save classifier
+            </Button>
+          )}
+          {fittedSegmenter && (
+            <Button variant="outlined" onClick={onSaveSegmenterDialogOpen}>
+              Save segmenter
+            </Button>
+          )}
           {inAnnotator && (
             <Button
               variant="outlined"
@@ -214,9 +244,21 @@ export const FallBackDialog = (props: any) => {
           popupState={popupState}
         />
 
-        <SaveClassifierDialog
+        <SaveFittedModelDialog
+          fittedModel={fittedClassifierModel}
+          modelProps={selectedClassifierModelProps}
+          modelTypeString={"Classifier"}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
+          popupState={popupState}
+        />
+
+        <SaveFittedModelDialog
+          fittedModel={fittedSegmenterModel}
+          modelProps={selectedSegmenterModelProps}
+          modelTypeString={"Segmenter"}
+          onClose={onSaveSegmenterDialogClose}
+          open={openSaveSegmenterDialog}
           popupState={popupState}
         />
 

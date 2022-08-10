@@ -1,46 +1,70 @@
 import { CollapsibleList } from "../CollapsibleList";
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { CategoryListItem } from "../CategoryListItem";
-import { Category } from "../../types/Category";
+import { Category, CategoryType } from "types/Category";
 import { CreateCategoryListItem } from "../CreateCategoryListItem";
-import {
-  createdCategoriesSelector,
-  unknownCategorySelector,
-} from "../../store/selectors";
-import { predictedSelector } from "store/selectors/predictedSelector";
 import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
+import { DeleteAllCategoriesMenuItem } from "components/DeleteAllCategoriesMenuItem";
 
-export const CategoriesList = () => {
-  const categories = useSelector(createdCategoriesSelector);
-  const unknownCategory = useSelector(unknownCategorySelector);
+type CategoriesListProps = {
+  createdCategories: Array<Category>;
+  categoryType: CategoryType;
+  unknownCategory: Category;
+  predicted: boolean;
+  onCategoryClickCallBack: (category: Category) => void;
+};
 
-  const predicted = useSelector(predictedSelector);
+export const CategoriesList = (props: CategoriesListProps) => {
+  const {
+    createdCategories: categories,
+    categoryType,
+    unknownCategory,
+    predicted,
+    onCategoryClickCallBack,
+  } = props;
+
   const [showPredictionVisibilityMenu, setShowPredictionVisibilityMenu] =
+    React.useState<boolean>(true);
+
+  const [showDeleteAllCategoriesIcon, setShowDeleteAllCategoriesIcon] =
     React.useState<boolean>(true);
 
   useEffect(() => {
     setShowPredictionVisibilityMenu(predicted);
   }, [predicted]);
 
+  useEffect(() => {
+    setShowDeleteAllCategoriesIcon(categories.length > 0);
+  }, [categories]);
+
   return (
     <CollapsibleList primary="Categories">
       <CategoryListItem
+        categoryType={categoryType}
         category={unknownCategory}
         key={unknownCategory.id}
         id={unknownCategory.id}
+        onCategoryClickCallBack={onCategoryClickCallBack}
       />
       {categories.map((category: Category) => {
         return (
           <CategoryListItem
+            categoryType={categoryType}
             category={category}
             key={category.id}
             id={category.id}
+            onCategoryClickCallBack={onCategoryClickCallBack}
           />
         );
       })}
+
       {showPredictionVisibilityMenu && <PredictionVisibility />}
-      <CreateCategoryListItem />
+
+      <CreateCategoryListItem categoryType={categoryType} />
+
+      {showDeleteAllCategoriesIcon && (
+        <DeleteAllCategoriesMenuItem categoryType={categoryType} />
+      )}
     </CollapsibleList>
   );
 };

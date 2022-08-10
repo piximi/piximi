@@ -1,16 +1,18 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 import { ListItemText, MenuItem } from "@mui/material";
 import {
   applicationSlice,
   classifierSlice,
   projectSlice,
-} from "../../store/slices";
+  segmenterSlice,
+} from "store/slices";
 import { SerializedProjectType } from "types/SerializedProjectType";
 import { Classifier } from "types/Classifier";
 import { deserializeImages } from "image/imageHelper";
 import { AlertStateType, AlertType } from "types/AlertStateType";
 import { ImageType } from "types/ImageType";
+import { SegmenterStoreType } from "types/SegmenterStoreType";
 
 type OpenProjectMenuItemProps = {
   popupState: any;
@@ -41,10 +43,12 @@ export const OpenProjectMenuItem = ({
         var images: Array<ImageType>;
         var project: SerializedProjectType;
         var classifier: Classifier;
+        var segmenter: SegmenterStoreType;
         try {
           const projectJSON = JSON.parse(event.target.result as string);
           project = projectJSON.project;
           classifier = projectJSON.classifier;
+          segmenter = projectJSON.segmenter;
           images = await deserializeImages(project.serializedImages);
         } catch (err) {
           const error: Error = err as Error;
@@ -60,23 +64,30 @@ export const OpenProjectMenuItem = ({
         }
 
         try {
-          dispatch(applicationSlice.actions.clearSelectedImages());
+          batch(() => {
+            dispatch(applicationSlice.actions.clearSelectedImages());
 
-          //Open project
-          dispatch(
-            projectSlice.actions.openProject({
-              images: images,
-              categories: project.categories,
-              name: project.name,
-            })
-          );
+            dispatch(
+              projectSlice.actions.openProject({
+                images: images,
+                categories: project.categories,
+                annotationCategories: project.annotationCategories,
+                name: project.name,
+              })
+            );
 
-          //Open Classifier options
-          dispatch(
-            classifierSlice.actions.setClassifier({
-              classifier: classifier,
-            })
-          );
+            dispatch(
+              classifierSlice.actions.setClassifier({
+                classifier: classifier,
+              })
+            );
+
+            dispatch(
+              segmenterSlice.actions.setSegmenter({
+                segmenter: segmenter,
+              })
+            );
+          });
         } catch (err) {
           const error: Error = err as Error;
           const warning: AlertStateType = {

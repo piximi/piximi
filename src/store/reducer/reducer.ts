@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import {
   imageViewerSlice,
   classifierSlice,
+  segmenterSlice,
   projectSlice,
   applicationSlice,
   toolOptionsSlice,
@@ -9,6 +10,7 @@ import {
 
 const reducers = {
   classifier: classifierSlice.reducer,
+  segmenter: segmenterSlice.reducer,
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
   settings: applicationSlice.reducer,

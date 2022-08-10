@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ColorIcon } from "../ColorIcon";
-import { Category } from "../../types/Category";
-import { updateCategory } from "../../store/slices";
+import { Category, CategoryType } from "../../types/Category";
+import { updateAnnotationCategory, updateCategory } from "../../store/slices";
 import {
   Button,
   Dialog,
@@ -16,12 +16,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 type EditCategoryDialogProps = {
   category: Category;
+  categoryType: CategoryType;
   onClose: () => void;
   open: boolean;
 };
 
 export const EditCategoryDialog = ({
   category,
+  categoryType,
   onClose,
   open,
 }: EditCategoryDialogProps) => {
@@ -40,13 +42,23 @@ export const EditCategoryDialog = ({
   };
 
   const onEdit = () => {
-    dispatch(
-      updateCategory({
-        id: category.id,
-        name: name,
-        color: color,
-      })
-    );
+    if (categoryType === CategoryType.ClassifierCategory) {
+      dispatch(
+        updateCategory({
+          id: category.id,
+          name: name,
+          color: color,
+        })
+      );
+    } else {
+      dispatch(
+        updateAnnotationCategory({
+          id: category.id,
+          name: name,
+          color: color,
+        })
+      );
+    }
 
     onClose();
   };

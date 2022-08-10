@@ -1,10 +1,17 @@
 import React from "react";
 import { CreateCategoryDialog } from "../CreateCategoryDialog";
-import { useDialog } from "../../hooks";
+import { useDialog } from "hooks";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { CategoryType } from "types/Category";
 
-export const CreateCategoryListItem = () => {
+type CreateCategoryListItemProps = {
+  categoryType: CategoryType;
+};
+
+export const CreateCategoryListItem = (props: CreateCategoryListItemProps) => {
+  const { categoryType } = props;
+
   const { onClose, onOpen, open } = useDialog();
 
   return (
@@ -17,7 +24,11 @@ export const CreateCategoryListItem = () => {
         <ListItemText primary="Create category" />
       </ListItem>
 
-      <CreateCategoryDialog onClose={onClose} open={open} />
+      <CreateCategoryDialog
+        categoryType={categoryType}
+        onClose={onClose}
+        open={open}
+      />
     </>
   );
 };

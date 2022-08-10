@@ -6,6 +6,7 @@ import {
 } from "../ClassifierListItems";
 import {
   Collapse,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -14,11 +15,23 @@ import {
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useSelector } from "react-redux";
-import { fittedSelector } from "../../store/selectors/fittedSelector";
-import { trainingFlagSelector } from "../../store/selectors/trainingFlagSelector";
+import { fittedSelector } from "store/selectors/fittedSelector";
+import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+import { CategoriesList } from "components/CategoriesList";
+import {
+  createdCategoriesSelector,
+  unknownCategorySelector,
+} from "store/selectors";
+import { predictedSelector } from "store/selectors/predictedSelector";
+import { Category, CategoryType } from "types/Category";
 
 export const ClassifierList = () => {
-  const [collapsed, setCollapsed] = React.useState(false);
+  const categories = useSelector(createdCategoriesSelector);
+  const unknownCategory = useSelector(unknownCategorySelector);
+
+  const predicted = useSelector(predictedSelector);
+
+  const [collapsed, setCollapsed] = React.useState(true);
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] = React.useState<string>(
@@ -48,6 +61,8 @@ export const ClassifierList = () => {
     setCollapsed(!collapsed);
   };
 
+  const onCategoryClickCallBack = (category: Category) => {};
+
   return (
     <List dense>
       <ListItem button dense onClick={onCollapseClick}>
@@ -59,6 +74,16 @@ export const ClassifierList = () => {
       </ListItem>
 
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
+        <CategoriesList
+          createdCategories={categories}
+          unknownCategory={unknownCategory}
+          predicted={predicted}
+          categoryType={CategoryType.ClassifierCategory}
+          onCategoryClickCallBack={onCategoryClickCallBack}
+        />
+
+        <Divider />
+
         <List component="div" dense disablePadding>
           <FitClassifierListItem />
 

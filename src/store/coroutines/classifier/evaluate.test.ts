@@ -13,7 +13,7 @@ import { Shape } from "../../../types/Shape";
 import { RescaleOptions } from "../../../types/RescaleOptions";
 import { generateDefaultChannels } from "../../../image/imageHelper";
 import { preprocess } from "store/coroutines/classifier/preprocess";
-import { EvaluationResultType } from "types/EvaluationResultType";
+import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { FitOptions } from "types/FitOptions";
 import { CropOptions, CropSchema } from "types/CropOptions";
@@ -225,7 +225,7 @@ it("evaluate", async () => {
     return res;
   });
 
-  const result = profile.result as EvaluationResultType;
+  const result = profile.result as ClassifierEvaluationResultType;
 
   // console.log(`newBytes: ${profile.newBytes}`);
   // console.log(`newTensors: ${profile.newTensors}`);

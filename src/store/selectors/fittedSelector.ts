@@ -5,6 +5,6 @@ export const fittedSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): LayersModel => {
-  return classifier.fitted!;
+}): LayersModel | undefined => {
+  return classifier.fitted;
 };

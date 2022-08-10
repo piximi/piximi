@@ -10,9 +10,10 @@ import {
   TextField,
 } from "@mui/material";
 import saveAs from "file-saver";
-import { classifierSelector } from "../../store/selectors";
-import { serializedProjectSelector } from "../../store/selectors/serializedProjectSelector";
+import { classifierSelector } from "store/selectors";
+import { serializedProjectSelector } from "store/selectors/serializedProjectSelector";
 import { useHotkeys } from "react-hotkeys-hook";
+import { segmenterSelector } from "store/selectors/segmenter";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -27,6 +28,8 @@ export const SaveProjectDialog = ({
 }: SaveProjectDialogProps) => {
   const classifier = useSelector(classifierSelector);
 
+  const segmenter = useSelector(segmenterSelector);
+
   const serializedProject = useSelector(serializedProjectSelector);
 
   const [projectName, setProjectName] = useState<string>(
@@ -36,6 +39,7 @@ export const SaveProjectDialog = ({
   const onSaveProjectClick = () => {
     const part = {
       classifier: classifier,
+      segmenter: segmenter,
       project: serializedProject,
       version: "0.0.0",
     };
