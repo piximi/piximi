@@ -1,9 +1,13 @@
 import React from "react";
-import { CreateCategoryDialog } from "../CreateCategoryDialog";
-import { useDialog } from "hooks";
+
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { CategoryType } from "types/Category";
+
+import { useDialog } from "hooks";
+
+import { CreateCategoryDialog } from "../CreateCategoryDialog";
+
+import { CategoryType } from "types";
 
 type CreateCategoryListItemProps = {
   categoryType: CategoryType;

@@ -1,12 +1,15 @@
-import { FileList } from "../FileList";
-import { ClassifierList } from "../ClassifierList";
-import { ApplicationList } from "../ApplicationList";
 import React from "react";
+
 import { Divider, Drawer } from "@mui/material";
+
+import { MainList } from "../MainList";
+
+import { FileList } from "components/FileList";
+import { ClassifierList } from "components/ClassifierList";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 import { SegmenterList } from "components/segmenter/SegmenterList/SegmenterList";
 
-export const ApplicationDrawer = () => {
+export const MainDrawer = () => {
   return (
     <Drawer
       anchor="left"
@@ -35,7 +38,7 @@ export const ApplicationDrawer = () => {
 
       <Divider />
 
-      <ApplicationList />
+      <MainList />
     </Drawer>
   );
 };

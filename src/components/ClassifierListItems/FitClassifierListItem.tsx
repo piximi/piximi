@@ -1,11 +1,18 @@
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
+import {
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+
+import {
+  ScatterPlot as ScatterPlotIcon,
+  Settings as SettingsIcon,
+} from "@mui/icons-material";
+
+import { useDialog } from "hooks";
+
 import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
-import { IconButton } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { useDialog } from "hooks/useDialog/useDialog";
 
 export const FitClassifierListItem = () => {
   const { onClose, onOpen, open } = useDialog(false);

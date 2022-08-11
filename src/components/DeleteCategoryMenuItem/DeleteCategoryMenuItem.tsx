@@ -1,16 +1,16 @@
 import React from "react";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
-import {
-  Category,
-  CategoryType,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-} from "types/Category";
-import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
-import { useDialog } from "hooks";
 import { batch, useDispatch, useSelector } from "react-redux";
+
+import { MenuItem, Typography } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
+
 import { imagesSelector } from "store/selectors";
 import { imageViewerSlice, projectSlice } from "store/slices";
+
+import { Category, CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
 type DeleteCategoryMenuItemProps = {
   category: Category;

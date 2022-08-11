@@ -1,14 +1,19 @@
 import React from "react";
-import { UploadButton } from "../UploadButton";
-import { Logo } from "../Application/Logo";
-import { applicationSlice } from "../../store/slices";
 import { useDispatch } from "react-redux";
+
 import { Slider, Toolbar, Box } from "@mui/material";
-import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import {
+  ZoomOut as ZoomOutIcon,
+  ZoomIn as ZoomInIcon,
+} from "@mui/icons-material";
+
+import { UploadButton } from "components/UploadButton";
+import { Logo } from "components/Application/Logo";
 import { ImageSortSelection } from "components/ImageSortSelection/ImageSortSelection";
 
-export const ApplicationToolbar = () => {
+import { applicationSlice } from "store/slices";
+
+export const MainToolbar = () => {
   const dispatch = useDispatch();
   const [value, setValue] = React.useState<number>(1);
 

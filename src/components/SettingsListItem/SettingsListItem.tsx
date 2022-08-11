@@ -1,8 +1,11 @@
 import React from "react";
-import { SettingsDialog } from "../SettingsDialog";
-import { useDialog } from "../../hooks";
+
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+
+import { useDialog } from "hooks";
+
+import { SettingsDialog } from "../SettingsDialog";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialog();

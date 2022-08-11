@@ -1,10 +1,12 @@
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import AddIcon from "@mui/icons-material/Add";
-import ListItemText from "@mui/material/ListItemText";
 import React from "react";
+
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
+import AddIcon from "@mui/icons-material/Add";
+
+import { useDialog } from "hooks";
+
 import { NewProjectDialog } from "../NewProjectDialog";
-import { useDialog } from "../../hooks";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialog();

@@ -1,14 +1,6 @@
+import { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ImageType } from "../../types/ImageType";
-import {
-  selectedImagesSelector,
-  visibleImagesSelector,
-  imageSelectionColorSelector,
-  imageSelectionSizeSelector,
-} from "../../store/selectors";
-import { tileSizeSelector } from "../../store/selectors/tileSizeSelector";
-import { applicationSlice } from "../../store/slices";
-import { ImageGridAppBar } from "../ImageGridAppBar";
+
 import {
   Container,
   ImageList,
@@ -16,9 +8,24 @@ import {
   ImageListItemBar,
   Box,
 } from "@mui/material";
+
+import { useDndFileDrop } from "hooks";
+
 import { ImageIconLabel } from "./ImageIconLabel";
-import { memo } from "react";
-import { useDndFileDrop } from "hooks/useDndFileDrop/useDndFileDrop";
+
+import { ImageGridAppBar } from "../ImageGridAppBar";
+
+import {
+  imageSelectionColorSelector,
+  imageSelectionSizeSelector,
+  selectedImagesSelector,
+  tileSizeSelector,
+  visibleImagesSelector,
+} from "store/selectors";
+
+import { applicationSlice } from "store/slices";
+
+import { ImageType } from "types";
 
 type ImageGridProps = {
   onDrop: (files: FileList) => void;

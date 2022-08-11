@@ -1,10 +1,14 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import { Category, CategoryType } from "types/Category";
 import { useHotkeys } from "react-hotkeys-hook";
+
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+
+import { Category, CategoryType } from "types";
 
 type DeleteCategoryDialogProps = {
   category: Category;

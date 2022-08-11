@@ -1,11 +1,15 @@
 import React from "react";
-import { ApplicationToolbar } from "../ApplicationToolbar";
-import { AppBar, Box } from "@mui/material";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { useSelector } from "react-redux";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
 
-export const ApplicationAppBar = () => {
+import { AppBar, Box } from "@mui/material";
+
+import { MainToolbar } from "../MainToolbar";
+
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+import { alertStateSelector } from "store/selectors";
+
+export const MainAppBar = () => {
   const alertState = useSelector(alertStateSelector);
 
   return (
@@ -18,7 +22,7 @@ export const ApplicationAppBar = () => {
         color="inherit"
         position="fixed"
       >
-        <ApplicationToolbar />
+        <MainToolbar />
 
         {alertState.visible && <AlertDialog alertState={alertState} />}
       </AppBar>

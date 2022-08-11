@@ -1,14 +1,19 @@
-import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
-import { bindMenu } from "material-ui-popup-state";
-import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { ImportTensorflowModelDialog } from "../common/ImportTensorflowModelDialog";
-import { useDialog } from "hooks";
-import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
+import React from "react";
 import { useDispatch } from "react-redux";
-import { classifierSlice, segmenterSlice } from "store/slices";
-import { Shape } from "types/Shape";
-import { ModelType } from "types/ModelType";
+import { bindMenu } from "material-ui-popup-state";
 import { LayersModel } from "@tensorflow/tfjs";
+
+import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
+
+import { useDialog } from "hooks";
+
+import { OpenProjectMenuItem } from "components/OpenProjectMenuItem";
+import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
+import { OpenExampleClassifierDialog } from "components/OpenExampleProjectDialog/OpenExampleProjectDialog";
+
+import { classifierSlice, segmenterSlice } from "store/slices";
+
+import { ModelType, Shape } from "types";
 
 type OpenMenuProps = {
   popupState: any;

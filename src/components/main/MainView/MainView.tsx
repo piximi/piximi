@@ -1,19 +1,27 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { ApplicationDrawer } from "../../ApplicationDrawer";
-import { ImageGrid } from "../../ImageGrid";
-import { ApplicationAppBar } from "../../ApplicationAppBar";
-import { Box, CssBaseline } from "@mui/material";
-import { ImageShapeDialog } from "../../annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
-import { applicationSlice } from "store/slices/applicationSlice";
-import { useHotkeys } from "react-hotkeys-hook";
 import { useDispatch, useSelector } from "react-redux";
-import { visibleImagesSelector } from "store/selectors";
-import { ImageType } from "../../../types/ImageType";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ErrorBoundary } from "react-error-boundary";
-import { AlertType } from "types/AlertStateType";
+
+import { Box, CssBaseline } from "@mui/material";
+
+import { useUpload } from "hooks";
+
+import { MainDrawer } from "../MainDrawer";
+import { ImageGrid } from "components/ImageGrid";
+import { MainAppBar } from "../MainAppBar";
+
+import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
-import { getStackTraceFromError } from "utils/getStackTrace";
-import { useUpload } from "hooks/useUpload/useUpload";
+
+import { visibleImagesSelector } from "store/selectors";
+
+import { applicationSlice } from "store/slices";
+
+import { AlertType, ImageType } from "types";
+
+import { getStackTraceFromError } from "utils";
 
 export const MainView = () => {
   const dispatch = useDispatch();
@@ -112,9 +120,9 @@ export const MainView = () => {
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
 
-            <ApplicationAppBar />
+            <MainAppBar />
 
-            <ApplicationDrawer />
+            <MainDrawer />
 
             <ImageGrid onDrop={onDrop} />
 

@@ -1,9 +1,12 @@
-import { HelpTopic } from "../HelpContent/HelpContent";
-import HelpDrawer, { FallBackHelpDrawer } from "./HelpDrawer";
-import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";
+import { ErrorBoundary } from "react-error-boundary";
+
+import HelpDrawer, { FallBackHelpDrawer } from "./HelpDrawer";
+import { HelpTopic } from "../HelpContent/HelpContent";
+
 import { applicationSlice } from "store/slices";
-import { AlertType } from "types/AlertStateType";
+
+import { AlertType } from "types";
 
 export const ClassifierHelpDrawer = () => {
   const dispatch = useDispatch();

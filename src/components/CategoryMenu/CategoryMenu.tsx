@@ -1,16 +1,20 @@
 import React from "react";
+
+import { Divider, Menu, MenuList } from "@mui/material";
+
+import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
+import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
+
+import { DeleteCategoryMenuItem } from "components/DeleteCategoryMenuItem";
+import { EditCategoryMenuItem } from "components/EditCategoryMenuItem";
+import { ClearAnnotationMenuItem } from "components/ClearCategoryMenuItem";
+
 import {
   Category,
   CategoryType,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_CATEGORY_ID,
-} from "types/Category";
-import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
-import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
-import { Divider, Menu, MenuList } from "@mui/material";
-import { DeleteCategoryMenuItem } from "components/DeleteCategoryMenuItem";
-import { EditCategoryMenuItem } from "components/EditCategoryMenuItem";
-import { ClearAnnotationMenuItem } from "components/ClearCategoryMenuItem";
+} from "types";
 
 type CategoryMenuProps = {
   anchorElCategoryMenu: any;

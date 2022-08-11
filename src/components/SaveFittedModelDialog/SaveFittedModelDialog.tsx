@@ -1,4 +1,7 @@
 import { ChangeEvent, useState } from "react";
+import { LayersModel } from "@tensorflow/tfjs";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -8,9 +11,8 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { useHotkeys } from "react-hotkeys-hook";
-import { SegmenterModelProps, ClassifierModelProps } from "types/ModelType";
-import { LayersModel } from "@tensorflow/tfjs";
+
+import { SegmenterModelProps, ClassifierModelProps } from "types";
 
 type SaveFittedModelDialogProps = {
   modelProps: ClassifierModelProps | SegmenterModelProps;

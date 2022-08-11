@@ -1,4 +1,7 @@
 import React from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import * as tf from "@tensorflow/tfjs";
+
 import {
   Button,
   Dialog,
@@ -10,13 +13,11 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { Shape } from "types/Shape";
-import * as tf from "@tensorflow/tfjs";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
-import { LayersModel } from "@tensorflow/tfjs";
-import { useHotkeys } from "react-hotkeys-hook";
-import { AlertStateType, AlertType, defaultAlert } from "types/AlertStateType";
+
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+import { AlertStateType, AlertType, defaultAlert, Shape } from "types";
 
 type ImportTensorflowModelDialogProps = {
   onClose: any;
@@ -37,7 +38,8 @@ export const ImportTensorflowModelDialog = ({
   modelType,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
-  const [classifierModel, setClassifierModel] = React.useState<LayersModel>();
+  const [classifierModel, setClassifierModel] =
+    React.useState<tf.LayersModel>();
   const [modelSelected, setModelSelected] = React.useState<boolean>(false);
   const [modelName, setModelName] = React.useState<string>("");
   const [inputShape, setInputShape] = React.useState<Shape>({

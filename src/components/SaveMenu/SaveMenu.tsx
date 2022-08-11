@@ -1,11 +1,14 @@
+import { useSelector } from "react-redux";
 import { bindMenu } from "material-ui-popup-state";
+
 import { Menu, MenuItem } from "@mui/material";
+
 import { useDialog } from "hooks";
+
 import { SaveProjectDialog } from "../SaveProjectDialog/SaveProjectDialog";
 import { SaveFittedModelDialog } from "../SaveFittedModelDialog";
-import { useSelector } from "react-redux";
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { selectedModelSelector } from "store/selectors/selectedModelSelector";
+
+import { fittedSelector, selectedModelSelector } from "store/selectors";
 import {
   fittedSegmentationModelSelector,
   segmentationArchitectureOptionsSelector,

@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  FitClassifierListItem,
-  PredictClassifierListItem,
-  EvaluateClassifierListItem,
-} from "../ClassifierListItems";
+import { useSelector } from "react-redux";
+
 import {
   Collapse,
   Divider,
@@ -12,18 +9,29 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useSelector } from "react-redux";
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
+
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
+
+import {
+  FitClassifierListItem,
+  PredictClassifierListItem,
+  EvaluateClassifierListItem,
+} from "../ClassifierListItems";
+
 import { CategoriesList } from "components/CategoriesList";
+
 import {
   createdCategoriesSelector,
+  fittedSelector,
+  predictedSelector,
+  trainingFlagSelector,
   unknownCategorySelector,
 } from "store/selectors";
-import { predictedSelector } from "store/selectors/predictedSelector";
-import { Category, CategoryType } from "types/Category";
+
+import { Category, CategoryType } from "types";
 
 export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);

@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { ColorIcon } from "../ColorIcon";
-import { Category, CategoryType } from "../../types/Category";
-import { updateAnnotationCategory, updateCategory } from "../../store/slices";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -12,7 +11,12 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import { useHotkeys } from "react-hotkeys-hook";
+
+import { ColorIcon } from "../ColorIcon";
+
+import { updateAnnotationCategory, updateCategory } from "store/slices";
+
+import { Category, CategoryType } from "types";
 
 type EditCategoryDialogProps = {
   category: Category;

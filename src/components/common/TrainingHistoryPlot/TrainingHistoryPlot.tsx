@@ -1,7 +1,9 @@
-import { Container, Typography } from "@mui/material";
-import { ResponsiveLine } from "@nivo/line";
-import { usePreferredNivoTheme } from "hooks/useTheme/usePreferredNivoTheme";
 import _ from "lodash";
+import { ResponsiveLine } from "@nivo/line";
+
+import { Container, Typography } from "@mui/material";
+
+import { usePreferredNivoTheme } from "hooks";
 
 type TrainingHistoryPlotProps = {
   metric: string;

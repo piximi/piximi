@@ -1,8 +1,10 @@
-import { CategoryType } from "types/Category";
-import { useDialog } from "hooks";
-import { DeleteAllCategoriesDialog } from "components/DeleteAllCategoriesDialog";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+import { useDialog } from "hooks";
+import { DeleteAllCategoriesDialog } from "components/DeleteAllCategoriesDialog";
+
+import { CategoryType } from "types";
 
 type DeleteAllCategoriesMenuItemProps = {
   categoryType: CategoryType;

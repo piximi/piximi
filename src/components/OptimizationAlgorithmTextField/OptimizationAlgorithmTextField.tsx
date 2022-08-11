@@ -1,10 +1,12 @@
 import React from "react";
-import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
 import { useDispatch, useSelector } from "react-redux";
-import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { classifierSlice } from "../../store/slices";
-import { compileOptionsSelector } from "../../store/selectors";
+
+import { MenuItem, TextField } from "@mui/material";
+
+import { compileOptionsSelector } from "store/selectors";
+import { classifierSlice } from "store/slices";
+
+import { OptimizationAlgorithm } from "types";
 
 const enumKeys = <O extends object, K extends keyof O = keyof O>(
   obj: O

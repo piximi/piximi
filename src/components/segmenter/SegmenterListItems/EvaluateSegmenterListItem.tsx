@@ -1,3 +1,6 @@
+import React from "react";
+import { useDispatch } from "react-redux";
+
 import {
   CircularProgress,
   ListItem,
@@ -5,11 +8,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import { useDispatch } from "react-redux";
-import { segmenterSlice } from "store/slices";
-import React from "react";
-import { useTranslation } from "hooks/useTranslation";
+
+import { useTranslation } from "hooks";
 import { DisabledListItem } from "components/common/DisabledListItem";
+
+import { segmenterSlice } from "store/slices";
 
 type EvaluateSegmenterListItemProps = {
   disabled: boolean;

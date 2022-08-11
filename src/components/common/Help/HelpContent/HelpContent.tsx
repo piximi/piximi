@@ -1,6 +1,5 @@
-import Typography from "@mui/material/Typography";
-import { Box, Container } from "@mui/material";
-import Divider from "@mui/material/Divider";
+import { Box, Container, Divider, Typography } from "@mui/material";
+
 import { CollapsibleHelpContent } from "../HelpDialog/CollapsibleHelpContent";
 import {
   HelpWindowToolTitle,

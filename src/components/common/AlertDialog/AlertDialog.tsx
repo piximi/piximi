@@ -27,6 +27,7 @@ import { usePreferredMuiTheme } from "hooks";
 import { applicationSlice } from "store/slices";
 
 import { AlertStateType, AlertType } from "types";
+
 import { createGitHubIssue } from "utils";
 
 type AlertDialogProps = {

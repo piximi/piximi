@@ -59,6 +59,7 @@ export {
 } from "./imageViewerSlice";
 
 export {
+  createAnnotationCategory,
   createNewProject,
   createCategory,
   uploadImages,

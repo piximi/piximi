@@ -5,13 +5,19 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
+
 import { StyledFormControl } from "../../../FitClassifierDialog/StyledFormControl";
-import { LossFunction } from "types/LossFunction";
-import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+
 import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
-import { enumKeys } from "utils/enumKeys";
-import { FitOptions } from "types/FitOptions";
-import { CompileOptions } from "types/CompileOptions";
+
+import {
+  CompileOptions,
+  FitOptions,
+  LossFunction,
+  OptimizationAlgorithm,
+} from "types";
+
+import { enumKeys } from "utils";
 
 export type OptimizerSettingsGridProps = {
   compileOptions: CompileOptions;

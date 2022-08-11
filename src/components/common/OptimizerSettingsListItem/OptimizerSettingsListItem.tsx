@@ -1,12 +1,15 @@
-import * as React from "react";
 import { useState } from "react";
+
+import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
+
 import {
   OptimizerSettingsGrid,
   OptimizerSettingsGridProps,
 } from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
-import { Collapse, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export const OptimizerSettingsListItem = ({
   compileOptions,

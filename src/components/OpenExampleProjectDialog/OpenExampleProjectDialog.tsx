@@ -7,10 +7,12 @@ import {
   List,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useTranslation } from "../../hooks/useTranslation";
-import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
-import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
+import { useTranslation } from "hooks";
+
+import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
+
+import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";

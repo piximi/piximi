@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   AppBar,
   Box,
@@ -6,15 +8,19 @@ import {
   Toolbar,
   Tooltip,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { PlayCircleOutline, Stop } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import { segmenterSlice } from "store/slices";
+import {
+  Close as CloseIcon,
+  PlayCircleOutline,
+  Stop,
+} from "@mui/icons-material";
+
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
+
 import {
   compiledSegmentationModelSelector,
   segmentationTrainingFlagSelector,
 } from "store/selectors/segmenter";
+import { segmenterSlice } from "store/slices";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;

@@ -11,6 +11,7 @@ export type { ArchitectureOptions } from "./ArchitectureOptions";
 
 export type { Category } from "./Category";
 export {
+  CategoryType,
   UNKNOWN_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY,
@@ -81,6 +82,8 @@ export type { PreprocessOptions } from "./PreprocessOptions";
 export type { Project } from "./Project";
 
 export type { RescaleOptions } from "./RescaleOptions";
+
+export type { SegmenterStoreType } from "./SegmenterStoreType";
 
 export type { SerializedAnnotationType } from "./SerializedAnnotationType";
 

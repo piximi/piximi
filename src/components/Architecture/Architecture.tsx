@@ -1,7 +1,9 @@
-import { Grid, MenuItem, TextField } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
-import { architectureOptionsSelector } from "../../store/selectors/architectureOptionsSelector";
+
+import { Grid, MenuItem, TextField } from "@mui/material";
+
+import { architectureOptionsSelector } from "store/selectors";
 
 export const Architecture = () => {
   const architectureOptions = useSelector(architectureOptionsSelector);
