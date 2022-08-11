@@ -1,28 +1,37 @@
-import { ListItem } from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
 import React, { useCallback } from "react";
-import Slider from "@mui/material/Slider";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Checkbox from "@mui/material/Checkbox";
-import {
-  CheckboxCheckedIcon,
-  CheckboxUncheckedIcon,
-} from "../../../../../icons";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { Color } from "../../../../../types/Color";
 import { debounce } from "lodash";
-import { imageShapeSelector } from "../../../../../store/selectors/imageShapeSelector";
-import { CollapsibleList } from "../../../ImageViewerList/CollapsibleList";
-import { imageViewerSlice } from "../../../../../store/slices";
-import { activeImagePlaneSelector } from "../../../../../store/selectors/activeImagePlaneSelector";
+
+import {
+  Checkbox,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Slider,
+} from "@mui/material";
+
+import { Palette } from "../Palette";
+
+import { CollapsibleList } from "components/common/CollapsibleList";
+
+import {
+  activeImageColorsSelector,
+  activeImagePlaneSelector,
+  imageOriginalSrcSelector,
+  imageShapeSelector,
+} from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { Color } from "types";
+
 import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
   rgbToHex,
-} from "../../../../../image/imageHelper";
-import { Palette } from "../Palette";
-import { activeImageColorsSelector } from "../../../../../store/selectors/activeImageColorsSelector";
-import { imageOriginalSrcSelector } from "../../../../../store/selectors";
+} from "image/imageHelper";
+
+import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 
 export const ChannelsList = () => {
   const dispatch = useDispatch();

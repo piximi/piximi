@@ -1,6 +1,5 @@
 import { useState } from "react";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+
 import {
   Collapse,
   Grid,
@@ -9,6 +8,11 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import {
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from "@mui/icons-material";
+
 import { CustomNumberTextField } from "../CustomNumberTextField/CustomNumberTextField";
 import { StyledFormControl } from "../../FitClassifierDialog/StyledFormControl";
 

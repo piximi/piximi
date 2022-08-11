@@ -1,5 +1,29 @@
-import Drawer from "@mui/material/Drawer";
 import React from "react";
+import { useSelector } from "react-redux";
+
+import { Drawer } from "@mui/material";
+
+import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
+import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
+import { PenSelectionIconOptions } from "../PenSelectionIconOptions";
+import { LassoAnnotationOptions } from "../LassoAnnotationOptions";
+import { PolygonalAnnotationOptions } from "../PolygonalAnnotationOptions";
+import { MagneticAnnotationOptions } from "../MagneticAnnotationOptions";
+import { ColorAnnotationOptions } from "../ColorAnnotationOptions";
+import { QuickAnnotationOptions } from "../QuickAnnotationOptions";
+import { ObjectAnnotationOptions } from "../ObjectAnnotationOptions";
+import { ZoomOptions } from "../ZoomOptions";
+import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
+import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
+import { PointerSelectionOptions } from "../PointerSelectionOptions";
+import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
+
+import { AppBarOffset } from "components/styled/AppBarOffset";
+
+import { toolTypeSelector } from "store/selectors";
+
+import { ToolType } from "types";
+
 import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
@@ -14,24 +38,6 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "../../../../icons";
-import { ToolType } from "../../../../types/ToolType";
-import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
-import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
-import { PenSelectionIconOptions } from "../PenSelectionIconOptions";
-import { LassoAnnotationOptions } from "../LassoAnnotationOptions";
-import { PolygonalAnnotationOptions } from "../PolygonalAnnotationOptions";
-import { MagneticAnnotationOptions } from "../MagneticAnnotationOptions";
-import { ColorAnnotationOptions } from "../ColorAnnotationOptions";
-import { QuickAnnotationOptions } from "../QuickAnnotationOptions";
-import { ObjectAnnotationOptions } from "../ObjectAnnotationOptions";
-import { ZoomOptions } from "../ZoomOptions";
-import { useSelector } from "react-redux";
-import { toolTypeSelector } from "../../../../store/selectors";
-import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
-import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
-import { PointerSelectionOptions } from "../PointerSelectionOptions";
-import { AppBarOffset } from "components/styled/AppBarOffset";
-import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
 
 export const ToolOptions = () => {
   const activeOperation = useSelector(toolTypeSelector);

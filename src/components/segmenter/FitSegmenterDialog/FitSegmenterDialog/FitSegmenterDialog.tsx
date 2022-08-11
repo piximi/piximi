@@ -1,17 +1,19 @@
-import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
-import { useDispatch, useSelector } from "react-redux";
-import { segmenterSlice } from "store/slices";
-import { Dialog, DialogContent, List } from "@mui/material";
-import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { useEffect, useState } from "react";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Dialog, DialogContent, List } from "@mui/material";
+
+import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
+import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+
 import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
-import { DialogTransition } from "components/DialogTransition";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
+import { DialogTransition } from "components/DialogTransition";
+
+import { alertStateSelector } from "store/selectors";
 import {
   annotatedImagesSelector,
   compiledSegmentationModelSelector,
@@ -20,8 +22,14 @@ import {
   segmentationTrainingFlagSelector,
   segmentationTrainingPercentageSelector,
 } from "store/selectors/segmenter";
-import { LossFunction } from "types/LossFunction";
-import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+import { segmenterSlice } from "store/slices";
+
+import {
+  AlertStateType,
+  AlertType,
+  LossFunction,
+  OptimizationAlgorithm,
+} from "types";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;

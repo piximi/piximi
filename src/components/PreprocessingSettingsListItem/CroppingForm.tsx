@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Grid,
   Typography,
@@ -7,13 +9,18 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../store/slices";
-import { cropOptionsSelector } from "../../store/selectors";
-import { CropSchema } from "types/CropOptions";
+
 import { StyledFormControl } from "components/FitClassifierDialog/StyledFormControl";
-import { enumKeys } from "utils/enumKeys";
+
 import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
+
+import { cropOptionsSelector } from "store/selectors";
+
+import { classifierSlice } from "store/slices";
+
+import { CropSchema } from "types";
+
+import { enumKeys } from "utils";
 
 export const CroppingForm = () => {
   const cropOptions = useSelector(cropOptionsSelector);

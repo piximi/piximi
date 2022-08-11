@@ -1,8 +1,11 @@
-import Divider from "@mui/material/Divider";
 import React from "react";
+
+import { Divider } from "@mui/material";
+
+import { useTranslation } from "hooks";
+
 import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
-import { useTranslation } from "../../../../hooks/useTranslation";
 
 export const ObjectAnnotationOptions = () => {
   const t = useTranslation();

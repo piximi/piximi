@@ -1,10 +1,18 @@
-import Drawer from "@mui/material/Drawer";
 import React from "react";
-import { ToolType as OperationType } from "../../../../types/ToolType";
-import { Tool } from "../Tool";
 import { useDispatch, useSelector } from "react-redux";
-import { toolTypeSelector } from "../../../../store/selectors";
-import { imageViewerSlice } from "../../../../store/slices";
+
+import { Drawer } from "@mui/material";
+
+import { useTranslation } from "hooks";
+
+import { Tool } from "../Tool";
+
+import { toolTypeSelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/slices";
+
+import { ToolType as OperationType } from "types";
+
 import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
@@ -18,8 +26,7 @@ import {
   RectangularSelectionIcon,
   SelectionIcon,
   ZoomIcon,
-} from "../../../../icons";
-import { useTranslation } from "../../../../hooks/useTranslation";
+} from "icons";
 
 export const Tools = () => {
   const dispatch = useDispatch();

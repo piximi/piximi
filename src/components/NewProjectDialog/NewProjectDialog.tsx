@@ -1,3 +1,7 @@
+import React, { ChangeEvent } from "react";
+import { useDispatch } from "react-redux";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -6,9 +10,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import React, { ChangeEvent } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useDispatch } from "react-redux";
+
 import { projectSlice, classifierSlice } from "store/slices";
 
 type NewProjectDialogProps = {

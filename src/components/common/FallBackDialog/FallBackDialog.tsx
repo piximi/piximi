@@ -1,3 +1,8 @@
+import React from "react";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import StackTrace from "stacktrace-js";
+
 import {
   AppBar,
   Box,
@@ -12,25 +17,27 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { createGitHubIssue } from "utils/createGitHubIssue";
-import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
-import { useDialog } from "hooks/useDialog/useDialog";
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { SaveAnnotationProjectDialog } from "components/annotator/ImageViewerList/SaveMenu/SaveAnnotationProjectDialog";
-import StackTrace from "stacktrace-js";
-import { useSelector } from "react-redux";
-import { fittedSelector } from "store/selectors/fittedSelector";
-import { selectedModelSelector } from "store/selectors/selectedModelSelector";
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  GitHub as GitHubIcon,
+} from "@mui/icons-material";
+
+import { useDialog } from "hooks";
+
 import { SaveFittedModelDialog } from "components/SaveFittedModelDialog";
+import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
+import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
+
+import { fittedSelector, selectedModelSelector } from "store/selectors";
 import {
   fittedSegmentationModelSelector,
   segmentationArchitectureOptionsSelector,
 } from "store/selectors/segmenter";
+
+import { AlertStateType, AlertType } from "types";
+
+import { createGitHubIssue } from "utils";
 
 const popupState = {
   close: () => {},

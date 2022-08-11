@@ -1,4 +1,5 @@
 import React from "react";
+
 import { AnnotationModeTooltip } from "../AnnotationModeTooltip";
 
 type AddTooltipProps = {

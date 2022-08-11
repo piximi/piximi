@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Checkbox,
   FormControlLabel,
@@ -6,9 +8,10 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../store/slices";
-import { rescaleOptionsSelector } from "../../store/selectors";
+
+import { rescaleOptionsSelector } from "store/selectors";
+
+import { classifierSlice } from "store/slices";
 
 export const RescalingForm = () => {
   const rescaleOptions = useSelector(rescaleOptionsSelector);

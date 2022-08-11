@@ -1,10 +1,11 @@
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import React from "react";
-import { OpenMenu } from "../OpenMenu";
 import PopupState, { bindTrigger } from "material-ui-popup-state";
+
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+
+import { OpenMenu } from "../OpenMenu";
 
 export const OpenListItem = () => {
   return (

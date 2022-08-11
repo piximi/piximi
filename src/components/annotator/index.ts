@@ -1,2 +1,2 @@
-export { ImageViewer } from "./ImageViewer";
+export { ImageViewer } from "./vestigial/ImageViewer";
 export { AnnotatorView } from "./AnnotatorView";

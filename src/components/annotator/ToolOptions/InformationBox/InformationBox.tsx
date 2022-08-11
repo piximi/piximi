@@ -1,7 +1,6 @@
 import React from "react";
-import { Typography } from "@mui/material";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+
+import { AppBar, Toolbar, Typography } from "@mui/material";
 
 type InformationBoxProps = {
   description: string;

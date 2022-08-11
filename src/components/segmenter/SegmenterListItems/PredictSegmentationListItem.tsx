@@ -1,3 +1,6 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   CircularProgress,
   ListItem,
@@ -5,12 +8,13 @@ import {
   ListItemText,
 } from "@mui/material";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
-import { useDispatch, useSelector } from "react-redux";
-import { segmenterSlice } from "store/slices";
-import React, { useEffect } from "react";
-import { useTranslation } from "hooks/useTranslation";
+
+import { useTranslation } from "hooks";
+
 import { DisabledListItem } from "components/common/DisabledListItem";
+
 import { segmentationPredictingFlagSelector } from "store/selectors/segmenter";
+import { segmenterSlice } from "store/slices";
 
 type PredictSegmenterListItemProps = {
   disabled: boolean;

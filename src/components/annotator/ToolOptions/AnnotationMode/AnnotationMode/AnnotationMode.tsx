@@ -1,26 +1,34 @@
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Radio from "@mui/material/Radio";
 import React from "react";
-import RadioGroup from "@mui/material/RadioGroup";
 import { useDispatch, useSelector } from "react-redux";
+
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
+
+import { useTranslation } from "hooks";
+
+import { NewTooltip } from "../NewTooltip";
+import { AddTooltip } from "../AddTooltip";
+import { SubtractTooltip } from "../SubtractTooltip";
+import { IntersectionTooltip } from "../IntersectionTooltip";
+
 import {
   annotationStateSelector,
   selectedAnnotationSelector,
   selectionModeSelector,
 } from "store/selectors";
-import { AnnotationModeType } from "types/AnnotationModeType";
-import ListSubheader from "@mui/material/ListSubheader";
-import { NewTooltip } from "../NewTooltip";
-import { AddTooltip } from "../AddTooltip";
-import { SubtractTooltip } from "../SubtractTooltip";
-import { IntersectionTooltip } from "../IntersectionTooltip";
-import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
-import { useTranslation } from "hooks/useTranslation";
+
 import { imageViewerSlice } from "store/slices";
-import { AnnotationStateType } from "types/AnnotationStateType";
+
+import { AnnotationModeType, AnnotationStateType } from "types";
+
+import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 
 export const AnnotationMode = () => {
   const dispatch = useDispatch();

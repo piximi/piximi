@@ -1,8 +1,11 @@
 import React from "react";
-import { useMenu } from "../../hooks";
-import { UploadMenu } from "../UploadMenu";
+
 import { Button, Tooltip } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+import { useMenu } from "hooks";
+
+import { UploadMenu } from "../UploadMenu";
 
 export const UploadButton = () => {
   const { anchorEl, onClose, onOpen, open } = useMenu();

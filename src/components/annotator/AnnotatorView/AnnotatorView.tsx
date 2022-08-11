@@ -1,14 +1,43 @@
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
-import { useDispatch } from "react-redux";
-import { applicationSlice } from "store/slices";
-import { AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
-import { ImageViewer } from "../ImageViewer";
 
-export const AnnotatorView = () => {
+import { AppBar, Box, CssBaseline } from "@mui/material";
+
+import { useUpload } from "hooks";
+
+import { AnnotatorDrawer } from "../AnnotatorDrawer";
+import { ImageContent } from "../ImageContent";
+import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import { ToolOptions } from "../ToolOptions";
+import { Tools } from "../Tools";
+
+import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+
+import { alertStateSelector } from "store/selectors";
+import { applicationSlice, imageViewerSlice } from "store/slices";
+
+import { AlertType, ImageType } from "types";
+
+import { getStackTraceFromError } from "utils";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+type AnnotatorViewProps = {
+  image?: ImageType;
+};
+
+export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
   const dispatch = useDispatch();
+
+  const [files, setFiles] = useState<FileList>();
+
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+
+  const handleClose = () => {
+    setOpenDimensionsDialogBox(false);
+  };
+
+  const alertState = useSelector(alertStateSelector);
 
   const onUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
@@ -18,13 +47,6 @@ export const AnnotatorView = () => {
       return (e.returnValue = "Are you sure you want to exit?");
     }
   };
-
-  useEffect(() => {
-    window.addEventListener("beforeunload", onUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onUnload);
-    };
-  }, []);
 
   const handleError = useCallback(
     async (e: any) => {
@@ -63,6 +85,25 @@ export const AnnotatorView = () => {
   );
 
   useEffect(() => {
+    window.addEventListener("beforeunload", onUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onUnload);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (image) {
+      dispatch(imageViewerSlice.actions.setActiveImage({ imageId: image.id }));
+    }
+  }, [dispatch, image]);
+
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
+  const onDrop = async (files: FileList) => {
+    await uploadFiles(files);
+    setFiles(files);
+  };
+
+  useEffect(() => {
     window.addEventListener("error", handleError);
     window.addEventListener("unhandledrejection", handleUncaughtRejection);
     return () => {
@@ -73,7 +114,38 @@ export const AnnotatorView = () => {
 
   return (
     <ErrorBoundary FallbackComponent={FallBackDialog}>
-      <ImageViewer />
+      <Box sx={{ display: "flex" }}>
+        {alertState.visible && (
+          <AppBar
+            sx={{
+              borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+              boxShadow: "none",
+              zIndex: 2000,
+            }}
+            color="inherit"
+            position="fixed"
+          >
+            <AlertDialog alertState={alertState} />
+          </AppBar>
+        )}
+
+        <CssBaseline />
+
+        <AnnotatorDrawer />
+
+        <ImageContent onDrop={onDrop} />
+
+        <ImageShapeDialog
+          files={files!}
+          open={openDimensionsDialogBox}
+          onClose={handleClose}
+          isUploadedFromAnnotator={true}
+        />
+
+        <ToolOptions />
+
+        <Tools />
+      </Box>
     </ErrorBoundary>
   );
 };

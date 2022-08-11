@@ -1,10 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Category } from "../../types/Category";
-import { categoriesSelector } from "../../store/selectors";
-import { applicationSlice, updateImageCategories } from "../../store/slices";
+
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
+
+import { categoriesSelector } from "store/selectors";
+import { applicationSlice, updateImageCategories } from "store/slices";
+
+import { Category } from "types";
 
 type ImageCategoryMenuProps = {
   anchorEl: HTMLElement;

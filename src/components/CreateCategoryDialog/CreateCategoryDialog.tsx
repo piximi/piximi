@@ -1,11 +1,9 @@
-import { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ColorIcon } from "../ColorIcon";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
-import { availableColorsSelector } from "store/selectors/availableColorsSelector";
-import { categoriesSelector } from "store/selectors/categoriesSelector";
-import { Category, CategoryType } from "types/Category";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -16,9 +14,13 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import { useHotkeys } from "react-hotkeys-hook";
-import { createCategory } from "store/slices";
-import { createAnnotationCategory } from "store/slices/projectSlice";
+
+import { ColorIcon } from "../ColorIcon";
+
+import { availableColorsSelector, categoriesSelector } from "store/selectors";
+import { createCategory, createAnnotationCategory } from "store/slices";
+
+import { Category, CategoryType } from "types";
 
 type CreateCategoryDialogProps = {
   categoryType: CategoryType;

@@ -1,11 +1,15 @@
 import React from "react";
-import Checkbox from "@mui/material/Checkbox";
-import List from "@mui/material/List";
-import { ListItem } from "@mui/material";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import ListSubheader from "@mui/material/ListSubheader";
-import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "../../../../icons";
+
+import {
+  Checkbox,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
+
+import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 
 export const SampleList = () => {
   const [checked, setChecked] = React.useState([0, 1, 2]);

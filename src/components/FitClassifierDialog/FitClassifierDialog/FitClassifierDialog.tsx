@@ -1,29 +1,39 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Dialog, DialogContent, List } from "@mui/material";
+
+import { ModelSummaryTable } from "../../common/ModelSummary";
+
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { OptimizerSettingsListItem } from "../../common/OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "../../common/DatasetSettingsListItem/DatasetSettingsListItem";
-import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "store/slices";
-import { Dialog, DialogContent, List } from "@mui/material";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 import { DialogTransition } from "../../DialogTransition";
+
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+import { TrainingHistoryPlot } from "../../common/TrainingHistoryPlot";
+
 import {
+  alertStateSelector,
   categorizedImagesSelector,
   compiledSelector,
   compileOptionsSelector,
+  epochsSelector,
   fitOptionsSelector,
+  trainingFlagSelector,
   trainingPercentageSelector,
 } from "store/selectors";
-import { useEffect, useState } from "react";
-import { TrainingHistoryPlot } from "../../common/TrainingHistoryPlot";
-import { ModelSummaryTable } from "../../common/ModelSummary";
-import { epochsSelector } from "store/selectors/epochsSelector";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { AlertDialog } from "components/AlertDialog/AlertDialog";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { trainingFlagSelector } from "store/selectors/trainingFlagSelector";
-import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
-import { LossFunction } from "types/LossFunction";
+
+import { classifierSlice } from "store/slices";
+
+import {
+  AlertStateType,
+  AlertType,
+  OptimizationAlgorithm,
+  LossFunction,
+} from "types";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;

@@ -1,18 +1,20 @@
-import { Grid, TextField, Alert } from "@mui/material";
-import { StyledFormControl } from "../../StyledFormControl";
-import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { classifierSlice } from "../../../../store/slices";
-import { architectureOptionsSelector } from "../../../../store/selectors/architectureOptionsSelector";
-import { inputShapeSelector } from "../../../../store/selectors/inputShapeSelector";
+
+import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
+
+import { StyledFormControl } from "../../StyledFormControl";
+
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
+
 import {
-  availableClassifierModels,
-  ClassifierModelProps,
-} from "../../../../types/ModelType";
-import { SyntheticEvent } from "react";
-import { uploadedModelSelector } from "../../../../store/selectors/uploadedModelSelector";
-import { CustomNumberTextField } from "../../../common/CustomNumberTextField/CustomNumberTextField";
+  architectureOptionsSelector,
+  inputShapeSelector,
+  uploadedModelSelector,
+} from "store/selectors";
+import { classifierSlice } from "store/slices";
+
+import { availableClassifierModels, ClassifierModelProps } from "types";
 
 export const ArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(architectureOptionsSelector);
@@ -49,7 +51,7 @@ export const ArchitectureSettingsGrid = () => {
   }, [selectedModel]);
 
   const onSelectedModelChange = (
-    event: SyntheticEvent<Element, Event>,
+    event: React.SyntheticEvent<Element, Event>,
     value: ClassifierModelProps | null
   ) => {
     const selectedModel = value as ClassifierModelProps;

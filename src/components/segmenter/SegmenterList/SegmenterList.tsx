@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  FitSegmenterListItem,
-  PredictSegmenterListItem,
-  EvaluateSegmenterListItem,
-} from "../SegmenterListItems";
+import { useSelector } from "react-redux";
+
 import {
   Collapse,
   Divider,
@@ -12,17 +9,29 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useSelector } from "react-redux";
-import { createdAnnotatorCategoriesSelector } from "store/selectors/createdAnnotatorCategoriesSelector";
-import { unknownAnnotationCategorySelector } from "store/selectors";
+import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
+
+import {
+  FitSegmenterListItem,
+  PredictSegmenterListItem,
+  EvaluateSegmenterListItem,
+} from "../SegmenterListItems";
+
 import { CategoriesList } from "components/CategoriesList";
-import { CategoryType } from "types/Category";
+
 import {
   fittedSegmentationModelSelector,
   segmentationTrainingFlagSelector,
 } from "store/selectors/segmenter";
+import {
+  createdAnnotatorCategoriesSelector,
+  unknownAnnotationCategorySelector,
+} from "store/selectors";
+
+import { CategoryType } from "types";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Dialog,
   DialogTitle,
@@ -7,10 +9,12 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { useTranslation } from "hooks/useTranslation";
-import { useState } from "react";
-import { AlertType } from "types/AlertStateType";
-import { createGitHubIssue } from "utils/createGitHubIssue";
+
+import { useTranslation } from "hooks";
+
+import { AlertType } from "types";
+
+import { createGitHubIssue } from "utils";
 
 type SendFeedbackDialogProps = {
   onClose: () => void;

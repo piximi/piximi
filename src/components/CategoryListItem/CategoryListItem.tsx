@@ -1,11 +1,6 @@
 import React from "react";
-import { Category, CategoryType } from "types/Category";
-import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
-import { CategoryMenu } from "../CategoryMenu";
 import { useSelector } from "react-redux";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { State } from "types/State";
-import { ImageType } from "types/ImageType";
+
 import {
   Chip,
   IconButton,
@@ -13,10 +8,17 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
+import { CategoryMenu } from "../CategoryMenu";
+
 import {
   categoryCountsSelector,
   selectedCategorySelector,
 } from "store/selectors";
+
+import { Category, CategoryType, ImageType, State } from "types";
 
 type CategoryListItemProps = {
   categoryType: CategoryType;

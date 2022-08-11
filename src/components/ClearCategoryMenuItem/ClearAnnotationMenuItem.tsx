@@ -1,8 +1,12 @@
 import React from "react";
-import { Category } from "types/Category";
-import { useDialog } from "hooks";
+
 import { MenuItem, Typography } from "@mui/material";
+
+import { useDialog } from "hooks";
+
 import { ClearAnnotationDialog } from "components/ClearAnnotationDialog";
+
+import { Category } from "types";
 
 type ClearAnnotationMenuItemProps = {
   category: Category;

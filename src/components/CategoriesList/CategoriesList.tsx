@@ -1,10 +1,13 @@
-import { CollapsibleList } from "../CollapsibleList";
 import React, { useEffect } from "react";
+
+import { CollapsibleList } from "../CollapsibleList";
 import { CategoryListItem } from "../CategoryListItem";
-import { Category, CategoryType } from "types/Category";
 import { CreateCategoryListItem } from "../CreateCategoryListItem";
+
 import { PredictionVisibility } from "components/PredictionsVisibility/PredictionVisibility";
 import { DeleteAllCategoriesMenuItem } from "components/DeleteAllCategoriesMenuItem";
+
+import { Category, CategoryType } from "types";
 
 type CategoriesListProps = {
   createdCategories: Array<Category>;

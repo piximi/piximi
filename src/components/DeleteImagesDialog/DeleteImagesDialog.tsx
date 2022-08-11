@@ -1,3 +1,6 @@
+import { useDispatch } from "react-redux";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import {
   Button,
   Dialog,
@@ -5,9 +8,8 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useDispatch } from "react-redux";
-import { applicationSlice, projectSlice } from "../../store/slices";
+
+import { applicationSlice, projectSlice } from "store/slices";
 
 type DeleteImagesDialogProps = {
   imageIds: Array<string>;

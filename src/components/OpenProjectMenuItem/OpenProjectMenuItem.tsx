@@ -1,18 +1,25 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
+
 import { ListItemText, MenuItem } from "@mui/material";
+
 import {
   applicationSlice,
   classifierSlice,
   projectSlice,
   segmenterSlice,
 } from "store/slices";
-import { SerializedProjectType } from "types/SerializedProjectType";
-import { Classifier } from "types/Classifier";
+
+import {
+  AlertStateType,
+  AlertType,
+  Classifier,
+  ImageType,
+  SegmenterStoreType,
+  SerializedProjectType,
+} from "types";
+
 import { deserializeImages } from "image/imageHelper";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { ImageType } from "types/ImageType";
-import { SegmenterStoreType } from "types/SegmenterStoreType";
 
 type OpenProjectMenuItemProps = {
   popupState: any;

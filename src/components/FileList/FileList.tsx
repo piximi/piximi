@@ -1,7 +1,10 @@
 import React from "react";
+
+import { List } from "@mui/material";
+
 import { OpenListItem } from "../OpenListItem";
 import { SaveListItem } from "../SaveListItem";
-import { List } from "@mui/material";
+
 import { NewProjectListItem } from "components/NewProjectListItem";
 
 export const FileList = () => {

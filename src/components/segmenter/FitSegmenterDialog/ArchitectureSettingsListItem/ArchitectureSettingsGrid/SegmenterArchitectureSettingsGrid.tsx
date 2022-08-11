@@ -1,17 +1,19 @@
-import { Grid, TextField, Alert } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { segmenterSlice } from "store/slices";
-import { availableSegmenterModels, SegmenterModelProps } from "types/ModelType";
-import { SyntheticEvent } from "react";
-import { CustomNumberTextField } from "../../../../common/CustomNumberTextField/CustomNumberTextField";
+
+import { Grid, TextField, Alert, Autocomplete } from "@mui/material";
+
+import { CustomNumberTextField } from "components/common/CustomNumberTextField/CustomNumberTextField";
 import { StyledFormControl } from "components/FitClassifierDialog/StyledFormControl";
+
 import {
   segmentationArchitectureOptionsSelector,
   segmentationInputShapeSelector,
   userUploadedSegmentationModelSelector,
 } from "store/selectors/segmenter";
+import { segmenterSlice } from "store/slices";
+
+import { availableSegmenterModels, SegmenterModelProps } from "types";
 
 export const SegmenterArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(
@@ -50,7 +52,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
   }, [selectedModel]);
 
   const onSelectedModelChange = (
-    event: SyntheticEvent<Element, Event>,
+    event: React.SyntheticEvent<Element, Event>,
     value: SegmenterModelProps | null
   ) => {
     const selectedModel = value as SegmenterModelProps;

@@ -1,38 +1,48 @@
 import React, { ChangeEvent, useState } from "react";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import PaletteIcon from "@mui/icons-material/Palette";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { BlockPicker, ColorResult } from "react-color";
+
 import {
+  AppBar,
   Container,
+  Dialog,
   DialogContent,
+  IconButton,
   Switch,
   Grid,
   Popover,
   TextField,
+  Toolbar,
+  Typography,
   Stack,
+  styled,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { AppBarOffset } from "components/styled/AppBarOffset";
-import { batch, useDispatch, useSelector } from "react-redux";
+
 import {
-  themeModeSelector,
-  imageSelectionColorSelector,
+  Close as CloseIcon,
+  Palette as PaletteIcon,
+} from "@mui/icons-material";
+
+import { AppBarOffset } from "components/styled/AppBarOffset";
+
+import {
   availableColorsSelector,
+  imageSelectionColorSelector,
   imageSelectionSizeSelector,
+  soundEnabledSelector,
+  themeModeSelector,
 } from "store/selectors";
+
 import { imageViewerSlice, setThemeMode } from "store/slices";
-import { ThemeMode } from "types/ThemeMode";
+
+import { applicationSlice } from "store/slices";
+
+import { ThemeMode } from "types";
+
 import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
-import { BlockPicker, ColorResult } from "react-color";
-import { applicationSlice } from "store/slices";
-import { soundEnabledSelector } from "store/selectors/soundEnabledSelector";
 
 type SettingsDialogProps = {
   onClose: () => void;
