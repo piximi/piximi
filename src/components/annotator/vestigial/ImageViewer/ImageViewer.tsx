@@ -5,11 +5,11 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
 
-import { ImageViewerDrawer } from "../ImageViewerList";
-import { ToolOptions } from "../ToolOptions";
-import { Tools } from "../Tools";
-import { Content } from "../Content";
-import { ImageShapeDialog } from "../ImageViewerList/OpenMenu/ImageShapeDialog";
+import { AnnotatorDrawer } from "../../AnnotatorDrawer";
+import { ToolOptions } from "../../ToolOptions";
+import { Tools } from "../../Tools";
+import { ImageShapeDialog } from "../../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import { ImageContent } from "../../ImageContent";
 
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
@@ -66,9 +66,9 @@ export const ImageViewer = ({ image }: ImageViewerProps) => {
 
       <CssBaseline />
 
-      <ImageViewerDrawer />
+      <AnnotatorDrawer />
 
-      <Content onDrop={onDrop} />
+      <ImageContent onDrop={onDrop} />
 
       <ImageShapeDialog
         files={files!}

@@ -12,11 +12,11 @@ import {
 
 import { useDialog } from "hooks";
 
-import { ExitAnnotatorDialog } from "../ExitAnnotatorDialog";
+import { ExitAnnotatorDialog } from "../AnnotatorDrawer/ExitAnnotatorDialog";
 
 import { LogoIcon } from "components/Application/Logo";
 
-export const ImageViewerAppBar = () => {
+export const AnnotatorAppBar = () => {
   const {
     onClose: onCloseExitAnnotatorDialog,
     onOpen: onOpenExitAnnotatorDialog,

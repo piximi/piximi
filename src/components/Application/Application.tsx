@@ -1,10 +1,12 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
-import { StyledEngineProvider } from "@mui/material/styles";
-import { MainView } from "../MainView";
+
+import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
+
+import { usePreferredMuiTheme } from "hooks";
+
+import { MainView } from "../main";
 import { AnnotatorView } from "../annotator";
-import { usePreferredMuiTheme } from "hooks/useTheme/usePreferredMuiTheme";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();

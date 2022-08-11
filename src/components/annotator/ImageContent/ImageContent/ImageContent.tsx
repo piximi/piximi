@@ -6,11 +6,11 @@ import { Stage } from "../Stage";
 
 import { useBoundingClientRect, useDndFileDrop } from "hooks";
 
-type ContentProps = {
+type ImageContentProps = {
   onDrop: (files: FileList) => void;
 };
 
-export const Content = ({ onDrop }: ContentProps) => {
+export const ImageContent = ({ onDrop }: ImageContentProps) => {
   const ref = useRef<HTMLDivElement>(null);
   useBoundingClientRect(ref);
 

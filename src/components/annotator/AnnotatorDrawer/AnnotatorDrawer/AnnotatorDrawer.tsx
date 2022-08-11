@@ -9,7 +9,7 @@ import { SaveListItem } from "../SaveListItem";
 import { ClearAnnotationsListItem } from "../ClearAnnotations";
 import { CategoriesList } from "components/CategoriesList";
 
-import { ImageViewerAppBar } from "../ImageViewerAppBar";
+import { AnnotatorAppBar } from "../../AnnotatorAppBar";
 
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
@@ -24,7 +24,7 @@ import { imageViewerSlice } from "store/slices";
 
 import { Category, CategoryType } from "types/Category";
 
-export const ImageViewerDrawer = () => {
+export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
   const unknownAnnotationCategory = useSelector(
     unknownAnnotationCategorySelector
@@ -53,7 +53,7 @@ export const ImageViewerDrawer = () => {
       open
       variant="persistent"
     >
-      <ImageViewerAppBar />
+      <AnnotatorAppBar />
 
       <AppBarOffset />
 
