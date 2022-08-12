@@ -12,10 +12,11 @@ import {
   TextField,
 } from "@mui/material";
 
+import { ColorIcon } from "components/common/ColorIcon";
+
 import { updateAnnotationCategory, updateCategory } from "store/slices";
 
 import { Category, CategoryType } from "types";
-import { ColorIcon } from "../ColorIcon";
 
 type EditCategoryDialogProps = {
   category: Category;
