@@ -1,0 +1,1 @@
+export { MainImageGridAppBar } from "./MainImageGridAppBar";

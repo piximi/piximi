@@ -8,11 +8,11 @@ import { useUpload } from "hooks";
 
 import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ImageContent } from "../ImageContent";
-import { ImageShapeDialog } from "../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 import { ToolOptions } from "../ToolOptions";
 import { Tools } from "../Tools";
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
+import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
 import { alertStateSelector } from "store/selectors";
 import { applicationSlice, imageViewerSlice } from "store/slices";

@@ -6,9 +6,8 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 
-import { StyledFormControl } from "../../../FitClassifierDialog/StyledFormControl";
-
-import { CustomNumberTextField } from "../../CustomNumberTextField/CustomNumberTextField";
+import { StyledFormControl } from "../../StyledFormControl";
+import { CustomNumberTextField } from "../../InputFields";
 
 import {
   CompileOptions,

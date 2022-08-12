@@ -7,10 +7,9 @@ import { ImageList } from "../ImageList";
 import { OpenListItem } from "../OpenListItem";
 import { SaveListItem } from "../SaveListItem";
 import { ClearAnnotationsListItem } from "../ClearAnnotations";
-import { CategoriesList } from "components/CategoriesList";
-
 import { AnnotatorAppBar } from "../../AnnotatorAppBar";
 
+import { CategoriesList } from "components/categories/CategoriesList";
 import { AnnotatorHelpDrawer } from "components/common/Help";
 import { SendFeedbackListItem } from "components/common/SendFeedbackListItem";
 import { AppBarOffset } from "components/styled/AppBarOffset";
