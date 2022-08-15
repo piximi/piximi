@@ -13,8 +13,8 @@ import {
   ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 
-import { CustomNumberTextField } from "../CustomNumberTextField/CustomNumberTextField";
-import { StyledFormControl } from "../../FitClassifierDialog/StyledFormControl";
+import { CustomNumberTextField } from "../InputFields";
+import { StyledFormControl } from "../StyledFormControl";
 
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;

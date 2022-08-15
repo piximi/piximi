@@ -4,7 +4,7 @@ import { ListItemText, MenuItem } from "@mui/material";
 
 import { useUpload } from "hooks";
 
-import { ImageShapeDialog } from "./ImageShapeDialog";
+import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
 type OpenImageMenuItemProps = {
   popupState: any;

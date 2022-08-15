@@ -1,2 +1,1 @@
-export { ClassifierHelpDrawer } from "./HelpDrawer/ClassifierHelpDrawer";
-export { AnnotatorHelpDrawer } from "./HelpDrawer/AnnotatorHelpDrawer";
+export { HelpDrawer } from "./HelpDrawer/HelpDrawer";

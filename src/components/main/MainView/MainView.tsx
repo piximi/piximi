@@ -8,10 +8,10 @@ import { Box, CssBaseline } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { MainDrawer } from "../MainDrawer";
-import { ImageGrid } from "components/ImageGrid";
+import { MainImageGrid } from "../MainImageGrid";
 import { MainAppBar } from "../MainAppBar";
 
-import { ImageShapeDialog } from "components/annotator/AnnotatorDrawer/OpenMenu/ImageShapeDialog";
+import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
@@ -124,7 +124,7 @@ export const MainView = () => {
 
             <MainDrawer />
 
-            <ImageGrid onDrop={onDrop} />
+            <MainImageGrid onDrop={onDrop} />
 
             {files?.length && (
               <ImageShapeDialog

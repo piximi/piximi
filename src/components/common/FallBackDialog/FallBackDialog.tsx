@@ -25,8 +25,8 @@ import {
 
 import { useDialog } from "hooks";
 
-import { SaveFittedModelDialog } from "components/SaveFittedModelDialog";
-import { SaveProjectDialog } from "components/SaveProjectDialog/SaveProjectDialog";
+import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
+import { SaveProjectDialog } from "components/file-io/SaveProjectDialog/SaveProjectDialog";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
 import { fittedSelector, selectedModelSelector } from "store/selectors";

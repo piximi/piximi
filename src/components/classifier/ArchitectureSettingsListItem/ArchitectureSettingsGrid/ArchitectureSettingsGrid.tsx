@@ -1,30 +1,27 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Grid, TextField, Alert, Autocomplete } from "@mui/material";
+import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
 
-import { CustomNumberTextField } from "components/common/InputFields";
 import { StyledFormControl } from "components/common/StyledFormControl";
+import { CustomNumberTextField } from "components/common/InputFields/";
 
 import {
-  segmentationArchitectureOptionsSelector,
-  segmentationInputShapeSelector,
-  userUploadedSegmentationModelSelector,
-} from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+  architectureOptionsSelector,
+  inputShapeSelector,
+  uploadedModelSelector,
+} from "store/selectors";
+import { classifierSlice } from "store/slices";
 
-import { availableSegmenterModels, SegmenterModelProps } from "types";
+import { availableClassifierModels, ClassifierModelProps } from "types";
 
-export const SegmenterArchitectureSettingsGrid = () => {
-  const architectureOptions = useSelector(
-    segmentationArchitectureOptionsSelector
-  );
-  const userUploadedModel = useSelector(userUploadedSegmentationModelSelector);
-  const inputShape = useSelector(segmentationInputShapeSelector);
+export const ArchitectureSettingsGrid = () => {
+  const architectureOptions = useSelector(architectureOptionsSelector);
+  const userUploadedModel = useSelector(uploadedModelSelector);
+  const inputShape = useSelector(inputShapeSelector);
 
-  const [selectedModel, setSelectedModel] = React.useState<SegmenterModelProps>(
-    architectureOptions.selectedModel
-  );
+  const [selectedModel, setSelectedModel] =
+    React.useState<ClassifierModelProps>(architectureOptions.selectedModel);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     React.useState<boolean>(false);
@@ -33,7 +30,8 @@ export const SegmenterArchitectureSettingsGrid = () => {
 
   const dispatch = useDispatch();
 
-  const modelOptions: SegmenterModelProps[] = availableSegmenterModels.slice();
+  const modelOptions: ClassifierModelProps[] =
+    availableClassifierModels.slice();
 
   if (userUploadedModel) {
     modelOptions.push(userUploadedModel);
@@ -53,15 +51,15 @@ export const SegmenterArchitectureSettingsGrid = () => {
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
-    value: SegmenterModelProps | null
+    value: ClassifierModelProps | null
   ) => {
-    const selectedModel = value as SegmenterModelProps;
+    const selectedModel = value as ClassifierModelProps;
     setSelectedModel(selectedModel);
 
     // if the selected model requires a specific number of input channels, dispatch that number to the store
     if (selectedModel.requiredChannels) {
       dispatch(
-        segmenterSlice.actions.updateSegmentationInputShape({
+        classifierSlice.actions.updateInputShape({
           inputShape: {
             ...inputShape,
             channels: selectedModel.requiredChannels,
@@ -71,13 +69,13 @@ export const SegmenterArchitectureSettingsGrid = () => {
     }
 
     dispatch(
-      segmenterSlice.actions.updateSelectedModel({ model: selectedModel })
+      classifierSlice.actions.updateSelectedModel({ model: selectedModel })
     );
   };
 
   const dispatchRows = (height: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
+      classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, height: height },
       })
     );
@@ -85,7 +83,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
 
   const dispatchCols = (cols: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
+      classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, width: cols },
       })
     );
@@ -93,7 +91,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
 
   const dispatchChannels = (channels: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
+      classifierSlice.actions.updateInputShape({
         inputShape: { ...inputShape, channels: channels },
       })
     );
@@ -107,7 +105,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
             disableClearable={true}
             options={modelOptions}
             onChange={onSelectedModelChange}
-            getOptionLabel={(option: SegmenterModelProps) => option.modelName}
+            getOptionLabel={(option: ClassifierModelProps) => option.modelName}
             sx={{ width: 300 }}
             renderInput={(params) => (
               <TextField
