@@ -68,7 +68,7 @@ export const SegmenterList = () => {
   };
 
   return (
-    <List dense>
+    <List dense sx={{ bgcolor: "#392dcf80" }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}

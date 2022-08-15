@@ -72,7 +72,7 @@ export const ClassifierList = () => {
   const onCategoryClickCallBack = (category: Category) => {};
 
   return (
-    <List dense>
+    <List dense sx={{ bgcolor: "#02aec580" }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
