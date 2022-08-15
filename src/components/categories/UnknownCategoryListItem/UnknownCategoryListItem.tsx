@@ -17,6 +17,8 @@ import {
 
 import { UNKNOWN_CATEGORY_ID } from "types";
 
+import { UNKNOWN_CATEGORY_COLOR } from "colorPalette";
+
 export const UnknownCategoryListItem = () => {
   const id = UNKNOWN_CATEGORY_ID;
 
@@ -26,10 +28,14 @@ export const UnknownCategoryListItem = () => {
         <ListItemIcon>
           <Checkbox
             checked
-            checkedIcon={<LabelIcon style={{ color: "#AAAAAA" }} />}
+            checkedIcon={
+              <LabelIcon style={{ color: UNKNOWN_CATEGORY_COLOR }} />
+            }
             disableRipple
             edge="start"
-            icon={<LabelOutlinedIcon style={{ color: "#AAAAAA" }} />}
+            icon={
+              <LabelOutlinedIcon style={{ color: UNKNOWN_CATEGORY_COLOR }} />
+            }
             tabIndex={-1}
           />
         </ListItemIcon>
