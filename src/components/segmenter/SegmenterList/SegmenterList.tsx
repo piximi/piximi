@@ -32,6 +32,7 @@ import {
 } from "store/selectors";
 
 import { CategoryType } from "types";
+import { APPLICATION_COLORS } from "colorPalette";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);
@@ -68,7 +69,7 @@ export const SegmenterList = () => {
   };
 
   return (
-    <List dense sx={{ bgcolor: "#392dcf80" }}>
+    <List dense sx={{ bgcolor: APPLICATION_COLORS.segmenterList }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}

@@ -33,6 +33,8 @@ import {
 
 import { Category, CategoryType } from "types";
 
+import { APPLICATION_COLORS } from "colorPalette";
+
 export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);
   const unknownCategory = useSelector(unknownCategorySelector);
@@ -72,7 +74,7 @@ export const ClassifierList = () => {
   const onCategoryClickCallBack = (category: Category) => {};
 
   return (
-    <List dense sx={{ bgcolor: "#02aec580" }}>
+    <List dense sx={{ bgcolor: APPLICATION_COLORS.classifierList }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
