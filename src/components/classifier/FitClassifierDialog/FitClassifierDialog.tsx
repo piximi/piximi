@@ -3,47 +3,51 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Dialog, DialogContent, List } from "@mui/material";
 
-import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
-import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
+import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 
-import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
+import { ModelSummaryTable } from "components/common/ModelSummary";
+import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
-import { alertStateSelector } from "store/selectors";
 import {
-  annotatedImagesSelector,
-  compiledSegmentationModelSelector,
-  segmentationCompileOptionsSelector,
-  segmentationFitOptionsSelector,
-  segmentationTrainingFlagSelector,
-  segmentationTrainingPercentageSelector,
-} from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+  alertStateSelector,
+  categorizedImagesSelector,
+  compiledSelector,
+  compileOptionsSelector,
+  epochsSelector,
+  fitOptionsSelector,
+  trainingFlagSelector,
+  trainingPercentageSelector,
+} from "store/selectors";
+
+import { classifierSlice } from "store/slices";
 
 import {
   AlertStateType,
   AlertType,
-  LossFunction,
   OptimizationAlgorithm,
+  LossFunction,
 } from "types";
 
-type FitSegmenterDialogProps = {
+type FitClassifierDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
 };
 
-export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
+export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
   const [showWarning, setShowWarning] = useState<boolean>(true);
-  const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
+  const [noCategorizedImages, setNoCategorizedImages] =
+    useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
@@ -62,45 +66,35 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(segmentationTrainingFlagSelector);
-  const annotatedImages = useSelector(annotatedImagesSelector);
-  const compiledModel = useSelector(compiledSegmentationModelSelector);
+  const currentlyTraining = useSelector(trainingFlagSelector);
+  const categorizedImages = useSelector(categorizedImagesSelector);
+  const compiledModel = useSelector(compiledSelector);
   const alertState = useSelector(alertStateSelector);
 
-  const fitOptions = useSelector(segmentationFitOptionsSelector);
-  const compileOptions = useSelector(segmentationCompileOptionsSelector);
-
-  const trainingPercentage = useSelector(
-    segmentationTrainingPercentageSelector
-  );
+  const compileOptions = useSelector(compileOptionsSelector);
+  const fitOptions = useSelector(fitOptionsSelector);
+  const epochs = useSelector(epochsSelector);
+  const trainingPercentage = useSelector(trainingPercentageSelector);
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationBatchSize({
-        batchSize: batchSize,
-      })
-    );
+    dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
   };
 
   const dispatchLearningRateCallback = (learningRate: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationLearningRate({
-        learningRate: learningRate,
-      })
+      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
     );
   };
 
   const dispatchEpochsCallback = (epochs: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs })
-    );
+    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
   };
 
   const dispatchOptimizationAlgorithmCallback = (
     optimizationAlgorithm: OptimizationAlgorithm
   ) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationOptimizationAlgorithm({
+      classifierSlice.actions.updateOptimizationAlgorithm({
         optimizationAlgorithm: optimizationAlgorithm,
       })
     );
@@ -108,7 +102,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationLossFunction({
+      classifierSlice.actions.updateLossFunction({
         lossFunction: lossFunction,
       })
     );
@@ -116,7 +110,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
     dispatch(
-      segmenterSlice.actions.updateSegmentationTrainingPercentage({
+      classifierSlice.actions.updateTrainingPercentage({
         trainingPercentage: trainPercentage,
       })
     );
@@ -129,15 +123,15 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   };
 
   useEffect(() => {
-    if (annotatedImages.length === 0) {
-      setNoLabeledImages(true);
-      if (!noLabeledImages) {
+    if (categorizedImages.length === 0) {
+      setNoCategorizedImages(true);
+      if (!noCategorizedImages) {
         setShowWarning(true);
       }
     } else {
-      setNoLabeledImages(false);
+      setNoCategorizedImages(false);
     }
-  }, [annotatedImages, noLabeledImages]);
+  }, [categorizedImages, noCategorizedImages]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
@@ -188,7 +182,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     }
 
     dispatch(
-      segmenterSlice.actions.fitSegmenter({
+      classifierSlice.actions.fit({
         onEpochEnd: trainingHistoryCallback,
       })
     );
@@ -196,22 +190,21 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   return (
     <Dialog
-      fullWidth
-      maxWidth="md"
+      fullScreen
       onClose={closeDialog}
       open={openedDialog}
       TransitionComponent={DialogTransition}
-      style={{ zIndex: 1203, height: "100%" }}
+      style={{ zIndex: 1203 }}
     >
-      <FitSegmenterDialogAppBar
+      <FitClassifierDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noLabeledImages}
-        epochs={fitOptions.epochs}
+        disableFitting={noCategorizedImages}
+        epochs={epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noLabeledImages && (
+      {showWarning && noCategorizedImages && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
@@ -222,7 +215,9 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <SegmenterArchitectureSettingsListItem />
+          <PreprocessingSettingsListItem />
+
+          <ArchitectureSettingsListItem />
 
           <OptimizerSettingsListItem
             compileOptions={compileOptions}

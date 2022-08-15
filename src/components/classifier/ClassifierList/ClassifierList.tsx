@@ -9,43 +9,45 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+
 import {
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 
 import {
-  FitSegmenterListItem,
-  PredictSegmenterListItem,
-  EvaluateSegmenterListItem,
-} from "../SegmenterListItems";
+  FitClassifierListItem,
+  PredictClassifierListItem,
+  EvaluateClassifierListItem,
+} from "../ClassifierListItems";
 
 import { CategoriesList } from "components/categories/CategoriesList";
 
 import {
-  fittedSegmentationModelSelector,
-  segmentationTrainingFlagSelector,
-} from "store/selectors/segmenter";
-import {
-  createdAnnotatorCategoriesSelector,
-  unknownAnnotationCategorySelector,
+  createdCategoriesSelector,
+  fittedSelector,
+  predictedSelector,
+  trainingFlagSelector,
+  unknownCategorySelector,
 } from "store/selectors";
 
-import { CategoryType } from "types";
+import { Category, CategoryType } from "types";
 
-export const SegmenterList = () => {
-  const categories = useSelector(createdAnnotatorCategoriesSelector);
-  const unknownCategory = useSelector(unknownAnnotationCategorySelector);
+export const ClassifierList = () => {
+  const categories = useSelector(createdCategoriesSelector);
+  const unknownCategory = useSelector(unknownCategorySelector);
 
-  const [collapsed, setCollapsed] = React.useState(false);
+  const predicted = useSelector(predictedSelector);
+
+  const [collapsed, setCollapsed] = React.useState(true);
 
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] = React.useState<string>(
     "disabled: no trained model"
   );
 
-  const fitted = useSelector(fittedSegmentationModelSelector);
-  const training = useSelector(segmentationTrainingFlagSelector);
+  const fitted = useSelector(fittedSelector);
+  const training = useSelector(trainingFlagSelector);
 
   useEffect(() => {
     if (training) {
@@ -67,40 +69,40 @@ export const SegmenterList = () => {
     setCollapsed(!collapsed);
   };
 
+  const onCategoryClickCallBack = (category: Category) => {};
+
   return (
-    <List dense sx={{ bgcolor: "#392dcf80" }}>
+    <List dense sx={{ bgcolor: "#02aec580" }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </ListItemIcon>
 
-        <ListItemText primary="Segmenter" />
+        <ListItemText primary="Classifier" />
       </ListItem>
 
       <Collapse in={collapsed} timeout="auto" unmountOnExit>
         <CategoriesList
           createdCategories={categories}
           unknownCategory={unknownCategory}
-          predicted={false}
-          categoryType={CategoryType.AnnotationCategory}
-          onCategoryClickCallBack={() => {
-            return;
-          }}
+          predicted={predicted}
+          categoryType={CategoryType.ClassifierCategory}
+          onCategoryClickCallBack={onCategoryClickCallBack}
         />
 
         <Divider />
 
         <List component="div" dense disablePadding>
-          <FitSegmenterListItem />
+          <FitClassifierListItem />
 
-          <PredictSegmenterListItem
+          <PredictClassifierListItem
             disabled={disabled}
             helperText={helperText}
           />
 
-          <EvaluateSegmenterListItem
-            disabled={true}
-            helperText={"Not yet implemented."}
+          <EvaluateClassifierListItem
+            disabled={disabled}
+            helperText={helperText}
           />
         </List>
       </Collapse>

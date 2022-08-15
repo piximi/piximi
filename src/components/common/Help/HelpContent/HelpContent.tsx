@@ -17,6 +17,12 @@ export type HelpTopic = {
   subtopics: Array<Subtopic>;
 };
 
+export type HelpContentType = {
+  error: string;
+  appBarOffset: boolean;
+  topics: Array<HelpTopic>;
+};
+
 export const HelpContent = (helpContent: Array<HelpTopic>) => {
   return (
     <div>

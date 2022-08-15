@@ -1,1 +1,0 @@
-export { MainList } from "./MainList";

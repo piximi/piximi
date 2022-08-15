@@ -1,4 +1,7 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { ErrorBoundary } from "react-error-boundary";
+import { useLocation } from "react-router-dom";
 
 import {
   Drawer,
@@ -7,28 +10,42 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
-import { HelpContent, HelpTopic } from "../HelpContent/HelpContent";
+import { HelpContent, HelpContentType } from "../HelpContent/HelpContent";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
-type HelpDrawerProps = {
-  helpContent: Array<HelpTopic>;
-  appBarOffset?: boolean;
-};
+import { applicationSlice } from "store/slices";
 
-export default function HelpDrawer({
-  helpContent,
-  appBarOffset = false,
-}: HelpDrawerProps) {
+import { AlertType } from "types";
+
+export const HelpDrawer = () => {
+  const dispatch = useDispatch();
   const [state, setState] = React.useState({
     top: false,
     left: false,
     bottom: false,
     right: false,
   });
+  const location = useLocation();
+  const helpContent: HelpContentType =
+    location.pathname === "/annotator"
+      ? require("../HelpContent/AnnotatorHelpContent.json")
+      : require("../HelpContent/ClassifierHelpContent.json");
+
+  const handleError = (error: Error, info: { componentStack: string }) => {
+    dispatch(
+      applicationSlice.actions.updateAlertState({
+        alertState: {
+          alertType: AlertType.Error,
+          name: helpContent.error,
+          description: error.name + ": " + error.message,
+          stackTrace: info.componentStack,
+        },
+      })
+    );
+  };
 
   const toggleDrawer =
     (anchor: string, open: boolean) =>
@@ -44,47 +61,49 @@ export default function HelpDrawer({
       setState({ ...state, [anchor]: open });
     };
 
-  const HelpContentComponent = HelpContent(helpContent);
+  const HelpContentComponent = HelpContent(helpContent.topics);
 
   return (
-    <div key={"left"}>
-      <ListItem button onClick={toggleDrawer("left", true)}>
-        <ListItemIcon>
-          <HelpIcon />
-        </ListItemIcon>
+    <ErrorBoundary onError={handleError} FallbackComponent={FallBackHelpDrawer}>
+      <div key={"left"}>
+        <ListItem button onClick={toggleDrawer("left", true)}>
+          <ListItemIcon>
+            <HelpIcon />
+          </ListItemIcon>
 
-        <ListItemText primary="Help" />
-      </ListItem>
+          <ListItemText primary="Help" />
+        </ListItem>
 
-      <Drawer
-        variant={"persistent"}
-        anchor={"left"}
-        sx={(theme) => ({
-          width: theme.spacing(32),
-          flexShrink: 0,
-          "& > .MuiDrawer-paper": {
+        <Drawer
+          variant={"persistent"}
+          anchor={"left"}
+          sx={(theme) => ({
             width: theme.spacing(32),
-          },
-        })}
-        open={state["left"]}
-        onClose={toggleDrawer("left", false)}
-      >
-        {appBarOffset && <AppBarOffset />}
+            flexShrink: 0,
+            "& > .MuiDrawer-paper": {
+              width: theme.spacing(32),
+            },
+          })}
+          open={state["left"]}
+          onClose={toggleDrawer("left", false)}
+        >
+          {helpContent.appBarOffset && <AppBarOffset />}
 
-        <div tabIndex={1} role="button">
-          <IconButton
-            style={{ float: "right", marginRight: "20px" }}
-            onClick={toggleDrawer("left", false)}
-          >
-            <CloseIcon />
-          </IconButton>
-        </div>
+          <div tabIndex={1} role="button">
+            <IconButton
+              style={{ float: "right", marginRight: "20px" }}
+              onClick={toggleDrawer("left", false)}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
 
-        {HelpContentComponent}
-      </Drawer>
-    </div>
+          {HelpContentComponent}
+        </Drawer>
+      </div>
+    </ErrorBoundary>
   );
-}
+};
 
 export const FallBackHelpDrawer = () => {
   return (

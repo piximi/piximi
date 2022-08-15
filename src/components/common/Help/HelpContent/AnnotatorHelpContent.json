@@ -1,4 +1,6 @@
 {
+  "error": "Error in Annotator Help drawer",
+  "appBarOffset": false,
   "topics": [
     {
       "topic": "Opening images",

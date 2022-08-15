@@ -8,10 +8,10 @@ import { useUpload } from "hooks";
 import { AnnotatorDrawer } from "../../AnnotatorDrawer";
 import { ToolOptions } from "../../ToolOptions";
 import { Tools } from "../../Tools";
-import { ImageShapeDialog } from "../../AnnotatorDrawer/OpenMenu/ImageShapeDialog";
 import { ImageContent } from "../../ImageContent";
 
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
 import { alertStateSelector } from "store/selectors";
 
