@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
 import { CategoryListItem } from "../CategoryListItem";
-import { CreateCategoryListItem } from "../CreateCategoryListItem";
+import { CreateCategoryListItem } from "../CreateCategory";
 
 import { PredictionVisibility } from "../PredictionsVisibility/";
-import { DeleteAllCategoriesMenuItem } from "../DeleteAllCategoriesMenuItem";
+import { DeleteAllCategoriesMenuItem } from "../DeleteAllCategories";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 

@@ -69,6 +69,7 @@ const MainImageGridItem = memo(
     };
 
     const onSelectImage = (image: ImageType) => {
+      console.log(image.id);
       if (selected) {
         dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
       } else {

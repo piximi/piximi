@@ -5,9 +5,9 @@ import { Divider, Menu, MenuList } from "@mui/material";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 
-import { DeleteCategoryMenuItem } from "../DeleteCategoryMenuItem";
-import { EditCategoryMenuItem } from "../EditCategoryMenuItem";
-import { ClearAnnotationMenuItem } from "../ClearAnnotationMenuItem";
+import { DeleteCategoryMenuItem } from "../DeleteCategory";
+import { EditCategoryMenuItem } from "../EditCategory";
+import { ClearAnnotationMenuItem } from "../ClearAnnotation";
 
 import {
   Category,
