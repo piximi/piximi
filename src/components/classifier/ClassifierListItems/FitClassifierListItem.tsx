@@ -12,7 +12,7 @@ import {
 
 import { useDialog } from "hooks";
 
-import { FitClassifierDialog } from "..//FitClassifierDialog/FitClassifierDialog";
+import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
 
 export const FitClassifierListItem = () => {
   const { onClose, onOpen, open } = useDialog(false);
