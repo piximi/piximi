@@ -1,13 +1,10 @@
-import {
-  FormHelperText,
-  Grid,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { FormHelperText, Grid, SelectChangeEvent } from "@mui/material";
 
 import { StyledFormControl } from "../../StyledFormControl";
-import { CustomNumberTextField } from "../../InputFields";
+import {
+  CustomNumberTextField,
+  CustomFormSelectField,
+} from "../../InputFields";
 
 import {
   CompileOptions,
@@ -15,8 +12,6 @@ import {
   LossFunction,
   OptimizationAlgorithm,
 } from "types";
-
-import { enumKeys } from "utils";
 
 export type OptimizerSettingsGridProps = {
   compileOptions: CompileOptions;
@@ -59,26 +54,11 @@ export const OptimizerSettingsGrid = ({
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <FormHelperText>Optimization Algorithm</FormHelperText>
-            <Select
+            <CustomFormSelectField
+              keySource={OptimizationAlgorithm}
               value={compileOptions.optimizationAlgorithm as string}
               onChange={onOptimizationAlgorithmChange}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={(theme) => ({
-                flexBasis: 300,
-                width: "100%",
-                marginRight: theme.spacing(1),
-                marginTop: theme.spacing(0),
-              })}
-            >
-              {enumKeys(OptimizationAlgorithm).map((k) => {
-                return (
-                  <MenuItem key={k} value={OptimizationAlgorithm[k]}>
-                    {OptimizationAlgorithm[k]}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            />
           </Grid>
         </Grid>
         <Grid container spacing={2}>
@@ -98,26 +78,11 @@ export const OptimizerSettingsGrid = ({
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <FormHelperText>Loss Function</FormHelperText>
-            <Select
-              value={compileOptions.lossFunction as string} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
+            <CustomFormSelectField
+              keySource={LossFunction}
+              value={compileOptions.lossFunction as string}
               onChange={onLossFunctionChange}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={(theme) => ({
-                flexBasis: 300,
-                width: "100%",
-                marginRight: theme.spacing(1),
-                marginTop: theme.spacing(0),
-              })}
-            >
-              {enumKeys(LossFunction).map((k) => {
-                return (
-                  <MenuItem key={k} value={LossFunction[k]}>
-                    {LossFunction[k]}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            />
           </Grid>
         </Grid>
         <Grid container direction={"row"} spacing={2}>
