@@ -16,7 +16,7 @@ import {
   UNKNOWN_CATEGORY_ID,
 } from "types";
 
-type CategoryMenuProps = {
+type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
   categoryType: CategoryType;
@@ -25,13 +25,13 @@ type CategoryMenuProps = {
   openCategoryMenu: boolean;
 };
 
-export const CategoryMenu = ({
+export const CategoryItemMenu = ({
   anchorElCategoryMenu,
   category,
   categoryType,
   onCloseCategoryMenu,
   openCategoryMenu,
-}: CategoryMenuProps) => {
+}: CategoryItemMenuProps) => {
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}

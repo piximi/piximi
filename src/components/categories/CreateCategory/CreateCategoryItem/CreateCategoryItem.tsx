@@ -9,11 +9,11 @@ import { CreateCategoryDialog } from "../CreateCategoryDialog";
 
 import { CategoryType } from "types";
 
-type CreateCategoryListItemProps = {
+type CreateCategoryItemProps = {
   categoryType: CategoryType;
 };
 
-export const CreateCategoryListItem = (props: CreateCategoryListItemProps) => {
+export const CreateCategoryItem = (props: CreateCategoryItemProps) => {
   const { categoryType } = props;
 
   const { onClose, onOpen, open } = useDialog();

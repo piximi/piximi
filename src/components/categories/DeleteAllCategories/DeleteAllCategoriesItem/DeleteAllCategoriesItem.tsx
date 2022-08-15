@@ -6,13 +6,13 @@ import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 
 import { CategoryType } from "types";
 
-type DeleteAllCategoriesMenuItemProps = {
+type DeleteAllCategoriesItemProps = {
   categoryType: CategoryType;
 };
 
-export const DeleteAllCategoriesMenuItem = ({
+export const DeleteAllCategoriesItem = ({
   categoryType,
-}: DeleteAllCategoriesMenuItemProps) => {
+}: DeleteAllCategoriesItemProps) => {
   const { onClose, onOpen, open } = useDialog();
 
   return (

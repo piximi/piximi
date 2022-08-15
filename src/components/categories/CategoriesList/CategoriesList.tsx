@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
-import { CategoryListItem } from "../CategoryListItem";
-import { CreateCategoryListItem } from "../CreateCategory";
+import { CategoryItem } from "../CategoryItem";
+import { CreateCategoryItem } from "../CreateCategory";
 
 import { PredictionVisibility } from "../PredictionsVisibility/";
-import { DeleteAllCategoriesMenuItem } from "../DeleteAllCategories";
+import { DeleteAllCategoriesItem } from "../DeleteAllCategories";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
@@ -43,7 +43,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
 
   return (
     <CollapsibleList dense primary="Categories">
-      <CategoryListItem
+      <CategoryItem
         categoryType={categoryType}
         category={unknownCategory}
         key={unknownCategory.id}
@@ -52,7 +52,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
       />
       {categories.map((category: Category) => {
         return (
-          <CategoryListItem
+          <CategoryItem
             categoryType={categoryType}
             category={category}
             key={category.id}
@@ -64,10 +64,10 @@ export const CategoriesList = (props: CategoriesListProps) => {
 
       {showPredictionVisibilityMenu && <PredictionVisibility />}
 
-      <CreateCategoryListItem categoryType={categoryType} />
+      <CreateCategoryItem categoryType={categoryType} />
 
       {showDeleteAllCategoriesIcon && (
-        <DeleteAllCategoriesMenuItem categoryType={categoryType} />
+        <DeleteAllCategoriesItem categoryType={categoryType} />
       )}
     </CollapsibleList>
   );

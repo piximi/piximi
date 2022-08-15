@@ -1,2 +1,2 @@
 export { DeleteAllCategoriesDialog } from "./DeleteAllCategoriesDialog";
-export { DeleteAllCategoriesMenuItem } from "./DeleteAllCategoriesMenuItem";
+export { DeleteAllCategoriesItem } from "./DeleteAllCategoriesItem";

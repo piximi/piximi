@@ -15,15 +15,15 @@ import {
 
 import { Category, CategoryType, ImageType } from "types";
 
-type CategoryListItemCheckboxProps = {
+type CategoryItemCheckboxProps = {
   category: Category;
   categoryType: CategoryType;
 };
 
-export const CategoryListItemCheckbox = ({
+export const CategoryItemCheckbox = ({
   category,
   categoryType,
-}: CategoryListItemCheckboxProps) => {
+}: CategoryItemCheckboxProps) => {
   const dispatch = useDispatch();
 
   const images = useSelector(visibleImagesSelector);

@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { CategoryListItemCheckbox } from "../CategoryListItemCheckbox";
-import { CategoryMenu } from "../CategoryMenu";
+import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
+import { CategoryItemMenu } from "../CategoryItemMenu";
 
 import {
   categoryCountsSelector,
@@ -20,19 +20,19 @@ import {
 
 import { Category, CategoryType, ImageType, State } from "types";
 
-type CategoryListItemProps = {
+type CategoryItemProps = {
   categoryType: CategoryType;
   category: Category;
   id: string;
   onCategoryClickCallBack: (category: Category) => void;
 };
 
-export const CategoryListItem = ({
+export const CategoryItem = ({
   categoryType,
   category,
   id,
   onCategoryClickCallBack,
-}: CategoryListItemProps) => {
+}: CategoryItemProps) => {
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
@@ -75,10 +75,7 @@ export const CategoryListItem = ({
         onClick={onCategoryClick}
         selected={category.id === selectedCategory.id}
       >
-        <CategoryListItemCheckbox
-          category={category}
-          categoryType={categoryType}
-        />
+        <CategoryItemCheckbox category={category} categoryType={categoryType} />
 
         <ListItemText
           id={id}
@@ -105,7 +102,7 @@ export const CategoryListItem = ({
         </ListItemSecondaryAction>
       </ListItem>
 
-      <CategoryMenu
+      <CategoryItemMenu
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={category}
         categoryType={categoryType}

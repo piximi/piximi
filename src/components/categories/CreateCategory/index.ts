@@ -1,2 +1,2 @@
 export { CreateCategoryDialog } from "./CreateCategoryDialog";
-export { CreateCategoryListItem } from "./CreateCategoryListItem";
+export { CreateCategoryItem } from "./CreateCategoryItem";
