@@ -3,12 +3,7 @@ import _ from "lodash";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
-import {
-  createSegmentationModel,
-  compile,
-  preprocessSegmentationImages,
-  fitSegmenter,
-} from "store/coroutines";
+
 import {
   annotatedImagesSelector,
   projectSlice,
@@ -24,7 +19,11 @@ import {
   segmenterSlice,
   segmentationTrainImagesSelector,
   segmentationValidationImagesSelector,
+  createSegmentationModel,
+  preprocessSegmentationImages,
+  fitSegmenter,
 } from "store/segmenter";
+import { compile } from "store/common";
 import {
   FitOptions,
   PreprocessOptions,

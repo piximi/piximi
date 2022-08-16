@@ -2,8 +2,6 @@ import { put, select } from "redux-saga/effects";
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
 
 import { applicationSlice } from "store/application";
-import { preprocessSegmentationImages } from "store/coroutines";
-import { predictSegmentations } from "store/coroutines/segmenter";
 import { projectSlice, annotationCategoriesSelector } from "store/project";
 import {
   unannotatedImagesSelector,
@@ -12,6 +10,8 @@ import {
   segmentationFitOptionsSelector,
   fittedSegmentationModelSelector,
   segmenterSlice,
+  predictSegmentations,
+  preprocessSegmentationImages,
 } from "store/segmenter";
 import {
   AlertStateType,

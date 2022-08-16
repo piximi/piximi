@@ -1,9 +1,8 @@
-import { SegmentationArchitectureOptions } from "types/ArchitectureOptions";
-import { ModelType } from "types/ModelType";
+import { ModelType, SegmentationArchitectureOptions } from "types";
 import {
   createFCNSegmenterModel,
   createSimpleFCNSegmenterModel,
-} from "../models";
+} from "../../coroutines/models";
 
 export const createSegmentationModel = async (
   architectureOptions: SegmentationArchitectureOptions,

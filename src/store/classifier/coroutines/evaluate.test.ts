@@ -5,18 +5,24 @@ import {
   time as tftime,
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
+
 import { evaluate } from "./evaluate";
-import { Category } from "../../../types/Category";
-import { ImageType } from "../../../types/ImageType";
-import { Partition } from "../../../types/Partition";
-import { Shape } from "../../../types/Shape";
-import { RescaleOptions } from "../../../types/RescaleOptions";
-import { generateDefaultChannels } from "../../../image/imageHelper";
-import { preprocess } from "store/coroutines/classifier/preprocess";
-import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
-import { PreprocessOptions } from "types/PreprocessOptions";
-import { FitOptions } from "types/FitOptions";
-import { CropOptions, CropSchema } from "types/CropOptions";
+import { preprocess } from "./preprocess";
+
+import {
+  Category,
+  ClassifierEvaluationResultType,
+  ImageType,
+  Partition,
+  Shape,
+  RescaleOptions,
+  FitOptions,
+  PreprocessOptions,
+  CropOptions,
+  CropSchema,
+} from "types";
+
+import { generateDefaultChannels } from "image/imageHelper";
 
 jest.setTimeout(100000);
 

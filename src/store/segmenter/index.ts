@@ -1,5 +1,6 @@
 // Slices
-export { segmenterSlice, evaluateSegmenter } from "./segmenterSlice";
+
+export { segmenterSlice } from "./segmenterSlice";
 
 // Selectors
 
@@ -20,3 +21,32 @@ export { segmentationInputShapeSelector } from "./selectors/segmentationInputSha
 export { segmentationTrainingFlagSelector } from "./selectors/segmentationTrainingFlagSelector";
 export { segmenterSelector } from "./selectors/segmenterSelector";
 export { segmentationPredictingFlagSelector } from "./selectors/segmentationPredictingFlagSelector";
+
+// Sagas
+
+export { evaluateSegmenterSaga } from "./sagas/evaluateSegmenterSaga";
+export { fitSegmenterSaga } from "./sagas/fitSegmenterSaga";
+export { predictSegmenterSaga } from "./sagas/predictSegmenterSaga";
+export { watchEvaluateSegmenterSaga } from "./sagas/watchEvaluateSegmenterSaga";
+export { watchFitSegmenterSaga } from "./sagas/watchFitSegmenterSaga";
+export { watchPredictSegmenterSaga } from "./sagas/watchPredictSegmenterSaga";
+
+// Coroutines
+
+export { createSegmentationModel } from "./coroutines/createSegmentationModel";
+export { evaluateSegmenter } from "./coroutines/evaluateSegmenter";
+export { fitSegmenter } from "./coroutines/fitSegmenter";
+export { predictSegmentations } from "./coroutines/predictSegmentations";
+export {
+  decodeFromImgSrc,
+  decodeFromOriginalSrc,
+  decodeImage,
+  drawSegmentationMask,
+  sampleGenerator,
+  resize,
+  preprocessSegmentationImages,
+} from "./coroutines/preprocessSegmenter";
+export {
+  encodeAnnotationToSegmentationMask,
+  decodeSegmentationMaskToAnnotations,
+} from "./coroutines/segmentationMasks";

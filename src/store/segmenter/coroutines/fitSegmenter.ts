@@ -1,17 +1,16 @@
-import { History, LayersModel } from "@tensorflow/tfjs";
-import { FitOptions } from "../../../types/FitOptions";
-import * as tensorflow from "@tensorflow/tfjs";
+import { History, LayersModel, data, Tensor } from "@tensorflow/tfjs";
+import { FitOptions } from "types";
 
 export const fitSegmenter = async (
   compiled: LayersModel,
   data: {
-    val: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor;
-      ys: tensorflow.Tensor;
+    val: data.Dataset<{
+      xs: Tensor;
+      ys: Tensor;
     }>;
-    train: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor;
-      ys: tensorflow.Tensor;
+    train: data.Dataset<{
+      xs: Tensor;
+      ys: Tensor;
     }>;
   },
   options: FitOptions,

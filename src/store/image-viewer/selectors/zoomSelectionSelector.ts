@@ -1,4 +1,5 @@
 import { ImageViewer } from "types";
+
 export const zoomSelectionSelector = ({
   imageViewer,
 }: {

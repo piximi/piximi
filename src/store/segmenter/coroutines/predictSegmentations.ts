@@ -7,10 +7,15 @@ import {
   argMax,
   image,
 } from "@tensorflow/tfjs";
-import { AnnotationType } from "types/AnnotationType";
-import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
-import { ImageType } from "types/ImageType";
+
 import { decodeSegmentationMaskToAnnotations } from "./segmentationMasks";
+
+import {
+  AnnotationType,
+  Category,
+  ImageType,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
+} from "types";
 
 export const predictSegmentations = async (
   model: LayersModel,

@@ -8,8 +8,8 @@ import {
   segmentationValImagesSelector,
   segmenterSlice,
   segmentationValDataSelector,
+  evaluateSegmenter,
 } from "store/segmenter";
-import { evaluateSegmenter } from "store/coroutines/segmenter";
 
 import {
   Category,

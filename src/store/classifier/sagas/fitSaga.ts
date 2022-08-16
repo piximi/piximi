@@ -10,6 +10,9 @@ import {
   fitOptionsSelector,
   preprocessOptionsSelector,
   trainingPercentageSelector,
+  fit,
+  open,
+  preprocess,
 } from "store/classifier";
 import {
   categorizedImagesSelector,
@@ -20,6 +23,7 @@ import {
   valImagesSelector,
 } from "store/project";
 import { applicationSlice } from "store/application";
+import { compile } from "store/common";
 
 import {
   AlertStateType,
@@ -34,7 +38,6 @@ import {
   PreprocessOptions,
 } from "types";
 
-import { compile, fit, open, preprocess } from "store/coroutines";
 import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* fitSaga(action: any): any {

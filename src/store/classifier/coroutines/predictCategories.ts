@@ -1,6 +1,6 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import { LayersModel } from "@tensorflow/tfjs";
-import { Category } from "../../../types/Category";
+import { Category } from "types";
 
 export const predictCategories = async (
   model: LayersModel,

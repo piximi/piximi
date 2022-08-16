@@ -1,7 +1,5 @@
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
-import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
-import { Category } from "types/Category";
-import { ImageType } from "types/ImageType";
+import { Category, ImageType, SegmenterEvaluationResultType } from "types";
 
 export const evaluateSegmenter = async (
   model: LayersModel,

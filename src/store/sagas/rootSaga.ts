@@ -1,19 +1,21 @@
 import { all, fork } from "redux-saga/effects";
+import { watchUploadImagesSaga } from "store/application";
+import {
+  watchEvaluateSaga,
+  watchFitSaga,
+  watchPredictSaga,
+} from "store/classifier";
 import {
   watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
   watchActiveImageChangeSaga,
   watchActiveImageColorsChangeSaga,
-} from "./annotator";
+} from "store/image-viewer";
 import {
   watchFitSegmenterSaga,
   watchEvaluateSegmenterSaga,
   watchPredictSegmenterSaga,
-} from "./segmenter";
-import { watchFitSaga } from "./classifier";
-import { watchPredictSaga } from "./classifier/watchPredictSaga";
-import { watchEvaluateSaga } from "./classifier/watchEvaluateSaga";
-import { watchUploadImagesSaga } from "./application/watchUploadImagesSaga";
+} from "store/segmenter";
 
 export function* rootSaga() {
   const classifierEffects = [

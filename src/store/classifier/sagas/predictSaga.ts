@@ -7,6 +7,8 @@ import {
   fitOptionsSelector,
   fittedSelector,
   preprocessOptionsSelector,
+  predictCategories,
+  preprocess,
 } from "store/classifier";
 import {
   createdCategoriesSelector,
@@ -27,8 +29,6 @@ import {
 } from "types";
 
 import { getStackTraceFromError } from "utils/getStackTrace";
-import { preprocess } from "store/coroutines";
-import { predictCategories } from "store/coroutines/classifier/predictCategories";
 
 export function* predictSaga(action: any): any {
   const testImages: Array<ImageType> = yield select(testImagesSelector);

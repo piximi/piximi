@@ -6,10 +6,10 @@ import {
   classifierSlice,
   fittedSelector,
   valDataSelector,
+  evaluate,
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
 import { createdCategoriesSelector } from "store/project";
-import { evaluate } from "store/coroutines/classifier/evaluate";
 import {
   AlertStateType,
   AlertType,

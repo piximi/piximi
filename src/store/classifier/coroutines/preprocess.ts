@@ -1,16 +1,21 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import { DataType } from "@tensorflow/tfjs-core";
 import * as ImageJS from "image-js";
-import { Category, UNKNOWN_CATEGORY_ID } from "../../../types/Category";
-import { ImageType } from "../../../types/ImageType";
-import { Shape } from "../../../types/Shape";
-import { FitOptions } from "types/FitOptions";
-import { PreprocessOptions } from "types/PreprocessOptions";
-import { CropSchema } from "types/CropOptions";
-import { matchedCropPad, padToMatch } from "./cropUtil";
-import { RescaleOptions } from "types/RescaleOptions";
-import { Partition } from "types/Partition";
 import _ from "lodash";
+
+import { matchedCropPad, padToMatch } from "./cropUtil";
+
+import {
+  Category,
+  ImageType,
+  Partition,
+  Shape,
+  RescaleOptions,
+  FitOptions,
+  PreprocessOptions,
+  UNKNOWN_CATEGORY_ID,
+  CropSchema,
+} from "types";
 
 export const decodeCategory = (numCategories: number) => {
   return (item: {

@@ -1,14 +1,19 @@
 import "@tensorflow/tfjs-node";
 import { preprocess } from "./preprocess";
-import { Category } from "../../../types/Category";
-import { ImageType } from "../../../types/ImageType";
-import { Partition } from "../../../types/Partition";
-import { Shape } from "../../../types/Shape";
-import { RescaleOptions } from "../../../types/RescaleOptions";
-import { FitOptions } from "types/FitOptions";
-import { generateDefaultChannels } from "../../../image/imageHelper";
-import { CropOptions, CropSchema } from "types/CropOptions";
-import { PreprocessOptions } from "types/PreprocessOptions";
+
+import {
+  Category,
+  ImageType,
+  Partition,
+  Shape,
+  RescaleOptions,
+  FitOptions,
+  PreprocessOptions,
+  CropOptions,
+  CropSchema,
+} from "types";
+
+import { generateDefaultChannels } from "image/imageHelper";
 
 jest.setTimeout(50000);
 
