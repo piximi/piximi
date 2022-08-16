@@ -1,12 +1,14 @@
 import { call, put, select } from "redux-saga/effects";
-import { Color } from "types/Color";
-import { imageSelector } from "store/selectors";
+
+import { imageViewerSlice } from "store/image-viewer";
+import { imageSelector } from "store/common";
+
+import { Color, ImageType } from "types";
+
 import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
 } from "image/imageHelper";
-import { ImageType } from "types/ImageType";
-import { imageViewerSlice } from "store/slices";
 
 export function* activeImageIDChangeSaga({
   payload: { imageId },

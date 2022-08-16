@@ -13,8 +13,9 @@ import {
   TextField,
 } from "@mui/material";
 
-import { classifierSelector, serializedProjectSelector } from "store/selectors";
-import { segmenterSelector } from "store/selectors/segmenter";
+import { classifierSelector } from "store/classifier";
+import { serializedProjectSelector } from "store/project";
+import { segmenterSelector } from "store/segmenter";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

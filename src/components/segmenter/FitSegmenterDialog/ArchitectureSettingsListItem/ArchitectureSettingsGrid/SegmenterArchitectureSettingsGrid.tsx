@@ -8,10 +8,10 @@ import { StyledFormControl } from "components/common/StyledFormControl";
 
 import {
   segmentationArchitectureOptionsSelector,
-  segmentationInputShapeSelector,
   userUploadedSegmentationModelSelector,
-} from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+  segmentationInputShapeSelector,
+  segmenterSlice,
+} from "store/segmenter";
 
 import { availableSegmenterModels, SegmenterModelProps } from "types";
 

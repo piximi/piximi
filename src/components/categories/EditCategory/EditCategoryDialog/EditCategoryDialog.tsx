@@ -14,7 +14,7 @@ import {
 
 import { ColorIcon } from "components/common/ColorIcon";
 
-import { updateAnnotationCategory, updateCategory } from "store/slices";
+import { updateCategory, updateAnnotationCategory } from "store/project";
 
 import { Category, CategoryType } from "types";
 

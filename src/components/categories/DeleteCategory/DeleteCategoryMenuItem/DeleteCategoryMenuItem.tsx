@@ -7,8 +7,8 @@ import { useDialog } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
-import { imagesSelector } from "store/selectors";
-import { imageViewerSlice, projectSlice } from "store/slices";
+import { imageViewerSlice } from "store/image-viewer";
+import { imagesSelector, projectSlice } from "store/project";
 
 import { Category, CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 

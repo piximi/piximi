@@ -17,8 +17,12 @@ import {
 
 import { ColorIcon } from "components/common/ColorIcon";
 
-import { availableColorsSelector, categoriesSelector } from "store/selectors";
-import { createCategory, createAnnotationCategory } from "store/slices";
+import {
+  availableColorsSelector,
+  categoriesSelector,
+  createAnnotationCategory,
+  createCategory,
+} from "store/project";
 
 import { Category, CategoryType } from "types";
 

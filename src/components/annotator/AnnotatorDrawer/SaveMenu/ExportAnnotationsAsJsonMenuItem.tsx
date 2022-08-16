@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 
 import { MenuItem, ListItemText } from "@mui/material";
-
-import { activeSerializedAnnotationsSelector } from "store/selectors";
+import { activeSerializedAnnotationsSelector } from "store/common";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

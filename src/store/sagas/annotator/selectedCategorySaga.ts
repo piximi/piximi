@@ -1,12 +1,15 @@
 import { put, select } from "redux-saga/effects";
 import * as _ from "lodash";
-import { imageViewerSlice } from "../../slices";
-import { selectedAnnotationsIdsSelector } from "../../selectors/selectedAnnotationsIdsSelector";
-import { imageInstancesSelector } from "../../selectors/imageInstancesSelector";
-import { selectedAnnotationsSelector } from "../../selectors/selectedAnnotationsSelector";
-import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSelector";
-import { selectedCategorySelector } from "../../selectors/selectedCategorySelector";
-import { AnnotationType } from "../../../types/AnnotationType";
+
+import {
+  imageViewerSlice,
+  imageInstancesSelector,
+  selectedAnnotationSelector,
+  selectedAnnotationsIdsSelector,
+  selectedAnnotationsSelector,
+} from "store/image-viewer";
+import { selectedCategorySelector } from "store/common";
+import { AnnotationType } from "types";
 
 // eslint-disable-next-line no-empty-pattern
 export function* selectedCategorySaga({}: {

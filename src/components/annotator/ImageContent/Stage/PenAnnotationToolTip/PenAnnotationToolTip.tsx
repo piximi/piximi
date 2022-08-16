@@ -7,7 +7,7 @@ import {
   scaledImageHeightSelector,
   scaledImageWidthSelector,
   toolTypeSelector,
-} from "store/selectors";
+} from "store/image-viewer";
 
 import { ToolType } from "types";
 

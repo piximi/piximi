@@ -19,9 +19,8 @@ import { ImageMenu } from "../ImageMenu";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { annotatorImagesSelector, imageSelector } from "store/selectors";
-
-import { setActiveImage } from "store/slices";
+import { imageSelector } from "store/common";
+import { annotatorImagesSelector, setActiveImage } from "store/image-viewer";
 
 import { ImageType, ShadowImageType } from "types";
 

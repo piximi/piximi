@@ -14,7 +14,7 @@ import {
 
 import { CustomNumberTextField } from "components/common/InputFields";
 
-import { applicationSlice } from "store/slices";
+import { applicationSlice } from "store/application";
 
 import { ImageShapeEnum } from "image/imageHelper";
 

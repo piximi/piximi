@@ -6,12 +6,12 @@ import {
   LabelOutlined as LabelOutlinedIcon,
 } from "@mui/icons-material";
 
-import { visibleImagesSelector } from "store/selectors";
+import { deselectImages } from "store/application";
+import { visibleImagesSelector } from "store/common";
 import {
-  deselectImages,
-  setAnnotationCategoryVisibility,
   updateCategoryVisibility,
-} from "store/slices";
+  setAnnotationCategoryVisibility,
+} from "store/project";
 
 import { Category, CategoryType, ImageType } from "types";
 

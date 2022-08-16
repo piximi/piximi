@@ -12,7 +12,7 @@ import { ImageSortSelection } from "../ImageSortSelection";
 import { UploadButton } from "../UploadButton";
 import { Logo } from "components/Application/Logo";
 
-import { applicationSlice } from "store/slices";
+import { applicationSlice } from "store/application";
 
 export const MainToolbar = () => {
   const dispatch = useDispatch();

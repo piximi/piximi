@@ -1,16 +1,23 @@
-import { Category } from "../../../types/Category";
-import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
-import { ImageType } from "../../../types/ImageType";
-import { createdCategoriesSelector } from "../../selectors";
-import { fittedSelector } from "../../selectors/fittedSelector";
-import { valImagesSelector } from "store/selectors/valImagesSelector";
-import { classifierSlice, applicationSlice } from "../../slices";
-import { evaluate } from "store/coroutines/classifier/evaluate";
 import * as tensorflow from "@tensorflow/tfjs";
 import { put, select } from "redux-saga/effects";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
-import { valDataSelector } from "store/selectors";
+
+import { applicationSlice } from "store/application";
+import {
+  classifierSlice,
+  fittedSelector,
+  valDataSelector,
+} from "store/classifier";
+import { valImagesSelector } from "store/common";
+import { createdCategoriesSelector } from "store/project";
+import { evaluate } from "store/coroutines/classifier/evaluate";
+import {
+  AlertStateType,
+  AlertType,
+  Category,
+  ClassifierEvaluationResultType,
+  ImageType,
+} from "types";
+import { getStackTraceFromError } from "utils";
 
 export function* evaluateSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(fittedSelector);

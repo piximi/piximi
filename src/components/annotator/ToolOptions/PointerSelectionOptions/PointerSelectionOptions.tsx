@@ -19,12 +19,11 @@ import { InformationBox } from "../InformationBox";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
-  annotationCategoriesSelector,
+  imageViewerSlice,
   selectedAnnotationsSelector,
   unselectedAnnotationsSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/image-viewer";
+import { annotationCategoriesSelector } from "store/project";
 
 import { Category } from "types";
 

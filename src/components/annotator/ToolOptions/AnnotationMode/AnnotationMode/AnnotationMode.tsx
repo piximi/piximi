@@ -20,11 +20,10 @@ import { IntersectionTooltip } from "../IntersectionTooltip";
 
 import {
   annotationStateSelector,
+  imageViewerSlice,
   selectedAnnotationSelector,
   selectionModeSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/image-viewer";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
 

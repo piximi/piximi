@@ -11,4 +11,5 @@ export {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   AnnotationTool,
+  ThresholdAnnotationTool,
 } from "./AnnotationTool";

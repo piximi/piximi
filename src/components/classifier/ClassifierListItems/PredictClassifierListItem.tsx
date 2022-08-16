@@ -14,9 +14,7 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItem } from "components/common/DisabledListItem/DisabledListItem";
 
-import { predictionFlagSelector } from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+import { classifierSlice, predictionFlagSelector } from "store/classifier";
 
 type PredictClassifierListItemProps = {
   disabled: boolean;

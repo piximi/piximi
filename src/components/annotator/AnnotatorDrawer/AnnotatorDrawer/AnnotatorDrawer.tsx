@@ -16,9 +16,8 @@ import { ApplicationOptionsList } from "components/common/ApplicationOptionsList
 import {
   createdAnnotatorCategoriesSelector,
   unknownAnnotationCategorySelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/project";
+import { imageViewerSlice } from "store/image-viewer";
 
 import { Category, CategoryType } from "types/Category";
 

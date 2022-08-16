@@ -1,6 +1,8 @@
 import { takeLeading } from "redux-saga/effects";
-import { segmenterSlice } from "../../slices";
+
 import { predictSegmenterSaga } from "./predictSegmenterSaga";
+
+import { segmenterSlice } from "store/segmenter";
 
 export function* watchPredictSegmenterSaga(): any {
   yield takeLeading(

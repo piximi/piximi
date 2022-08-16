@@ -6,9 +6,9 @@ import { MenuItem, ListItemText } from "@mui/material";
 import {
   imageViewerSlice,
   setActiveImage,
-  setAnnotationCategories,
   setOperation,
-} from "store/slices";
+} from "store/image-viewer";
+import { setAnnotationCategories } from "store/project";
 
 import {
   AnnotationType,

@@ -9,9 +9,10 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { thresholdAnnotationValueSelector } from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+import {
+  imageViewerSlice,
+  thresholdAnnotationValueSelector,
+} from "store/image-viewer";
 
 export const ThresholdAnnotationOptions = () => {
   const t = useTranslation();

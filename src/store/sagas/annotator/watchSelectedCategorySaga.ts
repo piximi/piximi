@@ -1,6 +1,8 @@
 import { takeEvery } from "redux-saga/effects";
-import { imageViewerSlice } from "../../slices";
+
 import { selectedCategorySaga } from "./selectedCategorySaga";
+
+import { imageViewerSlice } from "store/image-viewer";
 
 export function* watchSelectedCategorySaga() {
   yield takeEvery(

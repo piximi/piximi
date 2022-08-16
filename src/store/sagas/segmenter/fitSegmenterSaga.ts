@@ -1,35 +1,43 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import _ from "lodash";
-import { put, select } from "redux-saga/effects";
-import { compile } from "store/coroutines";
-import { applicationSlice, projectSlice, segmenterSlice } from "store/slices";
-import { annotationCategoriesSelector } from "store/selectors";
-import { SegmentationArchitectureOptions } from "types/ArchitectureOptions";
-import { CompileOptions } from "types/CompileOptions";
-import { Category } from "types/Category";
-import { ImageType } from "types/ImageType";
-import { FitOptions } from "types/FitOptions";
-import { ModelType } from "types/ModelType";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
-import { Partition } from "types/Partition";
-import { PreprocessOptions } from "types/PreprocessOptions";
-import { annotatedImagesSelector } from "store/selectors/segmenter/annotatedImagesSelector";
+import { select, put } from "redux-saga/effects";
+
+import { applicationSlice } from "store/application";
 import {
   createSegmentationModel,
+  compile,
   preprocessSegmentationImages,
   fitSegmenter,
 } from "store/coroutines";
 import {
-  compiledSegmentationModelSelector,
-  segmentationArchitectureOptionsSelector,
-  segmentationFitOptionsSelector,
-  segmentationCompileOptionsSelector,
-  segmentationPreprocessOptionsSelector,
-  segmentationTrainImagesSelector,
+  annotatedImagesSelector,
+  projectSlice,
+  annotationCategoriesSelector,
+} from "store/project";
+import {
   segmentationTrainingPercentageSelector,
+  segmentationFitOptionsSelector,
+  segmentationPreprocessOptionsSelector,
+  segmentationArchitectureOptionsSelector,
+  compiledSegmentationModelSelector,
+  segmentationCompileOptionsSelector,
+  segmenterSlice,
+  segmentationTrainImagesSelector,
   segmentationValidationImagesSelector,
-} from "store/selectors/segmenter";
+} from "store/segmenter";
+import {
+  FitOptions,
+  PreprocessOptions,
+  Partition,
+  SegmentationArchitectureOptions,
+  Category,
+  ModelType,
+  CompileOptions,
+  AlertStateType,
+  AlertType,
+  ImageType,
+} from "types";
+import { getStackTraceFromError } from "utils";
 
 export function* fitSegmenterSaga(action: any): any {
   const { onEpochEnd } = action.payload;

@@ -7,7 +7,7 @@ import { MainToolbar } from "../MainToolbar";
 
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
-import { alertStateSelector } from "store/selectors";
+import { alertStateSelector } from "store/application";
 
 export const MainAppBar = () => {
   const alertState = useSelector(alertStateSelector);

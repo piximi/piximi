@@ -5,7 +5,7 @@ import { Selection } from "../Selection";
 
 import { Tool } from "annotator/image/Tool";
 
-import { annotationStateSelector, toolTypeSelector } from "store/selectors";
+import { annotationStateSelector, toolTypeSelector } from "store/image-viewer";
 
 import { AnnotationStateType, ToolType } from "types";
 

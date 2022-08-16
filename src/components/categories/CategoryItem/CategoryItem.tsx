@@ -13,10 +13,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
 import { CategoryItemMenu } from "../CategoryItemMenu";
 
-import {
-  categoryCountsSelector,
-  selectedCategorySelector,
-} from "store/selectors";
+import { categoryCountsSelector } from "store/classifier";
+import { selectedCategorySelector } from "store/common";
 
 import { Category, CategoryType, ImageType, State } from "types";
 

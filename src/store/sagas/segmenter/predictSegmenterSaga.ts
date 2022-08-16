@@ -1,25 +1,30 @@
 import { put, select } from "redux-saga/effects";
-import { applicationSlice, segmenterSlice, projectSlice } from "../../slices";
-import { annotationCategoriesSelector } from "../../selectors";
-import { Category } from "types/Category";
-import { ImageType } from "types/ImageType";
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
+
+import { applicationSlice } from "store/application";
 import { preprocessSegmentationImages } from "store/coroutines";
-import { Shape } from "types/Shape";
-import { FitOptions } from "types/FitOptions";
-import { PreprocessOptions } from "types/PreprocessOptions";
-import {
-  fittedSegmentationModelSelector,
-  segmentationFitOptionsSelector,
-  segmentationPreprocessOptionsSelector,
-  segmentationInputShapeSelector,
-  unannotatedImagesSelector,
-} from "store/selectors/segmenter";
 import { predictSegmentations } from "store/coroutines/segmenter";
-import { Partition } from "types/Partition";
-import { AnnotationType } from "types/AnnotationType";
+import { projectSlice, annotationCategoriesSelector } from "store/project";
+import {
+  unannotatedImagesSelector,
+  segmentationInputShapeSelector,
+  segmentationPreprocessOptionsSelector,
+  segmentationFitOptionsSelector,
+  fittedSegmentationModelSelector,
+  segmenterSlice,
+} from "store/segmenter";
+import {
+  AlertStateType,
+  AlertType,
+  AnnotationType,
+  Category,
+  FitOptions,
+  ImageType,
+  Partition,
+  PreprocessOptions,
+  Shape,
+} from "types";
+import { getStackTraceFromError } from "utils";
 
 export function* predictSegmenterSaga(action: any): any {
   const inferenceImages: Array<ImageType> = yield select(

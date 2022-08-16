@@ -1,18 +1,24 @@
-import { Category } from "types/Category";
-import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
-import { ImageType } from "types/ImageType";
-import { applicationSlice, segmenterSlice } from "../../slices";
-import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
-import { put, select } from "redux-saga/effects";
-import { AlertStateType, AlertType } from "types/AlertStateType";
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { LayersModel, data, Tensor, Rank } from "@tensorflow/tfjs";
+import { select, put } from "redux-saga/effects";
+
+import { applicationSlice } from "store/application";
+import { annotationCategoriesSelector } from "store/project";
 import {
   fittedSegmentationModelSelector,
-  segmentationValDataSelector,
   segmentationValImagesSelector,
-} from "store/selectors/segmenter";
-import { annotationCategoriesSelector } from "store/selectors/annotatorCategoriesSelector";
+  segmenterSlice,
+  segmentationValDataSelector,
+} from "store/segmenter";
 import { evaluateSegmenter } from "store/coroutines/segmenter";
+
+import {
+  Category,
+  AlertType,
+  SegmenterEvaluationResultType,
+  AlertStateType,
+  ImageType,
+} from "types";
+import { getStackTraceFromError } from "utils";
 
 export function* evaluateSegmenterSaga(action: any): any {
   const model: LayersModel = yield select(fittedSegmentationModelSelector);

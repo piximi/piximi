@@ -5,9 +5,10 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { SelectionOptions } from "../SelectionOptions";
 
-import { penSelectionBrushSizeSelector } from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+import {
+  imageViewerSlice,
+  penSelectionBrushSizeSelector,
+} from "store/image-viewer";
 
 export const FreehandSelectionOptions = () => {
   const dispatch = useDispatch();

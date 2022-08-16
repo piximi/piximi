@@ -1,12 +1,16 @@
 import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
-import { projectSlice, applicationSlice, imageViewerSlice } from "../../slices";
-import { ImageType } from "../../../types/ImageType";
-import { AlertStateType, AlertType } from "types/AlertStateType";
+
+import { imageViewerSlice, currentColorsSelector } from "store/image-viewer/";
+import { applicationSlice } from "store/application";
+import { projectSlice } from "store/project";
+
+import { AlertStateType, AlertType, ImageType } from "types";
+
 import { getStackTraceFromError } from "utils/getStackTrace";
+
 import { convertToImage, ImageShapeEnum } from "image/imageHelper";
-import { currentColorsSelector } from "store/selectors/currentColorsSelector";
 
 type ImageFileType = {
   fileName: string;

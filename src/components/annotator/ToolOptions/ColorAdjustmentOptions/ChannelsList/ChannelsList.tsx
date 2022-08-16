@@ -15,13 +15,12 @@ import { Palette } from "../Palette";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
+  imageViewerSlice,
+  imageShapeSelector,
   activeImageColorsSelector,
   activeImagePlaneSelector,
-  imageOriginalSrcSelector,
-  imageShapeSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/image-viewer";
+import { imageOriginalSrcSelector } from "store/common";
 
 import { Color } from "types";
 

@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
-import { categoriesSelector } from "store/selectors";
-import { applicationSlice, updateImageCategories } from "store/slices";
+import { applicationSlice } from "store/application";
+import { categoriesSelector, updateImageCategories } from "store/project";
 
 import { Category } from "types";
 

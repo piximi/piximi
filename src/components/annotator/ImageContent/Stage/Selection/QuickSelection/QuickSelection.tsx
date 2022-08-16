@@ -2,7 +2,7 @@ import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector } from "store/selectors";
+import { stageScaleSelector } from "store/image-viewer";
 
 import { QuickAnnotationTool } from "annotator/image/Tool";
 

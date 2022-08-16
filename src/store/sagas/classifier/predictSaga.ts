@@ -1,22 +1,34 @@
-import { put, select } from "redux-saga/effects";
-import { classifierSlice, projectSlice, applicationSlice } from "../../slices";
-import { createdCategoriesSelector } from "../../selectors";
-import { preprocessOptionsSelector } from "../../selectors/preprocessOptionsSelector";
-import { predictCategories } from "../../coroutines/classifier/predictCategories";
-import { testImagesSelector } from "../../selectors/testImagesSelector";
-import { fittedSelector } from "../../selectors/fittedSelector";
-import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
-import { Category } from "../../../types/Category";
-import { ArchitectureOptions } from "types/ArchitectureOptions";
-import { ImageType } from "../../../types/ImageType";
 import * as tensorflow from "@tensorflow/tfjs";
-import { AlertStateType, AlertType } from "types/AlertStateType";
+import { put, select } from "redux-saga/effects";
+
+import {
+  classifierSlice,
+  architectureOptionsSelector,
+  fitOptionsSelector,
+  fittedSelector,
+  preprocessOptionsSelector,
+} from "store/classifier";
+import {
+  createdCategoriesSelector,
+  projectSlice,
+  testImagesSelector,
+} from "store/project";
+import { applicationSlice } from "store/application";
+
+import {
+  AlertStateType,
+  AlertType,
+  ArchitectureOptions,
+  Category,
+  FitOptions,
+  ImageType,
+  PreprocessOptions,
+  Shape,
+} from "types";
+
 import { getStackTraceFromError } from "utils/getStackTrace";
 import { preprocess } from "store/coroutines";
-import { Shape } from "types/Shape";
-import { FitOptions } from "types/FitOptions";
-import { fitOptionsSelector } from "../../selectors";
-import { PreprocessOptions } from "types/PreprocessOptions";
+import { predictCategories } from "store/coroutines/classifier/predictCategories";
 
 export function* predictSaga(action: any): any {
   const testImages: Array<ImageType> = yield select(testImagesSelector);

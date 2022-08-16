@@ -13,9 +13,7 @@ import {
 import { StyledFormControl } from "components/common/StyledFormControl";
 import { CustomNumberTextField } from "components/common/InputFields";
 
-import { cropOptionsSelector } from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+import { cropOptionsSelector, classifierSlice } from "store/classifier";
 
 import { CropSchema } from "types";
 

@@ -10,7 +10,8 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { projectSlice, imageViewerSlice } from "store/slices";
+import { imageViewerSlice } from "store/image-viewer";
+import { projectSlice } from "store/project";
 
 import { CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 

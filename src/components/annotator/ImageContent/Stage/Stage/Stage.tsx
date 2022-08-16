@@ -29,18 +29,13 @@ import { Annotations } from "../Annotations/Annotations";
 import { PointerSelection } from "../Selection/PointerSelection";
 
 import {
-  activeImageIdSelector,
-  activeImagePlaneSelector,
-  annotatorImagesSelector,
-  annotationStateSelector,
-  cursorSelector,
+  imageViewerSlice,
   imageInstancesSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
   selectedAnnotationSelector,
   selectedAnnotationsIdsSelector,
   selectedAnnotationsSelector,
-  selectedCategorySelector,
   selectionModeSelector,
   soundEnabledSelector,
   stageHeightSelector,
@@ -48,10 +43,15 @@ import {
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
+  activeImageIdSelector,
+  activeImagePlaneSelector,
+  annotationStateSelector,
+  annotatorImagesSelector,
+  cursorSelector,
   unselectedAnnotationsSelector,
-} from "store/selectors";
-
-import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
+  setSelectedAnnotations,
+} from "store/image-viewer";
+import { selectedCategorySelector } from "store/common";
 
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 

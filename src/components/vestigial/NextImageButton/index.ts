@@ -1,1 +1,0 @@
-export { NextImageButton } from "./NextImageButton";

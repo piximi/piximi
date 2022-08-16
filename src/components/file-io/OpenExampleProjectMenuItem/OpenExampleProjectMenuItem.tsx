@@ -10,7 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 
-import { applicationSlice, classifierSlice, projectSlice } from "store/slices";
+import { applicationSlice } from "store/application";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
 
 import {
   Classifier,

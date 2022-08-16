@@ -8,10 +8,10 @@ import { CustomNumberTextField } from "components/common/InputFields/";
 
 import {
   architectureOptionsSelector,
-  inputShapeSelector,
   uploadedModelSelector,
-} from "store/selectors";
-import { classifierSlice } from "store/slices";
+  inputShapeSelector,
+  classifierSlice,
+} from "store/classifier";
 
 import { availableClassifierModels, ClassifierModelProps } from "types";
 

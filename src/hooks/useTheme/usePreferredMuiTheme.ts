@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { ThemeMode } from "types/ThemeMode";
-import { themeModeSelector } from "store/selectors/themeModeSelector";
-import { setThemeMode } from "store/slices";
+
+import { setThemeMode, themeModeSelector } from "store/application";
+
+import { ThemeMode } from "types";
+
 import { lightTheme, darkTheme } from "themes/muiTheme";
 
 export const usePreferredMuiTheme = () => {

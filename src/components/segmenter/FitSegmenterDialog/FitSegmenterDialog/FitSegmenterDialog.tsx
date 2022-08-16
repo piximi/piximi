@@ -13,16 +13,16 @@ import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
-import { alertStateSelector } from "store/selectors";
+import { alertStateSelector } from "store/application";
+import { annotatedImagesSelector } from "store/project";
 import {
-  annotatedImagesSelector,
-  compiledSegmentationModelSelector,
-  segmentationCompileOptionsSelector,
-  segmentationFitOptionsSelector,
   segmentationTrainingFlagSelector,
+  compiledSegmentationModelSelector,
+  segmentationFitOptionsSelector,
+  segmentationCompileOptionsSelector,
   segmentationTrainingPercentageSelector,
-} from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+  segmenterSlice,
+} from "store/segmenter";
 
 import {
   AlertStateType,

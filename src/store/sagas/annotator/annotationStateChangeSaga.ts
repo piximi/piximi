@@ -1,14 +1,17 @@
 import { put, select } from "redux-saga/effects";
-import { imageViewerSlice } from "../../slices";
-import { AnnotationTool } from "../../../annotator/image/Tool";
-import { AnnotationModeType } from "../../../types/AnnotationModeType";
-import { AnnotationStateType } from "../../../types/AnnotationStateType";
-import { ToolType } from "../../../types/ToolType";
-import { selectionModeSelector } from "../../selectors";
-import { selectedCategorySelector } from "../../selectors";
-import { toolTypeSelector } from "../../selectors";
-import { selectedAnnotationSelector } from "../../selectors/selectedAnnotationSelector";
-import { activeImagePlaneSelector } from "../../selectors/activeImagePlaneSelector";
+
+import {
+  imageViewerSlice,
+  activeImagePlaneSelector,
+  selectedAnnotationSelector,
+  selectionModeSelector,
+  toolTypeSelector,
+} from "store/image-viewer/";
+import { selectedCategorySelector } from "store/common";
+
+import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
+
+import { AnnotationTool } from "annotator/image/Tool";
 
 export function* annotationStateChangeSaga({
   payload: { annotationState, annotationTool },

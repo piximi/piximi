@@ -13,11 +13,9 @@ import { ImageContent } from "../../ImageContent";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
-import { alertStateSelector } from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
-
 import { ImageType } from "types";
+import { alertStateSelector } from "store/application";
+import { imageViewerSlice } from "store/image-viewer";
 
 type ImageViewerProps = {
   image?: ImageType;

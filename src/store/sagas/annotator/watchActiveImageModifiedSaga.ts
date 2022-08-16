@@ -1,9 +1,11 @@
-import { imageViewerSlice } from "../../slices";
 import { takeLatest } from "redux-saga/effects";
+
 import {
   activeImageColorChangeSaga,
   activeImageIDChangeSaga,
 } from "./activeImageModifiedSaga";
+
+import { imageViewerSlice } from "store/image-viewer";
 
 export function* watchActiveImageChangeSaga() {
   yield takeLatest(

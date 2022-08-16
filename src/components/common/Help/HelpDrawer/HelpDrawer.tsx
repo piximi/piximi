@@ -16,7 +16,7 @@ import { HelpContent, HelpContentType } from "../HelpContent/HelpContent";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
-import { applicationSlice } from "store/slices";
+import { applicationSlice } from "store/application";
 
 import { AlertType } from "types";
 

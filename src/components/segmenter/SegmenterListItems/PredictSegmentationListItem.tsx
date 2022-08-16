@@ -13,8 +13,10 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItem } from "components/common/DisabledListItem";
 
-import { segmentationPredictingFlagSelector } from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+import {
+  segmenterSlice,
+  segmentationPredictingFlagSelector,
+} from "store/segmenter";
 
 type PredictSegmenterListItemProps = {
   disabled: boolean;

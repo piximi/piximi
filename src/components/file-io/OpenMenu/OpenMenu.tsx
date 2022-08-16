@@ -11,7 +11,8 @@ import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
 import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
 import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
 
-import { classifierSlice, segmenterSlice } from "store/slices";
+import { classifierSlice } from "store/classifier";
+import { segmenterSlice } from "store/segmenter";
 
 import { ModelType, Shape } from "types";
 

@@ -23,13 +23,13 @@ import {
 import { CategoriesList } from "components/categories/CategoriesList";
 
 import {
-  fittedSegmentationModelSelector,
-  segmentationTrainingFlagSelector,
-} from "store/selectors/segmenter";
-import {
   createdAnnotatorCategoriesSelector,
   unknownAnnotationCategorySelector,
-} from "store/selectors";
+} from "store/project";
+import {
+  fittedSegmentationModelSelector,
+  segmentationTrainingFlagSelector,
+} from "store/segmenter";
 
 import { CategoryType } from "types";
 

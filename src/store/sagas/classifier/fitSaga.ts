@@ -1,31 +1,41 @@
 import * as tensorflow from "@tensorflow/tfjs";
 import _ from "lodash";
 import { put, select } from "redux-saga/effects";
-import { compile, fit, open, preprocess } from "store/coroutines";
-import { applicationSlice, classifierSlice, projectSlice } from "../../slices";
+
 import {
-  categorizedImagesSelector,
+  classifierSlice,
+  architectureOptionsSelector,
   compiledSelector,
   compileOptionsSelector,
-  createdCategoriesCountSelector,
-  createdCategoriesSelector,
   fitOptionsSelector,
   preprocessOptionsSelector,
   trainingPercentageSelector,
-} from "../../selectors";
-import { architectureOptionsSelector } from "../../selectors/architectureOptionsSelector";
-import { trainImagesSelector } from "../../selectors/trainImagesSelector";
-import { valImagesSelector } from "../../selectors/valImagesSelector";
-import { ArchitectureOptions } from "../../../types/ArchitectureOptions";
-import { CompileOptions } from "../../../types/CompileOptions";
-import { Category } from "../../../types/Category";
-import { ImageType } from "../../../types/ImageType";
-import { FitOptions } from "../../../types/FitOptions";
-import { ModelType } from "../../../types/ModelType";
-import { AlertStateType, AlertType } from "types/AlertStateType";
+} from "store/classifier";
+import {
+  categorizedImagesSelector,
+  createdCategoriesCountSelector,
+  createdCategoriesSelector,
+  projectSlice,
+  trainImagesSelector,
+  valImagesSelector,
+} from "store/project";
+import { applicationSlice } from "store/application";
+
+import {
+  AlertStateType,
+  AlertType,
+  ArchitectureOptions,
+  Category,
+  CompileOptions,
+  FitOptions,
+  ImageType,
+  ModelType,
+  Partition,
+  PreprocessOptions,
+} from "types";
+
+import { compile, fit, open, preprocess } from "store/coroutines";
 import { getStackTraceFromError } from "utils/getStackTrace";
-import { Partition } from "types/Partition";
-import { PreprocessOptions } from "types/PreprocessOptions";
 
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
