@@ -1,5 +1,5 @@
 import * as tensorflow from "@tensorflow/tfjs";
-import { Shape } from "../../../types/Shape";
+import { Shape } from "../../types/Shape";
 import { changeInputShape } from "./changeInputShape";
 
 /**

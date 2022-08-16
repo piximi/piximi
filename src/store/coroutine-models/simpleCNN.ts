@@ -1,5 +1,5 @@
 import * as tensorflow from "@tensorflow/tfjs";
-import { Shape } from "../../../types/Shape";
+import { Shape } from "../../types/Shape";
 
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem

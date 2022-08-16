@@ -1,6 +1,6 @@
 import { ArchitectureOptions, ModelType } from "types";
-import { createSimpleCNN } from "../../coroutines/models/simpleCNN";
-import { createMobileNet } from "../../coroutines/models/mobileNet";
+import { createSimpleCNN } from "../../coroutine-models/simpleCNN";
+import { createMobileNet } from "../../coroutine-models/mobileNet";
 
 export const open = async (
   modelOptions: ArchitectureOptions,
