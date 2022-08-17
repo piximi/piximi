@@ -40,7 +40,7 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-export function* fitSaga(action: any): any {
+export function* fitClassifierSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
   const trainingPercentage: number = yield select(

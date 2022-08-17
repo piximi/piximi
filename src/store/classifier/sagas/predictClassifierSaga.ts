@@ -30,7 +30,7 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-export function* predictSaga(action: any): any {
+export function* predictClassifierSaga(action: any): any {
   const testImages: Array<ImageType> = yield select(testImagesSelector);
 
   const categories: Category[] = yield select(createdCategoriesSelector);

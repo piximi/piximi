@@ -19,7 +19,7 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 
-export function* evaluateSaga(action: any): any {
+export function* evaluateClassifierSaga(action: any): any {
   const model: tensorflow.LayersModel = yield select(classifierFittedSelector);
   const validationImages: Array<ImageType> = yield select(valImagesSelector);
   yield put(yield put(applicationSlice.actions.hideAlertState({})));

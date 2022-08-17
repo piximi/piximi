@@ -28,12 +28,12 @@ export { classifierValidationDataSelector } from "./selectors/classifierValidati
 
 // Sagas
 
-export { evaluateSaga } from "./sagas/evaluateSaga";
-export { fitSaga } from "./sagas/fitSaga";
-export { predictSaga } from "./sagas/predictSaga";
-export { watchEvaluateSaga } from "./sagas/watchEvaluateSaga";
-export { watchFitSaga } from "./sagas/watchFitSaga";
-export { watchPredictSaga } from "./sagas/watchPredictSaga";
+export { evaluateClassifierSaga } from "./sagas/evaluateClassifierSaga";
+export { fitClassifierSaga } from "./sagas/fitClassifierSaga";
+export { predictClassifierSaga } from "./sagas/predictClassifierSaga";
+export { watchEvaluateClassifierSaga } from "./sagas/watchEvaluateClassifierSaga";
+export { watchClassifierFitSaga } from "./sagas/watchClassifierFitSaga";
+export { watchClassifierPredictSaga } from "./sagas/watchClassifierPredictSaga";
 
 // Coroutines
 
