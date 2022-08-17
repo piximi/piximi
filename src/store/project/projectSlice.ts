@@ -199,27 +199,24 @@ export const projectSlice = createSlice({
     },
     updateOtherCategoryVisibility(
       state: Project,
-      action: PayloadAction<{ id: string }>
+      action: PayloadAction<{ id?: string }>
     ) {
-      const categories = filter(state.categories, (category: Category) => {
-        return category.id !== action.payload.id;
-      });
-      for (let category of categories) {
-        category.visible = false;
+      for (let category of state.categories) {
+        category.visible =
+          action.payload.id === undefined
+            ? true
+            : category.id === action.payload.id;
       }
     },
     updateOtherAnnotationCategoryVisibility(
       state: Project,
-      action: PayloadAction<{ id: string }>
+      action: PayloadAction<{ id?: string }>
     ) {
-      const categories = filter(
-        state.annotationCategories,
-        (category: Category) => {
-          return category.id !== action.payload.id;
-        }
-      );
-      for (let category of categories) {
-        category.visible = false;
+      for (let category of state.annotationCategories) {
+        category.visible =
+          action.payload.id === undefined
+            ? true
+            : category.id === action.payload.id;
       }
     },
     updateLabeledImagesVisibility(
