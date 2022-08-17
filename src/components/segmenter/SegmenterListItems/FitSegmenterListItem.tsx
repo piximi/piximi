@@ -1,16 +1,11 @@
 import {
   Grid,
-  IconButton,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Stack,
 } from "@mui/material";
-import {
-  ScatterPlot as ScatterPlotIcon,
-  Settings as SettingsIcon,
-} from "@mui/icons-material";
+import { ScatterPlot as ScatterPlotIcon } from "@mui/icons-material";
 
 import { useDialog } from "hooks";
 
