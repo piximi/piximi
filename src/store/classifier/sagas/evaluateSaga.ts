@@ -4,8 +4,8 @@ import { put, select } from "redux-saga/effects";
 import { applicationSlice } from "store/application";
 import {
   classifierSlice,
-  fittedSelector,
-  valDataSelector,
+  classifierFittedSelector,
+  classifierValidationDataSelector,
   evaluate,
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
@@ -20,7 +20,7 @@ import {
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateSaga(action: any): any {
-  const model: tensorflow.LayersModel = yield select(fittedSelector);
+  const model: tensorflow.LayersModel = yield select(classifierFittedSelector);
   const validationImages: Array<ImageType> = yield select(valImagesSelector);
   yield put(yield put(applicationSlice.actions.hideAlertState({})));
 
@@ -70,7 +70,7 @@ function* runEvaluation(
     ys: tensorflow.Tensor;
     labels: tensorflow.Tensor<tensorflow.Rank.R1>;
     ids: tensorflow.Tensor<tensorflow.Rank.R1>;
-  }> = yield select(valDataSelector);
+  }> = yield select(classifierValidationDataSelector);
 
   try {
     var evaluationResult: ClassifierEvaluationResultType = yield evaluate(

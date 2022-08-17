@@ -16,8 +16,8 @@ import { DisabledListItem } from "components/common/DisabledListItem/DisabledLis
 
 import { alertStateSelector } from "store/application";
 import {
-  evaluationResultSelector,
-  evaluationFlagSelector,
+  classifierEvaluationResultSelector,
+  classifierEvaluationFlagSelector,
   classifierSlice,
 } from "store/classifier";
 import { createdCategoriesSelector } from "store/project";
@@ -37,9 +37,9 @@ export const EvaluateClassifierListItem = (
   const t = useTranslation();
 
   const categories: Category[] = useSelector(createdCategoriesSelector);
-  const evaluationResult = useSelector(evaluationResultSelector);
+  const evaluationResult = useSelector(classifierEvaluationResultSelector);
   const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
-  const evaluationFlag = useSelector(evaluationFlagSelector);
+  const evaluationFlag = useSelector(classifierEvaluationFlagSelector);
   const alertState = useSelector(alertStateSelector);
 
   const onEvaluate = async () => {

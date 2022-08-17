@@ -16,11 +16,11 @@ import { DialogTransition } from "components/common/DialogTransition";
 import { alertStateSelector } from "store/application";
 import { annotatedImagesSelector } from "store/project";
 import {
-  segmentationTrainingFlagSelector,
-  compiledSegmentationModelSelector,
-  segmentationFitOptionsSelector,
-  segmentationCompileOptionsSelector,
-  segmentationTrainingPercentageSelector,
+  segmenterTrainingFlagSelector,
+  segmenterCompiledModelSelector,
+  segmenterFitOptionsSelector,
+  segmenterCompileOptionsSelector,
+  segmenterTrainingPercentageSelector,
   segmenterSlice,
 } from "store/segmenter";
 
@@ -62,17 +62,15 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(segmentationTrainingFlagSelector);
+  const currentlyTraining = useSelector(segmenterTrainingFlagSelector);
   const annotatedImages = useSelector(annotatedImagesSelector);
-  const compiledModel = useSelector(compiledSegmentationModelSelector);
+  const compiledModel = useSelector(segmenterCompiledModelSelector);
   const alertState = useSelector(alertStateSelector);
 
-  const fitOptions = useSelector(segmentationFitOptionsSelector);
-  const compileOptions = useSelector(segmentationCompileOptionsSelector);
+  const fitOptions = useSelector(segmenterFitOptionsSelector);
+  const compileOptions = useSelector(segmenterCompileOptionsSelector);
 
-  const trainingPercentage = useSelector(
-    segmentationTrainingPercentageSelector
-  );
+  const trainingPercentage = useSelector(segmenterTrainingPercentageSelector);
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
     dispatch(

@@ -3,10 +3,10 @@ import { put, select } from "redux-saga/effects";
 
 import {
   classifierSlice,
-  architectureOptionsSelector,
-  fitOptionsSelector,
-  fittedSelector,
-  preprocessOptionsSelector,
+  classifierArchitectureOptionsSelector,
+  classifierFitOptionsSelector,
+  classifierFittedSelector,
+  classifierPreprocessOptionsSelector,
   predictCategories,
   preprocess,
 } from "store/classifier";
@@ -36,16 +36,16 @@ export function* predictSaga(action: any): any {
   const categories: Category[] = yield select(createdCategoriesSelector);
 
   const architectureOptions: ArchitectureOptions = yield select(
-    architectureOptionsSelector
+    classifierArchitectureOptionsSelector
   );
 
   const preprocessOptions: PreprocessOptions = yield select(
-    preprocessOptionsSelector
+    classifierPreprocessOptionsSelector
   );
 
-  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+  const fitOptions: FitOptions = yield select(classifierFitOptionsSelector);
 
-  let model = yield select(fittedSelector);
+  let model = yield select(classifierFittedSelector);
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 

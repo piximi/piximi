@@ -16,12 +16,12 @@ import { DialogTransition } from "components/common/DialogTransition";
 
 import { alertStateSelector } from "store/application";
 import {
-  trainingFlagSelector,
-  compiledSelector,
-  compileOptionsSelector,
-  fitOptionsSelector,
-  epochsSelector,
-  trainingPercentageSelector,
+  classifierTrainingFlagSelector,
+  classifierCompiledSelector,
+  classifierCompileOptionsSelector,
+  classifierFitOptionsSelector,
+  classifierEpochsSelector,
+  classifierTrainingPercentageSelector,
   classifierSlice,
 } from "store/classifier";
 import { categorizedImagesSelector } from "store/project";
@@ -65,15 +65,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(trainingFlagSelector);
+  const currentlyTraining = useSelector(classifierTrainingFlagSelector);
   const categorizedImages = useSelector(categorizedImagesSelector);
-  const compiledModel = useSelector(compiledSelector);
+  const compiledModel = useSelector(classifierCompiledSelector);
   const alertState = useSelector(alertStateSelector);
 
-  const compileOptions = useSelector(compileOptionsSelector);
-  const fitOptions = useSelector(fitOptionsSelector);
-  const epochs = useSelector(epochsSelector);
-  const trainingPercentage = useSelector(trainingPercentageSelector);
+  const compileOptions = useSelector(classifierCompileOptionsSelector);
+  const fitOptions = useSelector(classifierFitOptionsSelector);
+  const epochs = useSelector(classifierEpochsSelector);
+  const trainingPercentage = useSelector(classifierTrainingPercentageSelector);
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
     dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));

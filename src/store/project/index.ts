@@ -33,6 +33,7 @@ export { taskSelector } from "./selectors/taskSelector";
 export { testImagesSelector } from "./selectors/testImagesSelector";
 export { trainFlagSelector } from "./selectors/trainFlagSelector";
 export { trainImagesSelector } from "./selectors/trainImagesSelector";
+export { unannotatedImagesSelector } from "./selectors/unannotatedImagesSelector";
 export { unknownAnnotationCategorySelector } from "./selectors/unknownAnnotationCategorySelector";
 export { unknownCategorySelector } from "./selectors/unknownCategorySelector";
 export { valImagesSelector } from "./selectors/valImagesSelector";

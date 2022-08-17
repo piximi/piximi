@@ -4,10 +4,10 @@ import { select, put } from "redux-saga/effects";
 import { applicationSlice } from "store/application";
 import { annotationCategoriesSelector } from "store/project";
 import {
-  fittedSegmentationModelSelector,
-  segmentationValImagesSelector,
+  segmenterFittedModelSelector,
+  segmenterValidationImagesSelector,
   segmenterSlice,
-  segmentationValDataSelector,
+  segmenterValDataSelector,
   evaluateSegmenter,
 } from "store/segmenter";
 
@@ -21,10 +21,10 @@ import {
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateSegmenterSaga(action: any): any {
-  const model: LayersModel = yield select(fittedSegmentationModelSelector);
+  const model: LayersModel = yield select(segmenterFittedModelSelector);
 
   const validationImages: Array<ImageType> = yield select(
-    segmentationValImagesSelector
+    segmenterValidationImagesSelector
   );
 
   yield put(yield put(applicationSlice.actions.hideAlertState({})));
@@ -63,7 +63,7 @@ function* runSegmentationEvaluation(
     xs: Tensor<Rank.R4>;
     ys: Tensor<Rank.R4>;
     id: Tensor<Rank.R1>;
-  }> = yield select(segmentationValDataSelector);
+  }> = yield select(segmenterValDataSelector);
 
   try {
     var evaluationResult: SegmenterEvaluationResultType =

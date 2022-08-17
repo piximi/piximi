@@ -4,32 +4,27 @@ export { classifierSlice } from "./classifierSlice";
 
 // Selectors
 
-export { architectureOptionsSelector } from "./selectors/architectureOptionsSelector";
-export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
+export { classifierArchitectureOptionsSelector } from "./selectors/classifierArchitectureOptionsSelector";
 export { classifierSelector } from "./selectors/classifierSelector";
-export { compileOptionsSelector } from "./selectors/compileOptionsSelector";
-export { compiledSelector } from "./selectors/compiledSelector";
-export { cropOptionsSelector } from "./selectors/cropOptionsSelector";
-export { epochsSelector } from "./selectors/epochsSelector";
-export { evaluationFlagSelector } from "./selectors/evaluationFlagSelector";
-export { evaluationResultSelector } from "./selectors/evaluationResultSelector";
-export { fitOptionsSelector } from "./selectors/fitOptionsSelector";
-export { fittedSelector } from "./selectors/fittedSelector";
-export { inputShapeSelector } from "./selectors/inputShapeSelector";
-export { learningRateSelector } from "./selectors/learningRateSelector";
-export { lossFunctionSelector } from "./selectors/lossFunctionSelector";
-export { metricsSelector } from "./selectors/metricsSelector";
-export { optimizationAlgorithmSelector } from "./selectors/optimizationAlgorithmSelector";
-export { predictedSelector } from "./selectors/predictedSelector";
-export { predictionFlagSelector } from "./selectors/predictionFlagSelector";
-export { preprocessOptionsSelector } from "./selectors/preprocessOptionsSelector";
-export { rescaleOptionsSelector } from "./selectors/rescaleOptionsSelector";
-export { selectedModelSelector } from "./selectors/selectedModelSelector";
-export { trainDataSelector } from "./selectors/trainDataSelector";
-export { trainingFlagSelector } from "./selectors/trainingFlagSelector";
-export { trainingPercentageSelector } from "./selectors/trainingPercentageSelector";
-export { uploadedModelSelector } from "./selectors/uploadedModelSelector";
-export { valDataSelector } from "./selectors/valDataSelector";
+export { classifierCompileOptionsSelector } from "./selectors/classifierCompileOptionsSelector";
+export { classifierCompiledSelector } from "./selectors/classifierCompiledSelector";
+export { classifierCropOptionsSelector } from "./selectors/classifierCropOptionsSelector";
+export { classifierEpochsSelector } from "./selectors/classifierEpochsSelector";
+export { classifierEvaluationFlagSelector } from "./selectors/classifierEvaluationFlagSelector";
+export { classifierEvaluationResultSelector } from "./selectors/classifierEvaluationResultSelector";
+export { classifierFitOptionsSelector } from "./selectors/classifierFitOptionsSelector";
+export { classifierFittedSelector } from "./selectors/classifierFittedSelector";
+export { classifierInputShapeSelector } from "./selectors/classifierInputShapeSelector";
+export { classifierPredictedSelector } from "./selectors/classifierPredictedSelector";
+export { classifierPredictionFlagSelector } from "./selectors/classifierPredictionFlagSelector";
+export { classifierPreprocessOptionsSelector } from "./selectors/classifierPreprocessOptionsSelector";
+export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
+export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
+export { classifierTrainDataSelector } from "./selectors/classifierTrainDataSelector";
+export { classifierTrainingFlagSelector } from "./selectors/classifierTrainingFlagSelector";
+export { classifierTrainingPercentageSelector } from "./selectors/classifierTrainingPercentageSelector";
+export { classifierUploadedModelSelector } from "./selectors/classifierUploadedModelSelector";
+export { classifierValidationDataSelector } from "./selectors/classifierValidationDataSelector";
 
 // Sagas
 

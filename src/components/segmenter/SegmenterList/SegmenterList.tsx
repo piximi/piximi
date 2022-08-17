@@ -27,8 +27,8 @@ import {
   unknownAnnotationCategorySelector,
 } from "store/project";
 import {
-  fittedSegmentationModelSelector,
-  segmentationTrainingFlagSelector,
+  segmenterFittedModelSelector,
+  segmenterTrainingFlagSelector,
 } from "store/segmenter";
 
 import { CategoryType } from "types";
@@ -44,8 +44,8 @@ export const SegmenterList = () => {
     "disabled: no trained model"
   );
 
-  const fitted = useSelector(fittedSegmentationModelSelector);
-  const training = useSelector(segmentationTrainingFlagSelector);
+  const fitted = useSelector(segmenterFittedModelSelector);
+  const training = useSelector(segmenterTrainingFlagSelector);
 
   useEffect(() => {
     if (training) {

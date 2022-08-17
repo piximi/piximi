@@ -24,9 +24,9 @@ import {
 import { CategoriesList } from "components/categories/CategoriesList";
 
 import {
-  predictedSelector,
-  fittedSelector,
-  trainingFlagSelector,
+  classifierPredictedSelector,
+  classifierFittedSelector,
+  classifierTrainingFlagSelector,
 } from "store/classifier";
 import {
   createdCategoriesSelector,
@@ -39,7 +39,7 @@ export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 
-  const predicted = useSelector(predictedSelector);
+  const predicted = useSelector(classifierPredictedSelector);
 
   const [collapsed, setCollapsed] = React.useState(true);
 
@@ -48,8 +48,8 @@ export const ClassifierList = () => {
     "disabled: no trained model"
   );
 
-  const fitted = useSelector(fittedSelector);
-  const training = useSelector(trainingFlagSelector);
+  const fitted = useSelector(classifierFittedSelector);
+  const training = useSelector(classifierTrainingFlagSelector);
 
   useEffect(() => {
     if (training) {

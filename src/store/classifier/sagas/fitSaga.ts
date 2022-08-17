@@ -4,12 +4,12 @@ import { put, select } from "redux-saga/effects";
 
 import {
   classifierSlice,
-  architectureOptionsSelector,
-  compiledSelector,
-  compileOptionsSelector,
-  fitOptionsSelector,
-  preprocessOptionsSelector,
-  trainingPercentageSelector,
+  classifierArchitectureOptionsSelector,
+  classifierCompiledSelector,
+  classifierCompileOptionsSelector,
+  classifierFitOptionsSelector,
+  classifierPreprocessOptionsSelector,
+  classifierTrainingPercentageSelector,
   fit,
   open,
   preprocess,
@@ -43,13 +43,15 @@ import { getStackTraceFromError } from "utils/getStackTrace";
 export function* fitSaga(action: any): any {
   const { onEpochEnd } = action.payload;
 
-  const trainingPercentage: number = yield select(trainingPercentageSelector);
+  const trainingPercentage: number = yield select(
+    classifierTrainingPercentageSelector
+  );
   const categorizedImages: Array<ImageType> = yield select(
     categorizedImagesSelector
   );
-  const fitOptions: FitOptions = yield select(fitOptionsSelector);
+  const fitOptions: FitOptions = yield select(classifierFitOptionsSelector);
   const preprocessingOptions: PreprocessOptions = yield select(
-    preprocessOptionsSelector
+    classifierPreprocessOptionsSelector
   );
 
   //first assign train and val partition to all categorized images
@@ -85,13 +87,13 @@ export function* fitSaga(action: any): any {
   );
 
   const architectureOptions: ArchitectureOptions = yield select(
-    architectureOptionsSelector
+    classifierArchitectureOptionsSelector
   );
   const classes: number = yield select(createdCategoriesCountSelector);
 
   var model: tensorflow.LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
-    model = yield select(compiledSelector);
+    model = yield select(classifierCompiledSelector);
   } else {
     try {
       model = yield open(architectureOptions, classes);
@@ -101,7 +103,9 @@ export function* fitSaga(action: any): any {
     }
   }
 
-  const compileOptions: CompileOptions = yield select(compileOptionsSelector);
+  const compileOptions: CompileOptions = yield select(
+    classifierCompileOptionsSelector
+  );
 
   var compiledModel: tensorflow.LayersModel;
   try {
