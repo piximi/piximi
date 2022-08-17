@@ -6,7 +6,7 @@ import {
   classifierSlice,
   classifierFittedSelector,
   classifierValidationDataSelector,
-  evaluate,
+  evaluateClassifier,
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
 import { createdCategoriesSelector } from "store/project";
@@ -73,12 +73,13 @@ function* runEvaluation(
   }> = yield select(classifierValidationDataSelector);
 
   try {
-    var evaluationResult: ClassifierEvaluationResultType = yield evaluate(
-      model,
-      validationData,
-      validationImages,
-      categories
-    );
+    var evaluationResult: ClassifierEvaluationResultType =
+      yield evaluateClassifier(
+        model,
+        validationData,
+        validationImages,
+        categories
+      );
   } catch (error) {
     yield handleError(error as Error, "Error computing the evaluation results");
     return;

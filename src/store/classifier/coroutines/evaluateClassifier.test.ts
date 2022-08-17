@@ -6,8 +6,8 @@ import {
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
 
-import { evaluate } from "./evaluate";
-import { preprocess } from "./preprocess";
+import { evaluateClassifier } from "./evaluateClassifier";
+import { preprocessClassifier } from "./preprocessClassifier";
 
 import {
   Category,
@@ -183,10 +183,10 @@ const validationImages: Array<ImageType> = [
   },
 ];
 
-it("evaluate", async () => {
+it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationData = await preprocess(
+  const validationData = await preprocessClassifier(
     validationImages,
     categories,
     inputShape,
@@ -221,7 +221,7 @@ it("evaluate", async () => {
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
-    const res = await evaluate(
+    const res = await evaluateClassifier(
       //@ts-ignore
       model,
       validationData,
@@ -243,7 +243,7 @@ it("evaluate", async () => {
   // );
 
   // const time = await tftime(async () => {
-  //   const res = await evaluate(
+  //   const res = await evaluateClassifier(
   //     //@ts-ignore
   //     model,
   //     validationData,

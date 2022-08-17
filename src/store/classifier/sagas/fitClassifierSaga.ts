@@ -10,9 +10,9 @@ import {
   classifierFitOptionsSelector,
   classifierPreprocessOptionsSelector,
   classifierTrainingPercentageSelector,
-  fit,
-  open,
-  preprocess,
+  fitClassifier,
+  createClassifierModel,
+  preprocessClassifier,
 } from "store/classifier";
 import {
   categorizedImagesSelector,
@@ -96,7 +96,7 @@ export function* fitClassifierSaga(action: any): any {
     model = yield select(classifierCompiledSelector);
   } else {
     try {
-      model = yield open(architectureOptions, classes);
+      model = yield createClassifierModel(architectureOptions, classes);
     } catch (error) {
       yield handleError(error as Error, "Failed to create tensorflow model");
       return;
@@ -129,7 +129,7 @@ export function* fitClassifierSaga(action: any): any {
       ys: tensorflow.Tensor<tensorflow.Rank.R2>;
       labels: tensorflow.Tensor<tensorflow.Rank.R1>;
       ids: tensorflow.Tensor<tensorflow.Rank.R1>;
-    }> = yield preprocess(
+    }> = yield preprocessClassifier(
       trainImages,
       categories,
       architectureOptions.inputShape,
@@ -142,7 +142,7 @@ export function* fitClassifierSaga(action: any): any {
       ys: tensorflow.Tensor<tensorflow.Rank.R2>;
       labels: tensorflow.Tensor<tensorflow.Rank.R1>;
       ids: tensorflow.Tensor<tensorflow.Rank.R1>;
-    }> = yield preprocess(
+    }> = yield preprocessClassifier(
       valImages,
       categories,
       architectureOptions.inputShape,
@@ -160,7 +160,7 @@ export function* fitClassifierSaga(action: any): any {
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
   try {
-    var { fitted, status } = yield fit(
+    var { fitted, status } = yield fitClassifier(
       compiledModel,
       data,
       fitOptions,

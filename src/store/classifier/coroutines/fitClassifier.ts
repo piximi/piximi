@@ -2,7 +2,7 @@ import { History, LayersModel } from "@tensorflow/tfjs";
 import { FitOptions } from "../../../types/FitOptions";
 import * as tensorflow from "@tensorflow/tfjs";
 
-export const fit = async (
+export const fitClassifier = async (
   compiled: LayersModel,
   data: {
     val: tensorflow.data.Dataset<{

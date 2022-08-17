@@ -2,7 +2,7 @@ import * as tensorflow from "@tensorflow/tfjs";
 import { LayersModel } from "@tensorflow/tfjs";
 import { Category } from "types";
 
-export const predictCategories = async (
+export const predictClasses = async (
   model: LayersModel,
   data: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor<tensorflow.Rank.R4>;

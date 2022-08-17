@@ -2,7 +2,7 @@ import { ArchitectureOptions, ModelType } from "types";
 import { createSimpleCNN } from "../../coroutine-models/simpleCNN";
 import { createMobileNet } from "../../coroutine-models/mobileNet";
 
-export const open = async (
+export const createClassifierModel = async (
   modelOptions: ArchitectureOptions,
   classes: number
 ) => {

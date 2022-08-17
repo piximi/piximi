@@ -18,8 +18,8 @@ import {
 } from "types";
 
 import { generateDefaultChannels } from "image/imageHelper";
-import { preprocess } from "./preprocess";
-import { predictCategories } from "./predictCategories";
+import { preprocessClassifier } from "./preprocessClassifier";
+import { predictClasses } from "./predictClasses";
 
 jest.setTimeout(100000);
 
@@ -183,7 +183,7 @@ const inferrenceImages: Array<ImageType> = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceData = await preprocess(
+  const inferrenceData = await preprocessClassifier(
     inferrenceImages,
     categories,
     inputShape,
@@ -218,7 +218,7 @@ it("predict", async () => {
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
-    const res = await predictCategories(
+    const res = await predictClasses(
       //@ts-ignore
       model,
       inferrenceData,
@@ -242,7 +242,7 @@ it("predict", async () => {
   // );
 
   // const time = await tftime(async () => {
-  //   const res = await predictCategories(
+  //   const res = await predictClasses(
   //     //@ts-ignore
   //     model,
   //     inferrenceData,

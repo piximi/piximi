@@ -38,10 +38,10 @@ export { watchClassifierPredictSaga } from "./sagas/watchClassifierPredictSaga";
 // Coroutines
 
 export { matchedCropPad } from "./coroutines/cropUtil";
-export { evaluate } from "./coroutines/evaluate";
-export { fit } from "./coroutines/fit";
-export { open } from "./coroutines/open";
-export { predictCategories } from "./coroutines/predictCategories";
+export { evaluateClassifier } from "./coroutines/evaluateClassifier";
+export { fitClassifier } from "./coroutines/fitClassifier";
+export { createClassifierModel } from "./coroutines/createClassifierModel";
+export { predictClasses } from "./coroutines/predictClasses";
 export {
   decodeCategory,
   decodeFromImgSrc,
@@ -49,5 +49,5 @@ export {
   decodeImage,
   cropResize,
   sampleGenerator,
-  preprocess,
-} from "./coroutines/preprocess";
+  preprocessClassifier,
+} from "./coroutines/preprocessClassifier";

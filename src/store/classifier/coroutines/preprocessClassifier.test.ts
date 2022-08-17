@@ -1,5 +1,5 @@
 import "@tensorflow/tfjs-node";
-import { preprocess } from "./preprocess";
+import { preprocessClassifier } from "./preprocessClassifier";
 
 import {
   Category,
@@ -78,8 +78,8 @@ const images: Array<ImageType> = [
   },
 ];
 
-it("preprocess", async () => {
-  const preprocessed = await preprocess(
+it("preprocessClassifier", async () => {
+  const preprocessed = await preprocessClassifier(
     images,
     categories,
     inputShape,

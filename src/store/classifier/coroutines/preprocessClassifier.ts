@@ -445,7 +445,7 @@ const doShow = async (
 };
 /* /Debug Stuff */
 
-export const preprocess = async (
+export const preprocessClassifier = async (
   images: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,

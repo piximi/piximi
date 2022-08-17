@@ -7,8 +7,8 @@ import {
   classifierFitOptionsSelector,
   classifierFittedSelector,
   classifierPreprocessOptionsSelector,
-  predictCategories,
-  preprocess,
+  predictClasses,
+  preprocessClassifier,
 } from "store/classifier";
 import {
   createdCategoriesSelector,
@@ -102,7 +102,7 @@ function* runPrediction(
     ids: tensorflow.Tensor<tensorflow.Rank.R1>;
   }>;
   try {
-    data = yield preprocess(
+    data = yield preprocessClassifier(
       testImages,
       categories,
       inputShape,
@@ -118,7 +118,7 @@ function* runPrediction(
   }
 
   try {
-    var { imageIds, categoryIds } = yield predictCategories(
+    var { imageIds, categoryIds } = yield predictClasses(
       model,
       data,
       categories

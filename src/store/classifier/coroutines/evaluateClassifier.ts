@@ -3,7 +3,7 @@ import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
 import { ImageType } from "../../../types/ImageType";
 
-export const evaluate = async (
+export const evaluateClassifier = async (
   model: tensorflow.LayersModel,
   validationData: tensorflow.data.Dataset<{
     xs: tensorflow.Tensor;
