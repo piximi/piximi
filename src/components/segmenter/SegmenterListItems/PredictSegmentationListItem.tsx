@@ -3,15 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   CircularProgress,
-  ListItem,
+  Grid,
   ListItemIcon,
   ListItemText,
+  Stack,
 } from "@mui/material";
 import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 
 import { useTranslation } from "hooks";
 
-import { DisabledListItem } from "components/common/DisabledListItem";
+import { DisabledListItemButton } from "components/common/DisabledListItemButton";
 
 import {
   segmenterSlice,
@@ -43,15 +44,19 @@ export const PredictSegmenterListItem = (
   }, [predicting]);
 
   return (
-    <DisabledListItem {...props}>
-      <ListItem button onClick={onPredict} disablePadding>
-        <ListItemIcon>
-          <LabelImportantIcon />
-        </ListItemIcon>
-        <ListItemText primary={t("Predict Segmentation")} />
-      </ListItem>
-
-      {isPredicting && <CircularProgress disableShrink size={20} />}
-    </DisabledListItem>
+    <Grid item xs={4}>
+      <DisabledListItemButton {...props} onClick={onPredict}>
+        <Stack sx={{ alignItems: "center" }}>
+          <ListItemIcon sx={{ justifyContent: "center" }}>
+            {isPredicting ? (
+              <CircularProgress disableShrink size={24} />
+            ) : (
+              <LabelImportantIcon />
+            )}
+          </ListItemIcon>
+          <ListItemText primary={t("Predict")} />
+        </Stack>
+      </DisabledListItemButton>
+    </Grid>
   );
 };

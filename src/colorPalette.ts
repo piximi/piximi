@@ -19,8 +19,10 @@ export const CATEGORY_COLORS = {
 };
 
 export const UNKNOWN_CATEGORY_COLOR = "#AAAAAA";
+export const UNKNOWN_ANNOTATOR_CATEGORY_COLOR = "#920000";
 
 export const APPLICATION_COLORS = {
   classifierList: "#DCF3F450",
   segmenterList: "#E9E5FA50",
+  borderColor: "#0000001f",
 };

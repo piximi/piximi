@@ -3,14 +3,16 @@ import { useDispatch } from "react-redux";
 
 import {
   CircularProgress,
-  ListItem,
+  Grid,
   ListItemIcon,
   ListItemText,
+  Stack,
 } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import { useTranslation } from "hooks";
-import { DisabledListItem } from "components/common/DisabledListItem";
+
+import { DisabledListItemButton } from "components/common/DisabledListItemButton";
 
 import { segmenterSlice } from "store/segmenter";
 
@@ -33,17 +35,19 @@ export const EvaluateSegmenterListItem = (
   };
 
   return (
-    <>
-      <DisabledListItem {...props}>
-        <ListItem button onClick={onEvaluate} disablePadding>
-          <ListItemIcon>
-            <AssessmentIcon />
+    <Grid item xs={4}>
+      <DisabledListItemButton {...props} onClick={onEvaluate}>
+        <Stack sx={{ alignItems: "center" }}>
+          <ListItemIcon sx={{ justifyContent: "center" }}>
+            {isEvaluating ? (
+              <CircularProgress disableShrink size={24} />
+            ) : (
+              <AssessmentIcon />
+            )}
           </ListItemIcon>
-          <ListItemText primary={t("Evaluate Segmenter")} />
-        </ListItem>
-
-        {isEvaluating && <CircularProgress disableShrink size={20} />}
-      </DisabledListItem>
-    </>
+          <ListItemText primary={t("Evaluate")} />
+        </Stack>
+      </DisabledListItemButton>
+    </Grid>
   );
 };
