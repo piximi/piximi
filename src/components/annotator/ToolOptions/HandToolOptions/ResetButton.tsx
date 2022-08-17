@@ -5,7 +5,7 @@ import { ListItem, ListItemText } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/slices";
+import { imageViewerSlice } from "store/image-viewer";
 
 export const ResetButton = () => {
   const dispatch = useDispatch();

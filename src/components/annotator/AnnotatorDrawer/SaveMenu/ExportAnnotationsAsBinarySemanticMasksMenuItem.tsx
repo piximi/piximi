@@ -5,10 +5,8 @@ import { saveAs } from "file-saver";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import {
-  annotationCategoriesSelector,
-  annotatorImagesSelector,
-} from "store/selectors";
+import { annotatorImagesSelector } from "store/image-viewer";
+import { annotationCategoriesSelector } from "store/project";
 
 import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
 

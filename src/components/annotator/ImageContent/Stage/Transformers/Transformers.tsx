@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { Transformer } from "../Transformer/Transformer";
 
-import { selectedAnnotationsIdsSelector } from "store/selectors";
+import { selectedAnnotationsIdsSelector } from "store/image-viewer";
 
 import { AnnotationTool } from "annotator/image/Tool";
 

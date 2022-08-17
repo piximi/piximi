@@ -24,7 +24,7 @@ import {
 
 import { usePreferredMuiTheme } from "hooks";
 
-import { applicationSlice } from "store/slices";
+import { applicationSlice } from "store/application";
 
 import { AlertStateType, AlertType } from "types";
 

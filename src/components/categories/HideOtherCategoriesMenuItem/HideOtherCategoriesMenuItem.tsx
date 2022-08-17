@@ -4,9 +4,9 @@ import { useDispatch } from "react-redux";
 import { MenuItem, Typography } from "@mui/material";
 
 import {
-  updateOtherAnnotationCategoryVisibility,
   updateOtherCategoryVisibility,
-} from "store/slices";
+  updateOtherAnnotationCategoryVisibility,
+} from "store/project";
 
 import { Category, CategoryType } from "types";
 

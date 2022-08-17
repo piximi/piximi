@@ -3,12 +3,10 @@ import { batch, useDispatch } from "react-redux";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import {
-  applicationSlice,
-  classifierSlice,
-  projectSlice,
-  segmenterSlice,
-} from "store/slices";
+import { applicationSlice } from "store/application";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
+import { segmenterSlice } from "store/segmenter";
 
 import {
   AlertStateType,

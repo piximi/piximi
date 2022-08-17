@@ -8,11 +8,11 @@ import { useDialog } from "hooks";
 import { SaveProjectDialog } from "../SaveProjectDialog/SaveProjectDialog";
 import { SaveFittedModelDialog } from "../SaveFittedModelDialog";
 
-import { fittedSelector, selectedModelSelector } from "store/selectors";
+import { fittedSelector, selectedModelSelector } from "store/classifier";
 import {
   fittedSegmentationModelSelector,
   segmentationArchitectureOptionsSelector,
-} from "store/selectors/segmenter";
+} from "store/segmenter";
 
 type SaveMenuProps = {
   popupState: any;

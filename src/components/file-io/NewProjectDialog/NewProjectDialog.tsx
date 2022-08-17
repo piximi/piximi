@@ -11,7 +11,8 @@ import {
   TextField,
 } from "@mui/material";
 
-import { projectSlice, classifierSlice } from "store/slices";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
 
 type NewProjectDialogProps = {
   onClose: () => void;

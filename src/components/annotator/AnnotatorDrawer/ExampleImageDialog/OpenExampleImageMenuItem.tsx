@@ -4,13 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
-import { annotationCategoriesSelector } from "store/selectors";
-
 import {
-  imageViewerSlice,
-  setActiveImage,
+  annotationCategoriesSelector,
   setAnnotationCategories,
-} from "store/slices";
+} from "store/project";
+import { imageViewerSlice, setActiveImage } from "store/image-viewer";
 
 import {
   AnnotationType,

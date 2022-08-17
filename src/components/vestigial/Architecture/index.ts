@@ -1,1 +1,0 @@
-export { Architecture } from "./Architecture";

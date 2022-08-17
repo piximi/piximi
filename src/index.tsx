@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Application } from "./components/Application";
-import { productionStore } from "store/stores";
+import { productionStore } from "./store";
 
 ReactDOM.render(
   <Provider store={productionStore}>

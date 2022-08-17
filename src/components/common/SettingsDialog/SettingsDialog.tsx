@@ -26,16 +26,14 @@ import {
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
 import {
-  availableColorsSelector,
-  imageSelectionColorSelector,
   imageSelectionSizeSelector,
-  soundEnabledSelector,
+  imageSelectionColorSelector,
+  applicationSlice,
   themeModeSelector,
-} from "store/selectors";
-
-import { imageViewerSlice, setThemeMode } from "store/slices";
-
-import { applicationSlice } from "store/slices";
+  setThemeMode,
+} from "store/application";
+import { soundEnabledSelector, imageViewerSlice } from "store/image-viewer";
+import { availableColorsSelector } from "store/project";
 
 import { ThemeMode } from "types";
 

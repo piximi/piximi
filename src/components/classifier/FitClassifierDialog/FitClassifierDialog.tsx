@@ -14,18 +14,17 @@ import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
+import { alertStateSelector } from "store/application";
 import {
-  alertStateSelector,
-  categorizedImagesSelector,
+  trainingFlagSelector,
   compiledSelector,
   compileOptionsSelector,
-  epochsSelector,
   fitOptionsSelector,
-  trainingFlagSelector,
+  epochsSelector,
   trainingPercentageSelector,
-} from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+  classifierSlice,
+} from "store/classifier";
+import { categorizedImagesSelector } from "store/project";
 
 import {
   AlertStateType,

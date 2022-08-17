@@ -7,13 +7,9 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import {
-  activeImageSelector,
-  annotationCategoriesSelector,
-  annotatorImagesSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+import { annotationCategoriesSelector } from "store/project";
+import { annotatorImagesSelector, imageViewerSlice } from "store/image-viewer";
+import { activeImageSelector } from "store/common";
 
 import { ImageType } from "types";
 

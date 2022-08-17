@@ -6,10 +6,10 @@ import Konva from "konva";
 import {
   activeImagePlaneSelector,
   activeImageRenderedSrcsSelector,
+  boundingClientRectSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
-  boundingClientRectSelector,
-} from "store/selectors";
+} from "store/image-viewer";
 
 export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);

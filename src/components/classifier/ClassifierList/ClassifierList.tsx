@@ -24,12 +24,14 @@ import {
 import { CategoriesList } from "components/categories/CategoriesList";
 
 import {
-  createdCategoriesSelector,
-  fittedSelector,
   predictedSelector,
+  fittedSelector,
   trainingFlagSelector,
+} from "store/classifier";
+import {
+  createdCategoriesSelector,
   unknownCategorySelector,
-} from "store/selectors";
+} from "store/project";
 
 import { Category, CategoryType } from "types";
 

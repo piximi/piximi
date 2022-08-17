@@ -15,9 +15,8 @@ import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeD
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
-import { visibleImagesSelector } from "store/selectors";
-
-import { applicationSlice } from "store/slices";
+import { applicationSlice } from "store/application";
+import { visibleImagesSelector } from "store/common";
 
 import { AlertType, ImageType } from "types";
 

@@ -8,13 +8,12 @@ import {
 } from "@mui/icons-material";
 
 import {
+  imageViewerSlice,
+  imageShapeSelector,
   activeImageColorsSelector,
   activeImagePlaneSelector,
-  imageOriginalSrcSelector,
-  imageShapeSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/image-viewer";
+import { imageOriginalSrcSelector } from "store/common";
 
 import { Color, DEFAULT_COLORS } from "types";
 

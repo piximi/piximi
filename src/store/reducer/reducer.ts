@@ -1,12 +1,10 @@
 import { combineReducers } from "redux";
-import {
-  imageViewerSlice,
-  classifierSlice,
-  segmenterSlice,
-  projectSlice,
-  applicationSlice,
-  toolOptionsSlice,
-} from "../slices";
+import { applicationSlice } from "store/application";
+import { classifierSlice } from "store/classifier";
+import { imageViewerSlice } from "store/image-viewer";
+import { projectSlice } from "store/project";
+import { segmenterSlice } from "store/segmenter";
+import { toolOptionsSlice } from "store/tool-options";
 
 const reducers = {
   classifier: classifierSlice.reducer,

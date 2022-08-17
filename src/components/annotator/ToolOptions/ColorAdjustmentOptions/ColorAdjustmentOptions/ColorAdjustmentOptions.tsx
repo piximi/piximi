@@ -11,12 +11,11 @@ import { ChannelsList } from "../ChannelsList";
 import { InformationBox } from "../../InformationBox";
 
 import {
-  activeImagePlaneSelector,
-  imageOriginalSrcSelector,
+  imageViewerSlice,
   imageShapeSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+  activeImagePlaneSelector,
+} from "store/image-viewer";
+import { imageOriginalSrcSelector } from "store/common";
 
 import {
   convertImageURIsToImageData,

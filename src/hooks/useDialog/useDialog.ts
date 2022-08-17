@@ -1,8 +1,8 @@
-import React from "react";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import { alertStateSelector } from "store/selectors/alertStateSelector";
-import { AlertType } from "types/AlertStateType";
+
+import { alertStateSelector } from "store/application";
+import { AlertType } from "types";
 
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);

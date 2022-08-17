@@ -19,8 +19,8 @@ import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 import {
   compiledSegmentationModelSelector,
   segmentationTrainingFlagSelector,
-} from "store/selectors/segmenter";
-import { segmenterSlice } from "store/slices";
+  segmenterSlice,
+} from "store/segmenter";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;

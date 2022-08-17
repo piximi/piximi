@@ -9,7 +9,8 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { applicationSlice, projectSlice } from "store/slices";
+import { applicationSlice } from "store/application";
+import { projectSlice } from "store/project";
 
 type DeleteImagesDialogProps = {
   imageIds: Array<string>;

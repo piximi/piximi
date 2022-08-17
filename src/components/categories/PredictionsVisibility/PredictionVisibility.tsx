@@ -11,7 +11,8 @@ import {
 
 import { useTranslation } from "hooks";
 
-import { classifierSlice, projectSlice } from "store/slices";
+import { classifierSlice } from "store/classifier";
+import { projectSlice } from "store/project";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();

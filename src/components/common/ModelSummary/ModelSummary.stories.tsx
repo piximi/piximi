@@ -2,7 +2,7 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { ModelSummaryTable } from "./ModelSummary";
 import * as tensorflow from "@tensorflow/tfjs";
-import { createSimpleCNN } from "store/coroutines/models/simpleCNN";
+import { createSimpleCNN } from "store/coroutine-models/simpleCNN";
 import { Shape } from "types/Shape";
 
 export default {

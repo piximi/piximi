@@ -1,30 +1,30 @@
-import { ToolType } from "../../types/ToolType";
+import { useState } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
+import { useHotkeys } from "react-hotkeys-hook";
+import hotkeys from "hotkeys-js";
+
+import {
+  imageViewerSlice,
+  currentIndexSelector,
+  imageHeightSelector,
+  imageInstancesSelector,
+  imageWidthSelector,
+  pointerSelectionSelector,
+  selectedAnnotationsIdsSelector,
+  selectedAnnotationsSelector,
+  stageScaleSelector,
+  toolTypeSelector,
+  setSelectedAnnotations,
+  setSelectedCategoryId,
+  setPointerSelection,
+} from "store/image-viewer";
+
+import { AnnotationType, ToolType } from "types";
+
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
-} from "../../image/imageHelper";
-import { AnnotationType } from "../../types/AnnotationType";
-import { batch, useDispatch, useSelector } from "react-redux";
-import {
-  imageInstancesSelector,
-  stageScaleSelector,
-  toolTypeSelector,
-} from "../../store/selectors";
-import { selectedAnnotationsSelector } from "../../store/selectors/selectedAnnotationsSelector";
-import { currentIndexSelector } from "../../store/selectors/currentIndexSelector";
-import { useHotkeys } from "react-hotkeys-hook";
-import hotkeys from "hotkeys-js";
-import { useState } from "react";
-import { pointerSelectionSelector } from "../../store/selectors/pointerSelectionSelector";
-import { selectedAnnotationsIdsSelector } from "../../store/selectors/selectedAnnotationsIdsSelector";
-import { imageWidthSelector } from "../../store/selectors/imageWidthSelector";
-import { imageHeightSelector } from "../../store/selectors/imageHeightSelector";
-import {
-  imageViewerSlice,
-  setPointerSelection,
-  setSelectedAnnotations,
-  setSelectedCategoryId,
-} from "../../store/slices";
+} from "image/imageHelper";
 
 export const usePointer = () => {
   const dispatch = useDispatch();

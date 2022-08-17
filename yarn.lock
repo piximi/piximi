@@ -16212,9 +16212,9 @@ tty-browserify@0.0.0:
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
   integrity sha1-oVe6QC2iTpv5V/mqadUk7tQpAaY=
 
-"twgl.js@git+https://github.com/wearemothership/twgl.js.git#v4.19.1-node-canvas-webgl":
+"twgl.js@git+https://github.com/wearemothership/twgl.js#v4.19.1-node-canvas-webgl":
   version "4.19.1"
-  resolved "git+https://github.com/wearemothership/twgl.js.git#989b4cb0aadf64d97db80e7d150d8491e004b132"
+  resolved "git+https://github.com/wearemothership/twgl.js#989b4cb0aadf64d97db80e7d150d8491e004b132"
 
 two-product@^1.0.2:
   version "1.0.2"

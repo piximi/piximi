@@ -29,11 +29,11 @@ import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog"
 import { SaveProjectDialog } from "components/file-io/SaveProjectDialog/SaveProjectDialog";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
-import { fittedSelector, selectedModelSelector } from "store/selectors";
+import { fittedSelector, selectedModelSelector } from "store/classifier";
 import {
   fittedSegmentationModelSelector,
   segmentationArchitectureOptionsSelector,
-} from "store/selectors/segmenter";
+} from "store/segmenter";
 
 import { AlertStateType, AlertType } from "types";
 

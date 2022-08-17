@@ -5,7 +5,7 @@ import { CirclePicker, ColorResult } from "react-color";
 import { Avatar, IconButton, Popover, Box } from "@mui/material";
 import { Label } from "@mui/icons-material";
 
-import { availableColorsSelector } from "store/selectors";
+import { availableColorsSelector } from "store/project";
 
 type ColorIconButtonProps = {
   color: string;

@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText } from "@mui/material";
 
+import { imageViewerFullImagesSelector } from "store/common";
 import {
   activeImageColorsSelector,
   activeImagePlaneSelector,
-  imageViewerFullImagesSelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+  imageViewerSlice,
+} from "store/image-viewer";
 
 import { ImageType } from "types";
 

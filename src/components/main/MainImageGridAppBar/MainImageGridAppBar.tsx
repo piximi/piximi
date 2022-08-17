@@ -30,13 +30,9 @@ import { DeleteImagesDialog } from "../DeleteImagesDialog";
 
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
-import { selectedImagesSelector, visibleImagesSelector } from "store/selectors";
-
-import {
-  applicationSlice,
-  imageViewerSlice,
-  setActiveImage,
-} from "store/slices";
+import { applicationSlice } from "store/application";
+import { visibleImagesSelector, selectedImagesSelector } from "store/common";
+import { setActiveImage, imageViewerSlice } from "store/image-viewer";
 
 import { ImageType, ShadowImageType } from "types";
 

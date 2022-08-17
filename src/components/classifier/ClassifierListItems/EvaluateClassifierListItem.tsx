@@ -14,13 +14,13 @@ import { useDialog, useTranslation } from "hooks";
 import { EvaluateClassifierDialog } from "../EvaluateClassifierDialog/EvaluateClassifierDialog";
 import { DisabledListItem } from "components/common/DisabledListItem/DisabledListItem";
 
+import { alertStateSelector } from "store/application";
 import {
-  alertStateSelector,
-  createdCategoriesSelector,
-  evaluationFlagSelector,
   evaluationResultSelector,
-} from "store/selectors";
-import { classifierSlice } from "store/slices";
+  evaluationFlagSelector,
+  classifierSlice,
+} from "store/classifier";
+import { createdCategoriesSelector } from "store/project";
 
 import { Category } from "types";
 

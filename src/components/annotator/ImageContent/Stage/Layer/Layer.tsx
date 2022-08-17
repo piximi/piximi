@@ -9,8 +9,8 @@ import {
   stageHeightSelector,
   stageWidthSelector,
   zoomSelectionSelector,
-  zoomToolOptionsSelector,
-} from "store/selectors";
+} from "store/image-viewer";
+import { zoomToolOptionsSelector } from "store/tool-options";
 
 type LayerProps = {
   children?: React.ReactNode;

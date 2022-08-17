@@ -8,7 +8,7 @@ import {
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
 
-import { categoriesSelector } from "store/selectors";
+import { categoriesSelector } from "store/project";
 
 import { Category, ImageType, Partition, UNKNOWN_CATEGORY_ID } from "types";
 

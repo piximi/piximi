@@ -20,7 +20,7 @@ import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
-import { toolTypeSelector } from "store/selectors";
+import { toolTypeSelector } from "store/image-viewer";
 
 import { ToolType } from "types";
 
@@ -37,7 +37,7 @@ import {
   QuickSelectionIcon,
   RectangularSelectionIcon,
   ZoomIcon,
-} from "../../../../icons";
+} from "icons";
 
 export const ToolOptions = () => {
   const activeOperation = useSelector(toolTypeSelector);

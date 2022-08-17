@@ -16,14 +16,12 @@ import { ImageIconLabel } from "./ImageIconLabel";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
 
 import {
+  tileSizeSelector,
+  applicationSlice,
   imageSelectionColorSelector,
   imageSelectionSizeSelector,
-  selectedImagesSelector,
-  tileSizeSelector,
-  visibleImagesSelector,
-} from "store/selectors";
-
-import { applicationSlice } from "store/slices";
+} from "store/application";
+import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
 import { ImageType } from "types";
 
@@ -69,6 +67,7 @@ const MainImageGridItem = memo(
     };
 
     const onSelectImage = (image: ImageType) => {
+      console.log(image.id);
       if (selected) {
         dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
       } else {
