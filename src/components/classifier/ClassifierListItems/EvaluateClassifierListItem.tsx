@@ -3,16 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   CircularProgress,
-  ListItem,
+  Grid,
   ListItemIcon,
   ListItemText,
+  Stack,
 } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import { useDialog, useTranslation } from "hooks";
 
 import { EvaluateClassifierDialog } from "../EvaluateClassifierDialog/EvaluateClassifierDialog";
-import { DisabledListItem } from "components/common/DisabledListItem/DisabledListItem";
+import { DisabledListItemButton } from "components/common/DisabledListItemButton/DisabledListItemButton";
 
 import { alertStateSelector } from "store/application";
 import {
@@ -54,17 +55,19 @@ export const EvaluateClassifierListItem = (
   }, [alertState.visible, evaluationFlag, isEvaluating, onOpen]);
 
   return (
-    <>
-      <DisabledListItem {...props}>
-        <ListItem button onClick={onEvaluate} disablePadding>
-          <ListItemIcon>
-            <AssessmentIcon />
+    <Grid item xs={4}>
+      <DisabledListItemButton {...props} onClick={onEvaluate}>
+        <Stack sx={{ alignItems: "center" }}>
+          <ListItemIcon sx={{ justifyContent: "center" }}>
+            {isEvaluating ? (
+              <CircularProgress disableShrink size={24} />
+            ) : (
+              <AssessmentIcon />
+            )}
           </ListItemIcon>
           <ListItemText primary={t("Evaluate")} />
-        </ListItem>
-
-        {isEvaluating && <CircularProgress disableShrink size={20} />}
-      </DisabledListItem>
+        </Stack>
+      </DisabledListItemButton>
 
       <EvaluateClassifierDialog
         openedDialog={open}
@@ -77,6 +80,6 @@ export const EvaluateClassifierListItem = (
         recall={evaluationResult.recall}
         f1Score={evaluationResult.f1Score}
       />
-    </>
+    </Grid>
   );
 };

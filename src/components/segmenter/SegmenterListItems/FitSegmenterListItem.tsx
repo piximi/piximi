@@ -1,8 +1,11 @@
 import {
+  Grid,
   IconButton,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
+  Stack,
 } from "@mui/material";
 import {
   ScatterPlot as ScatterPlotIcon,
@@ -21,18 +24,17 @@ export const FitSegmenterListItem = () => {
   };
 
   return (
-    <>
-      <ListItem onClick={() => {}}>
-        <ListItemIcon>
-          <ScatterPlotIcon />
-        </ListItemIcon>
+    <Grid item xs={4}>
+      <ListItemButton onClick={onOpenFitSegmenterDialog}>
+        <Stack sx={{ alignItems: "center" }}>
+          <ListItemIcon sx={{ justifyContent: "center" }}>
+            <ScatterPlotIcon />
+          </ListItemIcon>
 
-        <ListItemText primary="Fit Segmenter" />
-        <IconButton edge="end" onClick={onOpenFitSegmenterDialog}>
-          <SettingsIcon />
-        </IconButton>
-      </ListItem>
+          <ListItemText primary="Fit" />
+        </Stack>
+      </ListItemButton>
       <FitSegmenterDialog openedDialog={open} closeDialog={onClose} />
-    </>
+    </Grid>
   );
 };

@@ -10,19 +10,19 @@
       {
         "name": "NoGFP",
         "visible": true,
-        "color": "#ffb6db",
+        "color": "#009292",
         "id": "6ec3da3d-6d16-481b-bc2a-4dda852e9257"
       },
       {
         "name": "CytoplasmicGFP",
         "visible": true,
-        "color": "#009292",
+        "color": "#b66dff",
         "id": "0e81beed-12f4-4ef4-827d-c89d07469205"
       },
       {
         "name": "NuclearGFP",
         "visible": true,
-        "color": "#920000",
+        "color": "#b6dbff",
         "id": "d3cdd513-5dc1-4662-aa0b-7a7dfa51d426"
       }
     ],

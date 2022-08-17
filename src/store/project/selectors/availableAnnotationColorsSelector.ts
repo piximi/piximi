@@ -1,6 +1,6 @@
 import { Project } from "types/Project";
 import { Category } from "types/Category";
-import { COLORS } from "colorPalette";
+import { CATEGORY_COLORS } from "colorPalette";
 
 export const availableAnnotationColorsSelector = ({
   project,
@@ -10,5 +10,7 @@ export const availableAnnotationColorsSelector = ({
   const usedColors = project.annotationCategories.map((category: Category) => {
     return category.color;
   });
-  return COLORS.filter((color: string) => !usedColors.includes(color));
+  return Object.values(CATEGORY_COLORS).filter(
+    (color: string) => !usedColors.includes(color)
+  );
 };

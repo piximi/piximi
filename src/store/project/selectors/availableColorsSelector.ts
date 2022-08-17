@@ -1,5 +1,5 @@
 import { Category, Project } from "types";
-import { COLORS } from "colorPalette";
+import { CATEGORY_COLORS } from "colorPalette";
 
 export const availableColorsSelector = ({
   project,
@@ -9,5 +9,7 @@ export const availableColorsSelector = ({
   const usedColors = project.categories.map((category: Category) => {
     return category.color;
   });
-  return COLORS.filter((color: string) => !usedColors.includes(color));
+  return Object.values(CATEGORY_COLORS).filter(
+    (color: string) => !usedColors.includes(color)
+  );
 };

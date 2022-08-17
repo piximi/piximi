@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 import {
@@ -15,19 +15,12 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 
-import {
-  FitClassifierListItem,
-  PredictClassifierListItem,
-  EvaluateClassifierListItem,
-} from "../ClassifierListItems";
+import { ClassifierExecListItem } from "../ClassifierExecListItem";
 
 import { CategoriesList } from "components/categories/CategoriesList";
 
-import {
-  classifierPredictedSelector,
-  classifierFittedSelector,
-  classifierTrainingFlagSelector,
-} from "store/classifier";
+import { classifierPredictedSelector } from "store/classifier";
+
 import {
   createdCategoriesSelector,
   unknownCategorySelector,
@@ -35,37 +28,14 @@ import {
 
 import { Category, CategoryType } from "types";
 
+import { APPLICATION_COLORS } from "colorPalette";
+
 export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);
   const unknownCategory = useSelector(unknownCategorySelector);
 
-  const predicted = useSelector(classifierPredictedSelector);
-
   const [collapsed, setCollapsed] = React.useState(true);
-
-  const [disabled, setDisabled] = React.useState<boolean>(true);
-  const [helperText, setHelperText] = React.useState<string>(
-    "disabled: no trained model"
-  );
-
-  const fitted = useSelector(classifierFittedSelector);
-  const training = useSelector(classifierTrainingFlagSelector);
-
-  useEffect(() => {
-    if (training) {
-      setDisabled(true);
-      setHelperText("disabled during training");
-    }
-  }, [training]);
-
-  useEffect(() => {
-    if (fitted) {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-      setHelperText("disabled: no trained model");
-    }
-  }, [fitted]);
+  const predicted = useSelector(classifierPredictedSelector);
 
   const onCollapseClick = () => {
     setCollapsed(!collapsed);
@@ -74,7 +44,7 @@ export const ClassifierList = () => {
   const onCategoryClickCallBack = (category: Category) => {};
 
   return (
-    <List dense>
+    <List dense sx={{ bgcolor: APPLICATION_COLORS.classifierList }}>
       <ListItem button dense onClick={onCollapseClick}>
         <ListItemIcon>
           {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -94,19 +64,7 @@ export const ClassifierList = () => {
 
         <Divider />
 
-        <List component="div" dense disablePadding>
-          <FitClassifierListItem />
-
-          <PredictClassifierListItem
-            disabled={disabled}
-            helperText={helperText}
-          />
-
-          <EvaluateClassifierListItem
-            disabled={disabled}
-            helperText={helperText}
-          />
-        </List>
+        <ClassifierExecListItem />
       </Collapse>
     </List>
   );
