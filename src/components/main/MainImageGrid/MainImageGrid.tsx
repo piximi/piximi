@@ -1,111 +1,26 @@
-import { memo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-import {
-  Container,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Box,
-} from "@mui/material";
+import { Container, ImageList, Box } from "@mui/material";
 
 import { useDndFileDrop } from "hooks";
-
-import { ImageIconLabel } from "./ImageIconLabel";
 
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
 
 import {
   tileSizeSelector,
-  applicationSlice,
   imageSelectionColorSelector,
   imageSelectionSizeSelector,
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
 import { ImageType } from "types";
+import { MainImageGridItem } from "../MainImageGridItem";
+import { useState } from "react";
+import { ImageCategoryMenu } from "../ImageCategoryMenu";
 
 type MainImageGridProps = {
   onDrop: (files: FileList) => void;
 };
-
-type MainImageGridItemProps = {
-  image: ImageType;
-  selected: boolean;
-  selectionColor: string;
-  selectionSize: number;
-};
-
-const MainImageGridItem = memo(
-  ({
-    image,
-    selected,
-    selectionColor,
-    selectionSize,
-  }: MainImageGridItemProps) => {
-    const dispatch = useDispatch();
-    const scaleFactor = useSelector(tileSizeSelector);
-
-    const getSize = (scaleFactor: number) => {
-      const width = (220 * scaleFactor).toString() + "px";
-      const height = (220 * scaleFactor).toString() + "px";
-
-      return {
-        width: width,
-        height: height,
-        margin: "2px",
-      };
-    };
-
-    const getSelectionStatus = () => {
-      return selected
-        ? {
-            border: `solid ${selectionSize}px ${selectionColor}`,
-            borderRadius: `${selectionSize}px`,
-          }
-        : { border: "none" };
-    };
-
-    const onSelectImage = (image: ImageType) => {
-      console.log(image.id);
-      if (selected) {
-        dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
-      } else {
-        dispatch(applicationSlice.actions.selectImage({ id: image.id }));
-      }
-    };
-
-    return (
-      <ImageListItem
-        onClick={() => onSelectImage(image)}
-        style={getSize(scaleFactor)}
-        sx={getSelectionStatus()}
-      >
-        <Box
-          component="img"
-          alt=""
-          src={image.src}
-          sx={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            top: 0,
-            transform: "none",
-          }}
-        />
-
-        <ImageListItemBar
-          position="top"
-          actionIcon={<ImageIconLabel image={image} />}
-          actionPosition="left"
-          sx={{
-            background: "transparent",
-          }}
-        />
-      </ImageListItem>
-    );
-  }
-);
 
 export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const images = useSelector(visibleImagesSelector);
@@ -115,6 +30,14 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const scaleFactor = useSelector(tileSizeSelector);
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+
+  const handleClose = () => {
+    setContextMenu(null);
+  };
 
   return (
     <Box
@@ -154,9 +77,22 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
               selectionColor={imageSelectionColor}
               selectionSize={imageSelectionSize}
               key={image.id}
+              contextMenu={contextMenu}
+              setContextMenu={setContextMenu}
             />
           ))}
         </ImageList>
+        <ImageCategoryMenu
+          open={contextMenu !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          imageIds={selectedImages}
+          anchorPosition={
+            contextMenu !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        />
 
         <MainImageGridAppBar />
       </Container>

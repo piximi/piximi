@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Menu, MenuItem, MenuList } from "@mui/material";
+import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
 import { applicationSlice } from "store/application";
@@ -10,15 +10,21 @@ import { categoriesSelector, updateImageCategories } from "store/project";
 import { Category } from "types";
 
 type ImageCategoryMenuProps = {
-  anchorEl: HTMLElement;
+  anchorEl?: HTMLElement;
   imageIds: Array<string>;
   onClose: () => void;
+  anchorReference?: PopoverReference;
+  anchorPosition?: { top: number; left: number };
+  open: boolean;
 };
 
 export const ImageCategoryMenu = ({
   anchorEl,
   imageIds,
   onClose,
+  anchorReference,
+  anchorPosition,
+  open,
 }: ImageCategoryMenuProps) => {
   const categories = useSelector(categoriesSelector);
 
@@ -36,6 +42,8 @@ export const ImageCategoryMenu = ({
 
   return (
     <Menu
+      anchorReference={anchorReference}
+      anchorPosition={anchorPosition}
       anchorOrigin={{
         horizontal: "center",
         vertical: "bottom",
@@ -45,7 +53,7 @@ export const ImageCategoryMenu = ({
         vertical: "top",
       }}
       anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
+      open={open}
       onClose={onClose}
     >
       <MenuList dense variant="menu">

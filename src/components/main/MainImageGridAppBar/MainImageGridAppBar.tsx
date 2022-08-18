@@ -38,19 +38,15 @@ import { ImageType, ShadowImageType } from "types";
 
 export const MainImageGridAppBar = () => {
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   const images = useSelector(visibleImagesSelector);
-
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
-
   const [showImageGridAppBar, setShowImageGridAppBar] =
     React.useState<boolean>(false);
-
   const [showSelectAllButton, setShowSelectAllButton] =
     React.useState<boolean>(true);
 
@@ -240,6 +236,7 @@ export const MainImageGridAppBar = () => {
         anchorEl={categoryMenuAnchorEl as HTMLElement}
         imageIds={selectedImages}
         onClose={onCloseCategoryMenu}
+        open={Boolean(categoryMenuAnchorEl as HTMLElement)}
       />
 
       <DeleteImagesDialog
