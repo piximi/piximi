@@ -1,4 +1,5 @@
 import * as tensorflow from "@tensorflow/tfjs";
+import { PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
 import { put, select } from "redux-saga/effects";
 
@@ -40,8 +41,13 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-export function* fitClassifierSaga(action: any): any {
-  const { onEpochEnd } = action.payload;
+export function* fitClassifierSaga({
+  payload: { onEpochEnd, execSaga },
+}: PayloadAction<{
+  onEpochEnd: any;
+  execSaga: boolean;
+}>): any {
+  if (!execSaga) return;
 
   const trainingPercentage: number = yield select(
     classifierTrainingPercentageSelector

@@ -188,6 +188,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     dispatch(
       segmenterSlice.actions.fitSegmenter({
         onEpochEnd: trainingHistoryCallback,
+        execSaga: true,
       })
     );
   };

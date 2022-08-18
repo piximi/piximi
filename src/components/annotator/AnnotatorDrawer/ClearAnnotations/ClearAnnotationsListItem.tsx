@@ -55,6 +55,7 @@ export const ClearAnnotationsListItem = () => {
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: unknownAnnotationCategory.id,
+          execSaga: true,
         })
       );
       dispatch(

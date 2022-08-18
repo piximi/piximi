@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 import * as _ from "lodash";
 
@@ -12,10 +13,11 @@ import { selectedCategorySelector } from "store/common";
 import { AnnotationType } from "types";
 
 // eslint-disable-next-line no-empty-pattern
-export function* selectedCategorySaga({}: {
-  type: string;
-  payload: { selectedCategoryId: string };
-}): any {
+export function* selectedCategorySaga({
+  payload: { execSaga },
+}: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>): any {
+  if (!execSaga) return;
+
   const selectedAnnotationsIds = yield select(selectedAnnotationsIdsSelector);
   if (!selectedAnnotationsIds) return;
 

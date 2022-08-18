@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
@@ -23,16 +24,24 @@ type ImageFileError = {
 };
 
 export function* uploadImagesSaga({
-  payload: { files, channels, slices, imageShapeInfo, isUploadedFromAnnotator },
-}: {
   payload: {
-    files: FileList;
-    channels: number;
-    slices: number;
-    imageShapeInfo: ImageShapeEnum;
-    isUploadedFromAnnotator: boolean;
-  };
-}): any {
+    files,
+    channels,
+    slices,
+    imageShapeInfo,
+    isUploadedFromAnnotator,
+    execSaga,
+  },
+}: PayloadAction<{
+  files: FileList;
+  channels: number;
+  slices: number;
+  imageShapeInfo: ImageShapeEnum;
+  isUploadedFromAnnotator: boolean;
+  execSaga: boolean;
+}>): any {
+  if (!execSaga) return;
+
   const colors = yield select(currentColorsSelector);
   const singleRGBImages = imageShapeInfo === ImageShapeEnum.SingleRGBImage;
   const invalidImageFiles: Array<ImageFileError> = [];
@@ -120,6 +129,7 @@ export function* uploadImagesSaga({
       yield put(
         imageViewerSlice.actions.setActiveImage({
           imageId: imagesToUpload[0].id,
+          execSaga: true,
         })
       );
     } else {

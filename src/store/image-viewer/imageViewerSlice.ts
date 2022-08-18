@@ -192,6 +192,7 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{
         annotationState: AnnotationStateType;
         annotationTool: AnnotationTool | undefined;
+        execSaga: boolean;
       }>
     ) {
       state.annotationState = action.payload.annotationState;
@@ -231,7 +232,7 @@ export const imageViewerSlice = createSlice({
     },
     setActiveImage(
       state: ImageViewer,
-      action: PayloadAction<{ imageId: string | undefined }>
+      action: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>
     ) {
       state.activeImageId = action.payload.imageId;
 
@@ -254,7 +255,10 @@ export const imageViewerSlice = createSlice({
     },
     setImageColors(
       state: ImageViewer,
-      action: PayloadAction<{ colors: Array<Color>; ignoreRender?: boolean }>
+      action: PayloadAction<{
+        colors: Array<Color>;
+        execSaga: boolean;
+      }>
     ) {
       if (!state.activeImageId) return;
       state.images = state.images.map((image: ShadowImageType) => {
@@ -408,7 +412,7 @@ export const imageViewerSlice = createSlice({
     },
     setSelectedCategoryId(
       state: ImageViewer,
-      action: PayloadAction<{ selectedCategoryId: string }>
+      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },

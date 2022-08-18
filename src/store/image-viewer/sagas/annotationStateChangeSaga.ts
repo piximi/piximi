@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
 import {
@@ -14,17 +15,18 @@ import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 import { AnnotationTool } from "annotator/image/Tool";
 
 export function* annotationStateChangeSaga({
-  payload: { annotationState, annotationTool },
-}: {
-  type: string;
-  payload: {
-    annotationState: AnnotationStateType;
-    annotationTool: AnnotationTool | undefined;
-  };
-}): any {
-  if (!annotationTool) return;
-
-  if (annotationState !== AnnotationStateType.Annotated) return;
+  payload: { annotationState, annotationTool, execSaga },
+}: PayloadAction<{
+  annotationState: AnnotationStateType;
+  annotationTool: AnnotationTool | undefined;
+  execSaga: boolean;
+}>): any {
+  if (
+    !execSaga ||
+    !annotationTool ||
+    annotationState !== AnnotationStateType.Annotated
+  )
+    return;
 
   const selectionMode = yield select(selectionModeSelector);
   const activeImagePlane = yield select(activeImagePlaneSelector);

@@ -67,6 +67,7 @@ export const ImageShapeDialog = ({
         slices: slices,
         imageShapeInfo: ImageShapeEnum.HyperStackImage,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
+        execSaga: true,
       })
     );
 

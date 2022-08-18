@@ -33,6 +33,7 @@ export const AnnotatorDrawer = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedCategoryId({
         selectedCategoryId: category.id,
+        execSaga: true,
       })
     );
   };

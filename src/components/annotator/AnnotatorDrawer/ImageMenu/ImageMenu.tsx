@@ -66,7 +66,10 @@ export const ImageMenu = ({
         }
 
         dispatch(
-          imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+          imageViewerSlice.actions.setActiveImage({
+            imageId: newActiveImageId,
+            execSaga: true,
+          })
         );
       }
 

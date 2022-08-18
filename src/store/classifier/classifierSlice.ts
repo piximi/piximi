@@ -67,14 +67,20 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         onEpochEnd: any;
+        execSaga: boolean;
       }>
     ) {
       state.fitting = true;
     },
-    predict(state, action: PayloadAction<{}>) {
+    predict(state, action: PayloadAction<{ execSaga: boolean }>) {
       state.predicting = true;
     },
-    evaluate(state, action: PayloadAction<{}>) {
+    evaluate(
+      state,
+      action: PayloadAction<{
+        execSaga: boolean;
+      }>
+    ) {
       state.evaluating = true;
     },
     setClassifier(
