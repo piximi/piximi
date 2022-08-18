@@ -78,7 +78,7 @@ export const ChannelsList = () => {
         dispatch(
           imageViewerSlice.actions.setImageColors({
             colors: updatedChannels,
-            ignoreRender: true,
+            execSaga: false,
           })
         );
       };
@@ -106,7 +106,7 @@ export const ChannelsList = () => {
       dispatch(
         imageViewerSlice.actions.setImageColors({
           colors: activeImageColors,
-          ignoreRender: false,
+          execSaga: false,
         })
       );
     });
@@ -131,6 +131,7 @@ export const ChannelsList = () => {
       dispatch(
         imageViewerSlice.actions.setImageColors({
           colors: copiedChannels,
+          execSaga: true,
         })
       );
 

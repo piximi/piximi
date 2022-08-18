@@ -30,6 +30,7 @@ export const DeleteAllAnnotationsDialog = ({
       dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
+          execSaga: true,
         })
       );
     });

@@ -42,6 +42,7 @@ export const ColorAdjustmentOptions = () => {
     dispatch(
       imageViewerSlice.actions.setImageColors({
         colors: defaultChannels,
+        execSaga: true,
       })
     );
 

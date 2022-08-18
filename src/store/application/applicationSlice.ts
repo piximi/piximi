@@ -88,6 +88,7 @@ export const applicationSlice = createSlice({
         slices: number;
         imageShapeInfo: ImageShapeEnum;
         isUploadedFromAnnotator: boolean;
+        execSaga: boolean;
       }>
     ) {},
   },

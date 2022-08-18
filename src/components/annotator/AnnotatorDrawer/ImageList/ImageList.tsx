@@ -43,7 +43,7 @@ export const ImageList = () => {
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
-    dispatch(setActiveImage({ imageId: image.id }));
+    dispatch(setActiveImage({ imageId: image.id, execSaga: true }));
   };
 
   const onImageMenuOpen = (

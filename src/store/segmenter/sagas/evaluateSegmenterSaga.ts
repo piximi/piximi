@@ -1,4 +1,5 @@
 import { LayersModel, data, Tensor, Rank } from "@tensorflow/tfjs";
+import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
@@ -20,7 +21,11 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 
-export function* evaluateSegmenterSaga(action: any): any {
+export function* evaluateSegmenterSaga({
+  payload: { execSaga },
+}: PayloadAction<{ execSaga: boolean }>): any {
+  if (!execSaga) return;
+
   const model: LayersModel = yield select(segmenterFittedModelSelector);
 
   const validationImages: Array<ImageType> = yield select(

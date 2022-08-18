@@ -65,7 +65,10 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     );
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({ colors: updatedColors })
+      imageViewerSlice.actions.setImageColors({
+        colors: updatedColors,
+        execSaga: true,
+      })
     );
 
     if (!originalSrc || !imageShape) return;

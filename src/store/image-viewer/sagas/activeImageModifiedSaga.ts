@@ -1,3 +1,4 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
 import { imageViewerSlice } from "store/image-viewer";
@@ -11,13 +12,10 @@ import {
 } from "image/imageHelper";
 
 export function* activeImageIDChangeSaga({
-  payload: { imageId },
-}: {
-  type: string;
-  payload: {
-    imageId: string;
-  };
-}): any {
+  payload: { imageId, execSaga },
+}: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>): any {
+  if (!execSaga) return;
+
   const image: ImageType | undefined = yield select(imageSelector);
 
   if (!image) {
@@ -62,15 +60,12 @@ export function* activeImageIDChangeSaga({
 }
 
 export function* activeImageColorChangeSaga({
-  payload: { colors, ignoreRender },
-}: {
-  type: string;
-  payload: {
-    colors: Array<Color>;
-    ignoreRender?: boolean;
-  };
-}): any {
-  if (ignoreRender) return;
+  payload: { colors, execSaga },
+}: PayloadAction<{
+  colors: Array<Color>;
+  execSaga: boolean;
+}>): any {
+  if (!execSaga) return;
 
   const image: ImageType | undefined = yield select(imageSelector);
 
