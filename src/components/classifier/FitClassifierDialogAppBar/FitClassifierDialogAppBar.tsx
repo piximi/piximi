@@ -14,8 +14,8 @@ import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import {
-  compiledSelector,
-  trainingFlagSelector,
+  classifierCompiledSelector,
+  classifierTrainingFlagSelector,
   classifierSlice,
 } from "store/classifier";
 
@@ -36,8 +36,8 @@ export const FitClassifierDialogAppBar = ({
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
 
-  const compiled = useSelector(compiledSelector);
-  const training = useSelector(trainingFlagSelector);
+  const compiled = useSelector(classifierCompiledSelector);
+  const training = useSelector(classifierTrainingFlagSelector);
 
   const onStopFitting = () => {
     if (!compiled) return;

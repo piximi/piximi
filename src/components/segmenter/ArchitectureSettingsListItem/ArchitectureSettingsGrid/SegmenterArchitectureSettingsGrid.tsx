@@ -7,20 +7,18 @@ import { CustomNumberTextField } from "components/common/InputFields";
 import { StyledFormControl } from "components/common/StyledFormControl";
 
 import {
-  segmentationArchitectureOptionsSelector,
-  userUploadedSegmentationModelSelector,
-  segmentationInputShapeSelector,
+  segmenterArchitectureOptionsSelector,
+  segmenterUserUploadedModelSelector,
+  segmenterInputShapeSelector,
   segmenterSlice,
 } from "store/segmenter";
 
 import { availableSegmenterModels, SegmenterModelProps } from "types";
 
 export const SegmenterArchitectureSettingsGrid = () => {
-  const architectureOptions = useSelector(
-    segmentationArchitectureOptionsSelector
-  );
-  const userUploadedModel = useSelector(userUploadedSegmentationModelSelector);
-  const inputShape = useSelector(segmentationInputShapeSelector);
+  const architectureOptions = useSelector(segmenterArchitectureOptionsSelector);
+  const userUploadedModel = useSelector(segmenterUserUploadedModelSelector);
+  const inputShape = useSelector(segmenterInputShapeSelector);
 
   const [selectedModel, setSelectedModel] = React.useState<SegmenterModelProps>(
     architectureOptions.selectedModel

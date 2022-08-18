@@ -81,7 +81,7 @@ const images: Array<ImageType> = [
   },
 ];
 
-it("preprocess-segmentation", async () => {
+it("preprocessClassifier-segmentation", async () => {
   const preprocessed = await preprocessSegmentationImages(
     images,
     annotationCategories,

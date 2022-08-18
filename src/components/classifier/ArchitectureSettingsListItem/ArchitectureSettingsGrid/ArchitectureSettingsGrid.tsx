@@ -7,18 +7,20 @@ import { StyledFormControl } from "components/common/StyledFormControl";
 import { CustomNumberTextField } from "components/common/InputFields/";
 
 import {
-  architectureOptionsSelector,
-  uploadedModelSelector,
-  inputShapeSelector,
+  classifierArchitectureOptionsSelector,
+  classifierUploadedModelSelector,
+  classifierInputShapeSelector,
   classifierSlice,
 } from "store/classifier";
 
 import { availableClassifierModels, ClassifierModelProps } from "types";
 
 export const ArchitectureSettingsGrid = () => {
-  const architectureOptions = useSelector(architectureOptionsSelector);
-  const userUploadedModel = useSelector(uploadedModelSelector);
-  const inputShape = useSelector(inputShapeSelector);
+  const architectureOptions = useSelector(
+    classifierArchitectureOptionsSelector
+  );
+  const userUploadedModel = useSelector(classifierUploadedModelSelector);
+  const inputShape = useSelector(classifierInputShapeSelector);
 
   const [selectedModel, setSelectedModel] =
     React.useState<ClassifierModelProps>(architectureOptions.selectedModel);

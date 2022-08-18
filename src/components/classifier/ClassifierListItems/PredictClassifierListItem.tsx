@@ -15,7 +15,10 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/common/DisabledListItemButton/DisabledListItemButton";
 
-import { classifierSlice, predictionFlagSelector } from "store/classifier";
+import {
+  classifierSlice,
+  classifierPredictionFlagSelector,
+} from "store/classifier";
 
 type PredictClassifierListItemProps = {
   disabled: boolean;
@@ -35,7 +38,7 @@ export const PredictClassifierListItem = (
     dispatch(classifierSlice.actions.predict({}));
   };
 
-  const predicting = useSelector(predictionFlagSelector);
+  const predicting = useSelector(classifierPredictionFlagSelector);
 
   useEffect(() => {
     setIsPredicting(predicting);

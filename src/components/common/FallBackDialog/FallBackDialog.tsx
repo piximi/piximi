@@ -29,10 +29,13 @@ import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog"
 import { SaveProjectDialog } from "components/file-io/SaveProjectDialog/SaveProjectDialog";
 import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
-import { fittedSelector, selectedModelSelector } from "store/classifier";
 import {
-  fittedSegmentationModelSelector,
-  segmentationArchitectureOptionsSelector,
+  classifierFittedSelector,
+  classifierSelectedModelSelector,
+} from "store/classifier";
+import {
+  segmenterFittedModelSelector,
+  segmenterArchitectureOptionsSelector,
 } from "store/segmenter";
 
 import { AlertStateType, AlertType } from "types";
@@ -91,13 +94,15 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialog();
 
-  const fittedClassifierModel = useSelector(fittedSelector);
-  const selectedClassifierModelProps = useSelector(selectedModelSelector);
+  const fittedClassifierModel = useSelector(classifierFittedSelector);
+  const selectedClassifierModelProps = useSelector(
+    classifierSelectedModelSelector
+  );
   const fittedClassifier = fittedClassifierModel ? true : false;
 
-  const fittedSegmenterModel = useSelector(fittedSegmentationModelSelector);
+  const fittedSegmenterModel = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
-    segmentationArchitectureOptionsSelector
+    segmenterArchitectureOptionsSelector
   ).selectedModel;
   const fittedSegmenter = fittedSegmenterModel ? true : false;
 

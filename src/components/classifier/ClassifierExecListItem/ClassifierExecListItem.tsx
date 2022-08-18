@@ -9,7 +9,10 @@ import {
   EvaluateClassifierListItem,
 } from "../ClassifierListItems";
 
-import { fittedSelector, trainingFlagSelector } from "store/classifier";
+import {
+  classifierFittedSelector,
+  classifierTrainingFlagSelector,
+} from "store/classifier";
 
 import { APPLICATION_COLORS } from "colorPalette";
 
@@ -18,8 +21,8 @@ export const ClassifierExecListItem = () => {
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const fitted = useSelector(fittedSelector);
-  const training = useSelector(trainingFlagSelector);
+  const fitted = useSelector(classifierFittedSelector);
+  const training = useSelector(classifierTrainingFlagSelector);
 
   useEffect(() => {
     if (training) {

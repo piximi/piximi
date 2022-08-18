@@ -10,8 +10,8 @@ import {
 } from "../SegmenterListItems";
 
 import {
-  fittedSegmentationModelSelector,
-  segmentationTrainingFlagSelector,
+  segmenterFittedModelSelector,
+  segmenterTrainingFlagSelector,
 } from "store/segmenter";
 
 import { APPLICATION_COLORS } from "colorPalette";
@@ -20,8 +20,8 @@ export const SegmenterExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
-  const fitted = useSelector(fittedSegmentationModelSelector);
-  const training = useSelector(segmentationTrainingFlagSelector);
+  const fitted = useSelector(segmenterFittedModelSelector);
+  const training = useSelector(segmenterTrainingFlagSelector);
 
   useEffect(() => {
     if (training) {

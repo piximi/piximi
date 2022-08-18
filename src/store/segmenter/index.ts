@@ -4,23 +4,21 @@ export { segmenterSlice } from "./segmenterSlice";
 
 // Selectors
 
-export { segmentationTrainImagesSelector } from "./selectors/segmentationTrainImagesSelector";
-export { segmentationValidationImagesSelector } from "./selectors/segmentationValidationImagesSelector";
-export { segmentationTrainingPercentageSelector } from "./selectors/segmentationTrainingPercentageSelector";
-export { segmentationFitOptionsSelector } from "./selectors/segmentationFitOptionsSelector";
-export { segmentationCompileOptionsSelector } from "./selectors/segmentationCompileOptionsSelector";
-export { segmentationArchitectureOptionsSelector } from "./selectors/segmentationArchitectureOptionsSelector";
-export { compiledSegmentationModelSelector } from "./selectors/compiledSegmentationModelSelector";
-export { segmentationPreprocessOptionsSelector } from "./selectors/segmentationPreprocessOptionsSelector";
-export { fittedSegmentationModelSelector } from "./selectors/fittedSegmentationModelSelector";
-export { segmentationValDataSelector } from "./selectors/segmentationValDataSelector";
-export { unannotatedImagesSelector } from "./selectors/unannotatedImagesSelector";
-export { segmentationValImagesSelector } from "./selectors/segmentationValImagesSelector";
-export { userUploadedSegmentationModelSelector } from "./selectors/userUploadedSegmentationModelSelector";
-export { segmentationInputShapeSelector } from "./selectors/segmentationInputShapeSelector";
-export { segmentationTrainingFlagSelector } from "./selectors/segmentationTrainingFlagSelector";
+export { segmenterTrainImagesSelector } from "./selectors/segmenterTrainImagesSelector";
+export { segmenterValidationImagesSelector } from "./selectors/segmenterValidationImagesSelector";
+export { segmenterTrainingPercentageSelector } from "./selectors/segmenterTrainingPercentageSelector";
+export { segmenterFitOptionsSelector } from "./selectors/segmenterFitOptionsSelector";
+export { segmenterCompileOptionsSelector } from "./selectors/segmenterCompileOptionsSelector";
+export { segmenterArchitectureOptionsSelector } from "./selectors/segmenterArchitectureOptionsSelector";
+export { segmenterCompiledModelSelector } from "./selectors/segmenterCompiledModelSelector";
+export { segmenterPreprocessOptionsSelector } from "./selectors/segmenterPreprocessOptionsSelector";
+export { segmenterFittedModelSelector } from "./selectors/segmenterFittedModelSelector";
+export { segmenterValDataSelector } from "./selectors/segmenterValidationDataSelector";
+export { segmenterUserUploadedModelSelector } from "./selectors/segmenterUserUploadedModelSelector";
+export { segmenterInputShapeSelector } from "./selectors/segmenterInputShapeSelector";
+export { segmenterTrainingFlagSelector } from "./selectors/segmenterTrainingFlagSelector";
 export { segmenterSelector } from "./selectors/segmenterSelector";
-export { segmentationPredictingFlagSelector } from "./selectors/segmentationPredictingFlagSelector";
+export { segmenterPredictingFlagSelector } from "./selectors/segmenterPredictingFlagSelector";
 
 // Sagas
 

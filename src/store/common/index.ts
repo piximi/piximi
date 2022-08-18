@@ -3,6 +3,7 @@
 export { activeImageSelector } from "./selectors/activeImageSelector";
 export { activeSerializedAnnotationsSelector } from "./selectors/activeSerializedAnnotationsSelector";
 export { allSerializedAnnotationsSelector } from "./selectors/allSerializedAnnotationsSelector";
+export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
 export { imageNameSelector } from "./selectors/imageNameSelector";
 export { imageOriginalSrcSelector } from "./selectors/imageOriginalSrcSelector";
 export { imageSelector } from "./selectors/imageSelector";

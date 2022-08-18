@@ -19,7 +19,8 @@ import { ClassifierExecListItem } from "../ClassifierExecListItem";
 
 import { CategoriesList } from "components/categories/CategoriesList";
 
-import { predictedSelector } from "store/classifier";
+import { classifierPredictedSelector } from "store/classifier";
+
 import {
   createdCategoriesSelector,
   unknownCategorySelector,
@@ -34,7 +35,8 @@ export const ClassifierList = () => {
   const unknownCategory = useSelector(unknownCategorySelector);
 
   const [collapsed, setCollapsed] = React.useState(true);
-  const predicted = useSelector(predictedSelector);
+  const predicted = useSelector(classifierPredictedSelector);
+
   const onCollapseClick = () => {
     setCollapsed(!collapsed);
   };

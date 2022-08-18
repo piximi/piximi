@@ -2,13 +2,16 @@ import { put, select } from "redux-saga/effects";
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
 
 import { applicationSlice } from "store/application";
-import { projectSlice, annotationCategoriesSelector } from "store/project";
 import {
+  projectSlice,
+  annotationCategoriesSelector,
   unannotatedImagesSelector,
-  segmentationInputShapeSelector,
-  segmentationPreprocessOptionsSelector,
-  segmentationFitOptionsSelector,
-  fittedSegmentationModelSelector,
+} from "store/project";
+import {
+  segmenterInputShapeSelector,
+  segmenterPreprocessOptionsSelector,
+  segmenterFitOptionsSelector,
+  segmenterFittedModelSelector,
   segmenterSlice,
   predictSegmentations,
   preprocessSegmentationImages,
@@ -42,15 +45,15 @@ export function* predictSegmenterSaga(action: any): any {
     annotationCategoriesSelector
   );
 
-  const inputShape: Shape = yield select(segmentationInputShapeSelector);
+  const inputShape: Shape = yield select(segmenterInputShapeSelector);
 
   const preprocessOptions: PreprocessOptions = yield select(
-    segmentationPreprocessOptionsSelector
+    segmenterPreprocessOptionsSelector
   );
 
-  const fitOptions: FitOptions = yield select(segmentationFitOptionsSelector);
+  const fitOptions: FitOptions = yield select(segmenterFitOptionsSelector);
 
-  let model = yield select(fittedSegmentationModelSelector);
+  let model = yield select(segmenterFittedModelSelector);
 
   if (!inferenceImages.length) {
     yield put(

@@ -9,7 +9,8 @@ import * as Sentry from "@sentry/react";
 import thunk from "redux-thunk";
 import logger from "redux-logger";
 
-import { reducer, rootSaga } from "../";
+import { reducer } from "../reducer";
+import { rootSaga } from "../sagas";
 
 export const saga = createSagaMiddleware();
 

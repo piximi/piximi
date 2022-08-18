@@ -8,10 +8,13 @@ import { useDialog } from "hooks";
 import { SaveProjectDialog } from "../SaveProjectDialog/SaveProjectDialog";
 import { SaveFittedModelDialog } from "../SaveFittedModelDialog";
 
-import { fittedSelector, selectedModelSelector } from "store/classifier";
 import {
-  fittedSegmentationModelSelector,
-  segmentationArchitectureOptionsSelector,
+  classifierFittedSelector,
+  classifierSelectedModelSelector,
+} from "store/classifier";
+import {
+  segmenterFittedModelSelector,
+  segmenterArchitectureOptionsSelector,
 } from "store/segmenter";
 
 type SaveMenuProps = {
@@ -37,12 +40,14 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
     open: openSaveSegmenterDialog,
   } = useDialog();
 
-  const fittedClassifier = useSelector(fittedSelector);
-  const selectedClassifierModelProps = useSelector(selectedModelSelector);
+  const fittedClassifier = useSelector(classifierFittedSelector);
+  const selectedClassifierModelProps = useSelector(
+    classifierSelectedModelSelector
+  );
 
-  const fittedSegmenter = useSelector(fittedSegmentationModelSelector);
+  const fittedSegmenter = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
-    segmentationArchitectureOptionsSelector
+    segmenterArchitectureOptionsSelector
   ).selectedModel;
 
   return (

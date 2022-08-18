@@ -17,8 +17,8 @@ import {
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 
 import {
-  compiledSegmentationModelSelector,
-  segmentationTrainingFlagSelector,
+  segmenterCompiledModelSelector,
+  segmenterTrainingFlagSelector,
   segmenterSlice,
 } from "store/segmenter";
 
@@ -39,8 +39,8 @@ export const FitSegmenterDialogAppBar = ({
 }: FitSegmenterDialogAppBarProps) => {
   const dispatch = useDispatch();
 
-  const compiled = useSelector(compiledSegmentationModelSelector);
-  const training = useSelector(segmentationTrainingFlagSelector);
+  const compiled = useSelector(segmenterCompiledModelSelector);
+  const training = useSelector(segmenterTrainingFlagSelector);
 
   const onStopFitting = () => {
     if (!compiled) return;

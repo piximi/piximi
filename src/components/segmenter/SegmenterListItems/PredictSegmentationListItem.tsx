@@ -16,7 +16,7 @@ import { DisabledListItemButton } from "components/common/DisabledListItemButton
 
 import {
   segmenterSlice,
-  segmentationPredictingFlagSelector,
+  segmenterPredictingFlagSelector,
 } from "store/segmenter";
 
 type PredictSegmenterListItemProps = {
@@ -37,7 +37,7 @@ export const PredictSegmenterListItem = (
     dispatch(segmenterSlice.actions.predictSegmenter({}));
   };
 
-  const predicting = useSelector(segmentationPredictingFlagSelector);
+  const predicting = useSelector(segmenterPredictingFlagSelector);
 
   useEffect(() => {
     setIsPredicting(predicting);
