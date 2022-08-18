@@ -1,4 +1,5 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import _ from "lodash";
 import { select, put } from "redux-saga/effects";
 
@@ -90,7 +91,7 @@ export function* fitSegmenterSaga(action: any): any {
     annotationCategoriesSelector
   );
 
-  var model: tensorflow.LayersModel;
+  var model: LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
     model = yield select(segmenterCompiledModelSelector);
   } else {
@@ -109,7 +110,7 @@ export function* fitSegmenterSaga(action: any): any {
     segmenterCompileOptionsSelector
   );
 
-  var compiledModel: tensorflow.LayersModel;
+  var compiledModel: LayersModel;
   try {
     compiledModel = yield compile(model, compileOptions);
   } catch (error) {
@@ -127,10 +128,10 @@ export function* fitSegmenterSaga(action: any): any {
   );
 
   try {
-    const trainData: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-      ys: tensorflow.Tensor<tensorflow.Rank.R4>;
-      id: tensorflow.Tensor<tensorflow.Rank.R1>;
+    const trainData: Dataset<{
+      xs: Tensor<Rank.R4>;
+      ys: Tensor<Rank.R4>;
+      id: Tensor<Rank.R1>;
     }> = yield preprocessSegmentationImages(
       trainImages,
       categories,
@@ -139,10 +140,10 @@ export function* fitSegmenterSaga(action: any): any {
       fitOptions
     );
 
-    const valData: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-      ys: tensorflow.Tensor<tensorflow.Rank.R4>;
-      id: tensorflow.Tensor<tensorflow.Rank.R1>;
+    const valData: Dataset<{
+      xs: Tensor<Rank.R4>;
+      ys: Tensor<Rank.R4>;
+      id: Tensor<Rank.R1>;
     }> = yield preprocessSegmentationImages(
       valImages,
       categories,

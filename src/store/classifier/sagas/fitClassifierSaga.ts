@@ -1,4 +1,5 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import _ from "lodash";
 import { put, select } from "redux-saga/effects";
 
@@ -91,7 +92,7 @@ export function* fitClassifierSaga(action: any): any {
   );
   const classes: number = yield select(createdCategoriesCountSelector);
 
-  var model: tensorflow.LayersModel;
+  var model: LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
     model = yield select(classifierCompiledSelector);
   } else {
@@ -107,7 +108,7 @@ export function* fitClassifierSaga(action: any): any {
     classifierCompileOptionsSelector
   );
 
-  var compiledModel: tensorflow.LayersModel;
+  var compiledModel: LayersModel;
   try {
     compiledModel = yield compile(model, compileOptions);
   } catch (error) {
@@ -124,11 +125,11 @@ export function* fitClassifierSaga(action: any): any {
   const valImages: ImageType[] = yield select(valImagesSelector);
 
   try {
-    const trainData: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    const trainData: Dataset<{
+      xs: Tensor<Rank.R4>;
+      ys: Tensor<Rank.R2>;
+      labels: Tensor<Rank.R1>;
+      ids: Tensor<Rank.R1>;
     }> = yield preprocessClassifier(
       trainImages,
       categories,
@@ -137,11 +138,11 @@ export function* fitClassifierSaga(action: any): any {
       fitOptions
     );
 
-    const valData: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-      ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-      labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-      ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+    const valData: Dataset<{
+      xs: Tensor<Rank.R4>;
+      ys: Tensor<Rank.R2>;
+      labels: Tensor<Rank.R1>;
+      ids: Tensor<Rank.R1>;
     }> = yield preprocessClassifier(
       valImages,
       categories,

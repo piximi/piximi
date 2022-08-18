@@ -1,4 +1,6 @@
+import { LayersModel } from "@tensorflow/tfjs";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { ShadowImageType } from "types/ImageType";
 import {
   Category,
@@ -11,7 +13,6 @@ import { AnnotationType } from "types/AnnotationType";
 import { AnnotationModeType } from "types/AnnotationModeType";
 import { AnnotationStateType } from "types/AnnotationStateType";
 import { LanguageType } from "types/LanguageType";
-import * as tensorflow from "@tensorflow/tfjs";
 import { ImageViewer } from "types/ImageViewer";
 import { Color } from "types/Color";
 import { SerializedFileType } from "types/SerializedFileType";
@@ -481,7 +482,7 @@ export const imageViewerSlice = createSlice({
   extraReducers: {
     "thunks/loadLayersModel/fulfilled": (
       state: ImageViewer,
-      action: PayloadAction<tensorflow.LayersModel>
+      action: PayloadAction<LayersModel>
     ) => {
       console.info(action.payload);
     },

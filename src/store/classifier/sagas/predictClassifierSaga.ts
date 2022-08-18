@@ -1,4 +1,5 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { put, select } from "redux-saga/effects";
 
 import {
@@ -93,13 +94,13 @@ function* runPrediction(
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: tensorflow.LayersModel
+  model: LayersModel
 ) {
-  var data: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  var data: Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }>;
   try {
     data = yield preprocessClassifier(

@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { ModelSummaryTable } from "./ModelSummary";
-import * as tensorflow from "@tensorflow/tfjs";
+import { train } from "@tensorflow/tfjs";
 import { createSimpleCNN } from "store/coroutine-models/simpleCNN";
 import { Shape } from "types/Shape";
 
@@ -23,7 +23,7 @@ const simpleCNN = createSimpleCNN(inputShape, 10);
 simpleCNN.compile({
   loss: "meanSquaredError",
   metrics: "categoricalAccuracy",
-  optimizer: tensorflow.train.adadelta(0.015),
+  optimizer: train.adadelta(0.015),
 });
 
 const Template: ComponentStory<typeof ModelSummaryTable> = (args) => (

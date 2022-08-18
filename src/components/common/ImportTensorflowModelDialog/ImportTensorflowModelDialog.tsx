@@ -1,6 +1,6 @@
 import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import * as tf from "@tensorflow/tfjs";
+import { LayersModel, loadLayersModel, io } from "@tensorflow/tfjs";
 
 import {
   Button,
@@ -38,8 +38,7 @@ export const ImportTensorflowModelDialog = ({
   modelType,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
-  const [classifierModel, setClassifierModel] =
-    React.useState<tf.LayersModel>();
+  const [classifierModel, setClassifierModel] = React.useState<LayersModel>();
   const [modelSelected, setModelSelected] = React.useState<boolean>(false);
   const [modelName, setModelName] = React.useState<string>("");
   const [inputShape, setInputShape] = React.useState<Shape>({
@@ -87,8 +86,8 @@ export const ImportTensorflowModelDialog = ({
     }
 
     try {
-      const model = await tf.loadLayersModel(
-        tf.io.browserFiles([jsonFile, ...weightsFiles])
+      const model = await loadLayersModel(
+        io.browserFiles([jsonFile, ...weightsFiles])
       );
       setClassifierModel(model);
       setModelSelected(true);

@@ -1,9 +1,9 @@
 import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 import { FitOptions } from "./FitOptions";
-import * as tensorflow from "@tensorflow/tfjs";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
 import { ClassifierModelProps } from "./ModelType";
@@ -11,17 +11,17 @@ import { ClassifierEvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
   compiled?: LayersModel;
-  trainDataSet?: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-    labels: tensorflow.Tensor;
-    ids: tensorflow.Tensor;
+  trainDataSet?: Dataset<{
+    xs: Tensor;
+    ys: Tensor;
+    labels: Tensor;
+    ids: Tensor;
   }>;
-  valDataSet?: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-    labels: tensorflow.Tensor;
-    ids: tensorflow.Tensor;
+  valDataSet?: Dataset<{
+    xs: Tensor;
+    ys: Tensor;
+    labels: Tensor;
+    ids: Tensor;
   }>;
   evaluating: boolean;
   fitOptions: FitOptions;

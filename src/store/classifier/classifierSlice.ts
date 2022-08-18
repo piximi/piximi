@@ -3,7 +3,8 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import * as tensorflow from "@tensorflow/tfjs";
+import { Tensor, Rank } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
@@ -215,17 +216,17 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         data: {
-          val: tensorflow.data.Dataset<{
-            xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-            ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-            labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-            ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+          val: Dataset<{
+            xs: Tensor<Rank.R4>;
+            ys: Tensor<Rank.R2>;
+            labels: Tensor<Rank.R1>;
+            ids: Tensor<Rank.R1>;
           }>;
-          train: tensorflow.data.Dataset<{
-            xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-            ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-            labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-            ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+          train: Dataset<{
+            xs: Tensor<Rank.R4>;
+            ys: Tensor<Rank.R2>;
+            labels: Tensor<Rank.R1>;
+            ids: Tensor<Rank.R1>;
           }>;
         };
       }>

@@ -1,5 +1,20 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import {
+  Tensor,
+  Rank,
+  Tensor2D,
+  Tensor3D,
+  tensor2d,
+  tensor3d,
+  util as tfutil,
+  image as tfimage,
+  data as tfdata,
+  browser,
+  scalar,
+  stack,
+  tidy,
+} from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
+
 import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Shape } from "types/Shape";
@@ -12,24 +27,24 @@ import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 export const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
   item: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+    xs: Tensor<Rank.R3>;
     annotations: AnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R3>;
   id: string;
 }> => {
-  const ys = tensorflow.tidy(() => {
+  const ys = tidy(() => {
     const segmentationMasks = encodeAnnotationToSegmentationMask(
       item.annotations,
       item.shape,
       createdCategoriesIDs
     );
 
-    return tensorflow.tensor3d(segmentationMasks);
+    return tensor3d(segmentationMasks);
   });
 
   return new Promise((resolve) => {
@@ -47,12 +62,12 @@ export const decodeFromImgSrc = async (
     shape: Shape;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  xs: Tensor<Rank.R3>;
   annotations: AnnotationType[];
   id: string;
   shape: Shape;
 }> => {
-  const fetched = await tensorflow.util.fetch(item.srcs);
+  const fetched = await tfutil.fetch(item.srcs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
@@ -62,10 +77,10 @@ export const decodeFromImgSrc = async (
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  let x: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+  let x: Tensor3D = browser.fromPixels(canvas, channels);
 
   if (rescaleOptions.rescale) {
-    const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
+    const rescaleFactor = scalar(255); //Because xs is string, values are encoded by uint8array by default
     const unscaledx = x;
     x = unscaledx.div(rescaleFactor);
     unscaledx.dispose();
@@ -86,48 +101,48 @@ export const decodeFromOriginalSrc = async (
     shape: Shape;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  xs: Tensor<Rank.R3>;
   annotations: AnnotationType[];
   id: string;
   shape: Shape;
 }> => {
-  const channelPromises: Array<Promise<tensorflow.Tensor2D>> = [];
+  const channelPromises: Array<Promise<Tensor2D>> = [];
 
   for (const channelData of item.srcs) {
-    const channelPromise = tensorflow.util
+    const channelPromise = tfutil
       .fetch(channelData)
       .then((fetched) => fetched.arrayBuffer())
       .then((buffer) => ImageJS.Image.load(buffer))
       .then((im) => {
         const canvas = im.getCanvas();
-        let x2d: tensorflow.Tensor2D = tensorflow.tidy(() => {
-          const x3d = tensorflow.browser.fromPixels(canvas, 1); // 3D: [w, h, 1 channel]
+        let x2d: Tensor2D = tidy(() => {
+          const x3d = browser.fromPixels(canvas, 1); // 3D: [w, h, 1 channel]
           return x3d.reshape([x3d.shape[0], x3d.shape[1]]); // 2D: [w, h]
         });
 
         if (rescaleOptions.rescale) {
-          const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
+          const rescaleFactor = scalar(255); //Because xs is string, values are encoded by uint8array by default
           const unscaledx = x2d;
           x2d = unscaledx.div(rescaleFactor);
           unscaledx.dispose();
           rescaleFactor.dispose();
         }
 
-        return x2d as tensorflow.Tensor2D;
+        return x2d as Tensor2D;
       })
       .catch((err) => {
         process.env.NODE_ENV !== "production" && console.error(err);
-        return tensorflow.tensor2d([[]]);
+        return tensor2d([[]]);
       });
 
     channelPromises.push(channelPromise);
   }
 
   return Promise.all(channelPromises).then((channels) => {
-    const x: tensorflow.Tensor<tensorflow.Rank.R3> = tensorflow.stack(
+    const x: Tensor<Rank.R3> = stack(
       channels,
       2 // axis to stack on, producing tensor of dims: [height, width, channels]
-    ) as tensorflow.Tensor<tensorflow.Rank.R3>;
+    ) as Tensor<Rank.R3>;
 
     for (const c of channels) {
       c.dispose();
@@ -147,7 +162,7 @@ export const decodeImage = async (
     shape: Shape;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
+  xs: Tensor<Rank.R3>;
   annotations: AnnotationType[];
   id: string;
   shape: Shape;
@@ -203,25 +218,25 @@ export const sampleGenerator = (images: Array<ImageType>, channels: number) => {
 export const resize = async (
   inputShape: Shape,
   item: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+    xs: Tensor<Rank.R3>;
+    ys: Tensor<Rank.R3>;
     id: string;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R3>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R3>;
   id: string;
 }> => {
-  const resizedXs = tensorflow.tidy(() => {
-    return tensorflow.image.resizeBilinear(item.xs as tensorflow.Tensor3D, [
+  const resizedXs = tidy(() => {
+    return tfimage.resizeBilinear(item.xs as Tensor3D, [
       inputShape.height,
       inputShape.width,
     ]);
   });
   item.xs.dispose();
 
-  const resizedYs = tensorflow.tidy(() => {
-    return tensorflow.image.resizeBilinear(item.ys as tensorflow.Tensor3D, [
+  const resizedYs = tidy(() => {
+    return tfimage.resizeBilinear(item.ys as Tensor3D, [
       inputShape.height,
       inputShape.width,
     ]);
@@ -240,10 +255,10 @@ export const preprocessSegmentationImages = async (
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions
 ): Promise<
-  tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R4>;
-    id: tensorflow.Tensor<tensorflow.Rank.R1>;
+  tfdata.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R4>;
+    id: Tensor<Rank.R1>;
   }>
 > => {
   const createdCategoriesIDs = categories
@@ -254,7 +269,7 @@ export const preprocessSegmentationImages = async (
       return category.id;
     });
 
-  const imageData = tensorflow.data
+  const imageData = tfdata
     .generator(sampleGenerator(images, inputShape.channels))
     .mapAsync(
       decodeImage.bind(
@@ -268,9 +283,9 @@ export const preprocessSegmentationImages = async (
 
   const imageDataBatched = imageData.batch(fitOptions.batchSize);
 
-  return imageDataBatched as tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R4>;
-    id: tensorflow.Tensor<tensorflow.Rank.R1>;
+  return imageDataBatched as tfdata.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R4>;
+    id: Tensor<Rank.R1>;
   }>;
 };

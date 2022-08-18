@@ -1,12 +1,17 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import {
+  Sequential,
+  sequential,
+  layers,
+  serialization,
+} from "@tensorflow/tfjs";
 
 export const changeInputShape = async (
-  model: tensorflow.Sequential,
+  model: Sequential,
   inputShape: number[]
 ) => {
-  const newModel = tensorflow.sequential();
-  newModel.add(tensorflow.layers.inputLayer({ inputShape: inputShape }));
-  const map = tensorflow.serialization.SerializationMap.getMap().classNameMap;
+  const newModel = sequential();
+  newModel.add(layers.inputLayer({ inputShape: inputShape }));
+  const map = serialization.SerializationMap.getMap().classNameMap;
   for (let i = 1; i < model.layers.length; i++) {
     const layer = model.layers[i];
     const className: string = layer.getClassName();

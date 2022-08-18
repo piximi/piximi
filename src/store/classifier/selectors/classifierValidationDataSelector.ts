@@ -1,15 +1,16 @@
+import { Tensor } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { Classifier } from "types";
-import * as tensorflow from "@tensorflow/tfjs";
 
 export const classifierValidationDataSelector = ({
   classifier,
 }: {
   classifier: Classifier;
 }):
-  | tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor;
-      ys: tensorflow.Tensor;
-      labels: tensorflow.Tensor;
+  | Dataset<{
+      xs: Tensor;
+      ys: Tensor;
+      labels: Tensor;
     }>
   | undefined => {
   return classifier.valDataSet;
