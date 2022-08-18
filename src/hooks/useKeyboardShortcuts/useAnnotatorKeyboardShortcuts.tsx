@@ -29,7 +29,10 @@ export const useAnnotatorKeyboardShortcuts = () => {
     if (!selectedCategory) return;
 
     dispatch(
-      setSelectedCategoryId({ selectedCategoryId: selectedCategory.id })
+      setSelectedCategoryId({
+        selectedCategoryId: selectedCategory.id,
+        execSaga: true,
+      })
     );
   });
 

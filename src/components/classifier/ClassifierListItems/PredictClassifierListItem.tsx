@@ -35,7 +35,7 @@ export const PredictClassifierListItem = (
   const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
 
   const onPredict = () => {
-    dispatch(classifierSlice.actions.predict({}));
+    dispatch(classifierSlice.actions.predict({ execSaga: true }));
   };
 
   const predicting = useSelector(classifierPredictionFlagSelector);

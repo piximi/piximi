@@ -167,6 +167,7 @@ export const Stage = () => {
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
+          execSaga: true,
         })
       );
 
@@ -197,6 +198,7 @@ export const Stage = () => {
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotating,
           annotationTool,
+          execSaga: true,
         })
       );
     };
@@ -209,6 +211,7 @@ export const Stage = () => {
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
           annotationTool,
+          execSaga: true,
         })
       );
 
@@ -230,6 +233,7 @@ export const Stage = () => {
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
+          execSaga: true,
         })
       );
     };
@@ -602,7 +606,10 @@ export const Stage = () => {
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+        imageViewerSlice.actions.setActiveImage({
+          imageId: newActiveImageId,
+          execSaga: true,
+        })
       );
     },
     [images, activeImageId]
@@ -624,7 +631,10 @@ export const Stage = () => {
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+        imageViewerSlice.actions.setActiveImage({
+          imageId: newActiveImageId,
+          execSaga: true,
+        })
       );
     },
     [images, activeImageId]

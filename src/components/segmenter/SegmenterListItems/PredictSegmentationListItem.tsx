@@ -34,7 +34,7 @@ export const PredictSegmenterListItem = (
   const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
 
   const onPredict = () => {
-    dispatch(segmenterSlice.actions.predictSegmenter({}));
+    dispatch(segmenterSlice.actions.predictSegmenter({ execSaga: true }));
   };
 
   const predicting = useSelector(segmenterPredictingFlagSelector);

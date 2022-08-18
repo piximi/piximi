@@ -173,6 +173,7 @@ export const usePointer = () => {
             dispatch(
               setSelectedCategoryId({
                 selectedCategoryId: annotationsInBox[0].categoryId,
+                execSaga: true,
               })
             );
           });
@@ -265,6 +266,7 @@ export const usePointer = () => {
         dispatch(
           setSelectedCategoryId({
             selectedCategoryId: currentAnnotation.categoryId,
+            execSaga: true,
           })
         );
       });

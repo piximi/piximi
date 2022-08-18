@@ -105,6 +105,7 @@ export const OpenExampleImageMenuItem = ({
       dispatch(
         setActiveImage({
           imageId: serializedExampleImageFile.imageId,
+          execSaga: true,
         })
       );
     });

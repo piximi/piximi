@@ -330,6 +330,7 @@ export const Transformer = ({
         imageViewerSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool: annotationTool,
+          execSaga: true,
         })
       );
     }

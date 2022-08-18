@@ -93,7 +93,12 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
   useEffect(() => {
     if (image) {
-      dispatch(imageViewerSlice.actions.setActiveImage({ imageId: image.id }));
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({
+          imageId: image.id,
+          execSaga: true,
+        })
+      );
     }
   }, [dispatch, image]);
 

@@ -1,5 +1,6 @@
 import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
+import { PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
 import { select, put } from "redux-saga/effects";
 
@@ -39,8 +40,13 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 
-export function* fitSegmenterSaga(action: any): any {
-  const { onEpochEnd } = action.payload;
+export function* fitSegmenterSaga({
+  payload: { onEpochEnd, execSaga },
+}: PayloadAction<{
+  onEpochEnd: any;
+  execSaga: boolean;
+}>): any {
+  if (!execSaga) return;
 
   const trainingPercentage: number = yield select(
     segmenterTrainingPercentageSelector

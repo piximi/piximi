@@ -64,14 +64,15 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{
         onEpochEnd: any;
+        execSaga: boolean;
       }>
     ) {
       state.fitting = true;
     },
-    predictSegmenter(state, action: PayloadAction<{}>) {
+    predictSegmenter(state, action: PayloadAction<{ execSaga: boolean }>) {
       state.predicting = true;
     },
-    evaluateSegmenter(state, action: PayloadAction<{}>) {
+    evaluateSegmenter(state, action: PayloadAction<{ execSaga: boolean }>) {
       state.evaluating = true;
     },
     setSegmenter(

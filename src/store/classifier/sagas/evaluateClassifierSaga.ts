@@ -1,5 +1,6 @@
 import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
+import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
@@ -20,7 +21,13 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 
-export function* evaluateClassifierSaga(action: any): any {
+export function* evaluateClassifierSaga({
+  payload: { execSaga },
+}: PayloadAction<{
+  execSaga: boolean;
+}>): any {
+  if (!execSaga) return;
+
   const model: LayersModel = yield select(classifierFittedSelector);
   const validationImages: Array<ImageType> = yield select(valImagesSelector);
   yield put(yield put(applicationSlice.actions.hideAlertState({})));

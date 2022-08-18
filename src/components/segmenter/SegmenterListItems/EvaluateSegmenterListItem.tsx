@@ -31,7 +31,7 @@ export const EvaluateSegmenterListItem = (
 
   const onEvaluate = async () => {
     setIsEvaluating(true);
-    dispatch(segmenterSlice.actions.evaluateSegmenter({}));
+    dispatch(segmenterSlice.actions.evaluateSegmenter({ execSaga: true }));
   };
 
   return (

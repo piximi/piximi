@@ -44,7 +44,7 @@ export const EvaluateClassifierListItem = (
   const alertState = useSelector(alertStateSelector);
 
   const onEvaluate = async () => {
-    dispatch(classifierSlice.actions.evaluate({}));
+    dispatch(classifierSlice.actions.evaluate({ execSaga: true }));
   };
 
   useEffect(() => {

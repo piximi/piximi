@@ -1,5 +1,6 @@
 import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
+import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
 import {
@@ -31,7 +32,11 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-export function* predictClassifierSaga(action: any): any {
+export function* predictClassifierSaga({
+  payload: { execSaga },
+}: PayloadAction<{ execSaga: boolean }>): any {
+  if (!execSaga) return;
+
   const testImages: Array<ImageType> = yield select(testImagesSelector);
 
   const categories: Category[] = yield select(createdCategoriesSelector);

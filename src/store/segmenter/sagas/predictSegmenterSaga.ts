@@ -1,5 +1,6 @@
-import { put, select } from "redux-saga/effects";
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
+import { PayloadAction } from "@reduxjs/toolkit";
+import { put, select } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
 import {
@@ -29,7 +30,11 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 
-export function* predictSegmenterSaga(action: any): any {
+export function* predictSegmenterSaga({
+  payload: { execSaga },
+}: PayloadAction<{ execSaga: boolean }>): any {
+  if (!execSaga) return;
+
   const inferenceImages: Array<ImageType> = yield select(
     unannotatedImagesSelector
   );

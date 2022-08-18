@@ -184,6 +184,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     dispatch(
       classifierSlice.actions.fit({
         onEpochEnd: trainingHistoryCallback,
+        execSaga: true,
       })
     );
   };
