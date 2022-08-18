@@ -2,8 +2,8 @@ import { all, fork } from "redux-saga/effects";
 import { watchUploadImagesSaga } from "store/application";
 import {
   watchEvaluateClassifierSaga,
-  watchClassifierFitSaga,
-  watchClassifierPredictSaga,
+  watchFitClassifierSaga,
+  watchPredictClassifierSaga,
 } from "store/classifier";
 import {
   watchAnnotationStateChangeSaga,
@@ -19,8 +19,8 @@ import {
 
 export function* rootSaga() {
   const classifierEffects = [
-    fork(watchClassifierFitSaga),
-    fork(watchClassifierPredictSaga),
+    fork(watchFitClassifierSaga),
+    fork(watchPredictClassifierSaga),
     fork(watchEvaluateClassifierSaga),
   ];
 

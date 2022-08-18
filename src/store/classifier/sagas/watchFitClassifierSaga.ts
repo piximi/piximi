@@ -3,6 +3,6 @@ import { fitClassifierSaga } from "./fitClassifierSaga";
 
 import { classifierSlice } from "store/classifier";
 
-export function* watchClassifierFitSaga(): any {
+export function* watchFitClassifierSaga(): any {
   yield takeLeading(classifierSlice.actions.fit.type, fitClassifierSaga);
 }
