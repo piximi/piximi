@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/static/js/main.19e0e435.js",
-    "static/js/608.e6377810.chunk.js": "/static/js/608.e6377810.chunk.js",
-    "static/js/280.29c034ab.chunk.js": "/static/js/280.29c034ab.chunk.js",
-    "static/js/564.2b7df326.chunk.js": "/static/js/564.2b7df326.chunk.js",
-    "static/js/843.81c407be.chunk.js": "/static/js/843.81c407be.chunk.js",
-    "static/js/845.02a9151d.chunk.js": "/static/js/845.02a9151d.chunk.js",
+    "main.js": "/static/js/main.874d4263.js",
+    "static/js/608.5bfc9c67.chunk.js": "/static/js/608.5bfc9c67.chunk.js",
+    "static/js/280.3adb8679.chunk.js": "/static/js/280.3adb8679.chunk.js",
+    "static/js/564.b9909a79.chunk.js": "/static/js/564.b9909a79.chunk.js",
+    "static/js/843.cb94bb48.chunk.js": "/static/js/843.cb94bb48.chunk.js",
+    "static/js/301.4aba4e75.chunk.js": "/static/js/301.4aba4e75.chunk.js",
     "static/media/malaria.png": "/static/media/malaria.5b73ad7591d4eef598db.png",
     "static/media/cElegansExampleProjectIcon.png": "/static/media/cElegansExampleProjectIcon.ec038762b8385f2d59fd.png",
     "static/media/humanU2OSCellsExampleProjectIcon.png": "/static/media/humanU2OSCellsExampleProjectIcon.59ecbfc81d965b81358b.png",
@@ -35,10 +35,10 @@
     "static/media/VolumeOff.svg": "/static/media/VolumeOff.1149786552b52a25580655f2ce3391c1.svg",
     "static/media/VolumeUp.svg": "/static/media/VolumeUp.30de055e122b96e2aa207a710b1bd74a.svg",
     "static/media/Moon.svg": "/static/media/Moon.593035e92f1f02f04668bb75454d1fb3.svg",
-    "main.19e0e435.js.map": "/static/js/main.19e0e435.js.map",
-    "845.02a9151d.chunk.js.map": "/static/js/845.02a9151d.chunk.js.map"
+    "main.874d4263.js.map": "/static/js/main.874d4263.js.map",
+    "301.4aba4e75.chunk.js.map": "/static/js/301.4aba4e75.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.19e0e435.js"
+    "static/js/main.874d4263.js"
   ]
 }
