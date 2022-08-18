@@ -1,0 +1,1 @@
+export { MainImageGridItem } from "./MainImageGridItem";
