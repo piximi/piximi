@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toolTypeSelector } from "../../store/selectors";
-import { ToolType } from "../../types/ToolType";
-import { imageViewerSlice } from "../../store/slices";
+
+import { ToolType } from "types";
+import { imageViewerSlice, toolTypeSelector } from "store/image-viewer";
 
 export const useCursor = () => {
   const toolType = useSelector(toolTypeSelector);

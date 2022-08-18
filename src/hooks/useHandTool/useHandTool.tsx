@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { ToolType } from "../../types/ToolType";
 import { useSelector } from "react-redux";
-import { toolTypeSelector } from "../../store/selectors";
+
+import { toolTypeSelector } from "store/image-viewer";
+
+import { ToolType } from "types";
 
 export const useHandTool = () => {
   const toolType = useSelector(toolTypeSelector);

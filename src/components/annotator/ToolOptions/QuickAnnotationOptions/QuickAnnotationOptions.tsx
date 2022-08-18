@@ -9,9 +9,10 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { quickSelectionRegionSizeSelector } from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+import {
+  imageViewerSlice,
+  quickSelectionRegionSizeSelector,
+} from "store/image-viewer";
 
 export const QuickAnnotationOptions = () => {
   const t = useTranslation();

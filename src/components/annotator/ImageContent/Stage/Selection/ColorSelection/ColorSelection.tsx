@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
-import { stageScaleSelector } from "store/selectors";
+import { stageScaleSelector } from "store/image-viewer";
 
 import { ColorAnnotationTool } from "annotator/image/Tool";
 

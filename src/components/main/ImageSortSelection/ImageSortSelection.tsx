@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Autocomplete, TextField } from "@mui/material";
 
-import { imageSortKeySelector } from "store/selectors";
-
-import { projectSlice } from "store/slices";
+import { imageSortKeySelector, projectSlice } from "store/project";
 
 import { availableImageSortKeys, ImageSortKeyType, ImageSortKey } from "types";
 

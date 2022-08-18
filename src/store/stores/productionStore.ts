@@ -1,15 +1,16 @@
-import { reducer } from "../reducer";
+import createSagaMiddleware from "redux-saga";
 import {
   configureStore,
   EnhancedStore,
   Middleware,
   StoreEnhancer,
 } from "@reduxjs/toolkit";
-import logger from "redux-logger";
-import createSagaMiddleware from "redux-saga";
-import { rootSaga } from "../sagas";
 import * as Sentry from "@sentry/react";
 import thunk from "redux-thunk";
+import logger from "redux-logger";
+
+import { reducer } from "../reducer";
+import { rootSaga } from "../sagas";
 
 export const saga = createSagaMiddleware();
 

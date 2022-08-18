@@ -7,7 +7,10 @@ export { AnnotationStateType } from "./AnnotationStateType";
 
 export type { AnnotationType } from "./AnnotationType";
 
-export type { ArchitectureOptions } from "./ArchitectureOptions";
+export type {
+  ArchitectureOptions,
+  SegmentationArchitectureOptions,
+} from "./ArchitectureOptions";
 
 export type { Category } from "./Category";
 export {

@@ -8,7 +8,8 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { imageViewerSlice, projectSlice } from "store/slices";
+import { imageViewerSlice } from "store/image-viewer";
+import { projectSlice } from "store/project";
 
 import { Category } from "types";
 

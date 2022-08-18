@@ -13,16 +13,17 @@ import {
 import { StyledFormControl } from "components/common/StyledFormControl";
 import { CustomNumberTextField } from "components/common/InputFields";
 
-import { cropOptionsSelector } from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+import {
+  classifierCropOptionsSelector,
+  classifierSlice,
+} from "store/classifier";
 
 import { CropSchema } from "types";
 
 import { enumKeys } from "utils";
 
 export const CroppingForm = () => {
-  const cropOptions = useSelector(cropOptionsSelector);
+  const cropOptions = useSelector(classifierCropOptionsSelector);
 
   const dispatch = useDispatch();
 

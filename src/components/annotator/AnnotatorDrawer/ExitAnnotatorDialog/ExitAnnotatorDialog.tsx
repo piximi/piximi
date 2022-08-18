@@ -9,12 +9,9 @@ import {
   Stack,
 } from "@mui/material";
 
-import {
-  annotatorImagesSelector,
-  selectedImagesSelector,
-} from "store/selectors";
-
-import { projectSlice } from "store/slices";
+import { annotatorImagesSelector } from "store/image-viewer";
+import { selectedImagesSelector } from "store/common";
+import { projectSlice } from "store/project";
 
 import { ImageType, ShadowImageType } from "types";
 

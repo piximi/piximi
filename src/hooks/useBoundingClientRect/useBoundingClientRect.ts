@@ -1,16 +1,15 @@
 import useResizeObserver from "@react-hook/resize-observer";
 import React, { useEffect, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import { imageSelector } from "store/common";
 import {
-  imageSelector,
-  stageHeightSelector,
   stageWidthSelector,
-} from "../../store/selectors";
-import {
-  setBoundingClientRect,
+  stageHeightSelector,
   setStageScale,
+  setBoundingClientRect,
   setStageWidth,
-} from "../../store/slices";
+} from "store/image-viewer";
 
 export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
   const dispatch = useDispatch();

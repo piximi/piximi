@@ -7,13 +7,12 @@ import { useDialog, useTranslation } from "hooks";
 
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 
+import { unknownAnnotationCategorySelector } from "store/project";
 import {
   annotatorImagesSelector,
+  imageViewerSlice,
   selectedAnnotationsIdsSelector,
-  unknownAnnotationCategorySelector,
-} from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+} from "store/image-viewer";
 
 import { ShadowImageType } from "types";
 

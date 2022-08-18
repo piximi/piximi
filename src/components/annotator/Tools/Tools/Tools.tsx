@@ -7,9 +7,7 @@ import { useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
-import { toolTypeSelector } from "store/selectors";
-
-import { imageViewerSlice } from "store/slices";
+import { imageViewerSlice, toolTypeSelector } from "store/image-viewer";
 
 import { ToolType as OperationType } from "types";
 

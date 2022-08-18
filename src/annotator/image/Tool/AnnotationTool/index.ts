@@ -8,3 +8,4 @@ export { PolygonalAnnotationTool } from "./PolygonalAnnotationTool";
 export { QuickAnnotationTool } from "./QuickAnnotationTool";
 export { RectangularAnnotationTool } from "./RectangularAnnotationTool";
 export { AnnotationTool } from "./AnnotationTool";
+export { ThresholdAnnotationTool } from "./ThresholdAnnotationTool";

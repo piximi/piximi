@@ -8,9 +8,10 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { penSelectionBrushSizeSelector } from "store/selectors/penSelectionBrushSizeSelector";
-
-import { imageViewerSlice } from "store/slices";
+import {
+  imageViewerSlice,
+  penSelectionBrushSizeSelector,
+} from "store/image-viewer";
 
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();

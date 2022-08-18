@@ -9,12 +9,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import { rescaleOptionsSelector } from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+import {
+  classifierRescaleOptionsSelector,
+  classifierSlice,
+} from "store/classifier";
 
 export const RescalingForm = () => {
-  const rescaleOptions = useSelector(rescaleOptionsSelector);
+  const rescaleOptions = useSelector(classifierRescaleOptionsSelector);
 
   const dispatch = useDispatch();
 

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector, toolTypeSelector } from "store/selectors";
-
-import { annotationStateSelector } from "store/selectors";
+import {
+  annotationStateSelector,
+  stageScaleSelector,
+  toolTypeSelector,
+} from "store/image-viewer";
 
 import { AnnotationStateType, ToolType } from "types";
 

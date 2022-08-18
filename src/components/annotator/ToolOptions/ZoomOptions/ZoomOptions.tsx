@@ -26,17 +26,18 @@ import { InformationBox } from "../InformationBox";
 import { ResetButton } from "../HandToolOptions/ResetButton";
 
 import {
-  imageSelector,
   offsetSelector,
+  setOffset,
+  setStageScale,
   stageHeightSelector,
   stageScaleSelector,
   stageWidthSelector,
+} from "store/image-viewer";
+import { imageSelector } from "store/common";
+import {
   zoomToolOptionsSelector,
-} from "store/selectors";
-
-import { setOffset, setStageScale } from "store/slices";
-
-import { setZoomToolOptions } from "store/slices/toolOptionsSlice";
+  setZoomToolOptions,
+} from "store/tool-options";
 
 import { ZoomModeType } from "types";
 

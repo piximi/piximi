@@ -7,18 +7,18 @@ import * as ImageJS from "image-js";
 import useSound from "use-sound";
 
 import {
-  activeImageIdSelector,
-  cursorSelector,
-  imageHeightSelector,
+  imageViewerSlice,
   imageWidthSelector,
   stageScaleSelector,
   selectedAnnotationSelector,
   selectedAnnotationsSelector,
   soundEnabledSelector,
+  activeImageIdSelector,
+  cursorSelector,
+  imageHeightSelector,
+  setSelectedAnnotations,
   unselectedAnnotationsSelector,
-} from "store/selectors";
-
-import { imageViewerSlice, setSelectedAnnotations } from "store/slices";
+} from "store/image-viewer";
 
 import { AnnotationModeType, AnnotationStateType, AnnotationType } from "types";
 

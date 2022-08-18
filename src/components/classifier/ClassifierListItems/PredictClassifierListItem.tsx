@@ -3,20 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   CircularProgress,
-  ListItem,
+  Grid,
   ListItemIcon,
   ListItemText,
+  Stack,
 } from "@mui/material";
 
 import { LabelImportant as LabelImportantIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { DisabledListItem } from "components/common/DisabledListItem/DisabledListItem";
+import { DisabledListItemButton } from "components/common/DisabledListItemButton/DisabledListItemButton";
 
-import { predictionFlagSelector } from "store/selectors";
-
-import { classifierSlice } from "store/slices";
+import {
+  classifierSlice,
+  classifierPredictionFlagSelector,
+} from "store/classifier";
 
 type PredictClassifierListItemProps = {
   disabled: boolean;
@@ -36,22 +38,26 @@ export const PredictClassifierListItem = (
     dispatch(classifierSlice.actions.predict({}));
   };
 
-  const predicting = useSelector(predictionFlagSelector);
+  const predicting = useSelector(classifierPredictionFlagSelector);
 
   useEffect(() => {
     setIsPredicting(predicting);
   }, [predicting]);
 
   return (
-    <DisabledListItem {...props}>
-      <ListItem button onClick={onPredict} disablePadding>
-        <ListItemIcon>
-          <LabelImportantIcon />
-        </ListItemIcon>
-        <ListItemText primary={t("Predict")} />
-      </ListItem>
-
-      {isPredicting && <CircularProgress disableShrink size={20} />}
-    </DisabledListItem>
+    <Grid item xs={4}>
+      <DisabledListItemButton {...props} onClick={onPredict}>
+        <Stack sx={{ alignItems: "center" }}>
+          <ListItemIcon sx={{ justifyContent: "center" }}>
+            {isPredicting ? (
+              <CircularProgress disableShrink size={24} />
+            ) : (
+              <LabelImportantIcon />
+            )}
+          </ListItemIcon>
+          <ListItemText primary={t("Predict")} />
+        </Stack>
+      </DisabledListItemButton>
+    </Grid>
   );
 };

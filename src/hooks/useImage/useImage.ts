@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { imagesSelector } from "../../store/selectors";
+import { imagesSelector } from "store/project";
 
 export const useImage = () => {
   const image = useSelector(imagesSelector)[0];

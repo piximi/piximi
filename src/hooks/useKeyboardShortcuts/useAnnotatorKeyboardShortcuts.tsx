@@ -1,8 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ToolType } from "../../types/ToolType";
 import { useHotkeys } from "react-hotkeys-hook";
-import { setOperation, setSelectedCategoryId } from "../../store/slices";
-import { annotationCategoriesSelector } from "store/selectors/annotationCategoriesSelector";
+
+import { annotationCategoriesSelector } from "store/project";
+import { setOperation, setSelectedCategoryId } from "store/image-viewer";
+
+import { ToolType } from "types";
 
 export const useAnnotatorKeyboardShortcuts = () => {
   const dispatch = useDispatch();

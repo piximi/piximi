@@ -1,8 +1,10 @@
 // User has switched back to the tab
 import { useEffect } from "react";
-import { imageViewerSlice } from "../../store/slices";
-import { AnnotationModeType } from "../../types/AnnotationModeType";
 import { useDispatch } from "react-redux";
+
+import { imageViewerSlice } from "store/image-viewer";
+
+import { AnnotationModeType } from "types";
 
 export const useWindowFocusHandler = () => {
   const dispatch = useDispatch();
