@@ -40,6 +40,7 @@ type FitClassifierDialogProps = {
 
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
+
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
