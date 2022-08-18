@@ -9,6 +9,7 @@ import { DeleteAllCategoriesItem } from "../DeleteAllCategories";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { Category, CategoryType } from "types";
+import { ShowAllCategoriesListItem } from "../ShowAllCategoriesListItem";
 
 type CategoriesListProps = {
   createdCategories: Array<Category>;
@@ -69,6 +70,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
       {showDeleteAllCategoriesIcon && (
         <DeleteAllCategoriesItem categoryType={categoryType} />
       )}
+      <ShowAllCategoriesListItem categoryType={categoryType} />
     </CollapsibleList>
   );
 };
