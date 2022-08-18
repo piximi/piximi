@@ -1,4 +1,5 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -27,7 +28,7 @@ export function* evaluateClassifierSaga({
 }>): any {
   if (!execSaga) return;
 
-  const model: tensorflow.LayersModel = yield select(classifierFittedSelector);
+  const model: LayersModel = yield select(classifierFittedSelector);
   const validationImages: Array<ImageType> = yield select(valImagesSelector);
   yield put(yield put(applicationSlice.actions.hideAlertState({})));
 
@@ -68,15 +69,15 @@ export function* evaluateClassifierSaga({
 
 function* runEvaluation(
   validationImages: Array<ImageType>,
-  model: tensorflow.LayersModel,
+  model: LayersModel,
   categories: Array<Category>
 ) {
   //@ts-ignore
-  const validationData: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  const validationData: Dataset<{
+    xs: Tensor;
+    ys: Tensor;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }> = yield select(classifierValidationDataSelector);
 
   try {

@@ -1,5 +1,23 @@
-import * as tensorflow from "@tensorflow/tfjs";
-import { DataType } from "@tensorflow/tfjs-core";
+import {
+  Tensor,
+  Tensor2D,
+  Tensor3D,
+  Rank,
+  DataType,
+  oneHot,
+  util as tfutil,
+  image as tfimage,
+  data as tfdata,
+  browser,
+  scalar,
+  tensor1d,
+  tensor2d,
+  tensor3d,
+  fill,
+  slice,
+  stack,
+  tidy,
+} from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 import _ from "lodash";
 
@@ -24,16 +42,13 @@ export const decodeCategory = (numCategories: number) => {
     ids: string;
   }): {
     srcs: string | string[];
-    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ys: Tensor<Rank.R1>;
     labels: number;
     ids: string;
   } => {
     return {
       ...item,
-      ys: tensorflow.oneHot(
-        item.labels,
-        numCategories
-      ) as tensorflow.Tensor<tensorflow.Rank.R1>,
+      ys: oneHot(item.labels, numCategories) as Tensor<Rank.R1>,
     };
   };
 };
@@ -43,17 +58,17 @@ export const decodeFromImgSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string; // dataURL
-    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ys: Tensor<Rank.R1>;
     labels: number;
     ids: string;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R1>;
   labels: number;
   ids: string;
 }> => {
-  const fetched = await tensorflow.util.fetch(item.srcs);
+  const fetched = await tfutil.fetch(item.srcs);
 
   const buffer: ArrayBuffer = await fetched.arrayBuffer();
 
@@ -63,10 +78,10 @@ export const decodeFromImgSrc = async (
 
   const canvas: HTMLCanvasElement = data.getCanvas();
 
-  let x: tensorflow.Tensor3D = tensorflow.browser.fromPixels(canvas, channels);
+  let x: Tensor3D = browser.fromPixels(canvas, channels);
 
   if (rescaleOptions.rescale) {
-    const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
+    const rescaleFactor = scalar(255); //Because xs is string, values are encoded by uint8array by default
     const unscaledx = x;
     x = unscaledx.div(rescaleFactor);
     unscaledx.dispose();
@@ -82,53 +97,53 @@ export const decodeFromOriginalSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
-    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ys: Tensor<Rank.R1>;
     labels: number;
     ids: string;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R1>;
   labels: number;
   ids: string;
 }> => {
-  const channelPromises: Array<Promise<tensorflow.Tensor2D>> = [];
+  const channelPromises: Array<Promise<Tensor2D>> = [];
 
   for (const channelData of item.srcs) {
-    const channelPromise = tensorflow.util
+    const channelPromise = tfutil
       .fetch(channelData)
       .then((fetched) => fetched.arrayBuffer())
       .then((buffer) => ImageJS.Image.load(buffer))
       .then((im) => {
         const canvas = im.getCanvas();
-        let x2d: tensorflow.Tensor2D = tensorflow.tidy(() => {
-          const x3d = tensorflow.browser.fromPixels(canvas, 1); // 3D: [w, h, 1 channel]
+        let x2d: Tensor2D = tidy(() => {
+          const x3d = browser.fromPixels(canvas, 1); // 3D: [w, h, 1 channel]
           return x3d.reshape([x3d.shape[0], x3d.shape[1]]); // 2D: [w, h]
         });
 
         if (rescaleOptions.rescale) {
-          const rescaleFactor = tensorflow.scalar(255); //Because xs is string, values are encoded by uint8array by default
+          const rescaleFactor = scalar(255); //Because xs is string, values are encoded by uint8array by default
           const unscaledx = x2d;
           x2d = unscaledx.div(rescaleFactor);
           unscaledx.dispose();
           rescaleFactor.dispose();
         }
 
-        return x2d as tensorflow.Tensor2D;
+        return x2d as Tensor2D;
       })
       .catch((err) => {
         process.env.NODE_ENV !== "production" && console.error(err);
-        return tensorflow.tensor2d([[]]);
+        return tensor2d([[]]);
       });
 
     channelPromises.push(channelPromise);
   }
 
   return Promise.all(channelPromises).then((channels) => {
-    const x: tensorflow.Tensor<tensorflow.Rank.R3> = tensorflow.stack(
+    const x: Tensor<Rank.R3> = stack(
       channels,
       2 // axis to stack on, producing tensor of dims: [height, width, channels]
-    ) as tensorflow.Tensor<tensorflow.Rank.R3>;
+    ) as Tensor<Rank.R3>;
 
     for (const c of channels) {
       c.dispose();
@@ -143,13 +158,13 @@ export const decodeImage = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string | string[];
-    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    ys: Tensor<Rank.R1>;
     labels: number;
     ids: string;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R1>;
   labels: number;
   ids: string;
 }> => {
@@ -159,7 +174,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string;
-          ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+          ys: Tensor<Rank.R1>;
           labels: number;
           ids: string;
         }
@@ -168,7 +183,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string[];
-          ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+          ys: Tensor<Rank.R1>;
           labels: number;
           ids: string;
         }
@@ -180,14 +195,14 @@ export const cropResize = async (
   preprocessOptions: PreprocessOptions,
   training: boolean,
   item: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+    xs: Tensor<Rank.R3>;
+    ys: Tensor<Rank.R1>;
     labels: number;
     ids: string;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R3>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R3>;
+  ys: Tensor<Rank.R1>;
   labels: number;
   ids: string;
 }> => {
@@ -218,19 +233,19 @@ export const cropResize = async (
       throw Error("CropSchema has unknown value");
   }
 
-  const crop = tensorflow.tidy(() => {
-    const box = tensorflow.tensor2d(cropCoords, [1, 4], "float32" as DataType);
+  const crop = tidy(() => {
+    const box = tensor2d(cropCoords, [1, 4], "float32" as DataType);
 
-    const boxInd = tensorflow.tensor1d([0], "int32" as DataType);
+    const boxInd = tensor1d([0], "int32" as DataType);
 
     const xs =
       preprocessOptions.cropOptions.cropSchema === CropSchema.Match
         ? padToMatch(item.xs, { width: cropSize[1], height: cropSize[0] })
         : item.xs;
 
-    const batchedXs = xs.expandDims(0) as tensorflow.Tensor<tensorflow.Rank.R4>;
+    const batchedXs = xs.expandDims(0) as Tensor<Rank.R4>;
 
-    return tensorflow.image
+    return tfimage
       .cropAndResize(
         batchedXs, // needs batchSize in first dim
         box,
@@ -242,7 +257,7 @@ export const cropResize = async (
         inputShape.height,
         inputShape.width,
         xs.shape[2], // channels
-      ]) as tensorflow.Tensor<tensorflow.Rank.R3>;
+      ]) as Tensor<Rank.R3>;
   });
 
   return new Promise((resolve) => {
@@ -316,8 +331,8 @@ const doShowImages = async (
 
   for (const [i, c] of xsData.entries()) {
     try {
-      const channel = tensorflow.tensor3d(c, undefined, "int32");
-      const imageDataArr = await tensorflow.browser.toPixels(channel);
+      const channel = tensor3d(c, undefined, "int32");
+      const imageDataArr = await browser.toPixels(channel);
       channel.dispose();
       let imageData;
       if (process.env.NODE_ENV === "test") {
@@ -364,34 +379,34 @@ const doShowFromChannels = async (
   numChannels: number,
   partition: Partition,
   items: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-  labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R4>;
+  ys: Tensor<Rank.R2>;
+  labels: Tensor<Rank.R1>;
 }> => {
-  const xsData = tensorflow.tidy(() => {
-    let xs3ch: tensorflow.Tensor<tensorflow.Rank.R4>;
+  const xsData = tidy(() => {
+    let xs3ch: Tensor<Rank.R4>;
     if (numChannels === 2) {
-      const ch3 = tensorflow.fill(
+      const ch3 = fill(
         [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
         0
       );
-      xs3ch = items.xs.concat(ch3, 3) as tensorflow.Tensor<tensorflow.Rank.R4>;
+      xs3ch = items.xs.concat(ch3, 3) as Tensor<Rank.R4>;
     } else {
-      xs3ch = tensorflow.slice(
+      xs3ch = slice(
         items.xs,
         [0, 0, 0, 0],
         [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 3]
       );
     }
 
-    return xs3ch.mul(tensorflow.scalar(255)).arraySync() as number[][][][];
+    return xs3ch.mul(scalar(255)).arraySync() as number[][][][];
   });
-  const ysData = tensorflow.tidy(() => items.ys.arraySync());
+  const ysData = tidy(() => items.ys.arraySync());
 
   doShowImages(partition, xsData, ysData);
   return new Promise((resolve) => resolve(items));
@@ -400,20 +415,20 @@ const doShowFromChannels = async (
 const doShowFromBrowser = async (
   partition: Partition,
   items: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-  labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R4>;
+  ys: Tensor<Rank.R2>;
+  labels: Tensor<Rank.R1>;
 }> => {
-  const xsData = tensorflow.tidy(() => {
-    return items.xs.mul(tensorflow.scalar(255)).arraySync() as number[][][][];
+  const xsData = tidy(() => {
+    return items.xs.mul(scalar(255)).arraySync() as number[][][][];
     // return items.xs.arraySync() as number[][][][];
   });
-  const ysData = tensorflow.tidy(() => items.ys.arraySync());
+  const ysData = tidy(() => items.ys.arraySync());
   doShowImages(partition, xsData, ysData);
   return new Promise((resolve) => resolve(items));
 };
@@ -423,21 +438,21 @@ const doShow = async (
   numChannels: number,
   partition: Partition,
   items: {
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
   }
 ): Promise<{
-  xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-  ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-  labels: tensorflow.Tensor<tensorflow.Rank.R1>;
+  xs: Tensor<Rank.R4>;
+  ys: Tensor<Rank.R2>;
+  labels: Tensor<Rank.R1>;
 }> => {
   // console.log(
   //   "perf:",
   //   items.xs.shape[0],
-  //   tensorflow.memory().numTensors,
-  //   tensorflow.memory().numBytes, // @ts-ignore
-  //   tensorflow.memory().numBytesInGPU
+  //   memory().numTensors,
+  //   memory().numBytes, // @ts-ignore
+  //   memory().numBytesInGPU
   // );
   return numChannels === 1 || numChannels === 3
     ? doShowFromBrowser(partition, items)
@@ -452,11 +467,11 @@ export const preprocessClassifier = async (
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions
 ): Promise<
-  tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  tfdata.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }>
 > => {
   let multipliedImages: Array<ImageType>;
@@ -474,7 +489,7 @@ export const preprocessClassifier = async (
     multipliedImages = images;
   }
 
-  let imageData = tensorflow.data
+  let imageData = tfdata
     .generator(
       sampleGenerator(multipliedImages, categories, inputShape.channels)
     )
@@ -500,10 +515,10 @@ export const preprocessClassifier = async (
   //   doShow(inputShape.channels, images[0].partition, items)
   // ); // For debug stuff
 
-  return imageDataBatched as tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor<tensorflow.Rank.R4>;
-    ys: tensorflow.Tensor<tensorflow.Rank.R2>;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  return imageDataBatched as tfdata.Dataset<{
+    xs: Tensor<Rank.R4>;
+    ys: Tensor<Rank.R2>;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }>;
 };

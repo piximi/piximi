@@ -1,12 +1,23 @@
+import {
+  LayersModel,
+  loadLayersModel,
+  Tensor,
+  Tensor3D,
+  Rank,
+  train,
+  tidy,
+  image,
+  browser,
+  scalar,
+} from "@tensorflow/tfjs";
 import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
-import * as tensorflow from "@tensorflow/tfjs";
 import * as _ from "lodash";
 import { encode } from "../../../rle";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
-  graph?: tensorflow.LayersModel;
+  graph?: LayersModel;
   prediction?: ImageJS.Image;
   points: Array<number> = [];
   // @ts-ignore
@@ -39,9 +50,9 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
     const pathname =
       "https://raw.githubusercontent.com/zaidalyafeai/HostedModels/master/unet-128/model.json";
 
-    instance.graph = await tensorflow.loadLayersModel(pathname);
+    instance.graph = await loadLayersModel(pathname);
 
-    const optimizer = tensorflow.train.adam();
+    const optimizer = train.adam();
 
     instance.graph.compile({
       optimizer: optimizer,
@@ -65,23 +76,19 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       height: height,
     });
 
-    const prediction = tensorflow.tidy(() => {
+    const prediction = tidy(() => {
       if (crop) {
-        const cropped: tensorflow.Tensor3D = tensorflow.browser.fromPixels(
-          crop.getCanvas()
-        );
+        const cropped: Tensor3D = browser.fromPixels(crop.getCanvas());
 
         const size: [number, number] = [128, 128];
-        const resized = tensorflow.image.resizeBilinear(cropped, size);
-        const standardized = resized.div(tensorflow.scalar(255));
+        const resized = image.resizeBilinear(cropped, size);
+        const standardized = resized.div(scalar(255));
         const batch = standardized.expandDims(0);
 
         if (!this.height || !this.width || !this.origin) return;
 
         if (this.graph) {
-          const prediction = this.graph.predict(
-            batch
-          ) as tensorflow.Tensor<tensorflow.Rank>;
+          const prediction = this.graph.predict(batch) as Tensor<Rank>;
 
           return prediction
             .squeeze([0])
@@ -100,8 +107,8 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
     });
 
     if (prediction) {
-      const clamped: Uint8ClampedArray = await tensorflow.browser.toPixels(
-        prediction as tensorflow.Tensor3D
+      const clamped: Uint8ClampedArray = await browser.toPixels(
+        prediction as Tensor3D
       );
       // .then(async (clamped) => {
       this.output = new ImageJS.Image({

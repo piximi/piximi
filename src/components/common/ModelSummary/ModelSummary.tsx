@@ -1,4 +1,4 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel } from "@tensorflow/tfjs";
 
 import {
   Container,
@@ -18,7 +18,7 @@ interface ModelLayerData {
   trainable: string;
 }
 
-const getModelSummary = (model: tensorflow.LayersModel): ModelLayerData[] => {
+const getModelSummary = (model: LayersModel): ModelLayerData[] => {
   const modelSummary: ModelLayerData[] = [];
 
   for (let i = 0; i < model.layers.length; i++) {
@@ -63,7 +63,7 @@ const columns: readonly Column[] = [
 ];
 
 type ModelSummaryTableProps = {
-  compiledModel: tensorflow.LayersModel;
+  compiledModel: LayersModel;
 };
 
 export const ModelSummaryTable = (props: ModelSummaryTableProps) => {

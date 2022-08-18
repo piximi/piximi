@@ -1,10 +1,10 @@
-import * as tf from "@tensorflow/tfjs";
+import { Tensor, Rank } from "@tensorflow/tfjs";
 import { random } from "lodash";
 
 export const padToMatch = (
-  sample: tf.Tensor<tf.Rank.R3>,
+  sample: Tensor<Rank.R3>,
   targetDims: { width: number; height: number }
-): tf.Tensor<tf.Rank.R3> => {
+): Tensor<Rank.R3> => {
   const sampleHeight = sample.shape[0];
   const sampleWidth = sample.shape[1];
 
@@ -23,7 +23,7 @@ export const padToMatch = (
     padX[1] = Math.ceil(dWidth / 2);
   }
 
-  const padded: tf.Tensor<tf.Rank.R3> = sample.pad([padY, padX, [0, 0]]);
+  const padded: Tensor<Rank.R3> = sample.pad([padY, padX, [0, 0]]);
 
   sample.dispose();
   return padded;

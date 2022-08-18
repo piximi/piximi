@@ -1,44 +1,41 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { LayersModel, Optimizer, train, losses } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { LossFunction } from "../../../types/LossFunction";
 import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
 import { Metric } from "../../../types/Metric";
 
-export const compile = (
-  opened: tensorflow.LayersModel,
-  options: CompileOptions
-) => {
+export const compile = (opened: LayersModel, options: CompileOptions) => {
   const compiled = opened;
 
   const loss = (): any => {
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {
-        return tensorflow.losses.absoluteDifference;
+        return losses.absoluteDifference;
       }
       case LossFunction.CategoricalCrossEntropy: {
-        // 'categoricalCrossentropy' is the string name for 'tf.losses.softmaxCrossEntropy'
-        return tensorflow.losses.softmaxCrossEntropy;
+        // 'categoricalCrossentropy' is the string name for 'losses.softmaxCrossEntropy'
+        return losses.softmaxCrossEntropy;
       }
       case LossFunction.CosineDistance: {
-        return tensorflow.losses.cosineDistance;
+        return losses.cosineDistance;
       }
       case LossFunction.Hinge: {
-        return tensorflow.losses.hingeLoss;
+        return losses.hingeLoss;
       }
       case LossFunction.Huber: {
-        return tensorflow.losses.huberLoss;
+        return losses.huberLoss;
       }
       case LossFunction.Log: {
-        return tensorflow.losses.logLoss;
+        return losses.logLoss;
       }
       case LossFunction.MeanSquaredError: {
-        return tensorflow.losses.meanSquaredError;
+        return losses.meanSquaredError;
       }
       case LossFunction.SigmoidCrossEntropy: {
-        return tensorflow.losses.sigmoidCrossEntropy;
+        return losses.sigmoidCrossEntropy;
       }
       default: {
-        return tensorflow.losses.softmaxCrossEntropy;
+        return losses.softmaxCrossEntropy;
       }
     }
   };
@@ -73,28 +70,28 @@ export const compile = (
     });
   };
 
-  const optimizer = (): tensorflow.Optimizer => {
+  const optimizer = (): Optimizer => {
     switch (options.optimizationAlgorithm) {
       case OptimizationAlgorithm.Adadelta: {
-        return tensorflow.train.adadelta(options.learningRate);
+        return train.adadelta(options.learningRate);
       }
       case OptimizationAlgorithm.Adagrad: {
-        return tensorflow.train.adagrad(options.learningRate);
+        return train.adagrad(options.learningRate);
       }
       case OptimizationAlgorithm.Adam: {
-        return tensorflow.train.adam(options.learningRate);
+        return train.adam(options.learningRate);
       }
       case OptimizationAlgorithm.Adamax: {
-        return tensorflow.train.adamax(options.learningRate);
+        return train.adamax(options.learningRate);
       }
       case OptimizationAlgorithm.RMSProp: {
-        return tensorflow.train.rmsprop(options.learningRate);
+        return train.rmsprop(options.learningRate);
       }
       case OptimizationAlgorithm.StochasticGradientDescent: {
-        return tensorflow.train.sgd(options.learningRate);
+        return train.sgd(options.learningRate);
       }
       default: {
-        return tensorflow.train.sgd(options.learningRate);
+        return train.sgd(options.learningRate);
       }
     }
   };

@@ -1,4 +1,4 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import { loadLayersModel, sequential, layers } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { changeInputShape } from "./changeInputShape";
 
@@ -25,11 +25,11 @@ export const createMobileNet = async (
   const resource =
     "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json";
 
-  const mobilenet = await tensorflow.loadLayersModel(resource);
+  const mobilenet = await loadLayersModel(resource);
 
   const layerName = "conv_pw_13_relu";
 
-  const backbone = tensorflow.sequential();
+  const backbone = sequential();
   for (const l of mobilenet.layers) {
     backbone.add(l);
     if (l.name === layerName) {
@@ -49,32 +49,32 @@ export const createMobileNet = async (
   }
 
   if (useCustomTopLayer) {
-    model.add(tensorflow.layers.globalAveragePooling2d({}));
+    model.add(layers.globalAveragePooling2d({}));
 
     const numfeat = model.layers[model.layers.length - 1].outputShape[1];
     model.add(
-      tensorflow.layers.reshape({
+      layers.reshape({
         targetShape: [1, 1, numfeat as number],
       })
     );
 
-    model.add(tensorflow.layers.dropout({ rate: 0.001 }));
+    model.add(layers.dropout({ rate: 0.001 }));
 
     model.add(
-      tensorflow.layers.conv2d({
+      layers.conv2d({
         filters: numClasses,
         kernelSize: [1, 1],
       })
     );
 
     model.add(
-      tensorflow.layers.reshape({
+      layers.reshape({
         targetShape: [numClasses],
       })
     );
 
     model.add(
-      tensorflow.layers.activation({
+      layers.activation({
         activation: "softmax",
       })
     );

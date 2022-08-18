@@ -1,17 +1,17 @@
-import { History, LayersModel } from "@tensorflow/tfjs";
+import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { FitOptions } from "../../../types/FitOptions";
-import * as tensorflow from "@tensorflow/tfjs";
 
 export const fitClassifier = async (
   compiled: LayersModel,
   data: {
-    val: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor;
-      ys: tensorflow.Tensor;
+    val: Dataset<{
+      xs: Tensor;
+      ys: Tensor;
     }>;
-    train: tensorflow.data.Dataset<{
-      xs: tensorflow.Tensor;
-      ys: tensorflow.Tensor;
+    train: Dataset<{
+      xs: Tensor;
+      ys: Tensor;
     }>;
   },
   options: FitOptions,

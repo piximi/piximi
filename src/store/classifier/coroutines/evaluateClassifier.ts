@@ -1,15 +1,25 @@
-import * as tensorflow from "@tensorflow/tfjs";
+import {
+  LayersModel,
+  Tensor,
+  Tensor1D,
+  Rank,
+  oneHot,
+  math,
+  metrics,
+  argMax,
+} from "@tensorflow/tfjs";
+import { Dataset } from "@tensorflow/tfjs-data";
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
 import { ImageType } from "../../../types/ImageType";
 
 export const evaluateClassifier = async (
-  model: tensorflow.LayersModel,
-  validationData: tensorflow.data.Dataset<{
-    xs: tensorflow.Tensor;
-    ys: tensorflow.Tensor;
-    labels: tensorflow.Tensor<tensorflow.Rank.R1>;
-    ids: tensorflow.Tensor<tensorflow.Rank.R1>;
+  model: LayersModel,
+  validationData: Dataset<{
+    xs: Tensor;
+    ys: Tensor;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }>,
   validationImages: ImageType[],
   categories: Category[]
@@ -19,11 +29,10 @@ export const evaluateClassifier = async (
 
   const inferredBatchTensors = await validationData
     .map((items) => {
-      //@ts-ignore
       const batchProbs = model.predict(items.xs);
       //@ts-ignore
-      const batchPred = tensorflow.argMax(batchProbs, 1);
-      const batchPredOneHot = tensorflow.oneHot(batchPred, numberOfClasses);
+      const batchPred = argMax(batchProbs, 1);
+      const batchPredOneHot = oneHot(batchPred, numberOfClasses);
       return {
         probs: batchProbs,
         preds: batchPred,
@@ -44,10 +53,10 @@ export const evaluateClassifier = async (
     };
   });
 
-  const confusionMatrix = await tensorflow.math
+  const confusionMatrix = await math
     .confusionMatrix(
       inferredTensors.labels,
-      inferredTensors.preds as tensorflow.Tensor1D,
+      inferredTensors.preds as Tensor1D,
       numberOfClasses
     )
     .array();
@@ -55,26 +64,26 @@ export const evaluateClassifier = async (
   var accuracy: number[];
   var crossEntropy: number[];
   if (numberOfClasses === 2) {
-    accuracy = (await tensorflow.metrics
+    accuracy = (await metrics
       .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
       .array()) as number[];
-    crossEntropy = (await tensorflow.metrics
+    crossEntropy = (await metrics
       .binaryCrossentropy(
         inferredTensors.ys,
-        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+        inferredTensors.probs as Tensor<Rank>
       )
       .array()) as number[];
   } else {
-    accuracy = (await tensorflow.metrics
+    accuracy = (await metrics
       .categoricalAccuracy(
         inferredTensors.ys,
-        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+        inferredTensors.probs as Tensor<Rank>
       )
       .array()) as number[];
-    crossEntropy = (await tensorflow.metrics
+    crossEntropy = (await metrics
       .categoricalCrossentropy(
         inferredTensors.ys,
-        inferredTensors.probs as tensorflow.Tensor<tensorflow.Rank>
+        inferredTensors.probs as Tensor<Rank>
       )
       .array()) as number[];
   }
