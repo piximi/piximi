@@ -21,7 +21,6 @@ export const MainToolbar = () => {
   const minZoom = 0.6;
   const maxZoom = 4;
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
-
   const onChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
