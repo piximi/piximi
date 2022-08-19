@@ -19,7 +19,6 @@ export const MainToolbar = () => {
   const [value, setValue] = React.useState<number>(1);
   const minZoom = 0.6;
   const maxZoom = 4;
-
   const onChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
