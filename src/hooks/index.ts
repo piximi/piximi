@@ -2,6 +2,7 @@ export { useAnimationFrame } from "./useAnimationFrame/useAnimationFrame";
 export { useAnnotationTool } from "./useAnnotationTool/useAnnotationTool";
 export { useBoundingClientRect } from "./useBoundingClientRect/useBoundingClientRect";
 export { useCollapseList } from "./useCollapseList/useCollapseList";
+export { useContextMenu } from "./useContextMenu/useContextMenu";
 export { useCursor } from "./useCursor/useCursor";
 export { useDebounce } from "./useDebounce/useDebounce";
 export { useDialog } from "./useDialog/useDialog";
