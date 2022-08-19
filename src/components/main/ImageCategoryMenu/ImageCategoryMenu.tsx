@@ -16,6 +16,7 @@ type ImageCategoryMenuProps = {
   anchorReference?: PopoverReference;
   anchorPosition?: { top: number; left: number };
   open: boolean;
+  container?: Element | null;
 };
 
 export const ImageCategoryMenu = ({
@@ -25,6 +26,7 @@ export const ImageCategoryMenu = ({
   anchorReference,
   anchorPosition,
   open,
+  container,
 }: ImageCategoryMenuProps) => {
   const categories = useSelector(categoriesSelector);
 
@@ -55,6 +57,7 @@ export const ImageCategoryMenu = ({
       anchorEl={anchorEl}
       open={open}
       onClose={onClose}
+      container={container}
     >
       <MenuList dense variant="menu">
         {categories.map((category: Category) => (

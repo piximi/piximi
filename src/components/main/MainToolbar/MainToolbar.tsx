@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch } from "react-redux";
 
-import { Slider, Toolbar, Box, Button } from "@mui/material";
+import { Slider, Toolbar, Box, Button, Menu, MenuItem } from "@mui/material";
 import {
   ZoomOut as ZoomOutIcon,
   ZoomIn as ZoomInIcon,
@@ -13,13 +13,15 @@ import { UploadButton } from "../UploadButton";
 import { Logo } from "components/Application/Logo";
 
 import { applicationSlice } from "store/application";
+import { useContextMenu } from "hooks/useContextMenu/useContextMenu";
 
 export const MainToolbar = () => {
   const dispatch = useDispatch();
   const [value, setValue] = React.useState<number>(1);
   const minZoom = 0.6;
   const maxZoom = 4;
-
+  const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
+  const div = useRef(null);
   const onChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
@@ -51,7 +53,25 @@ export const MainToolbar = () => {
 
   return (
     <Toolbar>
-      <Logo width={250} height={50} />
+      <div onContextMenu={handleContextMenu}>
+        <Logo width={250} height={50} />
+        <Menu
+          open={contextMenu !== null}
+          onClose={closeContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        >
+          <MenuItem onClick={closeContextMenu}>Copy</MenuItem>
+          <MenuItem onClick={closeContextMenu}>Print</MenuItem>
+          <MenuItem onClick={closeContextMenu}>Highlight</MenuItem>
+          <MenuItem onClick={closeContextMenu}>Email</MenuItem>
+        </Menu>
+      </div>
+
       {/*<TaskSelect />*/}
       <Box sx={{ flexGrow: 1 }} />
 
@@ -86,4 +106,8 @@ export const MainToolbar = () => {
       <UploadButton />
     </Toolbar>
   );
+};
+
+const Div = ({ children }: { children: any }) => {
+  return <div>{children}</div>;
 };
