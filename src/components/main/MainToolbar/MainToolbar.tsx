@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch } from "react-redux";
 
 import { Slider, Toolbar, Box, Button } from "@mui/material";
@@ -85,4 +85,8 @@ export const MainToolbar = () => {
       <UploadButton />
     </Toolbar>
   );
+};
+
+const Div = ({ children }: { children: any }) => {
+  return <div>{children}</div>;
 };
