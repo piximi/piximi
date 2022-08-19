@@ -1,4 +1,10 @@
-import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
+import {
+  LayersModel,
+  Tensor,
+  Rank,
+  enableDebugMode,
+  ENV,
+} from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
@@ -49,6 +55,13 @@ export function* fitClassifierSaga({
   execSaga: boolean;
 }>): any {
   if (!execSaga) return;
+
+  process.env.NODE_ENV !== "production" &&
+    process.env.REACT_APP_TF_DEBUG &&
+    enableDebugMode();
+
+  process.env.NODE_ENV !== "production" &&
+    console.log("tensorflow flags:", ENV.features);
 
   const trainingPercentage: number = yield select(
     classifierTrainingPercentageSelector
