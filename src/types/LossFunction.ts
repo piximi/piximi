@@ -1,7 +1,11 @@
 export enum LossFunction {
   AbsoluteDifference = "Absolute difference",
   CategoricalCrossEntropy = "Categorical cross entropy",
-  CosineDistance = "Cosine distance",
+  /*
+   * Disabled CosineDistance - see comment in
+   * store/common/coroutines/compile.ts
+   */
+  // CosineDistance = "Cosine distance",
   Hinge = "Hinge",
   Huber = "Huber",
   Log = "Log",

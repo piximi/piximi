@@ -1,4 +1,10 @@
-import { LayersModel, Optimizer, train, losses } from "@tensorflow/tfjs";
+import {
+  LayersModel,
+  Optimizer,
+  ModelCompileArgs,
+  train,
+  losses,
+} from "@tensorflow/tfjs";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { LossFunction } from "../../../types/LossFunction";
 import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
@@ -7,7 +13,7 @@ import { Metric } from "../../../types/Metric";
 export const compile = (opened: LayersModel, options: CompileOptions) => {
   const compiled = opened;
 
-  const loss = (): any => {
+  const loss = (): ModelCompileArgs["loss"] => {
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {
         return losses.absoluteDifference;
@@ -16,9 +22,15 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
         // 'categoricalCrossentropy' is the string name for 'losses.softmaxCrossEntropy'
         return losses.softmaxCrossEntropy;
       }
-      case LossFunction.CosineDistance: {
-        return losses.cosineDistance;
-      }
+      /*
+       * Disabling CosineDistance, as it doesn't conform to typescript's own type
+       * definition of it (`LossOrMetricFn` in @tensorflow/tfjs-layers/dist/types.d.ts).
+       * I've filed a PR for it here:
+       * https://github.com/tensorflow/tfjs/pull/6780
+       */
+      // case LossFunction.CosineDistance: {
+      //   return losses.cosineDistance;
+      // }
       case LossFunction.Hinge: {
         return losses.hingeLoss;
       }
@@ -40,7 +52,7 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
     }
   };
 
-  const metrics = () => {
+  const metrics = (): ModelCompileArgs["metrics"] => {
     // eslint-disable-next-line array-callback-return
     return options.metrics.map((metric: Metric) => {
       switch (metric) {
@@ -70,7 +82,7 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
     });
   };
 
-  const optimizer = (): Optimizer => {
+  const optimizer = (): ModelCompileArgs["optimizer"] => {
     switch (options.optimizationAlgorithm) {
       case OptimizationAlgorithm.Adadelta: {
         return train.adadelta(options.learningRate);
