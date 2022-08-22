@@ -1,10 +1,4 @@
-import {
-  LayersModel,
-  Optimizer,
-  ModelCompileArgs,
-  train,
-  losses,
-} from "@tensorflow/tfjs";
+import { LayersModel, ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
 import { CompileOptions } from "../../../types/CompileOptions";
 import { LossFunction } from "../../../types/LossFunction";
 import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
@@ -53,7 +47,6 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
   };
 
   const metrics = (): ModelCompileArgs["metrics"] => {
-    // eslint-disable-next-line array-callback-return
     return options.metrics.map((metric: Metric) => {
       switch (metric) {
         case Metric.BinaryAccuracy:
@@ -78,6 +71,8 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
           return "recall";
         case Metric.SparseCategoricalAccuracy:
           return "sparseCategoricalAccuracy";
+        default:
+          return "categoricalAccuracy";
       }
     });
   };
