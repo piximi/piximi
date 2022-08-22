@@ -30,7 +30,7 @@ import {
   FitOptions,
   PreprocessOptions,
   Partition,
-  SegmentationArchitectureOptions,
+  SegmenterArchitectureOptions,
   Category,
   ModelType,
   CompileOptions,
@@ -89,7 +89,7 @@ export function* fitSegmenterSaga({
     })
   );
 
-  const architectureOptions: SegmentationArchitectureOptions = yield select(
+  const architectureOptions: SegmenterArchitectureOptions = yield select(
     segmenterArchitectureOptionsSelector
   );
 

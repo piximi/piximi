@@ -36,7 +36,7 @@ import { compile } from "store/common";
 import {
   AlertStateType,
   AlertType,
-  ArchitectureOptions,
+  ClassifierArchitectureOptions,
   Category,
   CompileOptions,
   FitOptions,
@@ -106,7 +106,7 @@ export function* fitClassifierSaga({
     })
   );
 
-  const architectureOptions: ArchitectureOptions = yield select(
+  const architectureOptions: ClassifierArchitectureOptions = yield select(
     classifierArchitectureOptionsSelector
   );
   const classes: number = yield select(createdCategoriesCountSelector);

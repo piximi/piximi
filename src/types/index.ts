@@ -8,8 +8,8 @@ export { AnnotationStateType } from "./AnnotationStateType";
 export type { AnnotationType } from "./AnnotationType";
 
 export type {
-  ArchitectureOptions,
-  SegmentationArchitectureOptions,
+  ClassifierArchitectureOptions,
+  SegmenterArchitectureOptions,
 } from "./ArchitectureOptions";
 
 export type { Category } from "./Category";

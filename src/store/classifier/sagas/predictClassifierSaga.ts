@@ -22,7 +22,7 @@ import { applicationSlice } from "store/application";
 import {
   AlertStateType,
   AlertType,
-  ArchitectureOptions,
+  ClassifierArchitectureOptions,
   Category,
   FitOptions,
   ImageType,
@@ -41,7 +41,7 @@ export function* predictClassifierSaga({
 
   const categories: Category[] = yield select(createdCategoriesSelector);
 
-  const architectureOptions: ArchitectureOptions = yield select(
+  const architectureOptions: ClassifierArchitectureOptions = yield select(
     classifierArchitectureOptionsSelector
   );
 

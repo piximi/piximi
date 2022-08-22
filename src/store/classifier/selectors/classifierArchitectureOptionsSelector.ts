@@ -1,10 +1,10 @@
-import { ArchitectureOptions, Classifier } from "types";
+import { ClassifierArchitectureOptions, Classifier } from "types";
 
 export const classifierArchitectureOptionsSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): ArchitectureOptions => {
+}): ClassifierArchitectureOptions => {
   return {
     inputShape: classifier.inputShape,
     selectedModel: classifier.selectedModel,

@@ -1,11 +1,11 @@
-import { ModelType, SegmentationArchitectureOptions } from "types";
+import { ModelType, SegmenterArchitectureOptions } from "types";
 import {
   createFCNSegmenterModel,
   createSimpleFCNSegmenterModel,
 } from "../../coroutine-models";
 
 export const createSegmentationModel = async (
-  architectureOptions: SegmentationArchitectureOptions,
+  architectureOptions: SegmenterArchitectureOptions,
   numClasses: number
 ) => {
   switch (architectureOptions.selectedModel.modelType) {
