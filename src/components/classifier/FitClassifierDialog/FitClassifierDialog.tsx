@@ -134,7 +134,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   }, [categorizedImages, noCategorizedImages]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV && categorizedImages.length > 0) {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      categorizedImages.length > 0
+    ) {
       const trainingSize = Math.round(
         categorizedImages.length * trainingPercentage
       );

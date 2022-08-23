@@ -57,10 +57,11 @@ export function* fitClassifierSaga({
   if (!execSaga) return;
 
   process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_TF_DEBUG &&
+    process.env.REACT_APP_LOG_LEVEL === "3" &&
     enableDebugMode();
 
   process.env.NODE_ENV !== "production" &&
+    process.env.REACT_APP_LOG_LEVEL === "2" &&
     console.log("tensorflow flags:", ENV.features);
 
   const trainingPercentage: number = yield select(
