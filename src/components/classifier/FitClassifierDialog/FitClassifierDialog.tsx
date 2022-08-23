@@ -78,6 +78,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
     dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
+    process.env.NODE_ENV !== "production" &&
+      console.log(
+        `Set batches per epoch to RoundUp[${
+          categorizedImages.length
+        } / ${batchSize}] = ${Math.ceil(categorizedImages.length / batchSize)}`
+      );
   };
 
   const dispatchLearningRateCallback = (learningRate: number) => {
@@ -114,6 +120,14 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         trainingPercentage: trainPercentage,
       })
     );
+    process.env.NODE_ENV !== "production" &&
+      console.log(
+        `Set training size to Round[${
+          categorizedImages.length
+        } * ${trainPercentage}] = ${Math.round(
+          categorizedImages.length * trainPercentage
+        )}`
+      );
   };
 
   const noLabeledImageAlert: AlertStateType = {
