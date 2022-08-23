@@ -134,7 +134,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   }, [categorizedImages, noCategorizedImages]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV) {
+    if (process.env.NODE_ENV && categorizedImages.length > 0) {
       const trainingSize = Math.round(
         categorizedImages.length * trainingPercentage
       );
@@ -156,7 +156,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
       );
     }
-  }, [fitOptions.batchSize, categorizedImages]);
+  }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
