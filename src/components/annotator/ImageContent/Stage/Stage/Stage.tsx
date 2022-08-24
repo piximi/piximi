@@ -289,7 +289,13 @@ export const Stage = () => {
     return transform.point(position);
   };
 
-  const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
+  const onMouseDown = (
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+  ) => {
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "2" &&
+      console.log(event);
+
     if (
       !event.target.getParent() ||
       // TODO: shouldn't be using string for className here -- Nodar
@@ -376,7 +382,13 @@ export const Stage = () => {
   ]);
 
   const onMouseMove = useMemo(() => {
-    const func = () => {
+    const func = (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => {
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "2" &&
+        console.log(event);
+
       if (!stageRef || !stageRef.current) return;
 
       if (toolType === ToolType.ColorAdjustment) return;
@@ -433,7 +445,9 @@ export const Stage = () => {
       }
     };
     const throttled = _.throttle(func, 5);
-    return () => throttled();
+    return (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => throttled(event);
   }, [
     annotationTool,
     toolType,
@@ -445,7 +459,13 @@ export const Stage = () => {
   ]);
 
   const onMouseUp = useMemo(() => {
-    const func = async () => {
+    const func = async (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => {
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "2" &&
+        console.log(event);
+
       if (!stageRef || !stageRef.current) return;
 
       const position = stageRef.current.getPointerPosition();
@@ -480,7 +500,9 @@ export const Stage = () => {
     };
     const throttled = _.throttle(func, 10);
 
-    return () => throttled();
+    return (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => throttled(event);
   }, [
     annotationTool,
     toolType,
@@ -678,9 +700,12 @@ export const Stage = () => {
       draggable={draggable}
       height={stageHeight}
       onMouseDown={(evt) => onMouseDown(evt)}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onWheel={onZoomWheel}
+      onTouchStart={(evt) => onMouseDown(evt)}
+      onMouseMove={(evt) => onMouseMove(evt)}
+      onTouchMove={(evt) => onMouseMove(evt)}
+      onMouseUp={(evt) => onMouseUp(evt)}
+      onTouchEnd={(evt) => onMouseUp(evt)}
+      onWheel={(evt) => onZoomWheel(evt)}
       position={stagePosition}
       ref={stageRef}
       width={stageWidth}
