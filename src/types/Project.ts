@@ -11,4 +11,5 @@ export type Project = {
   task: Task;
   trainFlag: number; //whether we apply a pre-trained network or want to train one
   imageSortKey: ImageSortKeyType;
+  highlightedCategory: string | null;
 };

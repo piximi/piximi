@@ -44,6 +44,7 @@ const initialState: Project = {
   task: Task.Classify,
   trainFlag: 0,
   imageSortKey: defaultImageSortKey,
+  highlightedCategory: null,
 };
 
 export const projectSlice = createSlice({
@@ -188,6 +189,29 @@ export const projectSlice = createSlice({
       state.categories[index].name = action.payload.name;
       state.categories[index].color = action.payload.color;
     },
+    updateHighlightedCategory(
+      state: Project,
+      action: PayloadAction<{ categoryIndex: number }>
+    ) {
+      console.log(action.payload.categoryIndex);
+      const index = action.payload.categoryIndex;
+      if (!isNaN(index) && index < state.categories.length) {
+        const categoryId = state.categories[action.payload.categoryIndex].id;
+        state.highlightedCategory = categoryId;
+      } else {
+        state.highlightedCategory = null;
+      }
+      // if (action.payload.categoryIndex % 3 === 0) {
+      //   state.highlightedCategory = state.categories[0].id;
+      // } else if (action.payload.categoryIndex % 3 === 1) {
+      //   state.highlightedCategory = state.categories[1].id;
+      // } else if (action.payload.categoryIndex % 3 === 2) {
+      //   state.highlightedCategory = state.categories[2].id;
+      // } else {
+      //   state.highlightedCategory = state.categories[0].id;
+      //   // state.highlightedCategory = null;
+      // }
+    },
     updateCategoryVisibility(
       state: Project,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
@@ -195,6 +219,7 @@ export const projectSlice = createSlice({
       const index = findIndex(state.categories, (category: Category) => {
         return category.id === action.payload.categoryId;
       });
+
       state.categories[index].visible = action.payload.visible;
     },
     updateOtherCategoryVisibility(
@@ -249,15 +274,23 @@ export const projectSlice = createSlice({
     },
     updateImageCategories(
       state: Project,
-      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
+      action: PayloadAction<{ ids: Array<string>; categoryId?: string }>
     ) {
       action.payload.ids.forEach((imageId) => {
         const index = findIndex(state.images, (image: ImageType) => {
           return image.id === imageId;
         });
-        if (index >= 0) {
+        if (index >= 0 && action.payload.categoryId) {
           state.images[index].categoryId = action.payload.categoryId;
           if (action.payload.categoryId === UNKNOWN_CATEGORY_ID) {
+            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
+            state.images[index].partition = Partition.Inference;
+          } else {
+            state.images[index].partition = Partition.Training;
+          }
+        } else if (!action.payload.categoryId && state.highlightedCategory) {
+          state.images[index].categoryId = state.highlightedCategory;
+          if (state.highlightedCategory === UNKNOWN_CATEGORY_ID) {
             //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
             state.images[index].partition = Partition.Inference;
           } else {
@@ -447,6 +480,7 @@ export const {
   updateCategory,
   updateAnnotationCategory,
   updateCategoryVisibility,
+  updateHighlightedCategory,
   setAnnotationCategoryVisibility,
   updateImageCategories,
   updateImageCategory,

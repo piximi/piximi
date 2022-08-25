@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Settings } from "../../types/Settings";
+import { HotkeyView, Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
 import { ImageShapeEnum } from "image/imageHelper";
@@ -11,33 +11,15 @@ const initialState: Settings = {
   imageSelectionColor: "#FF6DB6",
   imageSelectionSize: 5,
   alertState: defaultAlert,
+  hotkeyStack: [HotkeyView.MainImageGrid],
 };
 
 export const applicationSlice = createSlice({
   name: "settings",
   initialState: initialState,
   reducers: {
-    updateTileSize(
-      state: Settings,
-      action: PayloadAction<{ newValue: number }>
-    ) {
-      state.tileSize = action.payload.newValue!;
-    },
-    selectImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages.push(action.payload.id);
-    },
-    selectOneImage(state: Settings, action: PayloadAction<{ id: string }>) {
+    clearSelectedImages(state: Settings) {
       state.selectedImages = [];
-
-      state.selectedImages.push(action.payload.id);
-    },
-    selectAllImages(
-      state: Settings,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      state.selectedImages = [];
-
-      state.selectedImages = action.payload.ids;
     },
     deselectImage(state: Settings, action: PayloadAction<{ id: string }>) {
       state.selectedImages = state.selectedImages.filter(
@@ -52,11 +34,31 @@ export const applicationSlice = createSlice({
         (id: string) => !action.payload.ids.includes(id)
       );
     },
-    clearSelectedImages(state: Settings) {
-      state.selectedImages = [];
+
+    hideAlertState(state, action: PayloadAction<{}>) {
+      state.alertState.visible = false;
     },
-    setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
-      state.themeMode = action.payload.mode;
+    registerHotkeyView(
+      state,
+      action: PayloadAction<{ hotkeyView: HotkeyView }>
+    ) {
+      state.hotkeyStack.push(action.payload.hotkeyView);
+    },
+    selectAllImages(
+      state: Settings,
+      action: PayloadAction<{ ids: Array<string> }>
+    ) {
+      state.selectedImages = [];
+
+      state.selectedImages = action.payload.ids;
+    },
+    selectImage(state: Settings, action: PayloadAction<{ id: string }>) {
+      state.selectedImages.push(action.payload.id);
+    },
+    selectOneImage(state: Settings, action: PayloadAction<{ id: string }>) {
+      state.selectedImages = [];
+
+      state.selectedImages.push(action.payload.id);
     },
     setImageSelectionColor(
       state: Settings,
@@ -70,6 +72,12 @@ export const applicationSlice = createSlice({
     ) {
       state.imageSelectionSize = action.payload.selectionSize;
     },
+    setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
+      state.themeMode = action.payload.mode;
+    },
+    unregisterHotkeyView(state, action: PayloadAction<{}>) {
+      state.hotkeyStack.pop();
+    },
     updateAlertState(
       state,
       action: PayloadAction<{ alertState: AlertStateType }>
@@ -77,9 +85,13 @@ export const applicationSlice = createSlice({
       state.alertState = action.payload.alertState;
       state.alertState.visible = true;
     },
-    hideAlertState(state, action: PayloadAction<{}>) {
-      state.alertState.visible = false;
+    updateTileSize(
+      state: Settings,
+      action: PayloadAction<{ newValue: number }>
+    ) {
+      state.tileSize = action.payload.newValue!;
     },
+
     uploadImages(
       state,
       action: PayloadAction<{
@@ -94,14 +106,16 @@ export const applicationSlice = createSlice({
 });
 
 export const {
-  updateTileSize,
-  selectImage,
-  selectOneImage,
+  clearSelectedImages,
   deselectImage,
   deselectImages,
-  clearSelectedImages,
-  setThemeMode,
-  updateAlertState,
+  updateTileSize,
   hideAlertState,
+  registerHotkeyView,
+  selectImage,
+  selectOneImage,
+  setThemeMode,
+  unregisterHotkeyView,
+  updateAlertState,
   uploadImages,
 } = applicationSlice.actions;

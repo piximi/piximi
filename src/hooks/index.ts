@@ -24,3 +24,4 @@ export { useTranslation } from "./useTranslation/useTranslation";
 export { useUpload } from "./useUpload/useUpload";
 export { useWindowFocusHandler } from "./useWindowFocusHandler/useWindowFocusHandler";
 export { useZoom } from "./useZoom/useZoom";
+export { useHotkeys } from "./useHotkeys/useHotkeys";
