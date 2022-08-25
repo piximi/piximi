@@ -26,31 +26,63 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
   return tagFilter(ev, ["INPUT", "TEXTAREA", "SELECT"]);
 };
 
-export function useHotkeys(
+export interface HotkeysEvent {
+  key: string;
+  method: KeyHandler;
+  mods: number[];
+  scope: string;
+  shortcut: string;
+}
+
+export interface KeyHandler {
+  (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent): void | boolean;
+}
+
+export type Options = {
+  enabled?: boolean; // Main setting that determines if the hotkey is enabled or not. (Default: true)
+  filter?: typeof hotkeys.filter; // A filter function returning whether the callback should get triggered or not. (Default: undefined)
+  filterPreventDefault?: boolean; // Prevent default browser behavior if the filter function returns false. (Default: true)
+  enableOnTags?: AvailableTags[]; // Enable hotkeys on a list of tags. (Default: [])
+  enableOnContentEditable?: boolean; // Enable hotkeys on tags with contentEditable props. (Default: false)
+  splitKey?: string; // Character to split keys in hotkeys combinations. (Default +)
+  scope?: string; // Scope. Currently not doing anything.
+  keyup?: boolean; // Trigger on keyup event? (Default: undefined)
+  keydown?: boolean; // Trigger on keydown event? (Default: true)
+};
+
+// export function useHotkeys<T extends Element>(
+//   keys: string,
+//   callback: KeyHandler,
+//   hotkeyView: HotkeyView,
+//   options?: Options
+// ): void;
+// export function useHotkeys<T extends Element>(
+//   keys: string,
+//   callback: KeyHandler,
+//   hotkeyView: HotkeyView,
+//   deps?: any[]
+// ): void;
+// export function useHotkeys<T extends Element>(
+//   keys: string,
+//   callback: KeyHandler,
+//   hotkeyView: HotkeyView,
+//   options?: Options,
+//   deps?: any[]
+// ): void;
+// export function useHotkeys<T extends Element>(
+//   keys: string,
+//   callback: KeyHandler,
+//   hotkeyView: HotkeyView,
+//   options?: any[] | Options,
+//   deps?: any[]
+// ):
+
+export function useHotkeys<T extends Element>(
   keys: string,
   callback: KeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: Options
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: KeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
-  deps?: any[]
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: KeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
+  hotkeyView: HotkeyView,
   options?: Options,
-  deps?: any[]
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: () => void,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: any[] | Options,
-  deps?: any[]
+  deps: any[] = []
 ): void {
   if (options instanceof Array) {
     deps = options;
@@ -66,12 +98,14 @@ export function useHotkeys(
     enabled = true,
     enableOnContentEditable = false,
   } = (options as Options) || {};
+  console.log("registering useHotKeys HOOK");
   const currentHotkeyView = useSelector(hotkeyViewSelector);
+  console.log(keys);
   // The return value of this callback determines if the browsers default behavior is prevented.
-
   const memoisedCallback = useCallback(
     (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => {
       if (filter && !filter(keyboardEvent)) {
+        console.log("filtered");
         return !filterPreventDefault;
       }
 
@@ -85,19 +119,22 @@ export function useHotkeys(
         return true;
       }
 
-      if (
-        (hotkeyView.length && hotkeyView.includes(currentHotkeyView)) ||
-        (!hotkeyView.length && hotkeyView === currentHotkeyView)
-      ) {
+      if (true) {
+        //hotkeyView === currentHotkeyView
         callback(keyboardEvent, hotkeysEvent);
         return true;
       }
 
       return false;
-    }, //eslint-disable-next-line react-hooks/exhaustive-deps
-    deps
-      ? [hotkeyView, currentHotkeyView, enableOnTags, filter, ...deps]
-      : [hotkeyView, currentHotkeyView, enableOnTags, filter]
+    },
+    [
+      /*hotkeyView, currentHotkeyView,*/ enableOnTags,
+      callback,
+      filter,
+      enableOnContentEditable,
+      filterPreventDefault,
+      ...deps,
+    ]
   );
 
   useEffect(() => {
@@ -116,5 +153,14 @@ export function useHotkeys(
     hotkeys(keys, (options as Options) || {}, memoisedCallback);
 
     return () => hotkeys.unbind(keys, memoisedCallback);
-  }, [keyup, keydown, options, memoisedCallback, keys, enabled]);
+  }, [
+    memoisedCallback,
+    keydown,
+    keyup,
+    options,
+    keys,
+    enabled,
+    enableOnTags,
+    filter,
+  ]);
 }

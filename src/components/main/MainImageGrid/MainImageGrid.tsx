@@ -8,7 +8,6 @@ import { useDndFileDrop, useContextMenu, useHotkeys } from "hooks";
 import { MainImageGridItem } from "../MainImageGridItem";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
-
 import {
   updateImageCategoryFromHighlighted,
   updateHighlightedCategory,
