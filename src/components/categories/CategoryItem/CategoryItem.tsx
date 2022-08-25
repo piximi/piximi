@@ -16,6 +16,7 @@ import { CategoryItemMenu } from "../CategoryItemMenu";
 import { categoryCountsSelector, selectedCategorySelector } from "store/common";
 
 import { Category, CategoryType, ImageType, State } from "types";
+import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
 
 type CategoryItemProps = {
   categoryType: CategoryType;
@@ -41,8 +42,8 @@ export const CategoryItem = ({
     setCategoryMenuAnchorEl(null);
   };
 
+  const highlightedCategory = useSelector(highlightedCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
-
   const imageCount = useSelector((state: State) => {
     return state.project.images.filter((image: ImageType) => {
       return image.categoryId === category.id;
@@ -71,6 +72,10 @@ export const CategoryItem = ({
         id={category.id}
         onClick={onCategoryClick}
         selected={category.id === selectedCategory.id}
+        sx={{
+          backgroundColor:
+            category.id === highlightedCategory ? "rgba(0,0,0,0.2)" : "none",
+        }}
       >
         <CategoryItemCheckbox category={category} categoryType={categoryType} />
 

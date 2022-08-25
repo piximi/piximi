@@ -1,4 +1,5 @@
-import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Container, ImageList, Box } from "@mui/material";
 
@@ -7,15 +8,20 @@ import { useDndFileDrop, useContextMenu } from "hooks";
 import { MainImageGridItem } from "../MainImageGridItem";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
-
 import {
   tileSizeSelector,
   imageSelectionColorSelector,
   imageSelectionSizeSelector,
+  registerHotkeyView,
+  unregisterHotkeyView,
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
-import { ImageType } from "types";
+import { HotkeyView, ImageType } from "types";
+import { updateHighlightedCategory } from "store/project/projectSlice";
+import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
+import { updateImageCategories } from "store/project";
+import { useHotkeys } from "hooks";
 
 type MainImageGridProps = {
   onDrop: (files: FileList) => void;
@@ -30,6 +36,66 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
+  const [categoryIndex, setCategoryIndex] = useState<string>("");
+  const highlightedCategoryId = useSelector(highlightedCategoriesSelector);
+  const dispatch = useDispatch();
+  const hotkeyView = HotkeyView.MainImageGrid;
+
+  useHotkeys(
+    "shift+1,shift+2,shift+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9,shift+0",
+    (event: any, _handler) => {
+      console.log(categoryIndex);
+      console.log("SHIFT+SOMETHING FIRED", event);
+      if (!event.repeat) {
+        setCategoryIndex((index) => {
+          console.log(index);
+          return index + _handler.key[_handler.key.length - 1].toString();
+        });
+      }
+    },
+    hotkeyView
+  );
+  useHotkeys(
+    "shift+backspace",
+    (event) => {
+      if (!event.repeat) {
+        setCategoryIndex((index) => {
+          console.log(index);
+          return index.slice(0, index.length - 1);
+        });
+      }
+    },
+    hotkeyView
+  );
+  useHotkeys(
+    "shift",
+    () => {
+      if (highlightedCategoryId) {
+        dispatch(
+          updateImageCategories({
+            ids: selectedImages,
+          })
+        );
+      }
+      setCategoryIndex("");
+    },
+    hotkeyView,
+    { keyup: true },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    console.log("updating highighted categoriyIndex with", categoryIndex);
+    dispatch(
+      updateHighlightedCategory({ categoryIndex: parseInt(categoryIndex) })
+    );
+  }, [categoryIndex, dispatch]);
+
+  useEffect(() => {
+    console.log("register");
+    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.MainImageGrid }));
+    return () => {};
+  }, [dispatch]);
 
   return (
     <Box

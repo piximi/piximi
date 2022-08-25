@@ -99,6 +99,7 @@ export type { SerializedImageType } from "./SerializedImageType";
 export type { SerializedProjectType } from "./SerializedProjectType";
 
 export type { Settings } from "./Settings";
+export { HotkeyView } from "./Settings";
 
 export type { Shape } from "./Shape";
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { LegacyRef, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
@@ -33,7 +33,6 @@ export const Layer = ({ children }: LayerProps) => {
     x: 0,
     y: 0,
   });
-
   useEffect(() => {
     if (!imageWidth || !imageHeight) return;
 

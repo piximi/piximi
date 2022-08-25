@@ -25,3 +25,4 @@ export { useUpload } from "./useUpload/useUpload";
 export { useWindowFocusHandler } from "./useWindowFocusHandler/useWindowFocusHandler";
 export { useZoom } from "./useZoom/useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState/useLocalGlobalState";
+export { useHotkeys } from "./useHotkeys/useHotkeys";
