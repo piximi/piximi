@@ -133,6 +133,10 @@ export const useZoom = () => {
   };
 
   const onWheel = (event: KonvaEventObject<WheelEvent>) => {
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "2" &&
+      console.log(event);
+
     if (toolType !== ToolType.Zoom) return;
 
     if (!imageWidth) return;

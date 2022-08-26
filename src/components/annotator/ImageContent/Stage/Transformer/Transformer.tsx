@@ -349,7 +349,7 @@ export const Transformer = ({
     );
   };
 
-  const onSaveAnnotationClick = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const onSaveAnnotationClick = (event: Konva.KonvaEventObject<Event>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
@@ -369,9 +369,7 @@ export const Transformer = ({
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
-  const onClearAnnotationClick = (
-    event: Konva.KonvaEventObject<MouseEvent>
-  ) => {
+  const onClearAnnotationClick = (event: Konva.KonvaEventObject<Event>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
@@ -426,6 +424,7 @@ export const Transformer = ({
                   y: posY + 6,
                 }}
                 onClick={onSaveAnnotationClick}
+                onTap={onSaveAnnotationClick}
                 id={"label"}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
@@ -451,6 +450,7 @@ export const Transformer = ({
                   y: posY + 35,
                 }}
                 onClick={onClearAnnotationClick}
+                onTap={onClearAnnotationClick}
                 id={"label"}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
