@@ -23,8 +23,6 @@ import {
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
 import { HotkeyView, ImageType } from "types";
-import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
-import { updateImageCategories } from "store/project";
 
 type MainImageGridProps = {
   onDrop: (files: FileList) => void;
