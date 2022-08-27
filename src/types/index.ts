@@ -41,6 +41,12 @@ export type {
 export type { FitOptions } from "./FitOptions";
 
 export type { HistoryStateType } from "./HistoryStateType";
+export type {
+  AvailableTags,
+  HotkeysEvent,
+  KeyHandler,
+  Options,
+} from "./HotkeyType";
 
 export type { ImageSortKeyType } from "./ImageSortType";
 export {

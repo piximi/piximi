@@ -26,24 +26,6 @@ function getPressedKeyCodes() {
   return _downKeys.slice(0);
 }
 
-// Form control control judgment returns Boolean
-// hotkey is effective only when filter return true
-/*
-function filter(event) {
-  const target = event.target || event.srcElement;
-  const { tagName } = target;
-  let flag = true;
-  // ignore: isContentEditable === 'true', <input> and <textarea> when readOnly state is false, <select>
-  if (
-    target.isContentEditable ||
-    ((tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT") &&
-      !target.readOnly)
-  ) {
-    flag = false;
-  }
-  return flag;
-}
-*/
 function filter(event) {
   return true;
 }
@@ -218,13 +200,15 @@ function dispatch(event, element) {
    * Jest test cases are required.
    * ===============================
    */
-  ["ctrlKey", "altKey", "metaKey"].forEach((keyName) => {
+  ["ctrlKey", "altKey", "metaKey", "shiftKey"].forEach((keyName) => {
     const keyNum = modifierMap[keyName];
 
     if (event[keyName] && _downKeys.indexOf(keyNum) === -1) {
       _downKeys.push(keyNum);
     } else if (!event[keyName] && _downKeys.indexOf(keyNum) > -1) {
-      _downKeys.splice(_downKeys.indexOf(keyNum), 1);
+      if (keyName !== "shiftKey") {
+        _downKeys.splice(_downKeys.indexOf(keyNum), 1);
+      }
     } else if (
       keyName === "metaKey" &&
       event[keyName] &&

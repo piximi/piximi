@@ -3,9 +3,13 @@ import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
 import React, { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { hotkeyViewSelector } from "store/application";
-import { HotkeyView } from "types";
-
-type AvailableTags = "INPUT" | "TEXTAREA" | "SELECT";
+import {
+  AvailableTags,
+  HotkeysEvent,
+  HotkeyView,
+  KeyHandler,
+  Options,
+} from "types";
 
 // We implement our own custom filter system.
 
@@ -24,30 +28,6 @@ const tagFilter = (
 
 const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
   return tagFilter(ev, ["INPUT", "TEXTAREA", "SELECT"]);
-};
-
-export interface HotkeysEvent {
-  key: string;
-  method: KeyHandler;
-  mods: number[];
-  scope: string;
-  shortcut: string;
-}
-
-export interface KeyHandler {
-  (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent): void | boolean;
-}
-
-export type Options = {
-  enabled?: boolean; // Main setting that determines if the hotkey is enabled or not. (Default: true)
-  filter?: typeof hotkeys.filter; // A filter function returning whether the callback should get triggered or not. (Default: undefined)
-  filterPreventDefault?: boolean; // Prevent default browser behavior if the filter function returns false. (Default: true)
-  enableOnTags?: AvailableTags[]; // Enable hotkeys on a list of tags. (Default: [])
-  enableOnContentEditable?: boolean; // Enable hotkeys on tags with contentEditable props. (Default: false)
-  splitKey?: string; // Character to split keys in hotkeys combinations. (Default +)
-  scope?: string; // Scope. Currently not doing anything.
-  keyup?: boolean; // Trigger on keyup event? (Default: undefined)
-  keydown?: boolean; // Trigger on keydown event? (Default: true)
 };
 
 export function useHotkeys<T extends Element>(
@@ -90,9 +70,7 @@ export function useHotkeys<T extends Element>(
     enabled = true,
     enableOnContentEditable = false,
   } = (options as Options) || {};
-  console.log("registering useHotKeys HOOK");
   const currentHotkeyView = useSelector(hotkeyViewSelector);
-  console.log(keys);
   // The return value of this callback determines if the browsers default behavior is prevented.
   const memoisedCallback = useCallback(
     (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => {
