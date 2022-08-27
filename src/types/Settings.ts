@@ -3,6 +3,7 @@ import { AlertStateType } from "./AlertStateType";
 
 export enum HotkeyView {
   MainImageGrid,
+  Classifier,
 }
 export type Settings = {
   tileSize: number;

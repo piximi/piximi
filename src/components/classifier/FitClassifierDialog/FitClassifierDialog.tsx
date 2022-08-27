@@ -14,7 +14,7 @@ import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
-import { alertStateSelector } from "store/application";
+import { alertStateSelector, unregisterHotkeyView } from "store/application";
 import {
   classifierTrainingFlagSelector,
   classifierCompiledSelector,
@@ -186,17 +186,22 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       })
     );
   };
+  const closeAndUnregisterHotkey = () => {
+    console.log("close Dialog");
+    closeDialog();
+    dispatch(unregisterHotkeyView({}));
+  };
 
   return (
     <Dialog
       fullScreen
-      onClose={closeDialog}
+      onClose={closeAndUnregisterHotkey}
       open={openedDialog}
       TransitionComponent={DialogTransition}
       style={{ zIndex: 1203 }}
     >
       <FitClassifierDialogAppBar
-        closeDialog={closeDialog}
+        closeDialog={closeAndUnregisterHotkey}
         fit={onFit}
         disableFitting={noCategorizedImages}
         epochs={epochs}
