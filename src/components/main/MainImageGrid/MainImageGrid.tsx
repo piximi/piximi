@@ -20,7 +20,7 @@ import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 import { HotkeyView, ImageType } from "types";
 import { updateHighlightedCategory } from "store/project/projectSlice";
 import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
-import { updateImageCategories } from "store/project";
+import { updateImageCategoryFromHighlighted } from "store/project";
 import { useHotkeys } from "hooks";
 
 type MainImageGridProps = {
@@ -44,11 +44,8 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   useHotkeys(
     "shift+1,shift+2,shift+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9,shift+0",
     (event: any, _handler) => {
-      console.log(categoryIndex);
-      console.log("SHIFT+SOMETHING FIRED", event);
       if (!event.repeat) {
         setCategoryIndex((index) => {
-          console.log(index);
           return index + _handler.key[_handler.key.length - 1].toString();
         });
       }
@@ -60,7 +57,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     (event) => {
       if (!event.repeat) {
         setCategoryIndex((index) => {
-          console.log(index);
           return index.slice(0, index.length - 1);
         });
       }
@@ -70,29 +66,26 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   useHotkeys(
     "shift",
     () => {
-      if (highlightedCategoryId) {
-        dispatch(
-          updateImageCategories({
-            ids: selectedImages,
-          })
-        );
-      }
+      dispatch(
+        updateImageCategoryFromHighlighted({
+          ids: selectedImages,
+        })
+      );
+
       setCategoryIndex("");
     },
     hotkeyView,
     { keyup: true },
-    [dispatch]
+    [dispatch, selectedImages]
   );
 
   useEffect(() => {
-    console.log("updating highighted categoriyIndex with", categoryIndex);
     dispatch(
       updateHighlightedCategory({ categoryIndex: parseInt(categoryIndex) })
     );
   }, [categoryIndex, dispatch]);
 
   useEffect(() => {
-    console.log("register");
     dispatch(registerHotkeyView({ hotkeyView: HotkeyView.MainImageGrid }));
     return () => {};
   }, [dispatch]);

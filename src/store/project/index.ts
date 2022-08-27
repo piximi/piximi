@@ -12,6 +12,7 @@ export {
   updateOtherCategoryVisibility,
   updateOtherAnnotationCategoryVisibility,
   updateImageCategories,
+  updateImageCategoryFromHighlighted,
 } from "./projectSlice";
 
 // Selectors
