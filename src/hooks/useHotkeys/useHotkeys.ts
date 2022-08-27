@@ -89,8 +89,7 @@ export function useHotkeys<T extends Element>(
         return true;
       }
 
-      if (true) {
-        //hotkeyView === currentHotkeyView
+      if (hotkeyView === currentHotkeyView) {
         callback(keyboardEvent, hotkeysEvent);
         return true;
       }
@@ -98,8 +97,8 @@ export function useHotkeys<T extends Element>(
       return false;
     },
     deps
-      ? [/*hotkeyView, currentHotkeyView,*/ enableOnTags, filter, ...deps]
-      : [/*hotkeyView, currentHotkeyView,*/ enableOnTags, filter]
+      ? [hotkeyView, currentHotkeyView, enableOnTags, filter, ...deps]
+      : [hotkeyView, currentHotkeyView, enableOnTags, filter]
   );
 
   useEffect(() => {
