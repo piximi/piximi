@@ -10,8 +10,7 @@ const _keyMap = {
   enter: 13,
   "↩": 13,
   return: 13,
-  "⇧": 16,
-  shift: 16,
+
   esc: 27,
   escape: 27,
   space: 32,
@@ -60,6 +59,8 @@ const _keyMap = {
 
 // Modifier Keys
 const _modifier = {
+  "⇧": 16,
+  shift: 16,
   // altKey
   "⌥": 18,
   alt: 18,
@@ -74,10 +75,12 @@ const _modifier = {
   command: 91,
 };
 const modifierMap = {
+  16: "shiftKey",
   18: "altKey",
   17: "ctrlKey",
   91: "metaKey",
 
+  shiftKey: 16,
   ctrlKey: 17,
   altKey: 18,
   metaKey: 91,

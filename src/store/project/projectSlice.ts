@@ -344,23 +344,15 @@ export const projectSlice = createSlice({
     },
     updateImageCategories(
       state,
-      action: PayloadAction<{ ids: Array<string>; categoryId?: string }>
+      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
     ) {
       action.payload.ids.forEach((imageId) => {
         const index = findIndex(state.images, (image) => {
           return image.id === imageId;
         });
-        if (index >= 0 && action.payload.categoryId) {
+        if (index >= 0) {
           state.images[index].categoryId = action.payload.categoryId;
           if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
-            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
-            state.images[index].partition = Partition.Inference;
-          } else {
-            state.images[index].partition = Partition.Training;
-          }
-        } else if (!action.payload.categoryId && state.highlightedCategory) {
-          state.images[index].categoryId = state.highlightedCategory;
-          if (state.highlightedCategory === UNKNOWN_CLASS_CATEGORY_ID) {
             //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
             state.images[index].partition = Partition.Inference;
           } else {

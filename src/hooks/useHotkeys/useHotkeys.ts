@@ -3,9 +3,13 @@ import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
 import React, { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { hotkeyViewSelector } from "store/application";
-import { HotkeyView } from "types";
-
-type AvailableTags = "INPUT" | "TEXTAREA" | "SELECT";
+import {
+  AvailableTags,
+  HotkeysEvent,
+  HotkeyView,
+  KeyHandler,
+  Options,
+} from "types";
 
 // We implement our own custom filter system.
 
