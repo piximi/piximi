@@ -1,31 +1,19 @@
-// @ts-nocheck
 const isff =
   typeof navigator !== "undefined"
     ? navigator.userAgent.toLowerCase().indexOf("firefox") > 0
     : false;
 
-// bind event
-function addEvent(object, event, method, useCapture) {
-  if (object.addEventListener) {
-    object.addEventListener(event, method, useCapture);
-  } else if (object.attachEvent) {
-    object.attachEvent(`on${event}`, () => {
-      method(window.event);
-    });
-  }
-}
-
 // Convert modifier keys to corresponding key codes
-function getMods(modifier, key) {
-  const mods = key.slice(0, key.length - 1);
-  for (let i = 0; i < mods.length; i++)
-    mods[i] = modifier[mods[i].toLowerCase()];
-  return mods;
+function getMods(modifier: Record<string, number>, key: string[]) {
+  const mod_names = key.slice(0, key.length - 1);
+  let mod_keys = [];
+  for (let i = 0; i < mod_names.length; i++)
+    mod_keys.push(modifier[mod_names[i].toLowerCase()]);
+  return mod_keys;
 }
 
 // Convert the passed key string to an array
-function getKeys(key) {
-  if (typeof key !== "string") key = "";
+function getKeys(key: string) {
   key = key.replace(/\s/g, ""); // matches any whitespace character, including spaces, tabs, form feeds, etc.
   const keys = key.split(","); // Set multiple shortcut keys at the same time, separated by ','
   let index = keys.lastIndexOf("");
@@ -41,7 +29,7 @@ function getKeys(key) {
 }
 
 // Compare arrays of modifier keys
-function compareArray(a1, a2) {
+function compareArray(a1: number[], a2: number[]) {
   const arr1 = a1.length >= a2.length ? a1 : a2;
   const arr2 = a1.length >= a2.length ? a2 : a1;
   let isIndex = true;
@@ -52,4 +40,4 @@ function compareArray(a1, a2) {
   return isIndex;
 }
 
-export { isff, getMods, getKeys, addEvent, compareArray };
+export { isff, getMods, getKeys, compareArray };
