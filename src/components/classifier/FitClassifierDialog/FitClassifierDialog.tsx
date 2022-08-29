@@ -223,22 +223,17 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       })
     );
   };
-  const closeAndUnregisterHotkey = () => {
-    console.log("close Dialog");
-    closeDialog();
-    dispatch(unregisterHotkeyView({}));
-  };
 
   return (
     <Dialog
       fullScreen
-      onClose={closeAndUnregisterHotkey}
+      onClose={closeDialog}
       open={openedDialog}
       TransitionComponent={DialogTransition}
       style={{ zIndex: 1203 }}
     >
       <FitClassifierDialogAppBar
-        closeDialog={closeAndUnregisterHotkey}
+        closeDialog={closeDialog}
         fit={onFit}
         disableFitting={noCategorizedImages}
         epochs={epochs}
