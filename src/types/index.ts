@@ -43,6 +43,7 @@ export type { FitOptions } from "./FitOptions";
 export type { HistoryStateType } from "./HistoryStateType";
 export type {
   AvailableTags,
+  HandlerItem,
   HotkeysEvent,
   KeyHandler,
   Options,

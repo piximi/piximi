@@ -1,13 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Container, ImageList, Box } from "@mui/material";
 
-import { useDndFileDrop, useContextMenu } from "hooks";
+import { useDndFileDrop, useContextMenu, useHotkeys } from "hooks";
 
 import { MainImageGridItem } from "../MainImageGridItem";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
+
+import {
+  updateImageCategoryFromHighlighted,
+  updateHighlightedCategory,
+} from "store/project";
 import {
   tileSizeSelector,
   imageSelectionColorSelector,
@@ -18,10 +23,6 @@ import {
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
 import { HotkeyView, ImageType } from "types";
-import { updateHighlightedCategory } from "store/project/projectSlice";
-import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
-import { updateImageCategoryFromHighlighted } from "store/project";
-import { useHotkeys } from "hooks";
 
 type MainImageGridProps = {
   onDrop: (files: FileList) => void;
@@ -37,7 +38,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
   const [categoryIndex, setCategoryIndex] = useState<string>("");
-  const highlightedCategoryId = useSelector(highlightedCategoriesSelector);
   const dispatch = useDispatch();
   const hotkeyView = HotkeyView.MainImageGrid;
 
@@ -87,7 +87,9 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
 
   useEffect(() => {
     dispatch(registerHotkeyView({ hotkeyView: HotkeyView.MainImageGrid }));
-    return () => {};
+    return () => {
+      unregisterHotkeyView({});
+    };
   }, [dispatch]);
 
   return (

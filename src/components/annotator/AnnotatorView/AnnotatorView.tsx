@@ -13,6 +13,7 @@ import { Tools } from "../Tools";
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 import { alertStateSelector, applicationSlice } from "store/application";
 import { imageViewerSlice } from "store/image-viewer";
@@ -20,7 +21,8 @@ import { imageViewerSlice } from "store/image-viewer";
 import { AlertType, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+import { APPLICATION_COLORS } from "colorPalette";
 
 type AnnotatorViewProps = {
   image?: ImageType;
@@ -118,7 +120,7 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
         {alertState.visible && (
           <AppBar
             sx={{
-              borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+              borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
               boxShadow: "none",
               zIndex: 2000,
             }}

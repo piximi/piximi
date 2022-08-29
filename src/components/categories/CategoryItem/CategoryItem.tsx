@@ -13,10 +13,12 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
 import { CategoryItemMenu } from "../CategoryItemMenu";
 
+import { highlightedCategoriesSelector } from "store/project";
 import { categoryCountsSelector, selectedCategorySelector } from "store/common";
 
 import { Category, CategoryType, ImageType, State } from "types";
-import { highlightedCategoriesSelector } from "store/project/selectors/highlightedCategorySelector";
+
+import { APPLICATION_COLORS } from "colorPalette";
 
 type CategoryItemProps = {
   categoryType: CategoryType;
@@ -74,7 +76,9 @@ export const CategoryItem = ({
         selected={category.id === selectedCategory.id}
         sx={{
           backgroundColor:
-            category.id === highlightedCategory ? "rgba(0,0,0,0.2)" : "none",
+            category.id === highlightedCategory
+              ? APPLICATION_COLORS.highlightColor
+              : "none",
         }}
       >
         <CategoryItemCheckbox category={category} categoryType={categoryType} />
