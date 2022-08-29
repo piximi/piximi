@@ -8,19 +8,18 @@ import {
 
 import { ScatterPlot as ScatterPlotIcon } from "@mui/icons-material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
-import { useDispatch } from "react-redux";
-import { registerHotkeyView } from "store/application";
 import { HotkeyView } from "types";
 
 export const FitClassifierListItem = () => {
-  const { onClose, onOpen, open } = useDialog(false);
-  const dispatch = useDispatch();
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyView.Classifier,
+    false
+  );
 
   const onFitClick = () => {
-    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.Classifier }));
     onOpen();
   };
 

@@ -1,6 +1,6 @@
 import { HandlerItem } from "types";
-import { getMods, getKeys, compareArray } from "./utils";
-import { _keyMap, _modifier, modifierMap, _mods, _handlers } from "./var";
+import { getMods, getKeys, compareArray } from "./hotkeyUtils";
+import { _keyMap, _modifier, modifierMap, _mods, _handlers } from "./hotkeyVar";
 
 let _downKeys: number[] = []; // record the binding key pressed
 let winListendFocus = false; // Whether the window has listened to the focus event

@@ -282,16 +282,6 @@ export const projectSlice = createSlice({
       } else {
         state.highlightedCategory = null;
       }
-      // if (action.payload.categoryIndex % 3 === 0) {
-      //   state.highlightedCategory = state.categories[0].id;
-      // } else if (action.payload.categoryIndex % 3 === 1) {
-      //   state.highlightedCategory = state.categories[1].id;
-      // } else if (action.payload.categoryIndex % 3 === 2) {
-      //   state.highlightedCategory = state.categories[2].id;
-      // } else {
-      //   state.highlightedCategory = state.categories[0].id;
-      //   // state.highlightedCategory = null;
-      // }
     },
     updateCategoryVisibility(
       state: Project,
@@ -339,7 +329,6 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ ids: Array<string> }>
     ) {
-      console.log("hello", state.highlightedCategory);
       action.payload.ids.forEach((imageId) => {
         const index = findIndex(state.images, (image: ImageType) => {
           return image.id === imageId;
