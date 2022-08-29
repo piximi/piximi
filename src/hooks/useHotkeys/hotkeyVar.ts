@@ -1,4 +1,4 @@
-import { isff } from "./utils";
+import { isff } from "./hotkeyUtils";
 
 // Special Keys
 const _keyMap: Record<string, number> = {
