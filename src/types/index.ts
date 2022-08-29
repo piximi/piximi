@@ -45,6 +45,7 @@ export type { GeneratorReturnType } from "./GeneratorReturnType";
 export type { HistoryStateType } from "./HistoryStateType";
 export type {
   AvailableTags,
+  HandlerItem,
   HotkeysEvent,
   KeyHandler,
   Options,

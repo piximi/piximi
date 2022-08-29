@@ -41,6 +41,7 @@ import {
 import { AlertStateType, AlertType } from "types";
 
 import { createGitHubIssue } from "utils";
+import { APPLICATION_COLORS } from "colorPalette";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -136,7 +137,7 @@ export const FallBackDialog = (props: any) => {
           position: "sticky",
           backgroundColor: (theme) => theme.palette.error.light,
           boxShadow: "none",
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
         }}
       >
         <Toolbar>

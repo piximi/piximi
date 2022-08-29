@@ -12,6 +12,18 @@ export interface KeyHandler {
   (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent): void | boolean;
 }
 
+export type HandlerItem = {
+  keyup: boolean;
+  keydown: boolean;
+  scope: string;
+  mods: number[];
+  shortcut: string;
+  method: Function;
+  key: string;
+  splitKey: string;
+  element: Document;
+};
+
 export type Options = {
   enabled?: boolean; // Main setting that determines if the hotkey is enabled or not. (Default: true)
   filter?: Function; // A filter function returning whether the callback should get triggered or not. (Default: undefined)

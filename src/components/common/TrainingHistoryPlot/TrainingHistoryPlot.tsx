@@ -4,6 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { Container, Typography } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
+import { APPLICATION_COLORS } from "colorPalette";
 
 type TrainingHistoryPlotProps = {
   metric: string;
@@ -127,7 +128,7 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
               {
                 on: "hover",
                 style: {
-                  itemBackground: "rgba(0, 0, 0, .03)",
+                  itemBackground: APPLICATION_COLORS.highlightColor,
                   itemOpacity: 1,
                 },
               },
