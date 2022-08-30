@@ -15,10 +15,15 @@ import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog"
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
-import { alertStateSelector, applicationSlice } from "store/application";
+import {
+  alertStateSelector,
+  applicationSlice,
+  registerHotkeyView,
+  unregisterHotkeyView,
+} from "store/application";
 import { imageViewerSlice } from "store/image-viewer";
 
-import { AlertType, ImageType } from "types";
+import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
 
@@ -92,6 +97,12 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
       window.removeEventListener("beforeunload", onUnload);
     };
   }, []);
+  useEffect(() => {
+    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.Annotator }));
+    return () => {
+      dispatch(unregisterHotkeyView({}));
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (image) {

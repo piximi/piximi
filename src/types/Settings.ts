@@ -2,6 +2,7 @@ import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType } from "./AlertStateType";
 
 export enum HotkeyView {
+  Annotator,
   MainImageGrid,
   Classifier,
 }
