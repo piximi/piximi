@@ -132,6 +132,15 @@ export const usePointer = () => {
           },
         })
       );
+      console.log(
+        `mouseUp\n
+        selecting: ${JSON.stringify(pointerSelection.selecting)}\n
+        dragging: ${JSON.stringify(pointerSelection.dragging)}\n
+        minimum: ${JSON.stringify(pointerSelection.minimum)}\n
+        maximum: ${JSON.stringify(pointerSelection.maximum)}\n
+        current position: ${JSON.stringify(position)}\n
+        annotations length: ${annotations.length}\n`
+      );
 
       if (!minimum || !annotations.length) {
         dispatch(
