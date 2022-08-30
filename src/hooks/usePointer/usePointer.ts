@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
-import hotkeys from "hotkeys-js";
+import { useHotkeys } from "hooks";
 
 import {
   imageViewerSlice,
@@ -19,7 +18,7 @@ import {
   setPointerSelection,
 } from "store/image-viewer";
 
-import { AnnotationType, ToolType } from "types";
+import { AnnotationType, HotkeyView, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
@@ -54,27 +53,16 @@ export const usePointer = () => {
   const [shift, setShift] = useState<boolean>(false);
 
   useHotkeys(
-    "*",
+    "shift",
     (event) => {
-      if (hotkeys.shift) {
-        if (event.type === "keyup") {
-          setShift(false);
-        }
+      if (event.type === "keydown") {
+        setShift(true);
+      } else {
+        setShift(false);
       }
     },
-    { keyup: true }
-  );
-
-  useHotkeys(
-    "*",
-    (event) => {
-      if (hotkeys.shift) {
-        if (event.type === "keydown") {
-          setShift(true);
-        }
-      }
-    },
-    { keydown: true }
+    HotkeyView.Annotator,
+    { keyup: true, keydown: true }
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
@@ -144,15 +132,6 @@ export const usePointer = () => {
           },
         })
       );
-      console.log(
-        `mouseUp\n
-        selecting: ${JSON.stringify(pointerSelection.selecting)}\n
-        dragging: ${JSON.stringify(pointerSelection.dragging)}\n
-        minimum: ${JSON.stringify(pointerSelection.minimum)}\n
-        maximum: ${JSON.stringify(pointerSelection.maximum)}\n
-        current position: ${JSON.stringify(position)}\n
-        annotations length: ${annotations.length}\n`
-      );
 
       if (!minimum || !annotations.length) {
         dispatch(
@@ -182,7 +161,7 @@ export const usePointer = () => {
       );
 
       if (annotationsInBox.length) {
-        if (!shift) {
+        if (shift) {
           batch(() => {
             dispatch(
               setSelectedAnnotations({

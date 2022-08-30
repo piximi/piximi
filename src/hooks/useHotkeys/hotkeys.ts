@@ -26,10 +26,6 @@ function getPressedKeyCodes() {
   return _downKeys.slice(0);
 }
 
-function filter(event: string) {
-  return true;
-}
-
 // Determine whether the pressed key is a certain key, return true or false
 function isPressed(keyCode: string | number) {
   if (typeof keyCode === "string") {
