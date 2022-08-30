@@ -78,6 +78,7 @@ export const usePointer = () => {
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
+    console.log("mouseDown");
     dispatch(
       setPointerSelection({
         pointerSelection: {
@@ -143,8 +144,27 @@ export const usePointer = () => {
           },
         })
       );
+      console.log(
+        `mouseUp\n
+        selecting: ${JSON.stringify(pointerSelection.selecting)}\n
+        dragging: ${JSON.stringify(pointerSelection.dragging)}\n
+        minimum: ${JSON.stringify(pointerSelection.minimum)}\n
+        maximum: ${JSON.stringify(pointerSelection.maximum)}\n
+        current position: ${JSON.stringify(position)}\n
+        annotations length: ${annotations.length}\n`
+      );
 
-      if (!minimum || !annotations.length) return;
+      if (!minimum || !annotations.length) {
+        dispatch(
+          setPointerSelection({
+            pointerSelection: {
+              ...pointerSelection,
+              selecting: false,
+            },
+          })
+        );
+        return;
+      }
 
       const scaledMinimum = {
         x: minimum.x / stageScale,
