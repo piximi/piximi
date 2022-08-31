@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
+import useSound from "use-sound";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
