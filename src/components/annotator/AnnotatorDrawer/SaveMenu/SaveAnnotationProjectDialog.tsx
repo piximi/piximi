@@ -1,7 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
-import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   Button,
@@ -13,7 +12,10 @@ import {
   TextField,
 } from "@mui/material";
 
+import { useHotkeys } from "hooks";
+
 import { allSerializedAnnotationsSelector } from "store/common";
+import { HotkeyView } from "types";
 
 type SaveAnnotationProjectDialogProps = {
   onClose: () => void;
@@ -56,6 +58,7 @@ export const SaveAnnotationProjectDialog = ({
     () => {
       onSaveAllAnnotations();
     },
+    HotkeyView.SaveAnnotationProjectDialog,
     { enabled: open },
     [onSaveAllAnnotations]
   );

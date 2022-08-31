@@ -88,7 +88,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   useEffect(() => {
     dispatch(registerHotkeyView({ hotkeyView: HotkeyView.MainImageGrid }));
     return () => {
-      unregisterHotkeyView({});
+      dispatch(unregisterHotkeyView({}));
     };
   }, [dispatch]);
 

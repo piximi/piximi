@@ -274,7 +274,6 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ categoryIndex: number }>
     ) {
-      console.log(action.payload.categoryIndex);
       const index = action.payload.categoryIndex;
       if (!isNaN(index) && index < state.categories.length) {
         const categoryId = state.categories[action.payload.categoryIndex].id;

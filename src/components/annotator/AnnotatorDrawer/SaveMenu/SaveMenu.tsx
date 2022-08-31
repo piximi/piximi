@@ -3,7 +3,7 @@ import { bindMenu } from "material-ui-popup-state";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
@@ -11,6 +11,7 @@ import { ExportAnnotationsAsMatrixMenuItem } from "./ExportAnnotationsAsMatrixMe
 import { ExportAnnotationsAsLabeledSemanticMasksMenuItem } from "./ExportAnnotationsAsLabeledSemanticMasksMenuItem";
 import { ExportAnnotationsAsBinarySemanticMasksMenuItem } from "./ExportAnnotationsAsBinarySemanticMasksMenuItem";
 import { ExportAnnotationsAsBinaryInstancesMenuItem } from "./ExportAnnotationsAsBinaryInstancesMenuItem";
+import { HotkeyView } from "types";
 
 type SaveMenuProps = {
   popupState: any;
@@ -19,7 +20,9 @@ type SaveMenuProps = {
 export const SaveMenu = ({ popupState }: SaveMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const { onClose, onOpen, open } = useDialog();
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyView.SaveAnnotationProjectDialog
+  );
 
   const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
     setAnchorEl(event.currentTarget);

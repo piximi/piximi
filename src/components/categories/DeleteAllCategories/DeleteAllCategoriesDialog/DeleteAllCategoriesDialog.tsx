@@ -1,6 +1,5 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   Button,
@@ -10,10 +9,17 @@ import {
   DialogActions,
 } from "@mui/material";
 
+import { useHotkeys } from "hooks";
+
 import { imageViewerSlice } from "store/image-viewer";
 import { projectSlice } from "store/project";
 
-import { CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
+import {
+  CategoryType,
+  HotkeyView,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
+} from "types";
+import { unregisterHotkeyView } from "store/application";
 
 type DeleteAllCategoriesDialogProps = {
   categoryType: CategoryType;
@@ -34,6 +40,7 @@ export const DeleteAllCategoriesDialog = ({
     } else {
       deleteAllAnnotationCategories();
     }
+    dispatch(unregisterHotkeyView(HotkeyView.DeleteAllCategoriesDialog));
   };
 
   const deleteAllClassifierCategories = () => {
@@ -59,7 +66,7 @@ export const DeleteAllCategoriesDialog = ({
     () => {
       onDeleteAllCategories();
     },
-    { enabled: open },
+    HotkeyView.DeleteAllCategoriesDialog,
     [onDeleteAllCategories]
   );
 
