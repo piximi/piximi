@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
@@ -97,7 +98,6 @@ export const useAnnotatorKeyboardShortcuts = ({
   /*
    * Select category (1-9)
    */
-
   useHotkeys(
     "shift+1,shift+2,shit+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9",
     (event: KeyboardEvent, handler) => {
