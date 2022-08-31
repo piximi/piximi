@@ -2,7 +2,7 @@ import React from "react";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog, useMenu } from "hooks";
+import { useDialog, useMenuHotkey } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
@@ -10,6 +10,7 @@ import { ExportAnnotationsAsMatrixMenuItem } from "./ExportAnnotationsAsMatrixMe
 import { ExportAnnotationsAsLabeledSemanticMasksMenuItem } from "./ExportAnnotationsAsLabeledSemanticMasksMenuItem";
 import { ExportAnnotationsAsBinarySemanticMasksMenuItem } from "./ExportAnnotationsAsBinarySemanticMasksMenuItem";
 import { ExportAnnotationsAsBinaryInstancesMenuItem } from "./ExportAnnotationsAsBinaryInstancesMenuItem";
+import { HotkeyView } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -29,7 +30,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
     onClose: onSubMenuClose,
     onOpen: onSubMenuOpen,
     open: subMenuOpen,
-  } = useMenu();
+  } = useMenuHotkey(HotkeyView.SaveAnnotationProjectDialog);
 
   const onMenusClose = () => {
     onSubMenuClose();

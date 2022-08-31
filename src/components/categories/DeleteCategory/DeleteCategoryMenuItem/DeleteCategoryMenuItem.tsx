@@ -3,14 +3,19 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, Typography } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
 import { imageViewerSlice } from "store/image-viewer";
 import { imagesSelector, projectSlice } from "store/project";
 
-import { Category, CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
+import {
+  Category,
+  CategoryType,
+  HotkeyView,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
+} from "types";
 
 type DeleteCategoryMenuItemProps = {
   category: Category;
@@ -23,20 +28,20 @@ export const DeleteCategoryMenuItem = ({
   categoryType,
   onCloseCategoryMenu,
 }: DeleteCategoryMenuItemProps) => {
+  const dispatch = useDispatch();
+  const images = useSelector(imagesSelector);
+
   const {
     onClose: onCloseDeleteCategoryDialog,
     onOpen: onOpenDeleteCategoryDialog,
     open: openDeleteCategoryDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
+
   const {
     onClose: onCloseDeleteAnnotationCategoryDialog,
     onOpen: onOpenDeleteAnnotationCategoryDialog,
     open: openDeleteAnnotationCategoryDialog,
-  } = useDialog();
-
-  const dispatch = useDispatch();
-
-  const images = useSelector(imagesSelector);
+  } = useDialogHotkey(HotkeyView.DeleteAnnotationCategoryDialog);
 
   const onDeleteCategory = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>
@@ -64,7 +69,6 @@ export const DeleteCategoryMenuItem = ({
     } // Warn user that these images will be relabeled as unknown.
     else {
       deleteClassificationCategoryCallback(category.id);
-      onClose();
     }
   };
 
@@ -97,7 +101,6 @@ export const DeleteCategoryMenuItem = ({
     } // Warn user that these annotations will be relabeled as unknown.
     else {
       deleteAnnotationCategoryCallback(category.id);
-      onClose();
     }
   };
 
@@ -125,8 +128,13 @@ export const DeleteCategoryMenuItem = ({
   };
 
   const onClose = () => {
-    onCloseDeleteCategoryDialog();
-    onCloseDeleteAnnotationCategoryDialog();
+    if (categoryType === CategoryType.ClassifierCategory) {
+      console.log("closing catagory");
+      onCloseDeleteCategoryDialog();
+    } else {
+      onCloseDeleteAnnotationCategoryDialog();
+    }
+    console.log("closing Menu");
     onCloseCategoryMenu();
   };
 

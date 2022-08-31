@@ -11,7 +11,7 @@ const initialState: Settings = {
   imageSelectionColor: "#FF6DB6",
   imageSelectionSize: 5,
   alertState: defaultAlert,
-  hotkeyStack: [HotkeyView.MainImageGrid],
+  hotkeyStack: [],
 };
 
 export const applicationSlice = createSlice({

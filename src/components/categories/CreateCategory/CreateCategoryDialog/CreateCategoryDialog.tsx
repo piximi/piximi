@@ -2,7 +2,6 @@ import React, { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorResult } from "react-color";
 import { sample } from "lodash";
-import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   Button,
@@ -14,6 +13,7 @@ import {
   TextField,
   Box,
 } from "@mui/material";
+import { useHotkeys } from "hooks";
 
 import { ColorIcon } from "components/common/ColorIcon";
 
@@ -24,7 +24,7 @@ import {
   createCategory,
 } from "store/project";
 
-import { Category, CategoryType } from "types";
+import { Category, CategoryType, HotkeyView } from "types";
 
 type CreateCategoryDialogProps = {
   categoryType: CategoryType;
@@ -103,6 +103,7 @@ export const CreateCategoryDialog = ({
     () => {
       onCreate();
     },
+    HotkeyView.CreateCategoryDialog,
     { enabled: open },
     [onCreate]
   );

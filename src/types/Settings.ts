@@ -3,8 +3,13 @@ import { AlertStateType } from "./AlertStateType";
 
 export enum HotkeyView {
   Annotator,
-  MainImageGrid,
   Classifier,
+  CreateCategoryDialog,
+  DeleteAnnotationCategoryDialog,
+  DeleteAllCategoriesDialog,
+  DeleteCategoryDialog,
+  MainImageGrid,
+  SaveAnnotationProjectDialog,
 }
 export type Settings = {
   tileSize: number;
