@@ -1,9 +1,8 @@
-import { AnnotationTool } from "../AnnotationTool";
-import { slic } from "../../../slic";
 import * as ImageJS from "image-js";
-import { encode } from "../../../rle";
 import _ from "lodash";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { AnnotationTool } from "../AnnotationTool";
+import { encode, slic } from "annotator/image/helpers";
+import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class QuickAnnotationTool extends AnnotationTool {
   regionSize?: number;

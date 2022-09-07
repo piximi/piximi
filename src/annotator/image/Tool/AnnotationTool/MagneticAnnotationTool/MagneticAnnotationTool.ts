@@ -1,9 +1,13 @@
-import { AnnotationTool } from "../AnnotationTool";
-import { createPathFinder, makeGraph, PiximiGraph } from "../../../GraphHelper";
-import { getIdx } from "image/imageHelper";
 import * as ImageJS from "image-js";
 import _ from "lodash";
-import { encode } from "../../../rle";
+import { AnnotationTool } from "../AnnotationTool";
+import {
+  createPathFinder,
+  encode,
+  makeGraph,
+  PiximiGraph,
+} from "annotator/image/helpers";
+import { getIdx } from "image/imageHelper";
 import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class MagneticAnnotationTool extends AnnotationTool {

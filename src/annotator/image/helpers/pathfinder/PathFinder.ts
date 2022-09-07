@@ -1,5 +1,6 @@
+import { fromIdxToCoord, PiximiGraph, PiximiNode } from "../";
 import { NodeHeap } from "./NodeHeap";
-import { fromIdxToCoord, PiximiGraph, PiximiNode } from "../GraphHelper";
+
 import { Node } from "ngraph.graph";
 
 /**

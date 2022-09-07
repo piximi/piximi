@@ -1,7 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { doFlood, makeFloodMap } from "../../../flood";
+import { doFlood, makeFloodMap, encode } from "../../../helpers";
 import * as ImageJS from "image-js";
-import { encode } from "../../../rle";
 import PriorityQueue from "ts-priority-queue";
 import { AnnotationStateType } from "types/AnnotationStateType";
 

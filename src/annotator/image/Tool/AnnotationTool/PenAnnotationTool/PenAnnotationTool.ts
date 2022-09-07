@@ -2,8 +2,8 @@ import { AnnotationTool } from "../AnnotationTool";
 import * as ImageJS from "image-js";
 import _ from "lodash";
 import { connectPoints } from "image/imageHelper";
-import { encode } from "../../../rle";
-import { AnnotationStateType } from "types/AnnotationStateType";
+import { encode } from "../../../helpers";
+import { AnnotationStateType } from "types";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
