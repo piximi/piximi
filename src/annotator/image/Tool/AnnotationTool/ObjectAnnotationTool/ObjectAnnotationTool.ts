@@ -13,8 +13,8 @@ import {
 import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
-import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+import { encode } from "../../../helpers";
+import { AnnotationStateType } from "types";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;

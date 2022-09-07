@@ -7,7 +7,7 @@ import { stageScaleSelector } from "store/image-viewer";
 import { AnnotationType, Shape } from "types";
 
 import { colorOverlayROI } from "image/imageHelper";
-import { toRGBA } from "annotator/image";
+import { toRGBA } from "annotator/image/helpers";
 
 type AnnotationProps = {
   annotation: AnnotationType;

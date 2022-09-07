@@ -7,6 +7,7 @@ import {
   selectedAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
+  setSelectedAnnotations,
 } from "store/image-viewer/";
 import { selectedCategorySelector } from "store/common";
 
@@ -15,73 +16,71 @@ import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 import { AnnotationTool } from "annotator/image/Tool";
 
 export function* annotationStateChangeSaga({
-  payload: { annotationState, annotationTool, execSaga },
+  payload: { annotationState, annotationTool },
 }: PayloadAction<{
   annotationState: AnnotationStateType;
   annotationTool: AnnotationTool | undefined;
   execSaga: boolean;
 }>) {
-  if (
-    !execSaga ||
-    !annotationTool ||
-    annotationState !== AnnotationStateType.Annotated
-  )
-    return;
-
   const selectionMode: ReturnType<typeof selectionModeSelector> = yield select(
     selectionModeSelector
   );
   const activeImagePlane: ReturnType<typeof activeImagePlaneSelector> =
     yield select(activeImagePlaneSelector);
+  const toolType: ReturnType<typeof toolTypeSelector> = yield select(
+    toolTypeSelector
+  );
+  const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
+    yield select(selectedAnnotationSelector);
+  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+    yield select(selectedCategorySelector);
+  let combinedMask, combinedBoundingBox;
+
+  if (!annotationTool) return;
+
+  if (annotationState !== AnnotationStateType.Annotated) return;
 
   if (selectionMode === AnnotationModeType.New) {
-    const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-      yield select(selectedCategorySelector);
-
     annotationTool.annotate(selectedCategory, activeImagePlane);
-
     if (!annotationTool.annotation) return;
 
     yield put(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      setSelectedAnnotations({
         selectedAnnotations: [annotationTool.annotation],
         selectedAnnotation: annotationTool.annotation,
       })
     );
   } else {
-    const toolType: ReturnType<typeof toolTypeSelector> = yield select(
-      toolTypeSelector
-    );
-
-    if (toolType === ToolType.Zoom) return;
-
-    const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
-      yield select(selectedAnnotationSelector);
-
-    if (annotationTool.annotationState !== AnnotationStateType.Annotated)
+    if (
+      toolType === ToolType.Zoom ||
+      annotationTool.annotationState !== AnnotationStateType.Annotated ||
+      !selectedAnnotation
+    ) {
       return;
+    }
 
-    let combinedMask, combinedBoundingBox;
+    switch (selectionMode) {
+      case AnnotationModeType.Add:
+        [combinedMask, combinedBoundingBox] = annotationTool.add(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
 
-    if (!selectedAnnotation) return;
-
-    if (selectionMode === AnnotationModeType.Add) {
-      [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Subtract) {
-      [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Intersect) {
-      [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else {
-      return;
+      case AnnotationModeType.Subtract:
+        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
+      case AnnotationModeType.Intersect:
+        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
+      default:
+        return;
     }
 
     annotationTool.mask = combinedMask;

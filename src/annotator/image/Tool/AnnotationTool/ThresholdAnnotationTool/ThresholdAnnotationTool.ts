@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "../../../rle";
-import { AnnotationStateType } from "types/AnnotationStateType";
+import { encode } from "../../../helpers";
+import { AnnotationStateType } from "types";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   origin?: { x: number; y: number };

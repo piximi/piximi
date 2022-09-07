@@ -1,6 +1,6 @@
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
-import { decode } from "../annotator/image/rle";
+import { decode } from "../annotator/image/helpers";
 import { Category, UNKNOWN_CATEGORY_ID } from "../types/Category";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { saveAs } from "file-saver";

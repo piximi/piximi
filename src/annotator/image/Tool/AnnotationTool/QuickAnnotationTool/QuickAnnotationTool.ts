@@ -1,7 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { slic } from "../../../slic";
+import { encode, slic } from "../../../helpers";
 import * as ImageJS from "image-js";
-import { encode } from "../../../rle";
 import * as _ from "lodash";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
