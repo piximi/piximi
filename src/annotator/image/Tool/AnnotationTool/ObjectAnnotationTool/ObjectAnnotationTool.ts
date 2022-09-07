@@ -10,11 +10,12 @@ import {
   browser,
   scalar,
 } from "@tensorflow/tfjs";
-import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
 import _ from "lodash";
-import { encode } from "../../../rle";
-import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
+
+import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
+import { encode } from "annotator/image/helpers";
+import { AnnotationStateType } from "types";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;

@@ -2,7 +2,7 @@ import * as ImageJS from "image-js";
 import _ from "lodash";
 import { saveAs } from "file-saver";
 
-import { decode } from "../annotator/image/rle";
+import { decode } from "../annotator/image/helpers";
 
 import { AnnotationType } from "../types/AnnotationType";
 import { Category } from "../types/Category";

@@ -1,7 +1,7 @@
 import { ColorAnnotationTool } from "./ColorAnnotationTool";
 import { test } from "@jest/globals";
 import { Image } from "image-js";
-import { makeFloodMap } from "../../../flood";
+import { makeFloodMap } from "../../../helpers";
 
 test("deselect", () => {
   expect(true).toBe(true);

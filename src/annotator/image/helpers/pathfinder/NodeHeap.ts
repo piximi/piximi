@@ -7,7 +7,7 @@
  *
  * Further adapted for Piximi
  */
-import { PiximiNode } from "../GraphHelper";
+import { PiximiNode } from "../";
 
 export class NodeHeap {
   public data: Array<any> = [];
