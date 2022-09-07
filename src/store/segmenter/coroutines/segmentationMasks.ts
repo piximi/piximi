@@ -1,4 +1,4 @@
-import { decode, encode } from "annotator/image/rle";
+import { decode, encode } from "annotator/image/helpers";
 import { AnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { Shape } from "types/Shape";

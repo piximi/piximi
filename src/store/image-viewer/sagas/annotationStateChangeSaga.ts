@@ -6,6 +6,7 @@ import {
   selectedAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
+  setSelectedAnnotations,
 } from "store/image-viewer/";
 import { selectedCategorySelector } from "store/common";
 
@@ -22,56 +23,58 @@ export function* annotationStateChangeSaga({
     annotationTool: AnnotationTool | undefined;
   };
 }): any {
+  const selectionMode = yield select(selectionModeSelector);
+  const activeImagePlane = yield select(activeImagePlaneSelector);
+  const toolType = yield select(toolTypeSelector);
+  const selectedAnnotation = yield select(selectedAnnotationSelector);
+  const selectedCategory = yield select(selectedCategorySelector);
+  let combinedMask, combinedBoundingBox;
+
   if (!annotationTool) return;
 
   if (annotationState !== AnnotationStateType.Annotated) return;
 
-  const selectionMode = yield select(selectionModeSelector);
-  const activeImagePlane = yield select(activeImagePlaneSelector);
-
   if (selectionMode === AnnotationModeType.New) {
-    const selectedCategory = yield select(selectedCategorySelector);
-
     annotationTool.annotate(selectedCategory, activeImagePlane);
-
     if (!annotationTool.annotation) return;
 
     yield put(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      setSelectedAnnotations({
         selectedAnnotations: [annotationTool.annotation],
         selectedAnnotation: annotationTool.annotation,
       })
     );
   } else {
-    const toolType = yield select(toolTypeSelector);
-    if (toolType === ToolType.Zoom) return;
-
-    const selectedAnnotation = yield select(selectedAnnotationSelector);
-
-    if (annotationTool.annotationState !== AnnotationStateType.Annotated)
+    if (
+      toolType === ToolType.Zoom ||
+      annotationTool.annotationState !== AnnotationStateType.Annotated ||
+      !selectedAnnotation
+    ) {
       return;
+    }
 
-    let combinedMask, combinedBoundingBox;
+    switch (selectionMode) {
+      case AnnotationModeType.Add:
+        [combinedMask, combinedBoundingBox] = annotationTool.add(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
 
-    if (!selectedAnnotation) return;
-
-    if (selectionMode === AnnotationModeType.Add) {
-      [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Subtract) {
-      [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else if (selectionMode === AnnotationModeType.Intersect) {
-      [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
-      );
-    } else {
-      return;
+      case AnnotationModeType.Subtract:
+        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
+      case AnnotationModeType.Intersect:
+        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+          selectedAnnotation.mask,
+          selectedAnnotation.boundingBox
+        );
+        break;
+      default:
+        return;
     }
 
     annotationTool.mask = combinedMask;

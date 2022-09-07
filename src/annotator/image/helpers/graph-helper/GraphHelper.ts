@@ -1,9 +1,10 @@
 import createGraph, { Graph, Node } from "ngraph.graph";
-import { getIdx } from "../../image/imageHelper";
+
 import { DataArray } from "image-js";
 
-import { cachedAStarPathSearch } from "./pathfinder/PathFinder";
-import { NodeHeap } from "./pathfinder/NodeHeap";
+import { cachedAStarPathSearch, NodeHeap } from "../";
+
+import { getIdx } from "image/imageHelper";
 
 export interface PiximiGraph extends Graph {
   fromId: number;
