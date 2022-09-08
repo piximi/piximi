@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { applicationSlice } from "store/application";
 
-import { getImageInformation, ImageShapeEnum } from "image/imageHelper";
+import { getImageInformation, ImageShapeEnum } from "utils/common/imageHelper";
 
 export const useUpload = (
   setOpenDimensionsDialogBox: (flag: boolean) => void,

@@ -28,7 +28,7 @@ import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
   rgbToHex,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 

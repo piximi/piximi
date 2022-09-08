@@ -5,7 +5,7 @@ import { Transformer } from "../Transformer/Transformer";
 
 import { selectedAnnotationsIdsSelector } from "store/image-viewer";
 
-import { AnnotationTool } from "annotator/image/Tool";
+import { AnnotationTool } from "annotator/AnnotationTools";
 
 type TransformersProps = {
   transformPosition: ({

@@ -1,4 +1,4 @@
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "utils/common/imageHelper";
 import { UNKNOWN_CATEGORY_ID } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";

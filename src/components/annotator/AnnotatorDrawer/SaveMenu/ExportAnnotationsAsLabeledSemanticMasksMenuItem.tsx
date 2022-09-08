@@ -7,7 +7,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 import { annotatorImagesSelector } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
 
-import { saveAnnotationsAsLabeledSemanticSegmentationMasks } from "image/imageHelper";
+import { saveAnnotationsAsLabeledSemanticSegmentationMasks } from "utils/common/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   popupState: any;

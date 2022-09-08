@@ -15,7 +15,7 @@ import { ImageType } from "types";
 import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(activeImageColorsSelector);

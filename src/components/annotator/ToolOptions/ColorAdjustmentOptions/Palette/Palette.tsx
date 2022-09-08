@@ -21,7 +21,7 @@ import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
   rgbToHex,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 type PaletteProps = {
   channelIdx: number;

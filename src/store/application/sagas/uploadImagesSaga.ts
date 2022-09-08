@@ -8,9 +8,9 @@ import { projectSlice } from "store/project";
 
 import { AlertStateType, AlertType, ImageType } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
-import { convertToImage, ImageShapeEnum } from "image/imageHelper";
+import { convertToImage, ImageShapeEnum } from "utils/common/imageHelper";
 
 type ImageFileType = {
   fileName: string;

@@ -14,7 +14,7 @@ import {
   classifierTrainingFlagSelector,
 } from "store/classifier";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const ClassifierExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);

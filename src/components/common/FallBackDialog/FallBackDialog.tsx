@@ -41,7 +41,7 @@ import {
 import { AlertStateType, AlertType } from "types";
 
 import { createGitHubIssue } from "utils";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 const popupState = {
   close: () => {},

@@ -17,7 +17,7 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "utils/common/imageHelper";
 import { preprocessClassifier } from "./preprocessClassifier";
 import { predictClasses } from "./predictClasses";
 

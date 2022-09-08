@@ -21,7 +21,7 @@ import {
   convertImageURIsToImageData,
   generateDefaultChannels,
   mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
