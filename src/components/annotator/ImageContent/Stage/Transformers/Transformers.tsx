@@ -34,7 +34,7 @@ export const Transformers = ({
             transformPosition={transformPosition}
             annotationId={annotationId}
             annotationTool={annotationTool}
-            key={idx}
+            key={annotationId}
           />
         );
       })}

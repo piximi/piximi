@@ -9,14 +9,10 @@ import {
   ListSubheader,
   Radio,
   RadioGroup,
+  Tooltip,
 } from "@mui/material";
 
 import { useTranslation } from "hooks";
-
-import { NewTooltip } from "../NewTooltip";
-import { AddTooltip } from "../AddTooltip";
-import { SubtractTooltip } from "../SubtractTooltip";
-import { IntersectionTooltip } from "../IntersectionTooltip";
 
 import {
   annotationStateSelector,
@@ -86,7 +82,11 @@ export const AnnotationMode = () => {
           <ListSubheader component="div">{t("Annotation mode")}</ListSubheader>
         }
       >
-        <NewTooltip>
+        <Tooltip
+          title="Create a new annotation."
+          placement="bottom"
+          disableInteractive
+        >
           <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
@@ -104,9 +104,13 @@ export const AnnotationMode = () => {
 
             <ListItemText primary={t("New annotation")} />
           </ListItemButton>
-        </NewTooltip>
+        </Tooltip>
 
-        <AddTooltip>
+        <Tooltip
+          title="Adding to an annotation adds any new areas you annotate to an existing annotation."
+          placement="bottom"
+          disableInteractive
+        >
           <ListItemButton
             dense
             onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
@@ -125,9 +129,13 @@ export const AnnotationMode = () => {
 
             <ListItemText primary={t("Add area")} />
           </ListItemButton>
-        </AddTooltip>
+        </Tooltip>
 
-        <SubtractTooltip>
+        <Tooltip
+          title="Remove the area you label from an existing annotation."
+          placement="bottom"
+          disableInteractive
+        >
           <ListItemButton
             dense
             onClick={(event) =>
@@ -148,9 +156,13 @@ export const AnnotationMode = () => {
 
             <ListItemText primary={t("Subtract area")} />
           </ListItemButton>
-        </SubtractTooltip>
+        </Tooltip>
 
-        <IntersectionTooltip>
+        <Tooltip
+          title="Constrain the boundary of the new annotation to the selected annotation."
+          placement="bottom"
+          disableInteractive
+        >
           <ListItemButton
             dense
             onClick={(event) =>
@@ -171,7 +183,7 @@ export const AnnotationMode = () => {
 
             <ListItemText primary={t("Intersection")} />
           </ListItemButton>
-        </IntersectionTooltip>
+        </Tooltip>
       </List>
     </RadioGroup>
   );
