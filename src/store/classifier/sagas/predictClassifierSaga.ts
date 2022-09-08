@@ -29,7 +29,7 @@ import {
   Shape,
 } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export function* predictClassifierSaga({
   payload: { execSaga },

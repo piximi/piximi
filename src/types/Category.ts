@@ -1,7 +1,7 @@
 import {
   UNKNOWN_ANNOTATION_CATEGORY_COLOR,
   UNKNOWN_CLASS_CATEGORY_COLOR,
-} from "colorPalette";
+} from "utils/common/colorPalette";
 
 export type Category = {
   color: string; // 3 byte hex, eg. "#a08cd2"

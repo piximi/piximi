@@ -4,7 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import { Container, Typography } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type TrainingHistoryPlotProps = {
   metric: string;

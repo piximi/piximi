@@ -19,7 +19,7 @@ import {
   classifierSlice,
 } from "store/classifier";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;

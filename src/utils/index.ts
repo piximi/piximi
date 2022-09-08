@@ -1,3 +1,3 @@
-export { createGitHubIssue } from "./createGitHubIssue";
-export { enumKeys } from "./enumKeys";
-export { getStackTraceFromError } from "./getStackTrace";
+export { createGitHubIssue } from "./common/createGitHubIssue";
+export { enumKeys } from "./common/enumKeys";
+export { getStackTraceFromError } from "./common/getStackTrace";

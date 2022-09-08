@@ -8,7 +8,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 import { annotatorImagesSelector } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
 
-import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "utils/common/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   handleMenuClose: () => void;

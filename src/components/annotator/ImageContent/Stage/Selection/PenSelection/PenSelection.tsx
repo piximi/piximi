@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { PenAnnotationTool } from "annotator/image/Tool";
+import { PenAnnotationTool } from "annotator/AnnotationTools";
 
 type PenSelectionProps = {
   operator: PenAnnotationTool;

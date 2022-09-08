@@ -17,6 +17,7 @@ import {
   useZoom,
 } from "hooks";
 
+import { SoundEvents } from "./SoundEvents";
 import { Image } from "../Image";
 import { Selecting } from "../Selecting";
 import { Layer } from "../Layer";
@@ -48,8 +49,8 @@ import { selectedCategorySelector } from "store/common";
 
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
-import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
-import { SoundEvents } from "./SoundEvents";
+import { ObjectAnnotationTool } from "annotator/AnnotationTools";
+import { Tool } from "annotator/Tool";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);

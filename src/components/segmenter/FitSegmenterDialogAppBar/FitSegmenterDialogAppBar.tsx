@@ -21,7 +21,7 @@ import {
   segmenterTrainingFlagSelector,
   segmenterSlice,
 } from "store/segmenter";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;

@@ -17,7 +17,7 @@ import {
 
 import { UNKNOWN_CLASS_CATEGORY_ID } from "types";
 
-import { UNKNOWN_CLASS_CATEGORY_COLOR } from "colorPalette";
+import { UNKNOWN_CLASS_CATEGORY_COLOR } from "utils/common/colorPalette";
 
 export const UnknownCategoryListItem = () => {
   const id = UNKNOWN_CLASS_CATEGORY_ID;
