@@ -30,15 +30,13 @@ export const Transformers = ({
     <>
       {selectedAnnotationsIds.map((annotationId, idx) => {
         return (
-          <>
-            <React.Fragment key={annotationId}>
-              <Transformer
-                transformPosition={transformPosition}
-                annotationId={annotationId}
-                annotationTool={annotationTool}
-              />
-            </React.Fragment>
-          </>
+          <React.Fragment key={annotationId}>
+            <Transformer
+              transformPosition={transformPosition}
+              annotationId={annotationId}
+              annotationTool={annotationTool}
+            />
+          </React.Fragment>
         );
       })}
     </>

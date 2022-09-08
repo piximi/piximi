@@ -9,7 +9,7 @@ import { useUpload } from "hooks";
 import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ImageContent } from "../ImageContent";
 import { ToolOptions } from "../ToolOptions";
-import { Tools } from "../Tools";
+import { ToolDrawer } from "../ToolDrawer";
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
@@ -157,7 +157,7 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
         <ToolOptions />
 
-        <Tools />
+        <ToolDrawer />
       </Box>
     </ErrorBoundary>
   );

@@ -42,7 +42,6 @@ import {
 export const ToolOptions = () => {
   const activeOperation = useSelector(toolTypeSelector);
 
-  // @ts-ignore
   const operations = [
     {
       icon: <ColorAdjustmentIcon />,
@@ -145,13 +144,7 @@ export const ToolOptions = () => {
     >
       <AppBarOffset />
 
-      {
-        operations[
-          operations.findIndex(
-            (operation) => operation.method === activeOperation
-          )
-        ].options
-      }
+      {operations.filter((type) => type.method === activeOperation)[0].options}
     </Drawer>
   );
 };
