@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { Selection } from "../Selection";
 
-import { Tool } from "annotator/image/Tool";
+import { Tool } from "annotator/Tool";
 
 import { annotationStateSelector, toolTypeSelector } from "store/image-viewer";
 

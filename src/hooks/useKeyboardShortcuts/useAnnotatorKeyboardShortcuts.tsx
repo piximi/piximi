@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
-import useSound from "use-sound";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
@@ -22,7 +21,7 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator/image/Tool";
+import { AnnotationTool } from "annotator/AnnotationTools";
 
 type useAnnotatorHotkeysProps = {
   annotations: AnnotationType[];

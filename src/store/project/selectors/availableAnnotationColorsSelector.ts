@@ -1,6 +1,5 @@
-import { Project } from "types/Project";
-import { Category } from "types/Category";
-import { CATEGORY_COLORS } from "colorPalette";
+import { Category, Project } from "types";
+import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 export const availableAnnotationColorsSelector = ({
   project,

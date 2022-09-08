@@ -14,7 +14,7 @@ import {
   GeneratorReturnType,
 } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 import {
   ImageShapeInfo,

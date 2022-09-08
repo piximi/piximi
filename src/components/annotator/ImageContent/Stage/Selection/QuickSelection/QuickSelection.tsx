@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { QuickAnnotationTool } from "annotator/image/Tool";
+import { QuickAnnotationTool } from "annotator/AnnotationTools";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;

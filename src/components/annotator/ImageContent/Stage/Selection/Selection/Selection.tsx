@@ -23,8 +23,8 @@ import {
   PolygonalAnnotationTool,
   QuickAnnotationTool,
   RectangularAnnotationTool,
-  Tool,
-} from "annotator/image/Tool";
+} from "annotator/AnnotationTools";
+import { Tool } from "annotator/Tool";
 
 type SelectionProps = {
   tool?: Tool;

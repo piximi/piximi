@@ -23,7 +23,7 @@ import {
 } from "store/application";
 
 import { getStackTraceFromError } from "utils";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
 import { AlertType, HotkeyView } from "types";

@@ -8,7 +8,7 @@ import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "utils/common/imageHelper";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 
