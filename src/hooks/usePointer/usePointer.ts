@@ -23,7 +23,7 @@ import { AnnotationType, HotkeyView, ToolType } from "types";
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 export const usePointer = () => {
   const dispatch = useDispatch();

@@ -14,7 +14,7 @@ import {
   segmenterTrainingFlagSelector,
 } from "store/segmenter";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);

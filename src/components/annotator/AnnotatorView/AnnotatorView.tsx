@@ -27,7 +27,7 @@ import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type AnnotatorViewProps = {
   image?: ImageType;

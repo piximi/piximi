@@ -13,7 +13,7 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "utils/common/imageHelper";
 
 jest.setTimeout(50000);
 

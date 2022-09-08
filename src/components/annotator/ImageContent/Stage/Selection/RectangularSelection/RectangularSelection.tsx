@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { RectangularAnnotationTool } from "annotator/image/Tool";
+import { RectangularAnnotationTool } from "annotator/AnnotationTools";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool;

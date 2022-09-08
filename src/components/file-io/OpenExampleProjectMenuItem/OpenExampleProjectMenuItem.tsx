@@ -22,7 +22,7 @@ import {
 } from "types";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/imageHelper";
+import { deserializeImages } from "utils/common/imageHelper";
 
 type ExampleProjectProps = {
   projectName: string;

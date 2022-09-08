@@ -22,8 +22,8 @@ import {
 
 import { AnnotationModeType, AnnotationStateType, AnnotationType } from "types";
 
-import { AnnotationTool } from "annotator/image/Tool";
-import { decode, encode } from "annotator/image/helpers";
+import { AnnotationTool } from "annotator/AnnotationTools";
+import { decode, encode } from "utils/annotator";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 

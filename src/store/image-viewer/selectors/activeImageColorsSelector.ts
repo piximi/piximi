@@ -1,5 +1,5 @@
 import { Color, ImageViewer, ShadowImageType } from "types";
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "utils/common/imageHelper";
 
 export const activeImageColorsSelector = ({
   imageViewer,

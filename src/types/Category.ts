@@ -1,7 +1,7 @@
 import {
   UNKNOWN_ANNOTATOR_CATEGORY_COLOR,
   UNKNOWN_CATEGORY_COLOR,
-} from "colorPalette";
+} from "utils/common/colorPalette";
 
 export type Category = {
   color: string;

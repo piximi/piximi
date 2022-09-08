@@ -20,7 +20,7 @@ import {
   convertToImage,
   generateDefaultChannels,
   importSerializedAnnotations,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 type ExampleImageProject = {
   exampleImageName: string;

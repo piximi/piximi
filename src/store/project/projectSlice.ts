@@ -13,7 +13,7 @@ import { filter, findIndex } from "lodash";
 import { Task } from "types/Task";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { replaceDuplicateName } from "image/imageHelper";
+import { replaceDuplicateName } from "utils/common/imageHelper";
 import { defaultImage } from "images/defaultImage";
 import { AnnotationType } from "types/AnnotationType";
 
