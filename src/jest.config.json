@@ -1,0 +1,8 @@
+{
+  "bail": 1,
+  "verbose": false,
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/node_modules/",
+    "<rootDir>/qsrc/store/"
+  ]
+}

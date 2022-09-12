@@ -28,16 +28,17 @@ export const Transformers = ({
 
   return (
     <>
-      {selectedAnnotationsIds.map((annotationId, idx) => {
-        return (
-          <Transformer
-            transformPosition={transformPosition}
-            annotationId={annotationId}
-            annotationTool={annotationTool}
-            key={annotationId}
-          />
-        );
-      })}
+      {selectedAnnotationsIds &&
+        selectedAnnotationsIds.map((annotationId, idx) => {
+          return (
+            <Transformer
+              transformPosition={transformPosition}
+              annotationId={annotationId}
+              annotationTool={annotationTool}
+              key={annotationId}
+            />
+          );
+        })}
     </>
   );
 };
