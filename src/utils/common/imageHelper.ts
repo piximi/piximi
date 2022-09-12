@@ -642,20 +642,23 @@ export const generateDefaultChannels = (numChannels: number): Array<Color> => {
 export const connectPoints = (coordinates: Array<Array<number>>) => {
   let connectedPoints: Array<Array<number>> = [];
 
-  const foo = _.filter(
-    _.zip(coordinates.slice(0, coordinates.length - 1), coordinates.slice(1)),
-    ([current, next]) => {
-      return !_.isEqual(current, next);
-    }
+  const consecutiveCoords = coordinates
+    .slice(0, coordinates.length - 1)
+    .map((coord, i) => [coord, coordinates[i + 1]]);
+
+  const adjacentPoints = consecutiveCoords.filter(
+    ([current, next]) => !_.isEqual(current, next)
   );
-  foo.forEach(([current, next]) => {
+
+  adjacentPoints.forEach(([current, next]) => {
     const points = drawLine(current!, next!);
-    connectedPoints = _.concat(connectedPoints, points);
+    connectedPoints = connectedPoints.concat(points);
   });
+
   return connectedPoints;
 };
 
-export const drawLine = (p: Array<number>, q: Array<number>) => {
+export const drawLine = (p1: Array<number>, p2: Array<number>) => {
   const coords: Array<Array<number>> = [];
 
   let x: number,
@@ -669,19 +672,15 @@ export const drawLine = (p: Array<number>, q: Array<number>) => {
     step: number,
     i: number;
 
-  x1 = Math.round(p[0]);
-  y1 = Math.round(p[1]);
-  x2 = Math.round(q[0]);
-  y2 = Math.round(q[1]);
+  x1 = Math.round(p1[0]);
+  y1 = Math.round(p1[1]);
+  x2 = Math.round(p2[0]);
+  y2 = Math.round(p2[1]);
 
   dx = x2 - x1;
   dy = y2 - y1;
 
-  step = Math.abs(dy);
-
-  if (Math.abs(dx) >= Math.abs(dy)) {
-    step = Math.abs(dx);
-  }
+  step = Math.abs(dx) >= Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
 
   dx = dx / step;
   dy = dy / step;

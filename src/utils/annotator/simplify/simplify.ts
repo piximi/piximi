@@ -115,8 +115,8 @@ export function simplifyPolygon(
 
   const sqTolerance = tolerance * tolerance;
 
-  points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
-  points = simplifyDouglasPeucker(points, sqTolerance);
-
+  //points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
+  //points = simplifyDouglasPeucker(points, sqTolerance);
+  console.log("simplify");
   return points;
 }
