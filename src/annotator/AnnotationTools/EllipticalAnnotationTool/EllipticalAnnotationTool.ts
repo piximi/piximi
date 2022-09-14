@@ -43,7 +43,6 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       this.points = this.convertToPoints();
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
-
       const mask = this.convertToMask();
 
       if (!mask) return;
@@ -60,9 +59,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     const canvas = document.createElement("canvas");
     canvas.width = this.image.width;
     canvas.height = this.image.height;
-
     const ctx = canvas.getContext("2d");
-
     if (!ctx || !this.center || !this.radius) return undefined;
 
     ctx.beginPath();
