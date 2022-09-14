@@ -1,9 +1,7 @@
 import { test } from "@jest/globals";
-import { data } from "./ColorAnotationToolTestData.json";
 import { Image } from "image-js";
+import { data } from "../testData.json";
 import { ColorAnnotationTool } from "./ColorAnnotationTool";
-
-import { makeFloodMap } from "utils/annotator";
 import { AnnotationStateType } from "types";
 
 test("deselect", () => {
