@@ -15,17 +15,26 @@ import { AnnotationType } from "types";
 // eslint-disable-next-line no-empty-pattern
 export function* selectedCategorySaga({
   payload: { execSaga },
-}: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>): any {
+}: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const selectedAnnotationsIds = yield select(selectedAnnotationsIdsSelector);
+  const selectedAnnotationsIds: ReturnType<
+    typeof selectedAnnotationsIdsSelector
+  > = yield select(selectedAnnotationsIdsSelector);
+
   if (!selectedAnnotationsIds) return;
 
-  const annotations = yield select(imageInstancesSelector);
+  const annotations: ReturnType<typeof imageInstancesSelector> = yield select(
+    imageInstancesSelector
+  );
+
   if (!annotations.length) return;
 
-  const selectedAnnotations = yield select(selectedAnnotationsSelector);
-  const selectedCategory = yield select(selectedCategorySelector);
+  const selectedAnnotations: ReturnType<typeof selectedAnnotationsSelector> =
+    yield select(selectedAnnotationsSelector);
+
+  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+    yield select(selectedCategorySelector);
 
   const updatedAnnotations = _.map(
     selectedAnnotations,
@@ -34,7 +43,9 @@ export function* selectedCategorySaga({
     }
   );
 
-  const selectedAnnotation = yield select(selectedAnnotationSelector);
+  const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
+    yield select(selectedAnnotationSelector);
+
   if (!selectedAnnotation) return;
 
   yield put(

@@ -1,5 +1,4 @@
-import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
+import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -12,27 +11,37 @@ import {
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
 import { createdCategoriesSelector } from "store/project";
-import {
-  AlertStateType,
-  AlertType,
-  Category,
-  ClassifierEvaluationResultType,
-  ImageType,
-} from "types";
+import { AlertStateType, AlertType, Category, ImageType } from "types";
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateClassifierSaga({
   payload: { execSaga },
 }: PayloadAction<{
   execSaga: boolean;
-}>): any {
+}>) {
   if (!execSaga) return;
 
-  const model: LayersModel = yield select(classifierFittedSelector);
-  const validationImages: Array<ImageType> = yield select(valImagesSelector);
-  yield put(yield put(applicationSlice.actions.hideAlertState({})));
+  const model: ReturnType<typeof classifierFittedSelector> = yield select(
+    classifierFittedSelector
+  );
 
-  const categories: Array<Category> = yield select(createdCategoriesSelector);
+  if (model === undefined) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
+    );
+    return;
+  }
+
+  const validationImages: ReturnType<typeof valImagesSelector> = yield select(
+    valImagesSelector
+  );
+
+  yield put(applicationSlice.actions.hideAlertState({}));
+
+  const categories: ReturnType<typeof createdCategoriesSelector> = yield select(
+    createdCategoriesSelector
+  );
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
@@ -72,16 +81,19 @@ function* runEvaluation(
   model: LayersModel,
   categories: Array<Category>
 ) {
-  //@ts-ignore
-  const validationData: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
-  }> = yield select(classifierValidationDataSelector);
+  const validationData: ReturnType<typeof classifierValidationDataSelector> =
+    yield select(classifierValidationDataSelector);
+
+  if (validationData === undefined) {
+    yield handleError(
+      new Error("No selectable validation data in store"),
+      "Failed to get validation data"
+    );
+    return;
+  }
 
   try {
-    var evaluationResult: ClassifierEvaluationResultType =
+    var evaluationResult: Awaited<ReturnType<typeof evaluateClassifier>> =
       yield evaluateClassifier(
         model,
         validationData,
@@ -100,8 +112,9 @@ function* runEvaluation(
   );
 }
 
-function* handleError(error: Error, name: string): any {
-  const stackTrace = yield getStackTraceFromError(error);
+function* handleError(error: Error, name: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
   const alertState: AlertStateType = {
     alertType: AlertType.Error,

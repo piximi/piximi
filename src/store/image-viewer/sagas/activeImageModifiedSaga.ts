@@ -4,7 +4,7 @@ import { call, put, select } from "redux-saga/effects";
 import { imageViewerSlice } from "store/image-viewer";
 import { imageSelector } from "store/common";
 
-import { Color, ImageType } from "types";
+import { Color } from "types";
 
 import {
   convertImageURIsToImageData,
@@ -13,10 +13,10 @@ import {
 
 export function* activeImageIDChangeSaga({
   payload: { imageId, execSaga },
-}: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>): any {
+}: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const image: ImageType | undefined = yield select(imageSelector);
+  const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
 
   if (!image) {
     yield put(
@@ -40,10 +40,8 @@ export function* activeImageIDChangeSaga({
     })
   );
 
-  const planesData: number[][][] = yield call(
-    convertImageURIsToImageData,
-    image.originalSrc
-  );
+  const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
+    yield call(convertImageURIsToImageData, image.originalSrc);
 
   const renderedSrcs = planesData.map((planeData) => {
     return mapChannelsToSpecifiedRGBImage(
@@ -64,17 +62,15 @@ export function* activeImageColorChangeSaga({
 }: PayloadAction<{
   colors: Array<Color>;
   execSaga: boolean;
-}>): any {
+}>) {
   if (!execSaga) return;
 
-  const image: ImageType | undefined = yield select(imageSelector);
+  const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
 
   if (!image) return;
 
-  const planesData: number[][][] = yield call(
-    convertImageURIsToImageData,
-    image.originalSrc
-  );
+  const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
+    yield call(convertImageURIsToImageData, image.originalSrc);
 
   const renderedSrcs = planesData.map((planeData, idx) => {
     return mapChannelsToSpecifiedRGBImage(

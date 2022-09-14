@@ -1,5 +1,4 @@
-import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
+import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -22,7 +21,6 @@ import { applicationSlice } from "store/application";
 import {
   AlertStateType,
   AlertType,
-  ClassifierArchitectureOptions,
   Category,
   FitOptions,
   ImageType,
@@ -34,24 +32,39 @@ import { getStackTraceFromError } from "utils/getStackTrace";
 
 export function* predictClassifierSaga({
   payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>): any {
+}: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const testImages: Array<ImageType> = yield select(testImagesSelector);
-
-  const categories: Category[] = yield select(createdCategoriesSelector);
-
-  const architectureOptions: ClassifierArchitectureOptions = yield select(
-    classifierArchitectureOptionsSelector
+  const testImages: ReturnType<typeof testImagesSelector> = yield select(
+    testImagesSelector
   );
 
-  const preprocessOptions: PreprocessOptions = yield select(
-    classifierPreprocessOptionsSelector
+  const categories: ReturnType<typeof createdCategoriesSelector> = yield select(
+    createdCategoriesSelector
   );
 
-  const fitOptions: FitOptions = yield select(classifierFitOptionsSelector);
+  const architectureOptions: ReturnType<
+    typeof classifierArchitectureOptionsSelector
+  > = yield select(classifierArchitectureOptionsSelector);
 
-  let model = yield select(classifierFittedSelector);
+  const preprocessOptions: ReturnType<
+    typeof classifierPreprocessOptionsSelector
+  > = yield select(classifierPreprocessOptionsSelector);
+
+  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
+    yield select(classifierFitOptionsSelector);
+
+  let model: ReturnType<typeof classifierFittedSelector> = yield select(
+    classifierFittedSelector
+  );
+
+  if (model === undefined) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
+    );
+    return;
+  }
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
@@ -101,12 +114,7 @@ function* runPrediction(
   fitOptions: FitOptions,
   model: LayersModel
 ) {
-  var data: Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R2>;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
-  }>;
+  var data: Awaited<ReturnType<typeof preprocessClassifier>>;
   try {
     data = yield preprocessClassifier(
       testImages,
@@ -124,11 +132,8 @@ function* runPrediction(
   }
 
   try {
-    var { imageIds, categoryIds } = yield predictClasses(
-      model,
-      data,
-      categories
-    ); //returns an array of Image ID and an array of corresponding categories ID
+    var { imageIds, categoryIds }: Awaited<ReturnType<typeof predictClasses>> =
+      yield predictClasses(model, data, categories); //returns an array of Image ID and an array of corresponding categories ID
   } catch (error) {
     yield handleError(error as Error, "Error predicting the inference data");
     return;
@@ -148,8 +153,9 @@ function* runPrediction(
   );
 }
 
-function* handleError(error: Error, name: string): any {
-  const stackTrace = yield getStackTraceFromError(error);
+function* handleError(error: Error, name: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
   const alertState: AlertStateType = {
     alertType: AlertType.Error,

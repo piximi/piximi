@@ -20,7 +20,6 @@ import {
 import {
   AlertStateType,
   AlertType,
-  AnnotationType,
   Category,
   FitOptions,
   ImageType,
@@ -32,12 +31,11 @@ import { getStackTraceFromError } from "utils";
 
 export function* predictSegmenterSaga({
   payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>): any {
+}: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const inferenceImages: Array<ImageType> = yield select(
-    unannotatedImagesSelector
-  );
+  const inferenceImages: ReturnType<typeof unannotatedImagesSelector> =
+    yield select(unannotatedImagesSelector);
 
   yield put(
     projectSlice.actions.updateSegmentationImagesPartition({
@@ -46,19 +44,30 @@ export function* predictSegmenterSaga({
     })
   );
 
-  const annotationCategories: Category[] = yield select(
-    annotationCategoriesSelector
+  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
+    yield select(annotationCategoriesSelector);
+
+  const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
+    yield select(segmenterInputShapeSelector);
+
+  const preprocessOptions: ReturnType<
+    typeof segmenterPreprocessOptionsSelector
+  > = yield select(segmenterPreprocessOptionsSelector);
+
+  const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
+    yield select(segmenterFitOptionsSelector);
+
+  let model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
+    segmenterFittedModelSelector
   );
 
-  const inputShape: Shape = yield select(segmenterInputShapeSelector);
-
-  const preprocessOptions: PreprocessOptions = yield select(
-    segmenterPreprocessOptionsSelector
-  );
-
-  const fitOptions: FitOptions = yield select(segmenterFitOptionsSelector);
-
-  let model = yield select(segmenterFittedModelSelector);
+  if (model === undefined) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
+    );
+    return;
+  }
 
   if (!inferenceImages.length) {
     yield put(
@@ -117,10 +126,7 @@ function* runSegmentationPrediction(
     return;
   }
 
-  var predictedAnnotations: Array<{
-    annotations: Array<AnnotationType>;
-    imageId: string;
-  }>;
+  var predictedAnnotations: Awaited<ReturnType<typeof predictSegmentations>>;
   try {
     predictedAnnotations = yield predictSegmentations(
       model,
@@ -157,8 +163,9 @@ function* runSegmentationPrediction(
   );
 }
 
-function* handleError(error: Error, name: string): any {
-  const stackTrace = yield getStackTraceFromError(error);
+function* handleError(error: Error, name: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
   const alertState: AlertStateType = {
     alertType: AlertType.Error,

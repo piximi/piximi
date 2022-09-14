@@ -4,7 +4,7 @@ import { predictClassifierSaga } from "./predictClassifierSaga";
 
 import { classifierSlice } from "store/classifier";
 
-export function* watchPredictClassifierSaga(): any {
+export function* watchPredictClassifierSaga() {
   yield takeLeading(
     classifierSlice.actions.predict.type,
     predictClassifierSaga

@@ -1,4 +1,4 @@
-import { LayersModel, data, Tensor, Rank } from "@tensorflow/tfjs";
+import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
@@ -12,31 +12,33 @@ import {
   evaluateSegmenter,
 } from "store/segmenter";
 
-import {
-  Category,
-  AlertType,
-  SegmenterEvaluationResultType,
-  AlertStateType,
-  ImageType,
-} from "types";
+import { Category, AlertType, AlertStateType, ImageType } from "types";
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateSegmenterSaga({
   payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>): any {
+}: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const model: LayersModel = yield select(segmenterFittedModelSelector);
-
-  const validationImages: Array<ImageType> = yield select(
-    segmenterValidationImagesSelector
+  const model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
+    segmenterFittedModelSelector
   );
 
-  yield put(yield put(applicationSlice.actions.hideAlertState({})));
+  if (model === undefined) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
+    );
+    return;
+  }
 
-  const categories: Array<Category> = yield select(
-    annotationCategoriesSelector
-  );
+  const validationImages: ReturnType<typeof segmenterValidationImagesSelector> =
+    yield select(segmenterValidationImagesSelector);
+
+  yield put(applicationSlice.actions.hideAlertState({}));
+
+  const categories: ReturnType<typeof annotationCategoriesSelector> =
+    yield select(annotationCategoriesSelector);
 
   if (validationImages.length === 0) {
     yield put(
@@ -64,14 +66,19 @@ function* runSegmentationEvaluation(
   model: LayersModel,
   categories: Array<Category>
 ) {
-  const validationData: data.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
-  }> = yield select(segmenterValDataSelector);
+  const validationData: ReturnType<typeof segmenterValDataSelector> =
+    yield select(segmenterValDataSelector);
+
+  if (validationData === undefined) {
+    yield handleError(
+      new Error("No selectable validation data in store"),
+      "Failed to get validation data"
+    );
+    return;
+  }
 
   try {
-    var evaluationResult: SegmenterEvaluationResultType =
+    var evaluationResult: Awaited<ReturnType<typeof evaluateSegmenter>> =
       yield evaluateSegmenter(
         model,
         validationData,
@@ -90,8 +97,9 @@ function* runSegmentationEvaluation(
   );
 }
 
-function* handleError(error: Error, name: string): any {
-  const stackTrace = yield getStackTraceFromError(error);
+function* handleError(error: Error, name: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
   const alertState: AlertStateType = {
     alertType: AlertType.Error,

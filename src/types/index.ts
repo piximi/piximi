@@ -40,6 +40,8 @@ export type {
 
 export type { FitOptions } from "./FitOptions";
 
+export type { GeneratorReturnType } from "./GeneratorReturnType";
+
 export type { HistoryStateType } from "./HistoryStateType";
 
 export type { ImageSortKeyType } from "./ImageSortType";

@@ -1,5 +1,4 @@
-import { LayersModel, Tensor, Rank } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
+import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import _ from "lodash";
 import { select, put } from "redux-saga/effects";
@@ -27,13 +26,8 @@ import {
 } from "store/segmenter";
 import { compile } from "store/common";
 import {
-  FitOptions,
-  PreprocessOptions,
   Partition,
-  SegmenterArchitectureOptions,
-  Category,
   ModelType,
-  CompileOptions,
   AlertStateType,
   AlertType,
   ImageType,
@@ -45,19 +39,22 @@ export function* fitSegmenterSaga({
 }: PayloadAction<{
   onEpochEnd: any;
   execSaga: boolean;
-}>): any {
+}>) {
   if (!execSaga) return;
 
-  const trainingPercentage: number = yield select(
-    segmenterTrainingPercentageSelector
-  );
-  const annotatedImages: Array<ImageType> = yield select(
-    annotatedImagesSelector
-  );
-  const fitOptions: FitOptions = yield select(segmenterFitOptionsSelector);
-  const preprocessingOptions: PreprocessOptions = yield select(
-    segmenterPreprocessOptionsSelector
-  );
+  const trainingPercentage: ReturnType<
+    typeof segmenterTrainingPercentageSelector
+  > = yield select(segmenterTrainingPercentageSelector);
+
+  const annotatedImages: ReturnType<typeof annotatedImagesSelector> =
+    yield select(annotatedImagesSelector);
+
+  const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
+    yield select(segmenterFitOptionsSelector);
+
+  const preprocessingOptions: ReturnType<
+    typeof segmenterPreprocessOptionsSelector
+  > = yield select(segmenterPreprocessOptionsSelector);
 
   // First assign train and val partition to all categorized images.
   const annotatedImagesIds = (
@@ -89,13 +86,12 @@ export function* fitSegmenterSaga({
     })
   );
 
-  const architectureOptions: SegmenterArchitectureOptions = yield select(
-    segmenterArchitectureOptionsSelector
-  );
+  const architectureOptions: ReturnType<
+    typeof segmenterArchitectureOptionsSelector
+  > = yield select(segmenterArchitectureOptionsSelector);
 
-  const annotationCategories: Array<Category> = yield select(
-    annotationCategoriesSelector
-  );
+  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
+    yield select(annotationCategoriesSelector);
 
   var model: LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
@@ -112,11 +108,10 @@ export function* fitSegmenterSaga({
     }
   }
 
-  const compileOptions: CompileOptions = yield select(
-    segmenterCompileOptionsSelector
-  );
+  const compileOptions: ReturnType<typeof segmenterCompileOptionsSelector> =
+    yield select(segmenterCompileOptionsSelector);
 
-  var compiledModel: LayersModel;
+  var compiledModel: ReturnType<typeof compile>;
   try {
     compiledModel = yield compile(model, compileOptions);
   } catch (error) {
@@ -126,37 +121,32 @@ export function* fitSegmenterSaga({
 
   yield put(segmenterSlice.actions.updateCompiled({ compiled: compiledModel }));
 
-  const categories: Category[] = yield select(annotationCategoriesSelector);
+  const categories: ReturnType<typeof annotationCategoriesSelector> =
+    yield select(annotationCategoriesSelector);
 
-  const trainImages: ImageType[] = yield select(segmenterTrainImagesSelector);
-  const valImages: ImageType[] = yield select(
-    segmenterValidationImagesSelector
-  );
+  const trainImages: ReturnType<typeof segmenterTrainImagesSelector> =
+    yield select(segmenterTrainImagesSelector);
+  const valImages: ReturnType<typeof segmenterValidationImagesSelector> =
+    yield select(segmenterValidationImagesSelector);
 
   try {
-    const trainData: Dataset<{
-      xs: Tensor<Rank.R4>;
-      ys: Tensor<Rank.R4>;
-      id: Tensor<Rank.R1>;
-    }> = yield preprocessSegmentationImages(
-      trainImages,
-      categories,
-      architectureOptions.inputShape,
-      preprocessingOptions,
-      fitOptions
-    );
+    const trainData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =
+      yield preprocessSegmentationImages(
+        trainImages,
+        categories,
+        architectureOptions.inputShape,
+        preprocessingOptions,
+        fitOptions
+      );
 
-    const valData: Dataset<{
-      xs: Tensor<Rank.R4>;
-      ys: Tensor<Rank.R4>;
-      id: Tensor<Rank.R1>;
-    }> = yield preprocessSegmentationImages(
-      valImages,
-      categories,
-      architectureOptions.inputShape,
-      preprocessingOptions,
-      fitOptions
-    );
+    const valData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =
+      yield preprocessSegmentationImages(
+        valImages,
+        categories,
+        architectureOptions.inputShape,
+        preprocessingOptions,
+        fitOptions
+      );
 
     var dataset = { train: trainData, val: valData };
   } catch (error) {
@@ -170,7 +160,10 @@ export function* fitSegmenterSaga({
   );
 
   try {
-    var { fitted, status: trainingHistory } = yield fitSegmenter(
+    var {
+      fitted,
+      status: trainingHistory,
+    }: Awaited<ReturnType<typeof fitSegmenter>> = yield fitSegmenter(
       compiledModel,
       dataset,
       fitOptions,
@@ -187,8 +180,9 @@ export function* fitSegmenterSaga({
   yield put(segmenterSlice.actions.updateFitted(payload));
 }
 
-function* handleError(error: Error, errorName: string): any {
-  const stackTrace = yield getStackTraceFromError(error);
+function* handleError(error: Error, errorName: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
   const alertState: AlertStateType = {
     alertType: AlertType.Error,

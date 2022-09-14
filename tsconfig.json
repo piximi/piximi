@@ -19,7 +19,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "noErrorTruncation": true
   },
   "include": [
     "src"

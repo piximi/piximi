@@ -7,7 +7,12 @@ import { imageViewerSlice, currentColorsSelector } from "store/image-viewer/";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
-import { AlertStateType, AlertType, ImageType } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  ImageType,
+  GeneratorReturnType,
+} from "types";
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
@@ -15,7 +20,7 @@ import { convertToImage, ImageShapeEnum } from "image/imageHelper";
 
 type ImageFileType = {
   fileName: string;
-  image: Array<ImageJS.Image>;
+  image: Array<ImageJS.Image> | ImageJS.Stack;
 };
 
 type ImageFileError = {
@@ -39,10 +44,12 @@ export function* uploadImagesSaga({
   imageShapeInfo: ImageShapeEnum;
   isUploadedFromAnnotator: boolean;
   execSaga: boolean;
-}>): any {
+}>) {
   if (!execSaga) return;
 
-  const colors = yield select(currentColorsSelector);
+  const colors: ReturnType<typeof currentColorsSelector> = yield select(
+    currentColorsSelector
+  );
   const singleRGBImages = imageShapeInfo === ImageShapeEnum.SingleRGBImage;
   const invalidImageFiles: Array<ImageFileError> = [];
   const imagesToUpload: Array<ImageType> = [];
@@ -50,10 +57,8 @@ export function* uploadImagesSaga({
   const imageFiles: Array<ImageFileType> = [];
   for (let i = 0; i < files.length; i++) {
     try {
-      const imageFile: ImageFileType = yield getImageData(
-        files[i],
-        imageShapeInfo
-      );
+      const imageFile: GeneratorReturnType<ReturnType<typeof getImageData>> =
+        yield getImageData(files[i], imageShapeInfo);
       imageFiles.push(imageFile);
     } catch (err) {
       invalidImageFiles.push({
@@ -83,17 +88,19 @@ export function* uploadImagesSaga({
     }
 
     try {
-      const imageToUpload: ImageType = yield convertToImage(
-        imageFiles[i].image,
-        imageFiles[i].fileName,
-        colors,
-        slices,
-        channels
-      );
+      const imageToUpload: ReturnType<typeof convertToImage> =
+        yield convertToImage(
+          imageFiles[i].image,
+          imageFiles[i].fileName,
+          colors,
+          slices,
+          channels
+        );
       imagesToUpload.push(imageToUpload);
     } catch (err) {
       const error = err as Error;
-      const stackTrace = yield getStackTraceFromError(error);
+      const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+        yield getStackTraceFromError(error);
       const warning: AlertStateType = {
         alertType: AlertType.Error,
         name: "Could not convert file to image",
@@ -143,7 +150,8 @@ export function* uploadImagesSaga({
 function* getImageData(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let img: ImageJS.Image | ImageJS.Stack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {
-    const imgArrayBuffer: ArrayBuffer = yield imageFile.arrayBuffer();
+    const imgArrayBuffer: Awaited<ReturnType<typeof imageFile.arrayBuffer>> =
+      yield imageFile.arrayBuffer();
     const imgArray = new Uint8Array(imgArrayBuffer);
 
     var dicomImgData = DicomParser.parseDicom(imgArray);
@@ -174,7 +182,7 @@ function* getImageData(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   return {
     image: Array.isArray(img) ? img : [img],
     fileName: imageFile.name,
-  };
+  } as ImageFileType;
 }
 
 function checkImageShape(
