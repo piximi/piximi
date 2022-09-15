@@ -608,25 +608,26 @@ const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
   });
 };
 
-export const generateDefaultChannels = (components: number): Array<Color> => {
+export const generateDefaultChannels = (numChannels: number): Array<Color> => {
   /**
    * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
    * green to the second channel, etc.. (see DefaultColors type)
    * If image is greyscale, we assign the white color to that one channel.
    * **/
   let defaultChannels: Array<Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
-  if (components === 1) {
-    defaultChannels = [
-      { color: [255, 255, 255], range: [0, 255], visible: true },
-    ];
-  } else {
-    for (let i = 0; i < components; i++) {
-      defaultChannels.push({
-        color: i < DEFAULT_COLORS.length ? DEFAULT_COLORS[i] : [255, 255, 255],
-        range: [0, 255],
-        visible: !(components > 3 && i > 0), //if image is multi-channel and c > 3, only show the first channel as default (user can then toggle / untoggle the other channels if desired).
-      });
-    }
+
+  for (let i = 0; i < numChannels; i++) {
+    defaultChannels.push({
+      color:
+        numChannels > 1 && i < DEFAULT_COLORS.length
+          ? DEFAULT_COLORS[i]
+          : [255, 255, 255],
+      range: [0, 255],
+      // if image has more than 3 channels,
+      // only show the first channel as default
+      // (user can then toggle / untoggle the other channels if desired)
+      visible: !(numChannels > 3 && i > 0),
+    });
   }
 
   return defaultChannels;
