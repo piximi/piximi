@@ -41,13 +41,11 @@ type ExampleProjectProps = {
 
 type OpenExampleProjectMenuItemProps = {
   exampleProject: ExampleProjectProps;
-  popupState: any;
-  onClose: any;
+  onClose: () => void;
 };
 
 export const OpenExampleProjectMenuItem = ({
   exampleProject,
-  popupState,
   onClose,
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
@@ -113,7 +111,6 @@ export const OpenExampleProjectMenuItem = ({
     );
 
     onClose();
-    popupState.close();
   };
 
   return (

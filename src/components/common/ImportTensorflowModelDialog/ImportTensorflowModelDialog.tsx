@@ -20,9 +20,8 @@ import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { AlertStateType, AlertType, defaultAlert, Shape } from "types";
 
 type ImportTensorflowModelDialogProps = {
-  onClose: any;
-  open: any;
-  popupState: any;
+  onClose: () => void;
+  open: boolean;
   modelType: string;
   dispatchFunction: (
     inputShape: Shape,
@@ -34,7 +33,6 @@ type ImportTensorflowModelDialogProps = {
 export const ImportTensorflowModelDialog = ({
   onClose,
   open,
-  popupState,
   modelType,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
@@ -57,7 +55,6 @@ export const ImportTensorflowModelDialog = ({
     dispatchFunction(inputShape, modelName, classifierModel);
 
     closeDialog();
-    popupState.close();
   };
 
   const closeDialog = () => {

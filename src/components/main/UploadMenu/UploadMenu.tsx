@@ -21,7 +21,7 @@ type UploadMenuProps = {
   open: boolean;
 };
 
-export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
+export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
   const handleClose = () => {
@@ -58,7 +58,7 @@ export const UploadMenu = ({ anchorEl, onClose }: UploadMenuProps) => {
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         onClose={onClose}
-        open={Boolean(anchorEl)}
+        open={open}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <ListSubheader

@@ -20,22 +20,16 @@ import {
 import { deserializeImages } from "image/imageHelper";
 
 type OpenProjectMenuItemProps = {
-  popupState: any;
+  onMenuClose: () => void;
 };
 
 export const OpenProjectMenuItem = ({
-  popupState,
+  onMenuClose,
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onOpenProjectFile = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    close: () => void
-  ) => {
-    popupState.close();
+  const onOpenProjectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.persist();
-
-    close();
 
     if (!event.currentTarget.files) return;
 
@@ -117,9 +111,10 @@ export const OpenProjectMenuItem = ({
         accept="application/json"
         hidden
         id="open-project-file"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          onOpenProjectFile(event, popupState.close)
-        }
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          onMenuClose();
+          onOpenProjectFile(event);
+        }}
         type="file"
       />
     </MenuItem>

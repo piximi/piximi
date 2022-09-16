@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-import { bindMenu } from "material-ui-popup-state";
 
 import { Menu, MenuItem } from "@mui/material";
 
@@ -18,10 +17,12 @@ import {
 } from "store/segmenter";
 
 type SaveMenuProps = {
-  popupState: any;
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  open: boolean;
 };
 
-export const SaveMenu = ({ popupState }: SaveMenuProps) => {
+export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   const {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,
@@ -40,6 +41,13 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
     open: openSaveSegmenterDialog,
   } = useDialog();
 
+  const onMenuDialogClose = (onDialogClose: () => void) => {
+    return () => {
+      onDialogClose();
+      onClose();
+    };
+  };
+
   const fittedClassifier = useSelector(classifierFittedSelector);
   const selectedClassifierModelProps = useSelector(
     classifierSelectedModelSelector
@@ -51,7 +59,7 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
   ).selectedModel;
 
   return (
-    <Menu {...bindMenu(popupState)}>
+    <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
       <MenuItem onClick={onSaveProjectDialogOpen}>Save project</MenuItem>
 
       <MenuItem onClick={onSaveClassifierDialogOpen}>Save classifier</MenuItem>
@@ -59,27 +67,24 @@ export const SaveMenu = ({ popupState }: SaveMenuProps) => {
       <MenuItem onClick={onSaveSegmenterDialogOpen}>Save segmenter</MenuItem>
 
       <SaveProjectDialog
-        onClose={onSaveProjectDialogClose}
+        onClose={onMenuDialogClose(onSaveProjectDialogClose)}
         open={openSaveProjectDialog}
-        popupState={popupState}
       />
 
       <SaveFittedModelDialog
         fittedModel={fittedClassifier}
         modelProps={selectedClassifierModelProps}
         modelTypeString={"Classifier"}
-        onClose={onSaveClassifierDialogClose}
+        onClose={onMenuDialogClose(onSaveClassifierDialogClose)}
         open={openSaveClassifierDialog}
-        popupState={popupState}
       />
 
       <SaveFittedModelDialog
         fittedModel={fittedSegmenter}
         modelProps={selectedSegmenterModelProps}
         modelTypeString={"Segmenter"}
-        onClose={onSaveSegmenterDialogClose}
+        onClose={onMenuDialogClose(onSaveSegmenterDialogClose)}
         open={openSaveSegmenterDialog}
-        popupState={popupState}
       />
     </Menu>
   );

@@ -7,16 +7,11 @@ import { useUpload } from "hooks";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 
 type OpenImageMenuItemProps = {
-  popupState: any;
+  onCloseMenu: () => void;
 };
 
-export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
+export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-
-  const handleClose = () => {
-    setOpenDimensionsDialogBox(false);
-    popupState.close();
-  };
 
   const [files, setFiles] = React.useState<FileList>();
 
@@ -25,10 +20,12 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
 
-    await uploadFiles(files);
-    event.target.value = "";
-    handleClose();
     setFiles(files);
+
+    const needShape = await uploadFiles(files);
+    if (!needShape) {
+      onCloseMenu();
+    }
   };
 
   return (
@@ -48,7 +45,10 @@ export const OpenImageMenuItem = ({ popupState }: OpenImageMenuItemProps) => {
         <ImageShapeDialog
           files={files}
           open={openDimensionsDialogBox}
-          onClose={handleClose}
+          onClose={() => {
+            setOpenDimensionsDialogBox(false);
+            onCloseMenu();
+          }}
           isUploadedFromAnnotator={true}
         />
       )}

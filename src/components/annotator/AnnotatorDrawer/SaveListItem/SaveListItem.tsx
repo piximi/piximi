@@ -1,32 +1,26 @@
-import PopupState, { bindTrigger } from "material-ui-popup-state";
-
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import SaveIcon from "@mui/icons-material/Save";
 
-import { useTranslation } from "hooks";
+import { useMenu, useTranslation } from "hooks";
 
 import { SaveMenu } from "../SaveMenu/SaveMenu";
 
 export const SaveListItem = () => {
   const t = useTranslation();
 
+  const { anchorEl, onClose, onOpen, open } = useMenu();
+
   return (
     <>
-      <PopupState variant="popover">
-        {(popupState) => (
-          <>
-            <ListItem button {...bindTrigger(popupState)}>
-              <ListItemIcon>
-                <SaveIcon />
-              </ListItemIcon>
+      <ListItem button onClick={onOpen}>
+        <ListItemIcon>
+          <SaveIcon />
+        </ListItemIcon>
 
-              <ListItemText primary={t("Save")} />
-            </ListItem>
-            <SaveMenu popupState={popupState} />
-          </>
-        )}
-      </PopupState>
+        <ListItemText primary={t("Save")} />
+      </ListItem>
+      <SaveMenu anchorEl={anchorEl} onClose={onClose} open={open} />
     </>
   );
 };

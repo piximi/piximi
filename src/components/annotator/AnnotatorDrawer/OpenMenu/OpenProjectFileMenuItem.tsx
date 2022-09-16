@@ -21,11 +21,11 @@ import {
 import { importSerializedAnnotations } from "image/imageHelper";
 
 type OpenAnnotationsMenuItemProps = {
-  popupState: any;
+  onCloseMenu: () => void;
 };
 
 export const OpenProjectFileMenuItem = ({
-  popupState,
+  onCloseMenu,
 }: OpenAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
 
@@ -101,7 +101,7 @@ export const OpenProjectFileMenuItem = ({
         hidden
         id="open-project-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          onOpenProjectFile(event, popupState.close)
+          onOpenProjectFile(event, onCloseMenu)
         }
         type="file"
       />

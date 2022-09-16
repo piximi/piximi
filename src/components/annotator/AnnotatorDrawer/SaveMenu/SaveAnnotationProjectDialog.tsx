@@ -18,13 +18,11 @@ import { allSerializedAnnotationsSelector } from "store/common";
 type SaveAnnotationProjectDialogProps = {
   onClose: () => void;
   open: boolean;
-  popupState: any;
 };
 
 export const SaveAnnotationProjectDialog = ({
   onClose,
   open,
-  popupState,
 }: SaveAnnotationProjectDialogProps) => {
   const [projectName, setProjectName] = useState<string>("");
 
@@ -39,7 +37,6 @@ export const SaveAnnotationProjectDialog = ({
 
     setProjectName("");
     onClose();
-    popupState.close();
   };
 
   const onCancel = () => {
