@@ -62,16 +62,15 @@ export const ChannelsList = () => {
     );
   }, [activeImageColors]);
 
-  const handleSliderChange = useCallback(
-    debounce((idx: number, event: any, newValue: [number, number]) => {
-      console.log("it do");
+  const handleSliderChange = debounce(
+    useCallback((idx: number, event: any, newValue: [number, number]) => {
       setViewImageColors((curr) => {
         return curr.map((channel: Color, i: number) => {
           return i === idx ? { ...channel, range: newValue } : channel;
         });
       });
-    }, 10),
-    [activeImageColors]
+    }, []),
+    10
   );
 
   const handleSliderChangeCommitted = async () => {
