@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { debounce } from "lodash";
 
@@ -43,61 +43,47 @@ export const ChannelsList = () => {
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  const visibleChannelsIndices = activeImageColors
-    .map((channel: Color, idx) => channel.visible)
-    .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), []);
+  // keep component-local state of the current active image colors,
+  // to avoid dispatching to store on range slider changes
+  // actual changes are dispatched on range slider commit
+  const [viewImageColors, setViewImageColors] = useState<Array<Color>>([]);
 
-  const handleSliderChange = (
-    idx: number,
-    event: any,
-    newValue: number | number[]
-  ) => {
-    const oldValues = activeImageColors.map((channel: Color, i: number) => {
-      if (i === idx) {
-        return newValue as Array<number>;
-      } else {
-        return channel.range;
-      }
-    });
-    handler(oldValues);
-  };
+  const [visibleChannelsIdxs, setVisibleChannelsIdxs] = useState<Array<number>>(
+    []
+  );
 
-  const handler = useCallback(
-    (values: Array<Array<number>>) => {
-      const updateIntensityRanges = (values: Array<Array<number>>) => {
-        const copiedValues = [...values].map((range: Array<number>) => {
-          return [...range];
+  useEffect(() => {
+    setViewImageColors(activeImageColors);
+
+    setVisibleChannelsIdxs(
+      activeImageColors
+        .map((channel: Color) => channel.visible)
+        .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), [])
+    );
+  }, [activeImageColors]);
+
+  const handleSliderChange = useCallback(
+    debounce((idx: number, event: any, newValue: [number, number]) => {
+      console.log("it do");
+      setViewImageColors((curr) => {
+        return curr.map((channel: Color, i: number) => {
+          return i === idx ? { ...channel, range: newValue } : channel;
         });
-
-        const updatedChannels = activeImageColors.map(
-          (channel: Color, index: number) => {
-            return { ...channel, range: copiedValues[index] };
-          }
-        );
-
-        dispatch(
-          imageViewerSlice.actions.setImageColors({
-            colors: updatedChannels,
-            execSaga: false,
-          })
-        );
-      };
-      updateIntensityRanges(values);
-      return debounce(updateIntensityRanges, 100);
-    },
-    [activeImageColors, dispatch]
+      });
+    }, 10),
+    [activeImageColors]
   );
 
   const handleSliderChangeCommitted = async () => {
     if (!originalSrc || !imageShape) return;
 
-    const originalData = await convertImageURIsToImageData([
-      originalSrc[activeImagePlane],
-    ]);
+    const originalData = await convertImageURIsToImageData(
+      new Array(originalSrc[activeImagePlane])
+    );
 
     const modifiedURI = mapChannelsToSpecifiedRGBImage(
       originalData[0],
-      activeImageColors,
+      viewImageColors,
       imageShape.height,
       imageShape.width
     );
@@ -105,19 +91,19 @@ export const ChannelsList = () => {
       dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
       dispatch(
         imageViewerSlice.actions.setImageColors({
-          colors: activeImageColors,
-          execSaga: false,
+          colors: viewImageColors,
+          execSaga: true,
         })
       );
     });
   };
 
   const onCheckboxChanged = (index: number) => () => {
-    const current = visibleChannelsIndices.indexOf(index);
+    const current = visibleChannelsIdxs.indexOf(index);
 
-    const visibleChannels = [...visibleChannelsIndices];
+    const visibleChannels = [...visibleChannelsIdxs];
 
-    const copiedChannels = [...activeImageColors];
+    const copiedChannels = [...viewImageColors];
 
     if (current === -1) {
       visibleChannels.push(index);
@@ -164,7 +150,7 @@ export const ChannelsList = () => {
   };
 
   const colorAdjustmentSlider = (index: number, name: string) => {
-    const isVisible = visibleChannelsIndices.indexOf(index) !== -1;
+    const isVisible = visibleChannelsIdxs.indexOf(index) !== -1;
 
     return (
       <ListItem dense key={index}>
@@ -192,10 +178,10 @@ export const ChannelsList = () => {
                   : theme.palette.action.disabled,
             },
           }}
-          value={activeImageColors[index].range}
+          value={viewImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
-            handleSliderChange(index, event, value)
+            handleSliderChange(index, event, value as [number, number])
           }
           onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
@@ -208,7 +194,7 @@ export const ChannelsList = () => {
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {Array(activeImageColors.length)
+      {Array(viewImageColors.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);

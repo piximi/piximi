@@ -1,5 +1,5 @@
 export type Color = {
-  range: Array<number>;
+  range: [number, number];
   visible: boolean;
   color: Array<number>;
 };
