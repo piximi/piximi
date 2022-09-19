@@ -31,11 +31,12 @@ import {
 } from "image/imageHelper";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
+import { useLocalGlobalState } from "hooks";
 
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const activeImageColors = useSelector(activeImageColorsSelector);
+  const globalActiveImageColors = useSelector(activeImageColorsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
@@ -43,33 +44,39 @@ export const ChannelsList = () => {
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  // keep component-local state of the current active image colors,
-  // to avoid dispatching to store on range slider changes
-  // actual changes are dispatched on range slider commit
-  const [viewImageColors, setViewImageColors] = useState<Array<Color>>([]);
+  const {
+    localState: localActiveImageColors,
+    setLocalState: setLocalActiveImageColors,
+    commitState: dispatchGlobalActiveImageColors,
+  } = useLocalGlobalState(
+    activeImageColorsSelector,
+    imageViewerSlice.actions.setImageColors,
+    []
+  );
 
   const [visibleChannelsIdxs, setVisibleChannelsIdxs] = useState<Array<number>>(
     []
   );
 
   useEffect(() => {
-    setViewImageColors(activeImageColors);
-
     setVisibleChannelsIdxs(
-      activeImageColors
+      globalActiveImageColors
         .map((channel: Color) => channel.visible)
         .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), [])
     );
-  }, [activeImageColors]);
+  }, [globalActiveImageColors]);
 
   const handleSliderChange = debounce(
-    useCallback((idx: number, event: any, newValue: [number, number]) => {
-      setViewImageColors((curr) => {
-        return curr.map((channel: Color, i: number) => {
-          return i === idx ? { ...channel, range: newValue } : channel;
+    useCallback(
+      (idx: number, event: any, newValue: [number, number]) => {
+        setLocalActiveImageColors((curr) => {
+          return curr.map((channel: Color, i: number) => {
+            return i === idx ? { ...channel, range: newValue } : channel;
+          });
         });
-      });
-    }, []),
+      },
+      [setLocalActiveImageColors]
+    ),
     10
   );
 
@@ -82,18 +89,16 @@ export const ChannelsList = () => {
 
     const modifiedURI = mapChannelsToSpecifiedRGBImage(
       originalData[0],
-      viewImageColors,
+      localActiveImageColors,
       imageShape.height,
       imageShape.width
     );
     batch(() => {
       dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-      dispatch(
-        imageViewerSlice.actions.setImageColors({
-          colors: viewImageColors,
-          execSaga: true,
-        })
-      );
+      dispatchGlobalActiveImageColors({
+        colors: localActiveImageColors,
+        execSaga: true,
+      });
     });
   };
 
@@ -102,7 +107,7 @@ export const ChannelsList = () => {
 
     const visibleChannels = [...visibleChannelsIdxs];
 
-    const copiedChannels = [...viewImageColors];
+    const copiedChannels = [...localActiveImageColors];
 
     if (current === -1) {
       visibleChannels.push(index);
@@ -173,11 +178,11 @@ export const ChannelsList = () => {
             "& .MuiSlider-track": {
               color: (theme) =>
                 isVisible
-                  ? rgbToHex(activeImageColors[index].color)
+                  ? rgbToHex(localActiveImageColors[index].color)
                   : theme.palette.action.disabled,
             },
           }}
-          value={viewImageColors[index].range}
+          value={localActiveImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
             handleSliderChange(index, event, value as [number, number])
@@ -193,7 +198,7 @@ export const ChannelsList = () => {
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {Array(viewImageColors.length)
+      {Array(localActiveImageColors.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);
