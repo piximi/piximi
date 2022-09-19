@@ -36,8 +36,6 @@ import { useLocalGlobalState } from "hooks";
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const globalActiveImageColors = useSelector(activeImageColorsSelector);
-
   const imageShape = useSelector(imageShapeSelector);
 
   const activeImagePlane = useSelector(activeImagePlaneSelector);
@@ -47,7 +45,7 @@ export const ChannelsList = () => {
   const {
     localState: localActiveImageColors,
     setLocalState: setLocalActiveImageColors,
-    commitState: dispatchGlobalActiveImageColors,
+    dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     activeImageColorsSelector,
     imageViewerSlice.actions.setImageColors,
@@ -60,11 +58,11 @@ export const ChannelsList = () => {
 
   useEffect(() => {
     setVisibleChannelsIdxs(
-      globalActiveImageColors
+      localActiveImageColors
         .map((channel: Color) => channel.visible)
         .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), [])
     );
-  }, [globalActiveImageColors]);
+  }, [localActiveImageColors]);
 
   const handleSliderChange = debounce(
     useCallback(
@@ -95,7 +93,7 @@ export const ChannelsList = () => {
     );
     batch(() => {
       dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-      dispatchGlobalActiveImageColors({
+      dispatchActiveImageColors({
         colors: localActiveImageColors,
         execSaga: true,
       });

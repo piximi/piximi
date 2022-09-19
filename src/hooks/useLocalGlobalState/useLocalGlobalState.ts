@@ -34,9 +34,9 @@ export function useLocalGlobalState<StateType, PayloadType>(
     setLocalState(globalState);
   }, [globalState]);
 
-  const commitState = (payload: PayloadType) => {
+  const dispatchState = (payload: PayloadType) => {
     dispatch(actionCreator(payload));
   };
 
-  return { localState, setLocalState, commitState };
+  return { localState, setLocalState, dispatchState };
 }
