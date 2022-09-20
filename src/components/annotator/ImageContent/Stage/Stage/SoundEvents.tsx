@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { memo, useCallback, useEffect } from "react";
+import { memo } from "react";
 import useSound from "use-sound";
 import { useHotkeys } from "react-hotkeys-hook";
 
