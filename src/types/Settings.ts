@@ -8,6 +8,8 @@ export enum HotkeyView {
   DeleteAnnotationCategoryDialog,
   DeleteAllCategoriesDialog,
   DeleteCategoryDialog,
+  EditCategoryDialog,
+  ImageShapeDialog,
   MainImageGrid,
   SaveAnnotationProjectDialog,
 }

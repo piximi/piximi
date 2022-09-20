@@ -1,5 +1,5 @@
 //@ts-nocheck
-import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
+import hotkeys from "./hotkeys";
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { hotkeyViewSelector } from "store/application";

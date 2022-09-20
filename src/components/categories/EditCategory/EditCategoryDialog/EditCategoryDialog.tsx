@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -16,7 +16,7 @@ import { ColorIcon } from "components/common/ColorIcon";
 
 import { updateCategory, updateAnnotationCategory } from "store/project";
 
-import { Category, CategoryType } from "types";
+import { Category, CategoryType, HotkeyView } from "types";
 
 type EditCategoryDialogProps = {
   category: Category;
@@ -77,7 +77,8 @@ export const EditCategoryDialog = ({
     () => {
       onEdit();
     },
-    { enabled: open },
+    HotkeyView.EditCategoryDialog,
+
     [onEdit]
   );
 
