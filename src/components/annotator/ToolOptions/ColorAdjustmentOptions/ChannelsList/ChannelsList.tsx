@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { debounce } from "lodash";
 
@@ -64,18 +64,16 @@ export const ChannelsList = () => {
     );
   }, [localActiveImageColors]);
 
-  const handleSliderChange = debounce(
-    useCallback(
-      (idx: number, event: any, newValue: [number, number]) => {
+  const handleSliderChange = useMemo(
+    () =>
+      debounce((idx: number, event: any, newValue: [number, number]) => {
         setLocalActiveImageColors((curr) => {
           return curr.map((channel: Color, i: number) => {
             return i === idx ? { ...channel, range: newValue } : channel;
           });
         });
-      },
-      [setLocalActiveImageColors]
-    ),
-    10
+      }, 16),
+    [setLocalActiveImageColors]
   );
 
   const handleSliderChangeCommitted = async () => {
