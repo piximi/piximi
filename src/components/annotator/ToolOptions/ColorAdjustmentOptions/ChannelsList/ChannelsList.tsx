@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { debounce } from "lodash";
 
@@ -31,11 +31,10 @@ import {
 } from "image/imageHelper";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
+import { useLocalGlobalState } from "hooks";
 
 export const ChannelsList = () => {
   const dispatch = useDispatch();
-
-  const activeImageColors = useSelector(activeImageColorsSelector);
 
   const imageShape = useSelector(imageShapeSelector);
 
@@ -43,81 +42,68 @@ export const ChannelsList = () => {
 
   const originalSrc = useSelector(imageOriginalSrcSelector);
 
-  const visibleChannelsIndices = activeImageColors
-    .map((channel: Color, idx) => channel.visible)
-    .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), []);
+  const {
+    localState: localActiveImageColors,
+    setLocalState: setLocalActiveImageColors,
+    dispatchState: dispatchActiveImageColors,
+  } = useLocalGlobalState(
+    activeImageColorsSelector,
+    imageViewerSlice.actions.setImageColors,
+    []
+  );
 
-  const handleSliderChange = (
-    idx: number,
-    event: any,
-    newValue: number | number[]
-  ) => {
-    const oldValues = activeImageColors.map((channel: Color, i: number) => {
-      if (i === idx) {
-        return newValue as Array<number>;
-      } else {
-        return channel.range;
-      }
-    });
-    handler(oldValues);
-  };
+  const [visibleChannelsIdxs, setVisibleChannelsIdxs] = useState<Array<number>>(
+    []
+  );
 
-  const handler = useCallback(
-    (values: Array<Array<number>>) => {
-      const updateIntensityRanges = (values: Array<Array<number>>) => {
-        const copiedValues = [...values].map((range: Array<number>) => {
-          return [...range];
+  useEffect(() => {
+    setVisibleChannelsIdxs(
+      localActiveImageColors
+        .map((channel: Color) => channel.visible)
+        .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), [])
+    );
+  }, [localActiveImageColors]);
+
+  const handleSliderChange = useMemo(
+    () =>
+      debounce((idx: number, event: any, newValue: [number, number]) => {
+        setLocalActiveImageColors((curr) => {
+          return curr.map((channel: Color, i: number) => {
+            return i === idx ? { ...channel, range: newValue } : channel;
+          });
         });
-
-        const updatedChannels = activeImageColors.map(
-          (channel: Color, index: number) => {
-            return { ...channel, range: copiedValues[index] };
-          }
-        );
-
-        dispatch(
-          imageViewerSlice.actions.setImageColors({
-            colors: updatedChannels,
-            execSaga: false,
-          })
-        );
-      };
-      updateIntensityRanges(values);
-      return debounce(updateIntensityRanges, 100);
-    },
-    [activeImageColors, dispatch]
+      }, 16),
+    [setLocalActiveImageColors]
   );
 
   const handleSliderChangeCommitted = async () => {
     if (!originalSrc || !imageShape) return;
 
-    const originalData = await convertImageURIsToImageData([
-      originalSrc[activeImagePlane],
-    ]);
+    const originalData = await convertImageURIsToImageData(
+      new Array(originalSrc[activeImagePlane])
+    );
 
     const modifiedURI = mapChannelsToSpecifiedRGBImage(
       originalData[0],
-      activeImageColors,
+      localActiveImageColors,
       imageShape.height,
       imageShape.width
     );
     batch(() => {
       dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-      dispatch(
-        imageViewerSlice.actions.setImageColors({
-          colors: activeImageColors,
-          execSaga: false,
-        })
-      );
+      dispatchActiveImageColors({
+        colors: localActiveImageColors,
+        execSaga: true,
+      });
     });
   };
 
   const onCheckboxChanged = (index: number) => () => {
-    const current = visibleChannelsIndices.indexOf(index);
+    const current = visibleChannelsIdxs.indexOf(index);
 
-    const visibleChannels = [...visibleChannelsIndices];
+    const visibleChannels = [...visibleChannelsIdxs];
 
-    const copiedChannels = [...activeImageColors];
+    const copiedChannels = [...localActiveImageColors];
 
     if (current === -1) {
       visibleChannels.push(index);
@@ -164,7 +150,7 @@ export const ChannelsList = () => {
   };
 
   const colorAdjustmentSlider = (index: number, name: string) => {
-    const isVisible = visibleChannelsIndices.indexOf(index) !== -1;
+    const isVisible = visibleChannelsIdxs.indexOf(index) !== -1;
 
     return (
       <ListItem dense key={index}>
@@ -188,14 +174,14 @@ export const ChannelsList = () => {
             "& .MuiSlider-track": {
               color: (theme) =>
                 isVisible
-                  ? rgbToHex(activeImageColors[index].color)
+                  ? rgbToHex(localActiveImageColors[index].color)
                   : theme.palette.action.disabled,
             },
           }}
-          value={activeImageColors[index].range}
+          value={localActiveImageColors[index].range}
           max={255}
           onChange={(event, value: number | number[]) =>
-            handleSliderChange(index, event, value)
+            handleSliderChange(index, event, value as [number, number])
           }
           onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
@@ -208,7 +194,7 @@ export const ChannelsList = () => {
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {Array(activeImageColors.length)
+      {Array(localActiveImageColors.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);

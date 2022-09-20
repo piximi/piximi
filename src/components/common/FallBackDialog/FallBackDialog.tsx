@@ -42,10 +42,6 @@ import { AlertStateType, AlertType } from "types";
 
 import { createGitHubIssue } from "utils";
 
-const popupState = {
-  close: () => {},
-};
-
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
 
@@ -253,7 +249,6 @@ export const FallBackDialog = (props: any) => {
         <SaveProjectDialog
           onClose={onSaveProjectDialogClose}
           open={openSaveProjectDialog}
-          popupState={popupState}
         />
 
         <SaveFittedModelDialog
@@ -262,7 +257,6 @@ export const FallBackDialog = (props: any) => {
           modelTypeString={"Classifier"}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
-          popupState={popupState}
         />
 
         <SaveFittedModelDialog
@@ -271,13 +265,11 @@ export const FallBackDialog = (props: any) => {
           modelTypeString={"Segmenter"}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
-          popupState={popupState}
         />
 
         <SaveAnnotationProjectDialog
           onClose={onSaveAnnotationProjectDialogClose}
           open={openAnnotationSaveProjectDialog}
-          popupState={popupState}
         />
       </DialogContent>
     </Dialog>

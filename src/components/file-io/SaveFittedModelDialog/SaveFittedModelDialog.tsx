@@ -20,7 +20,6 @@ type SaveFittedModelDialogProps = {
   modelTypeString: string;
   onClose: () => void;
   open: boolean;
-  popupState: any;
 };
 
 export const SaveFittedModelDialog = ({
@@ -29,7 +28,6 @@ export const SaveFittedModelDialog = ({
   modelTypeString,
   onClose,
   open,
-  popupState,
 }: SaveFittedModelDialogProps) => {
   const [classifierName, setClassifierName] = useState<string>(
     modelProps.modelName
@@ -41,7 +39,6 @@ export const SaveFittedModelDialog = ({
     await fittedModel!.save(`downloads://${classifierName}`);
 
     onClose();
-    popupState.close();
   };
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {

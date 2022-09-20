@@ -338,7 +338,7 @@ const convertImageDataToURI = (
 };
 
 export const convertToImage = (
-  input: Array<ImageJS.Image>,
+  inputStack: Array<ImageJS.Image>,
   filename: string,
   currentColors: Array<Color> | undefined,
   slices: number,
@@ -352,21 +352,22 @@ export const convertToImage = (
     ? currentColors
     : generateDefaultChannels(channels);
 
-  const isSingleRgbImage = slices === 1 && channels === 3 && input.length === 1;
+  const isSingleRgbImage =
+    slices === 1 && channels === 3 && inputStack.length === 1;
   if (isSingleRgbImage)
-    return convertSingleRGBImage(input[0], filename, colors);
+    return convertSingleRGBImage(inputStack[0], filename, colors);
 
   // calculate min/max values per channel
   const channelMinMaxValues: Array<Array<number>> = [...Array(channels)].map(
     (e) => [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]
   );
 
-  for (let i = 0; i < input.length; i += channels) {
+  for (let i = 0; i < inputStack.length; i += channels) {
     for (let c = 0; c < channels; c++) {
       const frameIdx = i + c;
 
-      const frameMin = input[frameIdx].min[0];
-      const frameMax = input[frameIdx].max[0];
+      const frameMin = inputStack[frameIdx].min[0];
+      const frameMax = inputStack[frameIdx].max[0];
 
       if (channelMinMaxValues[c][0] > frameMin) {
         channelMinMaxValues[c][0] = frameMin;
@@ -378,21 +379,21 @@ export const convertToImage = (
     }
   }
 
-  const bitDepth = input[0].bitDepth;
+  const bitDepth = inputStack[0].bitDepth;
   // downscale images to 8bit if necessarily
   if (bitDepth === BitDepth.UINT16) {
-    for (let i = 0; i < input.length; i += channels) {
+    for (let i = 0; i < inputStack.length; i += channels) {
       for (let c = 0; c < channels; c++) {
         const frameIdx = i + c;
         const min = channelMinMaxValues[c][0];
         const max = channelMinMaxValues[c][1];
 
-        input[frameIdx].data = new Uint8Array(
-          input[frameIdx].data.map((p) =>
+        inputStack[frameIdx].data = new Uint8Array(
+          inputStack[frameIdx].data.map((p) =>
             Math.floor(((p - min) / (max - min + 1)) * 256)
           )
         );
-        input[frameIdx].bitDepth = BitDepth.UINT8;
+        inputStack[frameIdx].bitDepth = BitDepth.UINT8;
       }
     }
   } else if (bitDepth !== BitDepth.UINT8 && bitDepth !== BitDepth.BINARY) {
@@ -400,23 +401,23 @@ export const convertToImage = (
   }
 
   const displayedIdx: number = 0;
-  const width = input[0].width;
-  const height = input[0].height;
+  const width = inputStack[0].width;
+  const height = inputStack[0].height;
   let displayedData: Array<Array<number>> = [];
   const originalURIs: Array<Array<string>> = [];
 
-  for (let i = 0; i < input.length; i += channels) {
+  for (let i = 0; i < inputStack.length; i += channels) {
     let sliceData: Array<Array<number>> = [];
     let sliceURI: Array<string> = [];
 
     for (let c = 0; c < channels; c++) {
       const frameIdx = i + c;
 
-      sliceData.push(Array.from(input[frameIdx].data)); //populate array of data
+      sliceData.push(Array.from(inputStack[frameIdx].data)); //populate array of data
       const channelURI = convertImageDataToURI(
         width,
         height,
-        Array.from(input[frameIdx].data),
+        Array.from(inputStack[frameIdx].data),
         1,
         0
       );
@@ -607,25 +608,26 @@ const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
   });
 };
 
-export const generateDefaultChannels = (components: number): Array<Color> => {
+export const generateDefaultChannels = (numChannels: number): Array<Color> => {
   /**
    * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
    * green to the second channel, etc.. (see DefaultColors type)
    * If image is greyscale, we assign the white color to that one channel.
    * **/
   let defaultChannels: Array<Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
-  if (components === 1) {
-    defaultChannels = [
-      { color: [255, 255, 255], range: [0, 255], visible: true },
-    ];
-  } else {
-    for (let i = 0; i < components; i++) {
-      defaultChannels.push({
-        color: i < DEFAULT_COLORS.length ? DEFAULT_COLORS[i] : [255, 255, 255],
-        range: [0, 255],
-        visible: !(components > 3 && i > 0), //if image is multi-channel and c > 3, only show the first channel as default (user can then toggle / untoggle the other channels if desired).
-      });
-    }
+
+  for (let i = 0; i < numChannels; i++) {
+    defaultChannels.push({
+      color:
+        numChannels > 1 && i < DEFAULT_COLORS.length
+          ? DEFAULT_COLORS[i]
+          : [255, 255, 255],
+      range: [0, 255],
+      // if image has more than 3 channels,
+      // only show the first channel as default
+      // (user can then toggle / untoggle the other channels if desired)
+      visible: !(numChannels > 3 && i > 0),
+    });
   }
 
   return defaultChannels;

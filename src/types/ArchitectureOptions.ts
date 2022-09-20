@@ -1,12 +1,12 @@
 import { ClassifierModelProps, SegmenterModelProps } from "./ModelType";
 import { Shape } from "./Shape";
 
-export type ArchitectureOptions = {
+export type ClassifierArchitectureOptions = {
   selectedModel: ClassifierModelProps;
   inputShape: Shape;
 };
 
-export type SegmentationArchitectureOptions = {
+export type SegmenterArchitectureOptions = {
   selectedModel: SegmenterModelProps;
   inputShape: Shape;
 };

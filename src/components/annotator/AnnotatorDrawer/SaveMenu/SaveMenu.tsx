@@ -1,9 +1,8 @@
 import React from "react";
-import { bindMenu } from "material-ui-popup-state";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialog, useMenu } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
@@ -13,61 +12,65 @@ import { ExportAnnotationsAsBinarySemanticMasksMenuItem } from "./ExportAnnotati
 import { ExportAnnotationsAsBinaryInstancesMenuItem } from "./ExportAnnotationsAsBinaryInstancesMenuItem";
 
 type SaveMenuProps = {
-  popupState: any;
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  open: boolean;
 };
 
-export const SaveMenu = ({ popupState }: SaveMenuProps) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
+  const {
+    onClose: onCloseDialog,
+    onOpen: onOpenDialog,
+    open: openDialog,
+  } = useDialog();
 
-  const { onClose, onOpen, open } = useDialog();
+  const {
+    anchorEl: subMenuAnchorEl,
+    onClose: onSubMenuClose,
+    onOpen: onSubMenuOpen,
+    open: subMenuOpen,
+  } = useMenu();
 
-  const handleClick = (event: React.MouseEvent<HTMLLIElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+  const onMenusClose = () => {
+    onSubMenuClose();
+    onClose();
   };
 
   return (
     <div>
-      <Menu {...bindMenu(popupState)}>
-        <MenuItem onClick={handleClick}>Export annotations as</MenuItem>
+      <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
+        <MenuItem onClick={onSubMenuOpen}>Export annotations as</MenuItem>
         <Menu
           id="save-annotations-as-menu"
-          anchorEl={anchorEl}
+          anchorEl={subMenuAnchorEl}
           keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
+          open={subMenuOpen}
+          onClose={onSubMenuClose}
         >
           <ExportAnnotationsAsLabeledInstancesMenuItem
-            popupState={popupState}
-            handleCloseMenu={handleClose}
+            handleMenuClose={onMenusClose}
           />
           <ExportAnnotationsAsBinaryInstancesMenuItem
-            popupState={popupState}
-            handleCloseMenu={handleClose}
+            handleMenuClose={onMenusClose}
           />
           <ExportAnnotationsAsLabeledSemanticMasksMenuItem
-            popupState={popupState}
-            handleCloseMenu={handleClose}
+            handleMenuClose={onMenusClose}
           />
           <ExportAnnotationsAsBinarySemanticMasksMenuItem
-            popupState={popupState}
-            handleCloseMenu={handleClose}
+            handleMenuClose={onMenusClose}
           />
-          <ExportAnnotationsAsMatrixMenuItem
-            popupState={popupState}
-            handleCloseMenu={handleClose}
-          />
+          <ExportAnnotationsAsMatrixMenuItem handleMenuClose={onMenusClose} />
+          {/* <ExportAnnotationsAsJsonMenuItem handleMenuClose={onMenusClose} /> */}
         </Menu>
-        <MenuItem onClick={onOpen}>Save Annotation Project</MenuItem>
+        <MenuItem onClick={onOpenDialog}>Save Annotation Project</MenuItem>
       </Menu>
 
       <SaveAnnotationProjectDialog
-        onClose={onClose}
-        open={open}
-        popupState={popupState}
+        onClose={() => {
+          onCloseDialog();
+          onMenusClose();
+        }}
+        open={openDialog}
       />
     </div>
   );

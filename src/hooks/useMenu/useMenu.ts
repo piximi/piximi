@@ -5,14 +5,10 @@ export const useMenu = () => {
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const onClose = useCallback(
-    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      setAnchorEl(null);
-
-      setOpen(false);
-    },
-    []
-  );
+  const onClose = useCallback(() => {
+    setOpen(false);
+    setAnchorEl(null);
+  }, []);
 
   const onOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setOpen(true);

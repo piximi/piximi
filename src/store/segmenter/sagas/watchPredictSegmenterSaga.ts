@@ -4,7 +4,7 @@ import { predictSegmenterSaga } from "./predictSegmenterSaga";
 
 import { segmenterSlice } from "store/segmenter";
 
-export function* watchPredictSegmenterSaga(): any {
+export function* watchPredictSegmenterSaga() {
   yield takeLeading(
     segmenterSlice.actions.predictSegmenter.type,
     predictSegmenterSaga

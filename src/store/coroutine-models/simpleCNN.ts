@@ -4,10 +4,6 @@ import { Shape } from "../../types/Shape";
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem
  * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
- *
- * @param inputShape array of number specifying the input shape [imageWidth, imageHeight, imageChannels]
- * @param numClasses shape of the output layer (i.e. number of classes to predict)
- * @returns tensorflow.sequential model
  */
 export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
   const imageWidth = inputShape.width;

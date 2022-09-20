@@ -23857,7 +23857,7 @@
     "predicting": false,
     "evaluating": false,
     "learningRate": 0.001,
-    "lossFunction": "Categorical cross entropy",
+    "lossFunction": "Categorical (softmax) cross entropy",
     "fitOptions": {
       "epochs": 16,
       "initialEpoch": 0,

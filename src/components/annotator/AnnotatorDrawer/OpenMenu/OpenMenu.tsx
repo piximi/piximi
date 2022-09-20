@@ -1,5 +1,4 @@
 import React from "react";
-import { bindMenu } from "material-ui-popup-state";
 
 import { Divider, Menu } from "@mui/material";
 
@@ -8,19 +7,21 @@ import { OpenProjectFileMenuItem } from "./OpenProjectFileMenuItem";
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 
 type OpenMenuProps = {
-  popupState: any;
+  anchorEl: HTMLElement | null;
+  onCloseMenu: () => void;
+  open: boolean;
 };
 
-export const OpenMenu = ({ popupState }: OpenMenuProps) => {
+export const OpenMenu = ({ anchorEl, onCloseMenu, open }: OpenMenuProps) => {
   return (
-    <Menu {...bindMenu(popupState)}>
-      <OpenImageMenuItem popupState={popupState} />
+    <Menu open={open} anchorEl={anchorEl} onClose={onCloseMenu}>
+      <OpenImageMenuItem onCloseMenu={onCloseMenu} />
 
-      <OpenProjectFileMenuItem popupState={popupState} />
+      <OpenProjectFileMenuItem onCloseMenu={onCloseMenu} />
 
       <Divider />
 
-      <OpenExampleImageMenuItem popupState={popupState} />
+      <OpenExampleImageMenuItem onCloseMenu={onCloseMenu} />
     </Menu>
   );
 };

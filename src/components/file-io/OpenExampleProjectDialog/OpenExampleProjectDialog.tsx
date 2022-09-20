@@ -86,21 +86,16 @@ const exampleProjects = [
 type OpenExampleClassifierDialogProps = {
   open: boolean;
   onClose: () => void;
-  popupState: any;
 };
 
 export const OpenExampleClassifierDialog = (
   props: OpenExampleClassifierDialogProps
 ) => {
   const t = useTranslation();
-  const { open, onClose, popupState } = props;
-
-  const closeMenuAndDialog = () => {
-    onClose();
-  };
+  const { open, onClose } = props;
 
   return (
-    <Dialog fullWidth maxWidth="md" open={open} onClose={closeMenuAndDialog}>
+    <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
       <DialogTitle
         sx={{
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -117,7 +112,7 @@ export const OpenExampleClassifierDialog = (
             right: theme.spacing(1),
             top: theme.spacing(1),
           })}
-          onClick={closeMenuAndDialog}
+          onClick={onClose}
         >
           <CloseIcon />
         </IconButton>
@@ -135,7 +130,6 @@ export const OpenExampleClassifierDialog = (
               <OpenExampleProjectMenuItem
                 key={index}
                 exampleProject={exampleProject}
-                popupState={popupState}
                 onClose={onClose}
               />
             );

@@ -4,6 +4,6 @@ import { uploadImagesSaga } from "./uploadImagesSaga";
 
 import { applicationSlice } from "store/application";
 
-export function* watchUploadImagesSaga(): any {
+export function* watchUploadImagesSaga() {
   yield takeLeading(applicationSlice.actions.uploadImages, uploadImagesSaga);
 }

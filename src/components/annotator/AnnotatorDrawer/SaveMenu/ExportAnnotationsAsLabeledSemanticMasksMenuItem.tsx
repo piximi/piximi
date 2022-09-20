@@ -10,20 +10,17 @@ import { annotationCategoriesSelector } from "store/project";
 import { saveAnnotationsAsLabeledSemanticSegmentationMasks } from "image/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
-  popupState: any;
-  handleCloseMenu: () => void;
+  handleMenuClose: () => void;
 };
 
 export const ExportAnnotationsAsLabeledSemanticMasksMenuItem = ({
-  popupState,
-  handleCloseMenu,
+  handleMenuClose,
 }: SaveAnnotationsMenuItemProps) => {
   const images = useSelector(annotatorImagesSelector);
   const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onExport = () => {
-    popupState.close();
-    handleCloseMenu();
+    handleMenuClose();
 
     let zip = new JSZip();
 

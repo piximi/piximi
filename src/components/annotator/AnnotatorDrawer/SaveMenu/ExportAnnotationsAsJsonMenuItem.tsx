@@ -6,16 +6,16 @@ import { MenuItem, ListItemText } from "@mui/material";
 import { activeSerializedAnnotationsSelector } from "store/common";
 
 type SaveAnnotationsMenuItemProps = {
-  popupState: any;
+  handleMenuClose: () => void;
 };
 
 export const ExportAnnotationsAsJsonMenuItem = ({
-  popupState,
+  handleMenuClose,
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(activeSerializedAnnotationsSelector);
 
   const onSaveAnnotations = () => {
-    popupState.close();
+    handleMenuClose();
     if (!annotations) return;
     const blob = new Blob([JSON.stringify(annotations)], {
       type: "application/json;charset=utf-8",

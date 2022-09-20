@@ -20,7 +20,7 @@ export function* annotationStateChangeSaga({
   annotationState: AnnotationStateType;
   annotationTool: AnnotationTool | undefined;
   execSaga: boolean;
-}>): any {
+}>) {
   if (
     !execSaga ||
     !annotationTool ||
@@ -28,11 +28,15 @@ export function* annotationStateChangeSaga({
   )
     return;
 
-  const selectionMode = yield select(selectionModeSelector);
-  const activeImagePlane = yield select(activeImagePlaneSelector);
+  const selectionMode: ReturnType<typeof selectionModeSelector> = yield select(
+    selectionModeSelector
+  );
+  const activeImagePlane: ReturnType<typeof activeImagePlaneSelector> =
+    yield select(activeImagePlaneSelector);
 
   if (selectionMode === AnnotationModeType.New) {
-    const selectedCategory = yield select(selectedCategorySelector);
+    const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+      yield select(selectedCategorySelector);
 
     annotationTool.annotate(selectedCategory, activeImagePlane);
 
@@ -45,10 +49,14 @@ export function* annotationStateChangeSaga({
       })
     );
   } else {
-    const toolType = yield select(toolTypeSelector);
+    const toolType: ReturnType<typeof toolTypeSelector> = yield select(
+      toolTypeSelector
+    );
+
     if (toolType === ToolType.Zoom) return;
 
-    const selectedAnnotation = yield select(selectedAnnotationSelector);
+    const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
+      yield select(selectedAnnotationSelector);
 
     if (annotationTool.annotationState !== AnnotationStateType.Annotated)
       return;
@@ -87,6 +95,8 @@ export function* annotationStateChangeSaga({
         }
       : undefined;
 
+    if (!combinedSelectedAnnotation) return;
+
     yield put(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [combinedSelectedAnnotation],
@@ -95,7 +105,8 @@ export function* annotationStateChangeSaga({
     );
 
     if (annotationTool.mask.length) {
-      const selectedCategory = yield select(selectedCategorySelector);
+      const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+        yield select(selectedCategorySelector);
       annotationTool.annotate(selectedCategory, activeImagePlane);
     }
   }

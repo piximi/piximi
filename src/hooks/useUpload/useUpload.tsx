@@ -13,6 +13,7 @@ export const useUpload = (
 
   return useCallback(
     async (files: FileList) => {
+      let needShape = false;
       const imageShapeInfo = await getImageInformation(files[0]);
 
       if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
@@ -38,6 +39,7 @@ export const useUpload = (
           })
         );
       } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {
+        needShape = true;
         setOpenDimensionsDialogBox(true);
       } else if (imageShapeInfo === ImageShapeEnum.InvalidImage) {
         process.env.NODE_ENV !== "production" &&
@@ -48,6 +50,8 @@ export const useUpload = (
         process.env.NODE_ENV !== "production" &&
           console.warn("Unrecognized ImageShapeEnum value");
       }
+
+      return needShape;
     },
     [dispatch, isUploadedFromAnnotator, setOpenDimensionsDialogBox]
   );

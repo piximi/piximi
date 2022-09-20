@@ -20,13 +20,11 @@ import { segmenterSelector } from "store/segmenter";
 type SaveProjectDialogProps = {
   onClose: () => void;
   open: boolean;
-  popupState: any;
 };
 
 export const SaveProjectDialog = ({
   onClose,
   open,
-  popupState,
 }: SaveProjectDialogProps) => {
   const classifier = useSelector(classifierSelector);
 
@@ -55,7 +53,6 @@ export const SaveProjectDialog = ({
     saveAs(data, `${projectName}.json`);
 
     onClose();
-    popupState.close();
   };
 
   const onCancel = () => {

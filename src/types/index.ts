@@ -8,8 +8,8 @@ export { AnnotationStateType } from "./AnnotationStateType";
 export type { AnnotationType } from "./AnnotationType";
 
 export type {
-  ArchitectureOptions,
-  SegmentationArchitectureOptions,
+  ClassifierArchitectureOptions,
+  SegmenterArchitectureOptions,
 } from "./ArchitectureOptions";
 
 export type { Category } from "./Category";
@@ -39,6 +39,8 @@ export type {
 } from "./EvaluationResultType";
 
 export type { FitOptions } from "./FitOptions";
+
+export type { GeneratorReturnType } from "./GeneratorReturnType";
 
 export type { HistoryStateType } from "./HistoryStateType";
 

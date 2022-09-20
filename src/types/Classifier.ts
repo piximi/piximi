@@ -1,4 +1,4 @@
-import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { History, LayersModel, Rank, Tensor } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
@@ -20,8 +20,8 @@ export type Classifier = {
   valDataSet?: Dataset<{
     xs: Tensor;
     ys: Tensor;
-    labels: Tensor;
-    ids: Tensor;
+    labels: Tensor<Rank.R1>;
+    ids: Tensor<Rank.R1>;
   }>;
   evaluating: boolean;
   fitOptions: FitOptions;

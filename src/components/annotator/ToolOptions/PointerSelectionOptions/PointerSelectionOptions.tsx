@@ -105,12 +105,13 @@ export const PointerSelectionOptions = () => {
 
       <Divider />
       <CollapsibleList closed dense primary={t("Select by Category")}>
-        {annotationCategories.map((category: Category) => {
+        {annotationCategories.map((category: Category, idx: number) => {
           return (
             <ListItem
               button
               id={category.id}
               onClick={(event) => onSelectCategory(event, category)}
+              key={idx}
             >
               <ListItemIcon>
                 <LabelIcon style={{ color: category.color }} />

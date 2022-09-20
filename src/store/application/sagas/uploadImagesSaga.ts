@@ -7,7 +7,12 @@ import { imageViewerSlice, currentColorsSelector } from "store/image-viewer/";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
-import { AlertStateType, AlertType, ImageType } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  ImageType,
+  GeneratorReturnType,
+} from "types";
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
@@ -15,7 +20,7 @@ import { convertToImage, ImageShapeEnum } from "image/imageHelper";
 
 type ImageFileType = {
   fileName: string;
-  image: Array<ImageJS.Image>;
+  imageStack: Array<ImageJS.Image> | ImageJS.Stack;
 };
 
 type ImageFileError = {
@@ -39,61 +44,55 @@ export function* uploadImagesSaga({
   imageShapeInfo: ImageShapeEnum;
   isUploadedFromAnnotator: boolean;
   execSaga: boolean;
-}>): any {
+}>) {
   if (!execSaga) return;
 
-  const colors = yield select(currentColorsSelector);
-  const singleRGBImages = imageShapeInfo === ImageShapeEnum.SingleRGBImage;
+  const colors: ReturnType<typeof currentColorsSelector> = yield select(
+    currentColorsSelector
+  );
+
   const invalidImageFiles: Array<ImageFileError> = [];
-  const imagesToUpload: Array<ImageType> = [];
 
   const imageFiles: Array<ImageFileType> = [];
-  for (let i = 0; i < files.length; i++) {
+  for (const file of files) {
     try {
-      const imageFile: ImageFileType = yield getImageData(
-        files[i],
-        imageShapeInfo
-      );
+      const imageFile: GeneratorReturnType<ReturnType<typeof decodeImageFile>> =
+        yield decodeImageFile(file, imageShapeInfo);
       imageFiles.push(imageFile);
     } catch (err) {
       invalidImageFiles.push({
-        fileName: files[i].name,
+        fileName: file.name,
         error: "could not decode",
       });
     }
   }
 
-  for (let i = 0; i < imageFiles.length; i++) {
-    const imageObject = imageFiles[i].image;
-
-    if (!checkImageShape(imageObject, channels, slices, singleRGBImages)) {
+  const imagesToUpload: Array<ImageType> = [];
+  for (const { imageStack, fileName } of imageFiles) {
+    if (!checkImageShape(imageStack, channels, slices, imageShapeInfo)) {
       invalidImageFiles.push({
-        fileName: imageFiles[i].fileName,
+        fileName,
         error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
       });
       continue;
     }
 
-    if (![8, 16].includes(imageObject[0].bitDepth)) {
+    if (![8, 16].includes(imageStack[0].bitDepth)) {
       invalidImageFiles.push({
-        fileName: imageFiles[i].fileName,
-        error: `unsupported bit depth of ${imageObject[0].bitDepth}`,
+        fileName,
+        error: `unsupported bit depth of ${imageStack[0].bitDepth}`,
       });
       continue;
     }
 
     try {
-      const imageToUpload: ImageType = yield convertToImage(
-        imageFiles[i].image,
-        imageFiles[i].fileName,
-        colors,
-        slices,
-        channels
-      );
+      const imageToUpload: ReturnType<typeof convertToImage> =
+        yield convertToImage(imageStack, fileName, colors, slices, channels);
       imagesToUpload.push(imageToUpload);
     } catch (err) {
       const error = err as Error;
-      const stackTrace = yield getStackTraceFromError(error);
+      const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+        yield getStackTraceFromError(error);
       const warning: AlertStateType = {
         alertType: AlertType.Error,
         name: "Could not convert file to image",
@@ -140,10 +139,12 @@ export function* uploadImagesSaga({
   }
 }
 
-function* getImageData(imageFile: File, imageTypeEnum: ImageShapeEnum) {
+function* decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let img: ImageJS.Image | ImageJS.Stack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {
-    const imgArrayBuffer: ArrayBuffer = yield imageFile.arrayBuffer();
+    const imgArrayBuffer: Awaited<ReturnType<typeof imageFile.arrayBuffer>> =
+      yield imageFile.arrayBuffer();
+
     const imgArray = new Uint8Array(imgArrayBuffer);
 
     var dicomImgData = DicomParser.parseDicom(imgArray);
@@ -172,20 +173,20 @@ function* getImageData(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   }
 
   return {
-    image: Array.isArray(img) ? img : [img],
+    imageStack: Array.isArray(img) ? img : [img],
     fileName: imageFile.name,
-  };
+  } as ImageFileType;
 }
 
 function checkImageShape(
-  image: Array<ImageJS.Image>,
+  imageStack: Array<ImageJS.Image>,
   channels: number,
   slices: number,
-  singleRGBImage: boolean
+  imageShapeInfo: ImageShapeEnum
 ) {
-  const frames = image.length;
-  if (singleRGBImage) {
-    return frames === 1 && image[0].components === 3;
+  const frames = imageStack.length;
+  if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
+    return frames === 1 && imageStack[0].components === 3;
   } else {
     return channels * slices === frames;
   }

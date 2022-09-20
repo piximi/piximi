@@ -140,12 +140,14 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
         <ImageContent onDrop={onDrop} />
 
-        <ImageShapeDialog
-          files={files!}
-          open={openDimensionsDialogBox}
-          onClose={handleClose}
-          isUploadedFromAnnotator={true}
-        />
+        {files?.length && (
+          <ImageShapeDialog
+            files={files}
+            open={openDimensionsDialogBox}
+            onClose={handleClose}
+            isUploadedFromAnnotator={true}
+          />
+        )}
 
         <ToolOptions />
 

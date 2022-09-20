@@ -133,6 +133,35 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
   }, [categorizedImages, noCategorizedImages]);
 
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      categorizedImages.length > 0
+    ) {
+      const trainingSize = Math.round(
+        categorizedImages.length * trainingPercentage
+      );
+      const validationSize = categorizedImages.length - trainingSize;
+
+      console.log(
+        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`
+      );
+
+      console.log(
+        `Set training batches per epoch to RoundUp[${trainingSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Set validation batches per epoch to RoundUp[${validationSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
+      );
+    }
+  }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
+
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
     const trainingEpochIndicator = epochCount - 0.5;

@@ -7,11 +7,11 @@ import { useDialog } from "hooks";
 import { ExampleImageDialog } from "../ExampleImageDialog";
 
 type OpenExampleImageMenuItemProps = {
-  popupState: any;
+  onCloseMenu: () => void;
 };
 
 export const OpenExampleImageMenuItem = ({
-  popupState,
+  onCloseMenu,
 }: OpenExampleImageMenuItemProps) => {
   const { onClose, onOpen, open } = useDialog();
 
@@ -22,7 +22,7 @@ export const OpenExampleImageMenuItem = ({
         onClose={() => {
           onClose();
 
-          popupState.close();
+          onCloseMenu();
         }}
         open={open}
       />

@@ -1,6 +1,5 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { bindMenu } from "material-ui-popup-state";
 import { LayersModel } from "@tensorflow/tfjs";
 
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
@@ -17,10 +16,12 @@ import { segmenterSlice } from "store/segmenter";
 import { ModelType, Shape } from "types";
 
 type OpenMenuProps = {
-  popupState: any;
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  open: boolean;
 };
 
-export const OpenMenu = ({ popupState }: OpenMenuProps) => {
+export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
   const {
     onClose: onCloseImportClassifierDialog,
     onOpen: onOpenImportClassifierDialog,
@@ -73,10 +74,17 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
     );
   };
 
+  const onMenuDialogClose = (onDialogClose: () => void) => {
+    return () => {
+      onDialogClose();
+      onClose();
+    };
+  };
+
   return (
-    <Menu {...bindMenu(popupState)}>
+    <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
       <MenuList dense variant="menu">
-        <OpenProjectMenuItem popupState={popupState} />
+        <OpenProjectMenuItem onMenuClose={onClose} />
         <MenuItem onClick={onOpenExampleClassifierDialog}>
           Open example project
         </MenuItem>
@@ -91,23 +99,20 @@ export const OpenMenu = ({ popupState }: OpenMenuProps) => {
       </MenuList>
 
       <OpenExampleClassifierDialog
-        onClose={onCloseExampleClassifierDialog}
+        onClose={onMenuDialogClose(onCloseExampleClassifierDialog)}
         open={openExampleClassifier}
-        popupState={popupState}
       />
 
       <ImportTensorflowModelDialog
-        onClose={onCloseImportClassifierDialog}
+        onClose={onMenuDialogClose(onCloseImportClassifierDialog)}
         open={openImportClassifierDialog}
-        popupState={popupState}
         modelType={"Classifier"}
         dispatchFunction={importClassifierModel}
       />
 
       <ImportTensorflowModelDialog
-        onClose={onCloseImportSegmenterDialog}
+        onClose={onMenuDialogClose(onCloseImportSegmenterDialog)}
         open={openImportSegmenterDialog}
-        popupState={popupState}
         modelType={"Segmentation"}
         dispatchFunction={importSegmentationModel}
       />
