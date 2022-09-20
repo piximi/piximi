@@ -13,6 +13,7 @@ import { Tools } from "../Tools";
 
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
+import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 import { alertStateSelector, applicationSlice } from "store/application";
 import { imageViewerSlice } from "store/image-viewer";
@@ -20,7 +21,7 @@ import { imageViewerSlice } from "store/image-viewer";
 import { AlertType, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
 type AnnotatorViewProps = {
   image?: ImageType;
@@ -30,6 +31,10 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
+
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
@@ -104,7 +109,8 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onDrop = async (files: FileList) => {
-    await uploadFiles(files);
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
     setFiles(files);
   };
 
@@ -146,6 +152,7 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
             open={openDimensionsDialogBox}
             onClose={handleClose}
             isUploadedFromAnnotator={true}
+            referenceImageShape={imageShape}
           />
         )}
 

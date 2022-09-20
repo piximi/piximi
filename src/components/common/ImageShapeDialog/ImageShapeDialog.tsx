@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHotkeys } from "react-hotkeys-hook";
-import * as ImageJS from "image-js";
 
 import {
   Alert,
@@ -16,13 +15,14 @@ import { CustomNumberTextField } from "components/common/InputFields";
 
 import { applicationSlice } from "store/application";
 
-import { ImageShapeEnum } from "image/imageHelper";
+import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 type ImageShapeDialogProps = {
   files: FileList;
   open: boolean;
   onClose: () => void;
   isUploadedFromAnnotator: boolean;
+  referenceImageShape: ImageShapeInfo;
 };
 
 export const ImageShapeDialog = ({
@@ -30,10 +30,15 @@ export const ImageShapeDialog = ({
   open,
   onClose,
   isUploadedFromAnnotator,
+  referenceImageShape,
 }: ImageShapeDialogProps) => {
   const dispatch = useDispatch();
 
-  const [channels, setChannels] = useState<number>(3);
+  const [channels, setChannels] = useState<number>(
+    referenceImageShape.components && referenceImageShape.components % 3 !== 0
+      ? referenceImageShape.components
+      : 3 // assume 3 if no compnents key set or if cleanly divisible by 3
+  );
 
   const [frames, setFrames] = useState<number>(-1);
   const [invalidImageShape, setInvalidImageShape] = useState<boolean>(false);
@@ -45,15 +50,16 @@ export const ImageShapeDialog = ({
   const uploadImages = async () => {
     var imageFrames = frames;
     if (imageFrames === -1) {
-      const buffer = await files[0].arrayBuffer();
-      const image = await ImageJS.Image.load(buffer, { ignorePalette: true });
-
-      imageFrames = Array.isArray(image) ? image.length : 1;
+      imageFrames =
+        referenceImageShape.shape === ImageShapeEnum.HyperStackImage
+          ? referenceImageShape.components! // components always set on HyperStackImage
+          : 1;
       setFrames(imageFrames);
     }
 
     const slices = imageFrames / channels;
 
+    // check if user-supplied channels cleanly divides known num frames
     if (!Number.isInteger(slices)) {
       setInvalidImageShape(true);
       return;
@@ -65,7 +71,7 @@ export const ImageShapeDialog = ({
         files: files,
         channels: channels,
         slices: slices,
-        imageShapeInfo: ImageShapeEnum.HyperStackImage,
+        imageShapeInfo: referenceImageShape,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
         execSaga: true,
       })

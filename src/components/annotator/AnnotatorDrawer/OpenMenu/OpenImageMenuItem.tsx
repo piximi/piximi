@@ -5,6 +5,7 @@ import { ListItemText, MenuItem } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
+import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;
@@ -13,17 +14,22 @@ type OpenImageMenuItemProps = {
 export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
+
   const [files, setFiles] = React.useState<FileList>();
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
+    const shapeInfo = await uploadFiles(files);
 
-    setFiles(files);
-
-    const needShape = await uploadFiles(files);
-    if (!needShape) {
+    if (shapeInfo.shape === ImageShapeEnum.HyperStackImage) {
+      setImageShape(shapeInfo);
+      setFiles(files);
+    } else {
       onCloseMenu();
     }
   };
@@ -50,6 +56,7 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
             onCloseMenu();
           }}
           isUploadedFromAnnotator={true}
+          referenceImageShape={imageShape}
         />
       )}
     </React.Fragment>
