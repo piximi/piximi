@@ -12,7 +12,6 @@ import { MainImageGrid } from "../MainImageGrid";
 import { MainAppBar } from "../MainAppBar";
 
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
-
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
 import { applicationSlice } from "store/application";
@@ -21,11 +20,16 @@ import { visibleImagesSelector } from "store/common";
 import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
+import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 export const MainView = () => {
   const dispatch = useDispatch();
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
@@ -96,7 +100,8 @@ export const MainView = () => {
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
   const onDrop = async (files: FileList) => {
-    await uploadFiles(files);
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
     setFiles(files);
   };
 
@@ -132,6 +137,7 @@ export const MainView = () => {
                 open={openDimensionsDialogBox}
                 onClose={handleClose}
                 isUploadedFromAnnotator={false}
+                referenceImageShape={imageShape}
               />
             )}
           </Box>

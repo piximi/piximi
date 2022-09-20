@@ -16,7 +16,8 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-import { convertToImage, ImageShapeEnum } from "image/imageHelper";
+import { convertToImage } from "image/imageHelper";
+import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
 type ImageFileType = {
   fileName: string;
@@ -41,7 +42,7 @@ export function* uploadImagesSaga({
   files: FileList;
   channels: number;
   slices: number;
-  imageShapeInfo: ImageShapeEnum;
+  imageShapeInfo: ImageShapeInfo;
   isUploadedFromAnnotator: boolean;
   execSaga: boolean;
 }>) {
@@ -57,7 +58,7 @@ export function* uploadImagesSaga({
   for (const file of files) {
     try {
       const imageFile: GeneratorReturnType<ReturnType<typeof decodeImageFile>> =
-        yield decodeImageFile(file, imageShapeInfo);
+        yield decodeImageFile(file, imageShapeInfo.shape);
       imageFiles.push(imageFile);
     } catch (err) {
       invalidImageFiles.push({
@@ -69,7 +70,7 @@ export function* uploadImagesSaga({
 
   const imagesToUpload: Array<ImageType> = [];
   for (const { imageStack, fileName } of imageFiles) {
-    if (!checkImageShape(imageStack, channels, slices, imageShapeInfo)) {
+    if (!checkImageShape(imageStack, channels, slices, imageShapeInfo.shape)) {
       invalidImageFiles.push({
         fileName,
         error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,

@@ -28,6 +28,7 @@ import { AlertType, HotkeyView, ImageType } from "types";
 import { getStackTraceFromError } from "utils";
 
 import { APPLICATION_COLORS } from "colorPalette";
+import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
 type AnnotatorViewProps = {
   image?: ImageType;
@@ -37,6 +38,10 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
+
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
@@ -117,7 +122,8 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onDrop = async (files: FileList) => {
-    await uploadFiles(files);
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
     setFiles(files);
   };
 
@@ -159,6 +165,7 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
             open={openDimensionsDialogBox}
             onClose={handleClose}
             isUploadedFromAnnotator={true}
+            referenceImageShape={imageShape}
           />
         )}
 

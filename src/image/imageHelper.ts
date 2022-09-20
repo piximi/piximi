@@ -292,6 +292,7 @@ export const convertDataArrayToRGBSource = async (
   });
 };
 
+// TODO: image_data
 export enum ImageShapeEnum {
   DicomImage,
   SingleRGBImage,
@@ -299,6 +300,7 @@ export enum ImageShapeEnum {
   InvalidImage,
 }
 
+// TODO: image_data
 export const getImageInformation = async (file: File) => {
   try {
     if (file.name.endsWith("dcm") || file.name.endsWith("DICOM")) {
