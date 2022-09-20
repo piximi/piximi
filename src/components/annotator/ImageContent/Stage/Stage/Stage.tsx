@@ -58,6 +58,7 @@ import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
+import { SoundEvents } from "./SoundEvents";
 
 export const Stage = () => {
   const imageRef = useRef<Konva.Image | null>(null);
@@ -91,6 +92,8 @@ export const Stage = () => {
     y: number;
   }>();
 
+  const [firstMouseDown, setFirstMouseDown] = useState(false);
+
   const scaledImageWidth = useSelector(scaledImageWidthSelector);
   const scaledImageHeight = useSelector(scaledImageHeightSelector);
 
@@ -122,12 +125,12 @@ export const Stage = () => {
 
   useWindowFocusHandler();
 
-  const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
-  );
-  const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
-  );
+  // const [playCreateAnnotationSoundEffect] = useSound(
+  //   createAnnotationSoundEffect
+  // );
+  // const [playDeleteAnnotationSoundEffect] = useSound(
+  // deleteAnnotationSoundEffect
+  // );
 
   const soundEnabled = useSelector(soundEnabledSelector);
 
@@ -307,6 +310,10 @@ export const Stage = () => {
 
   const memoizedOnMouseDown = useMemo(() => {
     const func = () => {
+      if (!firstMouseDown) {
+        setFirstMouseDown(true);
+      }
+
       if (toolType === ToolType.Hand || toolType === ToolType.ColorAdjustment)
         return;
 
@@ -536,7 +543,7 @@ export const Stage = () => {
       })
     );
 
-    if (soundEnabled) playCreateAnnotationSoundEffect();
+    // if (soundEnabled) playCreateAnnotationSoundEffect();
 
     deselectAnnotation();
 
@@ -581,7 +588,7 @@ export const Stage = () => {
       deselectAllTransformers();
 
       if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
+        // playDeleteAnnotationSoundEffect();
       }
 
       deselectAnnotation();
@@ -604,7 +611,7 @@ export const Stage = () => {
       deselectAllTransformers();
 
       if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
+        // playDeleteAnnotationSoundEffect();
       }
 
       deselectAnnotation();
@@ -696,45 +703,51 @@ export const Stage = () => {
   const store = useStore();
 
   return (
-    <ReactKonva.Stage
-      draggable={draggable}
-      height={stageHeight}
-      onMouseDown={(evt) => onMouseDown(evt)}
-      onTouchStart={(evt) => onMouseDown(evt)}
-      onMouseMove={(evt) => onMouseMove(evt)}
-      onTouchMove={(evt) => onMouseMove(evt)}
-      onMouseUp={(evt) => onMouseUp(evt)}
-      onTouchEnd={(evt) => onMouseUp(evt)}
-      onWheel={(evt) => onZoomWheel(evt)}
-      position={stagePosition}
-      ref={stageRef}
-      width={stageWidth}
-    >
-      <Provider store={store}>
-        <DndProvider backend={HTML5Backend}>
-          <Layer>
-            <Image ref={imageRef} />
+    <>
+      <ReactKonva.Stage
+        draggable={draggable}
+        height={stageHeight}
+        onMouseDown={(evt) => onMouseDown(evt)}
+        onTouchStart={(evt) => onMouseDown(evt)}
+        onMouseMove={(evt) => onMouseMove(evt)}
+        onTouchMove={(evt) => onMouseMove(evt)}
+        onMouseUp={(evt) => onMouseUp(evt)}
+        onTouchEnd={(evt) => onMouseUp(evt)}
+        onWheel={(evt) => onZoomWheel(evt)}
+        position={stagePosition}
+        ref={stageRef}
+        width={stageWidth}
+      >
+        <Provider store={store}>
+          <DndProvider backend={HTML5Backend}>
+            <Layer>
+              <Image ref={imageRef} />
 
-            <ZoomSelection />
+              <ZoomSelection />
 
-            <Selecting tool={tool!} />
+              <Selecting tool={tool!} />
 
-            <PenAnnotationToolTip
-              currentPosition={currentPosition}
-              annotating={annotationState === AnnotationStateType.Annotating}
-            />
+              <PenAnnotationToolTip
+                currentPosition={currentPosition}
+                annotating={annotationState === AnnotationStateType.Annotating}
+              />
 
-            <PointerSelection />
+              <PointerSelection />
 
-            <Annotations />
+              <Annotations />
 
-            <Transformers
-              transformPosition={getRelativePointerPosition}
-              annotationTool={annotationTool}
-            />
-          </Layer>
-        </DndProvider>
-      </Provider>
-    </ReactKonva.Stage>
+              <Transformers
+                transformPosition={getRelativePointerPosition}
+                annotationTool={annotationTool}
+              />
+            </Layer>
+          </DndProvider>
+        </Provider>
+      </ReactKonva.Stage>
+      {/* SoundEvents must be mounted following some user gesture
+          else an "AudioContext was not allowed to start" warning
+          will be issued by Chrome*/}
+      {firstMouseDown && <SoundEvents />}
+    </>
   );
 };
