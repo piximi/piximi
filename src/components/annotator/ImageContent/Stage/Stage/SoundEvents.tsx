@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { memo, useCallback, useEffect } from "react";
 import useSound from "use-sound";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -15,46 +16,43 @@ import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
   Hence this component must only be mounted as a response to
   some (arbitrary) user gesture, like onMouseDown.
   See: https://goo.gl/7K7WLu
-  Technically useSound only *creates* and AudioContext,
+  Technically useSound only *creates* an AudioContext,
   and we only *play* the sounds after a user gesture,
   so it would (and did) still work if this was in the Stage component,
   but Chrome is overly aggressive and throws multiple warnings in Console,
   so this component was made just to get rid of the annoying warnings.
  */
-export const SoundEvents = () => {
+export const SoundEvents = memo(() => {
   const soundEnabled = useSelector(soundEnabledSelector);
 
-  const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
-  );
-  const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
-  );
+  const [playCreateAnnotationSoundEffect, { sound: creeateAnnotationSound }] =
+    useSound(createAnnotationSoundEffect, { soundEnabled });
+  const [playDeleteAnnotationSoundEffect, { sound: deleteAnnotationSound }] =
+    useSound(deleteAnnotationSoundEffect, { soundEnabled });
 
   useHotkeys(
     "enter",
     () => {
-      console.log("enter", soundEnabled);
-      if (soundEnabled) playCreateAnnotationSoundEffect();
+      playCreateAnnotationSoundEffect();
     },
-    [soundEnabled]
+    [soundEnabled, creeateAnnotationSound]
   );
 
   useHotkeys(
     "escape",
     () => {
-      if (soundEnabled) playDeleteAnnotationSoundEffect();
+      playDeleteAnnotationSoundEffect();
     },
-    [soundEnabled]
+    [soundEnabled, deleteAnnotationSound]
   );
 
   useHotkeys(
     "backspace, delete",
     () => {
-      if (soundEnabled) playDeleteAnnotationSoundEffect();
+      playDeleteAnnotationSoundEffect();
     },
-    [soundEnabled]
+    [soundEnabled, deleteAnnotationSound]
   );
 
   return <></>;
-};
+});
