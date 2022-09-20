@@ -4,7 +4,6 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import * as _ from "lodash";
-import useSound from "use-sound";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -37,7 +36,6 @@ import {
   selectedAnnotationsIdsSelector,
   selectedAnnotationsSelector,
   selectionModeSelector,
-  soundEnabledSelector,
   stageHeightSelector,
   stagePositionSelector,
   stageScaleSelector,
@@ -56,8 +54,6 @@ import { selectedCategorySelector } from "store/common";
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
 import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
-import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 import { SoundEvents } from "./SoundEvents";
 
 export const Stage = () => {
@@ -124,15 +120,6 @@ export const Stage = () => {
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
 
   useWindowFocusHandler();
-
-  // const [playCreateAnnotationSoundEffect] = useSound(
-  //   createAnnotationSoundEffect
-  // );
-  // const [playDeleteAnnotationSoundEffect] = useSound(
-  // deleteAnnotationSoundEffect
-  // );
-
-  const soundEnabled = useSelector(soundEnabledSelector);
 
   const detachTransformer = (transformerId: string) => {
     if (!stageRef || !stageRef.current) return;
@@ -386,6 +373,7 @@ export const Stage = () => {
     onPointerMouseDown,
     onZoomMouseDown,
     stageScale,
+    firstMouseDown,
   ]);
 
   const onMouseMove = useMemo(() => {
@@ -543,8 +531,6 @@ export const Stage = () => {
       })
     );
 
-    // if (soundEnabled) playCreateAnnotationSoundEffect();
-
     deselectAnnotation();
 
     if (selectionMode !== AnnotationModeType.New)
@@ -574,7 +560,6 @@ export const Stage = () => {
       unselectedAnnotations,
       selectionMode,
       selectedAnnotationsIds,
-      soundEnabled,
       toolType,
     ]
   );
@@ -587,16 +572,12 @@ export const Stage = () => {
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        // playDeleteAnnotationSoundEffect();
-      }
-
       deselectAnnotation();
 
       if (toolType !== ToolType.Zoom) return;
       onZoomDeselect();
     },
-    [annotations, annotationTool, soundEnabled, toolType]
+    [annotations, annotationTool, toolType]
   );
 
   useHotkeys(
@@ -610,13 +591,9 @@ export const Stage = () => {
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        // playDeleteAnnotationSoundEffect();
-      }
-
       deselectAnnotation();
     },
-    [selectedAnnotationsIds, annotations, soundEnabled]
+    [selectedAnnotationsIds, annotations]
   );
 
   useHotkeys(
