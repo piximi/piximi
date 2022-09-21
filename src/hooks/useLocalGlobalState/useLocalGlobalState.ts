@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
   1) Get global state from the store
   2) Update a copy of the state locally in the component, an arbitrary number of times,
      without dispatching those state updates back to the store
-  3) Until finnally commiting the final state update to the store, once
+  3) Until finally commiting the final state update to the store, once
 
   e.g. get global state (selector) -> update local -> udpate local -> update local -> commit final state (dispatch)
 

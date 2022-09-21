@@ -2,7 +2,7 @@ import React from "react";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog, useMenuHotkey } from "hooks";
+import { useDialogHotkey, useMenu } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
@@ -20,17 +20,17 @@ type SaveMenuProps = {
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   const {
-    onClose: onCloseDialog,
-    onOpen: onOpenDialog,
-    open: openDialog,
-  } = useDialog();
+    onClose: onCloseSaveAnnotatorDialog,
+    onOpen: onOpenSaveAnnotatorDialog,
+    open: openSaveAnnotatorDialog,
+  } = useDialogHotkey(HotkeyView.SaveAnnotationProjectDialog);
 
   const {
     anchorEl: subMenuAnchorEl,
     onClose: onSubMenuClose,
     onOpen: onSubMenuOpen,
     open: subMenuOpen,
-  } = useMenuHotkey(HotkeyView.SaveAnnotationProjectDialog);
+  } = useMenu();
 
   const onMenusClose = () => {
     onSubMenuClose();
@@ -63,15 +63,17 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
           <ExportAnnotationsAsMatrixMenuItem handleMenuClose={onMenusClose} />
           {/* <ExportAnnotationsAsJsonMenuItem handleMenuClose={onMenusClose} /> */}
         </Menu>
-        <MenuItem onClick={onOpenDialog}>Save Annotation Project</MenuItem>
+        <MenuItem onClick={onOpenSaveAnnotatorDialog}>
+          Save Annotation Project
+        </MenuItem>
       </Menu>
 
       <SaveAnnotationProjectDialog
         onClose={() => {
-          onCloseDialog();
+          onCloseSaveAnnotatorDialog();
           onMenusClose();
         }}
-        open={openDialog}
+        open={openSaveAnnotatorDialog}
       />
     </div>
   );

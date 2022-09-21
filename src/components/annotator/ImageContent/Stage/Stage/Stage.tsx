@@ -44,6 +44,10 @@ import {
   annotationStateSelector,
   cursorSelector,
   setSelectedAnnotations,
+  activeImageIdSelector,
+  selectedAnnotationsSelector,
+  unselectedAnnotationsSelector,
+  annotatorImagesSelector,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
 
@@ -63,6 +67,8 @@ export const Stage = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
+  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
+  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
   const selectionMode = useSelector(selectionModeSelector);
 
   const stageHeight = useSelector(stageHeightSelector);
@@ -72,6 +78,9 @@ export const Stage = () => {
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
 
+  const images = useSelector(annotatorImagesSelector);
+
+  const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const [currentPosition, setCurrentPosition] = useState<{
