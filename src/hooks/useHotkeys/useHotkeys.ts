@@ -30,32 +30,32 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
   return tagFilter(ev, ["INPUT", "TEXTAREA", "SELECT"]);
 };
 
-export function useHotkeys<T extends Element>(
+export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: Options
 ): void;
-export function useHotkeys<T extends Element>(
+export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: Options
 ): void;
-export function useHotkeys<T extends Element>(
+export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   deps?: any[]
 ): void;
-export function useHotkeys<T extends Element>(
+export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: Options,
   deps?: any[]
 ): void;
-export function useHotkeys<T extends Element>(
+export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,

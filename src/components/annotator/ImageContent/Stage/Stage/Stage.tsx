@@ -43,10 +43,6 @@ import {
   annotationStateSelector,
   cursorSelector,
   setSelectedAnnotations,
-  activeImageIdSelector,
-  selectedAnnotationsSelector,
-  unselectedAnnotationsSelector,
-  annotatorImagesSelector,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
 
@@ -66,8 +62,6 @@ export const Stage = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
   const selectionMode = useSelector(selectionModeSelector);
 
   const stageHeight = useSelector(stageHeightSelector);
@@ -77,9 +71,6 @@ export const Stage = () => {
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
 
-  const images = useSelector(annotatorImagesSelector);
-
-  const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const [currentPosition, setCurrentPosition] = useState<{
@@ -506,44 +497,6 @@ export const Stage = () => {
     scaledImageWidth,
     stageScale,
   ]);
-
-  const confirmAnnotations = () => {
-    if (
-      !selectedAnnotation ||
-      !annotationTool ||
-      annotationTool.annotationState === AnnotationStateType.Annotating ||
-      !activeImageId
-    )
-      return;
-
-    if (
-      toolType === ToolType.PolygonalAnnotation ||
-      toolType === ToolType.LassoAnnotation
-    ) {
-      annotationTool.connect();
-    }
-
-    dispatch(
-      imageViewerSlice.actions.setImageInstances({
-        instances: [...unselectedAnnotations, ...selectedAnnotations],
-        imageId: activeImageId,
-      })
-    );
-
-    deselectAnnotation();
-
-    if (selectionMode !== AnnotationModeType.New)
-      dispatch(
-        imageViewerSlice.actions.setSelectionMode({
-          selectionMode: AnnotationModeType.New,
-        })
-      );
-
-    if (!selectedAnnotationsIds.length) return;
-
-    deselectAllAnnotations();
-    deselectAllTransformers();
-  };
 
   /*/
   Detach transformers and selections when all annotations are removed
