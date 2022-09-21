@@ -39,7 +39,10 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
   const [categoryIndex, setCategoryIndex] = useState<string>("");
   const dispatch = useDispatch();
-  const hotkeyView = HotkeyView.MainImageGrid;
+  const hotkeyViews = [
+    HotkeyView.MainImageGrid,
+    HotkeyView.MainImageGridAppBar,
+  ];
 
   useHotkeys(
     "shift+1,shift+2,shift+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9,shift+0",
@@ -50,8 +53,9 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
         });
       }
     },
-    hotkeyView
+    hotkeyViews
   );
+
   useHotkeys(
     "shift+backspace",
     (event) => {
@@ -61,8 +65,9 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
         });
       }
     },
-    hotkeyView
+    hotkeyViews
   );
+
   useHotkeys(
     "shift",
     () => {
@@ -74,7 +79,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
 
       setCategoryIndex("");
     },
-    hotkeyView,
+    hotkeyViews,
     { keyup: true },
     [dispatch, selectedImages]
   );

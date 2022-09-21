@@ -33,26 +33,32 @@ const isKeyboardEventTriggeredByInput = (ev: KeyboardEvent) => {
 export function useHotkeys<T extends Element>(
   keys: string,
   callback: KeyHandler,
-  hotkeyView: HotkeyView,
+  hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: Options
 ): void;
 export function useHotkeys<T extends Element>(
   keys: string,
   callback: KeyHandler,
-  hotkeyView: HotkeyView,
+  hotkeyView: HotkeyView | Array<HotkeyView>,
+  options?: Options
+): void;
+export function useHotkeys<T extends Element>(
+  keys: string,
+  callback: KeyHandler,
+  hotkeyView: HotkeyView | Array<HotkeyView>,
   deps?: any[]
 ): void;
 export function useHotkeys<T extends Element>(
   keys: string,
   callback: KeyHandler,
-  hotkeyView: HotkeyView,
+  hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: Options,
   deps?: any[]
 ): void;
 export function useHotkeys<T extends Element>(
   keys: string,
   callback: KeyHandler,
-  hotkeyView: HotkeyView,
+  hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: any[] | Options,
   deps?: any[]
 ): void {
@@ -72,6 +78,7 @@ export function useHotkeys<T extends Element>(
   } = (options as Options) || {};
   const currentHotkeyView = useSelector(hotkeyViewSelector);
   // The return value of this callback determines if the browsers default behavior is prevented.
+
   const memoisedCallback = useCallback(
     (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => {
       if (filter && !filter(keyboardEvent)) {
@@ -89,7 +96,11 @@ export function useHotkeys<T extends Element>(
         return true;
       }
 
-      if (hotkeyView === currentHotkeyView) {
+      if (
+        (hotkeyView.length && hotkeyView.includes(currentHotkeyView)) ||
+        (!hotkeyView.length && hotkeyView === currentHotkeyView)
+      ) {
+        console.log(true);
         callback(keyboardEvent, hotkeysEvent);
         return true;
       }

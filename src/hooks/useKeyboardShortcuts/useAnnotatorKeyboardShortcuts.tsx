@@ -120,7 +120,10 @@ export const useAnnotatorKeyboardShortcuts = ({
       if (!selectedCategory) return;
 
       dispatch(
-        setSelectedCategoryId({ selectedCategoryId: selectedCategory.id })
+        setSelectedCategoryId({
+          selectedCategoryId: selectedCategory.id,
+          execSaga: false,
+        })
       );
     },
     HotkeyView.Annotator
@@ -335,7 +338,10 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+        imageViewerSlice.actions.setActiveImage({
+          imageId: newActiveImageId,
+          execSaga: false,
+        })
       );
     },
     HotkeyView.Annotator,
@@ -358,7 +364,10 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({ imageId: newActiveImageId })
+        imageViewerSlice.actions.setActiveImage({
+          imageId: newActiveImageId,
+          execSaga: false,
+        })
       );
     },
     HotkeyView.Annotator,

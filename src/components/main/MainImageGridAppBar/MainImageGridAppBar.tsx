@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "hooks";
@@ -59,20 +59,32 @@ export const MainImageGridAppBar = () => {
   React.useEffect(() => {
     if (selectedImages.length > 0) {
       setShowImageGridAppBar(true);
-      dispatch(
-        registerHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
-      );
     } else {
       setShowImageGridAppBar(false);
-      if (currentHotkeyView === HotkeyView.MainImageGridAppBar) {
-        dispatch(unregisterHotkeyView({}));
-      }
     }
 
     images.length === selectedImages.length
       ? setShowSelectAllButton(false)
       : setShowSelectAllButton(true);
   }, [selectedImages, images]);
+
+  useEffect(() => {
+    if (
+      showImageGridAppBar &&
+      currentHotkeyView !== HotkeyView.MainImageGridAppBar
+    ) {
+      dispatch(
+        registerHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
+      );
+    } else if (
+      !showImageGridAppBar &&
+      currentHotkeyView === HotkeyView.MainImageGridAppBar
+    ) {
+      if (currentHotkeyView === HotkeyView.MainImageGridAppBar) {
+        dispatch(unregisterHotkeyView({}));
+      }
+    }
+  }, [showImageGridAppBar, currentHotkeyView, dispatch]);
 
   const {
     onClose: onCloseDeleteImagesDialog,
@@ -125,6 +137,7 @@ export const MainImageGridAppBar = () => {
     if (!selected) return;
 
     dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+    dispatch(unregisterHotkeyView({}));
     navigate("/annotator");
   };
 

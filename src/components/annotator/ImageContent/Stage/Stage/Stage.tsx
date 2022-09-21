@@ -4,7 +4,6 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import * as _ from "lodash";
-import { useHotkeys } from "react-hotkeys-hook";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -545,106 +544,6 @@ export const Stage = () => {
     deselectAllAnnotations();
     deselectAllTransformers();
   };
-
-  useHotkeys(
-    "enter",
-    () => {
-      confirmAnnotations();
-    },
-    [
-      activeImageId,
-      annotations,
-      annotationTool,
-      annotationTool?.annotationState,
-      selectedAnnotations,
-      unselectedAnnotations,
-      selectionMode,
-      selectedAnnotationsIds,
-      toolType,
-    ]
-  );
-
-  useHotkeys(
-    "escape",
-    () => {
-      if (!annotationTool) return;
-
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      deselectAnnotation();
-
-      if (toolType !== ToolType.Zoom) return;
-      onZoomDeselect();
-    },
-    [annotations, annotationTool, toolType]
-  );
-
-  useHotkeys(
-    "backspace, delete",
-    () => {
-      dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
-        })
-      );
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      deselectAnnotation();
-    },
-    [selectedAnnotationsIds, annotations]
-  );
-
-  useHotkeys(
-    "up",
-    () => {
-      if (!activeImageId) {
-        return;
-      }
-
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId
-      );
-      if (activeImageIdx < 1) {
-        return;
-      }
-
-      const newActiveImageId = images[activeImageIdx - 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: newActiveImageId,
-          execSaga: true,
-        })
-      );
-    },
-    [images, activeImageId]
-  );
-
-  useHotkeys(
-    "down",
-    () => {
-      if (!activeImageId) {
-        return;
-      }
-
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId
-      );
-      if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
-        return;
-      }
-
-      const newActiveImageId = images[activeImageIdx + 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: newActiveImageId,
-          execSaga: true,
-        })
-      );
-    },
-    [images, activeImageId]
-  );
 
   /*/
   Detach transformers and selections when all annotations are removed
