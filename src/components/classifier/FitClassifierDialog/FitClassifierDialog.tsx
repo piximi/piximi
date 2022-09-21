@@ -14,7 +14,7 @@ import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
-import { alertStateSelector, unregisterHotkeyView } from "store/application";
+import { alertStateSelector } from "store/application";
 import {
   classifierTrainingFlagSelector,
   classifierCompiledSelector,
