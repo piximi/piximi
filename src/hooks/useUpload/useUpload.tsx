@@ -3,7 +3,10 @@ import { useDispatch } from "react-redux";
 
 import { applicationSlice } from "store/application";
 
-import { getImageInformation, ImageShapeEnum } from "image/utils/imageHelper";
+import {
+  getImageFileInformation,
+  ImageShapeEnum,
+} from "image/utils/imageHelper";
 
 export const useUpload = (
   setOpenDimensionsDialogBox: (flag: boolean) => void,
@@ -13,15 +16,19 @@ export const useUpload = (
 
   return useCallback(
     async (files: FileList) => {
-      const imageShapeInfo = await getImageInformation(files[0]);
+      const imageShapeInfo = await getImageFileInformation(files[0]);
 
-      if (imageShapeInfo.shape === ImageShapeEnum.SingleRGBImage) {
+      if (
+        [ImageShapeEnum.SingleRGBImage, ImageShapeEnum.GreyScale].includes(
+          imageShapeInfo.shape
+        )
+      ) {
         dispatch(
           applicationSlice.actions.uploadImages({
             files: files,
-            channels: 3,
+            channels: imageShapeInfo.shape === ImageShapeEnum.GreyScale ? 1 : 3,
             slices: 1,
-            imageShapeInfo: imageShapeInfo,
+            referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
             execSaga: true,
           })
@@ -32,7 +39,7 @@ export const useUpload = (
             files: files,
             channels: 1,
             slices: 1,
-            imageShapeInfo: imageShapeInfo,
+            referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
             execSaga: true,
           })

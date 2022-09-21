@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -71,7 +71,7 @@ export const ImageShapeDialog = ({
         files: files,
         channels: channels,
         slices: slices,
-        imageShapeInfo: referenceImageShape,
+        referenceShape: referenceImageShape,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
         execSaga: true,
       })

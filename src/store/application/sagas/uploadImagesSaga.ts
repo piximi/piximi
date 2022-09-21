@@ -17,11 +17,15 @@ import {
 import { getStackTraceFromError } from "utils/getStackTrace";
 
 import { convertToImage } from "image/imageHelper";
-import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
+import {
+  ImageShapeInfo,
+  ImageShapeEnum,
+  loadImageAsStack,
+} from "image/utils/imageHelper";
 
 type ImageFileType = {
   fileName: string;
-  imageStack: Array<ImageJS.Image> | ImageJS.Stack;
+  imageStack: ImageJS.Stack;
 };
 
 type ImageFileError = {
@@ -34,7 +38,7 @@ export function* uploadImagesSaga({
     files,
     channels,
     slices,
-    imageShapeInfo,
+    referenceShape,
     isUploadedFromAnnotator,
     execSaga,
   },
@@ -42,7 +46,7 @@ export function* uploadImagesSaga({
   files: FileList;
   channels: number;
   slices: number;
-  imageShapeInfo: ImageShapeInfo;
+  referenceShape: ImageShapeInfo;
   isUploadedFromAnnotator: boolean;
   execSaga: boolean;
 }>) {
@@ -58,19 +62,20 @@ export function* uploadImagesSaga({
   for (const file of files) {
     try {
       const imageFile: GeneratorReturnType<ReturnType<typeof decodeImageFile>> =
-        yield decodeImageFile(file, imageShapeInfo.shape);
+        yield decodeImageFile(file, referenceShape.shape);
       imageFiles.push(imageFile);
     } catch (err) {
+      process.env.NODE_ENV !== "production" && console.error(err);
       invalidImageFiles.push({
         fileName: file.name,
-        error: "could not decode",
+        error: "Could not decode",
       });
     }
   }
 
   const imagesToUpload: Array<ImageType> = [];
   for (const { imageStack, fileName } of imageFiles) {
-    if (!checkImageShape(imageStack, channels, slices, imageShapeInfo.shape)) {
+    if (!checkImageShape(imageStack, channels, slices, referenceShape.shape)) {
       invalidImageFiles.push({
         fileName,
         error: `Could not match image to shape ${channels} (c) x ${slices} (z)`,
@@ -81,7 +86,7 @@ export function* uploadImagesSaga({
     if (![8, 16].includes(imageStack[0].bitDepth)) {
       invalidImageFiles.push({
         fileName,
-        error: `unsupported bit depth of ${imageStack[0].bitDepth}`,
+        error: `Unsupported bit depth of ${imageStack[0].bitDepth}`,
       });
       continue;
     }
@@ -141,7 +146,7 @@ export function* uploadImagesSaga({
 }
 
 function* decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
-  let img: ImageJS.Image | ImageJS.Stack;
+  let imageStack: ImageJS.Stack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {
     const imgArrayBuffer: Awaited<ReturnType<typeof imageFile.arrayBuffer>> =
       yield imageFile.arrayBuffer();
@@ -162,19 +167,23 @@ function* decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
       pixelDataElement.length / 2
     );
 
-    img = new ImageJS.Image(rows, columns, pixelData, {
+    const img = new ImageJS.Image(rows, columns, pixelData, {
       components: samplesPerPixel,
       bitDepth: bitsAllocated,
       alpha: 0,
     });
+
+    const channels: ImageJS.Image[] = [];
+    for (let i = 0; i < samplesPerPixel; i++) {
+      channels.push(img.getChannel(i));
+    }
+    imageStack = new ImageJS.Stack(channels);
   } else {
-    img = yield imageFile.arrayBuffer().then((buffer) => {
-      return ImageJS.Image.load(buffer, { ignorePalette: true });
-    });
+    imageStack = yield loadImageAsStack(imageFile);
   }
 
   return {
-    imageStack: Array.isArray(img) ? img : [img],
+    imageStack,
     fileName: imageFile.name,
   } as ImageFileType;
 }
@@ -183,10 +192,12 @@ function checkImageShape(
   imageStack: Array<ImageJS.Image>,
   channels: number,
   slices: number,
-  imageShapeInfo: ImageShapeEnum
+  imageShape: ImageShapeEnum
 ) {
   const frames = imageStack.length;
-  if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
+  if (imageShape === ImageShapeEnum.GreyScale) {
+    return frames === 1 && imageStack[0].components === 1;
+  } else if (imageShape === ImageShapeEnum.SingleRGBImage) {
     return frames === 1 && imageStack[0].components === 3;
   } else {
     return channels * slices === frames;

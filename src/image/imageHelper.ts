@@ -339,6 +339,7 @@ const convertImageDataToURI = (
   });
 };
 
+// TODO: image_data
 export const convertToImage = (
   inputStack: Array<ImageJS.Image>,
   filename: string,
@@ -473,6 +474,7 @@ export const convertToImage = (
   };
 };
 
+// TODO: image_data
 const convertSingleRGBImage = (
   input: ImageJS.Image,
   filename: string,
@@ -610,6 +612,7 @@ const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
   });
 };
 
+// TODO: image_data
 export const generateDefaultChannels = (numChannels: number): Array<Color> => {
   /**
    * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
