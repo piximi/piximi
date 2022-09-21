@@ -85,7 +85,3 @@ export const MainToolbar = () => {
     </Toolbar>
   );
 };
-
-const Div = ({ children }: { children: any }) => {
-  return <div>{children}</div>;
-};
