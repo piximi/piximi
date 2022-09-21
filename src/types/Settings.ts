@@ -8,10 +8,17 @@ export enum HotkeyView {
   DeleteAnnotationCategoryDialog,
   DeleteAllCategoriesDialog,
   DeleteCategoryDialog,
+  DeleteImagesDialog,
   EditCategoryDialog,
+  ExampleClassifierDialog,
   ImageShapeDialog,
+  ImportTensorflowModelDialog,
   MainImageGrid,
+  MainImageGridAppBar,
+  NewProjectDialog,
   SaveAnnotationProjectDialog,
+  SaveFittedModelDialog,
+  SaveProjectDialog,
 }
 export type Settings = {
   tileSize: number;

@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { LayersModel } from "@tensorflow/tfjs";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 
-import { SegmenterModelProps, ClassifierModelProps } from "types";
+import { SegmenterModelProps, ClassifierModelProps, HotkeyView } from "types";
 
 type SaveFittedModelDialogProps = {
   modelProps: ClassifierModelProps | SegmenterModelProps;
@@ -50,7 +50,7 @@ export const SaveFittedModelDialog = ({
     () => {
       onSaveClassifierClick();
     },
-    { enabled: open },
+    HotkeyView.SaveFittedModelDialog,
     [onSaveClassifierClick]
   );
 

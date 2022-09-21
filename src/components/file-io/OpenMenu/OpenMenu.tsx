@@ -4,7 +4,7 @@ import { LayersModel } from "@tensorflow/tfjs";
 
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
 import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
@@ -13,7 +13,7 @@ import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowM
 import { classifierSlice } from "store/classifier";
 import { segmenterSlice } from "store/segmenter";
 
-import { ModelType, Shape } from "types";
+import { HotkeyView, ModelType, Shape } from "types";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -26,17 +26,17 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     onClose: onCloseImportClassifierDialog,
     onOpen: onOpenImportClassifierDialog,
     open: openImportClassifierDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
     open: openImportSegmenterDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
   const {
     onClose: onCloseExampleClassifierDialog,
     onOpen: onOpenExampleClassifierDialog,
     open: openExampleClassifier,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.ExampleClassifierDialog);
 
   const dispatch = useDispatch();
 

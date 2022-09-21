@@ -23,7 +23,7 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
 import { SaveProjectDialog } from "components/file-io/SaveProjectDialog/SaveProjectDialog";
@@ -38,7 +38,7 @@ import {
   segmenterArchitectureOptionsSelector,
 } from "store/segmenter";
 
-import { AlertStateType, AlertType } from "types";
+import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
 import { APPLICATION_COLORS } from "colorPalette";
@@ -68,13 +68,13 @@ export const FallBackDialog = (props: any) => {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,
     open: openSaveProjectDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.SaveProjectDialog);
 
   const {
     onClose: onSaveAnnotationProjectDialogClose,
     onOpen: onSaveAnnotationProjectDialogOpen,
     open: openAnnotationSaveProjectDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.SaveAnnotationProjectDialog);
 
   const routPath = useLocation().pathname;
   const inAnnotator = routPath === "/annotator";
@@ -83,13 +83,13 @@ export const FallBackDialog = (props: any) => {
     onClose: onSaveClassifierDialogClose,
     onOpen: onSaveClassifierDialogOpen,
     open: openSaveClassifierDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
   const {
     onClose: onSaveSegmenterDialogClose,
     onOpen: onSaveSegmenterDialogOpen,
     open: openSaveSegmenterDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
   const fittedClassifierModel = useSelector(classifierFittedSelector);
   const selectedClassifierModelProps = useSelector(

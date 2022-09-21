@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   AppBar,
@@ -23,18 +23,23 @@ import {
   SelectAll as SelectAllIcon,
 } from "@mui/icons-material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { DeleteImagesDialog } from "../DeleteImagesDialog";
 
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
-import { applicationSlice } from "store/application";
+import {
+  applicationSlice,
+  hotkeyViewSelector,
+  registerHotkeyView,
+  unregisterHotkeyView,
+} from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 import { setActiveImage, imageViewerSlice } from "store/image-viewer";
 
-import { ImageType, ShadowImageType } from "types";
+import { HotkeyView, ImageType, ShadowImageType } from "types";
 
 export const MainImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -42,6 +47,7 @@ export const MainImageGridAppBar = () => {
 
   const images = useSelector(visibleImagesSelector);
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
+  const currentHotkeyView = useSelector(hotkeyViewSelector);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -51,9 +57,17 @@ export const MainImageGridAppBar = () => {
     React.useState<boolean>(true);
 
   React.useEffect(() => {
-    selectedImages.length > 0
-      ? setShowImageGridAppBar(true)
-      : setShowImageGridAppBar(false);
+    if (selectedImages.length > 0) {
+      setShowImageGridAppBar(true);
+      dispatch(
+        registerHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
+      );
+    } else {
+      setShowImageGridAppBar(false);
+      if (currentHotkeyView === HotkeyView.MainImageGridAppBar) {
+        dispatch(unregisterHotkeyView({}));
+      }
+    }
 
     images.length === selectedImages.length
       ? setShowSelectAllButton(false)
@@ -64,7 +78,7 @@ export const MainImageGridAppBar = () => {
     onClose: onCloseDeleteImagesDialog,
     onOpen: onOpenDeleteImagesDialog,
     open: openDeleteImagesDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.DeleteImagesDialog);
 
   const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     setCategoryMenuAnchorEl(event.currentTarget);
@@ -125,10 +139,12 @@ export const MainImageGridAppBar = () => {
     dispatch(applicationSlice.actions.clearSelectedImages());
   };
 
-  useHotkeys("esc", () => unselectImages(), { enabled: showImageGridAppBar });
-  useHotkeys("backspace, delete", () => onOpenDeleteImagesDialog(), {
-    enabled: showImageGridAppBar,
-  });
+  useHotkeys("esc", () => unselectImages(), HotkeyView.MainImageGridAppBar);
+  useHotkeys(
+    "backspace, delete",
+    () => onOpenDeleteImagesDialog(),
+    HotkeyView.MainImageGridAppBar
+  );
 
   const tooltipTitle = (
     tooltip: string,
