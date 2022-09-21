@@ -98,7 +98,7 @@ export const applicationSlice = createSlice({
         files: FileList;
         channels: number;
         slices: number;
-        imageShapeInfo: ImageShapeInfo;
+        referenceShape: ImageShapeInfo;
         isUploadedFromAnnotator: boolean;
         execSaga: boolean;
       }>

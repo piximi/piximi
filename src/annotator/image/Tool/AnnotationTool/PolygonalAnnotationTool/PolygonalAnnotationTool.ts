@@ -80,6 +80,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       const maskImage = this.computeAnnotationMaskFromPoints();
       if (!maskImage) return;
 
+      //@ts-expect-error: TODO: image_data
       this._mask = encode(maskImage.data);
 
       this.buffer = [];

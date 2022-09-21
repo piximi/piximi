@@ -72,7 +72,7 @@ export const ImageShapeDialog = ({
         files: files,
         channels: channels,
         slices: slices,
-        imageShapeInfo: referenceImageShape,
+        referenceShape: referenceImageShape,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
         execSaga: true,
       })
