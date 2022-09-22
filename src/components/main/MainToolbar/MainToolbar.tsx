@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 
 import { Slider, Toolbar, Box, Button } from "@mui/material";
