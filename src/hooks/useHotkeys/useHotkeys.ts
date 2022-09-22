@@ -128,5 +128,5 @@ export function useHotkeys(
     hotkeys(keys, (options as Options) || {}, memoisedCallback);
 
     return () => hotkeys.unbind(keys, memoisedCallback);
-  }, [memoisedCallback, keys, enabled]);
+  }, [keyup, keydown, options, memoisedCallback, keys, enabled]);
 }
