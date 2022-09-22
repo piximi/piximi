@@ -19,9 +19,9 @@ import { SerializedFileType } from "types/SerializedFileType";
 import {
   generateDefaultChannels,
   replaceDuplicateName,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 import { Partition } from "types/Partition";
-import { AnnotationTool } from "annotator/image/Tool";
+import { AnnotationTool } from "annotator/AnnotationTools";
 import { defaultImage } from "images/defaultImage";
 
 const initialState: ImageViewer = {

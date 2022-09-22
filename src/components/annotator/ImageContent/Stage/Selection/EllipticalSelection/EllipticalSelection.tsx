@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { EllipticalAnnotationTool } from "annotator/image/Tool";
+import { EllipticalAnnotationTool } from "annotator/AnnotationTools";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;

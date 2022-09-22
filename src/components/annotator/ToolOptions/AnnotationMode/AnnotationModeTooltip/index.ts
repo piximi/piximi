@@ -1,1 +1,0 @@
-export { AnnotationModeTooltip } from "./AnnotationModeTooltip";

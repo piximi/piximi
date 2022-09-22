@@ -1,8 +1,7 @@
-import { decode, encode } from "annotator/image/rle";
-import { AnnotationType } from "types/AnnotationType";
-import { Category } from "types/Category";
-import { Shape } from "types/Shape";
 import { v4 as uuidv4 } from "uuid";
+
+import { decode, encode } from "utils/annotator";
+import { AnnotationType, Category, Shape } from "types";
 
 export const encodeAnnotationToSegmentationMask = (
   annotations: AnnotationType[],

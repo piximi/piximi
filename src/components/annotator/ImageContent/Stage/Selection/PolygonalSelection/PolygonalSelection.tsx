@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { PolygonalAnnotationTool } from "annotator/image/Tool";
+import { PolygonalAnnotationTool } from "annotator/AnnotationTools";
 
 type PolygonalSelectionProps = {
   operator: PolygonalAnnotationTool;

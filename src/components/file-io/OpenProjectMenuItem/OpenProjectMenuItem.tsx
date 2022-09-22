@@ -17,7 +17,7 @@ import {
   SerializedProjectType,
 } from "types";
 
-import { deserializeImages } from "image/imageHelper";
+import { deserializeImages } from "utils/common/imageHelper";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;

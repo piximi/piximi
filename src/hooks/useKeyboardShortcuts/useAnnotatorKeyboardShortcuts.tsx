@@ -22,7 +22,7 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator/image/Tool";
+import { AnnotationTool } from "annotator/AnnotationTools";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 

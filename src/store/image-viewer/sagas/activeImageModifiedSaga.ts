@@ -9,7 +9,7 @@ import { Color } from "types";
 import {
   convertImageURIsToImageData,
   mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 export function* activeImageIDChangeSaga({
   payload: { imageId, execSaga },

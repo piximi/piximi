@@ -23,7 +23,7 @@ import {
 } from "store/project";
 
 import { CategoryType } from "types";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);

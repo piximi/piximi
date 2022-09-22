@@ -48,7 +48,8 @@ import { selectedCategorySelector } from "store/common";
 
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
-import { ObjectAnnotationTool, Tool } from "annotator/image/Tool";
+import { ObjectAnnotationTool } from "annotator/AnnotationTools";
+import { Tool } from "annotator/Tool";
 import { SoundEvents } from "./SoundEvents";
 
 export const Stage = () => {

@@ -18,7 +18,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 
-import { importSerializedAnnotations } from "image/imageHelper";
+import { importSerializedAnnotations } from "utils/common/imageHelper";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;

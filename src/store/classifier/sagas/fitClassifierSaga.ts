@@ -34,7 +34,7 @@ import {
   Partition,
 } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export function* fitClassifierSaga({
   payload: { onEpochEnd, execSaga },
