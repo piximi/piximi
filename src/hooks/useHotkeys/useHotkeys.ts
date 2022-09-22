@@ -57,7 +57,7 @@ export function useHotkeys(
 ): void;
 export function useHotkeys(
   keys: string,
-  callback: KeyHandler,
+  callback: () => void,
   hotkeyView: HotkeyView | Array<HotkeyView>,
   options?: any[] | Options,
   deps?: any[]
@@ -106,7 +106,7 @@ export function useHotkeys(
       }
 
       return false;
-    },
+    }, //eslint-disable-next-line react-hooks/exhaustive-deps
     deps
       ? [hotkeyView, currentHotkeyView, enableOnTags, filter, ...deps]
       : [hotkeyView, currentHotkeyView, enableOnTags, filter]
