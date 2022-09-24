@@ -5,5 +5,6 @@ export const currentColorsSelector = ({
 }: {
   imageViewer: ImageViewer;
 }): Array<Color> | undefined => {
+  // TODO: image_data
   return imageViewer.currentColors;
 };

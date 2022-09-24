@@ -28,6 +28,7 @@ enum BitDepth {
   FLOAT32 = 32,
 }
 
+// TODO: image_data
 export const mapChannelsToSpecifiedRGBImage = (
   data: Array<Array<number>>,
   colors: Array<Color>,
@@ -106,6 +107,7 @@ export const mapChannelsToSpecifiedRGBImage = (
   });
 };
 
+// TODO: image_data
 export const extractChannelsFromFlattenedArray = (
   flattened: Uint8Array,
   channels: number,
@@ -319,6 +321,7 @@ export const getImageInformation = async (file: File) => {
   }
 };
 
+// TODO: image_data
 const convertImageDataToURI = (
   width: number,
   height: number,
@@ -446,6 +449,7 @@ export const convertToImage = (
     }
   }
 
+  // apply colors
   const displayedURI = mapChannelsToSpecifiedRGBImage(
     displayedData,
     colors,
@@ -483,6 +487,7 @@ const convertSingleRGBImage = (
   const width = input.width;
   const height = input.height;
 
+  // deinterlace
   const displayedData = extractChannelsFromFlattenedArray(
     input.data as Uint8Array,
     input.components,
@@ -496,6 +501,7 @@ const convertSingleRGBImage = (
     }
   );
 
+  // make composite
   const displayedURI = mapChannelsToSpecifiedRGBImage(
     displayedData,
     colors,
