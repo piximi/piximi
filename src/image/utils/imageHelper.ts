@@ -49,7 +49,7 @@ const MIMETYPES = [
   "image/dicom",
 ] as const;
 
-type MIMEType = typeof MIMETYPES[number];
+export type MIMEType = typeof MIMETYPES[number];
 
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;
@@ -71,21 +71,23 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
 export const loadImageAsStack = async (file: File) => {
   try {
     const buffer = await file.arrayBuffer();
-    const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
-      buffer,
-      { ignorePalette: true }
-    );
+    let image = (await ImageJS.Image.load(buffer, {
+      ignorePalette: true,
+    })) as ImageJS.Image | ImageJS.Stack;
 
     const imageShapeInfo = getImageInformation(image);
 
     if (imageShapeInfo.shape !== ImageShapeEnum.HyperStackImage) {
-      const imageStack: Array<ImageJS.Image> = [];
-      for (let i = 0; i < image.components; i++) {
-        imageStack.push(image.getChannel(i));
+      image = (image as ImageJS.Image).split({ preserveAlpha: false });
+      // preserveAlpha removes the alpha data from each ImageJS.Image
+      // but its still present as its own ImageJS.Image as the final
+      // element of the stack, so remove it
+      if (imageShapeInfo.alpha) {
+        image = new ImageJS.Stack(image.splice(0, image.length - 1));
       }
-      return new ImageJS.Stack(imageStack);
-    } else {
       return image;
+    } else {
+      return image as ImageJS.Stack;
     }
   } catch (err) {
     process.env.NODE_ENV !== "production" &&
@@ -395,6 +397,7 @@ const renderTensor = async (compositeTensor: Tensor3D) => {
   const image = new ImageJS.Image(width, height, imageData);
   // const dataURL = await image.toDataURL("iamge/png", { useCanvas: true });
   const dataURL = image.toDataURL("image/png");
+  // TODO: image_data, use Blob instead: https://javascript.info/blob
   return dataURL;
 };
 
