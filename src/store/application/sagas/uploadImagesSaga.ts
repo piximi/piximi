@@ -16,11 +16,11 @@ import {
 
 import { getStackTraceFromError } from "utils/getStackTrace";
 
-import { convertToImage } from "image/imageHelper";
 import {
   ImageShapeInfo,
   ImageShapeEnum,
   loadImageAsStack,
+  convertToImage,
 } from "image/utils/imageHelper";
 
 type ImageFileType = {
@@ -52,6 +52,8 @@ export function* uploadImagesSaga({
 }>) {
   if (!execSaga) return;
 
+  // TODO: image_data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const colors: ReturnType<typeof currentColorsSelector> = yield select(
     currentColorsSelector
   );
@@ -92,8 +94,10 @@ export function* uploadImagesSaga({
     }
 
     try {
-      const imageToUpload: ReturnType<typeof convertToImage> =
-        yield convertToImage(imageStack, fileName, colors, slices, channels);
+      //@ts-ignore TODO: image_data
+      const imageToUpload: Awaited<ReturnType<typeof convertToImage>> =
+        yield convertToImage(imageStack, fileName, undefined, slices, channels);
+      //@ts-ignore TODO: image_data
       imagesToUpload.push(imageToUpload);
     } catch (err) {
       const error = err as Error;
@@ -194,12 +198,11 @@ function checkImageShape(
   slices: number,
   imageShape: ImageShapeEnum
 ) {
-  const frames = imageStack.length;
   if (imageShape === ImageShapeEnum.GreyScale) {
-    return frames === 1 && imageStack[0].components === 1;
+    return channels === 1 && imageStack.length === 1;
   } else if (imageShape === ImageShapeEnum.SingleRGBImage) {
-    return frames === 1 && imageStack[0].components === 3;
+    return channels === 3 && imageStack.length === 3;
   } else {
-    return channels * slices === frames;
+    return channels * slices === imageStack.length;
   }
 }

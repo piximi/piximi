@@ -22,6 +22,7 @@ export {
 
 export type { Classifier } from "./Classifier";
 
+// TODO: image_data
 export type { Color } from "./Color";
 
 export type { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
