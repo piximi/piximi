@@ -1,11 +1,12 @@
 import "@tensorflow/tfjs-node";
+import { scalar, tensor2d, Tensor4D, tidy } from "@tensorflow/tfjs-node";
 import * as ImageJS from "image-js";
 
-import { tensor2d } from "@tensorflow/tfjs-node";
 import {
   MIMEType,
   generateDefaultChannels,
   loadImageAsStack,
+  convertToTensor,
 } from "image/utils/imageHelper";
 
 describe("color generation", () => {
@@ -94,7 +95,12 @@ describe("color generation", () => {
   });
 });
 
-describe("image data to ImageJS.Image", () => {
+describe("ImageJS Images -> Stacks -> Tensors ", () => {
+  /*
+  ======================
+  Test Image Definitions
+ */
+
   type PreloadedTestImages = {
     [key: string]: {
       filepath: string;
@@ -279,8 +285,13 @@ describe("image data to ImageJS.Image", () => {
 
   testData = testDataUnloaded as TestImages;
 
+  /*
+    / Test Image Definitions
+    ========================
+   */
+
   it.each(Object.keys(testData))(
-    "should load image stacks - %s",
+    "should load proper image stack - %s",
     async (im) => {
       const {
         width: expectedWidth,
@@ -293,9 +304,12 @@ describe("image data to ImageJS.Image", () => {
       } = testData[im];
 
       const imageStack = await loadImageAsStack(testData[im].data);
+
       // is ImageJS.Stack (subclass of array, containing ImageJS.Image objects)
       // and correct number of ImageJS.Image objects
       expect(imageStack.length || false).toBe(expectedFrames);
+
+      // each frame has correct properties
       imageStack.forEach((img) => {
         expect(img.width).toBe(expectedWidth);
         expect(img.height).toBe(expectedHeight);
@@ -305,6 +319,76 @@ describe("image data to ImageJS.Image", () => {
         expect(img.alpha).toBe(0);
         expect(img.size).toBe(expectedWidth * expectedHeight);
       });
+    }
+  );
+
+  it.each(Object.keys(testData))(
+    "should convert to tensor of correct shape - %s",
+    async (im) => {
+      const {
+        width: expectedWidth,
+        height: expectedHeight,
+        bitDepth: expectedBitDepth,
+        // frames: expectedFrames,
+        channels: expectedChannels,
+        slices: expectedSlices,
+        // mimetype: expectedMimeType,
+      } = testData[im];
+
+      const imageStack = await loadImageAsStack(testData[im].data);
+
+      const imageTensor = convertToTensor(
+        imageStack,
+        expectedSlices,
+        expectedChannels
+      );
+
+      const [axis0, axis1, axis2, axis3] = imageTensor.shape;
+
+      expect(axis0).toBe(expectedSlices);
+      expect(axis1).toBe(expectedHeight);
+      expect(axis2).toBe(expectedWidth);
+      expect(axis3).toBe(expectedChannels);
+
+      const imageTensorInt = tidy(() => {
+        return imageTensor
+          .mul<Tensor4D>(scalar(2 ** expectedBitDepth - 1, "int32"))
+          .round();
+      });
+
+      const imageTensorData = await imageTensorInt.array();
+
+      // gc - no longer needed
+      imageTensor.dispose();
+      imageTensorInt.dispose();
+
+      /*
+        This test loops on each image, and below is a quad-loop for each.
+        Calling expect in the innermost loop millions of times is super slow.
+
+        Instead, build an array of differences between tensor data and image data,
+        And check the sum is equal to 0 after.
+       */
+      const diffs: number[] = [];
+
+      let frameIdx = 0;
+      for (let sliceIdx = 0; sliceIdx < axis0; sliceIdx++) {
+        for (let channelIdx = 0; channelIdx < axis3; channelIdx++) {
+          let pixelIdx = 0;
+          for (let rowIdx = 0; rowIdx < axis1; rowIdx++) {
+            for (let colIdx = 0; colIdx < axis2; colIdx++) {
+              diffs.push(
+                imageTensorData[sliceIdx][rowIdx][colIdx][channelIdx] -
+                  imageStack[frameIdx].data[pixelIdx]
+              );
+              pixelIdx++;
+            }
+          }
+          frameIdx++;
+        }
+      }
+
+      expect(diffs.reduce((partialSum, diff) => partialSum + diff, 0)).toBe(0);
     }
   );
 });
