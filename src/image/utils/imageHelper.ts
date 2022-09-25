@@ -251,14 +251,19 @@ export const convertToTensor = (
   get slice corresponding to given index
   return image slice with dims: [H, W, C]
  */
-const getImageSlice = (imageTensor: Tensor4D, sliceIdx: number): Tensor3D => {
+export const getImageSlice = (
+  imageTensor: Tensor4D,
+  sliceIdx: number
+): Tensor3D => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, height, width, numChannels] = imageTensor.shape;
 
   return tidy("getImageSlice", () => {
-    return imageTensor
+    const res = imageTensor
       .slice([sliceIdx], [1, height, width, numChannels])
       .reshape([height, width, numChannels]) as Tensor3D;
+    imageTensor.dispose();
+    return res;
   });
 };
 
