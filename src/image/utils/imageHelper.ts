@@ -68,6 +68,21 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
  -----------------
  */
 
+/*
+  Receives a File blob and returns an ImageJS.Stack
+  If the file is a greyscale, rgb, rgba, ImageJS will return a single
+  ImageJS.Image object, where the data field has the pixel data interleaved
+  (including alpha, if present).
+
+    e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
+
+  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
+  of a simple array, where each element is a single channel ImageJS.Image object.
+
+  Instead we want to always return a stack, regardless of filetype.
+  Alpha channel is discarded, if present.
+  BitDepth and datat type is preserved.
+ */
 export const loadImageAsStack = async (file: File) => {
   try {
     const buffer = await file.arrayBuffer();
@@ -253,7 +268,8 @@ export const convertToTensor = (
  */
 export const getImageSlice = (
   imageTensor: Tensor4D,
-  sliceIdx: number
+  sliceIdx: number,
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: false }
 ): Tensor3D => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, height, width, numChannels] = imageTensor.shape;
@@ -262,13 +278,14 @@ export const getImageSlice = (
     const res = imageTensor
       .slice([sliceIdx], [1, height, width, numChannels])
       .reshape([height, width, numChannels]) as Tensor3D;
-    imageTensor.dispose();
+    // gc input tensor
+    opts.disposeImageTensor && imageTensor.dispose();
     return res;
   });
 };
 
 // filter out channels with visibility true in image colors
-const filterVisibleChannels = (colors: Colors): Array<number> => {
+export const filterVisibleChannels = (colors: Colors): Array<number> => {
   /*
     colors.visible has shape { [channel: boolean]: boolean; }
     Object.entries(colors.visible) produces [string, boolean][],
@@ -292,9 +309,10 @@ const filterVisibleChannels = (colors: Colors): Array<number> => {
   return color filtered image slice of dims:
     [H, W, VC]
  */
-const sliceVisibleChannels = (
+export const sliceVisibleChannels = (
   imageSlice: Tensor3D,
-  filter: Array<number>
+  filter: Array<number>,
+  opts: { disposeImageSlice: boolean } = { disposeImageSlice: true }
 ): Tensor3D => {
   // channel axis is innermost
   const channelAxis = 2;
@@ -304,7 +322,10 @@ const sliceVisibleChannels = (
 
     // form a new 3D tensor, gathering only channels in the indices matching the filter
     // channel axis is innermost, 2
-    return imageSlice.gather(indices, channelAxis);
+    const res = imageSlice.gather(indices, channelAxis);
+    // gc input tensor
+    opts.disposeImageSlice && imageSlice.dispose();
+    return res;
   });
 };
 
@@ -317,7 +338,7 @@ const sliceVisibleChannels = (
   return filtered color matrix of dims:
     [VC, 3]
  */
-const sliceVisibleColors = (
+export const sliceVisibleColors = (
   colors: Colors,
   filter: Array<number>
 ): Tensor2D => {
@@ -372,22 +393,29 @@ const sliceVisibleColors = (
  */
 export const generateColoredTensor = (
   imageSlice: Tensor3D,
-  colors: Tensor2D
+  colors: Tensor2D,
+  opts: { disposeImageSlice: boolean; disposeColors: boolean } = {
+    disposeImageSlice: true,
+    disposeColors: true,
+  }
 ): Tensor3D => {
   const [height, width, numVisibleChannels] = imageSlice.shape;
 
   return tidy("generateColoredTensor", () => {
-    return (
-      imageSlice
-        // [pixels, VC]
-        .reshape([height * width, numVisibleChannels])
-        // [pixels, VC] * [VC, 3] = [pixels, 3]
-        .matMul(colors)
-        // make sure composite is clamped to proper range for float32
-        .clipByValue(0, 1)
-        // [H, W, 3]
-        .reshape([height, width, 3])
-    );
+    const res: Tensor3D = imageSlice
+      // [pixels, VC]
+      .reshape([height * width, numVisibleChannels])
+      // [pixels, VC] * [VC, 3] = [pixels, 3]
+      .matMul(colors)
+      // make sure composite is clamped to proper range for float32
+      .clipByValue(0, 1)
+      // [H, W, 3]
+      .reshape([height, width, 3]);
+
+    opts.disposeImageSlice && imageSlice.dispose();
+    opts.disposeColors && colors.dispose();
+
+    return res;
   });
 };
 
