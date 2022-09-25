@@ -206,7 +206,7 @@ export const getImageInformation = (
 
  Return the resulting imageTensor
  */
-const convertToTensor = (
+export const convertToTensor = (
   imageStack: ImageJS.Stack,
   numSlices: number,
   numChannels: number
@@ -238,8 +238,8 @@ const convertToTensor = (
 
     // normalize in range of 0-1, if not already
     if (!(imageStack[0].data instanceof Float32Array)) {
-      const normScalar = scalar(2 ** bitDepth - 1).reciprocal();
-      imageTensor = imageTensor.mul(normScalar);
+      const normScalar = scalar(2 ** bitDepth - 1);
+      imageTensor = imageTensor.div(normScalar);
     }
 
     return imageTensor;
