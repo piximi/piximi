@@ -1,5 +1,12 @@
 import "@tensorflow/tfjs-node";
-import { scalar, tensor2d, Tensor4D, tidy } from "@tensorflow/tfjs-node";
+import {
+  scalar,
+  Tensor,
+  tensor2d,
+  tensor4d,
+  Tensor4D,
+  tidy,
+} from "@tensorflow/tfjs-node";
 import * as ImageJS from "image-js";
 
 import {
@@ -7,9 +14,10 @@ import {
   generateDefaultChannels,
   loadImageAsStack,
   convertToTensor,
+  getImageSlice,
 } from "image/utils/imageHelper";
 
-describe("color generation", () => {
+describe.skip("color generation", () => {
   const ALL = [1, 1, 1];
   const RED = [1, 0, 0];
   const GREEN = [0, 1, 0];
@@ -95,7 +103,7 @@ describe("color generation", () => {
   });
 });
 
-describe("ImageJS Images -> Stacks -> Tensors ", () => {
+describe.skip("ImageJS Images -> Stacks -> Tensors ", () => {
   /*
   ======================
   Test Image Definitions
@@ -291,16 +299,13 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
    */
 
   it.each(Object.keys(testData))(
-    "should load proper image stack - %s",
+    "should load correct image stack and metadata - %s",
     async (im) => {
       const {
         width: expectedWidth,
         height: expectedHeight,
         bitDepth: expectedBitDepth,
         frames: expectedFrames,
-        // channels: expectedChannels,
-        // slices: expectedSlices,
-        // mimetype: expectedMimeType,
       } = testData[im];
 
       const imageStack = await loadImageAsStack(testData[im].data);
@@ -323,17 +328,18 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
   );
 
   it.each(Object.keys(testData))(
-    "should convert to tensor of correct shape - %s",
+    "should convert to tensor of correct shape and data - %s",
     async (im) => {
       const {
         width: expectedWidth,
         height: expectedHeight,
         bitDepth: expectedBitDepth,
-        // frames: expectedFrames,
+        frames: expectedFrames,
         channels: expectedChannels,
         slices: expectedSlices,
-        // mimetype: expectedMimeType,
       } = testData[im];
+
+      expect(expectedChannels * expectedSlices).toBe(expectedFrames);
 
       const imageStack = await loadImageAsStack(testData[im].data);
 
@@ -391,4 +397,85 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
       expect(diffs.reduce((partialSum, diff) => partialSum + diff, 0)).toBe(0);
     }
   );
+});
+
+describe("Tensor -> Composite Image", () => {
+  const z = 2;
+  const h = 3;
+  const w = 2;
+  const c = 4;
+
+  function normTensor<T extends Tensor>(tensor: T) {
+    return tidy(() => {
+      const res = tensor.mul<T>(scalar(2 ** 16 - 1)).arraySync();
+      tensor.dispose();
+      return res;
+    });
+  }
+
+  const stackData = [
+    new Uint16Array([1111, 1121, 1211, 1221, 1311, 1321]),
+    new Uint16Array([1112, 1122, 1212, 1222, 1312, 1322]),
+    new Uint16Array([1113, 1123, 1213, 1223, 1313, 1323]),
+    new Uint16Array([1114, 1124, 1214, 1224, 1314, 1324]),
+
+    new Uint16Array([2111, 2121, 2211, 2221, 2311, 2321]),
+    new Uint16Array([2112, 2122, 2212, 2222, 2312, 2322]),
+    new Uint16Array([2113, 2123, 2213, 2223, 2313, 2323]),
+    new Uint16Array([2114, 2124, 2214, 2224, 2314, 2324]),
+  ];
+
+  const imageStack = new ImageJS.Stack(
+    stackData.map((imData, i) => {
+      return new ImageJS.Image({
+        width: 2,
+        height: 3,
+        data: stackData[i],
+        kind: "GREY" as ImageJS.ImageKind.GREY,
+        bitDepth: 16 as ImageJS.BitDepth.UINT16,
+        components: 1,
+        alpha: 0,
+        colorModel: "GREY" as ImageJS.ColorModel.GREY,
+      });
+    })
+  );
+
+  it("create tensor - Image -> Tensor4D", async () => {
+    let imageTensor = convertToTensor(imageStack, z, c);
+
+    // prettier-ignore
+    let expectedTensorArray = 
+    [
+        [[[1111, 1112, 1113, 1114], [1121, 1122, 1123, 1124]],
+         [[1211, 1212, 1213, 1214], [1221, 1222, 1223, 1224]],
+         [[1311, 1312, 1313, 1314], [1321, 1322, 1323, 1324]]]
+      ,
+        [[[2111, 2112, 2113, 2114], [2121, 2122, 2123, 2124]],
+         [[2211, 2212, 2213, 2214], [2221, 2222, 2223, 2224]],
+         [[2311, 2312, 2313, 2314], [2321, 2322, 2323, 2324]]]
+    ]
+
+    expect(imageTensor.shape).toEqual([z, h, w, c]);
+    expect(imageTensor.rank).toBe(4);
+    expect(normTensor(imageTensor)).toEqual(expectedTensorArray);
+    expect(imageTensor.isDisposed).toBe(true);
+  });
+
+  it("slice tensor - Tensor4D -> Tensor3D", async () => {
+    let imageTensor = convertToTensor(imageStack, z, c);
+
+    // prettier-ignore
+    const expectedTensorArray = 
+    [[[1111, 1112, 1113, 1114], [1121, 1122, 1123, 1124]],
+    [[1211, 1212, 1213, 1214], [1221, 1222, 1223, 1224]],
+    [[1311, 1312, 1313, 1314], [1321, 1322, 1323, 1324]]]
+
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    expect(imageSlice.shape).toEqual([h, w, c]);
+    expect(imageSlice.rank).toBe(3);
+    expect(normTensor(imageSlice)).toEqual(expectedTensorArray);
+    expect(imageTensor.isDisposed).toBe(true);
+    expect(imageSlice.isDisposed).toBe(true);
+  });
 });
