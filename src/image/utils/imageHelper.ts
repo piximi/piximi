@@ -420,17 +420,53 @@ export const generateColoredTensor = (
 };
 
 /*
+ Receives a 3D tensor of shape [H,W,C]
+ normalizes it based on the bit depth
+ and returns the correct TypedArray view on the buffer data
+ */
+const getImageTensorData = async (
+  imageTensor: Tensor3D,
+  bitDepth: ImageJS.BitDepth,
+  opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
+) => {
+  const imageData = await tidy(() =>
+    imageTensor.mul(2 ** bitDepth - 1).round()
+  ).data();
+
+  opts.disposeImageTensor && imageTensor.dispose();
+
+  // DO NOT USE "imageData instanceof Float32Array" here
+  // tensorflow sublcasses typed arrays, so it will always return false
+  if (imageData.constructor.name !== "Float32Array") {
+    throw Error("Tensor data should be stored as Float32Array");
+  }
+
+  switch (bitDepth) {
+    case 1:
+      throw Error("Binary bit depth not (yet) supported");
+    case 8:
+      return Uint8Array.from(imageData);
+    case 16:
+      return Uint16Array.from(imageData);
+    case 32:
+      return imageData; // already Float32
+    default:
+      throw Error("Unrecognized bit depth");
+  }
+};
+
+/*
   Receives a tensor of shape [H, W, 3]
   returns its base64 data url
  */
 export const renderTensor = async (
   compositeTensor: Tensor3D,
-  bitDepth: number,
+  bitDepth: ImageJS.BitDepth,
   opts: { disposeCompositeTensor?: boolean; useCanvas?: boolean } = {}
 ) => {
   opts.disposeCompositeTensor = opts.disposeCompositeTensor ?? true;
-  // TODO: image_data - default false after renderImage refactor
-  // so that it converts to 16 bit data
+  // using canvas will result in an rgba image where each channel is
+  // 0-255, regardless of the value of bitDepth
   opts.useCanvas = opts.useCanvas ?? true;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -438,30 +474,29 @@ export const renderTensor = async (
   /*
     tf.browser.toPixels has 2 quirks:
     - it will convert the tensor to the range 0-255,
-      can't ask it to return 16 bit instead
+      which is what we usually want (bc less memory),
+      but we can't override it to return 16 bit instead
     - it will insert alpha values (255) when the C dim is 3
 
     leaving here as reminder of why we're not using it
-
-    TODO: image_data - refactor to use ImageJS directly
-    from tensor data, research Blob first before refactoring
    */
-  const imageData = await browser.toPixels(compositeTensor);
+  // const imageData = await browser.toPixels(compositeTensor);
+  const imageData = await getImageTensorData(compositeTensor, bitDepth, {
+    disposeImageTensor: opts.disposeCompositeTensor,
+  });
+
   const image = new ImageJS.Image({
     width: width,
     height: height,
-    data: Uint8Array.from(imageData),
-    kind: "RGBA" as ImageJS.ImageKind,
-    // TODO: image_data - bitDepth after renderImage refactor
-    bitDepth: 8 as ImageJS.BitDepth,
+    data: imageData,
+    kind: "RGB" as ImageJS.ImageKind,
+    bitDepth: bitDepth as ImageJS.BitDepth,
     components: 3,
-    alpha: 1,
+    alpha: 0,
     colorModel: "RGB" as ImageJS.ColorModel,
   });
   const dataURL = image.toDataURL("image/png", { useCanvas: opts.useCanvas });
   // TODO: image_data, use Blob instead: https://javascript.info/blob
-
-  opts.disposeCompositeTensor && compositeTensor.dispose();
   return dataURL;
 };
 
