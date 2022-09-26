@@ -136,7 +136,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     const y1 = Math.round(origin.y);
     const x2 = Math.round(origin.x + width);
     const y2 = Math.round(origin.y + height);
-    points.push(...[x1, y1, x2, y1, x2, y2, x1, y2, x1, y1]);
+    points.push(...[x1, y1, x2, y2]);
 
     return points;
   }
