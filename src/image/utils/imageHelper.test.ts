@@ -19,9 +19,10 @@ import {
   sliceVisibleChannels,
   sliceVisibleColors,
   generateColoredTensor,
+  renderTensor,
 } from "image/utils/imageHelper";
 
-describe.skip("color generation", () => {
+describe("color generation", () => {
   const ALL = [1, 1, 1];
   const RED = [1, 0, 0];
   const GREEN = [0, 1, 0];
@@ -107,7 +108,7 @@ describe.skip("color generation", () => {
   });
 });
 
-describe.skip("ImageJS Images -> Stacks -> Tensors ", () => {
+describe("ImageJS Images -> Stacks -> Tensors ", () => {
   /*
   ======================
   Test Image Definitions
@@ -633,6 +634,106 @@ describe("Tensor -> Composite Image", () => {
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
 
     expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
+  });
+
+  it("should generate a correctly rendered image", async () => {
+    const Z = 2;
+    const H = 3;
+    const W = 2;
+    const C = 5;
+    const BITDEPTH = 16;
+    const useCanvas = false;
+
+    // TODO: image_data - for renderImage refactor
+    // // prettier-ignore
+    // const expectedOutput = [
+    //   65535, 65535, 65535,
+    //   65535, 65535, 65535,
+    //   65535, 65535, 65535,
+    //   65535, 65535, 65535,
+    //   65535, 65535, 65535,
+    //   65535, 65535, 65535,
+    // ];
+
+    // prettier-ignore
+    const expectedOutput = [
+      255, 255, 255, 255,
+      255, 255, 255, 255,
+      255, 255, 255, 255,
+      255, 255, 255, 255,
+      255, 255, 255, 255,
+      255, 255, 255, 255,
+    ];
+
+    const expectedImage = new ImageJS.Image({
+      width: W,
+      height: H,
+      data: new Uint8Array(expectedOutput),
+      // TODO: image_data - "RGB" after renderImage refactor
+      kind: "RGBA" as ImageJS.ImageKind,
+      // TODO: image_data - BITDEPTH after renderImage refactor
+      bitDepth: 8 as ImageJS.BitDepth,
+      components: 3,
+      // TODO: image_data - 0 after renderImage refactor
+      alpha: 1,
+      colorModel: "RGB" as ImageJS.ColorModel,
+    });
+
+    const expectedDataURL = expectedImage.toDataURL("image/png", {
+      useCanvas,
+    });
+
+    const stackData = [
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+    ];
+
+    const imageStack = new ImageJS.Stack(
+      stackData.map((imData, i) => {
+        return new ImageJS.Image({
+          width: W,
+          height: H,
+          data: stackData[i],
+          kind: "GREY" as ImageJS.ImageKind,
+          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          components: 1,
+          alpha: 0,
+          colorModel: "GREY" as ImageJS.ColorModel,
+        });
+      })
+    );
+
+    const colors = generateDefaultChannels(C);
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = true;
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    const renderedURL = await renderTensor(compositeImage, BITDEPTH, {
+      useCanvas,
+    });
+
+    const image = await ImageJS.Image.load(renderedURL);
+    const imageData = Array.from(image.data);
+
+    expect(renderedURL).toBe(expectedDataURL);
+    expect(imageData).toEqual(expectedOutput);
   });
 
   it("should garbage collect all but last tensors", async () => {
