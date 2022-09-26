@@ -744,13 +744,14 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    const renderedURL = await renderTensor(compositeImage, BITDEPTH);
 
     // intermediary tensors should be disposed
     expect(imageSlice.isDisposed).toBe(true);
     expect(filteredSlice.isDisposed).toBe(true);
     expect(filteredColors.isDisposed).toBe(true);
+    expect(compositeImage.isDisposed).toBe(true);
     // output tensors should not be disposed
     expect(imageTensor.isDisposed).toBe(false);
-    expect(compositeImage.isDisposed).toBe(false);
   });
 });
