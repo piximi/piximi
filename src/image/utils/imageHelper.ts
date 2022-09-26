@@ -1,6 +1,5 @@
 import * as ImageJS from "image-js";
 import {
-  browser,
   scalar,
   tensor1d,
   Tensor2D,
