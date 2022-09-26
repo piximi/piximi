@@ -423,14 +423,45 @@ export const generateColoredTensor = (
   Receives a tensor of shape [H, W, 3]
   returns its base64 data url
  */
-const renderTensor = async (compositeTensor: Tensor3D) => {
+export const renderTensor = async (
+  compositeTensor: Tensor3D,
+  bitDepth: number,
+  opts: { disposeCompositeTensor?: boolean; useCanvas?: boolean } = {}
+) => {
+  opts.disposeCompositeTensor = opts.disposeCompositeTensor ?? true;
+  // TODO: image_data - default false after renderImage refactor
+  // so that it converts to 16 bit data
+  opts.useCanvas = opts.useCanvas ?? true;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [height, width, _] = compositeTensor.shape;
+  /*
+    tf.browser.toPixels has 2 quirks:
+    - it will convert the tensor to the range 0-255,
+      can't ask it to return 16 bit instead
+    - it will insert alpha values (255) when the C dim is 3
+
+    leaving here as reminder of why we're not using it
+
+    TODO: image_data - refactor to use ImageJS directly
+    from tensor data, research Blob first before refactoring
+   */
   const imageData = await browser.toPixels(compositeTensor);
-  const image = new ImageJS.Image(width, height, imageData);
-  // const dataURL = await image.toDataURL("iamge/png", { useCanvas: true });
-  const dataURL = image.toDataURL("image/png");
+  const image = new ImageJS.Image({
+    width: width,
+    height: height,
+    data: Uint8Array.from(imageData),
+    kind: "RGBA" as ImageJS.ImageKind,
+    // TODO: image_data - bitDepth after renderImage refactor
+    bitDepth: 8 as ImageJS.BitDepth,
+    components: 3,
+    alpha: 1,
+    colorModel: "RGB" as ImageJS.ColorModel,
+  });
+  const dataURL = image.toDataURL("image/png", { useCanvas: opts.useCanvas });
   // TODO: image_data, use Blob instead: https://javascript.info/blob
+
+  opts.disposeCompositeTensor && compositeTensor.dispose();
   return dataURL;
 };
 
@@ -442,7 +473,7 @@ export const convertToImage = async (
   numChannels: number
 ) => {
   if (!imageStack.length) return;
-  // const { bitDepth, width, height } = imageStack[0];
+  const { bitDepth } = imageStack[0];
 
   const colors = currentColors
     ? currentColors
@@ -468,7 +499,7 @@ export const convertToImage = async (
 
   // TODO: image_data
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const coloredSliceSrc = await renderTensor(compositeImage);
+  const coloredSliceSrc = await renderTensor(compositeImage, bitDepth);
 
   // displayData := apply colors to each channel of each z slice
   // calculate min/max values per channel
