@@ -152,7 +152,6 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.points = this.buffer;
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
-
       const maskImage = this.computeAnnotationMaskFromPoints();
       if (!maskImage) return;
 
@@ -227,7 +226,6 @@ export class MagneticAnnotationTool extends AnnotationTool {
         this.origin.y,
         ...this.path,
       ];
-
       return;
     }
   }
