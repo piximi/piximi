@@ -1,56 +1,27 @@
-import * as ImageJS from "image-js";
 import { test } from "@jest/globals";
+import { Image } from "image-js";
+import { data } from "../testData.json";
 import { PolygonalAnnotationTool } from "./PolygonalAnnotationTool";
-import { Category } from "types";
+import { AnnotationStateType, Category } from "types";
 
-test("deselect", () => {
-  expect(true).toBe(true);
+const src = data.image;
+
+test("onMouseDown", async () => {
+  const image = await Image.load(src);
+
+  const operator = new PolygonalAnnotationTool(image);
+
+  operator.onMouseDown({ x: 0, y: 0 });
+
+  expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
+
+  expect(operator.annotation).toBe(undefined);
+
+  expect(operator.anchor).toStrictEqual(undefined);
+  expect(operator.buffer).toStrictEqual([]);
+  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.points).toStrictEqual([]);
 });
-
-// test("deselect", () => {
-//   const image = new ImageJS.Image();
-//
-//   const operator = new PolygonalAnnotationTool(image);
-//
-//   operator.annotated = true;
-//
-//   operator.anchor = { x: 100, y: 0 };
-//   operator.buffer = [0, 0, 100, 0, 100, 100, 0, 100];
-//   operator.origin = { x: 0, y: 0 };
-//   operator.points = [0, 0, 100, 0, 100, 100, 0, 100, 0, 0];
-//
-//   operator.deselect();
-//
-//   expect(operator.annotated).toBe(false);
-//   expect(operator.annotating).toBe(false);
-//
-//   expect(operator.annotation).toBe(undefined);
-//
-//   expect(operator.origin).toStrictEqual(undefined);
-//
-//   expect(operator.anchor).toStrictEqual(undefined);
-//   expect(operator.buffer).toStrictEqual([]);
-//   expect(operator.origin).toStrictEqual(undefined);
-//   expect(operator.points).toStrictEqual([]);
-// });
-//
-// test("onMouseDown", () => {
-//   const image = new ImageJS.Image();
-//
-//   const operator = new PolygonalAnnotationTool(image);
-//
-//   operator.onMouseDown({ x: 0, y: 0 });
-//
-//   expect(operator.annotated).toBe(false);
-//   expect(operator.annotating).toBe(true);
-//
-//   expect(operator.annotation).toBe(undefined);
-//
-//   expect(operator.anchor).toStrictEqual(undefined);
-//   expect(operator.buffer).toStrictEqual([]);
-//   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-//   expect(operator.points).toStrictEqual([]);
-// });
 //
 // test("onMouseDown (subsequent, unconnected)", () => {
 //   const image = new ImageJS.Image();
@@ -248,3 +219,35 @@ test("deselect", () => {
 //   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 //   expect(operator.points).toStrictEqual([0, 0, 100, 0, 100, 100, 0, 100, 0, 0]);
 // });
+
+test("deselect", () => {
+  expect(true).toBe(true);
+});
+
+// test("deselect", () => {
+//   const image = new ImageJS.Image();
+//
+//   const operator = new PolygonalAnnotationTool(image);
+//
+//   operator.annotated = true;
+//
+//   operator.anchor = { x: 100, y: 0 };
+//   operator.buffer = [0, 0, 100, 0, 100, 100, 0, 100];
+//   operator.origin = { x: 0, y: 0 };
+//   operator.points = [0, 0, 100, 0, 100, 100, 0, 100, 0, 0];
+//
+//   operator.deselect();
+//
+//   expect(operator.annotated).toBe(false);
+//   expect(operator.annotating).toBe(false);
+//
+//   expect(operator.annotation).toBe(undefined);
+//
+//   expect(operator.origin).toStrictEqual(undefined);
+//
+//   expect(operator.anchor).toStrictEqual(undefined);
+//   expect(operator.buffer).toStrictEqual([]);
+//   expect(operator.origin).toStrictEqual(undefined);
+//   expect(operator.points).toStrictEqual([]);
+// });
+//

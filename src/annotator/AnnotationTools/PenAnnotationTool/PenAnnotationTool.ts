@@ -67,7 +67,6 @@ export class PenAnnotationTool extends AnnotationTool {
       const chunks = _.chunk(this.points, 2);
       connectedPoints = connectPoints(chunks);
     }
-
     // Compute bounding box coordinates.
     const boundingBox = this.computeBoundingBoxFromContours(
       _.flatten(connectedPoints)

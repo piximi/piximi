@@ -79,7 +79,6 @@ export class ColorAnnotationTool extends AnnotationTool {
       0,
     ]);
 
-    console.log(this.toleranceQueue.peek());
     const idx =
       Math.floor(position.x) + Math.floor(position.y) * this.image.width;
     this.seen.add(idx);
