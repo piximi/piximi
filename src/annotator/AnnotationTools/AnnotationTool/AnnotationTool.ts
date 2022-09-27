@@ -71,7 +71,6 @@ export abstract class AnnotationTool extends Tool {
     contour: Array<number>
   ): [number, number, number, number] {
     const pairs = _.chunk(contour, 2);
-
     return [
       Math.round(_.min(_.map(pairs, _.first))!),
       Math.round(_.min(_.map(pairs, _.last))!),
