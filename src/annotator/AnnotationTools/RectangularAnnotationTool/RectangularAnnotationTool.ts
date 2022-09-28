@@ -19,10 +19,8 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotated) return;
-
     if (!this.width) {
       this.origin = position;
-
       this.setAnnotating();
     } else {
       this.resize(position);
@@ -41,13 +39,11 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
-
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
-
     if (this.width) {
       this.points = this.convertToPoints();
 
