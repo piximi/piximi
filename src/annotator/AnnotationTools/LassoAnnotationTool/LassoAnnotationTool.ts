@@ -24,55 +24,76 @@ export class LassoAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    if (this.buffer.length === 0) {
-      if (!this.origin) {
-        this.origin = position;
-        this.buffer = [...this.buffer, position.x, position.y];
-      }
+    if (this.annotationState === AnnotationStateType.Blank) {
+      this.origin = position;
+      this.buffer = [position.x, position.y, this.origin.x, this.origin.y];
 
       this.setAnnotating();
     }
+    // console.log("MouseDown at ", position);
+    // console.log("Buffer: ", this.buffer);
+    // console.log("Anchor: ", this.anchor);
   }
 
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (
+      Math.abs(this.buffer[this.buffer.length - 4] - position.x) >= 1 ||
+      Math.abs(this.buffer[this.buffer.length - 3] - position.y) >= 1
+    ) {
+      // console.log("MouseMove at ", position);
+      // console.log("Buffer: ", this.buffer);
+      // console.log("Anchor: ", this.anchor);
 
-    if (this.anchor) {
-      if (
-        this.buffer[this.buffer.length - 2] !== this.anchor.x ||
-        this.buffer[this.buffer.length - 1] !== this.anchor.y
-      ) {
-        this.buffer.pop();
-        this.buffer.pop();
-      }
+      // if (this.anchor) {
+      //   if (
+      //     this.buffer[this.buffer.length - 2] !== this.anchor.x ||
+      //     this.buffer[this.buffer.length - 1] !== this.anchor.y
+      //   ) {
+      //     this.buffer.pop();
+      //     this.buffer.pop();
+      //   }
 
-      this.buffer = [...this.buffer, position.x, position.y];
+      //   this.buffer = [...this.buffer, position.x, position.y];
 
-      return;
-    }
+      //   return;
+      // }
+      // this.buffer.pop();
+      // this.buffer.pop();
 
-    if (this.origin) {
-      this.buffer = [...this.buffer, position.x, position.y];
+      this.buffer = [
+        ...this.buffer.slice(0, this.buffer.length - 2),
+        position.x,
+        position.y,
+        this.origin!.x,
+        this.origin!.y,
+      ];
     }
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating || !this.origin)
+    if (
+      this.annotationState !== AnnotationStateType.Annotating ||
+      !this.origin
+    ) {
       return;
-
-    if (this.buffer.length < 3) {
-      console.log("Bufferr too small, goodbye");
+    }
+    if (this.origin && this.buffer.length < 6) {
+      this.deselect();
       return;
     }
 
-    if (this.origin && this.buffer.length >= 3 && this.connected(position)) {
-      this.buffer = [
-        ...this.buffer,
-        position.x,
-        position.y,
-        this.origin.x,
-        this.origin.y,
-      ];
+    if (
+      this.origin &&
+      this.buffer.length >= 6 /*&& this.connected(position)*/
+    ) {
+      // this.buffer = [
+      //   ...this.buffer,
+      //   position.x,
+      //   position.y,
+      //   this.origin.x,
+      //   this.origin.y,
+      // ];
 
       this.points = this.buffer;
 
@@ -81,7 +102,6 @@ export class LassoAnnotationTool extends AnnotationTool {
       const maskImage = this.computeAnnotationMaskFromPoints();
 
       if (!maskImage) {
-        console.log("I will exit, no mask");
         return;
       }
 
@@ -92,25 +112,25 @@ export class LassoAnnotationTool extends AnnotationTool {
       this.setAnnotated();
     }
 
-    if (this.anchor) {
-      console.log("I will define an anchor");
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
-      };
+    // if (this.anchor) {
+    //   this.anchor = {
+    //     x: this.buffer[this.buffer.length - 2],
+    //     y: this.buffer[this.buffer.length - 1],
+    //   };
 
-      return;
-    }
-    console.log("John Cena", this.origin, this.buffer.length);
-    if (this.origin && this.buffer && this.buffer.length > 0) {
-      console.log("I will define an anchor");
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
-      };
+    //   return;
+    // }
+    // if (this.origin && this.buffer && this.buffer.length > 0) {
+    //   this.anchor = {
+    //     x: this.buffer[this.buffer.length - 2],
+    //     y: this.buffer[this.buffer.length - 1],
+    //   };
+    // console.log("MouseUp at ", position);
+    // console.log("Buffer: ", this.buffer);
+    // console.log("Anchor: ", this.anchor);
 
-      return;
-    }
+    //   return;
+    // }
   }
   private connected(
     position: { x: number; y: number },
