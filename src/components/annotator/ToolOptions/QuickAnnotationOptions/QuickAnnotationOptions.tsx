@@ -21,17 +21,19 @@ export const QuickAnnotationOptions = () => {
     quickSelectionRegionSizeSelector
   );
 
-  const [brushSize, setBrushSize] = useState<number>(quickSelectionRegionSize);
+  const [regionSize, setRegionSize] = useState<number>(
+    quickSelectionRegionSize
+  );
 
   const dispatch = useDispatch();
 
   const onChange = (event: any, changed: number | number[]) => {
-    setBrushSize(changed as number);
+    setRegionSize(changed as number);
   };
 
   const onChangeCommitted = (event: any, changed: number | number[]) => {
-    const payload = { quickSelectionBrushSize: changed as number };
-    dispatch(imageViewerSlice.actions.setQuickSelectionBrushSize(payload));
+    const payload = { quickSelectionRegionSize: changed as number };
+    dispatch(imageViewerSlice.actions.setQuickSelectionRegionSize(payload));
   };
 
   return (
@@ -54,7 +56,7 @@ export const QuickAnnotationOptions = () => {
                 min={2}
                 onChange={onChange}
                 onChangeCommitted={onChangeCommitted}
-                value={brushSize}
+                value={regionSize}
               />
             }
           />

@@ -91,16 +91,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       return;
     }
 
-    if (this.anchor) {
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
-      };
-
-      return;
-    }
-
-    if (this.origin && this.buffer.length > 0) {
+    if (this.anchor || (this.origin && this.buffer.length > 0)) {
       this.anchor = {
         x: this.buffer[this.buffer.length - 2],
         y: this.buffer[this.buffer.length - 1],

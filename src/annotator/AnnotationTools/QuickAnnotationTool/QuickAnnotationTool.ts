@@ -15,6 +15,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   superpixelsMap?: { [key: number]: Array<number> };
   currentMask?: ImageJS.Image;
   map?: Uint8Array | Uint8ClampedArray;
+  startAnnotating = false;
 
   initializeSuperpixels(regionSize: number) {
     this.regionSize = Math.round(regionSize);
@@ -73,13 +74,17 @@ export class QuickAnnotationTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
-    if (!this.superpixels || !this.superpixelsMap) return;
+    if (
+      this.annotationState === AnnotationStateType.Annotated ||
+      !this.superpixels ||
+      !this.superpixelsMap
+    )
+      return;
 
     const pixel =
       Math.round(position.x) + Math.round(position.y) * this.image.width;
 
     const superpixel = this.superpixels[pixel];
-
     if (!superpixel || this.currentSuperpixels.has(superpixel)) return;
 
     this.lastSuperpixel = superpixel;
@@ -137,7 +142,6 @@ export class QuickAnnotationTool extends AnnotationTool {
     );
 
     this._mask = encode(Uint8Array.from(thresholdMask));
-
     this.setAnnotated();
   }
 }
