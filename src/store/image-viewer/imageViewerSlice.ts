@@ -393,11 +393,11 @@ export const imageViewerSlice = createSlice({
     ) {
       state.pointerSelection = action.payload.pointerSelection;
     },
-    setQuickSelectionBrushSize(
+    setQuickSelectionRegionSize(
       state: ImageViewer,
-      action: PayloadAction<{ quickSelectionBrushSize: number }>
+      action: PayloadAction<{ quickSelectionRegionSize: number }>
     ) {
-      state.quickSelectionRegionSize = action.payload.quickSelectionBrushSize;
+      state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
     setThresholdAnnotationValue(
       state: ImageViewer,
@@ -515,7 +515,7 @@ export const {
   setOperation,
   setPenSelectionBrushSize,
   setPointerSelection,
-  setQuickSelectionBrushSize,
+  setQuickSelectionRegionSize,
   setSaturation,
   setSelectedAnnotations,
   setSelectionMode,
