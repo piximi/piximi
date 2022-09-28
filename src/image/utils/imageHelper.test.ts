@@ -643,13 +643,13 @@ describe("Tensor -> Composite Image", () => {
     const MINS = [1111, 1112, 1113, 1114];
     const MAXS = [1321, 1322, 1323, 1324];
 
-    const norm = (
+    const scale = (
       values: number[],
       mins: number[] = MINS,
       maxs: number[] = MAXS,
       bitDepth: number = BITDEPTH
     ) => {
-      const normedCh: number[] = [];
+      const scaledCh: number[] = [];
 
       for (let i = 0; i < 4; i++) {
         let value = values[i];
@@ -657,21 +657,21 @@ describe("Tensor -> Composite Image", () => {
         let min = mins[i];
         let range = max - min;
 
-        normedCh.push(((value - min) / range) * (2 ** bitDepth - 1));
+        scaledCh.push(((value - min) / range) * (2 ** bitDepth - 1));
       }
 
       return [
-        Math.min(Math.round(normedCh[0] + normedCh[3]), 2 ** bitDepth - 1),
-        Math.min(Math.round(normedCh[1] + normedCh[3]), 2 ** bitDepth - 1),
-        Math.round(normedCh[2]),
+        Math.min(Math.round(scaledCh[0] + scaledCh[3]), 2 ** bitDepth - 1),
+        Math.min(Math.round(scaledCh[1] + scaledCh[3]), 2 ** bitDepth - 1),
+        Math.round(scaledCh[2]),
       ];
     };
 
     // prettier-ignore
     const expectedTensorArray =
-      [[norm([1111, 1112, 1113, 1114]), norm([1121, 1122, 1123, 1124])],
-       [norm([1211, 1212, 1213, 1214]), norm([1221, 1222, 1223, 1224])],
-       [norm([1311, 1312, 1313, 1314]), norm([1321, 1322, 1323, 1324])]]
+      [[scale([1111, 1112, 1113, 1114]), scale([1121, 1122, 1123, 1124])],
+       [scale([1211, 1212, 1213, 1214]), scale([1221, 1222, 1223, 1224])],
+       [scale([1311, 1312, 1313, 1314]), scale([1321, 1322, 1323, 1324])]]
 
     const colors = generateDefaultChannels(C);
     // set all channel visibility to true, except last
