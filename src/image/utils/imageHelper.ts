@@ -10,13 +10,13 @@ import {
   tensor4d,
   tidy,
 } from "@tensorflow/tfjs";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   DEFAULT_COLORS,
-  // ImageType,
-  // Partition,
-  // UNKNOWN_CATEGORY_ID,
+  ImageType,
+  Partition,
+  UNKNOWN_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
 
@@ -558,12 +558,15 @@ export const renderTensor = async (
 
 export const convertToImage = async (
   imageStack: ImageJS.Stack,
-  fileName: string,
+  filename: string,
   currentColors: Colors | undefined,
   numSlices: number,
   numChannels: number
 ) => {
-  if (!imageStack.length) return;
+  if (!imageStack.length) {
+    throw Error("Expected image stack");
+  }
+
   const { bitDepth } = imageStack[0];
 
   const colors = currentColors
@@ -598,10 +601,20 @@ export const convertToImage = async (
   const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const coloredSliceSrc = await renderTensor(compositeImage, bitDepth);
+  const coloredSliceURL = await renderTensor(compositeImage, bitDepth);
 
-  // return image
-  return;
+  return {
+    activePlane: 0,
+    annotations: [],
+    colors: colors,
+    categoryId: UNKNOWN_CATEGORY_ID,
+    id: uuidv4(),
+    name: filename,
+    data: imageTensor,
+    partition: Partition.Inference,
+    src: coloredSliceURL,
+    visible: true,
+  } as ImageType;
 };
 
 /*

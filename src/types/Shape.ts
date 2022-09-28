@@ -1,3 +1,5 @@
+// todo: image_data
+// removed from ImageType
 export type Shape = {
   width: number;
   channels: number;

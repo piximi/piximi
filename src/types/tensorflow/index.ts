@@ -1,1 +1,1 @@
-export type { Colors } from "./Color";
+export type { Colors } from "./Colors";
