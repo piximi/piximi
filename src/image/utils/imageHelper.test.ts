@@ -20,6 +20,9 @@ import {
   sliceVisibleColors,
   generateColoredTensor,
   renderTensor,
+  scaleColors,
+  findChannelMinMaxs,
+  scaleImageTensor,
 } from "image/utils/imageHelper";
 
 describe("color generation", () => {
@@ -636,6 +639,66 @@ describe("Tensor -> Composite Image", () => {
     expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
+  it("should scale channel ranges to min-max values", async () => {
+    const MINS = [1111, 1112, 1113, 1114];
+    const MAXS = [1321, 1322, 1323, 1324];
+
+    const norm = (
+      values: number[],
+      mins: number[] = MINS,
+      maxs: number[] = MAXS,
+      bitDepth: number = BITDEPTH
+    ) => {
+      const normedCh: number[] = [];
+
+      for (let i = 0; i < 4; i++) {
+        let value = values[i];
+        let max = maxs[i];
+        let min = mins[i];
+        let range = max - min;
+
+        normedCh.push(((value - min) / range) * (2 ** bitDepth - 1));
+      }
+
+      return [
+        Math.min(Math.round(normedCh[0] + normedCh[3]), 2 ** bitDepth - 1),
+        Math.min(Math.round(normedCh[1] + normedCh[3]), 2 ** bitDepth - 1),
+        Math.round(normedCh[2]),
+      ];
+    };
+
+    // prettier-ignore
+    const expectedTensorArray =
+      [[norm([1111, 1112, 1113, 1114]), norm([1121, 1122, 1123, 1124])],
+       [norm([1211, 1212, 1213, 1214]), norm([1221, 1222, 1223, 1224])],
+       [norm([1311, 1312, 1313, 1314]), norm([1321, 1322, 1323, 1324])]]
+
+    const colors = generateDefaultChannels(C);
+    // set all channel visibility to true, except last
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = false;
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+    const [mins, maxs] = await findChannelMinMaxs(imageSlice);
+    scaleColors(colors, mins, maxs);
+    const scaledImageSlice = scaleImageTensor(imageSlice, colors);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels
+    );
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    expect(compositeImage.rank).toBe(3);
+    expect(compositeImage.shape).toEqual([H, W, 3]);
+    expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
+  });
+
   it("should generate a correctly rendered 8 bit image", async () => {
     const Z = 2;
     const H = 3;
@@ -812,14 +875,21 @@ describe("Tensor -> Composite Image", () => {
     const colors = generateDefaultChannels(C);
     const imageTensor = convertToTensor(imageStack, Z, C);
     const imageSlice = getImageSlice(imageTensor, 0);
+    const [mins, maxs] = await findChannelMinMaxs(imageSlice);
+    scaleColors(colors, mins, maxs);
+    const scaledImageSlice = scaleImageTensor(imageSlice, colors);
     const visibleChannels = filterVisibleChannels(colors);
-    const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels
+    );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
     const renderedURL = await renderTensor(compositeImage, BITDEPTH);
 
     // intermediary tensors should be disposed
     expect(imageSlice.isDisposed).toBe(true);
+    expect(scaledImageSlice.isDisposed).toBe(true);
     expect(filteredSlice.isDisposed).toBe(true);
     expect(filteredColors.isDisposed).toBe(true);
     expect(compositeImage.isDisposed).toBe(true);
