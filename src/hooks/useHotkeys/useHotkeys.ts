@@ -100,7 +100,6 @@ export function useHotkeys(
         (hotkeyView.length && hotkeyView.includes(currentHotkeyView)) ||
         (!hotkeyView.length && hotkeyView === currentHotkeyView)
       ) {
-        console.log(true);
         callback(keyboardEvent, hotkeysEvent);
         return true;
       }
