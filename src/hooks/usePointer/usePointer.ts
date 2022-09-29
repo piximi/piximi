@@ -66,7 +66,6 @@ export const usePointer = () => {
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
-    console.log("mouseDown");
     dispatch(
       setPointerSelection({
         pointerSelection: {

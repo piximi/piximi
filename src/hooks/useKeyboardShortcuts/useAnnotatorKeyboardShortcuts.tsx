@@ -82,8 +82,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       })
     );
 
-    if (soundEnabled) playCreateAnnotationSoundEffect();
-
     deselectAnnotation();
 
     if (selectionMode !== AnnotationModeType.New)
@@ -98,13 +96,6 @@ export const useAnnotatorKeyboardShortcuts = ({
     deselectAllAnnotations();
     deselectAllTransformers();
   };
-
-  const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
-  );
-  const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
-  );
 
   const soundEnabled = useSelector(soundEnabledSelector);
   /*
@@ -288,10 +279,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
-
       deselectAnnotation();
 
       if (toolType !== ToolType.Zoom) return;
@@ -311,10 +298,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       );
       deselectAllAnnotations();
       deselectAllTransformers();
-
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
 
       deselectAnnotation();
     },
