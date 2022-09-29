@@ -64,7 +64,9 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
 
       <MenuItem onClick={onSaveClassifierDialogOpen}>Save classifier</MenuItem>
 
-      <MenuItem onClick={onSaveSegmenterDialogOpen}>Save segmenter</MenuItem>
+      {process.env.NODE_ENV === "development" && (
+        <MenuItem onClick={onSaveSegmenterDialogOpen}>Save segmenter</MenuItem>
+      )}
 
       <SaveProjectDialog
         onClose={onMenuDialogClose(onSaveProjectDialogClose)}

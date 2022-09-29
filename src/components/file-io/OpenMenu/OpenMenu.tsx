@@ -93,9 +93,11 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         <MenuItem onClick={onOpenImportClassifierDialog}>
           Import classifier model
         </MenuItem>
-        <MenuItem onClick={onOpenImportSegmenterDialog}>
-          Import Segmentation model
-        </MenuItem>
+        {process.env.NODE_ENV === "development" && (
+          <MenuItem onClick={onOpenImportSegmenterDialog}>
+            Import Segmentation model
+          </MenuItem>
+        )}
       </MenuList>
 
       <OpenExampleClassifierDialog
