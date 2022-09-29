@@ -1,15 +1,17 @@
 {
   "files": {
-    "main.js": "/static/js/main.89d32195.js",
+    "main.js": "/static/js/main.36b6d70a.js",
     "static/js/608.1bf528d8.chunk.js": "/static/js/608.1bf528d8.chunk.js",
     "static/js/280.d66c9c33.chunk.js": "/static/js/280.d66c9c33.chunk.js",
     "static/js/564.8fc44b0b.chunk.js": "/static/js/564.8fc44b0b.chunk.js",
     "static/js/843.999b0403.chunk.js": "/static/js/843.999b0403.chunk.js",
+    "static/js/886.60596906.chunk.js": "/static/js/886.60596906.chunk.js",
     "static/js/301.4aba4e75.chunk.js": "/static/js/301.4aba4e75.chunk.js",
     "static/media/malaria.png": "/static/media/malaria.5b73ad7591d4eef598db.png",
     "static/media/cElegansExampleProjectIcon.png": "/static/media/cElegansExampleProjectIcon.ec038762b8385f2d59fd.png",
     "static/media/humanU2OSCellsExampleProjectIcon.png": "/static/media/humanU2OSCellsExampleProjectIcon.59ecbfc81d965b81358b.png",
     "static/media/cell-painting.png": "/static/media/cell-painting.f118ef087853056f08e6.png",
+    "static/media/PLP1ExampleProjectIcon.png": "/static/media/PLP1ExampleProjectIcon.1a2a370efa06017d493e.png",
     "static/media/pop-up-off.mp3": "/static/media/pop-up-off.83c6ba5b67be3cc15952.mp3",
     "static/media/pop-up-on.mp3": "/static/media/pop-up-on.b776a1eff9299387d55c.mp3",
     "static/media/ObjectAnnotation.svg": "/static/media/ObjectAnnotation.64bf20e5b62a9181cb5a192943d2346e.svg",
@@ -35,10 +37,10 @@
     "static/media/VolumeOff.svg": "/static/media/VolumeOff.1149786552b52a25580655f2ce3391c1.svg",
     "static/media/VolumeUp.svg": "/static/media/VolumeUp.30de055e122b96e2aa207a710b1bd74a.svg",
     "static/media/Moon.svg": "/static/media/Moon.593035e92f1f02f04668bb75454d1fb3.svg",
-    "main.89d32195.js.map": "/static/js/main.89d32195.js.map",
+    "main.36b6d70a.js.map": "/static/js/main.36b6d70a.js.map",
     "301.4aba4e75.chunk.js.map": "/static/js/301.4aba4e75.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.89d32195.js"
+    "static/js/main.36b6d70a.js"
   ]
 }
