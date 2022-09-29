@@ -1,12 +1,7 @@
 import { sequential, layers, initializers } from "@tensorflow/tfjs";
-import { useSelector } from "react-redux";
 
 import { Shape } from "../../types/Shape";
 
-import {
-  classifierShuffleOptionsSelector,
-  classifierSlice,
-} from "store/classifier";
 import { productionStore } from "store/stores";
 
 /**
