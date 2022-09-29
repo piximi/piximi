@@ -13,6 +13,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 
+import { ShuffleForm } from "./ShuffleForm";
 import { CustomNumberTextField } from "../InputFields";
 import { StyledFormControl } from "../StyledFormControl";
 
@@ -73,6 +74,7 @@ export const DatasetSettingsListItem = ({
             </Grid>
           </Grid>
         </StyledFormControl>
+        <ShuffleForm />
       </Collapse>
     </>
   );

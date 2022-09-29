@@ -248,6 +248,9 @@ export const classifierSlice = createSlice({
     ) {
       state.preprocessOptions.rescaleOptions = action.payload.rescaleOptions;
     },
+    updateShuffleOptions(state, action: PayloadAction<{ shuffle: boolean }>) {
+      state.preprocessOptions.shuffle = action.payload.shuffle;
+    },
     updateCropOptions(
       state,
       action: PayloadAction<{ cropOptions: CropOptions }>

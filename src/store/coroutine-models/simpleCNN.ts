@@ -17,7 +17,8 @@ export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
   // the convolution operation that takes place in this layer.
   model.add(
     layers.conv2d({
-      inputShape: [imageWidth, imageHeight, imageChannels],
+      // inputShape: [imageWidth, imageHeight, imageChannels],
+      inputShape: [imageHeight, imageWidth, imageChannels],
       kernelSize: 5,
       filters: 8,
       strides: 1,

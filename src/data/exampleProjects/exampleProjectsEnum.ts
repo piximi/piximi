@@ -3,4 +3,5 @@ export enum ExampleProject {
   CElegans,
   HumanU2OSCells,
   BBBC013,
+  PLP1,
 }
