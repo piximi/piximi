@@ -4,6 +4,8 @@ Piximi is a free, open source web app for performing image understanding tasks. 
 
 Piximi's target users are computational or non-computational scientists interested in image analysis from fields like astronomy, biology, and medicine.
 
+[Try Piximi now at Piximi.app!](https://www.piximi.app)
+
 # Development
 
 ## Available Scripts
