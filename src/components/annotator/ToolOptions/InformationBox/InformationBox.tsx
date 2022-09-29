@@ -12,7 +12,7 @@ export const InformationBox = ({ description, name }: InformationBoxProps) => {
     <AppBar
       sx={{
         backgroundColor: "rgba(0, 0, 0, 0)",
-        // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+        // borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
         boxShadow: "none",
         position: "absolute",
       }}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
-import hotkeys from "hotkeys-js";
+import { useHotkeys } from "hooks";
 
 import {
   imageViewerSlice,
@@ -19,7 +18,7 @@ import {
   setPointerSelection,
 } from "store/image-viewer";
 
-import { AnnotationType, ToolType } from "types";
+import { AnnotationType, HotkeyView, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
@@ -54,30 +53,20 @@ export const usePointer = () => {
   const [shift, setShift] = useState<boolean>(false);
 
   useHotkeys(
-    "*",
+    "shift",
     (event) => {
-      if (hotkeys.shift) {
-        if (event.type === "keyup") {
-          setShift(false);
-        }
+      if (event.type === "keydown") {
+        setShift(true);
+      } else {
+        setShift(false);
       }
     },
-    { keyup: true }
-  );
-
-  useHotkeys(
-    "*",
-    (event) => {
-      if (hotkeys.shift) {
-        if (event.type === "keydown") {
-          setShift(true);
-        }
-      }
-    },
-    { keydown: true }
+    HotkeyView.Annotator,
+    { keyup: true, keydown: true }
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
+    console.log("mouseDown");
     dispatch(
       setPointerSelection({
         pointerSelection: {
@@ -144,7 +133,17 @@ export const usePointer = () => {
         })
       );
 
-      if (!minimum || !annotations.length) return;
+      if (!minimum || !annotations.length) {
+        dispatch(
+          setPointerSelection({
+            pointerSelection: {
+              ...pointerSelection,
+              selecting: false,
+            },
+          })
+        );
+        return;
+      }
 
       const scaledMinimum = {
         x: minimum.x / stageScale,
@@ -162,7 +161,7 @@ export const usePointer = () => {
       );
 
       if (annotationsInBox.length) {
-        if (!shift) {
+        if (shift) {
           batch(() => {
             dispatch(
               setSelectedAnnotations({

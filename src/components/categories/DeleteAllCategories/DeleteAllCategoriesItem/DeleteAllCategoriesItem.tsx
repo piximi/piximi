@@ -1,10 +1,10 @@
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 import { DeleteAllCategoriesDialog } from "../DeleteAllCategoriesDialog";
 
-import { CategoryType } from "types";
+import { CategoryType, HotkeyView } from "types";
 
 type DeleteAllCategoriesItemProps = {
   categoryType: CategoryType;
@@ -13,7 +13,9 @@ type DeleteAllCategoriesItemProps = {
 export const DeleteAllCategoriesItem = ({
   categoryType,
 }: DeleteAllCategoriesItemProps) => {
-  const { onClose, onOpen, open } = useDialog();
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyView.DeleteAllCategoriesDialog
+  );
 
   return (
     <>

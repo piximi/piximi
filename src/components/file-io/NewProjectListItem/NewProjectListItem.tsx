@@ -4,12 +4,15 @@ import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { NewProjectDialog } from "../NewProjectDialog";
+import { HotkeyView } from "types";
 
 export const NewProjectListItem = () => {
-  const { onClose, onOpen, open } = useDialog();
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyView.NewProjectDialog
+  );
 
   return (
     <>

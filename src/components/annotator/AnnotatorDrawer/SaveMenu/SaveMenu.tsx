@@ -2,7 +2,7 @@ import React from "react";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialog, useMenu } from "hooks";
+import { useDialogHotkey, useMenu } from "hooks";
 
 import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
 import { ExportAnnotationsAsLabeledInstancesMenuItem } from "./ExportAnnotationsAsLabeledInstancesMenuItem";
@@ -10,6 +10,7 @@ import { ExportAnnotationsAsMatrixMenuItem } from "./ExportAnnotationsAsMatrixMe
 import { ExportAnnotationsAsLabeledSemanticMasksMenuItem } from "./ExportAnnotationsAsLabeledSemanticMasksMenuItem";
 import { ExportAnnotationsAsBinarySemanticMasksMenuItem } from "./ExportAnnotationsAsBinarySemanticMasksMenuItem";
 import { ExportAnnotationsAsBinaryInstancesMenuItem } from "./ExportAnnotationsAsBinaryInstancesMenuItem";
+import { HotkeyView } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -19,10 +20,10 @@ type SaveMenuProps = {
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   const {
-    onClose: onCloseDialog,
-    onOpen: onOpenDialog,
-    open: openDialog,
-  } = useDialog();
+    onClose: onCloseSaveAnnotatorDialog,
+    onOpen: onOpenSaveAnnotatorDialog,
+    open: openSaveAnnotatorDialog,
+  } = useDialogHotkey(HotkeyView.SaveAnnotationProjectDialog);
 
   const {
     anchorEl: subMenuAnchorEl,
@@ -62,15 +63,17 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
           <ExportAnnotationsAsMatrixMenuItem handleMenuClose={onMenusClose} />
           {/* <ExportAnnotationsAsJsonMenuItem handleMenuClose={onMenusClose} /> */}
         </Menu>
-        <MenuItem onClick={onOpenDialog}>Save Annotation Project</MenuItem>
+        <MenuItem onClick={onOpenSaveAnnotatorDialog}>
+          Save Annotation Project
+        </MenuItem>
       </Menu>
 
       <SaveAnnotationProjectDialog
         onClose={() => {
-          onCloseDialog();
+          onCloseSaveAnnotatorDialog();
           onMenusClose();
         }}
-        open={openDialog}
+        open={openSaveAnnotatorDialog}
       />
     </div>
   );

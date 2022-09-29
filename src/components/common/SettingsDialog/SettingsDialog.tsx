@@ -41,6 +41,7 @@ import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
+import { APPLICATION_COLORS } from "colorPalette";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -79,7 +80,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
     <Dialog fullScreen onClose={preClose} open={open}>
       <AppBar
         sx={{
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
           boxShadow: "none",
         }}
         color="inherit"

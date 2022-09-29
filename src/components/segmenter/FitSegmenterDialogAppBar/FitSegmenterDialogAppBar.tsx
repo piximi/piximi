@@ -21,6 +21,7 @@ import {
   segmenterTrainingFlagSelector,
   segmenterSlice,
 } from "store/segmenter";
+import { APPLICATION_COLORS } from "colorPalette";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;
@@ -54,7 +55,7 @@ export const FitSegmenterDialogAppBar = ({
         position: "sticky",
         backgroundColor: "transparent",
         boxShadow: "none",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+        borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
       }}
     >
       <Toolbar>

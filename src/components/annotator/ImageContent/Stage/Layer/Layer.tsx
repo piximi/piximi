@@ -33,7 +33,6 @@ export const Layer = ({ children }: LayerProps) => {
     x: 0,
     y: 0,
   });
-
   useEffect(() => {
     if (!imageWidth || !imageHeight) return;
 

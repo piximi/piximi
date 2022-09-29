@@ -4,7 +4,6 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import * as _ from "lodash";
-import { useHotkeys } from "react-hotkeys-hook";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -34,19 +33,15 @@ import {
   scaledImageWidthSelector,
   selectedAnnotationSelector,
   selectedAnnotationsIdsSelector,
-  selectedAnnotationsSelector,
   selectionModeSelector,
   stageHeightSelector,
   stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
-  activeImageIdSelector,
   activeImagePlaneSelector,
   annotationStateSelector,
-  annotatorImagesSelector,
   cursorSelector,
-  unselectedAnnotationsSelector,
   setSelectedAnnotations,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
@@ -67,8 +62,6 @@ export const Stage = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
 
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
   const selectionMode = useSelector(selectionModeSelector);
 
   const stageHeight = useSelector(stageHeightSelector);
@@ -78,9 +71,6 @@ export const Stage = () => {
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
 
-  const images = useSelector(annotatorImagesSelector);
-
-  const activeImageId = useSelector(activeImageIdSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const [currentPosition, setCurrentPosition] = useState<{
@@ -508,144 +498,6 @@ export const Stage = () => {
     stageScale,
   ]);
 
-  const confirmAnnotations = () => {
-    if (
-      !selectedAnnotation ||
-      !annotationTool ||
-      annotationTool.annotationState === AnnotationStateType.Annotating ||
-      !activeImageId
-    )
-      return;
-
-    if (
-      toolType === ToolType.PolygonalAnnotation ||
-      toolType === ToolType.LassoAnnotation
-    ) {
-      annotationTool.connect();
-    }
-
-    dispatch(
-      imageViewerSlice.actions.setImageInstances({
-        instances: [...unselectedAnnotations, ...selectedAnnotations],
-        imageId: activeImageId,
-      })
-    );
-
-    deselectAnnotation();
-
-    if (selectionMode !== AnnotationModeType.New)
-      dispatch(
-        imageViewerSlice.actions.setSelectionMode({
-          selectionMode: AnnotationModeType.New,
-        })
-      );
-
-    if (!selectedAnnotationsIds.length) return;
-
-    deselectAllAnnotations();
-    deselectAllTransformers();
-  };
-
-  useHotkeys(
-    "enter",
-    () => {
-      confirmAnnotations();
-    },
-    [
-      activeImageId,
-      annotations,
-      annotationTool,
-      annotationTool?.annotationState,
-      selectedAnnotations,
-      unselectedAnnotations,
-      selectionMode,
-      selectedAnnotationsIds,
-      toolType,
-    ]
-  );
-
-  useHotkeys(
-    "escape",
-    () => {
-      if (!annotationTool) return;
-
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      deselectAnnotation();
-
-      if (toolType !== ToolType.Zoom) return;
-      onZoomDeselect();
-    },
-    [annotations, annotationTool, toolType]
-  );
-
-  useHotkeys(
-    "backspace, delete",
-    () => {
-      dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
-        })
-      );
-      deselectAllAnnotations();
-      deselectAllTransformers();
-
-      deselectAnnotation();
-    },
-    [selectedAnnotationsIds, annotations]
-  );
-
-  useHotkeys(
-    "up",
-    () => {
-      if (!activeImageId) {
-        return;
-      }
-
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId
-      );
-      if (activeImageIdx < 1) {
-        return;
-      }
-
-      const newActiveImageId = images[activeImageIdx - 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: newActiveImageId,
-          execSaga: true,
-        })
-      );
-    },
-    [images, activeImageId]
-  );
-
-  useHotkeys(
-    "down",
-    () => {
-      if (!activeImageId) {
-        return;
-      }
-
-      const activeImageIdx = images.findIndex(
-        (image) => image.id === activeImageId
-      );
-      if (activeImageIdx === -1 || activeImageIdx === images.length - 1) {
-        return;
-      }
-
-      const newActiveImageId = images[activeImageIdx + 1].id;
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: newActiveImageId,
-          execSaga: true,
-        })
-      );
-    },
-    [images, activeImageId]
-  );
-
   /*/
   Detach transformers and selections when all annotations are removed
    */
@@ -661,7 +513,18 @@ export const Stage = () => {
     setTool(annotationTool);
   }, [annotationTool, toolType]);
 
-  useAnnotatorKeyboardShortcuts();
+  useAnnotatorKeyboardShortcuts({
+    annotations,
+    annotationTool,
+    deselectAllAnnotations,
+    deselectAllTransformers,
+    deselectAnnotation,
+    onZoomDeselect,
+    selectedAnnotation,
+    selectedAnnotationsIds,
+    selectionMode,
+    toolType,
+  });
 
   const { draggable } = useHandTool();
 

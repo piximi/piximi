@@ -1,8 +1,12 @@
 import React, { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { alertStateSelector } from "store/application";
-import { AlertType } from "types";
+import {
+  alertStateSelector,
+  registerHotkeyView,
+  unregisterHotkeyView,
+} from "store/application";
+import { AlertType, HotkeyView } from "types";
 
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);
@@ -28,4 +32,28 @@ export const useDialog = (closeOnError: boolean = true) => {
   }, []);
 
   return { onClose, onOpen, open };
+};
+
+export const useDialogHotkey = (
+  view: HotkeyView,
+  closeOnError: boolean = true
+) => {
+  const dispatch = useDispatch();
+  const {
+    onClose: onDialogClose,
+    onOpen: onDialogOpen,
+    open: dialogOpen,
+  } = useDialog(closeOnError);
+
+  const onOpen = () => {
+    dispatch(registerHotkeyView({ hotkeyView: view }));
+    onDialogOpen();
+  };
+
+  const onClose = () => {
+    dispatch(unregisterHotkeyView({}));
+    onDialogClose();
+  };
+
+  return { onClose, onOpen, open: dialogOpen };
 };
