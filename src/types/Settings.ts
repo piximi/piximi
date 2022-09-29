@@ -20,6 +20,7 @@ export enum HotkeyView {
   SaveFittedModelDialog,
   SaveProjectDialog,
 }
+
 export type Settings = {
   tileSize: number;
   selectedImages: Array<string>;

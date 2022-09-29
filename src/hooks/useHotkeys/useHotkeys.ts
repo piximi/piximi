@@ -40,12 +40,6 @@ export function useHotkeys(
   keys: string,
   callback: KeyHandler,
   hotkeyView: HotkeyView | Array<HotkeyView>,
-  options?: Options
-): void;
-export function useHotkeys(
-  keys: string,
-  callback: KeyHandler,
-  hotkeyView: HotkeyView | Array<HotkeyView>,
   deps?: any[]
 ): void;
 export function useHotkeys(
