@@ -4,6 +4,7 @@ export enum ImageSortKey {
   None,
   FileName,
   Category,
+  Random,
 }
 
 export type ImageSortKeyType = {
@@ -28,5 +29,10 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
     imageSortKeyName: "Image category",
     imageSortKey: ImageSortKey.Category,
     comparerFunction: (a, b) => a.categoryId.localeCompare(b.categoryId),
+  },
+  {
+    imageSortKeyName: "Random",
+    imageSortKey: ImageSortKey.Random,
+    comparerFunction: (a, b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
   },
 ];
