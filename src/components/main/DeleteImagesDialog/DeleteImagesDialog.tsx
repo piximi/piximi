@@ -38,6 +38,7 @@ export const DeleteImagesDialog = ({
       onDelete();
     },
     HotkeyView.DeleteImagesDialog,
+    { enableOnTags: ["INPUT"] },
     [onDelete]
   );
 

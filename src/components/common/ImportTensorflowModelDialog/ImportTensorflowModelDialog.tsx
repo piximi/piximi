@@ -123,6 +123,7 @@ export const ImportTensorflowModelDialog = ({
     "enter",
     () => dispatchModelToStore(),
     HotkeyView.ImportTensorflowModelDialog,
+    { enableOnTags: ["INPUT"] },
     [dispatchModelToStore]
   );
 

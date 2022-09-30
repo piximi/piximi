@@ -1,7 +1,5 @@
-import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
-import useSound from "use-sound";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
@@ -23,8 +21,6 @@ import {
   ToolType,
 } from "types";
 import { AnnotationTool } from "annotator/image/Tool";
-import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 
 type useAnnotatorHotkeysProps = {
   annotations: AnnotationType[];
@@ -82,8 +78,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       })
     );
 
-    if (soundEnabled) playCreateAnnotationSoundEffect();
-
     deselectAnnotation();
 
     if (selectionMode !== AnnotationModeType.New)
@@ -99,21 +93,15 @@ export const useAnnotatorKeyboardShortcuts = ({
     deselectAllTransformers();
   };
 
-  const [playCreateAnnotationSoundEffect] = useSound(
-    createAnnotationSoundEffect
-  );
-  const [playDeleteAnnotationSoundEffect] = useSound(
-    deleteAnnotationSoundEffect
-  );
-
   const soundEnabled = useSelector(soundEnabledSelector);
   /*
    * Select category (1-9)
    */
+
   useHotkeys(
     "shift+1,shift+2,shit+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9",
     (event: KeyboardEvent, handler) => {
-      const index = parseInt(handler.key) - 1;
+      const index = parseInt(handler.key.slice(-1));
 
       const selectedCategory = annotationCategories[index];
 
@@ -288,10 +276,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
-
       deselectAnnotation();
 
       if (toolType !== ToolType.Zoom) return;
@@ -311,10 +295,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       );
       deselectAllAnnotations();
       deselectAllTransformers();
-
-      if (!_.isEmpty(annotations) && soundEnabled) {
-        playDeleteAnnotationSoundEffect();
-      }
 
       deselectAnnotation();
     },

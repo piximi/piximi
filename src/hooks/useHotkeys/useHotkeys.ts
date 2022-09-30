@@ -76,7 +76,6 @@ export function useHotkeys(
   const memoisedCallback = useCallback(
     (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => {
       if (filter && !filter(keyboardEvent)) {
-        console.log("filtered");
         return !filterPreventDefault;
       }
 
@@ -94,7 +93,6 @@ export function useHotkeys(
         (hotkeyView.length && hotkeyView.includes(currentHotkeyView)) ||
         (!hotkeyView.length && hotkeyView === currentHotkeyView)
       ) {
-        console.log(true);
         callback(keyboardEvent, hotkeysEvent);
         return true;
       }

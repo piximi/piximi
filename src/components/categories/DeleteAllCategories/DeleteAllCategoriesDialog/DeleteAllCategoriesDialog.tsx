@@ -68,6 +68,7 @@ export const DeleteAllCategoriesDialog = ({
       onDeleteAllCategories();
     },
     HotkeyView.DeleteAllCategoriesDialog,
+    { enableOnTags: ["INPUT"] },
     [onDeleteAllCategories]
   );
 

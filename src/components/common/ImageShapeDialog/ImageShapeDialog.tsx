@@ -87,6 +87,7 @@ export const ImageShapeDialog = ({
       uploadImages();
     },
     HotkeyView.ImageShapeDialog,
+    { enableOnTags: ["INPUT"] },
     [uploadImages]
   );
 

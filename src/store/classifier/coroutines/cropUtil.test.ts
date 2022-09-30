@@ -23,8 +23,8 @@ it("padToMatch", async () => {
   const result = profile.result as tf.Tensor<tf.Rank.R3>;
   const padded = result.arraySync();
 
-  console.log(`newBytes: ${profile.newBytes}`);
-  console.log(`newTensors: ${profile.newTensors}`);
+  // console.log(`newBytes: ${profile.newBytes}`);
+  // console.log(`newTensors: ${profile.newTensors}`);
 
   const expected = [
     [
@@ -185,7 +185,7 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -207,7 +207,7 @@ describe("matchedCropPad - random", () => {
       [0.66666, 1.0],
     ];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -229,7 +229,7 @@ describe("matchedCropPad - random", () => {
       [1.0, 1.0],
     ];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });
@@ -280,7 +280,7 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 0.0, 0.75, 1.0];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -297,7 +297,7 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.25, 1 / 8, 0.75, 7 / 8];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 
@@ -314,7 +314,7 @@ describe("matchedCropPad - center", () => {
 
     const cropCoordsExpected = [0.0, 0.0, 1.0, 1.0];
 
-    console.log(cropCoords);
+    // console.log(cropCoords);
     matchedCropExpectations(dims, cropCoords, cropCoordsExpected);
   });
 });

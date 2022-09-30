@@ -62,9 +62,13 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     onClose();
   };
 
-  useHotkeys("enter", () => onCreateNewProject(), HotkeyView.NewProjectDialog, [
-    onCreateNewProject,
-  ]);
+  useHotkeys(
+    "enter",
+    () => onCreateNewProject(),
+    HotkeyView.NewProjectDialog,
+    { enableOnTags: ["INPUT"] },
+    [onCreateNewProject]
+  );
 
   return (
     <Dialog fullWidth maxWidth={"xs"} onClose={closeDialog} open={open}>

@@ -38,6 +38,7 @@ export const DeleteCategoryDialog = ({
       onDelete();
     },
     HotkeyView.DeleteCategoryDialog,
+    { enableOnTags: ["INPUT"] },
     [onDelete]
   );
 

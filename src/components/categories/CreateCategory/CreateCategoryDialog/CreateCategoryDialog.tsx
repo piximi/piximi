@@ -104,7 +104,7 @@ export const CreateCategoryDialog = ({
       onCreate();
     },
     HotkeyView.CreateCategoryDialog,
-    { enabled: open },
+    { enableOnTags: ["INPUT"] },
     [onCreate]
   );
 

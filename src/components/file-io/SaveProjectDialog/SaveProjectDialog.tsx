@@ -70,6 +70,7 @@ export const SaveProjectDialog = ({
       onSaveProjectClick();
     },
     HotkeyView.SaveProjectDialog,
+    { enableOnTags: ["INPUT"] },
     [onSaveProjectClick]
   );
 

@@ -56,7 +56,7 @@ export const SaveAnnotationProjectDialog = ({
       onSaveAllAnnotations();
     },
     HotkeyView.SaveAnnotationProjectDialog,
-    { enabled: open },
+    { enableOnTags: ["INPUT"] },
     [onSaveAllAnnotations]
   );
 
