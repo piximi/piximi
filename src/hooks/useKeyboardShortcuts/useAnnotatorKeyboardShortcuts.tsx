@@ -101,10 +101,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   /*
    * Select category (1-9)
    */
+
   useHotkeys(
     "shift+1,shift+2,shit+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9",
     (event: KeyboardEvent, handler) => {
-      const index = parseInt(handler.key) - 1;
+      const index = parseInt(handler.key.slice(-1));
 
       const selectedCategory = annotationCategories[index];
 
