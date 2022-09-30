@@ -1,7 +1,5 @@
-import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
-import useSound from "use-sound";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
@@ -23,8 +21,6 @@ import {
   ToolType,
 } from "types";
 import { AnnotationTool } from "annotator/image/Tool";
-import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 
 type useAnnotatorHotkeysProps = {
   annotations: AnnotationType[];
