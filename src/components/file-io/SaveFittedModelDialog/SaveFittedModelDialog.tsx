@@ -51,6 +51,7 @@ export const SaveFittedModelDialog = ({
       onSaveClassifierClick();
     },
     HotkeyView.SaveFittedModelDialog,
+    { enableOnTags: ["INPUT"] },
     [onSaveClassifierClick]
   );
 

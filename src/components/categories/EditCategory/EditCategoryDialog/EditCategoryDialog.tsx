@@ -78,6 +78,7 @@ export const EditCategoryDialog = ({
       onEdit();
     },
     HotkeyView.EditCategoryDialog,
+    { enableOnTags: ["INPUT"] },
 
     [onEdit]
   );
