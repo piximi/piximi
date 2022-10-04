@@ -102,9 +102,11 @@ export abstract class AnnotationTool extends Tool {
     }
 
     const coordinates = _.chunk(this.points, 2);
+
     const connectedPoints = connectPoints(coordinates); // get coordinates of connected points and draw boundaries of mask
 
     const simplifiedPoints = simplifyPolygon(connectedPoints);
+
     const maskImage = slpf(
       simplifiedPoints,
       this.image.width,
