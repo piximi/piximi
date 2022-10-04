@@ -2,15 +2,6 @@
 
 import * as ImageJS from "image-js";
 
-import {
-  getXofYMax,
-  getXofYMin,
-  getYMax,
-  getYMin,
-  lerp,
-  pointsToEdges,
-} from "./util";
-
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.
  * @param polygon Polygon that defines the annotation.
@@ -32,12 +23,15 @@ export function slpf(
   if (polygon.length < 3) return maskImage;
 
   // initialize ET and AET
+
   const ET: Array<Array<Array<number>>> = pointsToEdges(polygon).sort(
     (e1: Array<Array<number>>, e2: Array<Array<number>>) =>
       getYMin(e2) - getYMin(e1)
   );
+
   const AET: Array<Array<Array<number>>> = [];
   let yScan = getYMin(ET[ET.length - 1]);
+  const allSpans = [];
 
   // repeat until both ET and AET are empty
   while (ET.length > 0 || AET.length > 0) {
@@ -51,9 +45,9 @@ export function slpf(
     // fill spans on scanline
     const spans = getSpans(yScan, AET);
     drawSpans(spans, yScan, maskImage);
+    allSpans.push([spans, [yScan, yScan]]);
     yScan++;
   }
-
   return maskImage;
 }
 
@@ -89,8 +83,17 @@ function getSpans(yScan: number, AET: Array<Array<Array<number>>>) {
   }
   return spans;
 }
-
+// linear interpolation
+// finds x-value from scanline intersecting edge
+export function lerp(
+  yScan: number,
+  [[x1, y1], [x2, y2]]: Array<Array<number>>
+) {
+  return Math.floor(((yScan - y1) / (y2 - y1)) * (x2 - x1) + x1);
+}
 function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
+  spans.sort((e1, e2) => e1 - e2);
+
   for (let i = 0; i < spans.length; i += 2) {
     fillSpan(spans[i], spans[i + 1], yScan, img);
   }
@@ -101,4 +104,39 @@ function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   for (let x = x1; x < x2; x++) {
     img.setPixelXY(x, y, [255, 255, 255, 255]);
   }
+}
+
+// Code from: https://github.com/kamoroso94/polygon-fill-benchmark
+
+// returns minimum y-value of two points
+export function getYMin([[, y1], [, y2]]: Array<Array<number>>) {
+  return y1 <= y2 ? y1 : y2;
+}
+
+// returns maximum y-value of two points
+export function getYMax([[, y1], [, y2]]: Array<Array<number>>) {
+  return y1 > y2 ? y1 : y2;
+}
+
+// returns the x-value of the point with the minimum y-value
+export function getXofYMin([[x1, y1], [x2, y2]]: Array<Array<number>>) {
+  return y1 <= y2 ? x1 : x2;
+}
+
+// returns the x-value of the point with the maximum y-value
+export function getXofYMax([[x1, y1], [x2, y2]]: Array<Array<number>>) {
+  return y1 > y2 ? x1 : x2;
+}
+
+// converts list of points to list of non-horizontal edges
+export function pointsToEdges(points: Array<Array<number>>) {
+  let edges = [];
+  let p1 = points[points.length - 1];
+  for (let i = 0; i < points.length; i++) {
+    const p2 = points[i];
+    // ignore horizontal edges
+    if (p1[1] !== p2[1]) edges.push([p1, p2]);
+    p1 = p2;
+  }
+  return edges;
 }
