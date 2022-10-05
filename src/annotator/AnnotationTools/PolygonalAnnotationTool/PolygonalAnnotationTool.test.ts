@@ -33,7 +33,10 @@ test("onMouseMove  (origin)", async () => {
   expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
 
   expect(operator.anchor).toBe(undefined);
-  expect(operator.buffer).toStrictEqual([0, 0, 200, 200]);
+  expect(operator.buffer).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 200, y: 200 },
+  ]);
 });
 
 test("onMouseUp (unconnected)", async () => {
@@ -66,7 +69,11 @@ test("onMouseMove (with anchor)", async () => {
 
   expect(operator.annotation).toBe(undefined);
 
-  expect(operator.buffer).toStrictEqual([0, 0, 100, 0, 200, 200]);
+  expect(operator.buffer).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 0 },
+    { x: 200, y: 200 },
+  ]);
 });
 
 test("onMouseUp (connected)", async () => {
@@ -93,7 +100,12 @@ test("onMouseUp (connected)", async () => {
 
   expect(operator.annotation).toBe(undefined);
   expect(operator.points).toStrictEqual([
-    100, 0, 0, 100, 200, 100, 100, 0, 100, 0, 100, 0,
+    { x: 100, y: 0 },
+    { x: 0, y: 100 },
+    { x: 200, y: 100 },
+    { x: 100, y: 0 },
+    { x: 100, y: 0 },
+    { x: 100, y: 0 },
   ]);
 
   expect(operator.mask).toBeDefined();

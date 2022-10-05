@@ -44,7 +44,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
           </>
         )}
         <ReactKonva.Line
-          points={operator.buffer}
+          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
           scale={{ x: stageScale, y: stageScale }}
           stroke="black"
           strokeWidth={1 / stageScale}
@@ -54,7 +54,7 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
           dashOffset={-dashOffset}
           scale={{ x: stageScale, y: stageScale }}
           stroke="white"
-          points={operator.buffer}
+          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
           strokeWidth={1 / stageScale}
         />
       </ReactKonva.Group>

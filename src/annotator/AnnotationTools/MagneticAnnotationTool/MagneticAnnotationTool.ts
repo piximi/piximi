@@ -9,17 +9,18 @@ import { getIdx } from "utils/common/imageHelper";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { AnnotationStateType } from "types/AnnotationStateType";
+import { Point } from "types";
 
 export class MagneticAnnotationTool extends AnnotationTool {
-  anchor?: { x: number; y: number };
-  buffer: Array<number> = [];
+  anchor?: Point;
+  buffer: Array<Point> = [];
   factor: number;
   graph?: PiximiGraph;
-  origin?: { x: number; y: number };
-  path: Array<number> = [];
+  origin?: Point;
+  path: Array<Point> = [];
   pathfinder?: { find: (fromId: number, toId: number) => any };
-  points: Array<number> = [];
-  previous: Array<number> = [];
+  points: Array<Point> = [];
+  previous: Array<Point> = [];
   response?: ImageJS.Image;
 
   constructor(image: ImageJS.Image, factor: number = 0.5) {
@@ -93,19 +94,13 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.path = _.flatten(this.pathfinder.find(source, destination));
 
       if (
-        this.buffer[this.buffer.length - 2] !== this.anchor.x ||
-        this.buffer[this.buffer.length - 1] !== this.anchor.y
+        this.buffer[this.buffer.length - 1].x !== this.anchor.x ||
+        this.buffer[this.buffer.length - 1].y !== this.anchor.y
       ) {
-        this.buffer.pop();
         this.buffer.pop();
       }
 
-      this.buffer = [
-        ...this.previous,
-        this.anchor.x,
-        this.anchor.y,
-        ...this.path,
-      ];
+      this.buffer = [...this.previous, this.anchor, ...this.path];
 
       return;
     }
@@ -128,7 +123,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.buffer.pop();
       this.buffer.pop();
 
-      this.buffer = [this.origin.x, this.origin.y, ...this.path];
+      this.buffer = [this.origin, ...this.path];
     }
   }
 
@@ -141,13 +136,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.buffer &&
       this.buffer.length > 0
     ) {
-      this.buffer = [
-        ...this.buffer,
-        position.x,
-        position.y,
-        this.origin.x,
-        this.origin.y,
-      ];
+      this.buffer = [...this.buffer, position, this.origin];
 
       this.points = this.buffer;
 
@@ -172,8 +161,8 @@ export class MagneticAnnotationTool extends AnnotationTool {
       );
 
       const destination = getIdx(this.image.width * this.factor, 1)(
-        Math.floor(this.buffer[this.buffer.length - 2] * this.factor),
-        Math.floor(this.buffer[this.buffer.length - 1] * this.factor),
+        Math.floor(this.buffer[this.buffer.length - 1].x * this.factor),
+        Math.floor(this.buffer[this.buffer.length - 1].y * this.factor),
         0
       );
 
@@ -182,15 +171,14 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.path = _.flatten(this.pathfinder.find(source, destination));
 
       this.buffer.pop();
-      this.buffer.pop();
 
       this.buffer = [...this.previous, ...this.path];
 
       this.previous = [...this.previous, ...this.path];
 
       this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
+        x: this.buffer[this.buffer.length - 1].x,
+        y: this.buffer[this.buffer.length - 1].y,
       };
 
       return;
@@ -200,8 +188,8 @@ export class MagneticAnnotationTool extends AnnotationTool {
       if (!this.image || !this.origin || !this.pathfinder) return;
 
       this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
+        x: this.buffer[this.buffer.length - 1].x,
+        y: this.buffer[this.buffer.length - 1].y,
       };
 
       const source = getIdx(this.image.width * this.factor, 1)(
@@ -211,21 +199,16 @@ export class MagneticAnnotationTool extends AnnotationTool {
       );
 
       const destination = getIdx(this.image.width * this.factor, 1)(
-        Math.floor(this.buffer[this.buffer.length - 2] * this.factor),
-        Math.floor(this.buffer[this.buffer.length - 1] * this.factor),
+        Math.floor(this.buffer[this.buffer.length - 1].x * this.factor),
+        Math.floor(this.buffer[this.buffer.length - 1].y * this.factor),
         0
       );
 
       this.path = _.flatten(this.pathfinder.find(source, destination));
 
-      this.buffer = [this.origin.x, this.origin.y, ...this.path];
+      this.buffer = [this.origin, ...this.path];
 
-      this.previous = [
-        ...this.previous,
-        this.origin.x,
-        this.origin.y,
-        ...this.path,
-      ];
+      this.previous = [...this.previous, this.origin, ...this.path];
       return;
     }
   }

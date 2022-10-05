@@ -1,9 +1,10 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
+import { drawRectangle } from "utils/common/imageHelper";
 
 export class RectangularAnnotationTool extends AnnotationTool {
-  origin?: { x: number; y: number };
+  origin?: Point;
   width?: number;
   height?: number;
 
@@ -24,7 +25,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
     } else {
       this.resize(position);
 
-      this.points = this.convertToPoints();
+      this.points = drawRectangle(this.origin, this.width, this.height);
 
       this._boundingBox = this.computeBoundingBox();
 
@@ -44,7 +45,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
     if (this.width) {
-      this.points = this.convertToPoints();
+      this.points = drawRectangle(this.origin, this.width, this.height);
 
       this._boundingBox = this.computeBoundingBox();
 
@@ -56,44 +57,13 @@ export class RectangularAnnotationTool extends AnnotationTool {
     }
   }
 
-  private convertToPoints() {
-    if (!this.width || !this.height || !this.origin) return [];
-
-    const points: Array<number> = [];
-
-    const origin = { x: this.origin.x, y: this.origin.y };
-    let width = this.width;
-    let height = this.height;
-
-    // Negative height and width may happen if the rectangle was drawn from right to left.
-    if (this.width < 0) {
-      width = Math.abs(this.width);
-      origin.x = this.origin.x - width;
-    }
-    if (this.height < 0) {
-      height = Math.abs(this.height);
-      origin.y = this.origin.y - height;
-    }
-
-    // Add corners of the bounding box.
-    const x1 = Math.round(origin.x);
-    const y1 = Math.round(origin.y);
-    const x2 = Math.round(origin.x + width);
-    const y2 = Math.round(origin.y + height);
-    points.push(...[x1, y1, x2, y2]);
-
-    return points;
-  }
-
   private convertToMask() {
     if (!this.points || !this.boundingBox) return;
 
-    const x1 = this.points[0];
-    const y1 = this.points[1];
-    const x2 = this.points[2];
-    const y2 = this.points[3];
+    const p1 = this.points[0];
+    const p2 = this.points[1];
 
-    return new Uint8Array((x2 - x1) * (y2 - y1)).fill(255);
+    return new Uint8Array((p2.x - p1.x) * (p2.y - p1.y)).fill(255);
   }
 
   private resize(position: { x: number; y: number }) {

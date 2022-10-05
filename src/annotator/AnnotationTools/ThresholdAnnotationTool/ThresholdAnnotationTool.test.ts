@@ -61,7 +61,10 @@ test("onMouseUp", async () => {
 
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toStrictEqual([10000]);
 });
@@ -127,7 +130,10 @@ test("onMouseDown-NoDrag", async () => {
 
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toStrictEqual([10000]);
 });
@@ -150,7 +156,10 @@ test("onMouseUp-NoDragLast", async () => {
 
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toStrictEqual([10000]);
 });

@@ -2,6 +2,7 @@ import { fromIdxToCoord, PiximiGraph, PiximiNode } from "..";
 import { NodeHeap } from "./NodeHeap";
 
 import { Node } from "ngraph.graph";
+import { Point } from "types";
 
 /**
  * Performs a uni-directional A Star search on graph.
@@ -32,18 +33,18 @@ export function cachedAStarPathSearch(
   const oriented = true;
 
   const heuristic = (fromNode: PiximiNode, toNode: PiximiNode) => {
-    const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
-    const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
-    if (x1 === x2 || y1 === y2) {
+    const p1 = fromIdxToCoord(fromNode.id as number, width);
+    const p2 = fromIdxToCoord(toNode.id as number, width);
+    if (p1.x === p2.x || p1.y === p2.y) {
       return 1;
     }
     return 1.41;
   };
 
   const distance = (fromNode: Node, toNode: Node) => {
-    const [x1, y1] = fromIdxToCoord(fromNode.id as number, width);
-    const [x2, y2] = fromIdxToCoord(toNode.id as number, width);
-    if (x1 === x2 || y1 === y2) {
+    const p1 = fromIdxToCoord(fromNode.id as number, width);
+    const p2 = fromIdxToCoord(toNode.id as number, width);
+    if (p1.x === p2.x || p1.y === p2.y) {
       return 1 * toNode.data;
     }
     return 1.41 * toNode.data;
@@ -153,9 +154,9 @@ function reconstructPath(
 ) {
   if (!searchNode) return;
 
-  const [x, y] = fromIdxToCoord(searchNode.id as number, width);
-  const newCoord = [x / factor, y / factor];
-  let coords = [];
+  const point = fromIdxToCoord(searchNode.id as number, width);
+  const newCoord = { x: point.x / factor, y: point.y / factor };
+  let coords: Array<Point> = [];
   const fromId = graph.fromId;
   if (searchNode!.parentId !== null) {
     const parentNode = graph.getNode(searchNode!.parentId) as PiximiNode;
@@ -178,11 +179,11 @@ function reconstructPath(
   return coords;
 }
 
-export const pathDirection = (from: Array<number>, to: Array<number>) => {
+export const pathDirection = (from: Point, to: Point) => {
   // Generate a number representing the relative direction of the coordinates.
   // Assuming TopLeft of an image is 0,0
-  const dx = to[0] - from[0];
-  const dy = to[1] - from[1];
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
   if (dx === 0) {
     if (dy < 0) {
       return 0; // Up

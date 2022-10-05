@@ -1,6 +1,5 @@
-// Code from: https://github.com/kamoroso94/polygon-fill-benchmark
-
 import * as ImageJS from "image-js";
+import { Edge, Point } from "types";
 
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.
@@ -9,8 +8,9 @@ import * as ImageJS from "image-js";
  * @param imageHeight Height of the annotated image.
  * @returns Annotation Mask
  */
-export function slpf(
-  polygon: Array<Array<number>>,
+
+export function scanline(
+  polygon: Array<Point>,
   imageWidth: number,
   imageHeight: number
 ) {
@@ -24,20 +24,31 @@ export function slpf(
 
   // initialize ET and AET
 
-  const ET: Array<Array<Array<number>>> = pointsToEdges(polygon).sort(
-    (e1: Array<Array<number>>, e2: Array<Array<number>>) =>
-      getYMin(e2) - getYMin(e1)
+  const ET: Array<Edge> = pointsToEdges(polygon).sort(
+    (e1: Edge, e2: Edge) => getYMin(e2) - getYMin(e1)
   );
 
-  const AET: Array<Array<Array<number>>> = [];
+  const AET: Array<Edge> = [];
   let yScan = getYMin(ET[ET.length - 1]);
   const allSpans = [];
 
   // repeat until both ET and AET are empty
   while (ET.length > 0 || AET.length > 0) {
     // manage AET
-    moveEdges(yScan, ET, AET);
-    removeEdges(yScan, AET);
+    // move active edges from ET to AET
+    while (ET.length > 0 && yScan === getYMin(ET[ET.length - 1])) {
+      AET.push(ET.pop()!);
+    }
+    // remove inactive edges from AET
+    for (let i = 0; i < AET.length; i++) {
+      if (yScan >= getYMax(AET[i])) {
+        const last = AET.pop();
+        if (i < AET.length && last) {
+          AET[i] = last;
+          i--;
+        }
+      }
+    }
     AET.sort((e1, e2) => {
       const cmp = getXofYMin(e1) - getXofYMin(e2);
       return cmp === 0 ? getXofYMax(e1) - getXofYMax(e2) : cmp;
@@ -50,33 +61,8 @@ export function slpf(
   }
   return maskImage;
 }
-
-// move active edges from ET to AET
-function moveEdges(
-  yScan: number,
-  ET: Array<Array<Array<number>>>,
-  AET: Array<Array<Array<number>>>
-) {
-  while (ET.length > 0 && yScan === getYMin(ET[ET.length - 1])) {
-    AET.push(ET.pop()!);
-  }
-}
-
-// remove inactive edges from AET
-function removeEdges(yScan: number, AET: Array<Array<Array<number>>>) {
-  for (let i = 0; i < AET.length; i++) {
-    if (yScan >= getYMax(AET[i])) {
-      const last = AET.pop();
-      if (i < AET.length && last) {
-        AET[i] = last;
-        i--;
-      }
-    }
-  }
-}
-
 // find spans along scanline
-function getSpans(yScan: number, AET: Array<Array<Array<number>>>) {
+function getSpans(yScan: number, AET: Array<Edge>) {
   const spans = [];
   for (const edge of AET) {
     spans.push(lerp(yScan, edge));
@@ -85,12 +71,14 @@ function getSpans(yScan: number, AET: Array<Array<Array<number>>>) {
 }
 // linear interpolation
 // finds x-value from scanline intersecting edge
-export function lerp(
-  yScan: number,
-  [[x1, y1], [x2, y2]]: Array<Array<number>>
-) {
+export function lerp(yScan: number, edge: Edge) {
+  const y1 = edge.p1.y;
+  const y2 = edge.p2.y;
+  const x1 = edge.p1.x;
+  const x2 = edge.p2.x;
   return Math.floor(((yScan - y1) / (y2 - y1)) * (x2 - x1) + x1);
 }
+
 function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
   spans.sort((e1, e2) => e1 - e2);
 
@@ -106,36 +94,34 @@ function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   }
 }
 
-// Code from: https://github.com/kamoroso94/polygon-fill-benchmark
-
 // returns minimum y-value of two points
-export function getYMin([[, y1], [, y2]]: Array<Array<number>>) {
-  return y1 <= y2 ? y1 : y2;
+export function getYMin(edge: Edge) {
+  return edge.p1.y <= edge.p2.y ? edge.p1.y : edge.p2.y;
 }
 
 // returns maximum y-value of two points
-export function getYMax([[, y1], [, y2]]: Array<Array<number>>) {
-  return y1 > y2 ? y1 : y2;
+export function getYMax(edge: Edge) {
+  return edge.p1.y > edge.p2.y ? edge.p1.y : edge.p2.y;
 }
 
 // returns the x-value of the point with the minimum y-value
-export function getXofYMin([[x1, y1], [x2, y2]]: Array<Array<number>>) {
-  return y1 <= y2 ? x1 : x2;
+export function getXofYMin(edge: Edge) {
+  return edge.p1.y <= edge.p2.y ? edge.p1.x : edge.p2.x;
 }
 
 // returns the x-value of the point with the maximum y-value
-export function getXofYMax([[x1, y1], [x2, y2]]: Array<Array<number>>) {
-  return y1 > y2 ? x1 : x2;
+export function getXofYMax(edge: Edge) {
+  return edge.p1.y > edge.p2.y ? edge.p1.x : edge.p2.x;
 }
 
 // converts list of points to list of non-horizontal edges
-export function pointsToEdges(points: Array<Array<number>>) {
-  let edges = [];
+export function pointsToEdges(points: Array<Point>) {
+  let edges: Array<Edge> = [];
   let p1 = points[points.length - 1];
   for (let i = 0; i < points.length; i++) {
     const p2 = points[i];
     // ignore horizontal edges
-    if (p1[1] !== p2[1]) edges.push([p1, p2]);
+    if (p1.y !== p2.y) edges.push({ p1: p1, p2: p2 });
     p1 = p2;
   }
   return edges;

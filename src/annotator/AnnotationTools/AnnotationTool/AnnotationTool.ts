@@ -1,11 +1,11 @@
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { slpf, simplifyPolygon, decode, encode } from "utils/annotator";
+import { scanline, simplifyPolygon, decode, encode } from "utils/annotator";
 import { Tool } from "../../Tool/Tool";
 import { connectPoints, drawLine } from "utils/common/imageHelper";
 
-import { AnnotationStateType, AnnotationType, Category } from "types";
+import { AnnotationStateType, AnnotationType, Category, Point } from "types";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -16,7 +16,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Polygon that defines the annotation area, array of (x, y) coordinates.
    */
-  points?: Array<number> = [];
+  points?: Array<Point> = [];
   /**
    * Coordinates of the annotation bounding box: [x1, y1, x2, y2].
    * Specifies the top left and bottom right points.
@@ -34,9 +34,9 @@ export abstract class AnnotationTool extends Tool {
    * Annotation object of the Tool.
    */
   annotation?: AnnotationType;
-  anchor?: { x: number; y: number } = undefined;
-  origin?: { x: number; y: number } = undefined;
-  buffer?: Array<number> = [];
+  anchor?: Point = undefined;
+  origin?: Point = undefined;
+  buffer?: Array<Point> = [];
 
   onAnnotating?: () => void;
   onAnnotated?: () => void;
@@ -64,18 +64,24 @@ export abstract class AnnotationTool extends Tool {
    */
   computeBoundingBox(): [number, number, number, number] | undefined {
     if (!this.points || !this.points.length) return undefined;
-    return [this.points[0], this.points[1], this.points[2], this.points[3]];
+    return [
+      this.points[0].x,
+      this.points[0].y,
+      this.points[1].x,
+      this.points[1].y,
+    ];
   }
 
   computeBoundingBoxFromContours(
-    contour: Array<number>
+    contour: Array<Point>
   ): [number, number, number, number] {
-    const pairs = _.chunk(contour, 2);
+    const xValues = contour.map((point) => point.x);
+    const yValues = contour.map((point) => point.y);
     return [
-      Math.round(_.min(_.map(pairs, _.first))!),
-      Math.round(_.min(_.map(pairs, _.last))!),
-      Math.round(_.max(_.map(pairs, _.first))!),
-      Math.round(_.max(_.map(pairs, _.last))!),
+      Math.round(_.min(xValues)!),
+      Math.round(_.min(yValues)!),
+      Math.round(_.max(xValues)!),
+      Math.round(_.max(yValues)!),
     ];
   }
 
@@ -92,7 +98,7 @@ export abstract class AnnotationTool extends Tool {
    * @returns Mask image of the annotation.
    */
   computeAnnotationMaskFromPoints() {
-    const boundingBox = this._boundingBox;
+    const boundingBox = this.boundingBox;
     if (!boundingBox) return undefined;
 
     const width = boundingBox[2] - boundingBox[0];
@@ -101,13 +107,13 @@ export abstract class AnnotationTool extends Tool {
       return undefined;
     }
 
-    const coordinates = _.chunk(this.points, 2);
+    const coordinates = this.buffer;
 
-    const connectedPoints = connectPoints(coordinates); // get coordinates of connected points and draw boundaries of mask
+    const connectedPoints = connectPoints(coordinates!); // get coordinates of connected points and draw boundaries of mask
 
     const simplifiedPoints = simplifyPolygon(connectedPoints);
 
-    const maskImage = slpf(
+    const maskImage = scanline(
       simplifiedPoints,
       this.image.width,
       this.image.height
@@ -178,6 +184,36 @@ export abstract class AnnotationTool extends Tool {
       mask: this.mask,
       plane: plane,
     };
+  }
+  connect() {
+    if (this.annotationState === AnnotationStateType.Annotated) return;
+
+    if (!this.anchor || !this.origin || !this.buffer) return;
+
+    const anchorIndex = _.findLastIndex(this.buffer, (point) => {
+      return point.x === this.anchor!.x;
+    });
+
+    const segment = drawLine(
+      { x: this.anchor.x, y: this.anchor.y },
+      { x: this.origin.x, y: this.origin.y }
+    );
+    this.buffer.splice(anchorIndex, segment.length, ...segment);
+
+    this._boundingBox = this.computeBoundingBoxFromContours(this.buffer);
+
+    this.points = this.buffer;
+
+    const maskImage = this.computeAnnotationMaskFromPoints();
+    if (!maskImage) return;
+
+    this._mask = encode(maskImage.data);
+
+    this.anchor = undefined;
+    this.origin = undefined;
+    this.buffer = [];
+
+    this.setAnnotated();
   }
 
   /*
@@ -280,37 +316,6 @@ export abstract class AnnotationTool extends Tool {
     }
 
     return [encode(Uint8Array.from(combinedMaskData)), combinedBoundingBox];
-  }
-
-  connect() {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
-
-    if (!this.anchor || !this.origin || !this.buffer) return;
-
-    const anchorIndex = _.findLastIndex(this.buffer, (point) => {
-      return point === this.anchor!.x;
-    });
-
-    const segment = _.flatten(
-      drawLine([this.anchor.x, this.anchor.y], [this.origin.x, this.origin.y])
-    );
-
-    this.buffer.splice(anchorIndex, segment.length, ...segment);
-
-    this._boundingBox = this.computeBoundingBoxFromContours(this.buffer);
-
-    this.points = this.buffer;
-
-    const maskImage = this.computeAnnotationMaskFromPoints();
-    if (!maskImage) return;
-
-    this._mask = encode(maskImage.data);
-
-    this.anchor = undefined;
-    this.origin = undefined;
-    this.buffer = [];
-
-    this.setAnnotated();
   }
 
   /**

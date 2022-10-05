@@ -14,12 +14,12 @@ import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
 import { encode } from "utils/annotator";
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
   graph?: LayersModel;
   prediction?: ImageJS.Image;
-  points: Array<number> = [];
+  points: Array<Point> = [];
   // @ts-ignore
   roi?: ImageJS.Roi;
   offset?: { x: number; y: number };

@@ -5,6 +5,7 @@ import { DataArray } from "image-js";
 import { cachedAStarPathSearch, NodeHeap } from "..";
 
 import { getIdx } from "utils/common/imageHelper";
+import { Point } from "types";
 
 export interface PiximiGraph extends Graph {
   fromId: number;
@@ -13,7 +14,7 @@ export interface PiximiGraph extends Graph {
 
 export interface PiximiNode extends Node {
   fromId: number;
-  trace: Array<Array<number>>;
+  trace: Array<Point>;
 
   parentId: number | null;
   closed: boolean;
@@ -31,7 +32,7 @@ export const validNeighbours = (
 ) => {
   const xoffsets = [0];
   const yoffsets = [0];
-  const output: { x: number; y: number }[] = [];
+  const output: Point[] = [];
   //David will know what to write here
   if (x > 0) {
     xoffsets.push(-1);
@@ -58,7 +59,7 @@ export const validNeighbours = (
 export const fromIdxToCoord = (idx: number, width: number) => {
   const row = Math.floor(idx / width);
   const col = idx - row * width;
-  return [col, row];
+  return { x: col, y: row };
 };
 
 export const makeGraph = (
@@ -107,8 +108,8 @@ export const convertPathToCoords = (
   const pathCoords = [];
   for (let node of foundPath) {
     const id = node.id as number;
-    const [x, y] = fromIdxToCoord(id, width);
-    pathCoords.push([x / factor, y / factor]);
+    const point = fromIdxToCoord(id, width);
+    pathCoords.push([point.x / factor, point.y / factor]);
   }
   return pathCoords;
 };
