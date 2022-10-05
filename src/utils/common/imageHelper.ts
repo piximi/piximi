@@ -4,10 +4,21 @@ import { saveAs } from "file-saver";
 
 import { decode } from "utils/annotator";
 
-import { AnnotationType, Category, ShadowImageType } from "types";
+import { AnnotationType, Category, ShadowImageType, Point } from "types";
 
-export const connectPoints = (coordinates: Array<Array<number>>) => {
-  let connectedPoints: Array<Array<number>> = [];
+export const generatePoints = (buffer: Array<number> | undefined) => {
+  if (!buffer) return undefined;
+  const pointArray: Array<Point> = [];
+  buffer.forEach((q, idx) => {
+    if ((idx + 1) % 2 === 0) {
+      pointArray.push({ x: buffer[idx - 1], y: q });
+    }
+  });
+  return pointArray;
+};
+
+export const connectPoints = (coordinates: Array<Point>) => {
+  let connectedPoints: Array<Point> = [];
 
   const consecutiveCoords = coordinates
     .slice(0, coordinates.length - 1)
@@ -25,8 +36,8 @@ export const connectPoints = (coordinates: Array<Array<number>>) => {
   return connectedPoints;
 };
 
-export const drawLine = (p1: Array<number>, p2: Array<number>) => {
-  const coords: Array<Array<number>> = [];
+export const drawLine = (p1: Point, p2: Point) => {
+  const coords: Array<Point> = [];
 
   let x: number,
     y: number,
@@ -39,10 +50,10 @@ export const drawLine = (p1: Array<number>, p2: Array<number>) => {
     step: number,
     i: number;
 
-  x1 = Math.round(p1[0]);
-  y1 = Math.round(p1[1]);
-  x2 = Math.round(p2[0]);
-  y2 = Math.round(p2[1]);
+  x1 = Math.round(p1.x);
+  y1 = Math.round(p1.y);
+  x2 = Math.round(p2.x);
+  y2 = Math.round(p2.y);
 
   dx = x2 - x1;
   dy = y2 - y1;
@@ -56,13 +67,47 @@ export const drawLine = (p1: Array<number>, p2: Array<number>) => {
   i = 1;
 
   while (i <= step) {
-    coords.push([Math.round(x), Math.round(y)]);
+    coords.push({ x: Math.round(x), y: Math.round(y) });
     x = x + dx;
     y = y + dy;
     i = i + 1;
   }
 
   return coords;
+};
+
+export const drawRectangle = (
+  origin: Point | undefined,
+  width: number | undefined,
+  height: number | undefined
+) => {
+  if (!width || !height || !origin) return [];
+
+  const points: Array<Point> = [];
+
+  // Negative height and width may happen if the rectangle was drawn from right to left.
+  if (width < 0) {
+    width = Math.abs(width);
+    origin.x = origin.x - width;
+  }
+  if (height < 0) {
+    height = Math.abs(height);
+    origin.y = origin.y - height;
+  }
+
+  // Add corners of the bounding box.
+  const x1 = Math.round(origin.x);
+  const y1 = Math.round(origin.y);
+  const x2 = Math.round(origin.x + width);
+  const y2 = Math.round(origin.y + height);
+  points.push(
+    ...[
+      { x: x1, y: y1 },
+      { x: x2, y: y2 },
+    ]
+  );
+
+  return points;
 };
 
 export const getIdx = (width: number, nchannels: number) => {

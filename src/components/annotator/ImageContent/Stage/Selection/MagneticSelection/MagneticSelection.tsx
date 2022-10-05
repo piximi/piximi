@@ -43,7 +43,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
           </>
         )}
         <ReactKonva.Line
-          points={operator.buffer}
+          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
           scale={{ x: stageScale, y: stageScale }}
           stroke="black"
           strokeWidth={1 / stageScale}
@@ -53,7 +53,7 @@ export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
           scale={{ x: stageScale, y: stageScale }}
           dashOffset={-dashOffset}
           stroke="white"
-          points={operator.buffer}
+          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
           strokeWidth={1 / stageScale}
         />
       </ReactKonva.Group>

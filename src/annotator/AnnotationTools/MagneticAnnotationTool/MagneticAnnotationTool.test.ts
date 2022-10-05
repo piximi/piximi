@@ -34,11 +34,11 @@ test("onMouseMove (from origin)", async () => {
 
   expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-  expect([operator.buffer[0], operator.buffer[1]]).toStrictEqual([0, 0]);
-  expect([
-    operator.buffer[operator.buffer.length - 2],
-    operator.buffer[operator.buffer.length - 1],
-  ]).toStrictEqual([300, 300]);
+  expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.buffer[operator.buffer.length - 1]).toStrictEqual({
+    x: 300,
+    y: 300,
+  });
 
   expect(operator.points).toStrictEqual([]);
 });
@@ -64,15 +64,12 @@ test("onMouseMove (from anchor)", async () => {
 
   const anchorStart = operator.previous.length;
 
-  expect([operator.buffer[0], operator.buffer[1]]).toStrictEqual([0, 0]);
-  expect([
-    operator.buffer[anchorStart],
-    operator.buffer[anchorStart + 1],
-  ]).toStrictEqual([150, 150]);
-  expect([
-    operator.buffer[operator.buffer.length - 2],
-    operator.buffer[operator.buffer.length - 1],
-  ]).toStrictEqual([300, 300]);
+  expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.buffer[anchorStart]).toStrictEqual({ x: 150, y: 150 });
+  expect(operator.buffer[operator.buffer.length - 1]).toStrictEqual({
+    x: 300,
+    y: 300,
+  });
 
   expect(operator.points).toStrictEqual([]);
 });
@@ -99,12 +96,12 @@ test("onMouseup (unconnected, from origin)", async () => {
   expect(operator.annotation).toBe(undefined);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
-  expect([operator.buffer[0], operator.buffer[1]]).toStrictEqual([0, 0]);
-  expect([operator.path[0], operator.path[1]]).toStrictEqual([150, 150]);
-  expect([
-    operator.buffer[operator.buffer.length - 2],
-    operator.buffer[operator.buffer.length - 1],
-  ]).toStrictEqual([300, 300]);
+  expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.path[0]).toStrictEqual({ x: 150, y: 150 });
+  expect(operator.buffer[operator.buffer.length - 1]).toStrictEqual({
+    x: 300,
+    y: 300,
+  });
 
   expect(operator.anchor).toStrictEqual({ x: 300, y: 300 });
 
@@ -128,11 +125,11 @@ test("onMouseup (unconnected, from anchor)", async () => {
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
   expect(operator.anchor).toStrictEqual({ x: 300, y: 300 });
-  expect([operator.buffer[0], operator.buffer[1]]).toStrictEqual([0, 0]);
-  expect([
-    operator.buffer[operator.buffer.length - 2],
-    operator.buffer[operator.buffer.length - 1],
-  ]).toStrictEqual([300, 300]);
+  expect(operator.buffer[0]).toStrictEqual({ x: 0, y: 0 });
+  expect(operator.buffer[operator.buffer.length - 1]).toStrictEqual({
+    x: 300,
+    y: 300,
+  });
 
   expect(operator.points).toStrictEqual([]);
 });
@@ -160,11 +157,11 @@ test("onMouseUp (connected)", async () => {
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
 
   expect(operator.annotation).toBe(undefined);
-  expect([operator.points[0], operator.points[1]]).toStrictEqual([300, 0]);
-  expect([
-    operator.points[operator.points.length - 2],
-    operator.points[operator.points.length - 1],
-  ]).toStrictEqual([300, 0]);
+  expect(operator.points[0]).toStrictEqual({ x: 300, y: 0 });
+  expect(operator.points[operator.points.length - 1]).toStrictEqual({
+    x: 300,
+    y: 0,
+  });
   expect(operator.buffer).toStrictEqual([]);
   expect(operator.origin).toStrictEqual({ x: 300, y: 0 });
   expect(operator.mask).toBeDefined();

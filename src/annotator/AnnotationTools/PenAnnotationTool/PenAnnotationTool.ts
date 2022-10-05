@@ -4,14 +4,14 @@ import * as ImageJS from "image-js";
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
 
-import { connectPoints } from "utils/common/imageHelper";
+import { connectPoints, generatePoints } from "utils/common/imageHelper";
 
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
-  buffer: Array<number> = [];
-  points: Array<number> = [];
+  buffer: Array<Point> = [];
+  points: Array<Point> = [];
 
   deselect() {
     this.buffer = [];
@@ -23,7 +23,7 @@ export class PenAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    this.buffer = [...this.buffer, position.x, position.y];
+    this.buffer = [...this.buffer, position];
 
     this.setAnnotating();
   }
@@ -31,7 +31,7 @@ export class PenAnnotationTool extends AnnotationTool {
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
-    this.buffer = [...this.buffer, position.x, position.y];
+    this.buffer = [...this.buffer, position];
   }
 
   onMouseUp(position: { x: number; y: number }) {
@@ -59,18 +59,15 @@ export class PenAnnotationTool extends AnnotationTool {
 
     if (!ctx) return undefined;
 
-    let connectedPoints: Array<Array<number>>;
-    if (this.points.length === 2) {
+    let connectedPoints: Array<Point>;
+    if (this.points.length === 1) {
       // Handling the case in which a single point has been clicked.
-      connectedPoints = _.chunk(this.points, 2);
+      connectedPoints = this.points;
     } else {
-      const chunks = _.chunk(this.points, 2);
-      connectedPoints = connectPoints(chunks);
+      connectedPoints = connectPoints(this.points);
     }
     // Compute bounding box coordinates.
-    const boundingBox = this.computeBoundingBoxFromContours(
-      _.flatten(connectedPoints)
-    );
+    const boundingBox = this.computeBoundingBoxFromContours(connectedPoints);
 
     // Make sure the bounding box is valid.
     if (boundingBox.some((x) => Number.isNaN(x))) return undefined;
@@ -83,11 +80,11 @@ export class PenAnnotationTool extends AnnotationTool {
     ];
 
     // Compute mask by drawing circles over canvas.
-    connectedPoints.forEach((position) => {
+    connectedPoints.forEach((point) => {
       ctx.beginPath();
       ctx.arc(
-        Math.round(position[0]),
-        Math.round(position[1]),
+        Math.round(point.x),
+        Math.round(point.y),
         this.brushSize,
         0,
         Math.PI * 2,
