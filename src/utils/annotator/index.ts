@@ -12,15 +12,7 @@ export type { PiximiGraph, PiximiNode } from "./graph-helper/GraphHelper";
 
 export { NodeHeap } from "./pathfinder/NodeHeap";
 export { cachedAStarPathSearch, pathDirection } from "./pathfinder/PathFinder";
-export { slpf } from "./polygon-fill/slpf";
-export {
-  lerp,
-  getXofYMax,
-  getXofYMin,
-  getYMax,
-  getYMin,
-  pointsToEdges,
-} from "./polygon-fill/util";
+export { scanline } from "./polygon-fill/scanline";
 
 export { simplifyPolygon } from "./simplify/simplify";
 

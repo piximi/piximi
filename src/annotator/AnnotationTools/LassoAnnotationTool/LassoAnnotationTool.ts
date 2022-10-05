@@ -1,12 +1,13 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
+import { generatePoints } from "utils/common/imageHelper";
 
 export class LassoAnnotationTool extends AnnotationTool {
-  anchor?: { x: number; y: number };
-  buffer: Array<number> = [];
-  origin?: { x: number; y: number };
-  points: Array<number> = [];
+  anchor?: Point;
+  buffer: Array<Point> = [];
+  origin?: Point;
+  points: Array<Point> = [];
 
   deselect() {
     this.annotation = undefined;
@@ -24,7 +25,10 @@ export class LassoAnnotationTool extends AnnotationTool {
 
     if (this.annotationState === AnnotationStateType.Blank) {
       this.origin = position;
-      this.buffer = [position.x, position.y, this.origin.x, this.origin.y];
+      this.buffer = [
+        { x: position.x, y: position.y },
+        { x: this.origin.x, y: this.origin.y },
+      ];
 
       this.setAnnotating();
     }
@@ -36,8 +40,8 @@ export class LassoAnnotationTool extends AnnotationTool {
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
     if (
-      Math.abs(this.buffer[this.buffer.length - 4] - position.x) >= 1 ||
-      Math.abs(this.buffer[this.buffer.length - 3] - position.y) >= 1
+      Math.abs(this.buffer[this.buffer.length - 2].x - position.x) >= 1 ||
+      Math.abs(this.buffer[this.buffer.length - 2].y - position.y) >= 1
     ) {
       // console.log("MouseMove at ", position);
       // console.log("Buffer: ", this.buffer);
@@ -60,11 +64,9 @@ export class LassoAnnotationTool extends AnnotationTool {
       // this.buffer.pop();
 
       this.buffer = [
-        ...this.buffer.slice(0, this.buffer.length - 2),
-        position.x,
-        position.y,
-        this.origin!.x,
-        this.origin!.y,
+        ...this.buffer.slice(0, this.buffer.length - 1),
+        { x: position.x, y: position.y },
+        { x: this.origin!.x, y: this.origin!.y },
       ];
     }
   }

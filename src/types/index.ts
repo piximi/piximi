@@ -89,6 +89,8 @@ export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";
 
+export type { Point, Edge } from "./Polygon";
+
 export type { PreprocessOptions } from "./PreprocessOptions";
 
 export type { Project } from "./Project";

@@ -16,7 +16,7 @@ export const PenSelection = ({ operator }: PenSelectionProps) => {
     <>
       <ReactKonva.Group>
         <ReactKonva.Line
-          points={operator.buffer}
+          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
           lineJoin="round"
           lineCap="round"
           scale={{ x: stageScale, y: stageScale }}
