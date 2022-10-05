@@ -1,6 +1,7 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
 import { AnnotationStateType } from "types";
+import { drawRectangle } from "utils/common/imageHelper";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   // TODO: ts throws error on this overwriting AnnotationTool property
@@ -63,7 +64,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   }
 
   computeMask() {
-    this.points = this.convertToPoints();
+    this.points = drawRectangle(this.origin, this.width, this.height);
 
     const boundingBox = this.computeBoundingBox();
     this._boundingBox = boundingBox;

@@ -4,12 +4,11 @@ import _ from "lodash";
 import { AnnotationTool } from "../AnnotationTool";
 
 import { encode } from "utils/annotator";
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
+import { generatePoints } from "utils/common/imageHelper";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
-  center?: { x: number; y: number };
-  // TODO: ts throws error on this overwriting AnnotationTool property
-  // origin?: { x: number; y: number };
+  center?: Point;
   radius?: { x: number; y: number };
 
   deselect() {
@@ -42,7 +41,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     if (this.radius) {
       this.points = this.convertToPoints();
 
-      this._boundingBox = this.computeBoundingBoxFromContours(this.points);
+      this._boundingBox = this.computeBoundingBoxFromContours(this.points!);
       const mask = this.convertToMask();
 
       if (!mask) return;
@@ -110,8 +109,25 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     const centerX = Math.round(this.center.x);
     const centerY = Math.round(this.center.y);
 
-    const points: Array<number> = [];
-    const foo: Array<Array<number>> = [];
+    const points: Array<Point> = [];
+    const foo: Array<Point> = [];
+    const doints: Array<Point> = [];
+
+    const r = (
+      theta: number,
+      a: number = this.radius!.x,
+      b: number = this.radius!.y
+    ) => {
+      return (
+        (a * b) / Math.sqrt(b ** 2 * Math.cos(theta) + a ** 2 * Math.sin(theta))
+      );
+    };
+
+    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.05) {
+      const x = r(theta) * Math.cos(theta) + centerX;
+      const y = r(theta) * Math.sin(theta) + centerY;
+      doints.push({ x: x, y: y });
+    }
     //first quadrant points
     for (let y = centerY; y < centerY + this.radius.y; y += 0.5) {
       const x =
@@ -121,35 +137,30 @@ export class EllipticalAnnotationTool extends AnnotationTool {
               ((y - centerY) * (y - centerY)) / (this.radius.y * this.radius.y)
           ) +
         centerX;
-      points.push(Math.round(x));
-      points.push(Math.round(y));
-      foo.push([Math.round(x), Math.round(y)]);
+      points.push({ x: Math.round(x), y: Math.round(y) });
+      foo.push({ x: Math.round(x), y: Math.round(y) });
     }
-    // const reversedFoo = _.reverse(foo);
     //second quadrant points
-    _.forEachRight(foo, (position: Array<number>) => {
-      let x = 2 * centerX - position[0];
-      points.push(x);
-      points.push(position[1]);
+    _.forEachRight(foo, (position: Point) => {
+      let x = 2 * centerX - position.x;
+      points.push({ x: x, y: position.y });
     });
     //third quadrant points
-    _.forEach(foo, (position: Array<number>) => {
-      let x = 2 * centerX - position[0];
-      let y = 2 * centerY - position[1];
-      points.push(x);
-      points.push(y);
+    _.forEach(foo, (position: Point) => {
+      let x = 2 * centerX - position.x;
+      let y = 2 * centerY - position.y;
+      points.push({ x: x, y: y });
     });
     //fourth quadant points
-    _.forEachRight(foo, (position: Array<number>) => {
-      let y = 2 * centerY - position[1];
-      points.push(position[0]);
-      points.push(y);
+    _.forEachRight(foo, (position: Point) => {
+      let y = 2 * centerY - position.y;
+      points.push({ x: position.x, y: y });
     });
 
     return points;
   }
 
-  private resize(position: { x: number; y: number }) {
+  private resize(position: Point) {
     if (this.origin) {
       this.center = {
         x: (position.x - this.origin.x) / 2 + this.origin.x,

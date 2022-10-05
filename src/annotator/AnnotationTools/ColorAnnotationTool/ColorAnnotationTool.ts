@@ -4,7 +4,7 @@ import PriorityQueue from "ts-priority-queue";
 import { AnnotationTool } from "../AnnotationTool";
 import { doFlood, makeFloodMap, encode } from "utils/annotator";
 
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
 
 export class ColorAnnotationTool extends AnnotationTool {
   roiContour?: ImageJS.Image;
@@ -12,7 +12,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   roiManager?: ImageJS.RoiManager;
   offset: { x: number; y: number } = { x: 0, y: 0 };
   overlayData: string = "";
-  points: Array<number> = [];
+  points: Array<Point> = [];
   initialPosition: { x: number; y: number } = { x: 0, y: 0 };
   tolerance: number = 1;
   toleranceMap?: ImageJS.Image;

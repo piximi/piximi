@@ -1,14 +1,11 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
-import { AnnotationStateType } from "types";
+import { AnnotationStateType, Point } from "types";
+import { generatePoints } from "utils/common/imageHelper";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
-  // TODO: ts throws error on this overwriting AnnotationTool property
-  // anchor?: { x: number; y: number };
-  buffer: Array<number> = [];
-  // TODO: ts throws error on this overwriting AnnotationTool property
-  // origin?: { x: number; y: number };
-  points: Array<number> = [];
+  buffer: Array<Point> = [];
+  points: Array<Point> = [];
 
   deselect() {
     this.annotation = undefined;
@@ -38,23 +35,21 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
     if (this.anchor) {
       if (
-        this.buffer[this.buffer.length - 2] !== this.anchor.x ||
-        this.buffer[this.buffer.length - 1] !== this.anchor.y
+        this.buffer[this.buffer.length - 1].x !== this.anchor.x ||
+        this.buffer[this.buffer.length - 1].y !== this.anchor.y
       ) {
-        this.buffer.pop();
         this.buffer.pop();
       }
 
-      this.buffer = [...this.buffer, position.x, position.y];
+      this.buffer = [...this.buffer, position];
 
       return;
     }
 
     if (this.origin) {
       this.buffer.pop();
-      this.buffer.pop();
 
-      this.buffer = [this.origin.x, this.origin.y, position.x, position.y];
+      this.buffer = [this.origin, position];
     }
   }
 
@@ -67,13 +62,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       this.buffer &&
       this.buffer.length > 0
     ) {
-      this.buffer = [
-        ...this.buffer,
-        position.x,
-        position.y,
-        this.origin.x,
-        this.origin.y,
-      ];
+      this.buffer = [...this.buffer, position, this.origin];
 
       this.points = this.buffer;
 
@@ -95,8 +84,8 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
     if (this.anchor || (this.origin && this.buffer.length > 0)) {
       this.anchor = {
-        x: this.buffer[this.buffer.length - 2],
-        y: this.buffer[this.buffer.length - 1],
+        x: this.buffer[this.buffer.length - 1].x,
+        y: this.buffer[this.buffer.length - 1].y,
       };
 
       return;

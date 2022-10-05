@@ -60,7 +60,10 @@ test("onMouseUp", async () => {
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
 
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toBeDefined();
 });
@@ -85,7 +88,10 @@ test("make rectangle by clicking twice", async () => {
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
 
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toBeDefined();
 });
@@ -115,7 +121,10 @@ test("select", async () => {
   expect(operator.width).toBe(100);
   expect(operator.height).toBe(100);
 
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.mask).toBeDefined();
 
