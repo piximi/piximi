@@ -1,6 +1,6 @@
 import { enableDebugMode, ENV } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
-import _ from "lodash";
+import { shuffle, take, takeRight } from "lodash";
 import { put, select } from "redux-saga/effects";
 
 import {
@@ -70,7 +70,7 @@ export function* fitClassifierSaga({
   //first assign train and val partition to all categorized images
   const categorizedImagesIds = (
     preprocessingOptions.shuffle
-      ? _.shuffle(categorizedImages)
+      ? shuffle(categorizedImages)
       : categorizedImages
   ).map((image: ImageType) => {
     return image.id;
@@ -82,8 +82,8 @@ export function* fitClassifierSaga({
   );
   const valDataLength = categorizedImagesIds.length - trainDataLength;
 
-  const trainDataIds = _.take(categorizedImagesIds, trainDataLength);
-  const valDataIds = _.takeRight(categorizedImagesIds, valDataLength);
+  const trainDataIds = take(categorizedImagesIds, trainDataLength);
+  const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
   yield put(
     projectSlice.actions.updateImagesPartition({

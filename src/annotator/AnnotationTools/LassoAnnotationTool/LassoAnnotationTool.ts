@@ -1,7 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
-import { generatePoints } from "utils/common/imageHelper";
 
 export class LassoAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
@@ -23,16 +22,10 @@ export class LassoAnnotationTool extends AnnotationTool {
 
     if (this.annotationState === AnnotationStateType.Blank) {
       this.origin = position;
-      this.buffer = [
-        { x: position.x, y: position.y },
-        { x: this.origin.x, y: this.origin.y },
-      ];
+      this.buffer = [position, this.origin];
 
       this.setAnnotating();
     }
-    // console.log("MouseDown at ", position);
-    // console.log("Buffer: ", this.buffer);
-    // console.log("Anchor: ", this.anchor);
   }
 
   onMouseMove(position: { x: number; y: number }) {
@@ -41,30 +34,10 @@ export class LassoAnnotationTool extends AnnotationTool {
       Math.abs(this.buffer[this.buffer.length - 2].x - position.x) >= 1 ||
       Math.abs(this.buffer[this.buffer.length - 2].y - position.y) >= 1
     ) {
-      // console.log("MouseMove at ", position);
-      // console.log("Buffer: ", this.buffer);
-      // console.log("Anchor: ", this.anchor);
-
-      // if (this.anchor) {
-      //   if (
-      //     this.buffer[this.buffer.length - 2] !== this.anchor.x ||
-      //     this.buffer[this.buffer.length - 1] !== this.anchor.y
-      //   ) {
-      //     this.buffer.pop();
-      //     this.buffer.pop();
-      //   }
-
-      //   this.buffer = [...this.buffer, position.x, position.y];
-
-      //   return;
-      // }
-      // this.buffer.pop();
-      // this.buffer.pop();
-
       this.buffer = [
         ...this.buffer.slice(0, this.buffer.length - 1),
-        { x: position.x, y: position.y },
-        { x: this.origin!.x, y: this.origin!.y },
+        position,
+        this.origin!,
       ];
     }
   }
@@ -76,23 +49,10 @@ export class LassoAnnotationTool extends AnnotationTool {
     ) {
       return;
     }
-    if (this.origin && this.buffer.length < 6) {
+    if (this.buffer.length < 6) {
       this.deselect();
       return;
-    }
-
-    if (
-      this.origin &&
-      this.buffer.length >= 6 /*&& this.connected(position)*/
-    ) {
-      // this.buffer = [
-      //   ...this.buffer,
-      //   position.x,
-      //   position.y,
-      //   this.origin.x,
-      //   this.origin.y,
-      // ];
-
+    } else {
       this.points = this.buffer;
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
@@ -109,38 +69,5 @@ export class LassoAnnotationTool extends AnnotationTool {
 
       this.setAnnotated();
     }
-
-    // if (this.anchor) {
-    //   this.anchor = {
-    //     x: this.buffer[this.buffer.length - 2],
-    //     y: this.buffer[this.buffer.length - 1],
-    //   };
-
-    //   return;
-    // }
-    // if (this.origin && this.buffer && this.buffer.length > 0) {
-    //   this.anchor = {
-    //     x: this.buffer[this.buffer.length - 2],
-    //     y: this.buffer[this.buffer.length - 1],
-    //   };
-    // console.log("MouseUp at ", position);
-    // console.log("Buffer: ", this.buffer);
-    // console.log("Anchor: ", this.anchor);
-
-    //   return;
-    // }
-  }
-  private connected(
-    position: { x: number; y: number },
-    threshold: number = 4
-  ): boolean | undefined {
-    if (!this.origin) return undefined;
-
-    const distance = Math.hypot(
-      position.x - this.origin.x,
-      position.y - this.origin.y
-    );
-
-    return distance < threshold;
   }
 }

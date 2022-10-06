@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { filter, findIndex } from "lodash";
+import { filter } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 import { Project } from "types/Project";
@@ -224,8 +224,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.categoryId;
         }
@@ -257,7 +256,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.id;
       });
       state.categories[index].name = action.payload.name;
@@ -279,7 +278,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.categoryId;
       });
 
@@ -322,7 +321,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string> }>
     ) {
       action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -335,7 +334,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ id: string; categoryId: string }>
     ) {
-      const index = findIndex(state.images, (image) => {
+      const index = state.images.findIndex((image) => {
         return image.id === action.payload.id;
       });
       if (index >= 0) {
@@ -347,7 +346,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; categoryId: string }>
     ) {
       action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -366,7 +365,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -379,7 +378,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -392,7 +391,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -404,8 +403,7 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.id;
         }

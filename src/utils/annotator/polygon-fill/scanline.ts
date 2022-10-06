@@ -1,5 +1,13 @@
 import * as ImageJS from "image-js";
 import { Edge, Point } from "types";
+import {
+  getXofYMax,
+  getXofYMin,
+  getYMax,
+  getYMin,
+  interpolateX,
+  pointsToEdges,
+} from "utils/annotator";
 
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.
@@ -65,18 +73,9 @@ export function scanline(
 function getSpans(yScan: number, AET: Array<Edge>) {
   const spans = [];
   for (const edge of AET) {
-    spans.push(lerp(yScan, edge));
+    spans.push(interpolateX(yScan, edge));
   }
   return spans;
-}
-// linear interpolation
-// finds x-value from scanline intersecting edge
-export function lerp(yScan: number, edge: Edge) {
-  const y1 = edge.p1.y;
-  const y2 = edge.p2.y;
-  const x1 = edge.p1.x;
-  const x2 = edge.p2.x;
-  return Math.floor(((yScan - y1) / (y2 - y1)) * (x2 - x1) + x1);
 }
 
 function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
@@ -92,37 +91,4 @@ function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   for (let x = x1; x < x2; x++) {
     img.setPixelXY(x, y, [255, 255, 255, 255]);
   }
-}
-
-// returns minimum y-value of two points
-export function getYMin(edge: Edge) {
-  return edge.p1.y <= edge.p2.y ? edge.p1.y : edge.p2.y;
-}
-
-// returns maximum y-value of two points
-export function getYMax(edge: Edge) {
-  return edge.p1.y > edge.p2.y ? edge.p1.y : edge.p2.y;
-}
-
-// returns the x-value of the point with the minimum y-value
-export function getXofYMin(edge: Edge) {
-  return edge.p1.y <= edge.p2.y ? edge.p1.x : edge.p2.x;
-}
-
-// returns the x-value of the point with the maximum y-value
-export function getXofYMax(edge: Edge) {
-  return edge.p1.y > edge.p2.y ? edge.p1.x : edge.p2.x;
-}
-
-// converts list of points to list of non-horizontal edges
-export function pointsToEdges(points: Array<Point>) {
-  let edges: Array<Edge> = [];
-  let p1 = points[points.length - 1];
-  for (let i = 0; i < points.length; i++) {
-    const p2 = points[i];
-    // ignore horizontal edges
-    if (p1.y !== p2.y) edges.push({ p1: p1, p2: p2 });
-    p1 = p2;
-  }
-  return edges;
 }

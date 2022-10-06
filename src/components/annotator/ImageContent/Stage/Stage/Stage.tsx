@@ -3,7 +3,7 @@ import { Provider, useDispatch, useSelector, useStore } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
-import _ from "lodash";
+import throttle from "lodash/throttle";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -230,8 +230,7 @@ export const Stage = () => {
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
-
-    _.forEach(selectedAnnotationsIds, (annotationId) => {
+    selectedAnnotationsIds.forEach((annotationId) => {
       if (!stageRef || !stageRef.current) return;
 
       const transformerId = "tr-".concat(annotationId);
@@ -351,7 +350,7 @@ export const Stage = () => {
         annotationTool.onMouseDown(rawImagePosition);
       }
     };
-    const throttled = _.throttle(func, 5);
+    const throttled = throttle(func, 5);
     return () => throttled();
   }, [
     annotationState,
@@ -430,7 +429,7 @@ export const Stage = () => {
         annotationTool.onMouseMove(rawImagePosition);
       }
     };
-    const throttled = _.throttle(func, 5);
+    const throttled = throttle(func, 5);
     return (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => throttled(event);
@@ -484,7 +483,7 @@ export const Stage = () => {
         annotationTool.onMouseUp(rawImagePosition);
       }
     };
-    const throttled = _.throttle(func, 10);
+    const throttled = throttle(func, 10);
 
     return (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>

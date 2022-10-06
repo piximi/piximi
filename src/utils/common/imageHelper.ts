@@ -2,7 +2,7 @@ import * as ImageJS from "image-js";
 import _ from "lodash";
 import { saveAs } from "file-saver";
 
-import { decode } from "utils/annotator";
+import { decode, pointsAreEqual } from "utils/annotator";
 
 import { AnnotationType, Category, ShadowImageType, Point } from "types";
 
@@ -25,7 +25,7 @@ export const connectPoints = (coordinates: Array<Point>) => {
     .map((coord, i) => [coord, coordinates[i + 1]]);
 
   const adjacentPoints = consecutiveCoords.filter(
-    ([current, next]) => !_.isEqual(current, next)
+    ([current, next]) => !pointsAreEqual(current, next)
   );
 
   adjacentPoints.forEach(([current, next]) => {

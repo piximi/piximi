@@ -1,5 +1,5 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import _ from "lodash";
+import { intersection, difference } from "lodash";
 
 import {
   Button,
@@ -37,12 +37,12 @@ export const ExitAnnotatorDialog = ({
       (image: ShadowImageType) => image.id
     );
 
-    const modifiedImagesIds = _.intersection(
+    const modifiedImagesIds = intersection(
       selectedImagesIds,
       annotatorImagesIds
     );
-    const deletedImagesIds = _.difference(selectedImagesIds, modifiedImagesIds);
-    const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
+    const deletedImagesIds = difference(selectedImagesIds, modifiedImagesIds);
+    const newImagesIds = difference(annotatorImagesIds, modifiedImagesIds);
 
     const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
       return modifiedImagesIds.includes(image.id);
