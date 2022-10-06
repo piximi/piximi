@@ -1,5 +1,5 @@
 import * as ImageJS from "image-js";
-import * as _ from "lodash";
+import { min, max, findLastIndex } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { scanline, simplifyPolygon, decode, encode } from "utils/annotator";
 import { Tool } from "../../Tool/Tool";
@@ -78,10 +78,10 @@ export abstract class AnnotationTool extends Tool {
     const xValues = contour.map((point) => point.x);
     const yValues = contour.map((point) => point.y);
     return [
-      Math.round(_.min(xValues)!),
-      Math.round(_.min(yValues)!),
-      Math.round(_.max(xValues)!),
-      Math.round(_.max(yValues)!),
+      Math.round(min(xValues)!),
+      Math.round(min(yValues)!),
+      Math.round(max(xValues)!),
+      Math.round(max(yValues)!),
     ];
   }
 
@@ -190,14 +190,11 @@ export abstract class AnnotationTool extends Tool {
 
     if (!this.anchor || !this.origin || !this.buffer) return;
 
-    const anchorIndex = _.findLastIndex(this.buffer, (point) => {
+    const anchorIndex = findLastIndex(this.buffer, (point) => {
       return point.x === this.anchor!.x;
     });
 
-    const segment = drawLine(
-      { x: this.anchor.x, y: this.anchor.y },
-      { x: this.origin.x, y: this.origin.y }
-    );
+    const segment = drawLine(this.anchor, this.origin);
     this.buffer.splice(anchorIndex, segment.length, ...segment);
 
     this._boundingBox = this.computeBoundingBoxFromContours(this.buffer);

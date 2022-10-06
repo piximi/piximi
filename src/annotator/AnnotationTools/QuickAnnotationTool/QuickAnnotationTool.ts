@@ -1,5 +1,4 @@
 import * as ImageJS from "image-js";
-import * as _ from "lodash";
 
 import { AnnotationTool } from "../AnnotationTool";
 import { encode, slic } from "utils/annotator";
@@ -137,7 +136,7 @@ export class QuickAnnotationTool extends AnnotationTool {
       height: height,
     });
 
-    const thresholdMask = _.map(croppedGreyMask.data, (i: number) =>
+    const thresholdMask = croppedGreyMask.data.map((i: number) =>
       i > 1 ? 255 : 0
     );
 

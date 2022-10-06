@@ -1,7 +1,7 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "utils/annotator";
+import { encode, getDistance, pointsAreEqual } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
-import { generatePoints } from "utils/common/imageHelper";
+import { getLastItem } from "utils/common";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   anchor?: Point;
@@ -11,12 +11,10 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
   deselect() {
     this.annotation = undefined;
-
     this.anchor = undefined;
     this.buffer = [];
     this.origin = undefined;
     this.points = [];
-
     this.setBlank();
   }
 
@@ -36,10 +34,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (this.anchor) {
-      if (
-        this.buffer[this.buffer.length - 1].x !== this.anchor.x ||
-        this.buffer[this.buffer.length - 1].y !== this.anchor.y
-      ) {
+      if (!pointsAreEqual(getLastItem(this.buffer), this.anchor)) {
         this.buffer.pop();
       }
 
@@ -85,10 +80,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
     }
 
     if (this.anchor || (this.origin && this.buffer.length > 0)) {
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 1].x,
-        y: this.buffer[this.buffer.length - 1].y,
-      };
+      this.anchor = getLastItem(this.buffer);
 
       return;
     }
@@ -100,10 +92,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   ): boolean | undefined {
     if (!this.origin) return undefined;
 
-    const distance = Math.hypot(
-      position.x - this.origin.x,
-      position.y - this.origin.y
-    );
+    const distance = getDistance(position, this.origin);
 
     return distance < threshold;
   }

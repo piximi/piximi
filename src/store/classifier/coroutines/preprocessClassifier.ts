@@ -19,7 +19,7 @@ import {
   tidy,
 } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
-import _ from "lodash";
+import shuffle from "lodash/shuffle";
 
 import { matchedCropPad, padToMatch } from "./cropUtil";
 
@@ -480,7 +480,7 @@ export const preprocessClassifier = async (
     images[0].partition === Partition.Training &&
     preprocessOptions.shuffle
   ) {
-    multipliedImages = _.shuffle(
+    multipliedImages = shuffle(
       images.flatMap((i) =>
         Array(preprocessOptions.cropOptions.numCrops).fill(i)
       )

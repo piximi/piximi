@@ -1,9 +1,8 @@
 import { saveAs } from "file-saver";
 import { v4 as uuidv4 } from "uuid";
-import * as _ from "lodash";
 import * as ImageJS from "image-js";
 
-import { decode } from "utils/annotator";
+import { decode, pointsAreEqual } from "utils/annotator";
 
 import {
   AnnotationType,
@@ -101,7 +100,7 @@ export const mapChannelsToSpecifiedRGBImage = (
     }
   }
 
-  const flattened: Array<number> = _.flatten(summedChannels);
+  const flattened: Array<number> = summedChannels.flat();
 
   const img: ImageJS.Image = new ImageJS.Image(columns, rows, flattened, {
     components: 3,
@@ -659,7 +658,7 @@ export const connectPoints = (coordinates: Array<Point>) => {
     .map((coord, i) => [coord, coordinates[i + 1]]);
 
   const adjacentPoints = consecutiveCoords.filter(
-    ([current, next]) => !_.isEqual(current, next)
+    ([current, next]) => !pointsAreEqual(current, next)
   );
 
   adjacentPoints.forEach(([current, next]) => {
