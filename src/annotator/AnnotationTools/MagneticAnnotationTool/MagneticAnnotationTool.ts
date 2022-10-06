@@ -4,10 +4,13 @@ import { AnnotationTool } from "../AnnotationTool";
 import {
   createPathFinder,
   encode,
+  getDistance,
   makeGraph,
   PiximiGraph,
 } from "utils/annotator";
-import { getIdx } from "utils/common/imageHelper";
+import { getIdx, getLastItem } from "utils/common";
+import { pointsAreEqual } from "utils/annotator";
+
 import { AnnotationStateType } from "types/AnnotationStateType";
 import { Point } from "types";
 
@@ -75,7 +78,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
       this.annotationState !== AnnotationStateType.Annotating
     )
       return;
-
+    let why; //get Idx returns a function thats immediately evaluated...why?
     if (this.anchor) {
       const source = getIdx(this.image.width * this.factor, 1)(
         Math.floor(this.anchor.x * this.factor),
@@ -89,12 +92,9 @@ export class MagneticAnnotationTool extends AnnotationTool {
         0
       );
 
-      this.path = _.flatten(this.pathfinder.find(source, destination));
+      this.path = this.pathfinder.find(source, destination).flat();
 
-      if (
-        this.buffer[this.buffer.length - 1].x !== this.anchor.x ||
-        this.buffer[this.buffer.length - 1].y !== this.anchor.y
-      ) {
+      if (!pointsAreEqual(getLastItem(this.buffer!), this.anchor)) {
         this.buffer.pop();
       }
 
@@ -116,7 +116,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         0
       );
 
-      this.path = _.flatten(this.pathfinder.find(source, destination));
+      this.path = this.pathfinder.find(source, destination).flat();
 
       this.buffer.pop();
       this.buffer.pop();
@@ -166,7 +166,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
       if (!this.pathfinder) return;
 
-      this.path = _.flatten(this.pathfinder.find(source, destination));
+      this.path = this.pathfinder.find(source, destination).flat();
 
       this.buffer.pop();
 
@@ -174,10 +174,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
       this.previous = [...this.previous, ...this.path];
 
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 1].x,
-        y: this.buffer[this.buffer.length - 1].y,
-      };
+      this.anchor = getLastItem(this.buffer);
 
       return;
     }
@@ -185,10 +182,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
     if (this.origin && this.buffer.length > 0) {
       if (!this.image || !this.origin || !this.pathfinder) return;
 
-      this.anchor = {
-        x: this.buffer[this.buffer.length - 1].x,
-        y: this.buffer[this.buffer.length - 1].y,
-      };
+      this.anchor = getLastItem(this.buffer);
 
       const source = getIdx(this.image.width * this.factor, 1)(
         Math.floor(this.origin.x * this.factor),
@@ -202,7 +196,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
         0
       );
 
-      this.path = _.flatten(this.pathfinder.find(source, destination));
+      this.path = this.pathfinder.find(source, destination).flat();
 
       this.buffer = [this.origin, ...this.path];
 
@@ -217,10 +211,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
   ): boolean | undefined {
     if (!this.origin) return undefined;
 
-    const distance = Math.hypot(
-      position.x - this.origin.x,
-      position.y - this.origin.y
-    );
+    const distance = getDistance(position, this.origin);
 
     return distance < threshold;
   }

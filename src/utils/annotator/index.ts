@@ -20,3 +20,14 @@ export { decode, encode, fromString, toImageData } from "./rle/rle";
 
 export { slic } from "./slic/slic";
 export { toRGBA } from "./toRGBA/toRGBA";
+
+export {
+  pointsAreEqual,
+  getDistance,
+  getXofYMax,
+  getXofYMin,
+  getYMax,
+  getYMin,
+  pointsToEdges,
+  interpolateX,
+} from "./point-operations/point-operations";

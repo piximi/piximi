@@ -5,7 +5,6 @@ import { AnnotationTool } from "../AnnotationTool";
 
 import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
-import { generatePoints } from "utils/common/imageHelper";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: Point;
@@ -108,10 +107,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
     const centerX = Math.round(this.center.x);
     const centerY = Math.round(this.center.y);
-
     const points: Array<Point> = [];
-    const foo: Array<Point> = [];
-    const doints: Array<Point> = [];
 
     const r = (
       theta: number,
@@ -119,43 +115,16 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       b: number = this.radius!.y
     ) => {
       return (
-        (a * b) / Math.sqrt(b ** 2 * Math.cos(theta) + a ** 2 * Math.sin(theta))
+        (a * b) /
+        Math.sqrt(b ** 2 * Math.cos(theta) ** 2 + a ** 2 * Math.sin(theta) ** 2)
       );
     };
 
     for (let theta = 0; theta <= 2 * Math.PI; theta += 0.05) {
       const x = r(theta) * Math.cos(theta) + centerX;
       const y = r(theta) * Math.sin(theta) + centerY;
-      doints.push({ x: x, y: y });
-    }
-    //first quadrant points
-    for (let y = centerY; y < centerY + this.radius.y; y += 0.5) {
-      const x =
-        this.radius.x *
-          Math.sqrt(
-            1 -
-              ((y - centerY) * (y - centerY)) / (this.radius.y * this.radius.y)
-          ) +
-        centerX;
-      points.push({ x: Math.round(x), y: Math.round(y) });
-      foo.push({ x: Math.round(x), y: Math.round(y) });
-    }
-    //second quadrant points
-    _.forEachRight(foo, (position: Point) => {
-      let x = 2 * centerX - position.x;
-      points.push({ x: x, y: position.y });
-    });
-    //third quadrant points
-    _.forEach(foo, (position: Point) => {
-      let x = 2 * centerX - position.x;
-      let y = 2 * centerY - position.y;
       points.push({ x: x, y: y });
-    });
-    //fourth quadant points
-    _.forEachRight(foo, (position: Point) => {
-      let y = 2 * centerY - position.y;
-      points.push({ x: position.x, y: y });
-    });
+    }
 
     return points;
   }

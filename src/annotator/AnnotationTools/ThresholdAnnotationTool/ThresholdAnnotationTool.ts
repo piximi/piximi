@@ -1,7 +1,7 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "utils/annotator";
 import { AnnotationStateType } from "types";
-import { drawRectangle } from "utils/common/imageHelper";
+import { encode } from "utils/annotator";
+import { drawRectangle } from "utils/common";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   // TODO: ts throws error on this overwriting AnnotationTool property
@@ -112,35 +112,6 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     }
 
     return thresholdMask;
-  }
-
-  private convertToPoints() {
-    if (!this.width || !this.height || !this.origin) return [];
-
-    const points: Array<number> = [];
-
-    const origin = { x: this.origin.x, y: this.origin.y };
-    let width = this.width;
-    let height = this.height;
-
-    // Negative height and width may happen if the rectangle was drawn from right to left.
-    if (this.width < 0) {
-      width = Math.abs(this.width);
-      origin.x = this.origin.x - width;
-    }
-    if (this.height < 0) {
-      height = Math.abs(this.height);
-      origin.y = this.origin.y - height;
-    }
-
-    // Add corners of the bounding box.
-    const x1 = Math.round(origin.x);
-    const y1 = Math.round(origin.y);
-    const x2 = Math.round(origin.x + width);
-    const y2 = Math.round(origin.y + height);
-    points.push(...[x1, y1, x2, y2]);
-
-    return points;
   }
 
   private resize(position: { x: number; y: number }) {

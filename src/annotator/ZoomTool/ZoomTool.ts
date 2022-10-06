@@ -1,4 +1,3 @@
-import _ from "lodash";
 import numeral from "numeral";
 import { KonvaEventObject } from "konva/lib/Node";
 import * as ImageJS from "image-js";
@@ -44,7 +43,7 @@ export class ZoomTool extends Tool {
   }
 
   get percentiles(): Array<string> {
-    return _.map(this.scales, (scale: number) => {
+    return this.scales.map((scale: number) => {
       return numeral(scale).format("0%");
     });
   }
@@ -122,7 +121,7 @@ export class ZoomTool extends Tool {
     if (this.mode === ZoomModeType.In) {
       if (this.scale === 32.0) return;
 
-      const index = _.findIndex(this.scales, (scale) => {
+      const index = this.scales.findIndex((scale) => {
         return this.scale < scale;
       });
 
@@ -132,7 +131,7 @@ export class ZoomTool extends Tool {
     } else {
       if (this.scale === 0.25) return;
 
-      const index = _.findIndex(this.scales, (scale) => {
+      const index = this.scales.findIndex((scale) => {
         return this.scale <= scale;
       });
 

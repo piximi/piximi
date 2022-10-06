@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
-import _ from "lodash";
 
 import {
   imageViewerSlice,
@@ -36,8 +35,7 @@ export function* selectedCategorySaga({
   const selectedCategory: ReturnType<typeof selectedCategorySelector> =
     yield select(selectedCategorySelector);
 
-  const updatedAnnotations = _.map(
-    selectedAnnotations,
+  const updatedAnnotations = selectedAnnotations.map(
     (annotation: AnnotationType) => {
       return { ...annotation, categoryId: selectedCategory.id };
     }

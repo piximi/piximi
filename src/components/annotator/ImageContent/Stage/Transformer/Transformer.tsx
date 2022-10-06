@@ -2,8 +2,8 @@ import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
-import _ from "lodash";
 import * as ImageJS from "image-js";
+import { chunk } from "lodash";
 import useSound from "use-sound";
 
 import {
@@ -147,14 +147,14 @@ export const Transformer = ({
     center: { x: number; y: number },
     scale: { x: number; y: number }
   ) => {
-    return _.flatten(
-      _.map(_.chunk(contour, 2), (el: Array<number>) => {
+    return chunk(contour, 2)
+      .map((el: Array<number>) => {
         return [
           Math.round(center.x + scale.x * (el[0] - center.x)),
           Math.round(center.y + scale.y * (el[1] - center.y)),
         ];
       })
-    );
+      .flat();
   };
 
   const onTransformEnd = () => {
