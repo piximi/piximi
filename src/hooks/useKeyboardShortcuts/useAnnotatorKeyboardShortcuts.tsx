@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 import useSound from "use-sound";
@@ -288,7 +287,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
+      if (!annotations.length && soundEnabled) {
         playDeleteAnnotationSoundEffect();
       }
 
@@ -312,7 +311,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       deselectAllAnnotations();
       deselectAllTransformers();
 
-      if (!_.isEmpty(annotations) && soundEnabled) {
+      if (!annotations.length && soundEnabled) {
         playDeleteAnnotationSoundEffect();
       }
 

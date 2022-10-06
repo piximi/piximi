@@ -1,10 +1,9 @@
-import * as _ from "lodash";
 import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "../AnnotationTool";
 import { encode } from "utils/annotator";
 
-import { connectPoints, generatePoints } from "utils/common/imageHelper";
+import { connectPoints } from "utils/common";
 
 import { AnnotationStateType, Point } from "types";
 

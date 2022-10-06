@@ -9,7 +9,6 @@ import {
 } from "types/Category";
 import { v4 as uuidv4 } from "uuid";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { filter, findIndex } from "lodash";
 import { Task } from "types/Task";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
@@ -162,7 +161,7 @@ export const projectSlice = createSlice({
     },
 
     deleteCategory(state: Project, action: PayloadAction<{ id: string }>) {
-      state.categories = filter(state.categories, (category: Category) => {
+      state.categories = state.categories.filter((category: Category) => {
         return category.id !== action.payload.id;
       });
       state.images = state.images.map((image: ImageType) => {
@@ -178,7 +177,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ ids: Array<string> }>
     ) {
-      state.images = filter(state.images, (image: ImageType) => {
+      state.images = state.images.filter((image: ImageType) => {
         return !action.payload.ids.includes(image.id);
       });
     },
@@ -227,8 +226,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.categoryId;
         }
@@ -264,7 +262,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.id;
       });
       state.categories[index].name = action.payload.name;
@@ -286,7 +284,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.categoryId;
       });
 
@@ -329,7 +327,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string> }>
     ) {
       action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image: ImageType) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -342,7 +340,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ id: string; categoryId: string }>
     ) {
-      const index = findIndex(state.images, (image: ImageType) => {
+      const index = state.images.findIndex((image: ImageType) => {
         return image.id === action.payload.id;
       });
       if (index >= 0) {
@@ -354,7 +352,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; categoryId: string }>
     ) {
       action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image: ImageType) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -373,7 +371,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image: ImageType) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -386,7 +384,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image: ImageType) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -399,7 +397,7 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image: ImageType) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -421,8 +419,7 @@ export const projectSlice = createSlice({
       state: Project,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.id;
         }

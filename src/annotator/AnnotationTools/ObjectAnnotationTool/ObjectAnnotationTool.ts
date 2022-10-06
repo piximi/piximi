@@ -10,9 +10,7 @@ import {
   browser,
   scalar,
 } from "@tensorflow/tfjs";
-import * as _ from "lodash";
 import * as ImageJS from "image-js";
-import * as tensorflow from "@tensorflow/tfjs";
 
 import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import { encode } from "utils/annotator";
@@ -138,9 +136,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       this._boundingBox = [roi.minX, roi.minY, roi.maxX, roi.maxY];
 
       //threshold
-      const thresholded = _.map(greyMask.data, (i: number) =>
-        i > 1 ? 255 : 0
-      ); //threshold necessary because output of NN is not binary
+      const thresholded = greyMask.data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
 
       // @ts-ignore
       this._mask = encode(thresholded);
