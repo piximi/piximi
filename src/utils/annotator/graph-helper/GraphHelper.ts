@@ -76,7 +76,7 @@ export const makeGraph = (
   }
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const startIdx = getIdx(width, 1)(x, y, 0);
+      const startIdx = getIdx(width, 1, x, y, 0);
       const dist = cap - edges[startIdx];
 
       graph.addNode(startIdx, dist);
@@ -84,7 +84,7 @@ export const makeGraph = (
       const pixels = validNeighbours(x, y, height, width);
 
       for (let pixel of pixels) {
-        const idx = getIdx(width, 1)(pixel.x, pixel.y, 0);
+        const idx = getIdx(width, 1, pixel.x, pixel.y, 0);
         graph.addLink(startIdx, idx);
       }
     }

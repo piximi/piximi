@@ -110,11 +110,15 @@ export const drawRectangle = (
   return points;
 };
 
-export const getIdx = (width: number, nchannels: number) => {
-  return (x: number, y: number, index: number) => {
-    index = index || 0;
-    return Math.floor((width * y + x) * nchannels + index);
-  };
+export const getIdx = (
+  width: number,
+  nchannels: number,
+  x: number,
+  y: number,
+  index: number
+) => {
+  index = index || 0;
+  return Math.floor((width * y + x) * nchannels + index);
 };
 
 /*

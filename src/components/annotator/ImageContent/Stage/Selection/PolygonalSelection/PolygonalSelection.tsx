@@ -44,7 +44,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
           </>
         )}
         <ReactKonva.Line
-          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
+          points={operator.buffer.flatMap((point) => [point.x, point.y])}
           scale={{ x: stageScale, y: stageScale }}
           stroke="black"
           strokeWidth={1 / stageScale}
@@ -54,7 +54,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
           dashOffset={-dashOffset}
           scale={{ x: stageScale, y: stageScale }}
           stroke="white"
-          points={operator.buffer.map((point) => [point.x, point.y]).flat()}
+          points={operator.buffer.flatMap((point) => [point.x, point.y])}
           strokeWidth={1 / stageScale}
         />
       </ReactKonva.Group>
