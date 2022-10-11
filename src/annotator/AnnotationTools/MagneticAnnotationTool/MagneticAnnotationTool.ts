@@ -80,13 +80,17 @@ export class MagneticAnnotationTool extends AnnotationTool {
       return;
     let why; //get Idx returns a function thats immediately evaluated...why?
     if (this.anchor) {
-      const source = getIdx(this.image.width * this.factor, 1)(
+      const source = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.anchor.x * this.factor),
         Math.floor(this.anchor.y * this.factor),
         0
       );
 
-      const destination = getIdx(this.image.width * this.factor, 1)(
+      const destination = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(position.x * this.factor),
         Math.floor(position.y * this.factor),
         0
@@ -104,13 +108,17 @@ export class MagneticAnnotationTool extends AnnotationTool {
     }
 
     if (this.origin) {
-      const source = getIdx(this.image.width * this.factor, 1)(
+      const source = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.origin.x * this.factor),
         Math.floor(this.origin.y * this.factor),
         0
       );
 
-      const destination = getIdx(this.image.width * this.factor, 1)(
+      const destination = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(position.x * this.factor),
         Math.floor(position.y * this.factor),
         0
@@ -152,13 +160,17 @@ export class MagneticAnnotationTool extends AnnotationTool {
     }
 
     if (this.anchor && this.image) {
-      const source = getIdx(this.image.width * this.factor, 1)(
+      const source = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.anchor.x * this.factor),
         Math.floor(this.anchor.y * this.factor),
         0
       );
 
-      const destination = getIdx(this.image.width * this.factor, 1)(
+      const destination = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.buffer[this.buffer.length - 1].x * this.factor),
         Math.floor(this.buffer[this.buffer.length - 1].y * this.factor),
         0
@@ -184,13 +196,17 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
       this.anchor = getLastItem(this.buffer);
 
-      const source = getIdx(this.image.width * this.factor, 1)(
+      const source = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.origin.x * this.factor),
         Math.floor(this.origin.y * this.factor),
         0
       );
 
-      const destination = getIdx(this.image.width * this.factor, 1)(
+      const destination = getIdx(
+        this.image.width * this.factor,
+        1,
         Math.floor(this.buffer[this.buffer.length - 1].x * this.factor),
         Math.floor(this.buffer[this.buffer.length - 1].y * this.factor),
         0
