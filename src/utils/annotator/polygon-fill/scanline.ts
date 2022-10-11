@@ -30,54 +30,67 @@ export function scanline(
 
   if (polygon.length < 3) return maskImage;
 
-  // initialize ET and AET
+  // initialize the edge and active edge tables
 
-  const ET: Array<Edge> = pointsToEdges(polygon).sort(
+  const edgeTable: Array<Edge> = pointsToEdges(polygon).sort(
     (e1: Edge, e2: Edge) => getYMin(e2) - getYMin(e1)
   );
 
-  const AET: Array<Edge> = [];
-  let yScan = getYMin(ET[ET.length - 1]);
+  const activeEdgeTable: Array<Edge> = [];
+  let yScan = getYMin(edgeTable[edgeTable.length - 1]);
   const allSpans = [];
 
-  // repeat until both ET and AET are empty
-  while (ET.length > 0 || AET.length > 0) {
-    // manage AET
-    // move active edges from ET to AET
-    while (ET.length > 0 && yScan === getYMin(ET[ET.length - 1])) {
-      AET.push(ET.pop()!);
+  // repeat until both the edge and active edge tables are empty
+  while (edgeTable.length > 0 || activeEdgeTable.length > 0) {
+    // move active edges from edge table to active edge table
+    while (
+      edgeTable.length > 0 &&
+      yScan === getYMin(edgeTable[edgeTable.length - 1])
+    ) {
+      activeEdgeTable.push(edgeTable.pop()!);
     }
-    // remove inactive edges from AET
-    for (let i = 0; i < AET.length; i++) {
-      if (yScan >= getYMax(AET[i])) {
-        const last = AET.pop();
-        if (i < AET.length && last) {
-          AET[i] = last;
+    // remove inactive edges from active edge table
+    for (let i = 0; i < activeEdgeTable.length; i++) {
+      if (yScan >= getYMax(activeEdgeTable[i])) {
+        const last = activeEdgeTable.pop();
+        if (i < activeEdgeTable.length && last) {
+          activeEdgeTable[i] = last;
           i--;
         }
       }
     }
-    AET.sort((e1, e2) => {
+    activeEdgeTable.sort((e1, e2) => {
       const cmp = getXofYMin(e1) - getXofYMin(e2);
       return cmp === 0 ? getXofYMax(e1) - getXofYMax(e2) : cmp;
     });
     // fill spans on scanline
-    const spans = getSpans(yScan, AET);
+    const spans = getSpans(yScan, activeEdgeTable);
     drawSpans(spans, yScan, maskImage);
     allSpans.push([spans, [yScan, yScan]]);
     yScan++;
   }
   return maskImage;
 }
-// find spans along scanline
-function getSpans(yScan: number, AET: Array<Edge>) {
+/**
+ * Finds the intersections of the scanline and active edges
+ * @param yScan y-coordinate of the current scanline
+ * @param activeEdgeTable active edge table
+ * @returns Array containing x-coordinates of the active edges at the current scanline location
+ */
+function getSpans(yScan: number, activeEdgeTable: Array<Edge>) {
   const spans = [];
-  for (const edge of AET) {
+  for (const edge of activeEdgeTable) {
     spans.push(interpolateX(yScan, edge));
   }
   return spans;
 }
 
+/**
+ * Sorts intersection points and couples pairs for filling
+ * @param spans Array of intersection points
+ * @param yScan
+ * @param img
+ */
 function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
   spans.sort((e1, e2) => e1 - e2);
 
@@ -86,7 +99,13 @@ function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
   }
 }
 
-// fill pixels within a span
+/**
+ * Fills in span from xMin to xMax
+ * @param x1 xMin of span
+ * @param x2 xMax of span
+ * @param y y-coord of current spanline
+ * @param img Image on which the annotation id drawn
+ */
 function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   for (let x = x1; x < x2; x++) {
     img.setPixelXY(x, y, [255, 255, 255, 255]);

@@ -52,7 +52,7 @@ export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
         <ReactKonva.Line
           scale={{ x: stageScale, y: stageScale }}
           stroke="white"
-          points={operator.points.map((point) => [point.x, point.y]).flat()}
+          points={operator.points.flatMap((point) => [point.x, point.y])}
           strokeWidth={1}
         />
       </ReactKonva.Group>
