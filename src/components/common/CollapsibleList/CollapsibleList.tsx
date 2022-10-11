@@ -1,23 +1,29 @@
 import React from "react";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+} from "@mui/material";
+import {
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+} from "@mui/icons-material";
 
 type CollapsibleListProps = {
   children: any;
   dense: boolean;
   primary: string;
   closed?: boolean;
+  backgroundColor?: string;
 };
 
 export const CollapsibleList = ({
   children,
   dense,
   closed,
+  backgroundColor,
   primary,
 }: CollapsibleListProps) => {
   const [collapsed, setCollapsed] = React.useState(closed);
@@ -27,10 +33,13 @@ export const CollapsibleList = ({
   };
 
   return (
-    <List dense={dense}>
+    <List
+      sx={{ backgroundColor: backgroundColor ? backgroundColor : "" }}
+      dense={dense}
+    >
       <ListItem button onClick={onClick}>
         <ListItemIcon>
-          {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          {collapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
         </ListItemIcon>
 
         <ListItemText primary={primary} />
