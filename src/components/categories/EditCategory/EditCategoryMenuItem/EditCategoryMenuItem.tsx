@@ -2,11 +2,11 @@ import React from "react";
 
 import { MenuItem, Typography } from "@mui/material";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { EditCategoryDialog } from "../EditCategoryDialog";
 
-import { Category, CategoryType } from "types";
+import { Category, CategoryType, HotkeyView } from "types";
 
 type EditCategoryMenuItemProps = {
   category: Category;
@@ -23,7 +23,7 @@ export const EditCategoryMenuItem = ({
     onClose: onCloseEditCategoryDialog,
     onOpen: onOpenEditCategoryDialog,
     open: openEditCategoryDialog,
-  } = useDialog();
+  } = useDialogHotkey(HotkeyView.EditCategoryDialog);
 
   const onClose = () => {
     onCloseEditCategoryDialog();

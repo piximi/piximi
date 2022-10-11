@@ -1,5 +1,5 @@
 import React from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 import { LayersModel, loadLayersModel, io } from "@tensorflow/tfjs";
 
 import {
@@ -17,7 +17,13 @@ import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
-import { AlertStateType, AlertType, defaultAlert, Shape } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  defaultAlert,
+  HotkeyView,
+  Shape,
+} from "types";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -113,9 +119,13 @@ export const ImportTensorflowModelDialog = ({
     }
   };
 
-  useHotkeys("enter", () => dispatchModelToStore(), { enabled: open }, [
-    dispatchModelToStore,
-  ]);
+  useHotkeys(
+    "enter",
+    () => dispatchModelToStore(),
+    HotkeyView.ImportTensorflowModelDialog,
+    { enableOnTags: ["INPUT"] },
+    [dispatchModelToStore]
+  );
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>

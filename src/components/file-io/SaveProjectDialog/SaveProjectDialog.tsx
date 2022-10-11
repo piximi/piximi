@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import saveAs from "file-saver";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -16,6 +16,7 @@ import {
 import { classifierSelector } from "store/classifier";
 import { serializedProjectSelector } from "store/project";
 import { segmenterSelector } from "store/segmenter";
+import { HotkeyView } from "types";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -68,7 +69,8 @@ export const SaveProjectDialog = ({
     () => {
       onSaveProjectClick();
     },
-    { enabled: open },
+    HotkeyView.SaveProjectDialog,
+    { enableOnTags: ["INPUT"] },
     [onSaveProjectClick]
   );
 

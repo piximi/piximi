@@ -17,6 +17,7 @@ import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIco
 import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
 import BBBC013ModeExampleProjectIcon from "data/exampleProjects/BBBC013ModeExampleProjectIcon.png";
+import PLP1ExampleProjectIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
 
 const exampleProjects = [
   {
@@ -67,7 +68,7 @@ const exampleProjects = [
   {
     projectName: "Human U2OS-cells cytoplasm crops",
     projectDescription:
-      "Human U2OS cells cytoplasm–nucleus translocation: " +
+      "Human U2OS cells cytoplasm-nucleus translocation: " +
       "Images of cytoplasm to nucleus translocation of the Forkhead (FKHR-EGFP) fusion protein in stably transfected human osteosarcoma cells.\n" +
       "Channel 1: FKHR-GFP; Channel 2: DNA",
     exampleProjectEnum: ExampleProject.BBBC013,
@@ -79,6 +80,22 @@ const exampleProjects = [
     license: {
       licenseName: "CC-BY-3",
       licenseUrl: "https://creativecommons.org/licenses/by/3.0/",
+    },
+  },
+  {
+    projectName: "Human PLP1 localization",
+    projectDescription:
+      "Human HeLa cells expressing the disease-associated variant of PLP1 protein, which localizes differently than the healthy version.\n" +
+      "Channel 1: artifacts; Channel 2: tagged protein (PLP1); Channel 3: DNA",
+    exampleProjectEnum: ExampleProject.PLP1,
+    projectIcon: PLP1ExampleProjectIcon,
+    projectSource: {
+      sourceName: "Jessica Lacoste, Mikko Taipale lab, University of Toronto",
+      sourceUrl: "http://taipalelab.org/?page_id=56",
+    },
+    license: {
+      licenseName: "CC0",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
     },
   },
 ];

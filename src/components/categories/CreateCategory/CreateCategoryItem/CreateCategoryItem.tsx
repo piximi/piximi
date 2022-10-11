@@ -3,11 +3,11 @@ import React from "react";
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-import { useDialog } from "hooks";
+import { useDialogHotkey } from "hooks";
 
 import { CreateCategoryDialog } from "../CreateCategoryDialog";
 
-import { CategoryType } from "types";
+import { CategoryType, HotkeyView } from "types";
 
 type CreateCategoryItemProps = {
   categoryType: CategoryType;
@@ -16,7 +16,9 @@ type CreateCategoryItemProps = {
 export const CreateCategoryItem = (props: CreateCategoryItemProps) => {
   const { categoryType } = props;
 
-  const { onClose, onOpen, open } = useDialog();
+  const { onClose, onOpen, open } = useDialogHotkey(
+    HotkeyView.CreateCategoryDialog
+  );
 
   return (
     <>

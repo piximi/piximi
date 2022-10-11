@@ -1,5 +1,3 @@
-import { useHotkeys } from "react-hotkeys-hook";
-
 import {
   Button,
   Dialog,
@@ -8,7 +6,9 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { Category, CategoryType } from "types";
+import { useHotkeys } from "hooks";
+
+import { Category, CategoryType, HotkeyView } from "types";
 
 type DeleteCategoryDialogProps = {
   category: Category;
@@ -25,6 +25,7 @@ export const DeleteCategoryDialog = ({
   onClose,
   open,
 }: DeleteCategoryDialogProps) => {
+  //
   const onDelete = () => {
     deleteCategoryCallback(category.id);
 
@@ -36,7 +37,8 @@ export const DeleteCategoryDialog = ({
     () => {
       onDelete();
     },
-    { enabled: open },
+    HotkeyView.DeleteCategoryDialog,
+    { enableOnTags: ["INPUT"] },
     [onDelete]
   );
 

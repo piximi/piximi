@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
+import * as ImageJS from "image-js";
 
 import {
   Alert,
@@ -16,6 +17,7 @@ import { CustomNumberTextField } from "components/common/InputFields";
 import { applicationSlice } from "store/application";
 
 import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
+import { HotkeyView } from "types";
 
 type ImageShapeDialogProps = {
   files: FileList;
@@ -91,7 +93,8 @@ export const ImageShapeDialog = ({
     () => {
       uploadImages();
     },
-    { enabled: open },
+    HotkeyView.ImageShapeDialog,
+    { enableOnTags: ["INPUT"] },
     [uploadImages]
   );
 

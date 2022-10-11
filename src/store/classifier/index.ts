@@ -19,6 +19,7 @@ export { classifierPredictedSelector } from "./selectors/classifierPredictedSele
 export { classifierPredictionFlagSelector } from "./selectors/classifierPredictionFlagSelector";
 export { classifierPreprocessOptionsSelector } from "./selectors/classifierPreprocessOptionsSelector";
 export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
+export { classifierShuffleOptionsSelector } from "./selectors/classifierShuffleOptionsSelector";
 export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
 export { classifierTrainDataSelector } from "./selectors/classifierTrainDataSelector";
 export { classifierTrainingFlagSelector } from "./selectors/classifierTrainingFlagSelector";

@@ -19,6 +19,8 @@ import {
   classifierSlice,
 } from "store/classifier";
 
+import { APPLICATION_COLORS } from "colorPalette";
+
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
   fit: any;
@@ -51,7 +53,7 @@ export const FitClassifierDialogAppBar = ({
         position: "sticky",
         backgroundColor: "transparent",
         boxShadow: "none",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+        borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
       }}
     >
       <Toolbar>

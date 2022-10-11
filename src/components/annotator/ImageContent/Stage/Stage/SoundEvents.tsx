@@ -1,11 +1,12 @@
 import { useSelector } from "react-redux";
 import { memo } from "react";
 import useSound from "use-sound";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import { soundEnabledSelector } from "store/image-viewer";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
+import { HotkeyView } from "types";
 
 /*
   This component is responsible for playing sound effects
@@ -33,24 +34,18 @@ export const SoundEvents = memo(() => {
   useHotkeys(
     "enter",
     () => {
-      playCreateAnnotationSoundEffect();
+      soundEnabled && playCreateAnnotationSoundEffect();
     },
+    HotkeyView.Annotator,
     [soundEnabled, creeateAnnotationSound]
   );
 
   useHotkeys(
-    "escape",
+    "escape, backspace, delete",
     () => {
-      playDeleteAnnotationSoundEffect();
+      soundEnabled && playDeleteAnnotationSoundEffect();
     },
-    [soundEnabled, deleteAnnotationSound]
-  );
-
-  useHotkeys(
-    "backspace, delete",
-    () => {
-      playDeleteAnnotationSoundEffect();
-    },
+    HotkeyView.Annotator,
     [soundEnabled, deleteAnnotationSound]
   );
 

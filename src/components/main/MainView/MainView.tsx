@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -17,7 +17,7 @@ import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog"
 import { applicationSlice } from "store/application";
 import { visibleImagesSelector } from "store/common";
 
-import { AlertType, ImageType } from "types";
+import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
 import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
@@ -111,16 +111,17 @@ export const MainView = () => {
     dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
   };
 
-  const selectAllImagesHotkeyRef = useHotkeys(
+  useHotkeys(
     "control+a",
     () => selectAllImages(),
+    [HotkeyView.MainImageGrid, HotkeyView.MainImageGridAppBar],
     [images]
-  ) as React.MutableRefObject<HTMLDivElement>;
+  );
 
   return (
     <div>
       <ErrorBoundary FallbackComponent={FallBackDialog}>
-        <div ref={selectAllImagesHotkeyRef} tabIndex={-1}>
+        <div tabIndex={-1}>
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
 

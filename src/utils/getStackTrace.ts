@@ -8,7 +8,7 @@ export const getStackTraceFromError = async (error: Error): Promise<string> => {
       .map((stackFrame) => stackFrame.toString())
       .join("\n");
   } catch (error) {
-    console.log("Could not resolve stacktrace", error);
+    console.error("Could not resolve stacktrace", error);
   }
 
   return stacktrace;

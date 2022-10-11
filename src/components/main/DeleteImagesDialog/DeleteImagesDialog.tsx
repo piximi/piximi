@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -11,6 +11,7 @@ import {
 
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
+import { HotkeyView } from "types";
 
 type DeleteImagesDialogProps = {
   imageIds: Array<string>;
@@ -36,7 +37,8 @@ export const DeleteImagesDialog = ({
     () => {
       onDelete();
     },
-    { enabled: open },
+    HotkeyView.DeleteImagesDialog,
+    { enableOnTags: ["INPUT"] },
     [onDelete]
   );
 

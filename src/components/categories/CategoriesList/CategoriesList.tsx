@@ -5,11 +5,11 @@ import { CreateCategoryItem } from "../CreateCategory";
 
 import { PredictionVisibility } from "../PredictionsVisibility/";
 import { DeleteAllCategoriesItem } from "../DeleteAllCategories";
+import { ShowAllCategoriesListItem } from "../ShowAllCategoriesListItem";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { Category, CategoryType } from "types";
-import { ShowAllCategoriesListItem } from "../ShowAllCategoriesListItem";
 
 type CategoriesListProps = {
   createdCategories: Array<Category>;

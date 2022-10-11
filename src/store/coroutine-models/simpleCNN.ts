@@ -1,11 +1,18 @@
-import { sequential, layers } from "@tensorflow/tfjs";
+import { sequential, layers, initializers } from "@tensorflow/tfjs";
+
 import { Shape } from "../../types/Shape";
+
+import { productionStore } from "store/stores";
 
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem
  * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
  */
 export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
+  const shuffle =
+    productionStore.getState().classifier.preprocessOptions.shuffle;
+  const seed = shuffle ? Math.random() : 0.42;
+
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
   const imageChannels = inputShape.channels;
@@ -17,12 +24,13 @@ export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
   // the convolution operation that takes place in this layer.
   model.add(
     layers.conv2d({
-      inputShape: [imageWidth, imageHeight, imageChannels],
+      // inputShape: [imageWidth, imageHeight, imageChannels],
+      inputShape: [imageHeight, imageWidth, imageChannels],
       kernelSize: 5,
       filters: 8,
       strides: 1,
       activation: "relu",
-      kernelInitializer: "varianceScaling",
+      kernelInitializer: initializers.varianceScaling({ seed }),
     })
   );
 
@@ -38,7 +46,7 @@ export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
       filters: 16,
       strides: 1,
       activation: "relu",
-      kernelInitializer: "varianceScaling",
+      kernelInitializer: initializers.varianceScaling({ seed }),
     })
   );
   model.add(layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }));
@@ -52,7 +60,7 @@ export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
   model.add(
     layers.dense({
       units: numClasses,
-      kernelInitializer: "varianceScaling",
+      kernelInitializer: initializers.varianceScaling({ seed }),
       activation: "softmax",
     })
   );

@@ -284,7 +284,7 @@ it("evaluateClassifier", async () => {
     f1Score: 0.6666666865348816,
   };
 
-  console.log(result);
+  // console.log(result);
 
   // expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
   // expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);

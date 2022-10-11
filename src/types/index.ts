@@ -44,6 +44,13 @@ export type { FitOptions } from "./FitOptions";
 export type { GeneratorReturnType } from "./GeneratorReturnType";
 
 export type { HistoryStateType } from "./HistoryStateType";
+export type {
+  AvailableTags,
+  HandlerItem,
+  HotkeysEvent,
+  KeyHandler,
+  Options,
+} from "./HotkeyType";
 
 export type { ImageSortKeyType } from "./ImageSortType";
 export {
@@ -100,6 +107,7 @@ export type { SerializedImageType } from "./SerializedImageType";
 export type { SerializedProjectType } from "./SerializedProjectType";
 
 export type { Settings } from "./Settings";
+export { HotkeyView } from "./Settings";
 
 export type { Shape } from "./Shape";
 

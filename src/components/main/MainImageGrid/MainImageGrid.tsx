@@ -1,111 +1,32 @@
-import { memo } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Container,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Box,
-} from "@mui/material";
+import { Container, ImageList, Box } from "@mui/material";
 
-import { useDndFileDrop } from "hooks";
+import { useDndFileDrop, useContextMenu, useHotkeys } from "hooks";
 
-import { ImageIconLabel } from "./ImageIconLabel";
-
+import { MainImageGridItem } from "../MainImageGridItem";
+import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
 
 import {
+  updateImageCategoryFromHighlighted,
+  updateHighlightedCategory,
+} from "store/project";
+import {
   tileSizeSelector,
-  applicationSlice,
   imageSelectionColorSelector,
   imageSelectionSizeSelector,
+  registerHotkeyView,
+  unregisterHotkeyView,
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
-import { ImageType } from "types";
+import { HotkeyView, ImageType } from "types";
 
 type MainImageGridProps = {
   onDrop: (files: FileList) => void;
 };
-
-type MainImageGridItemProps = {
-  image: ImageType;
-  selected: boolean;
-  selectionColor: string;
-  selectionSize: number;
-};
-
-const MainImageGridItem = memo(
-  ({
-    image,
-    selected,
-    selectionColor,
-    selectionSize,
-  }: MainImageGridItemProps) => {
-    const dispatch = useDispatch();
-    const scaleFactor = useSelector(tileSizeSelector);
-
-    const getSize = (scaleFactor: number) => {
-      const width = (220 * scaleFactor).toString() + "px";
-      const height = (220 * scaleFactor).toString() + "px";
-
-      return {
-        width: width,
-        height: height,
-        margin: "2px",
-      };
-    };
-
-    const getSelectionStatus = () => {
-      return selected
-        ? {
-            border: `solid ${selectionSize}px ${selectionColor}`,
-            borderRadius: `${selectionSize}px`,
-          }
-        : { border: "none" };
-    };
-
-    const onSelectImage = (image: ImageType) => {
-      console.log(image.id);
-      if (selected) {
-        dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
-      } else {
-        dispatch(applicationSlice.actions.selectImage({ id: image.id }));
-      }
-    };
-
-    return (
-      <ImageListItem
-        onClick={() => onSelectImage(image)}
-        style={getSize(scaleFactor)}
-        sx={getSelectionStatus()}
-      >
-        <Box
-          component="img"
-          alt=""
-          src={image.src}
-          sx={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            top: 0,
-            transform: "none",
-          }}
-        />
-
-        <ImageListItemBar
-          position="top"
-          actionIcon={<ImageIconLabel image={image} />}
-          actionPosition="left"
-          sx={{
-            background: "transparent",
-          }}
-        />
-      </ImageListItem>
-    );
-  }
-);
 
 export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const images = useSelector(visibleImagesSelector);
@@ -115,6 +36,66 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const scaleFactor = useSelector(tileSizeSelector);
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
+  const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
+  const [categoryIndex, setCategoryIndex] = useState<string>("");
+  const dispatch = useDispatch();
+  const hotkeyViews = [
+    HotkeyView.MainImageGrid,
+    HotkeyView.MainImageGridAppBar,
+  ];
+
+  useHotkeys(
+    "shift+1,shift+2,shift+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9,shift+0",
+    (event: any, _handler) => {
+      if (!event.repeat) {
+        setCategoryIndex((index) => {
+          return index + _handler.key[_handler.key.length - 1].toString();
+        });
+      }
+    },
+    hotkeyViews
+  );
+
+  useHotkeys(
+    "shift+backspace",
+    (event) => {
+      if (!event.repeat) {
+        setCategoryIndex((index) => {
+          return index.slice(0, index.length - 1);
+        });
+      }
+    },
+    hotkeyViews
+  );
+
+  useHotkeys(
+    "shift",
+    () => {
+      dispatch(
+        updateImageCategoryFromHighlighted({
+          ids: selectedImages,
+        })
+      );
+
+      setCategoryIndex("");
+    },
+    hotkeyViews,
+    { keyup: true },
+    [dispatch, selectedImages]
+  );
+
+  useEffect(() => {
+    dispatch(
+      updateHighlightedCategory({ categoryIndex: parseInt(categoryIndex) })
+    );
+  }, [categoryIndex, dispatch]);
+
+  useEffect(() => {
+    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.MainImageGrid }));
+    return () => {
+      dispatch(unregisterHotkeyView({}));
+    };
+  }, [dispatch]);
 
   return (
     <Box
@@ -142,22 +123,35 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
         })}
         maxWidth={false}
       >
-        <ImageList
-          sx={{ transform: "translateZ(0)", height: "100%" }}
-          cols={Math.floor(6 / scaleFactor)}
-          rowHeight={"auto"}
-        >
-          {images.slice(0, max_images).map((image: ImageType) => (
-            <MainImageGridItem
-              image={image}
-              selected={selectedImages.includes(image.id)}
-              selectionColor={imageSelectionColor}
-              selectionSize={imageSelectionSize}
-              key={image.id}
-            />
-          ))}
-        </ImageList>
+        <div onContextMenu={handleContextMenu}>
+          <ImageList
+            sx={{ transform: "translateZ(0)", height: "100%" }}
+            cols={Math.floor(6 / scaleFactor)}
+            rowHeight={"auto"}
+          >
+            {images.slice(0, max_images).map((image: ImageType) => (
+              <MainImageGridItem
+                image={image}
+                selected={selectedImages.includes(image.id)}
+                selectionColor={imageSelectionColor}
+                selectionSize={imageSelectionSize}
+                key={image.id}
+              />
+            ))}
+          </ImageList>
 
+          <ImageCategoryMenu
+            open={contextMenu !== null}
+            onClose={closeContextMenu}
+            anchorReference="anchorPosition"
+            imageIds={selectedImages}
+            anchorPosition={
+              contextMenu !== null
+                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                : undefined
+            }
+          />
+        </div>
         <MainImageGridAppBar />
       </Container>
     </Box>

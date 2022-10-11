@@ -8,6 +8,7 @@ import { MainToolbar } from "../MainToolbar";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 import { alertStateSelector } from "store/application";
+import { APPLICATION_COLORS } from "colorPalette";
 
 export const MainAppBar = () => {
   const alertState = useSelector(alertStateSelector);
@@ -16,7 +17,7 @@ export const MainAppBar = () => {
     <Box>
       <AppBar
         sx={{
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
           boxShadow: "none",
         }}
         color="inherit"

@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -13,6 +13,7 @@ import {
 
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
+import { HotkeyView } from "types";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -61,9 +62,13 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
     onClose();
   };
 
-  useHotkeys("enter", () => onCreateNewProject(), { enabled: open }, [
-    onCreateNewProject,
-  ]);
+  useHotkeys(
+    "enter",
+    () => onCreateNewProject(),
+    HotkeyView.NewProjectDialog,
+    { enableOnTags: ["INPUT"] },
+    [onCreateNewProject]
+  );
 
   return (
     <Dialog fullWidth maxWidth={"xs"} onClose={closeDialog} open={open}>

@@ -11,7 +11,9 @@ export {
   updateAnnotationCategory,
   updateOtherCategoryVisibility,
   updateOtherAnnotationCategoryVisibility,
+  updateHighlightedCategory,
   updateImageCategories,
+  updateImageCategoryFromHighlighted,
 } from "./projectSlice";
 
 // Selectors
@@ -25,6 +27,7 @@ export { categorizedImagesSelector } from "./selectors/categorizedImagesSelector
 export { createdAnnotatorCategoriesSelector } from "./selectors/createdAnnotatorCategoriesSelector";
 export { createdCategoriesCountSelector } from "./selectors/createdCategoriesCountSelector";
 export { createdCategoriesSelector } from "./selectors/createdCategoriesSelector";
+export { highlightedCategoriesSelector } from "./selectors/highlightedCategorySelector";
 export { imageSortKeySelector } from "./selectors/imageSortKeySelector";
 export { imagesSelector } from "./selectors/imagesSelector";
 export { projectSelector } from "./selectors/projectSelector";
