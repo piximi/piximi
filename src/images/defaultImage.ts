@@ -1,4 +1,4 @@
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "image/utils/imageHelper";
 import { UNKNOWN_CATEGORY_ID } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
@@ -6,6 +6,7 @@ import { Shape } from "types/Shape";
 import colorImage from "./cell-painting.png";
 import * as cellPaintingAnnotations from "./cell-painting.json";
 
+// todo: image_data
 const initialImageShape: Shape = {
   channels: 3,
   frames: 1,
@@ -23,7 +24,6 @@ export const defaultImage: ImageType = {
   name: "cell-painting.png",
   partition: Partition.Inference,
   visible: true,
-  shape: initialImageShape,
-  originalSrc: (cellPaintingAnnotations as any).default[0].imageData,
+  data: (cellPaintingAnnotations as any).default[0].data,
   src: colorImage,
 };
