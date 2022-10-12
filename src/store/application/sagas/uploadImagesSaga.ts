@@ -164,6 +164,10 @@ function* decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
     const columns = dicomImgData.int16("x00280011");
     const bitsAllocated = dicomImgData.int16("x00280100");
 
+    if (!samplesPerPixel || !rows || !columns || !bitsAllocated) {
+      throw Error("Failed to parse dicom image tags");
+    }
+
     var pixelData = new Uint16Array(
       dicomImgData.byteArray.buffer,
       pixelDataElement.dataOffset,

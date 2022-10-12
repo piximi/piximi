@@ -20,14 +20,6 @@ import {
 } from "types";
 import { Colors } from "types/tensorflow";
 
-declare module "image-js" {
-  interface Image {
-    colorDepth(newColorDepth: BitDepth): Image;
-    min: number[];
-    max: number[];
-  }
-}
-
 /*
  ======================================
  Image Inspection/Introspection helpers
@@ -610,6 +602,7 @@ export const convertToImage = async (
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
+    shape: imageTensor.shape,
     data: imageTensor,
     partition: Partition.Inference,
     src: coloredSliceURL,
@@ -662,4 +655,26 @@ export const scaleColors = (colors: Colors, mins: number[], maxs: number[]) => {
   for (let i = 0; i < mins.length; i++) {
     colors.range[i] = [mins[i], maxs[i]];
   }
+};
+
+/*
+ =======================
+ General Utility Methods
+ =======================
+ */
+
+/*
+ * Method to rename a cateogry/image if a category/image with this name already exists
+ */
+export const replaceDuplicateName = (
+  newName: string,
+  existingNames: Array<string>
+) => {
+  let currentName = newName;
+  let i = 1;
+  while (existingNames.includes(currentName)) {
+    currentName = newName + `_${i}`;
+    i += 1;
+  }
+  return currentName;
 };

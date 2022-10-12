@@ -13,6 +13,7 @@ export type ImageType = {
   colors: Colors;
   id: string;
   name: string;
+  shape: [number, number, number, number]; // data.shape: [Z, H, W, C]
   data: Tensor4D; // [Z, H, W, C]
   partition: Partition;
   segmentationPartition?: Partition;
@@ -40,9 +41,10 @@ export type ShadowImageType = {
   annotations: Array<AnnotationType>;
   activePlane: number;
   categoryId?: string;
-  colors: Array<Color>;
+  colors: Colors;
   id: string;
   name: string;
+  shape: [number, number, number, number]; // data.shape: [Z, H, W, C]
   data?: Tensor4D; // [Z, H, W, C]
   partition?: Partition;
   segmentationPartition?: Partition;

@@ -202,6 +202,7 @@ export const deserializeImages = async (
     deserializedImages.push({
       activePlane: defaultPlane,
       categoryId: serializedImage.imageCategoryId,
+      //@ts-ignore TODO: image_data
       colors: serializedImage.imageColors
         ? serializedImage.imageColors
         : generateDefaultChannels(serializedImage.imageChannels),
@@ -361,6 +362,7 @@ export const convertToImage = (
   const isSingleRgbImage =
     slices === 1 && channels === 3 && inputStack.length === 1;
   if (isSingleRgbImage)
+    // @ts-ignore TODO: image_data
     return convertSingleRGBImage(inputStack[0], filename, colors);
 
   // calculate min/max values per channel
@@ -460,6 +462,7 @@ export const convertToImage = (
   return {
     activePlane: 0,
     annotations: [],
+    //@ts-ignore TODO: image_data
     colors: colors,
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
@@ -895,17 +898,20 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
 ): any => {
   images.forEach((current: ShadowImageType) => {
     current.annotations.forEach((annotation: AnnotationType) => {
+      const height = current.shape[1];
+      const width = current.shape[2];
+
       const fullLabelImage = new ImageJS.Image(
-        current.shape.width,
-        current.shape.height,
+        width,
+        height,
         new Uint8Array().fill(0),
         { components: 1, alpha: 0 }
       );
       const encoded = annotation.mask;
       const decoded = decode(encoded);
       const boundingBox = annotation.boundingBox;
-      const endX = Math.min(current.shape.width, boundingBox[2]);
-      const endY = Math.min(current.shape.height, boundingBox[3]);
+      const endX = Math.min(width, boundingBox[2]);
+      const endY = Math.min(height, boundingBox[3]);
 
       //extract bounding box params
       const boundingBoxWidth = endX - boundingBox[0];
@@ -958,9 +964,12 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
   zip: any
 ): any => {
   images.forEach((current: ShadowImageType) => {
+    const height = current.shape[1];
+    const width = current.shape[2];
+
     const fullLabelImage = new ImageJS.Image(
-      current.shape.width,
-      current.shape.height,
+      width,
+      height,
       new Uint8Array().fill(0),
       { components: 1, alpha: 0 }
     );
@@ -973,8 +982,8 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
         const encoded = annotation.mask;
         const decoded = decode(encoded);
         const boundingBox = annotation.boundingBox;
-        const endX = Math.min(current.shape.width, boundingBox[2]);
-        const endY = Math.min(current.shape.height, boundingBox[3]);
+        const endX = Math.min(width, boundingBox[2]);
+        const endY = Math.min(height, boundingBox[3]);
 
         //extract bounding box params
         const boundingBoxWidth = endX - boundingBox[0];
@@ -1021,11 +1030,14 @@ export const saveAnnotationsAsLabelMatrix = (
 ): Array<Promise<unknown>> => {
   return images
     .map((current: ShadowImageType) => {
+      const height = current.shape[1];
+      const width = current.shape[2];
+
       return categories.map((category: Category) => {
         return new Promise((resolve, reject) => {
           const fullLabelImage = new ImageJS.Image(
-            current.shape.width,
-            current.shape.height,
+            width,
+            height,
             new Uint8Array().fill(0),
             { components: 1, alpha: 0 }
           );
@@ -1046,8 +1058,8 @@ export const saveAnnotationsAsLabelMatrix = (
             const encoded = annotation.mask;
             const decoded = decode(encoded);
             const boundingBox = annotation.boundingBox;
-            const endX = Math.min(current.shape.width, boundingBox[2]);
-            const endY = Math.min(current.shape.height, boundingBox[3]);
+            const endX = Math.min(width, boundingBox[2]);
+            const endY = Math.min(height, boundingBox[3]);
 
             //extract bounding box params
             const boundingBoxWidth = endX - boundingBox[0];

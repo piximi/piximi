@@ -109,7 +109,6 @@ export class PenAnnotationTool extends AnnotationTool {
       height: height,
     });
 
-    // @ts-ignore: getChannel API is not exposed
     const thresholdMaskImg = this.thresholdMask(croppedRgbMask.getChannel(3));
     return thresholdMaskImg.data as Uint8Array;
   }

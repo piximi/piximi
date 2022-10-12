@@ -165,7 +165,6 @@ export abstract class AnnotationTool extends Tool {
     const maskImage = this.computeAnnotationMaskFromPoints();
     if (!maskImage) return;
 
-    //@ts-expect-error: TODO: image_data
     this._mask = encode(maskImage.data);
 
     this.anchor = undefined;
@@ -464,7 +463,6 @@ export abstract class AnnotationTool extends Tool {
       this.image.height
     );
 
-    // @ts-ignore: getChannel API is not exposed
     const greyScaleMask = maskImage.getChannel(0);
 
     return greyScaleMask.crop({
