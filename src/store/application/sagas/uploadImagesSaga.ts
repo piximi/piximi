@@ -94,10 +94,9 @@ export function* uploadImagesSaga({
     }
 
     try {
-      //@ts-ignore TODO: image_data
       const imageToUpload: Awaited<ReturnType<typeof convertToImage>> =
         yield convertToImage(imageStack, fileName, undefined, slices, channels);
-      //@ts-ignore TODO: image_data
+
       imagesToUpload.push(imageToUpload);
     } catch (err) {
       const error = err as Error;
