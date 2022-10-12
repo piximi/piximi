@@ -200,6 +200,8 @@ export const projectSlice = createSlice({
         if (projectImageIdx >= 0) {
           const projectImage = state.images[projectImageIdx];
 
+          // TODO: this might be doing unecessary copying
+          //       when shadow image is actually a full image
           state.images[projectImageIdx] = {
             ...projectImage,
             ...shadowImage,
@@ -241,7 +243,7 @@ export const projectSlice = createSlice({
       const selectedSortKey = action.payload.imageSortKey;
       state.imageSortKey = selectedSortKey;
 
-      state.images.sort(selectedSortKey.comparerFunction);
+      (state.images as ImageType[]).sort(selectedSortKey.comparerFunction);
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
