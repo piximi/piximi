@@ -10,9 +10,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   height?: number;
 
   updateMask(threshold: number) {
-    const t1 = performance.now();
     this.threshold = Math.round(threshold);
-    console.log("maskData undefined? ", !this.maskData);
     if (this.maskData) {
       if (!this._boundingBox) return;
 
@@ -27,8 +25,6 @@ export class ThresholdAnnotationTool extends AnnotationTool {
 
       this.setAnnotated();
     }
-    const t2 = performance.now();
-    console.log("Time inside updateMask Function: ", t2 - t1);
   }
 
   deselect() {
