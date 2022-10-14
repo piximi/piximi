@@ -164,11 +164,8 @@ function reconstructPath(
       // Fetch a trace from the last coordinate
       coords.push(...parentNode.trace);
       if (coords.length > 1) {
-        const oldDirection = pathDirection(
-          coords[coords.length - 2],
-          coords[coords.length - 1]
-        );
-        const newDirection = pathDirection(coords[coords.length - 1], newCoord);
+        const oldDirection = pathDirection(coords.at(-2)!, coords.at(-1)!);
+        const newDirection = pathDirection(coords.at(-1)!, newCoord);
         if (oldDirection === newDirection) {
           coords.pop();
         }

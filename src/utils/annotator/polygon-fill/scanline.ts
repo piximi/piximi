@@ -37,17 +37,14 @@ export function scanline(
   );
 
   const activeEdgeTable: Array<Edge> = [];
-  let yScan = getYMin(edgeTable[edgeTable.length - 1]);
+  let yScan = getYMin(edgeTable.at(-1)!);
   const allSpans = [];
 
   // repeat until both the edge and active edge tables are empty
   while (edgeTable.length > 0 || activeEdgeTable.length > 0) {
     // move active edges from edge table to active edge table
-    while (
-      edgeTable.length > 0 &&
-      yScan === getYMin(edgeTable[edgeTable.length - 1])
-    ) {
-      activeEdgeTable.push(edgeTable.pop()!);
+    while (edgeTable.length > 0 && yScan === getYMin(edgeTable.at(-1)!)) {
+      if (edgeTable.length > 0) activeEdgeTable.push(edgeTable.pop()!);
     }
     // remove inactive edges from active edge table
     for (let i = 0; i < activeEdgeTable.length; i++) {
@@ -105,6 +102,7 @@ function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
  * @param x2 xMax of span
  * @param y y-coord of current spanline
  * @param img Image on which the annotation id drawn
+ *
  */
 function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   for (let x = x1; x < x2; x++) {

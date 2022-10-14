@@ -43,7 +43,7 @@ export const ColorSelection = ({ operator }: ColorSelectionProps) => {
       </ReactKonva.Group>
       <ColorAnnotationToolTip
         toolTipPosition={operator.toolTipPosition}
-        initialPosition={operator.initialPosition}
+        initialPosition={operator.origin}
         tolerance={operator.tolerance}
       />
     </>

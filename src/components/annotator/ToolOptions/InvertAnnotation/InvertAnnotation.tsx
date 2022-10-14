@@ -27,10 +27,10 @@ export const InvertAnnotation = () => {
   const onInvertClick = () => {
     if (!annotationTool) return;
 
-    if (!selectedAnnotation || !selectedAnnotation.mask) return;
+    if (!selectedAnnotation || !selectedAnnotation.maskData) return;
 
     const [invertedMask, invertedBoundingBox] = annotationTool.invert(
-      selectedAnnotation.mask,
+      selectedAnnotation.maskData,
       selectedAnnotation.boundingBox
     );
 
@@ -40,13 +40,13 @@ export const InvertAnnotation = () => {
           {
             ...selectedAnnotation,
             boundingBox: invertedBoundingBox,
-            mask: invertedMask,
+            maskData: invertedMask,
           },
         ],
         selectedAnnotation: {
           ...selectedAnnotation,
           boundingBox: invertedBoundingBox,
-          mask: invertedMask,
+          maskData: invertedMask,
         },
       })
     );

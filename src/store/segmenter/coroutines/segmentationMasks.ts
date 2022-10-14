@@ -1,10 +1,11 @@
+//@ts-ignore
 import { v4 as uuidv4 } from "uuid";
 
 import { decode, encode } from "utils/annotator";
-import { AnnotationType, Category, Shape } from "types";
+import { encodedAnnotationType, Category, Shape } from "types";
 
 export const encodeAnnotationToSegmentationMask = (
-  annotations: AnnotationType[],
+  annotations: encodedAnnotationType[],
   imageShape: Shape,
   createdCategoriesIDs: Array<string>
 ) => {
@@ -55,7 +56,7 @@ export const decodeSegmentationMaskToAnnotations = (
   segmentationMask: Array<Array<number>>,
   imageShape: Shape
 ) => {
-  const annotations: Array<AnnotationType> = [];
+  const annotations: Array<encodedAnnotationType> = [];
 
   const segmentationMasks: Array<Array<Array<number>>> = Array.from(
     Array(createdCategories.length),

@@ -368,8 +368,8 @@ test("makeCircle", async () => {
 //     operator.onMouseMove({ x: route[i][0], y: route[i][1] });
 //   }
 //   operator.onMouseUp({
-//     x: route[route.length - 1][0],
-//     y: [route.length - 1][1],
+//     x: route.at(-1).x,
+//     y: route.at(-1).y,
 //   });
 // });
 

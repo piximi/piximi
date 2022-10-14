@@ -4,7 +4,13 @@ import { saveAs } from "file-saver";
 
 import { decode, pointsAreEqual } from "utils/annotator";
 
-import { AnnotationType, Category, ShadowImageType, Point } from "types";
+import {
+  encodedAnnotationType,
+  bufferedAnnotationType,
+  Category,
+  ShadowImageType,
+  Point,
+} from "types";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -126,12 +132,12 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<AnnotationType>,
+  annotations: Array<bufferedAnnotationType>,
   imageWidth: number,
   imageHeight: number
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: AnnotationType) => {
+    (annotation: bufferedAnnotationType) => {
       const boundingBox = annotation.boundingBox;
       if (
         position.x >= boundingBox[0] &&
@@ -146,7 +152,7 @@ export const getOverlappingAnnotations = (
           const maskROI = new ImageJS.Image(
             boundingBox[2] - boundingBox[0],
             boundingBox[3] - boundingBox[1],
-            decode(annotation.mask),
+            annotation.maskData,
             { components: 1, alpha: 0 }
           );
           if (
@@ -161,7 +167,7 @@ export const getOverlappingAnnotations = (
       return false;
     }
   );
-  return overlappingAnnotations.map((annotation: AnnotationType) => {
+  return overlappingAnnotations.map((annotation: bufferedAnnotationType) => {
     return annotation.id;
   });
 };
@@ -169,9 +175,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<AnnotationType>
+  annotations: Array<bufferedAnnotationType>
 ) => {
-  return annotations.filter((annotation: AnnotationType) => {
+  return annotations.filter((annotation: bufferedAnnotationType) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
@@ -187,16 +193,14 @@ export const getAnnotationsInBox = (
  *          when creating an image from mask, the original width/height should be scaled by the same scale factor
  */
 export const colorOverlayROI = (
-  encodedMask: Array<number>,
+  maskData: Uint8Array,
   boundingBox: [number, number, number, number],
   imageWidth: number,
   imageHeight: number,
   color: Array<number>,
   scalingFactor: number
 ): HTMLImageElement | undefined => {
-  if (!encodedMask) return undefined;
-
-  const decodedData = decode(encodedMask);
+  if (!maskData) return undefined;
 
   const endX = Math.min(imageWidth, boundingBox[2]);
   const endY = Math.min(imageHeight, boundingBox[3]);
@@ -207,7 +211,7 @@ export const colorOverlayROI = (
 
   if (!boxWidth || !boxHeight) return undefined;
 
-  const croppedImage = new ImageJS.Image(boxWidth, boxHeight, decodedData, {
+  const croppedImage = new ImageJS.Image(boxWidth, boxHeight, maskData, {
     components: 1,
     alpha: 0,
   }).resize({ factor: scalingFactor });
@@ -277,7 +281,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   zip: any
 ): any => {
   images.forEach((current: ShadowImageType) => {
-    current.annotations.forEach((annotation: AnnotationType) => {
+    current.annotations.forEach((annotation: encodedAnnotationType) => {
       const height = current.shape.height;
       const width = current.shape.width;
 
@@ -287,8 +291,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
         new Uint8Array().fill(0),
         { components: 1, alpha: 0 }
       );
-      const encoded = annotation.mask;
-      const decoded = decode(encoded);
+      const decoded = decode(annotation.mask);
       const boundingBox = annotation.boundingBox;
       const endX = Math.min(width, boundingBox[2]);
       const endY = Math.min(height, boundingBox[3]);
@@ -359,8 +362,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 
       for (let annotation of current.annotations) {
         if (annotation.categoryId !== category.id) continue;
-        const encoded = annotation.mask;
-        const decoded = decode(encoded);
+        const decoded = decode(annotation.mask);
         const boundingBox = annotation.boundingBox;
         const endX = Math.min(width, boundingBox[2]);
         const endY = Math.min(height, boundingBox[3]);
@@ -435,8 +437,7 @@ export const saveAnnotationsAsLabelMatrix = (
               g = g + 1;
             }
             if (annotation.categoryId !== category.id) continue;
-            const encoded = annotation.mask;
-            const decoded = decode(encoded);
+            const decoded = decode(annotation.mask);
             const boundingBox = annotation.boundingBox;
             const endX = Math.min(width, boundingBox[2]);
             const endY = Math.min(height, boundingBox[3]);

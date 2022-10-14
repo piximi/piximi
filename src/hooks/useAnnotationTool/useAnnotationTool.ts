@@ -107,7 +107,10 @@ export const useAnnotationTool = () => {
 
   useEffect(() => {
     if (operator instanceof ThresholdAnnotationTool) {
+      const t1 = performance.now();
       operator.updateMask(threshold);
+      const t2 = performance.now();
+      console.log("Time in useAnnotatorTool: ", t2 - t1);
     }
   }, [operator, threshold]);
 

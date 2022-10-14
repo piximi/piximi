@@ -1,7 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode, getDistance, pointsAreEqual } from "utils/annotator";
+import { getDistance, pointsAreEqual } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
-import { getLastItem } from "utils/common";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
@@ -32,7 +31,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     if (this.anchor) {
-      if (!pointsAreEqual(getLastItem(this.buffer), this.anchor)) {
+      if (!pointsAreEqual(this.buffer.at(-1)!, this.anchor)) {
         this.buffer.pop();
       }
 
@@ -66,7 +65,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
       const maskImage = this.computeAnnotationMaskFromPoints();
       if (!maskImage) return;
 
-      this._mask = encode(maskImage.data);
+      this.maskData = maskImage.data;
 
       this.buffer = [];
 
@@ -78,7 +77,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
     }
 
     if (this.anchor || (this.origin && this.buffer.length > 0)) {
-      this.anchor = getLastItem(this.buffer);
+      this.anchor = this.buffer.at(-1);
 
       return;
     }

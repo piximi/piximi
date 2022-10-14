@@ -28,9 +28,9 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
       this._boundingBox = this.computeBoundingBox();
 
-      const mask = this.convertToMask();
-      if (!mask) return;
-      this._mask = encode(new Uint8Array(mask));
+      const maskData = this.convertToMask();
+      if (!maskData) return;
+      this._maskData = maskData;
 
       this.setAnnotated();
     }
@@ -48,9 +48,9 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
       this._boundingBox = this.computeBoundingBox();
 
-      const mask = this.convertToMask();
-      if (!mask) return;
-      this._mask = encode(new Uint8Array(mask));
+      const maskData = this.convertToMask();
+      if (!maskData) return;
+      this._maskData = maskData;
 
       this.setAnnotated();
     }

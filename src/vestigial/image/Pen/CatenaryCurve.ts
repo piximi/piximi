@@ -145,13 +145,11 @@ export class CatenaryCurve {
       oy = y;
     }
 
-    length = data.length;
-
     context.quadraticCurveTo(
-      data[length - 4],
-      data[length - 3],
-      data[length - 2],
-      data[length - 1]
+      data.at(-4)!,
+      data.at(-3)!,
+      data.at(-2)!,
+      data.at(-1)!
     );
 
     return temp;

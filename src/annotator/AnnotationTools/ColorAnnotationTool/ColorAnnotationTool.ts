@@ -2,7 +2,7 @@ import * as ImageJS from "image-js";
 import PriorityQueue from "ts-priority-queue";
 
 import { AnnotationTool } from "../AnnotationTool";
-import { doFlood, makeFloodMap, encode } from "utils/annotator";
+import { doFlood, makeFloodMap } from "utils/annotator";
 
 import { AnnotationStateType, Point } from "types";
 
@@ -13,7 +13,7 @@ export class ColorAnnotationTool extends AnnotationTool {
   offset: { x: number; y: number } = { x: 0, y: 0 };
   overlayData: string = "";
   points: Array<Point> = [];
-  initialPosition: { x: number; y: number } = { x: 0, y: 0 };
+  origin: { x: number; y: number } = { x: 0, y: 0 };
   tolerance: number = 1;
   toleranceMap?: ImageJS.Image;
   floodMap?: ImageJS.Image;
@@ -33,7 +33,7 @@ export class ColorAnnotationTool extends AnnotationTool {
 
     this.points = [];
 
-    this.initialPosition = { x: 0, y: 0 };
+    this.origin = { x: 0, y: 0 };
     this.toolTipPosition = undefined;
 
     this.tolerance = 1;
@@ -46,7 +46,7 @@ export class ColorAnnotationTool extends AnnotationTool {
 
   onMouseDown(position: { x: number; y: number }) {
     this.tolerance = 1;
-    this.initialPosition = position;
+    this.origin = position;
     this.toolTipPosition = position;
 
     this.toleranceMap = makeFloodMap({
@@ -90,14 +90,11 @@ export class ColorAnnotationTool extends AnnotationTool {
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotating) {
       const diff = Math.ceil(
-        Math.hypot(
-          position.x - this.initialPosition!.x,
-          position.y - this.initialPosition!.y
-        )
+        Math.hypot(position.x - this.origin!.x, position.y - this.origin!.y)
       );
       if (diff !== this.tolerance) {
         this.tolerance = diff;
-        this.updateOverlay(this.initialPosition);
+        this.updateOverlay(this.origin);
       }
       this.toolTipPosition = position;
     }
@@ -138,7 +135,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       }
     }
 
-    this._mask = encode(imgMask.data as Uint8Array);
+    this.maskData = imgMask.data as Uint8Array;
 
     this.setAnnotated();
   }

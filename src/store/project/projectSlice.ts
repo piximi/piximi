@@ -13,8 +13,12 @@ import {
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { AnnotationType } from "types/AnnotationType";
 import { replaceDuplicateName } from "image/utils/imageHelper";
+import {
+  bufferedAnnotationType,
+  encodedAnnotationType,
+} from "types/AnnotationType";
+import { encode } from "utils/annotator";
 
 export const initialState: Project = {
   categories: [UNKNOWN_CLASS_CATEGORY],
@@ -35,7 +39,7 @@ export const projectSlice = createSlice({
     clearAnnotations(state, action: PayloadAction<{ category: Category }>) {
       for (let image of state.images) {
         image.annotations = image.annotations.filter(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             return annotation.categoryId !== action.payload.category.id;
           }
         );
@@ -84,7 +88,7 @@ export const projectSlice = createSlice({
 
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             return {
               ...annotation,
               categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -114,7 +118,7 @@ export const projectSlice = createSlice({
 
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             if (annotation.categoryId === action.payload.categoryID) {
               return {
                 ...annotation,
@@ -435,7 +439,7 @@ export const projectSlice = createSlice({
     updateImageAnnotations(
       state,
       action: PayloadAction<{
-        annotations: Array<AnnotationType>;
+        annotations: Array<bufferedAnnotationType>;
         imageId: string;
       }>
     ) {
@@ -443,7 +447,16 @@ export const projectSlice = createSlice({
         if (action.payload.imageId !== image.id) {
           return image;
         } else {
-          return { ...image, annotations: action.payload.annotations };
+          const encodedAnnotations = action.payload.annotations.map(
+            (annotation: bufferedAnnotationType) => {
+              const { maskData, ...encodedAnnotation } = {
+                mask: encode(annotation.maskData),
+                ...annotation,
+              };
+              return encodedAnnotation;
+            }
+          );
+          return { ...image, annotations: encodedAnnotations };
         }
       });
     },

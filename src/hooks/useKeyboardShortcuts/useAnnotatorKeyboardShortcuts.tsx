@@ -16,20 +16,20 @@ import {
 import {
   AnnotationModeType,
   AnnotationStateType,
-  AnnotationType,
+  bufferedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
 import { AnnotationTool } from "annotator/AnnotationTools";
 
 type useAnnotatorHotkeysProps = {
-  annotations: AnnotationType[];
+  annotations: bufferedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   onZoomDeselect: () => void;
-  selectedAnnotation: AnnotationType | undefined;
+  selectedAnnotation: bufferedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;
@@ -63,13 +63,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       !activeImageId
     )
       return;
-
-    if (
-      toolType === ToolType.PolygonalAnnotation ||
-      toolType === ToolType.LassoAnnotation
-    ) {
-      annotationTool.connect();
-    }
 
     dispatch(
       imageViewerSlice.actions.setImageInstances({
