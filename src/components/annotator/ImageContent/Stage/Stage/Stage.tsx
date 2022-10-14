@@ -46,48 +46,66 @@ import {
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
 
-import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
+import {
+  AnnotationModeType,
+  AnnotationStateType,
+  Point,
+  ToolType,
+} from "types";
 
 import { ObjectAnnotationTool } from "annotator/AnnotationTools";
 import { Tool } from "annotator/Tool";
 import { SoundEvents } from "./SoundEvents";
 
 export const Stage = () => {
-  const imageRef = useRef<Konva.Image | null>(null);
-  const stageRef = useRef<Konva.Stage>(null);
+  /*
+    Konva's Stage is implemented such that its children are not connected,
+    and the store is no longer available to them, so we need to reinject
+    it to the Provider as a child of Stage.
+    See: https://github.com/konvajs/react-konva/issues/311
+    Discussion linked to above recommends use of
+    ReactReduxContext.Consumer -> Stage -> Provider pattern,
+    but that is not a publi API and may break in the future:
+    https://react-redux.js.org/using-react-redux/accessing-store#using-reactreduxcontext-directly
+    Here useStore() is utilized instead of getting the store
+    from ReactReduxContext.Consumer, which has the same result, but is safer.
+   */
+  const store = useStore();
 
-  const selectingRef = useRef<Konva.Line | null>(null);
-
-  const toolType = useSelector(toolTypeSelector);
-
-  const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const selectedCategory = useSelector(selectedCategorySelector);
-
-  const selectionMode = useSelector(selectionModeSelector);
-
-  const stageHeight = useSelector(stageHeightSelector);
-  const stageWidth = useSelector(stageWidthSelector);
-  const stagePosition = useSelector(stagePositionSelector);
-
-  const saveLabelRef = useRef<Konva.Label>();
-  const clearLabelRef = useRef<Konva.Label>();
-
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
-
+  // useState
+  const [firstMouseDown, setFirstMouseDown] = useState(false);
+  const [tool, setTool] = useState<Tool>();
   const [currentPosition, setCurrentPosition] = useState<{
     x: number;
     y: number;
   }>();
 
-  const [firstMouseDown, setFirstMouseDown] = useState(false);
+  // useRef
+  const imageRef = useRef<Konva.Image | null>(null);
+  const stageRef = useRef<Konva.Stage>(null);
+  const selectingRef = useRef<Konva.Line | null>(null);
+  const saveLabelRef = useRef<Konva.Label>();
+  const clearLabelRef = useRef<Konva.Label>();
 
+  // useSelector
+  const toolType = useSelector(toolTypeSelector);
+  const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
+  const selectedCategory = useSelector(selectedCategorySelector);
+  const selectionMode = useSelector(selectionModeSelector);
+  const stageHeight = useSelector(stageHeightSelector);
+  const stageWidth = useSelector(stageWidthSelector);
+  const stagePosition = useSelector(stagePositionSelector);
+  const activeImagePlane = useSelector(activeImagePlaneSelector);
   const scaledImageWidth = useSelector(scaledImageWidthSelector);
   const scaledImageHeight = useSelector(scaledImageHeightSelector);
-
   const stageScale = useSelector(stageScaleSelector);
+  const annotations = useSelector(imageInstancesSelector);
+  const annotationState = useSelector(annotationStateSelector);
+  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+  const cursor = useSelector(cursorSelector);
 
+  // useHook
   const dispatch = useDispatch();
-
   const {
     deselect: onZoomDeselect,
     onMouseUp: onZoomMouseUp,
@@ -95,7 +113,6 @@ export const Stage = () => {
     onMouseDown: onZoomMouseDown,
     onWheel: onZoomWheel,
   } = useZoom();
-
   const {
     onMouseDown: onPointerMouseDown,
     onMouseMove: onPointerMouseMove,
@@ -103,15 +120,30 @@ export const Stage = () => {
   } = usePointer();
 
   const [annotationTool] = useAnnotationTool();
-
-  const annotations = useSelector(imageInstancesSelector);
-
-  const annotationState = useSelector(annotationStateSelector);
-
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
-
+  const { draggable } = useHandTool();
+  useCursor();
   useWindowFocusHandler();
 
+  // helper functions
+
+  /**
+   * Takes the current pointer position in the browser window and coverts it to
+   *  coordinates relative to the image in the stage
+   * @param position  position of cursor in the window
+   * @returns {Point}  position of cursor in relation to stage
+   */
+  const getRelativePointerPosition = (position: {
+    x: number;
+    y: number;
+  }): Point | undefined => {
+    if (!imageRef || !imageRef.current) return;
+
+    const transform = imageRef.current.getAbsoluteTransform().copy();
+
+    transform.invert();
+
+    return transform.point(position);
+  };
   const detachTransformer = (transformerId: string) => {
     if (!stageRef || !stageRef.current) return;
     const transformer = stageRef.current.findOne(`#${transformerId}`);
@@ -132,15 +164,6 @@ export const Stage = () => {
       (tr as Konva.Transformer).getLayer()?.batchDraw();
     });
   };
-
-  const deselectAllAnnotations = useCallback(() => {
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
-  }, [dispatch]);
 
   const deselectAnnotation = useCallback(() => {
     if (!annotationTool) {
@@ -165,13 +188,14 @@ export const Stage = () => {
     detachTransformer(transformerId);
   }, [annotationTool, selectedAnnotation, dispatch]);
 
-  const cursor = useSelector(cursorSelector);
-  useCursor();
-
-  useEffect(() => {
-    if (!stageRef || !stageRef.current) return;
-    stageRef.current.container().style.cursor = cursor;
-  }, [cursor]);
+  const deselectAllAnnotations = useCallback(() => {
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [],
+        selectedAnnotation: undefined,
+      })
+    );
+  }, [dispatch]);
 
   const onAnnotating = useMemo(() => {
     const func = () => {
@@ -220,54 +244,6 @@ export const Stage = () => {
     };
     return func;
   }, [annotationTool, dispatch]);
-
-  useEffect(() => {
-    if (!annotationTool) return;
-    annotationTool.registerOnAnnotatedHandler(onAnnotated);
-    annotationTool.registerOnAnnotatingHandler(onAnnotating);
-    annotationTool.registerOnDeselectHandler(onDeselect);
-  }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
-
-  useEffect(() => {
-    if (!stageRef || !stageRef.current) return;
-    selectedAnnotationsIds.forEach((annotationId) => {
-      if (!stageRef || !stageRef.current) return;
-
-      const transformerId = "tr-".concat(annotationId);
-
-      const transformer = stageRef.current.findOne(`#${transformerId}`);
-      const line = stageRef.current.findOne(`#${annotationId}`);
-
-      if (!line) return;
-
-      if (!transformer) return;
-
-      (transformer as Konva.Transformer).nodes([line]);
-
-      const layer = (transformer as Konva.Transformer).getLayer();
-
-      if (!layer) return;
-
-      layer.batchDraw();
-
-      // Not ideal but this figures out which label is which
-      const label = stageRef.current.find(`#label`);
-      if (label.length > 1) {
-        saveLabelRef.current = label[0] as Konva.Label;
-        clearLabelRef.current = label[1] as Konva.Label;
-      }
-    });
-  }, [selectedAnnotationsIds, selectedAnnotation?.mask]);
-
-  const getRelativePointerPosition = (position: { x: number; y: number }) => {
-    if (!imageRef || !imageRef.current) return;
-
-    const transform = imageRef.current.getAbsoluteTransform().copy();
-
-    transform.invert();
-
-    return transform.point(position);
-  };
 
   const onMouseDown = (
     event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
@@ -498,6 +474,7 @@ export const Stage = () => {
     stageScale,
   ]);
 
+  // useEffect
   /*/
   Detach transformers and selections when all annotations are removed
    */
@@ -507,11 +484,51 @@ export const Stage = () => {
     deselectAllTransformers();
   }, [annotations, deselectAllAnnotations]);
 
-  const [tool, setTool] = useState<Tool>();
-
   useEffect(() => {
     setTool(annotationTool);
   }, [annotationTool, toolType]);
+  useEffect(() => {
+    if (!annotationTool) return;
+    annotationTool.registerOnAnnotatedHandler(onAnnotated);
+    annotationTool.registerOnAnnotatingHandler(onAnnotating);
+    annotationTool.registerOnDeselectHandler(onDeselect);
+  }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
+
+  useEffect(() => {
+    if (!stageRef || !stageRef.current) return;
+    selectedAnnotationsIds.forEach((annotationId) => {
+      if (!stageRef || !stageRef.current) return;
+
+      const transformerId = "tr-".concat(annotationId);
+
+      const transformer = stageRef.current.findOne(`#${transformerId}`);
+      const line = stageRef.current.findOne(`#${annotationId}`);
+
+      if (!line) return;
+
+      if (!transformer) return;
+
+      (transformer as Konva.Transformer).nodes([line]);
+
+      const layer = (transformer as Konva.Transformer).getLayer();
+
+      if (!layer) return;
+
+      layer.batchDraw();
+
+      // Not ideal but this figures out which label is which
+      const label = stageRef.current.find(`#label`);
+      if (label.length > 1) {
+        saveLabelRef.current = label[0] as Konva.Label;
+        clearLabelRef.current = label[1] as Konva.Label;
+      }
+    });
+  }, [selectedAnnotationsIds, selectedAnnotation?.maskData]);
+
+  useEffect(() => {
+    if (!stageRef || !stageRef.current) return;
+    stageRef.current.container().style.cursor = cursor;
+  }, [cursor]);
 
   useAnnotatorKeyboardShortcuts({
     annotations,
@@ -525,23 +542,6 @@ export const Stage = () => {
     selectionMode,
     toolType,
   });
-
-  const { draggable } = useHandTool();
-
-  /*
-    Konva's Stage is implemented such that its children are not connected,
-    and the store is no longer available to them, so we need to reinject
-    it to the Provider as a child of Stage.
-    See: https://github.com/konvajs/react-konva/issues/311
-    Discussion linked to above recommends use of
-    ReactReduxContext.Consumer -> Stage -> Provider pattern,
-    but that is not a publi API and may break in the future:
-    https://react-redux.js.org/using-react-redux/accessing-store#using-reactreduxcontext-directly
-    Here useStore() is utilized instead of getting the store
-    from ReactReduxContext.Consumer, which has the same result, but is safer.
-   */
-  const store = useStore();
-
   return (
     <>
       <ReactKonva.Stage

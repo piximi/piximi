@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
+import Image from "image-js";
 
 export class LassoAnnotationTool extends AnnotationTool {
   anchor?: Point;
@@ -59,13 +59,13 @@ export class LassoAnnotationTool extends AnnotationTool {
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points);
 
-      const maskImage = this.computeAnnotationMaskFromPoints();
+      const maskImage = this.computeAnnotationMaskFromPoints() as Image;
 
       if (!maskImage) {
         return;
       }
 
-      this._mask = encode(maskImage.data);
+      this.maskData = maskImage.data as Uint8Array;
 
       this.buffer = [];
 

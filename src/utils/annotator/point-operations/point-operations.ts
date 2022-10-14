@@ -31,7 +31,7 @@ export function getXofYMax(edge: Edge) {
 // converts list of points to list of non-horizontal edges
 export function pointsToEdges(points: Array<Point>) {
   let edges: Array<Edge> = [];
-  let p1 = points[points.length - 1];
+  let p1 = points.at(-1)!;
   for (let i = 0; i < points.length; i++) {
     const p2 = points[i];
     // ignore horizontal edges

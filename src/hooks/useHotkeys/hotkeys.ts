@@ -362,7 +362,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
     if (key.length > 1) mods = getMods(_modifier, key);
 
     // Convert non-modifier keys to keycodes
-    let hotkey = key[key.length - 1];
+    let hotkey = key.at(-1)!;
     let keyCode = hotkey === "*" ? "*" : code(hotkey); // * means match all shortcut keys
 
     // Determine whether the key is in _handlers, if not, assign an empty array

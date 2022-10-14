@@ -13,6 +13,7 @@ import { selectedCategorySelector } from "store/common";
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
 import { AnnotationTool } from "annotator/AnnotationTools";
+import { encode } from "utils/annotator";
 
 export function* annotationStateChangeSaga({
   payload: { annotationState, annotationTool, execSaga },
@@ -67,31 +68,33 @@ export function* annotationStateChangeSaga({
 
     if (selectionMode === AnnotationModeType.Add) {
       [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
+        selectedAnnotation.maskData!,
         selectedAnnotation.boundingBox
       );
     } else if (selectionMode === AnnotationModeType.Subtract) {
       [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.mask,
+        selectedAnnotation.maskData!,
         selectedAnnotation.boundingBox
       );
     } else if (selectionMode === AnnotationModeType.Intersect) {
       [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.mask,
+        selectedAnnotation.maskData!,
         selectedAnnotation.boundingBox
       );
     } else {
       return;
     }
 
-    annotationTool.mask = combinedMask;
+    annotationTool.maskData = combinedMask;
     annotationTool.boundingBox = combinedBoundingBox;
+    annotationTool.mask = encode(combinedMask);
 
-    const combinedSelectedAnnotation = annotationTool.mask.length
+    const combinedSelectedAnnotation = annotationTool.maskData.length
       ? {
           ...selectedAnnotation,
           boundingBox: annotationTool.boundingBox,
           mask: annotationTool.mask,
+          maskData: annotationTool.maskData,
         }
       : undefined;
 
@@ -104,7 +107,7 @@ export function* annotationStateChangeSaga({
       })
     );
 
-    if (annotationTool.mask.length) {
+    if (annotationTool.maskData.length) {
       const selectedCategory: ReturnType<typeof selectedCategorySelector> =
         yield select(selectedCategorySelector);
       annotationTool.annotate(selectedCategory, activeImagePlane);

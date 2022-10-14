@@ -1,4 +1,4 @@
-import { AnnotationType } from "./AnnotationType";
+import { encodedAnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 import { Color } from "./Color";
 
@@ -15,5 +15,5 @@ export type SerializedImageType = {
   imagePlanes: number;
   imageWidth: number;
   imagePartition: Partition;
-  annotations: Array<AnnotationType>;
+  annotations: Array<encodedAnnotationType>;
 };

@@ -20,10 +20,13 @@ import {
   unselectedAnnotationsSelector,
 } from "store/image-viewer";
 
-import { AnnotationModeType, AnnotationStateType, AnnotationType } from "types";
+import {
+  AnnotationModeType,
+  AnnotationStateType,
+  bufferedAnnotationType,
+} from "types";
 
 import { AnnotationTool } from "annotator/AnnotationTools";
-import { decode, encode } from "utils/annotator";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 
@@ -52,20 +55,8 @@ export const Transformer = ({
   annotationId,
   annotationTool,
 }: TransformerProps) => {
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
-
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
-
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-
-  const transformerRef = useRef<Konva.Transformer | null>(null);
-
-  const activeImageId = useSelector(activeImageIdSelector);
-
-  const dispatch = useDispatch();
-
+  // useState
   const [boundBox, setBoundBox] = useState<box | null>(null);
-
   const [startBox, setStartBox] = useState<box>({
     x: 0,
     y: 0,
@@ -73,25 +64,57 @@ export const Transformer = ({
     width: 0,
     rotation: 0,
   });
-
   const [center, setCenter] = useState<{ x: number; y: number } | undefined>();
 
+  // useRef
+  const transformerRef = useRef<Konva.Transformer | null>(null);
+
+  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
+  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
+  const activeImageId = useSelector(activeImageIdSelector);
   const stageScale = useSelector(stageScaleSelector);
-
   const cursor = useSelector(cursorSelector);
-
   const soundEnabled = useSelector(soundEnabledSelector);
-
   const imageWidth = useSelector(imageWidthSelector);
   const imageHeight = useSelector(imageHeightSelector);
+
+  //console.log("unselectedAnnotations: \n", unselectedAnnotations);
+  //console.log("selectedAnnotations: \n", selectedAnnotations);
+  //console.log("selectedAnnotation: \n", selectedAnnotation);
+  //console.log("activeImageId: \n", activeImageId);
+  //console.log("stageScale: \n", stageScale);
+  //console.log("imageWidth: \n", imageWidth;
+  //console.log("imageHeight: \n", imageHeight);
+
+  const dispatch = useDispatch();
 
   const [playCreateAnnotationSoundEffect] = useSound(
     createAnnotationSoundEffect
   );
-
   const [playDeleteAnnotationSoundEffect] = useSound(
     deleteAnnotationSoundEffect
   );
+
+  /**
+   * Obtain box coordinates in image space
+   * @param boundBox -
+   * @returns {box}
+   */
+  const getRelativeBox = (boundBox: box): box | undefined => {
+    const relativePosition = transformPosition({
+      x: boundBox.x,
+      y: boundBox.y,
+    });
+    if (!relativePosition) return;
+    return {
+      x: relativePosition.x / stageScale,
+      y: relativePosition.y / stageScale,
+      height: boundBox.height / stageScale,
+      width: boundBox.width / stageScale,
+      rotation: 0,
+    };
+  };
 
   const boundingBoxFunc = (oldBox: box, newBox: box) => {
     if (!boundBox) {
@@ -122,24 +145,6 @@ export const Transformer = ({
 
     setBoundBox(newBox);
     return newBox;
-  };
-
-  /*
-   * Obtain box coordinates in image space
-   */
-  const getRelativeBox = (boundBox: box) => {
-    const relativePosition = transformPosition({
-      x: boundBox.x,
-      y: boundBox.y,
-    });
-    if (!relativePosition) return;
-    return {
-      x: relativePosition.x / stageScale,
-      y: relativePosition.y / stageScale,
-      height: boundBox.height / stageScale,
-      width: boundBox.width / stageScale,
-      rotation: 0,
-    };
   };
 
   const getScaledCoordinate = (
@@ -174,7 +179,6 @@ export const Transformer = ({
     const scaleY = relativeBoundBox.height / relativeStartBox.height;
 
     //extract roi and resize
-    const mask = selectedAnnotation.mask;
     const boundingBox = selectedAnnotation.boundingBox;
 
     const roiWidth = boundingBox[2] - boundingBox[0];
@@ -182,7 +186,7 @@ export const Transformer = ({
     const roiX = boundingBox[0];
     const roiY = boundingBox[1];
 
-    const decodedData = new Uint8Array(decode(mask));
+    const decodedData = selectedAnnotation.maskData;
 
     if (!roiWidth || !roiHeight) return;
 
@@ -202,8 +206,6 @@ export const Transformer = ({
       y: scaleY,
     });
 
-    const resizedMask = encode(Uint8Array.from(resizedMaskROI.data));
-
     const updatedAnnotation = {
       ...selectedAnnotation,
       boundingBox: [
@@ -212,7 +214,7 @@ export const Transformer = ({
         scaledOffset[0] + resizedMaskROI.width,
         scaledOffset[1] + resizedMaskROI.height,
       ] as [number, number, number, number],
-      mask: resizedMask,
+      maskData: Uint8Array.from(resizedMaskROI.data),
     };
 
     dispatch(
@@ -228,7 +230,9 @@ export const Transformer = ({
     setBoundBox(null);
   };
 
-  const updateSelectedAnnotation = (updatedAnnotation: AnnotationType) => {
+  const updateSelectedAnnotation = (
+    updatedAnnotation: bufferedAnnotationType
+  ) => {
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [updatedAnnotation],
@@ -308,9 +312,11 @@ export const Transformer = ({
   };
 
   const onTransformStart = () => {
-    const selected = selectedAnnotations.find((annotation: AnnotationType) => {
-      return annotation.id === annotationId;
-    });
+    const selected = selectedAnnotations.find(
+      (annotation: bufferedAnnotationType) => {
+        return annotation.id === annotationId;
+      }
+    );
 
     if (!selected) return;
 
@@ -442,11 +448,13 @@ export const Transformer = ({
                   fontSize={14}
                   padding={6}
                   text={"Confirm"}
+                  width={65}
+                  align={"center"}
                 />
               </ReactKonva.Label>
               <ReactKonva.Label
                 position={{
-                  x: posX - 52,
+                  x: posX - 58,
                   y: posY + 35,
                 }}
                 onClick={onClearAnnotationClick}
@@ -468,6 +476,8 @@ export const Transformer = ({
                   fontSize={14}
                   padding={6}
                   text={"Cancel"}
+                  width={65}
+                  align={"center"}
                 />
               </ReactKonva.Label>
             </ReactKonva.Group>

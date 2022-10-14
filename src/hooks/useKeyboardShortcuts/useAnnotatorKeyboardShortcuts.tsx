@@ -17,7 +17,7 @@ import {
 import {
   AnnotationModeType,
   AnnotationStateType,
-  AnnotationType,
+  bufferedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
@@ -26,13 +26,13 @@ import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 
 type useAnnotatorHotkeysProps = {
-  annotations: AnnotationType[];
+  annotations: bufferedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   onZoomDeselect: () => void;
-  selectedAnnotation: AnnotationType | undefined;
+  selectedAnnotation: bufferedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;
@@ -66,13 +66,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       !activeImageId
     )
       return;
-
-    if (
-      toolType === ToolType.PolygonalAnnotation ||
-      toolType === ToolType.LassoAnnotation
-    ) {
-      annotationTool.connect();
-    }
 
     dispatch(
       imageViewerSlice.actions.setImageInstances({

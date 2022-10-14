@@ -11,7 +11,7 @@ import {
 import { setAnnotationCategories } from "store/project";
 
 import {
-  AnnotationType,
+  bufferedAnnotationType,
   SerializedFileType,
   SerializedAnnotationType,
   ToolType,
@@ -54,7 +54,9 @@ export const OpenProjectFileMenuItem = ({
           serializedImages.forEach(
             (serializedImage: SerializedFileType, index: number) => {
               const annotations = serializedImage.annotations.map(
-                (annotation: SerializedAnnotationType): AnnotationType => {
+                (
+                  annotation: SerializedAnnotationType
+                ): bufferedAnnotationType => {
                   const { annotation_out, categories } =
                     importSerializedAnnotations(
                       annotation,
