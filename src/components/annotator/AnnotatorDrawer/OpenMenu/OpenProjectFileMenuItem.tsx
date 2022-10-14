@@ -43,6 +43,7 @@ export const OpenProjectFileMenuItem = ({
           event.target.result as string
         );
 
+        // TODO: BIG_MERGE - check if this is still correct
         const deserializedAnnotations = deserializeAnnotations(
           serializedAnnotations.annotations
         );

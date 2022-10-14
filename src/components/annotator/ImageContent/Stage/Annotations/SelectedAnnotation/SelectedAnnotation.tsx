@@ -6,11 +6,11 @@ import { toRGBA } from "utils/annotator";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { AnnotationType, Shape } from "types";
+import { bufferedAnnotationType, Shape } from "types";
 import { colorOverlayROI } from "utils/common/imageHelper";
 
 type AnnotationProps = {
-  annotation: AnnotationType;
+  annotation: bufferedAnnotationType;
   imageShape: Shape;
   fillColor: string;
 };
@@ -30,7 +30,7 @@ export const SelectedAnnotation = ({
   useEffect(() => {
     const color = toRGBA(fillColor, 0);
     const overlayMask = colorOverlayROI(
-      annotation.mask,
+      annotation.maskData,
       annotation.boundingBox,
       imageWidth,
       imageHeight,
@@ -40,7 +40,7 @@ export const SelectedAnnotation = ({
     if (!overlayMask) return;
     setImageMask(overlayMask);
   }, [
-    annotation.mask,
+    annotation.maskData,
     fillColor,
     annotation.boundingBox,
     imageHeight,

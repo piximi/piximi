@@ -45,6 +45,7 @@ export const OpenExampleImageMenuItem = ({
       exampleImageProject.exampleImageName
     );
 
+    // TODO: BIG_MERGE - check if this is still correct
     dispatch(projectSlice.actions.addAnnotationCategories({ categories }));
     batch(() => {
       dispatch(

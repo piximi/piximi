@@ -1,7 +1,7 @@
 import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "../AnnotationTool";
-import { encode, slic } from "utils/annotator";
+import { slic } from "utils/annotator";
 
 import { AnnotationStateType } from "types";
 
@@ -140,7 +140,7 @@ export class QuickAnnotationTool extends AnnotationTool {
       i > 1 ? 255 : 0
     );
 
-    this._mask = encode(Uint8Array.from(thresholdMask));
+    this.maskData = Uint8Array.from(thresholdMask);
     this.setAnnotated();
   }
 }

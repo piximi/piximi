@@ -9,7 +9,8 @@ import {
   selectedAnnotationsSelector,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
-import { AnnotationType } from "types";
+import { bufferedAnnotationType } from "types";
+import { encode } from "utils/annotator";
 
 // eslint-disable-next-line no-empty-pattern
 export function* selectedCategorySaga({
@@ -36,7 +37,7 @@ export function* selectedCategorySaga({
     yield select(selectedCategorySelector);
 
   const updatedAnnotations = selectedAnnotations.map(
-    (annotation: AnnotationType) => {
+    (annotation: bufferedAnnotationType) => {
       return { ...annotation, categoryId: selectedCategory.id };
     }
   );
@@ -44,13 +45,11 @@ export function* selectedCategorySaga({
   const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
     yield select(selectedAnnotationSelector);
 
-  if (!selectedAnnotation) return;
-
   yield put(
     imageViewerSlice.actions.setSelectedAnnotations({
       selectedAnnotations: updatedAnnotations,
       selectedAnnotation: {
-        ...selectedAnnotation,
+        ...selectedAnnotation!,
         categoryId: selectedCategory.id,
       },
     })

@@ -4,7 +4,13 @@ import { activeImageSelector } from "store/common";
 import { selectedAnnotationsSelector } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
 
-import { AnnotationType, Category, UNKNOWN_ANNOTATION_CATEGORY } from "types";
+import {
+  bufferedAnnotationType,
+  encodedAnnotationType,
+  Category,
+  UNKNOWN_ANNOTATION_CATEGORY,
+} from "types";
+import { decode } from "utils/annotator";
 
 export const unselectedAnnotationObjectsSelector = createSelector(
   [
@@ -15,7 +21,7 @@ export const unselectedAnnotationObjectsSelector = createSelector(
   (activeImage, categories, selectedAnnotations) => {
     if (!activeImage) return [];
 
-    const getFillColor = (annotation: AnnotationType) => {
+    const getFillColor = (annotation: encodedAnnotationType) => {
       const annotationCategory = categories.find(
         (category: Category) => category.id === annotation.categoryId
       );
@@ -31,16 +37,16 @@ export const unselectedAnnotationObjectsSelector = createSelector(
       });
 
     const selectedAnnotationIDs = selectedAnnotations.map(
-      (annotation: AnnotationType) => {
+      (annotation: bufferedAnnotationType) => {
         return annotation.id;
       }
     );
 
     const visibleUnselectedAnnotations = activeImage.annotations
-      .filter((annotation: AnnotationType) => {
+      .filter((annotation: encodedAnnotationType) => {
         return !selectedAnnotationIDs.includes(annotation.id);
       })
-      .filter((annotation: AnnotationType) => {
+      .filter((annotation: encodedAnnotationType) => {
         return (
           visibleCategories.includes(annotation.categoryId) &&
           annotation.plane === activeImage?.activePlane
@@ -48,9 +54,13 @@ export const unselectedAnnotationObjectsSelector = createSelector(
       });
 
     return visibleUnselectedAnnotations.map(
-      (visibleUnselectedAnnotation: AnnotationType) => {
+      (visibleUnselectedAnnotation: encodedAnnotationType) => {
+        const { mask, ...buffered } = {
+          maskData: Uint8Array.from(decode(visibleUnselectedAnnotation.mask)),
+          ...visibleUnselectedAnnotation,
+        };
         return {
-          annotation: visibleUnselectedAnnotation,
+          annotation: buffered,
           imageShape: activeImage.shape,
           fillColor: getFillColor(visibleUnselectedAnnotation),
         };

@@ -5,7 +5,10 @@ export { AnnotationModeType } from "./AnnotationModeType";
 
 export { AnnotationStateType } from "./AnnotationStateType";
 
-export type { AnnotationType } from "./AnnotationType";
+export type {
+  encodedAnnotationType,
+  bufferedAnnotationType,
+} from "./AnnotationType";
 
 export type {
   ClassifierArchitectureOptions,

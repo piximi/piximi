@@ -41,11 +41,11 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       this.points = this.convertToPoints();
 
       this._boundingBox = this.computeBoundingBoxFromContours(this.points!);
-      const mask = this.convertToMask();
+      const maskData = this.convertToMask();
 
-      if (!mask) return;
+      if (!maskData) return;
 
-      this._mask = encode(mask);
+      this.maskData = maskData;
 
       this.setAnnotated();
     }

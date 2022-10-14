@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
@@ -25,10 +25,12 @@ export const ThresholdAnnotationOptions = () => {
 
   const onChange = (event: any, changed: number | number[]) => {
     setThreshold(changed as number);
-
-    const payload = { thresholdAnnotationValue: changed as number };
-    dispatch(imageViewerSlice.actions.setThresholdAnnotationValue(payload));
   };
+
+  useEffect(() => {
+    const payload = { thresholdAnnotationValue: threshold };
+    dispatch(imageViewerSlice.actions.setThresholdAnnotationValue(payload));
+  }, [dispatch, threshold]);
 
   return (
     <>
