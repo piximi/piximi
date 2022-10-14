@@ -1,10 +1,10 @@
 import { Shape } from "./Shape";
-import { AnnotationType } from "./AnnotationType";
+import { encodedAnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
 import { Color } from "./Color";
 
 export type ImageType = {
-  annotations: Array<AnnotationType>;
+  annotations: Array<encodedAnnotationType>;
   activePlane: number;
   categoryId: string;
   colors: Array<Color>;
@@ -21,7 +21,7 @@ export type ImageType = {
 export type ShadowImageType = {
   id: string;
   name: string;
-  annotations: Array<AnnotationType>;
+  annotations: Array<encodedAnnotationType>;
   src: string; // The URI to be displayed on the canvas
   activePlane: number;
   shape: Shape;

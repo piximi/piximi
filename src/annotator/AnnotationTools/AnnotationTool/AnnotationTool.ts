@@ -1,11 +1,16 @@
 import * as ImageJS from "image-js";
-import { min, max, findLastIndex } from "lodash";
+import { min, max } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { scanline, simplifyPolygon, decode, encode } from "utils/annotator";
+import { scanline, simplifyPolygon } from "utils/annotator";
 import { Tool } from "../../Tool/Tool";
-import { connectPoints, drawLine } from "utils/common/imageHelper";
+import { connectPoints } from "utils/common/imageHelper";
 
-import { AnnotationStateType, AnnotationType, Category, Point } from "types";
+import {
+  AnnotationStateType,
+  bufferedAnnotationType,
+  Category,
+  Point,
+} from "types";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -27,13 +32,17 @@ export abstract class AnnotationTool extends Tool {
    */
   protected _mask?: Array<number>;
   /**
+   * Raw msk data
+   */
+  protected _maskData?: Uint8Array;
+  /**
    * State of the annotation: Blank (not yet annotating), Annotating or Annotated
    */
   annotationState = AnnotationStateType.Blank;
   /**
    * Annotation object of the Tool.
    */
-  annotation?: AnnotationType;
+  annotation?: bufferedAnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];
@@ -44,7 +53,6 @@ export abstract class AnnotationTool extends Tool {
 
   constructor(image: ImageJS.Image) {
     super(image);
-
     this.manager = image.getRoiManager();
   }
 
@@ -93,6 +101,14 @@ export abstract class AnnotationTool extends Tool {
     this._mask = updatedMask;
   }
 
+  get maskData(): Uint8Array | undefined {
+    return this._maskData;
+  }
+
+  set maskData(updatedMask: Uint8Array | undefined) {
+    this._maskData = updatedMask;
+  }
+
   /**
    * Compute the mask image of the annotation polygon from the bounding box and the polygon points.
    * @returns Mask image of the annotation.
@@ -107,7 +123,7 @@ export abstract class AnnotationTool extends Tool {
       return undefined;
     }
 
-    const coordinates = this.buffer;
+    const coordinates = this.points;
 
     const connectedPoints = connectPoints(coordinates!); // get coordinates of connected points and draw boundaries of mask
 
@@ -120,7 +136,7 @@ export abstract class AnnotationTool extends Tool {
     );
 
     // @ts-ignore: getChannel API is not exposed
-    const greyScaleMask = maskImage.getChannel(0);
+    const greyScaleMask = maskImage.getChannel(0); // as ImageJS.Image;
 
     return greyScaleMask.crop({
       x: boundingBox[0],
@@ -130,34 +146,34 @@ export abstract class AnnotationTool extends Tool {
     });
   }
 
-  registerOnAnnotatingHandler(handler: () => void): void {
-    this.onAnnotating = handler;
-  }
   setAnnotating() {
     this.annotationState = AnnotationStateType.Annotating;
     if (this.onAnnotating) {
       this.onAnnotating();
     }
   }
-
-  registerOnAnnotatedHandler(handler: () => void): void {
-    this.onAnnotated = handler;
+  registerOnAnnotatingHandler(handler: () => void): void {
+    this.onAnnotating = handler;
   }
+
   setAnnotated() {
     this.annotationState = AnnotationStateType.Annotated;
     if (this.onAnnotated) {
       this.onAnnotated();
     }
   }
-
-  registerOnDeselectHandler(handler: () => void): void {
-    this.onDeselect = handler;
+  registerOnAnnotatedHandler(handler: () => void): void {
+    this.onAnnotated = handler;
   }
+
   setBlank() {
     this.annotationState = AnnotationStateType.Blank;
     if (this.onDeselect) {
       this.onDeselect();
     }
+  }
+  registerOnDeselectHandler(handler: () => void): void {
+    this.onDeselect = handler;
   }
 
   abstract deselect(): void;
@@ -175,42 +191,15 @@ export abstract class AnnotationTool extends Tool {
    * @returns
    */
   annotate(category: Category, plane: number): void {
-    if (!this.boundingBox || !this.mask) return;
+    if (!this.boundingBox || !this.maskData) return;
 
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
       id: uuidv4(),
-      mask: this.mask,
+      maskData: this.maskData,
       plane: plane,
     };
-  }
-  connect() {
-    if (this.annotationState === AnnotationStateType.Annotated) return;
-
-    if (!this.anchor || !this.origin || !this.buffer) return;
-
-    const anchorIndex = findLastIndex(this.buffer, (point) => {
-      return point.x === this.anchor!.x;
-    });
-
-    const segment = drawLine(this.anchor, this.origin);
-    this.buffer.splice(anchorIndex, segment.length, ...segment);
-
-    this._boundingBox = this.computeBoundingBoxFromContours(this.buffer);
-
-    this.points = this.buffer;
-
-    const maskImage = this.computeAnnotationMaskFromPoints();
-    if (!maskImage) return;
-
-    this._mask = encode(maskImage.data);
-
-    this.anchor = undefined;
-    this.origin = undefined;
-    this.buffer = [];
-
-    this.setAnnotated();
   }
 
   /*
@@ -238,6 +227,13 @@ export abstract class AnnotationTool extends Tool {
   //   return newMaskImage;
   // }
 
+  /**
+   * Checks if a point lies within an annotation bounding box
+   * @param x x-coord of point
+   * @param y y-coord of point
+   * @param boundingBox Bounding box of annotation
+   * @returns true if point lies within the bounding box, false otherwise
+   */
   isInBoundingBox(
     x: number,
     y: number,
@@ -251,18 +247,19 @@ export abstract class AnnotationTool extends Tool {
 
   /**
    * Add the areas selected by the current AnnotationTool from the selected annotation.
-   * @param newEncodedMaskData
-   * @param newBoundingBox
-   * @returns Bounding box and mask of the added annotation areas
+   * @param newEncodedMaskData Encoded mask data of new annotation to be added
+   * @param newBoundingBox Bounding box of new annotation to be added
+   * @returns Bounding box and mask of the combined annotation areas
    */
   add(
-    newEncodedMaskData: Array<number>,
+    newEncodedMaskData: Uint8Array,
     newBoundingBox: [number, number, number, number]
-  ): [Array<number>, [number, number, number, number]] {
-    if (!this._mask || !this._boundingBox) return [[], [0, 0, 0, 0]];
+  ): [Uint8Array, [number, number, number, number]] {
+    if (!this._maskData || !this._boundingBox)
+      return [Uint8Array.from([]), [0, 0, 0, 0]];
 
-    const newMaskData = decode(newEncodedMaskData);
-    const existingMaskData = decode(this._mask);
+    const newMaskData = newEncodedMaskData;
+    const existingMaskData = this._maskData;
     const existingBoundingBox = this._boundingBox;
 
     const combinedBoundingBox = [
@@ -312,7 +309,7 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    return [encode(Uint8Array.from(combinedMaskData)), combinedBoundingBox];
+    return [Uint8Array.from(combinedMaskData), combinedBoundingBox];
   }
 
   /**
@@ -322,13 +319,14 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the intersected annotation areas.
    */
   intersect(
-    decodedMask1: Array<number>,
+    decodedMask1: Uint8Array,
     boundingBox1: [number, number, number, number]
-  ): [Array<number>, [number, number, number, number]] {
-    if (!this._mask || !this._boundingBox) return [[], [0, 0, 0, 0]];
+  ): [Uint8Array, [number, number, number, number]] {
+    if (!this._maskData || !this._boundingBox)
+      return [Uint8Array.from([]), [0, 0, 0, 0]];
 
-    const maskData1 = decode(decodedMask1);
-    const maskData2 = decode(this._mask);
+    const maskData1 = decodedMask1;
+    const maskData2 = this._maskData;
 
     const boundingBox2 = this._boundingBox;
 
@@ -346,7 +344,7 @@ export abstract class AnnotationTool extends Tool {
 
     // Check if bounding box is valid: width and height of the intersection must be positive.
     if (intersectionBoundingBoxWidth < 0 || intersectionBoundingBoxHeight < 0) {
-      return [[], [0, 0, 0, 0]];
+      return [Uint8Array.from([]), [0, 0, 0, 0]];
     }
 
     const newMaskData = [];
@@ -381,9 +379,9 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    if (!newMaskData.length) return [[], [0, 0, 0, 0]];
+    if (!newMaskData.length) return [Uint8Array.from([]), [0, 0, 0, 0]];
 
-    return [encode(Uint8Array.from(newMaskData)), intersectionBoundingBox];
+    return [Uint8Array.from(newMaskData), intersectionBoundingBox];
   }
 
   /**
@@ -393,10 +391,10 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the inverted annotation area
    */
   invert(
-    selectedMask: Array<number>,
+    selectedMask: Uint8Array,
     selectedBoundingBox: [number, number, number, number]
-  ): [Array<number>, [number, number, number, number]] {
-    const mask = decode(selectedMask);
+  ): [Uint8Array, [number, number, number, number]] {
+    const mask = selectedMask;
 
     const imageWidth = this.image.width;
     const imageHeight = this.image.height;
@@ -450,9 +448,7 @@ export abstract class AnnotationTool extends Tool {
       height: invertedBoundingBox[3] - invertedBoundingBox[1],
     });
 
-    const invertedMaskData = encode(Uint8Array.from(croppedInvertedMask.data));
-
-    return [invertedMaskData, invertedBoundingBox];
+    return [Uint8Array.from(croppedInvertedMask.data), invertedBoundingBox];
   }
 
   /**
@@ -463,15 +459,16 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the difference of the annotation areas.
    */
   subtract(
-    encodedMinuendData: Array<number>,
+    encodedMinuendData: Uint8Array,
     minuendBoundingBox: [number, number, number, number]
-  ): [Array<number>, [number, number, number, number]] {
-    if (!this._mask || !this._boundingBox) return [[], [0, 0, 0, 0]];
+  ): [Uint8Array, [number, number, number, number]] {
+    if (!this._maskData || !this._boundingBox)
+      return [Uint8Array.from([]), [0, 0, 0, 0]];
 
     // decode the selected annotation data
-    const minuendData = decode(encodedMinuendData);
+    const minuendData = encodedMinuendData;
     // decode the the subtrahend data
-    const subtrahendData = decode(this._mask);
+    const subtrahendData = this._maskData;
 
     const subtrahendBoundingBox = this._boundingBox;
 
@@ -509,10 +506,10 @@ export abstract class AnnotationTool extends Tool {
 
     // Check if bounding box is valid: width and height of the intersection must be positive.
     if (resultingBoundingBoxWidth < 0 || resultingBoundingBoxHeight < 0) {
-      return [[], [0, 0, 0, 0]];
+      return [Uint8Array.from([]), [0, 0, 0, 0]];
     }
 
-    const resultingMaskData = [];
+    const resultingMaskData: number[] = [];
     const deltaX1 = minuendBoundingBox[0] - resultingBoundingBox[0];
     const deltaY1 = minuendBoundingBox[1] - resultingBoundingBox[1];
     const deltaX2 = subtrahendBoundingBox[0] - resultingBoundingBox[0];
@@ -545,6 +542,6 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    return [encode(Uint8Array.from(resultingMaskData)), resultingBoundingBox];
+    return [Uint8Array.from(resultingMaskData), resultingBoundingBox];
   }
 }

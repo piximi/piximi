@@ -1,4 +1,4 @@
-import { AnnotationType } from "types/AnnotationType";
+import { encodedAnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { SerializedFileType } from "types/SerializedFileType";
@@ -31,7 +31,7 @@ export const allSerializedAnnotationsSelector = ({
     };
 
     const serializedAnnotations = image.annotations.map(
-      (annotation: AnnotationType) => {
+      (annotation: encodedAnnotationType) => {
         const index = project.annotationCategories.findIndex(
           (category: Category) => {
             return category.id === annotation.categoryId;

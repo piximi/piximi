@@ -1,6 +1,5 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { AnnotationStateType } from "types";
-import { encode } from "utils/annotator";
 import { drawRectangle } from "utils/common";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
@@ -10,10 +9,12 @@ export class ThresholdAnnotationTool extends AnnotationTool {
   height?: number;
 
   updateMask(threshold: number) {
+    const t1 = performance.now();
     this.threshold = Math.round(threshold);
-
-    if (this.mask) {
+    console.log("maskData undefined? ", !this.maskData);
+    if (this.maskData) {
       if (!this._boundingBox) return;
+
       const maskImg = this.applyThreshold(this._boundingBox);
 
       if (!maskImg) {
@@ -21,10 +22,12 @@ export class ThresholdAnnotationTool extends AnnotationTool {
         return;
       }
 
-      this._mask = encode(maskImg);
+      this.maskData = maskImg;
 
       this.setAnnotated();
     }
+    const t2 = performance.now();
+    console.log("Time inside updateMask Function: ", t2 - t1);
   }
 
   deselect() {
@@ -76,7 +79,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
       return;
     }
 
-    this._mask = encode(thresholdMask);
+    this.maskData = thresholdMask;
 
     this.setAnnotated();
   }
@@ -101,9 +104,9 @@ export class ThresholdAnnotationTool extends AnnotationTool {
 
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
-        const imgI = y1 + i;
-        const imgJ = x1 + j;
-        const imgIdx = imgI * this.image.width + imgJ;
+        const imgY = y1 + i;
+        const imgX = x1 + j;
+        const imgIdx = imgY * this.image.width + imgX;
         if (binaryMask[imgIdx] > this.threshold) {
           thresholdMask[i * width + j] = 255;
         }

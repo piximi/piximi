@@ -13,7 +13,6 @@ import {
 import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
 import * as _ from "lodash";
-import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
 
 export class ObjectAnnotationTool extends RectangularAnnotationTool {
@@ -139,7 +138,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       const thresholded = greyMask.data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
 
       // @ts-ignore
-      this._mask = encode(thresholded);
+      this.maskData = thresholded;
 
       this.width = undefined;
     }

@@ -11,7 +11,7 @@ import {
 import { imageViewerSlice, setActiveImage } from "store/image-viewer";
 
 import {
-  AnnotationType,
+  bufferedAnnotationType,
   SerializedAnnotationType,
   SerializedFileType,
 } from "types";
@@ -79,7 +79,7 @@ export const OpenExampleImageMenuItem = ({
     batch(() => {
       let updatedAnnotationCategories = annotationCategories;
       const annotations = serializedExampleImageFile.annotations.map(
-        (annotation: SerializedAnnotationType): AnnotationType => {
+        (annotation: SerializedAnnotationType): bufferedAnnotationType => {
           const { annotation_out, categories } = importSerializedAnnotations(
             annotation,
             updatedAnnotationCategories

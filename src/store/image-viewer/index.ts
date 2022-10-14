@@ -57,7 +57,6 @@ export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotationValueSelector";
 export { toolTypeSelector } from "./selectors/toolTypeSelector";
-export { unselectedAnnotationObjectsSelector } from "./selectors/unselectedAnnotationObjectsSelector";
 export { unselectedAnnotationsSelector } from "./selectors/unselectedAnnotationsSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";

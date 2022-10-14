@@ -1,7 +1,6 @@
 import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "utils/annotator";
 
 import { connectPoints } from "utils/common";
 
@@ -45,12 +44,12 @@ export class PenAnnotationTool extends AnnotationTool {
       return;
     }
 
-    this._mask = encode(circlesData);
+    this.maskData = circlesData;
 
     this.setAnnotated();
   }
 
-  private computeCircleData(): Uint8Array | Uint8ClampedArray | undefined {
+  private computeCircleData(): Uint8Array | undefined {
     const canvas = document.createElement("canvas");
     canvas.width = this.image.width;
     canvas.height = this.image.height;

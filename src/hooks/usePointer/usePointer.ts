@@ -18,7 +18,7 @@ import {
   setPointerSelection,
 } from "store/image-viewer";
 
-import { AnnotationType, HotkeyView, ToolType } from "types";
+import { bufferedAnnotationType, HotkeyView, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
@@ -66,7 +66,6 @@ export const usePointer = () => {
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
-    console.log("mouseDown");
     dispatch(
       setPointerSelection({
         pointerSelection: {
@@ -179,7 +178,7 @@ export const usePointer = () => {
         } else {
           //only include if not already selected
           const additionalAnnotations = annotationsInBox.filter(
-            (annotation: AnnotationType) => {
+            (annotation: bufferedAnnotationType) => {
               return !selectedAnnotationsIds.includes(annotation.id);
             }
           );
@@ -224,7 +223,7 @@ export const usePointer = () => {
       imageHeight
     );
 
-    let currentAnnotation: AnnotationType | undefined;
+    let currentAnnotation: bufferedAnnotationType | undefined;
 
     if (overlappingAnnotationsIds.length > 1) {
       dispatch(
@@ -237,13 +236,17 @@ export const usePointer = () => {
       );
       const nextAnnotationId = overlappingAnnotationsIds[currentIndex];
 
-      currentAnnotation = annotations.find((annotation: AnnotationType) => {
-        return annotation.id === nextAnnotationId;
-      });
+      currentAnnotation = annotations.find(
+        (annotation: bufferedAnnotationType) => {
+          return annotation.id === nextAnnotationId;
+        }
+      );
     } else {
-      currentAnnotation = annotations.find((annotation: AnnotationType) => {
-        return annotation.id === overlappingAnnotationsIds[0];
-      });
+      currentAnnotation = annotations.find(
+        (annotation: bufferedAnnotationType) => {
+          return annotation.id === overlappingAnnotationsIds[0];
+        }
+      );
       dispatch(
         imageViewerSlice.actions.setCurrentIndex({
           currentIndex: 0,
