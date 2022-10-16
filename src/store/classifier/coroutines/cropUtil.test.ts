@@ -18,6 +18,7 @@ it("padToMatch", async () => {
   ]);
 
   const profile = await tf.profile(() =>
+    // @ts-ignore TODO: image_data
     padToMatch(sample, { width: 5, height: 5 })
   );
   const result = profile.result as tf.Tensor<tf.Rank.R3>;
@@ -64,6 +65,7 @@ it("padToMatch", async () => {
     ],
   ];
 
+  // @ts-ignore TODO: image_data
   const paddedAgain = padToMatch(result, { width: 5, height: 5 }).arraySync();
 
   expect(padded).toStrictEqual(expected);

@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: image_data
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 

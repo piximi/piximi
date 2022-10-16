@@ -13,7 +13,7 @@ export type ImageType = {
   colors: Colors;
   id: string;
   name: string;
-  shape: [number, number, number, number]; // data.shape: [Z, H, W, C]
+  shape: Shape;
   data: Tensor4D; // [Z, H, W, C]
   partition: Partition;
   segmentationPartition?: Partition;
@@ -44,7 +44,7 @@ export type ShadowImageType = {
   colors: Colors;
   id: string;
   name: string;
-  shape: [number, number, number, number]; // data.shape: [Z, H, W, C]
+  shape: Shape;
   data?: Tensor4D; // [Z, H, W, C]
   partition?: Partition;
   segmentationPartition?: Partition;

@@ -3,14 +3,14 @@ import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
-import { Color } from "./Color";
+import { Colors } from "./tensorflow/Colors";
 import { ShadowImageType } from "./ImageType";
 
 export type ImageViewer = {
   annotationState: AnnotationStateType;
   boundingClientRect: DOMRect;
   brightness: number;
-  currentColors: Array<Color> | undefined;
+  currentColors: Colors | undefined;
   contrast: number;
   currentIndex: number;
   currentPosition?: { x: number; y: number };

@@ -18,11 +18,10 @@ import { CropOptions, CropSchema } from "types/CropOptions";
 const initialState: Classifier = {
   evaluating: false,
   inputShape: {
+    planes: 1,
     height: 256,
     width: 256,
     channels: 3,
-    planes: 1,
-    frames: 1,
   },
   fitOptions: {
     epochs: 10,

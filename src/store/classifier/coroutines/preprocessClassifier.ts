@@ -294,7 +294,8 @@ export const sampleGenerator = (
       const src =
         channels === 1 || channels === 3
           ? image.src
-          : image.originalSrc[image.activePlane];
+          : // @ts-ignore: TODO: image_data
+            image.originalSrc[image.activePlane];
 
       yield {
         srcs: src,

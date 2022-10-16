@@ -1,11 +1,12 @@
-import { Color, ImageViewer, ShadowImageType } from "types";
-import { generateDefaultChannels } from "image/imageHelper";
+import { ImageViewer, ShadowImageType } from "types";
+import { Colors } from "types/tensorflow";
+import { generateDefaultChannels } from "image/utils/imageHelper";
 
 export const activeImageColorsSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
-}): Array<Color> => {
+}): Colors => {
   const activeImage = imageViewer.images.find((image: ShadowImageType) => {
     return imageViewer.activeImageId === image.id;
   });

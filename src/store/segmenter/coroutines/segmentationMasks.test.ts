@@ -39,7 +39,6 @@ it("create-segmentation-mask", async () => {
     height: 10,
     channels: 3,
     planes: 1,
-    frames: 1,
   };
 
   const expectedSegmentationMask = [
@@ -194,7 +193,6 @@ it("create-annotation-from-segmentation-mask", async () => {
     height: 10,
     channels: 3,
     planes: 1,
-    frames: 1,
   };
 
   const createdCategories = annotationCategories.filter(

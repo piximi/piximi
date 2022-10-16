@@ -1,10 +1,10 @@
-import { Color, ImageViewer } from "types";
+import { ImageViewer } from "types";
+import { Colors } from "types/tensorflow";
 
 export const currentColorsSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
-}): Array<Color> | undefined => {
-  // TODO: image_data
+}): Colors | undefined => {
   return imageViewer.currentColors;
 };

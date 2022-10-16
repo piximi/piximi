@@ -96,11 +96,10 @@ const categories: Array<Category> = [
 ];
 
 const inputShape: Shape = {
-  width: 28,
-  channels: 1,
-  frames: 1,
-  height: 28,
   planes: 1,
+  width: 28,
+  height: 28,
+  channels: 1,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -133,6 +132,7 @@ const validationImages: Array<ImageType> = [
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
     id: "00000000-0000-0000-0001-00000000000",
+    //@ts-ignore TODO: image_data
     colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
     originalSrc: [
@@ -150,6 +150,7 @@ const validationImages: Array<ImageType> = [
     annotations: [],
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000008", // 8
+    //@ts-ignore TODO: image_data
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
     name: "mnist",
@@ -168,6 +169,7 @@ const validationImages: Array<ImageType> = [
     annotations: [],
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000007", // 7
+    //@ts-ignore TODO: image_data
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
     name: "mnist",

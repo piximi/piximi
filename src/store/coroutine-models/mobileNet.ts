@@ -1,4 +1,6 @@
 import { loadLayersModel, sequential, layers } from "@tensorflow/tfjs";
+import * as _ from "lodash";
+
 import { Shape } from "../../types/Shape";
 import { changeInputShape } from "./changeInputShape";
 
@@ -38,7 +40,7 @@ export const createMobileNet = async (
   }
 
   let model = backbone;
-  if (inputShape !== [224, 224, 3]) {
+  if (!_.isEqual(inputShape, [224, 224, 3])) {
     model = await changeInputShape(model, inputShape);
   }
 

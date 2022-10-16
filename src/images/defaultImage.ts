@@ -6,13 +6,11 @@ import { Shape } from "types/Shape";
 import colorImage from "./cell-painting.png";
 import * as cellPaintingAnnotations from "./cell-painting.json";
 
-// todo: image_data
 const initialImageShape: Shape = {
-  channels: 3,
-  frames: 1,
-  height: 512,
   planes: 1,
+  height: 512,
   width: 512,
+  channels: 3,
 };
 
 export const defaultImage: ImageType = {
@@ -22,6 +20,7 @@ export const defaultImage: ImageType = {
   id: "f8eecf66-8776-4e14-acd2-94b44603a1a7",
   annotations: [],
   name: "cell-painting.png",
+  shape: initialImageShape,
   partition: Partition.Inference,
   visible: true,
   data: (cellPaintingAnnotations as any).default[0].data,

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHotkeys } from "hooks";
-import * as ImageJS from "image-js";
 
 import {
   Alert,

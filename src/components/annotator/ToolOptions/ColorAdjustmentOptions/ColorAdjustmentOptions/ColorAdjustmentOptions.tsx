@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: image_data
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -15,7 +16,7 @@ import {
   imageShapeSelector,
   activeImagePlaneSelector,
 } from "store/image-viewer";
-import { imageOriginalSrcSelector } from "store/common";
+import { imageDataSelector } from "store/common";
 
 import {
   convertImageURIsToImageData,
@@ -32,7 +33,9 @@ export const ColorAdjustmentOptions = () => {
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  // TODO: image_data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const imageData = useSelector(imageDataSelector);
 
   const onResetChannelsClick = async () => {
     if (!imageShape) return;

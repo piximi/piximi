@@ -1,3 +1,4 @@
+//@ts-nocheck TODO: image_data
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -13,7 +14,7 @@ import {
   activeImageColorsSelector,
   activeImagePlaneSelector,
 } from "store/image-viewer";
-import { imageOriginalSrcSelector } from "store/common";
+import { imageDataSelector } from "store/common";
 
 import { Color, DEFAULT_COLORS } from "types";
 
@@ -40,7 +41,9 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  // TODO: image_data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const imageData = useSelector(imageDataSelector);
 
   const dispatch = useDispatch();
 
