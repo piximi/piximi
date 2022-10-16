@@ -11,11 +11,10 @@ export default {
 } as ComponentMeta<typeof ModelSummaryTable>;
 
 const inputShape: Shape = {
-  width: 28,
-  channels: 3,
-  frames: 1,
-  height: 28,
   planes: 1,
+  channels: 3,
+  height: 28,
+  width: 28,
 };
 
 const simpleCNN = createSimpleCNN(inputShape, 10);

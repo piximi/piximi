@@ -40,7 +40,6 @@ const initialState: SegmenterStoreType = {
     width: 256,
     channels: 3,
     planes: 1,
-    frames: 1,
   },
   trainingPercentage: 0.75,
   predicted: false,

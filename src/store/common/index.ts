@@ -5,7 +5,7 @@ export { activeSerializedAnnotationsSelector } from "./selectors/activeSerialize
 export { allSerializedAnnotationsSelector } from "./selectors/allSerializedAnnotationsSelector";
 export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
 export { imageNameSelector } from "./selectors/imageNameSelector";
-export { imageOriginalSrcSelector } from "./selectors/imageOriginalSrcSelector";
+export { imageDataSelector } from "./selectors/imageDataSelector";
 export { imageSelector } from "./selectors/imageSelector";
 export { imageViewerFullImagesSelector } from "./selectors/imageViewerFullImagesSelector";
 export { selectedAnnotationObjectsSelector } from "./selectors/selectedAnnotationObjectsSelector";

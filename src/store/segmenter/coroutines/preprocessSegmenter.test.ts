@@ -13,11 +13,10 @@ import { PreprocessOptions } from "types/PreprocessOptions";
 //jest.setTimeout(50000);
 
 const inputShape: Shape = {
+  planes: 1,
+  height: 256,
   width: 256,
   channels: 3,
-  frames: 1,
-  height: 256,
-  planes: 1,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -60,6 +59,7 @@ const annotationCategories: Array<Category> = [
 const images: Array<ImageType> = [
   {
     categoryId: "00000000-0000-0000-0000-000000000000",
+    // @ts-ignore TODO: image_data
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-1111-0000-0001-00000000000",
     name: "cell-painting.png",

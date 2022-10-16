@@ -32,10 +32,10 @@ export const activeSerializedAnnotationsSelector = ({
   const columns = {
     imageChannels: image.shape.channels,
     imageColors: image.colors,
+    // @ts-ignore TODO: image_data
     imageData: image.originalSrc,
     imageSrc: image.src,
     imageFilename: image.name,
-    imageFrames: image.shape.frames,
     imageHeight: image.shape.height,
     imageId: image.id,
     imagePlanes: image.shape.planes,
@@ -66,5 +66,6 @@ export const activeSerializedAnnotationsSelector = ({
       };
     });
 
+  // @ts-ignore TODO: image_data
   return { ...columns, annotations: serializedAnnotations };
 };

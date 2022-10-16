@@ -595,6 +595,8 @@ export const convertToImage = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const coloredSliceURL = await renderTensor(compositeImage, bitDepth);
 
+  const [planes, height, width, channels] = imageTensor.shape;
+
   return {
     activePlane: 0,
     annotations: [],
@@ -602,7 +604,7 @@ export const convertToImage = async (
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
-    shape: imageTensor.shape,
+    shape: { planes, height, width, channels },
     data: imageTensor,
     partition: Partition.Inference,
     src: coloredSliceURL,

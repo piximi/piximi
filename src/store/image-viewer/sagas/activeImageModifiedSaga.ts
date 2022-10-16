@@ -4,7 +4,7 @@ import { call, put, select } from "redux-saga/effects";
 import { imageViewerSlice } from "store/image-viewer";
 import { imageSelector } from "store/common";
 
-import { Color } from "types";
+import { Colors } from "types/tensorflow";
 
 import {
   convertImageURIsToImageData,
@@ -41,11 +41,13 @@ export function* activeImageIDChangeSaga({
   );
 
   const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
+    //@ts-ignore TODO: image_data
     yield call(convertImageURIsToImageData, image.originalSrc);
 
   const renderedSrcs = planesData.map((planeData) => {
     return mapChannelsToSpecifiedRGBImage(
       planeData,
+      //@ts-ignore TODO: image_data
       image.colors,
       image.shape.height,
       image.shape.width
@@ -60,7 +62,7 @@ export function* activeImageIDChangeSaga({
 export function* activeImageColorChangeSaga({
   payload: { colors, execSaga },
 }: PayloadAction<{
-  colors: Array<Color>;
+  colors: Colors;
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
@@ -70,11 +72,13 @@ export function* activeImageColorChangeSaga({
   if (!image) return;
 
   const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
+    // @ts-ignore TODO: image_data
     yield call(convertImageURIsToImageData, image.originalSrc);
 
   const renderedSrcs = planesData.map((planeData, idx) => {
     return mapChannelsToSpecifiedRGBImage(
       planeData,
+      // @ts-ignore TODO: image_data
       colors,
       image.shape.height,
       image.shape.width

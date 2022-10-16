@@ -1,6 +1,6 @@
 import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
 
-export const imageOriginalSrcSelector = ({
+export const imageDataSelector = ({
   imageViewer,
   project,
 }: {
@@ -10,9 +10,9 @@ export const imageOriginalSrcSelector = ({
   if (!imageViewer.images.length || !imageViewer.activeImageId) return;
 
   /*
-   * return originalSrc from full image in projects,
+   * return image data from full image in projects,
    * if not in projects, full image in imageViewer,
-   * so return originalSrc from there instead
+   * so return image data from there instead
    */
   const image =
     project.images.find((image: ImageType) => {
@@ -24,5 +24,5 @@ export const imageOriginalSrcSelector = ({
 
   if (!image) return;
 
-  return image.originalSrc;
+  return image.data;
 };

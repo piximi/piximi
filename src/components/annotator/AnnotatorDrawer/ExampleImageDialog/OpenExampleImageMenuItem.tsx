@@ -17,10 +17,10 @@ import {
 } from "types";
 
 import {
-  convertToImage,
   generateDefaultChannels,
   importSerializedAnnotations,
 } from "image/imageHelper";
+import { convertToImage } from "image/utils/imageHelper";
 
 type ExampleImageProject = {
   exampleImageName: string;
@@ -65,6 +65,7 @@ export const OpenExampleImageMenuItem = ({
       ignorePalette: true,
     });
     const exampleImageTypeObject = convertToImage(
+      //@ts-ignore TODO: image_data
       [exampleImage],
       exampleImageProject.exampleImageName,
       defaultColors,
@@ -74,6 +75,7 @@ export const OpenExampleImageMenuItem = ({
 
     serializedExampleImageFile.imageId = uuidv4();
     serializedExampleImageFile.imageSrc = exampleImageSrc;
+    // @ts-ignore TODO: image_Data
     serializedExampleImageFile.imageData = exampleImageTypeObject.originalSrc;
 
     batch(() => {

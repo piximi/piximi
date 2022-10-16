@@ -1,3 +1,4 @@
+// @ts-nocheck TODO:image_data
 import * as ImageJS from "image-js";
 import { AnnotationType } from "../types/AnnotationType";
 import { decode } from "../annotator/image/rle";

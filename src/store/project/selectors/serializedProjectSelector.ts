@@ -12,10 +12,10 @@ export const serializedProjectSelector = ({
       imageCategoryId: image.categoryId,
       imageChannels: image.shape.channels,
       imageColors: image.colors,
+      // @ts-ignore TODO: image_data
       imageData: image.originalSrc,
       imageSrc: image.src, // TODO: keep this for larger saved projects, or delete it for slower load times
       imageFilename: image.name,
-      imageFrames: image.shape.frames,
       imageHeight: image.shape.height,
       imageId: image.id,
       imagePlanes: image.shape.planes,

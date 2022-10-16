@@ -5,6 +5,7 @@ import {
   time as tftime,
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
+
 import {
   Category,
   ImageType,
@@ -17,7 +18,7 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "image/utils/imageHelper";
 import { preprocessClassifier } from "./preprocessClassifier";
 import { predictClasses } from "./predictClasses";
 
@@ -93,11 +94,10 @@ const categories: Array<Category> = [
 ];
 
 const inputShape: Shape = {
-  channels: 1,
   planes: 1,
-  frames: 1,
-  width: 28,
   height: 28,
+  width: 28,
+  channels: 1,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -132,6 +132,7 @@ const inferrenceImages: Array<ImageType> = [
     id: "00000000-0000-0000-0001-00000000000",
     colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
+    // @ts-ignore TODO: image_data
     originalSrc: [
       [
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA7ElEQVR4nGNgGGggenEnbsm5f9/K45Lj+/j378wDNVjlmJb/+/v37993ptgkS/7++/v3799/a7HISbz69/9KNUPN/+MwERaEJCv7/76mTwyf///HZmyKHQMDg/jNfzm4HMw1/e8RFhxypmf+/i3FKqPQee/fv393scpxnIF4pQMuwoSQlDVkYHjdu51BFy6CZPnfd/vWHXjp68mATfKeKAMDA4MDw310+9g8pSGM+H//FNElZ/31YGBgYBCo//J3KoYnvv51VRWWTTvy9+9mbnRJ1b9///199PHvv7+beTC8KPESGltbMfTRGwAAe3RlA24l0K8AAAAASUVORK5CYII=",
@@ -150,6 +151,7 @@ const inferrenceImages: Array<ImageType> = [
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
     name: "mnist",
+    // @ts-ignore TODO: image_data
     originalSrc: [
       [
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA+UlEQVR4nGNgGNSANeb2AQYGBgbmJf+E0KQ4Yq79/XJFjoGBddHfH4KocvyX/v6aqsjAwKC39e83XzS53L+3wxkYGBgst/194Y9maP/f2yoMDAwMWi/+flZAd0z/R08+BgYGq11/t9tChVjgkq95tpx6wHCkRmxX1HuoECNckm2SMQODMj/DRZd3ODxa9PfvThxSDIovUCSZkOW4G0QXIfNRJKtjbnIx3MZuqNSbW+pb/tpilRO98cFP6+NJbqySzX/zBHf+DcUqx7Hvb2zs39kcWCWF/37o/vrXC7tzhP/+/v53Bhsuyb9/r7Bgl2PgOvV3DisOOeoCAPdCVcP4Rpg/AAAAAElFTkSuQmCC",
@@ -168,6 +170,7 @@ const inferrenceImages: Array<ImageType> = [
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
     name: "mnist",
+    // @ts-ignore TODO: image_data
     originalSrc: [
       [
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAuUlEQVR4nGNgGEqAkYGBgeEC7y4GBoaVH94+xiIpcU6CgYGBgeH1XQaGbbdXokoysDPLeTEwMGg4MDBIcX1fkI3LHoPyx19wu4K5C49k3H+4JBO6HGvQ//M4NU76984elxzf1X99ODWW/fukgEtO+du/abjk2Of9++SES1Lr378eJC6qV1wZ/m7BpVH+z7/9uOQYpv37J4lLju/mv+WsuCT7/r1RQhFAchCTCsPFe7g0sv37h9OPpAIAr7k2JCcwVrMAAAAASUVORK5CYII=",

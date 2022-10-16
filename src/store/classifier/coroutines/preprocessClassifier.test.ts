@@ -13,16 +13,15 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
+import { generateDefaultChannels } from "image/utils/imageHelper";
 
 jest.setTimeout(50000);
 
 const inputShape: Shape = {
+  planes: 1,
+  height: 224,
   width: 224,
   channels: 3,
-  frames: 1,
-  height: 224,
-  planes: 1,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -70,6 +69,7 @@ const images: Array<ImageType> = [
     id: "00000000-0000-0000-0001-00000000000",
     annotations: [],
     name: "",
+    // @ts-ignore TODO: image_data
     originalSrc: [],
     src: "https://picsum.photos/seed/piximi/224",
     partition: Partition.Training,

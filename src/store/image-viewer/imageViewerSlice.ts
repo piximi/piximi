@@ -14,7 +14,7 @@ import { AnnotationModeType } from "types/AnnotationModeType";
 import { AnnotationStateType } from "types/AnnotationStateType";
 import { LanguageType } from "types/LanguageType";
 import { ImageViewer } from "types/ImageViewer";
-import { Color } from "types/Color";
+import { Colors } from "types/tensorflow";
 import { SerializedFileType } from "types/SerializedFileType";
 import {
   generateDefaultChannels,
@@ -156,6 +156,7 @@ export const imageViewerSlice = createSlice({
         name: action.payload.imageFile.imageFilename,
         annotations: action.payload.annotations,
         activePlane: 0,
+        // @ts-ignore: TODO: image_data
         colors: action.payload.imageFile.imageColors
           ? action.payload.imageFile.imageColors
           : generateDefaultChannels(action.payload.imageFile.imageChannels),
@@ -166,6 +167,7 @@ export const imageViewerSlice = createSlice({
         visible: true,
         shape: {
           channels: action.payload.imageFile.imageChannels,
+          // @ts-ignore: TODO: image_data
           frames: action.payload.imageFile.imageFrames,
           height: action.payload.imageFile.imageHeight,
           planes: action.payload.imageFile.imagePlanes,
@@ -240,7 +242,7 @@ export const imageViewerSlice = createSlice({
     setImageColors(
       state,
       action: PayloadAction<{
-        colors: Array<Color>;
+        colors: Colors;
         execSaga: boolean;
       }>
     ) {
@@ -272,7 +274,7 @@ export const imageViewerSlice = createSlice({
     setCurrentColors(
       state,
       action: PayloadAction<{
-        currentColors: Array<Color>;
+        currentColors: Colors;
       }>
     ) {
       state.currentColors = action.payload.currentColors;

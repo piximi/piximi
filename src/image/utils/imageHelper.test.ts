@@ -6,7 +6,7 @@ import {
   tensor4d,
   Tensor4D,
   tidy,
-} from "@tensorflow/tfjs-node";
+} from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 
 import {
