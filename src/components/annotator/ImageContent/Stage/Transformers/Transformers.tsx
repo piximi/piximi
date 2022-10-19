@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Transformer } from "../Transformer/Transformer";
+import { Transformer } from "./Transformer/Transformer";
 
 import { selectedAnnotationsIdsSelector } from "store/image-viewer";
 

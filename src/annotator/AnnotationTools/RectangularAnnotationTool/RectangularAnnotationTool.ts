@@ -1,5 +1,4 @@
 import { AnnotationTool } from "../AnnotationTool";
-import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
 import { drawRectangle } from "utils/common/imageHelper";
 
@@ -13,6 +12,7 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
     this.width = undefined;
     this.height = undefined;
+    this.annotation = undefined;
 
     this.setBlank();
   }
@@ -45,6 +45,9 @@ export class RectangularAnnotationTool extends AnnotationTool {
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
     if (this.width) {
+      if (this.width * this.height! < 10) {
+        return;
+      }
       this.points = drawRectangle(this.origin, this.width, this.height);
 
       this._boundingBox = this.computeBoundingBox();

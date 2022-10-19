@@ -87,13 +87,11 @@ export function* annotationStateChangeSaga({
 
     annotationTool.maskData = combinedMask;
     annotationTool.boundingBox = combinedBoundingBox;
-    annotationTool.mask = encode(combinedMask);
 
     const combinedSelectedAnnotation = annotationTool.maskData.length
       ? {
           ...selectedAnnotation,
           boundingBox: annotationTool.boundingBox,
-          mask: annotationTool.mask,
           maskData: annotationTool.maskData,
         }
       : undefined;
