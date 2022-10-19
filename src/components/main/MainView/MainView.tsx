@@ -22,8 +22,34 @@ import { AlertType, HotkeyView, ImageType } from "types";
 import { getStackTraceFromError } from "utils";
 import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
+// TOOD: image_data
+// temporary hack
+import { loadImageAsStack, convertToImage } from "image/utils/imageHelper";
+import { projectSlice } from "store/project";
+import colorImage from "images/cell-painting.png";
+
 export const MainView = () => {
   const dispatch = useDispatch();
+
+  // TODO: image_data
+  // temporary hack
+  useEffect(() => {
+    fetch(colorImage)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "cell-painting.png", blob);
+        const stackPromise = loadImageAsStack(file);
+        stackPromise
+          .then((stack) => convertToImage(stack, file.name, undefined, 1, 3))
+          .then((image) => {
+            dispatch(
+              projectSlice.actions.setImages({
+                images: [image],
+              })
+            );
+          });
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 

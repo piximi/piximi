@@ -1,7 +1,14 @@
 import { Tensor2D } from "@tensorflow/tfjs";
 
-export type Colors = {
+type ColorsMeta = {
   range: { [channel: number]: [number, number] };
   visible: { [channel: number]: boolean };
-  color: Tensor2D; // shape: C x 3; [channel_idx, rgb]
 };
+
+export type Colors = {
+  color: Tensor2D; // shape: C x 3; [channel_idx, rgb]
+} & ColorsMeta;
+
+export type ColorsRaw = {
+  color: [number, number, number][];
+} & ColorsMeta;

@@ -120,6 +120,7 @@ export const MainImageGridAppBar = () => {
         activePlane: projectImage.activePlane,
         shape: projectImage.shape,
         colors: projectImage.colors,
+        bitDepth: projectImage.bitDepth,
       };
 
       if (idx === 0) {

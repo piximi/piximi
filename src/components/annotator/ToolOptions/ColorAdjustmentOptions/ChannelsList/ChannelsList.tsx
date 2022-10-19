@@ -1,6 +1,7 @@
-// @ts-nocheck TODO: image_data
-import React, { useEffect, useMemo, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import React, { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import produce from "immer";
+import { tensor2d } from "@tensorflow/tfjs";
 import { debounce } from "lodash";
 
 import {
@@ -17,19 +18,16 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
   imageViewerSlice,
-  imageShapeSelector,
   activeImageColorsSelector,
-  activeImagePlaneSelector,
 } from "store/image-viewer";
-import { imageDataSelector } from "store/common";
 
-import { Color } from "types";
+import { imageBitDepthSelector, imageDataSelector } from "store/common";
 
 import {
-  convertImageURIsToImageData,
-  mapChannelsToSpecifiedRGBImage,
   rgbToHex,
-} from "image/imageHelper";
+  scaleUpRange,
+  scaleDownRange,
+} from "image/utils/imageHelper";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 import { useLocalGlobalState } from "hooks";
@@ -37,13 +35,9 @@ import { useLocalGlobalState } from "hooks";
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const imageShape = useSelector(imageShapeSelector);
-
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
-
-  // TODO: image_data
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const imageData = useSelector(imageDataSelector);
+
+  const imageBitDepth = useSelector(imageBitDepthSelector);
 
   const {
     localState: localActiveImageColors,
@@ -52,114 +46,64 @@ export const ChannelsList = () => {
   } = useLocalGlobalState(
     activeImageColorsSelector,
     imageViewerSlice.actions.setImageColors,
-    []
+    { range: {}, visible: {}, color: [] }
   );
-
-  const [visibleChannelsIdxs, setVisibleChannelsIdxs] = useState<Array<number>>(
-    []
-  );
-
-  useEffect(() => {
-    setVisibleChannelsIdxs(
-      localActiveImageColors
-        .map((channel: Color) => channel.visible)
-        .reduce((c: Array<number>, v, i) => (v ? c.concat(i) : c), [])
-    );
-  }, [localActiveImageColors]);
 
   const handleSliderChange = useMemo(
     () =>
-      debounce((idx: number, event: any, newValue: [number, number]) => {
-        setLocalActiveImageColors((curr) => {
-          return curr.map((channel: Color, i: number) => {
-            return i === idx ? { ...channel, range: newValue } : channel;
-          });
-        });
-      }, 16),
+      debounce(
+        (
+          idx: number,
+          newValue: [number, number],
+          bitDepth: Exclude<typeof imageBitDepth, undefined>
+        ) => {
+          setLocalActiveImageColors(
+            produce((draftColor) => {
+              draftColor.range[idx] = scaleDownRange(newValue, bitDepth);
+            })
+          );
+        },
+        10
+      ),
     [setLocalActiveImageColors]
   );
 
   const handleSliderChangeCommitted = async () => {
-    if (!originalSrc || !imageShape) return;
-
-    const originalData = await convertImageURIsToImageData(
-      new Array(originalSrc[activeImagePlane])
-    );
-
-    const modifiedURI = mapChannelsToSpecifiedRGBImage(
-      originalData[0],
-      localActiveImageColors,
-      imageShape.height,
-      imageShape.width
-    );
-    batch(() => {
-      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-      dispatchActiveImageColors({
-        colors: localActiveImageColors,
-        execSaga: true,
-      });
+    dispatchActiveImageColors({
+      colors: {
+        ...localActiveImageColors,
+        color: tensor2d(localActiveImageColors.color),
+      },
+      execSaga: true,
     });
   };
 
-  const onCheckboxChanged = (index: number) => () => {
-    const current = visibleChannelsIdxs.indexOf(index);
+  const onCheckboxChanged = (index: number, enabled: boolean) => {
+    const newColors = {
+      visible: { ...localActiveImageColors.visible }, // copy so we can modify
+      range: localActiveImageColors.range,
+      color: tensor2d(localActiveImageColors.color),
+    };
+    newColors.visible[index] = enabled;
 
-    const visibleChannels = [...visibleChannelsIdxs];
-
-    const copiedChannels = [...localActiveImageColors];
-
-    if (current === -1) {
-      visibleChannels.push(index);
-      copiedChannels[index] = { ...copiedChannels[index], visible: true };
-    } else {
-      visibleChannels.splice(current, 1);
-      copiedChannels[index] = { ...copiedChannels[index], visible: false };
-    }
-
-    batch(async () => {
-      dispatch(
-        imageViewerSlice.actions.setImageColors({
-          colors: copiedChannels,
-          execSaga: true,
-        })
-      );
-
-      if (!originalSrc || !imageShape) return;
-
-      const originalData = await convertImageURIsToImageData(
-        new Array(originalSrc[activeImagePlane])
-      );
-
-      const arrayLength = originalData[0][0].length;
-      const modifiedData = originalData[0].map(
-        (arr: Array<number>, i: number) => {
-          if (visibleChannels.includes(i)) {
-            return arr;
-          } else {
-            return new Array(arrayLength).fill(0);
-          }
-        }
-      );
-
-      const modifiedURI = mapChannelsToSpecifiedRGBImage(
-        modifiedData,
-        copiedChannels,
-        imageShape.height,
-        imageShape.width
-      );
-
-      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
-    });
+    dispatch(
+      imageViewerSlice.actions.setImageColors({
+        colors: newColors,
+        execSaga: true,
+      })
+    );
   };
 
   const colorAdjustmentSlider = (index: number, name: string) => {
-    const isVisible = visibleChannelsIdxs.indexOf(index) !== -1;
+    const isVisible = localActiveImageColors.visible[index];
+
+    if (!imageData || !imageBitDepth) return <></>;
 
     return (
       <ListItem dense key={index}>
         <ListItemIcon>
           <Checkbox
-            onClick={onCheckboxChanged(index)}
+            onChange={(event) => onCheckboxChanged(index, event.target.checked)}
             checked={isVisible}
             disableRipple
             edge="start"
@@ -177,14 +121,17 @@ export const ChannelsList = () => {
             "& .MuiSlider-track": {
               color: (theme) =>
                 isVisible
-                  ? rgbToHex(localActiveImageColors[index].color)
+                  ? rgbToHex(localActiveImageColors.color[index])
                   : theme.palette.action.disabled,
             },
           }}
-          value={localActiveImageColors[index].range}
-          max={255}
+          value={scaleUpRange(
+            localActiveImageColors.range[index],
+            imageBitDepth
+          )}
+          max={2 ** imageBitDepth - 1}
           onChange={(event, value: number | number[]) =>
-            handleSliderChange(index, event, value as [number, number])
+            handleSliderChange(index, value as [number, number], imageBitDepth)
           }
           onChangeCommitted={handleSliderChangeCommitted}
           valueLabelDisplay="auto"
@@ -197,7 +144,7 @@ export const ChannelsList = () => {
 
   return (
     <CollapsibleList closed dense primary="Channels">
-      {Array(localActiveImageColors.length)
+      {Array(localActiveImageColors.color.length)
         .fill(0)
         .map((_, i) => {
           return colorAdjustmentSlider(i, `Ch. ${i}`);

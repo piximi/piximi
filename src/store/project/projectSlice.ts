@@ -16,7 +16,8 @@ import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { AnnotationType } from "types/AnnotationType";
 import { replaceDuplicateName } from "image/utils/imageHelper";
-import { defaultImage } from "images/defaultImage";
+// todo: image_data
+//import { defaultImage } from "images/defaultImage";
 
 const initialAnnotationCategories =
   process.env.NODE_ENV === "development"
@@ -40,7 +41,9 @@ const initialAnnotationCategories =
 const initialState: Project = {
   categories: [UNKNOWN_CATEGORY],
   annotationCategories: initialAnnotationCategories,
-  images: [defaultImage],
+  // TODO: image_data
+  // images: [defaultImage],
+  images: [],
   name: "Untitled project",
   task: Task.Classify,
   trainFlag: 0,

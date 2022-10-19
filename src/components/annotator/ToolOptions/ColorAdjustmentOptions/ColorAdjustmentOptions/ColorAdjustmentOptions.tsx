@@ -1,4 +1,3 @@
-// @ts-nocheck TODO: image_data
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,13 +15,14 @@ import {
   imageShapeSelector,
   activeImagePlaneSelector,
 } from "store/image-viewer";
-import { imageDataSelector } from "store/common";
+
+import { imageDataSelector, imageBitDepthSelector } from "store/common";
 
 import {
-  convertImageURIsToImageData,
   generateDefaultChannels,
-  mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+  createRenderedTensor,
+  findMinMaxs,
+} from "image/utils/imageHelper";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
@@ -33,9 +33,9 @@ export const ColorAdjustmentOptions = () => {
 
   const imageShape = useSelector(imageShapeSelector);
 
-  // TODO: image_data
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const imageData = useSelector(imageDataSelector);
+
+  const imageBitDepth = useSelector(imageBitDepthSelector);
 
   const onResetChannelsClick = async () => {
     if (!imageShape) return;
@@ -49,22 +49,19 @@ export const ColorAdjustmentOptions = () => {
       })
     );
 
-    if (!originalSrc || !imageShape) return;
+    if (!imageData || !imageShape || !imageBitDepth) return;
 
-    const activePlaneData = (
-      await convertImageURIsToImageData(
-        new Array(originalSrc[activeImagePlane])
-      )
-    )[0];
+    const [mins, maxs] = await findMinMaxs(imageData);
 
-    const modifiedURI = mapChannelsToSpecifiedRGBImage(
-      activePlaneData,
+    const modifiedSrc = await createRenderedTensor(
+      imageData,
       defaultChannels,
-      imageShape.height,
-      imageShape.width
+      imageBitDepth,
+      { mins, maxs },
+      activeImagePlane
     );
 
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedSrc }));
   };
 
   return (

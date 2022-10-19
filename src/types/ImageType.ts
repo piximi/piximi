@@ -1,4 +1,5 @@
 import { Tensor4D } from "@tensorflow/tfjs";
+import { BitDepth } from "image-js";
 import { Shape } from "./Shape";
 import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
@@ -11,6 +12,7 @@ export type ImageType = {
   activePlane: number;
   categoryId: string;
   colors: Colors;
+  bitDepth: BitDepth;
   id: string;
   name: string;
   shape: Shape;
@@ -42,6 +44,7 @@ export type ShadowImageType = {
   activePlane: number;
   categoryId?: string;
   colors: Colors;
+  bitDepth: BitDepth;
   id: string;
   name: string;
   shape: Shape;
