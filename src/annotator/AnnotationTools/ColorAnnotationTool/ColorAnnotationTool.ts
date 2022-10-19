@@ -40,12 +40,12 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.toleranceMap = undefined;
     this.toleranceQueue.clear();
     this.seen.clear();
+    this.annotation = undefined;
 
     this.setBlank();
   }
 
   onMouseDown(position: { x: number; y: number }) {
-    this.tolerance = 1;
     this.origin = position;
     this.toolTipPosition = position;
 
@@ -78,6 +78,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       Math.floor(position.y),
       0,
     ]);
+    console.log(this.toleranceQueue.length);
 
     const idx =
       Math.floor(position.x) + Math.floor(position.y) * this.image.width;
@@ -141,14 +142,15 @@ export class ColorAnnotationTool extends AnnotationTool {
   }
 
   private updateOverlay(position: { x: number; y: number }) {
-    doFlood({
-      floodMap: this.floodMap!,
-      toleranceMap: this.toleranceMap!,
-      queue: this.toleranceQueue,
-      tolerance: this.tolerance,
-      maxTol: 0,
-      seen: this.seen,
-    });
+    doFlood(
+      this.floodMap!,
+      this.toleranceMap!,
+      this.toleranceQueue,
+      this.tolerance,
+      0,
+      this.seen
+    );
+    console.log(this.toleranceQueue.length);
     // Make a threshold mask
     this.roiMask = this.floodMap!.mask({
       threshold: this.tolerance,

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
@@ -51,8 +51,8 @@ type TransformerProps = {
 };
 
 export const Transformer = ({
-  transformPosition,
-  annotationId,
+  transformPosition, // shouldn't change on annotation adjustments
+  annotationId, // shouldn't change on annotation adjustments
   annotationTool,
 }: TransformerProps) => {
   // useState

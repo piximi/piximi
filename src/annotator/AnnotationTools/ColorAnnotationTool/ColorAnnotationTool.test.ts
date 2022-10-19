@@ -4,31 +4,65 @@ import { data } from "../testData.json";
 import { ColorAnnotationTool } from "./ColorAnnotationTool";
 import { AnnotationStateType, Category } from "types";
 
-test("onMouseDown", async () => {
+describe("onMouseDown", () => {
   const src = data.image;
 
-  const image = await Image.load(src);
+  it("sets the origin", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
 
-  const operator = new ColorAnnotationTool(image);
+    operator.onMouseDown({ x: 0, y: 0 });
 
-  operator.onMouseDown({ x: 0, y: 0 });
+    expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
-  expect(operator.annotation).toBe(undefined);
+    expect(operator.roiManager).toBeDefined();
 
-  expect(operator.tolerance).toBe(1);
+    expect(operator.toleranceQueue.length).toBeGreaterThan(0);
+    expect(operator.seen.size).toBeGreaterThan(0);
+    expect(operator.overlayData.length).toBeGreaterThan(0);
 
-  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-  expect(operator.toolTipPosition).toStrictEqual({ x: 0, y: 0 });
+    expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
+  });
+  it("sets the tool tip position", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
 
-  expect(operator.toleranceMap).toBeDefined();
-  expect(operator.floodMap).toBeDefined();
-  expect(operator.roiManager).toBeDefined();
+    operator.onMouseDown({ x: 0, y: 0 });
 
-  expect(operator.toleranceQueue.length).toBeGreaterThan(0);
-  expect(operator.seen.size).toBeGreaterThan(0);
-  expect(operator.overlayData.length).toBeGreaterThan(0);
+    expect(operator.toolTipPosition).toStrictEqual({ x: 0, y: 0 });
+  });
+  it("creates a tolerance map", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
 
-  expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
+    operator.onMouseDown({ x: 0, y: 0 });
+
+    expect(operator.toleranceMap).toBeDefined();
+  });
+  it("creates a flood map", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
+
+    operator.onMouseDown({ x: 0, y: 0 });
+
+    expect(operator.floodMap).toBeDefined();
+  });
+  it("initializes a tolerance Queue", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
+
+    operator.onMouseDown({ x: 0, y: 0 });
+
+    expect(operator.toleranceQueue.length).toBe(1);
+  });
+  it("initializes the seen array", async () => {
+    const image = await Image.load(src);
+    const operator = new ColorAnnotationTool(image);
+
+    operator.onMouseDown({ x: 0, y: 0 });
+
+    expect(operator.seen.size).toBe(1);
+  });
 });
 
 // test("onMouseMove", async () => {

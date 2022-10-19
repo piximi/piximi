@@ -14,6 +14,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     this.center = undefined;
     this.origin = undefined;
     this.radius = undefined;
+    this.annotation = undefined;
 
     this.setBlank();
   }
