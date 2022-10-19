@@ -196,10 +196,16 @@ export abstract class AnnotationTool extends Tool {
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
-      id: uuidv4(),
+      id: this.annotation ? this.annotation.id : uuidv4(),
       maskData: this.maskData,
       plane: plane,
     };
+  }
+
+  updateAnnotationMask(): void {
+    if (!this.boundingBox || !this.maskData || !this.annotation) return;
+
+    this.annotation = { ...this.annotation, maskData: this.maskData };
   }
 
   /*

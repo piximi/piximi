@@ -34,6 +34,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     this.height = undefined;
 
     this.setBlank();
+    this.annotation = undefined;
   }
 
   onMouseDown(position: { x: number; y: number }) {
@@ -60,6 +61,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
 
     this.computeMask();
+    this.setAnnotated();
   }
 
   computeMask() {
@@ -77,8 +79,6 @@ export class ThresholdAnnotationTool extends AnnotationTool {
     }
 
     this.maskData = thresholdMask;
-
-    this.setAnnotated();
   }
 
   private applyThreshold(boundingBox: [number, number, number, number]) {
