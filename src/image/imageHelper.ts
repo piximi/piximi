@@ -141,6 +141,7 @@ export const extractChannelsFromFlattenedArray = (
   return results;
 };
 
+// TODO: image_data - delete
 export const deserializeImages = async (
   serializedImages: Array<SerializedImageType>
 ) => {
