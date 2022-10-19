@@ -36,6 +36,8 @@ const initialState: ImageViewer = {
   hue: 0,
   activeImageId: defaultImage.id,
   activeImageRenderedSrcs: [defaultImage.src],
+  // TODO: image_data
+  // images: [],
   images: [defaultImage],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
@@ -251,6 +253,7 @@ export const imageViewerSlice = createSlice({
         if (state.activeImageId !== image.id) {
           return image;
         } else {
+          image.colors.color.dispose();
           return { ...image, colors: action.payload.colors };
         }
       });

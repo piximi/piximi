@@ -1,12 +1,5 @@
 import "@tensorflow/tfjs-node";
-import {
-  scalar,
-  Tensor,
-  tensor2d,
-  tensor4d,
-  Tensor4D,
-  tidy,
-} from "@tensorflow/tfjs";
+import { scalar, Tensor, tensor2d, Tensor4D, tidy } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 
 import {
@@ -21,7 +14,7 @@ import {
   generateColoredTensor,
   renderTensor,
   scaleColors,
-  findChannelMinMaxs,
+  findMinMaxs,
   scaleImageTensor,
 } from "image/utils/imageHelper";
 
@@ -489,8 +482,8 @@ describe("Tensor -> Composite Image", () => {
     expect(normTensor(imageSlice, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
-  it("should filter visible channels from image tensor", async () => {
-    // c-1 because we will disabled channel 2
+  it("should filter visible channels from image tensor - Tensor4D -> Tensor3D", async () => {
+    // c-1 because we will disable channel 2
     const expectedC = C - 1;
 
     // prettier-ignore
@@ -517,6 +510,42 @@ describe("Tensor -> Composite Image", () => {
     expect(visibleChannels).toEqual(expectedVisibleChannels);
     expect(filteredSlice.rank).toBe(3);
     expect(filteredSlice.shape).toEqual([H, W, expectedC]);
+    expect(normTensor(filteredSlice, BITDEPTH)).toEqual(expectedTensorArray);
+  });
+
+  it("should filter visible channels from image tensor - Tensor4D -> Tensor4D", async () => {
+    // c-1 because we will disable channel 2
+    const expectedC = C - 1;
+
+    // prettier-ignore
+    const expectedTensorArray = 
+    [
+      [[[1111, 1112, 1113, 1114], [1121, 1122, 1123, 1124]],
+       [[1211, 1212, 1213, 1214], [1221, 1222, 1223, 1224]],
+       [[1311, 1312, 1313, 1314], [1321, 1322, 1323, 1324]]],
+
+      [[[2111, 2112, 2113, 2114], [2121, 2122, 2123, 2124]],
+       [[2211, 2212, 2213, 2214], [2221, 2222, 2223, 2224]],
+       [[2311, 2312, 2313, 2314], [2321, 2322, 2323, 2324]]]
+    ]
+
+    const colors = generateDefaultChannels(C);
+    // set all channel visibility to true, except last
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = false;
+
+    const expectedVisibleChannels = [0, 1, 2, 3];
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
+
+    expect(visibleChannels).toEqual(expectedVisibleChannels);
+    expect(filteredSlice.rank).toBe(4);
+    expect(filteredSlice.shape).toEqual([Z, H, W, expectedC]);
     expect(normTensor(filteredSlice, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
@@ -552,7 +581,7 @@ describe("Tensor -> Composite Image", () => {
     expect(filteredColorsArray).toEqual(expectedTensorArray);
   });
 
-  it("should apply colors", async () => {
+  it("should apply colors - [H, W, C] -> [H, W, 3]", async () => {
     // prettier-ignore
     const expectedTensorArray =
       [[[1111+1114, 1112+1114, 1113], [1121+1124, 1122+1124, 1123]],
@@ -576,6 +605,38 @@ describe("Tensor -> Composite Image", () => {
 
     expect(compositeImage.rank).toBe(3);
     expect(compositeImage.shape).toEqual([H, W, 3]);
+    expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
+  });
+
+  it("should apply colors - [Z, H, W, C] -> [Z, H, W, 3]", async () => {
+    // prettier-ignore
+    const expectedTensorArray =
+      [
+        [[[1111+1114, 1112+1114, 1113], [1121+1124, 1122+1124, 1123]],
+         [[1211+1214, 1212+1214, 1213], [1221+1224, 1222+1224, 1223]],
+         [[1311+1314, 1312+1314, 1313], [1321+1324, 1322+1324, 1323]]],
+
+        [[[2111+2114, 2112+2114, 2113], [2121+2124, 2122+2124, 2123]],
+         [[2211+2214, 2212+2214, 2213], [2221+2224, 2222+2224, 2223]],
+         [[2311+2314, 2312+2314, 2313], [2321+2324, 2322+2324, 2323]]]
+      ]
+
+    const colors = generateDefaultChannels(C);
+    // set all channel visibility to true, except last
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = false;
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    expect(compositeImage.rank).toBe(4);
+    expect(compositeImage.shape).toEqual([Z, H, W, 3]);
     expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
@@ -639,7 +700,7 @@ describe("Tensor -> Composite Image", () => {
     expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
-  it("should scale channel ranges to min-max values", async () => {
+  it("should scale channel ranges to min-max values - [H, W, C]", async () => {
     const MINS = [1111, 1112, 1113, 1114];
     const MAXS = [1321, 1322, 1323, 1324];
 
@@ -683,8 +744,8 @@ describe("Tensor -> Composite Image", () => {
 
     const imageTensor = convertToTensor(imageStack, Z, C);
     const imageSlice = getImageSlice(imageTensor, 0);
-    const [mins, maxs] = await findChannelMinMaxs(imageSlice);
-    scaleColors(colors, mins, maxs);
+    const [mins, maxs] = await findMinMaxs(imageSlice);
+    scaleColors(colors, { mins, maxs });
     const scaledImageSlice = scaleImageTensor(imageSlice, colors);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(
@@ -696,6 +757,71 @@ describe("Tensor -> Composite Image", () => {
 
     expect(compositeImage.rank).toBe(3);
     expect(compositeImage.shape).toEqual([H, W, 3]);
+    expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
+  });
+
+  it("should scale channel ranges to min-max values - [Z, H, W, C]", async () => {
+    const MINS = [1111, 1112, 1113, 1114];
+    const MAXS = [2321, 2322, 2323, 2324];
+
+    const scale = (
+      values: number[],
+      mins: number[] = MINS,
+      maxs: number[] = MAXS,
+      bitDepth: number = BITDEPTH
+    ) => {
+      const scaledCh: number[] = [];
+
+      for (let i = 0; i < 4; i++) {
+        let value = values[i];
+        let max = maxs[i];
+        let min = mins[i];
+        let range = max - min;
+
+        scaledCh.push(((value - min) / range) * (2 ** bitDepth - 1));
+      }
+
+      return [
+        Math.min(Math.round(scaledCh[0] + scaledCh[3]), 2 ** bitDepth - 1),
+        Math.min(Math.round(scaledCh[1] + scaledCh[3]), 2 ** bitDepth - 1),
+        Math.round(scaledCh[2]),
+      ];
+    };
+
+    // prettier-ignore
+    const expectedTensorArray =
+      [
+        [[scale([1111, 1112, 1113, 1114]), scale([1121, 1122, 1123, 1124])],
+         [scale([1211, 1212, 1213, 1214]), scale([1221, 1222, 1223, 1224])],
+         [scale([1311, 1312, 1313, 1314]), scale([1321, 1322, 1323, 1324])]],
+        
+        [[scale([2111, 2112, 2113, 2114]), scale([2121, 2122, 2123, 2124])],
+         [scale([2211, 2212, 2213, 2214]), scale([2221, 2222, 2223, 2224])],
+         [scale([2311, 2312, 2313, 2314]), scale([2321, 2322, 2323, 2324])]],
+      ]
+
+    const colors = generateDefaultChannels(C);
+    // set all channel visibility to true, except last
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = false;
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const [mins, maxs] = await findMinMaxs(imageTensor);
+    scaleColors(colors, { mins, maxs });
+    const scaledImageSlice = scaleImageTensor(imageTensor, colors);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels
+    );
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    expect(compositeImage.rank).toBe(4);
+    expect(compositeImage.shape).toEqual([Z, H, W, 3]);
     expect(normTensor(compositeImage, BITDEPTH)).toEqual(expectedTensorArray);
   });
 
@@ -783,6 +909,95 @@ describe("Tensor -> Composite Image", () => {
 
     expect(renderedURL).toBe(expectedDataURL);
     expect(imageData).toEqual(expectedOutput);
+  });
+
+  it("should generate a stack of correctly rendered 8 bit images", async () => {
+    const Z = 2;
+    const H = 3;
+    const W = 2;
+    const C = 5;
+    const BITDEPTH = 8;
+    const useCanvas = false;
+
+    // prettier-ignore
+    const expectedOutput = [
+      255, 255, 255,
+      255, 255, 255,
+      255, 255, 255,
+      255, 255, 255,
+      255, 255, 255,
+      255, 255, 255,
+    ];
+
+    const expectedImage = new ImageJS.Image({
+      width: W,
+      height: H,
+      data: new Uint8Array(expectedOutput),
+      kind: "RGB" as ImageJS.ImageKind,
+      bitDepth: BITDEPTH as ImageJS.BitDepth,
+      components: 3,
+      alpha: 0,
+      colorModel: "RGB" as ImageJS.ColorModel,
+    });
+
+    const expectedDataURL = expectedImage.toDataURL("image/png", {
+      useCanvas,
+    });
+
+    const stackData = [
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+      new Uint16Array([65535, 65535, 65535, 65535, 65535, 65535]),
+    ];
+
+    const imageStack = new ImageJS.Stack(
+      stackData.map((imData, i) => {
+        return new ImageJS.Image({
+          width: W,
+          height: H,
+          data: stackData[i],
+          kind: "GREY" as ImageJS.ImageKind,
+          bitDepth: BITDEPTH as ImageJS.BitDepth,
+          components: 1,
+          alpha: 0,
+          colorModel: "GREY" as ImageJS.ColorModel,
+        });
+      })
+    );
+
+    const colors = generateDefaultChannels(C);
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = true;
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const visibleChannels = filterVisibleChannels(colors);
+    const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    const renderedURLs = await renderTensor(compositeImage, BITDEPTH, {
+      useCanvas,
+    });
+
+    expect(renderedURLs.length).toBe(Z);
+
+    for (let i = 0; i < renderedURLs.length; i++) {
+      const image = await ImageJS.Image.load(renderedURLs[i]);
+      const imageData = Array.from(image.data);
+
+      expect(renderedURLs[i]).toBe(expectedDataURL);
+      expect(imageData).toEqual(expectedOutput);
+    }
   });
 
   it("should generate a correctly rendered 16 bit image", async () => {
@@ -875,8 +1090,8 @@ describe("Tensor -> Composite Image", () => {
     const colors = generateDefaultChannels(C);
     const imageTensor = convertToTensor(imageStack, Z, C);
     const imageSlice = getImageSlice(imageTensor, 0);
-    const [mins, maxs] = await findChannelMinMaxs(imageSlice);
-    scaleColors(colors, mins, maxs);
+    const [mins, maxs] = await findMinMaxs(imageSlice);
+    scaleColors(colors, { mins, maxs });
     const scaledImageSlice = scaleImageTensor(imageSlice, colors);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(

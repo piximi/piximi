@@ -1,14 +1,15 @@
 import * as ImageJS from "image-js";
 import {
   scalar,
-  Tensor1D,
   tensor1d,
-  Tensor2D,
   tensor2d,
+  tensor4d,
+  Tensor1D,
+  Tensor2D,
   Tensor3D,
   Tensor4D,
-  tensor4d,
   tidy,
+  fill,
 } from "@tensorflow/tfjs";
 import { v4 as uuidv4 } from "uuid";
 
@@ -293,6 +294,8 @@ export const filterVisibleChannels = (colors: Colors): Array<number> => {
 };
 
 /*
+  for input of Tensor3D:
+
   receive image slice of dims:
     [H, W, C]
   and filter array with channels to include in result
@@ -300,21 +303,28 @@ export const filterVisibleChannels = (colors: Colors): Array<number> => {
 
   return color filtered image slice of dims:
     [H, W, VC]
+
+  for input of Tensor4D:
+
+  receive image slice of dims:
+    [Z, H, W, C]
+  filter and return image slice of dims:
+    [Z, H, W, VC]
  */
-export const sliceVisibleChannels = (
-  imageSlice: Tensor3D,
+export const sliceVisibleChannels = <T extends Tensor3D | Tensor4D>(
+  imageSlice: T,
   filter: Array<number>,
   opts: { disposeImageSlice: boolean } = { disposeImageSlice: true }
-): Tensor3D => {
+): T => {
   // channel axis is innermost
-  const channelAxis = 2;
+  const channelAxis = imageSlice.rank - 1;
 
   return tidy("sliceVisibleChannels", () => {
     const indices = tensor1d(filter, "int32");
 
-    // form a new 3D tensor, gathering only channels in the indices matching the filter
+    // form a new 3D/4D tensor, gathering only channels in the indices matching the filter
     // channel axis is innermost, 2
-    const res = imageSlice.gather(indices, channelAxis);
+    const res = (imageSlice as T).gather(indices, channelAxis);
     // gc input tensor
     opts.disposeImageSlice && imageSlice.dispose();
     return res;
@@ -346,6 +356,8 @@ export const sliceVisibleColors = (
 };
 
 /*
+  for input of Tensor3D:
+
   receive image slice (with channels filtered for visibility) of shape:
     [H, W, VC]
   reshape input image slice to shape:
@@ -383,48 +395,87 @@ export const sliceVisibleColors = (
 
   which is reshaped to [height, width, 3] and returned
 
+  for input of Tensor4D, all of the above happens, however
+  receive image of shape [Z, H, W, VC],
+  reshape to [Z, pixels, VC]
+
+  take colors of shape [VC, 3] and broad cast to shape [Z, VC, 3],
+  where each element of the Z dim is just a copy,
+  and apply, resulting in [Z, pixels, 3],
+  which is then reshaped to [Z, H, W, 3] and returned
+
   if opts.scaleMinMax is set to true, each channel will be
   normalized from the range [min_channel_value, max_channel_value]
   to the range [0, 2**bitDepth-1]
  */
-export const generateColoredTensor = (
-  imageSlice: Tensor3D,
+export const generateColoredTensor = <T extends Tensor3D | Tensor4D>(
+  imageSlice: T,
   colors: Tensor2D,
   opts: {
     disposeImageSlice?: boolean;
     disposeColors?: boolean;
   } = {}
-): Tensor3D => {
+): T => {
   opts.disposeImageSlice = opts.disposeImageSlice ?? true;
   opts.disposeColors = opts.disposeColors ?? true;
 
-  const [height, width, numVisibleChannels] = imageSlice.shape;
+  if (imageSlice.rank === 3) {
+    const [height, width, numVisibleChannels] = (imageSlice as Tensor3D).shape;
 
-  return tidy("generateColoredTensor", () => {
-    const res: Tensor3D = imageSlice
-      // [pixels, VC]
-      .reshape([height * width, numVisibleChannels])
-      // [pixels, VC] * [VC, 3] = [pixels, 3]
-      .matMul(colors)
-      // make sure composite is clamped to proper range for float32
-      .clipByValue(0, 1)
-      // [H, W, 3]
-      .reshape([height, width, 3]);
+    return tidy("generateColoredTensor", () => {
+      const res: T =
+        numVisibleChannels > 0
+          ? imageSlice
+              // [pixels, VC]
+              .reshape([height * width, numVisibleChannels])
+              // [pixels, VC] * [VC, 3] = [pixels, 3]
+              .matMul(colors)
+              // make sure composite is clamped to proper range for float32
+              .clipByValue(0, 1)
+              // [H, W, 3]
+              .reshape([height, width, 3])
+          : // if no visible channels, return tensor of all 0s: [H, W, 3]
+            (fill([height, width, 1], 0) as T);
 
-    opts.disposeImageSlice && imageSlice.dispose();
-    opts.disposeColors && colors.dispose();
+      opts.disposeImageSlice && imageSlice.dispose();
+      opts.disposeColors && colors.dispose();
 
-    return res;
-  });
+      return res;
+    });
+  } else {
+    const [slices, height, width, numVisibleChannels] = (imageSlice as Tensor4D)
+      .shape;
+
+    return tidy("generateColoredTensor", () => {
+      const res: T =
+        numVisibleChannels > 0
+          ? imageSlice
+              // [Z, pixels, VC]
+              .reshape([slices, height * width, numVisibleChannels])
+              // [Z, pixels, VC] * broadcast_on_Z( [VC, 3] ) = [Z, pixels, 3]
+              .matMul(colors)
+              // make sure composite is clamped to proper range for float32
+              .clipByValue(0, 1)
+              // [Z, H, W, 3]
+              .reshape([slices, height, width, 3])
+          : // if no visible channels, return tensor of all 0s: [H, W, 3]
+            (fill([slices, height, width, 3], 0) as T);
+
+      opts.disposeImageSlice && imageSlice.dispose();
+      opts.disposeColors && colors.dispose();
+
+      return res;
+    });
+  }
 };
 
 /*
- Receives a 3D tensor of shape [H,W,C]
+ Receives a tensor of shape [H,W,C] or [Z,H,W,C]
  normalizes it based on the bit depth
  and returns the correct TypedArray view on the buffer data
  */
 const getImageTensorData = async (
-  imageTensor: Tensor3D,
+  imageTensor: Tensor3D | Tensor4D,
   bitDepth: ImageJS.BitDepth,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
@@ -455,35 +506,47 @@ const getImageTensorData = async (
 };
 
 /*
-  Receives an imageTensor of shape [H, W, C]
+  Receives an imageTensor of shape [H, W, C] or [Z, H, W, C]
   Returns an array of size 2, where the first element is the min values
   for each of the channels; and the second element contains
   the max values.
+
+  For input of [Z, H, W, C], it is the min and max of each channel
+  across the entire stack, eg the min and max values for channel 0
+  are those that occur for every possible indexing of [Z, H, W, 0]
  */
-export const findChannelMinMaxs = async (
-  imageTensor: Tensor3D,
+export const findMinMaxs = async <T extends Tensor3D | Tensor4D>(
+  imageTensor: T,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: false }
 ): Promise<[number[], number[]]> => {
-  const mins = await tidy(() => imageTensor.min([0, 1]) as Tensor1D).array();
-  const maxs = await tidy(() => imageTensor.max([0, 1]) as Tensor1D).array();
+  let mins: number[];
+  let maxs: number[];
+
+  if (imageTensor.rank === 3) {
+    mins = await tidy(() => imageTensor.min([0, 1]) as Tensor1D).array();
+    maxs = await tidy(() => imageTensor.max([0, 1]) as Tensor1D).array();
+  } else {
+    mins = await tidy(() => imageTensor.min([0, 1, 2]) as Tensor1D).array();
+    maxs = await tidy(() => imageTensor.max([0, 1, 2]) as Tensor1D).array();
+  }
 
   opts.disposeImageTensor && imageTensor.dispose();
-
   return [mins, maxs];
 };
 
 /*
-  Receives an image tensor of shape [H, W, C], along with its Colors
+  Receives an image tensor of shape [H, W, C] or [Z, H, W, C],
+  along with its Colors,
   and scales it by the ranges defined in Colors.
 
-  Returns scaled image tensor of same shape.
+  Returns scaled image tensor of same shape as input.
  */
-export const scaleImageTensor = (
-  imageTensor: Tensor3D,
+export const scaleImageTensor = <T extends Tensor3D | Tensor4D>(
+  imageTensor: T,
   colors: Colors,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
-): Tensor3D => {
-  const numChannels = imageTensor.shape[2];
+): T => {
+  const numChannels = imageTensor.shape[imageTensor.rank - 1];
 
   const mins: number[] = [];
   const ranges: number[] = [];
@@ -494,8 +557,8 @@ export const scaleImageTensor = (
     ranges.push(range);
   }
 
-  const scaledImageTensor = tidy(() =>
-    imageTensor.sub<Tensor3D>(tensor1d(mins)).div<Tensor3D>(tensor1d(ranges))
+  const scaledImageTensor: T = tidy(() =>
+    imageTensor.sub(tensor1d(mins)).div(tensor1d(ranges))
   );
 
   opts.disposeImageTensor && imageTensor.dispose();
@@ -504,21 +567,26 @@ export const scaleImageTensor = (
 };
 
 /*
-  Receives a tensor of shape [H, W, 3]
-  returns its base64 data url
+  Receives a tensor of shape [H, W, 3] or [Z, H, W, 3]
+  returns its base64 data url, or array of urls if Z present
  */
-export const renderTensor = async (
-  compositeTensor: Tensor3D,
+export async function renderTensor<T extends Tensor3D | Tensor4D>(
+  compositeTensor: T,
   bitDepth: ImageJS.BitDepth,
-  opts: { disposeCompositeTensor?: boolean; useCanvas?: boolean } = {}
-) => {
+  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
+): Promise<T extends Tensor3D ? string : string[]>;
+
+export async function renderTensor(
+  compositeTensor: Tensor3D | Tensor4D,
+  bitDepth: ImageJS.BitDepth,
+  opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
+): Promise<string | string[]> {
+  opts = opts ?? {};
   opts.disposeCompositeTensor = opts.disposeCompositeTensor ?? true;
   // using canvas will result in an rgba image where each channel is
   // 0-255, regardless of the value of bitDepth
   opts.useCanvas = opts.useCanvas ?? true;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [height, width, _] = compositeTensor.shape;
   /*
     tf.browser.toPixels has 2 quirks:
     - it will convert the tensor to the range 0-255,
@@ -533,20 +601,110 @@ export const renderTensor = async (
     disposeImageTensor: opts.disposeCompositeTensor,
   });
 
-  const image = new ImageJS.Image({
-    width: width,
-    height: height,
-    data: imageData,
-    kind: "RGB" as ImageJS.ImageKind,
-    bitDepth: bitDepth as ImageJS.BitDepth,
-    components: 3,
-    alpha: 0,
-    colorModel: "RGB" as ImageJS.ColorModel,
-  });
-  const dataURL = image.toDataURL("image/png", { useCanvas: opts.useCanvas });
+  if (compositeTensor.rank === 3) {
+    const [height, width, components] = (compositeTensor as Tensor3D).shape;
 
-  return dataURL;
-};
+    const image = new ImageJS.Image({
+      width,
+      height,
+      data: imageData,
+      kind: "RGB" as ImageJS.ImageKind,
+      bitDepth: bitDepth as ImageJS.BitDepth,
+      components,
+      alpha: 0,
+      colorModel: "RGB" as ImageJS.ColorModel,
+    });
+    return image.toDataURL("image/png", { useCanvas: opts.useCanvas });
+  } else {
+    let imageURLs: string[] = [];
+
+    const [slices, height, width, components] = (compositeTensor as Tensor4D)
+      .shape;
+
+    const strideLength = height * width * components;
+
+    for (let i = 0; i < slices; i++) {
+      const sliceStart = i * strideLength;
+      const sliceEnd = sliceStart + strideLength;
+
+      const image = new ImageJS.Image({
+        width,
+        height,
+        data: imageData.slice(sliceStart, sliceEnd),
+        kind: "RGB" as ImageJS.ImageKind,
+        bitDepth: bitDepth as ImageJS.BitDepth,
+        components,
+        alpha: 0,
+        colorModel: "RGB" as ImageJS.ColorModel,
+      });
+
+      imageURLs.push(
+        image.toDataURL("image/png", { useCanvas: opts.useCanvas })
+      );
+    }
+
+    return imageURLs;
+  }
+}
+
+/*
+  Receives a tensor of shape [Z, H, W, C], colors to apply, and a bitDepth,
+  applies the colors generating a [H, W, 3] tensor,
+  and returns the corresponding data url
+ */
+export async function createRenderedTensor<T extends number | undefined>(
+  imageTensor: Tensor4D,
+  colors: Colors,
+  bitDepth: ImageJS.BitDepth,
+  minMax: { mins: number[]; maxs: number[] } | undefined,
+  plane: T
+): Promise<T extends number ? string : string[]>;
+
+export async function createRenderedTensor(
+  imageTensor: Tensor4D,
+  colors: Colors,
+  bitDepth: ImageJS.BitDepth,
+  minMax: { mins: number[]; maxs: number[] } | undefined,
+  plane: number | undefined
+) {
+  let operandTensor: Tensor4D | Tensor3D;
+  let disposeOperandTensor: boolean;
+
+  if (plane === undefined) {
+    operandTensor = imageTensor;
+    disposeOperandTensor = false;
+  } else {
+    // image slice := get z idx 0 of image with dims: [H, W, C]
+    operandTensor = getImageSlice(imageTensor, plane);
+    disposeOperandTensor = true;
+  }
+
+  if (!minMax) {
+    minMax = extractMinMax(colors.range);
+  }
+
+  // adjust color ranges by min/max vals
+  scaleColors(colors, minMax);
+
+  // scale each channel by its range
+  const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
+    disposeImageTensor: disposeOperandTensor,
+  });
+
+  // get indices of visible channels, VC
+  const visibleChannels = filterVisibleChannels(colors);
+
+  // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
+  const filteredSlice = sliceVisibleChannels(scaledImageSlice, visibleChannels);
+
+  // color matrix filtered by visible channels: [VC, 3]
+  const filteredColors = sliceVisibleColors(colors, visibleChannels);
+
+  // composite image slice: [H, W, 3] or [Z, H, W, 3]
+  const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+  return await renderTensor(compositeImage, bitDepth);
+}
 
 export const convertToImage = async (
   imageStack: ImageJS.Stack,
@@ -559,7 +717,9 @@ export const convertToImage = async (
     throw Error("Expected image stack");
   }
 
-  const { bitDepth } = imageStack[0];
+  const activePlane = 0;
+
+  const { bitDepth } = imageStack[activePlane];
 
   const colors = currentColors
     ? currentColors
@@ -568,39 +728,24 @@ export const convertToImage = async (
   // image data := create image of dims: [Z, H, W, C]
   const imageTensor = convertToTensor(imageStack, numSlices, numChannels);
 
-  // image slice := get z idx 0 of image with dims: [H, W, C]
-  const imageSlice = getImageSlice(imageTensor, 0);
-
   // min/max for each channel
-  const [mins, maxs] = await findChannelMinMaxs(imageSlice);
+  const [mins, maxs] = await findMinMaxs(imageTensor);
 
-  // adjust color ranges by min/max vals
-  scaleColors(colors, mins, maxs);
-
-  // scale each channel by its range
-  const scaledImageSlice = scaleImageTensor(imageSlice, colors);
-
-  // get indices of visible channels, VC
-  const visibleChannels = filterVisibleChannels(colors);
-
-  // image slice filtered by visible channels: [H, W, VC]
-  const filteredSlice = sliceVisibleChannels(scaledImageSlice, visibleChannels);
-
-  // color matrix filtered by visible channels: [VC, 3]
-  const filteredColors = sliceVisibleColors(colors, visibleChannels);
-
-  // composite image slice: [H, W, 3]
-  const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const coloredSliceURL = await renderTensor(compositeImage, bitDepth);
+  const coloredSliceURL = await createRenderedTensor(
+    imageTensor,
+    colors,
+    bitDepth,
+    { mins, maxs },
+    activePlane
+  );
 
   const [planes, height, width, channels] = imageTensor.shape;
 
   return {
-    activePlane: 0,
+    activePlane: activePlane,
     annotations: [],
     colors: colors,
+    bitDepth,
     categoryId: UNKNOWN_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
@@ -645,7 +790,12 @@ export const generateDefaultChannels = (numChannels: number): Colors => {
   };
 };
 
-export const scaleColors = (colors: Colors, mins: number[], maxs: number[]) => {
+export const scaleColors = (
+  colors: Colors,
+  minMax: { mins: number[]; maxs: number[] }
+) => {
+  const { mins, maxs } = minMax;
+
   if (mins.length !== maxs.length) {
     throw Error("Number of min and max values must be identical");
   }
@@ -657,6 +807,20 @@ export const scaleColors = (colors: Colors, mins: number[], maxs: number[]) => {
   for (let i = 0; i < mins.length; i++) {
     colors.range[i] = [mins[i], maxs[i]];
   }
+};
+
+const componentToHex = (c: number) => {
+  var hex = (c * 255).toString(16);
+  return hex.length === 1 ? "0" + hex : hex;
+};
+
+export const rgbToHex = (rgb: [number, number, number]) => {
+  return (
+    "#" +
+    componentToHex(rgb[0]) +
+    componentToHex(rgb[1]) +
+    componentToHex(rgb[2])
+  );
 };
 
 /*
@@ -679,4 +843,67 @@ export const replaceDuplicateName = (
     i += 1;
   }
   return currentName;
+};
+
+export const scaleUpRange = (
+  range: [number, number],
+  bitDepth: ImageJS.BitDepth
+): [number, number] => {
+  return [
+    Math.floor(range[0] * (2 ** bitDepth - 1)),
+    Math.floor(range[1] * (2 ** bitDepth - 1)),
+  ];
+};
+
+export const scaleUpRanges = (
+  ranges: { [channel: number]: [number, number] },
+  bitDepth: ImageJS.BitDepth,
+  opts: { inPlace: boolean } = { inPlace: false }
+): { [channel: number]: [number, number] } => {
+  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+
+  for (const ch of Object.keys(ranges)) {
+    const chKey = parseInt(ch);
+    operandRanges[chKey] = scaleUpRange(ranges[chKey], bitDepth);
+  }
+
+  return ranges;
+};
+
+export const scaleDownRange = (
+  range: [number, number],
+  bitDepth: ImageJS.BitDepth
+): [number, number] => {
+  return [range[0] / (2 ** bitDepth - 1), range[1] / (2 ** bitDepth - 1)];
+};
+
+export const scaleDownRanges = (
+  ranges: { [channel: number]: [number, number] },
+  bitDepth: ImageJS.BitDepth,
+  opts: { inPlace: boolean } = { inPlace: false }
+): { [channel: number]: [number, number] } => {
+  let operandRanges = opts.inPlace ? ranges : { ...ranges };
+
+  for (const ch of Object.keys(ranges)) {
+    const chKey = parseInt(ch);
+    operandRanges[chKey] = scaleDownRange(ranges[chKey], bitDepth);
+  }
+
+  return ranges;
+};
+
+export const extractMinMax = (ranges: {
+  [channel: number]: [number, number];
+}) => {
+  const channels = Object.keys(ranges).map((ch) => parseInt(ch));
+  const mins = Array(channels.length);
+  const maxs = Array(channels.length);
+
+  for (const ch of channels) {
+    const [min, max] = ranges[ch];
+    mins[ch] = min;
+    maxs[ch] = max;
+  }
+
+  return { mins, maxs };
 };

@@ -6,11 +6,9 @@ import { imageSelector } from "store/common";
 
 import { Colors } from "types/tensorflow";
 
-import {
-  convertImageURIsToImageData,
-  mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+import { createRenderedTensor } from "image/utils/imageHelper";
 
+// TODO: image_data (including all prerendering machinary, generally)
 export function* activeImageIDChangeSaga({
   payload: { imageId, execSaga },
 }: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>) {
@@ -40,22 +38,27 @@ export function* activeImageIDChangeSaga({
     })
   );
 
-  const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
-    //@ts-ignore TODO: image_data
-    yield call(convertImageURIsToImageData, image.originalSrc);
+  // const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
+  //   //@ts-ignore TODO: image_data
+  //   yield call(convertImageURIsToImageData, image.originalSrc);
 
-  const renderedSrcs = planesData.map((planeData) => {
-    return mapChannelsToSpecifiedRGBImage(
-      planeData,
-      //@ts-ignore TODO: image_data
-      image.colors,
-      image.shape.height,
-      image.shape.width
-    );
-  });
+  // const renderedSrcs = planesData.map((planeData) => {
+  //   return mapChannelsToSpecifiedRGBImage(
+  //     planeData,
+  //     //@ts-ignore TODO: image_data
+  //     image.colors,
+  //     image.shape.height,
+  //     image.shape.width
+  //   );
+  // });
 
+  // yield put(
+  //   imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+  // );
   yield put(
-    imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({
+      renderedSrcs: [image.src],
+    })
   );
 }
 
@@ -71,19 +74,22 @@ export function* activeImageColorChangeSaga({
 
   if (!image) return;
 
-  const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
-    // @ts-ignore TODO: image_data
-    yield call(convertImageURIsToImageData, image.originalSrc);
+  const colorsEditable = {
+    range: { ...colors.range },
+    visible: { ...colors.visible },
+    color: colors.color,
+  };
 
-  const renderedSrcs = planesData.map((planeData, idx) => {
-    return mapChannelsToSpecifiedRGBImage(
-      planeData,
-      // @ts-ignore TODO: image_data
-      colors,
-      image.shape.height,
-      image.shape.width
-    );
-  });
+  const renderedSrcs: Awaited<
+    ReturnType<typeof createRenderedTensor<undefined>>
+  > = yield call(
+    createRenderedTensor,
+    image.data,
+    colorsEditable,
+    image.bitDepth,
+    undefined,
+    undefined
+  );
 
   yield put(
     imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
