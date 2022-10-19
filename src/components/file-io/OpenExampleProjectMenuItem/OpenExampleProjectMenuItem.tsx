@@ -21,8 +21,12 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 
+// TODO: image_data
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { _SerializedImageType } from "types/SerializedImageType";
+
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/imageHelper";
+import { deserializeImages } from "image/utils/deserialize";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -95,7 +99,7 @@ export const OpenExampleProjectMenuItem = ({
     const project = exampleProjectJson.project as SerializedProjectType;
     const classifier = exampleProjectJson.classifier as Classifier;
     const images = await deserializeImages(
-      project.serializedImages as Array<SerializedImageType>
+      project.serializedImages as unknown as Array<_SerializedImageType>
     );
 
     dispatch(applicationSlice.actions.clearSelectedImages());

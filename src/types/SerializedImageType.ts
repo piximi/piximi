@@ -1,19 +1,34 @@
 import { AnnotationType } from "./AnnotationType";
 import { Partition } from "./Partition";
-import { Color } from "./Color";
+import { ColorsRaw } from "./tensorflow";
 
 export type SerializedImageType = {
+  name: string; // prev imageFilename
+  id: string; // prev imageId
+
+  planes: number; // z, prev imagePlanes
+  height: number; // h, prev imageHeight
+  width: number; // w, prev imageWidth
+  channels: number; // c, prev imageChannels
+  data: number[][][][]; // to add
+  bitDepth: number;
+  colors: ColorsRaw; // to add
+
+  partition: Partition; // prev imagePartition
+  categoryId: string; // prev imageCategoryId
+  annotations: Array<AnnotationType>;
+
+  src?: string;
+};
+
+//TODO: image_data - remove this
+export type _SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
-  // TODO: image_data
-  // imageColors: Array<Color>; // if missing: imageHelper.generateDefaultChannels(serializedImage.imageChannels)
-  // TODO: image_data
   imageData: Array<Array<string>>;
-  // TODO: image_data
   imageSrc: string; // missing -- NG
   imageFilename: string;
-  // TODO: image_data
-  //imageFrames: number;
+  imageFrames: number;
   imageHeight: number;
   imageId: string;
   imagePlanes: number;

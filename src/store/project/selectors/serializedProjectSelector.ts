@@ -9,18 +9,20 @@ export const serializedProjectSelector = ({
 }): SerializedProjectType => {
   const serializedImages = project.images.map((image: ImageType) => {
     return {
-      imageCategoryId: image.categoryId,
-      imageChannels: image.shape.channels,
-      imageColors: image.colors,
-      // @ts-ignore TODO: image_data
-      imageData: image.originalSrc,
-      imageSrc: image.src, // TODO: keep this for larger saved projects, or delete it for slower load times
-      imageFilename: image.name,
-      imageHeight: image.shape.height,
-      imageId: image.id,
-      imagePlanes: image.shape.planes,
-      imageWidth: image.shape.width,
-      imagePartition: image.partition,
+      name: image.name,
+      id: image.id,
+      planes: image.shape.planes,
+      height: image.shape.height,
+      width: image.shape.width,
+      channels: image.shape.channels,
+      data: image.data.arraySync(),
+      bitDepth: image.bitDepth,
+      colors: {
+        ...image.colors,
+        color: image.colors.color.arraySync() as [number, number, number][],
+      },
+      partition: image.partition,
+      categoryId: image.categoryId,
       annotations: image.annotations,
     };
   });
