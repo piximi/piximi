@@ -18,7 +18,7 @@ const _convertSerialization = async (image: _SerializedImageType) => {
 
   for (const plane of image.imageData) {
     for (const src of plane) {
-      const im = await ImageJS.Image.load(src, {
+      let im = await ImageJS.Image.load(src, {
         ignorePalette: true,
       });
 
@@ -28,6 +28,10 @@ const _convertSerialization = async (image: _SerializedImageType) => {
 
       //@ts-ignore
       im.colorModel = "GREY";
+
+      if (im.components > 0) {
+        im = im.combineChannels();
+      }
 
       const checks = [
         im.width === image.imageWidth,
