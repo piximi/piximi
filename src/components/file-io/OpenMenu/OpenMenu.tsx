@@ -7,7 +7,7 @@ import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 import { useDialogHotkey } from "hooks";
 
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenExampleClassifierDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
+import { OpenExampleProjectDialog } from "../OpenExampleProjectDialog/OpenExampleProjectDialog";
 import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
 
 import { classifierSlice } from "store/classifier";
@@ -33,9 +33,9 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     open: openImportSegmenterDialog,
   } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
   const {
-    onClose: onCloseExampleClassifierDialog,
-    onOpen: onOpenExampleClassifierDialog,
-    open: openExampleClassifier,
+    onClose: onCloseExampleProjectDialog,
+    onOpen: onOpenExampleProjectDialog,
+    open: openExampleProject,
   } = useDialogHotkey(HotkeyView.ExampleClassifierDialog);
 
   const dispatch = useDispatch();
@@ -85,7 +85,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
     <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
       <MenuList dense variant="menu">
         <OpenProjectMenuItem onMenuClose={onClose} />
-        <MenuItem onClick={onOpenExampleClassifierDialog}>
+        <MenuItem onClick={onOpenExampleProjectDialog}>
           Open example project
         </MenuItem>
         <Divider />
@@ -100,9 +100,9 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         )}
       </MenuList>
 
-      <OpenExampleClassifierDialog
-        onClose={onMenuDialogClose(onCloseExampleClassifierDialog)}
-        open={openExampleClassifier}
+      <OpenExampleProjectDialog
+        onClose={onMenuDialogClose(onCloseExampleProjectDialog)}
+        open={openExampleProject}
       />
 
       <ImportTensorflowModelDialog

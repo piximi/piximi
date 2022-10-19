@@ -100,13 +100,13 @@ const exampleProjects = [
   },
 ];
 
-type OpenExampleClassifierDialogProps = {
+type OpenExampleProjectDialogProps = {
   open: boolean;
   onClose: () => void;
 };
 
-export const OpenExampleClassifierDialog = (
-  props: OpenExampleClassifierDialogProps
+export const OpenExampleProjectDialog = (
+  props: OpenExampleProjectDialogProps
 ) => {
   const t = useTranslation();
   const { open, onClose } = props;
