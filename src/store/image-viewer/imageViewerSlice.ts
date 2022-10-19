@@ -26,7 +26,6 @@ import {
 import { Partition } from "types/Partition";
 import { AnnotationTool } from "annotator/AnnotationTools";
 import { defaultImage } from "images/defaultImage";
-import { PlaceOutlined } from "@mui/icons-material";
 import { encode } from "utils/annotator";
 
 const initialState: ImageViewer = {

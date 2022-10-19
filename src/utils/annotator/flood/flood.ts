@@ -99,21 +99,14 @@ export const makeFloodMap = ({
 };
 
 // Expand a watershed map until the desired tolerance is reached.
-export const doFlood = ({
-  floodMap,
-  toleranceMap,
-  queue,
-  tolerance,
-  maxTol,
-  seen,
-}: {
-  floodMap: ImageJS.Image;
-  toleranceMap: ImageJS.Image;
-  queue: PriorityQueue<Array<number>>;
-  tolerance: number;
-  maxTol: number;
-  seen: Set<number>;
-}) => {
+export const doFlood = (
+  floodMap: ImageJS.Image,
+  toleranceMap: ImageJS.Image,
+  queue: PriorityQueue<Array<number>>,
+  tolerance: number,
+  maxTol: number,
+  seen: Set<number>
+) => {
   while (queue.length > 0 && queue.peek()[2] <= tolerance) {
     let currentPoint = queue.dequeue();
     maxTol = Math.max(currentPoint[2], maxTol);

@@ -14,6 +14,7 @@ export class PenAnnotationTool extends AnnotationTool {
   deselect() {
     this.buffer = [];
     this.points = [];
+    this.annotation = undefined;
 
     this.setBlank();
   }

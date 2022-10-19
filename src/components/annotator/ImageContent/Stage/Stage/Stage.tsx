@@ -132,18 +132,19 @@ export const Stage = () => {
    * @param position  position of cursor in the window
    * @returns {Point}  position of cursor in relation to stage
    */
-  const getRelativePointerPosition = (position: {
-    x: number;
-    y: number;
-  }): Point | undefined => {
-    if (!imageRef || !imageRef.current) return;
+  const getRelativePointerPosition = useCallback(
+    (position: { x: number; y: number }): Point | undefined => {
+      if (!imageRef || !imageRef.current) return;
 
-    const transform = imageRef.current.getAbsoluteTransform().copy();
+      const transform = imageRef.current.getAbsoluteTransform().copy();
 
-    transform.invert();
+      transform.invert();
 
-    return transform.point(position);
-  };
+      return transform.point(position);
+    },
+    [imageRef]
+  );
+
   const detachTransformer = (transformerId: string) => {
     if (!stageRef || !stageRef.current) return;
     const transformer = stageRef.current.findOne(`#${transformerId}`);
@@ -315,10 +316,10 @@ export const Stage = () => {
       } else {
         if (annotationState === AnnotationStateType.Annotated) {
           deselectAnnotation();
-        }
-
-        if (selectionMode === AnnotationModeType.New) {
-          deselectAllAnnotations();
+          if (selectionMode === AnnotationModeType.New) {
+            deselectAllAnnotations();
+            return;
+          }
         }
 
         if (!annotationTool) return;
@@ -340,6 +341,7 @@ export const Stage = () => {
     onZoomMouseDown,
     stageScale,
     firstMouseDown,
+    getRelativePointerPosition,
   ]);
 
   const onMouseMove = useMemo(() => {
@@ -417,6 +419,7 @@ export const Stage = () => {
     scaledImageHeight,
     scaledImageWidth,
     stageScale,
+    getRelativePointerPosition,
   ]);
 
   const onMouseUp = useMemo(() => {
@@ -472,6 +475,7 @@ export const Stage = () => {
     scaledImageHeight,
     scaledImageWidth,
     stageScale,
+    getRelativePointerPosition,
   ]);
 
   // useEffect
@@ -485,8 +489,16 @@ export const Stage = () => {
   }, [annotations, deselectAllAnnotations]);
 
   useEffect(() => {
+    console.log("I'm called");
+    annotationTool?.deselect();
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [],
+        selectedAnnotation: undefined,
+      })
+    );
     setTool(annotationTool);
-  }, [annotationTool, toolType]);
+  }, [annotationTool, dispatch]);
   useEffect(() => {
     if (!annotationTool) return;
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
