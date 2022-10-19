@@ -29,7 +29,7 @@ const _convertSerialization = async (image: _SerializedImageType) => {
       //@ts-ignore
       im.colorModel = "GREY";
 
-      if (im.components > 0) {
+      if (im.components > 1) {
         im = im.combineChannels();
       }
 
@@ -67,6 +67,7 @@ const _convertSerialization = async (image: _SerializedImageType) => {
     convertedImage.shape.planes === image.imagePlanes,
     convertedImage.bitDepth === imageBitDepth,
     convertedImage.name === image.imageFilename,
+    convertedImage.shape.channels === imageStack.length,
   ];
 
   if (!_.every(checks)) {
