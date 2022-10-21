@@ -1,13 +1,10 @@
-import {
-  convertToImage,
-  createRenderedTensor,
-  generateDefaultChannels,
-} from "image/utils/imageHelper";
-import { SerializedImageType, ImageType } from "types";
-import { _SerializedImageType } from "types/SerializedImageType"; // TODO: immge_data
+import { tensor2d, tensor4d } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js"; // TODO: image_data
 import _ from "lodash";
-import { tensor2d, tensor4d } from "@tensorflow/tfjs";
+
+import { convertToImage, createRenderedTensor } from "image/utils/imageHelper";
+import { SerializedImageType, ImageType } from "types";
+import { _SerializedImageType } from "types/SerializedImageType"; // TODO: immge_data
 
 export const deserializeProject = (files: FileList) => {};
 

@@ -8,11 +8,9 @@
       "planes": 1
     },
     "fitOptions": {
-      "test_data_size": 1000,
       "batchSize": 32,
       "initialEpoch": 0,
-      "epochs": 10,
-      "train_data_size": 6500
+      "epochs": 10
     },
     "lossFunction": "Categorical (softmax) cross entropy",
     "predicting": false,

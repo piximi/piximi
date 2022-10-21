@@ -79,7 +79,12 @@ export { LossFunction } from "./LossFunction";
 
 export { Metric } from "./Metric";
 
-export type { ClassifierModelProps, SegmenterModelProps } from "./ModelType";
+export type {
+  ClassifierModelProps,
+  SegmenterModelProps,
+  UserUploadedModelProps,
+  DefaultModelProps,
+} from "./ModelType";
 export {
   ModelType,
   availableClassifierModels,
@@ -114,8 +119,6 @@ export type { Shape } from "./Shape";
 export type { ShapeType } from "./ShapeType";
 
 export type { State } from "./State";
-
-export { Task } from "./Task";
 
 export { ThemeMode } from "./ThemeMode";
 

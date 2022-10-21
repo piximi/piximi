@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import saveAs from "file-saver";
-import { useHotkeys } from "hooks";
+import h5wasm from "h5wasm";
 
 import {
   Button,
@@ -14,8 +14,13 @@ import {
 } from "@mui/material";
 
 import { classifierSelector } from "store/classifier";
-import { serializedProjectSelector } from "store/project";
+import { projectSelector } from "store/project";
 import { segmenterSelector } from "store/segmenter";
+
+import { useHotkeys } from "hooks";
+import { download } from "./file_handlers";
+import { serialize } from "image/utils/serialize";
+
 import { HotkeyView } from "types";
 
 type SaveProjectDialogProps = {
@@ -31,27 +36,37 @@ export const SaveProjectDialog = ({
 
   const segmenter = useSelector(segmenterSelector);
 
-  const serializedProject = useSelector(serializedProjectSelector);
+  const project = useSelector(projectSelector);
 
-  const [projectName, setProjectName] = useState<string>(
-    serializedProject.name
-  );
+  const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onSaveProjectClick = () => {
-    const part = {
-      classifier: classifier,
-      segmenter: segmenter,
-      project: serializedProject,
-      version: "0.0.0",
-    };
+  const onSaveProjectClick = async () => {
+    await h5wasm.ready;
 
-    part.project.name = projectName;
+    const f = new h5wasm.File(`${project.name}.h5`, "w");
 
-    const parts = [JSON.stringify(part)];
+    serialize(f, project, classifier);
 
-    const data = new Blob(parts, { type: "application/json;charset=utf-8" });
+    await download(f);
+    const closeStatus = f.close();
 
-    saveAs(data, `${projectName}.json`);
+    process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log(`closed ${project.name} with status ${closeStatus}`);
+
+    // const part = {
+    //   classifier: classifier,
+    //   segmenter: segmenter,
+    //   project: serializedProject,
+    //   version: "0.0.0",
+    // };
+
+    // part.project.name = projectName;
+
+    // const parts = [JSON.stringify(part)];
+
+    // const data = new Blob(parts, { type: "application/json;charset=utf-8" });
+
+    // saveAs(data, `${projectName}.json`);
 
     onClose();
   };

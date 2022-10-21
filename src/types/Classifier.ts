@@ -30,10 +30,7 @@ export type Classifier = {
   inputShape: Shape;
   history?: History;
   learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
+  lossFunction: LossFunction;
   metrics: Array<Metric>;
   selectedModel: ClassifierModelProps;
   userUploadedModel?: ClassifierModelProps;

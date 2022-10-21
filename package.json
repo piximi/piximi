@@ -38,6 +38,7 @@
     "dicom-parser": "^1.8.13",
     "dicom.ts": "^1.0.5",
     "file-saver": "^2.0.5",
+    "h5wasm": "^0.4.6",
     "i18next": "19.0.0",
     "image-js": "0.35.2",
     "jszip": "^3.7.1",

@@ -31,10 +31,7 @@ export { highlightedCategoriesSelector } from "./selectors/highlightedCategorySe
 export { imageSortKeySelector } from "./selectors/imageSortKeySelector";
 export { imagesSelector } from "./selectors/imagesSelector";
 export { projectSelector } from "./selectors/projectSelector";
-export { serializedProjectSelector } from "./selectors/serializedProjectSelector";
-export { taskSelector } from "./selectors/taskSelector";
 export { testImagesSelector } from "./selectors/testImagesSelector";
-export { trainFlagSelector } from "./selectors/trainFlagSelector";
 export { trainImagesSelector } from "./selectors/trainImagesSelector";
 export { unannotatedImagesSelector } from "./selectors/unannotatedImagesSelector";
 export { unknownAnnotationCategorySelector } from "./selectors/unknownAnnotationCategorySelector";
