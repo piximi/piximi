@@ -122,8 +122,6 @@ const fitOptions: FitOptions = {
   epochs: 2,
   batchSize: 3,
   initialEpoch: 0,
-  test_data_size: 3,
-  train_data_size: 3,
 };
 
 const validationImages: Array<ImageType> = [

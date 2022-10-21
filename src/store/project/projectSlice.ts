@@ -11,7 +11,6 @@ import {
   UNKNOWN_CATEGORY_ID,
 } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { Task } from "types/Task";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { AnnotationType } from "types/AnnotationType";
@@ -45,8 +44,6 @@ const initialState: Project = {
   // images: [defaultImage],
   images: [],
   name: "Untitled project",
-  task: Task.Classify,
-  trainFlag: 0,
   imageSortKey: defaultImageSortKey,
   highlightedCategory: null,
 };
@@ -104,8 +101,6 @@ export const projectSlice = createSlice({
       state.categories = [UNKNOWN_CATEGORY];
       state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
       state.images = [];
-      state.task = Task.Classify;
-      state.trainFlag = 0;
       state.imageSortKey = defaultImageSortKey;
     },
     deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
@@ -397,12 +392,6 @@ export const projectSlice = createSlice({
           state.images[index].segmentationPartition = action.payload.partition;
         }
       });
-    },
-    updateTask(state, action: PayloadAction<{ task: Task }>) {
-      state.task = action.payload.task;
-    },
-    updateTrainFlag(state, action: PayloadAction<{ trainFlag: number }>) {
-      state.trainFlag = action.payload.trainFlag;
     },
     updateAnnotationCategory(
       state,

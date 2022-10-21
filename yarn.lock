@@ -3748,7 +3748,7 @@
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-layers/-/tfjs-layers-4.0.0.tgz#3e8c8c344e448bfdd609c8c10742ae741b87f990"
   integrity sha512-StDOBLaJQr3dL2McM5Dne60yDnwzS98CxxJ0DOH8zq3ZOwY1Zg1GshCebHTy8zEYAbv6vga9JO19nXLVuSa3yQ==
 
-"@tensorflow/tfjs-node@3.22.0":
+"@tensorflow/tfjs-node@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-node/-/tfjs-node-4.0.0.tgz#5c93a0b62f2c87d8f9b67608bc31ce4c328ddd62"
   integrity sha512-r+82X0C78ssFOqfVs6x70f3knMzZljVD9Emlnih5d/xpxccS0cZUSNG8tshQV7p5C5nNmiSt5n1XEvn9Qa2hsg==
@@ -9032,6 +9032,11 @@ gzip-size@^6.0.0:
   integrity sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==
   dependencies:
     duplexer "^0.1.2"
+
+h5wasm@^0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/h5wasm/-/h5wasm-0.4.6.tgz#e8f2fc3d26230db765a961627c889636bb09b79c"
+  integrity sha512-wyLTS2i8VF8Q9EbwLbAatOJ0LlVXrUEtG+a0YPr8Wd/spHeKf3ZzpT2a3SLWFLuEN6O3ECkHEUVP2Wu4kfLJTw==
 
 handle-thing@^2.0.0:
   version "2.0.1"

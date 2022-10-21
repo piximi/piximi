@@ -16,13 +16,13 @@ import { projectSlice } from "store/project";
 
 import {
   Classifier,
+  // TODO: image_data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   SerializedImageType,
   SerializedProjectType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 
-// TODO: image_data
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { _SerializedImageType } from "types/SerializedImageType";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
