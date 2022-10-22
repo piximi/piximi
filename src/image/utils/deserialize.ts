@@ -1,12 +1,23 @@
 import { tensor2d, tensor4d } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js"; // TODO: image_data
+import { Dataset, File, Group } from "h5wasm";
 import _ from "lodash";
 
 import { convertToImage, createRenderedTensor } from "image/utils/imageHelper";
-import { SerializedImageType, ImageType } from "types";
+import {
+  SerializedImageType,
+  ImageType,
+  Project,
+  Classifier,
+  AnnotationType,
+} from "types";
 import { _SerializedImageType } from "types/SerializedImageType"; // TODO: immge_data
 
-export const deserializeProject = (files: FileList) => {};
+/*
+  =====================
+  Image Deserialization
+  =====================
+*/
 
 // TODO: image_data
 const _convertSerialization = async (image: _SerializedImageType) => {
@@ -147,4 +158,153 @@ export const deserializeImages = async (
     }
   }
   return deserializedImages;
+};
+
+/*
+  ====================
+  File Deserialization
+  ====================
+ */
+
+const deserializeAnnotationsGroup = (
+  annotationsGroup: Group
+): Array<AnnotationType> => {
+  const bboxes = getDataset(annotationsGroup, "bounding_box")
+    .value as Uint8Array;
+  const categories = getDataset(annotationsGroup, "category").value as string[];
+  const ids = getDataset(annotationsGroup, "id").value as string[];
+  const masks = getDataset(annotationsGroup, "mask").value as Uint8Array;
+  const maskLengths = getDataset(annotationsGroup, "mask_length")
+    .value as Uint8Array;
+  const planes = getDataset(annotationsGroup, "plane").value as Uint8Array;
+
+  let annotations: Array<AnnotationType> = [];
+  let bboxIdx = 0;
+  let maskIdx = 0;
+  for (let i = 0; i < ids.length; i++) {
+    annotations.push({
+      id: ids[i],
+      categoryId: categories[i],
+      plane: planes[i],
+      boundingBox: Array.from(bboxes.slice(bboxIdx, bboxIdx + 4)) as [
+        number,
+        number,
+        number,
+        number
+      ],
+      mask: Array.from(masks.slice(maskIdx, maskIdx + maskLengths[i])),
+    });
+
+    bboxIdx += 4;
+    maskIdx += maskLengths[i];
+  }
+
+  /*
+  boundingBox: [number, number, number, number];
+  categoryId: string;
+  id: string;
+  mask: Array<number>;
+  plane: number;
+  */
+
+  return "" as unknown as Array<AnnotationType>;
+};
+
+const deserializeImageGroup = (name: string, imageGroup: Group): ImageType => {
+  const id = getAttr(imageGroup, "id");
+  const activePlane = getAttr(imageGroup, "active_plane");
+  const categoryId = getAttr(imageGroup, "category_id");
+  const classifierPartition = getAttr(imageGroup, "classifier_partition");
+  const visible = Boolean(getAttr(imageGroup, "visible_B"));
+
+  const annotationsGroup = getGroup(imageGroup, "annotations");
+  const annotations = deserializeAnnotationsGroup(annotationsGroup);
+  // const colorsGroup = getGroup(imageGroup, 'colors');
+  // const imageDataset = getDataset(imageGroup, name);
+
+  return "" as unknown as ImageType;
+};
+
+const deserializeImagesGroup = (imagesGroup: Group): Array<ImageType> => {
+  const sortKey = getAttr(imagesGroup, "sort_key");
+
+  const imageNames = imagesGroup.keys();
+  const images: Array<ImageType> = [];
+  for (const name of imageNames) {
+    let imageGroup = getGroup(imagesGroup, name);
+    images.push(deserializeImageGroup(name, imageGroup));
+  }
+
+  return images;
+};
+
+const deserializeProjectGroup = (projectGroup: Group): Project => {
+  const name = getAttr(projectGroup, "name");
+
+  const imagesGroup = getGroup(projectGroup, "images");
+  const images = deserializeImagesGroup(imagesGroup);
+
+  // const categoriesGroup = getGroup(projectGroup, "categories");
+  // const categories = deserializeCategoriesGroup(categoriesGroup);
+
+  // const annotationCategoriesGroup = getGroup(projectGroup, "annotationCategories");
+  // const annotationCategories = deserializeAnnotationCategories(annotationCategoriesGroup);
+
+  return "" as unknown as Project;
+};
+
+// const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {};
+
+export const deserialize = (filename: string) => {
+  let f = new File(filename, "r");
+
+  if (!(f.type === "Group")) {
+    throw Error("Expected group at top level");
+  }
+
+  const projectGroup = getGroup(f, "project");
+  const project = deserializeProjectGroup(projectGroup);
+
+  // const classifierGroup = getGroup("classifier")
+  // classifier = deserializeClassifier(classifierGroup);
+
+  // return {
+  //   project, classifier;
+  // }
+};
+
+/*
+  ============================
+  File Deserialization Helpers
+  ============================
+ */
+
+const getDataset = (root: File | Group, key: string) => {
+  const dataset = root.get(key);
+
+  if (dataset && dataset.type === "Dataset") {
+    return dataset as Dataset;
+  } else {
+    throw Error(`Expected dataset "${key}" in group "${root.path}"`);
+  }
+};
+
+const getAttr = (root: File | Group, attr: string) => {
+  if (root.attrs.hasOwnProperty(attr)) {
+    return root.attrs[attr].value;
+  } else {
+    throw Error(`Expected attribute "${attr}" in group "${root.path}"`);
+  }
+};
+
+const getGroup = (root: File | Group, key: string) => {
+  const group = root.get(key);
+
+  if (group && group.type === "Group") {
+    return group as Group;
+  } else {
+    throw Error(
+      `Expected key "${key}" of type "Group" in group "${root.path}"`
+    );
+  }
 };

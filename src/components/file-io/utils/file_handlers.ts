@@ -5,25 +5,20 @@ import { ready, File as H5WasmFile } from "h5wasm";
 
 export const UPLOADED_FILES: string[] = [];
 
-export async function uploader(event: Event) {
+export async function uploader(file: File) {
   const { FS } = await ready;
-  const target = event.target as HTMLInputElement;
-  let file = target.files?.[0]; // only one file allowed
-  if (file) {
-    let datafilename = file.name;
-    let ab = await file.arrayBuffer();
-    FS.writeFile(datafilename, new Uint8Array(ab));
-    if (!UPLOADED_FILES.includes(datafilename)) {
-      UPLOADED_FILES.push(datafilename);
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
-        console.log("file loaded:", datafilename);
-    } else {
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "1" &&
-        console.log("file updated: ", datafilename);
-    }
-    target.value = "";
+  let datafilename = file.name;
+  let ab = await file.arrayBuffer();
+  FS.writeFile(datafilename, new Uint8Array(ab));
+  if (!UPLOADED_FILES.includes(datafilename)) {
+    UPLOADED_FILES.push(datafilename);
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log("file loaded:", datafilename);
+  } else {
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log("file updated: ", datafilename);
   }
 }
 

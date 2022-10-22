@@ -1,6 +1,5 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import saveAs from "file-saver";
 import h5wasm from "h5wasm";
 
 import {
@@ -15,10 +14,11 @@ import {
 
 import { classifierSelector } from "store/classifier";
 import { projectSelector } from "store/project";
-import { segmenterSelector } from "store/segmenter";
+// TODO: implement segmenter serialization
+// import { segmenterSelector } from "store/segmenter";
 
 import { useHotkeys } from "hooks";
-import { download } from "./file_handlers";
+import { download } from "components/file-io/utils/file_handlers";
 import { serialize } from "image/utils/serialize";
 
 import { HotkeyView } from "types";
@@ -33,8 +33,6 @@ export const SaveProjectDialog = ({
   open,
 }: SaveProjectDialogProps) => {
   const classifier = useSelector(classifierSelector);
-
-  const segmenter = useSelector(segmenterSelector);
 
   const project = useSelector(projectSelector);
 
@@ -52,21 +50,6 @@ export const SaveProjectDialog = ({
 
     process.env.REACT_APP_LOG_LEVEL === "1" &&
       console.log(`closed ${project.name} with status ${closeStatus}`);
-
-    // const part = {
-    //   classifier: classifier,
-    //   segmenter: segmenter,
-    //   project: serializedProject,
-    //   version: "0.0.0",
-    // };
-
-    // part.project.name = projectName;
-
-    // const parts = [JSON.stringify(part)];
-
-    // const data = new Blob(parts, { type: "application/json;charset=utf-8" });
-
-    // saveAs(data, `${projectName}.json`);
 
     onClose();
   };
