@@ -8,6 +8,9 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 
+import { uploader } from "components/file-io/utils/file_handlers";
+import { deserialize } from "image/utils/deserialize";
+
 import {
   AlertStateType,
   AlertType,
@@ -28,87 +31,95 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onOpenProjectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onOpenProjectFile = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     event.persist();
 
     if (!event.currentTarget.files) return;
 
     const file = event.currentTarget.files[0];
 
-    const reader = new FileReader();
+    await uploader(file);
 
-    reader.onload = async (event: ProgressEvent<FileReader>) => {
-      if (event.target && event.target.result) {
-        var images: Array<ImageType>;
-        var project: SerializedProjectType;
-        var classifier: Classifier;
-        var segmenter: SegmenterStoreType;
-        try {
-          const projectJSON = JSON.parse(event.target.result as string);
-          project = projectJSON.project;
-          classifier = projectJSON.classifier;
-          segmenter = projectJSON.segmenter;
-          images = await deserializeImages(project.serializedImages);
-        } catch (err) {
-          const error: Error = err as Error;
-          const warning: AlertStateType = {
-            alertType: AlertType.Warning,
-            name: "Could not parse JSON file",
-            description: `Error while parsing the project file: ${error.name}\n${error.message}`,
-          };
-          dispatch(
-            applicationSlice.actions.updateAlertState({ alertState: warning })
-          );
-          return;
-        }
+    event.target.value = "";
 
-        try {
-          batch(() => {
-            dispatch(applicationSlice.actions.clearSelectedImages());
+    deserialize(file.name);
 
-            dispatch(
-              projectSlice.actions.openProject({
-                images: images,
-                categories: project.categories,
-                annotationCategories: project.annotationCategories,
-                name: project.name,
-              })
-            );
+    // const reader = new FileReader();
 
-            dispatch(
-              classifierSlice.actions.setClassifier({
-                classifier: classifier,
-              })
-            );
+    // reader.onload = async (event: ProgressEvent<FileReader>) => {
+    //   if (event.target && event.target.result) {
+    //     var images: Array<ImageType>;
+    //     var project: SerializedProjectType;
+    //     var classifier: Classifier;
+    //     var segmenter: SegmenterStoreType;
+    //     try {
+    //       const projectJSON = JSON.parse(event.target.result as string);
+    //       project = projectJSON.project;
+    //       classifier = projectJSON.classifier;
+    //       segmenter = projectJSON.segmenter;
+    //       images = await deserializeImages(project.serializedImages);
+    //     } catch (err) {
+    //       const error: Error = err as Error;
+    //       const warning: AlertStateType = {
+    //         alertType: AlertType.Warning,
+    //         name: "Could not parse JSON file",
+    //         description: `Error while parsing the project file: ${error.name}\n${error.message}`,
+    //       };
+    //       dispatch(
+    //         applicationSlice.actions.updateAlertState({ alertState: warning })
+    //       );
+    //       return;
+    //     }
 
-            dispatch(
-              segmenterSlice.actions.setSegmenter({
-                segmenter: segmenter,
-              })
-            );
-          });
-        } catch (err) {
-          const error: Error = err as Error;
-          const warning: AlertStateType = {
-            alertType: AlertType.Warning,
-            name: "Could not open project file",
-            description: `Error while opening the project file: ${error.name}\n${error.message}`,
-          };
-          dispatch(
-            applicationSlice.actions.updateAlertState({ alertState: warning })
-          );
-        }
-      }
-    };
+    //     try {
+    //       batch(() => {
+    //         dispatch(applicationSlice.actions.clearSelectedImages());
 
-    reader.readAsText(file);
+    //         dispatch(
+    //           projectSlice.actions.openProject({
+    //             images: images,
+    //             categories: project.categories,
+    //             annotationCategories: project.annotationCategories,
+    //             name: project.name,
+    //           })
+    //         );
+
+    //         dispatch(
+    //           classifierSlice.actions.setClassifier({
+    //             classifier: classifier,
+    //           })
+    //         );
+
+    //         dispatch(
+    //           segmenterSlice.actions.setSegmenter({
+    //             segmenter: segmenter,
+    //           })
+    //         );
+    //       });
+    //     } catch (err) {
+    //       const error: Error = err as Error;
+    //       const warning: AlertStateType = {
+    //         alertType: AlertType.Warning,
+    //         name: "Could not open project file",
+    //         description: `Error while opening the project file: ${error.name}\n${error.message}`,
+    //       };
+    //       dispatch(
+    //         applicationSlice.actions.updateAlertState({ alertState: warning })
+    //       );
+    //     }
+    //   }
+    // };
+
+    // reader.readAsText(file);
   };
 
   return (
     <MenuItem component="label">
       <ListItemText primary="Open project" />
       <input
-        accept="application/json"
+        accept="application/x-hdf5"
         hidden
         id="open-project-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
