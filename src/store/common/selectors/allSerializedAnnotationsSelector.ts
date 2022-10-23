@@ -22,7 +22,7 @@ export const allSerializedAnnotationsSelector = ({
       imageChannels: image.shape.channels,
       imageColors: image.colors,
       // @ts-ignore TODO: image_data
-      imageData: image.originalSrc,
+      // imageData: image.originalSrc,
       imageSrc: image.src,
       imageFilename: image.name,
       imageHeight: image.shape.height,

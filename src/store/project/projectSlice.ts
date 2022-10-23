@@ -37,7 +37,7 @@ const initialAnnotationCategories =
       ]
     : [UNKNOWN_ANNOTATION_CATEGORY];
 
-const initialState: Project = {
+export const initialState: Project = {
   categories: [UNKNOWN_CATEGORY],
   annotationCategories: initialAnnotationCategories,
   // TODO: image_data
@@ -83,7 +83,6 @@ export const projectSlice = createSlice({
       };
       state.annotationCategories.push(category);
     },
-
     createCategory(
       state,
       action: PayloadAction<{ name: string; color: string }>
@@ -170,6 +169,12 @@ export const projectSlice = createSlice({
         return !action.payload.ids.includes(image.id);
       });
     },
+    setProject(state, action: PayloadAction<{ project: Project }>) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.project;
+      return action.payload.project;
+    },
+    // TODO: image_data, should not need openProject by the end
     openProject(
       state,
       action: PayloadAction<{

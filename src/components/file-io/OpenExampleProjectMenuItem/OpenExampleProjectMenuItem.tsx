@@ -48,6 +48,7 @@ type OpenExampleProjectMenuItemProps = {
   onClose: () => void;
 };
 
+// TODO: image_data
 export const OpenExampleProjectMenuItem = ({
   exampleProject,
   onClose,
@@ -104,6 +105,7 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
+    // TODO: iamge_data - set to setProject
     dispatch(
       projectSlice.actions.openProject({
         images: images,
@@ -113,8 +115,9 @@ export const OpenExampleProjectMenuItem = ({
       })
     );
 
+    // TODO: image_data - set to new setClassifier
     dispatch(
-      classifierSlice.actions.setClassifier({
+      classifierSlice.actions.oldSetClassifier({
         classifier: classifier,
       })
     );

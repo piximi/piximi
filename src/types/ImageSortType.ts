@@ -36,3 +36,15 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
     comparerFunction: (a, b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
   },
 ];
+
+export const sortKeyByName = (name: string): ImageSortKeyType => {
+  const sortKeyIdx = availableImageSortKeys
+    .map((e) => e.imageSortKeyName)
+    .indexOf(name);
+
+  if (sortKeyIdx >= 0) {
+    return availableImageSortKeys[sortKeyIdx];
+  } else {
+    return defaultImageSortKey;
+  }
+};

@@ -8,6 +8,7 @@ import {
   ImageType,
   PreprocessOptions,
   Project,
+  Category,
 } from "types";
 import { Colors } from "types/tensorflow";
 
@@ -49,18 +50,18 @@ const serializeImageAnnotations = (
 
 const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
   const numChannels = colors.color.shape[0];
-  const rangeMins = new Uint8Array(numChannels);
-  const rangeMaxs = new Uint8Array(numChannels);
+  const rangeMins = new Float32Array(numChannels);
+  const rangeMaxs = new Float32Array(numChannels);
   const visibilities = new Uint8Array(numChannels);
 
   for (let i = 0; i < numChannels; i++) {
     rangeMins[i] = colors.range[i][0];
     rangeMaxs[i] = colors.range[i][1];
-    visibilities[i] = Number(colors.visible);
+    visibilities[i] = Number(colors.visible[i]);
   }
 
-  colorsGroup.create_dataset("range_min", rangeMins, undefined, "<B");
-  colorsGroup.create_dataset("range_max", rangeMaxs, undefined, "<B");
+  colorsGroup.create_dataset("range_min", rangeMins, undefined, "<f4");
+  colorsGroup.create_dataset("range_max", rangeMaxs, undefined, "<f4");
   colorsGroup.create_dataset("visible_B", visibilities, undefined, "<B");
 
   colorsGroup.create_dataset(
@@ -99,22 +100,22 @@ const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
   }
 };
 
-const serializeCategory = (categoryGroup: Group, project: Project) => {
+const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
   categoryGroup.create_dataset(
     "color",
-    project.categories.map((cat) => cat.color)
+    categories.map((cat) => cat.color)
   );
   categoryGroup.create_dataset(
     "id",
-    project.categories.map((cat) => cat.id)
+    categories.map((cat) => cat.id)
   );
   categoryGroup.create_dataset(
     "name",
-    project.categories.map((cat) => cat.name)
+    categories.map((cat) => cat.name)
   );
   categoryGroup.create_dataset(
     "visible_B",
-    Uint8Array.from(project.categories.map((cat) => Number(cat.visible))),
+    Uint8Array.from(categories.map((cat) => Number(cat.visible))),
     undefined,
     "<B"
   );
@@ -131,11 +132,11 @@ const serializeProject = (projectGroup: Group, project: Project) => {
   serializeImages(imagesGroup, project.images);
 
   const categoriesGroup = projectGroup.create_group("categories");
-  serializeCategory(categoriesGroup, project);
+  serializeCategories(categoriesGroup, project.categories);
   const annotationCategoriesGroup = projectGroup.create_group(
     "annotationCategories"
   );
-  serializeCategory(annotationCategoriesGroup, project);
+  serializeCategories(annotationCategoriesGroup, project.annotationCategories);
 };
 
 /*

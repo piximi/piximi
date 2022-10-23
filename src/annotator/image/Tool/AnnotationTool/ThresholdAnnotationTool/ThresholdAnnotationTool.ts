@@ -3,7 +3,8 @@ import { encode } from "../../../rle";
 import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
-  origin?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // origin?: { x: number; y: number };
   threshold = 255;
   width?: number;
   height?: number;
