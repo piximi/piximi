@@ -7,11 +7,13 @@ import { encode } from "../../../rle";
 import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class MagneticAnnotationTool extends AnnotationTool {
-  anchor?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // anchor?: { x: number; y: number };
   buffer: Array<number> = [];
   factor: number;
   graph?: PiximiGraph;
-  origin?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // origin?: { x: number; y: number };
   path: Array<number> = [];
   pathfinder?: { find: (fromId: number, toId: number) => any };
   points: Array<number> = [];

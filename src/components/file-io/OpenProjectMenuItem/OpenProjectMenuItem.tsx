@@ -11,16 +11,7 @@ import { segmenterSlice } from "store/segmenter";
 import { uploader } from "components/file-io/utils/file_handlers";
 import { deserialize } from "image/utils/deserialize";
 
-import {
-  AlertStateType,
-  AlertType,
-  Classifier,
-  ImageType,
-  SegmenterStoreType,
-  SerializedProjectType,
-} from "types";
-
-import { deserializeImages } from "image/imageHelper";
+import { AlertStateType, AlertType } from "types";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -44,75 +35,41 @@ export const OpenProjectMenuItem = ({
 
     event.target.value = "";
 
-    deserialize(file.name);
+    deserialize(file.name)
+      .then((res) => {
+        batch(() => {
+          dispatch(applicationSlice.actions.clearSelectedImages());
 
-    // const reader = new FileReader();
+          dispatch(
+            projectSlice.actions.setProject({
+              project: res.project,
+            })
+          );
 
-    // reader.onload = async (event: ProgressEvent<FileReader>) => {
-    //   if (event.target && event.target.result) {
-    //     var images: Array<ImageType>;
-    //     var project: SerializedProjectType;
-    //     var classifier: Classifier;
-    //     var segmenter: SegmenterStoreType;
-    //     try {
-    //       const projectJSON = JSON.parse(event.target.result as string);
-    //       project = projectJSON.project;
-    //       classifier = projectJSON.classifier;
-    //       segmenter = projectJSON.segmenter;
-    //       images = await deserializeImages(project.serializedImages);
-    //     } catch (err) {
-    //       const error: Error = err as Error;
-    //       const warning: AlertStateType = {
-    //         alertType: AlertType.Warning,
-    //         name: "Could not parse JSON file",
-    //         description: `Error while parsing the project file: ${error.name}\n${error.message}`,
-    //       };
-    //       dispatch(
-    //         applicationSlice.actions.updateAlertState({ alertState: warning })
-    //       );
-    //       return;
-    //     }
+          dispatch(
+            classifierSlice.actions.setClassifier({
+              classifier: res.classifier,
+            })
+          );
 
-    //     try {
-    //       batch(() => {
-    //         dispatch(applicationSlice.actions.clearSelectedImages());
-
-    //         dispatch(
-    //           projectSlice.actions.openProject({
-    //             images: images,
-    //             categories: project.categories,
-    //             annotationCategories: project.annotationCategories,
-    //             name: project.name,
-    //           })
-    //         );
-
-    //         dispatch(
-    //           classifierSlice.actions.setClassifier({
-    //             classifier: classifier,
-    //           })
-    //         );
-
-    //         dispatch(
-    //           segmenterSlice.actions.setSegmenter({
-    //             segmenter: segmenter,
-    //           })
-    //         );
-    //       });
-    //     } catch (err) {
-    //       const error: Error = err as Error;
-    //       const warning: AlertStateType = {
-    //         alertType: AlertType.Warning,
-    //         name: "Could not open project file",
-    //         description: `Error while opening the project file: ${error.name}\n${error.message}`,
-    //       };
-    //       dispatch(
-    //         applicationSlice.actions.updateAlertState({ alertState: warning })
-    //       );
-    //     }
-    //   }
-    // };
-
-    // reader.readAsText(file);
+          dispatch(
+            segmenterSlice.actions.setSegmenter({
+              segmenter: res.segmenter,
+            })
+          );
+        });
+      })
+      .catch((err) => {
+        const error: Error = err as Error;
+        const warning: AlertStateType = {
+          alertType: AlertType.Warning,
+          name: "Could not parse project file",
+          description: `Error while parsing the project file: ${error.name}\n${error.message}`,
+        };
+        dispatch(
+          applicationSlice.actions.updateAlertState({ alertState: warning })
+        );
+      });
   };
 
   return (

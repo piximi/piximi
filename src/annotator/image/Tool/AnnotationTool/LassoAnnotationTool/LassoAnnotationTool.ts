@@ -3,9 +3,11 @@ import { encode } from "../../../rle";
 import { AnnotationStateType } from "types/AnnotationStateType";
 
 export class LassoAnnotationTool extends AnnotationTool {
-  anchor?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // anchor?: { x: number; y: number };
   buffer: Array<number> = [];
-  origin?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // origin?: { x: number; y: number };
   points: Array<number> = [];
 
   deselect() {

@@ -6,7 +6,8 @@ import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: { x: number; y: number };
-  origin?: { x: number; y: number };
+  // TODO: ts throws error on this overwriting AnnotationTool property
+  // origin?: { x: number; y: number };
   radius?: { x: number; y: number };
 
   deselect() {

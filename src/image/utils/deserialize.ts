@@ -10,8 +10,25 @@ import {
   Project,
   Classifier,
   AnnotationType,
+  Partition,
+  Category,
+  FitOptions,
+  PreprocessOptions,
+  CropOptions,
+  RescaleOptions,
+  ClassifierModelProps,
+  ModelType,
+  CropSchema,
+  Metric,
+  LossFunction,
+  OptimizationAlgorithm,
 } from "types";
 import { _SerializedImageType } from "types/SerializedImageType"; // TODO: immge_data
+import { Colors } from "types/tensorflow";
+import { sortKeyByName } from "types/ImageSortType";
+import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
+import { initialState as initialProjectState } from "store/project/projectSlice";
+import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
 
 /*
   =====================
@@ -199,63 +216,294 @@ const deserializeAnnotationsGroup = (
     maskIdx += maskLengths[i];
   }
 
-  /*
-  boundingBox: [number, number, number, number];
-  categoryId: string;
-  id: string;
-  mask: Array<number>;
-  plane: number;
-  */
-
-  return "" as unknown as Array<AnnotationType>;
+  return annotations;
 };
 
-const deserializeImageGroup = (name: string, imageGroup: Group): ImageType => {
-  const id = getAttr(imageGroup, "id");
-  const activePlane = getAttr(imageGroup, "active_plane");
-  const categoryId = getAttr(imageGroup, "category_id");
-  const classifierPartition = getAttr(imageGroup, "classifier_partition");
+const deserializeColorsGroup = (colorsGroup: Group): Colors => {
+  const colorsDataset = getDataset(colorsGroup, "color");
+  const numChannels = colorsDataset.shape[0];
+  const colors = colorsDataset.value as Float32Array;
+  const rangeMaxs = getDataset(colorsGroup, "range_max").value as Float32Array;
+  const rangeMins = getDataset(colorsGroup, "range_min").value as Float32Array;
+  const visibilities = getDataset(colorsGroup, "visible_B").value as Uint8Array;
+
+  if (
+    rangeMaxs.length !== numChannels ||
+    rangeMins.length !== numChannels ||
+    visibilities.length !== numChannels
+  ) {
+    throw Error(
+      `Expected colors group "${colorsGroup.path}" to have "${numChannels}" channels, range and visibility`
+    );
+  }
+
+  let range: Colors["range"] = {};
+  let visible: Colors["visible"] = {};
+  for (let i = 0; i < numChannels; i++) {
+    range[i] = [rangeMins[i], rangeMaxs[i]];
+    visible[i] = Boolean(visibilities[i]);
+  }
+
+  return {
+    range,
+    visible,
+    color: tensor2d(colors, [numChannels, 3], "float32"),
+  };
+};
+
+const deserializeImageGroup = async (
+  name: string,
+  imageGroup: Group
+): Promise<ImageType> => {
+  const id = getAttr(imageGroup, "id") as string;
+  const activePlane = getAttr(imageGroup, "active_plane") as number;
+  const categoryId = getAttr(imageGroup, "category_id") as string;
+  const classifierPartition = getAttr(
+    imageGroup,
+    "classifier_partition"
+  ) as Partition;
   const visible = Boolean(getAttr(imageGroup, "visible_B"));
 
   const annotationsGroup = getGroup(imageGroup, "annotations");
   const annotations = deserializeAnnotationsGroup(annotationsGroup);
-  // const colorsGroup = getGroup(imageGroup, 'colors');
-  // const imageDataset = getDataset(imageGroup, name);
+  const colorsGroup = getGroup(imageGroup, "colors");
+  const colors = deserializeColorsGroup(colorsGroup);
+  const imageDataset = getDataset(imageGroup, name);
+  const imageData = imageDataset.value as Float32Array;
+  const [planes, height, width, channels] = imageDataset.shape;
+  const bitDepth = getAttr(imageDataset, "bit_depth") as ImageJS.BitDepth;
 
-  return "" as unknown as ImageType;
+  const imageTensor = tensor4d(
+    imageData,
+    [planes, height, width, channels],
+    "float32"
+  );
+  const src = await createRenderedTensor(
+    imageTensor,
+    colors,
+    bitDepth,
+    undefined,
+    activePlane
+  );
+
+  return {
+    id,
+    name,
+    activePlane,
+    categoryId,
+    partition: classifierPartition,
+    visible,
+    annotations,
+    colors,
+    data: imageTensor,
+    bitDepth,
+    shape: {
+      planes,
+      height,
+      width,
+      channels,
+    },
+    src,
+  };
 };
 
-const deserializeImagesGroup = (imagesGroup: Group): Array<ImageType> => {
-  const sortKey = getAttr(imagesGroup, "sort_key");
-
+const deserializeImagesGroup = async (imagesGroup: Group) => {
   const imageNames = imagesGroup.keys();
   const images: Array<ImageType> = [];
   for (const name of imageNames) {
     let imageGroup = getGroup(imagesGroup, name);
-    images.push(deserializeImageGroup(name, imageGroup));
+    let image = await deserializeImageGroup(name, imageGroup);
+    images.push(image);
   }
 
   return images;
 };
 
-const deserializeProjectGroup = (projectGroup: Group): Project => {
-  const name = getAttr(projectGroup, "name");
+const deserializeCategoriesGroup = (categoriesGroup: Group) => {
+  const ids = getDataset(categoriesGroup, "id").value as string[];
+  const colors = getDataset(categoriesGroup, "color").value as string[];
+  const names = getDataset(categoriesGroup, "name").value as string[];
+  const visibilities = Array.from(
+    getDataset(categoriesGroup, "visible_B").value as Uint8Array
+  ).map(Boolean);
 
-  const imagesGroup = getGroup(projectGroup, "images");
-  const images = deserializeImagesGroup(imagesGroup);
+  if (
+    ids.length !== colors.length ||
+    ids.length !== names.length ||
+    ids.length !== visibilities.length
+  ) {
+    throw Error(
+      `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
+    );
+  }
 
-  // const categoriesGroup = getGroup(projectGroup, "categories");
-  // const categories = deserializeCategoriesGroup(categoriesGroup);
+  const categories: Array<Category> = [];
+  for (let i = 0; i < ids.length; i++) {
+    categories.push({
+      id: ids[i],
+      color: colors[i],
+      name: names[i],
+      visible: visibilities[i],
+    });
+  }
 
-  // const annotationCategoriesGroup = getGroup(projectGroup, "annotationCategories");
-  // const annotationCategories = deserializeAnnotationCategories(annotationCategoriesGroup);
-
-  return "" as unknown as Project;
+  return categories;
 };
 
-// const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {};
+const deserializeProjectGroup = async (
+  projectGroup: Group
+): Promise<Project> => {
+  const name = getAttr(projectGroup, "name") as string;
 
-export const deserialize = (filename: string) => {
+  const imagesGroup = getGroup(projectGroup, "images");
+  const sortKeyName = getAttr(imagesGroup, "sort_key") as string;
+  const imageSortKey = sortKeyByName(sortKeyName);
+  const images = await deserializeImagesGroup(imagesGroup);
+
+  const categoriesGroup = getGroup(projectGroup, "categories");
+  const categories = deserializeCategoriesGroup(categoriesGroup);
+
+  const annotationCategoriesGroup = getGroup(
+    projectGroup,
+    "annotationCategories"
+  );
+  const annotationCategories = deserializeCategoriesGroup(
+    annotationCategoriesGroup
+  );
+
+  return {
+    ...initialProjectState,
+    name,
+    categories,
+    annotationCategories,
+    imageSortKey: imageSortKey,
+    images,
+  };
+};
+
+const deserializeFitOptionsGroup = (fitOptionsGroup: Group): FitOptions => {
+  const batchSize = getAttr(fitOptionsGroup, "batch_size") as number;
+  const epochs = getAttr(fitOptionsGroup, "epochs") as number;
+  const initialEpoch = getAttr(fitOptionsGroup, "initial_epoch") as number;
+
+  return {
+    batchSize,
+    epochs,
+    initialEpoch,
+  };
+};
+
+const deserializeCropOptionsGroup = (cropOptionsGroup: Group): CropOptions => {
+  const cropSchema = getAttr(
+    cropOptionsGroup,
+    "crop_schema"
+  ) as string as CropSchema;
+  const numCrops = getAttr(cropOptionsGroup, "num_crops") as number;
+
+  return { cropSchema, numCrops };
+};
+
+const deserializeRescaleOptionsGroup = (
+  rescaleOptionsGroup: Group
+): RescaleOptions => {
+  const center = Boolean(getAttr(rescaleOptionsGroup, "center_B") as number);
+  const rescale = Boolean(getAttr(rescaleOptionsGroup, "rescale_B") as number);
+
+  return { center, rescale };
+};
+
+const deserializePreprocessOptionsGroup = (
+  preprocessOptionsGroup: Group
+): PreprocessOptions => {
+  const shuffle = Boolean(
+    getAttr(preprocessOptionsGroup, "shuffle_B") as number
+  );
+
+  const cropOptionsGroup = getGroup(preprocessOptionsGroup, "crop_options");
+  const cropOptions = deserializeCropOptionsGroup(cropOptionsGroup);
+
+  const rescaleOptionsGroup = getGroup(
+    preprocessOptionsGroup,
+    "rescale_options"
+  );
+  const rescaleOptions = deserializeRescaleOptionsGroup(rescaleOptionsGroup);
+
+  return { cropOptions, rescaleOptions, shuffle };
+};
+
+const deserializeSelectedModelGroup = (
+  selectedModelGroup: Group
+): ClassifierModelProps => {
+  const modelName = getAttr(selectedModelGroup, "model_name") as string;
+  const modelType = getAttr(
+    selectedModelGroup,
+    "model_type"
+  ) as number as ModelType;
+  const srcAttr = selectedModelGroup.attrs["src"];
+  const src = srcAttr ? (srcAttr.value as string) : null;
+
+  if (src) {
+    return { modelName, modelType, src };
+  } else {
+    return { modelName, modelType };
+  }
+};
+
+const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
+  const learningRate = getAttr(classifierGroup, "learning_rate") as number;
+  const lossFunction = getAttr(
+    classifierGroup,
+    "loss_function"
+  ) as string as LossFunction;
+  const optimizationAlgorithm = getAttr(
+    classifierGroup,
+    "optimization_algorithm"
+  ) as string as OptimizationAlgorithm;
+  const trainingPercentage = getAttr(
+    classifierGroup,
+    "training_percent"
+  ) as number;
+
+  const fitOptionsGroup = getGroup(classifierGroup, "fit_options");
+  const fitOptions = deserializeFitOptionsGroup(fitOptionsGroup);
+
+  const inputShape = getDataset(classifierGroup, "input_shape")
+    .value as Uint8Array;
+  const [planes, height, width, channels] = inputShape;
+  const metrics = getDataset(classifierGroup, "metrics")
+    .value as string[] as Metric[];
+
+  const preprocessOptionsGroup = getGroup(
+    classifierGroup,
+    "preprocess_options"
+  );
+  const preprocessOptions = deserializePreprocessOptionsGroup(
+    preprocessOptionsGroup
+  );
+
+  const selectedModelGroup = getGroup(classifierGroup, "selected_model");
+  const selectedModel = deserializeSelectedModelGroup(selectedModelGroup);
+
+  return {
+    ...initialClassifierState,
+    fitOptions,
+    inputShape: {
+      planes,
+      height,
+      width,
+      channels,
+    },
+    metrics,
+    preprocessOptions,
+    selectedModel,
+    learningRate,
+    lossFunction,
+    optimizationAlgorithm,
+    trainingPercentage,
+  };
+};
+
+export const deserialize = async (filename: string) => {
   let f = new File(filename, "r");
 
   if (!(f.type === "Group")) {
@@ -263,14 +511,16 @@ export const deserialize = (filename: string) => {
   }
 
   const projectGroup = getGroup(f, "project");
-  const project = deserializeProjectGroup(projectGroup);
+  const project = await deserializeProjectGroup(projectGroup);
 
-  // const classifierGroup = getGroup("classifier")
-  // classifier = deserializeClassifier(classifierGroup);
+  const classifierGroup = getGroup(f, "classifier");
+  const classifier = deserializeClassifierGroup(classifierGroup);
 
-  // return {
-  //   project, classifier;
-  // }
+  return {
+    project,
+    classifier,
+    segmenter: initialSegmenterState,
+  };
 };
 
 /*
@@ -289,7 +539,7 @@ const getDataset = (root: File | Group, key: string) => {
   }
 };
 
-const getAttr = (root: File | Group, attr: string) => {
+const getAttr = (root: File | Group | Dataset, attr: string) => {
   if (root.attrs.hasOwnProperty(attr)) {
     return root.attrs[attr].value;
   } else {

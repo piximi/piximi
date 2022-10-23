@@ -15,7 +15,7 @@ import {
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
 
-const initialState: Classifier = {
+export const initialState: Classifier = {
   evaluating: false,
   inputShape: {
     planes: 1,
@@ -83,7 +83,13 @@ export const classifierSlice = createSlice({
     ) {
       state.evaluating = true;
     },
-    setClassifier(
+    setClassifier(state, action: PayloadAction<{ classifier: Classifier }>) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.classifier;
+      return action.payload.classifier;
+    },
+    // TODO: image_data - delete this when doen
+    oldSetClassifier(
       state,
       action: PayloadAction<{
         classifier: Classifier;
