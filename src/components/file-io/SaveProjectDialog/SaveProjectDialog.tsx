@@ -1,6 +1,5 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import h5wasm from "h5wasm";
 
 import {
   Button,
@@ -17,11 +16,10 @@ import { projectSelector } from "store/project";
 // TODO: implement segmenter serialization
 // import { segmenterSelector } from "store/segmenter";
 
-import { useHotkeys } from "hooks";
-import { download } from "components/file-io/utils/file_handlers";
-import { serialize } from "image/utils/serialize";
-
 import { HotkeyView } from "types";
+import { useHotkeys } from "hooks";
+import { serialize } from "image/utils/serialize";
+import { downloader } from "../utils/file_handlers";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -39,17 +37,13 @@ export const SaveProjectDialog = ({
   const [projectName, setProjectName] = useState<string>(project.name);
 
   const onSaveProjectClick = async () => {
-    await h5wasm.ready;
-
-    const f = new h5wasm.File(`${project.name}.h5`, "w");
-
-    serialize(f, project, classifier);
-
-    await download(f);
-    const closeStatus = f.close();
-
-    process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log(`closed ${project.name} with status ${closeStatus}`);
+    serialize(projectName, project, classifier)
+      .then((f) => {
+        downloader(f, `${projectName}.h5`);
+      })
+      .catch((err) => {
+        process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);
+      });
 
     onClose();
   };
