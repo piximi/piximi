@@ -1,4 +1,6 @@
-import { File, Group } from "h5wasm";
+import { Group, ready } from "h5wasm";
+
+import { getFile, to_blob } from "components/file-io/utils/file_handlers";
 import {
   AnnotationType,
   Classifier,
@@ -292,16 +294,31 @@ const serializeClassifier = (
   ===========
  */
 
-export const serialize = (
-  file: File,
+export const serialize = async (
+  name: string,
   projectSlice: Project,
   classifierSlice: Classifier
 ) => {
-  file.create_attribute("version", "0.1.0");
+  const { FS } = await ready;
 
-  const projectGroup = file.create_group("project");
+  const f = await getFile(name, "w");
+
+  f.create_attribute("version", "0.1.0");
+
+  const projectGroup = f.create_group("project");
   serializeProject(projectGroup, projectSlice);
 
-  const classifierGroup = file.create_group("classifier");
+  const classifierGroup = f.create_group("classifier");
   serializeClassifier(classifierGroup, classifierSlice);
+
+  const fBlob = await to_blob(f);
+
+  const closeStatus = f.close();
+
+  process.env.REACT_APP_LOG_LEVEL === "1" &&
+    console.log(`closed ${name} with status ${closeStatus}`);
+
+  FS.unlink(`${f.path}${f.filename}`);
+
+  return fBlob;
 };

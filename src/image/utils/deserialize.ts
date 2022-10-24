@@ -1,8 +1,9 @@
 import { tensor2d, tensor4d } from "@tensorflow/tfjs";
 import * as ImageJS from "image-js"; // TODO: image_data
-import { Dataset, File, Group } from "h5wasm";
+import { Dataset, File, Group, ready } from "h5wasm";
 import _ from "lodash";
 
+import { getFile } from "components/file-io/utils/file_handlers";
 import { convertToImage, createRenderedTensor } from "image/utils/imageHelper";
 import {
   SerializedImageType,
@@ -504,7 +505,9 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
 };
 
 export const deserialize = async (filename: string) => {
-  let f = new File(filename, "r");
+  const { FS } = await ready;
+
+  let f = await getFile(filename, "r");
 
   if (!(f.type === "Group")) {
     throw Error("Expected group at top level");
@@ -515,6 +518,12 @@ export const deserialize = async (filename: string) => {
 
   const classifierGroup = getGroup(f, "classifier");
   const classifier = deserializeClassifierGroup(classifierGroup);
+
+  const status = f.close();
+  process.env.REACT_APP_LOG_LEVEL === "1" &&
+    console.log(`closed ${filename} with status ${status}`);
+
+  FS.unlink(`${f.path}${f.filename}`);
 
   return {
     project,

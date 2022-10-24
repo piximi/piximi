@@ -3,23 +3,23 @@
 
 import { ready, File as H5WasmFile } from "h5wasm";
 
-export const UPLOADED_FILES: string[] = [];
+// export const UPLOADED_FILES: string[] = [];
 
 export async function uploader(file: File) {
   const { FS } = await ready;
   let datafilename = file.name;
   let ab = await file.arrayBuffer();
   FS.writeFile(datafilename, new Uint8Array(ab));
-  if (!UPLOADED_FILES.includes(datafilename)) {
-    UPLOADED_FILES.push(datafilename);
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log("file loaded:", datafilename);
-  } else {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log("file updated: ", datafilename);
-  }
+  // if (!UPLOADED_FILES.includes(datafilename)) {
+  //   UPLOADED_FILES.push(datafilename);
+  //   process.env.NODE_ENV !== "production" &&
+  //     process.env.REACT_APP_LOG_LEVEL === "1" &&
+  //     console.log("file loaded:", datafilename);
+  // } else {
+  //   process.env.NODE_ENV !== "production" &&
+  //     process.env.REACT_APP_LOG_LEVEL === "1" &&
+  //     console.log("file updated: ", datafilename);
+  // }
 }
 
 function create_downloader() {
@@ -70,7 +70,7 @@ export async function download(hdf5_file: H5WasmFile) {
 export function dirlisting(
   path: string,
   FS: FS.FileSystemType
-): { files: string[]; subfolders: string[] } | {} {
+): { files: string[]; subfolders: string[] } {
   let node = FS.analyzePath(path).object;
   if (node && node.isFolder) {
     let files = Object.values(node.contents)
@@ -81,6 +81,26 @@ export function dirlisting(
       .map((v) => v.name);
     return { files, subfolders };
   } else {
-    return {};
+    return { files: [], subfolders: [] };
   }
 }
+
+export const getFile = async (name: string, mode: "r" | "w") => {
+  const { FS } = await ready;
+  const fName = name.endsWith(".h5") ? name : `${name}.h5`;
+
+  try {
+    const f = new H5WasmFile(fName, mode);
+
+    if (f.file_id === -1n) {
+      throw Error(`Failed to ${mode === "w" ? "create" : "retrieve"} ${fName}`);
+    }
+
+    return f;
+  } catch (err) {
+    if (dirlisting("/", FS).files.includes(fName)) {
+      FS.unlink(fName);
+    }
+    throw err;
+  }
+};
