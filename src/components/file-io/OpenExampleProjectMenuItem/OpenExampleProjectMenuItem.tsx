@@ -105,7 +105,7 @@ export const OpenExampleProjectMenuItem = ({
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
-    // TODO: iamge_data - set to setProject
+    // TODO: image_data - set to setProject
     dispatch(
       projectSlice.actions.openProject({
         images: images,

@@ -15,7 +15,7 @@ import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { AnnotationType } from "types/AnnotationType";
 import { replaceDuplicateName } from "image/utils/imageHelper";
-// todo: image_data
+// TODO: image_data
 //import { defaultImage } from "images/defaultImage";
 
 const initialAnnotationCategories =
