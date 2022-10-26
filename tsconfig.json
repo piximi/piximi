@@ -19,7 +19,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2022",
+    "target": "ES2022",
     "noErrorTruncation": true
   },
   "include": [
