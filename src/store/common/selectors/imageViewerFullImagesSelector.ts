@@ -1,5 +1,6 @@
 import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
 
+// TODO: image-data - getting original color tensor is bad
 export const imageViewerFullImagesSelector = ({
   imageViewer,
   project,

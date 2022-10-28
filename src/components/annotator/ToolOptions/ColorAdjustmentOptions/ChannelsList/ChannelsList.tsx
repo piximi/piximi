@@ -18,7 +18,7 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
   imageViewerSlice,
-  activeImageColorsSelector,
+  activeImageColorsRawSelector,
 } from "store/image-viewer";
 
 import { imageBitDepthSelector, imageDataSelector } from "store/common";
@@ -44,7 +44,7 @@ export const ChannelsList = () => {
     setLocalState: setLocalActiveImageColors,
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
-    activeImageColorsSelector,
+    activeImageColorsRawSelector,
     imageViewerSlice.actions.setImageColors,
     { range: {}, visible: {}, color: [] }
   );

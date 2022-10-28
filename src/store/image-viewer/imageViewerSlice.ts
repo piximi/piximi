@@ -17,28 +17,25 @@ import { ImageViewer } from "types/ImageViewer";
 import { Colors } from "types/tensorflow";
 import { SerializedFileType } from "types/SerializedFileType";
 import {
+  // TODO: image_data
   generateDefaultChannels,
   replaceDuplicateName,
 } from "image/imageHelper";
 import { Partition } from "types/Partition";
 import { AnnotationTool } from "annotator/image/Tool";
-import { defaultImage } from "images/defaultImage";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
   boundingClientRect: new DOMRect(),
   brightness: 0,
-  currentColors: undefined,
   currentIndex: 0,
   cursor: "default",
   contrast: 0,
   exposure: 0,
   hue: 0,
-  activeImageId: defaultImage.id,
-  activeImageRenderedSrcs: [defaultImage.src],
-  // TODO: image_data
-  // images: [],
-  images: [defaultImage],
+  activeImageId: undefined,
+  activeImageRenderedSrcs: [],
+  images: [],
   language: LanguageType.English,
   offset: { x: 0, y: 0 },
   penSelectionBrushSize: 10,
@@ -164,6 +161,7 @@ export const imageViewerSlice = createSlice({
           : generateDefaultChannels(action.payload.imageFile.imageChannels),
         src: action.payload.imageFile.imageSrc,
         categoryId: UNKNOWN_CATEGORY_ID,
+        // TODO: image_data
         originalSrc: action.payload.imageFile.imageData,
         partition: Partition.Inference,
         visible: true,
@@ -272,15 +270,11 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{ images: Array<ShadowImageType> }>
     ) {
+      for (const im of state.images) {
+        im.data?.dispose();
+        im.colors.color.dispose();
+      }
       state.images = action.payload.images;
-    },
-    setCurrentColors(
-      state,
-      action: PayloadAction<{
-        currentColors: Colors;
-      }>
-    ) {
-      state.currentColors = action.payload.currentColors;
     },
     setCursor(
       state,
@@ -464,7 +458,6 @@ export const {
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,
-  setCurrentColors,
   setContrast,
   setCurrentIndex,
   setCursor,

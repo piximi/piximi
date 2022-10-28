@@ -10,7 +10,7 @@ import {
 
 import {
   imageViewerSlice,
-  activeImageColorsSelector,
+  activeImageColorsRawSelector,
 } from "store/image-viewer";
 
 import { DEFAULT_COLORS } from "types";
@@ -26,7 +26,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
 
   const open = Boolean(anchorEl);
 
-  const colors = useSelector(activeImageColorsSelector);
+  const colors = useSelector(activeImageColorsRawSelector);
 
   const dispatch = useDispatch();
 

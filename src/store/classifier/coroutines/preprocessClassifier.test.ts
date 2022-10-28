@@ -13,7 +13,8 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/utils/imageHelper";
+// TODO: image_data
+import { generateBlankColors } from "image/utils/imageHelper";
 
 jest.setTimeout(50000);
 
@@ -65,7 +66,7 @@ const images: Array<ImageType> = [
   {
     activePlane: 0,
     categoryId: "00000000-0000-0000-0000-00000000001",
-    colors: generateDefaultChannels(inputShape.channels),
+    colors: generateBlankColors(inputShape.channels),
     id: "00000000-0000-0000-0001-00000000000",
     annotations: [],
     name: "",

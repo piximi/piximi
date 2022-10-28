@@ -38,27 +38,18 @@ export function* activeImageIDChangeSaga({
     })
   );
 
-  // const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
-  //   //@ts-ignore TODO: image_data
-  //   yield call(convertImageURIsToImageData, image.originalSrc);
+  const renderedSrcs: Awaited<
+    ReturnType<typeof createRenderedTensor<undefined>>
+  > = yield call(
+    createRenderedTensor,
+    image.data,
+    image.colors,
+    image.bitDepth,
+    undefined
+  );
 
-  // const renderedSrcs = planesData.map((planeData) => {
-  //   return mapChannelsToSpecifiedRGBImage(
-  //     planeData,
-  //     //@ts-ignore TODO: image_data
-  //     image.colors,
-  //     image.shape.height,
-  //     image.shape.width
-  //   );
-  // });
-
-  // yield put(
-  //   imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
-  // );
   yield put(
-    imageViewerSlice.actions.setActiveImageRenderedSrcs({
-      renderedSrcs: [image.src],
-    })
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
   );
 }
 
@@ -87,7 +78,6 @@ export function* activeImageColorChangeSaga({
     image.data,
     colorsEditable,
     image.bitDepth,
-    undefined,
     undefined
   );
 

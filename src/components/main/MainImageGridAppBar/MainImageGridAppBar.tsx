@@ -112,6 +112,11 @@ export const MainImageGridAppBar = () => {
         );
       }
 
+      const annotatorImageColors = {
+        ...projectImage.colors,
+        color: projectImage.colors.color.clone(),
+      };
+
       const annotatorImage: ShadowImageType = {
         id: projectImage.id,
         name: projectImage.name,
@@ -119,7 +124,10 @@ export const MainImageGridAppBar = () => {
         src: projectImage.src,
         activePlane: projectImage.activePlane,
         shape: projectImage.shape,
-        colors: projectImage.colors,
+        // clone so that if it's mutated or disposed in annotator
+        // it won't apply those changes to the tensor in the main view
+        // unless changes are saved
+        colors: annotatorImageColors,
         bitDepth: projectImage.bitDepth,
       };
 
