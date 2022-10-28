@@ -1,27 +1,9 @@
-import { useState } from "react";
-
-import {
-  Collapse,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  styled,
-} from "@mui/material";
-import {
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
+import { styled } from "@mui/material";
 
 import { SegmenterArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
+import { CollapsibleList } from "components/common/CollapsibleList";
 
 export const SegmenterArchitectureSettingsListItem = () => {
-  const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
-    useState<boolean>(false);
-
-  const onSegmenterSettingsListClick = () => {
-    setCollapsedClassifierSettingsList(!collapsedClassifierSettingsList);
-  };
-
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -29,34 +11,15 @@ export const SegmenterArchitectureSettingsListItem = () => {
   });
 
   return (
-    <>
-      <ListItem
-        button
-        onClick={onSegmenterSettingsListClick}
-        style={{ padding: "12px 0px" }}
-      >
-        <ListItemIcon>
-          {collapsedClassifierSettingsList ? (
-            <ExpandLessIcon />
-          ) : (
-            <ExpandMoreIcon />
-          )}
-        </ListItemIcon>
-
-        <ListItemText
-          primary="Architecture Settings"
-          style={{ fontSize: "20px" }}
-        />
-      </ListItem>
-      <Collapse
-        in={collapsedClassifierSettingsList}
-        timeout="auto"
-        unmountOnExit
-      >
-        <StyledForm noValidate autoComplete="off">
-          <SegmenterArchitectureSettingsGrid />
-        </StyledForm>
-      </Collapse>
-    </>
+    <CollapsibleList
+      dense={false}
+      primary="Architecture Settings"
+      disablePadding={false}
+      paddingLeft={true}
+    >
+      <StyledForm noValidate autoComplete="off">
+        <SegmenterArchitectureSettingsGrid />
+      </StyledForm>
+    </CollapsibleList>
   );
 };

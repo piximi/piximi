@@ -17,8 +17,8 @@ import {
   ErrorOutline as ErrorOutlineIcon,
   WarningAmberOutlined as WarningAmberOutlinedIcon,
   InfoOutlined as InfoOutlinedIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
@@ -132,7 +132,7 @@ export const AlertDialog = ({
             color="inherit"
             onClick={() => setExpanded((prev) => !prev)}
           >
-            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            {expanded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
           </IconButton>
         </Tooltip>
 
