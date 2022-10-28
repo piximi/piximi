@@ -15,7 +15,7 @@ import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { replaceDuplicateName } from "image/utils/imageHelper";
 import {
-  bufferedAnnotationType,
+  decodedAnnotationType,
   encodedAnnotationType,
 } from "types/AnnotationType";
 import { encode } from "utils/annotator";
@@ -256,6 +256,102 @@ export const projectSlice = createSlice({
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
     },
+    updateImageAnnotations(
+      state,
+      action: PayloadAction<{
+        annotations: Array<decodedAnnotationType>;
+        imageId: string;
+      }>
+    ) {
+      state.images = state.images.map((image) => {
+        if (action.payload.imageId !== image.id) {
+          return image;
+        } else {
+          const encodedAnnotations = action.payload.annotations.map(
+            (annotation: decodedAnnotationType) => {
+              const { maskData, ...encodedAnnotation } = {
+                mask: encode(annotation.maskData),
+                ...annotation,
+              };
+              return encodedAnnotation;
+            }
+          );
+          return { ...image, annotations: encodedAnnotations };
+        }
+      });
+    },
+    updateImageCategories(
+      state,
+      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
+    ) {
+      action.payload.ids.forEach((imageId) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryId;
+          if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
+            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
+            state.images[index].partition = Partition.Inference;
+          } else {
+            state.images[index].partition = Partition.Training;
+          }
+        }
+      });
+    },
+    updateImageCategory(
+      // unused
+      state,
+      action: PayloadAction<{ id: string; categoryId: string }>
+    ) {
+      const index = state.images.findIndex((image) => {
+        return image.id === action.payload.id;
+      });
+      if (index >= 0) {
+        state.images[index].categoryId = action.payload.categoryId;
+      }
+    },
+    updateImageCategoryFromHighlighted(
+      state,
+      action: PayloadAction<{ ids: Array<string> }>
+    ) {
+      action.payload.ids.forEach((imageId) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          if (state.highlightedCategory)
+            state.images[index].categoryId = state.highlightedCategory;
+        }
+      });
+    },
+    updateImagesCategories(
+      state,
+      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryIds[idx];
+        }
+      });
+    },
+    updateImagesPartition(
+      state,
+      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].partition = action.payload.partition;
+        }
+      });
+    },
+
     updateCategory(
       state,
       action: PayloadAction<{ id: string; name: string; color: string }>
@@ -288,16 +384,15 @@ export const projectSlice = createSlice({
 
       state.categories[index].visible = action.payload.visible;
     },
-    updateOtherCategoryVisibility(
+    updateLabeledImagesVisibility(
       state,
-      action: PayloadAction<{ id?: string }>
+      action: PayloadAction<{ visibility: boolean }>
     ) {
-      for (let category of state.categories) {
-        category.visible =
-          action.payload.id === undefined
-            ? true
-            : category.id === action.payload.id;
-      }
+      state.images.forEach((image) => {
+        if (image.partition !== Partition.Inference) {
+          image.visible = action.payload.visibility;
+        }
+      });
     },
     updateOtherAnnotationCategoryVisibility(
       state,
@@ -310,86 +405,18 @@ export const projectSlice = createSlice({
             : category.id === action.payload.id;
       }
     },
-    updateLabeledImagesVisibility(
+    updateOtherCategoryVisibility(
       state,
-      action: PayloadAction<{ visibility: boolean }>
+      action: PayloadAction<{ id?: string }>
     ) {
-      state.images.forEach((image) => {
-        if (image.partition !== Partition.Inference) {
-          image.visible = action.payload.visibility;
-        }
-      });
-    },
-    updateImageCategoryFromHighlighted(
-      state,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          if (state.highlightedCategory)
-            state.images[index].categoryId = state.highlightedCategory;
-        }
-      });
-    },
-    updateImageCategory(
-      state,
-      action: PayloadAction<{ id: string; categoryId: string }>
-    ) {
-      const index = state.images.findIndex((image) => {
-        return image.id === action.payload.id;
-      });
-      if (index >= 0) {
-        state.images[index].categoryId = action.payload.categoryId;
+      for (let category of state.categories) {
+        category.visible =
+          action.payload.id === undefined
+            ? true
+            : category.id === action.payload.id;
       }
     },
-    updateImageCategories(
-      state,
-      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryId;
-          if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
-            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
-            state.images[index].partition = Partition.Inference;
-          } else {
-            state.images[index].partition = Partition.Training;
-          }
-        }
-      });
-    },
-    updateImagesCategories(
-      state,
-      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryIds[idx];
-        }
-      });
-    },
-    updateImagesPartition(
-      state,
-      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].partition = action.payload.partition;
-        }
-      });
-    },
+
     updateSegmentationImagesPartition(
       state,
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
@@ -399,7 +426,7 @@ export const projectSlice = createSlice({
           return image.id === imageId;
         });
         if (index >= 0) {
-          state.images[index].segmentationPartition = action.payload.partition;
+          state.images[index].partition = action.payload.partition;
         }
       });
     },
@@ -435,30 +462,6 @@ export const projectSlice = createSlice({
       );
 
       state.images.push(...updatedImages);
-    },
-    updateImageAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: Array<bufferedAnnotationType>;
-        imageId: string;
-      }>
-    ) {
-      state.images = state.images.map((image) => {
-        if (action.payload.imageId !== image.id) {
-          return image;
-        } else {
-          const encodedAnnotations = action.payload.annotations.map(
-            (annotation: bufferedAnnotationType) => {
-              const { maskData, ...encodedAnnotation } = {
-                mask: encode(annotation.maskData),
-                ...annotation,
-              };
-              return encodedAnnotation;
-            }
-          );
-          return { ...image, annotations: encodedAnnotations };
-        }
-      });
     },
   },
 });

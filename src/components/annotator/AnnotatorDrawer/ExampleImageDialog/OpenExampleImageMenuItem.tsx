@@ -56,6 +56,7 @@ export const OpenExampleImageMenuItem = ({
       dispatch(
         imageViewerSlice.actions.setActiveImage({
           imageId: image.id,
+          prevImageId: undefined,
           execSaga: true,
         })
       );

@@ -12,16 +12,7 @@ export const imageInstancesSelector = ({
     return image.id === imageViewer.activeImageId;
   });
   if (activeImage) {
-    const activeImageBufferedAnnotations = activeImage.annotations.map(
-      (annotation) => {
-        const { mask, ...buffered } = {
-          maskData: Uint8Array.from(decode(annotation.mask)),
-          ...annotation,
-        };
-        return buffered;
-      }
-    );
-    return activeImageBufferedAnnotations;
+    return activeImage.annotations;
   } else {
     return [];
   }

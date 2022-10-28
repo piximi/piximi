@@ -10,7 +10,7 @@ import { deserializeAnnotations } from "image/utils/loadExampleImage";
 
 import { validateFileType } from "types/runtime";
 
-import { activeImageSelector } from "store/common";
+import { activeImageSelector } from "store/image-viewer";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;

@@ -17,13 +17,13 @@ import {
   cursorSelector,
   imageHeightSelector,
   setSelectedAnnotations,
-  unselectedAnnotationsSelector,
+  stagedAnnotationsSelector,
 } from "store/image-viewer";
 
 import {
   AnnotationModeType,
   AnnotationStateType,
-  bufferedAnnotationType,
+  decodedAnnotationType,
 } from "types";
 
 import { AnnotationTool } from "annotator/AnnotationTools";
@@ -50,9 +50,20 @@ type TransformerProps = {
   annotationTool?: AnnotationTool;
 };
 
+const oppositeAnchorMap: Record<string, string> = {
+  "bottom-right": "top-left",
+  "bottom-center": "top-center",
+  "bottom-left": "top-right",
+  "top-left": "bottom-right",
+  "top-right": "bottom-left",
+  "top-center": "bottom-center",
+  "middle-right": "middle-left",
+  "middle-left": "middle-right",
+};
+
 export const Transformer = ({
-  transformPosition, // shouldn't change on annotation adjustments
-  annotationId, // shouldn't change on annotation adjustments
+  transformPosition,
+  annotationId,
   annotationTool,
 }: TransformerProps) => {
   // useState
@@ -69,7 +80,7 @@ export const Transformer = ({
   // useRef
   const transformerRef = useRef<Konva.Transformer | null>(null);
 
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);
@@ -78,14 +89,6 @@ export const Transformer = ({
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
   const imageHeight = useSelector(imageHeightSelector);
-
-  //console.log("unselectedAnnotations: \n", unselectedAnnotations);
-  //console.log("selectedAnnotations: \n", selectedAnnotations);
-  //console.log("selectedAnnotation: \n", selectedAnnotation);
-  //console.log("activeImageId: \n", activeImageId);
-  //console.log("stageScale: \n", stageScale);
-  //console.log("imageWidth: \n", imageWidth;
-  //console.log("imageHeight: \n", imageHeight);
 
   const dispatch = useDispatch();
 
@@ -116,37 +119,6 @@ export const Transformer = ({
     };
   };
 
-  const boundingBoxFunc = (oldBox: box, newBox: box) => {
-    if (!boundBox) {
-      setStartBox(oldBox);
-    }
-
-    const relativeNewBox = getRelativeBox(newBox);
-
-    if (!imageWidth || !imageHeight || !relativeNewBox)
-      return boundBox ? boundBox : startBox;
-
-    const minimumBoxArea = 5;
-
-    if (
-      relativeNewBox.width < minimumBoxArea ||
-      relativeNewBox.height < minimumBoxArea
-    )
-      return boundBox ? boundBox : oldBox;
-
-    if (
-      Math.floor(relativeNewBox.x + relativeNewBox.width) > imageWidth ||
-      Math.floor(relativeNewBox.y + relativeNewBox.height) > imageHeight ||
-      relativeNewBox.x < 0 ||
-      relativeNewBox.y < 0
-    ) {
-      return boundBox ? boundBox : oldBox;
-    }
-
-    setBoundBox(newBox);
-    return newBox;
-  };
-
   const getScaledCoordinate = (
     contour: Array<number>,
     center: { x: number; y: number },
@@ -162,12 +134,98 @@ export const Transformer = ({
       .flat();
   };
 
+  const getOppositeAnchorPosition = () => {
+    if (!transformerRef || !transformerRef.current) return { x: 0, y: 0 };
+    const activeAnchor = transformerRef.current.getActiveAnchor();
+    if (oppositeAnchorMap.hasOwnProperty(activeAnchor)) {
+      return transformerRef.current
+        .findOne(".".concat(oppositeAnchorMap[activeAnchor]))
+        .position();
+    } else {
+      return { x: 0, y: 0 };
+    }
+  };
+
+  const onTransformStart = () => {
+    const selected = stagedAnnotations.find(
+      (annotation: decodedAnnotationType) => {
+        return annotation.id === annotationId;
+      }
+    );
+
+    if (!selected) return;
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [selected],
+        selectedAnnotation: selected,
+      })
+    );
+  };
+
+  const onTransform = () => {
+    if (!center) {
+      //at the beginning of transform, find out the "center" coordinate used for the resizing (i.e., the coordinate that does not move during resize)
+      const oppositeAnchorPosition = getOppositeAnchorPosition();
+      const scaledOppositeAnchorPosition = {
+        x: oppositeAnchorPosition.x / stageScale,
+        y: oppositeAnchorPosition.y / stageScale,
+      };
+
+      const relativeStartBox = getRelativeBox(startBox);
+
+      if (!relativeStartBox) return;
+
+      setCenter({
+        x: scaledOppositeAnchorPosition.x + relativeStartBox.x,
+        y: scaledOppositeAnchorPosition.y + relativeStartBox.y,
+      });
+    }
+  };
+  const boundingBoxFunc = (oldBox: box, newBox: box) => {
+    if (!boundBox) {
+      setStartBox(oldBox);
+    }
+
+    const relativeNewBox = getRelativeBox(newBox);
+
+    if (!imageWidth || !imageHeight || !relativeNewBox)
+      return boundBox ? boundBox : startBox;
+
+    const minimumBoxDim = 5;
+
+    if (
+      relativeNewBox.width < minimumBoxDim ||
+      relativeNewBox.height < minimumBoxDim
+    )
+      return boundBox ? boundBox : oldBox;
+
+    if (
+      Math.floor(relativeNewBox.x + relativeNewBox.width) > imageWidth ||
+      Math.floor(relativeNewBox.y + relativeNewBox.height) > imageHeight ||
+      relativeNewBox.x < 0 ||
+      relativeNewBox.y < 0
+    ) {
+      return boundBox ? boundBox : oldBox;
+    }
+
+    setBoundBox(newBox);
+    console.log("boundingBoxFunc: newBox:", newBox);
+    return newBox;
+  };
   const onTransformEnd = () => {
     if (!selectedAnnotation) return;
 
     if (!boundBox || !startBox) return;
 
     if (!imageWidth || !imageHeight) return;
+
+    console.log("TransformEnd");
+    console.log(
+      `BoundBox width: ${boundBox.width}, height: ${boundBox.height}, x: ${boundBox.x}, y: ${boundBox.y}`
+    );
+    console.log(
+      `StartBox width: ${startBox.width}, height: ${startBox.height}, x: ${startBox.x}, y: ${startBox.y}`
+    );
 
     const relativeBoundBox = getRelativeBox(boundBox);
     const relativeStartBox = getRelativeBox(startBox);
@@ -181,10 +239,32 @@ export const Transformer = ({
     //extract roi and resize
     const boundingBox = selectedAnnotation.boundingBox;
 
-    const roiWidth = boundingBox[2] - boundingBox[0];
+    const roiWidth = boundingBox[2] - boundingBox[0]; // startBox
     const roiHeight = boundingBox[3] - boundingBox[1];
     const roiX = boundingBox[0];
     const roiY = boundingBox[1];
+
+    console.log(
+      "roiWidth: ",
+      roiWidth,
+      ", relativeStartWidth: ",
+      relativeStartBox.width
+    );
+
+    console.log(
+      "roiHeight: ",
+      roiHeight,
+      ", relativeStartHeight: ",
+      relativeStartBox.height
+    );
+
+    console.log("scaleX: ", scaleX);
+    console.log(
+      "scaledWidth: ",
+      roiWidth * scaleX,
+      ", boundBoxWidth: ",
+      relativeBoundBox.width
+    );
 
     const decodedData = selectedAnnotation.maskData;
 
@@ -218,117 +298,17 @@ export const Transformer = ({
     };
 
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [],
-        selectedAnnotation: undefined,
-      })
-    );
-
-    updateSelectedAnnotation(updatedAnnotation);
-
-    setCenter(undefined);
-    setBoundBox(null);
-  };
-
-  const updateSelectedAnnotation = (
-    updatedAnnotation: bufferedAnnotationType
-  ) => {
-    dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [updatedAnnotation],
         selectedAnnotation: updatedAnnotation,
       })
     );
+
+    setCenter(undefined);
+    setBoundBox(null);
   };
 
-  const getOppositeAnchorPosition = () => {
-    if (!transformerRef || !transformerRef.current) return { x: 0, y: 0 };
-    const activeAnchor = transformerRef.current.getActiveAnchor();
-    switch (activeAnchor) {
-      case "bottom-right": {
-        return transformerRef.current
-          .findOne(".".concat("top-left"))
-          .position();
-      }
-      case "bottom-center": {
-        return transformerRef.current
-          .findOne(".".concat("top-center"))
-          .position();
-      }
-      case "bottom-left": {
-        return transformerRef.current
-          .findOne(".".concat("top-right"))
-          .position();
-      }
-      case "middle-left": {
-        return transformerRef.current
-          .findOne(".".concat("middle-right"))
-          .position();
-      }
-      case "top-left": {
-        return transformerRef.current
-          .findOne(".".concat("bottom-right"))
-          .position();
-      }
-      case "top-center": {
-        return transformerRef.current
-          .findOne(".".concat("bottom-center"))
-          .position();
-      }
-      case "top-right": {
-        return transformerRef.current
-          .findOne(".".concat("bottom-left"))
-          .position();
-      }
-      case "middle-right": {
-        return transformerRef.current
-          .findOne(".".concat("middle-left"))
-          .position();
-      }
-      default: {
-        return { x: 0, y: 0 };
-      }
-    }
-  };
-
-  const onTransform = () => {
-    if (!center) {
-      //at the beginning of transform, find out the "center" coordinate used for the resizing (i.e., the coordinate that does not move during resize)
-      const oppositeAnchorPosition = getOppositeAnchorPosition();
-      const scaledOppositeAnchorPosition = {
-        x: oppositeAnchorPosition.x / stageScale,
-        y: oppositeAnchorPosition.y / stageScale,
-      };
-
-      const relativeStartBox = getRelativeBox(startBox);
-
-      if (!relativeStartBox) return;
-
-      setCenter({
-        x: scaledOppositeAnchorPosition.x + relativeStartBox.x,
-        y: scaledOppositeAnchorPosition.y + relativeStartBox.y,
-      });
-    }
-  };
-
-  const onTransformStart = () => {
-    const selected = selectedAnnotations.find(
-      (annotation: bufferedAnnotationType) => {
-        return annotation.id === annotationId;
-      }
-    );
-
-    if (!selected) return;
-
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [selected],
-        selectedAnnotation: selected,
-      })
-    );
-  };
-
-  const clearAnnotations = () => {
+  const cancelAnnotation = () => {
     if (annotationTool) {
       annotationTool.deselect();
     } else {
@@ -355,31 +335,26 @@ export const Transformer = ({
     );
   };
 
-  const onSaveAnnotationClick = (event: Konva.KonvaEventObject<Event>) => {
+  const confirmAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
     if (!activeImageId) return;
 
-    dispatch(
-      imageViewerSlice.actions.setImageInstances({
-        instances: [...unselectedAnnotations, ...selectedAnnotations],
-        imageId: activeImageId,
-      })
-    );
+    dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
 
     transformerRef.current!.detach();
     transformerRef.current!.getLayer()?.batchDraw();
 
-    clearAnnotations();
+    cancelAnnotation();
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
-  const onClearAnnotationClick = (event: Konva.KonvaEventObject<Event>) => {
+  const cancelAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
-    clearAnnotations();
+    cancelAnnotation();
     if (soundEnabled) playDeleteAnnotationSoundEffect();
   };
 
@@ -414,9 +389,9 @@ export const Transformer = ({
       <ReactKonva.Group>
         <ReactKonva.Transformer
           boundBoxFunc={boundingBoxFunc}
-          onTransform={onTransform}
           onTransformEnd={onTransformEnd}
           onTransformStart={onTransformStart}
+          onTransform={onTransform}
           id={"tr-".concat(annotationId)}
           ref={transformerRef}
           rotateEnabled={false}
@@ -429,8 +404,8 @@ export const Transformer = ({
                   x: posX - 58,
                   y: posY + 6,
                 }}
-                onClick={onSaveAnnotationClick}
-                onTap={onSaveAnnotationClick}
+                onClick={confirmAnnotationHandler}
+                onTap={confirmAnnotationHandler}
                 id={"label"}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
@@ -457,8 +432,8 @@ export const Transformer = ({
                   x: posX - 58,
                   y: posY + 35,
                 }}
-                onClick={onClearAnnotationClick}
-                onTap={onClearAnnotationClick}
+                onClick={cancelAnnotationHandler}
+                onTap={cancelAnnotationHandler}
                 id={"label"}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}

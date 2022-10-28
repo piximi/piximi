@@ -14,7 +14,6 @@ export type ImageType = {
   shape: Shape;
   data: Tensor4D; // [Z, H, W, C]
   partition: Partition;
-  segmentationPartition?: Partition;
   visible: boolean;
   src: string; // The URI to be displayed on the canvas
 };
@@ -30,7 +29,7 @@ export type ShadowImageType = {
   shape: Shape;
   data?: Tensor4D; // [Z, H, W, C]
   partition?: Partition;
-  segmentationPartition?: Partition;
+  segmentationPartition?: Partition; // TODO: BIG_MERGE - necessary?
   visible?: boolean;
   src: string; // The URI to be displayed on the canvas
 };

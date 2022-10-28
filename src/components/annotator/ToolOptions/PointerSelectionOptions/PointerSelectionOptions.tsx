@@ -21,7 +21,7 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 import {
   imageViewerSlice,
   selectedAnnotationsSelector,
-  unselectedAnnotationsSelector,
+  stagedAnnotationsSelector,
 } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
 
@@ -35,11 +35,11 @@ export const PointerSelectionOptions = () => {
   const dispatch = useDispatch();
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
   const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onSelectAll = () => {
-    const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
+    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: allAnnotations,
@@ -64,7 +64,7 @@ export const PointerSelectionOptions = () => {
       | React.MouseEvent<HTMLDivElement>,
     category: Category
   ) => {
-    const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
+    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     const desiredAnnotations = allAnnotations.filter((annotation) => {
       return annotation.categoryId === category.id;
     });

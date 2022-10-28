@@ -1,9 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { put } from "redux-saga/effects";
+import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { imageViewerSlice } from "store/image-viewer/";
+import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer/";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
@@ -51,6 +51,10 @@ export function* uploadImagesSaga({
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
+
+  const activeImageId: ReturnType<typeof activeImageIdSelector> = yield select(
+    activeImageIdSelector
+  );
 
   const invalidImageFiles: Array<ImageFileError> = [];
 
@@ -131,6 +135,7 @@ export function* uploadImagesSaga({
       yield put(
         imageViewerSlice.actions.setActiveImage({
           imageId: imagesToUpload[0].id,
+          prevImageId: activeImageId,
           execSaga: true,
         })
       );

@@ -3,16 +3,14 @@ import { put, select } from "redux-saga/effects";
 
 import {
   imageViewerSlice,
-  imageInstancesSelector,
+  stagedAnnotationsSelector,
   selectedAnnotationSelector,
   selectedAnnotationsIdsSelector,
   selectedAnnotationsSelector,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
-import { bufferedAnnotationType } from "types";
-import { encode } from "utils/annotator";
+import { decodedAnnotationType } from "types";
 
-// eslint-disable-next-line no-empty-pattern
 export function* selectedCategorySaga({
   payload: { execSaga },
 }: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>) {
@@ -24,9 +22,8 @@ export function* selectedCategorySaga({
 
   if (!selectedAnnotationsIds) return;
 
-  const annotations: ReturnType<typeof imageInstancesSelector> = yield select(
-    imageInstancesSelector
-  );
+  const annotations: ReturnType<typeof stagedAnnotationsSelector> =
+    yield select(stagedAnnotationsSelector);
 
   if (!annotations.length) return;
 
@@ -37,7 +34,7 @@ export function* selectedCategorySaga({
     yield select(selectedCategorySelector);
 
   const updatedAnnotations = selectedAnnotations.map(
-    (annotation: bufferedAnnotationType) => {
+    (annotation: decodedAnnotationType) => {
       return { ...annotation, categoryId: selectedCategory.id };
     }
   );

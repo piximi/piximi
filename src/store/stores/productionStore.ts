@@ -6,7 +6,6 @@ import {
   StoreEnhancer,
 } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/react";
-import thunk from "redux-thunk";
 import logger from "redux-logger";
 
 import { reducer } from "../reducer";
@@ -18,11 +17,17 @@ const sentryReduxEnhancer = Sentry.createReduxEnhancer({});
 
 const enhancers: StoreEnhancer[] = [sentryReduxEnhancer];
 
+/* In order to ensure that sagas are ran after the dispatched action,
+ * always keep "saga" as the last item in the middleware array .
+ * https://redux-saga.js.org/docs/api/index.html#selectselector-args
+ *
+ * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
+ */
 let middleware: Middleware[] =
   process.env.NODE_ENV !== "production" &&
   process.env.REACT_APP_LOG_LEVEL === "2"
-    ? [logger, saga, thunk]
-    : [saga, thunk];
+    ? [logger, saga]
+    : [saga];
 
 const preloadedState = {};
 

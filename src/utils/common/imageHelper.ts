@@ -6,7 +6,7 @@ import { decode, pointsAreEqual } from "utils/annotator";
 
 import {
   encodedAnnotationType,
-  bufferedAnnotationType,
+  decodedAnnotationType,
   Category,
   ShadowImageType,
   Point,
@@ -132,12 +132,12 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<bufferedAnnotationType>,
+  annotations: Array<decodedAnnotationType>,
   imageWidth: number,
   imageHeight: number
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: bufferedAnnotationType) => {
+    (annotation: decodedAnnotationType) => {
       const boundingBox = annotation.boundingBox;
       if (
         position.x >= boundingBox[0] &&
@@ -167,7 +167,7 @@ export const getOverlappingAnnotations = (
       return false;
     }
   );
-  return overlappingAnnotations.map((annotation: bufferedAnnotationType) => {
+  return overlappingAnnotations.map((annotation: decodedAnnotationType) => {
     return annotation.id;
   });
 };
@@ -175,9 +175,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<bufferedAnnotationType>
+  annotations: Array<decodedAnnotationType>
 ) => {
-  return annotations.filter((annotation: bufferedAnnotationType) => {
+  return annotations.filter((annotation: decodedAnnotationType) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
