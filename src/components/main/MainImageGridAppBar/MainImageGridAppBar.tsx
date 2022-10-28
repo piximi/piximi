@@ -146,6 +146,7 @@ export const MainImageGridAppBar = () => {
       dispatch(
         setActiveImage({
           imageId: selected.length > 0 ? selected[0].id : undefined,
+          prevImageId: undefined,
           execSaga: true,
         })
       );

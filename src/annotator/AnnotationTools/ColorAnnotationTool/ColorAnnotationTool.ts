@@ -2,7 +2,6 @@ import * as ImageJS from "image-js";
 import PriorityQueue from "ts-priority-queue";
 
 import { AnnotationTool } from "../AnnotationTool";
-import { doFlood, makeFloodMap } from "utils/annotator";
 
 import { AnnotationStateType, Point } from "types";
 
@@ -49,7 +48,7 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.origin = position;
     this.toolTipPosition = position;
 
-    this.toleranceMap = makeFloodMap({
+    this.toleranceMap = this.createToleranceMap({
       x: Math.floor(position.x),
       y: Math.floor(position.y),
       image: this.image,
@@ -141,8 +140,88 @@ export class ColorAnnotationTool extends AnnotationTool {
     this.setAnnotated();
   }
 
+  private createToleranceMap = ({
+    x,
+    y,
+    image,
+  }: {
+    x: number;
+    y: number;
+    image: ImageJS.Image;
+  }) => {
+    const tol: Array<number> = [];
+
+    const color = image.getPixelXY(x, y);
+
+    if (image.data.length === image.width * image.height * 3) {
+      //RGB image
+      for (let i = 0; i < image.data.length; i += 3) {
+        const red = Math.abs(image.data[i] - color[0]);
+        const green = Math.abs(image.data[i + 1] - color[1]);
+        const blue = Math.abs(image.data[i + 2] - color[2]);
+        tol.push(Math.floor((red + green + blue) / 3));
+      }
+    } else if (image.data.length === image.width * image.height * 4) {
+      //RGBA image
+      for (let i = 0; i < image.data.length; i += 4) {
+        const red = Math.abs(image.data[i] - color[0]);
+        const green = Math.abs(image.data[i + 1] - color[1]);
+        const blue = Math.abs(image.data[i + 2] - color[2]);
+        tol.push(Math.floor((red + green + blue) / 3));
+      }
+    } else if (image.data.length === image.width * image.height) {
+      //greyscale
+      for (let i = 0; i < image.data.length; i++) {
+        const grey = Math.abs(image.data[i] - color[0]);
+        tol.push(Math.floor((grey / image.maxValue) * 255));
+      }
+    }
+
+    return new ImageJS.Image(image.width, image.height, tol, {
+      alpha: 0,
+      components: 1,
+    });
+  };
+
+  // Expand a watershed map until the desired tolerance is reached.
+  private createFloodMap = (
+    floodMap: ImageJS.Image,
+    toleranceMap: ImageJS.Image,
+    queue: PriorityQueue<Array<number>>,
+    tolerance: number,
+    maxTol: number,
+    seen: Set<number>
+  ) => {
+    const dirs = [
+      [1, 0],
+      [0, 1],
+      [-1, 0],
+      [0, -1],
+    ];
+    while (queue.length > 0 && queue.peek()[2] <= tolerance) {
+      let currentPoint = queue.dequeue();
+      maxTol = Math.max(currentPoint[2], maxTol);
+      floodMap.setPixelXY(currentPoint[0], currentPoint[1], [maxTol]);
+      for (let dir of dirs) {
+        let newX = currentPoint[0] + dir[0];
+        let newY = currentPoint[1] + dir[1];
+        let idx = newX + newY * toleranceMap.width;
+        if (
+          !seen.has(idx) &&
+          newX >= 0 &&
+          newY >= 0 &&
+          newX < toleranceMap.width &&
+          newY < toleranceMap.height
+        ) {
+          queue.queue([newX, newY, toleranceMap.getPixelXY(newX, newY)[0]]);
+          seen.add(idx);
+        }
+      }
+    }
+  };
+
   private updateOverlay(position: { x: number; y: number }) {
-    doFlood(
+    this.createFloodMap(
       this.floodMap!,
       this.toleranceMap!,
       this.toleranceQueue,

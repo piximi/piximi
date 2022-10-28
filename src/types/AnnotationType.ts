@@ -6,7 +6,7 @@ export type encodedAnnotationType = {
   mask: Array<number>;
   plane: number;
 };
-export type bufferedAnnotationType = {
+export type decodedAnnotationType = {
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;

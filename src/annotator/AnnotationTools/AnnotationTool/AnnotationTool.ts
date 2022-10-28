@@ -7,7 +7,7 @@ import { connectPoints } from "utils/common/imageHelper";
 
 import {
   AnnotationStateType,
-  bufferedAnnotationType,
+  decodedAnnotationType,
   Category,
   Point,
 } from "types";
@@ -42,7 +42,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: bufferedAnnotationType;
+  annotation?: decodedAnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];

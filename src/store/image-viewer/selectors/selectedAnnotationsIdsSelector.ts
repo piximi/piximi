@@ -1,4 +1,4 @@
-import { encodedAnnotationType, ImageViewer } from "types";
+import { decodedAnnotationType, ImageViewer } from "types";
 
 export const selectedAnnotationsIdsSelector = ({
   imageViewer,
@@ -6,7 +6,7 @@ export const selectedAnnotationsIdsSelector = ({
   imageViewer: ImageViewer;
 }): Array<string> => {
   return imageViewer.selectedAnnotations.map(
-    (annotation: encodedAnnotationType) => {
+    (annotation: decodedAnnotationType) => {
       return annotation.id;
     }
   );

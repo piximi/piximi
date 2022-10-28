@@ -1,3 +1,5 @@
+import { decodedAnnotationType, encodedAnnotationType } from "types";
+
 /**
  * Decode a Run-length encoded input array.
  * @param encoded Run-length encoded input array
@@ -17,6 +19,34 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
   }
 
   return new Uint8ClampedArray(decoded);
+};
+
+export const decodeAnnotation = (
+  encodedAnnotation: encodedAnnotationType | undefined
+): decodedAnnotationType | undefined => {
+  if (!encodedAnnotation) return undefined;
+  const { mask, ...decodedAnnotation } = {
+    maskData: Uint8Array.from(decode(encodedAnnotation.mask)),
+    ...encodedAnnotation,
+  };
+
+  return decodedAnnotation;
+};
+
+export const decodeAnnotations = async (
+  encodedAnnotations: Array<encodedAnnotationType>
+): Promise<Array<decodedAnnotationType>> => {
+  return new Promise((resolve, reject) => {
+    const decodedAnnotations = encodedAnnotations.map((annotation) => {
+      const { mask, ...decdodedAnnotation } = {
+        maskData: Uint8Array.from(decode(annotation.mask)),
+        ...annotation,
+      };
+      return decdodedAnnotation;
+    });
+
+    resolve(decodedAnnotations);
+  });
 };
 
 /**
@@ -52,6 +82,34 @@ export const encode = (
   encoded.push(lastSequenceSize);
 
   return encoded;
+};
+
+export const encodeAnnotation = (
+  decodedAnnotation: decodedAnnotationType | undefined
+): encodedAnnotationType | undefined => {
+  if (!decodedAnnotation) return undefined;
+  const { maskData, ...encodedAnnotation } = {
+    mask: encode(decodedAnnotation.maskData),
+    ...decodedAnnotation,
+  };
+
+  return encodedAnnotation;
+};
+
+export const encodeAnnotations = (
+  decodedAnnotations: Array<decodedAnnotationType>
+): Promise<Array<encodedAnnotationType>> => {
+  return new Promise((resolve) => {
+    const encodedAnnotations = decodedAnnotations.map((annotation) => {
+      const { maskData, ...decdodedAnnotation } = {
+        mask: encode(annotation.maskData),
+        ...annotation,
+      };
+      return decdodedAnnotation;
+    });
+
+    resolve(encodedAnnotations);
+  });
 };
 
 export const fromString = (s: Array<number>) => {

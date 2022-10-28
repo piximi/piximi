@@ -1,18 +1,26 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import { imageViewerSlice } from "store/image-viewer";
+import {
+  imageViewerSlice,
+  imageInstancesSelector,
+  stagedAnnotationsSelector,
+} from "store/image-viewer";
 import { imageSelector } from "store/common";
+import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
 
 import { Colors } from "types/tensorflow";
 
 import { createRenderedTensor } from "image/utils/imageHelper";
 
 export function* activeImageIDChangeSaga({
-  payload: { imageId, execSaga },
-}: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>) {
+  payload: { imageId, prevImageId, execSaga },
+}: PayloadAction<{
+  imageId: string | undefined;
+  prevImageId: string | undefined;
+  execSaga: boolean;
+}>) {
   if (!execSaga) return;
-
   const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
 
   if (!image) {
@@ -44,6 +52,39 @@ export function* activeImageIDChangeSaga({
       renderedSrcs: tmpRenderedSrc,
     })
   );
+
+  let previousStagedAnnotations:
+    | ReturnType<typeof stagedAnnotationsSelector>
+    | undefined;
+
+  if (prevImageId) {
+    previousStagedAnnotations = yield select(stagedAnnotationsSelector);
+  }
+
+  const imageAnnotations: ReturnType<typeof imageInstancesSelector> =
+    yield select(imageInstancesSelector);
+
+  const newDecodedAnnotations: Awaited<ReturnType<typeof decodeAnnotations>> =
+    yield call(decodeAnnotations, imageAnnotations);
+
+  yield put(
+    imageViewerSlice.actions.setStagedAnnotations({
+      annotations: newDecodedAnnotations,
+    })
+  );
+
+  if (previousStagedAnnotations) {
+    const previousEncodedAnnotations: Awaited<
+      ReturnType<typeof encodeAnnotations>
+    > = yield call(encodeAnnotations, previousStagedAnnotations);
+
+    yield put(
+      imageViewerSlice.actions.setImageInstances({
+        instances: previousEncodedAnnotations,
+        imageId: prevImageId!,
+      })
+    );
+  }
 
   const renderedSrcs: Awaited<
     ReturnType<typeof createRenderedTensor<undefined>>

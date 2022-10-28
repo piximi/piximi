@@ -7,7 +7,7 @@ import {
   setOperation,
   setSelectedCategoryId,
   selectedAnnotationsSelector,
-  unselectedAnnotationsSelector,
+  stagedAnnotationsSelector,
   annotatorImagesSelector,
   activeImageIdSelector,
   soundEnabledSelector,
@@ -16,20 +16,20 @@ import {
 import {
   AnnotationModeType,
   AnnotationStateType,
-  bufferedAnnotationType,
+  decodedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
 import { AnnotationTool } from "annotator/AnnotationTools";
 
 type useAnnotatorHotkeysProps = {
-  annotations: bufferedAnnotationType[];
+  annotations: decodedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   onZoomDeselect: () => void;
-  selectedAnnotation: bufferedAnnotationType | undefined;
+  selectedAnnotation: decodedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;
@@ -53,7 +53,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   const images = useSelector(annotatorImagesSelector);
   const activeImageId = useSelector(activeImageIdSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const confirmAnnotations = () => {
     if (
@@ -64,12 +64,7 @@ export const useAnnotatorKeyboardShortcuts = ({
     )
       return;
 
-    dispatch(
-      imageViewerSlice.actions.setImageInstances({
-        instances: [...unselectedAnnotations, ...selectedAnnotations],
-        imageId: activeImageId,
-      })
-    );
+    dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
 
     deselectAnnotation();
 
@@ -102,7 +97,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       dispatch(
         setSelectedCategoryId({
           selectedCategoryId: selectedCategory.id,
-          execSaga: false,
+          execSaga: true,
         })
       );
     },
@@ -252,7 +247,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       annotationTool,
       annotationTool?.annotationState,
       selectedAnnotations,
-      unselectedAnnotations,
+      stagedAnnotations,
       selectionMode,
       selectedAnnotationsIds,
       soundEnabled,
@@ -312,7 +307,8 @@ export const useAnnotatorKeyboardShortcuts = ({
       dispatch(
         imageViewerSlice.actions.setActiveImage({
           imageId: newActiveImageId,
-          execSaga: false,
+          prevImageId: activeImageId,
+          execSaga: true,
         })
       );
     },
@@ -338,7 +334,8 @@ export const useAnnotatorKeyboardShortcuts = ({
       dispatch(
         imageViewerSlice.actions.setActiveImage({
           imageId: newActiveImageId,
-          execSaga: false,
+          prevImageId: activeImageId,
+          execSaga: true,
         })
       );
     },

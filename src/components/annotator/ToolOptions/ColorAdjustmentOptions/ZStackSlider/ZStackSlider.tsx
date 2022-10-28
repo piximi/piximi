@@ -3,8 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { activeImageSelector } from "store/common";
-import { activeImagePlaneSelector, imageViewerSlice } from "store/image-viewer";
+import {
+  activeImageSelector,
+  activeImagePlaneSelector,
+  imageViewerSlice,
+} from "store/image-viewer";
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();

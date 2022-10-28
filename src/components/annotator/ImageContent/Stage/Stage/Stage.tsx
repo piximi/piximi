@@ -29,7 +29,7 @@ import { PointerSelection } from "../Selection/PointerSelection";
 
 import {
   imageViewerSlice,
-  imageInstancesSelector,
+  stagedAnnotationsSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
   selectedAnnotationSelector,
@@ -99,7 +99,7 @@ export const Stage = () => {
   const scaledImageWidth = useSelector(scaledImageWidthSelector);
   const scaledImageHeight = useSelector(scaledImageHeightSelector);
   const stageScale = useSelector(stageScaleSelector);
-  const annotations = useSelector(imageInstancesSelector);
+  const annotations = useSelector(stagedAnnotationsSelector);
   const annotationState = useSelector(annotationStateSelector);
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
   const cursor = useSelector(cursorSelector);
@@ -348,9 +348,9 @@ export const Stage = () => {
     const func = (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
-      process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "2" &&
-        console.log(event);
+      // process.env.NODE_ENV !== "production" &&
+      //   process.env.REACT_APP_LOG_LEVEL === "2" &&
+      //   console.log(event);
 
       if (!stageRef || !stageRef.current) return;
 
@@ -489,7 +489,6 @@ export const Stage = () => {
   }, [annotations, deselectAllAnnotations]);
 
   useEffect(() => {
-    console.log("I'm called");
     annotationTool?.deselect();
     dispatch(
       setSelectedAnnotations({
