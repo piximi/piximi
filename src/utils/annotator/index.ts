@@ -1,5 +1,3 @@
-export { doFlood, makeFloodMap } from "./flood/flood";
-export type { FloodImage } from "./flood/flood";
 export {
   validNeighbours,
   fromIdxToCoord,
@@ -16,10 +14,18 @@ export { scanline } from "./polygon-fill/scanline";
 
 export { simplifyPolygon } from "./simplify/simplify";
 
-export { decode, encode, fromString, toImageData } from "./rle/rle";
+export {
+  decode,
+  decodeAnnotation,
+  decodeAnnotations,
+  encode,
+  encodeAnnotation,
+  encodeAnnotations,
+  fromString,
+  toImageData,
+} from "./rle/rle";
 
 export { slic } from "./slic/slic";
-export { toRGBA } from "./toRGBA/toRGBA";
 
 export {
   pointsAreEqual,

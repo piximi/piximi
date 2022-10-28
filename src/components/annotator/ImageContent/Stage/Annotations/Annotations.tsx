@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   selectedAnnotationObjectsSelector,
-  unselectedAnnotationObjectsSelector,
+  stagedAnnotationObjectsSelector,
 } from "store/common";
 import { Annotation } from "./Annotation";
 
@@ -16,9 +16,7 @@ export const Annotations = ({
   const selectedAnnotationObjects = useSelector(
     selectedAnnotationObjectsSelector
   );
-  const unselectedAnnotationObjects = useSelector(
-    unselectedAnnotationObjectsSelector
-  );
+  const stagedAnnotationObjects = useSelector(stagedAnnotationObjectsSelector);
 
   return (
     <>
@@ -32,7 +30,7 @@ export const Annotations = ({
           />
         ))}
       {(unselected || !selected) &&
-        unselectedAnnotationObjects.map((annotationObject) => (
+        stagedAnnotationObjects.map((annotationObject) => (
           <Annotation
             annotation={annotationObject.annotation}
             imageShape={annotationObject.imageShape}

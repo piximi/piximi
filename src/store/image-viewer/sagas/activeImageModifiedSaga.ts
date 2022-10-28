@@ -1,8 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import { imageViewerSlice } from "store/image-viewer";
+import {
+  imageViewerSlice,
+  imageInstancesSelector,
+  stagedAnnotationsSelector,
+} from "store/image-viewer";
 import { imageSelector } from "store/common";
+import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
 
 import { Color } from "types";
 
@@ -12,10 +17,13 @@ import {
 } from "utils/common/imageHelper";
 
 export function* activeImageIDChangeSaga({
-  payload: { imageId, execSaga },
-}: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>) {
+  payload: { imageId, prevImageId, execSaga },
+}: PayloadAction<{
+  imageId: string | undefined;
+  prevImageId: string | undefined;
+  execSaga: boolean;
+}>) {
   if (!execSaga) return;
-
   const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
 
   if (!image) {
@@ -39,6 +47,39 @@ export function* activeImageIDChangeSaga({
       renderedSrcs: [image.src],
     })
   );
+
+  let previousStagedAnnotations:
+    | ReturnType<typeof stagedAnnotationsSelector>
+    | undefined = undefined;
+
+  if (prevImageId) {
+    previousStagedAnnotations = yield select(stagedAnnotationsSelector);
+  }
+
+  const imageAnnotations: ReturnType<typeof imageInstancesSelector> =
+    yield select(imageInstancesSelector);
+
+  const newDecodedAnnotations: Awaited<ReturnType<typeof decodeAnnotations>> =
+    yield call(decodeAnnotations, imageAnnotations);
+
+  yield put(
+    imageViewerSlice.actions.setStagedAnnotations({
+      annotations: newDecodedAnnotations,
+    })
+  );
+
+  if (previousStagedAnnotations) {
+    const previousEncodedAnnotations: Awaited<
+      ReturnType<typeof encodeAnnotations>
+    > = yield call(encodeAnnotations, previousStagedAnnotations);
+
+    yield put(
+      imageViewerSlice.actions.setImageInstances({
+        instances: previousEncodedAnnotations,
+        imageId: prevImageId!,
+      })
+    );
+  }
 
   const planesData: Awaited<ReturnType<typeof convertImageURIsToImageData>> =
     yield call(convertImageURIsToImageData, image.originalSrc);

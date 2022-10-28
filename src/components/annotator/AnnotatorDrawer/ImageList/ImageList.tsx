@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -20,33 +20,49 @@ import { ImageMenu } from "../ImageMenu";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { imageSelector } from "store/common";
-import { annotatorImagesSelector, setActiveImage } from "store/image-viewer";
+import {
+  annotatorImagesSelector,
+  activeImageSelector,
+  setActiveImage,
+  stagedAnnotationsSelector,
+} from "store/image-viewer";
 
 import { ImageType, ShadowImageType } from "types";
 
 export const ImageList = () => {
   const dispatch = useDispatch();
 
-  const currentImage = useSelector(imageSelector);
+  const activeImage = useSelector(activeImageSelector);
 
   const annotatorImages = useSelector(annotatorImagesSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
   );
 
-  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
-    currentImage!
+  const [selectedImage, setSelectedImage] = React.useState<ShadowImageType>(
+    activeImage!
   );
 
-  const onImageItemClick = (
+  const ImageItemClickHandler = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
-    dispatch(setActiveImage({ imageId: image.id, execSaga: true }));
+    if (image.id !== activeImage!.id) {
+      console.log("im true!");
+      dispatch(
+        setActiveImage({
+          imageId: image.id,
+          prevImageId: activeImage!.id,
+          execSaga: true,
+        })
+      );
+      setSelectedImage(image as ImageType);
+    }
   };
 
-  const onImageMenuOpen = (
+  const ImageMenuOpenHandler = (
     event: React.MouseEvent<HTMLButtonElement>,
     image: ShadowImageType
   ) => {
@@ -70,9 +86,9 @@ export const ImageList = () => {
                 button
                 id={image.id}
                 onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                  onImageItemClick(evt, image)
+                  ImageItemClickHandler(evt, image)
                 }
-                selected={image.id === currentImage?.id}
+                selected={image.id === activeImage?.id}
               >
                 <ListItemAvatar>
                   <Avatar alt={image.name} src={image.src} variant={"square"} />
@@ -82,13 +98,23 @@ export const ImageList = () => {
                   primary={image.name}
                   primaryTypographyProps={{ noWrap: true }}
                 />
-                {image.annotations.length !== 0 && (
-                  <Chip label={image.annotations.length} size="small" />
+                {((image.id !== activeImage?.id &&
+                  image.annotations.length !== 0) ||
+                  (image.id === activeImage?.id &&
+                    stagedAnnotations.length !== 0)) && (
+                  <Chip
+                    label={
+                      image.id === activeImage?.id
+                        ? stagedAnnotations.length
+                        : image.annotations.length
+                    }
+                    size="small"
+                  />
                 )}
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
-                    onClick={(event) => onImageMenuOpen(event, image)}
+                    onClick={(event) => ImageMenuOpenHandler(event, image)}
                   >
                     <MoreHorizIcon />
                   </IconButton>

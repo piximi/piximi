@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
-
+import { hexToRGBA } from "./hexToRGBA";
 import { colorOverlayROI } from "utils/common/imageHelper";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { bufferedAnnotationType, Shape } from "types";
-import { toRGBA } from "utils/annotator";
+import { decodedAnnotationType, Shape } from "types";
 
 type AnnotationProps = {
-  annotation: bufferedAnnotationType;
+  annotation: decodedAnnotationType;
   imageShape: Shape;
   fillColor: string;
 };
@@ -32,7 +31,7 @@ export const Annotation = ({
     const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
     if (!boxWidth || !boxHeight) return;
     if (Math.round(boxWidth) <= 0 || Math.round(boxHeight) <= 0) return;
-    const color = toRGBA(fillColor, 0);
+    const color = hexToRGBA(fillColor, 0);
     setImageMask(
       colorOverlayROI(
         annotation.maskData,
@@ -51,6 +50,17 @@ export const Annotation = ({
     imageWidth,
     imageHeight,
   ]);
+
+  useEffect(() => {
+    const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
+    const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
+
+    console.log(
+      `AnnotationComponent - scale: ${stageScale}; bboxW: ${boxWidth}, bboxH: ${boxHeight}; scaled-bboxW: ${
+        boxWidth * stageScale
+      }; scaled-bboxH: ${boxHeight * stageScale} ${annotation.boundingBox}`
+    );
+  });
 
   return (
     <>

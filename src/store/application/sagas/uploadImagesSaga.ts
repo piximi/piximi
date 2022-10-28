@@ -3,7 +3,11 @@ import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { imageViewerSlice, currentColorsSelector } from "store/image-viewer/";
+import {
+  imageViewerSlice,
+  currentColorsSelector,
+  activeImageIdSelector,
+} from "store/image-viewer/";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
@@ -49,6 +53,10 @@ export function* uploadImagesSaga({
 
   const colors: ReturnType<typeof currentColorsSelector> = yield select(
     currentColorsSelector
+  );
+
+  const activeImageId: ReturnType<typeof activeImageIdSelector> = yield select(
+    activeImageIdSelector
   );
 
   const invalidImageFiles: Array<ImageFileError> = [];
@@ -128,6 +136,7 @@ export function* uploadImagesSaga({
       yield put(
         imageViewerSlice.actions.setActiveImage({
           imageId: imagesToUpload[0].id,
+          prevImageId: activeImageId,
           execSaga: true,
         })
       );

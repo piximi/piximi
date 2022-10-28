@@ -7,7 +7,7 @@ export { AnnotationStateType } from "./AnnotationStateType";
 
 export type {
   encodedAnnotationType,
-  bufferedAnnotationType,
+  decodedAnnotationType,
 } from "./AnnotationType";
 
 export type {

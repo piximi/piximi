@@ -22,14 +22,14 @@ import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { RescaleOptions } from "types/RescaleOptions";
-import { bufferedAnnotationType } from "types/AnnotationType";
+import { decodedAnnotationType } from "types/AnnotationType";
 import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 
 export const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
   item: {
     xs: Tensor<Rank.R3>;
-    annotations: bufferedAnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
@@ -58,13 +58,13 @@ export const decodeFromImgSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string; // dataURL
-    annotations: bufferedAnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
   xs: Tensor<Rank.R3>;
-  annotations: bufferedAnnotationType[];
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -97,13 +97,13 @@ export const decodeFromOriginalSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
-    annotations: bufferedAnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
   xs: Tensor<Rank.R3>;
-  annotations: bufferedAnnotationType[];
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -158,13 +158,13 @@ export const decodeImage = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string | string[];
-    annotations: bufferedAnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
   xs: Tensor<Rank.R3>;
-  annotations: bufferedAnnotationType[];
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -174,7 +174,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string;
-          annotations: bufferedAnnotationType[];
+          annotations: decodedAnnotationType[];
           id: string;
           shape: Shape;
         }
@@ -183,7 +183,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string[];
-          annotations: bufferedAnnotationType[];
+          annotations: decodedAnnotationType[];
           id: string;
           shape: Shape;
         }
