@@ -33,7 +33,7 @@ export const ClearAnnotationsListItem = () => {
     open: openDeleteAllAnnotationsDialog,
   } = useDialog();
 
-  const onClearAllAnnotations = () => {
+  const ClearAllAnnotationsHandler = () => {
     const existingAnnotations = annotatorImages
       .map((image: ShadowImageType) => {
         return [...image.annotations];
@@ -72,7 +72,7 @@ export const ClearAnnotationsListItem = () => {
   return (
     <>
       <List dense>
-        <ListItem button onClick={onClearAllAnnotations}>
+        <ListItem button onClick={ClearAllAnnotationsHandler}>
           <ListItemIcon>
             <DeleteIcon color="disabled" />
           </ListItemIcon>

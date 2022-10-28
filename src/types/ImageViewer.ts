@@ -1,7 +1,7 @@
 import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
-import { encodedAnnotationType } from "./";
+import { decodedAnnotationType } from "./";
 import { AnnotationStateType } from "./AnnotationStateType";
 import { Color } from "./Color";
 import { ShadowImageType } from "./ImageType";
@@ -18,6 +18,7 @@ export type ImageViewer = {
   exposure: number;
   hue: number;
   activeImageId?: string;
+  previousImageId?: string;
   activeImageRenderedSrcs: Array<string>;
   images: Array<ShadowImageType>;
   language: LanguageType;
@@ -32,8 +33,10 @@ export type ImageViewer = {
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
   saturation: number;
-  selectedAnnotations: Array<encodedAnnotationType>;
-  selectedAnnotation: encodedAnnotationType | undefined;
+  selectedAnnotation: decodedAnnotationType | undefined;
+  selectedAnnotations: Array<decodedAnnotationType>;
+  stagedAnnotations: Array<decodedAnnotationType>;
+  stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;
   selectionMode: AnnotationModeType;
   soundEnabled: boolean;

@@ -126,6 +126,7 @@ export const MainImageGridAppBar = () => {
         dispatch(
           setActiveImage({
             imageId: annotatorImage.id,
+            prevImageId: undefined,
             execSaga: true,
           })
         );

@@ -1,11 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { activeImageSelector } from "./activeImageSelector";
-import { selectedAnnotationsSelector } from "store/image-viewer";
+import {
+  selectedAnnotationsSelector,
+  activeImageSelector,
+} from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
 
 import {
-  bufferedAnnotationType,
+  decodedAnnotationType,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
@@ -19,7 +21,7 @@ export const selectedAnnotationObjectsSelector = createSelector(
   (activeImage, categories, selectedAnnotations) => {
     if (!activeImage) return [];
 
-    const getFillColor = (annotation: bufferedAnnotationType) => {
+    const getFillColor = (annotation: decodedAnnotationType) => {
       const annotationCategory = categories.find(
         (category: Category) => category.id === annotation.categoryId
       );
@@ -29,7 +31,7 @@ export const selectedAnnotationObjectsSelector = createSelector(
         : UNKNOWN_ANNOTATION_CATEGORY.id;
     };
 
-    return selectedAnnotations.map((annotation: bufferedAnnotationType) => {
+    return selectedAnnotations.map((annotation: decodedAnnotationType) => {
       return {
         annotation: annotation,
         imageShape: activeImage.shape,

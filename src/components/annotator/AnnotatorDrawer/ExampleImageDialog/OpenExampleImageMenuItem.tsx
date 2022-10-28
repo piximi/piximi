@@ -8,10 +8,14 @@ import {
   annotationCategoriesSelector,
   setAnnotationCategories,
 } from "store/project";
-import { imageViewerSlice, setActiveImage } from "store/image-viewer";
+import {
+  imageViewerSlice,
+  setActiveImage,
+  activeImageIdSelector,
+} from "store/image-viewer";
 
 import {
-  bufferedAnnotationType,
+  decodedAnnotationType,
   SerializedAnnotationType,
   SerializedFileType,
 } from "types";
@@ -47,6 +51,7 @@ export const OpenExampleImageMenuItem = ({
   onClose,
 }: OpenExampleImageMenuItemProps) => {
   const dispatch = useDispatch();
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const annotationCategories = useSelector(annotationCategoriesSelector);
 
@@ -79,7 +84,7 @@ export const OpenExampleImageMenuItem = ({
     batch(() => {
       let updatedAnnotationCategories = annotationCategories;
       const annotations = serializedExampleImageFile.annotations.map(
-        (annotation: SerializedAnnotationType): bufferedAnnotationType => {
+        (annotation: SerializedAnnotationType): decodedAnnotationType => {
           const { annotation_out, categories } = importSerializedAnnotations(
             annotation,
             updatedAnnotationCategories
@@ -105,6 +110,7 @@ export const OpenExampleImageMenuItem = ({
       dispatch(
         setActiveImage({
           imageId: serializedExampleImageFile.imageId,
+          prevImageId: activeImageId,
           execSaga: true,
         })
       );

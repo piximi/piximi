@@ -1,5 +1,5 @@
 import React from "react";
-import { batch, useDispatch } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
@@ -7,11 +7,12 @@ import {
   imageViewerSlice,
   setActiveImage,
   setOperation,
+  activeImageIdSelector,
 } from "store/image-viewer";
 import { setAnnotationCategories } from "store/project";
 
 import {
-  bufferedAnnotationType,
+  decodedAnnotationType,
   SerializedFileType,
   SerializedAnnotationType,
   ToolType,
@@ -28,6 +29,7 @@ export const OpenProjectFileMenuItem = ({
   onCloseMenu,
 }: OpenAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const onOpenProjectFile = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -56,7 +58,7 @@ export const OpenProjectFileMenuItem = ({
               const annotations = serializedImage.annotations.map(
                 (
                   annotation: SerializedAnnotationType
-                ): bufferedAnnotationType => {
+                ): decodedAnnotationType => {
                   const { annotation_out, categories } =
                     importSerializedAnnotations(
                       annotation,
@@ -83,6 +85,7 @@ export const OpenProjectFileMenuItem = ({
           dispatch(
             setActiveImage({
               imageId: serializedImages[0].imageId,
+              prevImageId: activeImageId,
               execSaga: true,
             })
           );

@@ -11,6 +11,7 @@ export {
   setStageWidth,
   setPointerSelection,
   setZoomSelection,
+  updateStagedAnnotations,
 } from "./imageViewerSlice";
 
 // Selectors
@@ -18,6 +19,7 @@ export { activeImageColorsSelector } from "./selectors/activeImageColorsSelector
 export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
 export { activeImagePlaneSelector } from "./selectors/activeImagePlaneSelector";
 export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
+export { activeImageSelector } from "./selectors/activeImageSelector";
 export { annotationStateSelector } from "./selectors/annotationStateSelector";
 export { annotatorImagesSelector } from "./selectors/annotatorImagesSelector";
 export { boundingClientRectSelector } from "./selectors/boundingClientRectSelector";
@@ -32,7 +34,6 @@ export { imageHeightSelector } from "./selectors/imageHeightSelector";
 export { imageInstancesSelector } from "./selectors/imageInstancesSelector";
 export { imageShapeSelector } from "./selectors/imageShapeSelector";
 export { imageSrcSelector } from "./selectors/imageSrcSelector";
-export { imageViewerImageSelector } from "./selectors/imageViewerImageSelector";
 export { imageViewerOperationSelector } from "./selectors/imageViewerOperationSelector";
 export { imageViewerSelectionModeSelector } from "./selectors/imageViewerSelectionModeSelector";
 export { imageViewerZoomModeSelector } from "./selectors/imageViewerZoomModeSelector";
@@ -57,7 +58,7 @@ export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotationValueSelector";
 export { toolTypeSelector } from "./selectors/toolTypeSelector";
-export { unselectedAnnotationsSelector } from "./selectors/unselectedAnnotationsSelector";
+export { stagedAnnotationsSelector } from "./selectors/stagedAnnotationsSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
 
