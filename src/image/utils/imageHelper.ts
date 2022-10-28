@@ -523,11 +523,19 @@ export const findMinMaxs = async <T extends Tensor3D | Tensor4D>(
   let maxs: number[];
 
   if (imageTensor.rank === 3) {
-    mins = await tidy(() => imageTensor.min([0, 1]) as Tensor1D).array();
-    maxs = await tidy(() => imageTensor.max([0, 1]) as Tensor1D).array();
+    mins = await tidy(
+      () => (imageTensor as Tensor3D).min([0, 1]) as Tensor1D
+    ).array();
+    maxs = await tidy(
+      () => (imageTensor as Tensor3D).max([0, 1]) as Tensor1D
+    ).array();
   } else {
-    mins = await tidy(() => imageTensor.min([0, 1, 2]) as Tensor1D).array();
-    maxs = await tidy(() => imageTensor.max([0, 1, 2]) as Tensor1D).array();
+    mins = await tidy(
+      () => (imageTensor as Tensor4D).min([0, 1, 2]) as Tensor1D
+    ).array();
+    maxs = await tidy(
+      () => (imageTensor as Tensor4D).max([0, 1, 2]) as Tensor1D
+    ).array();
   }
 
   opts.disposeImageTensor && imageTensor.dispose();
@@ -656,7 +664,6 @@ export async function createRenderedTensor<T extends number | undefined>(
   imageTensor: Tensor4D,
   colors: Colors,
   bitDepth: ImageJS.BitDepth,
-  minMax: { mins: number[]; maxs: number[] } | undefined,
   plane: T
 ): Promise<T extends number ? string : string[]>;
 
@@ -664,7 +671,6 @@ export async function createRenderedTensor(
   imageTensor: Tensor4D,
   colors: Colors,
   bitDepth: ImageJS.BitDepth,
-  minMax: { mins: number[]; maxs: number[] } | undefined,
   plane: number | undefined
 ) {
   let operandTensor: Tensor4D | Tensor3D;
@@ -678,13 +684,6 @@ export async function createRenderedTensor(
     operandTensor = getImageSlice(imageTensor, plane);
     disposeOperandTensor = true;
   }
-
-  if (!minMax) {
-    minMax = extractMinMax(colors.range);
-  }
-
-  // adjust color ranges by min/max vals
-  scaleColors(colors, minMax);
 
   // scale each channel by its range
   const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
@@ -721,21 +720,17 @@ export const convertToImage = async (
 
   const { bitDepth } = imageStack[activePlane];
 
-  const colors = currentColors
-    ? currentColors
-    : generateDefaultChannels(numChannels);
-
   // image data := create image of dims: [Z, H, W, C]
   const imageTensor = convertToTensor(imageStack, numSlices, numChannels);
 
-  // min/max for each channel
-  const [mins, maxs] = await findMinMaxs(imageTensor);
+  const colors = currentColors
+    ? currentColors
+    : await generateDefaultColors(imageTensor);
 
   const coloredSliceURL = await createRenderedTensor(
     imageTensor,
     colors,
     bitDepth,
-    { mins, maxs },
     activePlane
   );
 
@@ -763,7 +758,49 @@ export const convertToImage = async (
  ================================
  */
 
-export const generateDefaultChannels = (numChannels: number): Colors => {
+export const generateDefaultColors = async <T extends Tensor3D | Tensor4D>(
+  imageTensor: T
+): Promise<Colors> => {
+  const range: { [channel: number]: [number, number] } = {};
+  const visible: { [channel: number]: boolean } = {};
+  let color: Array<[number, number, number]> = [];
+
+  const numChannels =
+    imageTensor.rank === 3
+      ? (imageTensor as Tensor3D).shape[2]
+      : (imageTensor as Tensor4D).shape[3];
+
+  const [mins, maxs] = await findMinMaxs(imageTensor);
+
+  if (mins.length !== numChannels || maxs.length !== numChannels) {
+    throw Error(
+      `Expected num channels, min values, and max values to all be ${numChannels}`
+    );
+  }
+
+  for (let i = 0; i < numChannels; i++) {
+    color.push(
+      numChannels > 1 && i < DEFAULT_COLORS.length
+        ? DEFAULT_COLORS[i]
+        : [1, 1, 1]
+    );
+
+    range[i] = [mins[i], maxs[i]];
+
+    // if image has more than 3 channels,
+    // only show the first channel as default
+    // (user can then toggle / untoggle the other channels if desired)
+    visible[i] = !(numChannels > 3 && i > 0);
+  }
+
+  return {
+    range,
+    visible,
+    color: tensor2d(color, [numChannels, 3], "float32"),
+  };
+};
+
+export const generateBlankColors = (numChannels: number): Colors => {
   const range: { [channel: number]: [number, number] } = {};
   const visible: { [channel: number]: boolean } = {};
   let color: Array<[number, number, number]> = [];
@@ -790,6 +827,9 @@ export const generateDefaultChannels = (numChannels: number): Colors => {
   };
 };
 
+/*
+  Set color ranges to provided mins and maxs
+ */
 export const scaleColors = (
   colors: Colors,
   minMax: { mins: number[]; maxs: number[] }

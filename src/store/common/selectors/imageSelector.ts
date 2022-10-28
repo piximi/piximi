@@ -1,5 +1,6 @@
 import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
 
+// TODO: image_data - should be called fullImageSelector ?
 export const imageSelector = ({
   imageViewer,
   project,
@@ -17,6 +18,7 @@ export const imageSelector = ({
 
   if (!imageViewer.images.length) return;
 
+  // TODO: image_data - bad because project.images image.colors.color is untouchable reference
   const image =
     project.images.find((im: ImageType) => {
       return im.id === imageViewer.activeImageId;

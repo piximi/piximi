@@ -147,13 +147,7 @@ export const deserializeImage = async (
     activePlane: 0,
     src:
       serializedImage.src ??
-      createRenderedTensor(
-        imageData,
-        imageColors,
-        serializedImage.bitDepth,
-        undefined,
-        0
-      ),
+      createRenderedTensor(imageData, imageColors, serializedImage.bitDepth, 0),
   } as ImageType;
 };
 
@@ -283,7 +277,6 @@ const deserializeImageGroup = async (
     imageTensor,
     colors,
     bitDepth,
-    undefined,
     activePlane
   );
 

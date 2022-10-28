@@ -10,7 +10,6 @@ export type ImageViewer = {
   annotationState: AnnotationStateType;
   boundingClientRect: DOMRect;
   brightness: number;
-  currentColors: Colors | undefined;
   contrast: number;
   currentIndex: number;
   currentPosition?: { x: number; y: number };

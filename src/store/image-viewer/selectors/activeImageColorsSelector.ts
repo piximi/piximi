@@ -1,8 +1,8 @@
 import { ImageViewer, ShadowImageType } from "types";
 import { Colors, ColorsRaw } from "types/tensorflow";
-import { generateDefaultChannels } from "image/utils/imageHelper";
+import { generateBlankColors } from "image/utils/imageHelper";
 
-export const activeImageColorsSelector = ({
+export const activeImageColorsRawSelector = ({
   imageViewer,
 }: {
   imageViewer: ImageViewer;
@@ -14,7 +14,7 @@ export const activeImageColorsSelector = ({
   let colors: Colors;
 
   if (!activeImage) {
-    colors = generateDefaultChannels(3);
+    colors = generateBlankColors(3);
   } else {
     colors = activeImage.colors;
   }
@@ -26,4 +26,20 @@ export const activeImageColorsSelector = ({
     range: colors.range,
     visible: colors.visible,
   };
+};
+
+export const activeImageColorsSelector = ({
+  imageViewer,
+}: {
+  imageViewer: ImageViewer;
+}): Colors => {
+  const activeImage = imageViewer.images.find((image: ShadowImageType) => {
+    return imageViewer.activeImageId === image.id;
+  });
+
+  if (!activeImage) {
+    return generateBlankColors(3);
+  } else {
+    return activeImage.colors;
+  }
 };

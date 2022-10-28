@@ -165,9 +165,18 @@ export const projectSlice = createSlice({
       });
     },
     deleteImages(state, action: PayloadAction<{ ids: Array<string> }>) {
-      state.images = filter(state.images, (image) => {
-        return !action.payload.ids.includes(image.id);
-      });
+      const remainingImages: typeof state.images = [];
+
+      for (const im of state.images) {
+        if (action.payload.ids.includes(im.id)) {
+          im.data.dispose();
+          im.colors.color.dispose();
+        } else {
+          remainingImages.push(im);
+        }
+      }
+
+      state.images = remainingImages;
     },
     setProject(state, action: PayloadAction<{ project: Project }>) {
       // WARNING, don't do below (overwrites draft object)
@@ -203,8 +212,8 @@ export const projectSlice = createSlice({
         if (projectImageIdx >= 0) {
           const projectImage = state.images[projectImageIdx];
 
-          // TODO: this might be doing unecessary copying
-          //       when shadow image is actually a full image
+          projectImage.colors.color.dispose();
+
           state.images[projectImageIdx] = {
             ...projectImage,
             ...shadowImage,

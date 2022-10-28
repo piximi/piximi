@@ -18,7 +18,8 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/utils/imageHelper";
+// TODO: image_data
+import { generateBlankColors } from "image/utils/imageHelper";
 import { preprocessClassifier } from "./preprocessClassifier";
 import { predictClasses } from "./predictClasses";
 
@@ -128,7 +129,7 @@ const inferrenceImages: Array<ImageType> = [
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000003", // 3
     id: "00000000-0000-0000-0001-00000000000",
-    colors: generateDefaultChannels(inputShape.channels),
+    colors: generateBlankColors(inputShape.channels),
     name: "mnist",
     // @ts-ignore TODO: image_data
     originalSrc: [
@@ -146,7 +147,7 @@ const inferrenceImages: Array<ImageType> = [
     annotations: [],
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000008", // 8
-    colors: generateDefaultChannels(inputShape.channels),
+    colors: generateBlankColors(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
     name: "mnist",
     // @ts-ignore TODO: image_data
@@ -165,7 +166,7 @@ const inferrenceImages: Array<ImageType> = [
     annotations: [],
     activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000007", // 7
-    colors: generateDefaultChannels(inputShape.channels),
+    colors: generateBlankColors(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
     name: "mnist",
     // @ts-ignore TODO: image_data

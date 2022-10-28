@@ -1,10 +1,18 @@
 import "@tensorflow/tfjs-node";
-import { scalar, Tensor, tensor2d, Tensor4D, tidy } from "@tensorflow/tfjs";
+import {
+  scalar,
+  Tensor,
+  tensor2d,
+  tensor4d,
+  Tensor3D,
+  Tensor4D,
+  tidy,
+} from "@tensorflow/tfjs";
 import * as ImageJS from "image-js";
 
 import {
   MIMEType,
-  generateDefaultChannels,
+  generateDefaultColors,
   loadImageAsStack,
   convertToTensor,
   getImageSlice,
@@ -18,6 +26,17 @@ import {
   scaleImageTensor,
 } from "image/utils/imageHelper";
 
+// https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
+interface CustomMatchers<R = unknown> {
+  closeTo(delta: number, value: number): R;
+}
+
+declare global {
+  namespace jest {
+    interface Expect extends CustomMatchers {}
+  }
+}
+
 describe("color generation", () => {
   const ALL = [1, 1, 1];
   const RED = [1, 0, 0];
@@ -27,8 +46,35 @@ describe("color generation", () => {
   const CYAN = [0, 1, 1];
   const MAGNETA = [1, 0, 1];
 
-  test("1 channel - greyscale", () => {
-    const colors = generateDefaultChannels(1);
+  const v = [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1];
+  // prettier-ignore
+  let dummyTensor = tensor4d(
+  [
+    [[[v[0], v[0], v[1], v[1], v[0], v[6], v[2]], [v[6], v[3], v[4], v[5], v[0], v[6], v[3]]],
+     [[v[0], v[1], v[2], v[1], v[0], v[6], v[2]], [v[6], v[4], v[5], v[5], v[0], v[6], v[3]]],
+     [[v[0], v[2], v[3], v[1], v[0], v[6], v[2]], [v[6], v[5], v[6], v[5], v[0], v[6], v[3]]]]
+    ,
+    [[[v[1], v[6], v[0], v[0], v[1], v[5], v[2]], [v[3], v[6], v[6], v[6], v[1], v[5], v[3]]],
+     [[v[1], v[6], v[0], v[0], v[1], v[5], v[2]], [v[4], v[6], v[6], v[6], v[1], v[5], v[3]]],
+     [[v[2], v[6], v[0], v[0], v[1], v[5], v[2]], [v[5], v[6], v[6], v[6], v[1], v[5], v[3]]]]
+  ], [2, 3, 2, 7], "float32");
+
+  test("1 channel - greyscale", async () => {
+    const [Z, H, W, C] = dummyTensor.shape;
+
+    const inputTensor = tidy("getImageSlice", () => {
+      const [grey, rest] = dummyTensor
+        .slice([0], [1, H, W, C])
+        // cast to 3D tensor
+        .reshape([H, W, C])
+        // split on channel axis resulting in 2 tensors
+        // [H, W, 1] and [H, 2, 6]
+        .split([1, 6], 2);
+
+      return grey as Tensor3D;
+    });
+
+    const colors = await generateDefaultColors(inputTensor);
 
     const expectedColorData = [ALL];
 
@@ -47,13 +93,31 @@ describe("color generation", () => {
     expectedResult.color.dispose();
   });
 
-  test("3 channel - rgb", () => {
-    const colors = generateDefaultChannels(3);
+  test("3 channel - rgb", async () => {
+    const [Z, H, W, C] = dummyTensor.shape;
+
+    const inputTensor = tidy("getImageSlice", () => {
+      const [rgb, rest] = dummyTensor
+        .slice([0], [1, H, W, C])
+        // cast to 3D tensor
+        .reshape([H, W, C])
+        // split on channel axis resulting in 2 tensors
+        // [H, W, 3] and [H, 2, 3]
+        .split([3, 4], 2);
+
+      return rgb as Tensor3D;
+    });
+
+    const colors = await generateDefaultColors(inputTensor);
 
     const expectedColorData = [RED, GREEN, BLUE];
 
     const expectedResult = {
-      range: { 0: [0, 1], 1: [0, 1], 2: [0, 1] },
+      range: {
+        0: [0, 1],
+        1: [0, expect.closeTo(5 / 6, 5)],
+        2: [expect.closeTo(1 / 6, 5), 1],
+      },
       visible: { 0: true, 1: true, 2: true },
       color: tensor2d(expectedColorData),
     };
@@ -67,20 +131,31 @@ describe("color generation", () => {
     expectedResult.color.dispose();
   });
 
-  test("shold have all colors for all channels, and first visible", () => {
-    const colors = generateDefaultChannels(7);
+  test("shold have all colors for all channels, and first visible", async () => {
+    const [Z, H, W, C] = dummyTensor.shape;
+
+    const inputTensor = tidy("getImageSlice", () => {
+      return (
+        dummyTensor
+          .slice([0], [1, H, W, C])
+          // cast to 3D tensor
+          .reshape([H, W, C]) as Tensor3D
+      );
+    });
+
+    const colors = await generateDefaultColors(inputTensor);
 
     const expectedColorData = [RED, GREEN, BLUE, YELLOW, CYAN, MAGNETA, ALL];
 
     const expectedResult = {
       range: {
         0: [0, 1],
-        1: [0, 1],
-        2: [0, 1],
-        3: [0, 1],
-        4: [0, 1],
-        5: [0, 1],
-        6: [0, 1],
+        1: [0, expect.closeTo(5 / 6, 5)],
+        2: [expect.closeTo(1 / 6, 5), 1],
+        3: [expect.closeTo(1 / 6, 5), expect.closeTo(5 / 6, 5)],
+        4: [0, 0],
+        5: [1, 1],
+        6: [expect.closeTo(2 / 6, 5), expect.closeTo(3 / 6, 5)],
       },
       visible: {
         0: true,
@@ -483,7 +558,7 @@ describe("Tensor -> Composite Image", () => {
   });
 
   it("should filter visible channels from image tensor - Tensor4D -> Tensor3D", async () => {
-    // c-1 because we will disable channel 2
+    // c-1 because we will disable last channel
     const expectedC = C - 1;
 
     // prettier-ignore
@@ -492,7 +567,12 @@ describe("Tensor -> Composite Image", () => {
      [[1211, 1212, 1213, 1214], [1221, 1222, 1223, 1224]],
      [[1311, 1312, 1313, 1314], [1321, 1322, 1323, 1324]]]
 
-    const colors = generateDefaultChannels(C);
+    const expectedVisibleChannels = [0, 1, 2, 3];
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -500,10 +580,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const expectedVisibleChannels = [0, 1, 2, 3];
-
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
 
@@ -514,7 +590,7 @@ describe("Tensor -> Composite Image", () => {
   });
 
   it("should filter visible channels from image tensor - Tensor4D -> Tensor4D", async () => {
-    // c-1 because we will disable channel 2
+    // c-1 because we will disable last channel
     const expectedC = C - 1;
 
     // prettier-ignore
@@ -529,7 +605,11 @@ describe("Tensor -> Composite Image", () => {
        [[2311, 2312, 2313, 2314], [2321, 2322, 2323, 2324]]]
     ]
 
-    const colors = generateDefaultChannels(C);
+    const expectedVisibleChannels = [0, 1, 2, 3];
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+
+    const colors = await generateDefaultColors(imageTensor);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -537,9 +617,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const expectedVisibleChannels = [0, 1, 2, 3];
-
-    const imageTensor = convertToTensor(imageStack, Z, C);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
 
@@ -550,7 +627,7 @@ describe("Tensor -> Composite Image", () => {
   });
 
   it("should filter visible channels from color tensor", async () => {
-    // c-1 because we will disabled channel 2
+    // c-1 because we will disable last channel
     const expectedC = C - 1;
 
     // prettier-ignore
@@ -560,15 +637,29 @@ describe("Tensor -> Composite Image", () => {
        [0, 0, 1],
        [1, 1, 0]];
 
-    const colors = generateDefaultChannels(C);
+    const expectedVisibleChannels = [0, 1, 2, 3];
+
+    // prettier-ignore
+    const inputTensorArray = 
+    [
+      [[[1111, 1112, 1113, 1114], [1121, 1122, 1123, 1124]],
+       [[1211, 1212, 1213, 1214], [1221, 1222, 1223, 1224]],
+       [[1311, 1312, 1313, 1314], [1321, 1322, 1323, 1324]]],
+
+      [[[2111, 2112, 2113, 2114], [2121, 2122, 2123, 2124]],
+       [[2211, 2212, 2213, 2214], [2221, 2222, 2223, 2224]],
+       [[2311, 2312, 2313, 2314], [2321, 2322, 2323, 2324]]]
+    ]
+
+    const imageTensor = convertToTensor(imageStack, Z, C);
+
+    const colors = await generateDefaultColors(imageTensor);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
     colors.visible[2] = true;
     colors.visible[3] = true;
     colors.visible[4] = false;
-
-    const expectedVisibleChannels = [0, 1, 2, 3];
 
     const visibleChannels = filterVisibleChannels(colors);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -588,7 +679,10 @@ describe("Tensor -> Composite Image", () => {
        [[1211+1214, 1212+1214, 1213], [1221+1224, 1222+1224, 1223]],
        [[1311+1314, 1312+1314, 1313], [1321+1324, 1322+1324, 1323]]]
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -596,8 +690,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -621,7 +713,9 @@ describe("Tensor -> Composite Image", () => {
          [[2311+2314, 2312+2314, 2313], [2321+2324, 2322+2324, 2323]]]
       ]
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+
+    const colors = await generateDefaultColors(imageTensor);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -629,7 +723,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -684,14 +777,15 @@ describe("Tensor -> Composite Image", () => {
       })
     );
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     colors.visible[0] = true;
     colors.visible[1] = true;
     colors.visible[2] = true;
     colors.visible[3] = true;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -734,7 +828,10 @@ describe("Tensor -> Composite Image", () => {
        [scale([1211, 1212, 1213, 1214]), scale([1221, 1222, 1223, 1224])],
        [scale([1311, 1312, 1313, 1314]), scale([1321, 1322, 1323, 1324])]]
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -742,8 +839,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const [mins, maxs] = await findMinMaxs(imageSlice);
     scaleColors(colors, { mins, maxs });
     const scaledImageSlice = scaleImageTensor(imageSlice, colors);
@@ -800,7 +895,9 @@ describe("Tensor -> Composite Image", () => {
          [scale([2311, 2312, 2313, 2314]), scale([2321, 2322, 2323, 2324])]],
       ]
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+
+    const colors = await generateDefaultColors(imageTensor);
     // set all channel visibility to true, except last
     colors.visible[0] = true;
     colors.visible[1] = true;
@@ -808,9 +905,6 @@ describe("Tensor -> Composite Image", () => {
     colors.visible[3] = true;
     colors.visible[4] = false;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const [mins, maxs] = await findMinMaxs(imageTensor);
-    scaleColors(colors, { mins, maxs });
     const scaledImageSlice = scaleImageTensor(imageTensor, colors);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(
@@ -887,15 +981,16 @@ describe("Tensor -> Composite Image", () => {
       })
     );
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     colors.visible[0] = true;
     colors.visible[1] = true;
     colors.visible[2] = true;
     colors.visible[3] = true;
     colors.visible[4] = true;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -973,14 +1068,15 @@ describe("Tensor -> Composite Image", () => {
       })
     );
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+
+    const colors = await generateDefaultColors(imageTensor);
     colors.visible[0] = true;
     colors.visible[1] = true;
     colors.visible[2] = true;
     colors.visible[3] = true;
     colors.visible[4] = true;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -1062,15 +1158,16 @@ describe("Tensor -> Composite Image", () => {
       })
     );
 
-    const colors = generateDefaultChannels(C);
+    const imageTensor = convertToTensor(imageStack, Z, C);
+    const imageSlice = getImageSlice(imageTensor, 0);
+
+    const colors = await generateDefaultColors(imageSlice);
     colors.visible[0] = true;
     colors.visible[1] = true;
     colors.visible[2] = true;
     colors.visible[3] = true;
     colors.visible[4] = true;
 
-    const imageTensor = convertToTensor(imageStack, Z, C);
-    const imageSlice = getImageSlice(imageTensor, 0);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
@@ -1087,11 +1184,16 @@ describe("Tensor -> Composite Image", () => {
   });
 
   it("should garbage collect all but last tensors", async () => {
-    const colors = generateDefaultChannels(C);
     const imageTensor = convertToTensor(imageStack, Z, C);
     const imageSlice = getImageSlice(imageTensor, 0);
-    const [mins, maxs] = await findMinMaxs(imageSlice);
-    scaleColors(colors, { mins, maxs });
+
+    const colors = await generateDefaultColors(imageSlice);
+    colors.visible[0] = true;
+    colors.visible[1] = true;
+    colors.visible[2] = true;
+    colors.visible[3] = true;
+    colors.visible[4] = true;
+
     const scaledImageSlice = scaleImageTensor(imageSlice, colors);
     const visibleChannels = filterVisibleChannels(colors);
     const filteredSlice = sliceVisibleChannels(

@@ -16,6 +16,7 @@ import {
   SerializedFileType,
 } from "types";
 
+// TODO: image_data
 import {
   generateDefaultChannels,
   importSerializedAnnotations,

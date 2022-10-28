@@ -3,7 +3,7 @@ import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { imageViewerSlice, currentColorsSelector } from "store/image-viewer/";
+import { imageViewerSlice } from "store/image-viewer/";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
@@ -51,12 +51,6 @@ export function* uploadImagesSaga({
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
-
-  // TODO: image_data
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const colors: ReturnType<typeof currentColorsSelector> = yield select(
-    currentColorsSelector
-  );
 
   const invalidImageFiles: Array<ImageFileError> = [];
 

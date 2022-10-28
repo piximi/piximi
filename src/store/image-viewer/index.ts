@@ -15,6 +15,7 @@ export {
 
 // Selectors
 export { activeImageColorsSelector } from "./selectors/activeImageColorsSelector";
+export { activeImageColorsRawSelector } from "./selectors/activeImageColorsSelector";
 export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
 export { activeImagePlaneSelector } from "./selectors/activeImagePlaneSelector";
 export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
@@ -23,7 +24,6 @@ export { annotatorImagesSelector } from "./selectors/annotatorImagesSelector";
 export { boundingClientRectSelector } from "./selectors/boundingClientRectSelector";
 export { brightnessSelector } from "./selectors/brightnessSelector";
 export { contrastSelector } from "./selectors/contrastSelector";
-export { currentColorsSelector } from "./selectors/currentColorsSelector";
 export { currentIndexSelector } from "./selectors/currentIndexSelector";
 export { cursorSelector } from "./selectors/cursorSelector";
 export { exposureSelector } from "./selectors/exposureSelector";

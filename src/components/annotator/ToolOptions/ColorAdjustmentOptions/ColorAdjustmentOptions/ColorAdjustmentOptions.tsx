@@ -19,9 +19,8 @@ import {
 import { imageDataSelector, imageBitDepthSelector } from "store/common";
 
 import {
-  generateDefaultChannels,
+  generateDefaultColors,
   createRenderedTensor,
-  findMinMaxs,
 } from "image/utils/imageHelper";
 
 export const ColorAdjustmentOptions = () => {
@@ -38,26 +37,23 @@ export const ColorAdjustmentOptions = () => {
   const imageBitDepth = useSelector(imageBitDepthSelector);
 
   const onResetChannelsClick = async () => {
-    if (!imageShape) return;
+    if (!imageShape || !imageData) return;
 
-    const defaultChannels = generateDefaultChannels(imageShape.channels);
+    const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
       imageViewerSlice.actions.setImageColors({
-        colors: defaultChannels,
+        colors: defaultColors,
         execSaga: true,
       })
     );
 
     if (!imageData || !imageShape || !imageBitDepth) return;
 
-    const [mins, maxs] = await findMinMaxs(imageData);
-
     const modifiedSrc = await createRenderedTensor(
       imageData,
-      defaultChannels,
+      defaultColors,
       imageBitDepth,
-      { mins, maxs },
       activeImagePlane
     );
 
