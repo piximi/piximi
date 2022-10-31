@@ -25,6 +25,11 @@ export function* activeImageIDChangeSaga({
     return;
   }
 
+  yield put(
+    imageViewerSlice.actions.setImageSrc({
+      src: image.src,
+    })
+  );
   /*
    * Since converting each plane to image data, and mapping them to RGBs
    * can take some time, there is a a window of time where the previous
@@ -79,6 +84,12 @@ export function* activeImageColorChangeSaga({
     colorsEditable,
     image.bitDepth,
     undefined
+  );
+
+  yield put(
+    imageViewerSlice.actions.setImageSrc({
+      src: renderedSrcs[image.activePlane],
+    })
   );
 
   yield put(
