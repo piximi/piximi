@@ -48,7 +48,13 @@ export const OpenProjectFileMenuItem = ({
         const serializedImages = JSON.parse(event.target.result as string);
 
         batch(() => {
-          dispatch(imageViewerSlice.actions.setImages({ images: [] }));
+          dispatch(
+            imageViewerSlice.actions.setImages({
+              images: [],
+              disposeDataTensors: true,
+              disposeColorTensors: true,
+            })
+          );
 
           let updatedAnnotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
           serializedImages.forEach(

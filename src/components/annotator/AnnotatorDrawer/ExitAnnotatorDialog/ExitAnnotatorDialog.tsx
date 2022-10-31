@@ -9,7 +9,7 @@ import {
   Stack,
 } from "@mui/material";
 
-import { annotatorImagesSelector } from "store/image-viewer";
+import { imageViewerSlice, annotatorImagesSelector } from "store/image-viewer";
 import { selectedImagesSelector } from "store/common";
 import { projectSlice } from "store/project";
 
@@ -37,11 +37,26 @@ export const ExitAnnotatorDialog = ({
     );
 
     if (selectedImagesIds.length === 0) {
-      dispatch(
-        projectSlice.actions.setImages({
-          images: annotatorImages as Array<ImageType>,
-        })
-      );
+      batch(() => {
+        dispatch(
+          projectSlice.actions.setImages({
+            images: annotatorImages as Array<ImageType>,
+          })
+        );
+        dispatch(
+          imageViewerSlice.actions.setImages({
+            images: [],
+            disposeDataTensors: false,
+            disposeColorTensors: false,
+          })
+        );
+        dispatch(
+          imageViewerSlice.actions.setActiveImage({
+            imageId: undefined,
+            execSaga: true,
+          })
+        );
+      });
     } else {
       const modifiedImagesIds = _.intersection(
         selectedImagesIds,
@@ -69,8 +84,42 @@ export const ExitAnnotatorDialog = ({
         dispatch(
           projectSlice.actions.reconcileImages({ images: modifiedImages })
         );
+        dispatch(
+          imageViewerSlice.actions.setImages({
+            images: [],
+            disposeDataTensors: true,
+            disposeColorTensors: false,
+          })
+        );
+        dispatch(
+          imageViewerSlice.actions.setActiveImage({
+            imageId: undefined,
+            execSaga: true,
+          })
+        );
       });
     }
+
+    onReturnToProject();
+  };
+
+  const onDiscardAnnotations = () => {
+    batch(() => {
+      dispatch(
+        imageViewerSlice.actions.setImages({
+          images: [],
+          disposeDataTensors: true,
+          disposeColorTensors: true,
+        })
+      );
+
+      dispatch(
+        imageViewerSlice.actions.setActiveImage({
+          imageId: undefined,
+          execSaga: true,
+        })
+      );
+    });
 
     onReturnToProject();
   };
@@ -90,7 +139,7 @@ export const ExitAnnotatorDialog = ({
         Stay on this page
       </Button>
 
-      <Button onClick={onReturnToProject} color="primary">
+      <Button onClick={onDiscardAnnotations} color="primary">
         Discard changes and return to project
       </Button>
 

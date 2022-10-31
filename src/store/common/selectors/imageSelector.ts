@@ -16,18 +16,30 @@ export const imageSelector = ({
       then the shadow image is the full image, so return that
   */
 
-  if (!imageViewer.images.length) return;
+  let activeImageId: string;
+  if (!imageViewer.images.length || !imageViewer.activeImageId) {
+    return;
+  } else {
+    activeImageId = imageViewer.activeImageId;
+  }
 
-  // TODO: image_data - bad because project.images image.colors.color is untouchable reference
-  const image =
-    project.images.find((im: ImageType) => {
-      return im.id === imageViewer.activeImageId;
-    }) ||
-    (imageViewer.images.find((im: ShadowImageType) => {
-      return im.id === imageViewer.activeImageId;
-    }) as ImageType);
+  const image = imageViewer.images.find((im: ShadowImageType) => {
+    return im.id === activeImageId;
+  }) as ShadowImageType;
 
-  if (!image) return;
+  if (!image.data) {
+    const projectImage = project.images.find((im: ImageType) => {
+      return im.id === activeImageId;
+    }) as ImageType;
 
-  return image;
+    // can't just return project image directly because
+    // imageViewer image has cloned color tensor
+    return {
+      ...projectImage,
+      ...image,
+      data: projectImage.data.clone(),
+    } as ImageType;
+  }
+
+  return image as ImageType;
 };
