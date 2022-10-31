@@ -270,13 +270,13 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{
         images: Array<ShadowImageType>;
-        disposeDataTensors: boolean;
         disposeColorTensors: boolean;
       }>
     ) {
-      for (const im of state.images) {
-        action.payload.disposeDataTensors && im.data?.dispose();
-        action.payload.disposeColorTensors && im.colors.color.dispose();
+      if (action.payload.disposeColorTensors) {
+        for (const im of state.images) {
+          action.payload.disposeColorTensors && im.colors.color.dispose();
+        }
       }
       state.images = action.payload.images;
     },
