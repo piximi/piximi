@@ -26,7 +26,7 @@ import {
 import { Partition } from "types/Partition";
 import { AnnotationTool } from "annotator/AnnotationTools";
 import { defaultImage } from "images/defaultImage";
-import { encode, encodeAnnotation, decodeAnnotation } from "utils/annotator";
+import { encode } from "utils/annotator";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
@@ -443,6 +443,12 @@ export const imageViewerSlice = createSlice({
         selectedAnnotation: decodedAnnotationType | undefined;
       }>
     ) {
+      const selectedIds = action.payload.selectedAnnotations.map(
+        (annotation) => annotation.id
+      );
+      state.stagedAnnotations = state.stagedAnnotations.filter(
+        (annotation) => !selectedIds.includes(annotation.id)
+      );
       state.selectedAnnotations = action.payload.selectedAnnotations;
       state.selectedAnnotation = action.payload.selectedAnnotation;
     },

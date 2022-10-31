@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import {
-  selectedAnnotationObjectsSelector,
-  stagedAnnotationObjectsSelector,
-} from "store/common";
+import { selectedAnnotationObjectsSelector } from "store/common";
+import { stagedAnnotationObjectsSelector } from "store/image-viewer";
 import { Annotation } from "./Annotation";
 
 export const Annotations = ({
@@ -18,6 +16,23 @@ export const Annotations = ({
   );
   const stagedAnnotationObjects = useSelector(stagedAnnotationObjectsSelector);
 
+  useEffect(() => {
+    console.log(
+      `selected: ${
+        selectedAnnotationObjects.length > 0
+          ? selectedAnnotationObjects[0].annotation.boundingBox
+          : ""
+      }`
+    );
+    console.log(
+      `staged: ${
+        stagedAnnotationObjects.length > 0
+          ? stagedAnnotationObjects[0].annotation.boundingBox
+          : ""
+      }`
+    );
+  });
+
   return (
     <>
       {(selected || !unselected) &&
@@ -27,6 +42,7 @@ export const Annotations = ({
             annotation={annotationObject.annotation}
             imageShape={annotationObject.imageShape}
             fillColor={annotationObject.fillColor}
+            selected={true}
           />
         ))}
       {(unselected || !selected) &&
