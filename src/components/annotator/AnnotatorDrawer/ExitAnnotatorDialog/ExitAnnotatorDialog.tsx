@@ -31,11 +31,31 @@ export const ExitAnnotatorDialog = ({
   const annotatorImages = useSelector(annotatorImagesSelector);
   const selectedImagesIds = useSelector(selectedImagesSelector);
 
-  const onSaveAnnotations = () => {
+  // TODO: image_data - make these selectors
+  const getImageSets = () => {
     const annotatorImagesIds = annotatorImages.map(
       (image: ShadowImageType) => image.id
     );
 
+    const modifiedImagesIds = _.intersection(
+      selectedImagesIds,
+      annotatorImagesIds
+    );
+    const deletedImagesIds = _.difference(selectedImagesIds, modifiedImagesIds);
+    const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
+
+    const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
+      return modifiedImagesIds.includes(image.id);
+    });
+
+    const newImages = annotatorImages.filter((image: ShadowImageType) => {
+      return newImagesIds.includes(image.id);
+    }) as Array<ImageType>;
+
+    return { newImages, modifiedImages, deletedImagesIds };
+  };
+
+  const onSaveAnnotations = () => {
     if (selectedImagesIds.length === 0) {
       batch(() => {
         dispatch(
@@ -46,7 +66,6 @@ export const ExitAnnotatorDialog = ({
         dispatch(
           imageViewerSlice.actions.setImages({
             images: [],
-            disposeDataTensors: false,
             disposeColorTensors: false,
           })
         );
@@ -58,25 +77,7 @@ export const ExitAnnotatorDialog = ({
         );
       });
     } else {
-      const modifiedImagesIds = _.intersection(
-        selectedImagesIds,
-        annotatorImagesIds
-      );
-      const deletedImagesIds = _.difference(
-        selectedImagesIds,
-        modifiedImagesIds
-      );
-      const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
-
-      const modifiedImages = annotatorImages.filter(
-        (image: ShadowImageType) => {
-          return modifiedImagesIds.includes(image.id);
-        }
-      );
-
-      const newImages = annotatorImages.filter((image: ShadowImageType) => {
-        return newImagesIds.includes(image.id);
-      }) as Array<ImageType>;
+      const { newImages, modifiedImages, deletedImagesIds } = getImageSets();
 
       batch(() => {
         dispatch(projectSlice.actions.addImages({ images: newImages }));
@@ -87,7 +88,6 @@ export const ExitAnnotatorDialog = ({
         dispatch(
           imageViewerSlice.actions.setImages({
             images: [],
-            disposeDataTensors: true,
             disposeColorTensors: false,
           })
         );
@@ -104,11 +104,16 @@ export const ExitAnnotatorDialog = ({
   };
 
   const onDiscardAnnotations = () => {
+    const { newImages } = getImageSets();
+
+    for (const im of newImages) {
+      im.data.dispose();
+    }
+
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setImages({
           images: [],
-          disposeDataTensors: true,
           disposeColorTensors: true,
         })
       );

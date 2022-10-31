@@ -148,7 +148,6 @@ export const MainImageGridAppBar = () => {
     dispatch(
       imageViewerSlice.actions.setImages({
         images: selected,
-        disposeDataTensors: true,
         disposeColorTensors: true,
       })
     );

@@ -59,8 +59,7 @@ export const ApplyColorsButton = () => {
       dispatch(
         imageViewerSlice.actions.setImages({
           images: updatedImages,
-          disposeDataTensors: true,
-          disposeColorTensors: true,
+          disposeColorTensors: false,
         })
       );
     });

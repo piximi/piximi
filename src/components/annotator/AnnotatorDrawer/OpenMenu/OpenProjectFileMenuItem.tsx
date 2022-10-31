@@ -48,10 +48,10 @@ export const OpenProjectFileMenuItem = ({
         const serializedImages = JSON.parse(event.target.result as string);
 
         batch(() => {
+          // TODO: image_data - needs to dispose data tensors of annotator uploaded images
           dispatch(
             imageViewerSlice.actions.setImages({
               images: [],
-              disposeDataTensors: true,
               disposeColorTensors: true,
             })
           );
