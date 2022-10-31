@@ -905,15 +905,18 @@ export const replaceDuplicateName = (name: string, names: Array<string>) => {
 /*
  * from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
  * */
-const hexToRgb = (hex: string) => {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
+export const hexToRGBA = (color: string, alpha?: number) => {
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  const a = alpha
+    ? alpha
+    : color.length === 9
+    ? parseInt(color.slice(7, 9), 16)
+    : undefined;
+
+  return a ? [r, g, b, a] : [r, g, b];
+  // return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
 export const rgbToHex = (rgb: Array<number>) => {
@@ -1006,7 +1009,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
       { components: 1, alpha: 0 }
     );
     categories.forEach((category: Category) => {
-      const categoryColor = hexToRgb(category.color);
+      const categoryColor = hexToRGBA(category.color);
       if (!categoryColor) return;
 
       for (let annotation of current.annotations) {
@@ -1035,7 +1038,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
               fullLabelImage.setPixelXY(
                 i + annotation.boundingBox[0],
                 j + annotation.boundingBox[1],
-                [categoryColor.r, categoryColor.g, categoryColor.b]
+                categoryColor
               );
             }
           }

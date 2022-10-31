@@ -22,18 +22,6 @@ export class RectangularAnnotationTool extends AnnotationTool {
     if (!this.width) {
       this.origin = position;
       this.setAnnotating();
-    } else {
-      this.resize(position);
-
-      this.points = drawRectangle(this.origin, this.width, this.height);
-
-      this._boundingBox = this.computeBoundingBox();
-
-      const maskData = this.convertToMask();
-      if (!maskData) return;
-      this._maskData = maskData;
-
-      this.setAnnotated();
     }
   }
 
@@ -44,10 +32,13 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
+    console.log(this.width, this.height);
     if (this.width && this.height) {
-      if (this.width * this.height < 10) {
+      if (Math.abs(this.width * this.height) < 10) {
         return;
       }
+      this.resize(position);
+
       this.points = drawRectangle(this.origin, this.width, this.height);
 
       this._boundingBox = this.computeBoundingBox();
