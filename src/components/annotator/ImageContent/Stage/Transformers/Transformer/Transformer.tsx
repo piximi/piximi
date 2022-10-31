@@ -209,7 +209,20 @@ export const Transformer = ({
     }
 
     setBoundBox(newBox);
-    console.log("boundingBoxFunc: newBox:", newBox);
+    console.log(
+      "newBox: ",
+      newBox.x,
+      newBox.y,
+      newBox.x + newBox.width,
+      newBox.y + newBox.height
+    );
+    console.log(
+      "relativeNewBox: ",
+      relativeNewBox.x,
+      relativeNewBox.y,
+      relativeNewBox.x + relativeNewBox.width,
+      relativeNewBox.y + relativeNewBox.height
+    );
     return newBox;
   };
   const onTransformEnd = () => {
@@ -221,10 +234,18 @@ export const Transformer = ({
 
     console.log("TransformEnd");
     console.log(
-      `BoundBox width: ${boundBox.width}, height: ${boundBox.height}, x: ${boundBox.x}, y: ${boundBox.y}`
+      "startBox: ",
+      startBox.x,
+      startBox.y,
+      startBox.x + startBox.width,
+      startBox.y + startBox.height
     );
     console.log(
-      `StartBox width: ${startBox.width}, height: ${startBox.height}, x: ${startBox.x}, y: ${startBox.y}`
+      "boundBox: ",
+      boundBox.x,
+      boundBox.y,
+      boundBox.x + boundBox.width,
+      boundBox.y + boundBox.height
     );
 
     const relativeBoundBox = getRelativeBox(boundBox);
@@ -245,26 +266,14 @@ export const Transformer = ({
     const roiY = boundingBox[1];
 
     console.log(
-      "roiWidth: ",
-      roiWidth,
-      ", relativeStartWidth: ",
-      relativeStartBox.width
-    );
-
-    console.log(
-      "roiHeight: ",
-      roiHeight,
-      ", relativeStartHeight: ",
-      relativeStartBox.height
+      "selectedAnnotationBox: ",
+      boundingBox[0],
+      boundingBox[1],
+      boundingBox[2],
+      boundingBox[3]
     );
 
     console.log("scaleX: ", scaleX);
-    console.log(
-      "scaledWidth: ",
-      roiWidth * scaleX,
-      ", boundBoxWidth: ",
-      relativeBoundBox.width
-    );
 
     const decodedData = selectedAnnotation.maskData;
 

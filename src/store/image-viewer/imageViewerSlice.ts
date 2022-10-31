@@ -20,7 +20,6 @@ import { Colors } from "types/tensorflow";
 import { AnnotationTool } from "annotator/AnnotationTools";
 
 import { replaceDuplicateName } from "image/utils/imageHelper";
-import { encode } from "utils/annotator";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
@@ -376,6 +375,12 @@ export const imageViewerSlice = createSlice({
         selectedAnnotation: decodedAnnotationType | undefined;
       }>
     ) {
+      const selectedIds = action.payload.selectedAnnotations.map(
+        (annotation) => annotation.id
+      );
+      state.stagedAnnotations = state.stagedAnnotations.filter(
+        (annotation) => !selectedIds.includes(annotation.id)
+      );
       state.selectedAnnotations = action.payload.selectedAnnotations;
       state.selectedAnnotation = action.payload.selectedAnnotation;
     },
