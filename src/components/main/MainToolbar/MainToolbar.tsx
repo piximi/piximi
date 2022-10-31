@@ -53,7 +53,6 @@ export const MainToolbar = () => {
     <Toolbar>
       <Logo width={250} height={50} />
 
-      {/*<TaskSelect />*/}
       <Box sx={{ flexGrow: 1 }} />
 
       <ImageSortSelection />
@@ -83,7 +82,6 @@ export const MainToolbar = () => {
         />
       </Button>
 
-      {/*<SearchInput />*/}
       <UploadButton />
     </Toolbar>
   );
