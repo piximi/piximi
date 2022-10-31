@@ -52,13 +52,14 @@ export { selectedAnnotationsIdsSelector } from "./selectors/selectedAnnotationsI
 export { selectedAnnotationsSelector } from "./selectors/selectedAnnotationsSelector";
 export { selectionModeSelector } from "./selectors/selectionModeSelector";
 export { soundEnabledSelector } from "./selectors/soundEnabledSelector";
+export { stagedAnnotationsSelector } from "./selectors/stagedAnnotationsSelector";
+export { stagedAnnotationObjectsSelector } from "./selectors/stagedAnnotationObjectsSelector";
 export { stageHeightSelector } from "./selectors/stageHeightSelector";
 export { stagePositionSelector } from "./selectors/stagePositionSelector";
 export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotationValueSelector";
 export { toolTypeSelector } from "./selectors/toolTypeSelector";
-export { stagedAnnotationsSelector } from "./selectors/stagedAnnotationsSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
 
