@@ -145,7 +145,13 @@ export const MainImageGridAppBar = () => {
 
     if (!selected) return;
 
-    dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+    dispatch(
+      imageViewerSlice.actions.setImages({
+        images: selected,
+        disposeDataTensors: true,
+        disposeColorTensors: true,
+      })
+    );
     dispatch(unregisterHotkeyView({}));
     navigate("/annotator");
   };

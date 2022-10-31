@@ -1,6 +1,5 @@
 import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
 
-// TODO: image-data - getting original color tensor is bad
 export const imageViewerFullImagesSelector = ({
   imageViewer,
   project,
@@ -9,9 +8,20 @@ export const imageViewerFullImagesSelector = ({
   project: Project;
 }): Array<ImageType> => {
   return imageViewer.images.map((shadowImage: ShadowImageType) => {
-    return (
-      project.images.find((im: ImageType) => im.id === shadowImage.id) ||
-      (shadowImage as ImageType)
+    const projectImage = project.images.find(
+      (im: ImageType) => im.id === shadowImage.id
     );
+
+    if (projectImage) {
+      // can't return project image directly since
+      // image viewer image has its own color tensor
+      return {
+        ...projectImage,
+        ...shadowImage,
+        data: projectImage.data.clone(),
+      };
+    } else {
+      return shadowImage as ImageType;
+    }
   });
 };

@@ -56,7 +56,13 @@ export const ApplyColorsButton = () => {
 
     getUpdatedImages().then((updatedImages) => {
       newColor.dispose();
-      dispatch(imageViewerSlice.actions.setImages({ images: updatedImages }));
+      dispatch(
+        imageViewerSlice.actions.setImages({
+          images: updatedImages,
+          disposeDataTensors: true,
+          disposeColorTensors: true,
+        })
+      );
     });
   };
 
