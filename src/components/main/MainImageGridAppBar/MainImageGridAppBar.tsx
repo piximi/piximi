@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "hooks";
 
@@ -131,26 +131,25 @@ export const MainImageGridAppBar = () => {
         bitDepth: projectImage.bitDepth,
       };
 
-      if (idx === 0) {
-        dispatch(
-          setActiveImage({
-            imageId: annotatorImage.id,
-            execSaga: true,
-          })
-        );
-      }
-
       return annotatorImage;
     });
 
     if (!selected) return;
 
-    dispatch(
-      imageViewerSlice.actions.setImages({
-        images: selected,
-        disposeColorTensors: true,
-      })
-    );
+    batch(() => {
+      dispatch(
+        imageViewerSlice.actions.setImages({
+          images: selected,
+          disposeColorTensors: true,
+        })
+      );
+      dispatch(
+        setActiveImage({
+          imageId: selected.length > 0 ? selected[0].id : undefined,
+          execSaga: true,
+        })
+      );
+    });
     dispatch(unregisterHotkeyView({}));
     navigate("/annotator");
   };
