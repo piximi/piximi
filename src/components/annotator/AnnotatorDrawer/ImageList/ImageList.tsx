@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -19,7 +19,6 @@ import { ImageMenu } from "../ImageMenu";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { imageSelector } from "store/common";
 import {
   annotatorImagesSelector,
   activeImageSelector,
@@ -50,7 +49,6 @@ export const ImageList = () => {
     image: ShadowImageType
   ) => {
     if (image.id !== activeImage!.id) {
-      console.log("im true!");
       dispatch(
         setActiveImage({
           imageId: image.id,

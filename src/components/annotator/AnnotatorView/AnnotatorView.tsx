@@ -21,9 +21,8 @@ import {
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer";
 
-import { AlertType, HotkeyView, ImageType } from "types";
+import { AlertType, HotkeyView } from "types";
 
 import { getStackTraceFromError } from "utils";
 
@@ -35,8 +34,6 @@ export const AnnotatorView = () => {
   const [files, setFiles] = useState<FileList>();
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-
-  const activeImageId = useSelector(activeImageIdSelector);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);

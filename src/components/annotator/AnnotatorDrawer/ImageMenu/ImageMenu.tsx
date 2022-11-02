@@ -14,7 +14,7 @@ import {
   imageViewerSlice,
 } from "store/image-viewer";
 
-import { ImageType, ShadowImageType } from "types";
+import { ShadowImageType } from "types";
 
 import {
   saveAnnotationsAsLabelMatrix,
