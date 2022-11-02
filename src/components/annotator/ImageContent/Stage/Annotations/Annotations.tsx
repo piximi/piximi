@@ -1,50 +1,38 @@
-import React, { useEffect } from "react";
+import { AnnotationTool } from "annotator/AnnotationTools";
+import Konva from "konva";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { selectedAnnotationObjectsSelector } from "store/common";
 import { stagedAnnotationObjectsSelector } from "store/image-viewer";
 import { Annotation } from "./Annotation";
+import { AnnotationTransformer } from "./AnnotationTransformer/AnnotationTransformer";
 
-export const Annotations = ({
-  selected,
-  unselected,
-}: {
+type AnnotationsProps = {
+  transformPosition: ({
+    x,
+    y,
+  }: {
+    x: number;
+    y: number;
+  }) => { x: number; y: number } | undefined;
   selected?: boolean;
   unselected?: boolean;
-}) => {
+  annotationTool?: AnnotationTool;
+};
+export const Annotations = ({
+  transformPosition,
+  selected,
+  unselected,
+  annotationTool,
+}: AnnotationsProps) => {
+  const transformerRef = useRef<Konva.Transformer | null>(null);
   const selectedAnnotationObjects = useSelector(
     selectedAnnotationObjectsSelector
   );
   const stagedAnnotationObjects = useSelector(stagedAnnotationObjectsSelector);
 
-  useEffect(() => {
-    console.log(
-      `selected: ${
-        selectedAnnotationObjects.length > 0
-          ? selectedAnnotationObjects[0].annotation.boundingBox
-          : ""
-      }`
-    );
-    console.log(
-      `staged: ${
-        stagedAnnotationObjects.length > 0
-          ? stagedAnnotationObjects[0].annotation.boundingBox
-          : ""
-      }`
-    );
-  });
-
   return (
     <>
-      {(selected || !unselected) &&
-        selectedAnnotationObjects.map((annotationObject) => (
-          <Annotation
-            key={annotationObject.annotation.id}
-            annotation={annotationObject.annotation}
-            imageShape={annotationObject.imageShape}
-            fillColor={annotationObject.fillColor}
-            selected={true}
-          />
-        ))}
       {(unselected || !selected) &&
         stagedAnnotationObjects.map((annotationObject) => (
           <Annotation
@@ -53,6 +41,25 @@ export const Annotations = ({
             fillColor={annotationObject.fillColor}
             key={annotationObject.annotation.id}
           />
+        ))}
+      {(selected || !unselected) &&
+        selectedAnnotationObjects.map((annotationObject) => (
+          <React.Fragment key={`group-${annotationObject.annotation.id}`}>
+            <Annotation
+              key={annotationObject.annotation.id}
+              annotation={annotationObject.annotation}
+              imageShape={annotationObject.imageShape}
+              fillColor={annotationObject.fillColor}
+              selected={true}
+            />
+            <AnnotationTransformer
+              transformerRef={transformerRef}
+              key={`tr-${annotationObject.annotation.id}`}
+              transformPosition={transformPosition}
+              annotationId={annotationObject.annotation.id}
+              annotationTool={annotationTool}
+            />
+          </React.Fragment>
         ))}
     </>
   );

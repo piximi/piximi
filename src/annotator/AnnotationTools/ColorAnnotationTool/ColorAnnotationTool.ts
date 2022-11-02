@@ -77,7 +77,6 @@ export class ColorAnnotationTool extends AnnotationTool {
       Math.floor(position.y),
       0,
     ]);
-    console.log(this.toleranceQueue.length);
 
     const idx =
       Math.floor(position.x) + Math.floor(position.y) * this.image.width;
@@ -229,7 +228,6 @@ export class ColorAnnotationTool extends AnnotationTool {
       0,
       this.seen
     );
-    console.log(this.toleranceQueue.length);
     // Make a threshold mask
     this.roiMask = this.floodMap!.mask({
       threshold: this.tolerance,

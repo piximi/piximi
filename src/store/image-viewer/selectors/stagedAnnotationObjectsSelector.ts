@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import {
   stagedAnnotationsSelector,
+  selectedAnnotationsIdsSelector,
   activeImageSelector,
 } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
@@ -10,15 +11,23 @@ import {
   decodedAnnotationType,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
+  Shape,
 } from "types";
+
+type AnnotationObject = {
+  annotation: decodedAnnotationType;
+  imageShape: Shape;
+  fillColor: string;
+};
 
 export const stagedAnnotationObjectsSelector = createSelector(
   [
     activeImageSelector,
     annotationCategoriesSelector,
     stagedAnnotationsSelector,
+    selectedAnnotationsIdsSelector,
   ],
-  (activeImage, categories, stagedAnnotations) => {
+  (activeImage, categories, stagedAnnotations, selectedIds) => {
     if (!activeImage) return [];
 
     const getFillColor = (annotation: decodedAnnotationType) => {
@@ -31,12 +40,20 @@ export const stagedAnnotationObjectsSelector = createSelector(
         : UNKNOWN_ANNOTATION_CATEGORY.id;
     };
 
-    return stagedAnnotations.map((annotation: decodedAnnotationType) => {
-      return {
-        annotation: annotation,
-        imageShape: activeImage.shape,
-        fillColor: getFillColor(annotation),
-      };
-    });
+    const reducedAnnotations: AnnotationObject[] = stagedAnnotations.reduce(
+      (objectArray: AnnotationObject[], annotation: decodedAnnotationType) => {
+        if (!selectedIds.includes(annotation.id)) {
+          objectArray.push({
+            annotation: annotation,
+            imageShape: activeImage.shape,
+            fillColor: getFillColor(annotation),
+          });
+        }
+        return objectArray;
+      },
+      []
+    );
+
+    return reducedAnnotations;
   }
 );

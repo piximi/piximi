@@ -31,7 +31,6 @@ export class RectangularAnnotationTool extends AnnotationTool {
 
   onMouseUp(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
-    console.log(this.width, this.height);
     if (this.width && this.height) {
       if (Math.abs(this.width * this.height) < 10) {
         return;
