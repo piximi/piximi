@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 import { hexToRGBA } from "utils/common/imageHelper";
 import { colorOverlayROI } from "utils/common/imageHelper";
+import Image from "image-js";
 
-import { stageScaleSelector } from "store/image-viewer";
+import { setSelectedAnnotations, stageScaleSelector } from "store/image-viewer";
 
 import { decodedAnnotationType, Shape } from "types";
 import Konva from "konva";
-import { Transformer } from "react-konva";
 
 type AnnotationProps = {
   annotation: decodedAnnotationType;
@@ -23,7 +23,6 @@ export const Annotation = ({
   fillColor,
   selected,
 }: AnnotationProps) => {
-  const trRef = useRef<Konva.Transformer | null>(null);
   const annotatorRef = useRef<Konva.Image | null>(null);
   const stageScale = useSelector(stageScaleSelector);
 
@@ -31,16 +30,7 @@ export const Annotation = ({
   const [imageHeight] = useState<number>(imageShape.height);
 
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
-
-  useEffect(() => {
-    if (selected) {
-      if (trRef && annotatorRef && trRef.current && annotatorRef.current) {
-        console.log("draw");
-        trRef.current.nodes([annotatorRef.current]);
-        trRef.current.getLayer()?.batchDraw();
-      }
-    }
-  }, [selected, annotatorRef, trRef]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
@@ -67,53 +57,74 @@ export const Annotation = ({
     imageHeight,
   ]);
 
-  useEffect(() => {
-    const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
-    const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
+  const onTransformEnd = () => {
+    if (!selected) return;
 
-    console.log(
-      `AnnotationComponent - scale: ${stageScale}; bboxW: ${boxWidth}, bboxH: ${boxHeight}; scaled-bboxW: ${
-        boxWidth * stageScale
-      }; scaled-bboxH: ${boxHeight * stageScale} ${annotation.boundingBox}`
+    if (!imageWidth || !imageHeight) return;
+
+    const node = annotatorRef.current;
+    if (!node) return;
+
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+    node.scaleX(1);
+    node.scaleY(1);
+    if (!scaleX || !scaleY) return;
+
+    const maskData = annotation.maskData;
+    const boundingBox = annotation.boundingBox;
+
+    const roiWidth = boundingBox[2] - boundingBox[0];
+    const roiHeight = boundingBox[3] - boundingBox[1];
+
+    if (!roiWidth || !roiHeight) return;
+
+    const roi = new Image(roiWidth, roiHeight, maskData, {
+      components: 1,
+      alpha: 0,
+    });
+
+    const resizedMaskROI = roi.resize({
+      height: Math.round(roiHeight * scaleY),
+      width: Math.round(roiWidth * scaleX),
+      preserveAspectRatio: false,
+    });
+    const stageScaledX = Math.round(node.x() / stageScale);
+    const stageScaleY = Math.round(node.y() / stageScale);
+
+    const updatedAnnotation = {
+      ...annotation,
+      boundingBox: [
+        stageScaledX,
+        stageScaleY,
+        stageScaledX + resizedMaskROI.width,
+        stageScaleY + resizedMaskROI.height,
+      ] as [number, number, number, number],
+      maskData: Uint8Array.from(resizedMaskROI.data),
+    };
+
+    dispatch(
+      setSelectedAnnotations({
+        selectedAnnotations: [updatedAnnotation],
+        selectedAnnotation: updatedAnnotation,
+      })
     );
-  });
-  useEffect(() => {
-    console.log(selected);
-  });
+  };
 
   return (
-    <>
-      <ReactKonva.Image
-        ref={annotatorRef}
-        id={annotation.id}
-        image={imageMask}
-        x={annotation.boundingBox[0] * stageScale}
-        y={annotation.boundingBox[1] * stageScale}
-        width={Math.round(
-          (annotation.boundingBox[2] - annotation.boundingBox[0]) * stageScale
-        )}
-        height={Math.round(
-          (annotation.boundingBox[3] - annotation.boundingBox[1]) * stageScale
-        )}
-        onTransformEnd={(e) => {
-          const node = annotatorRef.current;
-          const scaleX = node?.scaleX();
-          const scaleY = node?.scaleY();
-          console.log(scaleX, scaleY);
-        }}
-      />
-      {selected && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            // limit resize
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-        />
+    <ReactKonva.Image
+      ref={annotatorRef}
+      id={annotation.id}
+      image={imageMask}
+      x={annotation.boundingBox[0] * stageScale}
+      y={annotation.boundingBox[1] * stageScale}
+      width={Math.round(
+        (annotation.boundingBox[2] - annotation.boundingBox[0]) * stageScale
       )}
-    </>
+      height={Math.round(
+        (annotation.boundingBox[3] - annotation.boundingBox[1]) * stageScale
+      )}
+      onTransformEnd={onTransformEnd}
+    />
   );
 };

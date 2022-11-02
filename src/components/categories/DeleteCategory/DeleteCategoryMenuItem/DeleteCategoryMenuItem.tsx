@@ -129,12 +129,11 @@ export const DeleteCategoryMenuItem = ({
 
   const onClose = () => {
     if (categoryType === CategoryType.ClassifierCategory) {
-      console.log("closing catagory");
       onCloseDeleteCategoryDialog();
     } else {
       onCloseDeleteAnnotationCategoryDialog();
     }
-    console.log("closing Menu");
+
     onCloseCategoryMenu();
   };
 

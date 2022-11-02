@@ -21,7 +21,6 @@ import { Image } from "../Image";
 import { Selecting } from "../Selecting";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
-import { Transformers } from "../Transformers/Transformers";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
 import { Annotations } from "../Annotations/Annotations";
 import { PointerSelection } from "../Selection/PointerSelection";
@@ -348,9 +347,9 @@ export const Stage = () => {
     const func = (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
-      // process.env.NODE_ENV !== "production" &&
-      //   process.env.REACT_APP_LOG_LEVEL === "2" &&
-      //   console.log(event);
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "2" &&
+        console.log(event);
 
       if (!stageRef || !stageRef.current) return;
 
@@ -505,36 +504,36 @@ export const Stage = () => {
     annotationTool.registerOnDeselectHandler(onDeselect);
   }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
 
-  // useEffect(() => {
-  //   if (!stageRef || !stageRef.current) return;
-  //   selectedAnnotationsIds.forEach((annotationId) => {
-  //     if (!stageRef || !stageRef.current) return;
+  useEffect(() => {
+    if (!stageRef || !stageRef.current) return;
+    selectedAnnotationsIds.forEach((annotationId) => {
+      if (!stageRef || !stageRef.current) return;
 
-  //     const transformerId = "tr-".concat(annotationId);
+      const transformerId = "tr-".concat(annotationId);
 
-  //     const transformer = stageRef.current.findOne(`#${transformerId}`);
-  //     const line = stageRef.current.findOne(`#${annotationId}`);
+      const transformer = stageRef.current.findOne(`#${transformerId}`);
+      const line = stageRef.current.findOne(`#${annotationId}`);
 
-  //     if (!line) return;
+      if (!line) return;
 
-  //     if (!transformer) return;
+      if (!transformer) return;
 
-  //     (transformer as Konva.Transformer).nodes([line]);
+      (transformer as Konva.Transformer).nodes([line]);
 
-  //     const layer = (transformer as Konva.Transformer).getLayer();
+      const layer = (transformer as Konva.Transformer).getLayer();
 
-  //     if (!layer) return;
+      if (!layer) return;
 
-  //     layer.batchDraw();
+      layer.batchDraw();
 
-  //     // Not ideal but this figures out which label is which
-  //     const label = stageRef.current.find(`#label`);
-  //     if (label.length > 1) {
-  //       saveLabelRef.current = label[0] as Konva.Label;
-  //       clearLabelRef.current = label[1] as Konva.Label;
-  //     }
-  //   });
-  // }, [selectedAnnotationsIds, selectedAnnotation?.maskData]);
+      // Not ideal but this figures out which label is which
+      const label = stageRef.current.find(`#label`);
+      if (label.length > 1) {
+        saveLabelRef.current = label[0] as Konva.Label;
+        clearLabelRef.current = label[1] as Konva.Label;
+      }
+    });
+  }, [selectedAnnotationsIds, selectedAnnotation?.maskData]);
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
@@ -585,13 +584,7 @@ export const Stage = () => {
 
               <PointerSelection />
 
-              <Annotations />
-              {selectedAnnotation === undefined && (
-                <Transformers
-                  transformPosition={getRelativePointerPosition}
-                  annotationTool={annotationTool}
-                />
-              )}
+              <Annotations transformPosition={getRelativePointerPosition} />
             </Layer>
           </DndProvider>
         </Provider>
