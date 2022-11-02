@@ -1,4 +1,3 @@
-import { LayersModel } from "@tensorflow/tfjs";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { ShadowImageType } from "types/ImageType";
@@ -375,12 +374,6 @@ export const imageViewerSlice = createSlice({
         selectedAnnotation: decodedAnnotationType | undefined;
       }>
     ) {
-      const selectedIds = action.payload.selectedAnnotations.map(
-        (annotation) => annotation.id
-      );
-      state.stagedAnnotations = state.stagedAnnotations.filter(
-        (annotation) => !selectedIds.includes(annotation.id)
-      );
       state.selectedAnnotations = action.payload.selectedAnnotations;
       state.selectedAnnotation = action.payload.selectedAnnotation;
     },

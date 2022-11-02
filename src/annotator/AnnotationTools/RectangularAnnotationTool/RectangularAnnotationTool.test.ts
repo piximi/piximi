@@ -127,7 +127,6 @@ test("select", async () => {
   ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
   expect(operator.maskData).toBeDefined();
-  console.log(operator.annotation);
   expect(operator.annotation).toMatchObject({
     boundingBox: [0, 0, 100, 100],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",

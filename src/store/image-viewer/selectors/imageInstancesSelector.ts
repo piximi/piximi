@@ -1,5 +1,4 @@
 import { ImageViewer, ShadowImageType } from "types";
-import { decode } from "utils/annotator";
 
 export const imageInstancesSelector = ({
   imageViewer,

@@ -3,7 +3,6 @@ import _ from "lodash";
 
 import { AnnotationTool } from "../AnnotationTool";
 
-import { encode } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
