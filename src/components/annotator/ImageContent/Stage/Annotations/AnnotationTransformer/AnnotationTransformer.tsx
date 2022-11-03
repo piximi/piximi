@@ -26,7 +26,7 @@ import {
 import { AnnotationTool } from "annotator/AnnotationTools";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 type box = {
   x: number;
@@ -46,16 +46,15 @@ type AnnotationTransformerProps = {
   }) => { x: number; y: number } | undefined;
   annotationId: string;
   annotationTool?: AnnotationTool;
-  transformerRef: React.MutableRefObject<Konva.Transformer | null>;
 };
 
 export const AnnotationTransformer = ({
   transformPosition,
   annotationId,
   annotationTool,
-  transformerRef,
 }: AnnotationTransformerProps) => {
   const [transforming, setTransforming] = useState<boolean>(false);
+  const [transformed, setTransformed] = useState<boolean>(false);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
   const selectedAnnotation = useSelector(selectedAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
@@ -65,6 +64,7 @@ export const AnnotationTransformer = ({
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
   const imageHeight = useSelector(imageHeightSelector);
+  const trRef = useRef<Konva.Transformer | null>(null);
 
   const dispatch = useDispatch();
 
@@ -104,12 +104,14 @@ export const AnnotationTransformer = ({
 
     if (!selected) return;
     setTransforming(true);
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [selected],
-        selectedAnnotation: selected,
-      })
-    );
+    if (!transformed) {
+      dispatch(
+        setSelectedAnnotations({
+          selectedAnnotations: [selected],
+          selectedAnnotation: selected,
+        })
+      );
+    }
   };
 
   const boundingBoxFunc = (oldBox: box, newBox: box) => {
@@ -133,11 +135,14 @@ export const AnnotationTransformer = ({
     ) {
       return oldBox;
     }
-
+    if (!transformed) {
+      setTransformed(true);
+    }
     return newBox;
   };
 
   const cancelAnnotation = () => {
+    setTransformed(false);
     if (annotationTool) {
       annotationTool.deselect();
     } else {
@@ -172,8 +177,8 @@ export const AnnotationTransformer = ({
 
     dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
 
-    transformerRef.current!.detach();
-    transformerRef.current!.getLayer()?.batchDraw();
+    trRef.current!.detach();
+    trRef.current!.getLayer()?.batchDraw();
 
     cancelAnnotation();
     if (soundEnabled) playCreateAnnotationSoundEffect();
@@ -223,7 +228,7 @@ export const AnnotationTransformer = ({
             setTransforming(false);
           }}
           id={"tr-".concat(annotationId)}
-          ref={transformerRef}
+          ref={trRef}
           rotateEnabled={false}
         />
         {selectedAnnotation &&
