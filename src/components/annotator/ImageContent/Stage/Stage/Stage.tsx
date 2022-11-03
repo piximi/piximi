@@ -18,7 +18,7 @@ import {
 } from "hooks";
 
 import { Image } from "../Image";
-import { Selecting } from "../Selecting";
+import { Selection } from "../Selection";
 import { Layer } from "../Layer";
 import { ZoomSelection } from "../Selection/ZoomSelection";
 import { PenAnnotationToolTip } from "../PenAnnotationToolTip/PenAnnotationToolTip";
@@ -82,7 +82,7 @@ export const Stage = () => {
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
-  const selectingRef = useRef<Konva.Line | null>(null);
+
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
 
@@ -182,8 +182,6 @@ export const Stage = () => {
 
     if (!selectedAnnotation) return;
 
-    selectingRef.current = null;
-
     const transformerId = "tr-".concat(selectedAnnotation.id);
     detachTransformer(transformerId);
   }, [annotationTool, selectedAnnotation, dispatch]);
@@ -266,20 +264,15 @@ export const Stage = () => {
       if (!firstMouseDown) {
         setFirstMouseDown(true);
       }
-
       if (toolType === ToolType.Hand || toolType === ToolType.ColorAdjustment)
         return;
-
       if (!stageRef || !stageRef.current) return;
-
       const position = stageRef.current.getPointerPosition();
 
       if (!position) return;
-
       const relative = getRelativePointerPosition(position);
 
       if (!relative) return;
-
       if (saveLabelRef?.current?.getText() && clearLabelRef.current) {
         //do not proceed with mouse down events if user has clicked on Save Annotation button
         if (
@@ -322,7 +315,6 @@ export const Stage = () => {
         }
 
         if (!annotationTool) return;
-
         annotationTool.onMouseDown(rawImagePosition);
       }
     };
@@ -348,7 +340,7 @@ export const Stage = () => {
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
       process.env.NODE_ENV !== "production" &&
-        process.env.REACT_APP_LOG_LEVEL === "2" &&
+        process.env.REACT_APP_LOG_LEVEL === "3" &&
         console.log(event);
 
       if (!stageRef || !stageRef.current) return;
@@ -552,6 +544,7 @@ export const Stage = () => {
     selectionMode,
     toolType,
   });
+
   return (
     <>
       <ReactKonva.Stage
@@ -575,7 +568,10 @@ export const Stage = () => {
 
               <ZoomSelection />
 
-              <Selecting tool={tool!} />
+              {!(
+                annotationState !== AnnotationStateType.Annotating &&
+                toolType !== ToolType.QuickAnnotation
+              ) && <Selection tool={tool} toolType={toolType} />}
 
               <PenAnnotationToolTip
                 currentPosition={currentPosition}
@@ -584,7 +580,10 @@ export const Stage = () => {
 
               <PointerSelection />
 
-              <Annotations transformPosition={getRelativePointerPosition} />
+              <Annotations
+                transformPosition={getRelativePointerPosition}
+                annotationTool={annotationTool}
+              />
             </Layer>
           </DndProvider>
         </Provider>

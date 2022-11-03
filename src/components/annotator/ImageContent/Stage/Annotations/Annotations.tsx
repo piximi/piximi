@@ -1,6 +1,6 @@
 import { AnnotationTool } from "annotator/AnnotationTools";
 import Konva from "konva";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 import { selectedAnnotationObjectsSelector } from "store/common";
 import { stagedAnnotationObjectsSelector } from "store/image-viewer";
@@ -17,7 +17,7 @@ type AnnotationsProps = {
   }) => { x: number; y: number } | undefined;
   selected?: boolean;
   unselected?: boolean;
-  annotationTool?: AnnotationTool;
+  annotationTool: AnnotationTool;
 };
 export const Annotations = ({
   transformPosition,
@@ -25,7 +25,6 @@ export const Annotations = ({
   unselected,
   annotationTool,
 }: AnnotationsProps) => {
-  const transformerRef = useRef<Konva.Transformer | null>(null);
   const selectedAnnotationObjects = useSelector(
     selectedAnnotationObjectsSelector
   );
@@ -53,7 +52,6 @@ export const Annotations = ({
               selected={true}
             />
             <AnnotationTransformer
-              transformerRef={transformerRef}
               key={`tr-${annotationObject.annotation.id}`}
               transformPosition={transformPosition}
               annotationId={annotationObject.annotation.id}
