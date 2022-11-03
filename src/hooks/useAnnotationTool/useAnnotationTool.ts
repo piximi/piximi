@@ -122,5 +122,5 @@ export const useAnnotationTool = () => {
     }
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
 
-  return [operator];
+  return [operator!];
 };
