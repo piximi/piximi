@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import {
   stagedAnnotationsSelector,
-  selectedAnnotationsIdsSelector,
+  workingAnnotationIdSelector,
   activeImageSelector,
 } from "store/image-viewer";
 import { annotationCategoriesSelector } from "store/project";
@@ -25,9 +25,9 @@ export const stagedAnnotationObjectsSelector = createSelector(
     activeImageSelector,
     annotationCategoriesSelector,
     stagedAnnotationsSelector,
-    selectedAnnotationsIdsSelector,
+    workingAnnotationIdSelector,
   ],
-  (activeImage, categories, stagedAnnotations, selectedIds) => {
+  (activeImage, categories, stagedAnnotations, workingId) => {
     if (!activeImage) return [];
 
     const getFillColor = (annotation: decodedAnnotationType) => {
@@ -42,7 +42,7 @@ export const stagedAnnotationObjectsSelector = createSelector(
 
     const reducedAnnotations: AnnotationObject[] = stagedAnnotations.reduce(
       (objectArray: AnnotationObject[], annotation: decodedAnnotationType) => {
-        if (!selectedIds.includes(annotation.id)) {
+        if (workingId !== annotation.id) {
           objectArray.push({
             annotation: annotation,
             imageShape: activeImage.shape,

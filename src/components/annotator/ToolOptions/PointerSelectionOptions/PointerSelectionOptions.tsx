@@ -43,7 +43,7 @@ export const PointerSelectionOptions = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: allAnnotations,
-        selectedAnnotation: allAnnotations[0],
+        workingAnnotation: allAnnotations[0],
       })
     );
   };
@@ -52,7 +52,7 @@ export const PointerSelectionOptions = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [],
-        selectedAnnotation: undefined,
+        workingAnnotation: undefined,
       })
     );
   };
@@ -71,7 +71,7 @@ export const PointerSelectionOptions = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: desiredAnnotations,
-        selectedAnnotation: desiredAnnotations[0],
+        workingAnnotation: desiredAnnotations[0],
       })
     );
   };

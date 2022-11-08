@@ -106,7 +106,7 @@ export const Annotation = ({
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [updatedAnnotation],
-        selectedAnnotation: updatedAnnotation,
+        workingAnnotation: updatedAnnotation,
       })
     );
   };

@@ -28,11 +28,15 @@ import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
 type useAnnotatorHotkeysProps = {
   annotations: decodedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
+  deleteAnnotations: (
+    selectedAnnotationIds: Array<string>,
+    stagedAnnotations: Array<decodedAnnotationType>
+  ) => void;
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   onZoomDeselect: () => void;
-  selectedAnnotation: decodedAnnotationType | undefined;
+  workingAnnotation: decodedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;
@@ -41,11 +45,12 @@ type useAnnotatorHotkeysProps = {
 export const useAnnotatorKeyboardShortcuts = ({
   annotations,
   annotationTool,
+  deleteAnnotations,
   deselectAllAnnotations,
   deselectAllTransformers,
   deselectAnnotation,
   onZoomDeselect,
-  selectedAnnotation,
+  workingAnnotation,
   selectedAnnotationsIds,
   selectionMode,
   toolType,
@@ -60,7 +65,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
   const confirmAnnotations = () => {
     if (
-      !selectedAnnotation ||
+      !workingAnnotation ||
       !annotationTool ||
       annotationTool.annotationState === AnnotationStateType.Annotating ||
       !activeImageId
@@ -291,11 +296,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "backspace, delete",
     () => {
-      dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
-        })
-      );
+      deleteAnnotations(selectedAnnotationsIds, stagedAnnotations);
       deselectAllAnnotations();
       deselectAllTransformers();
 

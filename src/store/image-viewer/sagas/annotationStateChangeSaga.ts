@@ -4,7 +4,7 @@ import { put, select } from "redux-saga/effects";
 import {
   imageViewerSlice,
   activeImagePlaneSelector,
-  selectedAnnotationSelector,
+  workingAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
 } from "store/image-viewer/";
@@ -45,7 +45,7 @@ export function* annotationStateChangeSaga({
     yield put(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [annotationTool.annotation],
-        selectedAnnotation: annotationTool.annotation,
+        workingAnnotation: annotationTool.annotation,
       })
     );
   } else {
@@ -55,30 +55,30 @@ export function* annotationStateChangeSaga({
 
     if (toolType === ToolType.Zoom) return;
 
-    const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
-      yield select(selectedAnnotationSelector);
+    const workingAnnotation: ReturnType<typeof workingAnnotationSelector> =
+      yield select(workingAnnotationSelector);
 
     if (annotationTool.annotationState !== AnnotationStateType.Annotated)
       return;
 
     let combinedMask, combinedBoundingBox;
 
-    if (!selectedAnnotation) return;
+    if (!workingAnnotation) return;
 
     if (selectionMode === AnnotationModeType.Add) {
       [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.maskData!,
-        selectedAnnotation.boundingBox
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
     } else if (selectionMode === AnnotationModeType.Subtract) {
       [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-        selectedAnnotation.maskData!,
-        selectedAnnotation.boundingBox
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
     } else if (selectionMode === AnnotationModeType.Intersect) {
       [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-        selectedAnnotation.maskData!,
-        selectedAnnotation.boundingBox
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
     } else {
       return;
@@ -89,7 +89,7 @@ export function* annotationStateChangeSaga({
 
     const combinedSelectedAnnotation = annotationTool.maskData.length
       ? {
-          ...selectedAnnotation,
+          ...workingAnnotation,
           boundingBox: annotationTool.boundingBox,
           maskData: annotationTool.maskData,
         }
@@ -100,7 +100,7 @@ export function* annotationStateChangeSaga({
     yield put(
       imageViewerSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [combinedSelectedAnnotation],
-        selectedAnnotation: combinedSelectedAnnotation,
+        workingAnnotation: combinedSelectedAnnotation,
       })
     );
 
