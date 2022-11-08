@@ -28,6 +28,15 @@ export const DeleteAllAnnotationsDialog = ({
     batch(() => {
       dispatch(imageViewerSlice.actions.deleteAllInstances());
       dispatch(
+        imageViewerSlice.actions.setStagedAnnotations({ annotations: [] })
+      );
+      dispatch(
+        imageViewerSlice.actions.setSelectedAnnotations({
+          workingAnnotation: undefined,
+          selectedAnnotations: [],
+        })
+      );
+      dispatch(
         imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
