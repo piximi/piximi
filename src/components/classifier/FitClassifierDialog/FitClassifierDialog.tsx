@@ -145,7 +145,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       const validationSize = categorizedImages.length - trainingSize;
 
       console.log(
-        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`
+        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
+        `; val size to ${categorizedImages.length} - ${trainingSize} = ${validationSize}`
       );
 
       console.log(
@@ -158,6 +159,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         `Set validation batches per epoch to RoundUp[${validationSize} / ${
           fitOptions.batchSize
         }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
+        `; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
   }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
