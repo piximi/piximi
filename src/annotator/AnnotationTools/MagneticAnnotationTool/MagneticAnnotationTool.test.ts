@@ -164,7 +164,7 @@ test("onMouseUp (connected)", async () => {
   });
   expect(operator.buffer).toStrictEqual([]);
   expect(operator.origin).toStrictEqual({ x: 300, y: 0 });
-  expect(operator.mask).toBeDefined();
+  expect(operator.maskData).toBeDefined();
 });
 
 test("select", async () => {
@@ -197,7 +197,7 @@ test("select", async () => {
 
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
   expect(operator.boundingBox).toStrictEqual([2, 0, 300, 324]);
-  expect(operator.mask!.length).toBe(779);
+  expect(operator.maskData).toBeDefined();
 
   expect(operator.annotation).toMatchObject({
     boundingBox: [2, 0, 300, 324],
