@@ -17,7 +17,7 @@ test("onMouseDown", async () => {
 
   expect(operator.annotation).toBe(undefined);
 
-  expect(operator.buffer).toStrictEqual([0, 0]);
+  expect(operator.buffer).toStrictEqual([{ x: 0, y: 0 }]);
 });
 
 test("onMouseMove", async () => {
@@ -32,7 +32,16 @@ test("onMouseMove", async () => {
 
   expect(operator.annotation).toBe(undefined);
 
-  expect(operator.buffer).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.buffer).toStrictEqual([
+    {
+      x: 0,
+      y: 0,
+    },
+    {
+      x: 100,
+      y: 100,
+    },
+  ]);
 });
 
 test("onMouseUp-NoMove", async () => {
@@ -48,11 +57,11 @@ test("onMouseUp-NoMove", async () => {
 
   expect(operator.annotation).toBe(undefined);
 
-  expect(operator.points).toStrictEqual([0, 0]);
+  expect(operator.points).toStrictEqual([{ x: 0, y: 0 }]);
 
   expect(operator.boundingBox).toStrictEqual([0, 0, 8, 8]);
 
-  expect(operator.mask).toBeDefined();
+  expect(operator.maskData).toBeDefined();
 });
 
 test("onMouseUp-Move", async () => {
@@ -68,10 +77,13 @@ test("onMouseUp-Move", async () => {
 
   expect(operator.annotation).toBe(undefined);
 
-  expect(operator.points).toStrictEqual([0, 0, 100, 100]);
+  expect(operator.points).toStrictEqual([
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 107, 107]);
 
-  expect(operator.mask).toBeDefined();
+  expect(operator.maskData).toBeDefined();
 });
 
 test("select", async () => {

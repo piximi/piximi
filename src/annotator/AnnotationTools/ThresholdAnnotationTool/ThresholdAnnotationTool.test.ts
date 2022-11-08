@@ -66,7 +66,7 @@ test("onMouseUp", async () => {
     { x: 100, y: 100 },
   ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-  expect(operator.mask).toStrictEqual([10000]);
+  expect(operator.maskData).toBeDefined();
 });
 
 test("onMouseUp-NoDrag", async () => {
@@ -78,7 +78,7 @@ test("onMouseUp-NoDrag", async () => {
 
   operator.onMouseUp({ x: 0, y: 0 });
 
-  expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
+  expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
 
   expect(operator.annotation).toBe(undefined);
 
@@ -88,7 +88,7 @@ test("onMouseUp-NoDrag", async () => {
   expect(operator.height).toBe(undefined);
   expect(operator.points).toStrictEqual([]);
   expect(operator.boundingBox).toBe(undefined);
-  expect(operator.mask).toBe(undefined);
+  expect(operator.maskData).toBe(undefined);
 });
 
 test("onMouseMove-NoDrag", async () => {
@@ -100,68 +100,15 @@ test("onMouseMove-NoDrag", async () => {
   operator.onMouseUp({ x: 0, y: 0 });
   operator.onMouseMove({ x: 100, y: 100 });
 
-  expect(operator.annotationState).toBe(AnnotationStateType.Annotating);
+  expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
 
   expect(operator.annotation).toBe(undefined);
 
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
 
-  expect(operator.width).toBe(100);
-  expect(operator.height).toBe(100);
   expect(operator.points).toStrictEqual([]);
   expect(operator.boundingBox).toBe(undefined);
-  expect(operator.mask).toBe(undefined);
-});
-test("onMouseDown-NoDrag", async () => {
-  const image = await Image.load(src);
-
-  const operator = new ThresholdAnnotationTool(image);
-
-  operator.onMouseDown({ x: 0, y: 0 });
-  operator.onMouseUp({ x: 0, y: 0 });
-  operator.onMouseMove({ x: 100, y: 100 });
-  operator.onMouseDown({ x: 100, y: 100 });
-
-  expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
-
-  expect(operator.annotation).toBe(undefined);
-
-  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-
-  expect(operator.width).toBe(100);
-  expect(operator.height).toBe(100);
-  expect(operator.points).toStrictEqual([
-    { x: 0, y: 0 },
-    { x: 100, y: 100 },
-  ]);
-  expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-  expect(operator.mask).toStrictEqual([10000]);
-});
-test("onMouseUp-NoDragLast", async () => {
-  const image = await Image.load(src);
-
-  const operator = new ThresholdAnnotationTool(image);
-
-  operator.onMouseDown({ x: 0, y: 0 });
-  operator.onMouseUp({ x: 0, y: 0 });
-  operator.onMouseMove({ x: 100, y: 100 });
-  operator.onMouseDown({ x: 100, y: 100 });
-  operator.onMouseUp({ x: 100, y: 100 });
-
-  expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
-
-  expect(operator.annotation).toBe(undefined);
-
-  expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
-
-  expect(operator.width).toBe(100);
-  expect(operator.height).toBe(100);
-  expect(operator.points).toStrictEqual([
-    { x: 0, y: 0 },
-    { x: 100, y: 100 },
-  ]);
-  expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-  expect(operator.mask).toStrictEqual([10000]);
+  expect(operator.maskData).toBe(undefined);
 });
 
 test("select", async () => {
@@ -184,12 +131,11 @@ test("select", async () => {
 
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-
+  expect(operator.maskData).toBeDefined();
   expect(operator.annotation).toMatchObject({
     boundingBox: [0, 0, 100, 100],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     plane: 1,
-    mask: [10000],
   });
 });
 
