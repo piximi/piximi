@@ -3,9 +3,7 @@ import { put, select } from "redux-saga/effects";
 
 import {
   imageViewerSlice,
-  stagedAnnotationsSelector,
-  selectedAnnotationSelector,
-  selectedAnnotationsIdsSelector,
+  workingAnnotationSelector,
   selectedAnnotationsSelector,
 } from "store/image-viewer";
 import { selectedCategorySelector } from "store/common";
@@ -16,22 +14,15 @@ export function* selectedCategorySaga({
 }: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const selectedAnnotationsIds: ReturnType<
-    typeof selectedAnnotationsIdsSelector
-  > = yield select(selectedAnnotationsIdsSelector);
-
-  if (!selectedAnnotationsIds) return;
-
-  const annotations: ReturnType<typeof stagedAnnotationsSelector> =
-    yield select(stagedAnnotationsSelector);
-
-  if (!annotations.length) return;
+  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+    yield select(selectedCategorySelector);
 
   const selectedAnnotations: ReturnType<typeof selectedAnnotationsSelector> =
     yield select(selectedAnnotationsSelector);
+  if (!selectedAnnotations.length) return;
 
-  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-    yield select(selectedCategorySelector);
+  const workingAnnotation: ReturnType<typeof workingAnnotationSelector> =
+    yield select(workingAnnotationSelector);
 
   const updatedAnnotations = selectedAnnotations.map(
     (annotation: decodedAnnotationType) => {
@@ -39,16 +30,19 @@ export function* selectedCategorySaga({
     }
   );
 
-  const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
-    yield select(selectedAnnotationSelector);
-
   yield put(
     imageViewerSlice.actions.setSelectedAnnotations({
-      selectedAnnotations: updatedAnnotations,
-      selectedAnnotation: {
-        ...selectedAnnotation!,
+      workingAnnotation: {
+        ...workingAnnotation!,
         categoryId: selectedCategory.id,
       },
+      selectedAnnotations: selectedAnnotations,
+    })
+  );
+
+  yield put(
+    imageViewerSlice.actions.updateStagedAnnotations({
+      annotations: updatedAnnotations,
     })
   );
 }

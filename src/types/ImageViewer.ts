@@ -33,8 +33,8 @@ export type ImageViewer = {
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
   saturation: number;
-  selectedAnnotation: decodedAnnotationType | undefined;
-  selectedAnnotations: Array<decodedAnnotationType>;
+  workingAnnotation: decodedAnnotationType | undefined;
+  selectedAnnotations: Array<string>;
   stagedAnnotations: Array<decodedAnnotationType>;
   stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;

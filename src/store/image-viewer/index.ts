@@ -46,14 +46,13 @@ export { quickSelectionRegionSizeSelector } from "./selectors/quickSelectionRegi
 export { saturationSelector } from "./selectors/saturationSelector";
 export { scaledImageHeightSelector } from "./selectors/scaledImageHeightSelector";
 export { scaledImageWidthSelector } from "./selectors/scaledImageWidthSelector";
-export { selectedAnnotationIdSelector } from "./selectors/selectedAnnotationIdSelector";
-export { selectedAnnotationSelector } from "./selectors/selectedAnnotationSelector";
+export { workingAnnotationIdSelector } from "./selectors/workingAnnotationIdSelector";
+export { workingAnnotationSelector } from "./selectors/workingAnnotationSelector";
 export { selectedAnnotationsIdsSelector } from "./selectors/selectedAnnotationsIdsSelector";
 export { selectedAnnotationsSelector } from "./selectors/selectedAnnotationsSelector";
 export { selectionModeSelector } from "./selectors/selectionModeSelector";
 export { soundEnabledSelector } from "./selectors/soundEnabledSelector";
 export { stagedAnnotationsSelector } from "./selectors/stagedAnnotationsSelector";
-export { stagedAnnotationObjectsSelector } from "./selectors/stagedAnnotationObjectsSelector";
 export { stageHeightSelector } from "./selectors/stageHeightSelector";
 export { stagePositionSelector } from "./selectors/stagePositionSelector";
 export { stageScaleSelector } from "./selectors/stageScaleSelector";
@@ -62,6 +61,8 @@ export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotatio
 export { toolTypeSelector } from "./selectors/toolTypeSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
+export { stagedAnnotationObjectsSelector } from "./selectors/stagedAnnotationObjectsSelector";
+export { annotationObjectsSelector } from "./selectors/annotationObjectsSelector";
 
 // Sagas
 

@@ -4,7 +4,7 @@ import { put, select } from "redux-saga/effects";
 import {
   imageViewerSlice,
   activeImagePlaneSelector,
-  selectedAnnotationSelector,
+  workingAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
   setSelectedAnnotations,
@@ -47,66 +47,76 @@ export function* annotationStateChangeSaga({
     yield put(
       setSelectedAnnotations({
         selectedAnnotations: [annotationTool.annotation],
-        selectedAnnotation: annotationTool.annotation,
+        workingAnnotation: annotationTool.annotation,
       })
     );
   } else {
-    if (
-      toolType === ToolType.Zoom ||
-      annotationTool.annotationState !== AnnotationStateType.Annotated ||
-      !selectedAnnotation
-    ) {
-      return;
-    }
-
-    switch (selectionMode) {
-      case AnnotationModeType.Add:
-        [combinedMask, combinedBoundingBox] = annotationTool.add(
-          selectedAnnotation.mask,
-          selectedAnnotation.boundingBox
-        );
-        break;
-
-      case AnnotationModeType.Subtract:
-        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-          selectedAnnotation.mask,
-          selectedAnnotation.boundingBox
-        );
-        break;
-      case AnnotationModeType.Intersect:
-        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-          selectedAnnotation.mask,
-          selectedAnnotation.boundingBox
-        );
-        break;
-      default:
-        return;
-    }
-
-    annotationTool.maskData = combinedMask;
-    annotationTool.boundingBox = combinedBoundingBox;
-
-    const combinedSelectedAnnotation = annotationTool.maskData.length
-      ? {
-          ...selectedAnnotation,
-          boundingBox: annotationTool.boundingBox,
-          maskData: annotationTool.maskData,
-        }
-      : undefined;
-
-    if (!combinedSelectedAnnotation) return;
-
-    yield put(
-      imageViewerSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [combinedSelectedAnnotation],
-        selectedAnnotation: combinedSelectedAnnotation,
-      })
+    const toolType: ReturnType<typeof toolTypeSelector> = yield select(
+      toolTypeSelector
     );
 
-    if (annotationTool.maskData.length) {
-      const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-        yield select(selectedCategorySelector);
-      annotationTool.annotate(selectedCategory, activeImagePlane);
-    }
+    if (toolType === ToolType.Zoom) return;
+
+    const workingAnnotation: ReturnType<typeof workingAnnotationSelector> =
+      yield select(workingAnnotationSelector);
+
+    if (annotationTool.annotationState !== AnnotationStateType.Annotated)
+      return;
+  }
+
+  switch (selectionMode) {
+    case AnnotationModeType.Add:
+      [combinedMask, combinedBoundingBox] = annotationTool.add(
+        selectedAnnotation.mask,
+        selectedAnnotation.boundingBox
+      );
+      break;
+
+      if (!workingAnnotation) return;
+
+      if (selectionMode === AnnotationModeType.Add) {
+        [combinedMask, combinedBoundingBox] = annotationTool.add(
+          workingAnnotation.maskData!,
+          workingAnnotation.boundingBox
+        );
+      } else if (selectionMode === AnnotationModeType.Subtract) {
+        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+          workingAnnotation.maskData!,
+          workingAnnotation.boundingBox
+        );
+      } else if (selectionMode === AnnotationModeType.Intersect) {
+        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+          workingAnnotation.maskData!,
+          workingAnnotation.boundingBox
+        );
+      } else {
+        return;
+      }
+
+      annotationTool.maskData = combinedMask;
+      annotationTool.boundingBox = combinedBoundingBox;
+
+      const combinedSelectedAnnotation = annotationTool.maskData.length
+        ? {
+            ...workingAnnotation,
+            boundingBox: annotationTool.boundingBox,
+            maskData: annotationTool.maskData,
+          }
+        : undefined;
+
+      if (!combinedSelectedAnnotation) return;
+
+      yield put(
+        imageViewerSlice.actions.setSelectedAnnotations({
+          selectedAnnotations: [combinedSelectedAnnotation],
+          workingAnnotation: combinedSelectedAnnotation,
+        })
+      );
+
+      if (annotationTool.maskData.length) {
+        const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+          yield select(selectedCategorySelector);
+        annotationTool.annotate(selectedCategory, activeImagePlane);
+      }
   }
 }

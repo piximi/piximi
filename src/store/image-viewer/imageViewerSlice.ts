@@ -52,7 +52,7 @@ const initialState: ImageViewer = {
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   saturation: 0,
-  selectedAnnotation: undefined,
+  workingAnnotation: undefined,
   selectedAnnotations: [],
   stagedAnnotations: [],
   stagedAnnotationsHaveBeenUpdated: false,
@@ -252,7 +252,7 @@ export const imageViewerSlice = createSlice({
 
       // reset selected annotations
       state.selectedAnnotations = [];
-      state.selectedAnnotation = undefined;
+      state.workingAnnotation = undefined;
     },
 
     setActiveImagePlane(
@@ -439,11 +439,13 @@ export const imageViewerSlice = createSlice({
       state: ImageViewer,
       action: PayloadAction<{
         selectedAnnotations: Array<decodedAnnotationType>;
-        selectedAnnotation: decodedAnnotationType | undefined;
+        workingAnnotation: decodedAnnotationType | undefined;
       }>
     ) {
-      state.selectedAnnotations = action.payload.selectedAnnotations;
-      state.selectedAnnotation = action.payload.selectedAnnotation;
+      state.selectedAnnotations = action.payload.selectedAnnotations.map(
+        (annotation) => annotation.id
+      );
+      state.workingAnnotation = action.payload.workingAnnotation;
     },
     setSelectedCategoryId(
       state: ImageViewer,
@@ -521,20 +523,35 @@ export const imageViewerSlice = createSlice({
     ) {
       state.zoomSelection = action.payload.zoomSelection;
     },
-    updateStagedAnnotations(state: ImageViewer, action: PayloadAction<{}>) {
-      const stagedIDs = state.stagedAnnotations.map(
-        (annotation) => annotation.id
-      );
-      state.selectedAnnotations.forEach((annotation, idx) => {
-        const annotationIndex = stagedIDs.findIndex(
-          (id) => id === annotation.id
+    updateStagedAnnotations(
+      state: ImageViewer,
+      action: PayloadAction<{ annotations?: decodedAnnotationType[] }>
+    ) {
+      if (!action.payload.annotations) {
+        if (!state.workingAnnotation) return;
+        const stagedIDIndex = state.stagedAnnotations.findIndex(
+          (annotation) => annotation.id === state.workingAnnotation!.id
         );
-        if (annotationIndex === -1) {
-          state.stagedAnnotations.push(annotation!);
+        if (stagedIDIndex >= 0) {
+          state.stagedAnnotations[stagedIDIndex] = state.workingAnnotation;
         } else {
-          state.stagedAnnotations[annotationIndex] = annotation!;
+          state.stagedAnnotations.push(state.workingAnnotation);
         }
-      });
+      } else {
+        const stagedIDs = state.stagedAnnotations.map(
+          (annotation) => annotation.id
+        );
+        action.payload.annotations.forEach((annotation, idx) => {
+          const annotationIndex = stagedIDs.findIndex(
+            (id) => id === annotation.id
+          );
+          if (annotationIndex === -1) {
+            state.stagedAnnotations.push(annotation!);
+          } else {
+            state.stagedAnnotations[annotationIndex] = annotation!;
+          }
+        });
+      }
     },
   },
 });

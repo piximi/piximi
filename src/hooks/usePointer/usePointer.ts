@@ -152,13 +152,13 @@ export const usePointer = () => {
             dispatch(
               setSelectedAnnotations({
                 selectedAnnotations: annotationsInBox,
-                selectedAnnotation: annotationsInBox[0],
+                workingAnnotation: annotationsInBox[0],
               })
             );
             dispatch(
               setSelectedCategoryId({
                 selectedCategoryId: annotationsInBox[0].categoryId,
-                execSaga: true,
+                execSaga: false,
               })
             );
           });
@@ -175,7 +175,7 @@ export const usePointer = () => {
                 ...selectedAnnotations,
                 ...additionalAnnotations,
               ],
-              selectedAnnotation: annotationsInBox[0],
+              workingAnnotation: annotationsInBox[0],
             })
           );
         }
@@ -248,13 +248,13 @@ export const usePointer = () => {
         dispatch(
           setSelectedAnnotations({
             selectedAnnotations: [currentAnnotation!],
-            selectedAnnotation: currentAnnotation,
+            workingAnnotation: currentAnnotation,
           })
         );
         dispatch(
           setSelectedCategoryId({
             selectedCategoryId: currentAnnotation!.categoryId,
-            execSaga: true,
+            execSaga: false,
           })
         );
       });
@@ -265,7 +265,7 @@ export const usePointer = () => {
       dispatch(
         setSelectedAnnotations({
           selectedAnnotations: [...selectedAnnotations, currentAnnotation],
-          selectedAnnotation: currentAnnotation,
+          workingAnnotation: currentAnnotation,
         })
       );
     }
