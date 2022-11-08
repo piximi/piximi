@@ -12,6 +12,7 @@ import {
   annotatorImagesSelector,
   imageViewerSlice,
   selectedAnnotationsIdsSelector,
+  stagedAnnotationsSelector,
 } from "store/image-viewer";
 
 import { ShadowImageType } from "types";
@@ -24,6 +25,7 @@ export const ClearAnnotationsListItem = () => {
   );
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const annotatorImages = useSelector(annotatorImagesSelector);
 
@@ -48,8 +50,10 @@ export const ClearAnnotationsListItem = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
+        imageViewerSlice.actions.setStagedAnnotations({
+          annotations: stagedAnnotations.filter(
+            (annotation) => !selectedAnnotationsIds.includes(annotation.id)
+          ),
         })
       );
       dispatch(
@@ -61,7 +65,7 @@ export const ClearAnnotationsListItem = () => {
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
-          selectedAnnotation: undefined,
+          workingAnnotation: undefined,
         })
       );
     });

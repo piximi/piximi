@@ -7,7 +7,7 @@ import {
   imageViewerSlice,
   imageWidthSelector,
   stageScaleSelector,
-  selectedAnnotationSelector,
+  workingAnnotationSelector,
   selectedAnnotationsSelector,
   soundEnabledSelector,
   activeImageIdSelector,
@@ -26,7 +26,7 @@ import {
 import { AnnotationTool } from "annotator/AnnotationTools";
 import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type box = {
   x: number;
@@ -56,7 +56,7 @@ export const AnnotationTransformer = ({
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+  const workingAnnotation = useSelector(workingAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);
   const stageScale = useSelector(stageScaleSelector);
@@ -96,6 +96,7 @@ export const AnnotationTransformer = ({
   };
 
   const onTransformStart = () => {
+    setTransforming(true);
     const selected = stagedAnnotations.find(
       (annotation: decodedAnnotationType) => {
         return annotation.id === annotationId;
@@ -103,12 +104,12 @@ export const AnnotationTransformer = ({
     );
 
     if (!selected) return;
-    setTransforming(true);
+
     if (!transformed) {
       dispatch(
         setSelectedAnnotations({
           selectedAnnotations: [selected],
-          selectedAnnotation: selected,
+          workingAnnotation: selected,
         })
       );
     }
@@ -142,7 +143,6 @@ export const AnnotationTransformer = ({
   };
 
   const cancelAnnotation = () => {
-    setTransformed(false);
     if (annotationTool) {
       annotationTool.deselect();
     } else {
@@ -164,9 +164,20 @@ export const AnnotationTransformer = ({
     dispatch(
       setSelectedAnnotations({
         selectedAnnotations: [],
-        selectedAnnotation: undefined,
+        workingAnnotation: undefined,
       })
     );
+    if (!transformed) {
+      dispatch(
+        imageViewerSlice.actions.setStagedAnnotations({
+          annotations: stagedAnnotations.filter(
+            (annotation) => annotation.id !== annotationId
+          ),
+        })
+      );
+      return;
+    }
+    setTransformed(false);
   };
 
   const confirmAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
@@ -205,18 +216,28 @@ export const AnnotationTransformer = ({
   let posX = 0;
   let posY = 0;
 
-  if (selectedAnnotation && selectedAnnotations.length === 1) {
+  if (workingAnnotation && selectedAnnotations.length === 1) {
     posX =
       Math.max(
-        selectedAnnotation.boundingBox[0],
-        selectedAnnotation.boundingBox[2]
+        workingAnnotation.boundingBox[0],
+        workingAnnotation.boundingBox[2]
       ) * stageScale;
     posY =
       Math.max(
-        selectedAnnotation.boundingBox[1],
-        selectedAnnotation.boundingBox[3]
+        workingAnnotation.boundingBox[1],
+        workingAnnotation.boundingBox[3]
       ) * stageScale;
   }
+
+  useEffect(() => {
+    if (
+      !stagedAnnotations
+        .map((annotation) => annotation.id)
+        .includes(annotationId)
+    ) {
+      setTransformed(true);
+    }
+  }, [stagedAnnotations, annotationId]);
 
   return (
     <>
@@ -231,7 +252,7 @@ export const AnnotationTransformer = ({
           ref={trRef}
           rotateEnabled={false}
         />
-        {selectedAnnotation &&
+        {workingAnnotation &&
           selectedAnnotations.length === 1 &&
           !transforming && (
             <>
@@ -241,8 +262,16 @@ export const AnnotationTransformer = ({
                     x: posX - 58,
                     y: posY + 6,
                   }}
-                  onClick={confirmAnnotationHandler}
-                  onTap={confirmAnnotationHandler}
+                  onClick={
+                    transformed
+                      ? confirmAnnotationHandler
+                      : cancelAnnotationHandler
+                  }
+                  onTap={
+                    transformed
+                      ? confirmAnnotationHandler
+                      : cancelAnnotationHandler
+                  }
                   id={"label"}
                   onMouseEnter={onMouseEnter}
                   onMouseLeave={onMouseLeave}
@@ -259,7 +288,7 @@ export const AnnotationTransformer = ({
                     fill={"white"}
                     fontSize={14}
                     padding={6}
-                    text={"Confirm"}
+                    text={transformed ? "Confirm" : "Delete"}
                     width={65}
                     align={"center"}
                   />

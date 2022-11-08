@@ -17,7 +17,7 @@ import { useTranslation } from "hooks";
 import {
   annotationStateSelector,
   imageViewerSlice,
-  selectedAnnotationSelector,
+  workingAnnotationSelector,
   selectionModeSelector,
 } from "store/image-viewer";
 
@@ -32,26 +32,28 @@ export const AnnotationMode = () => {
 
   const annotationState = useSelector(annotationStateSelector);
 
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+  const workingAnnotation = useSelector(workingAnnotationSelector);
 
   const [disableAnnotationEdits, setDisabledAnnotationEdit] =
     React.useState(true);
 
   React.useEffect(() => {
     if (
-      selectedAnnotation ||
+      workingAnnotation ||
       annotationState === AnnotationStateType.Annotated
     ) {
       setDisabledAnnotationEdit(false);
     } else {
       setDisabledAnnotationEdit(true);
-      dispatch(
-        imageViewerSlice.actions.setSelectionMode({
-          selectionMode: AnnotationModeType.New,
-        })
-      );
+      if (annotationMode !== AnnotationModeType.New) {
+        dispatch(
+          imageViewerSlice.actions.setSelectionMode({
+            selectionMode: AnnotationModeType.New,
+          })
+        );
+      }
     }
-  }, [selectedAnnotation, annotationState, dispatch]);
+  }, [workingAnnotation, annotationMode, annotationState, dispatch]);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const payload = {
