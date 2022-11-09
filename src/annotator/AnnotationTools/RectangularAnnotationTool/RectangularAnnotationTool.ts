@@ -30,23 +30,24 @@ export class RectangularAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
-    if (this.width && this.height) {
-      if (Math.abs(this.width * this.height) < 10) {
-        return;
-      }
-      this.resize(position);
+    if (
+      this.annotationState !== AnnotationStateType.Annotating ||
+      !(this.width && this.height)
+    )
+      return;
 
-      this.points = drawRectangle(this.origin, this.width, this.height);
-
-      this._boundingBox = this.computeBoundingBox();
-
-      const maskData = this.convertToMask();
-      if (!maskData) return;
-      this._maskData = maskData;
-
-      this.setAnnotated();
+    if (Math.abs(this.width * this.height) < 10) {
+      return;
     }
+    this.resize(position);
+    this.points = drawRectangle(this.origin, this.width, this.height);
+    this._boundingBox = this.computeBoundingBox();
+
+    const maskData = this.convertToMask();
+    if (!maskData) return;
+
+    this._maskData = maskData;
+    this.setAnnotated();
   }
 
   private convertToMask() {
