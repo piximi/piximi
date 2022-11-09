@@ -24,7 +24,7 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   ThresholdAnnotationTool,
-} from "annotator/AnnotationTools";
+} from "annotator";
 
 export const useAnnotationTool = () => {
   const src = useSelector(imageSrcSelector);

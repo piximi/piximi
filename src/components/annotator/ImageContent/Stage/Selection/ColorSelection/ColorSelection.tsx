@@ -6,7 +6,7 @@ import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { ColorAnnotationTool } from "annotator/AnnotationTools";
+import { ColorAnnotationTool } from "annotator";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;

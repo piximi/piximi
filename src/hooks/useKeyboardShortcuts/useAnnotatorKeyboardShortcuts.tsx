@@ -20,7 +20,7 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator/AnnotationTools";
+import { AnnotationTool } from "annotator";
 
 type useAnnotatorHotkeysProps = {
   annotations: decodedAnnotationType[];

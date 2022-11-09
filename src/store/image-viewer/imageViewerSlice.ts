@@ -16,7 +16,7 @@ import { AnnotationStateType } from "types/AnnotationStateType";
 import { LanguageType } from "types/LanguageType";
 import { ImageViewer } from "types/ImageViewer";
 import { Colors } from "types/tensorflow";
-import { AnnotationTool } from "annotator/AnnotationTools";
+import { AnnotationTool } from "annotator";
 
 import { replaceDuplicateName } from "image/utils/imageHelper";
 

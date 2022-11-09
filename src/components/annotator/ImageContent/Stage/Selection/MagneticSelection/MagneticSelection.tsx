@@ -6,7 +6,7 @@ import { useMarchingAnts } from "hooks";
 
 import { stageScaleSelector } from "store/image-viewer";
 
-import { MagneticAnnotationTool } from "annotator/AnnotationTools";
+import { MagneticAnnotationTool } from "annotator";
 
 type MagneticSelectionProps = {
   operator: MagneticAnnotationTool;

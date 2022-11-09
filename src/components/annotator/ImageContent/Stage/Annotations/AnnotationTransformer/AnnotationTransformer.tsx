@@ -23,9 +23,9 @@ import {
   decodedAnnotationType,
 } from "types";
 
-import { AnnotationTool } from "annotator/AnnotationTools";
-import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
+import { AnnotationTool } from "annotator";
+import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 import { useEffect, useRef, useState } from "react";
 
 type box = {
