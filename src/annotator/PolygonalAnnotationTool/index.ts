@@ -1,0 +1,1 @@
+export { PolygonalAnnotationTool } from "./PolygonalAnnotationTool";
