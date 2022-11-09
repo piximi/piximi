@@ -26,21 +26,16 @@ export class ColorAnnotationTool extends AnnotationTool {
 
   deselect() {
     this.overlayData = "";
-
     this.roiManager = undefined;
     this.roiMask = undefined;
-
     this.points = [];
-
     this.origin = { x: 0, y: 0 };
     this.toolTipPosition = undefined;
-
     this.tolerance = 1;
     this.toleranceMap = undefined;
     this.toleranceQueue.clear();
     this.seen.clear();
     this.annotation = undefined;
-
     this.setBlank();
   }
 
@@ -80,8 +75,8 @@ export class ColorAnnotationTool extends AnnotationTool {
 
     const idx =
       Math.floor(position.x) + Math.floor(position.y) * this.image.width;
-    this.seen.add(idx);
 
+    this.seen.add(idx);
     this.updateOverlay(position);
     this.setAnnotating();
   }
