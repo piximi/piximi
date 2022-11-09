@@ -3,7 +3,7 @@ import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer/";
+import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
 
@@ -130,10 +130,10 @@ export function* uploadImagesSaga({
   if (imagesToUpload.length) {
     if (isUploadedFromAnnotator) {
       yield put(
-        imageViewerSlice.actions.addImages({ newImages: imagesToUpload })
+        AnnotatorSlice.actions.addImages({ newImages: imagesToUpload })
       );
       yield put(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: imagesToUpload[0].id,
           prevImageId: activeImageId,
           execSaga: true,

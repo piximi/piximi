@@ -9,7 +9,11 @@ import {
   Stack,
 } from "@mui/material";
 
-import { imageViewerSlice, annotatorImagesSelector } from "store/image-viewer";
+import {
+  AnnotatorSlice,
+  annotatorImagesSelector,
+  activeImageIdSelector,
+} from "store/annotator";
 import { selectedImagesSelector } from "store/common";
 import { projectSlice } from "store/project";
 
@@ -30,6 +34,8 @@ export const ExitAnnotatorDialog = ({
 
   const annotatorImages = useSelector(annotatorImagesSelector);
   const selectedImagesIds = useSelector(selectedImagesSelector);
+
+  const activeImageId = useSelector(activeImageIdSelector);
 
   // TODO: post PR #407 - make these selectors
   const getImageSets = () => {
@@ -64,14 +70,15 @@ export const ExitAnnotatorDialog = ({
           })
         );
         dispatch(
-          imageViewerSlice.actions.setImages({
+          AnnotatorSlice.actions.setImages({
             images: [],
             disposeColorTensors: false,
           })
         );
         dispatch(
-          imageViewerSlice.actions.setActiveImage({
+          AnnotatorSlice.actions.setActiveImage({
             imageId: undefined,
+            prevImageId: activeImageId,
             execSaga: true,
           })
         );
@@ -86,14 +93,15 @@ export const ExitAnnotatorDialog = ({
           projectSlice.actions.reconcileImages({ images: modifiedImages })
         );
         dispatch(
-          imageViewerSlice.actions.setImages({
+          AnnotatorSlice.actions.setImages({
             images: [],
             disposeColorTensors: false,
           })
         );
         dispatch(
-          imageViewerSlice.actions.setActiveImage({
+          AnnotatorSlice.actions.setActiveImage({
             imageId: undefined,
+            prevImageId: activeImageId,
             execSaga: true,
           })
         );
@@ -112,15 +120,16 @@ export const ExitAnnotatorDialog = ({
 
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setImages({
+        AnnotatorSlice.actions.setImages({
           images: [],
           disposeColorTensors: true,
         })
       );
 
       dispatch(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: undefined,
+          prevImageId: activeImageId,
           execSaga: true,
         })
       );

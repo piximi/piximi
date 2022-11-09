@@ -1,25 +1,25 @@
-import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
+import { ImageType, Annotator, Project, ShadowImageType } from "types";
 
 export const imageBitDepthSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }) => {
-  if (!imageViewer.images.length || !imageViewer.activeImageId) return;
+  if (!annotator.images.length || !annotator.activeImageId) return;
 
   /*
    * return image data from full image in projects,
-   * if not in projects, full image in imageViewer,
+   * if not in projects, full image in annotator,
    * so return image data from there instead
    */
   const image =
     project.images.find((image: ImageType) => {
-      return image.id === imageViewer.activeImageId;
+      return image.id === annotator.activeImageId;
     }) ||
-    imageViewer.images.find((image: ShadowImageType) => {
-      return image.id === imageViewer.activeImageId;
+    annotator.images.find((image: ShadowImageType) => {
+      return image.id === annotator.activeImageId;
     });
 
   if (!image) return;

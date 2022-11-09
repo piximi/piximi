@@ -32,7 +32,7 @@ import {
   stageHeightSelector,
   stageScaleSelector,
   stageWidthSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { imageSelector } from "store/common";
 import {
   zoomToolOptionsSelector,

@@ -10,7 +10,7 @@ import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 import { InformationBox } from "../../InformationBox";
 
-import { imageViewerSlice, imageShapeSelector } from "store/image-viewer";
+import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
 
 import { imageDataSelector } from "store/common";
 
@@ -31,7 +31,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
+      AnnotatorSlice.actions.setImageColors({
         colors: defaultColors,
         execSaga: true,
       })

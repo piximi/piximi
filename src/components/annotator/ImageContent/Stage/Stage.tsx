@@ -26,7 +26,7 @@ import { Annotations } from "./Annotations/Annotations";
 import { PointerSelection } from "./Selection/PointerSelection";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   stagedAnnotationsSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
@@ -42,7 +42,7 @@ import {
   annotationStateSelector,
   cursorSelector,
   setSelectedAnnotations,
-} from "store/image-viewer";
+} from "store/annotator";
 import { selectedCategorySelector } from "store/common";
 
 import {
@@ -53,8 +53,8 @@ import {
   ToolType,
 } from "types";
 
-import { ObjectAnnotationTool } from "annotator";
-import { Tool } from "annotator/Tool";
+import { ObjectAnnotationTool } from "annotator-tools";
+import { Tool } from "annotator-tools/Tool";
 import { SoundEvents } from "./sound-events";
 
 export const Stage = () => {
@@ -160,7 +160,7 @@ export const Stage = () => {
     stagedAnnotations: Array<decodedAnnotationType>
   ) => {
     dispatch(
-      imageViewerSlice.actions.setStagedAnnotations({
+      AnnotatorSlice.actions.setStagedAnnotations({
         annotations: stagedAnnotations.filter(
           (annotation) => !selectedAnnotationIds.includes(annotation.id)
         ),
@@ -182,7 +182,7 @@ export const Stage = () => {
   const deselectAnnotation = useCallback(() => {
     if (!annotationTool) {
       dispatch(
-        imageViewerSlice.actions.setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
           execSaga: true,
@@ -212,7 +212,7 @@ export const Stage = () => {
   const onAnnotating = useMemo(() => {
     const func = () => {
       dispatch(
-        imageViewerSlice.actions.setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotating,
           annotationTool,
           execSaga: true,
@@ -225,7 +225,7 @@ export const Stage = () => {
   const onAnnotated = useMemo(() => {
     const func = () => {
       dispatch(
-        imageViewerSlice.actions.setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
           annotationTool,
           execSaga: true,
@@ -247,7 +247,7 @@ export const Stage = () => {
   const onDeselect = useMemo(() => {
     const func = () => {
       dispatch(
-        imageViewerSlice.actions.setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
           execSaga: true,

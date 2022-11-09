@@ -9,7 +9,7 @@ import {
   stageHeightSelector,
   stageWidthSelector,
   zoomSelectionSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 type LayerProps = {

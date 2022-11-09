@@ -61,17 +61,17 @@ export {
 
 export type { ImageType, ShadowImageType } from "./ImageType";
 
-export type { ImageViewer } from "./ImageViewer";
+export type { Annotator } from "./Annotator";
 
-export type { ImageViewerImage } from "./ImageViewerImage";
+export type { AnnotatorImage } from "./AnnotatorImage";
 
-export { ImageViewerOperation } from "./ImageViewerOperation";
+export { AnnotatorOperation } from "./AnnotatorOperation";
 
-export { ImageViewerSelectionMode } from "./ImageViewerSelectionMode";
+export { AnnotatorSelectionMode } from "./AnnotatorSelectionMode";
 
-export type { ImageViewerState } from "./ImageViewerState";
+export type { AnnotatorState } from "./AnnotatorState";
 
-export { ImageViewerZoomMode } from "./ImageViewerZoomMode";
+export { AnnotatorZoomMode } from "./AnnotatorZoomMode";
 
 export { LanguageType } from "./LanguageType";
 

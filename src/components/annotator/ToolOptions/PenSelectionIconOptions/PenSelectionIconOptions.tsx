@@ -8,10 +8,7 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import {
-  imageViewerSlice,
-  penSelectionBrushSizeSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, penSelectionBrushSizeSelector } from "store/annotator";
 
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();
@@ -23,7 +20,7 @@ export const PenSelectionIconOptions = () => {
   const onChange = (event: any, changed: number | number[]) => {
     const payload = { penSelectionBrushSize: changed as number };
 
-    dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
+    dispatch(AnnotatorSlice.actions.setPenSelectionBrushSize(payload));
   };
 
   const t = useTranslation();

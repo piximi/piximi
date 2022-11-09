@@ -7,7 +7,7 @@ import { useDialogHotkey } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 import { imagesSelector, projectSlice } from "store/project";
 
 import {
@@ -107,14 +107,14 @@ export const DeleteCategoryMenuItem = ({
   const deleteAnnotationCategoryCallback = (categoryID: string) => {
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
+        AnnotatorSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })
       );
 
       dispatch(
-        imageViewerSlice.actions.deleteAnnotationCategory({
+        AnnotatorSlice.actions.deleteAnnotationCategory({
           categoryID: categoryID,
         })
       );

@@ -1,11 +1,11 @@
-import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
+import { ImageType, Annotator, Project, ShadowImageType } from "types";
 
 // TODO: post PR #407 - should be called fullImageSelector ?
 export const imageSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }) => {
   /*
@@ -17,13 +17,13 @@ export const imageSelector = ({
   */
 
   let activeImageId: string;
-  if (!imageViewer.images.length || !imageViewer.activeImageId) {
+  if (!annotator.images.length || !annotator.activeImageId) {
     return;
   } else {
-    activeImageId = imageViewer.activeImageId;
+    activeImageId = annotator.activeImageId;
   }
 
-  const image = imageViewer.images.find((im: ShadowImageType) => {
+  const image = annotator.images.find((im: ShadowImageType) => {
     return im.id === activeImageId;
   }) as ShadowImageType;
 

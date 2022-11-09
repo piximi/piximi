@@ -9,7 +9,7 @@ import {
   setStageScale,
   setBoundingClientRect,
   setStageWidth,
-} from "store/image-viewer";
+} from "store/annotator";
 
 export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
   const dispatch = useDispatch();

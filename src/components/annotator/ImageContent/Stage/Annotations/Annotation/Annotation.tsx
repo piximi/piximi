@@ -5,7 +5,7 @@ import { hexToRGBA } from "utils/common/imageHelper";
 import { colorOverlayROI } from "utils/common/imageHelper";
 import Image from "image-js";
 
-import { setSelectedAnnotations, stageScaleSelector } from "store/image-viewer";
+import { setSelectedAnnotations, stageScaleSelector } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 import Konva from "konva";
