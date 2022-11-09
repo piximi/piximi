@@ -10,9 +10,9 @@ import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   thresholdAnnotationValueSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 export const ThresholdAnnotationOptions = () => {
   const t = useTranslation();
@@ -29,7 +29,7 @@ export const ThresholdAnnotationOptions = () => {
 
   useEffect(() => {
     const payload = { thresholdAnnotationValue: threshold };
-    dispatch(imageViewerSlice.actions.setThresholdAnnotationValue(payload));
+    dispatch(AnnotatorSlice.actions.setThresholdAnnotationValue(payload));
   }, [dispatch, threshold]);
 
   return (

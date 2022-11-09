@@ -17,7 +17,7 @@ import {
   createdAnnotatorCategoriesSelector,
   unknownAnnotationCategorySelector,
 } from "store/project";
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 
 import { Category, CategoryType } from "types/Category";
 
@@ -31,7 +31,7 @@ export const AnnotatorDrawer = () => {
 
   const onCategoryClickCallBack = (category: Category) => {
     dispatch(
-      imageViewerSlice.actions.setSelectedCategoryId({
+      AnnotatorSlice.actions.setSelectedCategoryId({
         selectedCategoryId: category.id,
         execSaga: true,
       })

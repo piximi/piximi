@@ -15,11 +15,11 @@ import { Palette } from "../Palette";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   imageShapeSelector,
   activeImageColorsSelector,
   activeImagePlaneSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { imageOriginalSrcSelector } from "store/common";
 
 import { Color } from "types";
@@ -48,7 +48,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     activeImageColorsSelector,
-    imageViewerSlice.actions.setImageColors,
+    AnnotatorSlice.actions.setImageColors,
     []
   );
 
@@ -90,7 +90,7 @@ export const ChannelsList = () => {
       imageShape.width
     );
     batch(() => {
-      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+      dispatch(AnnotatorSlice.actions.setImageSrc({ src: modifiedURI }));
       dispatchActiveImageColors({
         colors: localActiveImageColors,
         execSaga: true,
@@ -115,7 +115,7 @@ export const ChannelsList = () => {
 
     batch(async () => {
       dispatch(
-        imageViewerSlice.actions.setImageColors({
+        AnnotatorSlice.actions.setImageColors({
           colors: copiedChannels,
           execSaga: true,
         })
@@ -145,7 +145,7 @@ export const ChannelsList = () => {
         imageShape.width
       );
 
-      dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+      dispatch(AnnotatorSlice.actions.setImageSrc({ src: modifiedURI }));
     });
   };
 

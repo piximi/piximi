@@ -10,9 +10,9 @@ import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   quickSelectionRegionSizeSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 export const QuickAnnotationOptions = () => {
   const t = useTranslation();
@@ -33,7 +33,7 @@ export const QuickAnnotationOptions = () => {
 
   const onChangeCommitted = (event: any, changed: number | number[]) => {
     const payload = { quickSelectionRegionSize: changed as number };
-    dispatch(imageViewerSlice.actions.setQuickSelectionRegionSize(payload));
+    dispatch(AnnotatorSlice.actions.setQuickSelectionRegionSize(payload));
   };
 
   return (

@@ -24,7 +24,7 @@ import {
   activeImageSelector,
   setActiveImage,
   stagedAnnotationsSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import { ImageType, ShadowImageType } from "types";
 

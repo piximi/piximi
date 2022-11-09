@@ -1,10 +1,10 @@
-import { AnnotationTool } from "annotator";
+import { AnnotationTool } from "annotator-tools";
 import React from "react";
 import { useSelector } from "react-redux";
 import {
   annotationObjectsSelector,
   selectedAnnotationsIdsSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer/AnnotationTransformer";
 

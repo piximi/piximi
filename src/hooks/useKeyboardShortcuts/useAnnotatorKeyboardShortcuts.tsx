@@ -3,7 +3,7 @@ import { useHotkeys } from "hooks";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   setOperation,
   setSelectedCategoryId,
   selectedAnnotationsSelector,
@@ -11,7 +11,7 @@ import {
   annotatorImagesSelector,
   activeImageIdSelector,
   soundEnabledSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import {
   AnnotationModeType,
@@ -20,7 +20,7 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator";
+import { AnnotationTool } from "annotator-tools";
 
 type useAnnotatorHotkeysProps = {
   annotations: decodedAnnotationType[];
@@ -69,13 +69,13 @@ export const useAnnotatorKeyboardShortcuts = ({
     )
       return;
 
-    dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
+    dispatch(AnnotatorSlice.actions.updateStagedAnnotations({}));
 
     deselectAnnotation();
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
-        imageViewerSlice.actions.setSelectionMode({
+        AnnotatorSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );
@@ -306,7 +306,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,
@@ -333,7 +333,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,

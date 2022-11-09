@@ -10,7 +10,7 @@ import {
   watchSelectedCategorySaga,
   watchActiveImageChangeSaga,
   watchActiveImageColorsChangeSaga,
-} from "store/image-viewer";
+} from "store/annotator";
 import {
   watchFitSegmenterSaga,
   watchEvaluateSegmenterSaga,

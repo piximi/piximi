@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 import useSound from "use-sound";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   imageWidthSelector,
   stageScaleSelector,
   workingAnnotationSelector,
@@ -15,7 +15,7 @@ import {
   imageHeightSelector,
   setSelectedAnnotations,
   stagedAnnotationsSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import {
   AnnotationModeType,
@@ -23,7 +23,7 @@ import {
   decodedAnnotationType,
 } from "types";
 
-import { AnnotationTool } from "annotator";
+import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 import { useEffect, useRef, useState } from "react";
@@ -147,7 +147,7 @@ export const AnnotationTransformer = ({
       annotationTool.deselect();
     } else {
       dispatch(
-        imageViewerSlice.actions.setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool: annotationTool,
           execSaga: true,
@@ -156,7 +156,7 @@ export const AnnotationTransformer = ({
     }
 
     dispatch(
-      imageViewerSlice.actions.setSelectionMode({
+      AnnotatorSlice.actions.setSelectionMode({
         selectionMode: AnnotationModeType.New,
       })
     );
@@ -169,7 +169,7 @@ export const AnnotationTransformer = ({
     );
     if (!transformed) {
       dispatch(
-        imageViewerSlice.actions.setStagedAnnotations({
+        AnnotatorSlice.actions.setStagedAnnotations({
           annotations: stagedAnnotations.filter(
             (annotation) => annotation.id !== annotationId
           ),
@@ -186,7 +186,7 @@ export const AnnotationTransformer = ({
 
     if (!activeImageId) return;
 
-    dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
+    dispatch(AnnotatorSlice.actions.updateStagedAnnotations({}));
 
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();

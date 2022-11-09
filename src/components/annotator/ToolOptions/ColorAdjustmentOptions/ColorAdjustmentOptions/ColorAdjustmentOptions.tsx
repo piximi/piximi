@@ -11,10 +11,10 @@ import { ChannelsList } from "../ChannelsList";
 import { InformationBox } from "../../InformationBox";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   imageShapeSelector,
   activeImagePlaneSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { imageOriginalSrcSelector } from "store/common";
 
 import {
@@ -40,7 +40,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultChannels = generateDefaultChannels(imageShape.channels);
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
+      AnnotatorSlice.actions.setImageColors({
         colors: defaultChannels,
         execSaga: true,
       })
@@ -61,7 +61,7 @@ export const ColorAdjustmentOptions = () => {
       imageShape.width
     );
 
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    dispatch(AnnotatorSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
   return (

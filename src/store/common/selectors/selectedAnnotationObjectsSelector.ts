@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import {
   selectedAnnotationsSelector,
   activeImageSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { annotationCategoriesSelector } from "store/project";
 
 import {

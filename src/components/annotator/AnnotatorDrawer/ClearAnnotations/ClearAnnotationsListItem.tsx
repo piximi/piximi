@@ -10,10 +10,10 @@ import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { unknownAnnotationCategorySelector } from "store/project";
 import {
   annotatorImagesSelector,
-  imageViewerSlice,
+  AnnotatorSlice,
   selectedAnnotationsIdsSelector,
   stagedAnnotationsSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -50,20 +50,20 @@ export const ClearAnnotationsListItem = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setStagedAnnotations({
+        AnnotatorSlice.actions.setStagedAnnotations({
           annotations: stagedAnnotations.filter(
             (annotation) => !selectedAnnotationsIds.includes(annotation.id)
           ),
         })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
+        AnnotatorSlice.actions.setSelectedCategoryId({
           selectedCategoryId: unknownAnnotationCategory.id,
           execSaga: true,
         })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotations({
+        AnnotatorSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
           workingAnnotation: undefined,
         })

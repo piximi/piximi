@@ -4,11 +4,11 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { MenuItem, ListItemText } from "@mui/material";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   setActiveImage,
   setOperation,
   activeImageIdSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { setAnnotationCategories } from "store/project";
 
 import {
@@ -50,7 +50,7 @@ export const OpenProjectFileMenuItem = ({
         const serializedImages = JSON.parse(event.target.result as string);
 
         batch(() => {
-          dispatch(imageViewerSlice.actions.setImages({ images: [] }));
+          dispatch(AnnotatorSlice.actions.setImages({ images: [] }));
 
           let updatedAnnotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
           serializedImages.forEach(
@@ -70,7 +70,7 @@ export const OpenProjectFileMenuItem = ({
               );
 
               dispatch(
-                imageViewerSlice.actions.openAnnotations({
+                AnnotatorSlice.actions.openAnnotations({
                   imageFile: serializedImage,
                   annotations: annotations,
                 })

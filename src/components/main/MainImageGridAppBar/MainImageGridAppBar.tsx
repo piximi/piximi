@@ -37,7 +37,7 @@ import {
   unregisterHotkeyView,
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
-import { setActiveImage, imageViewerSlice } from "store/image-viewer";
+import { setActiveImage, AnnotatorSlice } from "store/annotator";
 
 import { HotkeyView, ImageType, ShadowImageType } from "types";
 
@@ -137,7 +137,7 @@ export const MainImageGridAppBar = () => {
 
     if (!selected) return;
 
-    dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+    dispatch(AnnotatorSlice.actions.setImages({ images: selected }));
     dispatch(unregisterHotkeyView({}));
     navigate("/annotator");
   };

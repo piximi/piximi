@@ -2,19 +2,19 @@ import { encodedAnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { SerializedFileType } from "types/SerializedFileType";
-import { ImageViewer } from "types/ImageViewer";
+import { Annotator } from "types/Annotator";
 import { Project } from "types/Project";
 
 export const allSerializedAnnotationsSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }): Array<SerializedFileType> => {
-  if (!imageViewer.images.length) return [];
+  if (!annotator.images.length) return [];
 
-  return imageViewer.images.map((shadowImage: ShadowImageType) => {
+  return annotator.images.map((shadowImage: ShadowImageType) => {
     const image = shadowImage as ImageType;
 
     const columns = {
