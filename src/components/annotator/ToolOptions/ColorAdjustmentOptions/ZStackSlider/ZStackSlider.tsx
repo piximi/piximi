@@ -4,10 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import {
+  AnnotatorSlice,
   activeImageSelector,
   activeImagePlaneSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+} from "store/annotator";
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        imageViewerSlice.actions.setActiveImagePlane({
+        AnnotatorSlice.actions.setActiveImagePlane({
           activeImagePlane: newValue,
         })
       );

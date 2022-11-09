@@ -9,7 +9,7 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
@@ -26,18 +26,18 @@ export const DeleteAllAnnotationsDialog = ({
 
   const onDelete = () => {
     batch(() => {
-      dispatch(imageViewerSlice.actions.deleteAllInstances());
+      dispatch(AnnotatorSlice.actions.deleteAllInstances());
       dispatch(
-        imageViewerSlice.actions.setStagedAnnotations({ annotations: [] })
+        AnnotatorSlice.actions.setStagedAnnotations({ annotations: [] })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedAnnotations({
+        AnnotatorSlice.actions.setSelectedAnnotations({
           workingAnnotation: undefined,
           selectedAnnotations: [],
         })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
+        AnnotatorSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })

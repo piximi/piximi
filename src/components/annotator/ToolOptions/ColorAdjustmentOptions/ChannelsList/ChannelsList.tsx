@@ -16,10 +16,7 @@ import { Palette } from "../Palette";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import {
-  imageViewerSlice,
-  activeImageColorsRawSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
 import { imageBitDepthSelector, imageDataSelector } from "store/common";
 
@@ -45,7 +42,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     activeImageColorsRawSelector,
-    imageViewerSlice.actions.setImageColors,
+    AnnotatorSlice.actions.setImageColors,
     { range: {}, visible: {}, color: [] }
   );
 
@@ -87,7 +84,7 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
+      AnnotatorSlice.actions.setImageColors({
         colors: newColors,
         execSaga: true,
       })

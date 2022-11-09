@@ -9,7 +9,7 @@ import {
   boundingClientRectSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);

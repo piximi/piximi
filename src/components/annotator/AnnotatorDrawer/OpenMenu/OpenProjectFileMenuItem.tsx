@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 import { projectSlice } from "store/project";
 
 import { deserializeAnnotations } from "image/utils/loadExampleImage";
 
 import { validateFileType } from "types/runtime";
 
-import { activeImageSelector } from "store/image-viewer";
+import { activeImageSelector } from "store/annotator";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -59,7 +59,7 @@ export const OpenProjectFileMenuItem = ({
           })
         );
         dispatch(
-          imageViewerSlice.actions.setImageInstances({
+          AnnotatorSlice.actions.setImageInstances({
             imageId: activeImage.id,
             instances: newAnnotations,
           })

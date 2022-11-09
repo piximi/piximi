@@ -4,9 +4,9 @@ import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
-import { stageScaleSelector } from "store/image-viewer";
+import { stageScaleSelector } from "store/annotator";
 
-import { EllipticalAnnotationTool } from "annotator";
+import { EllipticalAnnotationTool } from "annotator-tools";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;

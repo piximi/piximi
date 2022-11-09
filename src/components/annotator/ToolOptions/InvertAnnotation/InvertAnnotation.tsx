@@ -11,10 +11,7 @@ import {
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import {
-  imageViewerSlice,
-  workingAnnotationSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, workingAnnotationSelector } from "store/annotator";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -35,7 +32,7 @@ export const InvertAnnotation = () => {
     );
 
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [
           {
             ...workingAnnotation,

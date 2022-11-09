@@ -5,11 +5,8 @@ import { ListItem, ListItemText } from "@mui/material";
 
 import { createRenderedTensor } from "image/utils/imageHelper";
 
-import { imageViewerFullImagesSelector } from "store/common";
-import {
-  activeImageColorsSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+import { annotatorFullImagesSelector } from "store/common";
+import { AnnotatorSlice, activeImageColorsSelector } from "store/annotator";
 
 import { ImageType } from "types";
 
@@ -17,7 +14,7 @@ export const ApplyColorsButton = () => {
   const dispatch = useDispatch();
 
   const activeImageColors = useSelector(activeImageColorsSelector);
-  const images = useSelector(imageViewerFullImagesSelector);
+  const images = useSelector(annotatorFullImagesSelector);
 
   const onApplyColorsClick = async () => {
     const newColor = activeImageColors.color.clone();
@@ -57,7 +54,7 @@ export const ApplyColorsButton = () => {
     getUpdatedImages().then((updatedImages) => {
       newColor.dispose();
       dispatch(
-        imageViewerSlice.actions.setImages({
+        AnnotatorSlice.actions.setImages({
           images: updatedImages,
           disposeColorTensors: false,
         })

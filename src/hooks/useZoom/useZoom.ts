@@ -9,7 +9,7 @@ import {
   setOffset,
   setStageScale,
   setZoomSelection,
-} from "store/image-viewer";
+} from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { ToolType, ZoomModeType } from "types";

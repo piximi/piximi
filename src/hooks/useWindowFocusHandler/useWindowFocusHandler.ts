@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { imageViewerSlice, selectionModeSelector } from "store/image-viewer";
+import { AnnotatorSlice, selectionModeSelector } from "store/annotator";
 
 import { AnnotationModeType } from "types";
 
@@ -13,7 +13,7 @@ export const useWindowFocusHandler = () => {
   const onBlur = () => {
     if (annotationMode !== AnnotationModeType.New) {
       dispatch(
-        imageViewerSlice.actions.setSelectionMode({
+        AnnotatorSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );

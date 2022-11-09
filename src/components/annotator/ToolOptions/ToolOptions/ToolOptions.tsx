@@ -20,7 +20,7 @@ import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
-import { toolTypeSelector } from "store/image-viewer";
+import { toolTypeSelector } from "store/annotator";
 
 import { ToolType } from "types";
 

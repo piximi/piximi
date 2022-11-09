@@ -8,10 +8,7 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import {
-  imageViewerSlice,
-  activeImageColorsRawSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
 import { DEFAULT_COLORS } from "types";
 
@@ -49,7 +46,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
+      AnnotatorSlice.actions.setImageColors({
         colors: { ...colors, color: tensor2d(updatedColors) },
         execSaga: true,
       })

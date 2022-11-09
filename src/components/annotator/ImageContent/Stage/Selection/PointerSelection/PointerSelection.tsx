@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { pointerSelectionSelector, toolTypeSelector } from "store/image-viewer";
+import { pointerSelectionSelector, toolTypeSelector } from "store/annotator";
 
 import { ToolType } from "types";
 

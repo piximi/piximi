@@ -7,7 +7,7 @@ import {
   scaledImageHeightSelector,
   scaledImageWidthSelector,
   toolTypeSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import { ToolType } from "types";
 
