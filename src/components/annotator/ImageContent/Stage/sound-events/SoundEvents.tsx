@@ -4,8 +4,8 @@ import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
 import { soundEnabledSelector } from "store/image-viewer";
-import createAnnotationSoundEffect from "annotator/sounds/pop-up-on.mp3";
-import deleteAnnotationSoundEffect from "annotator/sounds/pop-up-off.mp3";
+import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
+import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 import { HotkeyView } from "types";
 
 /*

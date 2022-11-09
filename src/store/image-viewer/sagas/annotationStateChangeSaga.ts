@@ -13,7 +13,7 @@ import { selectedCategorySelector } from "store/common";
 
 import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 
-import { AnnotationTool } from "annotator/AnnotationTools";
+import { AnnotationTool } from "annotator";
 
 export function* annotationStateChangeSaga({
   payload: { annotationState, annotationTool },

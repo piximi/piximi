@@ -53,7 +53,7 @@ import {
   ToolType,
 } from "types";
 
-import { ObjectAnnotationTool } from "annotator/AnnotationTools";
+import { ObjectAnnotationTool } from "annotator";
 import { Tool } from "annotator/Tool";
 import { SoundEvents } from "./sound-events";
 
