@@ -23,7 +23,7 @@ import {
   replaceDuplicateName,
 } from "utils/common/imageHelper";
 import { Partition } from "types/Partition";
-import { AnnotationTool } from "annotator/AnnotationTools";
+import { AnnotationTool } from "annotator";
 import { defaultImage } from "images/defaultImage";
 import { encode } from "utils/annotator";
 
