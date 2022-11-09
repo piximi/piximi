@@ -208,31 +208,6 @@ export abstract class AnnotationTool extends Tool {
     this.annotation = { ...this.annotation, maskData: this.maskData };
   }
 
-  /*
-   * Method for add, subtract and intersect modes.
-   * Draw a ROI mask in the coordinate space of the new combined bounding box.
-   * */
-  // drawMaskInNewBoundingBox(
-  //   newMaskImage: ImageJS.Image,
-  //   maskImage: ImageJS.Image,
-  //   boundingBox: [number, number, number, number],
-  //   newBoundingBox: [number, number, number, number]
-  // ) {
-  //   for (let x = 0; x < maskImage.width; x++) {
-  //     for (let y = 0; y < maskImage.height; y++) {
-  //       const pixel = maskImage.getPixelXY(x, y)[0];
-  //       if (pixel === 255) {
-  //         newMaskImage.setPixelXY(
-  //           x + boundingBox[0] - newBoundingBox[0],
-  //           y + boundingBox[1] - newBoundingBox[1],
-  //           [255]
-  //         );
-  //       }
-  //     }
-  //   }
-  //   return newMaskImage;
-  // }
-
   /**
    * Checks if a point lies within an annotation bounding box
    * @param x x-coord of point
