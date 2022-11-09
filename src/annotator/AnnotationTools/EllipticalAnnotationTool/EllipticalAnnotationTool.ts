@@ -13,7 +13,6 @@ export class EllipticalAnnotationTool extends AnnotationTool {
     this.origin = undefined;
     this.radius = undefined;
     this.annotation = undefined;
-
     this.setBlank();
   }
 
@@ -34,72 +33,19 @@ export class EllipticalAnnotationTool extends AnnotationTool {
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.annotationState !== AnnotationStateType.Annotating || !this.radius)
+      return;
+    const t1 = performance.now();
+    this.points = this.convertToPoints();
 
-    if (this.radius) {
-      this.points = this.convertToPoints();
+    this._boundingBox = this.computeBoundingBoxFromContours(this.points!);
+    const maskData = this.computeAnnotationMaskFromPoints() as ImageJS.Image;
+    if (!maskData) return;
 
-      this._boundingBox = this.computeBoundingBoxFromContours(this.points!);
-      const maskData = this.convertToMask();
-
-      if (!maskData) return;
-
-      this.maskData = maskData;
-
-      this.setAnnotated();
-    }
-  }
-
-  private convertToMask() {
-    if (!this.boundingBox) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = this.image.width;
-    canvas.height = this.image.height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx || !this.center || !this.radius) return undefined;
-
-    ctx.beginPath();
-    ctx.ellipse(
-      this.center.x,
-      this.center.y,
-      this.radius.x,
-      this.radius.y,
-      2 * Math.PI,
-      0,
-      2 * Math.PI
-    );
-    ctx.fill();
-
-    const roiWidth = this.boundingBox[2] - this.boundingBox[0];
-    const roiHeight = this.boundingBox[3] - this.boundingBox[1];
-
-    if (!roiWidth || !roiHeight) return undefined;
-
-    // @ts-ignore: getChannel API is not exposed
-    const imageMask = ImageJS.Image.fromCanvas(canvas).getChannel(3);
-
-    const croppedImageMask = new ImageJS.Image(roiWidth, roiHeight, {
-      components: 1,
-      alpha: 0,
-    });
-
-    for (let x = 0; x < roiWidth; x++) {
-      for (let y = 0; y < roiHeight; y++) {
-        if (
-          imageMask.getPixelXY(
-            x + this.boundingBox[0],
-            y + this.boundingBox[1]
-          )[0] > 1
-        ) {
-          croppedImageMask.setPixelXY(x, y, [255]);
-        } else {
-          croppedImageMask.setPixelXY(x, y, [0]);
-        }
-      }
-    }
-
-    return Uint8Array.from(croppedImageMask.data);
+    this.maskData = maskData.data as Uint8Array;
+    this.setAnnotated();
+    const t2 = performance.now();
+    console.log(t2 - t1);
   }
 
   private convertToPoints() {
