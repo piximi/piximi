@@ -6,7 +6,7 @@ export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
 export { imageNameSelector } from "./selectors/imageNameSelector";
 export { imageOriginalSrcSelector } from "./selectors/imageOriginalSrcSelector";
 export { imageSelector } from "./selectors/imageSelector";
-export { imageViewerFullImagesSelector } from "./selectors/imageViewerFullImagesSelector";
+export { annotatorFullImagesSelector } from "./selectors/annotatorFullImagesSelector";
 export { selectedAnnotationObjectsSelector } from "./selectors/selectedAnnotationObjectsSelector";
 export { selectedCategorySelector } from "./selectors/selectedCategorySelector";
 export { selectedImagesSelector } from "./selectors/selectedImagesSelector";

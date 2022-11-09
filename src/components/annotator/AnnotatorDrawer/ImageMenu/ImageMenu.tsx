@@ -11,8 +11,8 @@ import { annotationCategoriesSelector } from "store/project";
 import {
   activeImageSelector,
   annotatorImagesSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+  AnnotatorSlice,
+} from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -46,7 +46,7 @@ export const ImageMenu = ({
   ) => {
     if (!selectedImage) return;
     dispatch(
-      imageViewerSlice.actions.deleteAllImageAnnotations({
+      AnnotatorSlice.actions.deleteAllImageAnnotations({
         imageId: selectedImage.id,
       })
     );
@@ -71,7 +71,7 @@ export const ImageMenu = ({
         }
 
         dispatch(
-          imageViewerSlice.actions.setActiveImage({
+          AnnotatorSlice.actions.setActiveImage({
             imageId: newActiveImageId,
             prevImageId: undefined,
             execSaga: true,
@@ -79,7 +79,7 @@ export const ImageMenu = ({
         );
       }
 
-      dispatch(imageViewerSlice.actions.deleteImage({ id: selectedImage.id }));
+      dispatch(AnnotatorSlice.actions.deleteImage({ id: selectedImage.id }));
     });
 
     onCloseImageMenu(event);

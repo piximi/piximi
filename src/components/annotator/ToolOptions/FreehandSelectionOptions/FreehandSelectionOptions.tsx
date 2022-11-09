@@ -5,10 +5,7 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { SelectionOptions } from "../SelectionOptions";
 
-import {
-  imageViewerSlice,
-  penSelectionBrushSizeSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, penSelectionBrushSizeSelector } from "store/annotator";
 
 export const FreehandSelectionOptions = () => {
   const dispatch = useDispatch();
@@ -20,7 +17,7 @@ export const FreehandSelectionOptions = () => {
   const onChange = (event: any, changed: number | number[]) => {
     const payload = { penSelectionBrushSize: changed as number };
 
-    dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
+    dispatch(AnnotatorSlice.actions.setPenSelectionBrushSize(payload));
   };
 
   return (

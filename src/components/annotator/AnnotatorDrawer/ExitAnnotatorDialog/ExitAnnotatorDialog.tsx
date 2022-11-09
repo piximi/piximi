@@ -9,7 +9,7 @@ import {
   Stack,
 } from "@mui/material";
 
-import { annotatorImagesSelector } from "store/image-viewer";
+import { annotatorImagesSelector } from "store/annotator";
 import { selectedImagesSelector } from "store/common";
 import { projectSlice } from "store/project";
 

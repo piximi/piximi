@@ -8,11 +8,11 @@ import {
 } from "@mui/icons-material";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   imageShapeSelector,
   activeImageColorsSelector,
   activeImagePlaneSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { imageOriginalSrcSelector } from "store/common";
 
 import { Color, DEFAULT_COLORS } from "types";
@@ -65,7 +65,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     );
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
+      AnnotatorSlice.actions.setImageColors({
         colors: updatedColors,
         execSaga: true,
       })
@@ -85,7 +85,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
       imageShape.height,
       imageShape.width
     );
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
+    dispatch(AnnotatorSlice.actions.setImageSrc({ src: modifiedURI }));
 
     handleClose();
   };

@@ -7,8 +7,8 @@ import {
   activeImageSelector,
   activeImagePlaneSelector,
   activeImageRenderedSrcsSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+  AnnotatorSlice,
+} from "store/annotator";
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();
@@ -23,12 +23,12 @@ export const ZStackSlider = () => {
     if (typeof newValue === "number") {
       if (renderedSrcs.length === 0) return;
       dispatch(
-        imageViewerSlice.actions.setImageSrc({
+        AnnotatorSlice.actions.setImageSrc({
           src: renderedSrcs[newValue],
         })
       );
       dispatch(
-        imageViewerSlice.actions.setActiveImagePlane({
+        AnnotatorSlice.actions.setActiveImagePlane({
           activeImagePlane: newValue,
         })
       );

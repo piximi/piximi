@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText } from "@mui/material";
 
-import { imageViewerFullImagesSelector } from "store/common";
+import { annotatorFullImagesSelector } from "store/common";
 import {
   activeImageColorsSelector,
   activeImagePlaneSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+  AnnotatorSlice,
+} from "store/annotator";
 
 import { ImageType } from "types";
 
@@ -20,12 +20,12 @@ import {
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(activeImageColorsSelector);
   const dispatch = useDispatch();
-  const images = useSelector(imageViewerFullImagesSelector);
+  const images = useSelector(annotatorFullImagesSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
 
   const onApplyColorsClick = () => {
     dispatch(
-      imageViewerSlice.actions.setCurrentColors({
+      AnnotatorSlice.actions.setCurrentColors({
         currentColors: activeImageColors,
       })
     );
@@ -57,7 +57,7 @@ export const ApplyColorsButton = () => {
     };
 
     getUpdatedImages().then((updatedImages: Array<ImageType>) => {
-      dispatch(imageViewerSlice.actions.setImages({ images: updatedImages }));
+      dispatch(AnnotatorSlice.actions.setImages({ images: updatedImages }));
     });
   };
 

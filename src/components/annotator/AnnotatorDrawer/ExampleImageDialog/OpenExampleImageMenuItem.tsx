@@ -9,10 +9,10 @@ import {
   setAnnotationCategories,
 } from "store/project";
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   setActiveImage,
   activeImageIdSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import {
   decodedAnnotationType,
@@ -95,7 +95,7 @@ export const OpenExampleImageMenuItem = ({
       );
 
       dispatch(
-        imageViewerSlice.actions.openAnnotations({
+        AnnotatorSlice.actions.openAnnotations({
           imageFile: serializedExampleImageFile,
           annotations: annotations,
         })

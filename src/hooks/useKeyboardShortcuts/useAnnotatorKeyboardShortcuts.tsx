@@ -4,7 +4,7 @@ import useSound from "use-sound";
 
 import { annotationCategoriesSelector } from "store/project";
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   setOperation,
   setSelectedCategoryId,
   selectedAnnotationsSelector,
@@ -12,7 +12,7 @@ import {
   annotatorImagesSelector,
   activeImageIdSelector,
   soundEnabledSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import {
   AnnotationModeType,
@@ -21,7 +21,7 @@ import {
   HotkeyView,
   ToolType,
 } from "types";
-import { AnnotationTool } from "annotator";
+import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 
@@ -72,7 +72,7 @@ export const useAnnotatorKeyboardShortcuts = ({
     )
       return;
 
-    dispatch(imageViewerSlice.actions.updateStagedAnnotations({}));
+    dispatch(AnnotatorSlice.actions.updateStagedAnnotations({}));
 
     if (soundEnabled) playCreateAnnotationSoundEffect();
 
@@ -80,7 +80,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
-        imageViewerSlice.actions.setSelectionMode({
+        AnnotatorSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );
@@ -326,7 +326,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,
@@ -353,7 +353,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        imageViewerSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImage({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,

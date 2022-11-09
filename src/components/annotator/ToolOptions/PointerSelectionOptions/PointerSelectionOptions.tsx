@@ -19,10 +19,10 @@ import { InformationBox } from "../InformationBox";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   selectedAnnotationsSelector,
   stagedAnnotationsSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 import { annotationCategoriesSelector } from "store/project";
 
 import { Category } from "types";
@@ -41,7 +41,7 @@ export const PointerSelectionOptions = () => {
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: allAnnotations,
         workingAnnotation: allAnnotations[0],
       })
@@ -50,7 +50,7 @@ export const PointerSelectionOptions = () => {
 
   const onSelectNone = () => {
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [],
         workingAnnotation: undefined,
       })
@@ -69,7 +69,7 @@ export const PointerSelectionOptions = () => {
       return annotation.categoryId === category.id;
     });
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: desiredAnnotations,
         workingAnnotation: desiredAnnotations[0],
       })

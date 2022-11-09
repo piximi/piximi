@@ -1,10 +1,10 @@
-import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
+import { ImageType, Annotator, Project, ShadowImageType } from "types";
 
 export const imageSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }) => {
   /*
@@ -15,14 +15,14 @@ export const imageSelector = ({
       then the shadow image is the full image, so return that
   */
 
-  if (!imageViewer.images.length) return;
+  if (!annotator.images.length) return;
 
   const image =
     project.images.find((im: ImageType) => {
-      return im.id === imageViewer.activeImageId;
+      return im.id === annotator.activeImageId;
     }) ||
-    (imageViewer.images.find((im: ShadowImageType) => {
-      return im.id === imageViewer.activeImageId;
+    (annotator.images.find((im: ShadowImageType) => {
+      return im.id === annotator.activeImageId;
     }) as ImageType);
 
   if (!image) return;

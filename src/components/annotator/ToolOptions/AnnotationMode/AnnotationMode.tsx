@@ -16,10 +16,10 @@ import { useTranslation } from "hooks";
 
 import {
   annotationStateSelector,
-  imageViewerSlice,
+  AnnotatorSlice,
   workingAnnotationSelector,
   selectionModeSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
 
@@ -47,7 +47,7 @@ export const AnnotationMode = () => {
       setDisabledAnnotationEdit(true);
       if (annotationMode !== AnnotationModeType.New) {
         dispatch(
-          imageViewerSlice.actions.setSelectionMode({
+          AnnotatorSlice.actions.setSelectionMode({
             selectionMode: AnnotationModeType.New,
           })
         );
@@ -59,14 +59,14 @@ export const AnnotationMode = () => {
     const payload = {
       selectionMode: parseInt((event.target as HTMLInputElement).value),
     };
-    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
+    dispatch(AnnotatorSlice.actions.setSelectionMode(payload));
   };
 
   const onClickLabel = (event: any, mode: AnnotationModeType) => {
     const payload = {
       selectionMode: mode,
     };
-    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
+    dispatch(AnnotatorSlice.actions.setSelectionMode(payload));
   };
 
   const t = useTranslation();

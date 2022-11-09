@@ -1,14 +1,14 @@
-import { Category, ImageViewer, Project } from "types";
+import { Category, Annotator, Project } from "types";
 
 export const selectedCategorySelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }): Category => {
   const category = project.annotationCategories.find((category: Category) => {
-    return category.id === imageViewer.selectedCategoryId;
+    return category.id === annotator.selectedCategoryId;
   });
 
   return category!;

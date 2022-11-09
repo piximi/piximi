@@ -7,7 +7,7 @@ import { useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
-import { imageViewerSlice, toolTypeSelector } from "store/image-viewer";
+import { AnnotatorSlice, toolTypeSelector } from "store/annotator";
 
 import { ToolType as OperationType } from "types";
 
@@ -102,7 +102,7 @@ export const ToolDrawer = () => {
               name={t(name)}
               onClick={() => {
                 dispatch(
-                  imageViewerSlice.actions.setOperation({
+                  AnnotatorSlice.actions.setOperation({
                     operation: toolMap[name].operation,
                   })
                 );
