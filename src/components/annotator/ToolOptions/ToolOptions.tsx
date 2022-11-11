@@ -3,20 +3,20 @@ import { useSelector } from "react-redux";
 
 import { Drawer } from "@mui/material";
 
-import { RectangularAnnotationOptions } from "../RectangularAnnotationOptions";
-import { EllipticalAnnotationOptions } from "../EllipticalAnnotationOptions";
-import { PenSelectionIconOptions } from "../PenSelectionIconOptions";
-import { LassoAnnotationOptions } from "../LassoAnnotationOptions";
-import { PolygonalAnnotationOptions } from "../PolygonalAnnotationOptions";
-import { MagneticAnnotationOptions } from "../MagneticAnnotationOptions";
-import { ColorAnnotationOptions } from "../ColorAnnotationOptions";
-import { QuickAnnotationOptions } from "../QuickAnnotationOptions";
-import { ObjectAnnotationOptions } from "../ObjectAnnotationOptions";
-import { ZoomOptions } from "../ZoomOptions";
-import { HandToolOptions } from "../HandToolOptions/HandToolOptions";
-import { ColorAdjustmentOptions } from "../ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
-import { PointerSelectionOptions } from "../PointerSelectionOptions";
-import { ThresholdAnnotationOptions } from "../ThresholdAnnotationOptions";
+import { RectangularAnnotationOptions } from "./RectangularAnnotationOptions";
+import { EllipticalAnnotationOptions } from "./EllipticalAnnotationOptions";
+import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
+import { LassoAnnotationOptions } from "./LassoAnnotationOptions";
+import { PolygonalAnnotationOptions } from "./PolygonalAnnotationOptions";
+import { MagneticAnnotationOptions } from "./MagneticAnnotationOptions";
+import { ColorAnnotationOptions } from "./ColorAnnotationOptions";
+import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
+import { ObjectAnnotationOptions } from "./ObjectAnnotationOptions";
+import { ZoomOptions } from "./ZoomOptions";
+import { HandToolOptions } from "./HandToolOptions/HandToolOptions";
+import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
+import { PointerSelectionOptions } from "./PointerSelectionOptions";
+import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
@@ -39,7 +39,11 @@ import {
   ZoomIcon,
 } from "icons";
 
-export const ToolOptions = () => {
+export const ToolOptions = ({
+  optionsVisibility,
+}: {
+  optionsVisibility: boolean;
+}) => {
   const activeOperation = useSelector(toolTypeSelector);
 
   const operations = [
@@ -140,7 +144,8 @@ export const ToolOptions = () => {
           right: 56,
         },
       }}
-      variant="permanent"
+      variant="persistent"
+      open={optionsVisibility}
     >
       <AppBarOffset />
 

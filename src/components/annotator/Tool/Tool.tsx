@@ -12,9 +12,11 @@ import {
 } from "@mui/material";
 
 import { ToolBarToolTitle } from "./ToolBarToolTitle";
+import { CustomToolTip } from "./CustomToolTip";
 
 type TooltipCardProps = {
   name: string;
+  description: string | ReactElement;
   onClose: () => void;
 };
 
@@ -41,23 +43,11 @@ const toolTipMap: Record<string, { name: string; letter: string }> = {
   "Color Adjustment": { name: "Color Adjustment", letter: "I" },
 };
 
-export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
-  let description: string | ReactElement;
-
-  if (!Object.keys(toolTipMap).includes(name)) {
-    if (name === "Object annotation") {
-      description =
-        "Select a rectangular annotation around a desired object to automatically generate its boundaries.";
-    } else {
-      description = "";
-    }
-  } else {
-    const tool = toolTipMap[name];
-    description = (
-      <ToolBarToolTitle toolName={tool.name} letter={tool.letter} />
-    );
-  }
-
+export const TooltipCard = ({
+  name,
+  description,
+  onClose,
+}: TooltipCardProps) => {
   return (
     <Card sx={{ width: 210 }} variant="outlined">
       <CardActionArea>
@@ -72,36 +62,29 @@ export const TooltipCard = ({ name, onClose }: TooltipCardProps) => {
 };
 
 export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
-  const [open, setOpen] = useState<boolean>(false);
+  let toolName = name,
+    HKLetter;
 
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  const onOpen = () => {
-    setOpen(true);
-  };
+  if (!Object.keys(toolTipMap).includes(name)) {
+    if (name === "Object annotation") {
+      HKLetter =
+        "Select a rectangular annotation around a desired object to automatically generate its boundaries.";
+    } else {
+      HKLetter = "";
+    }
+  } else {
+    const tool = toolTipMap[name];
+    toolName = tool.name;
+    HKLetter = tool.letter;
+  }
 
   return (
-    <Tooltip
-      // can't use "sx" prop directly to access tooltip
-      // see: https://github.com/mui-org/material-ui/issues/28679
-      componentsProps={{
-        tooltip: {
-          sx: { backgroundColor: "transparent", maxWidth: "none" },
-        },
-      }}
-      onClose={onClose}
-      onOpen={onOpen}
-      open={open}
-      placement="left"
-      title={<TooltipCard name={name} onClose={onClose} />}
-    >
+    <CustomToolTip name={toolName} letter={HKLetter}>
       <ListItem button onClick={onClick} selected={selected}>
         <ListItemIcon>
           <SvgIcon fontSize="small">{children}</SvgIcon>
         </ListItemIcon>
       </ListItem>
-    </Tooltip>
+    </CustomToolTip>
   );
 };
