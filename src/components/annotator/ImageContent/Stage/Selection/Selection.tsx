@@ -14,6 +14,7 @@ import { ZoomSelection } from "./ZoomSelection";
 import { ToolType } from "types";
 
 import {
+  Tool,
   ColorAnnotationTool,
   EllipticalAnnotationTool,
   LassoAnnotationTool,
@@ -24,7 +25,6 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
 } from "annotator-tools";
-import { Tool } from "annotator-tools/Tool";
 
 type SelectionProps = {
   tool?: Tool;

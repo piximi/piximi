@@ -1,11 +1,9 @@
 import React, { useRef } from "react";
 
 import { Box } from "@mui/material";
-
-import { Stage } from "../Stage";
-
 import { useBoundingClientRect, useDndFileDrop } from "hooks";
 import { DispatchLocation, useDefaultImage } from "hooks/useDefaultImage";
+import { Stage } from "../Stage";
 
 type ImageContentProps = {
   onDrop: (files: FileList) => void;

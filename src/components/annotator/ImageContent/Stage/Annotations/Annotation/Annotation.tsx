@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Konva from "konva";
 import * as ReactKonva from "react-konva";
-import { hexToRGBA } from "utils/common/imageHelper";
-import { colorOverlayROI } from "utils/common/imageHelper";
 import Image from "image-js";
 
 import { setSelectedAnnotations, stageScaleSelector } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
-import Konva from "konva";
+
+import { hexToRGBA } from "utils/common/imageHelper";
+import { colorOverlayROI } from "utils/common/imageHelper";
 
 type AnnotationProps = {
   annotation: decodedAnnotationType;

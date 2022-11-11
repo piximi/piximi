@@ -1,15 +1,24 @@
 import React, { ReactElement } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, Drawer } from "@mui/material";
+import {
+  Divider,
+  Drawer,
+  ListItem,
+  ListItemIcon,
+  SvgIcon,
+  Tooltip,
+} from "@mui/material";
+import { West as WestIcon } from "@mui/icons-material";
+import { East as EastIcon } from "@mui/icons-material";
 
-import { useTranslation } from "hooks";
+import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
 import { AnnotatorSlice, toolTypeSelector } from "store/annotator";
 
-import { ToolType as OperationType } from "types";
+import { HotkeyView, ToolType as OperationType } from "types";
 
 import {
   ColorAdjustmentIcon,
@@ -25,6 +34,7 @@ import {
   SelectionIcon,
   ZoomIcon,
 } from "icons";
+import { CustomToolTip } from "../Tool/CustomToolTip";
 
 const toolMap: Record<
   string,
@@ -74,11 +84,28 @@ const toolMap: Record<
     icon: <RectangularSelectionIcon />,
   },
 };
-export const ToolDrawer = () => {
+export const ToolDrawer = ({
+  optionsVisibility,
+  setOptionsVisibility,
+}: {
+  optionsVisibility: boolean;
+  setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const dispatch = useDispatch();
 
   const activeOperation = useSelector(toolTypeSelector);
 
+  const toggleOptionsHandler = () => {
+    setOptionsVisibility((visible) => !visible);
+  };
+
+  useHotkeys(
+    "shift+o",
+    () => {
+      toggleOptionsHandler();
+    },
+    HotkeyView.Annotator
+  );
   const t = useTranslation();
 
   return (
@@ -94,6 +121,19 @@ export const ToolDrawer = () => {
       }}
       variant="permanent"
     >
+      <CustomToolTip
+        name={`${optionsVisibility ? "Hide" : "Show"} Options`}
+        letter="O"
+      >
+        <ListItem button onClick={toggleOptionsHandler}>
+          <ListItemIcon>
+            <SvgIcon fontSize="small">
+              {!optionsVisibility ? <WestIcon /> : <EastIcon />}
+            </SvgIcon>
+          </ListItemIcon>
+        </ListItem>
+      </CustomToolTip>
+
       <br />
       {Object.keys(toolMap).map((name, idx) => {
         return (

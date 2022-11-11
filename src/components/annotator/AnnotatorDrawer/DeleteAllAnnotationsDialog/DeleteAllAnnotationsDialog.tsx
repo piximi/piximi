@@ -25,6 +25,7 @@ export const DeleteAllAnnotationsDialog = ({
   const dispatch = useDispatch();
 
   const onDelete = () => {
+    console.log("pressed");
     batch(() => {
       dispatch(AnnotatorSlice.actions.deleteAllInstances());
       dispatch(

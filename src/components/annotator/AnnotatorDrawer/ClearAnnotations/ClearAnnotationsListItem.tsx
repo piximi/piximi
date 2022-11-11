@@ -1,6 +1,11 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialog, useTranslation } from "hooks";
@@ -41,7 +46,11 @@ export const ClearAnnotationsListItem = () => {
         return [...image.annotations];
       })
       .flat();
-    if (existingAnnotations.length) {
+    if (
+      existingAnnotations.length ||
+      stagedAnnotations.length ||
+      selectedAnnotationsIds.length
+    ) {
       onOpenDeleteAllAnnotationsDialog();
     }
   };
@@ -57,15 +66,15 @@ export const ClearAnnotationsListItem = () => {
         })
       );
       dispatch(
-        AnnotatorSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: unknownAnnotationCategory.id,
-          execSaga: true,
-        })
-      );
-      dispatch(
         AnnotatorSlice.actions.setSelectedAnnotations({
           selectedAnnotations: [],
           workingAnnotation: undefined,
+        })
+      );
+      dispatch(
+        AnnotatorSlice.actions.setSelectedCategoryId({
+          selectedCategoryId: unknownAnnotationCategory.id,
+          execSaga: true,
         })
       );
     });
@@ -76,24 +85,24 @@ export const ClearAnnotationsListItem = () => {
   return (
     <>
       <List dense>
-        <ListItem button onClick={ClearAllAnnotationsHandler}>
+        <ListItemButton onClick={ClearAllAnnotationsHandler}>
           <ListItemIcon>
             <DeleteIcon color="disabled" />
           </ListItemIcon>
           <ListItemText primary={t("Clear all annotations")} />
-        </ListItem>
+        </ListItemButton>
 
         <DeleteAllAnnotationsDialog
           onClose={onCloseDeleteAllAnnotationsDialog}
           open={openDeleteAllAnnotationsDialog}
         />
 
-        <ListItem button onClick={onClearSelectedAnnotations}>
+        <ListItemButton onClick={onClearSelectedAnnotations}>
           <ListItemIcon>
             <DeleteIcon color="disabled" />
           </ListItemIcon>
           <ListItemText primary={t("Clear selected annotations")} />
-        </ListItem>
+        </ListItemButton>
       </List>
     </>
   );
