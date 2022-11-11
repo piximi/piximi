@@ -1,12 +1,15 @@
-import { AnnotationTool } from "annotator-tools";
 import React from "react";
 import { useSelector } from "react-redux";
+
+import { Annotation } from "./Annotation";
+import { AnnotationTransformer } from "./AnnotationTransformer";
+
 import {
   annotationObjectsSelector,
   selectedAnnotationsIdsSelector,
 } from "store/annotator";
-import { Annotation } from "./Annotation";
-import { AnnotationTransformer } from "./AnnotationTransformer/AnnotationTransformer";
+
+import { AnnotationTool } from "annotator-tools";
 
 type AnnotationsProps = {
   transformPosition: ({

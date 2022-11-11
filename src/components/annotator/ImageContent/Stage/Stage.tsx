@@ -24,6 +24,7 @@ import { ZoomSelection } from "./Selection/ZoomSelection";
 import { PenAnnotationToolTip } from "./PenAnnotationToolTip/PenAnnotationToolTip";
 import { Annotations } from "./Annotations/Annotations";
 import { PointerSelection } from "./Selection/PointerSelection";
+import { SoundEvents } from "./sound-events";
 
 import {
   AnnotatorSlice,
@@ -53,9 +54,7 @@ import {
   ToolType,
 } from "types";
 
-import { ObjectAnnotationTool } from "annotator-tools";
-import { Tool } from "annotator-tools/Tool";
-import { SoundEvents } from "./sound-events";
+import { ObjectAnnotationTool, Tool } from "annotator-tools";
 
 export const Stage = () => {
   /*

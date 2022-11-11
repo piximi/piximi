@@ -4,9 +4,11 @@ import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
 import { soundEnabledSelector } from "store/annotator";
+
+import { HotkeyView } from "types";
+
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
-import { HotkeyView } from "types";
 
 /*
   This component is responsible for playing sound effects
