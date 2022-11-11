@@ -15,9 +15,9 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useTranslation } from "hooks";
 
-import { ImageMenu } from "../ImageMenu";
-
 import { CollapsibleList } from "components/common/CollapsibleList";
+
+import { ImageMenu } from "../ImageMenu";
 
 import {
   annotatorImagesSelector,
@@ -79,46 +79,45 @@ export const ImageList = () => {
       <CollapsibleList closed dense primary={t("Images")}>
         {annotatorImages.map((image: ShadowImageType) => {
           return (
-            <div key={image.id}>
-              <ListItem
-                button
+            <ListItem
+              button
+              key={image.id}
+              id={image.id}
+              onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+                ImageItemClickHandler(evt, image)
+              }
+              selected={image.id === activeImage?.id}
+            >
+              <ListItemAvatar>
+                <Avatar alt={image.name} src={image.src} variant={"square"} />
+              </ListItemAvatar>
+              <ListItemText
                 id={image.id}
-                onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                  ImageItemClickHandler(evt, image)
-                }
-                selected={image.id === activeImage?.id}
-              >
-                <ListItemAvatar>
-                  <Avatar alt={image.name} src={image.src} variant={"square"} />
-                </ListItemAvatar>
-                <ListItemText
-                  id={image.id}
-                  primary={image.name}
-                  primaryTypographyProps={{ noWrap: true }}
+                primary={image.name}
+                primaryTypographyProps={{ noWrap: true }}
+              />
+              {((image.id !== activeImage?.id &&
+                image.annotations.length !== 0) ||
+                (image.id === activeImage?.id &&
+                  stagedAnnotations.length !== 0)) && (
+                <Chip
+                  label={
+                    image.id === activeImage?.id
+                      ? stagedAnnotations.length
+                      : image.annotations.length
+                  }
+                  size="small"
                 />
-                {((image.id !== activeImage?.id &&
-                  image.annotations.length !== 0) ||
-                  (image.id === activeImage?.id &&
-                    stagedAnnotations.length !== 0)) && (
-                  <Chip
-                    label={
-                      image.id === activeImage?.id
-                        ? stagedAnnotations.length
-                        : image.annotations.length
-                    }
-                    size="small"
-                  />
-                )}
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => ImageMenuOpenHandler(event, image)}
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            </div>
+              )}
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  onClick={(event) => ImageMenuOpenHandler(event, image)}
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
           );
         })}
         <ImageMenu

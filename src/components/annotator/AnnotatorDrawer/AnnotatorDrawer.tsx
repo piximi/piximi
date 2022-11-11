@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Divider, Drawer, List } from "@mui/material";
 
-import { ImageList } from "../ImageList";
-import { OpenListItem } from "../OpenListItem";
-import { SaveListItem } from "../SaveListItem";
-import { ClearAnnotationsListItem } from "../ClearAnnotations";
-import { AnnotatorAppBar } from "../../AnnotatorAppBar";
-
 import { CategoriesList } from "components/categories/CategoriesList";
 import { AppBarOffset } from "components/styled/AppBarOffset";
 import { ApplicationOptionsList } from "components/common/ApplicationOptionsList";
+
+import { ImageList } from "./ImageList";
+import { OpenListItem } from "./OpenListItem";
+import { SaveListItem } from "./SaveListItem";
+import { ClearAnnotationsListItem } from "./ClearAnnotations";
+import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
 import {
   createdAnnotatorCategoriesSelector,

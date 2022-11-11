@@ -1,7 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
-import useSound from "use-sound";
 
 import {
   AnnotatorSlice,
@@ -17,6 +17,8 @@ import {
   stagedAnnotationsSelector,
 } from "store/annotator";
 
+import useSound from "use-sound";
+
 import {
   AnnotationModeType,
   AnnotationStateType,
@@ -26,7 +28,6 @@ import {
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
-import { useEffect, useRef, useState } from "react";
 
 type box = {
   x: number;

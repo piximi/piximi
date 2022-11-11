@@ -6,7 +6,6 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
 
-import { AnnotatorDrawer } from "../AnnotatorDrawer";
 import { ImageContent } from "../ImageContent";
 import { ToolOptions } from "../ToolOptions";
 import { ToolDrawer } from "../ToolDrawer";
@@ -14,6 +13,8 @@ import { ToolDrawer } from "../ToolDrawer";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
+
+import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
 
 import {
   alertStateSelector,
@@ -25,13 +26,13 @@ import {
 import { AlertType, HotkeyView } from "types";
 
 import { getStackTraceFromError } from "utils";
-
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const AnnotatorView = () => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
+  const [optionsVisibility, setOptionsVisibility] = useState<boolean>(true);
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
@@ -146,9 +147,12 @@ export const AnnotatorView = () => {
           />
         )}
 
-        <ToolOptions />
+        <ToolOptions optionsVisibility={optionsVisibility} />
 
-        <ToolDrawer />
+        <ToolDrawer
+          optionsVisibility={optionsVisibility}
+          setOptionsVisibility={setOptionsVisibility}
+        />
       </Box>
     </ErrorBoundary>
   );

@@ -137,6 +137,8 @@ export const annotatorSlice = createSlice({
       //deletes all instances across a given image
       if (action.payload.imageId === state.activeImageId) {
         state.stagedAnnotations = [];
+        state.selectedAnnotations = [];
+        state.workingAnnotation = undefined;
       } else {
         state.images = state.images.map((image: ShadowImageType) => {
           if (image.id === action.payload.imageId) {
