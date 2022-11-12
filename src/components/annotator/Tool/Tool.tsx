@@ -1,24 +1,8 @@
-import React, { ReactElement, useState } from "react";
+import React from "react";
 
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  ListItem,
-  ListItemIcon,
-  SvgIcon,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { ListItem, ListItemIcon, SvgIcon } from "@mui/material";
 
-import { ToolBarToolTitle } from "./ToolBarToolTitle";
 import { CustomToolTip } from "./CustomToolTip";
-
-type TooltipCardProps = {
-  name: string;
-  description: string | ReactElement;
-  onClose: () => void;
-};
 
 type ToolProps = {
   children: React.ReactNode;
@@ -41,24 +25,6 @@ const toolTipMap: Record<string, { name: string; letter: string }> = {
   Hand: { name: "Hand tool", letter: "H" },
   Zoom: { name: "Zoom tool", letter: "Z" },
   "Color Adjustment": { name: "Color Adjustment", letter: "I" },
-};
-
-export const TooltipCard = ({
-  name,
-  description,
-  onClose,
-}: TooltipCardProps) => {
-  return (
-    <Card sx={{ width: 210 }} variant="outlined">
-      <CardActionArea>
-        <CardContent>
-          <Typography variant="body2" color="textSecondary" component="span">
-            {description}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
 };
 
 export const Tool = ({ children, name, onClick, selected }: ToolProps) => {

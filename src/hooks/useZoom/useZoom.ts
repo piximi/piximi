@@ -142,7 +142,7 @@ export const useZoom = () => {
     if (!imageWidth) return;
     zoomAndOffset(
       { x: imageWidth / 2, y: imageWidth / 2 },
-      scaleBy,
+      1.01, //scaleBy,
       event.evt.deltaY < 0
     );
   };
