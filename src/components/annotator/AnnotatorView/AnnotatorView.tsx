@@ -1,28 +1,21 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
-
 import { AppBar, Box, CssBaseline } from "@mui/material";
-
 import { useUpload } from "hooks";
-
-import { ImageContent } from "../ImageContent";
+import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";
 import { ToolDrawer } from "../ToolDrawer";
-
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-
 import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
-
 import {
   alertStateSelector,
   applicationSlice,
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-
 import { getStackTraceFromError } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
@@ -142,7 +135,7 @@ export const AnnotatorView = () => {
 
         <AnnotatorDrawer />
 
-        <ImageContent onDrop={onDrop} />
+        <StageWrapper onDrop={onDrop} optionsVisibility={optionsVisibility} />
 
         {files?.length && (
           <ImageShapeDialog
