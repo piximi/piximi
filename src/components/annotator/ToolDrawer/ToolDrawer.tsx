@@ -9,8 +9,7 @@ import {
   SvgIcon,
   Tooltip,
 } from "@mui/material";
-import { West as WestIcon } from "@mui/icons-material";
-import { East as EastIcon } from "@mui/icons-material";
+import { Tune as TuneIcon } from "@mui/icons-material";
 
 import { useHotkeys, useTranslation } from "hooks";
 
@@ -126,9 +125,9 @@ export const ToolDrawer = ({
         letter="O"
       >
         <ListItem button onClick={toggleOptionsHandler}>
-          <ListItemIcon>
+          <ListItemIcon sx={{ pt: "1rem" }}>
             <SvgIcon fontSize="small">
-              {!optionsVisibility ? <WestIcon /> : <EastIcon />}
+              {!optionsVisibility ? <TuneIcon /> : <TuneIcon color="primary" />}
             </SvgIcon>
           </ListItemIcon>
         </ListItem>
