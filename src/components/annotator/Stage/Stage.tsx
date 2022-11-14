@@ -55,6 +55,7 @@ import {
 } from "types";
 
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
+import { dimensions } from "utils/common";
 
 export const Stage = () => {
   /*
@@ -563,7 +564,7 @@ export const Stage = () => {
     <>
       <ReactKonva.Stage
         draggable={draggable}
-        height={stageHeight}
+        height={window.innerHeight}
         onMouseDown={(evt) => onMouseDown(evt)}
         onTouchStart={(evt) => onMouseDown(evt)}
         onMouseMove={(evt) => onMouseMove(evt)}
@@ -573,7 +574,12 @@ export const Stage = () => {
         onWheel={(evt) => onZoomWheel(evt)}
         position={stagePosition}
         ref={stageRef}
-        width={stageWidth}
+        width={
+          window.innerWidth -
+          dimensions.annotatorDrawerWidth -
+          dimensions.annotatorToolDrawerWidth -
+          dimensions.stagePaddingX
+        }
       >
         <Provider store={store}>
           <DndProvider backend={HTML5Backend}>

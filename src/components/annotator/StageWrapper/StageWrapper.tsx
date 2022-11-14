@@ -4,12 +4,17 @@ import { Box } from "@mui/material";
 import { useBoundingClientRect, useDndFileDrop } from "hooks";
 import { DispatchLocation, useDefaultImage } from "hooks/useDefaultImage";
 import { Stage } from "../Stage";
+import { dimensions } from "utils/common";
 
-type ImageContentProps = {
+type StageWrapperProps = {
   onDrop: (files: FileList) => void;
+  optionsVisibility: boolean;
 };
 
-export const ImageContent = ({ onDrop }: ImageContentProps) => {
+export const StageWrapper = ({
+  onDrop,
+  optionsVisibility,
+}: StageWrapperProps) => {
   const ref = useRef<HTMLDivElement>(null);
   useBoundingClientRect(ref);
 
