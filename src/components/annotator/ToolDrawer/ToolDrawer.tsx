@@ -8,6 +8,7 @@ import {
   ListItemIcon,
   SvgIcon,
   Tooltip,
+  useTheme,
 } from "@mui/material";
 import { Tune as TuneIcon } from "@mui/icons-material";
 
@@ -91,7 +92,7 @@ export const ToolDrawer = ({
   setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const dispatch = useDispatch();
-
+  const theme = useTheme();
   const activeOperation = useSelector(toolTypeSelector);
 
   const toggleOptionsHandler = () => {
@@ -127,7 +128,11 @@ export const ToolDrawer = ({
         <ListItem button onClick={toggleOptionsHandler}>
           <ListItemIcon sx={{ pt: "1rem" }}>
             <SvgIcon fontSize="small">
-              {!optionsVisibility ? <TuneIcon /> : <TuneIcon color="primary" />}
+              {!optionsVisibility ? (
+                <TuneIcon sx={{ color: theme.palette.grey[400] }} />
+              ) : (
+                <TuneIcon color="primary" />
+              )}
             </SvgIcon>
           </ListItemIcon>
         </ListItem>
