@@ -1,10 +1,8 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
+import { ToolHotkeyTitle } from "components/common/styled/ToolHotkeyTitle";
 
 import { CollapsibleHelpContent } from "../HelpDialog/CollapsibleHelpContent";
-import {
-  HelpWindowToolTitle,
-  ToolTitleProps,
-} from "../HelpDialog/HelpWindowToolTitle";
+import { ToolTitleProps } from "../HelpDialog/HelpWindowToolTitle";
 
 export type Subtopic = {
   subtitle: string;
@@ -40,9 +38,10 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                   return (
                     <div key={subtopicIndex}>
                       {subTopic.tootleTitle ? (
-                        <HelpWindowToolTitle
+                        <ToolHotkeyTitle
                           toolName={subTopic.tootleTitle.toolName}
                           letter={subTopic.tootleTitle.letter}
+                          bold={true}
                         />
                       ) : (
                         <Typography component={"span"}>

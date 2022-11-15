@@ -2,7 +2,8 @@ import React from "react";
 
 import { ListItem, ListItemIcon, SvgIcon } from "@mui/material";
 
-import { CustomToolTip } from "./CustomToolTip";
+import { TooltipCard } from "components/common/styled/ToolTipCard";
+import { ToolHotkeyTitle } from "components/common/styled/ToolHotkeyTitle";
 
 type ToolProps = {
   children: React.ReactNode;
@@ -43,14 +44,15 @@ export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
     toolName = tool.name;
     HKLetter = tool.letter;
   }
+  const description = <ToolHotkeyTitle toolName={toolName} letter={HKLetter} />;
 
   return (
-    <CustomToolTip name={toolName} letter={HKLetter}>
+    <TooltipCard name={toolName} letter={HKLetter} description={description}>
       <ListItem button onClick={onClick} selected={selected}>
         <ListItemIcon>
           <SvgIcon fontSize="small">{children}</SvgIcon>
         </ListItemIcon>
       </ListItem>
-    </CustomToolTip>
+    </TooltipCard>
   );
 };
