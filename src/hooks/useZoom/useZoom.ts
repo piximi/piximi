@@ -16,7 +16,7 @@ import { ToolType, ZoomModeType } from "types";
 
 export const useZoom = () => {
   const delta = 10;
-  const scaleBy = 1.01;
+  const scaleBy = 1.1;
 
   const dispatch = useDispatch();
 
@@ -150,7 +150,7 @@ export const useZoom = () => {
     if (!imageWidth) return;
     zoomAndOffset(
       { x: imageWidth / 2, y: imageWidth / 2 },
-      scaleBy,
+      1.01,
       event.evt.deltaY < 0
     );
   };

@@ -23,7 +23,6 @@ export const StageWrapper = ({
     <Box
       sx={(theme) => ({
         backgroundColor: theme.palette.background.default,
-        width: "100%",
         border: isOver ? "5px solid blue" : "",
       })}
       ref={ref}

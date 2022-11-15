@@ -24,7 +24,7 @@ export const AnnotatorView = () => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
-  const [optionsVisibility, setOptionsVisibility] = useState<boolean>(true);
+  const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
@@ -128,7 +128,7 @@ export const AnnotatorView = () => {
 
         <AnnotatorDrawer />
 
-        <StageWrapper onDrop={onDrop} optionsVisibility={optionsVisibility} />
+        <StageWrapper onDrop={onDrop} optionsVisibility={optionsVisible} />
 
         {files?.length && (
           <ImageShapeDialog
@@ -139,11 +139,11 @@ export const AnnotatorView = () => {
           />
         )}
 
-        <ToolOptions optionsVisibility={optionsVisibility} />
+        <ToolOptions optionsVisibility={optionsVisible} />
 
         <ToolDrawer
-          optionsVisibility={optionsVisibility}
-          setOptionsVisibility={setOptionsVisibility}
+          optionsVisibility={optionsVisible}
+          setOptionsVisibility={setOptionsVisibile}
         />
       </Box>
     </ErrorBoundary>
