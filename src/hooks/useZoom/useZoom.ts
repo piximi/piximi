@@ -16,7 +16,7 @@ import { ToolType, ZoomModeType } from "types";
 
 export const useZoom = () => {
   const delta = 10;
-  const scaleBy = 1.25;
+  const scaleBy = 1.01;
 
   const dispatch = useDispatch();
 
@@ -32,6 +32,12 @@ export const useZoom = () => {
     scaleBy: number,
     zoomIn: boolean = true
   ) => {
+    let newScale = zoomIn ? stageScale * scaleBy : stageScale / scaleBy;
+    if (newScale < 0.25) {
+      newScale = 0.25;
+    } else if (newScale > 12.5) {
+      newScale = 12.5;
+    }
     if (!automaticCentering || zoomSelection.dragging) {
       if (!position) return;
       dispatch(
@@ -43,9 +49,10 @@ export const useZoom = () => {
         })
       );
     }
+
     dispatch(
       setStageScale({
-        stageScale: zoomIn ? stageScale * scaleBy : stageScale / scaleBy,
+        stageScale: newScale,
       })
     );
   };
@@ -136,7 +143,8 @@ export const useZoom = () => {
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
-
+    event.cancelBubble = true;
+    event.evt.preventDefault();
     if (toolType !== ToolType.Zoom) return;
 
     if (!imageWidth) return;
