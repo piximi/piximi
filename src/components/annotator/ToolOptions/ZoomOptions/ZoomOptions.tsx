@@ -42,6 +42,7 @@ import {
 import { ZoomModeType } from "types";
 
 import {
+  CheckboxCheckedIcon,
   CheckboxUncheckedIcon,
   RadioCheckedIcon,
   RadioUncheckedIcon,
@@ -303,7 +304,7 @@ export const ZoomOptions = () => {
             disableRipple
             edge="start"
             icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<RadioCheckedIcon />}
+            checkedIcon={<CheckboxCheckedIcon />}
             tabIndex={-1}
           />
         </ListItemIcon>
