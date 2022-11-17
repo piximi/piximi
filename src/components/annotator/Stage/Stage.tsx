@@ -80,6 +80,11 @@ export const Stage = () => {
     x: number;
     y: number;
   }>();
+  const [absolutePosition, setAbsolutePosition] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
 
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
@@ -358,9 +363,7 @@ export const Stage = () => {
         process.env.REACT_APP_LOG_LEVEL === "3" &&
         console.log(event);
 
-      if (!stageRef || !stageRef.current) return;
-
-      if (toolType === ToolType.ColorAdjustment) return;
+      if (!stageRef || !stageRef.current || !annotationTool) return;
 
       const position = stageRef.current.getPointerPosition();
 
@@ -368,39 +371,40 @@ export const Stage = () => {
 
       const relative = getRelativePointerPosition(position);
 
+      const image = annotationTool.image;
       if (!relative || !scaledImageWidth || !scaledImageHeight) return;
       setCurrentPosition(relative);
+      const absolute = {
+        x: Math.round(relative.x / stageScale),
+        y: Math.round(relative.y / stageScale),
+      };
 
       // Add a little leeway around the canvas to aid drawing up to the edges
-      if (relative.x > -50 && relative.x < 0) {
-        relative.x = 0;
-      } else if (
-        relative.x > scaledImageWidth &&
-        relative.x < scaledImageWidth + 50
-      ) {
-        relative.x = scaledImageWidth;
-      }
-      if (relative.y > -50 && relative.y < 0) {
-        relative.y = 0;
-      } else if (
-        relative.y > scaledImageHeight &&
-        relative.y < scaledImageHeight + 50
-      ) {
-        relative.y = scaledImageHeight;
-      }
-
       if (
-        relative.x > scaledImageWidth ||
-        relative.y > scaledImageHeight ||
-        relative.x < 0 ||
-        relative.y < 0
-      )
-        return;
+        absolute.x < 0 ||
+        absolute.x > image.width ||
+        absolute.y < 0 ||
+        absolute.y > image.height
+      ) {
+        setOutOfBounds(true);
+        absolute.x =
+          absolute.x < 0
+            ? 0
+            : absolute.x > image.width
+            ? image.width
+            : absolute.x;
+        absolute.y =
+          absolute.y < 0
+            ? 0
+            : absolute.y > image.height
+            ? image.height
+            : absolute.y;
+      } else {
+        setOutOfBounds(false);
+      }
 
-      const rawImagePosition = {
-        x: relative.x / stageScale,
-        y: relative.y / stageScale,
-      };
+      setAbsolutePosition(absolute);
+      if (toolType === ToolType.ColorAdjustment) return;
 
       if (toolType === ToolType.Zoom) {
         onZoomMouseMove(relative);
@@ -408,8 +412,8 @@ export const Stage = () => {
         onPointerMouseMove(relative);
       } else {
         if (!annotationTool) return;
-
-        annotationTool.onMouseMove(rawImagePosition);
+        console.log(absolute);
+        annotationTool.onMouseMove(absolute);
       }
     };
     const throttled = throttle(func, 5);
@@ -435,36 +439,20 @@ export const Stage = () => {
         process.env.REACT_APP_LOG_LEVEL === "2" &&
         console.log(event);
 
-      if (!stageRef || !stageRef.current) return;
-
-      const position = stageRef.current.getPointerPosition();
-
-      if (!position) return;
-
-      const relative = getRelativePointerPosition(position);
-
-      if (!relative) return;
-
-      const rawImagePosition = {
-        x: relative.x / stageScale,
-        y: relative.y / stageScale,
-      };
-
+      if (!currentPosition || !absolutePosition) return;
       if (toolType === ToolType.Zoom) {
-        onZoomMouseUp(relative);
+        onZoomMouseUp(currentPosition);
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseUp(relative);
+        onPointerMouseUp(currentPosition);
       } else {
         if (!annotationTool) return;
 
-        if (!relative || !scaledImageWidth || !scaledImageHeight) return;
-
         if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
-            rawImagePosition
+            absolutePosition
           );
         }
-        annotationTool.onMouseUp(rawImagePosition);
+        annotationTool.onMouseUp(absolutePosition);
       }
     };
     const throttled = throttle(func, 10);
@@ -477,10 +465,8 @@ export const Stage = () => {
     toolType,
     onPointerMouseUp,
     onZoomMouseUp,
-    scaledImageHeight,
-    scaledImageWidth,
-    stageScale,
-    getRelativePointerPosition,
+    absolutePosition,
+    currentPosition,
   ]);
 
   // useEffect
@@ -559,13 +545,7 @@ export const Stage = () => {
     selectionMode,
     toolType,
   });
-  useEffect(() => {
-    if (annotationTool && currentPosition) {
-      const x = Math.round(currentPosition.x);
-      const y = Math.round(currentPosition.y);
-      console.log(annotationTool.image.getPixelXY(x, y));
-    }
-  }, [annotationTool, currentPosition]);
+
   return (
     <>
       <ReactKonva.Stage
@@ -613,15 +593,26 @@ export const Stage = () => {
         sx={{
           width: stageWidth,
           height: dimensions.stageInfoHeight,
+          justifyContent: "space-between",
+          alignItems: "center",
+          display: "flex",
         }}
       >
-        <Typography>
-          {currentPosition &&
-            `x: ${Math.max(Math.round(currentPosition.x), 0)} y: ${Math.max(
-              Math.round(currentPosition.y),
-              0
-            )}`}
-        </Typography>
+        {!outOfBounds && absolutePosition && (
+          <>
+            <Typography>
+              {`x: ${absolutePosition.x} y: ${absolutePosition.y} `}
+            </Typography>
+            <Typography>
+              {`${annotationTool.image
+                .getPixelXY(absolutePosition.x, absolutePosition.y)
+                .reduce((prev, next) => {
+                  return prev + `${next}, `;
+                }, "")
+                .slice(0, -2)}`}
+            </Typography>
+          </>
+        )}
       </Box>
       {/* SoundEvents must be mounted following some user gesture
           else an "AudioContext was not allowed to start" warning
