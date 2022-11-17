@@ -4,6 +4,7 @@ export { ReactComponent as ColorAdjustmentIcon } from "./ColorAdjustment.svg";
 export { ReactComponent as ColorSelectionIcon } from "./ColorAnnotation.svg";
 export { ReactComponent as EllipticalSelectionIcon } from "./EllipticalAnnotation.svg";
 export { ReactComponent as HandIcon } from "./Hand.svg";
+export { Hand } from "./Hand";
 export { ReactComponent as LassoSelectionIcon } from "./LassoAnnotation.svg";
 export { ReactComponent as MagneticSelectionIcon } from "./MagneticAnnotation.svg";
 export { ReactComponent as ObjectSelectionIcon } from "./ObjectAnnotation.svg";
