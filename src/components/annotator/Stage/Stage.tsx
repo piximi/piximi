@@ -56,6 +56,7 @@ import {
 
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
 import { dimensions } from "utils/common";
+import { Box, Typography } from "@mui/material";
 
 export const Stage = () => {
   /*
@@ -368,8 +369,7 @@ export const Stage = () => {
       const relative = getRelativePointerPosition(position);
 
       if (!relative || !scaledImageWidth || !scaledImageHeight) return;
-
-      if (toolType === ToolType.PenAnnotation) setCurrentPosition(relative);
+      setCurrentPosition(relative);
 
       // Add a little leeway around the canvas to aid drawing up to the edges
       if (relative.x > -50 && relative.x < 0) {
@@ -559,12 +559,18 @@ export const Stage = () => {
     selectionMode,
     toolType,
   });
-
+  useEffect(() => {
+    if (annotationTool && currentPosition) {
+      const x = Math.round(currentPosition.x);
+      const y = Math.round(currentPosition.y);
+      console.log(annotationTool.image.getPixelXY(x, y));
+    }
+  }, [annotationTool, currentPosition]);
   return (
     <>
       <ReactKonva.Stage
         draggable={draggable}
-        height={window.innerHeight}
+        height={stageHeight}
         onMouseDown={(evt) => onMouseDown(evt)}
         onTouchStart={(evt) => onMouseDown(evt)}
         onMouseMove={(evt) => onMouseMove(evt)}
@@ -574,12 +580,7 @@ export const Stage = () => {
         onWheel={(evt) => onZoomWheel(evt)}
         position={stagePosition}
         ref={stageRef}
-        width={
-          window.innerWidth -
-          dimensions.annotatorDrawerWidth -
-          dimensions.annotatorToolDrawerWidth -
-          dimensions.stagePaddingX
-        }
+        width={stageWidth}
       >
         <Provider store={store}>
           <DndProvider backend={HTML5Backend}>
@@ -608,6 +609,20 @@ export const Stage = () => {
           </DndProvider>
         </Provider>
       </ReactKonva.Stage>
+      <Box
+        sx={{
+          width: stageWidth,
+          height: dimensions.stageInfoHeight,
+        }}
+      >
+        <Typography>
+          {currentPosition &&
+            `x: ${Math.max(Math.round(currentPosition.x), 0)} y: ${Math.max(
+              Math.round(currentPosition.y),
+              0
+            )}`}
+        </Typography>
+      </Box>
       {/* SoundEvents must be mounted following some user gesture
           else an "AudioContext was not allowed to start" warning
           will be issued by Chrome*/}
