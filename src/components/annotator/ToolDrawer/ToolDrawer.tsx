@@ -24,6 +24,7 @@ import {
   ColorSelectionIcon,
   EllipticalSelectionIcon,
   HandIcon,
+  Hand,
   LassoSelectionIcon,
   MagneticSelectionIcon,
   PenSelectionIcon,
@@ -37,50 +38,56 @@ import { CustomToolTip } from "../Tool/CustomToolTip";
 
 const toolMap: Record<
   string,
-  { operation: OperationType; icon: ReactElement }
+  { operation: OperationType; icon: (color: string) => ReactElement }
 > = {
-  Hand: { operation: OperationType.Hand, icon: <HandIcon /> },
-  Zoom: { operation: OperationType.Zoom, icon: <ZoomIcon /> },
+  Hand: {
+    operation: OperationType.Hand,
+    icon: (color) => <Hand color={color} />,
+  },
+  Zoom: { operation: OperationType.Zoom, icon: (color) => <ZoomIcon /> },
   "Color Adjustment": {
     operation: OperationType.ColorAdjustment,
-    icon: <ColorAdjustmentIcon />,
+    icon: (color) => <ColorAdjustmentIcon />,
   },
-  Pointer: { operation: OperationType.Pointer, icon: <SelectionIcon /> },
+  Pointer: {
+    operation: OperationType.Pointer,
+    icon: (color) => <SelectionIcon />,
+  },
   "Rectangular annotation": {
     operation: OperationType.RectangularAnnotation,
-    icon: <RectangularSelectionIcon />,
+    icon: (color) => <RectangularSelectionIcon />,
   },
   "Elliptical annotation": {
     operation: OperationType.EllipticalAnnotation,
-    icon: <EllipticalSelectionIcon />,
+    icon: (color) => <EllipticalSelectionIcon />,
   },
   "Polygonal annotation": {
     operation: OperationType.PolygonalAnnotation,
-    icon: <PolygonalSelectionIcon />,
+    icon: (color) => <PolygonalSelectionIcon />,
   },
   "Freehand annotation": {
     operation: OperationType.PenAnnotation,
-    icon: <PenSelectionIcon />,
+    icon: (color) => <PenSelectionIcon />,
   },
   "Lasso annotation (L)": {
     operation: OperationType.LassoAnnotation,
-    icon: <LassoSelectionIcon />,
+    icon: (color) => <LassoSelectionIcon />,
   },
   "Magnetic annotation": {
     operation: OperationType.MagneticAnnotation,
-    icon: <MagneticSelectionIcon />,
+    icon: (color) => <MagneticSelectionIcon />,
   },
   "Color annotation": {
     operation: OperationType.ColorAnnotation,
-    icon: <ColorSelectionIcon />,
+    icon: (color) => <ColorSelectionIcon />,
   },
   "Quick annotation": {
     operation: OperationType.QuickAnnotation,
-    icon: <QuickSelectionIcon />,
+    icon: (color) => <QuickSelectionIcon />,
   },
   "Threshold annotation": {
     operation: OperationType.ThresholdAnnotation,
-    icon: <RectangularSelectionIcon />,
+    icon: (color) => <RectangularSelectionIcon />,
   },
 };
 export const ToolDrawer = ({
@@ -127,11 +134,13 @@ export const ToolDrawer = ({
         <ListItem button onClick={toggleOptionsHandler}>
           <ListItemIcon sx={{ pt: "1rem" }}>
             <SvgIcon fontSize="small">
-              {!optionsVisibility ? (
-                <TuneIcon sx={{ color: theme.palette.grey[400] }} />
-              ) : (
-                <TuneIcon color="primary" />
-              )}
+              <TuneIcon
+                sx={{
+                  color: !optionsVisibility
+                    ? theme.palette.grey[400]
+                    : theme.palette.primary.dark,
+                }}
+              />
             </SvgIcon>
           </ListItemIcon>
         </ListItem>
@@ -152,7 +161,11 @@ export const ToolDrawer = ({
               }}
               selected={activeOperation === toolMap[name].operation}
             >
-              {toolMap[name].icon}
+              {toolMap[name].icon(
+                activeOperation === toolMap[name].operation
+                  ? theme.palette.primary.dark
+                  : theme.palette.grey[400]
+              )}
             </Tool>
             {[
               "Color Adjustment",
