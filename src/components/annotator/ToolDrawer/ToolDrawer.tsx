@@ -7,7 +7,6 @@ import {
   ListItem,
   ListItemIcon,
   SvgIcon,
-  Tooltip,
   useTheme,
 } from "@mui/material";
 import { Tune as TuneIcon } from "@mui/icons-material";
