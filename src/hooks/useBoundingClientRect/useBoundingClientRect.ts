@@ -9,6 +9,7 @@ import {
   setStageScale,
   setBoundingClientRect,
   setStageWidth,
+  setStageHeight,
 } from "store/annotator";
 
 export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
@@ -36,6 +37,7 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
     );
 
     dispatch(setStageWidth({ stageWidth: entry.contentRect.width }));
+    dispatch(setStageHeight({ stageHeight: entry.contentRect.height }));
   });
 
   useEffect(() => {
