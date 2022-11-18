@@ -9,7 +9,6 @@ type ToolProps = {
   children: React.ReactNode;
   name: string;
   onClick: () => void;
-  selected: boolean;
 };
 
 const toolTipMap: Record<string, { name: string; letter: string }> = {
@@ -28,7 +27,7 @@ const toolTipMap: Record<string, { name: string; letter: string }> = {
   "Color Adjustment": { name: "Color Adjustment", letter: "I" },
 };
 
-export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
+export const Tool = ({ children, name, onClick }: ToolProps) => {
   let toolName = name,
     HKLetter;
 
@@ -48,7 +47,7 @@ export const Tool = ({ children, name, onClick, selected }: ToolProps) => {
 
   return (
     <TooltipCard name={toolName} letter={HKLetter} description={description}>
-      <ListItem button onClick={onClick} selected={selected}>
+      <ListItem button onClick={onClick}>
         <ListItemIcon>
           <SvgIcon fontSize="small">{children}</SvgIcon>
         </ListItemIcon>

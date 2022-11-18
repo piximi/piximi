@@ -21,18 +21,29 @@ import { HotkeyView, ToolType as OperationType } from "types";
 
 import {
   ColorAdjustmentIcon,
+  ColorAdjustment,
   ColorSelectionIcon,
+  ColorAnnotation,
   EllipticalSelectionIcon,
+  EllipticalAnnotation,
   HandIcon,
   Hand,
   LassoSelectionIcon,
+  LassoAnnotation,
   MagneticSelectionIcon,
+  MagneticAnnotation,
   PenSelectionIcon,
+  FreehandAnnotation,
   PolygonalSelectionIcon,
+  PolygonAnnotation,
   QuickSelectionIcon,
+  QuickAnnotation,
   RectangularSelectionIcon,
+  RectangleAnnotation,
   SelectionIcon,
+  Selection,
   ZoomIcon,
+  Zoom,
 } from "icons";
 import { CustomToolTip } from "../Tool/CustomToolTip";
 
@@ -44,50 +55,53 @@ const toolMap: Record<
     operation: OperationType.Hand,
     icon: (color) => <Hand color={color} />,
   },
-  Zoom: { operation: OperationType.Zoom, icon: (color) => <ZoomIcon /> },
+  Zoom: {
+    operation: OperationType.Zoom,
+    icon: (color) => <Zoom color={color} />,
+  },
   "Color Adjustment": {
     operation: OperationType.ColorAdjustment,
-    icon: (color) => <ColorAdjustmentIcon />,
+    icon: (color) => <ColorAdjustment color={color} />,
   },
   Pointer: {
     operation: OperationType.Pointer,
-    icon: (color) => <SelectionIcon />,
+    icon: (color) => <Selection color={color} />,
   },
   "Rectangular annotation": {
     operation: OperationType.RectangularAnnotation,
-    icon: (color) => <RectangularSelectionIcon />,
+    icon: (color) => <RectangleAnnotation color={color} />,
   },
   "Elliptical annotation": {
     operation: OperationType.EllipticalAnnotation,
-    icon: (color) => <EllipticalSelectionIcon />,
+    icon: (color) => <EllipticalAnnotation color={color} />,
   },
   "Polygonal annotation": {
     operation: OperationType.PolygonalAnnotation,
-    icon: (color) => <PolygonalSelectionIcon />,
+    icon: (color) => <PolygonAnnotation color={color} />,
   },
   "Freehand annotation": {
     operation: OperationType.PenAnnotation,
-    icon: (color) => <PenSelectionIcon />,
+    icon: (color) => <FreehandAnnotation color={color} />,
   },
   "Lasso annotation (L)": {
     operation: OperationType.LassoAnnotation,
-    icon: (color) => <LassoSelectionIcon />,
+    icon: (color) => <LassoAnnotation color={color} />,
   },
   "Magnetic annotation": {
     operation: OperationType.MagneticAnnotation,
-    icon: (color) => <MagneticSelectionIcon />,
+    icon: (color) => <MagneticAnnotation color={color} />,
   },
   "Color annotation": {
     operation: OperationType.ColorAnnotation,
-    icon: (color) => <ColorSelectionIcon />,
+    icon: (color) => <ColorAnnotation color={color} />,
   },
   "Quick annotation": {
     operation: OperationType.QuickAnnotation,
-    icon: (color) => <QuickSelectionIcon />,
+    icon: (color) => <QuickAnnotation color={color} />,
   },
   "Threshold annotation": {
     operation: OperationType.ThresholdAnnotation,
-    icon: (color) => <RectangularSelectionIcon />,
+    icon: (color) => <RectangleAnnotation color={color} />,
   },
 };
 export const ToolDrawer = ({
@@ -159,7 +173,6 @@ export const ToolDrawer = ({
                   })
                 );
               }}
-              selected={activeOperation === toolMap[name].operation}
             >
               {toolMap[name].icon(
                 activeOperation === toolMap[name].operation

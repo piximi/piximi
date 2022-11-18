@@ -412,7 +412,6 @@ export const Stage = () => {
         onPointerMouseMove(relative);
       } else {
         if (!annotationTool) return;
-        console.log(absolute);
         annotationTool.onMouseMove(absolute);
       }
     };
