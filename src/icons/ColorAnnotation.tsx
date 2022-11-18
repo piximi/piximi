@@ -1,6 +1,6 @@
 import React from "react";
 
-const ColorAnnotation = ({ color }: { color: string }) => {
+export const ColorAnnotation = ({ color }: { color: string }) => {
   return (
     <svg
       width="24px"
@@ -56,5 +56,3 @@ const ColorAnnotation = ({ color }: { color: string }) => {
     </svg>
   );
 };
-
-export default ColorAnnotation;
