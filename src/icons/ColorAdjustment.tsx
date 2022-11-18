@@ -1,6 +1,6 @@
 import React from "react";
 
-const ColorAdjustment = ({ color }: { color: string }) => {
+export const ColorAdjustment = ({ color }: { color: string }) => {
   return (
     <svg
       width="24px"
@@ -45,5 +45,3 @@ const ColorAdjustment = ({ color }: { color: string }) => {
     </svg>
   );
 };
-
-export default ColorAdjustment;

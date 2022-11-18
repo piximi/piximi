@@ -1,6 +1,6 @@
 import React from "react";
 
-export const EllipticalAnnotation = ({ color }: { color: string }) => {
+export const RectangleAnnotation = ({ color }: { color: string }) => {
   return (
     <svg
       width="24px"
@@ -9,9 +9,9 @@ export const EllipticalAnnotation = ({ color }: { color: string }) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>Elliptical selection</title>
+      <title>Rectangular selection</title>
       <g
-        id="Elliptical-selection"
+        id="Rectangular-selection"
         stroke="none"
         stroke-width="1"
         fill="none"
@@ -19,7 +19,7 @@ export const EllipticalAnnotation = ({ color }: { color: string }) => {
       >
         <g id="Group" transform="translate(-0.000000, -0.000000)">
           <path
-            d="M18.3640001,5.63604002 C21.8787201,9.15076004 21.8787201,14.8492401 18.3640001,18.3639401 C14.8492801,21.8786601 9.15080004,21.8786601 5.63610002,18.3639401 C2.12138001,14.8492201 2.12138001,9.15074004 5.63610002,5.63604002 C9.15082004,2.12132001 14.8493001,2.12132001 18.3640001,5.63604002"
+            d="M18.4170001,20.25 L5.58300002,20.25 C4.57000002,20.25 3.75000002,19.4290001 3.75000002,18.4170001 L3.75000002,5.58300002 C3.75000002,4.57000002 4.57100002,3.75000002 5.58300002,3.75000002 L18.4160001,3.75000002 C19.4290001,3.75000002 20.249001,4.57100002 20.249001,5.58300002 L20.249001,18.4160001 C20.25,19.4290001 19.4290001,20.25 18.4170001,20.25 Z"
             id="Path"
             stroke={color}
             stroke-width="1.5"
