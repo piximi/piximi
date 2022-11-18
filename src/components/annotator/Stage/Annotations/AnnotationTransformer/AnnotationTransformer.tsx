@@ -223,11 +223,16 @@ export const AnnotationTransformer = ({
         workingAnnotation.boundingBox[0],
         workingAnnotation.boundingBox[2]
       ) * stageScale;
+
     posY =
       Math.max(
         workingAnnotation.boundingBox[1],
         workingAnnotation.boundingBox[3]
       ) * stageScale;
+    posY =
+      posY + 56 > imageHeight! * stageScale
+        ? imageHeight! * stageScale - 65
+        : posY;
   }
 
   useEffect(() => {
@@ -291,6 +296,7 @@ export const AnnotationTransformer = ({
                     padding={6}
                     text={transformed ? "Confirm" : "Delete"}
                     width={65}
+                    height={26}
                     align={"center"}
                   />
                 </ReactKonva.Label>
@@ -319,6 +325,7 @@ export const AnnotationTransformer = ({
                     padding={6}
                     text={"Cancel"}
                     width={65}
+                    height={26}
                     align={"center"}
                   />
                 </ReactKonva.Label>
