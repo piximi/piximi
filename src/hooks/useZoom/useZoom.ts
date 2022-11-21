@@ -9,10 +9,13 @@ import {
   setOffset,
   setStageScale,
   setZoomSelection,
+  offsetSelector,
 } from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
-import { ToolType, ZoomModeType } from "types";
+import { HotkeyView, ToolType, ZoomModeType } from "types";
+import { useHotkeys } from "hooks";
+import { useState } from "react";
 
 export const useZoom = () => {
   const delta = 10;
@@ -26,6 +29,27 @@ export const useZoom = () => {
   const zoomSelection = useSelector(zoomSelectionSelector);
 
   const imageWidth = useSelector(scaledImageWidthSelector);
+  const offset = useSelector(offsetSelector);
+  const [cmd, setCmd] = useState<boolean>(false);
+
+  useHotkeys(
+    "command",
+    () => {
+      setCmd(true);
+      console.log(cmd);
+    },
+    HotkeyView.Annotator,
+    { keydown: true, keyup: false },
+    [cmd]
+  );
+  useHotkeys(
+    "command",
+    () => {
+      setCmd(false);
+    },
+    HotkeyView.Annotator,
+    { keydown: false, keyup: true }
+  );
 
   const zoomAndOffset = (
     position: { x: number; y: number } | undefined,
@@ -143,16 +167,27 @@ export const useZoom = () => {
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
-    event.cancelBubble = true;
     event.evt.preventDefault();
     if (toolType !== ToolType.Zoom) return;
-
     if (!imageWidth) return;
-    zoomAndOffset(
-      { x: imageWidth / 2, y: imageWidth / 2 },
-      1.01,
-      event.evt.deltaY < 0
+    const position = { x: imageWidth / 2, y: imageWidth / 2 };
+    console.log(cmd);
+
+    dispatch(
+      setOffset({
+        offset: {
+          x: offset.x + event.evt.deltaX,
+          y: offset.y + event.evt.deltaY,
+        },
+      })
     );
+
+    // if (!imageWidth) return;
+    // zoomAndOffset(
+    //   { x: imageWidth / 2, y: imageWidth / 2 },
+    //   1.01,
+    //   event.evt.deltaY < 0
+    // );
   };
 
   return {

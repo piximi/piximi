@@ -22,7 +22,7 @@ import { Selection } from "./Selection";
 import { Layer } from "./Layer";
 import { ZoomSelection } from "./Selection/ZoomSelection";
 import { PenAnnotationToolTip } from "./PenAnnotationToolTip/PenAnnotationToolTip";
-import { Annotations } from "./Annotations/Annotations";
+import { Annotations } from "./Annotations";
 import { PointerSelection } from "./Selection/PointerSelection";
 import { SoundEvents } from "./sound-events";
 
