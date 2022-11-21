@@ -1,10 +1,17 @@
 import { HandlerItem } from "types";
-import { getMods, getKeys, compareArray } from "./hotkeyUtils";
-import { _keyMap, _modifier, modifierMap, _mods, _handlers } from "./hotkeyVar";
+import {
+  getMods,
+  getKeys,
+  compareArray,
+  _keyMap,
+  _modifier,
+  modifierMap,
+  _mods,
+  _handlers,
+} from "./hotkeyUtils";
 
 let _downKeys: number[] = []; // record the binding key pressed
 let winListendFocus = false; // Whether the window has listened to the focus event
-let _scope = "all"; // Default hotkey range
 const elementHasBindEvent: Document[] = []; // Node records for bound events
 
 // return key code
@@ -13,14 +20,6 @@ const code = (x: string) =>
   _modifier[x.toLowerCase()] ||
   x.toUpperCase().charCodeAt(0);
 
-//Set to get the current scope (defaults to 'all')
-function setScope(scope: string) {
-  _scope = scope || "all";
-}
-// get current scope
-function getScope() {
-  return _scope || "all";
-}
 // Get the key value of the bound key pressed
 function getPressedKeyCodes() {
   return _downKeys.slice(0);
@@ -32,28 +31,6 @@ function isPressed(keyCode: string | number) {
     keyCode = code(keyCode); // Convert to keycode
   }
   return _downKeys.indexOf(keyCode) !== -1;
-}
-
-// Loop through all scopes in handlers
-function deleteScope(scope: string, newScope: string) {
-  let handlers;
-  let i;
-
-  // No scope is specified, get scope
-  if (!scope) scope = getScope();
-
-  for (const key in _handlers) {
-    if (Object.prototype.hasOwnProperty.call(_handlers, key)) {
-      handlers = _handlers[key];
-      for (i = 0; i < handlers.length; ) {
-        if (handlers[i].scope === scope) handlers.splice(i, 1);
-        else i++;
-      }
-    }
-  }
-
-  // If the scope is removed, reset the scope to all
-  if (getScope() === scope) setScope(newScope || "all");
 }
 
 // Clear modifier keys
@@ -128,7 +105,7 @@ const eachUnbind = ({
     const keyCode = lastKey === "*" ? "*" : code(lastKey);
     if (!_handlers[keyCode]) return;
     // Determine whether the range is passed in, if not, get the range
-    if (!scope) scope = getScope();
+    scope = "all";
     const mods = len > 1 ? getMods(_modifier, unbindKeys) : [];
     _handlers[keyCode] = _handlers[keyCode].filter((record) => {
       // Judging by the function, whether to unbind, the function is equal and returns directly
@@ -190,7 +167,7 @@ function eventHandler(
 function dispatch(event: any, element: Document) {
   const asterisk = _handlers["*"];
   let key = event.keyCode || event.which || event.charCode;
-
+  console.log(key);
   // The command key value of Gecko (Firefox) is 224, which is consistent in Webkit (Chrome)
   // The left and right command keys of Webkit are different
   if (key === 93 || key === 224) key = 91;
@@ -236,12 +213,10 @@ function dispatch(event: any, element: Document) {
 
   if (key in _mods) {
     _mods[key] = true;
-
     // Register keys with special characters to hotkeys
     for (const k in _modifier) {
       if (_modifier[k] === key) setModifier(k, true);
     }
-
     if (!asterisk) return;
   }
 
@@ -275,7 +250,7 @@ function dispatch(event: any, element: Document) {
   }
 
   // get scope defaults to `all`
-  const scope = getScope();
+  const scope = "all";
   // What to do with any shortcut keys
   if (asterisk) {
     for (let i = 0; i < asterisk.length; i++) {
@@ -301,8 +276,8 @@ function dispatch(event: any, element: Document) {
         const { splitKey } = record;
         const keyShortcut = record.key.split(splitKey);
         const _downKeysCurrent = []; // record the current key value
-        for (let a = 0; a < keyShortcut.length; a++) {
-          _downKeysCurrent.push(code(keyShortcut[a]));
+        for (let j = 0; j < keyShortcut.length; j++) {
+          _downKeysCurrent.push(code(keyShortcut[j]));
         }
         if (_downKeysCurrent.sort().join("") === _downKeys.sort().join("")) {
           // find processing content
@@ -439,9 +414,7 @@ function setModifier(modifier: string, value: boolean) {
       return;
   }
 }
-hotkeys.setScope = setScope;
-hotkeys.getScope = getScope;
-hotkeys.deleteScope = deleteScope;
+
 hotkeys.getPressedKeyCodes = getPressedKeyCodes;
 hotkeys.isPressed = isPressed;
 hotkeys.trigger = trigger;
