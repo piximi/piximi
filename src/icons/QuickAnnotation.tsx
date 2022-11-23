@@ -13,18 +13,18 @@ export const QuickAnnotation = ({ color }: { color: string }) => {
       <g
         id="Quick-selection"
         stroke="none"
-        stroke-width="1"
+        strokeWidth="1"
         fill="none"
-        fill-rule="evenodd"
+        fillRule="evenodd"
       >
         <g id="Group" transform="translate(-0.000000, -0.000000)">
           <g
             transform="translate(3.000000, 3.000000)"
             id="Path"
             stroke={color}
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
           >
             <polyline points="2.54200002 13.2190001 0.225000013 15.5370001 1.58200002 17.1480001 4.22900003 17.1480001 5.36900003 16.0500001"></polyline>
             <path d="M8.00300005,14.8300001 L7.29600004,15.5370001 C6.51500004,16.3180001 5.24900003,16.3180001 4.46800003,15.5370001 L3.05400003,14.1230001 C2.27300002,13.3420001 2.27300002,12.0760001 3.05400003,11.2950001 L3.76100003,10.5880001"></path>

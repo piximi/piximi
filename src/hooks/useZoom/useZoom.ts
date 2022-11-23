@@ -10,19 +10,22 @@ import {
   setStageScale,
   setZoomSelection,
   offsetSelector,
+  stagePositionSelector,
+  setStagePosition,
 } from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { HotkeyView, ToolType, ZoomModeType } from "types";
 import { useHotkeys } from "hooks";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Stage } from "konva/lib/Stage";
 
-export const useZoom = () => {
+export const useZoom = (stageRef: React.RefObject<Stage>) => {
   const delta = 10;
   const scaleBy = 1.1;
 
   const dispatch = useDispatch();
-
+  const [draggable, setDraggable] = useState<boolean>(false);
   const stageScale = useSelector(stageScaleSelector);
   const toolType = useSelector(toolTypeSelector);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
@@ -30,22 +33,23 @@ export const useZoom = () => {
 
   const imageWidth = useSelector(scaledImageWidthSelector);
   const offset = useSelector(offsetSelector);
-  const [cmd, setCmd] = useState<boolean>(false);
+  const [altControls, setAltControls] = useState<boolean>(false);
+  const stagePosition = useSelector(stagePositionSelector);
 
   useHotkeys(
-    "command",
+    "space",
     () => {
-      setCmd(true);
-      console.log(cmd);
+      setAltControls(true);
+      console.log(altControls);
     },
     HotkeyView.Annotator,
     { keydown: true, keyup: false },
-    [cmd]
+    [altControls]
   );
   useHotkeys(
-    "command",
+    "space",
     () => {
-      setCmd(false);
+      setAltControls(false);
     },
     HotkeyView.Annotator,
     { keydown: false, keyup: true }
@@ -62,16 +66,25 @@ export const useZoom = () => {
     } else if (newScale > 12.5) {
       newScale = 12.5;
     }
+    const abs = { x: position!.x / stageScale, y: position!.y / stageScale };
+    const newPos = { x: abs.x * scaleBy, y: abs.y * scaleBy };
+    console.log("newPos: ", newPos);
     if (!automaticCentering || zoomSelection.dragging) {
       if (!position) return;
-      dispatch(
-        setOffset({
-          offset: {
-            x: zoomIn ? position.x * scaleBy : position.x / scaleBy,
-            y: zoomIn ? position.y * scaleBy : position.y / scaleBy,
-          },
-        })
-      );
+      //console.log("abs: ", abs);
+      //console.log("relative: ", position);
+
+      //const diff = { x: abs.x - newPos.x, y: abs.y - newPos.y };
+
+      //stageRef.current!.position(diff);
+      // dispatch(
+      //   setOffset({
+      //     offset: {
+      //       x: zoomIn ? position.x * scaleBy : position.x / scaleBy,
+      //       y: zoomIn ? position.y * scaleBy : position.y / scaleBy,
+      //     },
+      //   })
+      // );
     }
 
     dispatch(
@@ -95,7 +108,7 @@ export const useZoom = () => {
   };
 
   const onMouseDown = (position: { x: number; y: number }) => {
-    if (toolType !== ToolType.Zoom) return;
+    if (toolType !== ToolType.Zoom || altControls) return;
 
     dispatch(
       setZoomSelection({
@@ -110,11 +123,14 @@ export const useZoom = () => {
   };
 
   const onMouseMove = (position: { x: number; y: number }) => {
-    if (mode === ZoomModeType.Out) return;
-
-    if (!zoomSelection.selecting) return;
-
-    if (!position || !zoomSelection.minimum) return;
+    if (
+      mode === ZoomModeType.Out ||
+      !zoomSelection.selecting ||
+      !position ||
+      !zoomSelection.minimum ||
+      altControls
+    )
+      return;
 
     dispatch(
       setZoomSelection({
@@ -128,10 +144,7 @@ export const useZoom = () => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    if (!imageWidth) return;
-
-    if (!zoomSelection.selecting) return;
-
+    if (!imageWidth || !zoomSelection.selecting || altControls) return;
     if (zoomSelection.dragging) {
       if (!position) return;
 
@@ -168,27 +181,27 @@ export const useZoom = () => {
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
     event.evt.preventDefault();
-    if (toolType !== ToolType.Zoom) return;
-    if (!imageWidth) return;
-    const position = { x: imageWidth / 2, y: imageWidth / 2 };
-    console.log(cmd);
-
-    dispatch(
-      setOffset({
-        offset: {
-          x: offset.x + event.evt.deltaX,
-          y: offset.y + event.evt.deltaY,
-        },
-      })
-    );
-
-    // if (!imageWidth) return;
-    // zoomAndOffset(
-    //   { x: imageWidth / 2, y: imageWidth / 2 },
-    //   1.01,
-    //   event.evt.deltaY < 0
-    // );
+    if (toolType !== ToolType.Zoom || !imageWidth) return;
+    if (!altControls) {
+      dispatch(
+        setStagePosition({
+          stagePosition: {
+            x: stagePosition.x - event.evt.deltaX,
+            y: stagePosition.y - event.evt.deltaY,
+          },
+        })
+      );
+    } else {
+      zoomAndOffset(
+        { x: imageWidth / 2, y: imageWidth / 2 },
+        1.01,
+        event.evt.deltaY < 0
+      );
+    }
   };
+  useEffect(() => {
+    setDraggable(altControls);
+  }, [altControls]);
 
   return {
     deselect,
@@ -196,5 +209,6 @@ export const useZoom = () => {
     onMouseMove,
     onMouseUp,
     onWheel,
+    draggable,
   };
 };

@@ -132,7 +132,6 @@ const _mods: Record<number, boolean> = {
 type HandlerItem = {
   keyup: boolean;
   keydown: boolean;
-  scope: string;
   mods: number[];
   shortcut: string;
   method: Function;
@@ -141,6 +140,11 @@ type HandlerItem = {
   element: Document;
 };
 const _handlers: Record<string | number, HandlerItem[]> = {};
+
+const getCode = (x: string) =>
+  _keyMap[x.toLowerCase()] ||
+  _modifier[x.toLowerCase()] ||
+  x.toUpperCase().charCodeAt(0);
 
 // F1~F12 special key
 for (let k = 1; k < 20; k++) {
@@ -157,4 +161,5 @@ export {
   getMods,
   getKeys,
   compareArray,
+  getCode,
 };

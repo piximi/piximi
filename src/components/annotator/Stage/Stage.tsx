@@ -11,7 +11,6 @@ import {
   useAnnotatorKeyboardShortcuts,
   useAnnotationTool,
   useCursor,
-  useHandTool,
   usePointer,
   useWindowFocusHandler,
   useZoom,
@@ -118,7 +117,8 @@ export const Stage = () => {
     onMouseMove: onZoomMouseMove,
     onMouseDown: onZoomMouseDown,
     onWheel: onZoomWheel,
-  } = useZoom();
+    draggable,
+  } = useZoom(stageRef);
   const {
     onMouseDown: onPointerMouseDown,
     onMouseMove: onPointerMouseMove,
@@ -126,7 +126,6 @@ export const Stage = () => {
   } = usePointer();
 
   const [annotationTool] = useAnnotationTool();
-  const { draggable } = useHandTool();
   useCursor();
   useWindowFocusHandler();
 
@@ -139,7 +138,7 @@ export const Stage = () => {
    * @returns {Point}  position of cursor in relation to stage
    */
   const getRelativePointerPosition = useCallback(
-    (position: { x: number; y: number }): Point | undefined => {
+    (position: Point): Point | undefined => {
       if (!imageRef || !imageRef.current) return;
 
       const transform = imageRef.current.getAbsoluteTransform().copy();
@@ -150,6 +149,55 @@ export const Stage = () => {
     },
     [imageRef]
   );
+
+  const setCurrentMousePosition = useCallback(() => {
+    if (!stageRef.current) return;
+    const position = stageRef.current.getPointerPosition();
+
+    if (!position) return;
+
+    const relative = getRelativePointerPosition(position);
+
+    const image = annotationTool.image;
+    if (!relative || !scaledImageWidth || !scaledImageHeight) return;
+    setCurrentPosition(relative);
+    const absolute = {
+      x: Math.round(relative.x / stageScale),
+      y: Math.round(relative.y / stageScale),
+    };
+
+    // Add a little leeway around the canvas to aid drawing up to the edges
+    if (
+      absolute.x < 0 ||
+      absolute.x > image.width ||
+      absolute.y < 0 ||
+      absolute.y > image.height
+    ) {
+      setOutOfBounds(true);
+      absolute.x =
+        absolute.x < 0
+          ? 0
+          : absolute.x > image.width
+          ? image.width
+          : absolute.x;
+      absolute.y =
+        absolute.y < 0
+          ? 0
+          : absolute.y > image.height
+          ? image.height
+          : absolute.y;
+    } else {
+      setOutOfBounds(false);
+    }
+
+    setAbsolutePosition(absolute);
+  }, [
+    annotationTool?.image,
+    getRelativePointerPosition,
+    scaledImageHeight,
+    scaledImageWidth,
+    stageScale,
+  ]);
 
   const detachTransformer = (transformerId: string) => {
     if (!stageRef || !stageRef.current) return;
@@ -364,55 +412,16 @@ export const Stage = () => {
         console.log(event);
 
       if (!stageRef || !stageRef.current || !annotationTool) return;
-
-      const position = stageRef.current.getPointerPosition();
-
-      if (!position) return;
-
-      const relative = getRelativePointerPosition(position);
-
-      const image = annotationTool.image;
-      if (!relative || !scaledImageWidth || !scaledImageHeight) return;
-      setCurrentPosition(relative);
-      const absolute = {
-        x: Math.round(relative.x / stageScale),
-        y: Math.round(relative.y / stageScale),
-      };
-
-      // Add a little leeway around the canvas to aid drawing up to the edges
-      if (
-        absolute.x < 0 ||
-        absolute.x > image.width ||
-        absolute.y < 0 ||
-        absolute.y > image.height
-      ) {
-        setOutOfBounds(true);
-        absolute.x =
-          absolute.x < 0
-            ? 0
-            : absolute.x > image.width
-            ? image.width
-            : absolute.x;
-        absolute.y =
-          absolute.y < 0
-            ? 0
-            : absolute.y > image.height
-            ? image.height
-            : absolute.y;
-      } else {
-        setOutOfBounds(false);
-      }
-
-      setAbsolutePosition(absolute);
+      setCurrentMousePosition();
       if (toolType === ToolType.ColorAdjustment) return;
 
       if (toolType === ToolType.Zoom) {
-        onZoomMouseMove(relative);
+        onZoomMouseMove(currentPosition!);
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseMove(relative);
+        onPointerMouseMove(currentPosition!);
       } else {
         if (!annotationTool) return;
-        annotationTool.onMouseMove(absolute);
+        annotationTool.onMouseMove(absolutePosition!);
       }
     };
     const throttled = throttle(func, 5);
@@ -424,10 +433,9 @@ export const Stage = () => {
     toolType,
     onPointerMouseMove,
     onZoomMouseMove,
-    scaledImageHeight,
-    scaledImageWidth,
-    stageScale,
-    getRelativePointerPosition,
+    setCurrentMousePosition,
+    currentPosition,
+    absolutePosition,
   ]);
 
   const onMouseUp = useMemo(() => {
@@ -441,6 +449,7 @@ export const Stage = () => {
       if (!currentPosition || !absolutePosition) return;
       if (toolType === ToolType.Zoom) {
         onZoomMouseUp(currentPosition);
+        setCurrentMousePosition();
       } else if (toolType === ToolType.Pointer) {
         onPointerMouseUp(currentPosition);
       } else {
@@ -466,7 +475,12 @@ export const Stage = () => {
     onZoomMouseUp,
     absolutePosition,
     currentPosition,
+    setCurrentMousePosition,
   ]);
+
+  useEffect(() => {
+    console.log(currentPosition);
+  }, [currentPosition]);
 
   // useEffect
   /*/

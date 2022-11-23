@@ -13,18 +13,18 @@ export const ObjectAnnotation = ({ color }: { color: string }) => {
       <g
         id="Object-selection"
         stroke="none"
-        stroke-width="1"
+        strokeWidth="1"
         fill="none"
-        fill-rule="evenodd"
+        fillRule="evenodd"
       >
         <g id="Group" transform="translate(-0.000000, -0.000000)">
           <g
             transform="translate(2.000000, 3.000000)"
             id="Path"
             stroke={color}
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
           >
             <path d="M16.1970001,12.9320001 L16.1970001,12.9320001 L18.1730001,14.9080001 C18.6090001,15.3440001 18.6090001,16.0520001 18.1730001,16.4880001 L16.9870001,17.6740001 C16.5510001,18.1100001 15.8430001,18.1100001 15.4070001,17.6740001 L13.4310001,15.6980001 L11.9420001,17.1870001 C11.6480001,17.4810001 11.1480001,17.3630001 11.0170001,16.9690001 L8.14500004,8.35200005 C7.99900004,7.91500005 8.41500004,7.50000004 8.85200005,7.64500004 L17.4690001,10.5170001 C17.8630001,10.6480001 17.9810001,11.1480001 17.6870001,11.4420001 L16.1970001,12.9320001"></path>
             <line
