@@ -20,29 +20,17 @@ import { AnnotatorSlice, toolTypeSelector } from "store/annotator";
 import { HotkeyView, ToolType as OperationType } from "types";
 
 import {
-  ColorAdjustmentIcon,
   ColorAdjustment,
-  ColorSelectionIcon,
   ColorAnnotation,
-  EllipticalSelectionIcon,
   EllipticalAnnotation,
-  HandIcon,
   Hand,
-  LassoSelectionIcon,
   LassoAnnotation,
-  MagneticSelectionIcon,
   MagneticAnnotation,
-  PenSelectionIcon,
   FreehandAnnotation,
-  PolygonalSelectionIcon,
   PolygonAnnotation,
-  QuickSelectionIcon,
   QuickAnnotation,
-  RectangularSelectionIcon,
   RectangleAnnotation,
-  SelectionIcon,
   Selection,
-  ZoomIcon,
   Zoom,
 } from "icons";
 import { CustomToolTip } from "../Tool/CustomToolTip";

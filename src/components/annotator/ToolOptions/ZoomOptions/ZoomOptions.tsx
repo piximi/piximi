@@ -71,16 +71,8 @@ export const ZoomOptions = () => {
     };
 
     const centerOffset = {
-      x:
-        offset.x !== 0
-          ? 0
-          : ((image && image.shape ? image.shape.width : 512) * scale) / 2 -
-            offset.x,
-      y:
-        offset.y !== 0
-          ? 0
-          : ((image && image.shape ? image.shape.height : 512) * scale) / 2 -
-            offset.y,
+      x: 0,
+      y: 0,
     };
 
     batch(() => {
