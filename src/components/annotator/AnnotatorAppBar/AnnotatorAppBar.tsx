@@ -22,7 +22,6 @@ export const AnnotatorAppBar = () => {
     onOpen: onOpenExitAnnotatorDialog,
     open: openExitAnnotatorDialog,
   } = useDialog();
-
   const navigate = useNavigate();
 
   const onReturnToMainProject = () => {
