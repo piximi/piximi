@@ -13,15 +13,15 @@ export const MagneticAnnotation = ({ color }: { color: string }) => {
       <g
         id="Magnetic-selection"
         stroke="none"
-        stroke-width="1"
+        strokeWidth="1"
         fill="none"
-        fill-rule="evenodd"
+        fillRule="evenodd"
       >
         <g
           id="Group"
           transform="translate(2.995000, 2.995000)"
           stroke={color}
-          stroke-width="1.5"
+          strokeWidth="1.5"
         >
           <line
             x1="15.1525604"

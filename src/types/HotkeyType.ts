@@ -15,7 +15,6 @@ export interface KeyHandler {
 export type HandlerItem = {
   keyup: boolean;
   keydown: boolean;
-  scope: string;
   mods: number[];
   shortcut: string;
   method: Function;
