@@ -1,1 +1,0 @@
-export { ZoomTool } from "./ZoomTool";

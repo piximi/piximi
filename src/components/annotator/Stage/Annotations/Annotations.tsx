@@ -20,10 +20,12 @@ type AnnotationsProps = {
     y: number;
   }) => { x: number; y: number } | undefined;
   annotationTool: AnnotationTool;
+  stageScale: number;
 };
 export const Annotations = ({
   transformPosition,
   annotationTool,
+  stageScale,
 }: AnnotationsProps) => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const annotationObjects = useSelector(annotationObjectsSelector);
@@ -45,6 +47,7 @@ export const Annotations = ({
               transformPosition={transformPosition}
               annotationId={annotationObject.annotation.id}
               annotationTool={annotationTool}
+              stageScale={stageScale}
             />
           )}
         </React.Fragment>
