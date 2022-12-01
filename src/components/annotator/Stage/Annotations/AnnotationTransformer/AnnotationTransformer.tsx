@@ -47,12 +47,14 @@ type AnnotationTransformerProps = {
   }) => { x: number; y: number } | undefined;
   annotationId: string;
   annotationTool?: AnnotationTool;
+  stageScale: number;
 };
 
 export const AnnotationTransformer = ({
   transformPosition,
   annotationId,
   annotationTool,
+  stageScale,
 }: AnnotationTransformerProps) => {
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
@@ -60,7 +62,7 @@ export const AnnotationTransformer = ({
   const workingAnnotation = useSelector(workingAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);
-  const stageScale = useSelector(stageScaleSelector);
+  //const stageScale = useSelector(stageScaleSelector);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
@@ -182,6 +184,7 @@ export const AnnotationTransformer = ({
   };
 
   const confirmAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
+    console.log("transformer");
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
@@ -262,11 +265,16 @@ export const AnnotationTransformer = ({
           selectedAnnotations.length === 1 &&
           !transforming && (
             <>
-              <ReactKonva.Group>
+              <ReactKonva.Group
+                id={"label-group"}
+                position={{ x: posX, y: posY }}
+                scaleX={1}
+                scaleY={1}
+              >
                 <ReactKonva.Label
                   position={{
-                    x: posX - 58,
-                    y: posY + 6,
+                    x: -58,
+                    y: 6,
                   }}
                   onClick={
                     transformed
@@ -298,12 +306,13 @@ export const AnnotationTransformer = ({
                     width={65}
                     height={26}
                     align={"center"}
+                    name={"transformer-button"}
                   />
                 </ReactKonva.Label>
                 <ReactKonva.Label
                   position={{
-                    x: posX - 58,
-                    y: posY + 35,
+                    x: -58,
+                    y: 35,
                   }}
                   onClick={cancelAnnotationHandler}
                   onTap={cancelAnnotationHandler}
@@ -327,6 +336,7 @@ export const AnnotationTransformer = ({
                     width={65}
                     height={26}
                     align={"center"}
+                    name={"transformer-button"}
                   />
                 </ReactKonva.Label>
               </ReactKonva.Group>
