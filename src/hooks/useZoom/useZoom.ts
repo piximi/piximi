@@ -7,16 +7,12 @@ import {
   zoomSelectionSelector,
   scaledImageWidthSelector,
   setOffset,
-  setStageScale,
   setZoomSelection,
-  offsetSelector,
-  stagePositionSelector,
-  setStagePosition,
+  scaledImageHeightSelector,
 } from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
-import { HotkeyView, ToolType, ZoomModeType } from "types";
-import { useHotkeys } from "hooks";
+import { ToolType, ZoomModeType } from "types";
 import React, { useEffect, useState } from "react";
 import { Stage } from "konva/lib/Stage";
 
@@ -25,35 +21,13 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
   const scaleBy = 1.1;
 
   const dispatch = useDispatch();
-  const [draggable, setDraggable] = useState<boolean>(false);
   const stageScale = useSelector(stageScaleSelector);
   const toolType = useSelector(toolTypeSelector);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
-
+  const imageHeight = useSelector(scaledImageHeightSelector);
   const imageWidth = useSelector(scaledImageWidthSelector);
-  const offset = useSelector(offsetSelector);
-  const [altControls, setAltControls] = useState<boolean>(false);
-  const stagePosition = useSelector(stagePositionSelector);
-
-  useHotkeys(
-    "space",
-    () => {
-      setAltControls(true);
-      console.log(altControls);
-    },
-    HotkeyView.Annotator,
-    { keydown: true, keyup: false },
-    [altControls]
-  );
-  useHotkeys(
-    "space",
-    () => {
-      setAltControls(false);
-    },
-    HotkeyView.Annotator,
-    { keydown: false, keyup: true }
-  );
+  const [draggable, setDraggable] = useState<boolean>(false);
 
   const zoomAndOffset = (
     position: { x: number; y: number } | undefined,
@@ -66,32 +40,26 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
     } else if (newScale > 12.5) {
       newScale = 12.5;
     }
-    const abs = { x: position!.x / stageScale, y: position!.y / stageScale };
-    const newPos = { x: abs.x * scaleBy, y: abs.y * scaleBy };
-    console.log("newPos: ", newPos);
     if (!automaticCentering || zoomSelection.dragging) {
-      if (!position) return;
-      //console.log("abs: ", abs);
-      //console.log("relative: ", position);
+      if (!position || !imageHeight || !imageWidth) return;
 
-      //const diff = { x: abs.x - newPos.x, y: abs.y - newPos.y };
-
-      //stageRef.current!.position(diff);
-      // dispatch(
-      //   setOffset({
-      //     offset: {
-      //       x: zoomIn ? position.x * scaleBy : position.x / scaleBy,
-      //       y: zoomIn ? position.y * scaleBy : position.y / scaleBy,
-      //     },
-      //   })
-      // );
+      const scaledWidth = zoomIn ? imageWidth * scaleBy : imageWidth / scaleBy;
+      const scaledHeight = zoomIn
+        ? imageHeight * scaleBy
+        : imageHeight / scaleBy;
+      const growX = (scaledWidth - imageWidth) / 2;
+      const growY = (scaledHeight - imageHeight) / 2;
+      const rateX = growX / (scaledWidth / 2);
+      const rateY = growY / (scaledHeight / 2);
+      dispatch(
+        setOffset({
+          offset: {
+            x: rateX * position.x,
+            y: rateY * position.y,
+          },
+        })
+      );
     }
-
-    dispatch(
-      setStageScale({
-        stageScale: newScale,
-      })
-    );
   };
 
   const deselect = () => {
@@ -108,7 +76,7 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
   };
 
   const onMouseDown = (position: { x: number; y: number }) => {
-    if (toolType !== ToolType.Zoom || altControls) return;
+    if (toolType !== ToolType.Zoom || draggable) return;
 
     dispatch(
       setZoomSelection({
@@ -128,7 +96,7 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
       !zoomSelection.selecting ||
       !position ||
       !zoomSelection.minimum ||
-      altControls
+      draggable
     )
       return;
 
@@ -144,7 +112,7 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    if (!imageWidth || !zoomSelection.selecting || altControls) return;
+    if (!imageWidth || !zoomSelection.selecting || draggable) return;
     if (zoomSelection.dragging) {
       if (!position) return;
 
@@ -176,32 +144,66 @@ export const useZoom = (stageRef: React.RefObject<Stage>) => {
     );
   };
 
-  const onWheel = (event: KonvaEventObject<WheelEvent>) => {
+  const onWheel = (
+    event: KonvaEventObject<WheelEvent>,
+    position?: { x: number; y: number }
+  ) => {
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
     event.evt.preventDefault();
-    if (toolType !== ToolType.Zoom || !imageWidth) return;
-    if (!altControls) {
-      dispatch(
-        setStagePosition({
-          stagePosition: {
-            x: stagePosition.x - event.evt.deltaX,
-            y: stagePosition.y - event.evt.deltaY,
-          },
-        })
-      );
+    if (!imageWidth || !position) return;
+    const stage = event.target.getStage()!;
+
+    const scaleBy = 1.02;
+
+    const oldScale = stage.scaleX();
+
+    const newScale =
+      event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    stage.scale({ x: newScale, y: newScale });
+    let pointer;
+    if (automaticCentering && toolType === ToolType.Zoom) {
+      pointer = { x: stage.width() / 2, y: stage.height() / 2 };
     } else {
-      zoomAndOffset(
-        { x: imageWidth / 2, y: imageWidth / 2 },
-        1.01,
-        event.evt.deltaY < 0
-      );
+      pointer = stage.getPointerPosition();
     }
+    if (!pointer) return;
+
+    const mousePointTo = {
+      x: pointer.x / oldScale - stage.x() / oldScale,
+      y: pointer.y / oldScale - stage.y() / oldScale,
+    };
+
+    var newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+
+    stage.position(newPos);
+
+    const labelGroup = stage.find(`#label-group`)[0];
+    if (!labelGroup) return;
+    const labelPosition = labelGroup.position();
+    console.log(labelGroup);
+    const labelPointTo = {
+      x: labelPosition.x / oldScale - stage.x() / oldScale,
+      y: labelPosition.y / oldScale - stage.y() / oldScale,
+    };
+    labelGroup.setAttrs({
+      scaleX: 1 / stage.scaleX(),
+      scaleY: 1 / stage.scaleY(),
+    });
+
+    var newLabelPos = {
+      x: labelPosition.x - labelPointTo.x * newScale,
+      y: labelPosition.y - labelPointTo.y * newScale,
+    };
+
+    labelGroup.setAttrs({
+      position: newLabelPos,
+    });
   };
-  useEffect(() => {
-    setDraggable(altControls);
-  }, [altControls]);
 
   return {
     deselect,

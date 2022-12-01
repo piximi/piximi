@@ -91,6 +91,7 @@ export const Stage = () => {
 
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
+  const labelGroupRef = useRef<Konva.Group>();
 
   // useSelector
   const toolType = useSelector(toolTypeSelector);
@@ -317,11 +318,13 @@ export const Stage = () => {
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
+    console.log(event);
 
     if (
       !event.target.getParent() ||
       // TODO: shouldn't be using string for className here -- Nodar
-      event.target.getParent().className === "Transformer"
+      event.target.getParent().className === "Transformer" ||
+      event.target.attrs.name === "transformer-button"
     )
       return;
     memoizedOnMouseDown();
@@ -329,6 +332,7 @@ export const Stage = () => {
 
   const memoizedOnMouseDown = useMemo(() => {
     const func = () => {
+      console.log("stage");
       if (!firstMouseDown) {
         setFirstMouseDown(true);
       }
@@ -341,25 +345,6 @@ export const Stage = () => {
       const relative = getRelativePointerPosition(position);
 
       if (!relative) return;
-      if (saveLabelRef?.current?.getText() && clearLabelRef.current) {
-        //do not proceed with mouse down events if user has clicked on Save Annotation button
-        if (
-          (relative.x <
-            saveLabelRef.current.x() + saveLabelRef.current.width() &&
-            relative.x > saveLabelRef.current.x() &&
-            relative.y <
-              saveLabelRef.current.y() + saveLabelRef.current.height() &&
-            relative.y > saveLabelRef.current.y()) ||
-          (relative.x <
-            clearLabelRef.current.x() + clearLabelRef.current.width() &&
-            relative.x > clearLabelRef.current.x() &&
-            relative.y <
-              clearLabelRef.current.y() + clearLabelRef.current.height() &&
-            relative.y > clearLabelRef.current.y())
-        ) {
-          return;
-        }
-      }
 
       if (toolType === ToolType.Pointer) {
         onPointerMouseDown(relative);
@@ -391,7 +376,6 @@ export const Stage = () => {
   }, [
     annotationState,
     annotationTool,
-    saveLabelRef,
     selectionMode,
     toolType,
     deselectAllAnnotations,
@@ -478,10 +462,6 @@ export const Stage = () => {
     setCurrentMousePosition,
   ]);
 
-  useEffect(() => {
-    console.log(currentPosition);
-  }, [currentPosition]);
-
   // useEffect
   /*/
   Detach transformers and selections when all annotations are removed
@@ -502,6 +482,7 @@ export const Stage = () => {
     );
     setTool(annotationTool);
   }, [annotationTool, dispatch]);
+
   useEffect(() => {
     if (!annotationTool) return;
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
@@ -537,6 +518,8 @@ export const Stage = () => {
         saveLabelRef.current = label[0] as Konva.Label;
         clearLabelRef.current = label[1] as Konva.Label;
       }
+      const group = stageRef.current.find("#label-group");
+      labelGroupRef.current = group[0] as Konva.Group;
     });
   }, [selectedAnnotationsIds, workingAnnotation?.maskData]);
 
@@ -559,6 +542,11 @@ export const Stage = () => {
     toolType,
   });
 
+  const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
+    onZoomWheel(event, absolutePosition);
+    setCurrentMousePosition();
+  };
+
   return (
     <>
       <ReactKonva.Stage
@@ -570,10 +558,11 @@ export const Stage = () => {
         onTouchMove={(evt) => onMouseMove(evt)}
         onMouseUp={(evt) => onMouseUp(evt)}
         onTouchEnd={(evt) => onMouseUp(evt)}
-        onWheel={(evt) => onZoomWheel(evt)}
+        onWheel={(evt) => handleWheel(evt)}
         position={stagePosition}
         ref={stageRef}
         width={stageWidth}
+        scale={{ x: stageScale, y: stageScale }}
       >
         <Provider store={store}>
           <DndProvider backend={HTML5Backend}>
@@ -585,7 +574,13 @@ export const Stage = () => {
               {!(
                 annotationState !== AnnotationStateType.Annotating &&
                 toolType !== ToolType.QuickAnnotation
-              ) && <Selection tool={tool} toolType={toolType} />}
+              ) && (
+                <Selection
+                  tool={tool}
+                  toolType={toolType}
+                  stageScale={stageRef.current?.scaleX()!}
+                />
+              )}
 
               <PenAnnotationToolTip
                 currentPosition={currentPosition}
@@ -597,6 +592,7 @@ export const Stage = () => {
               <Annotations
                 transformPosition={getRelativePointerPosition}
                 annotationTool={annotationTool}
+                stageScale={stageRef.current?.scaleX()!}
               />
             </Layer>
           </DndProvider>

@@ -51,8 +51,14 @@ export const Layer = ({ children }: LayerProps) => {
     <>
       <ReactKonva.Layer
         imageSmoothingEnabled={false}
-        offset={offset}
-        position={position}
+        offset={{
+          x: (stageWidth - imageWidth!) / 2,
+          y: (stageHeight - imageHeight!) / 2,
+        }}
+        position={{
+          x: stageWidth - imageWidth!,
+          y: stageHeight - imageHeight!,
+        }}
       >
         {children}
       </ReactKonva.Layer>
