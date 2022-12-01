@@ -29,9 +29,10 @@ import {
 type SelectionProps = {
   tool?: Tool;
   toolType?: ToolType;
+  stageScale: number;
 };
 
-export const Selection = ({ tool, toolType }: SelectionProps) => {
+export const Selection = ({ tool, toolType, stageScale }: SelectionProps) => {
   if (!toolType || !tool) return <></>;
 
   switch (toolType) {
@@ -53,11 +54,17 @@ export const Selection = ({ tool, toolType }: SelectionProps) => {
       return <PolygonalSelection operator={tool as PolygonalAnnotationTool} />;
     case ToolType.RectangularAnnotation:
       return (
-        <RectangularSelection operator={tool as RectangularAnnotationTool} />
+        <RectangularSelection
+          operator={tool as RectangularAnnotationTool}
+          stageScale={stageScale}
+        />
       );
     case ToolType.ThresholdAnnotation:
       return (
-        <RectangularSelection operator={tool as RectangularAnnotationTool} />
+        <RectangularSelection
+          operator={tool as RectangularAnnotationTool}
+          stageScale={stageScale}
+        />
       );
     case ToolType.Zoom:
       return <ZoomSelection />;

@@ -10,14 +10,16 @@ import { RectangularAnnotationTool } from "annotator-tools";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool;
+  stageScale: number;
 };
 
 export const RectangularSelection = ({
   operator,
+  stageScale,
 }: RectangularSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const stageScale = useSelector(stageScaleSelector);
+  //const stageScale = useSelector(stageScaleSelector);
 
   if (!operator.origin || !operator.width || !operator.height) return null;
 
