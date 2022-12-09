@@ -13,11 +13,13 @@ import { ToolType } from "types";
 
 type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
+  absolutePosition?: { x: number; y: number };
   annotating: boolean;
 };
 export const PenAnnotationToolTip = ({
   annotating,
   currentPosition,
+  absolutePosition,
 }: PenAnnotationToolTipProps) => {
   const toolType = useSelector(toolTypeSelector);
 
@@ -30,16 +32,17 @@ export const PenAnnotationToolTip = ({
     toolType !== ToolType.PenAnnotation ||
     annotating ||
     !currentPosition ||
+    !absolutePosition ||
     !imageWidth ||
     !imageHeight
   )
     return <></>;
 
   if (
-    currentPosition.x > imageWidth - penSelectionBrushSize ||
-    currentPosition.y > imageHeight - penSelectionBrushSize ||
-    currentPosition.x < 0 ||
-    currentPosition.y < 0
+    absolutePosition.x > imageWidth - penSelectionBrushSize ||
+    absolutePosition.y > imageHeight - penSelectionBrushSize ||
+    absolutePosition.x < 0 ||
+    absolutePosition.y < 0
   )
     return <></>;
 

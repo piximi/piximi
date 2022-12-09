@@ -6,7 +6,6 @@ import * as ReactKonva from "react-konva";
 import {
   AnnotatorSlice,
   imageWidthSelector,
-  stageScaleSelector,
   workingAnnotationSelector,
   selectedAnnotationsSelector,
   soundEnabledSelector,
@@ -15,6 +14,7 @@ import {
   imageHeightSelector,
   setSelectedAnnotations,
   stagedAnnotationsSelector,
+  stageScaleSelector,
 } from "store/annotator";
 
 import useSound from "use-sound";
@@ -28,6 +28,7 @@ import {
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+import { useImageOrigin } from "hooks";
 
 type box = {
   x: number;
@@ -62,7 +63,7 @@ export const AnnotationTransformer = ({
   const workingAnnotation = useSelector(workingAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);
-  //const stageScale = useSelector(stageScaleSelector);
+  stageScale = useSelector(stageScaleSelector);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
@@ -77,6 +78,8 @@ export const AnnotationTransformer = ({
   const [playDeleteAnnotationSoundEffect] = useSound(
     deleteAnnotationSoundEffect
   );
+
+  const imageOrigin = useImageOrigin();
 
   /**
    * Obtain box coordinates in image space
@@ -225,17 +228,16 @@ export const AnnotationTransformer = ({
       Math.max(
         workingAnnotation.boundingBox[0],
         workingAnnotation.boundingBox[2]
-      ) * stageScale;
+      ) + imageOrigin.x;
 
+    posY = Math.max(
+      workingAnnotation.boundingBox[1],
+      workingAnnotation.boundingBox[3]
+    );
     posY =
-      Math.max(
-        workingAnnotation.boundingBox[1],
-        workingAnnotation.boundingBox[3]
-      ) * stageScale;
-    posY =
-      posY + 56 > imageHeight! * stageScale
-        ? imageHeight! * stageScale - 65
-        : posY;
+      posY + 56 > imageHeight!
+        ? imageHeight! - 65 + imageOrigin.y
+        : posY + imageOrigin.y;
   }
 
   useEffect(() => {
@@ -268,8 +270,8 @@ export const AnnotationTransformer = ({
               <ReactKonva.Group
                 id={"label-group"}
                 position={{ x: posX, y: posY }}
-                scaleX={1}
-                scaleY={1}
+                scaleX={1 / stageScale}
+                scaleY={1 / stageScale}
               >
                 <ReactKonva.Label
                   position={{
