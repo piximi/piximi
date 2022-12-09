@@ -111,7 +111,7 @@ function eventHandler(
 
   // Call the handler, if it is a modifier key, no processing
   if (
-    (handler.mods.length === 0 && !_mods[18] && !_mods[17] && !_mods[91]) ||
+    (handler.mods.length === 0 && !_mods[17] && !_mods[91]) ||
     modifiersMatch ||
     handler.shortcut === "*"
   ) {
@@ -128,7 +128,6 @@ function eventHandler(
 function dispatch(event: any, element: Document) {
   const asterisk = _handlers["*"];
   let key = event.keyCode || event.which || event.charCode;
-
   // The command key value of Gecko (Firefox) is 224, which is consistent in Webkit (Chrome)
   // The left and right command keys of Webkit are different
   if (key === 93 || key === 224) key = 91;
@@ -148,7 +147,7 @@ function dispatch(event: any, element: Document) {
       _downKeys.push(keyNum);
     } else if (!event[keyName] && _downKeys.indexOf(keyNum) > -1) {
       //modifier key isnt held down and is in keydown list
-      if (keyName !== "shiftKey") {
+      if (keyName !== "shiftKey" && keyName !== "altKey") {
         //remove key from keydown list unless its the shift key
         _downKeys.splice(_downKeys.indexOf(keyNum), 1);
       }
@@ -166,7 +165,7 @@ function dispatch(event: any, element: Document) {
     }
   });
 
-  if (key in _mods) {
+  if (key in _mods && key !== 18) {
     _mods[key] = true;
     // Register keys with special characters to hotkeys
     for (const k in _modifier) {
@@ -278,6 +277,7 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
   // for each shortcut key
   for (let i = 0; i < keyList.length; i++) {
     let key = keyList[i].split(splitKey); // key list
+
     mods = [];
 
     // If it is a combination shortcut key, get the combination shortcut key
@@ -286,7 +286,6 @@ function hotkeys(hotkeys: string, option: Option, method: Function) {
     // Convert non-modifier keys to keycodes
     let hotkey = key.at(-1)!;
     let keyCode = hotkey === "*" ? "*" : getCode(hotkey); // * means match all shortcut keys
-
     // Determine whether the key is in _handlers, if not, assign an empty array
     if (!(keyCode in _handlers)) _handlers[keyCode] = [];
     _handlers[keyCode].push({

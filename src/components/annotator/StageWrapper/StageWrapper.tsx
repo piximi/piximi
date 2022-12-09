@@ -7,13 +7,9 @@ import { dimensions } from "utils/common";
 
 type StageWrapperProps = {
   onDrop: (files: FileList) => void;
-  optionsVisibility: boolean;
 };
 
-export const StageWrapper = ({
-  onDrop,
-  optionsVisibility,
-}: StageWrapperProps) => {
+export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
   const ref = useRef<HTMLDivElement>(null);
   useBoundingClientRect(ref);
 
