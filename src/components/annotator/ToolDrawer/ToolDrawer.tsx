@@ -39,10 +39,6 @@ const toolMap: Record<
   string,
   { operation: OperationType; icon: (color: string) => ReactElement }
 > = {
-  Hand: {
-    operation: OperationType.Hand,
-    icon: (color) => <Hand color={color} />,
-  },
   Zoom: {
     operation: OperationType.Zoom,
     icon: (color) => <Zoom color={color} />,
