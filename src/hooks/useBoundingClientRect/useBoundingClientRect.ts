@@ -40,21 +40,21 @@ export const useBoundingClientRect = (target: React.RefObject<HTMLElement>) => {
     dispatch(setStageHeight({ stageHeight: entry.contentRect.height }));
   });
 
-  useEffect(() => {
-    if (!image?.shape) return;
+  // useEffect(() => {
+  //   if (!image?.shape) return;
 
-    if (image.shape.height / stageHeight > image.shape.width / stageWidth) {
-      dispatch(
-        setStageScale({
-          stageScale: (0.95 * stageHeight) / image.shape.height,
-        })
-      );
-    } else {
-      dispatch(
-        setStageScale({
-          stageScale: (0.95 * stageWidth) / image.shape.width,
-        })
-      );
-    }
-  }, [dispatch, image?.shape, stageHeight, stageWidth]);
+  //   if (image.shape.height / stageHeight > image.shape.width / stageWidth) {
+  //     dispatch(
+  //       setStageScale({
+  //         stageScale: (0.95 * stageHeight) / image.shape.height,
+  //       })
+  //     );
+  //   } else {
+  //     dispatch(
+  //       setStageScale({
+  //         stageScale: (0.95 * stageWidth) / image.shape.width,
+  //       })
+  //     );
+  //   }
+  // }, [dispatch, image?.shape, stageHeight, stageWidth]);
 };

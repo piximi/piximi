@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
@@ -20,7 +20,7 @@ import {
   ZoomOut as ZoomOutIcon,
 } from "@mui/icons-material";
 
-import { useTranslation } from "hooks";
+import { useTranslation, useZoom } from "hooks";
 
 import { InformationBox } from "../InformationBox";
 import { ResetButton } from "../HandToolOptions/ResetButton";
@@ -28,10 +28,13 @@ import { ResetButton } from "../HandToolOptions/ResetButton";
 import {
   offsetSelector,
   setOffset,
+  setStagePosition,
   setStageScale,
   stageHeightSelector,
+  stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
+  zoomSelectionSelector,
 } from "store/annotator";
 import { imageSelector } from "store/common";
 import {
@@ -52,15 +55,16 @@ export const ZoomOptions = () => {
   const dispatch = useDispatch();
 
   const options = useSelector(zoomToolOptionsSelector);
-
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
+  const stageScale = useSelector(stageScaleSelector);
+  const stagePosition = useSelector(stagePositionSelector);
+  const image = useSelector(imageSelector);
+  const { centerPoint } = useSelector(zoomSelectionSelector);
 
   const t = useTranslation();
 
-  const scale = useSelector(stageScaleSelector);
-  const image = useSelector(imageSelector);
-  const offset = useSelector(offsetSelector);
+  const { zoomAndOffset } = useZoom();
 
   const onAutomaticCenteringChange = () => {
     const payload = {
@@ -69,15 +73,8 @@ export const ZoomOptions = () => {
         automaticCentering: !options.automaticCentering,
       },
     };
-
-    const centerOffset = {
-      x: 0,
-      y: 0,
-    };
-
     batch(() => {
       dispatch(setZoomToolOptions(payload));
-      dispatch(setOffset({ offset: centerOffset }));
     });
   };
 
@@ -85,56 +82,18 @@ export const ZoomOptions = () => {
     const payload = {
       options: {
         ...options,
-        automaticCentering: true,
         toActualSize: !options.toActualSize,
       },
     };
 
-    batch(() => {
-      dispatch(setZoomToolOptions(payload));
-      dispatch(setStageScale({ stageScale: 1 }));
-      dispatch(setOffset({ offset: { x: 0, y: 0 } }));
-    });
-  };
-
-  const onToFullSizeClick = () => {
-    const payload = {
-      options: {
-        ...options,
-        automaticCentering: true,
-        toFit: !options.toFit,
-      },
-    };
-
-    if (!image || !image.shape) return;
-
-    const imageWidth = image && image.shape ? image.shape.width : 512;
-    const imageHeight = image && image.shape ? image.shape.height : 512;
-    if (imageHeight / stageHeight > imageWidth / stageWidth) {
-      dispatch(
-        setStageScale({
-          stageScale: stageHeight / imageHeight,
-        })
-      );
-    } else {
-      dispatch(
-        setStageScale({
-          stageScale: stageWidth / imageWidth,
-        })
-      );
-    }
-    batch(() => {
-      dispatch(setZoomToolOptions(payload));
-
-      dispatch(setOffset({ offset: { x: 0, y: 0 } }));
-    });
+    dispatch(setZoomToolOptions(payload));
+    zoomAndOffset(1, { x: stageWidth / 2, y: stageHeight / 2 });
   };
 
   const onToFitClick = () => {
     const payload = {
       options: {
         ...options,
-        automaticCentering: true,
         toFit: !options.toFit,
       },
     };
@@ -143,25 +102,13 @@ export const ZoomOptions = () => {
 
     const imageWidth = image && image.shape ? image.shape.width : 512;
     const imageHeight = image && image.shape ? image.shape.height : 512;
-    if (imageHeight / stageHeight > imageWidth / stageWidth) {
-      dispatch(
-        setStageScale({
-          stageScale: (0.95 * stageHeight) / imageHeight,
-        })
-      );
-    } else {
-      dispatch(
-        setStageScale({
-          stageScale: (0.95 * stageWidth) / imageWidth,
-        })
-      );
-    }
+    const newScale =
+      imageHeight / stageHeight > imageWidth / stageWidth
+        ? stageHeight / imageHeight
+        : stageWidth / imageWidth;
 
-    batch(() => {
-      dispatch(setZoomToolOptions(payload));
-
-      dispatch(setOffset({ offset: { x: 0, y: 0 } }));
-    });
+    dispatch(setZoomToolOptions(payload));
+    zoomAndOffset(newScale, { x: stageWidth / 2, y: stageHeight / 2 });
   };
 
   const onModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +136,21 @@ export const ZoomOptions = () => {
   };
 
   const onSliderChange = (value: number) => {
-    dispatch(setStageScale({ stageScale: value }));
+    if (options.automaticCentering) {
+      zoomAndOffset(value, centerPoint!);
+    } else {
+      zoomAndOffset(value, { x: stageWidth / 2, y: stageHeight / 2 });
+    }
+  };
+  const onResetClick = () => {
+    dispatch(
+      setStagePosition({
+        stagePosition: {
+          x: ((1 - stageScale) * stageWidth) / 2,
+          y: ((1 - stageScale) * stageHeight) / 2,
+        },
+      })
+    );
   };
 
   // @ts-ignore
@@ -217,9 +178,9 @@ export const ZoomOptions = () => {
                   onSliderChange(value as number)
                 }
                 valueLabelDisplay="auto"
-                value={scale}
-                min={0.01}
-                max={10}
+                value={stageScale}
+                min={0.25}
+                max={5}
                 step={0.01}
               />
             </Grid>
@@ -311,15 +272,13 @@ export const ZoomOptions = () => {
           <ListItemText>{t("Actual size")}</ListItemText>
         </ListItem>
 
-        <ListItem button onClick={onToFullSizeClick}>
-          <ListItemText>{t("Full size")}</ListItemText>
-        </ListItem>
-
         <ListItem button onClick={onToFitClick}>
           <ListItemText>{t("Fit to canvas")}</ListItemText>
         </ListItem>
 
-        <ResetButton />
+        <ListItem button onClick={onResetClick}>
+          <ListItemText>{t("Reset position")}</ListItemText>
+        </ListItem>
       </List>
     </>
   );

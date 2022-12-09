@@ -9,25 +9,23 @@ import {
   boundingClientRectSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
+  stageHeightSelector,
+  stageWidthSelector,
 } from "store/annotator";
+import { Point } from "types";
 
 export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);
-
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
-
   const width = useSelector(scaledImageWidthSelector);
-
   const height = useSelector(scaledImageHeightSelector);
-
   const [filters] = useState<Array<any>>();
-
   const boundingClientRect = useSelector(boundingClientRectSelector);
-
   const normalizeFont = 1300;
-
   const [images, setImages] = useState<Array<HTMLImageElement>>();
-
+  const stageWidth = useSelector(stageWidthSelector);
+  const stageHeight = useSelector(stageHeightSelector);
+  const [imagePosition, setImagePosition] = useState<Point>();
   useEffect(() => {
     setImages(
       renderedSrcs.map((src: string) => {
@@ -36,7 +34,14 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
         return imgElem;
       })
     );
-  }, [renderedSrcs]);
+  }, [renderedSrcs, width]);
+
+  useEffect(() => {
+    setImagePosition({
+      x: (stageWidth - width!) / 2,
+      y: (stageHeight - height!) / 2,
+    });
+  }, [stageWidth, stageHeight, width, height]);
 
   if (!(images && images.length)) {
     return (
@@ -69,6 +74,7 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
             filters={filters}
             visible={true}
             key={idx}
+            position={imagePosition}
           />
         ) : (
           <ReactKonva.Image

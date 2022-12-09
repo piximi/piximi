@@ -62,6 +62,7 @@ const initialState: Annotator = {
     minimum: undefined,
     maximum: undefined,
     selecting: false,
+    centerPoint: undefined,
   },
 };
 
@@ -434,6 +435,7 @@ export const annotatorSlice = createSlice({
           minimum: { x: number; y: number } | undefined;
           maximum: { x: number; y: number } | undefined;
           selecting: boolean;
+          centerPoint: { x: number; y: number } | undefined;
         };
       }>
     ) {
