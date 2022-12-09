@@ -423,7 +423,6 @@ export const Stage = () => {
     currentPosition,
     draggable,
     getTransformedPosition,
-    absolutePosition,
     annotationTool,
     toolType,
   ]);

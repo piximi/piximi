@@ -7,32 +7,25 @@ import {
   zoomSelectionSelector,
   scaledImageWidthSelector,
   setZoomSelection,
-  scaledImageHeightSelector,
   setStageScale,
   setStagePosition,
   stageWidthSelector,
-  stageHeightSelector,
   stagePositionSelector,
 } from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
-import React, { useEffect, useState } from "react";
-import { Stage } from "konva/lib/Stage";
 
 export const useZoom = () => {
   const delta = 10;
-  const scaleBy = 1.1;
 
   const dispatch = useDispatch();
   const stageScale = useSelector(stageScaleSelector);
   const stageWidth = useSelector(stageWidthSelector);
-  const stageHeight = useSelector(stageHeightSelector);
   const stagePosition = useSelector(stagePositionSelector);
   const toolType = useSelector(toolTypeSelector);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
-  const imageHeight = useSelector(scaledImageHeightSelector);
   const imageWidth = useSelector(scaledImageWidthSelector);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
@@ -50,8 +43,6 @@ export const useZoom = () => {
 
     dispatch(setStagePosition({ stagePosition: newPos }));
   };
-
-  const artifactCorrection = () => {};
 
   const deselect = () => {
     dispatch(
