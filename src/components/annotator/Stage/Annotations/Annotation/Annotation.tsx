@@ -6,14 +6,18 @@ import Image from "image-js";
 
 import {
   setSelectedAnnotations,
+  stageHeightSelector,
   stagePositionSelector,
   stageScaleSelector,
+  stageWidthSelector,
 } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 
 import { hexToRGBA } from "utils/common/imageHelper";
 import { colorOverlayROI } from "utils/common/imageHelper";
+import { number } from "prop-types";
+import { useImageOrigin } from "hooks";
 
 type AnnotationProps = {
   annotation: decodedAnnotationType;
@@ -32,8 +36,10 @@ export const Annotation = ({
 
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
-
+  const stageWidth = useSelector(stageWidthSelector);
+  const stageHeight = useSelector(stageHeightSelector);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
+  const imagePosition = useImageOrigin();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -119,8 +125,8 @@ export const Annotation = ({
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}
-      x={annotation.boundingBox[0]}
-      y={annotation.boundingBox[1]}
+      x={annotation.boundingBox[0] + imagePosition.x}
+      y={annotation.boundingBox[1] + imagePosition.y}
       width={Math.round(annotation.boundingBox[2] - annotation.boundingBox[0])}
       height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}

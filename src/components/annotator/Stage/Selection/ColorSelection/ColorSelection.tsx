@@ -7,6 +7,7 @@ import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 import { stageScaleSelector } from "store/annotator";
 
 import { ColorAnnotationTool } from "annotator-tools";
+import { useImageOrigin } from "hooks";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;
@@ -14,8 +15,7 @@ type ColorSelectionProps = {
 
 export const ColorSelection = ({ operator }: ColorSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
-
-  const stageScale = 1;
+  const imagePosition = useImageOrigin();
 
   useLayoutEffect(() => {
     let timerId: number;
@@ -38,12 +38,17 @@ export const ColorSelection = ({ operator }: ColorSelectionProps) => {
       <ReactKonva.Group>
         <ReactKonva.Image
           image={image}
-          scale={{ x: stageScale, y: stageScale }}
+          x={imagePosition.x}
+          y={imagePosition.y}
         />
       </ReactKonva.Group>
       <ColorAnnotationToolTip
-        toolTipPosition={operator.toolTipPosition}
+        toolTipPosition={{
+          x: operator.toolTipPosition!.x + imagePosition.x,
+          y: operator.toolTipPosition!.y + imagePosition.y,
+        }}
         initialPosition={operator.origin}
+        imageOrigin={imagePosition}
         tolerance={operator.tolerance}
       />
     </>

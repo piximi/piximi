@@ -15,6 +15,7 @@ import {
   useWindowFocusHandler,
   useZoom,
   useAnnotatorKeyboardShortcuts,
+  useImageOrigin,
 } from "hooks";
 
 import { Image } from "./Image";
@@ -190,10 +191,6 @@ export const Stage = () => {
       y: Math.round(relative.y),
     };
 
-    // Add a little leeway around the canvas to aid drawing up to the edges
-    // console.log("position: ", position);
-    // console.log("absolute: ", absolute);
-    // console.log("transformed: ", getTransformedPosition(position));
     if (
       absolute.x < 0 ||
       absolute.x > image.width ||
@@ -218,7 +215,7 @@ export const Stage = () => {
     }
 
     setAbsolutePosition(absolute);
-    setAnnotatorPosition(getTransformedPosition(position));
+    setAnnotatorPosition(absolute);
   }, [
     getRelativePointerPosition,
     scaledImageHeight,
@@ -372,7 +369,7 @@ export const Stage = () => {
 
       const transformed = getTransformedPosition(currentPosition);
       if (toolType === ToolType.Pointer) {
-        onPointerMouseDown(transformed!);
+        onPointerMouseDown(absolutePosition!);
         return;
       } else if (toolType === ToolType.Zoom) {
         onZoomMouseDown(transformed!);
@@ -419,7 +416,7 @@ export const Stage = () => {
       if (toolType === ToolType.Zoom) {
         onZoomMouseMove(transformed);
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseMove(transformed);
+        onPointerMouseMove(absolutePosition!);
       } else {
         if (!annotationTool) return;
         annotationTool.onMouseMove(absolutePosition!);
@@ -469,7 +466,7 @@ export const Stage = () => {
         onZoomMouseUp(transformed!);
         setCurrentMousePosition();
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseUp(transformed!);
+        onPointerMouseUp(absolutePosition);
       } else {
         if (!annotationTool) return;
         if (toolType === ToolType.ObjectAnnotation) {
@@ -511,17 +508,6 @@ export const Stage = () => {
 
     deselectAllTransformers();
   }, [annotations, deselectAllAnnotations]);
-
-  useEffect(() => {
-    annotationTool?.deselect();
-    dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        workingAnnotation: undefined,
-      })
-    );
-    setTool(annotationTool);
-  }, [annotationTool, dispatch]);
 
   useEffect(() => {
     if (!annotationTool) return;
@@ -604,6 +590,11 @@ export const Stage = () => {
         stagePosition: { x: stage.x(), y: stage.y() },
       })
     );
+    if (draggable) {
+      stageRef.current.container().style.cursor = "grab";
+    } else {
+      stageRef.current.container().style.cursor = cursor;
+    }
   }, [
     draggable,
     stageRef,
@@ -615,6 +606,7 @@ export const Stage = () => {
     zoomSelection.minimum,
     zoomSelection.selecting,
     automaticCentering,
+    cursor,
   ]);
 
   return (
@@ -641,18 +633,11 @@ export const Stage = () => {
               <Image ref={imageRef} />
 
               <ZoomSelection />
-              <ZoomSelection />
 
               {!(
                 annotationState !== AnnotationStateType.Annotating &&
                 toolType !== ToolType.QuickAnnotation
-              ) && (
-                <Selection
-                  tool={tool}
-                  toolType={toolType}
-                  stageScale={stageRef.current?.scaleX()!}
-                />
-              )}
+              ) && <Selection tool={tool} toolType={toolType} />}
 
               <PenAnnotationToolTip
                 currentPosition={transformedPosition}
