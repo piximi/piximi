@@ -13,5 +13,5 @@ export const scaledImageWidthSelector = ({
 
   if (!image) return;
 
-  return image.shape.width * annotator.stageScale;
+  return image.shape.width; //* annotator.stageScale;
 };

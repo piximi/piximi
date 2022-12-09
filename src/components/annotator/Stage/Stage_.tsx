@@ -8,65 +8,71 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import {
+  useAnnotatorKeyboardShortcuts,
   useAnnotationTool,
   useCursor,
-  useHotkeys,
   usePointer,
   useWindowFocusHandler,
   useZoom,
-  useAnnotatorKeyboardShortcuts,
 } from "hooks";
 
 import { Image } from "./Image";
+import { Selection } from "./Selection";
 import { Layer } from "./Layer";
 import { ZoomSelection } from "./Selection/ZoomSelection";
-import { Selection } from "./Selection";
+import { PenAnnotationToolTip } from "./PenAnnotationToolTip/PenAnnotationToolTip";
+import { Annotations } from "./Annotations";
+import { PointerSelection } from "./Selection/PointerSelection";
+import { SoundEvents } from "./sound-events";
 
 import {
-  activeImagePlaneSelector,
-  annotationStateSelector,
-  cursorSelector,
+  AnnotatorSlice,
+  stagedAnnotationsSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
+  workingAnnotationSelector,
   selectedAnnotationsIdsSelector,
   selectionModeSelector,
-  setStagePosition,
-  setZoomSelection,
-  stagedAnnotationsSelector,
   stageHeightSelector,
   stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
   toolTypeSelector,
-  workingAnnotationSelector,
-  zoomSelectionSelector,
-  setStagedAnnotations,
-  setAnnotationState,
+  activeImagePlaneSelector,
+  annotationStateSelector,
+  cursorSelector,
   setSelectedAnnotations,
 } from "store/annotator";
-
-import { zoomToolOptionsSelector } from "store/tool-options";
+import { selectedCategorySelector } from "store/common";
 
 import {
   AnnotationModeType,
   AnnotationStateType,
   decodedAnnotationType,
-  HotkeyView,
   Point,
   ToolType,
 } from "types";
 
+import { ObjectAnnotationTool, Tool } from "annotator-tools";
 import { dimensions } from "utils/common";
 import { Box, Typography } from "@mui/material";
-import { ObjectAnnotationTool, Tool } from "annotator-tools";
-import { selectedCategorySelector } from "store/common";
-import { Annotations } from "./Annotations";
-import { PenAnnotationToolTip } from "./PenAnnotationToolTip/PenAnnotationToolTip";
-import { PointerSelection } from "./Selection/PointerSelection";
 
-export const Stage = () => {
+export const Stage_ = () => {
+  /*
+    Konva's Stage is implemented such that its children are not connected,
+    and the store is no longer available to them, so we need to reinject
+    it to the Provider as a child of Stage.
+    See: https://github.com/konvajs/react-konva/issues/311
+    Discussion linked to above recommends use of
+    ReactReduxContext.Consumer -> Stage -> Provider pattern,
+    but that is not a publi API and may break in the future:
+    https://react-redux.js.org/using-react-redux/accessing-store#using-reactreduxcontext-directly
+    Here useStore() is utilized instead of getting the store
+    from ReactReduxContext.Consumer, which has the same result, but is safer.
+   */
   const store = useStore();
-  const dispatch = useDispatch();
+
+  // useState
   const [firstMouseDown, setFirstMouseDown] = useState(false);
   const [tool, setTool] = useState<Tool>();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -77,13 +83,12 @@ export const Stage = () => {
     x: number;
     y: number;
   }>();
-
   const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
-  const [draggable, setDraggable] = useState<boolean>(false);
 
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
+
   const saveLabelRef = useRef<Konva.Label>();
   const clearLabelRef = useRef<Konva.Label>();
   const labelGroupRef = useRef<Konva.Group>();
@@ -104,25 +109,15 @@ export const Stage = () => {
   const annotationState = useSelector(annotationStateSelector);
   const workingAnnotation = useSelector(workingAnnotationSelector);
   const cursor = useSelector(cursorSelector);
-  const zoomSelection = useSelector(zoomSelectionSelector);
-  const automaticCentering = useSelector(zoomToolOptionsSelector);
 
-  useHotkeys(
-    "alt",
-    (event) => {
-      setDraggable(event.type === "keydown" ? true : false);
-    },
-    HotkeyView.Annotator,
-    { keydown: true, keyup: true }
-  );
-
+  // useHook
+  const dispatch = useDispatch();
   const {
     deselect: onZoomDeselect,
     onMouseUp: onZoomMouseUp,
     onMouseMove: onZoomMouseMove,
     onMouseDown: onZoomMouseDown,
     onWheel: onZoomWheel,
-    handleDblClick: handleZoomDblClick,
   } = useZoom();
   const {
     onMouseDown: onPointerMouseDown,
@@ -134,6 +129,14 @@ export const Stage = () => {
   useCursor();
   useWindowFocusHandler();
 
+  // helper functions
+
+  /**
+   * Takes the current pointer position in the browser window and coverts it to
+   *  coordinates relative to the image in the stage
+   * @param position  position of cursor in the window
+   * @returns {Point}  position of cursor in relation to stage
+   */
   const getRelativePointerPosition = useCallback(
     (position: Point): Point | undefined => {
       if (!imageRef || !imageRef.current) return;
@@ -147,26 +150,8 @@ export const Stage = () => {
     [imageRef]
   );
 
-  const getTransformedPosition = useCallback(
-    (position: Point): Point | undefined => {
-      if (!stageRef || !stageRef.current) return;
-
-      const transform = stageRef.current.getAbsoluteTransform().copy();
-
-      transform.invert();
-      return transform.point(position);
-    },
-    [stageRef]
-  );
-
   const setCurrentMousePosition = useCallback(() => {
-    if (
-      !stageRef.current ||
-      !annotationTool ||
-      !scaledImageWidth ||
-      !scaledImageHeight
-    )
-      return;
+    if (!stageRef.current) return;
     const position = stageRef.current.getPointerPosition();
 
     if (!position) return;
@@ -174,17 +159,14 @@ export const Stage = () => {
     const relative = getRelativePointerPosition(position);
 
     const image = annotationTool.image;
-    if (!relative || !image) return;
-    setCurrentPosition(position);
+    if (!relative || !scaledImageWidth || !scaledImageHeight) return;
+    setCurrentPosition(relative);
     const absolute = {
-      x: Math.round(relative.x),
-      y: Math.round(relative.y),
+      x: Math.round(relative.x / stageScale),
+      y: Math.round(relative.y / stageScale),
     };
 
     // Add a little leeway around the canvas to aid drawing up to the edges
-    // console.log("position: ", position);
-    // console.log("absolute: ", absolute);
-    // console.log("transformed: ", getTransformedPosition(position));
     if (
       absolute.x < 0 ||
       absolute.x > image.width ||
@@ -210,10 +192,11 @@ export const Stage = () => {
 
     setAbsolutePosition(absolute);
   }, [
+    annotationTool?.image,
     getRelativePointerPosition,
     scaledImageHeight,
     scaledImageWidth,
-    annotationTool,
+    stageScale,
   ]);
 
   const detachTransformer = (transformerId: string) => {
@@ -231,7 +214,7 @@ export const Stage = () => {
     stagedAnnotations: Array<decodedAnnotationType>
   ) => {
     dispatch(
-      setStagedAnnotations({
+      AnnotatorSlice.actions.setStagedAnnotations({
         annotations: stagedAnnotations.filter(
           (annotation) => !selectedAnnotationIds.includes(annotation.id)
         ),
@@ -253,7 +236,7 @@ export const Stage = () => {
   const deselectAnnotation = useCallback(() => {
     if (!annotationTool) {
       dispatch(
-        setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
           execSaga: true,
@@ -283,7 +266,7 @@ export const Stage = () => {
   const onAnnotating = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotating,
           annotationTool,
           execSaga: true,
@@ -296,7 +279,7 @@ export const Stage = () => {
   const onAnnotated = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
           annotationTool,
           execSaga: true,
@@ -318,7 +301,7 @@ export const Stage = () => {
   const onDeselect = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        AnnotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
           execSaga: true,
@@ -351,123 +334,115 @@ export const Stage = () => {
       if (!firstMouseDown) {
         setFirstMouseDown(true);
       }
-      if (
-        !currentPosition ||
-        !absolutePosition ||
-        draggable ||
-        toolType === ToolType.ColorAdjustment
-      )
+      if (toolType === ToolType.Hand || toolType === ToolType.ColorAdjustment)
         return;
+      if (!stageRef || !stageRef.current) return;
+      const position = stageRef.current.getPointerPosition();
 
-      const transformed = getTransformedPosition(currentPosition);
+      if (!position) return;
+      const relative = getRelativePointerPosition(position);
+
+      if (!relative) return;
+
       if (toolType === ToolType.Pointer) {
-        onPointerMouseDown(transformed!);
+        onPointerMouseDown(relative);
         return;
-      } else if (toolType === ToolType.Zoom) {
-        onZoomMouseDown(transformed!);
-        return;
-      }
-      if (annotationState === AnnotationStateType.Annotated) {
-        deselectAnnotation();
-        if (selectionMode === AnnotationModeType.New) {
-          deselectAllAnnotations();
-          return;
-        }
       }
 
-      if (!annotationTool) return;
-      annotationTool.onMouseDown(transformed!);
+      const rawImagePosition = {
+        x: relative.x / stageScale,
+        y: relative.y / stageScale,
+      };
+
+      if (toolType === ToolType.Zoom) {
+        onZoomMouseDown(relative);
+      } else {
+        if (annotationState === AnnotationStateType.Annotated) {
+          deselectAnnotation();
+          if (selectionMode === AnnotationModeType.New) {
+            deselectAllAnnotations();
+            return;
+          }
+        }
+
+        if (!annotationTool) return;
+        annotationTool.onMouseDown(rawImagePosition);
+      }
     };
     const throttled = throttle(func, 5);
     return () => throttled();
   }, [
-    onPointerMouseDown,
-    onZoomMouseDown,
-    currentPosition,
-    absolutePosition,
-    getTransformedPosition,
-    draggable,
     annotationState,
     annotationTool,
-    deselectAllAnnotations,
-    deselectAnnotation,
-    firstMouseDown,
     selectionMode,
     toolType,
+    deselectAllAnnotations,
+    deselectAnnotation,
+    onPointerMouseDown,
+    onZoomMouseDown,
+    stageScale,
+    firstMouseDown,
+    getRelativePointerPosition,
   ]);
 
   const onMouseMove = useMemo(() => {
-    const func = (event: KonvaEventObject<MouseEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
+    const func = (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => {
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "3" &&
+        console.log(event);
+
+      if (!stageRef || !stageRef.current || !annotationTool) return;
       setCurrentMousePosition();
-      if (!currentPosition) return;
-      const transformed = getTransformedPosition(currentPosition);
-      if (!transformed) return;
       if (toolType === ToolType.ColorAdjustment) return;
 
       if (toolType === ToolType.Zoom) {
-        onZoomMouseMove(transformed);
+        onZoomMouseMove(currentPosition!);
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseMove(transformed);
+        onPointerMouseMove(currentPosition!);
       } else {
         if (!annotationTool) return;
-        annotationTool.onMouseMove(transformed!);
+        annotationTool.onMouseMove(absolutePosition!);
       }
     };
     const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
+    return (
+      event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+    ) => throttled(event);
   }, [
-    onPointerMouseMove,
-    onZoomMouseMove,
-    setCurrentMousePosition,
-    currentPosition,
-    draggable,
-    getTransformedPosition,
-    absolutePosition,
     annotationTool,
     toolType,
-  ]);
-
-  const onTouchMove = useMemo(() => {
-    const func = (event: KonvaEventObject<TouchEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
-      setCurrentMousePosition();
-      if (!currentPosition) return;
-      const transformed = getTransformedPosition(currentPosition);
-      if (!transformed) return;
-      onZoomMouseMove(transformed);
-      onPointerMouseMove(currentPosition);
-    };
-    const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
-  }, [
     onPointerMouseMove,
     onZoomMouseMove,
     setCurrentMousePosition,
     currentPosition,
-    draggable,
-    getTransformedPosition,
+    absolutePosition,
   ]);
 
   const onMouseUp = useMemo(() => {
     const func = async (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
-      if (!currentPosition || !absolutePosition || draggable) return;
-      const transformed = getTransformedPosition(currentPosition);
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "2" &&
+        console.log(event);
+
+      if (!currentPosition || !absolutePosition) return;
       if (toolType === ToolType.Zoom) {
-        onZoomMouseUp(transformed!);
+        onZoomMouseUp(currentPosition);
         setCurrentMousePosition();
       } else if (toolType === ToolType.Pointer) {
-        onPointerMouseUp(transformed!);
+        onPointerMouseUp(currentPosition);
       } else {
         if (!annotationTool) return;
+
         if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
             absolutePosition
           );
         }
-        annotationTool.onMouseUp(transformed!);
+        annotationTool.onMouseUp(absolutePosition);
       }
     };
     const throttled = throttle(func, 10);
@@ -476,26 +451,19 @@ export const Stage = () => {
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => throttled(event);
   }, [
+    annotationTool,
+    toolType,
     onPointerMouseUp,
     onZoomMouseUp,
     absolutePosition,
     currentPosition,
     setCurrentMousePosition,
-    getTransformedPosition,
-    draggable,
-    annotationTool,
-    toolType,
   ]);
 
-  const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
-    onZoomWheel(event);
-    setCurrentMousePosition();
-  };
-
-  const handleDblClick = (event: KonvaEventObject<MouseEvent>) => {
-    handleZoomDblClick(event);
-    setCurrentMousePosition();
-  };
+  // useEffect
+  /*/
+  Detach transformers and selections when all annotations are removed
+   */
   useEffect(() => {
     if (annotations.length) return;
 
@@ -572,65 +540,33 @@ export const Stage = () => {
     toolType,
   });
 
-  useEffect(() => {
-    if (!stageRef || !stageRef.current) return;
-    const stage = stageRef.current;
-    dispatch(
-      setZoomSelection({
-        zoomSelection: {
-          dragging: zoomSelection.dragging,
-          maximum: zoomSelection.maximum,
-          minimum: zoomSelection.minimum,
-          selecting: zoomSelection.selecting,
-          centerPoint: {
-            x: (stageWidth / 2) * stage.scaleX() + stage.x(),
-            y: (stageHeight / 2) * stage.scaleX() + stage.y(),
-          },
-        },
-      })
-    );
-    dispatch(
-      setStagePosition({
-        stagePosition: { x: stage.x(), y: stage.y() },
-      })
-    );
-  }, [
-    draggable,
-    stageRef,
-    dispatch,
-    stageHeight,
-    stageWidth,
-    zoomSelection.dragging,
-    zoomSelection.maximum,
-    zoomSelection.minimum,
-    zoomSelection.selecting,
-    automaticCentering,
-  ]);
+  const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
+    onZoomWheel(event);
+    setCurrentMousePosition();
+  };
 
   return (
     <>
       <ReactKonva.Stage
-        draggable={draggable}
+        draggable={true}
         height={stageHeight}
         onMouseDown={(evt) => onMouseDown(evt)}
         onTouchStart={(evt) => onMouseDown(evt)}
         onMouseMove={(evt) => onMouseMove(evt)}
-        onTouchMove={(evt) => onTouchMove(evt)}
+        onTouchMove={(evt) => onMouseMove(evt)}
         onMouseUp={(evt) => onMouseUp(evt)}
         onTouchEnd={(evt) => onMouseUp(evt)}
         onWheel={(evt) => handleWheel(evt)}
-        onDblClick={(evt) => handleDblClick(evt)}
         position={stagePosition}
-        scale={{ x: stageScale, y: stageScale }}
         ref={stageRef}
         width={stageWidth}
+        scale={{ x: stageScale, y: stageScale }}
       >
         <Provider store={store}>
           <DndProvider backend={HTML5Backend}>
             <Layer>
               <Image ref={imageRef} />
 
-              <ZoomSelection />
               <ZoomSelection />
 
               {!(
@@ -685,6 +621,10 @@ export const Stage = () => {
           </>
         )}
       </Box>
+      {/* SoundEvents must be mounted following some user gesture
+          else an "AudioContext was not allowed to start" warning
+          will be issued by Chrome*/}
+      {firstMouseDown && <SoundEvents />}
     </>
   );
 };
