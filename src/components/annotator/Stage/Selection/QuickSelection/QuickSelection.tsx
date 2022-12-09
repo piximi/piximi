@@ -2,9 +2,8 @@ import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector } from "store/annotator";
-
 import { QuickAnnotationTool } from "annotator-tools";
+import { useImageOrigin } from "hooks";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;
@@ -31,17 +30,14 @@ export const QuickSelection = ({ operator }: QuickSelectionProps) => {
     return () => cancelAnimationFrame(timerId);
   });
 
-  const stageScale = useSelector(stageScaleSelector);
+  const imageOrigin = useImageOrigin();
 
   if (!operator.currentMask) return null;
 
   return (
     <>
       <ReactKonva.Group>
-        <ReactKonva.Image
-          image={image}
-          scale={{ x: stageScale, y: stageScale }}
-        />
+        <ReactKonva.Image image={image} x={imageOrigin.x} y={imageOrigin.y} />
       </ReactKonva.Group>
     </>
   );

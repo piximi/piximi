@@ -94,6 +94,7 @@ export const usePointer = () => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
+    console.log("hello");
     if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
       return;
     if (pointerSelection.dragging) {
@@ -132,12 +133,12 @@ export const usePointer = () => {
       }
 
       const scaledMinimum = {
-        x: minimum.x / stageScale,
-        y: minimum.y / stageScale,
+        x: minimum.x,
+        y: minimum.y,
       };
       const scaledMaximum = {
-        x: maximum.x / stageScale,
-        y: maximum.y / stageScale,
+        x: maximum.x,
+        y: maximum.y,
       };
 
       const annotationsInBox = getAnnotationsInBox(
@@ -192,6 +193,7 @@ export const usePointer = () => {
   };
 
   const onClick = (position: { x: number; y: number }) => {
+    console.log("hello");
     if (toolType !== ToolType.Pointer) return;
 
     if (!position) return;
@@ -199,9 +201,10 @@ export const usePointer = () => {
     if (!stagedAnnotations.length || !imageWidth || !imageHeight) return;
 
     const scaledCurrentPosition = {
-      x: position.x / stageScale,
-      y: position.y / stageScale,
+      x: position.x,
+      y: position.y,
     };
+    console.log(scaledCurrentPosition);
 
     overlappingAnnotationsIds = getOverlappingAnnotations(
       scaledCurrentPosition,

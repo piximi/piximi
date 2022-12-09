@@ -27,7 +27,6 @@ export const PenAnnotationToolTip = ({
 
   const imageWidth = useSelector(scaledImageWidthSelector);
   const imageHeight = useSelector(scaledImageHeightSelector);
-  console.log(absolutePosition);
 
   if (
     toolType !== ToolType.PenAnnotation ||

@@ -2,11 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { useMarchingAnts } from "hooks";
-
-import { stageScaleSelector } from "store/annotator";
+import { useImageOrigin, useMarchingAnts } from "hooks";
 
 import { LassoAnnotationTool } from "annotator-tools";
+import { image } from "@tensorflow/tfjs";
 
 type LassoSelectionProps = {
   operator: LassoAnnotationTool;
@@ -14,8 +13,7 @@ type LassoSelectionProps = {
 
 export const LassoSelection = ({ operator }: LassoSelectionProps) => {
   const dashOffset = useMarchingAnts();
-
-  const stageScale = useSelector(stageScaleSelector);
+  const imageOrigin = useImageOrigin();
 
   if (!operator.origin) return <></>;
 
@@ -27,8 +25,8 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
           radius={3}
           stroke="black"
           strokeWidth={1}
-          x={operator.origin.x * stageScale}
-          y={operator.origin.y * stageScale}
+          x={operator.origin.x + imageOrigin.x}
+          y={operator.origin.y + imageOrigin.y}
         />
 
         {operator.anchor && (
@@ -38,24 +36,28 @@ export const LassoSelection = ({ operator }: LassoSelectionProps) => {
               radius={3}
               stroke="white"
               strokeWidth={1}
-              x={operator.anchor.x * stageScale}
-              y={operator.anchor.y * stageScale}
+              x={operator.anchor.x + imageOrigin.x}
+              y={operator.anchor.y + imageOrigin.y}
             />
           </>
         )}
         <ReactKonva.Line
-          points={operator.buffer.flatMap((point) => [point.x, point.y])}
-          scale={{ x: stageScale, y: stageScale }}
+          points={operator.buffer.flatMap((point) => [
+            point.x + imageOrigin.x,
+            point.y + imageOrigin.y,
+          ])}
           stroke="black"
-          strokeWidth={1 / stageScale}
+          strokeWidth={1}
         />
         <ReactKonva.Line
-          dash={[4 / stageScale, 2 / stageScale]}
+          dash={[4, 2]}
           dashOffset={-dashOffset}
-          scale={{ x: stageScale, y: stageScale }}
           stroke="white"
-          points={operator.buffer.flatMap((point) => [point.x, point.y])}
-          strokeWidth={1 / stageScale}
+          points={operator.buffer.flatMap((point) => [
+            point.x + imageOrigin.x,
+            point.y + imageOrigin.y,
+          ])}
+          strokeWidth={1}
         />
       </ReactKonva.Group>
     </>
