@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
@@ -23,15 +23,10 @@ import {
 import { useTranslation, useZoom } from "hooks";
 
 import { InformationBox } from "../InformationBox";
-import { ResetButton } from "../HandToolOptions/ResetButton";
 
 import {
-  offsetSelector,
-  setOffset,
   setStagePosition,
-  setStageScale,
   stageHeightSelector,
-  stagePositionSelector,
   stageScaleSelector,
   stageWidthSelector,
   zoomSelectionSelector,
@@ -58,7 +53,6 @@ export const ZoomOptions = () => {
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
   const stageScale = useSelector(stageScaleSelector);
-  const stagePosition = useSelector(stagePositionSelector);
   const image = useSelector(imageSelector);
   const { centerPoint } = useSelector(zoomSelectionSelector);
 
