@@ -117,14 +117,10 @@ export const Annotation = ({
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}
-      x={annotation.boundingBox[0] * stageScale}
-      y={annotation.boundingBox[1] * stageScale}
-      width={Math.round(
-        (annotation.boundingBox[2] - annotation.boundingBox[0]) * stageScale
-      )}
-      height={Math.round(
-        (annotation.boundingBox[3] - annotation.boundingBox[1]) * stageScale
-      )}
+      x={annotation.boundingBox[0]}
+      y={annotation.boundingBox[1]}
+      width={Math.round(annotation.boundingBox[2] - annotation.boundingBox[0])}
+      height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}
     />
   );

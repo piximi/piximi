@@ -13,5 +13,5 @@ export const scaledImageHeightSelector = ({
 
   if (!image) return;
 
-  return image.shape.height * annotator.stageScale;
+  return image.shape.height; //* annotator.stageScale;
 };
