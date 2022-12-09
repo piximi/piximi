@@ -77,6 +77,14 @@ export const Stage = () => {
     x: number;
     y: number;
   }>();
+  const [transformedPosition, setTransformedPosition] = useState<{
+    x: number;
+    y: number;
+  }>();
+  const [annotatorPosition, setAnnotatorPosition] = useState<{
+    x: number;
+    y: number;
+  }>();
 
   const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
   const [draggable, setDraggable] = useState<boolean>(false);
@@ -176,6 +184,7 @@ export const Stage = () => {
     const image = annotationTool.image;
     if (!relative || !image) return;
     setCurrentPosition(position);
+    setTransformedPosition(getTransformedPosition(position));
     const absolute = {
       x: Math.round(relative.x),
       y: Math.round(relative.y),
@@ -209,11 +218,13 @@ export const Stage = () => {
     }
 
     setAbsolutePosition(absolute);
+    setAnnotatorPosition(getTransformedPosition(position));
   }, [
     getRelativePointerPosition,
     scaledImageHeight,
     scaledImageWidth,
     annotationTool,
+    getTransformedPosition,
   ]);
 
   const detachTransformer = (transformerId: string) => {
@@ -376,7 +387,7 @@ export const Stage = () => {
       }
 
       if (!annotationTool) return;
-      annotationTool.onMouseDown(transformed!);
+      annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);
     return () => throttled();
@@ -411,7 +422,7 @@ export const Stage = () => {
         onPointerMouseMove(transformed);
       } else {
         if (!annotationTool) return;
-        annotationTool.onMouseMove(transformed!);
+        annotationTool.onMouseMove(absolutePosition!);
       }
     };
     const throttled = throttle(func, 5);
@@ -467,7 +478,7 @@ export const Stage = () => {
             absolutePosition
           );
         }
-        annotationTool.onMouseUp(transformed!);
+        annotationTool.onMouseUp(absolutePosition);
       }
     };
     const throttled = throttle(func, 10);
@@ -645,7 +656,8 @@ export const Stage = () => {
               )}
 
               <PenAnnotationToolTip
-                currentPosition={currentPosition}
+                currentPosition={transformedPosition}
+                absolutePosition={absolutePosition}
                 annotating={annotationState === AnnotationStateType.Annotating}
               />
 

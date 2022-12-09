@@ -15,7 +15,7 @@ type ColorSelectionProps = {
 export const ColorSelection = ({ operator }: ColorSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
 
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = 1;
 
   useLayoutEffect(() => {
     let timerId: number;

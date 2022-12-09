@@ -4,7 +4,11 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { setSelectedAnnotations, stageScaleSelector } from "store/annotator";
+import {
+  setSelectedAnnotations,
+  stagePositionSelector,
+  stageScaleSelector,
+} from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 
@@ -25,7 +29,6 @@ export const Annotation = ({
   selected,
 }: AnnotationProps) => {
   const annotatorRef = useRef<Konva.Image | null>(null);
-  const stageScale = useSelector(stageScaleSelector);
 
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
@@ -46,14 +49,13 @@ export const Annotation = ({
         imageWidth,
         imageHeight,
         color,
-        stageScale
+        1
       )
     );
   }, [
     annotation.maskData,
     fillColor,
     annotation.boundingBox,
-    stageScale,
     imageWidth,
     imageHeight,
   ]);
@@ -90,8 +92,8 @@ export const Annotation = ({
       width: Math.round(roiWidth * scaleX),
       preserveAspectRatio: false,
     });
-    const stageScaledX = Math.round(node.x() / stageScale);
-    const stageScaleY = Math.round(node.y() / stageScale);
+    const stageScaledX = Math.round(node.x());
+    const stageScaleY = Math.round(node.y());
 
     const updatedAnnotation = {
       ...annotation,
