@@ -433,6 +433,7 @@ export const Stage = () => {
     getTransformedPosition,
     annotationTool,
     toolType,
+    absolutePosition,
   ]);
 
   const onTouchMove = useMemo(() => {
@@ -553,6 +554,9 @@ export const Stage = () => {
     if (!stageRef || !stageRef.current) return;
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
+  useEffect(() => {
+    setTool(annotationTool);
+  }, [annotationTool, dispatch]);
 
   useAnnotatorKeyboardShortcuts({
     annotations,
