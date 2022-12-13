@@ -12,6 +12,7 @@ type RectangularSelectionProps = {
 export const RectangularSelection = ({
   operator,
 }: RectangularSelectionProps) => {
+  console.log("rect");
   const dashOffset = useMarchingAnts();
 
   const imageOrigin = useImageOrigin();
