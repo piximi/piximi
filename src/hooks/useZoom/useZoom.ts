@@ -125,12 +125,12 @@ export const useZoom = () => {
     event.evt.preventDefault();
     if (!imageWidth) return;
     const stage = event.target.getStage()!;
-    const scaleBy = 1.02;
+    const scaleBy = 1.035;
 
     const oldScale = stage.scaleX();
 
     const newScale =
-      event.evt.deltaY > 0
+      event.evt.deltaY < 0
         ? Math.min(5, oldScale * scaleBy)
         : Math.max(0.25, oldScale / scaleBy);
 

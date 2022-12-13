@@ -52,7 +52,6 @@ export const Selection = ({ tool, toolType }: SelectionProps) => {
     case ToolType.PolygonalAnnotation:
       return <PolygonalSelection operator={tool as PolygonalAnnotationTool} />;
     case ToolType.RectangularAnnotation:
-      console.log("rect");
       return (
         <RectangularSelection operator={tool as RectangularAnnotationTool} />
       );
