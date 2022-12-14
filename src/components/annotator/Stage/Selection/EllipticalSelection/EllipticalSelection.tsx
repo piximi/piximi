@@ -5,6 +5,7 @@ import * as ReactKonva from "react-konva";
 import { useImageOrigin, useMarchingAnts } from "hooks";
 
 import { EllipticalAnnotationTool } from "annotator-tools";
+import { stageScaleSelector } from "store/annotator";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;
@@ -13,6 +14,7 @@ type EllipticalSelectionProps = {
 export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
   const dashOffset = useMarchingAnts();
   const imageOrigin = useImageOrigin();
+  const stageScale = useSelector(stageScaleSelector);
   if (!operator.center || !operator.radius) return null;
 
   const x = operator.center.x + imageOrigin.x;
@@ -22,22 +24,22 @@ export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
     <>
       <ReactKonva.Group>
         <ReactKonva.Ellipse
-          dash={[4, 2]}
+          dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           radiusX={operator.radius.x}
           radiusY={operator.radius.y}
           stroke="black"
-          strokeWidth={1}
+          strokeWidth={1 / stageScale}
           x={x}
           y={y}
         />
         <ReactKonva.Ellipse
-          dash={[4, 2]}
+          dash={[4 / stageScale, 2 / stageScale]}
           dashOffset={-dashOffset}
           radiusX={operator.radius.x}
           radiusY={operator.radius.y}
           stroke="white"
-          strokeWidth={1}
+          strokeWidth={1 / stageScale}
           x={x}
           y={y}
         />
