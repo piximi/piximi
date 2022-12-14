@@ -16,7 +16,6 @@ import { decodedAnnotationType, Shape } from "types";
 
 import { hexToRGBA } from "utils/common/imageHelper";
 import { colorOverlayROI } from "utils/common/imageHelper";
-import { number } from "prop-types";
 import { useImageOrigin } from "hooks";
 
 type AnnotationProps = {
@@ -38,6 +37,7 @@ export const Annotation = ({
   const [imageHeight] = useState<number>(imageShape.height);
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
+  const stageScale = useSelector(stageScaleSelector);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
   const imagePosition = useImageOrigin();
   const dispatch = useDispatch();
@@ -64,6 +64,7 @@ export const Annotation = ({
     annotation.boundingBox,
     imageWidth,
     imageHeight,
+    imagePosition,
   ]);
 
   const onTransformEnd = () => {
@@ -82,6 +83,7 @@ export const Annotation = ({
 
     const maskData = annotation.maskData;
     const boundingBox = annotation.boundingBox;
+    console.log(boundingBox);
 
     const roiWidth = boundingBox[2] - boundingBox[0];
     const roiHeight = boundingBox[3] - boundingBox[1];
@@ -98,8 +100,8 @@ export const Annotation = ({
       width: Math.round(roiWidth * scaleX),
       preserveAspectRatio: false,
     });
-    const stageScaledX = Math.round(node.x());
-    const stageScaleY = Math.round(node.y());
+    const stageScaledX = Math.round(node.x()) - imagePosition.x;
+    const stageScaleY = Math.round(node.y()) - imagePosition.y;
 
     const updatedAnnotation = {
       ...annotation,
@@ -130,6 +132,7 @@ export const Annotation = ({
       width={Math.round(annotation.boundingBox[2] - annotation.boundingBox[0])}
       height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}
+      strokeWidth={100}
     />
   );
 };
