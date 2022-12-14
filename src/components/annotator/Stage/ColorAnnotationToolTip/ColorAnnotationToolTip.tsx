@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { annotationStateSelector, toolTypeSelector } from "store/annotator";
+import {
+  annotationStateSelector,
+  stageScaleSelector,
+  toolTypeSelector,
+} from "store/annotator";
 
 import { AnnotationStateType, ToolType } from "types";
 
@@ -21,12 +25,12 @@ export const ColorAnnotationToolTip = ({
 }: ColorAnnotationToolTipProps) => {
   const [text, setText] = useState<string>("Tolerance: 0%");
   const toolType = useSelector(toolTypeSelector);
-
+  const stageScale = useSelector(stageScaleSelector);
   const annotationState = useSelector(annotationStateSelector);
 
   useEffect(() => {
     if (!toolTipPosition) return;
-    setText(`Tolerance: ${tolerance}`);
+    setText(`Tolerance: ${tolerance} `);
   }, [toolTipPosition, tolerance]);
 
   if (toolType !== ToolType.ColorAnnotation) return <></>;
@@ -49,7 +53,7 @@ export const ColorAnnotationToolTip = ({
             initialPosition.x + imageOrigin!.x,
             initialPosition.y + imageOrigin!.y,
           ]}
-          strokeWidth={1}
+          strokeWidth={1 / stageScale}
           stroke="white"
         />
         <ReactKonva.Label
@@ -62,8 +66,8 @@ export const ColorAnnotationToolTip = ({
           <ReactKonva.Tag fill={"black"} />
           <ReactKonva.Text
             fill={"white"}
-            fontSize={12}
-            padding={5}
+            fontSize={12 / stageScale}
+            padding={5 / stageScale}
             text={text}
           />
         </ReactKonva.Label>
