@@ -15,9 +15,12 @@ import {
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
+import { useState } from "react";
+import { number } from "prop-types";
 
 export const useZoom = () => {
   const delta = 10;
+  const [selectStart, setSelectStart] = useState<{ x: number; y: number }>();
 
   const dispatch = useDispatch();
   const stageScale = useSelector(stageScaleSelector);
@@ -58,9 +61,13 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseDown = (position: { x: number; y: number }) => {
+  const onMouseDown = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
     if (toolType !== ToolType.Zoom) return;
-
+    const stage = event.target.getStage()!;
+    setSelectStart(stage.getPointerPosition()!);
     dispatch(
       setZoomSelection({
         zoomSelection: {
@@ -73,12 +80,18 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseMove = (position: { x: number; y: number }) => {
+  const onMouseMove = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
+    const stage = event.target.getStage()!;
+    const _position = stage.getPointerPosition()!;
     if (
       mode === ZoomModeType.Out ||
       !zoomSelection.selecting ||
       !position ||
-      !zoomSelection.minimum
+      !zoomSelection.minimum ||
+      !selectStart
     )
       return;
 
@@ -86,17 +99,22 @@ export const useZoom = () => {
       setZoomSelection({
         zoomSelection: {
           ...zoomSelection,
-          dragging: Math.abs(position.x - zoomSelection.minimum.x) >= delta,
+          dragging: Math.abs(_position.x - selectStart.x) >= delta,
           maximum: position,
         },
       })
     );
   };
 
-  const onMouseUp = (position: { x: number; y: number }) => {
+  const onMouseUp = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
     if (!imageWidth || !zoomSelection.selecting) return;
     if (zoomSelection.dragging) {
-      if (!position) return;
+      const stage = event.target.getStage()!;
+      const _position = stage.getPointerPosition()!;
+      if (!_position || !position || !selectStart) return;
 
       dispatch(
         setZoomSelection({
@@ -106,11 +124,25 @@ export const useZoom = () => {
 
       if (!zoomSelection.minimum) return;
 
-      const selectedWidth = position.x - zoomSelection.minimum.x;
-
-      zoomAndOffset(stageWidth / selectedWidth, {
-        x: zoomSelection.minimum.x + selectedWidth / 2,
-        y: zoomSelection.minimum.y + selectedWidth / 2,
+      const selectedWidth = Math.abs(_position.x - selectStart.x);
+      const newScale = Math.min(stageWidth / selectedWidth, 5);
+      let topLeft;
+      if (selectStart.x < _position.x) {
+        if (selectStart.y < _position.y) {
+          topLeft = selectStart;
+        } else {
+          topLeft = { x: selectStart.x, y: _position.y };
+        }
+      } else {
+        if (selectStart.y < _position.y) {
+          topLeft = { x: _position.x, y: selectStart.y };
+        } else {
+          topLeft = _position;
+        }
+      }
+      zoomAndOffset(newScale, {
+        x: topLeft.x + selectedWidth / 2,
+        y: topLeft.y + selectedWidth / 2,
       });
     }
 

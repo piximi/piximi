@@ -350,11 +350,11 @@ export const Stage = () => {
       event.target.attrs.name === "transformer-button"
     )
       return;
-    memoizedOnMouseDown();
+    memoizedOnMouseDown(event as KonvaEventObject<MouseEvent>);
   };
 
   const memoizedOnMouseDown = useMemo(() => {
-    const func = () => {
+    const func = (event: KonvaEventObject<MouseEvent>) => {
       if (!firstMouseDown) {
         setFirstMouseDown(true);
       }
@@ -376,7 +376,7 @@ export const Stage = () => {
         onPointerMouseDown(absolutePosition!);
         return;
       } else if (toolType === ToolType.Zoom) {
-        onZoomMouseDown(transformed!);
+        onZoomMouseDown(transformed!, event);
         return;
       }
       if (annotationState === AnnotationStateType.Annotated) {
@@ -391,7 +391,7 @@ export const Stage = () => {
       annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);
-    return () => throttled();
+    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
   }, [
     onPointerMouseDown,
     onZoomMouseDown,
@@ -421,7 +421,7 @@ export const Stage = () => {
       if (toolType === ToolType.ColorAdjustment) return;
 
       if (toolType === ToolType.Zoom) {
-        onZoomMouseMove(transformed);
+        onZoomMouseMove(transformed, event);
       } else if (toolType === ToolType.Pointer) {
         onPointerMouseMove(absolutePosition!);
       } else {
@@ -453,7 +453,7 @@ export const Stage = () => {
         stageRef.current
       );
       if (!transformed) return;
-      onZoomMouseMove(transformed);
+      //onZoomMouseMove(transformed);
       onPointerMouseMove(currentPosition);
     };
     const throttled = throttle(func, 5);
@@ -477,7 +477,7 @@ export const Stage = () => {
         stageRef.current!
       );
       if (toolType === ToolType.Zoom) {
-        onZoomMouseUp(transformed!);
+        onZoomMouseUp(transformed!, event as KonvaEventObject<MouseEvent>);
         setCurrentMousePosition();
       } else if (toolType === ToolType.Pointer) {
         onPointerMouseUp(absolutePosition);
