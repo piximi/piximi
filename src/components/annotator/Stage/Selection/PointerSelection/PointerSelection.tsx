@@ -5,6 +5,7 @@ import * as ReactKonva from "react-konva";
 import { pointerSelectionSelector, toolTypeSelector } from "store/annotator";
 
 import { ToolType } from "types";
+import { useImageOrigin } from "hooks";
 
 export const PointerSelection = () => {
   const toolType = useSelector(toolTypeSelector);
@@ -12,6 +13,7 @@ export const PointerSelection = () => {
   const { dragging, minimum, maximum, selecting } = useSelector(
     pointerSelectionSelector
   );
+  const imagePosition = useImageOrigin();
 
   if (!minimum || !maximum || !selecting || !dragging) return <></>;
 
@@ -25,8 +27,8 @@ export const PointerSelection = () => {
         stroke="white"
         strokeWidth={1}
         width={maximum.x - minimum.x}
-        x={minimum.x}
-        y={minimum.y}
+        x={minimum.x + imagePosition.x}
+        y={minimum.y + imagePosition.y}
       />
     </>
   );
