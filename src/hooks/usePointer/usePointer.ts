@@ -94,7 +94,6 @@ export const usePointer = () => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    console.log("hello");
     if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
       return;
     if (pointerSelection.dragging) {
@@ -193,7 +192,6 @@ export const usePointer = () => {
   };
 
   const onClick = (position: { x: number; y: number }) => {
-    console.log("hello");
     if (toolType !== ToolType.Pointer) return;
 
     if (!position) return;
@@ -204,7 +202,6 @@ export const usePointer = () => {
       x: position.x,
       y: position.y,
     };
-    console.log(scaledCurrentPosition);
 
     overlappingAnnotationsIds = getOverlappingAnnotations(
       scaledCurrentPosition,

@@ -157,15 +157,15 @@ export const Stage = () => {
   );
 
   const getTransformedPosition = useCallback(
-    (position: Point): Point | undefined => {
-      if (!stageRef || !stageRef.current) return;
+    (position: Point, target: Konva.Node): Point | undefined => {
+      if (!target) return;
 
-      const transform = stageRef.current.getAbsoluteTransform().copy();
+      const transform = target.getAbsoluteTransform().copy();
 
       transform.invert();
       return transform.point(position);
     },
-    [stageRef]
+    []
   );
 
   const setCurrentMousePosition = useCallback(() => {
@@ -185,7 +185,7 @@ export const Stage = () => {
     const image = annotationTool.image;
     if (!relative || !image) return;
     setCurrentPosition(position);
-    setTransformedPosition(getTransformedPosition(position));
+    setTransformedPosition(getTransformedPosition(position, stageRef.current));
     const absolute = {
       x: Math.round(relative.x),
       y: Math.round(relative.y),
@@ -342,7 +342,6 @@ export const Stage = () => {
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "2" &&
       console.log(event);
-    console.log(event);
 
     if (
       !event.target.getParent() ||
@@ -360,6 +359,8 @@ export const Stage = () => {
         setFirstMouseDown(true);
       }
       if (
+        !stageRef ||
+        !stageRef.current ||
         !currentPosition ||
         !absolutePosition ||
         draggable ||
@@ -367,7 +368,10 @@ export const Stage = () => {
       )
         return;
 
-      const transformed = getTransformedPosition(currentPosition);
+      const transformed = getTransformedPosition(
+        currentPosition,
+        stageRef.current
+      );
       if (toolType === ToolType.Pointer) {
         onPointerMouseDown(absolutePosition!);
         return;
@@ -409,7 +413,10 @@ export const Stage = () => {
       if (!stageRef || !stageRef.current || draggable) return;
       setCurrentMousePosition();
       if (!currentPosition) return;
-      const transformed = getTransformedPosition(currentPosition);
+      const transformed = getTransformedPosition(
+        currentPosition,
+        stageRef.current
+      );
       if (!transformed) return;
       if (toolType === ToolType.ColorAdjustment) return;
 
@@ -441,7 +448,10 @@ export const Stage = () => {
       if (!stageRef || !stageRef.current || draggable) return;
       setCurrentMousePosition();
       if (!currentPosition) return;
-      const transformed = getTransformedPosition(currentPosition);
+      const transformed = getTransformedPosition(
+        currentPosition,
+        stageRef.current
+      );
       if (!transformed) return;
       onZoomMouseMove(transformed);
       onPointerMouseMove(currentPosition);
@@ -462,7 +472,10 @@ export const Stage = () => {
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
       if (!currentPosition || !absolutePosition || draggable) return;
-      const transformed = getTransformedPosition(currentPosition);
+      const transformed = getTransformedPosition(
+        currentPosition,
+        stageRef.current!
+      );
       if (toolType === ToolType.Zoom) {
         onZoomMouseUp(transformed!);
         setCurrentMousePosition();
@@ -654,7 +667,6 @@ export const Stage = () => {
               <Annotations
                 transformPosition={getRelativePointerPosition}
                 annotationTool={annotationTool}
-                stageScale={stageRef.current?.scaleX()!}
               />
             </Layer>
           </DndProvider>
