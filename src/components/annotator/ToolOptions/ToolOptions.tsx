@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Drawer } from "@mui/material";
+import { Drawer, Typography } from "@mui/material";
 
 import { RectangularAnnotationOptions } from "./RectangularAnnotationOptions";
 import { EllipticalAnnotationOptions } from "./EllipticalAnnotationOptions";

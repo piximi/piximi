@@ -274,6 +274,19 @@ export const ZoomOptions = () => {
           <ListItemText>{t("Reset position")}</ListItemText>
         </ListItem>
       </List>
+      <List sx={{ mt: "auto" }}>
+        <ListItem>
+          <ListItemText
+            primaryTypographyProps={{
+              color: "gray",
+              fontSize: "0.875rem",
+              textAlign: "center",
+            }}
+          >
+            {t("Alt+Click to drage stage")}
+          </ListItemText>
+        </ListItem>
+      </List>
     </>
   );
 };
