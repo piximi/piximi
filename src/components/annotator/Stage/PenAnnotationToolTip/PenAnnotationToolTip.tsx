@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
@@ -6,6 +6,7 @@ import {
   penSelectionBrushSizeSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
+  stageScaleSelector,
   toolTypeSelector,
 } from "store/annotator";
 
@@ -27,7 +28,10 @@ export const PenAnnotationToolTip = ({
 
   const imageWidth = useSelector(scaledImageWidthSelector);
   const imageHeight = useSelector(scaledImageHeightSelector);
-
+  const stageScale = useSelector(stageScaleSelector);
+  useEffect(() => {
+    console.log(absolutePosition);
+  });
   if (
     toolType !== ToolType.PenAnnotation ||
     annotating ||
@@ -39,23 +43,23 @@ export const PenAnnotationToolTip = ({
     return <></>;
 
   if (
-    absolutePosition.x > imageWidth - penSelectionBrushSize ||
-    absolutePosition.y > imageHeight - penSelectionBrushSize ||
-    absolutePosition.x < 0 ||
-    absolutePosition.y < 0
+    absolutePosition.x >= imageWidth ||
+    absolutePosition.y >= imageHeight ||
+    absolutePosition.x <= 0 ||
+    absolutePosition.y <= 0
   )
     return <></>;
 
   return (
     <>
       <ReactKonva.Ellipse
-        radiusX={penSelectionBrushSize}
-        radiusY={penSelectionBrushSize}
+        radiusX={penSelectionBrushSize / stageScale}
+        radiusY={penSelectionBrushSize / stageScale}
         x={currentPosition.x}
         y={currentPosition.y}
         stroke="grey"
-        strokewidth={1}
-        dash={[2, 2]}
+        strokeWidth={2 / stageScale}
+        dash={[2 / stageScale, 2 / stageScale]}
       />
     </>
   );
