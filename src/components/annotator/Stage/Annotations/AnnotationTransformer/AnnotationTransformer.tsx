@@ -15,6 +15,11 @@ import {
   setSelectedAnnotations,
   stagedAnnotationsSelector,
   stageScaleSelector,
+  toolTypeSelector,
+  setAnnotationState,
+  setSelectionMode,
+  setStagedAnnotations,
+  updateStagedAnnotations,
 } from "store/annotator";
 
 import useSound from "use-sound";
@@ -48,22 +53,21 @@ type AnnotationTransformerProps = {
   }) => { x: number; y: number } | undefined;
   annotationId: string;
   annotationTool?: AnnotationTool;
-  stageScale: number;
 };
 
 export const AnnotationTransformer = ({
   transformPosition,
   annotationId,
   annotationTool,
-  stageScale,
 }: AnnotationTransformerProps) => {
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
+  const toolType = useSelector(toolTypeSelector);
   const workingAnnotation = useSelector(workingAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);
-  stageScale = useSelector(stageScaleSelector);
+  const stageScale = useSelector(stageScaleSelector);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
@@ -86,17 +90,20 @@ export const AnnotationTransformer = ({
    * @param boundBox -
    * @returns {box}
    */
-  const getRelativeBox = (boundBox: box, factor: number): box | undefined => {
+  const getRelativeBox = (
+    boundBox: box,
+    scaleFactor: number
+  ): box | undefined => {
     const relativePosition = transformPosition({
       x: boundBox.x,
       y: boundBox.y,
     });
     if (!relativePosition) return;
     return {
-      x: relativePosition.x / factor,
-      y: relativePosition.y / factor,
-      height: boundBox.height / factor,
-      width: boundBox.width / factor,
+      x: relativePosition.x / scaleFactor,
+      y: relativePosition.y / scaleFactor,
+      height: boundBox.height / scaleFactor,
+      width: boundBox.width / scaleFactor,
       rotation: 0,
     };
   };
@@ -153,7 +160,7 @@ export const AnnotationTransformer = ({
       annotationTool.deselect();
     } else {
       dispatch(
-        AnnotatorSlice.actions.setAnnotationState({
+        setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool: annotationTool,
           execSaga: true,
@@ -162,7 +169,7 @@ export const AnnotationTransformer = ({
     }
 
     dispatch(
-      AnnotatorSlice.actions.setSelectionMode({
+      setSelectionMode({
         selectionMode: AnnotationModeType.New,
       })
     );
@@ -173,27 +180,17 @@ export const AnnotationTransformer = ({
         workingAnnotation: undefined,
       })
     );
-    if (!transformed) {
-      dispatch(
-        AnnotatorSlice.actions.setStagedAnnotations({
-          annotations: stagedAnnotations.filter(
-            (annotation) => annotation.id !== annotationId
-          ),
-        })
-      );
-      return;
-    }
+
     setTransformed(false);
   };
 
   const confirmAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
-    console.log("transformer");
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
 
     if (!activeImageId) return;
 
-    dispatch(AnnotatorSlice.actions.updateStagedAnnotations({}));
+    dispatch(updateStagedAnnotations({}));
 
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
@@ -218,6 +215,28 @@ export const AnnotationTransformer = ({
   const onMouseLeave = (event: Konva.KonvaEventObject<MouseEvent>) => {
     const container = event.target.getStage()!.container();
     container.style.cursor = cursor;
+  };
+
+  const deleteAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
+    const container = event.target.getStage()!.container();
+    container.style.cursor = cursor;
+
+    if (!activeImageId) return;
+
+    dispatch(updateStagedAnnotations({}));
+
+    trRef.current!.detach();
+    trRef.current!.getLayer()?.batchDraw();
+
+    cancelAnnotation();
+    dispatch(
+      setStagedAnnotations({
+        annotations: stagedAnnotations.filter(
+          (annotation) => annotation.id !== annotationId
+        ),
+      })
+    );
+    if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
   let posX = 0;
@@ -281,12 +300,12 @@ export const AnnotationTransformer = ({
                   onClick={
                     transformed
                       ? confirmAnnotationHandler
-                      : cancelAnnotationHandler
+                      : deleteAnnotationHandler
                   }
                   onTap={
                     transformed
                       ? confirmAnnotationHandler
-                      : cancelAnnotationHandler
+                      : deleteAnnotationHandler
                   }
                   id={"label"}
                   onMouseEnter={onMouseEnter}
