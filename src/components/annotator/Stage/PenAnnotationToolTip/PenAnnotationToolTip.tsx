@@ -29,9 +29,7 @@ export const PenAnnotationToolTip = ({
   const imageWidth = useSelector(scaledImageWidthSelector);
   const imageHeight = useSelector(scaledImageHeightSelector);
   const stageScale = useSelector(stageScaleSelector);
-  useEffect(() => {
-    console.log(absolutePosition);
-  });
+
   if (
     toolType !== ToolType.PenAnnotation ||
     annotating ||
