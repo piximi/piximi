@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { PenAnnotationTool } from "annotator-tools";

@@ -1,10 +1,7 @@
 import { useLayoutEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
-
-import { stageScaleSelector } from "store/annotator";
 
 import { ColorAnnotationTool } from "annotator-tools";
 import { useImageOrigin } from "hooks";

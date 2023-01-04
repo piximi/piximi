@@ -1,16 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import {
-  setSelectedAnnotations,
-  stageHeightSelector,
-  stagePositionSelector,
-  stageScaleSelector,
-  stageWidthSelector,
-} from "store/annotator";
+import { setSelectedAnnotations } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 
@@ -35,9 +29,6 @@ export const Annotation = ({
 
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
-  const stageWidth = useSelector(stageWidthSelector);
-  const stageHeight = useSelector(stageHeightSelector);
-  const stageScale = useSelector(stageScaleSelector);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
   const imagePosition = useImageOrigin();
   const dispatch = useDispatch();
