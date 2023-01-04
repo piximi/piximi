@@ -1,5 +1,4 @@
 import { useLayoutEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { QuickAnnotationTool } from "annotator-tools";

@@ -16,7 +16,6 @@ import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
 import { useState } from "react";
-import { number } from "prop-types";
 
 export const useZoom = () => {
   const delta = 10;

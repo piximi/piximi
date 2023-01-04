@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import * as ReactKonva from "react-konva";
 
 import { useImageOrigin, useMarchingAnts } from "hooks";

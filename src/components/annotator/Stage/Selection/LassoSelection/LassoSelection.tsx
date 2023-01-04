@@ -5,7 +5,6 @@ import * as ReactKonva from "react-konva";
 import { useImageOrigin, useMarchingAnts } from "hooks";
 
 import { LassoAnnotationTool } from "annotator-tools";
-import { image } from "@tensorflow/tfjs";
 import { stageScaleSelector } from "store/annotator";
 
 type LassoSelectionProps = {
