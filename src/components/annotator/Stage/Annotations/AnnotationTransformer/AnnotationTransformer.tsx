@@ -4,7 +4,6 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import {
-  AnnotatorSlice,
   imageWidthSelector,
   workingAnnotationSelector,
   selectedAnnotationsSelector,
@@ -15,7 +14,6 @@ import {
   setSelectedAnnotations,
   stagedAnnotationsSelector,
   stageScaleSelector,
-  toolTypeSelector,
   setAnnotationState,
   setSelectionMode,
   setStagedAnnotations,
@@ -63,7 +61,6 @@ export const AnnotationTransformer = ({
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-  const toolType = useSelector(toolTypeSelector);
   const workingAnnotation = useSelector(workingAnnotationSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const activeImageId = useSelector(activeImageIdSelector);

@@ -10,7 +10,6 @@ import {
   pointerSelectionSelector,
   selectedAnnotationsIdsSelector,
   selectedAnnotationsSelector,
-  stageScaleSelector,
   toolTypeSelector,
   setSelectedAnnotations,
   setSelectedCategoryId,
@@ -39,8 +38,6 @@ export const usePointer = () => {
   const pointerSelection = useSelector(pointerSelectionSelector);
 
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-
-  const stageScale = useSelector(stageScaleSelector);
 
   const imageWidth = useSelector(imageWidthSelector);
 

@@ -15,7 +15,6 @@ import {
   useWindowFocusHandler,
   useZoom,
   useAnnotatorKeyboardShortcuts,
-  useImageOrigin,
 } from "hooks";
 
 import { Image } from "./Image";
@@ -79,10 +78,6 @@ export const Stage = () => {
     y: number;
   }>();
   const [transformedPosition, setTransformedPosition] = useState<{
-    x: number;
-    y: number;
-  }>();
-  const [annotatorPosition, setAnnotatorPosition] = useState<{
     x: number;
     y: number;
   }>();
@@ -215,7 +210,6 @@ export const Stage = () => {
     }
 
     setAbsolutePosition(absolute);
-    setAnnotatorPosition(absolute);
   }, [
     getRelativePointerPosition,
     scaledImageHeight,
@@ -453,14 +447,12 @@ export const Stage = () => {
         stageRef.current
       );
       if (!transformed) return;
-      //onZoomMouseMove(transformed);
       onPointerMouseMove(currentPosition);
     };
     const throttled = throttle(func, 5);
     return (event: KonvaEventObject<TouchEvent>) => throttled(event);
   }, [
     onPointerMouseMove,
-    onZoomMouseMove,
     setCurrentMousePosition,
     currentPosition,
     draggable,

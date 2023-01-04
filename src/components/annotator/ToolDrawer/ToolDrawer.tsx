@@ -23,7 +23,6 @@ import {
   ColorAdjustment,
   ColorAnnotation,
   EllipticalAnnotation,
-  Hand,
   LassoAnnotation,
   MagneticAnnotation,
   FreehandAnnotation,
