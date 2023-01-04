@@ -125,7 +125,10 @@ export const useZoom = () => {
       if (!zoomSelection.minimum) return;
 
       const selectedWidth = Math.abs(_position.x - selectStart.x);
-      const newScale = Math.min(stageWidth / selectedWidth, 5);
+      const newScale = Math.max(
+        Math.min(stageWidth / selectedWidth, 5),
+        stageScale
+      );
       let topLeft;
       if (selectStart.x < _position.x) {
         if (selectStart.y < _position.y) {
