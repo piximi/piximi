@@ -12,6 +12,7 @@ import {
   activeImageSelector,
   annotatorImagesSelector,
   AnnotatorSlice,
+  setStagedAnnotations,
 } from "store/annotator";
 
 import { ShadowImageType } from "types";
@@ -68,6 +69,8 @@ export const ImageMenu = ({
         if (images.length > 1) {
           newActiveImageId =
             activeImageIdx === 0 ? images[1].id : images[activeImageIdx - 1].id;
+        } else {
+          dispatch(setStagedAnnotations({ annotations: [] }));
         }
 
         dispatch(

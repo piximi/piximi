@@ -488,6 +488,8 @@ export const {
   setCursor,
   setExposure,
   setHue,
+  setImageInstances,
+  setImages,
   setLanguage,
   setOffset,
   setOperation,
