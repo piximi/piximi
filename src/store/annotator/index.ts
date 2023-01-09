@@ -25,6 +25,7 @@ export {
   setCursor,
   setExposure,
   setHue,
+  setImageInstances,
   setImages,
   setLanguage,
   setPenSelectionBrushSize,

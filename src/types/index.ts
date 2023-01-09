@@ -5,6 +5,8 @@ export { AnnotationModeType } from "./AnnotationModeType";
 
 export { AnnotationStateType } from "./AnnotationStateType";
 
+export { AnnotationExportType } from "./AnnotationExportType";
+
 export type {
   encodedAnnotationType,
   decodedAnnotationType,
