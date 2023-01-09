@@ -205,7 +205,8 @@ export const annotatorSlice = createSlice({
         annotations: Array<decodedAnnotationType>;
       }>
     ) {
-      if (!state.activeImageId) return;
+      // Cant load image if project is empty, reason for this?
+      //if (!state.activeImageId) return;
 
       const encodedAnnotations = action.payload.annotations.map(
         (annotation) => {
@@ -564,6 +565,7 @@ export const {
   setCursor,
   setExposure,
   setHue,
+  setImageInstances,
   setImages,
   setLanguage,
   setOffset,
