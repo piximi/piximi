@@ -3,8 +3,6 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { Tensor2D, Tensor4D } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
