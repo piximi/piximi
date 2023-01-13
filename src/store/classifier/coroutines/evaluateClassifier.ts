@@ -37,19 +37,6 @@ export const evaluateClassifier = async (
       // target class index scalars - shape [batchSize]
       const batchLabel = argMax(items.ys, 1) as Tensor1D;
 
-      // return (
-      //   batchTarget
-      //     .array()
-      //     // match each target idx (category idx) in batch to its category name
-      //     .then((targets) => targets.map((t) => categoryNames[t]))
-      //     .then((labels) => ({
-      //       probs: batchProbs,
-      //       preds: batchPred,
-      //       predsOneHot: batchPredOneHot, // ŷs
-      //       ys: items.ys,
-      //       labels: labels,
-      //     }))
-      // );
       return {
         probs: batchProbs,
         preds: batchPred,
