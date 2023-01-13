@@ -182,9 +182,6 @@ export function* fitClassifierSaga({
     return;
   }
 
-  // TODO: image_data - is it really necessary to put training data in store?
-  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
-
   try {
     var { fitted, status }: Awaited<ReturnType<typeof fitClassifier>> =
       yield fitClassifier(compiledModel, data, fitOptions, onEpochEnd);

@@ -21,11 +21,9 @@ export { classifierPreprocessOptionsSelector } from "./selectors/classifierPrepr
 export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
 export { classifierShuffleOptionsSelector } from "./selectors/classifierShuffleOptionsSelector";
 export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
-export { classifierTrainDataSelector } from "./selectors/classifierTrainDataSelector";
 export { classifierTrainingFlagSelector } from "./selectors/classifierTrainingFlagSelector";
 export { classifierTrainingPercentageSelector } from "./selectors/classifierTrainingPercentageSelector";
 export { classifierUploadedModelSelector } from "./selectors/classifierUploadedModelSelector";
-export { classifierValidationDataSelector } from "./selectors/classifierValidationDataSelector";
 
 // Sagas
 

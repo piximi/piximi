@@ -223,28 +223,6 @@ export const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = optimizationAlgorithm;
     },
-    updatePreprocessed(
-      state,
-      action: PayloadAction<{
-        data: {
-          val: Dataset<{
-            xs: Tensor4D;
-            ys: Tensor2D;
-          }>;
-          train: Dataset<{
-            xs: Tensor4D;
-            ys: Tensor2D;
-          }>;
-        };
-      }>
-    ) {
-      const { data } = action.payload;
-
-      // TODO: image_data - not used
-      state.trainDataSet = data.train;
-
-      state.valDataSet = data.val;
-    },
     updateRescaleOptions(
       state,
       action: PayloadAction<{ rescaleOptions: RescaleOptions }>
@@ -301,6 +279,5 @@ export const {
   updateLossFunction,
   updateMetrics,
   updateOptimizationAlgorithm,
-  updatePreprocessed,
   updateTrainingPercentage,
 } = classifierSlice.actions;
