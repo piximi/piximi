@@ -24,7 +24,7 @@ import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 // TOOD: image_data
 // temporary hack
-import { loadImageAsStack, convertToImage } from "image/utils/imageHelper";
+import { loadImageFileAsStack, convertToImage } from "image/utils/imageHelper";
 import { projectSlice } from "store/project";
 import colorImage from "images/cell-painting.png";
 import { imagesSelector } from "store/project";
@@ -41,7 +41,7 @@ export const MainView = () => {
         .then((res) => res.blob())
         .then((blob) => {
           const file = new File([blob], "cell-painting.png", blob);
-          const stackPromise = loadImageAsStack(file);
+          const stackPromise = loadImageFileAsStack(file);
           stackPromise
             .then((stack) => convertToImage(stack, file.name, undefined, 1, 3))
             .then((image) => {

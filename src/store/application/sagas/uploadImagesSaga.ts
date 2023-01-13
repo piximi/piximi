@@ -1,5 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { put, select } from "redux-saga/effects";
+import { put } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
@@ -19,7 +19,7 @@ import { getStackTraceFromError } from "utils/getStackTrace";
 import {
   ImageShapeInfo,
   ImageShapeEnum,
-  loadImageAsStack,
+  loadImageFileAsStack,
   convertToImage,
 } from "image/utils/imageHelper";
 
@@ -180,7 +180,7 @@ function* decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
     }
     imageStack = new ImageJS.Stack(channels);
   } else {
-    imageStack = yield loadImageAsStack(imageFile);
+    imageStack = yield loadImageFileAsStack(imageFile);
   }
 
   return {

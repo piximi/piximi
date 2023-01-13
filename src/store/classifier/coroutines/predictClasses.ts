@@ -1,4 +1,4 @@
-import { Tensor, Rank, tidy, argMax } from "@tensorflow/tfjs";
+import { Tensor, Tensor2D, Tensor4D, tidy, argMax } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { LayersModel } from "@tensorflow/tfjs";
 import { Category } from "types";
@@ -6,10 +6,8 @@ import { Category } from "types";
 export const predictClasses = async (
   model: LayersModel,
   data: Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R2>;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor2D;
   }>,
   categories: Array<Category>
 ): Promise<{ imageIds: Array<string>; categoryIds: Array<string> }> => {
@@ -21,8 +19,9 @@ export const predictClasses = async (
       });
 
       return {
-        preds: batchPred as Tensor<Rank.R1>,
-        labels: items.labels as Tensor<Rank.R1>,
+        preds: batchPred,
+        // TODO: image_data
+        //@ts-ignore
         ids: items.ids as Tensor<Rank.R1>,
       };
     })
@@ -31,18 +30,17 @@ export const predictClasses = async (
   const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
     return {
       preds: prev.preds.concat(curr.preds),
-      labels: prev.labels.concat(curr.labels),
       ids: prev.ids.concat(curr.ids),
     };
   });
 
   const imageIds = (await inferredTensors.ids.array()) as unknown as string[];
   const predictions = await inferredTensors.preds.array();
+  // TODO: image_data
+  //@ts-ignore
   const categoryIds = predictions.map((idx) => categories[idx].id);
 
   inferredTensors.preds.dispose();
-  inferredTensors.labels.dispose();
-  inferredTensors.ids.dispose();
 
   return { imageIds, categoryIds };
 };

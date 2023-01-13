@@ -56,13 +56,31 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
 }
 
 /*
- -----------------
- File blob helpers
- -----------------
+ ----------------------------
+ File blob & data url helpers
+ ----------------------------
  */
+
+const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
+  const imageShapeInfo = getImageInformation(image);
+
+  if (imageShapeInfo.shape !== ImageShapeEnum.HyperStackImage) {
+    image = (image as ImageJS.Image).split({ preserveAlpha: false });
+    // preserveAlpha removes the alpha data from each ImageJS.Image
+    // but its still present as its own ImageJS.Image as the final
+    // element of the stack, so remove it
+    if (imageShapeInfo.alpha) {
+      image = new ImageJS.Stack(image.splice(0, image.length - 1));
+    }
+    return image;
+  } else {
+    return image as ImageJS.Stack;
+  }
+};
 
 /*
   Receives a File blob and returns an ImageJS.Stack
+  
   If the file is a greyscale, rgb, rgba, ImageJS will return a single
   ImageJS.Image object, where the data field has the pixel data interleaved
   (including alpha, if present).
@@ -75,31 +93,80 @@ export interface ImageFileShapeInfo extends ImageShapeInfo {
   Instead we want to always return a stack, regardless of filetype.
   Alpha channel is discarded, if present.
   BitDepth and datat type is preserved.
+
+  ---
+
+  The File object, may come from an HTML <input type="file">,
+  
+  or generated browser-side, like so:
+
+    import theImage from "path/to/the_image.png";
+    
+    fetch(theImage)
+    .then((res) => res.blob())
+    .then((blob) => {
+      const file = new File([blob], "the_image.png", blob);
+      const stackPromise = loadImageFileAsStack(file);
+
+  or generated node-side (for testing), like so:
+
+    const imageFilepath = "path/to/the_image.png"
+    const imageName = "the_image.png"
+    const imageMimetype = "image/png"
+
+    const bufferData: BlobPart = fs.readFileSync(imageFilepath).buffer;
+
+    const imageFile = new File([bufferData], imageName, { type: imageMimetype });
+
+    // hacking node runtime 'File' type to be more like browser 'File' type
+    imageFile.arrayBuffer = () =>
+      //@ts-ignore
+      imageFile[Object.getOwnPropertySymbols(imageFile)[0]]._buffer;
+
+    const stackPromise = loadImageFileAsStack(imageFile)
  */
-export const loadImageAsStack = async (file: File) => {
+export const loadImageFileAsStack = async (file: File) => {
   try {
     const buffer = await file.arrayBuffer();
-    let image = (await ImageJS.Image.load(buffer, {
+
+    const image = (await ImageJS.Image.load(buffer, {
       ignorePalette: true,
     })) as ImageJS.Image | ImageJS.Stack;
 
-    const imageShapeInfo = getImageInformation(image);
-
-    if (imageShapeInfo.shape !== ImageShapeEnum.HyperStackImage) {
-      image = (image as ImageJS.Image).split({ preserveAlpha: false });
-      // preserveAlpha removes the alpha data from each ImageJS.Image
-      // but its still present as its own ImageJS.Image as the final
-      // element of the stack, so remove it
-      if (imageShapeInfo.alpha) {
-        image = new ImageJS.Stack(image.splice(0, image.length - 1));
-      }
-      return image;
-    } else {
-      return image as ImageJS.Stack;
-    }
+    return forceStack(image);
   } catch (err) {
     process.env.NODE_ENV !== "production" &&
       console.error(`Error loading image file ${file.name}`);
+    throw err;
+  }
+};
+
+/*
+  Converts a base64 dataURL encoded image into an ImageJS stack
+
+  If the encoded image is a greyscale, rgb, or rgba, ImageJS will return a single
+  ImageJS.Image object, where the data field has the pixel data interleaved
+  (including alpha, if present).
+
+    e.g. for rgba: [r1, g1, b1, a1, r2, g2, b2, a2, ...]
+
+  Otherwise ImageJS will return an ImageJS.Stack object, which is a sublcass
+  of a simple array, where each element is a single channel ImageJS.Image object.
+
+  Instead we want to always return a stack, regardless of filetype.
+  Alpha channel is discarded, if present.
+  BitDepth and datat type is preserved.
+ */
+export const loadDataUrlAsStack = async (dataURL: string) => {
+  try {
+    const image = await ImageJS.Image.load(dataURL, {
+      ignorePalette: true,
+    });
+
+    return forceStack(image);
+  } catch (err) {
+    process.env.NODE_ENV !== "production" &&
+      console.error("Error loading dataURL");
     throw err;
   }
 };
@@ -469,6 +536,29 @@ export const generateColoredTensor = <T extends Tensor3D | Tensor4D>(
   }
 };
 
+/* 
+  Gets a normalized tensor, where values are in the float range [0, 1],
+  and returns a denormalized one, where values are in the integer range
+  determined by the given bitdepth, [0, 2**bitDepth - 1]
+
+  note: wrt "integer range" above, the tensor data type is not converted
+  from "float32" to "int32"; it remains as "float32" but the values are all "n.0",
+  where "n" is in the integer range [0, 2**bitDepth - 1]
+ */
+export const denormalizeTensor = (
+  normalTensor: Tensor3D | Tensor4D,
+  bitDepth: ImageJS.BitDepth,
+  opts: { disposeNormalTensor: boolean } = { disposeNormalTensor: true }
+) => {
+  const denormalizedTensor = tidy(() =>
+    normalTensor.mul(2 ** bitDepth - 1).round()
+  );
+
+  opts.disposeNormalTensor && normalTensor.dispose();
+
+  return denormalizedTensor;
+};
+
 /*
  Receives a tensor of shape [H,W,C] or [Z,H,W,C]
  normalizes it based on the bit depth
@@ -479,11 +569,9 @@ const getImageTensorData = async (
   bitDepth: ImageJS.BitDepth,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
-  const imageData = await tidy(() =>
-    imageTensor.mul(2 ** bitDepth - 1).round()
-  ).data();
-
-  opts.disposeImageTensor && imageTensor.dispose();
+  const imageData = await denormalizeTensor(imageTensor, bitDepth, {
+    disposeNormalTensor: opts.disposeImageTensor,
+  }).data();
 
   // DO NOT USE "imageData instanceof Float32Array" here
   // tensorflow sublcasses typed arrays, so it will always return false

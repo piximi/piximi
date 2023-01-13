@@ -1,4 +1,10 @@
-import { History, LayersModel, Rank, Tensor } from "@tensorflow/tfjs";
+import {
+  History,
+  LayersModel,
+  Tensor,
+  Tensor2D,
+  Tensor4D,
+} from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
@@ -11,17 +17,17 @@ import { ClassifierEvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
   compiled?: LayersModel;
+  // TODO: image_data - not used
   trainDataSet?: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor;
-    ids: Tensor;
+    xs: Tensor4D;
+    ys: Tensor2D;
   }>;
   valDataSet?: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor2D;
+    // TODO: image_data - better if labels and ids are not necessary
+    // labels: Tensor<Rank.R1>;
+    // ids: Tensor<Rank.R1>;
   }>;
   evaluating: boolean;
   fitOptions: FitOptions;

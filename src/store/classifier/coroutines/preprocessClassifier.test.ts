@@ -1,5 +1,8 @@
 import "@tensorflow/tfjs-node";
-import { preprocessClassifier } from "./preprocessClassifier";
+import {
+  preprocessClassifier,
+  createClassificationLabels,
+} from "./preprocessClassifier";
 
 import {
   Category,
@@ -13,8 +16,7 @@ import {
   CropSchema,
 } from "types";
 
-// TODO: image_data
-import { generateBlankColors } from "image/utils/imageHelper";
+import { loadImageFileAsStack, convertToImage } from "image/utils/imageHelper";
 
 jest.setTimeout(50000);
 
@@ -62,27 +64,38 @@ const categories: Array<Category> = [
   },
 ];
 
-const images: Array<ImageType> = [
-  {
-    activePlane: 0,
-    categoryId: "00000000-0000-0000-0000-00000000001",
-    colors: generateBlankColors(inputShape.channels),
-    id: "00000000-0000-0000-0001-00000000000",
-    annotations: [],
-    name: "",
-    // @ts-ignore TODO: image_data
-    originalSrc: [],
-    src: "https://picsum.photos/seed/piximi/224",
-    partition: Partition.Training,
-    visible: true,
-    shape: inputShape,
-  },
+const preloadedImages = [
+  { src: "https://picsum.photos/seed/piximi/224", name: "224.jpg" },
 ];
 
+const urlToeStack = async (src: string, name: string) => {
+  const file = await fetch(src)
+    .then((res) => res.blob())
+    .then((blob) => new File([blob], name, blob));
+
+  return loadImageFileAsStack(file);
+};
+
 it("preprocessClassifier", async () => {
+  const images: Array<ImageType> = [];
+
+  for (const preIm of preloadedImages) {
+    const imStack = await urlToeStack(preIm.src, preIm.name);
+    const im = await convertToImage(
+      imStack,
+      preIm.name,
+      undefined,
+      1,
+      imStack.length
+    );
+    images.push(im);
+  }
+
+  const imageLabels = createClassificationLabels(images, categories);
+
   const preprocessed = await preprocessClassifier(
     images,
-    categories,
+    imageLabels,
     inputShape,
     preprocessingOptions,
     fitOptions
