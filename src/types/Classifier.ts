@@ -16,35 +16,28 @@ import { ClassifierModelProps } from "./ModelType";
 import { ClassifierEvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
-  compiled?: LayersModel;
-  // TODO: image_data - not used
-  trainDataSet?: Dataset<{
-    xs: Tensor4D;
-    ys: Tensor2D;
-  }>;
-  valDataSet?: Dataset<{
-    xs: Tensor4D;
-    ys: Tensor2D;
-    // TODO: image_data - better if labels and ids are not necessary
-    // labels: Tensor<Rank.R1>;
-    // ids: Tensor<Rank.R1>;
-  }>;
-  evaluating: boolean;
-  fitOptions: FitOptions;
-  fitted?: LayersModel;
-  fitting: boolean;
+  // pre-fit state
+  userUploadedModel?: ClassifierModelProps;
+  selectedModel: ClassifierModelProps;
   inputShape: Shape;
-  history?: History;
+  preprocessOptions: PreprocessOptions;
+  fitOptions: FitOptions;
   learningRate: number;
   lossFunction: LossFunction;
-  metrics: Array<Metric>;
-  selectedModel: ClassifierModelProps;
-  userUploadedModel?: ClassifierModelProps;
   optimizationAlgorithm: OptimizationAlgorithm;
-  predicting: boolean;
-  predictions?: Tensor;
-  predicted: boolean;
   trainingPercentage: number;
+  metrics: Array<Metric>;
+  // post-fit results
+  compiled?: LayersModel;
+  history?: History;
+  // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
-  preprocessOptions: PreprocessOptions;
+  // post-prediction results
+  predictions?: Tensor;
+  // status flags
+  fitting: boolean;
+  fitted?: LayersModel;
+  evaluating: boolean;
+  predicting: boolean;
+  predicted: boolean;
 };

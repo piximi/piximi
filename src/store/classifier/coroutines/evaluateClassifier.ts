@@ -24,22 +24,38 @@ export const evaluateClassifier = async (
   categories: Category[]
 ): Promise<ClassifierEvaluationResultType> => {
   const categoryIDs = categories.map((c: Category) => c.id);
-  const numberOfClasses = categoryIDs.length;
+  const numClasses = categoryIDs.length;
 
   const inferredBatchTensors = await validationData
     .map((items) => {
-      const batchProbs = model.predict(items.xs);
-      //@ts-ignore
-      const batchPred = argMax(batchProbs, 1);
-      const batchPredOneHot = oneHot(batchPred, numberOfClasses);
+      // probability distribution vectors - shape [batchSize, numClasses]
+      const batchProbs = model.predict(items.xs) as Tensor2D;
+      // predicted class index scalars - shape [batchSize]
+      const batchPred = argMax(batchProbs, 1) as Tensor1D;
+      // prediction one hot vector - shape [bachSize, numClasses]
+      const batchPredOneHot = oneHot(batchPred, numClasses) as Tensor2D;
+      // target class index scalars - shape [batchSize]
+      const batchLabel = argMax(items.ys, 1) as Tensor1D;
+
+      // return (
+      //   batchTarget
+      //     .array()
+      //     // match each target idx (category idx) in batch to its category name
+      //     .then((targets) => targets.map((t) => categoryNames[t]))
+      //     .then((labels) => ({
+      //       probs: batchProbs,
+      //       preds: batchPred,
+      //       predsOneHot: batchPredOneHot, // ŷs
+      //       ys: items.ys,
+      //       labels: labels,
+      //     }))
+      // );
       return {
         probs: batchProbs,
         preds: batchPred,
         predsOneHot: batchPredOneHot, // ŷs
         ys: items.ys,
-        // TODO: image_data
-        //@ts-ignore
-        labels: items.labels,
+        labels: batchLabel,
       };
     })
     .toArray();
@@ -55,16 +71,12 @@ export const evaluateClassifier = async (
   });
 
   const confusionMatrix = await math
-    .confusionMatrix(
-      inferredTensors.labels,
-      inferredTensors.preds as Tensor1D,
-      numberOfClasses
-    )
+    .confusionMatrix(inferredTensors.labels, inferredTensors.preds, numClasses)
     .array();
 
   var accuracy: number[];
   var crossEntropy: number[];
-  if (numberOfClasses === 2) {
+  if (numClasses === 2) {
     accuracy = (await metrics
       .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
       .array()) as number[];
@@ -84,7 +96,7 @@ export const evaluateClassifier = async (
   }
 
   const { precision, recall, f1Score } = evaluateConfusionMatrix(
-    numberOfClasses,
+    numClasses,
     confusionMatrix
   );
 
