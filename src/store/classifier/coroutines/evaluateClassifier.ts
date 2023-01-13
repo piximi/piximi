@@ -2,7 +2,8 @@ import {
   LayersModel,
   Tensor,
   Tensor1D,
-  Rank,
+  Tensor2D,
+  Tensor4D,
   oneHot,
   math,
   metrics,
@@ -16,10 +17,8 @@ import { ImageType } from "../../../types/ImageType";
 export const evaluateClassifier = async (
   model: LayersModel,
   validationData: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor2D;
   }>,
   validationImages: ImageType[],
   categories: Category[]
@@ -38,6 +37,8 @@ export const evaluateClassifier = async (
         preds: batchPred,
         predsOneHot: batchPredOneHot, // ŷs
         ys: items.ys,
+        // TODO: image_data
+        //@ts-ignore
         labels: items.labels,
       };
     })
@@ -68,22 +69,16 @@ export const evaluateClassifier = async (
       .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
       .array()) as number[];
     crossEntropy = (await metrics
-      .binaryCrossentropy(
-        inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
-      )
+      .binaryCrossentropy(inferredTensors.ys, inferredTensors.probs as Tensor)
       .array()) as number[];
   } else {
     accuracy = (await metrics
-      .categoricalAccuracy(
-        inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
-      )
+      .categoricalAccuracy(inferredTensors.ys, inferredTensors.probs as Tensor)
       .array()) as number[];
     crossEntropy = (await metrics
       .categoricalCrossentropy(
         inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
+        inferredTensors.probs as Tensor
       )
       .array()) as number[];
   }

@@ -13,6 +13,7 @@ import {
   classifierTrainingPercentageSelector,
   fitClassifier,
   createClassifierModel,
+  createClassificationLabels,
   preprocessClassifier,
 } from "store/classifier";
 import {
@@ -150,10 +151,16 @@ export function* fitClassifierSaga({
   );
 
   try {
+    const trainLabels: Awaited<ReturnType<typeof createClassificationLabels>> =
+      yield createClassificationLabels(trainImages, categories);
+
+    const valLabels: Awaited<ReturnType<typeof createClassificationLabels>> =
+      yield createClassificationLabels(valImages, categories);
+
     const trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         trainImages,
-        categories,
+        trainLabels,
         architectureOptions.inputShape,
         preprocessingOptions,
         fitOptions
@@ -162,7 +169,7 @@ export function* fitClassifierSaga({
     const valData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         valImages,
-        categories,
+        valLabels,
         architectureOptions.inputShape,
         preprocessingOptions,
         fitOptions
@@ -175,6 +182,7 @@ export function* fitClassifierSaga({
     return;
   }
 
+  // TODO: image_data - is it really necessary to put training data in store?
   yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
 
   try {
@@ -186,9 +194,11 @@ export function* fitClassifierSaga({
     return;
   }
 
-  const payload = { fitted: fitted, status: status };
+  yield put(
+    classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
+  );
 
-  yield put(classifierSlice.actions.updateFitted(payload));
+  // TODO: image_data - dispose data (xs) and label (ys) tensors
 }
 
 function* handleError(error: Error, errorName: string) {

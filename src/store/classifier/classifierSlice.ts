@@ -3,7 +3,7 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { Tensor, Rank } from "@tensorflow/tfjs";
+import { Tensor2D, Tensor4D } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
@@ -228,23 +228,21 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         data: {
           val: Dataset<{
-            xs: Tensor<Rank.R4>;
-            ys: Tensor<Rank.R2>;
-            labels: Tensor<Rank.R1>;
-            ids: Tensor<Rank.R1>;
+            xs: Tensor4D;
+            ys: Tensor2D;
           }>;
           train: Dataset<{
-            xs: Tensor<Rank.R4>;
-            ys: Tensor<Rank.R2>;
-            labels: Tensor<Rank.R1>;
-            ids: Tensor<Rank.R1>;
+            xs: Tensor4D;
+            ys: Tensor2D;
           }>;
         };
       }>
     ) {
       const { data } = action.payload;
 
+      // TODO: image_data - not used
       state.trainDataSet = data.train;
+
       state.valDataSet = data.val;
     },
     updateRescaleOptions(

@@ -1,5 +1,4 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import * as ImageJS from "image-js";
 import { v4 as uuidv4 } from "uuid";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
@@ -21,7 +20,7 @@ import {
   generateDefaultChannels,
   importSerializedAnnotations,
 } from "image/imageHelper";
-import { convertToImage } from "image/utils/imageHelper";
+import { convertToImage, loadDataUrlAsStack } from "image/utils/imageHelper";
 
 type ExampleImageProject = {
   exampleImageName: string;
@@ -62,9 +61,7 @@ export const OpenExampleImageMenuItem = ({
     );
 
     const exampleImageSrc = exampleImageProject.exampleImageData as string;
-    const exampleImage = await ImageJS.Image.load(exampleImageSrc, {
-      ignorePalette: true,
-    });
+    const exampleImage = await loadDataUrlAsStack(exampleImageSrc);
     const exampleImageTypeObject = convertToImage(
       //@ts-ignore TODO: image_data
       [exampleImage],

@@ -44,11 +44,8 @@ export { fitClassifier } from "./coroutines/fitClassifier";
 export { createClassifierModel } from "./coroutines/createClassifierModel";
 export { predictClasses } from "./coroutines/predictClasses";
 export {
-  decodeCategory,
-  decodeFromImgSrc,
-  decodeFromOriginalSrc,
-  decodeImage,
   cropResize,
   sampleGenerator,
   preprocessClassifier,
+  createClassificationLabels,
 } from "./coroutines/preprocessClassifier";

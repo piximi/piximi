@@ -10,6 +10,7 @@ import {
   classifierPreprocessOptionsSelector,
   predictClasses,
   preprocessClassifier,
+  createClassificationLabels,
 } from "store/classifier";
 import {
   createdCategoriesSelector,
@@ -114,11 +115,13 @@ function* runPrediction(
   fitOptions: FitOptions,
   model: LayersModel
 ) {
-  var data: Awaited<ReturnType<typeof preprocessClassifier>>;
+  let data: Awaited<ReturnType<typeof preprocessClassifier>>;
   try {
+    const testLabels = createClassificationLabels(testImages, categories);
+
     data = yield preprocessClassifier(
       testImages,
-      categories,
+      testLabels,
       inputShape,
       preprocessOptions,
       fitOptions

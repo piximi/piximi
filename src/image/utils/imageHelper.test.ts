@@ -13,7 +13,7 @@ import * as ImageJS from "image-js";
 import {
   MIMEType,
   generateDefaultColors,
-  loadImageAsStack,
+  loadImageFileAsStack,
   convertToTensor,
   getImageSlice,
   filterVisibleChannels,
@@ -384,7 +384,7 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
         frames: expectedFrames,
       } = testData[im];
 
-      const imageStack = await loadImageAsStack(testData[im].data);
+      const imageStack = await loadImageFileAsStack(testData[im].data);
 
       // is ImageJS.Stack (subclass of array, containing ImageJS.Image objects)
       // and correct number of ImageJS.Image objects
@@ -417,7 +417,7 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
 
       expect(expectedChannels * expectedSlices).toBe(expectedFrames);
 
-      const imageStack = await loadImageAsStack(testData[im].data);
+      const imageStack = await loadImageFileAsStack(testData[im].data);
 
       const imageTensor = convertToTensor(
         imageStack,
