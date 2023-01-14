@@ -85,17 +85,17 @@ const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
 
  or via url, eg:
 
- https://piximi.photos/path/to/img
+ "https://piximi.photos/path/to/img"
 
- and generates a File object out of it, identical to a File
+ and optionally a name, which is inffered from path if not provided.
+
+ A File object is generated, identical to a File
  object retrived via html:
  
  <input type="file">
 
- This should only be used for served files browser side, ie importable files,
- or with urls, either with browser or node.
-
- If you want to use local files in node, use the analogous function defined in
+ This should only be used browser side, 
+ If you want to generate files node side, use the analogous function defined in
  "nodeImageHelper.ts".
 */
 export const fileFromPath = async (
