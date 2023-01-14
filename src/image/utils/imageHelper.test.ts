@@ -25,6 +25,7 @@ import {
   findMinMaxs,
   scaleImageTensor,
 } from "image/utils/imageHelper";
+import { fileFromPath } from "image/utils/nodeImageHelper";
 
 // https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
 interface CustomMatchers<R = unknown> {
@@ -179,7 +180,7 @@ describe("color generation", () => {
   });
 });
 
-describe("ImageJS Images -> Stacks -> Tensors ", () => {
+describe("ImageJS Images -> Stacks -> Tensors ", async () => {
   /*
   ======================
   Test Image Definitions
@@ -344,24 +345,15 @@ describe("ImageJS Images -> Stacks -> Tensors ", () => {
     // TODO: image_data
   };
 
-  const fs = require("fs");
-
   for (const im of Object.keys(testDataUnloaded)) {
     const imProps = testDataUnloaded[im];
-    const nameArr = imProps.filepath.split("/");
-    const imName = nameArr[nameArr.length - 1];
 
     try {
-      const bufferData: BlobPart = fs.readFileSync(imProps.filepath).buffer;
-
-      const data = new File([bufferData], imName, { type: imProps.mimetype });
-
-      // hacking node runtime File type to be more like browser File type
-      data.arrayBuffer = () =>
-        //@ts-ignore
-        data[Object.getOwnPropertySymbols(data)[0]]._buffer;
-
-      imProps.data = data;
+      imProps.data = await fileFromPath(
+        imProps.filepath,
+        imProps.mimetype,
+        false
+      );
     } catch (err) {
       console.error(err);
     }

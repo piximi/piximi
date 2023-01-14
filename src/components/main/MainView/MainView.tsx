@@ -20,7 +20,11 @@ import { visibleImagesSelector } from "store/common";
 import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
+import {
+  ImageShapeEnum,
+  ImageShapeInfo,
+  fileFromPath,
+} from "image/utils/imageHelper";
 
 // TOOD: image_data
 // temporary hack
@@ -37,21 +41,15 @@ export const MainView = () => {
   const theimages = useSelector(imagesSelector);
   useEffect(() => {
     if (theimages.length === 0) {
-      fetch(colorImage)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const file = new File([blob], "cell-painting.png", blob);
-          const stackPromise = loadImageFileAsStack(file);
-          stackPromise
-            .then((stack) => convertToImage(stack, file.name, undefined, 1, 3))
-            .then((image) => {
-              dispatch(
-                projectSlice.actions.setImages({
-                  images: [image],
-                })
-              );
-            });
-        });
+      fileFromPath(colorImage).then((file) => {
+        loadImageFileAsStack(file)
+          .then((imStack) =>
+            convertToImage(imStack, file.name, undefined, 1, 3)
+          )
+          .then((image) => {
+            dispatch(projectSlice.actions.setImages({ images: [image] }));
+          });
+      });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
