@@ -79,6 +79,44 @@ const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
 };
 
 /*
+ Receives a path to an image file, retrieved via import, eg:
+
+ import myImage from "path/to/myImage.png"
+
+ or via url, eg:
+
+ https://piximi.photos/path/to/img
+
+ and generates a File object out of it, identical to a File
+ object retrived via html:
+ 
+ <input type="file">
+
+ This should only be used for served files browser side, ie importable files,
+ or with urls, either with browser or node.
+
+ If you want to use local files in node, use the analogous function defined in
+ "nodeImageHelper.ts".
+*/
+export const fileFromPath = async (
+  imPath: string,
+  name: string | undefined = undefined
+) => {
+  let imName: string;
+
+  if (!name) {
+    const pathParts = imPath.split("/");
+    imName = pathParts[pathParts.length - 1];
+  } else {
+    imName = name;
+  }
+
+  return fetch(imPath)
+    .then((res) => res.blob())
+    .then((blob) => new File([blob], imName, blob));
+};
+
+/*
   Receives a File blob and returns an ImageJS.Stack
   
   If the file is a greyscale, rgb, rgba, ImageJS will return a single
@@ -98,33 +136,8 @@ const forceStack = async (image: ImageJS.Image | ImageJS.Stack) => {
 
   The File object, may come from an HTML <input type="file">,
   
-  or generated browser-side, like so:
-
-    import theImage from "path/to/the_image.png";
-    
-    fetch(theImage)
-    .then((res) => res.blob())
-    .then((blob) => {
-      const file = new File([blob], "the_image.png", blob);
-      const stackPromise = loadImageFileAsStack(file);
-
-  or generated node-side (for testing), like so:
-
-    const imageFilepath = "path/to/the_image.png"
-    const imageName = "the_image.png"
-    const imageMimetype = "image/png"
-
-    const bufferData: BlobPart = fs.readFileSync(imageFilepath).buffer;
-
-    const imageFile = new File([bufferData], imageName, { type: imageMimetype });
-
-    // hacking node runtime 'File' type to be more like browser 'File' type
-    imageFile.arrayBuffer = () =>
-      //@ts-ignore
-      imageFile[Object.getOwnPropertySymbols(imageFile)[0]]._buffer;
-
-    const stackPromise = loadImageFileAsStack(imageFile)
- */
+  or generated via "fileFromPath" either here or in "nodeImageHelper.ts"
+*/
 export const loadImageFileAsStack = async (file: File) => {
   try {
     const buffer = await file.arrayBuffer();
