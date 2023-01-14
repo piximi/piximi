@@ -115,11 +115,11 @@ function* runPrediction(
   fitOptions: FitOptions,
   model: LayersModel
 ) {
-  let data: Awaited<ReturnType<typeof preprocessClassifier>>;
+  let dataSet: Awaited<ReturnType<typeof preprocessClassifier>>;
   try {
     const testLabels = createClassificationLabels(testImages, categories);
 
-    data = yield preprocessClassifier(
+    dataSet = yield preprocessClassifier(
       testImages,
       testLabels,
       inputShape,
@@ -135,12 +135,14 @@ function* runPrediction(
   }
 
   try {
-    var { imageIds, categoryIds }: Awaited<ReturnType<typeof predictClasses>> =
-      yield predictClasses(model, data, categories); //returns an array of Image ID and an array of corresponding categories ID
+    var categoryIds: Awaited<ReturnType<typeof predictClasses>> =
+      yield predictClasses(model, dataSet, categories); //returns an array of Image ID and an array of corresponding categories ID
   } catch (error) {
     yield handleError(error as Error, "Error predicting the inference data");
     return;
   }
+
+  const imageIds = testImages.map((img) => img.id);
 
   yield put(
     projectSlice.actions.updateImagesCategories({

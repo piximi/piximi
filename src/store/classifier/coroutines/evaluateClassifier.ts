@@ -48,12 +48,30 @@ export const evaluateClassifier = async (
     .toArray();
 
   const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
+    const probs = prev.probs.concat(curr.probs);
+    const preds = prev.preds.concat(curr.preds);
+    const predsOneHot = prev.predsOneHot.concat(curr.predsOneHot); // ŷs
+    const ys = prev.ys.concat(curr.ys);
+    const labels = prev.labels.concat(curr.labels);
+
+    prev.probs.dispose();
+    prev.preds.dispose();
+    prev.predsOneHot.dispose();
+    prev.ys.dispose();
+    prev.labels.dispose();
+
+    curr.probs.dispose();
+    curr.preds.dispose();
+    curr.predsOneHot.dispose();
+    curr.ys.dispose();
+    curr.labels.dispose();
+
     return {
-      probs: prev.probs.concat(curr.probs),
-      preds: prev.preds.concat(curr.preds),
-      predsOneHot: prev.predsOneHot.concat(curr.predsOneHot), // ŷs
-      ys: prev.ys.concat(curr.ys),
-      labels: prev.labels.concat(curr.labels),
+      probs,
+      preds,
+      predsOneHot,
+      ys,
+      labels,
     };
   });
 
@@ -86,6 +104,12 @@ export const evaluateClassifier = async (
     numClasses,
     confusionMatrix
   );
+
+  inferredTensors.probs.dispose();
+  inferredTensors.preds.dispose();
+  inferredTensors.predsOneHot.dispose();
+  inferredTensors.ys.dispose();
+  inferredTensors.labels.dispose();
 
   return {
     confusionMatrix: confusionMatrix,

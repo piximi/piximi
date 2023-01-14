@@ -155,11 +155,13 @@ it("predict", async () => {
   // await setBackend("tensorflow");
 
   const inferrenceImages: Array<ImageType> = [];
+  const imageIds: Array<string> = [];
 
   for (const im of inferrenceImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);
     const loadedIm = await convertToImage(imStack, "mnist", undefined, 1, 1);
     inferrenceImages.push({ ...loadedIm, ...im });
+    imageIds.push(im.id);
   }
 
   const inferrenceLabels = createClassificationLabels(
@@ -167,7 +169,7 @@ it("predict", async () => {
     categories
   );
 
-  const inferrenceData = await preprocessClassifier(
+  const inferrenceData = preprocessClassifier(
     inferrenceImages,
     inferrenceLabels,
     inputShape,
@@ -211,10 +213,7 @@ it("predict", async () => {
     return res;
   });
 
-  const result = profile.result as {
-    imageIds: string[];
-    categoryIds: string[];
-  };
+  const categoryIds = profile.result as string[];
 
   // console.log(`newBytes: ${profile.newBytes}`);
   // console.log(`newTensors: ${profile.newTensors}`);
@@ -246,43 +245,34 @@ it("predict", async () => {
   //   }
   // }
 
-  const expectedResults = {
-    imageIds: [
-      "00000000-0000-0000-0001-00000000000",
-      "00000000-0000-0000-0002-00000000000",
-      "00000000-0000-0000-0003-00000000000",
-    ],
-    categoryIds: [
-      "10000000-0000-0000-0000-000000000003",
-      "10000000-0000-0000-0000-000000000008",
-      "10000000-0000-0000-0000-000000000007",
-    ],
-  };
+  const expectedImageIds = [
+    "00000000-0000-0000-0001-00000000000",
+    "00000000-0000-0000-0002-00000000000",
+    "00000000-0000-0000-0003-00000000000",
+  ];
+
+  const expectedCategoryIds = [
+    "10000000-0000-0000-0000-000000000003",
+    "10000000-0000-0000-0000-000000000008",
+    "10000000-0000-0000-0000-000000000007",
+  ];
 
   // each image should have a corresponding category
-  expect(result.imageIds.length).toEqual(result.categoryIds.length);
+  expect(imageIds.length).toEqual(categoryIds.length);
 
-  expect(result.imageIds.length).toEqual(expectedResults.imageIds.length);
-  expect(result.categoryIds.length).toEqual(expectedResults.categoryIds.length);
+  expect(imageIds.length).toEqual(expectedImageIds.length);
+  expect(categoryIds.length).toEqual(expectedCategoryIds.length);
 
-  expect(result.imageIds).toEqual(
-    expect.arrayContaining(expectedResults.imageIds)
-  );
-  expect(result.categoryIds).toEqual(
-    expect.arrayContaining(expectedResults.categoryIds)
-  );
+  expect(imageIds).toEqual(expect.arrayContaining(expectedImageIds));
+  expect(categoryIds).toEqual(expect.arrayContaining(expectedCategoryIds));
 
   // can't guarantee order, but must guarantee each image id has the correct category id
-  for (let i = 0; i < expectedResults.imageIds.length; i++) {
-    let resultImageId = result.imageIds[i];
-    let resultCategoryId = result.categoryIds[i];
+  for (let i = 0; i < expectedImageIds.length; i++) {
+    let resultImageId = imageIds[i];
+    let resultCategoryId = categoryIds[i];
 
-    let expectedIdx = expectedResults.imageIds.findIndex(
-      (id) => id === resultImageId
-    );
+    let expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
 
-    expect(resultCategoryId).toStrictEqual(
-      expectedResults.categoryIds[expectedIdx]
-    );
+    expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);
   }
 });
