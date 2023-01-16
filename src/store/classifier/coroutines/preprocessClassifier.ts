@@ -164,18 +164,19 @@ export const cropResize = (
 };
 
 /* Debug Stuff */
-let trainLimit = 1;
-let valLimit = 1;
-let infLimit = 1;
-// xsData: [batchNum, height, width, channel]; ysData: [batchNum, oneHot]
+let trainLimit = 0;
+let valLimit = 0;
+let infLimit = 0;
+// xsData: [height, width, channel]; ysData: [oneHot]
 const doShowImages = async (
   partition: Partition,
-  xsData: number[][][][],
-  ysData: number[][]
+  xsData: number[][][],
+  ysData: number[]
 ) => {
   let canvas;
   const refHeight = xsData[0].length;
   const refWidth = xsData[0][0].length;
+
   if (process.env.NODE_ENV === "test") {
     const { createCanvas } = require("canvas");
     canvas = createCanvas(refWidth, refHeight);
@@ -185,113 +186,56 @@ const doShowImages = async (
     canvas.height = refHeight;
   }
 
-  for (const [i, c] of xsData.entries()) {
-    try {
-      const channel = tensor3d(c, undefined, "int32");
-      const imageDataArr = await browser.toPixels(channel);
-      channel.dispose();
-      let imageData;
-      if (process.env.NODE_ENV === "test") {
-        const { createImageData } = require("canvas");
-        imageData = createImageData(imageDataArr, channel.shape[1]);
-      } else {
-        imageData = new ImageData(
-          imageDataArr,
-          channel.shape[1], // width
-          channel.shape[0] // height
-        );
-      }
-      const ctx = canvas.getContext("2d");
-      ctx.putImageData(imageData, 0, 0);
-    } catch (e) {
-      if (process.env.NODE_ENV !== "production") console.error(e);
-    }
-    if (partition === Partition.Training && trainLimit < 5) {
-      trainLimit++;
-      console.log(
-        "Training, class: ",
-        ysData[i].findIndex((e: any) => e === 1),
-        canvas.toDataURL()
-      );
-    } else if (partition === Partition.Validation && valLimit < 5) {
-      valLimit++;
-      console.log(
-        "Validation, class: ",
-        ysData[i].findIndex((e: any) => e === 1),
-        canvas.toDataURL()
-      );
-    } else if (partition === Partition.Inference && infLimit < 5) {
-      infLimit++;
-      console.log(
-        "Inference, class: ",
-        ysData[i].findIndex((e: any) => e === 1),
-        canvas.toDataURL()
-      );
-    }
-  }
-};
-
-const doShowFromChannels = (
-  partition: Partition,
-  items: {
-    xs: Tensor4D;
-    ys: Tensor2D;
-  }
-): {
-  xs: Tensor4D;
-  ys: Tensor2D;
-} => {
-  const numChannels = items.xs.shape[3];
-
-  const xsData = tidy(() => {
-    let xs3ch: Tensor4D;
-    if (numChannels === 2) {
-      const ch3 = fill(
-        [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
-        0
-      );
-      xs3ch = items.xs.concat(ch3, 3) as Tensor4D;
+  try {
+    const imTensor = tensor3d(xsData, undefined, "int32");
+    const imageDataArr = await browser.toPixels(imTensor);
+    imTensor.dispose();
+    let imageData;
+    if (process.env.NODE_ENV === "test") {
+      const { createImageData } = require("canvas");
+      imageData = createImageData(imageDataArr, imTensor.shape[1]);
     } else {
-      xs3ch = slice(
-        items.xs,
-        [0, 0, 0, 0],
-        [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 3]
+      imageData = new ImageData(
+        imageDataArr,
+        imTensor.shape[1], // width
+        imTensor.shape[0] // height
       );
     }
-
-    return xs3ch.mul(scalar(255)).arraySync() as number[][][][];
-  });
-  const ysData = tidy(() => items.ys.arraySync());
-
-  doShowImages(partition, xsData, ysData);
-
-  return items;
-};
-
-const doShowFromBrowser = (
-  partition: Partition,
-  items: {
-    xs: Tensor4D;
-    ys: Tensor2D;
+    const ctx = canvas.getContext("2d");
+    ctx.putImageData(imageData, 0, 0);
+  } catch (e) {
+    if (process.env.NODE_ENV !== "production") console.error(e);
   }
-): {
-  xs: Tensor4D;
-  ys: Tensor2D;
-} => {
-  const xsData = tidy(() => {
-    return items.xs.mul(scalar(255)).arraySync() as number[][][][];
-    // return items.xs.arraySync() as number[][][][];
-  });
-  const ysData = tidy(() => items.ys.arraySync());
-  doShowImages(partition, xsData, ysData);
-  return items;
+
+  if (partition === Partition.Training && trainLimit < 5) {
+    trainLimit++;
+    console.log(
+      "Training, class: ",
+      ysData.findIndex((e: any) => e === 1),
+      canvas.toDataURL()
+    );
+  } else if (partition === Partition.Validation && valLimit < 5) {
+    valLimit++;
+    console.log(
+      "Validation, class: ",
+      ysData.findIndex((e: any) => e === 1),
+      canvas.toDataURL()
+    );
+  } else if (partition === Partition.Inference && infLimit < 5) {
+    infLimit++;
+    console.log(
+      "Inference, class: ",
+      ysData.findIndex((e: any) => e === 1),
+      canvas.toDataURL()
+    );
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const doShow = (partition: Partition, value: TensorContainer) => {
   const items = value as {
-    xs: Tensor4D;
-    ys: Tensor2D;
+    xs: Tensor3D;
+    ys: Tensor1D;
   };
   // console.log(
   //   "perf:",
@@ -300,11 +244,33 @@ const doShow = (partition: Partition, value: TensorContainer) => {
   //   memory().numBytes, // @ts-ignore
   //   memory().numBytesInGPU
   // );
-  const numChannels = items.xs.shape[3];
+  const numChannels = items.xs.shape[2];
 
-  return numChannels === 1 || numChannels === 3
-    ? doShowFromBrowser(partition, items)
-    : doShowFromChannels(partition, items);
+  const xsData = tidy(() => {
+    let xsIm: Tensor3D;
+
+    if (numChannels === 2) {
+      const ch3 = fill(
+        [items.xs.shape[0], items.xs.shape[1], items.xs.shape[2], 1],
+        0
+      );
+      xsIm = items.xs.concat(ch3, 3) as Tensor3D;
+    } else if (numChannels > 3) {
+      xsIm = slice(
+        items.xs,
+        [0, 0, 0],
+        [items.xs.shape[0], items.xs.shape[1], 3]
+      );
+    } else {
+      xsIm = items.xs;
+    }
+
+    return xsIm.mul(scalar(255)).asType("int32").arraySync() as number[][][];
+  });
+
+  const ysData = tidy(() => items.ys.arraySync());
+
+  doShowImages(partition, xsData, ysData);
 };
 /* /Debug Stuff */
 
@@ -347,14 +313,12 @@ export const preprocessClassifier = (
       )
     );
 
-  const imageDataBatched = imageData.batch(fitOptions.batchSize);
-
   if (process.env.REACT_APP_LOG_LEVEL === "4") {
-    return imageDataBatched.map(doShow.bind(null, images[0].partition));
-  } else {
-    return imageDataBatched as tfdata.Dataset<{
-      xs: Tensor4D;
-      ys: Tensor2D;
-    }>;
+    imageData.forEachAsync(doShow.bind(null, images[0].partition));
   }
+
+  return imageData.batch(fitOptions.batchSize) as tfdata.Dataset<{
+    xs: Tensor4D;
+    ys: Tensor2D;
+  }>;
 };
