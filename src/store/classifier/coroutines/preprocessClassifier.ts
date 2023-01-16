@@ -288,13 +288,7 @@ const doShowFromBrowser = (
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const doShow = (
-  partition: Partition,
-  value: TensorContainer
-): {
-  xs: Tensor4D;
-  ys: Tensor2D;
-} => {
+const doShow = (partition: Partition, value: TensorContainer) => {
   const items = value as {
     xs: Tensor4D;
     ys: Tensor2D;
@@ -354,10 +348,13 @@ export const preprocessClassifier = (
     );
 
   const imageDataBatched = imageData.batch(fitOptions.batchSize);
-  // .map(doShow.bind(null, images[0].partition)); // For debug stuff
 
-  return imageDataBatched as tfdata.Dataset<{
-    xs: Tensor4D;
-    ys: Tensor2D;
-  }>;
+  if (process.env.REACT_APP_LOG_LEVEL === "4") {
+    return imageDataBatched.map(doShow.bind(null, images[0].partition));
+  } else {
+    return imageDataBatched as tfdata.Dataset<{
+      xs: Tensor4D;
+      ys: Tensor2D;
+    }>;
+  }
 };
