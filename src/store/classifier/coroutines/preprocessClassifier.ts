@@ -18,7 +18,11 @@ import {
 } from "@tensorflow/tfjs";
 import _ from "lodash";
 
-import { getImageSlice } from "image/utils/imageHelper";
+import {
+  denormalizeTensor,
+  getImageSlice,
+  BitDepth,
+} from "image/utils/imageHelper";
 
 import { matchedCropPad, padToMatch } from "./cropUtil";
 
@@ -163,6 +167,21 @@ export const cropResize = (
   };
 };
 
+export const scale = (
+  bitDepth: BitDepth,
+  items: {
+    xs: Tensor3D;
+    ys: Tensor1D;
+  }
+) => {
+  const scaleddXs = denormalizeTensor(items.xs, bitDepth);
+
+  return {
+    ...items,
+    xs: scaleddXs,
+  };
+};
+
 /* Debug Stuff */
 let trainLimit = 0;
 let valLimit = 0;
@@ -173,20 +192,20 @@ const doShowImages = async (
   xsData: number[][][],
   ysData: number[]
 ) => {
-  let canvas;
-  const refHeight = xsData[0].length;
-  const refWidth = xsData[0][0].length;
-
-  if (process.env.NODE_ENV === "test") {
-    const { createCanvas } = require("canvas");
-    canvas = createCanvas(refWidth, refHeight);
-  } else {
-    canvas = document.createElement("canvas");
-    canvas.width = refWidth;
-    canvas.height = refHeight;
-  }
-
   try {
+    let canvas: HTMLCanvasElement;
+    const refHeight = xsData.length;
+    const refWidth = xsData[0].length;
+
+    if (process.env.NODE_ENV === "test") {
+      const { createCanvas } = require("canvas");
+      canvas = createCanvas(refWidth, refHeight);
+    } else {
+      canvas = document.createElement("canvas");
+      canvas.width = refWidth;
+      canvas.height = refHeight;
+    }
+
     const imTensor = tensor3d(xsData, undefined, "int32");
     const imageDataArr = await browser.toPixels(imTensor);
     imTensor.dispose();
@@ -202,37 +221,42 @@ const doShowImages = async (
       );
     }
     const ctx = canvas.getContext("2d");
+    //@ts-ignore
     ctx.putImageData(imageData, 0, 0);
+
+    if (partition === Partition.Training && trainLimit < 5) {
+      trainLimit++;
+      console.log(
+        "Training, class: ",
+        ysData.findIndex((e) => e === 1),
+        canvas.toDataURL()
+      );
+    } else if (partition === Partition.Validation && valLimit < 5) {
+      valLimit++;
+      console.log(
+        "Validation, class: ",
+        ysData.findIndex((e) => e === 1),
+        canvas.toDataURL()
+      );
+    } else if (partition === Partition.Inference && infLimit < 5) {
+      infLimit++;
+      console.log(
+        "Inference, class: ",
+        ysData.findIndex((e) => e === 1),
+        canvas.toDataURL()
+      );
+    }
   } catch (e) {
     if (process.env.NODE_ENV !== "production") console.error(e);
-  }
-
-  if (partition === Partition.Training && trainLimit < 5) {
-    trainLimit++;
-    console.log(
-      "Training, class: ",
-      ysData.findIndex((e: any) => e === 1),
-      canvas.toDataURL()
-    );
-  } else if (partition === Partition.Validation && valLimit < 5) {
-    valLimit++;
-    console.log(
-      "Validation, class: ",
-      ysData.findIndex((e: any) => e === 1),
-      canvas.toDataURL()
-    );
-  } else if (partition === Partition.Inference && infLimit < 5) {
-    infLimit++;
-    console.log(
-      "Inference, class: ",
-      ysData.findIndex((e: any) => e === 1),
-      canvas.toDataURL()
-    );
   }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const doShow = (partition: Partition, value: TensorContainer) => {
+const doShow = (
+  partition: Partition,
+  scale: boolean,
+  value: TensorContainer
+) => {
   const items = value as {
     xs: Tensor3D;
     ys: Tensor1D;
@@ -265,7 +289,12 @@ const doShow = (partition: Partition, value: TensorContainer) => {
       xsIm = items.xs;
     }
 
-    return xsIm.mul(scalar(255)).asType("int32").arraySync() as number[][][];
+    if (scale) {
+      // don't dispose input tensor, tidy does that for us
+      xsIm = xsIm.mul(scalar(255));
+    }
+
+    return xsIm.asType("int32").arraySync() as number[][][];
   });
 
   const ysData = tidy(() => items.ys.arraySync());
@@ -284,26 +313,27 @@ export const preprocessClassifier = (
   xs: Tensor4D;
   ys: Tensor2D;
 }> => {
-  let multipliedImages: Array<ImageType>;
+  let imageSet: typeof images;
+  let labelSet: typeof labels;
+
   if (
     preprocessOptions.cropOptions.numCrops > 1 &&
-    images[0].partition === Partition.Training &&
-    preprocessOptions.shuffle
+    images[0].partition === Partition.Training
   ) {
     // TODO: image_data - data tensors need to be copied?
-    multipliedImages = _.shuffle(
-      images.flatMap((i) =>
-        Array(preprocessOptions.cropOptions.numCrops).fill(i)
-      )
+    imageSet = images.flatMap((im) =>
+      Array(preprocessOptions.cropOptions.numCrops).fill(im)
+    );
+    labelSet = labels.flatMap((label) =>
+      Array(preprocessOptions.cropOptions.numCrops).fill(label)
     );
   } else {
-    multipliedImages = images;
+    imageSet = images;
+    labelSet = labels;
   }
 
-  // TODO: image_data - rescale, or now un-rescale
-
   let imageData = tfdata
-    .generator(sampleGenerator(multipliedImages, labels))
+    .generator(sampleGenerator(imageSet, labelSet))
     .map(
       cropResize.bind(
         null,
@@ -313,8 +343,26 @@ export const preprocessClassifier = (
       )
     );
 
+  // If we took crops, the crops from each sample will be sequentially arranged
+  // ideally we want to shuffle the partition itslef to avoid biasing the model
+  // TODO: warn user against cropping without shuffling
+  if (preprocessOptions.cropOptions.numCrops > 1 && preprocessOptions.shuffle) {
+    imageData = imageData.shuffle(fitOptions.batchSize);
+  }
+
+  // rescaled (in range [0, 1]) by default, scale up if rescale is off
+  if (!preprocessOptions.rescaleOptions.rescale) {
+    imageData = imageData.map(scale.bind(null, images[0].bitDepth));
+  }
+
   if (process.env.REACT_APP_LOG_LEVEL === "4") {
-    imageData.forEachAsync(doShow.bind(null, images[0].partition));
+    imageData.forEachAsync(
+      doShow.bind(
+        null,
+        images[0].partition,
+        preprocessOptions.rescaleOptions.rescale
+      )
+    );
   }
 
   return imageData.batch(fitOptions.batchSize) as tfdata.Dataset<{
