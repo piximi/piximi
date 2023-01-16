@@ -44,9 +44,11 @@ const MIMETYPES = [
 
 export type MIMEType = typeof MIMETYPES[number];
 
+export type BitDepth = ImageJS.BitDepth;
+
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;
-  bitDepth?: ImageJS.BitDepth;
+  bitDepth?: BitDepth;
   components?: number;
   alpha?: boolean;
 }
@@ -558,14 +560,14 @@ export const generateColoredTensor = <T extends Tensor3D | Tensor4D>(
   from "float32" to "int32"; it remains as "float32" but the values are all "n.0",
   where "n" is in the integer range [0, 2**bitDepth - 1]
  */
-export const denormalizeTensor = (
-  normalTensor: Tensor3D | Tensor4D,
-  bitDepth: ImageJS.BitDepth,
+export const denormalizeTensor = <T extends Tensor3D | Tensor4D>(
+  normalTensor: T,
+  bitDepth: BitDepth,
   opts: { disposeNormalTensor: boolean } = { disposeNormalTensor: true }
 ) => {
   const denormalizedTensor = tidy(() =>
     normalTensor.mul(2 ** bitDepth - 1).round()
-  );
+  ) as T;
 
   opts.disposeNormalTensor && normalTensor.dispose();
 
@@ -579,7 +581,7 @@ export const denormalizeTensor = (
  */
 const getImageTensorData = async (
   imageTensor: Tensor3D | Tensor4D,
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
   const imageData = await denormalizeTensor(imageTensor, bitDepth, {
@@ -681,13 +683,13 @@ export const scaleImageTensor = <T extends Tensor3D | Tensor4D>(
  */
 export async function renderTensor<T extends Tensor3D | Tensor4D>(
   compositeTensor: T,
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
 ): Promise<T extends Tensor3D ? string : string[]>;
 
 export async function renderTensor(
   compositeTensor: Tensor3D | Tensor4D,
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   opts?: { disposeCompositeTensor?: boolean; useCanvas?: boolean }
 ): Promise<string | string[]> {
   opts = opts ?? {};
@@ -718,7 +720,7 @@ export async function renderTensor(
       height,
       data: imageData,
       kind: "RGB" as ImageJS.ImageKind,
-      bitDepth: bitDepth as ImageJS.BitDepth,
+      bitDepth: bitDepth,
       components,
       alpha: 0,
       colorModel: "RGB" as ImageJS.ColorModel,
@@ -741,7 +743,7 @@ export async function renderTensor(
         height,
         data: imageData.slice(sliceStart, sliceEnd),
         kind: "RGB" as ImageJS.ImageKind,
-        bitDepth: bitDepth as ImageJS.BitDepth,
+        bitDepth: bitDepth,
         components,
         alpha: 0,
         colorModel: "RGB" as ImageJS.ColorModel,
@@ -764,14 +766,14 @@ export async function renderTensor(
 export async function createRenderedTensor<T extends number | undefined>(
   imageTensor: Tensor4D,
   colors: Colors,
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   plane: T
 ): Promise<T extends number ? string : string[]>;
 
 export async function createRenderedTensor(
   imageTensor: Tensor4D,
   colors: Colors,
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   plane: number | undefined
 ) {
   let operandTensor: Tensor4D | Tensor3D;
@@ -988,7 +990,7 @@ export const replaceDuplicateName = (
 
 export const scaleUpRange = (
   range: [number, number],
-  bitDepth: ImageJS.BitDepth
+  bitDepth: BitDepth
 ): [number, number] => {
   return [
     Math.floor(range[0] * (2 ** bitDepth - 1)),
@@ -998,7 +1000,7 @@ export const scaleUpRange = (
 
 export const scaleUpRanges = (
   ranges: { [channel: number]: [number, number] },
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   opts: { inPlace: boolean } = { inPlace: false }
 ): { [channel: number]: [number, number] } => {
   let operandRanges = opts.inPlace ? ranges : { ...ranges };
@@ -1013,14 +1015,14 @@ export const scaleUpRanges = (
 
 export const scaleDownRange = (
   range: [number, number],
-  bitDepth: ImageJS.BitDepth
+  bitDepth: BitDepth
 ): [number, number] => {
   return [range[0] / (2 ** bitDepth - 1), range[1] / (2 ** bitDepth - 1)];
 };
 
 export const scaleDownRanges = (
   ranges: { [channel: number]: [number, number] },
-  bitDepth: ImageJS.BitDepth,
+  bitDepth: BitDepth,
   opts: { inPlace: boolean } = { inPlace: false }
 ): { [channel: number]: [number, number] } => {
   let operandRanges = opts.inPlace ? ranges : { ...ranges };
