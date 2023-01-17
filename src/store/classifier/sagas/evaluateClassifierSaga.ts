@@ -96,8 +96,13 @@ function* runEvaluation(
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);
 
-  const validationLabels: ReturnType<typeof createClassificationLabels> =
-    createClassificationLabels(validationImages, categories);
+  const {
+    labels: validationLabels,
+    disposeLabels: disposeValidationLabels,
+  }: ReturnType<typeof createClassificationLabels> = createClassificationLabels(
+    validationImages,
+    categories
+  );
 
   const validationData: ReturnType<typeof preprocessClassifier> =
     preprocessClassifier(
@@ -128,6 +133,8 @@ function* runEvaluation(
     yield handleError(error as Error, "Error computing the evaluation results");
     return;
   }
+
+  disposeValidationLabels();
 
   yield put(
     classifierSlice.actions.updateEvaluationResult({

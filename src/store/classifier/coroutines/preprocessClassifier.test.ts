@@ -89,7 +89,10 @@ it("preprocessClassifier", async () => {
     images.push(im);
   }
 
-  const imageLabels = createClassificationLabels(images, categories);
+  const { labels: imageLabels, disposeLabels } = createClassificationLabels(
+    images,
+    categories
+  );
 
   const preprocessed = preprocessClassifier(
     images,
@@ -101,6 +104,8 @@ it("preprocessClassifier", async () => {
 
   // future warning: toArrayForTest is undocumented
   const items = await preprocessed.toArrayForTest();
+
+  disposeLabels();
 
   expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
   expect(items[0]["ys"].shape).toEqual([1, 2]);

@@ -153,12 +153,10 @@ it("evaluateClassifier", async () => {
     validationImages.push({ ...loadedIm, ...im });
   }
 
-  const validationLabels = createClassificationLabels(
-    validationImages,
-    categories
-  );
+  const { labels: validationLabels, disposeLabels: disposeValidationLabels } =
+    createClassificationLabels(validationImages, categories);
 
-  const validationData = await preprocessClassifier(
+  const validationData = preprocessClassifier(
     validationImages,
     validationLabels,
     validationImages[0].shape,
@@ -202,6 +200,8 @@ it("evaluateClassifier", async () => {
     );
     return res;
   });
+
+  disposeValidationLabels();
 
   const result = profile.result as ClassifierEvaluationResultType;
 

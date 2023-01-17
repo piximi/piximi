@@ -170,10 +170,8 @@ it("predict", async () => {
     imageIds.push(im.id);
   }
 
-  const inferrenceLabels = createClassificationLabels(
-    inferrenceImages,
-    categories
-  );
+  const { labels: inferrenceLabels, disposeLabels: disposeInferrenceLabels } =
+    createClassificationLabels(inferrenceImages, categories);
 
   const inferrenceData = preprocessClassifier(
     inferrenceImages,
@@ -218,6 +216,8 @@ it("predict", async () => {
     );
     return res;
   });
+
+  disposeInferrenceLabels();
 
   const categoryIds = profile.result as string[];
 

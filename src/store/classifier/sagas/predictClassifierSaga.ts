@@ -115,17 +115,18 @@ function* runPrediction(
   fitOptions: FitOptions,
   model: LayersModel
 ) {
-  let dataSet: Awaited<ReturnType<typeof preprocessClassifier>>;
   try {
-    const testLabels = createClassificationLabels(testImages, categories);
+    var { labels: testLabels, disposeLabels: disposeTestLabels } =
+      createClassificationLabels(testImages, categories);
 
-    dataSet = yield preprocessClassifier(
-      testImages,
-      testLabels,
-      inputShape,
-      preprocessOptions,
-      fitOptions
-    );
+    var dataSet: Awaited<ReturnType<typeof preprocessClassifier>> =
+      yield preprocessClassifier(
+        testImages,
+        testLabels,
+        inputShape,
+        preprocessOptions,
+        fitOptions
+      );
   } catch (error) {
     yield handleError(
       error as Error,
@@ -143,6 +144,8 @@ function* runPrediction(
   }
 
   const imageIds = testImages.map((img) => img.id);
+
+  disposeTestLabels();
 
   yield put(
     projectSlice.actions.updateImagesCategories({
