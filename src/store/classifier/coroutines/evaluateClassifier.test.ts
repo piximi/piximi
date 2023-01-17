@@ -256,13 +256,10 @@ it("evaluateClassifier", async () => {
     f1Score: 0.6666666865348816,
   };
 
-  // console.log(result);
-
-  // expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
-  // expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
-  // expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
+  expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
+  expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
+  expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
   // expect(result.precision).toBeCloseTo(expectedResults.precision, 5);
   // expect(result.recall).toBeCloseTo(expectedResults.recall, 5);
   // expect(result.f1Score).toBeCloseTo(expectedResults.f1Score, 5);
-  expect(1).toEqual(1);
 });
