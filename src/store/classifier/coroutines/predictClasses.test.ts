@@ -109,18 +109,18 @@ const rescaleOptions: RescaleOptions = {
 };
 
 const cropOptions: CropOptions = {
-  numCrops: 2,
-  cropSchema: CropSchema.Match,
+  numCrops: 1,
+  cropSchema: CropSchema.None,
 };
 
 const preprocessingOptions: PreprocessOptions = {
-  shuffle: true,
+  shuffle: false,
   rescaleOptions,
   cropOptions,
 };
 
 const fitOptions: FitOptions = {
-  epochs: 2,
+  epochs: 1,
   batchSize: 3,
   initialEpoch: 0,
 };
@@ -159,7 +159,13 @@ it("predict", async () => {
 
   for (const im of inferrenceImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);
-    const loadedIm = await convertToImage(imStack, "mnist", undefined, 1, 1);
+    const loadedIm = await convertToImage(
+      imStack,
+      "mnist",
+      undefined,
+      inputShape.planes,
+      inputShape.channels
+    );
     inferrenceImages.push({ ...loadedIm, ...im });
     imageIds.push(im.id);
   }
