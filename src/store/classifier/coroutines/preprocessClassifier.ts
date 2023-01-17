@@ -77,11 +77,11 @@ export const sampleGenerator = (
       const dataPlane = getImageSlice(image.data, image.activePlane);
 
       /*
-      we clone the "label" tensor below, because it will be disposed internally
-      when passing it to TF for fit/evaluate/predict
-
-      we don't clone the "image" tensor because "getImageSlice" is already giving
-      us a new, disposable, tensor derived from "image"
+       we clone the "label" tensor below, because it will be disposed internally
+       when passing it to TF for fit/evaluate/predict
+ 
+       we don't clone the "image" tensor because "getImageSlice" is already giving
+       us a new, disposable, tensor derived from "image"
       */
 
       yield {
@@ -181,7 +181,7 @@ export const scale = (
   };
 };
 
-/* Debug Stuff */
+//#region Debug stuff
 let trainLimit = 0;
 let valLimit = 0;
 let infLimit = 0;
@@ -300,7 +300,7 @@ const doShow = (
 
   doShowImages(partition, xsData, ysData);
 };
-/* /Debug Stuff */
+//#endregion Debug stuff
 
 export const preprocessClassifier = (
   images: Array<ImageType>,
@@ -319,7 +319,7 @@ export const preprocessClassifier = (
     preprocessOptions.cropOptions.numCrops > 1 &&
     images[0].partition === Partition.Training
   ) {
-    // TODO: image_data - data tensors need to be copied?
+    // no need to copy the tensors here
     imageSet = images.flatMap((im) =>
       Array(preprocessOptions.cropOptions.numCrops).fill(im)
     );
