@@ -259,6 +259,8 @@ it("evaluateClassifier", async () => {
   expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
   expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
   expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
+
+  // Values below are NaN, currently
   // expect(result.precision).toBeCloseTo(expectedResults.precision, 5);
   // expect(result.recall).toBeCloseTo(expectedResults.recall, 5);
   // expect(result.f1Score).toBeCloseTo(expectedResults.f1Score, 5);
