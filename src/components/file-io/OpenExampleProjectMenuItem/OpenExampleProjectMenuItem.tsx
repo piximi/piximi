@@ -85,7 +85,7 @@ export const OpenExampleProjectMenuItem = ({
         break;
       case ExampleProject.BBBC013:
         exampleProjectJson = await import(
-          "data/exampleProjects/BBBC013ModeExampleProject.json"
+          "data/exampleProjects/BBBC013ExampleProject.json"
         );
         break;
       case ExampleProject.PLP1:

@@ -183,8 +183,9 @@ const deserializeAnnotationsGroup = (
 ): Array<AnnotationType> => {
   const bboxes = getDataset(annotationsGroup, "bounding_box")
     .value as Uint8Array;
-  const categories = getDataset(annotationsGroup, "category").value as string[];
-  const ids = getDataset(annotationsGroup, "id").value as string[];
+  const categories = getDataset(annotationsGroup, "annotation_category_id")
+    .value as string[];
+  const ids = getDataset(annotationsGroup, "annotation_id").value as string[];
   const masks = getDataset(annotationsGroup, "mask").value as Uint8Array;
   const maskLengths = getDataset(annotationsGroup, "mask_length")
     .value as Uint8Array;
@@ -250,9 +251,9 @@ const deserializeImageGroup = async (
   name: string,
   imageGroup: Group
 ): Promise<ImageType> => {
-  const id = getAttr(imageGroup, "id") as string;
+  const id = getAttr(imageGroup, "image_id") as string;
   const activePlane = getAttr(imageGroup, "active_plane") as number;
-  const categoryId = getAttr(imageGroup, "category_id") as string;
+  const categoryId = getAttr(imageGroup, "class_category_id") as string;
   const classifierPartition = getAttr(
     imageGroup,
     "classifier_partition"
@@ -314,7 +315,7 @@ const deserializeImagesGroup = async (imagesGroup: Group) => {
 };
 
 const deserializeCategoriesGroup = (categoriesGroup: Group) => {
-  const ids = getDataset(categoriesGroup, "id").value as string[];
+  const ids = getDataset(categoriesGroup, "category_id").value as string[];
   const colors = getDataset(categoriesGroup, "color").value as string[];
   const names = getDataset(categoriesGroup, "name").value as string[];
   const visibilities = Array.from(
