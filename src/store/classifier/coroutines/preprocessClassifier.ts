@@ -16,7 +16,6 @@ import {
   tidy,
   TensorContainer,
 } from "@tensorflow/tfjs";
-import _ from "lodash";
 
 import {
   denormalizeTensor,
