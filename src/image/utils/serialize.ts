@@ -24,7 +24,7 @@ const serializeImageAnnotations = (
   annotationsGroup: Group,
   annotations: AnnotationType[]
 ) => {
-  const boxes = new Uint8Array(annotations.length * 4);
+  const bboxes = new Uint8Array(annotations.length * 4);
   const categories = annotations.map((an) => an.categoryId);
   const ids = annotations.map((an) => an.id);
   const maskLengths = new Uint8Array(annotations.length);
@@ -36,15 +36,15 @@ const serializeImageAnnotations = (
   let maskStartIdx = 0;
   for (let i = 0; i < annotations.length; i++) {
     let annotation = annotations[i];
-    boxes.set(annotation.boundingBox, i * 4);
+    bboxes.set(annotation.boundingBox, i * 4);
     maskLengths[i] = annotation.mask.length;
     masks.set(annotation.mask, maskStartIdx);
     maskStartIdx += annotation.mask.length;
   }
 
-  annotationsGroup.create_dataset("bounding_box", boxes, undefined, "<B");
-  annotationsGroup.create_dataset("category", categories);
-  annotationsGroup.create_dataset("id", ids);
+  annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");
+  annotationsGroup.create_dataset("annotation_category_id", categories);
+  annotationsGroup.create_dataset("annotation_id", ids);
   annotationsGroup.create_dataset("mask_length", maskLengths, undefined, "<B");
   annotationsGroup.create_dataset("mask", masks, undefined, "<B");
   annotationsGroup.create_dataset("plane", planes, undefined, "<B");
@@ -87,9 +87,9 @@ const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
     );
     im_data.create_attribute("bit_depth", im.bitDepth, undefined, "<B");
 
-    imGroup.create_attribute("id", im.id);
+    imGroup.create_attribute("image_id", im.id);
     imGroup.create_attribute("active_plane", im.activePlane, undefined, "<B");
-    imGroup.create_attribute("category_id", im.categoryId);
+    imGroup.create_attribute("class_category_id", im.categoryId);
     imGroup.create_attribute("visible_B", Number(im.visible), undefined, "<B");
     imGroup.create_attribute("classifier_partition", im.partition);
     // imGroup.create_attribute("segmenter_partition", im.segmentationPartition)
@@ -108,7 +108,7 @@ const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
     categories.map((cat) => cat.color)
   );
   categoryGroup.create_dataset(
-    "id",
+    "category_id",
     categories.map((cat) => cat.id)
   );
   categoryGroup.create_dataset(
