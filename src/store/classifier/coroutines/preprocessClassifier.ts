@@ -58,7 +58,13 @@ export const createClassificationLabels = (
     labels.push(label);
   }
 
-  return labels;
+  const disposeLabels = () => {
+    for (const label of labels) {
+      label.dispose();
+    }
+  };
+
+  return { labels, disposeLabels };
 };
 
 export const sampleGenerator = (

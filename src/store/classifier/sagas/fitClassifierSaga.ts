@@ -151,13 +151,19 @@ export function* fitClassifierSaga({
   );
 
   try {
-    const trainLabels: Awaited<ReturnType<typeof createClassificationLabels>> =
+    var {
+      labels: trainLabels,
+      disposeLabels: disposeTrainLabels,
+    }: Awaited<ReturnType<typeof createClassificationLabels>> =
       yield createClassificationLabels(trainImages, categories);
 
-    const valLabels: Awaited<ReturnType<typeof createClassificationLabels>> =
+    var {
+      labels: valLabels,
+      disposeLabels: disposeValLabels,
+    }: Awaited<ReturnType<typeof createClassificationLabels>> =
       yield createClassificationLabels(valImages, categories);
 
-    const trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
+    var trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         trainImages,
         trainLabels,
@@ -166,7 +172,7 @@ export function* fitClassifierSaga({
         fitOptions
       );
 
-    const valData: Awaited<ReturnType<typeof preprocessClassifier>> =
+    var valData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         valImages,
         valLabels,
@@ -174,8 +180,6 @@ export function* fitClassifierSaga({
         preprocessingOptions,
         fitOptions
       );
-
-    var data = { train: trainData, val: valData };
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
@@ -184,7 +188,12 @@ export function* fitClassifierSaga({
 
   try {
     var { fitted, status }: Awaited<ReturnType<typeof fitClassifier>> =
-      yield fitClassifier(compiledModel, data, fitOptions, onEpochEnd);
+      yield fitClassifier(
+        compiledModel,
+        { train: trainData, val: valData },
+        fitOptions,
+        onEpochEnd
+      );
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
@@ -195,7 +204,8 @@ export function* fitClassifierSaga({
     classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
   );
 
-  // TODO: image_data - dispose data (xs) and label (ys) tensors
+  disposeTrainLabels();
+  disposeValLabels();
 }
 
 function* handleError(error: Error, errorName: string) {
