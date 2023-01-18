@@ -23,10 +23,17 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 
-import { _SerializedImageType } from "types/SerializedImageType";
-
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/utils/deserialize";
+import {
+  // TODO: image_data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  deserialize,
+  deserializeImages,
+} from "image/utils/deserialize";
+
+// TODO: image_data - all imports below
+import { _importExampleProject } from "format_convertor/convertExampleProject";
+import { _SerializedImageType } from "format_convertor/types/";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -66,41 +73,38 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   const openExampleProject = async () => {
-    var exampleProjectJson: any;
-    switch (exampleProject.exampleProjectEnum) {
-      case ExampleProject.Mnist:
-        exampleProjectJson = await import(
-          "data/exampleProjects/mnistExampleProject.json"
-        );
-        break;
-      case ExampleProject.CElegans:
-        exampleProjectJson = await import(
-          "data/exampleProjects/cElegansExampleProject.json"
-        );
-        break;
-      case ExampleProject.HumanU2OSCells:
-        exampleProjectJson = await import(
-          "data/exampleProjects/humanU2OSCellsExampleProject.json"
-        );
-        break;
-      case ExampleProject.BBBC013:
-        exampleProjectJson = await import(
-          "data/exampleProjects/BBBC013ExampleProject.json"
-        );
-        break;
-      case ExampleProject.PLP1:
-        exampleProjectJson = await import(
-          "data/exampleProjects/PLP1ExampleProject.json"
-        );
-        break;
-      default:
-        return;
-    }
+    const exampleProjectJson: any = await _importExampleProject(
+      exampleProject.exampleProjectEnum
+    );
 
-    const project = exampleProjectJson.project as SerializedProjectType;
-    const classifier = exampleProjectJson.classifier as Classifier;
-    const images = await deserializeImages(
-      project.serializedImages as unknown as Array<_SerializedImageType>
+    // TODO: image_data - replace above line with below
+    // var exampleProjectFile: string;
+    // switch (exampleProject.exampleProjectEnum) {
+    //   case ExampleProject.Mnist:
+    //     exampleProjectFile = "data/exampleProjects/mnistExampleProject.h5";
+    //     break;
+    //   case ExampleProject.CElegans:
+    //     exampleProjectFile = "data/exampleProjects/cElegansExampleProject.h5";
+    //     break;
+    //   case ExampleProject.HumanU2OSCells:
+    //     exampleProjectFile = "data/exampleProjects/humanU2OSCellsExampleProject.h5";
+    //     break;
+    //   case ExampleProject.BBBC013:
+    //     exampleProjectFile = "data/exampleProjects/BBBC013ExampleProject.h5";
+    //     break;
+    //   case ExampleProject.PLP1:
+    //     exampleProjectFile = "data/exampleProjects/PLP1ExampleProject.h5";
+    //     break;
+    //   default:
+    //     return;
+    // }
+
+    // const project = deserialize(exampleProjectFile)
+
+    const _project = exampleProjectJson.project as SerializedProjectType;
+    const _classifier = exampleProjectJson.classifier as Classifier;
+    const _images = await deserializeImages(
+      _project.serializedImages as unknown as Array<_SerializedImageType>
     );
 
     dispatch(applicationSlice.actions.clearSelectedImages());
@@ -108,17 +112,17 @@ export const OpenExampleProjectMenuItem = ({
     // TODO: image_data - set to setProject
     dispatch(
       projectSlice.actions.openProject({
-        images: images,
-        categories: project.categories,
+        images: _images,
+        categories: _project.categories,
         annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
-        name: project.name,
+        name: _project.name,
       })
     );
 
     // TODO: image_data - set to new setClassifier
     dispatch(
       classifierSlice.actions.oldSetClassifier({
-        classifier: classifier,
+        classifier: _classifier,
       })
     );
 
