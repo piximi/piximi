@@ -36,8 +36,7 @@ import { imagesSelector } from "store/project";
 export const MainView = () => {
   const dispatch = useDispatch();
 
-  // TODO: image_data
-  // temporary hack
+  // TODO: image_data - temporary hack
   const theimages = useSelector(imagesSelector);
   useEffect(() => {
     if (theimages.length === 0) {
