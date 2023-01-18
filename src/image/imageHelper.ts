@@ -1,18 +1,21 @@
 // @ts-nocheck TODO: image_data
 import * as ImageJS from "image-js";
-import { AnnotationType } from "../types/AnnotationType";
+import * as _ from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { saveAs } from "file-saver";
+
 import { decode } from "../annotator/image/rle";
+
+import { AnnotationType } from "../types/AnnotationType";
 import { Category, UNKNOWN_CATEGORY_ID } from "../types/Category";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
-import { saveAs } from "file-saver";
 import { ShapeType } from "../types/ShapeType";
-import { v4 as uuidv4 } from "uuid";
 import { Partition } from "../types/Partition";
 import { ImageType, ShadowImageType } from "../types/ImageType";
-import * as _ from "lodash";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
-import { Color } from "../types/Color";
 import { SerializedImageType } from "types/SerializedImageType";
+// TODO: image_data
+import { _Color } from "format_convertor/types";
 
 declare module "image-js" {
   interface Image {
@@ -32,7 +35,7 @@ enum BitDepth {
 // TODO: image_data
 export const mapChannelsToSpecifiedRGBImage = (
   data: Array<Array<number>>,
-  colors: Array<Color>,
+  colors: Array<_Color>,
   rows: number,
   columns: number
 ): string => {
@@ -349,7 +352,7 @@ const convertImageDataToURI = (
 export const convertToImage = (
   inputStack: Array<ImageJS.Image>,
   filename: string,
-  currentColors: Array<Color> | undefined,
+  currentColors: Array<_Color> | undefined,
   slices: number,
   channels: number
 ): ImageType => {
@@ -487,7 +490,7 @@ export const convertToImage = (
 const convertSingleRGBImage = (
   input: ImageJS.Image,
   filename: string,
-  colors: Array<Color>
+  colors: Array<_Color>
 ) => {
   const width = input.width;
   const height = input.height;
@@ -624,13 +627,13 @@ const convertURIToRGBImageData = (URI: string): Promise<ImageData> => {
 };
 
 // TODO: image_data
-export const generateDefaultChannels = (numChannels: number): Array<Color> => {
+export const generateDefaultChannels = (numChannels: number): Array<_Color> => {
   /**
    * Given the number of channels in an image, apply default color scheme. If multi-channel, we apply red to the first channel,
    * green to the second channel, etc.. (see DefaultColors type)
    * If image is greyscale, we assign the white color to that one channel.
    * **/
-  let defaultChannels: Array<Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
+  let defaultChannels: Array<_Color> = []; //number of channels depends on whether image is greyscale, RGB, or multi-channel
 
   for (let i = 0; i < numChannels; i++) {
     defaultChannels.push({

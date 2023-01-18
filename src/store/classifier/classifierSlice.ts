@@ -86,7 +86,7 @@ export const classifierSlice = createSlice({
       // state = action.payload.classifier;
       return action.payload.classifier;
     },
-    // TODO: image_data - delete this when doen
+    // TODO: image_data - delete this when done
     oldSetClassifier(
       state,
       action: PayloadAction<{

@@ -1,10 +1,8 @@
 import { tensor2d, tensor4d } from "@tensorflow/tfjs";
-import * as ImageJS from "image-js"; // TODO: image_data
 import { Dataset, File, Group, ready } from "h5wasm";
-import _ from "lodash";
 
 import { getFile } from "components/file-io/utils/file_handlers";
-import { convertToImage, createRenderedTensor } from "image/utils/imageHelper";
+import { createRenderedTensor, BitDepth } from "image/utils/imageHelper";
 import {
   SerializedImageType,
   ImageType,
@@ -24,99 +22,20 @@ import {
   LossFunction,
   OptimizationAlgorithm,
 } from "types";
-import { _SerializedImageType } from "types/SerializedImageType"; // TODO: immge_data
 import { Colors } from "types/tensorflow";
 import { sortKeyByName } from "types/ImageSortType";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
+// TODO: immge_data - all imports below
+import { _SerializedImageType } from "format_convertor/types/";
+import { _convertSerialization } from "format_convertor/convertSerialization";
 
 /*
   =====================
   Image Deserialization
   =====================
 */
-
-// TODO: image_data
-const _convertSerialization = async (image: _SerializedImageType) => {
-  let imageStack: ImageJS.Image[] = [];
-  let imageBitDepth = 0;
-
-  for (const plane of image.imageData) {
-    for (const src of plane) {
-      let im = await ImageJS.Image.load(src, {
-        ignorePalette: true,
-      });
-
-      if (imageBitDepth === 0) {
-        imageBitDepth = im.bitDepth;
-      }
-
-      //@ts-ignore
-      im.colorModel = "GREY";
-
-      if (im.components > 1) {
-        im = im.combineChannels();
-      }
-
-      const checks = [
-        im.width === image.imageWidth,
-        im.height === image.imageHeight,
-        im.components === 1,
-        im.channels === 1,
-        im.bitDepth === imageBitDepth,
-        im.alpha === 0,
-        im.colorModel === "GREY",
-      ];
-
-      if (!_.every(checks)) {
-        console.log("BAD src -> image CONVERSION!!!!!)");
-        throw Error("BAD THING!!!!");
-      }
-
-      imageStack.push(im);
-    }
-  }
-
-  let convertedImage = await convertToImage(
-    new ImageJS.Stack(imageStack),
-    image.imageFilename,
-    undefined,
-    1,
-    image.imageChannels
-  );
-
-  const checks = [
-    convertedImage.shape.width === image.imageWidth,
-    convertedImage.shape.height === image.imageHeight,
-    convertedImage.shape.channels === image.imageChannels,
-    convertedImage.shape.planes === image.imagePlanes,
-    convertedImage.bitDepth === imageBitDepth,
-    convertedImage.name === image.imageFilename,
-    convertedImage.shape.channels === imageStack.length,
-  ];
-
-  if (!_.every(checks)) {
-    console.log("BAD image -> tensor CONVERSION!!!!!");
-    throw Error("BAD THING!!!!");
-  }
-
-  return {
-    name: convertedImage.name,
-    id: image.imageId,
-    shape: convertedImage.shape,
-    data: convertedImage.data,
-    bitDepth: convertedImage.bitDepth,
-    colors: convertedImage.colors,
-    partition: image.imagePartition,
-    categoryId: image.imageCategoryId,
-    annotations: image.annotations,
-
-    visible: convertedImage.visible,
-    activePlane: convertedImage.activePlane,
-    src: convertedImage.src,
-  } as ImageType;
-};
 
 export const deserializeImage = async (
   serializedImage: SerializedImageType
@@ -267,7 +186,7 @@ const deserializeImageGroup = async (
   const imageDataset = getDataset(imageGroup, name);
   const imageData = imageDataset.value as Float32Array;
   const [planes, height, width, channels] = imageDataset.shape;
-  const bitDepth = getAttr(imageDataset, "bit_depth") as ImageJS.BitDepth;
+  const bitDepth = getAttr(imageDataset, "bit_depth") as BitDepth;
 
   const imageTensor = tensor4d(
     imageData,
