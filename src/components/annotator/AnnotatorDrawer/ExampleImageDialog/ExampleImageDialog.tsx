@@ -9,7 +9,7 @@ import { SerializedFileType } from "types";
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";
 import * as malariaAnnotations from "images/malaria.json";
-import * as cellPaintingAnnotations from "images/cell-painting.json";
+import cellPaintingAnnotations from "hooks/useDefaultImage/cell-painting.json";
 
 type ExampleImageDialogProps = {
   onClose: () => void;

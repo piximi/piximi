@@ -32,7 +32,7 @@ import {
   Shape,
   FitOptions,
   PreprocessOptions,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
   CropSchema,
 } from "types";
 
@@ -44,7 +44,7 @@ export const createClassificationLabels = (
 
   for (const image of images) {
     const labelIdx = categories.findIndex((category: Category) => {
-      if (category.id !== UNKNOWN_CATEGORY_ID) {
+      if (category.id !== UNKNOWN_CLASS_CATEGORY_ID) {
         return category.id === image.categoryId;
       } else {
         throw Error(

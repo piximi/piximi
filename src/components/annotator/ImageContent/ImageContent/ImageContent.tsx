@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { Stage } from "../Stage";
 
 import { useBoundingClientRect, useDndFileDrop } from "hooks";
+import { DispatchLocation, useDefaultImage } from "hooks/useDefaultImage";
 
 type ImageContentProps = {
   onDrop: (files: FileList) => void;
@@ -15,6 +16,8 @@ export const ImageContent = ({ onDrop }: ImageContentProps) => {
   useBoundingClientRect(ref);
 
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
+
+  useDefaultImage(DispatchLocation.ImageViewer);
 
   return (
     <Box

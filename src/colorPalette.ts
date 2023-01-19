@@ -18,8 +18,8 @@ export const CATEGORY_COLORS = {
   citrus: "#a89d00",
 };
 
-export const UNKNOWN_CATEGORY_COLOR = "#AAAAAA";
-export const UNKNOWN_ANNOTATOR_CATEGORY_COLOR = "#920000";
+export const UNKNOWN_CLASS_CATEGORY_COLOR = "#AAAAAA";
+export const UNKNOWN_ANNOTATION_CATEGORY_COLOR = "#920000";
 
 export const APPLICATION_COLORS = {
   classifierList: "#DCF3F450",
