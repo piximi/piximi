@@ -9,11 +9,13 @@ import {
 } from "store/project";
 import { imageViewerSlice, setActiveImage } from "store/image-viewer";
 
+import { AnnotationType } from "types";
+
+// TODO: image_data
 import {
-  AnnotationType,
-  SerializedAnnotationType,
-  SerializedFileType,
-} from "types";
+  _SerializedFileType,
+  _SerializedAnnotationType,
+} from "format_convertor/types";
 
 // TODO: image_data
 import {
@@ -26,7 +28,7 @@ type ExampleImageProject = {
   exampleImageName: string;
   exampleImageData: any;
   exampleImageDescription: string;
-  exampleImageAnnotations: Array<SerializedFileType>;
+  exampleImageAnnotations: Array<_SerializedFileType>;
   projectSource: {
     sourceName: string;
     sourceUrl: string;
@@ -79,7 +81,7 @@ export const OpenExampleImageMenuItem = ({
     batch(() => {
       let updatedAnnotationCategories = annotationCategories;
       const annotations = serializedExampleImageFile.annotations.map(
-        (annotation: SerializedAnnotationType): AnnotationType => {
+        (annotation: _SerializedAnnotationType): AnnotationType => {
           const { annotation_out, categories } = importSerializedAnnotations(
             annotation,
             updatedAnnotationCategories

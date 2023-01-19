@@ -3,12 +3,13 @@ import {
   loadImageFileAsStack,
   convertToImage,
 } from "image/utils/imageHelper";
-import { Category } from "types";
-import colorImage from "images/cell-painting.png";
-import cellPaintingAnnotations from "./cell-painting.json";
+import { Category, SerializedFileType } from "types";
 
-export const loadDefaultImage = async () => {
-  const imageFile = await fileFromPath(colorImage);
+export const loadExampleImage = async (
+  imagePath: string,
+  serializedAnnotations: SerializedFileType
+) => {
+  const imageFile = await fileFromPath(imagePath);
   const imageStack = await loadImageFileAsStack(imageFile);
   const image = await convertToImage(
     imageStack,
@@ -20,7 +21,7 @@ export const loadDefaultImage = async () => {
     3
   );
 
-  for (const annotation of cellPaintingAnnotations.annotations) {
+  for (const annotation of serializedAnnotations.annotations) {
     image.annotations.push({
       id: annotation.id,
       mask: annotation.mask.split(" ").map((e) => Number(e)),
@@ -30,7 +31,7 @@ export const loadDefaultImage = async () => {
     });
   }
 
-  const categories = cellPaintingAnnotations.categories as Category[];
+  const categories = serializedAnnotations.categories as Category[];
 
   return { image, categories };
 };
