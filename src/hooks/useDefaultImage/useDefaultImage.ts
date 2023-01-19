@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { projectSlice, imagesCountSelector } from "store/project";
 import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer";
-import { loadDefaultImage } from "./defaultImage";
+import { loadExampleImage } from "image/utils/loadExampleImage";
+import colorImage from "images/cell-painting.png";
+import cellPaintingAnnotations from "./cell-painting.json";
+import { SerializedFileType } from "types";
 
 export enum DispatchLocation {
   Project,
@@ -14,7 +17,10 @@ const dispatchToProject = async (
   dispatch: ReturnType<typeof useDispatch>
 ) => {
   if (location !== DispatchLocation.Project) return;
-  const { image, categories } = await loadDefaultImage();
+  const { image, categories } = await loadExampleImage(
+    colorImage,
+    cellPaintingAnnotations as SerializedFileType
+  );
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
   dispatch(projectSlice.actions.setImages({ images: [image] }));
 };
@@ -25,7 +31,10 @@ const dispatchToImageViewer = async (
 ) => {
   if (location !== DispatchLocation.ImageViewer) return;
 
-  const { image, categories } = await loadDefaultImage();
+  const { image, categories } = await loadExampleImage(
+    colorImage,
+    cellPaintingAnnotations as SerializedFileType
+  );
 
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
   batch(() => {

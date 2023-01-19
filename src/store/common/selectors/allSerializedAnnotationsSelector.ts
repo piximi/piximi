@@ -1,9 +1,11 @@
 import { AnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { SerializedFileType } from "types/SerializedFileType";
 import { ImageViewer } from "types/ImageViewer";
 import { Project } from "types/Project";
+
+// TODO: image_data
+import { _SerializedFileType } from "format_convertor/types";
 
 export const allSerializedAnnotationsSelector = ({
   imageViewer,
@@ -11,7 +13,7 @@ export const allSerializedAnnotationsSelector = ({
 }: {
   imageViewer: ImageViewer;
   project: Project;
-}): Array<SerializedFileType> => {
+}): Array<_SerializedFileType> => {
   if (!imageViewer.images.length) return [];
 
   // @ts-ignore TODO: image_data

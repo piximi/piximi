@@ -15,14 +15,16 @@ import { AnnotationStateType } from "types/AnnotationStateType";
 import { LanguageType } from "types/LanguageType";
 import { ImageViewer } from "types/ImageViewer";
 import { Colors } from "types/tensorflow";
-import { SerializedFileType } from "types/SerializedFileType";
+import { Partition } from "types/Partition";
+import { AnnotationTool } from "annotator/image/Tool";
+
+// TODO: image_data
+import { _SerializedFileType } from "format_convertor/types";
 import {
   // TODO: image_data
   generateDefaultChannels,
   replaceDuplicateName,
 } from "image/imageHelper";
-import { Partition } from "types/Partition";
-import { AnnotationTool } from "annotator/image/Tool";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
@@ -144,7 +146,7 @@ export const imageViewerSlice = createSlice({
     openAnnotations(
       state,
       action: PayloadAction<{
-        imageFile: SerializedFileType;
+        imageFile: _SerializedFileType;
         annotations: Array<AnnotationType>;
       }>
     ) {

@@ -8,14 +8,13 @@ import { decode } from "../annotator/image/rle";
 
 import { AnnotationType } from "../types/AnnotationType";
 import { Category, UNKNOWN_CLASS_CATEGORY_ID } from "../types/Category";
-import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { ShapeType } from "../types/ShapeType";
 import { Partition } from "../types/Partition";
 import { ImageType, ShadowImageType } from "../types/ImageType";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { SerializedImageType } from "types/SerializedImageType";
 // TODO: image_data
-import { _Color } from "format_convertor/types";
+import { _Color, _SerializedAnnotationType } from "format_convertor/types";
 
 declare module "image-js" {
   interface Image {
@@ -1104,7 +1103,7 @@ export const saveAnnotationsAsLabelMatrix = (
 };
 
 export const importSerializedAnnotations = (
-  annotation: SerializedAnnotationType,
+  annotation: _SerializedAnnotationType,
   existingCategories: Array<Category>
 ): { annotation_out: AnnotationType; categories: Array<Category> } => {
   const mask = annotation.annotationMask
