@@ -21,20 +21,14 @@ import {
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { imageViewerSlice } from "store/image-viewer";
-
-import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-
 import { APPLICATION_COLORS } from "colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
-type AnnotatorViewProps = {
-  image?: ImageType;
-};
+import { AlertType, HotkeyView } from "types";
 
-export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
+export const AnnotatorView = () => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
@@ -108,17 +102,6 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
       dispatch(unregisterHotkeyView({}));
     };
   }, [dispatch]);
-
-  useEffect(() => {
-    if (image) {
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: image.id,
-          execSaga: true,
-        })
-      );
-    }
-  }, [dispatch, image]);
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onDrop = async (files: FileList) => {
