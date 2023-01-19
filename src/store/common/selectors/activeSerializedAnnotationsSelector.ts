@@ -2,9 +2,13 @@ import { ImageViewer } from "types/ImageViewer";
 import { AnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { SerializedFileType } from "types/SerializedFileType";
-import { SerializedAnnotationType } from "types/SerializedAnnotationType";
 import { Project } from "types/Project";
+
+// TODO: image_data
+import {
+  _SerializedFileType,
+  _SerializedAnnotationType,
+} from "format_convertor/types";
 
 export const activeSerializedAnnotationsSelector = ({
   imageViewer,
@@ -12,7 +16,7 @@ export const activeSerializedAnnotationsSelector = ({
 }: {
   imageViewer: ImageViewer;
   project: Project;
-}): SerializedFileType | undefined => {
+}): _SerializedFileType | undefined => {
   if (!imageViewer.images.length) return undefined;
 
   /*
@@ -42,7 +46,7 @@ export const activeSerializedAnnotationsSelector = ({
     imageWidth: image.shape.width,
   };
 
-  const serializedAnnotations: Array<SerializedAnnotationType> =
+  const serializedAnnotations: Array<_SerializedAnnotationType> =
     image.annotations.map((annotation: AnnotationType) => {
       const index = project.annotationCategories.findIndex(
         (category: Category) => {

@@ -1,12 +1,7 @@
 export type SerializedAnnotationType = {
-  annotationBoundingBoxHeight: number;
-  annotationBoundingBoxWidth: number;
-  annotationBoundingBoxX: number;
-  annotationBoundingBoxY: number;
-  annotationCategoryColor: string;
-  annotationCategoryId: string;
-  annotationCategoryName: string;
-  annotationId: string;
-  annotationMask: string;
-  annotationPlane: number;
+  categoryId: string; // category id, matching id of a SerializedCategory
+  id: string;
+  mask: string; // e.g. "114 1 66 1 66 2 ..."
+  plane: number;
+  boundingBox: [number, number, number, number]; // [x1, y1, width, height]
 };

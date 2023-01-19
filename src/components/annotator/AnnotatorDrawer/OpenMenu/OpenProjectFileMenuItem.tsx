@@ -10,15 +10,15 @@ import {
 } from "store/image-viewer";
 import { setAnnotationCategories } from "store/project";
 
-import {
-  AnnotationType,
-  SerializedFileType,
-  SerializedAnnotationType,
-  ToolType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
+import { AnnotationType, ToolType, UNKNOWN_ANNOTATION_CATEGORY } from "types";
 
 import { importSerializedAnnotations } from "image/imageHelper";
+
+// TODO: image_data
+import {
+  _SerializedFileType,
+  _SerializedAnnotationType,
+} from "format_convertor/types";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -58,9 +58,9 @@ export const OpenProjectFileMenuItem = ({
 
           let updatedAnnotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
           serializedImages.forEach(
-            (serializedImage: SerializedFileType, index: number) => {
+            (serializedImage: _SerializedFileType, index: number) => {
               const annotations = serializedImage.annotations.map(
-                (annotation: SerializedAnnotationType): AnnotationType => {
+                (annotation: _SerializedAnnotationType): AnnotationType => {
                   const { annotation_out, categories } =
                     importSerializedAnnotations(
                       annotation,

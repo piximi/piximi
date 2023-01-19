@@ -1,17 +1,13 @@
 import { SerializedAnnotationType } from "./SerializedAnnotationType";
-import { _Color } from "format_convertor/types";
 
-// TODO: image_data
+type SerializedCategoryType = {
+  id: string;
+  color: string; // 3 byte hex
+  name: string;
+  visible: boolean;
+};
+
 export type SerializedFileType = {
-  imageChannels: number;
-  imageColors: Array<_Color>;
-  imageData: Array<Array<string>>;
-  imageSrc: string;
-  imageFilename: string;
-  //imageFrames: number;
-  imageHeight: number;
-  imageId: string;
-  imagePlanes: number;
-  imageWidth: number;
+  categories: Array<SerializedCategoryType>;
   annotations: Array<SerializedAnnotationType>;
 };

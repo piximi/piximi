@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 
-import { SerializedFileType } from "types";
+import { _SerializedFileType } from "format_convertor/types";
 
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";
@@ -27,7 +27,7 @@ export const ExampleImageDialog = ({
       exampleImageDescription:
         "Blood cells infected by P. vivax (malaria) and stained with Giemsa reagent.",
       exampleImageAnnotations:
-        malariaAnnotations as unknown as Array<SerializedFileType>,
+        malariaAnnotations as unknown as Array<_SerializedFileType>,
       projectSource: {
         sourceName: "BBBC041v1",
         sourceUrl: "https://bbbc.broadinstitute.org/BBBC041",
@@ -45,7 +45,7 @@ export const ExampleImageDialog = ({
         "Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
         "Channel 1 (blue): DNA stained via Hoechst; Channel 1 (green): mitochondria stained via MitoTracker",
       exampleImageAnnotations:
-        cellPaintingAnnotations as unknown as Array<SerializedFileType>,
+        cellPaintingAnnotations as unknown as Array<_SerializedFileType>,
       projectSource: {
         sourceName: "Boivin2021.06.22.449195",
         sourceUrl:
