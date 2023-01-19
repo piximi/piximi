@@ -20,37 +20,14 @@ import { visibleImagesSelector } from "store/common";
 import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-import {
-  ImageShapeEnum,
-  ImageShapeInfo,
-  fileFromPath,
-} from "image/utils/imageHelper";
+import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
-// TOOD: image_data
-// temporary hack
-import { loadImageFileAsStack, convertToImage } from "image/utils/imageHelper";
-import { projectSlice } from "store/project";
-import colorImage from "images/cell-painting.png";
-import { imagesSelector } from "store/project";
+import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 
 export const MainView = () => {
   const dispatch = useDispatch();
 
-  // TODO: image_data - temporary hack
-  const theimages = useSelector(imagesSelector);
-  useEffect(() => {
-    if (theimages.length === 0) {
-      fileFromPath(colorImage).then((file) => {
-        loadImageFileAsStack(file)
-          .then((imStack) =>
-            convertToImage(imStack, file.name, undefined, 1, 3)
-          )
-          .then((image) => {
-            dispatch(projectSlice.actions.setImages({ images: [image] }));
-          });
-      });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useDefaultImage(DispatchLocation.Project);
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 

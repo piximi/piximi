@@ -15,7 +15,7 @@ export type {
 export type { Category } from "./Category";
 export {
   CategoryType,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "./Category";

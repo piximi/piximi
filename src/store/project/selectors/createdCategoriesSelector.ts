@@ -1,4 +1,4 @@
-import { Project, Category, UNKNOWN_CATEGORY_ID } from "types";
+import { Project, Category, UNKNOWN_CLASS_CATEGORY_ID } from "types";
 
 export const createdCategoriesSelector = ({
   project,
@@ -6,7 +6,7 @@ export const createdCategoriesSelector = ({
   project: Project;
 }) => {
   const categories = project.categories.filter((category: Category) => {
-    return category.id !== UNKNOWN_CATEGORY_ID;
+    return category.id !== UNKNOWN_CLASS_CATEGORY_ID;
   });
 
   return categories;

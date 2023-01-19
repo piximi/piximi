@@ -6,7 +6,7 @@ import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types/Category";
 import { ToolType } from "types/ToolType";
 import { AnnotationType } from "types/AnnotationType";
@@ -160,7 +160,7 @@ export const imageViewerSlice = createSlice({
           ? action.payload.imageFile.imageColors
           : generateDefaultChannels(action.payload.imageFile.imageChannels),
         src: action.payload.imageFile.imageSrc,
-        categoryId: UNKNOWN_CATEGORY_ID,
+        categoryId: UNKNOWN_CLASS_CATEGORY_ID,
         // TODO: image_data
         originalSrc: action.payload.imageFile.imageData,
         partition: Partition.Inference,

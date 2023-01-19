@@ -25,3 +25,5 @@ export { useWindowFocusHandler } from "./useWindowFocusHandler/useWindowFocusHan
 export { useZoom } from "./useZoom/useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState/useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys/useHotkeys";
+// useDefaultImage not included to encourage use of
+// import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"
