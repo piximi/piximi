@@ -32,7 +32,7 @@ import {
 } from "image/utils/deserialize";
 
 // TODO: image_data - all imports below
-import { _importExampleProject } from "format_convertor/convertExampleProject";
+import { _importExampleProject } from "format_convertor";
 import { _SerializedImageType } from "format_convertor/types/";
 
 type ExampleProjectProps = {

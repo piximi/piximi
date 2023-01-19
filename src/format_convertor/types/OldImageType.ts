@@ -1,8 +1,6 @@
 import { Shape, Partition, AnnotationType } from "types";
 import { _Color } from "./OldColor";
 
-//@TODO: image_data
-
 export type _ImageType = {
   annotations: Array<AnnotationType>;
   activePlane: number;

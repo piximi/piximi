@@ -29,7 +29,7 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
 // TODO: immge_data - all imports below
 import { _SerializedImageType } from "format_convertor/types/";
-import { _convertSerialization } from "format_convertor/convertSerialization";
+import { _convertSerialization } from "format_convertor";
 
 /*
   =====================
