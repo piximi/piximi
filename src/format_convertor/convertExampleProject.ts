@@ -1,6 +1,5 @@
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 
-// TODO: image_data
 export const _importExampleProject = async (
   exampleProjectEnum: ExampleProject
 ) => {

@@ -4,7 +4,6 @@ import { convertToImage } from "image/utils/imageHelper";
 import { ImageType } from "types/ImageType";
 import { _SerializedImageType } from "./types";
 
-// TODO: image_data
 export const _convertSerialization = async (image: _SerializedImageType) => {
   let imageStack: ImageJS.Image[] = [];
   let imageBitDepth = 0;
