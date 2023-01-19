@@ -1,7 +1,6 @@
 import { AnnotationType } from "types/AnnotationType";
 import { Partition } from "types/Partition";
 
-//TODO: image_data - remove this
 export type _SerializedImageType = {
   imageCategoryId: string;
   imageChannels: number;
