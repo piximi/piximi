@@ -13,7 +13,7 @@ import {
   Category,
   CategoryType,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types";
 
 type CategoryItemMenuProps = {
@@ -53,7 +53,7 @@ export const CategoryItemMenu = ({
           onCloseCategoryMenu={onCloseCategoryMenu}
         />
 
-        {category.id !== UNKNOWN_CATEGORY_ID &&
+        {category.id !== UNKNOWN_CLASS_CATEGORY_ID &&
           category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
             <div>
               <Divider />

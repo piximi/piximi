@@ -17,7 +17,7 @@ import {
   DEFAULT_COLORS,
   ImageType,
   Partition,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
 
@@ -844,7 +844,7 @@ export const convertToImage = async (
     annotations: [],
     colors: colors,
     bitDepth,
-    categoryId: UNKNOWN_CATEGORY_ID,
+    categoryId: UNKNOWN_CLASS_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
     shape: { planes, height, width, channels },

@@ -3,7 +3,7 @@ import { Provider, useDispatch, useSelector, useStore } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
-import * as _ from "lodash";
+import _ from "lodash";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 

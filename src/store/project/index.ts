@@ -38,3 +38,4 @@ export { unknownAnnotationCategorySelector } from "./selectors/unknownAnnotation
 export { unknownCategorySelector } from "./selectors/unknownCategorySelector";
 export { valImagesSelector } from "./selectors/valImagesSelector";
 export { visibleAnnotationCategoriesSelector } from "./selectors/visibleAnnotationCategoriesSelector";
+export { imagesCountSelector } from "./selectors/imagesCountSelector";

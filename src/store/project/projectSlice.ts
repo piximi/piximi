@@ -7,41 +7,18 @@ import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY,
+  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { AnnotationType } from "types/AnnotationType";
 import { replaceDuplicateName } from "image/utils/imageHelper";
-// TODO: image_data
-//import { defaultImage } from "images/defaultImage";
-
-const initialAnnotationCategories =
-  process.env.NODE_ENV === "development"
-    ? [
-        UNKNOWN_ANNOTATION_CATEGORY,
-        {
-          color: "#b66dff",
-          id: "00000000-0000-0000-0000-000000000001",
-          name: "Cell membrane",
-          visible: true,
-        },
-        {
-          color: "#6db6ff",
-          id: "00000000-0000-0000-0000-000000000002",
-          name: "Cell nucleus",
-          visible: true,
-        },
-      ]
-    : [UNKNOWN_ANNOTATION_CATEGORY];
 
 export const initialState: Project = {
-  categories: [UNKNOWN_CATEGORY],
-  annotationCategories: initialAnnotationCategories,
-  // TODO: image_data
-  // images: [defaultImage],
+  categories: [UNKNOWN_CLASS_CATEGORY],
+  annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
   images: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey,
@@ -67,7 +44,7 @@ export const projectSlice = createSlice({
     clearPredictions(state, action: PayloadAction<{}>) {
       state.images.forEach((image) => {
         if (image.partition === Partition.Inference) {
-          image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
         }
       });
     },
@@ -97,7 +74,7 @@ export const projectSlice = createSlice({
     },
     createNewProject(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
-      state.categories = [UNKNOWN_CATEGORY];
+      state.categories = [UNKNOWN_CLASS_CATEGORY];
       state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
       state.images = [];
       state.imageSortKey = defaultImageSortKey;
@@ -119,10 +96,10 @@ export const projectSlice = createSlice({
       });
     },
     deleteAllCategories(state, action: PayloadAction<{}>) {
-      state.categories = [UNKNOWN_CATEGORY];
+      state.categories = [UNKNOWN_CLASS_CATEGORY];
 
       state.images = state.images.map((image) => {
-        image.categoryId = UNKNOWN_CATEGORY_ID;
+        image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
         image.partition = Partition.Inference;
         return image;
       });
@@ -158,7 +135,7 @@ export const projectSlice = createSlice({
       });
       state.images = state.images.map((image) => {
         if (image.categoryId === action.payload.id) {
-          image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
           image.partition = Partition.Inference;
         }
         return image;
@@ -225,7 +202,18 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
-      state.annotationCategories = action.payload.categories;
+      const replaceUnknown =
+        action.payload.categories.find(
+          (cat) => cat.id === UNKNOWN_ANNOTATION_CATEGORY_ID
+        ) === undefined;
+      if (replaceUnknown) {
+        state.annotationCategories = [
+          UNKNOWN_ANNOTATION_CATEGORY,
+          ...action.payload.categories,
+        ];
+      } else {
+        state.annotationCategories = action.payload.categories;
+      }
     },
     setAnnotationCategoryVisibility(
       state,
@@ -359,7 +347,7 @@ export const projectSlice = createSlice({
         });
         if (index >= 0) {
           state.images[index].categoryId = action.payload.categoryId;
-          if (action.payload.categoryId === UNKNOWN_CATEGORY_ID) {
+          if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
             //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
             state.images[index].partition = Partition.Inference;
           } else {

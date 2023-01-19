@@ -15,12 +15,12 @@ import {
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import { UNKNOWN_CATEGORY_ID } from "types";
+import { UNKNOWN_CLASS_CATEGORY_ID } from "types";
 
-import { UNKNOWN_CATEGORY_COLOR } from "colorPalette";
+import { UNKNOWN_CLASS_CATEGORY_COLOR } from "colorPalette";
 
 export const UnknownCategoryListItem = () => {
-  const id = UNKNOWN_CATEGORY_ID;
+  const id = UNKNOWN_CLASS_CATEGORY_ID;
 
   return (
     <>
@@ -29,12 +29,14 @@ export const UnknownCategoryListItem = () => {
           <Checkbox
             checked
             checkedIcon={
-              <LabelIcon style={{ color: UNKNOWN_CATEGORY_COLOR }} />
+              <LabelIcon style={{ color: UNKNOWN_CLASS_CATEGORY_COLOR }} />
             }
             disableRipple
             edge="start"
             icon={
-              <LabelOutlinedIcon style={{ color: UNKNOWN_CATEGORY_COLOR }} />
+              <LabelOutlinedIcon
+                style={{ color: UNKNOWN_CLASS_CATEGORY_COLOR }}
+              />
             }
             tabIndex={-1}
           />

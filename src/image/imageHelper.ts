@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 import { decode } from "../annotator/image/rle";
 
 import { AnnotationType } from "../types/AnnotationType";
-import { Category, UNKNOWN_CATEGORY_ID } from "../types/Category";
+import { Category, UNKNOWN_CLASS_CATEGORY_ID } from "../types/Category";
 import { SerializedAnnotationType } from "../types/SerializedAnnotationType";
 import { ShapeType } from "../types/ShapeType";
 import { Partition } from "../types/Partition";
@@ -469,7 +469,7 @@ export const convertToImage = (
     annotations: [],
     //@ts-ignore TODO: image_data
     colors: colors,
-    categoryId: UNKNOWN_CATEGORY_ID,
+    categoryId: UNKNOWN_CLASS_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
     originalSrc: originalURIs,
@@ -521,7 +521,7 @@ const convertSingleRGBImage = (
     activePlane: 0,
     annotations: [],
     colors: colors,
-    categoryId: UNKNOWN_CATEGORY_ID,
+    categoryId: UNKNOWN_CLASS_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
     originalSrc: [originalURI],
