@@ -1,14 +1,9 @@
 import { ImageViewer } from "types/ImageViewer";
-import { AnnotationType } from "types/AnnotationType";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { Project } from "types/Project";
 
-// TODO: image_data
-import {
-  _SerializedFileType,
-  _SerializedAnnotationType,
-} from "format_convertor/types";
+import { SerializedFileType, SerializedAnnotationType } from "types";
 
 export const activeSerializedAnnotationsSelector = ({
   imageViewer,
@@ -16,7 +11,7 @@ export const activeSerializedAnnotationsSelector = ({
 }: {
   imageViewer: ImageViewer;
   project: Project;
-}): _SerializedFileType | undefined => {
+}): SerializedFileType | undefined => {
   if (!imageViewer.images.length) return undefined;
 
   /*
@@ -33,43 +28,33 @@ export const activeSerializedAnnotationsSelector = ({
 
   if (!image) return undefined;
 
-  const columns = {
-    imageChannels: image.shape.channels,
-    imageColors: image.colors,
-    // @ts-ignore TODO: image_data
-    imageData: image.originalSrc,
-    imageSrc: image.src,
-    imageFilename: image.name,
-    imageHeight: image.shape.height,
-    imageId: image.id,
-    imagePlanes: image.shape.planes,
-    imageWidth: image.shape.width,
-  };
+  const categoriesFound: { [categoryId: string]: Category } = {};
 
-  const serializedAnnotations: Array<_SerializedAnnotationType> =
-    image.annotations.map((annotation: AnnotationType) => {
-      const index = project.annotationCategories.findIndex(
-        (category: Category) => {
-          return category.id === annotation.categoryId;
-        }
-      );
+  const annotations: Array<SerializedAnnotationType> = [];
 
-      const category = project.annotationCategories[index];
+  for (const annotation of image.annotations) {
+    const index = project.annotationCategories.findIndex(
+      (category: Category) => {
+        return category.id === annotation.categoryId;
+      }
+    );
 
-      return {
-        annotationBoundingBoxHeight: annotation.boundingBox[3],
-        annotationBoundingBoxWidth: annotation.boundingBox[2],
-        annotationBoundingBoxX: annotation.boundingBox[0],
-        annotationBoundingBoxY: annotation.boundingBox[1],
-        annotationCategoryColor: category.color,
-        annotationCategoryId: category.id,
-        annotationCategoryName: category.name,
-        annotationId: annotation.id,
-        annotationMask: annotation.mask.join(" "),
-        annotationPlane: annotation.plane,
-      };
+    const category = project.annotationCategories[index];
+
+    if (categoriesFound[category.id] === undefined) {
+      categoriesFound[category.id] = category;
+    }
+
+    annotations.push({
+      categoryId: category.id,
+      id: annotation.id,
+      mask: annotation.mask.join(" "),
+      boundingBox: [...annotation.boundingBox],
+      plane: annotation.plane,
     });
+  }
 
-  // @ts-ignore TODO: image_data
-  return { ...columns, annotations: serializedAnnotations };
+  const categories: Array<Category> = Object.values(categoriesFound);
+
+  return { annotations, categories };
 };

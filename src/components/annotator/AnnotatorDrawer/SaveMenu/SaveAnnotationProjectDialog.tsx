@@ -14,7 +14,7 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { allSerializedAnnotationsSelector } from "store/common";
+import { activeSerializedAnnotationsSelector } from "store/common";
 import { HotkeyView } from "types";
 
 type SaveAnnotationProjectDialogProps = {
@@ -22,13 +22,15 @@ type SaveAnnotationProjectDialogProps = {
   open: boolean;
 };
 
+// TODO: post PR #383 - refactor project file (SerializedFileType) to host
+// annotations for all images in viewer, rather than just the active one
 export const SaveAnnotationProjectDialog = ({
   onClose,
   open,
 }: SaveAnnotationProjectDialogProps) => {
   const [projectName, setProjectName] = useState<string>("");
 
-  const serializedProject = useSelector(allSerializedAnnotationsSelector);
+  const serializedProject = useSelector(activeSerializedAnnotationsSelector);
 
   const onSaveAllAnnotations = () => {
     const parts = [JSON.stringify(serializedProject)];
