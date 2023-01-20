@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: post PR #383, get working for segmenter
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
 import { Category } from "types/Category";
@@ -6,7 +8,6 @@ import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
-// @ts-ignore TODO: image_data
 import { generateDefaultChannels } from "image/imageHelper";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
@@ -60,14 +61,12 @@ const annotationCategories: Array<Category> = [
 const images: Array<ImageType> = [
   {
     categoryId: "00000000-0000-0000-0000-000000000000",
-    // @ts-ignore TODO: image_data
     colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-1111-0000-0001-00000000000",
     name: "cell-painting.png",
     partition: Partition.Training,
     visible: true,
     shape: inputShape,
-    // @ts-ignore TODO: image_data
     originalSrc: [[""]],
     src: "/static/media/cell-painting.f118ef087853056f08e6.png",
     activePlane: 0,
