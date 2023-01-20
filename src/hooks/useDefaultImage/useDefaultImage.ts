@@ -4,7 +4,7 @@ import { projectSlice, imagesCountSelector } from "store/project";
 import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer";
 import { loadExampleImage } from "image/utils/loadExampleImage";
 import colorImage from "images/cell-painting.png";
-import cellPaintingAnnotations from "./cell-painting.json";
+import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
 
 export enum DispatchLocation {

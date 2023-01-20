@@ -8,8 +8,10 @@ import { _SerializedFileType } from "format_convertor/types";
 
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";
-import * as malariaAnnotations from "images/malaria.json";
-import cellPaintingAnnotations from "hooks/useDefaultImage/cell-painting.json";
+import {
+  malariaAnnotations,
+  cellPaintingAnnotations,
+} from "data/exampleImages";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
