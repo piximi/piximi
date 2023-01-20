@@ -1,6 +1,6 @@
 // @ts-nocheck TODO: image_data
 import * as ImageJS from "image-js";
-import * as _ from "lodash";
+import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { saveAs } from "file-saver";
 
