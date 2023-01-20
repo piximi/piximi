@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, batch } from "react-redux";
 
 import {
   Avatar,
@@ -14,26 +14,9 @@ import { applicationSlice } from "store/application";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
-import {
-  Classifier,
-  // TODO: image_data
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  SerializedImageType,
-  SerializedProjectType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
-
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import {
-  // TODO: image_data
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  deserialize,
-  deserializeImages,
-} from "image/utils/deserialize";
-
-// TODO: image_data - all imports below
-import { _importExampleProject } from "format_convertor";
-import { _SerializedImageType } from "format_convertor/types/";
+import { deserialize } from "image/utils/deserialize";
+import { uploader } from "../utils";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -55,7 +38,6 @@ type OpenExampleProjectMenuItemProps = {
   onClose: () => void;
 };
 
-// TODO: image_data
 export const OpenExampleProjectMenuItem = ({
   exampleProject,
   onClose,
@@ -73,58 +55,61 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   const openExampleProject = async () => {
-    const exampleProjectJson: any = await _importExampleProject(
-      exampleProject.exampleProjectEnum
-    );
+    var exampleProjectFilePath: string;
+    switch (exampleProject.exampleProjectEnum) {
+      case ExampleProject.Mnist:
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/mnistExampleProject.h5")
+        ).default;
+        break;
+      case ExampleProject.CElegans:
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/cElegansExampleProject.h5")
+        ).default;
+        break;
+      case ExampleProject.HumanU2OSCells:
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/HumanU2OSCellsExampleProject.h5")
+        ).default;
+        break;
+      case ExampleProject.BBBC013:
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/BBBC013ExampleProject.h5")
+        ).default;
+        break;
+      case ExampleProject.PLP1:
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/PLP1ExampleProject.h5")
+        ).default;
+        break;
+      default:
+        return;
+    }
 
-    // TODO: image_data - replace above line with below
-    // var exampleProjectFile: string;
-    // switch (exampleProject.exampleProjectEnum) {
-    //   case ExampleProject.Mnist:
-    //     exampleProjectFile = "data/exampleProjects/mnistExampleProject.h5";
-    //     break;
-    //   case ExampleProject.CElegans:
-    //     exampleProjectFile = "data/exampleProjects/cElegansExampleProject.h5";
-    //     break;
-    //   case ExampleProject.HumanU2OSCells:
-    //     exampleProjectFile = "data/exampleProjects/humanU2OSCellsExampleProject.h5";
-    //     break;
-    //   case ExampleProject.BBBC013:
-    //     exampleProjectFile = "data/exampleProjects/BBBC013ExampleProject.h5";
-    //     break;
-    //   case ExampleProject.PLP1:
-    //     exampleProjectFile = "data/exampleProjects/PLP1ExampleProject.h5";
-    //     break;
-    //   default:
-    //     return;
-    // }
+    const exampleProjectFile = await fetch(exampleProjectFilePath)
+      .then((res) => res.blob())
+      .then((blob) => new File([blob], exampleProject.projectName, blob));
 
-    // const project = deserialize(exampleProjectFile)
+    await uploader(exampleProjectFile);
 
-    const _project = exampleProjectJson.project as SerializedProjectType;
-    const _classifier = exampleProjectJson.classifier as Classifier;
-    const _images = await deserializeImages(
-      _project.serializedImages as unknown as Array<_SerializedImageType>
-    );
+    const deserializedProject = await deserialize(exampleProjectFile.name);
+
+    const project = deserializedProject.project;
+    const classifier = deserializedProject.classifier;
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
-    // TODO: image_data - set to setProject
-    dispatch(
-      projectSlice.actions.openProject({
-        images: _images,
-        categories: _project.categories,
-        annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
-        name: _project.name,
-      })
-    );
+    batch(() => {
+      dispatch(projectSlice.actions.setProject({ project }));
 
-    // TODO: image_data - set to new setClassifier
-    dispatch(
-      classifierSlice.actions.oldSetClassifier({
-        classifier: _classifier,
-      })
-    );
+      dispatch(
+        classifierSlice.actions.setClassifier({
+          classifier,
+        })
+      );
+
+      dispatch(classifierSlice.actions.setDefaults({}));
+    });
 
     onClose();
   };

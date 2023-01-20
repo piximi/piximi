@@ -160,21 +160,6 @@ export const projectSlice = createSlice({
       // state = action.payload.project;
       return action.payload.project;
     },
-    // TODO: image_data, should not need openProject by the end
-    openProject(
-      state,
-      action: PayloadAction<{
-        images: Array<ImageType>;
-        name: string;
-        categories: Array<Category>;
-        annotationCategories: Array<Category>;
-      }>
-    ) {
-      state.categories = action.payload.categories;
-      state.annotationCategories = action.payload.annotationCategories;
-      state.name = action.payload.name;
-      state.images = action.payload.images;
-    },
     reconcileImages(
       state,
       action: PayloadAction<{

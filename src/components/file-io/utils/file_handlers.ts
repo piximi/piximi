@@ -7,7 +7,7 @@ import { ready, File as H5WasmFile } from "h5wasm";
 
 export async function uploader(file: File) {
   const { FS } = await ready;
-  let datafilename = file.name;
+  let datafilename = file.name.endsWith(".h5") ? file.name : `${file.name}.h5`;
   let ab = await file.arrayBuffer();
   FS.writeFile(datafilename, new Uint8Array(ab));
   // if (!UPLOADED_FILES.includes(datafilename)) {
