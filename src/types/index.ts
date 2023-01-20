@@ -106,8 +106,6 @@ export type { SerializedFileType } from "./SerializedFileType";
 
 export type { SerializedImageType } from "./SerializedImageType";
 
-export type { SerializedProjectType } from "./SerializedProjectType";
-
 export type { Settings } from "./Settings";
 export { HotkeyView } from "./Settings";
 

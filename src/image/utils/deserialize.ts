@@ -27,9 +27,6 @@ import { sortKeyByName } from "types/ImageSortType";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-// TODO: immge_data - all imports below
-import { _SerializedImageType } from "format_convertor/types/";
-import { _convertSerialization } from "format_convertor";
 
 /*
   =====================
@@ -68,27 +65,6 @@ export const deserializeImage = async (
       serializedImage.src ??
       createRenderedTensor(imageData, imageColors, serializedImage.bitDepth, 0),
   } as ImageType;
-};
-
-export const deserializeImages = async (
-  serializedImages: Array<_SerializedImageType>
-) => {
-  const deserializedImages: Array<ImageType> = [];
-
-  for (const serializedImage of serializedImages) {
-    // TODO: image_data - refactor this if/else block once done
-    let deserializedImage: ImageType;
-    if (serializedImage.imageData !== undefined) {
-      deserializedImage = await _convertSerialization(serializedImage);
-      deserializedImages.push(deserializedImage);
-    } else {
-      deserializedImage = await deserializeImage(
-        serializedImage as unknown as SerializedImageType
-      );
-      deserializedImages.push(deserializedImage);
-    }
-  }
-  return deserializedImages;
 };
 
 /*
