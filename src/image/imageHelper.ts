@@ -14,7 +14,7 @@ import { ImageType, ShadowImageType } from "../types/ImageType";
 import { DEFAULT_COLORS } from "../types/DefaultColors";
 import { SerializedImageType } from "types/SerializedImageType";
 // TODO: image_data
-import { _Color, _SerializedAnnotationType } from "format_convertor/types";
+import { _Color } from "format_convertor/types";
 
 declare module "image-js" {
   interface Image {
@@ -1100,99 +1100,4 @@ export const saveAnnotationsAsLabelMatrix = (
       });
     })
     .flat();
-};
-
-// TODO: image_data - should no longer be used
-export const importSerializedAnnotations = (
-  annotation: _SerializedAnnotationType,
-  existingCategories: Array<Category>
-): { annotation_out: AnnotationType; categories: Array<Category> } => {
-  const mask = annotation.annotationMask
-    .split(" ")
-    .map((x: string) => parseInt(x));
-
-  let newCategories = existingCategories;
-  //if category does not already exist in state, add it
-  if (
-    !existingCategories
-      .map((category: Category) => category.id)
-      .includes(annotation.annotationCategoryId)
-  ) {
-    const category: Category = {
-      color: annotation.annotationCategoryColor,
-      id: annotation.annotationCategoryId,
-      name: annotation.annotationCategoryName,
-      visible: true,
-    };
-    newCategories = [...newCategories, category];
-  }
-
-  let annotationPlane = annotation.annotationPlane;
-
-  if (!annotationPlane) {
-    annotationPlane = 0;
-  }
-
-  return {
-    annotation_out: {
-      boundingBox: [
-        annotation.annotationBoundingBoxX,
-        annotation.annotationBoundingBoxY,
-        annotation.annotationBoundingBoxWidth,
-        annotation.annotationBoundingBoxHeight,
-      ],
-      categoryId: annotation.annotationCategoryId,
-      id: annotation.annotationId,
-      mask: mask,
-      plane: annotationPlane,
-    },
-    categories: newCategories,
-  };
-};
-
-export const importSerializedAnnotationsTest = (
-  annotation: SerializedAnnotationType,
-  existingCategories: Array<Category>
-): { annotation_out: AnnotationType; categories: Array<Category> } => {
-  const mask = annotation.annotationMask
-    .split(" ")
-    .map((x: string) => parseInt(x));
-
-  let newCategories = existingCategories;
-  //if category does not already exist in state, add it
-  if (
-    !existingCategories
-      .map((category: Category) => category.id)
-      .includes(annotation.annotationCategoryId)
-  ) {
-    const category: Category = {
-      color: annotation.annotationCategoryColor,
-      id: annotation.annotationCategoryId,
-      name: annotation.annotationCategoryName,
-      visible: true,
-    };
-    newCategories = [...newCategories, category];
-  }
-
-  let annotationPlane = annotation.annotationPlane;
-
-  if (!annotationPlane) {
-    annotationPlane = 0;
-  }
-
-  return {
-    annotation_out: {
-      boundingBox: [
-        annotation.annotationBoundingBoxX,
-        annotation.annotationBoundingBoxY,
-        annotation.annotationBoundingBoxWidth,
-        annotation.annotationBoundingBoxHeight,
-      ],
-      categoryId: annotation.annotationCategoryId,
-      id: annotation.annotationId,
-      mask: mask,
-      plane: annotationPlane,
-    },
-    categories: newCategories,
-  };
 };
