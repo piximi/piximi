@@ -215,6 +215,26 @@ export const projectSlice = createSlice({
         state.annotationCategories = action.payload.categories;
       }
     },
+    addAnnotationCategories(
+      state,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      const newCategories = [];
+      for (const newCategory of action.payload.categories) {
+        const idExists = state.annotationCategories.find(
+          (c) => c.id === newCategory.id
+        );
+        if (idExists) {
+          newCategories.push({
+            ...newCategory,
+            id: uuidv4(),
+          });
+        } else {
+          newCategories.push(newCategory);
+        }
+      }
+      state.annotationCategories.push(...newCategories);
+    },
     setAnnotationCategoryVisibility(
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
