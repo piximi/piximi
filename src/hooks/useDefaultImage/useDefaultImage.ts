@@ -47,7 +47,7 @@ const dispatchToImageViewer = async (
     dispatch(
       imageViewerSlice.actions.setImages({
         images: [image],
-        disposeColorTensors: false,
+        disposeColorTensors: true,
       })
     );
     dispatch(
