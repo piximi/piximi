@@ -4,7 +4,7 @@ import { failure } from "io-ts/PathReporter";
 
 const SerializedCategoryType = T.type({
   id: T.string,
-  color: T.string,
+  color: T.string, // 3 byte hex, eg "#a08cd2"
   name: T.string,
   visible: T.boolean,
 });

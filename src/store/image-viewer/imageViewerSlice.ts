@@ -16,7 +16,7 @@ import { ImageViewer } from "types/ImageViewer";
 import { Colors } from "types/tensorflow";
 import { AnnotationTool } from "annotator/image/Tool";
 
-import { replaceDuplicateName } from "image/imageHelper";
+import { replaceDuplicateName } from "image/utils/imageHelper";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
