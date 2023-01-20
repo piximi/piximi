@@ -1102,6 +1102,7 @@ export const saveAnnotationsAsLabelMatrix = (
     .flat();
 };
 
+// TODO: image_data - should no longer be used
 export const importSerializedAnnotations = (
   annotation: _SerializedAnnotationType,
   existingCategories: Array<Category>

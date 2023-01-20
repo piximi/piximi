@@ -19,7 +19,10 @@ const dispatchToProject = async (
   if (location !== DispatchLocation.Project) return;
   const { image, categories } = await loadExampleImage(
     colorImage,
-    cellPaintingAnnotations as SerializedFileType
+    cellPaintingAnnotations as SerializedFileType,
+    // imageFile.name points to
+    // "/static/media/cell-painting.f118ef087853056f08e6.png"
+    "cell-painting.png"
   );
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
   dispatch(projectSlice.actions.setImages({ images: [image] }));
@@ -33,7 +36,10 @@ const dispatchToImageViewer = async (
 
   const { image, categories } = await loadExampleImage(
     colorImage,
-    cellPaintingAnnotations as SerializedFileType
+    cellPaintingAnnotations as SerializedFileType,
+    // imageFile.name points to
+    // "/static/media/cell-painting.f118ef087853056f08e6.png"
+    "cell-painting.png"
   );
 
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
