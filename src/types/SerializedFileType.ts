@@ -1,13 +1,4 @@
-import { SerializedAnnotationType } from "./SerializedAnnotationType";
+import * as T from "io-ts";
+import { SerializedFileType } from "./runtime";
 
-type SerializedCategoryType = {
-  id: string;
-  color: string; // 3 byte hex
-  name: string;
-  visible: boolean;
-};
-
-export type SerializedFileType = {
-  categories: Array<SerializedCategoryType>;
-  annotations: Array<SerializedAnnotationType>;
-};
+export type SerializedFileType = T.TypeOf<typeof SerializedFileType>;
