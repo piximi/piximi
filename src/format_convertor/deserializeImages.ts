@@ -9,7 +9,6 @@ export const deserializeImages = async (
   const deserializedImages: Array<ImageType> = [];
 
   for (const serializedImage of serializedImages) {
-    // TODO: image_data - refactor this if/else block once done
     let deserializedImage: ImageType;
     if (serializedImage.imageData !== undefined) {
       deserializedImage = await _convertSerialization(serializedImage);
