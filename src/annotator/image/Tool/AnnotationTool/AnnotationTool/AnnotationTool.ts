@@ -1,7 +1,7 @@
 import { AnnotationType } from "types/AnnotationType";
 import * as ImageJS from "image-js";
 import { Category } from "types/Category";
-import * as _ from "lodash";
+import _ from "lodash";
 import { connectPoints, drawLine } from "image/imageHelper";
 import { simplifyPolygon } from "../../../simplify/simplify";
 import { slpf } from "../../../polygon-fill/slpf";

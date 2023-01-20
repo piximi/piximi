@@ -12,7 +12,7 @@ import {
 } from "@tensorflow/tfjs";
 import { RectangularAnnotationTool } from "../RectangularAnnotationTool";
 import * as ImageJS from "image-js";
-import * as _ from "lodash";
+import _ from "lodash";
 import { encode } from "../../../rle";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 

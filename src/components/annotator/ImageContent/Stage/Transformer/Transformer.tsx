@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
-import * as _ from "lodash";
+import _ from "lodash";
 import * as ImageJS from "image-js";
 import useSound from "use-sound";
 

@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import * as ImageJS from "image-js";
-import * as _ from "lodash";
+import _ from "lodash";
 import { connectPoints } from "image/imageHelper";
 import { encode } from "../../../rle";
 import { AnnotationStateType } from "types/AnnotationStateType";
