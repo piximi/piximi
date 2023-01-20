@@ -4,7 +4,7 @@ import {
 } from "colorPalette";
 
 export type Category = {
-  color: string;
+  color: string; // 3 byte hex, eg. "#a08cd2"
   id: string;
   name: string;
   visible: boolean;
