@@ -7,15 +7,14 @@ import { Category, SerializedFileType } from "types";
 
 export const loadExampleImage = async (
   imagePath: string,
-  serializedAnnotations: SerializedFileType
+  serializedAnnotations: SerializedFileType,
+  imageName?: string
 ) => {
   const imageFile = await fileFromPath(imagePath);
   const imageStack = await loadImageFileAsStack(imageFile);
   const image = await convertToImage(
     imageStack,
-    // imageFile.name points to
-    // "/static/media/cell-painting.f118ef087853056f08e6.png"
-    "cell-painting.png",
+    imageName ? imageName : imageFile.name,
     undefined,
     1,
     3

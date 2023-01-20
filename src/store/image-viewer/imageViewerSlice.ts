@@ -143,6 +143,7 @@ export const imageViewerSlice = createSlice({
         } else return image;
       });
     },
+    // TODO: image_data - should no longer be used
     openAnnotations(
       state,
       action: PayloadAction<{
