@@ -6,6 +6,7 @@ import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
+// @ts-ignore TODO: image_data
 import { generateDefaultChannels } from "image/imageHelper";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
@@ -66,6 +67,7 @@ const images: Array<ImageType> = [
     partition: Partition.Training,
     visible: true,
     shape: inputShape,
+    // @ts-ignore TODO: image_data
     originalSrc: [[""]],
     src: "/static/media/cell-painting.f118ef087853056f08e6.png",
     activePlane: 0,
