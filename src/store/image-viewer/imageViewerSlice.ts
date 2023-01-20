@@ -6,7 +6,6 @@ import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types/Category";
 import { ToolType } from "types/ToolType";
 import { AnnotationType } from "types/AnnotationType";
@@ -15,16 +14,9 @@ import { AnnotationStateType } from "types/AnnotationStateType";
 import { LanguageType } from "types/LanguageType";
 import { ImageViewer } from "types/ImageViewer";
 import { Colors } from "types/tensorflow";
-import { Partition } from "types/Partition";
 import { AnnotationTool } from "annotator/image/Tool";
 
-// TODO: image_data
-import { _SerializedFileType } from "format_convertor/types";
-import {
-  // TODO: image_data
-  generateDefaultChannels,
-  replaceDuplicateName,
-} from "image/imageHelper";
+import { replaceDuplicateName } from "image/imageHelper";
 
 const initialState: ImageViewer = {
   annotationState: AnnotationStateType.Blank,
@@ -142,43 +134,6 @@ export const imageViewerSlice = createSlice({
           return { ...image, annotations: updatedAnnotations };
         } else return image;
       });
-    },
-    // TODO: image_data - should no longer be used
-    openAnnotations(
-      state,
-      action: PayloadAction<{
-        imageFile: _SerializedFileType;
-        annotations: Array<AnnotationType>;
-      }>
-    ) {
-      if (!state.activeImageId) return;
-
-      const newImage: ShadowImageType = {
-        id: action.payload.imageFile.imageId,
-        name: action.payload.imageFile.imageFilename,
-        annotations: action.payload.annotations,
-        activePlane: 0,
-        // @ts-ignore: TODO: image_data
-        colors: action.payload.imageFile.imageColors
-          ? action.payload.imageFile.imageColors
-          : generateDefaultChannels(action.payload.imageFile.imageChannels),
-        src: action.payload.imageFile.imageSrc,
-        categoryId: UNKNOWN_CLASS_CATEGORY_ID,
-        // TODO: image_data
-        originalSrc: action.payload.imageFile.imageData,
-        partition: Partition.Inference,
-        visible: true,
-        shape: {
-          channels: action.payload.imageFile.imageChannels,
-          // @ts-ignore: TODO: image_data
-          frames: action.payload.imageFile.imageFrames,
-          height: action.payload.imageFile.imageHeight,
-          planes: action.payload.imageFile.imagePlanes,
-          width: action.payload.imageFile.imageWidth,
-        },
-      };
-
-      state.images.push(...[newImage]);
     },
     setActiveImageRenderedSrcs(
       state,
@@ -459,7 +414,6 @@ export const {
   addImages,
   deleteAllInstances,
   deleteImage,
-  openAnnotations,
   setActiveImage,
   setActiveImagePlane,
   setAnnotationState,
