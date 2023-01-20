@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import _ from "lodash";
 import { Category, ImageViewer, Project } from "types";
 
 export const selectedCategorySelector = ({

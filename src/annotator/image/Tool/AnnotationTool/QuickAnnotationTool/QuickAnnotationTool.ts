@@ -2,7 +2,7 @@ import { AnnotationTool } from "../AnnotationTool";
 import { slic } from "../../../slic";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
-import * as _ from "lodash";
+import _ from "lodash";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";
 
 export class QuickAnnotationTool extends AnnotationTool {

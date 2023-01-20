@@ -1,5 +1,5 @@
 import { AnnotationTool } from "../AnnotationTool";
-import * as _ from "lodash";
+import _ from "lodash";
 import * as ImageJS from "image-js";
 import { encode } from "../../../rle";
 import { AnnotationStateType } from "../../../../../types/AnnotationStateType";

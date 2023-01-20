@@ -1,6 +1,6 @@
 import { Tool } from "../Tool";
 import { ZoomModeType } from "../../../../types/ZoomModeType";
-import * as _ from "lodash";
+import _ from "lodash";
 import numeral from "numeral";
 import { KonvaEventObject } from "konva/lib/Node";
 import * as ImageJS from "image-js";

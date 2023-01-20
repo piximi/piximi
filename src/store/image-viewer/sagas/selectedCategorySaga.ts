@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import {
   imageViewerSlice,

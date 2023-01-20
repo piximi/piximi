@@ -1,5 +1,5 @@
 import { loadLayersModel, sequential, layers } from "@tensorflow/tfjs";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { Shape } from "../../types/Shape";
 import { changeInputShape } from "./changeInputShape";
