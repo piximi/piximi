@@ -111,8 +111,6 @@ export { HotkeyView } from "./Settings";
 
 export type { Shape } from "./Shape";
 
-export type { ShapeType } from "./ShapeType";
-
 export type { State } from "./State";
 
 export { ThemeMode } from "./ThemeMode";

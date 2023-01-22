@@ -20,8 +20,7 @@ export const activeImageColorsRawSelector = ({
   }
 
   return {
-    // TODO: image_data - is sync appropriate?
-    // if so we may need to dispose??
+    // is sync appropriate? if so we may need to dispose??
     color: colors.color.arraySync() as [number, number, number][],
     range: colors.range,
     visible: colors.visible,
