@@ -50,8 +50,6 @@ export const ImportTensorflowModelDialog = ({
     width: 256,
     channels: 3,
     planes: 1,
-    // @TODO: image_data
-    //frames: 1,
   });
 
   const [alertState, setAlertState] =
