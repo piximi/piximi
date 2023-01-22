@@ -1,4 +1,4 @@
-import { ShapeType } from "./ShapeType";
+import { Shape } from "./Shape";
 import { AnnotationType } from "./AnnotationType";
 
 export type ImageViewerImage = {
@@ -6,7 +6,7 @@ export type ImageViewerImage = {
   id: string;
   annotations: Array<AnnotationType>;
   name: string;
-  shape: ShapeType;
+  shape: Shape;
   originalSrc: string; // original image data
   src: string; // filtered image data
 };
