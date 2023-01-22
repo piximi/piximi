@@ -8,7 +8,6 @@ import { Colors } from "types/tensorflow";
 
 import { createRenderedTensor } from "image/utils/imageHelper";
 
-// TODO: image_data (including all prerendering machinary, generally)
 export function* activeImageIDChangeSaga({
   payload: { imageId, execSaga },
 }: PayloadAction<{ imageId: string | undefined; execSaga: boolean }>) {
@@ -34,12 +33,15 @@ export function* activeImageIDChangeSaga({
    * Since converting each plane to image data, and mapping them to RGBs
    * can take some time, there is a a window of time where the previous
    * active image will be shown in the annotator. To avoid this, we want
-   * to first set renderedSrcs to just the already rendered image src,
+   * to first set renderedSrcs to a mostly blank array, with the only
+   * filled element being just the already rendered image src,
    * then after prerendering srcs for each plane, we replace it.
    */
+  const tmpRenderedSrc = Array(image.shape.planes);
+  tmpRenderedSrc[image.activePlane] = image.src;
   yield put(
     imageViewerSlice.actions.setActiveImageRenderedSrcs({
-      renderedSrcs: [image.src],
+      renderedSrcs: tmpRenderedSrc,
     })
   );
 

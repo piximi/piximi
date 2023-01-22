@@ -3,7 +3,6 @@ import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationType } from "./AnnotationType";
 import { AnnotationStateType } from "./AnnotationStateType";
-import { Colors } from "./tensorflow/Colors";
 import { ShadowImageType } from "./ImageType";
 
 export type ImageViewer = {

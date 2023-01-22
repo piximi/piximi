@@ -189,11 +189,22 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ activeImagePlane: number }>
     ) {
       if (!state.activeImageId) return;
+
+      const newPlane = action.payload.activeImagePlane;
+
+      if (newPlane < 0 || newPlane >= state.activeImageRenderedSrcs.length)
+        return;
+
       state.images = state.images.map((image) => {
         if (state.activeImageId !== image.id) {
           return image;
         } else {
-          return { ...image, activePlane: action.payload.activeImagePlane };
+          return {
+            ...image,
+            activePlane: newPlane,
+            // change rendered src to match new active plane
+            src: state.activeImageRenderedSrcs[newPlane],
+          };
         }
       });
     },
