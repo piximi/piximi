@@ -1,5 +1,5 @@
 // @ts-nocheck
-// TODO: post PR #383, get working for segmenter
+// TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
 import { Category } from "types/Category";

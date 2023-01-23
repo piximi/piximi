@@ -206,7 +206,7 @@ describe("ImageJS Images -> Stacks -> Tensors ", async () => {
 
   const testDataUnloaded: PreloadedTestImages = {
     // binary images
-    // TODO: post PR #383
+    // TODO: post PR #407
     // binary: {
     //   filepath: "src/images/1c_1b_Neighborhood_watch_bw.png",
     //   width: 200,
@@ -342,7 +342,7 @@ describe("ImageJS Images -> Stacks -> Tensors ", async () => {
       data: undefined,
     },
     // 32 bit float images
-    // TODO: post PR #383
+    // TODO: post PR #407
   };
 
   for (const im of Object.keys(testDataUnloaded)) {

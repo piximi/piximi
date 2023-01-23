@@ -31,7 +31,7 @@ export const ExitAnnotatorDialog = ({
   const annotatorImages = useSelector(annotatorImagesSelector);
   const selectedImagesIds = useSelector(selectedImagesSelector);
 
-  // TODO: post PR #383 - make these selectors
+  // TODO: post PR #407 - make these selectors
   const getImageSets = () => {
     const annotatorImagesIds = annotatorImages.map(
       (image: ShadowImageType) => image.id
