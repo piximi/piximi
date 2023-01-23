@@ -36,7 +36,7 @@ export const SoundEvents = memo(() => {
   useHotkeys(
     "enter",
     () => {
-      playCreateAnnotationSoundEffect();
+      soundEnabled && playCreateAnnotationSoundEffect();
     },
     HotkeyView.Annotator,
     [soundEnabled, creeateAnnotationSound]
@@ -45,7 +45,7 @@ export const SoundEvents = memo(() => {
   useHotkeys(
     "escape, backspace, delete",
     () => {
-      playDeleteAnnotationSoundEffect();
+      soundEnabled && playDeleteAnnotationSoundEffect();
     },
     HotkeyView.Annotator,
     [soundEnabled, deleteAnnotationSound]

@@ -15,32 +15,31 @@ import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
 import { AnnotationTool } from "annotator-tools";
 
 export function* annotationStateChangeSaga({
-  payload: { annotationState, annotationTool },
+  payload: { annotationState, annotationTool, execSaga },
 }: PayloadAction<{
   annotationState: AnnotationStateType;
   annotationTool: AnnotationTool | undefined;
   execSaga: boolean;
 }>) {
+  if (
+    !execSaga ||
+    !annotationTool ||
+    annotationState !== AnnotationStateType.Annotated
+  )
+    return;
+
   const selectionMode: ReturnType<typeof selectionModeSelector> = yield select(
     selectionModeSelector
   );
   const activeImagePlane: ReturnType<typeof activeImagePlaneSelector> =
     yield select(activeImagePlaneSelector);
-  const toolType: ReturnType<typeof toolTypeSelector> = yield select(
-    toolTypeSelector
-  );
-  const selectedAnnotation: ReturnType<typeof selectedAnnotationSelector> =
-    yield select(selectedAnnotationSelector);
-  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-    yield select(selectedCategorySelector);
-  let combinedMask, combinedBoundingBox;
-
-  if (!annotationTool) return;
-
-  if (annotationState !== AnnotationStateType.Annotated) return;
 
   if (selectionMode === AnnotationModeType.New) {
+    const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+      yield select(selectedCategorySelector);
+
     annotationTool.annotate(selectedCategory, activeImagePlane);
+
     if (!annotationTool.annotation) return;
 
     yield put(
@@ -61,81 +60,54 @@ export function* annotationStateChangeSaga({
 
     if (annotationTool.annotationState !== AnnotationStateType.Annotated)
       return;
-  }
 
-  switch (selectionMode) {
-    case AnnotationModeType.Add:
+    let combinedMask, combinedBoundingBox;
+
+    if (!workingAnnotation) return;
+
+    if (selectionMode === AnnotationModeType.Add) {
       [combinedMask, combinedBoundingBox] = annotationTool.add(
-        selectedAnnotation.mask,
-        selectedAnnotation.boundingBox
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
-      break;
-
-      if (!workingAnnotation) return;
-
-      if (selectionMode === AnnotationModeType.Add) {
-        [combinedMask, combinedBoundingBox] = annotationTool.add(
-          workingAnnotation.maskData!,
-          workingAnnotation.boundingBox
-        );
-      } else if (selectionMode === AnnotationModeType.Subtract) {
-        [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-          workingAnnotation.maskData!,
-          workingAnnotation.boundingBox
-        );
-      } else if (selectionMode === AnnotationModeType.Intersect) {
-        [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-          workingAnnotation.maskData!,
-          workingAnnotation.boundingBox
-        );
-      } else {
-        return;
-      }
-
-      annotationTool.maskData = combinedMask;
-      annotationTool.boundingBox = combinedBoundingBox;
-
-      const combinedSelectedAnnotation = annotationTool.maskData.length
-        ? {
-            ...workingAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            maskData: annotationTool.maskData,
-          }
-        : undefined;
-
-      if (!combinedSelectedAnnotation) return;
-
-      yield put(
-        imageViewerSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [combinedSelectedAnnotation],
-          workingAnnotation: combinedSelectedAnnotation,
-        })
+    } else if (selectionMode === AnnotationModeType.Subtract) {
+      [combinedMask, combinedBoundingBox] = annotationTool.subtract(
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
-
-      annotationTool.maskData = combinedMask;
-      annotationTool.boundingBox = combinedBoundingBox;
-
-      const combinedSelectedAnnotation = annotationTool.maskData.length
-        ? {
-            ...workingAnnotation,
-            boundingBox: annotationTool.boundingBox,
-            maskData: annotationTool.maskData,
-          }
-        : undefined;
-
-      if (!combinedSelectedAnnotation) return;
-
-      yield put(
-        AnnotatorSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [combinedSelectedAnnotation],
-          workingAnnotation: combinedSelectedAnnotation,
-        })
+    } else if (selectionMode === AnnotationModeType.Intersect) {
+      [combinedMask, combinedBoundingBox] = annotationTool.intersect(
+        workingAnnotation.maskData!,
+        workingAnnotation.boundingBox
       );
+    } else {
+      return;
+    }
 
-      if (annotationTool.maskData.length) {
-        const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-          yield select(selectedCategorySelector);
-        annotationTool.annotate(selectedCategory, activeImagePlane);
-      }
+    annotationTool.maskData = combinedMask;
+    annotationTool.boundingBox = combinedBoundingBox;
+
+    const combinedSelectedAnnotation = annotationTool.maskData.length
+      ? {
+          ...workingAnnotation,
+          boundingBox: annotationTool.boundingBox,
+          maskData: annotationTool.maskData,
+        }
+      : undefined;
+
+    if (!combinedSelectedAnnotation) return;
+
+    yield put(
+      AnnotatorSlice.actions.setSelectedAnnotations({
+        selectedAnnotations: [combinedSelectedAnnotation],
+        workingAnnotation: combinedSelectedAnnotation,
+      })
+    );
+
+    if (annotationTool.maskData.length) {
+      const selectedCategory: ReturnType<typeof selectedCategorySelector> =
+        yield select(selectedCategorySelector);
+      annotationTool.annotate(selectedCategory, activeImagePlane);
+    }
   }
 }
