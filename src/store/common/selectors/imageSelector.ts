@@ -1,6 +1,6 @@
 import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
 
-// TODO: post PR #383 - should be called fullImageSelector ?
+// TODO: post PR #407 - should be called fullImageSelector ?
 export const imageSelector = ({
   imageViewer,
   project,

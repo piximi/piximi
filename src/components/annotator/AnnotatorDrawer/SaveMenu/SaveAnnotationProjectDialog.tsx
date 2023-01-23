@@ -22,7 +22,7 @@ type SaveAnnotationProjectDialogProps = {
   open: boolean;
 };
 
-// TODO: post PR #383 - refactor project file (SerializedFileType) to host
+// TODO: post PR #407 - refactor project file (SerializedFileType) to host
 // annotations for all images in viewer, rather than just the active one
 export const SaveAnnotationProjectDialog = ({
   onClose,
