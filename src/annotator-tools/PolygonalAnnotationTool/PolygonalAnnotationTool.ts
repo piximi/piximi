@@ -3,9 +3,7 @@ import { getDistance, pointsAreEqual } from "utils/annotator";
 import { AnnotationStateType, Point } from "types";
 
 export class PolygonalAnnotationTool extends AnnotationTool {
-  anchor?: Point;
   buffer: Array<Point> = [];
-  origin?: Point;
   points: Array<Point> = [];
 
   deselect() {

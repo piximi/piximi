@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 
 import { MenuItem, ListItemText } from "@mui/material";
 import { activeSerializedAnnotationsSelector } from "store/common";
-import { activeImageSelector } from "store/common";
+import { activeImageSelector } from "store/annotator";
 
 type SaveAnnotationsMenuItemProps = {
   handleMenuClose: () => void;

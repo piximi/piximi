@@ -8,6 +8,6 @@ export const segmenterValidationImagesSelector = ({
   project: Project;
 }): Array<ImageType> => {
   return project.images.filter((image: ImageType) => {
-    return image.segmentationPartition === Partition.Validation;
+    return image.partition === Partition.Validation;
   });
 };

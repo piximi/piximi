@@ -31,6 +31,7 @@ export { highlightedCategoriesSelector } from "./selectors/highlightedCategorySe
 export { imageSortKeySelector } from "./selectors/imageSortKeySelector";
 export { imagesSelector } from "./selectors/imagesSelector";
 export { projectSelector } from "./selectors/projectSelector";
+export { projectNameSelector } from "./selectors/projectNameSelector";
 export { testImagesSelector } from "./selectors/testImagesSelector";
 export { trainImagesSelector } from "./selectors/trainImagesSelector";
 export { unannotatedImagesSelector } from "./selectors/unannotatedImagesSelector";

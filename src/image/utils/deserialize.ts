@@ -8,7 +8,7 @@ import {
   ImageType,
   Project,
   Classifier,
-  AnnotationType,
+  encodedAnnotationType,
   Partition,
   Category,
   FitOptions,
@@ -75,7 +75,7 @@ export const deserializeImage = async (
 
 const deserializeAnnotationsGroup = (
   annotationsGroup: Group
-): Array<AnnotationType> => {
+): Array<encodedAnnotationType> => {
   const bboxes = getDataset(annotationsGroup, "bounding_box")
     .value as Uint8Array;
   const categories = getDataset(annotationsGroup, "annotation_category_id")
@@ -86,7 +86,7 @@ const deserializeAnnotationsGroup = (
     .value as Uint8Array;
   const planes = getDataset(annotationsGroup, "plane").value as Uint8Array;
 
-  let annotations: Array<AnnotationType> = [];
+  let annotations: Array<encodedAnnotationType> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {

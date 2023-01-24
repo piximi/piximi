@@ -1,5 +1,4 @@
 import * as ImageJS from "image-js";
-import _ from "lodash";
 import { saveAs } from "file-saver";
 
 import { decode, pointsAreEqual } from "utils/annotator";

@@ -7,6 +7,7 @@ export type encodedAnnotationType = {
   plane: number;
 };
 export type decodedAnnotationType = {
+  // x1, y1, W, H
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;

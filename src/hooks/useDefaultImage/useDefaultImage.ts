@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { projectSlice, imagesCountSelector } from "store/project";
-import { imageViewerSlice, activeImageIdSelector } from "store/image-viewer";
+import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { loadExampleImage } from "image/utils/loadExampleImage";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
@@ -45,14 +45,15 @@ const dispatchToImageViewer = async (
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
   batch(() => {
     dispatch(
-      imageViewerSlice.actions.setImages({
+      AnnotatorSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
       })
     );
     dispatch(
-      imageViewerSlice.actions.setActiveImage({
+      AnnotatorSlice.actions.setActiveImage({
         imageId: image.id,
+        prevImageId: undefined, // no previous images
         execSaga: true,
       })
     );

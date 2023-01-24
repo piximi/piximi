@@ -12,11 +12,9 @@ import { getIdx } from "utils/common";
 import { AnnotationStateType, Point } from "types";
 
 export class MagneticAnnotationTool extends AnnotationTool {
-  anchor?: Point;
   buffer: Array<Point> = [];
   factor: number;
   graph?: PiximiGraph;
-  origin?: Point;
   path: Array<Point> = [];
   pathfinder?: { find: (fromId: number, toId: number) => any };
   points: Array<Point> = [];
