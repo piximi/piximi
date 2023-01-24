@@ -6,48 +6,44 @@ import {
   toolTypeSelector,
   zoomSelectionSelector,
   scaledImageWidthSelector,
-  setOffset,
-  setStageScale,
   setZoomSelection,
-} from "store/image-viewer";
+  setStageScale,
+  setStagePosition,
+  stageWidthSelector,
+  stagePositionSelector,
+} from "store/annotator";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
-import { ToolType, ZoomModeType } from "types";
+import { Point, ToolType, ZoomModeType } from "types";
+import { useState } from "react";
 
 export const useZoom = () => {
   const delta = 10;
-  const scaleBy = 1.25;
+  const [selectStart, setSelectStart] = useState<{ x: number; y: number }>();
 
   const dispatch = useDispatch();
-
   const stageScale = useSelector(stageScaleSelector);
+  const stageWidth = useSelector(stageWidthSelector);
+  const stagePosition = useSelector(stagePositionSelector);
   const toolType = useSelector(toolTypeSelector);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
-
   const imageWidth = useSelector(scaledImageWidthSelector);
 
-  const zoomAndOffset = (
-    position: { x: number; y: number } | undefined,
-    scaleBy: number,
-    zoomIn: boolean = true
-  ) => {
-    if (!automaticCentering || zoomSelection.dragging) {
-      if (!position) return;
-      dispatch(
-        setOffset({
-          offset: {
-            x: zoomIn ? position.x * scaleBy : position.x / scaleBy,
-            y: zoomIn ? position.y * scaleBy : position.y / scaleBy,
-          },
-        })
-      );
-    }
-    dispatch(
-      setStageScale({
-        stageScale: zoomIn ? stageScale * scaleBy : stageScale / scaleBy,
-      })
-    );
+  const zoomAndOffset = (newScale: number, center: Point) => {
+    if (!center) return;
+    dispatch(setStageScale({ stageScale: newScale }));
+    const mousePointTo = {
+      x: (center.x - stagePosition.x) / stageScale,
+      y: (center.y - stagePosition.y) / stageScale,
+    };
+
+    var newPos = {
+      x: center.x - mousePointTo.x * newScale,
+      y: center.y - mousePointTo.y * newScale,
+    };
+
+    dispatch(setStagePosition({ stagePosition: newPos }));
   };
 
   const deselect = () => {
@@ -58,14 +54,19 @@ export const useZoom = () => {
           minimum: undefined,
           selecting: false,
           dragging: false,
+          centerPoint: undefined,
         },
       })
     );
   };
 
-  const onMouseDown = (position: { x: number; y: number }) => {
+  const onMouseDown = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
     if (toolType !== ToolType.Zoom) return;
-
+    const stage = event.target.getStage()!;
+    setSelectStart(stage.getPointerPosition()!);
     dispatch(
       setZoomSelection({
         zoomSelection: {
@@ -78,31 +79,41 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseMove = (position: { x: number; y: number }) => {
-    if (mode === ZoomModeType.Out) return;
-
-    if (!zoomSelection.selecting) return;
-
-    if (!position || !zoomSelection.minimum) return;
+  const onMouseMove = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
+    const stage = event.target.getStage()!;
+    const _position = stage.getPointerPosition()!;
+    if (
+      mode === ZoomModeType.Out ||
+      !zoomSelection.selecting ||
+      !position ||
+      !zoomSelection.minimum ||
+      !selectStart
+    )
+      return;
 
     dispatch(
       setZoomSelection({
         zoomSelection: {
           ...zoomSelection,
-          dragging: Math.abs(position.x - zoomSelection.minimum.x) >= delta,
+          dragging: Math.abs(_position.x - selectStart.x) >= delta,
           maximum: position,
         },
       })
     );
   };
 
-  const onMouseUp = (position: { x: number; y: number }) => {
-    if (!imageWidth) return;
-
-    if (!zoomSelection.selecting) return;
-
+  const onMouseUp = (
+    position: { x: number; y: number },
+    event: KonvaEventObject<MouseEvent>
+  ) => {
+    if (!imageWidth || !zoomSelection.selecting) return;
     if (zoomSelection.dragging) {
-      if (!position) return;
+      const stage = event.target.getStage()!;
+      const _position = stage.getPointerPosition()!;
+      if (!_position || !position || !selectStart) return;
 
       dispatch(
         setZoomSelection({
@@ -112,17 +123,29 @@ export const useZoom = () => {
 
       if (!zoomSelection.minimum) return;
 
-      const selectedWidth = position.x - zoomSelection.minimum.x;
-
-      zoomAndOffset(
-        {
-          x: zoomSelection.minimum.x + selectedWidth / 2,
-          y: zoomSelection.minimum.y + selectedWidth / 2,
-        },
-        imageWidth / selectedWidth / stageScale
+      const selectedWidth = Math.abs(_position.x - selectStart.x);
+      const newScale = Math.max(
+        Math.min(stageWidth / selectedWidth, 5),
+        stageScale
       );
-    } else {
-      zoomAndOffset(position, scaleBy, mode === ZoomModeType.In);
+      let topLeft;
+      if (selectStart.x < _position.x) {
+        if (selectStart.y < _position.y) {
+          topLeft = selectStart;
+        } else {
+          topLeft = { x: selectStart.x, y: _position.y };
+        }
+      } else {
+        if (selectStart.y < _position.y) {
+          topLeft = { x: _position.x, y: selectStart.y };
+        } else {
+          topLeft = _position;
+        }
+      }
+      zoomAndOffset(newScale, {
+        x: topLeft.x + selectedWidth / 2,
+        y: topLeft.y + selectedWidth / 2,
+      });
     }
 
     dispatch(
@@ -133,18 +156,88 @@ export const useZoom = () => {
   };
 
   const onWheel = (event: KonvaEventObject<WheelEvent>) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
-      console.log(event);
-
-    if (toolType !== ToolType.Zoom) return;
-
+    event.evt.preventDefault();
     if (!imageWidth) return;
-    zoomAndOffset(
-      { x: imageWidth / 2, y: imageWidth / 2 },
-      scaleBy,
+    const stage = event.target.getStage()!;
+    const scaleBy = 1.035;
+
+    const oldScale = stage.scaleX();
+
+    const newScale =
       event.evt.deltaY < 0
-    );
+        ? Math.min(5, oldScale * scaleBy)
+        : Math.max(0.25, oldScale / scaleBy);
+
+    let center;
+
+    if (automaticCentering) {
+      center = zoomSelection.centerPoint;
+    } else {
+      center = stage.getPointerPosition() as Point;
+    }
+    if (!center) return;
+    zoomAndOffset(newScale, center);
+
+    const labelGroup = stage.find(`#label-group`)[0];
+    if (!labelGroup) return;
+    const labelPosition = labelGroup.position();
+    const labelPointTo = {
+      x: labelPosition.x / oldScale - stage.x() / oldScale,
+      y: labelPosition.y / oldScale - stage.y() / oldScale,
+    };
+    labelGroup.setAttrs({
+      scaleX: 1 / stage.scaleX(),
+      scaleY: 1 / stage.scaleY(),
+    });
+
+    var newLabelPos = {
+      x: labelPosition.x - labelPointTo.x * newScale,
+      y: labelPosition.y - labelPointTo.y * newScale,
+    };
+
+    labelGroup.setAttrs({
+      position: newLabelPos,
+    });
+  };
+
+  const handleDblClick = (event: KonvaEventObject<MouseEvent>) => {
+    event.evt.preventDefault();
+    if (!imageWidth) return;
+    const stage = event.target.getStage()!;
+    const scaleBy = 1.2;
+
+    const oldScale = stage.scaleX();
+
+    const newScale =
+      mode === ZoomModeType.In
+        ? Math.min(5, oldScale * scaleBy)
+        : Math.max(0.25, oldScale / scaleBy);
+
+    let center = stage.getPointerPosition() as Point;
+
+    if (!center) return;
+    zoomAndOffset(newScale, center);
+
+    const labelGroup = stage.find(`#label-group`)[0];
+    if (!labelGroup) return;
+    const labelPosition = labelGroup.position();
+    const labelPointTo = {
+      x: labelPosition.x / oldScale - stage.x() / oldScale,
+      y: labelPosition.y / oldScale - stage.y() / oldScale,
+    };
+    labelGroup.setAttrs({
+      scaleX: 1 / stage.scaleX(),
+      scaleY: 1 / stage.scaleY(),
+    });
+
+    var newLabelPos = {
+      x: labelPosition.x - labelPointTo.x * newScale,
+      y: labelPosition.y - labelPointTo.y * newScale,
+    };
+
+    labelGroup.setAttrs({
+      position: newLabelPos,
+    });
   };
 
   return {
@@ -153,5 +246,7 @@ export const useZoom = () => {
     onMouseMove,
     onMouseUp,
     onWheel,
+    zoomAndOffset,
+    handleDblClick,
   };
 };

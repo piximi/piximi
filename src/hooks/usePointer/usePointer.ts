@@ -3,27 +3,26 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   currentIndexSelector,
   imageHeightSelector,
-  imageInstancesSelector,
   imageWidthSelector,
   pointerSelectionSelector,
   selectedAnnotationsIdsSelector,
   selectedAnnotationsSelector,
-  stageScaleSelector,
   toolTypeSelector,
   setSelectedAnnotations,
   setSelectedCategoryId,
   setPointerSelection,
-} from "store/image-viewer";
+  stagedAnnotationsSelector,
+} from "store/annotator";
 
-import { AnnotationType, HotkeyView, ToolType } from "types";
+import { decodedAnnotationType, HotkeyView, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 export const usePointer = () => {
   const dispatch = useDispatch();
@@ -38,9 +37,7 @@ export const usePointer = () => {
 
   const pointerSelection = useSelector(pointerSelectionSelector);
 
-  const annotations = useSelector(imageInstancesSelector);
-
-  const stageScale = useSelector(stageScaleSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const imageWidth = useSelector(imageWidthSelector);
 
@@ -79,9 +76,8 @@ export const usePointer = () => {
   };
 
   const onMouseMove = (position: { x: number; y: number }) => {
-    if (!pointerSelection.selecting) return;
-
-    if (!position || !pointerSelection.minimum) return;
+    if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
+      return;
 
     dispatch(
       setPointerSelection({
@@ -95,11 +91,9 @@ export const usePointer = () => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    if (!pointerSelection.selecting || !pointerSelection.minimum) return;
-
+    if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
+      return;
     if (pointerSelection.dragging) {
-      if (!position) return;
-
       // correct minimum or maximum in the case where user may have selected rectangle from right to left
       const maximum: { x: number; y: number } = {
         x:
@@ -122,17 +116,7 @@ export const usePointer = () => {
             : pointerSelection.minimum.y,
       };
 
-      dispatch(
-        setPointerSelection({
-          pointerSelection: {
-            ...pointerSelection,
-            minimum: minimum,
-            maximum: maximum,
-          },
-        })
-      );
-
-      if (!minimum || !annotations.length) {
+      if (!minimum || !stagedAnnotations.length) {
         dispatch(
           setPointerSelection({
             pointerSelection: {
@@ -145,40 +129,40 @@ export const usePointer = () => {
       }
 
       const scaledMinimum = {
-        x: minimum.x / stageScale,
-        y: minimum.y / stageScale,
+        x: minimum.x,
+        y: minimum.y,
       };
       const scaledMaximum = {
-        x: maximum.x / stageScale,
-        y: maximum.y / stageScale,
+        x: maximum.x,
+        y: maximum.y,
       };
 
       const annotationsInBox = getAnnotationsInBox(
         scaledMinimum,
         scaledMaximum,
-        annotations
+        stagedAnnotations
       );
 
       if (annotationsInBox.length) {
-        if (shift) {
+        if (!shift) {
           batch(() => {
             dispatch(
               setSelectedAnnotations({
                 selectedAnnotations: annotationsInBox,
-                selectedAnnotation: annotationsInBox[0],
+                workingAnnotation: annotationsInBox[0],
               })
             );
             dispatch(
               setSelectedCategoryId({
                 selectedCategoryId: annotationsInBox[0].categoryId,
-                execSaga: true,
+                execSaga: false,
               })
             );
           });
         } else {
           //only include if not already selected
           const additionalAnnotations = annotationsInBox.filter(
-            (annotation: AnnotationType) => {
+            (annotation: decodedAnnotationType) => {
               return !selectedAnnotationsIds.includes(annotation.id);
             }
           );
@@ -188,7 +172,7 @@ export const usePointer = () => {
                 ...selectedAnnotations,
                 ...additionalAnnotations,
               ],
-              selectedAnnotation: annotationsInBox[0],
+              workingAnnotation: annotationsInBox[0],
             })
           );
         }
@@ -209,25 +193,25 @@ export const usePointer = () => {
 
     if (!position) return;
 
-    if (!annotations.length || !imageWidth || !imageHeight) return;
+    if (!stagedAnnotations.length || !imageWidth || !imageHeight) return;
 
     const scaledCurrentPosition = {
-      x: position.x / stageScale,
-      y: position.y / stageScale,
+      x: position.x,
+      y: position.y,
     };
 
     overlappingAnnotationsIds = getOverlappingAnnotations(
       scaledCurrentPosition,
-      annotations,
+      stagedAnnotations,
       imageWidth,
       imageHeight
     );
 
-    let currentAnnotation: AnnotationType | undefined;
+    let currentAnnotation: decodedAnnotationType | undefined;
 
     if (overlappingAnnotationsIds.length > 1) {
       dispatch(
-        imageViewerSlice.actions.setCurrentIndex({
+        AnnotatorSlice.actions.setCurrentIndex({
           currentIndex:
             currentIndex + 1 === overlappingAnnotationsIds.length
               ? 0
@@ -236,15 +220,19 @@ export const usePointer = () => {
       );
       const nextAnnotationId = overlappingAnnotationsIds[currentIndex];
 
-      currentAnnotation = annotations.find((annotation: AnnotationType) => {
-        return annotation.id === nextAnnotationId;
-      });
+      currentAnnotation = stagedAnnotations.find(
+        (annotation: decodedAnnotationType) => {
+          return annotation.id === nextAnnotationId;
+        }
+      );
     } else {
-      currentAnnotation = annotations.find((annotation: AnnotationType) => {
-        return annotation.id === overlappingAnnotationsIds[0];
-      });
+      currentAnnotation = stagedAnnotations.find(
+        (annotation: decodedAnnotationType) => {
+          return annotation.id === overlappingAnnotationsIds[0];
+        }
+      );
       dispatch(
-        imageViewerSlice.actions.setCurrentIndex({
+        AnnotatorSlice.actions.setCurrentIndex({
           currentIndex: 0,
         })
       );
@@ -254,17 +242,16 @@ export const usePointer = () => {
 
     if (!shift) {
       batch(() => {
-        if (!currentAnnotation) return;
         dispatch(
           setSelectedAnnotations({
-            selectedAnnotations: [currentAnnotation],
-            selectedAnnotation: currentAnnotation,
+            selectedAnnotations: [currentAnnotation!],
+            workingAnnotation: currentAnnotation,
           })
         );
         dispatch(
           setSelectedCategoryId({
-            selectedCategoryId: currentAnnotation.categoryId,
-            execSaga: true,
+            selectedCategoryId: currentAnnotation!.categoryId,
+            execSaga: false,
           })
         );
       });
@@ -275,7 +262,7 @@ export const usePointer = () => {
       dispatch(
         setSelectedAnnotations({
           selectedAnnotations: [...selectedAnnotations, currentAnnotation],
-          selectedAnnotation: currentAnnotation,
+          workingAnnotation: currentAnnotation,
         })
       );
     }

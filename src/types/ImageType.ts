@@ -1,33 +1,35 @@
-import { Shape } from "./Shape";
-import { AnnotationType } from "./AnnotationType";
-import { Partition } from "./Partition";
-import { Color } from "./Color";
+import { Tensor4D } from "@tensorflow/tfjs";
+import { BitDepth } from "image-js";
+import { Shape, encodedAnnotationType, Partition } from "types";
+import { Colors } from "./tensorflow";
 
 export type ImageType = {
-  annotations: Array<AnnotationType>;
+  annotations: Array<encodedAnnotationType>;
   activePlane: number;
   categoryId: string;
-  colors: Array<Color>;
+  colors: Colors;
+  bitDepth: BitDepth;
   id: string;
   name: string;
-  originalSrc: Array<Array<string>>; //We keep track of the URIs for each channel, for each slice (used for color adjustment)
-  partition: Partition;
-  segmentationPartition?: Partition;
-  visible: boolean;
   shape: Shape;
+  data: Tensor4D; // [Z, H, W, C]
+  partition: Partition;
+  visible: boolean;
   src: string; // The URI to be displayed on the canvas
 };
 
 export type ShadowImageType = {
+  annotations: Array<encodedAnnotationType>;
+  activePlane: number;
+  categoryId?: string;
+  colors: Colors;
+  bitDepth: BitDepth;
   id: string;
   name: string;
-  annotations: Array<AnnotationType>;
-  src: string; // The URI to be displayed on the canvas
-  activePlane: number;
   shape: Shape;
-  colors: Array<Color>;
-  categoryId?: string;
-  originalSrc?: Array<Array<string>>; //We keep track of the URIs for each channel, for each slice (used for color adjustment)
+  data?: Tensor4D; // [Z, H, W, C]
   partition?: Partition;
+  segmentationPartition?: Partition; // TODO: BIG_MERGE - necessary?
   visible?: boolean;
+  src: string; // The URI to be displayed on the canvas
 };

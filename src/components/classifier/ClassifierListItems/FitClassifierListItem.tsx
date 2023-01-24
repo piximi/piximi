@@ -19,13 +19,9 @@ export const FitClassifierListItem = () => {
     false
   );
 
-  const onFitClick = () => {
-    onOpen();
-  };
-
   return (
     <Grid item xs={4}>
-      <ListItemButton onClick={onFitClick}>
+      <ListItemButton onClick={onOpen}>
         <Stack sx={{ alignItems: "center" }}>
           <ListItemIcon sx={{ justifyContent: "center" }}>
             <ScatterPlotIcon />

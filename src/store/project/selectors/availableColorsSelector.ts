@@ -1,5 +1,5 @@
 import { Category, Project } from "types";
-import { CATEGORY_COLORS } from "colorPalette";
+import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 export const availableColorsSelector = ({
   project,

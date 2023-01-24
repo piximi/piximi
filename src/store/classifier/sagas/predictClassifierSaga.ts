@@ -10,6 +10,7 @@ import {
   classifierPreprocessOptionsSelector,
   predictClasses,
   preprocessClassifier,
+  createClassificationLabels,
 } from "store/classifier";
 import {
   createdCategoriesSelector,
@@ -28,7 +29,7 @@ import {
   Shape,
 } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export function* predictClassifierSaga({
   payload: { execSaga },
@@ -114,15 +115,18 @@ function* runPrediction(
   fitOptions: FitOptions,
   model: LayersModel
 ) {
-  var data: Awaited<ReturnType<typeof preprocessClassifier>>;
   try {
-    data = yield preprocessClassifier(
-      testImages,
-      categories,
-      inputShape,
-      preprocessOptions,
-      fitOptions
-    );
+    var { labels: testLabels, disposeLabels: disposeTestLabels } =
+      createClassificationLabels(testImages, categories);
+
+    var dataSet: Awaited<ReturnType<typeof preprocessClassifier>> =
+      yield preprocessClassifier(
+        testImages,
+        testLabels,
+        inputShape,
+        preprocessOptions,
+        fitOptions
+      );
   } catch (error) {
     yield handleError(
       error as Error,
@@ -132,12 +136,16 @@ function* runPrediction(
   }
 
   try {
-    var { imageIds, categoryIds }: Awaited<ReturnType<typeof predictClasses>> =
-      yield predictClasses(model, data, categories); //returns an array of Image ID and an array of corresponding categories ID
+    var categoryIds: Awaited<ReturnType<typeof predictClasses>> =
+      yield predictClasses(model, dataSet, categories); //returns an array of Image ID and an array of corresponding categories ID
   } catch (error) {
     yield handleError(error as Error, "Error predicting the inference data");
     return;
   }
+
+  const imageIds = testImages.map((img) => img.id);
+
+  disposeTestLabels();
 
   yield put(
     projectSlice.actions.updateImagesCategories({

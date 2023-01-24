@@ -1,20 +1,23 @@
 // User has switched back to the tab
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice, selectionModeSelector } from "store/annotator";
 
 import { AnnotationModeType } from "types";
 
 export const useWindowFocusHandler = () => {
   const dispatch = useDispatch();
+  const annotationMode = useSelector(selectionModeSelector);
 
   const onBlur = () => {
-    dispatch(
-      imageViewerSlice.actions.setSelectionMode({
-        selectionMode: AnnotationModeType.New,
-      })
-    );
+    if (annotationMode !== AnnotationModeType.New) {
+      dispatch(
+        AnnotatorSlice.actions.setSelectionMode({
+          selectionMode: AnnotationModeType.New,
+        })
+      );
+    }
   };
 
   useEffect(() => {

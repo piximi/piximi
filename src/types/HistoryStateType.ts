@@ -1,7 +1,7 @@
-import { ImageViewer } from "./ImageViewer";
+import { Annotator } from "./Annotator";
 
 export type HistoryStateType = {
-  future: Array<ImageViewer>;
-  past: Array<ImageViewer>;
-  present: ImageViewer;
+  future: Array<Annotator>;
+  past: Array<Annotator>;
+  present: Annotator;
 };

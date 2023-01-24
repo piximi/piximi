@@ -1,12 +1,6 @@
-export type SerializedAnnotationType = {
-  annotationBoundingBoxHeight: number;
-  annotationBoundingBoxWidth: number;
-  annotationBoundingBoxX: number;
-  annotationBoundingBoxY: number;
-  annotationCategoryColor: string;
-  annotationCategoryId: string;
-  annotationCategoryName: string;
-  annotationId: string;
-  annotationMask: string;
-  annotationPlane: number;
-};
+import * as T from "io-ts";
+import { SerializedAnnotationType } from "./runtime";
+
+export type SerializedAnnotationType = T.TypeOf<
+  typeof SerializedAnnotationType
+>;

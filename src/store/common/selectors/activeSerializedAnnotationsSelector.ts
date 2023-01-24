@@ -1,70 +1,60 @@
-import { ImageViewer } from "types/ImageViewer";
-import { AnnotationType } from "types/AnnotationType";
+import { Annotator } from "types/Annotator";
 import { Category } from "types/Category";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { SerializedFileType } from "types/SerializedFileType";
-import { SerializedAnnotationType } from "types/SerializedAnnotationType";
 import { Project } from "types/Project";
 
+import { SerializedFileType, SerializedAnnotationType } from "types";
+
 export const activeSerializedAnnotationsSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }): SerializedFileType | undefined => {
-  if (!imageViewer.images.length) return undefined;
+  if (!annotator.images.length) return undefined;
 
   /*
     Find full image in project slice, else if not there
-    full image is in imageViewer slice, return from there
+    full image is in annotator slice, return from there
   */
   const image =
     project.images.find((image: ImageType) => {
-      return image.id === imageViewer.activeImageId;
+      return image.id === annotator.activeImageId;
     }) ||
-    (imageViewer.images.find((image: ShadowImageType) => {
-      return image.id === imageViewer.activeImageId;
+    (annotator.images.find((image: ShadowImageType) => {
+      return image.id === annotator.activeImageId;
     }) as ImageType);
 
   if (!image) return undefined;
 
-  const columns = {
-    imageChannels: image.shape.channels,
-    imageColors: image.colors,
-    imageData: image.originalSrc,
-    imageSrc: image.src,
-    imageFilename: image.name,
-    imageFrames: image.shape.frames,
-    imageHeight: image.shape.height,
-    imageId: image.id,
-    imagePlanes: image.shape.planes,
-    imageWidth: image.shape.width,
-  };
+  const categoriesFound: { [categoryId: string]: Category } = {};
 
-  const serializedAnnotations: Array<SerializedAnnotationType> =
-    image.annotations.map((annotation: AnnotationType) => {
-      const index = project.annotationCategories.findIndex(
-        (category: Category) => {
-          return category.id === annotation.categoryId;
-        }
-      );
+  const annotations: Array<SerializedAnnotationType> = [];
 
-      const category = project.annotationCategories[index];
+  for (const annotation of image.annotations) {
+    const index = project.annotationCategories.findIndex(
+      (category: Category) => {
+        return category.id === annotation.categoryId;
+      }
+    );
 
-      return {
-        annotationBoundingBoxHeight: annotation.boundingBox[3],
-        annotationBoundingBoxWidth: annotation.boundingBox[2],
-        annotationBoundingBoxX: annotation.boundingBox[0],
-        annotationBoundingBoxY: annotation.boundingBox[1],
-        annotationCategoryColor: category.color,
-        annotationCategoryId: category.id,
-        annotationCategoryName: category.name,
-        annotationId: annotation.id,
-        annotationMask: annotation.mask.join(" "),
-        annotationPlane: annotation.plane,
-      };
+    const category = project.annotationCategories[index];
+
+    if (categoriesFound[category.id] === undefined) {
+      categoriesFound[category.id] = category;
+    }
+
+    annotations.push({
+      categoryId: category.id,
+      id: annotation.id,
+      mask: annotation.mask.join(" "),
+      boundingBox: [...annotation.boundingBox],
+      plane: annotation.plane,
     });
+  }
 
-  return { ...columns, annotations: serializedAnnotations };
+  const categories: Array<Category> = Object.values(categoriesFound);
+
+  return { annotations, categories };
 };

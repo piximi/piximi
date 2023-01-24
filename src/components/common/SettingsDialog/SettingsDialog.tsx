@@ -32,7 +32,7 @@ import {
   themeModeSelector,
   setThemeMode,
 } from "store/application";
-import { soundEnabledSelector, imageViewerSlice } from "store/image-viewer";
+import { soundEnabledSelector, AnnotatorSlice } from "store/annotator";
 import { availableColorsSelector } from "store/project";
 
 import { ThemeMode } from "types";
@@ -41,7 +41,7 @@ import Sun from "icons/Sun.svg";
 import Moon from "icons/Moon.svg";
 import VolumeUp from "icons/VolumeUp.svg";
 import VolumeOff from "icons/VolumeOff.svg";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type SettingsDialogProps = {
   onClose: () => void;
@@ -126,7 +126,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
 //   const onLanguageChange = (event: SelectChangeEvent) => {
 //     dispatch(
-//       imageViewerSlice.actions.setLanguage({
+//       AnnotatorSlice.actions.setLanguage({
 //         language: event.target.value as LanguageType,
 //       })
 //     );
@@ -167,7 +167,7 @@ const SoundSettings = () => {
 
   const toggleSoundEnabled = () => {
     dispatch(
-      imageViewerSlice.actions.setSoundEnabled({
+      AnnotatorSlice.actions.setSoundEnabled({
         soundEnabled: !soundEnabled,
       })
     );

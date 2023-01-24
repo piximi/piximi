@@ -1,0 +1,54 @@
+import { ToolType } from "./ToolType";
+import { AnnotationModeType } from "./AnnotationModeType";
+import { LanguageType } from "./LanguageType";
+import { decodedAnnotationType } from ".";
+import { AnnotationStateType } from "./AnnotationStateType";
+import { ShadowImageType } from "./ImageType";
+
+export type Annotator = {
+  annotationState: AnnotationStateType;
+  boundingClientRect: DOMRect;
+  brightness: number;
+  contrast: number;
+  currentIndex: number;
+  currentPosition?: { x: number; y: number };
+  cursor: string;
+  exposure: number;
+  hue: number;
+  activeImageId?: string;
+  previousImageId?: string;
+  activeImageRenderedSrcs: Array<string>;
+  images: Array<ShadowImageType>;
+  language: LanguageType;
+  offset: { x: number; y: number };
+  penSelectionBrushSize: number;
+  pointerSelection: {
+    dragging: boolean;
+    selecting: boolean;
+    minimum: { x: number; y: number } | undefined;
+    maximum: { x: number; y: number } | undefined;
+  };
+  quickSelectionRegionSize: number;
+  thresholdAnnotationValue: number;
+  saturation: number;
+  workingAnnotation: decodedAnnotationType | undefined;
+  selectedAnnotations: Array<string>;
+  stagedAnnotations: Array<decodedAnnotationType>;
+  stagedAnnotationsHaveBeenUpdated: boolean;
+  selectedCategoryId: string;
+  selectionMode: AnnotationModeType;
+  soundEnabled: boolean;
+  stageHeight: number;
+  stageScale: number;
+  stageWidth: number;
+  stagePosition: { x: number; y: number };
+  toolType: ToolType;
+  vibrance: number;
+  zoomSelection: {
+    dragging: boolean;
+    minimum: { x: number; y: number } | undefined;
+    maximum: { x: number; y: number } | undefined;
+    selecting: boolean;
+    centerPoint: { x: number; y: number } | undefined;
+  };
+};

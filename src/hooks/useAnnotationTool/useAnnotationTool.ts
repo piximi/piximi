@@ -9,7 +9,7 @@ import {
   stageScaleSelector,
   thresholdAnnotationValueSelector,
   toolTypeSelector,
-} from "store/image-viewer";
+} from "store/annotator";
 
 import { ToolType } from "types";
 import {
@@ -24,7 +24,7 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   ThresholdAnnotationTool,
-} from "annotator/image/Tool";
+} from "annotator-tools";
 
 export const useAnnotationTool = () => {
   const src = useSelector(imageSrcSelector);
@@ -122,5 +122,5 @@ export const useAnnotationTool = () => {
     }
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
 
-  return [operator];
+  return [operator!];
 };

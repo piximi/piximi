@@ -5,7 +5,7 @@ import { ListItem, ListItemText } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { setOffset } from "store/annotator";
 
 export const ResetButton = () => {
   const dispatch = useDispatch();
@@ -13,8 +13,8 @@ export const ResetButton = () => {
 
   const onResetClick = () => {
     dispatch(
-      imageViewerSlice.actions.setStagePosition({
-        stagePosition: { x: 0, y: 0 },
+      setOffset({
+        offset: { x: 0, y: 0 },
       })
     );
   };

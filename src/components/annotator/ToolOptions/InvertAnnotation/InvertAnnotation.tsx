@@ -11,10 +11,7 @@ import {
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import {
-  imageViewerSlice,
-  selectedAnnotationSelector,
-} from "store/image-viewer";
+import { AnnotatorSlice, workingAnnotationSelector } from "store/annotator";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -22,31 +19,31 @@ export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
   const [annotationTool] = useAnnotationTool();
-  const selectedAnnotation = useSelector(selectedAnnotationSelector);
+  const workingAnnotation = useSelector(workingAnnotationSelector);
 
   const onInvertClick = () => {
     if (!annotationTool) return;
 
-    if (!selectedAnnotation || !selectedAnnotation.mask) return;
+    if (!workingAnnotation || !workingAnnotation.maskData) return;
 
     const [invertedMask, invertedBoundingBox] = annotationTool.invert(
-      selectedAnnotation.mask,
-      selectedAnnotation.boundingBox
+      workingAnnotation.maskData,
+      workingAnnotation.boundingBox
     );
 
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [
           {
-            ...selectedAnnotation,
+            ...workingAnnotation,
             boundingBox: invertedBoundingBox,
-            mask: invertedMask,
+            maskData: invertedMask,
           },
         ],
-        selectedAnnotation: {
-          ...selectedAnnotation,
+        workingAnnotation: {
+          ...workingAnnotation,
           boundingBox: invertedBoundingBox,
-          mask: invertedMask,
+          maskData: invertedMask,
         },
       })
     );

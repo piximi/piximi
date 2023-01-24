@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useHotkeys } from "hooks";
 
@@ -37,7 +37,7 @@ import {
   unregisterHotkeyView,
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
-import { setActiveImage, imageViewerSlice } from "store/image-viewer";
+import { setActiveImage, AnnotatorSlice } from "store/annotator";
 
 import { HotkeyView, ImageType, ShadowImageType } from "types";
 
@@ -112,6 +112,11 @@ export const MainImageGridAppBar = () => {
         );
       }
 
+      const annotatorImageColors = {
+        ...projectImage.colors,
+        color: projectImage.colors.color.clone(),
+      };
+
       const annotatorImage: ShadowImageType = {
         id: projectImage.id,
         name: projectImage.name,
@@ -119,24 +124,33 @@ export const MainImageGridAppBar = () => {
         src: projectImage.src,
         activePlane: projectImage.activePlane,
         shape: projectImage.shape,
-        colors: projectImage.colors,
+        // clone so that if it's mutated or disposed in annotator
+        // it won't apply those changes to the tensor in the main view
+        // unless changes are saved
+        colors: annotatorImageColors,
+        bitDepth: projectImage.bitDepth,
       };
-
-      if (idx === 0) {
-        dispatch(
-          setActiveImage({
-            imageId: annotatorImage.id,
-            execSaga: true,
-          })
-        );
-      }
 
       return annotatorImage;
     });
 
     if (!selected) return;
 
-    dispatch(imageViewerSlice.actions.setImages({ images: selected }));
+    batch(() => {
+      dispatch(
+        AnnotatorSlice.actions.setImages({
+          images: selected,
+          disposeColorTensors: true,
+        })
+      );
+      dispatch(
+        setActiveImage({
+          imageId: selected.length > 0 ? selected[0].id : undefined,
+          prevImageId: undefined,
+          execSaga: true,
+        })
+      );
+    });
     dispatch(unregisterHotkeyView({}));
     navigate("/annotator");
   };

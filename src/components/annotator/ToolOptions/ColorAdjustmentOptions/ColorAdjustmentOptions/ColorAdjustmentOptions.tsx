@@ -10,58 +10,32 @@ import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 import { InformationBox } from "../../InformationBox";
 
-import {
-  imageViewerSlice,
-  imageShapeSelector,
-  activeImagePlaneSelector,
-} from "store/image-viewer";
-import { imageOriginalSrcSelector } from "store/common";
+import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
 
-import {
-  convertImageURIsToImageData,
-  generateDefaultChannels,
-  mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
+import { imageDataSelector } from "store/common";
+
+import { generateDefaultColors } from "image/utils/imageHelper";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
-
   const imageShape = useSelector(imageShapeSelector);
 
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  const imageData = useSelector(imageDataSelector);
 
   const onResetChannelsClick = async () => {
-    if (!imageShape) return;
+    if (!imageShape || !imageData) return;
 
-    const defaultChannels = generateDefaultChannels(imageShape.channels);
+    const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
-        colors: defaultChannels,
+      AnnotatorSlice.actions.setImageColors({
+        colors: defaultColors,
         execSaga: true,
       })
     );
-
-    if (!originalSrc || !imageShape) return;
-
-    const activePlaneData = (
-      await convertImageURIsToImageData(
-        new Array(originalSrc[activeImagePlane])
-      )
-    )[0];
-
-    const modifiedURI = mapChannelsToSpecifiedRGBImage(
-      activePlaneData,
-      defaultChannels,
-      imageShape.height,
-      imageShape.width
-    );
-
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
   };
 
   return (

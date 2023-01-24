@@ -1,32 +1,20 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import * as ImageJS from "image-js";
-import { v4 as uuidv4 } from "uuid";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
-import {
-  annotationCategoriesSelector,
-  setAnnotationCategories,
-} from "store/project";
-import { imageViewerSlice, setActiveImage } from "store/image-viewer";
+import { projectSlice } from "store/project";
+import { activeImageIdSelector, AnnotatorSlice } from "store/annotator";
 
-import {
-  AnnotationType,
-  SerializedAnnotationType,
-  SerializedFileType,
-} from "types";
+import { SerializedFileType } from "types";
 
-import {
-  convertToImage,
-  generateDefaultChannels,
-  importSerializedAnnotations,
-} from "image/imageHelper";
+import { loadExampleImage } from "image/utils/loadExampleImage";
 
 type ExampleImageProject = {
-  exampleImageName: string;
+  exampleImageTitle: string;
+  exampleImageName?: string;
   exampleImageData: any;
   exampleImageDescription: string;
-  exampleImageAnnotations: Array<SerializedFileType>;
+  exampleImageAnnotationsFile: SerializedFileType;
   projectSource: {
     sourceName: string;
     sourceUrl: string;
@@ -48,63 +36,29 @@ export const OpenExampleImageMenuItem = ({
 }: OpenExampleImageMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(annotationCategoriesSelector);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const openExampleImage = async () => {
     onClose();
 
-    const serializedExampleImageFile =
-      exampleImageProject.exampleImageAnnotations[0];
-
-    const defaultColors = generateDefaultChannels(
-      serializedExampleImageFile.imageChannels
+    const { image, categories } = await loadExampleImage(
+      exampleImageProject.exampleImageData,
+      exampleImageProject.exampleImageAnnotationsFile as SerializedFileType,
+      exampleImageProject.exampleImageName
     );
 
-    const exampleImageSrc = exampleImageProject.exampleImageData as string;
-    const exampleImage = await ImageJS.Image.load(exampleImageSrc, {
-      ignorePalette: true,
-    });
-    const exampleImageTypeObject = convertToImage(
-      [exampleImage],
-      exampleImageProject.exampleImageName,
-      defaultColors,
-      serializedExampleImageFile.imagePlanes,
-      serializedExampleImageFile.imageChannels
-    );
-
-    serializedExampleImageFile.imageId = uuidv4();
-    serializedExampleImageFile.imageSrc = exampleImageSrc;
-    serializedExampleImageFile.imageData = exampleImageTypeObject.originalSrc;
-
+    // TODO: BIG_MERGE - check if this is still correct
+    dispatch(projectSlice.actions.addAnnotationCategories({ categories }));
     batch(() => {
-      let updatedAnnotationCategories = annotationCategories;
-      const annotations = serializedExampleImageFile.annotations.map(
-        (annotation: SerializedAnnotationType): AnnotationType => {
-          const { annotation_out, categories } = importSerializedAnnotations(
-            annotation,
-            updatedAnnotationCategories
-          );
-          updatedAnnotationCategories = categories;
-          return annotation_out;
-        }
-      );
-
       dispatch(
-        imageViewerSlice.actions.openAnnotations({
-          imageFile: serializedExampleImageFile,
-          annotations: annotations,
+        AnnotatorSlice.actions.addImages({
+          newImages: [image],
         })
       );
-
       dispatch(
-        setAnnotationCategories({
-          categories: updatedAnnotationCategories,
-        })
-      );
-
-      dispatch(
-        setActiveImage({
-          imageId: serializedExampleImageFile.imageId,
+        AnnotatorSlice.actions.setActiveImage({
+          imageId: image.id,
+          prevImageId: activeImageId,
           execSaga: true,
         })
       );
@@ -116,7 +70,7 @@ export const OpenExampleImageMenuItem = ({
       <ListItemText
         primary={
           <Typography component="span" variant="subtitle1">
-            {exampleImageProject.exampleImageName}
+            {exampleImageProject.exampleImageTitle}
           </Typography>
         }
         secondary={

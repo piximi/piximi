@@ -5,10 +5,10 @@ import { saveAs } from "file-saver";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { annotatorImagesSelector } from "store/image-viewer";
+import { annotatorImagesSelector } from "store/annotator";
 import { annotationCategoriesSelector } from "store/project";
 
-import { saveAnnotationsAsLabelMatrix } from "image/imageHelper";
+import { saveAnnotationsAsLabelMatrix } from "utils/common/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   handleMenuClose: () => void;

@@ -9,7 +9,7 @@ import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
 import { CropSchema } from "types/CropOptions";
 import { SegmenterStoreType } from "types/SegmenterStoreType";
 
-const initialState: SegmenterStoreType = {
+export const initialState: SegmenterStoreType = {
   fitting: false,
   evaluating: false,
   predicting: false,
@@ -40,7 +40,6 @@ const initialState: SegmenterStoreType = {
     width: 256,
     channels: 3,
     planes: 1,
-    frames: 1,
   },
   trainingPercentage: 0.75,
   predicted: false,
@@ -81,41 +80,9 @@ export const segmenterSlice = createSlice({
         segmenter: SegmenterStoreType;
       }>
     ) {
-      const { segmenter } = action.payload;
-
-      state.compileOptions = segmenter.compileOptions;
-      state.fitOptions = segmenter.fitOptions;
-      state.inputShape = segmenter.inputShape;
-      state.trainingPercentage = segmenter.trainingPercentage;
-      state.trainingHistory = segmenter.trainingHistory;
-      state.predicted = segmenter.predicted;
-      state.preprocessOptions = segmenter.preprocessOptions;
-
-      state.selectedModel = availableSegmenterModels[0];
-      if (segmenter.selectedModel) {
-        const selectedModel = segmenter.selectedModel;
-        availableSegmenterModels.forEach((model) => {
-          if (
-            selectedModel.modelType === model.modelType &&
-            selectedModel.modelName === model.modelName
-          ) {
-            state.selectedModel = selectedModel;
-          }
-        });
-      }
-
-      // initialize all others to their default value
-      state.evaluating = false;
-      state.fitting = false;
-      state.predicting = false;
-      state.compiled = undefined;
-      state.fitted = undefined;
-      state.userUploadedModel = undefined;
-      state.evaluationResult = {
-        pixelAccuracy: -1,
-        IoUScore: -1,
-        diceScore: -1,
-      };
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.segmenter;
+      return action.payload.segmenter;
     },
     updateSegmentationBatchSize(
       state,

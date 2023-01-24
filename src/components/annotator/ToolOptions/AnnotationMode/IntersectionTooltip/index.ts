@@ -1,1 +1,0 @@
-export { IntersectionTooltip } from "./IntersectionTooltip";

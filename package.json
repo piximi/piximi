@@ -18,15 +18,15 @@
     "@reduxjs/toolkit": "^1.5.0",
     "@sentry/react": "^6.15.0",
     "@storybook/react": "^6.4.12",
-    "@tensorflow/tfjs": "3.18.0",
+    "@tensorflow/tfjs": "3.21.0",
     "@testing-library/dom": "^7.21.4",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.8.3",
     "@types/file-saver": "^2.0.4",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.5.1",
     "@types/lodash": "^4.14.177",
-    "@types/node": "^16.11.9",
+    "@types/node": "^18.7.18",
     "@types/numeral": "^2.0.2",
     "@types/react": "^17.0.39",
     "@types/react-color": "^3.0.4",
@@ -38,8 +38,11 @@
     "dicom-parser": "^1.8.13",
     "dicom.ts": "^1.0.5",
     "file-saver": "^2.0.5",
+    "fp-ts": "^2.13.1",
+    "h5wasm": "^0.4.6",
     "i18next": "19.0.0",
-    "image-js": "^0.34.0",
+    "image-js": "0.35.2",
+    "io-ts": "^2.2.20",
     "jszip": "^3.7.1",
     "konva": "^8.3.0",
     "lodash": "^4.17.20",
@@ -79,7 +82,7 @@
     "@storybook/node-logger": "^6.5.10",
     "@storybook/preset-create-react-app": "^4.1.2",
     "@storybook/testing-library": "^0.0.13",
-    "@tensorflow/tfjs-node": "3.18.0",
+    "@tensorflow/tfjs-node": "4.0.0",
     "babel-plugin-named-exports-order": "^0.0.2",
     "canvas": "^2.9.1",
     "husky": "^4.3.6",
@@ -87,14 +90,18 @@
     "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
     "prop-types": "^15.8.1",
+    "react-test-renderer": "^18.2.0",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.4.0",
     "webpack": "^5.74.0"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
+    "build": "NODE_OPTIONS=\"--max-old-space-size=6192\" react-scripts build",
     "build-local": "PUBLIC_URL=/ NODE_OPTIONS=\"--max-old-space-size=8192\" react-scripts build",
     "eject": "react-scripts eject",
     "start": "BROWSER='none' react-scripts start",
-    "test": "react-scripts test",
+    "start-logger": "BROWSER='none' REACT_APP_LOG_LEVEL='1' react-scripts start",
+    "test": "react-scripts test --env=./src/store/classifier/coroutines/custom-test-env.js",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },
@@ -147,5 +154,8 @@
   "private": true,
   "resolutions": {
     "**/@types/react": "^17.0.39"
+  },
+  "jest": {
+    "resetMocks": false
   }
 }

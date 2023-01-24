@@ -1,4 +1,10 @@
-import { History, LayersModel, Rank, Tensor } from "@tensorflow/tfjs";
+import {
+  History,
+  LayersModel,
+  Tensor,
+  Tensor2D,
+  Tensor4D,
+} from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
@@ -10,38 +16,28 @@ import { ClassifierModelProps } from "./ModelType";
 import { ClassifierEvaluationResultType } from "./EvaluationResultType";
 
 export type Classifier = {
-  compiled?: LayersModel;
-  trainDataSet?: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor;
-    ids: Tensor;
-  }>;
-  valDataSet?: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
-  }>;
-  evaluating: boolean;
-  fitOptions: FitOptions;
-  fitted?: LayersModel;
-  fitting: boolean;
-  inputShape: Shape;
-  history?: History;
-  learningRate: number;
-  lossFunction:
-    | LossFunction
-    | Array<LossFunction>
-    | { [outputName: string]: LossFunction };
-  metrics: Array<Metric>;
-  selectedModel: ClassifierModelProps;
+  // pre-fit state
   userUploadedModel?: ClassifierModelProps;
-  optimizationAlgorithm: OptimizationAlgorithm;
-  predicting: boolean;
-  predictions?: Tensor;
-  predicted: boolean;
-  trainingPercentage: number;
-  evaluationResult: ClassifierEvaluationResultType;
+  selectedModel: ClassifierModelProps;
+  inputShape: Shape;
   preprocessOptions: PreprocessOptions;
+  fitOptions: FitOptions;
+  learningRate: number;
+  lossFunction: LossFunction;
+  optimizationAlgorithm: OptimizationAlgorithm;
+  trainingPercentage: number;
+  metrics: Array<Metric>;
+  // post-fit results
+  compiled?: LayersModel;
+  history?: History;
+  // post-evaluation results
+  evaluationResult: ClassifierEvaluationResultType;
+  // post-prediction results
+  predictions?: Tensor;
+  // status flags
+  fitting: boolean;
+  fitted?: LayersModel;
+  evaluating: boolean;
+  predicting: boolean;
+  predicted: boolean;
 };

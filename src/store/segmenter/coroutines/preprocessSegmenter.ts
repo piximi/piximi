@@ -1,8 +1,10 @@
+// @ts-nocheck
+// TODO: post PR #407, fix for segmenter
 import {
-  Tensor,
-  Rank,
+  Tensor1D,
   Tensor2D,
   Tensor3D,
+  Tensor4D,
   tensor2d,
   tensor3d,
   util as tfutil,
@@ -21,20 +23,20 @@ import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { RescaleOptions } from "types/RescaleOptions";
-import { AnnotationType } from "types/AnnotationType";
+import { decodedAnnotationType } from "types/AnnotationType";
 import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 
 export const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
   item: {
-    xs: Tensor<Rank.R3>;
-    annotations: AnnotationType[];
+    xs: Tensor3D;
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
-  xs: Tensor<Rank.R3>;
-  ys: Tensor<Rank.R3>;
+  xs: Tensor3D;
+  ys: Tensor3D;
   id: string;
 }> => {
   const ys = tidy(() => {
@@ -57,13 +59,13 @@ export const decodeFromImgSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string; // dataURL
-    annotations: AnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
-  xs: Tensor<Rank.R3>;
-  annotations: AnnotationType[];
+  xs: Tensor3D;
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -96,13 +98,13 @@ export const decodeFromOriginalSrc = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: Array<string>; // [#channels]: dataURL (from activePlane)
-    annotations: AnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
-  xs: Tensor<Rank.R3>;
-  annotations: AnnotationType[];
+  xs: Tensor3D;
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -139,10 +141,10 @@ export const decodeFromOriginalSrc = async (
   }
 
   return Promise.all(channelPromises).then((channels) => {
-    const x: Tensor<Rank.R3> = stack(
+    const x: Tensor3D = stack(
       channels,
       2 // axis to stack on, producing tensor of dims: [height, width, channels]
-    ) as Tensor<Rank.R3>;
+    ) as Tensor3D;
 
     for (const c of channels) {
       c.dispose();
@@ -157,13 +159,13 @@ export const decodeImage = async (
   rescaleOptions: RescaleOptions,
   item: {
     srcs: string | string[];
-    annotations: AnnotationType[];
+    annotations: decodedAnnotationType[];
     id: string;
     shape: Shape;
   }
 ): Promise<{
-  xs: Tensor<Rank.R3>;
-  annotations: AnnotationType[];
+  xs: Tensor3D;
+  annotations: decodedAnnotationType[];
   id: string;
   shape: Shape;
 }> => {
@@ -173,7 +175,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string;
-          annotations: AnnotationType[];
+          annotations: decodedAnnotationType[];
           id: string;
           shape: Shape;
         }
@@ -182,7 +184,7 @@ export const decodeImage = async (
         rescaleOptions,
         item as {
           srcs: string[];
-          annotations: AnnotationType[];
+          annotations: decodedAnnotationType[];
           id: string;
           shape: Shape;
         }
@@ -218,13 +220,13 @@ export const sampleGenerator = (images: Array<ImageType>, channels: number) => {
 export const resize = async (
   inputShape: Shape,
   item: {
-    xs: Tensor<Rank.R3>;
-    ys: Tensor<Rank.R3>;
+    xs: Tensor3D;
+    ys: Tensor3D;
     id: string;
   }
 ): Promise<{
-  xs: Tensor<Rank.R3>;
-  ys: Tensor<Rank.R3>;
+  xs: Tensor3D;
+  ys: Tensor3D;
   id: string;
 }> => {
   const resizedXs = tidy(() => {
@@ -256,9 +258,9 @@ export const preprocessSegmentationImages = async (
   fitOptions: FitOptions
 ): Promise<
   tfdata.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor4D;
+    id: Tensor1D;
   }>
 > => {
   const createdCategoriesIDs = categories
@@ -284,8 +286,8 @@ export const preprocessSegmentationImages = async (
   const imageDataBatched = imageData.batch(fitOptions.batchSize);
 
   return imageDataBatched as tfdata.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor4D;
+    id: Tensor1D;
   }>;
 };

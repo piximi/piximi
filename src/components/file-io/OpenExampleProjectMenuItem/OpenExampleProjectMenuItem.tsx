@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, batch } from "react-redux";
 
 import {
   Avatar,
@@ -14,15 +14,9 @@ import { applicationSlice } from "store/application";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
-import {
-  Classifier,
-  SerializedImageType,
-  SerializedProjectType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
-
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserializeImages } from "image/imageHelper";
+import { deserialize } from "image/utils/deserialize";
+import { uploader } from "../utils";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -61,59 +55,61 @@ export const OpenExampleProjectMenuItem = ({
   };
 
   const openExampleProject = async () => {
-    var exampleProjectJson: any;
+    var exampleProjectFilePath: string;
     switch (exampleProject.exampleProjectEnum) {
       case ExampleProject.Mnist:
-        exampleProjectJson = await import(
-          "data/exampleProjects/mnistExampleProject.json"
-        );
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/mnistExampleProject.h5")
+        ).default;
         break;
       case ExampleProject.CElegans:
-        exampleProjectJson = await import(
-          "data/exampleProjects/cElegansExampleProject.json"
-        );
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/cElegansExampleProject.h5")
+        ).default;
         break;
       case ExampleProject.HumanU2OSCells:
-        exampleProjectJson = await import(
-          "data/exampleProjects/humanU2OSCellsExampleProject.json"
-        );
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/HumanU2OSCellsExampleProject.h5")
+        ).default;
         break;
       case ExampleProject.BBBC013:
-        exampleProjectJson = await import(
-          "data/exampleProjects/BBBC013ModeExampleProject.json"
-        );
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/BBBC013ExampleProject.h5")
+        ).default;
         break;
       case ExampleProject.PLP1:
-        exampleProjectJson = await import(
-          "data/exampleProjects/PLP1ExampleProject.json"
-        );
+        exampleProjectFilePath = (
+          await import("data/exampleProjects/PLP1ExampleProject.h5")
+        ).default;
         break;
       default:
         return;
     }
 
-    const project = exampleProjectJson.project as SerializedProjectType;
-    const classifier = exampleProjectJson.classifier as Classifier;
-    const images = await deserializeImages(
-      project.serializedImages as Array<SerializedImageType>
-    );
+    const exampleProjectFile = await fetch(exampleProjectFilePath)
+      .then((res) => res.blob())
+      .then((blob) => new File([blob], exampleProject.projectName, blob));
+
+    await uploader(exampleProjectFile);
+
+    const deserializedProject = await deserialize(exampleProjectFile.name);
+
+    const project = deserializedProject.project;
+    const classifier = deserializedProject.classifier;
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
-    dispatch(
-      projectSlice.actions.openProject({
-        images: images,
-        categories: project.categories,
-        annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
-        name: project.name,
-      })
-    );
+    batch(() => {
+      dispatch(projectSlice.actions.setProject({ project }));
 
-    dispatch(
-      classifierSlice.actions.setClassifier({
-        classifier: classifier,
-      })
-    );
+      dispatch(
+        classifierSlice.actions.setClassifier({
+          classifier,
+        })
+      );
+
+      dispatch(classifierSlice.actions.setDefaults({}));
+    });
 
     onClose();
   };

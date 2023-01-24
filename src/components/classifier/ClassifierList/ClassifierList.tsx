@@ -17,7 +17,7 @@ import {
 
 import { Category, CategoryType } from "types";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const ClassifierList = () => {
   const categories = useSelector(createdCategoriesSelector);

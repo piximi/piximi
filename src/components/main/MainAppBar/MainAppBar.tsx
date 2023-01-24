@@ -8,7 +8,7 @@ import { MainToolbar } from "../MainToolbar";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 import { alertStateSelector } from "store/application";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const MainAppBar = () => {
   const alertState = useSelector(alertStateSelector);

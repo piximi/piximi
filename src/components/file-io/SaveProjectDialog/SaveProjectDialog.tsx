@@ -1,7 +1,5 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import saveAs from "file-saver";
-import { useHotkeys } from "hooks";
 
 import {
   Button,
@@ -14,9 +12,14 @@ import {
 } from "@mui/material";
 
 import { classifierSelector } from "store/classifier";
-import { serializedProjectSelector } from "store/project";
-import { segmenterSelector } from "store/segmenter";
+import { projectSelector } from "store/project";
+// TODO: implement segmenter serialization
+// import { segmenterSelector } from "store/segmenter";
+
 import { HotkeyView } from "types";
+import { useHotkeys } from "hooks";
+import { serialize } from "image/utils/serialize";
+import { downloader } from "../utils/file_handlers";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -29,29 +32,18 @@ export const SaveProjectDialog = ({
 }: SaveProjectDialogProps) => {
   const classifier = useSelector(classifierSelector);
 
-  const segmenter = useSelector(segmenterSelector);
+  const project = useSelector(projectSelector);
 
-  const serializedProject = useSelector(serializedProjectSelector);
+  const [projectName, setProjectName] = useState<string>(project.name);
 
-  const [projectName, setProjectName] = useState<string>(
-    serializedProject.name
-  );
-
-  const onSaveProjectClick = () => {
-    const part = {
-      classifier: classifier,
-      segmenter: segmenter,
-      project: serializedProject,
-      version: "0.0.0",
-    };
-
-    part.project.name = projectName;
-
-    const parts = [JSON.stringify(part)];
-
-    const data = new Blob(parts, { type: "application/json;charset=utf-8" });
-
-    saveAs(data, `${projectName}.json`);
+  const onSaveProjectClick = async () => {
+    serialize(projectName, project, classifier)
+      .then((f) => {
+        downloader(f, `${projectName}.h5`);
+      })
+      .catch((err) => {
+        process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);
+      });
 
     onClose();
   };

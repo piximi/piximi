@@ -18,7 +18,7 @@ import { categoryCountsSelector, selectedCategorySelector } from "store/common";
 
 import { Category, CategoryType, ImageType, State } from "types";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type CategoryItemProps = {
   categoryType: CategoryType;

@@ -1,1 +1,0 @@
-import { SelectedAnnotation } from "./SelectedAnnotation";

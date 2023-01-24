@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { toolTypeSelector } from "store/image-viewer";
+import { toolTypeSelector } from "store/annotator";
 
 import { ToolType } from "types";
 

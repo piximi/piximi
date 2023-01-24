@@ -1,5 +1,5 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import _ from "lodash";
+import { intersection, difference } from "lodash";
 
 import {
   Button,
@@ -9,7 +9,11 @@ import {
   Stack,
 } from "@mui/material";
 
-import { annotatorImagesSelector } from "store/image-viewer";
+import {
+  AnnotatorSlice,
+  annotatorImagesSelector,
+  activeImageIdSelector,
+} from "store/annotator";
 import { selectedImagesSelector } from "store/common";
 import { projectSlice } from "store/project";
 
@@ -31,37 +35,56 @@ export const ExitAnnotatorDialog = ({
   const annotatorImages = useSelector(annotatorImagesSelector);
   const selectedImagesIds = useSelector(selectedImagesSelector);
 
-  const onSaveAnnotations = () => {
+  const activeImageId = useSelector(activeImageIdSelector);
+
+  // TODO: post PR #407 - make these selectors
+  const getImageSets = () => {
     const annotatorImagesIds = annotatorImages.map(
       (image: ShadowImageType) => image.id
     );
 
+    const modifiedImagesIds = intersection(
+      selectedImagesIds,
+      annotatorImagesIds
+    );
+    const deletedImagesIds = difference(selectedImagesIds, modifiedImagesIds);
+    const newImagesIds = difference(annotatorImagesIds, modifiedImagesIds);
+
+    const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
+      return modifiedImagesIds.includes(image.id);
+    });
+
+    const newImages = annotatorImages.filter((image: ShadowImageType) => {
+      return newImagesIds.includes(image.id);
+    }) as Array<ImageType>;
+
+    return { newImages, modifiedImages, deletedImagesIds };
+  };
+
+  const onSaveAnnotations = () => {
     if (selectedImagesIds.length === 0) {
-      dispatch(
-        projectSlice.actions.setImages({
-          images: annotatorImages as Array<ImageType>,
-        })
-      );
+      batch(() => {
+        dispatch(
+          projectSlice.actions.setImages({
+            images: annotatorImages as Array<ImageType>,
+          })
+        );
+        dispatch(
+          AnnotatorSlice.actions.setImages({
+            images: [],
+            disposeColorTensors: false,
+          })
+        );
+        dispatch(
+          AnnotatorSlice.actions.setActiveImage({
+            imageId: undefined,
+            prevImageId: activeImageId,
+            execSaga: true,
+          })
+        );
+      });
     } else {
-      const modifiedImagesIds = _.intersection(
-        selectedImagesIds,
-        annotatorImagesIds
-      );
-      const deletedImagesIds = _.difference(
-        selectedImagesIds,
-        modifiedImagesIds
-      );
-      const newImagesIds = _.difference(annotatorImagesIds, modifiedImagesIds);
-
-      const modifiedImages = annotatorImages.filter(
-        (image: ShadowImageType) => {
-          return modifiedImagesIds.includes(image.id);
-        }
-      );
-
-      const newImages = annotatorImages.filter((image: ShadowImageType) => {
-        return newImagesIds.includes(image.id);
-      }) as Array<ImageType>;
+      const { newImages, modifiedImages, deletedImagesIds } = getImageSets();
 
       batch(() => {
         dispatch(projectSlice.actions.addImages({ images: newImages }));
@@ -69,8 +92,48 @@ export const ExitAnnotatorDialog = ({
         dispatch(
           projectSlice.actions.reconcileImages({ images: modifiedImages })
         );
+        dispatch(
+          AnnotatorSlice.actions.setImages({
+            images: [],
+            disposeColorTensors: false,
+          })
+        );
+        dispatch(
+          AnnotatorSlice.actions.setActiveImage({
+            imageId: undefined,
+            prevImageId: activeImageId,
+            execSaga: true,
+          })
+        );
       });
     }
+
+    onReturnToProject();
+  };
+
+  const onDiscardAnnotations = () => {
+    const { newImages } = getImageSets();
+
+    for (const im of newImages) {
+      im.data.dispose();
+    }
+
+    batch(() => {
+      dispatch(
+        AnnotatorSlice.actions.setImages({
+          images: [],
+          disposeColorTensors: true,
+        })
+      );
+
+      dispatch(
+        AnnotatorSlice.actions.setActiveImage({
+          imageId: undefined,
+          prevImageId: activeImageId,
+          execSaga: true,
+        })
+      );
+    });
 
     onReturnToProject();
   };
@@ -90,7 +153,7 @@ export const ExitAnnotatorDialog = ({
         Stay on this page
       </Button>
 
-      <Button onClick={onReturnToProject} color="primary">
+      <Button onClick={onDiscardAnnotations} color="primary">
         Discard changes and return to project
       </Button>
 

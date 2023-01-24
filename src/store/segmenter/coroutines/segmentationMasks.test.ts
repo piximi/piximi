@@ -4,7 +4,7 @@ import {
   encodeAnnotationToSegmentationMask,
   decodeSegmentationMaskToAnnotations,
 } from "./segmentationMasks";
-import { AnnotationType } from "types/AnnotationType";
+import { encodedAnnotationType } from "types/AnnotationType";
 
 jest.setTimeout(50000);
 
@@ -24,7 +24,7 @@ const annotationCategories: Array<Category> = [
 ];
 
 it("create-segmentation-mask", async () => {
-  const annotations: Array<AnnotationType> = [
+  const annotations: Array<encodedAnnotationType> = [
     {
       boundingBox: [1, 1, 5, 5],
       categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
@@ -39,7 +39,6 @@ it("create-segmentation-mask", async () => {
     height: 10,
     channels: 3,
     planes: 1,
-    frames: 1,
   };
 
   const expectedSegmentationMask = [
@@ -179,7 +178,7 @@ it("create-segmentation-mask", async () => {
 });
 
 it("create-annotation-from-segmentation-mask", async () => {
-  const annotations: Array<AnnotationType> = [
+  const annotations: Array<encodedAnnotationType> = [
     {
       boundingBox: [1, 1, 5, 5],
       categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
@@ -194,7 +193,6 @@ it("create-annotation-from-segmentation-mask", async () => {
     height: 10,
     channels: 3,
     planes: 1,
-    frames: 1,
   };
 
   const createdCategories = annotationCategories.filter(

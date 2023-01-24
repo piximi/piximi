@@ -8,20 +8,24 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 import { useTranslation } from "hooks";
 
 import { annotationCategoriesSelector } from "store/project";
-import { annotatorImagesSelector, imageViewerSlice } from "store/image-viewer";
-import { activeImageSelector } from "store/common";
+import {
+  activeImageSelector,
+  annotatorImagesSelector,
+  AnnotatorSlice,
+  setStagedAnnotations,
+} from "store/annotator";
 
-import { ImageType } from "types";
+import { ShadowImageType } from "types";
 
 import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-} from "image/imageHelper";
+} from "utils/common/imageHelper";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ImageType;
+  selectedImage: ShadowImageType;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
@@ -33,24 +37,26 @@ export const ImageMenu = ({
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
-  const annotationCategories = useSelector(annotationCategoriesSelector);
 
+  const annotationCategories = useSelector(annotationCategoriesSelector);
   const images = useSelector(annotatorImagesSelector);
   const activeImage = useSelector(activeImageSelector);
 
-  const onClearAnnotationsClick = (
+  const ClearAnnotationsClickHandler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
     dispatch(
-      imageViewerSlice.actions.deleteAllImageInstances({
+      AnnotatorSlice.actions.deleteAllImageAnnotations({
         imageId: selectedImage.id,
       })
     );
     onCloseImageMenu(event);
   };
 
-  const onDeleteImage = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const DeleteImageHandler = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     if (!selectedImage) return;
 
     batch(() => {
@@ -63,23 +69,26 @@ export const ImageMenu = ({
         if (images.length > 1) {
           newActiveImageId =
             activeImageIdx === 0 ? images[1].id : images[activeImageIdx - 1].id;
+        } else {
+          dispatch(setStagedAnnotations({ annotations: [] }));
         }
 
         dispatch(
-          imageViewerSlice.actions.setActiveImage({
+          AnnotatorSlice.actions.setActiveImage({
             imageId: newActiveImageId,
+            prevImageId: undefined,
             execSaga: true,
           })
         );
       }
 
-      dispatch(imageViewerSlice.actions.deleteImage({ id: selectedImage.id }));
+      dispatch(AnnotatorSlice.actions.deleteImage({ id: selectedImage.id }));
     });
 
     onCloseImageMenu(event);
   };
 
-  const onExportLabeledInstanceMasks = (
+  const ExportLabeledInstanceMasksHandler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -103,7 +112,7 @@ export const ImageMenu = ({
     });
   };
 
-  const onExportBinaryInstanceMasks = (
+  const ExportBinaryInstanceMasksHandler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -120,7 +129,9 @@ export const ImageMenu = ({
     );
   };
 
-  const onExportLabels = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const ExportLabelsHandler = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     setAnchorEl(null);
     onCloseImageMenu(event);
 
@@ -137,7 +148,7 @@ export const ImageMenu = ({
     });
   };
 
-  const onExportLabeledSemanticMasks = (
+  const ExportLabeledSemanticMasksHAndler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -154,7 +165,7 @@ export const ImageMenu = ({
     );
   };
 
-  const onExportBinarySemanticMasks = (
+  const ExportBinarySemanticMasksHandler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -212,27 +223,27 @@ export const ImageMenu = ({
           >
             <MenuList dense variant="menu">
               <div>
-                <MenuItem onClick={onExportLabeledInstanceMasks}>
+                <MenuItem onClick={ExportLabeledInstanceMasksHandler}>
                   <Typography variant="inherit">
                     {t("Labeled instance masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={onExportBinaryInstanceMasks}>
+                <MenuItem onClick={ExportBinaryInstanceMasksHandler}>
                   <Typography variant="inherit">
                     {t("Binary instance masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={onExportLabeledSemanticMasks}>
+                <MenuItem onClick={ExportLabeledSemanticMasksHAndler}>
                   <Typography variant="inherit">
                     {t("Labeled semantic masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={onExportBinarySemanticMasks}>
+                <MenuItem onClick={ExportBinarySemanticMasksHandler}>
                   <Typography variant="inherit">
                     {t("Binary semantic masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={onExportLabels}>
+                <MenuItem onClick={ExportLabelsHandler}>
                   <Typography variant="inherit">
                     {t("Label matrices")}
                   </Typography>
@@ -241,10 +252,10 @@ export const ImageMenu = ({
             </MenuList>
           </Menu>
           <Divider />
-          <MenuItem onClick={onClearAnnotationsClick}>
+          <MenuItem onClick={ClearAnnotationsClickHandler}>
             <Typography variant="inherit">{t("Clear Annotations")}</Typography>
           </MenuItem>
-          <MenuItem onClick={onDeleteImage}>
+          <MenuItem onClick={DeleteImageHandler}>
             <Typography variant="inherit">{t("Delete Image")}</Typography>
           </MenuItem>
         </div>

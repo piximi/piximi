@@ -1,24 +1,16 @@
 import React from "react";
-import { batch, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import {
-  imageViewerSlice,
-  setActiveImage,
-  setOperation,
-} from "store/image-viewer";
-import { setAnnotationCategories } from "store/project";
+import { AnnotatorSlice } from "store/annotator";
+import { projectSlice } from "store/project";
 
-import {
-  AnnotationType,
-  SerializedFileType,
-  SerializedAnnotationType,
-  ToolType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
+import { deserializeAnnotations } from "image/utils/loadExampleImage";
 
-import { importSerializedAnnotations } from "image/imageHelper";
+import { validateFileType } from "types/runtime";
+
+import { activeImageSelector } from "store/annotator";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -28,6 +20,8 @@ export const OpenProjectFileMenuItem = ({
   onCloseMenu,
 }: OpenAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
+
+  const activeImage = useSelector(activeImageSelector);
 
   const onOpenProjectFile = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -44,49 +38,32 @@ export const OpenProjectFileMenuItem = ({
     const reader = new FileReader();
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
-      if (event.target && event.target.result) {
-        const serializedImages = JSON.parse(event.target.result as string);
+      if (event.target && event.target.result && activeImage) {
+        const serializedAnnotations = validateFileType(
+          event.target.result as string
+        );
 
-        batch(() => {
-          dispatch(imageViewerSlice.actions.setImages({ images: [] }));
+        // TODO: BIG_MERGE - check if this is still correct
+        const deserializedAnnotations = deserializeAnnotations(
+          serializedAnnotations.annotations
+        );
 
-          let updatedAnnotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
-          serializedImages.forEach(
-            (serializedImage: SerializedFileType, index: number) => {
-              const annotations = serializedImage.annotations.map(
-                (annotation: SerializedAnnotationType): AnnotationType => {
-                  const { annotation_out, categories } =
-                    importSerializedAnnotations(
-                      annotation,
-                      updatedAnnotationCategories
-                    );
-                  updatedAnnotationCategories = categories;
-                  return annotation_out;
-                }
-              );
+        const newAnnotations = [
+          ...activeImage.annotations,
+          ...deserializedAnnotations,
+        ];
 
-              dispatch(
-                imageViewerSlice.actions.openAnnotations({
-                  imageFile: serializedImage,
-                  annotations: annotations,
-                })
-              );
-            }
-          );
-
-          dispatch(
-            setAnnotationCategories({ categories: updatedAnnotationCategories })
-          );
-
-          dispatch(
-            setActiveImage({
-              imageId: serializedImages[0].imageId,
-              execSaga: true,
-            })
-          );
-
-          dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
-        });
+        dispatch(
+          projectSlice.actions.addAnnotationCategories({
+            categories: serializedAnnotations.categories,
+          })
+        );
+        dispatch(
+          AnnotatorSlice.actions.setImageInstances({
+            imageId: activeImage.id,
+            instances: newAnnotations,
+          })
+        );
       }
     };
 

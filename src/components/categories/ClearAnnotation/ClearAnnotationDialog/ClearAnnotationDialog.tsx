@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 import { projectSlice } from "store/project";
 
 import { Category } from "types";
@@ -28,7 +28,7 @@ export const ClearAnnotationDialog = ({
 
   const onClear = () => {
     dispatch(
-      imageViewerSlice.actions.clearCategoryAnnotations({ category: category })
+      AnnotatorSlice.actions.clearCategoryAnnotations({ category: category })
     );
 
     dispatch(projectSlice.actions.clearAnnotations({ category: category }));

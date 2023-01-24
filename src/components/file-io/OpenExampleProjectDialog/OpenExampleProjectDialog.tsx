@@ -16,7 +16,7 @@ import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";
 import cElegansExampleProjectIcon from "data/exampleProjects/cElegansExampleProjectIcon.png";
 import humanU2OSCellsExampleProjectIcon from "data/exampleProjects/humanU2OSCellsExampleProjectIcon.png";
-import BBBC013ModeExampleProjectIcon from "data/exampleProjects/BBBC013ModeExampleProjectIcon.png";
+import BBBC013ExampleProjectIcon from "data/exampleProjects/BBBC013ExampleProjectIcon.png";
 import PLP1ExampleProjectIcon from "data/exampleProjects/PLP1ExampleProjectIcon.png";
 
 const exampleProjects = [
@@ -72,7 +72,7 @@ const exampleProjects = [
       "Images of cytoplasm to nucleus translocation of the Forkhead (FKHR-EGFP) fusion protein in stably transfected human osteosarcoma cells.\n" +
       "Channel 1: FKHR-GFP; Channel 2: DNA",
     exampleProjectEnum: ExampleProject.BBBC013,
-    projectIcon: BBBC013ModeExampleProjectIcon,
+    projectIcon: BBBC013ExampleProjectIcon,
     projectSource: {
       sourceName: "BBBC013",
       sourceUrl: "https://bbbc.broadinstitute.org/BBBC013",
@@ -100,13 +100,13 @@ const exampleProjects = [
   },
 ];
 
-type OpenExampleClassifierDialogProps = {
+type OpenExampleProjectDialogProps = {
   open: boolean;
   onClose: () => void;
 };
 
-export const OpenExampleClassifierDialog = (
-  props: OpenExampleClassifierDialogProps
+export const OpenExampleProjectDialog = (
+  props: OpenExampleProjectDialogProps
 ) => {
   const t = useTranslation();
   const { open, onClose } = props;

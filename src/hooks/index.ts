@@ -10,6 +10,7 @@ export { useDndFileDrop } from "./useDndFileDrop/useDndFileDrop";
 export { useDrawer } from "./useDrawer/useDrawer";
 export { useHandTool } from "./useHandTool/useHandTool";
 export { useImage } from "./useImage/useImage";
+export { useImageOrigin } from "./useImageOrigin/useImageOrigin";
 export { useAnnotatorKeyboardShortcuts } from "./useKeyboardShortcuts/useAnnotatorKeyboardShortcuts";
 export { useKeyPress } from "./useKeyPress/useKeyPress";
 export { useMarchingAnts } from "./useMarchingAnts/useMarchingAnts";
@@ -25,3 +26,5 @@ export { useWindowFocusHandler } from "./useWindowFocusHandler/useWindowFocusHan
 export { useZoom } from "./useZoom/useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState/useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys/useHotkeys";
+// useDefaultImage not included to encourage use of
+// import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

@@ -5,6 +5,7 @@ import {
   time as tftime,
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
+
 import {
   Category,
   ImageType,
@@ -17,8 +18,11 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
-import { preprocessClassifier } from "./preprocessClassifier";
+import { loadDataUrlAsStack, convertToImage } from "image/utils/imageHelper";
+import {
+  preprocessClassifier,
+  createClassificationLabels,
+} from "./preprocessClassifier";
 import { predictClasses } from "./predictClasses";
 
 jest.setTimeout(100000);
@@ -93,11 +97,10 @@ const categories: Array<Category> = [
 ];
 
 const inputShape: Shape = {
-  channels: 1,
   planes: 1,
-  frames: 1,
-  width: 28,
   height: 28,
+  width: 28,
+  channels: 1,
 };
 
 const rescaleOptions: RescaleOptions = {
@@ -106,76 +109,44 @@ const rescaleOptions: RescaleOptions = {
 };
 
 const cropOptions: CropOptions = {
-  numCrops: 2,
-  cropSchema: CropSchema.Match,
+  numCrops: 1,
+  cropSchema: CropSchema.None,
 };
 
 const preprocessingOptions: PreprocessOptions = {
-  shuffle: true,
+  shuffle: false,
   rescaleOptions,
   cropOptions,
 };
 
 const fitOptions: FitOptions = {
-  epochs: 2,
+  epochs: 1,
   batchSize: 3,
   initialEpoch: 0,
-  test_data_size: 3,
-  train_data_size: 3,
 };
 
-const inferrenceImages: Array<ImageType> = [
+const inferrenceImagesUnloaded = [
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000003", // 3
     id: "00000000-0000-0000-0001-00000000000",
-    colors: generateDefaultChannels(inputShape.channels),
     name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA7ElEQVR4nGNgGGggenEnbsm5f9/K45Lj+/j378wDNVjlmJb/+/v37993ptgkS/7++/v3799/a7HISbz69/9KNUPN/+MwERaEJCv7/76mTwyf///HZmyKHQMDg/jNfzm4HMw1/e8RFhxypmf+/i3FKqPQee/fv393scpxnIF4pQMuwoSQlDVkYHjdu51BFy6CZPnfd/vWHXjp68mATfKeKAMDA4MDw310+9g8pSGM+H//FNElZ/31YGBgYBCo//J3KoYnvv51VRWWTTvy9+9mbnRJ1b9///199PHvv7+beTC8KPESGltbMfTRGwAAe3RlA24l0K8AAAAASUVORK5CYII=",
-      ],
-    ],
     partition: Partition.Inference,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA7ElEQVR4nGNgGGggenEnbsm5f9/K45Lj+/j378wDNVjlmJb/+/v37993ptgkS/7++/v3799/a7HISbz69/9KNUPN/+MwERaEJCv7/76mTwyf///HZmyKHQMDg/jNfzm4HMw1/e8RFhxypmf+/i3FKqPQee/fv393scpxnIF4pQMuwoSQlDVkYHjdu51BFy6CZPnfd/vWHXjp68mATfKeKAMDA4MDw310+9g8pSGM+H//FNElZ/31YGBgYBCo//J3KoYnvv51VRWWTTvy9+9mbnRJ1b9///199PHvv7+beTC8KPESGltbMfTRGwAAe3RlA24l0K8AAAAASUVORK5CYII=",
   },
 
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000008", // 8
-    colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
     name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA+UlEQVR4nGNgGNSANeb2AQYGBgbmJf+E0KQ4Yq79/XJFjoGBddHfH4KocvyX/v6aqsjAwKC39e83XzS53L+3wxkYGBgst/194Y9maP/f2yoMDAwMWi/+flZAd0z/R08+BgYGq11/t9tChVjgkq95tpx6wHCkRmxX1HuoECNckm2SMQODMj/DRZd3ODxa9PfvThxSDIovUCSZkOW4G0QXIfNRJKtjbnIx3MZuqNSbW+pb/tpilRO98cFP6+NJbqySzX/zBHf+DcUqx7Hvb2zs39kcWCWF/37o/vrXC7tzhP/+/v53Bhsuyb9/r7Bgl2PgOvV3DisOOeoCAPdCVcP4Rpg/AAAAAElFTkSuQmCC",
-      ],
-    ],
     partition: Partition.Inference,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA+UlEQVR4nGNgGNSANeb2AQYGBgbmJf+E0KQ4Yq79/XJFjoGBddHfH4KocvyX/v6aqsjAwKC39e83XzS53L+3wxkYGBgst/194Y9maP/f2yoMDAwMWi/+flZAd0z/R08+BgYGq11/t9tChVjgkq95tpx6wHCkRmxX1HuoECNckm2SMQODMj/DRZd3ODxa9PfvThxSDIovUCSZkOW4G0QXIfNRJKtjbnIx3MZuqNSbW+pb/tpilRO98cFP6+NJbqySzX/zBHf+DcUqx7Hvb2zs39kcWCWF/37o/vrXC7tzhP/+/v53Bhsuyb9/r7Bgl2PgOvV3DisOOeoCAPdCVcP4Rpg/AAAAAElFTkSuQmCC",
   },
 
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000007", // 7
-    colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
     name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAuUlEQVR4nGNgGEqAkYGBgeEC7y4GBoaVH94+xiIpcU6CgYGBgeH1XQaGbbdXokoysDPLeTEwMGg4MDBIcX1fkI3LHoPyx19wu4K5C49k3H+4JBO6HGvQ//M4NU76984elxzf1X99ODWW/fukgEtO+du/abjk2Of9++SES1Lr378eJC6qV1wZ/m7BpVH+z7/9uOQYpv37J4lLju/mv+WsuCT7/r1RQhFAchCTCsPFe7g0sv37h9OPpAIAr7k2JCcwVrMAAAAASUVORK5CYII=",
-      ],
-    ],
     partition: Partition.Inference,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAuUlEQVR4nGNgGEqAkYGBgeEC7y4GBoaVH94+xiIpcU6CgYGBgeH1XQaGbbdXokoysDPLeTEwMGg4MDBIcX1fkI3LHoPyx19wu4K5C49k3H+4JBO6HGvQ//M4NU76984elxzf1X99ODWW/fukgEtO+du/abjk2Of9++SES1Lr378eJC6qV1wZ/m7BpVH+z7/9uOQYpv37J4lLju/mv+WsuCT7/r1RQhFAchCTCsPFe7g0sv37h9OPpAIAr7k2JCcwVrMAAAAASUVORK5CYII=",
   },
 ];
@@ -183,9 +154,28 @@ const inferrenceImages: Array<ImageType> = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceData = await preprocessClassifier(
+  const inferrenceImages: Array<ImageType> = [];
+  const imageIds: Array<string> = [];
+
+  for (const im of inferrenceImagesUnloaded) {
+    const imStack = await loadDataUrlAsStack(im.src);
+    const loadedIm = await convertToImage(
+      imStack,
+      "mnist",
+      undefined,
+      inputShape.planes,
+      inputShape.channels
+    );
+    inferrenceImages.push({ ...loadedIm, ...im });
+    imageIds.push(im.id);
+  }
+
+  const { labels: inferrenceLabels, disposeLabels: disposeInferrenceLabels } =
+    createClassificationLabels(inferrenceImages, categories);
+
+  const inferrenceData = preprocessClassifier(
     inferrenceImages,
-    categories,
+    inferrenceLabels,
     inputShape,
     preprocessingOptions,
     fitOptions
@@ -227,10 +217,9 @@ it("predict", async () => {
     return res;
   });
 
-  const result = profile.result as {
-    imageIds: string[];
-    categoryIds: string[];
-  };
+  disposeInferrenceLabels();
+
+  const categoryIds = profile.result as string[];
 
   // console.log(`newBytes: ${profile.newBytes}`);
   // console.log(`newTensors: ${profile.newTensors}`);
@@ -262,43 +251,34 @@ it("predict", async () => {
   //   }
   // }
 
-  const expectedResults = {
-    imageIds: [
-      "00000000-0000-0000-0001-00000000000",
-      "00000000-0000-0000-0002-00000000000",
-      "00000000-0000-0000-0003-00000000000",
-    ],
-    categoryIds: [
-      "10000000-0000-0000-0000-000000000003",
-      "10000000-0000-0000-0000-000000000008",
-      "10000000-0000-0000-0000-000000000007",
-    ],
-  };
+  const expectedImageIds = [
+    "00000000-0000-0000-0001-00000000000",
+    "00000000-0000-0000-0002-00000000000",
+    "00000000-0000-0000-0003-00000000000",
+  ];
+
+  const expectedCategoryIds = [
+    "10000000-0000-0000-0000-000000000003",
+    "10000000-0000-0000-0000-000000000008",
+    "10000000-0000-0000-0000-000000000007",
+  ];
 
   // each image should have a corresponding category
-  expect(result.imageIds.length).toEqual(result.categoryIds.length);
+  expect(imageIds.length).toEqual(categoryIds.length);
 
-  expect(result.imageIds.length).toEqual(expectedResults.imageIds.length);
-  expect(result.categoryIds.length).toEqual(expectedResults.categoryIds.length);
+  expect(imageIds.length).toEqual(expectedImageIds.length);
+  expect(categoryIds.length).toEqual(expectedCategoryIds.length);
 
-  expect(result.imageIds).toEqual(
-    expect.arrayContaining(expectedResults.imageIds)
-  );
-  expect(result.categoryIds).toEqual(
-    expect.arrayContaining(expectedResults.categoryIds)
-  );
+  expect(imageIds).toEqual(expect.arrayContaining(expectedImageIds));
+  expect(categoryIds).toEqual(expect.arrayContaining(expectedCategoryIds));
 
   // can't guarantee order, but must guarantee each image id has the correct category id
-  for (let i = 0; i < expectedResults.imageIds.length; i++) {
-    let resultImageId = result.imageIds[i];
-    let resultCategoryId = result.categoryIds[i];
+  for (let i = 0; i < expectedImageIds.length; i++) {
+    let resultImageId = imageIds[i];
+    let resultCategoryId = categoryIds[i];
 
-    let expectedIdx = expectedResults.imageIds.findIndex(
-      (id) => id === resultImageId
-    );
+    let expectedIdx = expectedImageIds.findIndex((id) => id === resultImageId);
 
-    expect(resultCategoryId).toStrictEqual(
-      expectedResults.categoryIds[expectedIdx]
-    );
+    expect(resultCategoryId).toStrictEqual(expectedCategoryIds[expectedIdx]);
   }
 });

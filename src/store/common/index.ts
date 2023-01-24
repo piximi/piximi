@@ -1,17 +1,16 @@
 // Selectors
 
-export { activeImageSelector } from "./selectors/activeImageSelector";
 export { activeSerializedAnnotationsSelector } from "./selectors/activeSerializedAnnotationsSelector";
-export { allSerializedAnnotationsSelector } from "./selectors/allSerializedAnnotationsSelector";
 export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
 export { imageNameSelector } from "./selectors/imageNameSelector";
-export { imageOriginalSrcSelector } from "./selectors/imageOriginalSrcSelector";
+export { imageDataSelector } from "./selectors/imageDataSelector";
+export { imageBitDepthSelector } from "./selectors/imageBitDepthSelector";
 export { imageSelector } from "./selectors/imageSelector";
-export { imageViewerFullImagesSelector } from "./selectors/imageViewerFullImagesSelector";
+export { annotatorFullImagesSelector } from "./selectors/annotatorFullImagesSelector";
 export { selectedAnnotationObjectsSelector } from "./selectors/selectedAnnotationObjectsSelector";
 export { selectedCategorySelector } from "./selectors/selectedCategorySelector";
 export { selectedImagesSelector } from "./selectors/selectedImagesSelector";
-export { unselectedAnnotationObjectsSelector } from "./selectors/unselectedAnnotationObjectsSelector";
+
 export { valImagesSelector } from "./selectors/valImagesSelector";
 export { visibleImagesSelector } from "./selectors/visibleImagesSelector";
 

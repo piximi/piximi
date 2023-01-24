@@ -5,7 +5,7 @@ import { Shape } from "types/Shape";
  * Creates simple Fully Convolutional Network for semantic segmentation
  * from: https://stackoverflow.com/questions/54600956/fully-convolutional-network
  *
- * @param inputShape Shape of the input images [width, channels, frames, height, planes]
+ * @param inputShape Shape of the input images [planes, height, width, channels]
  * @param numClasses Number of segmentation classes to predict
  * @returns tensorflow.layer model
  */

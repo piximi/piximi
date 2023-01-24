@@ -1,10 +1,10 @@
-import _ from "lodash";
+import range from "lodash/range";
 import { ResponsiveLine } from "@nivo/line";
 
 import { Container, Typography } from "@mui/material";
 
 import { usePreferredNivoTheme } from "hooks";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type TrainingHistoryPlotProps = {
   metric: string;
@@ -36,7 +36,7 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
   };
 
   const stepSize = Math.ceil(currentEpoch / 30);
-  const epochRange = _.range(0, currentEpoch + 1, stepSize);
+  const epochRange = range(0, currentEpoch + 1, stepSize);
   const pointSizeAdjustment = Math.floor(currentEpoch / 20);
 
   const min = dynamicYRange ? "auto" : 0;

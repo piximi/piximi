@@ -5,7 +5,12 @@ export { AnnotationModeType } from "./AnnotationModeType";
 
 export { AnnotationStateType } from "./AnnotationStateType";
 
-export type { AnnotationType } from "./AnnotationType";
+export { AnnotationExportType } from "./AnnotationExportType";
+
+export type {
+  encodedAnnotationType,
+  decodedAnnotationType,
+} from "./AnnotationType";
 
 export type {
   ClassifierArchitectureOptions,
@@ -15,14 +20,12 @@ export type {
 export type { Category } from "./Category";
 export {
   CategoryType,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "./Category";
 
 export type { Classifier } from "./Classifier";
-
-export type { Color } from "./Color";
 
 export type { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
 
@@ -60,17 +63,17 @@ export {
 
 export type { ImageType, ShadowImageType } from "./ImageType";
 
-export type { ImageViewer } from "./ImageViewer";
+export type { Annotator } from "./Annotator";
 
-export type { ImageViewerImage } from "./ImageViewerImage";
+export type { AnnotatorImage } from "./AnnotatorImage";
 
-export { ImageViewerOperation } from "./ImageViewerOperation";
+export { AnnotatorOperation } from "./AnnotatorOperation";
 
-export { ImageViewerSelectionMode } from "./ImageViewerSelectionMode";
+export { AnnotatorSelectionMode } from "./AnnotatorSelectionMode";
 
-export type { ImageViewerState } from "./ImageViewerState";
+export type { AnnotatorState } from "./AnnotatorState";
 
-export { ImageViewerZoomMode } from "./ImageViewerZoomMode";
+export { AnnotatorZoomMode } from "./AnnotatorZoomMode";
 
 export { LanguageType } from "./LanguageType";
 
@@ -78,7 +81,12 @@ export { LossFunction } from "./LossFunction";
 
 export { Metric } from "./Metric";
 
-export type { ClassifierModelProps, SegmenterModelProps } from "./ModelType";
+export type {
+  ClassifierModelProps,
+  SegmenterModelProps,
+  UserUploadedModelProps,
+  DefaultModelProps,
+} from "./ModelType";
 export {
   ModelType,
   availableClassifierModels,
@@ -88,6 +96,8 @@ export {
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";
+
+export type { Point, Edge } from "./Polygon";
 
 export type { PreprocessOptions } from "./PreprocessOptions";
 
@@ -103,18 +113,12 @@ export type { SerializedFileType } from "./SerializedFileType";
 
 export type { SerializedImageType } from "./SerializedImageType";
 
-export type { SerializedProjectType } from "./SerializedProjectType";
-
 export type { Settings } from "./Settings";
 export { HotkeyView } from "./Settings";
 
 export type { Shape } from "./Shape";
 
-export type { ShapeType } from "./ShapeType";
-
 export type { State } from "./State";
-
-export { Task } from "./Task";
 
 export { ThemeMode } from "./ThemeMode";
 
