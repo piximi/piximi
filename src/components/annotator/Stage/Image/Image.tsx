@@ -64,29 +64,18 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
 
   return (
     <>
-      {images.map((image, idx) => {
-        return idx === activePlane ? (
-          <ReactKonva.Image
-            height={height}
-            image={image}
-            ref={ref}
-            width={width}
-            filters={filters}
-            visible={true}
-            key={idx}
-            position={imagePosition}
-          />
-        ) : (
-          <ReactKonva.Image
-            height={height}
-            image={image}
-            width={width}
-            filters={filters}
-            visible={false}
-            key={idx}
-          />
-        );
-      })}
+      {images.map((image, idx) => (
+        <ReactKonva.Image
+          height={height}
+          image={image}
+          ref={ref}
+          width={width}
+          filters={filters}
+          visible={idx === activePlane}
+          key={idx}
+          position={imagePosition}
+        />
+      ))}
     </>
   );
 });
