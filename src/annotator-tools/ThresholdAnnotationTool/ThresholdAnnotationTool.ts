@@ -3,7 +3,6 @@ import { AnnotationStateType } from "types";
 import { drawRectangle } from "utils/common";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
-  origin?: { x: number; y: number };
   threshold = 255;
   width?: number;
   height?: number;

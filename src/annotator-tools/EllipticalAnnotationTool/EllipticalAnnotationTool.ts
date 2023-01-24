@@ -5,7 +5,6 @@ import { AnnotationStateType, Point } from "types";
 
 export class EllipticalAnnotationTool extends AnnotationTool {
   center?: Point;
-  origin?: Point;
   radius?: { x: number; y: number };
 
   deselect() {

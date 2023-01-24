@@ -4,7 +4,7 @@ import {
   convertToImage,
 } from "image/utils/imageHelper";
 import {
-  AnnotationType,
+  encodedAnnotationType,
   Category,
   SerializedAnnotationType,
   SerializedFileType,
@@ -13,7 +13,7 @@ import {
 export const deserializeAnnotations = (
   serializedAnnotations: Array<SerializedAnnotationType>
 ) => {
-  const annotations: Array<AnnotationType> = [];
+  const annotations: Array<encodedAnnotationType> = [];
 
   for (const annotation of serializedAnnotations) {
     annotations.push({

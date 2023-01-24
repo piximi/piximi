@@ -3,9 +3,7 @@ import { AnnotationTool } from "../AnnotationTool";
 import { AnnotationStateType, Point } from "types";
 
 export class LassoAnnotationTool extends AnnotationTool {
-  anchor?: Point;
   buffer: Array<Point> = [];
-  origin?: Point;
   points: Array<Point> = [];
 
   deselect() {

@@ -1,6 +1,6 @@
 import { ImageType, Annotator, Project, ShadowImageType } from "types";
 
-export const imageViewerFullImagesSelector = ({
+export const annotatorFullImagesSelector = ({
   annotator,
   project,
 }: {

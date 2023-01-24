@@ -3,7 +3,10 @@ import { useSelector } from "react-redux";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { annotatorImagesSelector } from "store/annotator";
-import { annotationCategoriesSelector } from "store/project";
+import {
+  annotationCategoriesSelector,
+  projectNameSelector,
+} from "store/project";
 import { ListItemText, MenuItem } from "@mui/material";
 import { AnnotationExportType } from "types";
 import {
@@ -13,6 +16,7 @@ import {
 } from "utils/common/imageHelper";
 import { activeSerializedAnnotationsSelector } from "store/common";
 
+// TODO: post PR #407 - refactor all of this for new project format(s)
 type ExportAnnotationsAsMenuItemProps = {
   handleMenuClose: () => void;
   exportType: AnnotationExportType;
@@ -26,6 +30,7 @@ export const ExportAnnotationsAsMenuItem = ({
   const images = useSelector(annotatorImagesSelector);
   const annotationCategories = useSelector(annotationCategoriesSelector);
   const annotations = useSelector(activeSerializedAnnotationsSelector);
+  const projectName = useSelector(projectNameSelector);
 
   const onExport = () => {
     handleMenuClose();
@@ -38,7 +43,7 @@ export const ExportAnnotationsAsMenuItem = ({
         const blob = new Blob([JSON.stringify(annotations)], {
           type: "application/json;charset=utf-8",
         });
-        saveAs(blob, `${annotations.imageFilename}.json`);
+        saveAs(blob, `${projectName}.json`);
         return;
 
       case AnnotationExportType.Matrix:
