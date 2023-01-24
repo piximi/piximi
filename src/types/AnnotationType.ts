@@ -1,3 +1,5 @@
+import { DataArray } from "image/utils/imageHelper";
+
 export type encodedAnnotationType = {
   // x1, y1, W, H
   boundingBox: [number, number, number, number];
@@ -11,6 +13,6 @@ export type decodedAnnotationType = {
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;
-  maskData: Uint8Array;
+  maskData: DataArray;
   plane: number;
 };
