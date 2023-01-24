@@ -13,6 +13,7 @@ import {
   updateImageCategoryFromHighlighted,
   updateHighlightedCategory,
 } from "store/project";
+
 import {
   tileSizeSelector,
   imageSelectionColorSelector,
@@ -49,7 +50,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     (event: any, _handler) => {
       if (!event.repeat) {
         setCategoryIndex((index) => {
-          return index + _handler.key[_handler.key.length - 1].toString();
+          return index + _handler.key.at(-1)!.toString();
         });
       }
     },

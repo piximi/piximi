@@ -1,48 +1,30 @@
-import { Project } from "types/Project";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { filter } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+
+import { Project } from "types/Project";
 import {
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CATEGORY,
-  UNKNOWN_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY,
+  UNKNOWN_CLASS_CATEGORY_ID,
 } from "types/Category";
-import { v4 as uuidv4 } from "uuid";
 import { ImageType, ShadowImageType } from "types/ImageType";
-import { filter, findIndex } from "lodash";
-import { Task } from "types/Task";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { replaceDuplicateName } from "image/imageHelper";
-import { defaultImage } from "images/defaultImage";
-import { AnnotationType } from "types/AnnotationType";
+import { replaceDuplicateName } from "image/utils/imageHelper";
+import {
+  decodedAnnotationType,
+  encodedAnnotationType,
+} from "types/AnnotationType";
+import { encode } from "utils/annotator";
 
-const initialAnnotationCategories =
-  process.env.NODE_ENV === "development"
-    ? [
-        UNKNOWN_ANNOTATION_CATEGORY,
-        {
-          color: "#b66dff",
-          id: "00000000-0000-0000-0000-000000000001",
-          name: "Cell membrane",
-          visible: true,
-        },
-        {
-          color: "#6db6ff",
-          id: "00000000-0000-0000-0000-000000000002",
-          name: "Cell nucleus",
-          visible: true,
-        },
-      ]
-    : [UNKNOWN_ANNOTATION_CATEGORY];
-
-const initialState: Project = {
-  categories: [UNKNOWN_CATEGORY],
-  annotationCategories: initialAnnotationCategories,
-  images: [defaultImage],
+export const initialState: Project = {
+  categories: [UNKNOWN_CLASS_CATEGORY],
+  annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
+  images: [],
   name: "Untitled project",
-  task: Task.Classify,
-  trainFlag: 0,
   imageSortKey: defaultImageSortKey,
   highlightedCategory: null,
 };
@@ -51,33 +33,27 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
-    addImages(
-      state: Project,
-      action: PayloadAction<{ images: Array<ImageType> }>
-    ) {
+    addImages(state, action: PayloadAction<{ images: Array<ImageType> }>) {
       state.images = state.images.concat(action.payload.images);
     },
-    clearAnnotations(
-      state: Project,
-      action: PayloadAction<{ category: Category }>
-    ) {
+    clearAnnotations(state, action: PayloadAction<{ category: Category }>) {
       for (let image of state.images) {
         image.annotations = image.annotations.filter(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             return annotation.categoryId !== action.payload.category.id;
           }
         );
       }
     },
-    clearPredictions(state: Project, action: PayloadAction<{}>) {
-      state.images.forEach((image: ImageType) => {
+    clearPredictions(state, action: PayloadAction<{}>) {
+      state.images.forEach((image) => {
         if (image.partition === Partition.Inference) {
-          image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
         }
       });
     },
     createAnnotationCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ name: string; color: string }>
     ) {
       const category: Category = {
@@ -88,9 +64,8 @@ export const projectSlice = createSlice({
       };
       state.annotationCategories.push(category);
     },
-
     createCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ name: string; color: string }>
     ) {
       const category: Category = {
@@ -101,21 +76,19 @@ export const projectSlice = createSlice({
       };
       state.categories.push(category);
     },
-    createNewProject(state: Project, action: PayloadAction<{ name: string }>) {
+    createNewProject(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
-      state.categories = [UNKNOWN_CATEGORY];
+      state.categories = [UNKNOWN_CLASS_CATEGORY];
       state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
       state.images = [];
-      state.task = Task.Classify;
-      state.trainFlag = 0;
       state.imageSortKey = defaultImageSortKey;
     },
-    deleteAllAnnotationCategories(state: Project, action: PayloadAction<{}>) {
+    deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
       state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
 
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             return {
               ...annotation,
               categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -126,26 +99,26 @@ export const projectSlice = createSlice({
         return { ...image, annotations: instances };
       });
     },
-    deleteAllCategories(state: Project, action: PayloadAction<{}>) {
-      state.categories = [UNKNOWN_CATEGORY];
+    deleteAllCategories(state, action: PayloadAction<{}>) {
+      state.categories = [UNKNOWN_CLASS_CATEGORY];
 
-      state.images = state.images.map((image: ImageType) => {
-        image.categoryId = UNKNOWN_CATEGORY_ID;
+      state.images = state.images.map((image) => {
+        image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
         image.partition = Partition.Inference;
         return image;
       });
     },
     deleteAnnotationCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ categoryID: string }>
     ) {
       state.annotationCategories = state.annotationCategories.filter(
         (category: Category) => category.id !== action.payload.categoryID
       );
 
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: AnnotationType) => {
+          (annotation: encodedAnnotationType) => {
             if (annotation.categoryId === action.payload.categoryID) {
               return {
                 ...annotation,
@@ -160,55 +133,52 @@ export const projectSlice = createSlice({
         return { ...image, annotations: instances };
       });
     },
-
-    deleteCategory(state: Project, action: PayloadAction<{ id: string }>) {
+    deleteCategory(state, action: PayloadAction<{ id: string }>) {
       state.categories = filter(state.categories, (category: Category) => {
         return category.id !== action.payload.id;
       });
-      state.images = state.images.map((image: ImageType) => {
+      state.images = state.images.map((image) => {
         if (image.categoryId === action.payload.id) {
-          image.categoryId = UNKNOWN_CATEGORY_ID;
+          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
           image.partition = Partition.Inference;
         }
         return image;
       });
     },
+    deleteImages(state, action: PayloadAction<{ ids: Array<string> }>) {
+      const remainingImages: typeof state.images = [];
 
-    deleteImages(
-      state: Project,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      state.images = filter(state.images, (image: ImageType) => {
-        return !action.payload.ids.includes(image.id);
-      });
+      for (const im of state.images) {
+        if (action.payload.ids.includes(im.id)) {
+          im.data.dispose();
+          im.colors.color.dispose();
+        } else {
+          remainingImages.push(im);
+        }
+      }
+
+      state.images = remainingImages;
     },
-    openProject(
-      state: Project,
-      action: PayloadAction<{
-        images: Array<ImageType>;
-        name: string;
-        categories: Array<Category>;
-        annotationCategories: Array<Category>;
-      }>
-    ) {
-      state.categories = action.payload.categories;
-      state.annotationCategories = action.payload.annotationCategories;
-      state.name = action.payload.name;
-      state.images = action.payload.images;
+    setProject(state, action: PayloadAction<{ project: Project }>) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.project;
+      return action.payload.project;
     },
     reconcileImages(
-      state: Project,
+      state,
       action: PayloadAction<{
         images: Array<ShadowImageType>;
       }>
     ) {
       action.payload.images.forEach((shadowImage: ShadowImageType) => {
-        const projectImageIdx = state.images.findIndex((image: ImageType) => {
+        const projectImageIdx = state.images.findIndex((image) => {
           return shadowImage.id === image.id;
         });
 
         if (projectImageIdx >= 0) {
           const projectImage = state.images[projectImageIdx];
+
+          projectImage.colors.color.dispose();
 
           state.images[projectImageIdx] = {
             ...projectImage,
@@ -218,17 +188,47 @@ export const projectSlice = createSlice({
       });
     },
     setAnnotationCategories(
-      state: Project,
+      state,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
-      state.annotationCategories = action.payload.categories;
+      const replaceUnknown =
+        action.payload.categories.find(
+          (cat) => cat.id === UNKNOWN_ANNOTATION_CATEGORY_ID
+        ) === undefined;
+      if (replaceUnknown) {
+        state.annotationCategories = [
+          UNKNOWN_ANNOTATION_CATEGORY,
+          ...action.payload.categories,
+        ];
+      } else {
+        state.annotationCategories = action.payload.categories;
+      }
+    },
+    addAnnotationCategories(
+      state,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      const newCategories = [];
+      for (const newCategory of action.payload.categories) {
+        const idExists = state.annotationCategories.find(
+          (c) => c.id === newCategory.id
+        );
+        if (idExists) {
+          newCategories.push({
+            ...newCategory,
+            id: uuidv4(),
+          });
+        } else {
+          newCategories.push(newCategory);
+        }
+      }
+      state.annotationCategories.push(...newCategories);
     },
     setAnnotationCategoryVisibility(
-      state: Project,
+      state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.categoryId;
         }
@@ -236,42 +236,134 @@ export const projectSlice = createSlice({
       state.annotationCategories[index].visible = action.payload.visible;
     },
     setCategories(
-      state: Project,
+      state,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
       state.categories = [...state.categories, ...action.payload.categories];
     },
-    setImages(
-      state: Project,
-      action: PayloadAction<{ images: Array<ImageType> }>
-    ) {
+    setImages(state, action: PayloadAction<{ images: Array<ImageType> }>) {
       state.images = action.payload.images;
     },
     sortImagesBySelectedKey(
-      state: Project,
+      state,
       action: PayloadAction<{ imageSortKey: ImageSortKeyType }>
     ) {
       const selectedSortKey = action.payload.imageSortKey;
       state.imageSortKey = selectedSortKey;
 
-      state.images.sort(selectedSortKey.comparerFunction);
+      (state.images as ImageType[]).sort(selectedSortKey.comparerFunction);
     },
-
-    setProjectName(state: Project, action: PayloadAction<{ name: string }>) {
+    setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
     },
+    updateImageAnnotations(
+      state,
+      action: PayloadAction<{
+        annotations: Array<decodedAnnotationType>;
+        imageId: string;
+      }>
+    ) {
+      state.images = state.images.map((image) => {
+        if (action.payload.imageId !== image.id) {
+          return image;
+        } else {
+          const encodedAnnotations = action.payload.annotations.map(
+            (annotation: decodedAnnotationType) => {
+              const { maskData, ...encodedAnnotation } = {
+                mask: encode(annotation.maskData),
+                ...annotation,
+              };
+              return encodedAnnotation;
+            }
+          );
+          return { ...image, annotations: encodedAnnotations };
+        }
+      });
+    },
+    updateImageCategories(
+      state,
+      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
+    ) {
+      action.payload.ids.forEach((imageId) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryId;
+          if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
+            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
+            state.images[index].partition = Partition.Inference;
+          } else {
+            state.images[index].partition = Partition.Training;
+          }
+        }
+      });
+    },
+    updateImageCategory(
+      // unused
+      state,
+      action: PayloadAction<{ id: string; categoryId: string }>
+    ) {
+      const index = state.images.findIndex((image) => {
+        return image.id === action.payload.id;
+      });
+      if (index >= 0) {
+        state.images[index].categoryId = action.payload.categoryId;
+      }
+    },
+    updateImageCategoryFromHighlighted(
+      state,
+      action: PayloadAction<{ ids: Array<string> }>
+    ) {
+      action.payload.ids.forEach((imageId) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          if (state.highlightedCategory)
+            state.images[index].categoryId = state.highlightedCategory;
+        }
+      });
+    },
+    updateImagesCategories(
+      state,
+      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].categoryId = action.payload.categoryIds[idx];
+        }
+      });
+    },
+    updateImagesPartition(
+      state,
+      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
+    ) {
+      action.payload.ids.forEach((imageId, idx) => {
+        const index = state.images.findIndex((image) => {
+          return image.id === imageId;
+        });
+        if (index >= 0) {
+          state.images[index].partition = action.payload.partition;
+        }
+      });
+    },
+
     updateCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.id;
       });
       state.categories[index].name = action.payload.name;
       state.categories[index].color = action.payload.color;
     },
     updateHighlightedCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ categoryIndex: number }>
     ) {
       const index = action.payload.categoryIndex;
@@ -283,28 +375,27 @@ export const projectSlice = createSlice({
       }
     },
     updateCategoryVisibility(
-      state: Project,
+      state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
-      const index = findIndex(state.categories, (category: Category) => {
+      const index = state.categories.findIndex((category: Category) => {
         return category.id === action.payload.categoryId;
       });
 
       state.categories[index].visible = action.payload.visible;
     },
-    updateOtherCategoryVisibility(
-      state: Project,
-      action: PayloadAction<{ id?: string }>
+    updateLabeledImagesVisibility(
+      state,
+      action: PayloadAction<{ visibility: boolean }>
     ) {
-      for (let category of state.categories) {
-        category.visible =
-          action.payload.id === undefined
-            ? true
-            : category.id === action.payload.id;
-      }
+      state.images.forEach((image) => {
+        if (image.partition !== Partition.Inference) {
+          image.visible = action.payload.visibility;
+        }
+      });
     },
     updateOtherAnnotationCategoryVisibility(
-      state: Project,
+      state,
       action: PayloadAction<{ id?: string }>
     ) {
       for (let category of state.annotationCategories) {
@@ -314,79 +405,24 @@ export const projectSlice = createSlice({
             : category.id === action.payload.id;
       }
     },
-    updateLabeledImagesVisibility(
-      state: Project,
-      action: PayloadAction<{ visibility: boolean }>
+    updateOtherCategoryVisibility(
+      state,
+      action: PayloadAction<{ id?: string }>
     ) {
-      state.images.forEach((image: ImageType) => {
-        if (image.partition !== Partition.Inference) {
-          image.visible = action.payload.visibility;
-        }
-      });
-    },
-    updateImageCategoryFromHighlighted(
-      state: Project,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image: ImageType) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          if (state.highlightedCategory)
-            state.images[index].categoryId = state.highlightedCategory;
-        }
-      });
-    },
-    updateImageCategory(
-      state: Project,
-      action: PayloadAction<{ id: string; categoryId: string }>
-    ) {
-      const index = findIndex(state.images, (image: ImageType) => {
-        return image.id === action.payload.id;
-      });
-      if (index >= 0) {
-        state.images[index].categoryId = action.payload.categoryId;
+      for (let category of state.categories) {
+        category.visible =
+          action.payload.id === undefined
+            ? true
+            : category.id === action.payload.id;
       }
     },
-    updateImageCategories(
-      state: Project,
-      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = findIndex(state.images, (image: ImageType) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryId;
-          if (action.payload.categoryId === UNKNOWN_CATEGORY_ID) {
-            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
-            state.images[index].partition = Partition.Inference;
-          } else {
-            state.images[index].partition = Partition.Training;
-          }
-        }
-      });
-    },
-    updateImagesCategories(
-      state: Project,
-      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryIds[idx];
-        }
-      });
-    },
-    updateImagesPartition(
-      state: Project,
+
+    updateSegmentationImagesPartition(
+      state,
       action: PayloadAction<{ ids: Array<string>; partition: Partition }>
     ) {
       action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
+        const index = state.images.findIndex((image) => {
           return image.id === imageId;
         });
         if (index >= 0) {
@@ -394,35 +430,11 @@ export const projectSlice = createSlice({
         }
       });
     },
-    updateSegmentationImagesPartition(
-      state: Project,
-      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = findIndex(state.images, (image: ImageType) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].segmentationPartition = action.payload.partition;
-        }
-      });
-    },
-    updateTask(state: Project, action: PayloadAction<{ task: Task }>) {
-      state.task = action.payload.task;
-    },
-    updateTrainFlag(
-      state: Project,
-      action: PayloadAction<{ trainFlag: number }>
-    ) {
-      state.trainFlag = action.payload.trainFlag;
-    },
-
     updateAnnotationCategory(
-      state: Project,
+      state,
       action: PayloadAction<{ id: string; name: string; color: string }>
     ) {
-      const index = findIndex(
-        state.annotationCategories,
+      const index = state.annotationCategories.findIndex(
         (category: Category) => {
           return category.id === action.payload.id;
         }
@@ -430,15 +442,13 @@ export const projectSlice = createSlice({
       state.annotationCategories[index].name = action.payload.name;
       state.annotationCategories[index].color = action.payload.color;
     },
-
     uploadImages(
-      state: Project,
+      state,
       action: PayloadAction<{ newImages: Array<ImageType> }>
     ) {
-      const imageNames = state.images.map((image: ShadowImageType) => {
+      const imageNames = state.images.map((image) => {
         return image.name.split(".")[0];
       });
-
       const updatedImages = action.payload.newImages.map(
         (image: ImageType, i: number) => {
           const initialName = image.name.split(".")[0]; //get name before file extension
@@ -446,27 +456,12 @@ export const projectSlice = createSlice({
           const updatedName =
             replaceDuplicateName(initialName, imageNames) +
             "." +
-            image.name.split(".")[1];
+            image.name.split(".").slice(1);
           return { ...image, name: updatedName };
         }
       );
 
       state.images.push(...updatedImages);
-    },
-    updateImageAnnotations(
-      state: Project,
-      action: PayloadAction<{
-        annotations: Array<AnnotationType>;
-        imageId: string;
-      }>
-    ) {
-      state.images = state.images.map((image: ImageType) => {
-        if (action.payload.imageId !== image.id) {
-          return image;
-        } else {
-          return { ...image, annotations: action.payload.annotations };
-        }
-      });
     },
   },
 });

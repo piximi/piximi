@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
 import { Category } from "types/Category";
@@ -13,11 +15,10 @@ import { PreprocessOptions } from "types/PreprocessOptions";
 //jest.setTimeout(50000);
 
 const inputShape: Shape = {
+  planes: 1,
+  height: 256,
   width: 256,
   channels: 3,
-  frames: 1,
-  height: 256,
-  planes: 1,
 };
 
 const rescaleOptions: RescaleOptions = {

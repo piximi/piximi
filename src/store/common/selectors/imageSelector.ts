@@ -1,10 +1,11 @@
-import { ImageType, ImageViewer, Project, ShadowImageType } from "types";
+import { ImageType, Annotator, Project, ShadowImageType } from "types";
 
+// TODO: post PR #407 - should be called fullImageSelector ?
 export const imageSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }) => {
   /*
@@ -15,17 +16,30 @@ export const imageSelector = ({
       then the shadow image is the full image, so return that
   */
 
-  if (!imageViewer.images.length) return;
+  let activeImageId: string;
+  if (!annotator.images.length || !annotator.activeImageId) {
+    return;
+  } else {
+    activeImageId = annotator.activeImageId;
+  }
 
-  const image =
-    project.images.find((im: ImageType) => {
-      return im.id === imageViewer.activeImageId;
-    }) ||
-    (imageViewer.images.find((im: ShadowImageType) => {
-      return im.id === imageViewer.activeImageId;
-    }) as ImageType);
+  const image = annotator.images.find((im: ShadowImageType) => {
+    return im.id === activeImageId;
+  }) as ShadowImageType;
 
-  if (!image) return;
+  if (!image.data) {
+    const projectImage = project.images.find((im: ImageType) => {
+      return im.id === activeImageId;
+    }) as ImageType;
 
-  return image;
+    // can't just return project image directly because
+    // imageViewer image has cloned color tensor
+    return {
+      ...projectImage,
+      ...image,
+      data: projectImage.data.clone(),
+    } as ImageType;
+  }
+
+  return image as ImageType;
 };

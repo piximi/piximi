@@ -1,6 +1,6 @@
 import { enableDebugMode, ENV } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
-import _ from "lodash";
+import { shuffle, take, takeRight } from "lodash";
 import { put, select } from "redux-saga/effects";
 
 import {
@@ -13,6 +13,7 @@ import {
   classifierTrainingPercentageSelector,
   fitClassifier,
   createClassifierModel,
+  createClassificationLabels,
   preprocessClassifier,
 } from "store/classifier";
 import {
@@ -34,7 +35,7 @@ import {
   Partition,
 } from "types";
 
-import { getStackTraceFromError } from "utils/getStackTrace";
+import { getStackTraceFromError } from "utils";
 
 export function* fitClassifierSaga({
   payload: { onEpochEnd, execSaga },
@@ -69,7 +70,7 @@ export function* fitClassifierSaga({
   //first assign train and val partition to all categorized images
   const categorizedImagesIds = (
     preprocessingOptions.shuffle
-      ? _.shuffle(categorizedImages)
+      ? shuffle(categorizedImages)
       : categorizedImages
   ).map((image: ImageType) => {
     return image.id;
@@ -81,8 +82,8 @@ export function* fitClassifierSaga({
   );
   const valDataLength = categorizedImagesIds.length - trainDataLength;
 
-  const trainDataIds = _.take(categorizedImagesIds, trainDataLength);
-  const valDataIds = _.takeRight(categorizedImagesIds, valDataLength);
+  const trainDataIds = take(categorizedImagesIds, trainDataLength);
+  const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
   yield put(
     projectSlice.actions.updateImagesPartition({
@@ -150,45 +151,61 @@ export function* fitClassifierSaga({
   );
 
   try {
-    const trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
+    var {
+      labels: trainLabels,
+      disposeLabels: disposeTrainLabels,
+    }: Awaited<ReturnType<typeof createClassificationLabels>> =
+      yield createClassificationLabels(trainImages, categories);
+
+    var {
+      labels: valLabels,
+      disposeLabels: disposeValLabels,
+    }: Awaited<ReturnType<typeof createClassificationLabels>> =
+      yield createClassificationLabels(valImages, categories);
+
+    var trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         trainImages,
-        categories,
+        trainLabels,
         architectureOptions.inputShape,
         preprocessingOptions,
         fitOptions
       );
 
-    const valData: Awaited<ReturnType<typeof preprocessClassifier>> =
+    var valData: Awaited<ReturnType<typeof preprocessClassifier>> =
       yield preprocessClassifier(
         valImages,
-        categories,
+        valLabels,
         architectureOptions.inputShape,
         preprocessingOptions,
         fitOptions
       );
-
-    var data = { train: trainData, val: valData };
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
     return;
   }
 
-  yield put(classifierSlice.actions.updatePreprocessed({ data: data }));
-
   try {
     var { fitted, status }: Awaited<ReturnType<typeof fitClassifier>> =
-      yield fitClassifier(compiledModel, data, fitOptions, onEpochEnd);
+      yield fitClassifier(
+        compiledModel,
+        { train: trainData, val: valData },
+        fitOptions,
+        onEpochEnd
+      );
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
     return;
   }
 
-  const payload = { fitted: fitted, status: status };
+  yield put(
+    classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
+  );
 
-  yield put(classifierSlice.actions.updateFitted(payload));
+  disposeTrainLabels();
+  disposeValLabels();
 }
 
 function* handleError(error: Error, errorName: string) {

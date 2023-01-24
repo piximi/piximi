@@ -1,6 +1,11 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialog, useTranslation } from "hooks";
@@ -10,9 +15,10 @@ import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import { unknownAnnotationCategorySelector } from "store/project";
 import {
   annotatorImagesSelector,
-  imageViewerSlice,
+  AnnotatorSlice,
   selectedAnnotationsIdsSelector,
-} from "store/image-viewer";
+  stagedAnnotationsSelector,
+} from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -24,6 +30,7 @@ export const ClearAnnotationsListItem = () => {
   );
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const annotatorImages = useSelector(annotatorImagesSelector);
 
@@ -33,13 +40,17 @@ export const ClearAnnotationsListItem = () => {
     open: openDeleteAllAnnotationsDialog,
   } = useDialog();
 
-  const onClearAllAnnotations = () => {
+  const ClearAllAnnotationsHandler = () => {
     const existingAnnotations = annotatorImages
       .map((image: ShadowImageType) => {
         return [...image.annotations];
       })
       .flat();
-    if (existingAnnotations.length) {
+    if (
+      existingAnnotations.length ||
+      stagedAnnotations.length ||
+      selectedAnnotationsIds.length
+    ) {
       onOpenDeleteAllAnnotationsDialog();
     }
   };
@@ -48,20 +59,22 @@ export const ClearAnnotationsListItem = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.deleteImageInstances({
-          ids: selectedAnnotationsIds,
+        AnnotatorSlice.actions.setStagedAnnotations({
+          annotations: stagedAnnotations.filter(
+            (annotation) => !selectedAnnotationsIds.includes(annotation.id)
+          ),
         })
       );
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
+        AnnotatorSlice.actions.setSelectedAnnotations({
+          selectedAnnotations: [],
+          workingAnnotation: undefined,
+        })
+      );
+      dispatch(
+        AnnotatorSlice.actions.setSelectedCategoryId({
           selectedCategoryId: unknownAnnotationCategory.id,
           execSaga: true,
-        })
-      );
-      dispatch(
-        imageViewerSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [],
-          selectedAnnotation: undefined,
         })
       );
     });
@@ -72,24 +85,24 @@ export const ClearAnnotationsListItem = () => {
   return (
     <>
       <List dense>
-        <ListItem button onClick={onClearAllAnnotations}>
+        <ListItemButton onClick={ClearAllAnnotationsHandler}>
           <ListItemIcon>
             <DeleteIcon color="disabled" />
           </ListItemIcon>
           <ListItemText primary={t("Clear all annotations")} />
-        </ListItem>
+        </ListItemButton>
 
         <DeleteAllAnnotationsDialog
           onClose={onCloseDeleteAllAnnotationsDialog}
           open={openDeleteAllAnnotationsDialog}
         />
 
-        <ListItem button onClick={onClearSelectedAnnotations}>
+        <ListItemButton onClick={onClearSelectedAnnotations}>
           <ListItemIcon>
             <DeleteIcon color="disabled" />
           </ListItemIcon>
           <ListItemText primary={t("Clear selected annotations")} />
-        </ListItem>
+        </ListItemButton>
       </List>
     </>
   );

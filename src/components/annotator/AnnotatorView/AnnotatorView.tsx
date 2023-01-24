@@ -1,42 +1,36 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
-
 import { AppBar, Box, CssBaseline } from "@mui/material";
-
 import { useUpload } from "hooks";
-
-import { AnnotatorDrawer } from "../AnnotatorDrawer";
-import { ImageContent } from "../ImageContent";
+import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";
-import { Tools } from "../Tools";
-
+import { ToolDrawer } from "../ToolDrawer";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-
+import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
 import {
   alertStateSelector,
   applicationSlice,
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { imageViewerSlice } from "store/image-viewer";
-
-import { AlertType, HotkeyView, ImageType } from "types";
-
 import { getStackTraceFromError } from "utils";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
 
-import { APPLICATION_COLORS } from "colorPalette";
+import { AlertType, HotkeyView } from "types";
 
-type AnnotatorViewProps = {
-  image?: ImageType;
-};
-
-export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
+export const AnnotatorView = () => {
   const dispatch = useDispatch();
 
   const [files, setFiles] = useState<FileList>();
+  const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
+
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
 
@@ -104,20 +98,10 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
     };
   }, [dispatch]);
 
-  useEffect(() => {
-    if (image) {
-      dispatch(
-        imageViewerSlice.actions.setActiveImage({
-          imageId: image.id,
-          execSaga: true,
-        })
-      );
-    }
-  }, [dispatch, image]);
-
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
   const onDrop = async (files: FileList) => {
-    await uploadFiles(files);
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
     setFiles(files);
   };
 
@@ -151,7 +135,7 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
 
         <AnnotatorDrawer />
 
-        <ImageContent onDrop={onDrop} />
+        <StageWrapper onDrop={onDrop} />
 
         {files?.length && (
           <ImageShapeDialog
@@ -159,12 +143,16 @@ export const AnnotatorView = ({ image }: AnnotatorViewProps) => {
             open={openDimensionsDialogBox}
             onClose={handleClose}
             isUploadedFromAnnotator={true}
+            referenceImageShape={imageShape}
           />
         )}
 
-        <ToolOptions />
+        <ToolOptions optionsVisibility={optionsVisible} />
 
-        <Tools />
+        <ToolDrawer
+          optionsVisibility={optionsVisible}
+          setOptionsVisibility={setOptionsVisibile}
+        />
       </Box>
     </ErrorBoundary>
   );

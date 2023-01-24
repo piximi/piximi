@@ -12,11 +12,11 @@ type ModelProps = {
   modelType: ModelType;
 };
 
-interface UserUploadedModelProps extends ModelProps {
+export interface UserUploadedModelProps extends ModelProps {
   src: string;
 }
 
-interface DefaultModelProps extends ModelProps {}
+export interface DefaultModelProps extends ModelProps {}
 
 export type ClassifierModelProps = UserUploadedModelProps | DefaultModelProps;
 

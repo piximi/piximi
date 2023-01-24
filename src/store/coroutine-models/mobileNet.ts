@@ -1,4 +1,6 @@
 import { loadLayersModel, sequential, layers } from "@tensorflow/tfjs";
+import _ from "lodash";
+
 import { Shape } from "../../types/Shape";
 import { changeInputShape } from "./changeInputShape";
 
@@ -38,7 +40,7 @@ export const createMobileNet = async (
   }
 
   let model = backbone;
-  if (inputShape !== [224, 224, 3]) {
+  if (!_.isEqual(inputShape, [224, 224, 3])) {
     model = await changeInputShape(model, inputShape);
   }
 
@@ -51,7 +53,7 @@ export const createMobileNet = async (
   if (useCustomTopLayer) {
     model.add(layers.globalAveragePooling2d({}));
 
-    const numfeat = model.layers[model.layers.length - 1].outputShape[1];
+    const numfeat = model.layers.at(-1)!.outputShape[1];
     model.add(
       layers.reshape({
         targetShape: [1, 1, numfeat as number],

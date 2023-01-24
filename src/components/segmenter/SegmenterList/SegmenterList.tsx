@@ -12,7 +12,7 @@ import {
 } from "store/project";
 
 import { CategoryType } from "types";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 export const SegmenterList = () => {

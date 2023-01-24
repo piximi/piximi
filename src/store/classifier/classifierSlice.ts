@@ -3,8 +3,6 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { Tensor, Rank } from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
 import { History, LayersModel } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
@@ -15,14 +13,13 @@ import {
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
 
-const initialState: Classifier = {
+export const initialState: Classifier = {
   evaluating: false,
   inputShape: {
+    planes: 1,
     height: 256,
     width: 256,
     channels: 3,
-    planes: 1,
-    frames: 1,
   },
   fitOptions: {
     epochs: 10,
@@ -84,43 +81,12 @@ export const classifierSlice = createSlice({
     ) {
       state.evaluating = true;
     },
-    setClassifier(
-      state,
-      action: PayloadAction<{
-        classifier: Classifier;
-      }>
-    ) {
-      const { classifier } = action.payload;
-
-      state.fitOptions = classifier.fitOptions;
-      state.inputShape = classifier.inputShape;
-      state.learningRate = classifier.learningRate;
-      state.lossFunction = classifier.lossFunction;
-      state.metrics = classifier.metrics;
-
-      state.optimizationAlgorithm = classifier.optimizationAlgorithm;
-      state.trainingPercentage = classifier.trainingPercentage;
-      state.history = classifier.history;
-      state.predictions = classifier.predictions;
-      state.predicted = classifier.predicted;
-      state.preprocessOptions = classifier.preprocessOptions;
-
-      state.selectedModel = classifier.selectedModel;
-
-      state.selectedModel = availableClassifierModels[0];
-      if (classifier.selectedModel) {
-        const selectedModel = classifier.selectedModel;
-        availableClassifierModels.forEach((model) => {
-          if (
-            selectedModel.modelType === model.modelType &&
-            selectedModel.modelName === model.modelName
-          ) {
-            state.selectedModel = selectedModel;
-          }
-        });
-      }
-
-      // initialize all others to their default value
+    setClassifier(state, action: PayloadAction<{ classifier: Classifier }>) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.classifier;
+      return action.payload.classifier;
+    },
+    setDefaults(state, action: PayloadAction<{}>) {
       state.evaluating = false;
       state.fitting = false;
       state.predicting = false;
@@ -218,30 +184,6 @@ export const classifierSlice = createSlice({
 
       state.optimizationAlgorithm = optimizationAlgorithm;
     },
-    updatePreprocessed(
-      state,
-      action: PayloadAction<{
-        data: {
-          val: Dataset<{
-            xs: Tensor<Rank.R4>;
-            ys: Tensor<Rank.R2>;
-            labels: Tensor<Rank.R1>;
-            ids: Tensor<Rank.R1>;
-          }>;
-          train: Dataset<{
-            xs: Tensor<Rank.R4>;
-            ys: Tensor<Rank.R2>;
-            labels: Tensor<Rank.R1>;
-            ids: Tensor<Rank.R1>;
-          }>;
-        };
-      }>
-    ) {
-      const { data } = action.payload;
-
-      state.trainDataSet = data.train;
-      state.valDataSet = data.val;
-    },
     updateRescaleOptions(
       state,
       action: PayloadAction<{ rescaleOptions: RescaleOptions }>
@@ -298,6 +240,5 @@ export const {
   updateLossFunction,
   updateMetrics,
   updateOptimizationAlgorithm,
-  updatePreprocessed,
   updateTrainingPercentage,
 } = classifierSlice.actions;

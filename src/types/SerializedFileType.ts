@@ -1,16 +1,4 @@
-import { SerializedAnnotationType } from "./SerializedAnnotationType";
-import { Color } from "./Color";
+import * as T from "io-ts";
+import { SerializedFileType } from "./runtime";
 
-export type SerializedFileType = {
-  imageChannels: number;
-  imageColors: Array<Color>;
-  imageData: Array<Array<string>>;
-  imageSrc: string;
-  imageFilename: string;
-  imageFrames: number;
-  imageHeight: number;
-  imageId: string;
-  imagePlanes: number;
-  imageWidth: number;
-  annotations: Array<SerializedAnnotationType>;
-};
+export type SerializedFileType = T.TypeOf<typeof SerializedFileType>;

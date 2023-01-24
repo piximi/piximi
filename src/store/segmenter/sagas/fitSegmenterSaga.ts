@@ -1,6 +1,6 @@
 import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
-import _ from "lodash";
+import shuffle from "lodash/shuffle";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
@@ -58,7 +58,7 @@ export function* fitSegmenterSaga({
 
   // First assign train and val partition to all categorized images.
   const annotatedImagesIds = (
-    preprocessingOptions.shuffle ? _.shuffle(annotatedImages) : annotatedImages
+    preprocessingOptions.shuffle ? shuffle(annotatedImages) : annotatedImages
   ).map((image: ImageType) => {
     return image.id;
   });
@@ -69,8 +69,8 @@ export function* fitSegmenterSaga({
   );
   const valDataLength = annotatedImagesIds.length - trainDataLength;
 
-  const trainDataIds = _.take(annotatedImagesIds, trainDataLength);
-  const valDataIds = _.takeRight(annotatedImagesIds, valDataLength);
+  const trainDataIds = annotatedImagesIds.splice(0, trainDataLength);
+  const valDataIds = annotatedImagesIds.splice(-valDataLength, valDataLength);
 
   yield put(
     projectSlice.actions.updateSegmentationImagesPartition({

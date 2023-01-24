@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 
 import { MenuItem, ListItemText } from "@mui/material";
 import { activeSerializedAnnotationsSelector } from "store/common";
+import { activeImageSelector } from "store/annotator";
 
 type SaveAnnotationsMenuItemProps = {
   handleMenuClose: () => void;
@@ -14,13 +15,15 @@ export const ExportAnnotationsAsJsonMenuItem = ({
 }: SaveAnnotationsMenuItemProps) => {
   const annotations = useSelector(activeSerializedAnnotationsSelector);
 
+  const activeImage = useSelector(activeImageSelector);
+
   const onSaveAnnotations = () => {
     handleMenuClose();
-    if (!annotations) return;
+    if (!activeImage || !annotations) return;
     const blob = new Blob([JSON.stringify(annotations)], {
       type: "application/json;charset=utf-8",
     });
-    saveAs(blob, `${annotations.imageFilename}.json`);
+    saveAs(blob, `${!activeImage.name}.json`);
   };
 
   return (

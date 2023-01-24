@@ -2,7 +2,8 @@ import {
   LayersModel,
   Tensor,
   Tensor1D,
-  Rank,
+  Tensor2D,
+  Tensor4D,
   oneHot,
   math,
   metrics,
@@ -16,82 +17,99 @@ import { ImageType } from "../../../types/ImageType";
 export const evaluateClassifier = async (
   model: LayersModel,
   validationData: Dataset<{
-    xs: Tensor;
-    ys: Tensor;
-    labels: Tensor<Rank.R1>;
-    ids: Tensor<Rank.R1>;
+    xs: Tensor4D;
+    ys: Tensor2D;
   }>,
   validationImages: ImageType[],
   categories: Category[]
 ): Promise<ClassifierEvaluationResultType> => {
   const categoryIDs = categories.map((c: Category) => c.id);
-  const numberOfClasses = categoryIDs.length;
+  const numClasses = categoryIDs.length;
 
   const inferredBatchTensors = await validationData
     .map((items) => {
-      const batchProbs = model.predict(items.xs);
-      //@ts-ignore
-      const batchPred = argMax(batchProbs, 1);
-      const batchPredOneHot = oneHot(batchPred, numberOfClasses);
+      // probability distribution vectors - shape [batchSize, numClasses]
+      const batchProbs = model.predict(items.xs) as Tensor2D;
+      // predicted class index scalars - shape [batchSize]
+      const batchPred = argMax(batchProbs, 1) as Tensor1D;
+      // prediction one hot vector - shape [bachSize, numClasses]
+      const batchPredOneHot = oneHot(batchPred, numClasses) as Tensor2D;
+      // target class index scalars - shape [batchSize]
+      const batchLabel = argMax(items.ys, 1) as Tensor1D;
+
       return {
         probs: batchProbs,
         preds: batchPred,
         predsOneHot: batchPredOneHot, // ŷs
         ys: items.ys,
-        labels: items.labels,
+        labels: batchLabel,
       };
     })
     .toArray();
 
   const inferredTensors = inferredBatchTensors.reduce((prev, curr) => {
+    const probs = prev.probs.concat(curr.probs);
+    const preds = prev.preds.concat(curr.preds);
+    const predsOneHot = prev.predsOneHot.concat(curr.predsOneHot); // ŷs
+    const ys = prev.ys.concat(curr.ys);
+    const labels = prev.labels.concat(curr.labels);
+
+    prev.probs.dispose();
+    prev.preds.dispose();
+    prev.predsOneHot.dispose();
+    prev.ys.dispose();
+    prev.labels.dispose();
+
+    curr.probs.dispose();
+    curr.preds.dispose();
+    curr.predsOneHot.dispose();
+    curr.ys.dispose();
+    curr.labels.dispose();
+
     return {
-      probs: prev.probs.concat(curr.probs),
-      preds: prev.preds.concat(curr.preds),
-      predsOneHot: prev.predsOneHot.concat(curr.predsOneHot), // ŷs
-      ys: prev.ys.concat(curr.ys),
-      labels: prev.labels.concat(curr.labels),
+      probs,
+      preds,
+      predsOneHot,
+      ys,
+      labels,
     };
   });
 
   const confusionMatrix = await math
-    .confusionMatrix(
-      inferredTensors.labels,
-      inferredTensors.preds as Tensor1D,
-      numberOfClasses
-    )
+    .confusionMatrix(inferredTensors.labels, inferredTensors.preds, numClasses)
     .array();
 
   var accuracy: number[];
   var crossEntropy: number[];
-  if (numberOfClasses === 2) {
+  if (numClasses === 2) {
     accuracy = (await metrics
       .binaryAccuracy(inferredTensors.ys, inferredTensors.predsOneHot)
       .array()) as number[];
     crossEntropy = (await metrics
-      .binaryCrossentropy(
-        inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
-      )
+      .binaryCrossentropy(inferredTensors.ys, inferredTensors.probs as Tensor)
       .array()) as number[];
   } else {
     accuracy = (await metrics
-      .categoricalAccuracy(
-        inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
-      )
+      .categoricalAccuracy(inferredTensors.ys, inferredTensors.probs as Tensor)
       .array()) as number[];
     crossEntropy = (await metrics
       .categoricalCrossentropy(
         inferredTensors.ys,
-        inferredTensors.probs as Tensor<Rank>
+        inferredTensors.probs as Tensor
       )
       .array()) as number[];
   }
 
   const { precision, recall, f1Score } = evaluateConfusionMatrix(
-    numberOfClasses,
+    numClasses,
     confusionMatrix
   );
+
+  inferredTensors.probs.dispose();
+  inferredTensors.preds.dispose();
+  inferredTensors.predsOneHot.dispose();
+  inferredTensors.ys.dispose();
+  inferredTensors.labels.dispose();
 
   return {
     confusionMatrix: confusionMatrix,

@@ -18,3 +18,4 @@ yarn-error.log*
 .vscode
 package-lock.json
 stories
+git-sim_media

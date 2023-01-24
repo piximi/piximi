@@ -8,8 +8,10 @@ import { SerializedFileType } from "types";
 
 import malaria from "images/malaria.png";
 import cellPainting from "images/cell-painting.png";
-import * as malariaAnnotations from "images/malaria.json";
-import * as cellPaintingAnnotations from "images/cell-painting.json";
+import {
+  malariaAnnotations,
+  cellPaintingAnnotations,
+} from "data/exampleImages";
 
 type ExampleImageDialogProps = {
   onClose: () => void;
@@ -22,12 +24,12 @@ export const ExampleImageDialog = ({
 }: ExampleImageDialogProps) => {
   const exampleImages = [
     {
-      exampleImageName: "Malaria infected human blood smears",
+      exampleImageTitle: "Malaria infected human blood smears",
+      exampleImageName: "malaria.png",
       exampleImageData: malaria,
       exampleImageDescription:
         "Blood cells infected by P. vivax (malaria) and stained with Giemsa reagent.",
-      exampleImageAnnotations:
-        malariaAnnotations as unknown as Array<SerializedFileType>,
+      exampleImageAnnotationsFile: malariaAnnotations as SerializedFileType,
       projectSource: {
         sourceName: "BBBC041v1",
         sourceUrl: "https://bbbc.broadinstitute.org/BBBC041",
@@ -38,14 +40,15 @@ export const ExampleImageDialog = ({
       },
     },
     {
-      exampleImageName: "U2OS cell-painting experiment",
+      exampleImageTitle: "U2OS cell-painting experiment",
+      exampleImageName: "cell-painting.png",
       exampleImageData: cellPainting,
       exampleImageDescription:
         "U2OS cells treated with an RNAi reagent (https://portals.broadinstitute.org/gpp/public/clone/details?cloneId=TRCN0000195467) and stained for a cell-painting experiment.\n" +
         "Channel 1 (red): Actin, Golgi, and Plasma membrane stained via phalloidin and wheat germ agglutinin; " +
         "Channel 1 (blue): DNA stained via Hoechst; Channel 1 (green): mitochondria stained via MitoTracker",
-      exampleImageAnnotations:
-        cellPaintingAnnotations as unknown as Array<SerializedFileType>,
+      exampleImageAnnotationsFile:
+        cellPaintingAnnotations as SerializedFileType,
       projectSource: {
         sourceName: "Boivin2021.06.22.449195",
         sourceUrl:

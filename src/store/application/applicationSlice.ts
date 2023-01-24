@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HotkeyView, Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
-import { ImageShapeEnum } from "image/imageHelper";
+import { ImageShapeInfo } from "image/utils/imageHelper";
 
 const initialState: Settings = {
   selectedImages: [],
@@ -98,7 +98,7 @@ export const applicationSlice = createSlice({
         files: FileList;
         channels: number;
         slices: number;
-        imageShapeInfo: ImageShapeEnum;
+        referenceShape: ImageShapeInfo;
         isUploadedFromAnnotator: boolean;
         execSaga: boolean;
       }>

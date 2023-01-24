@@ -15,38 +15,52 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useTranslation } from "hooks";
 
-import { ImageMenu } from "../ImageMenu";
-
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { imageSelector } from "store/common";
-import { annotatorImagesSelector, setActiveImage } from "store/image-viewer";
+import { ImageMenu } from "../ImageMenu";
+
+import {
+  annotatorImagesSelector,
+  activeImageSelector,
+  setActiveImage,
+  stagedAnnotationsSelector,
+} from "store/annotator";
 
 import { ImageType, ShadowImageType } from "types";
 
 export const ImageList = () => {
   const dispatch = useDispatch();
 
-  const currentImage = useSelector(imageSelector);
+  const activeImage = useSelector(activeImageSelector);
 
   const annotatorImages = useSelector(annotatorImagesSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
   );
 
-  const [selectedImage, setSelectedImage] = React.useState<ImageType>(
-    currentImage!
+  const [selectedImage, setSelectedImage] = React.useState<ShadowImageType>(
+    activeImage!
   );
 
-  const onImageItemClick = (
+  const ImageItemClickHandler = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
-    dispatch(setActiveImage({ imageId: image.id, execSaga: true }));
+    if (image.id !== activeImage!.id) {
+      dispatch(
+        setActiveImage({
+          imageId: image.id,
+          prevImageId: activeImage!.id,
+          execSaga: true,
+        })
+      );
+      setSelectedImage(image as ImageType);
+    }
   };
 
-  const onImageMenuOpen = (
+  const ImageMenuOpenHandler = (
     event: React.MouseEvent<HTMLButtonElement>,
     image: ShadowImageType
   ) => {
@@ -65,36 +79,45 @@ export const ImageList = () => {
       <CollapsibleList closed dense primary={t("Images")}>
         {annotatorImages.map((image: ShadowImageType) => {
           return (
-            <div key={image.id}>
-              <ListItem
-                button
+            <ListItem
+              button
+              key={image.id}
+              id={image.id}
+              onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+                ImageItemClickHandler(evt, image)
+              }
+              selected={image.id === activeImage?.id}
+            >
+              <ListItemAvatar>
+                <Avatar alt={image.name} src={image.src} variant={"square"} />
+              </ListItemAvatar>
+              <ListItemText
                 id={image.id}
-                onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                  onImageItemClick(evt, image)
-                }
-                selected={image.id === currentImage?.id}
-              >
-                <ListItemAvatar>
-                  <Avatar alt={image.name} src={image.src} variant={"square"} />
-                </ListItemAvatar>
-                <ListItemText
-                  id={image.id}
-                  primary={image.name}
-                  primaryTypographyProps={{ noWrap: true }}
+                primary={image.name}
+                primaryTypographyProps={{ noWrap: true }}
+              />
+              {((image.id !== activeImage?.id &&
+                image.annotations.length !== 0) ||
+                (image.id === activeImage?.id &&
+                  stagedAnnotations.length !== 0)) && (
+                <Chip
+                  label={
+                    image.id === activeImage?.id
+                      ? stagedAnnotations.length
+                      : image.annotations.length
+                  }
+                  size="small"
                 />
-                {image.annotations.length !== 0 && (
-                  <Chip label={image.annotations.length} size="small" />
-                )}
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => onImageMenuOpen(event, image)}
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            </div>
+              )}
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  onClick={(event) => ImageMenuOpenHandler(event, image)}
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
           );
         })}
         <ImageMenu

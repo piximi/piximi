@@ -4,10 +4,10 @@ import JSZip from "jszip";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { annotatorImagesSelector } from "store/image-viewer";
+import { annotatorImagesSelector } from "store/annotator";
 import { annotationCategoriesSelector } from "store/project";
 
-import { saveAnnotationsAsBinaryInstanceSegmentationMasks } from "image/imageHelper";
+import { saveAnnotationsAsBinaryInstanceSegmentationMasks } from "utils/common/imageHelper";
 
 type SaveAnnotationsMenuItemProps = {
   handleMenuClose: () => void;

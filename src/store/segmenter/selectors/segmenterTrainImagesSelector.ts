@@ -8,6 +8,6 @@ export const segmenterTrainImagesSelector = ({
   project: Project;
 }): Array<ImageType> => {
   return project.images.filter((image: ImageType) => {
-    return image.segmentationPartition === Partition.Training;
+    return image.partition === Partition.Training;
   });
 };

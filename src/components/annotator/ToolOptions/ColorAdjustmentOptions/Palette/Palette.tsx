@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { tensor2d } from "@tensorflow/tfjs";
 
 import { Grid, IconButton, Menu } from "@mui/material";
 import {
@@ -7,40 +8,22 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import {
-  imageViewerSlice,
-  imageShapeSelector,
-  activeImageColorsSelector,
-  activeImagePlaneSelector,
-} from "store/image-viewer";
-import { imageOriginalSrcSelector } from "store/common";
+import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
-import { Color, DEFAULT_COLORS } from "types";
+import { DEFAULT_COLORS } from "types";
 
-import {
-  convertImageURIsToImageData,
-  mapChannelsToSpecifiedRGBImage,
-  rgbToHex,
-} from "image/imageHelper";
+import { rgbToHex } from "image/utils/imageHelper";
 
 type PaletteProps = {
   channelIdx: number;
 };
 
 export const Palette = ({ channelIdx }: PaletteProps) => {
-  const default_colors = DEFAULT_COLORS;
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
 
-  const colors = useSelector(activeImageColorsSelector);
-
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
-
-  const imageShape = useSelector(imageShapeSelector);
-
-  const originalSrc = useSelector(imageOriginalSrcSelector);
+  const colors = useSelector(activeImageColorsRawSelector);
 
   const dispatch = useDispatch();
 
@@ -56,46 +39,28 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     event:
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLButtonElement>,
-    newColor: Array<number>
+    newColor: [number, number, number]
   ) => {
-    const updatedColors: Array<Color> = colors.map(
-      (color: Color, i: number) => {
-        return i === channelIdx ? { ...color, color: newColor } : color;
-      }
-    );
+    const updatedColors = colors.color.map((color, i) => {
+      return i === channelIdx ? newColor : color;
+    });
 
     dispatch(
-      imageViewerSlice.actions.setImageColors({
-        colors: updatedColors,
+      AnnotatorSlice.actions.setImageColors({
+        colors: { ...colors, color: tensor2d(updatedColors) },
         execSaga: true,
       })
     );
-
-    if (!originalSrc || !imageShape) return;
-
-    const activePlaneData = (
-      await convertImageURIsToImageData(
-        new Array(originalSrc[activeImagePlane])
-      )
-    )[0];
-
-    const modifiedURI = mapChannelsToSpecifiedRGBImage(
-      activePlaneData,
-      updatedColors,
-      imageShape.height,
-      imageShape.width
-    );
-    dispatch(imageViewerSlice.actions.setImageSrc({ src: modifiedURI }));
 
     handleClose();
   };
 
   type ColorIconProps = {
-    color: Array<number>;
+    color: [number, number, number];
   };
 
   type FormRowProps = {
-    colors: Array<Array<number>>;
+    colors: [number, number, number][];
   };
 
   const ColorIcon = ({ color }: ColorIconProps) => {
@@ -136,13 +101,13 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <Grid>
           <Grid container item>
-            <FormRow colors={default_colors.slice(0, 3)} />
+            <FormRow colors={DEFAULT_COLORS.slice(0, 3)} />
           </Grid>
           <Grid container item>
-            <FormRow colors={default_colors.slice(3, 6)} />
+            <FormRow colors={DEFAULT_COLORS.slice(3, 6)} />
           </Grid>
           <Grid container item>
-            <ColorIcon color={[255, 255, 255]} />
+            <ColorIcon color={[1, 1, 1]} />
           </Grid>
         </Grid>
       </Menu>

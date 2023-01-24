@@ -7,14 +7,16 @@ import {
 } from "@tensorflow/tfjs-node";
 
 import { evaluateClassifier } from "./evaluateClassifier";
-import { preprocessClassifier } from "./preprocessClassifier";
+import {
+  preprocessClassifier,
+  createClassificationLabels,
+} from "./preprocessClassifier";
 
 import {
   Category,
   ClassifierEvaluationResultType,
   ImageType,
   Partition,
-  Shape,
   RescaleOptions,
   FitOptions,
   PreprocessOptions,
@@ -22,7 +24,7 @@ import {
   CropSchema,
 } from "types";
 
-import { generateDefaultChannels } from "image/imageHelper";
+import { loadDataUrlAsStack, convertToImage } from "image/utils/imageHelper";
 
 jest.setTimeout(100000);
 
@@ -95,14 +97,6 @@ const categories: Array<Category> = [
   },
 ];
 
-const inputShape: Shape = {
-  width: 28,
-  channels: 1,
-  frames: 1,
-  height: 28,
-  planes: 1,
-};
-
 const rescaleOptions: RescaleOptions = {
   rescale: true,
   center: false,
@@ -123,62 +117,27 @@ const fitOptions: FitOptions = {
   epochs: 2,
   batchSize: 3,
   initialEpoch: 0,
-  test_data_size: 3,
-  train_data_size: 3,
 };
 
-const validationImages: Array<ImageType> = [
+const validationImagesUnloaded = [
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000002", // should be 3, purposefully incorrect for testing
     id: "00000000-0000-0000-0001-00000000000",
-    colors: generateDefaultChannels(inputShape.channels),
-    name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA7ElEQVR4nGNgGGggenEnbsm5f9/K45Lj+/j378wDNVjlmJb/+/v37993ptgkS/7++/v3799/a7HISbz69/9KNUPN/+MwERaEJCv7/76mTwyf///HZmyKHQMDg/jNfzm4HMw1/e8RFhxypmf+/i3FKqPQee/fv393scpxnIF4pQMuwoSQlDVkYHjdu51BFy6CZPnfd/vWHXjp68mATfKeKAMDA4MDw310+9g8pSGM+H//FNElZ/31YGBgYBCo//J3KoYnvv51VRWWTTvy9+9mbnRJ1b9///199PHvv7+beTC8KPESGltbMfTRGwAAe3RlA24l0K8AAAAASUVORK5CYII=",
-      ],
-    ],
     partition: Partition.Validation,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA7ElEQVR4nGNgGGggenEnbsm5f9/K45Lj+/j378wDNVjlmJb/+/v37993ptgkS/7++/v3799/a7HISbz69/9KNUPN/+MwERaEJCv7/76mTwyf///HZmyKHQMDg/jNfzm4HMw1/e8RFhxypmf+/i3FKqPQee/fv393scpxnIF4pQMuwoSQlDVkYHjdu51BFy6CZPnfd/vWHXjp68mATfKeKAMDA4MDw310+9g8pSGM+H//FNElZ/31YGBgYBCo//J3KoYnvv51VRWWTTvy9+9mbnRJ1b9///199PHvv7+beTC8KPESGltbMfTRGwAAe3RlA24l0K8AAAAASUVORK5CYII=",
   },
 
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000008", // 8
-    colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0002-00000000000",
-    name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA+UlEQVR4nGNgGNSANeb2AQYGBgbmJf+E0KQ4Yq79/XJFjoGBddHfH4KocvyX/v6aqsjAwKC39e83XzS53L+3wxkYGBgst/194Y9maP/f2yoMDAwMWi/+flZAd0z/R08+BgYGq11/t9tChVjgkq95tpx6wHCkRmxX1HuoECNckm2SMQODMj/DRZd3ODxa9PfvThxSDIovUCSZkOW4G0QXIfNRJKtjbnIx3MZuqNSbW+pb/tpilRO98cFP6+NJbqySzX/zBHf+DcUqx7Hvb2zs39kcWCWF/37o/vrXC7tzhP/+/v53Bhsuyb9/r7Bgl2PgOvV3DisOOeoCAPdCVcP4Rpg/AAAAAElFTkSuQmCC",
-      ],
-    ],
     partition: Partition.Validation,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA+UlEQVR4nGNgGNSANeb2AQYGBgbmJf+E0KQ4Yq79/XJFjoGBddHfH4KocvyX/v6aqsjAwKC39e83XzS53L+3wxkYGBgst/194Y9maP/f2yoMDAwMWi/+flZAd0z/R08+BgYGq11/t9tChVjgkq95tpx6wHCkRmxX1HuoECNckm2SMQODMj/DRZd3ODxa9PfvThxSDIovUCSZkOW4G0QXIfNRJKtjbnIx3MZuqNSbW+pb/tpilRO98cFP6+NJbqySzX/zBHf+DcUqx7Hvb2zs39kcWCWF/37o/vrXC7tzhP/+/v53Bhsuyb9/r7Bgl2PgOvV3DisOOeoCAPdCVcP4Rpg/AAAAAElFTkSuQmCC",
   },
 
   {
-    annotations: [],
-    activePlane: 0,
     categoryId: "10000000-0000-0000-0000-000000000007", // 7
-    colors: generateDefaultChannels(inputShape.channels),
     id: "00000000-0000-0000-0003-00000000000",
-    name: "mnist",
-    originalSrc: [
-      [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAuUlEQVR4nGNgGEqAkYGBgeEC7y4GBoaVH94+xiIpcU6CgYGBgeH1XQaGbbdXokoysDPLeTEwMGg4MDBIcX1fkI3LHoPyx19wu4K5C49k3H+4JBO6HGvQ//M4NU76984elxzf1X99ODWW/fukgEtO+du/abjk2Of9++SES1Lr378eJC6qV1wZ/m7BpVH+z7/9uOQYpv37J4lLju/mv+WsuCT7/r1RQhFAchCTCsPFe7g0sv37h9OPpAIAr7k2JCcwVrMAAAAASUVORK5CYII=",
-      ],
-    ],
     partition: Partition.Validation,
-    visible: true,
-    shape: inputShape,
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAuUlEQVR4nGNgGEqAkYGBgeEC7y4GBoaVH94+xiIpcU6CgYGBgeH1XQaGbbdXokoysDPLeTEwMGg4MDBIcX1fkI3LHoPyx19wu4K5C49k3H+4JBO6HGvQ//M4NU76984elxzf1X99ODWW/fukgEtO+du/abjk2Of9++SES1Lr378eJC6qV1wZ/m7BpVH+z7/9uOQYpv37J4lLju/mv+WsuCT7/r1RQhFAchCTCsPFe7g0sv37h9OPpAIAr7k2JCcwVrMAAAAASUVORK5CYII=",
   },
 ];
@@ -186,10 +145,21 @@ const validationImages: Array<ImageType> = [
 it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationData = await preprocessClassifier(
+  const validationImages: ImageType[] = [];
+
+  for (const im of validationImagesUnloaded) {
+    const imStack = await loadDataUrlAsStack(im.src);
+    const loadedIm = await convertToImage(imStack, "mnist", undefined, 1, 1);
+    validationImages.push({ ...loadedIm, ...im });
+  }
+
+  const { labels: validationLabels, disposeLabels: disposeValidationLabels } =
+    createClassificationLabels(validationImages, categories);
+
+  const validationData = preprocessClassifier(
     validationImages,
-    categories,
-    inputShape,
+    validationLabels,
+    validationImages[0].shape,
     preprocessingOptions,
     fitOptions
   );
@@ -230,6 +200,8 @@ it("evaluateClassifier", async () => {
     );
     return res;
   });
+
+  disposeValidationLabels();
 
   const result = profile.result as ClassifierEvaluationResultType;
 
@@ -284,13 +256,12 @@ it("evaluateClassifier", async () => {
     f1Score: 0.6666666865348816,
   };
 
-  // console.log(result);
+  expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
+  expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
+  expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
 
-  // expect(result.confusionMatrix).toEqual(expectedResults.confusionMatrix);
-  // expect(result.accuracy).toBeCloseTo(expectedResults.accuracy, 5);
-  // expect(result.crossEntropy).toBeCloseTo(expectedResults.crossEntropy, 5);
+  // Values below are NaN, currently
   // expect(result.precision).toBeCloseTo(expectedResults.precision, 5);
   // expect(result.recall).toBeCloseTo(expectedResults.recall, 5);
   // expect(result.f1Score).toBeCloseTo(expectedResults.f1Score, 5);
-  expect(1).toEqual(1);
 });

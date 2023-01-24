@@ -10,7 +10,12 @@ import {
 
 import { categoriesSelector } from "store/project";
 
-import { Category, ImageType, Partition, UNKNOWN_CATEGORY_ID } from "types";
+import {
+  Category,
+  ImageType,
+  Partition,
+  UNKNOWN_CLASS_CATEGORY_ID,
+} from "types";
 
 type ImageIconLabelProps = {
   image: ImageType;
@@ -47,7 +52,7 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
 
   const predictedLabel =
     image.partition === Partition.Inference &&
-    image.categoryId !== UNKNOWN_CATEGORY_ID;
+    image.categoryId !== UNKNOWN_CLASS_CATEGORY_ID;
 
   return (
     <>

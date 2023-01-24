@@ -19,10 +19,10 @@ import { InformationBox } from "../InformationBox";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
-  imageViewerSlice,
+  AnnotatorSlice,
   selectedAnnotationsSelector,
-  unselectedAnnotationsSelector,
-} from "store/image-viewer";
+  stagedAnnotationsSelector,
+} from "store/annotator";
 import { annotationCategoriesSelector } from "store/project";
 
 import { Category } from "types";
@@ -35,24 +35,24 @@ export const PointerSelectionOptions = () => {
   const dispatch = useDispatch();
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const unselectedAnnotations = useSelector(unselectedAnnotationsSelector);
+  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
   const annotationCategories = useSelector(annotationCategoriesSelector);
 
   const onSelectAll = () => {
-    const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
+    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: allAnnotations,
-        selectedAnnotation: allAnnotations[0],
+        workingAnnotation: allAnnotations[0],
       })
     );
   };
 
   const onSelectNone = () => {
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: [],
-        selectedAnnotation: undefined,
+        workingAnnotation: undefined,
       })
     );
   };
@@ -64,14 +64,14 @@ export const PointerSelectionOptions = () => {
       | React.MouseEvent<HTMLDivElement>,
     category: Category
   ) => {
-    const allAnnotations = [...selectedAnnotations, ...unselectedAnnotations];
+    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     const desiredAnnotations = allAnnotations.filter((annotation) => {
       return annotation.categoryId === category.id;
     });
     dispatch(
-      imageViewerSlice.actions.setSelectedAnnotations({
+      AnnotatorSlice.actions.setSelectedAnnotations({
         selectedAnnotations: desiredAnnotations,
-        selectedAnnotation: desiredAnnotations[0],
+        workingAnnotation: desiredAnnotations[0],
       })
     );
   };

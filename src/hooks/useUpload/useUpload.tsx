@@ -3,7 +3,10 @@ import { useDispatch } from "react-redux";
 
 import { applicationSlice } from "store/application";
 
-import { getImageInformation, ImageShapeEnum } from "image/imageHelper";
+import {
+  getImageFileInformation,
+  ImageShapeEnum,
+} from "image/utils/imageHelper";
 
 export const useUpload = (
   setOpenDimensionsDialogBox: (flag: boolean) => void,
@@ -13,35 +16,37 @@ export const useUpload = (
 
   return useCallback(
     async (files: FileList) => {
-      let needShape = false;
-      const imageShapeInfo = await getImageInformation(files[0]);
+      const imageShapeInfo = await getImageFileInformation(files[0]);
 
-      if (imageShapeInfo === ImageShapeEnum.SingleRGBImage) {
+      if (
+        [ImageShapeEnum.SingleRGBImage, ImageShapeEnum.GreyScale].includes(
+          imageShapeInfo.shape
+        )
+      ) {
         dispatch(
           applicationSlice.actions.uploadImages({
             files: files,
-            channels: 3,
+            channels: imageShapeInfo.shape === ImageShapeEnum.GreyScale ? 1 : 3,
             slices: 1,
-            imageShapeInfo: imageShapeInfo,
+            referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
             execSaga: true,
           })
         );
-      } else if (imageShapeInfo === ImageShapeEnum.DicomImage) {
+      } else if (imageShapeInfo.shape === ImageShapeEnum.DicomImage) {
         dispatch(
           applicationSlice.actions.uploadImages({
             files: files,
             channels: 1,
             slices: 1,
-            imageShapeInfo: imageShapeInfo,
+            referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
             execSaga: true,
           })
         );
-      } else if (imageShapeInfo === ImageShapeEnum.HyperStackImage) {
-        needShape = true;
+      } else if (imageShapeInfo.shape === ImageShapeEnum.HyperStackImage) {
         setOpenDimensionsDialogBox(true);
-      } else if (imageShapeInfo === ImageShapeEnum.InvalidImage) {
+      } else if (imageShapeInfo.shape === ImageShapeEnum.InvalidImage) {
         process.env.NODE_ENV !== "production" &&
           console.warn(
             "Could not get shape information from first image in file list"
@@ -51,7 +56,7 @@ export const useUpload = (
           console.warn("Unrecognized ImageShapeEnum value");
       }
 
-      return needShape;
+      return imageShapeInfo;
     },
     [dispatch, isUploadedFromAnnotator, setOpenDimensionsDialogBox]
   );

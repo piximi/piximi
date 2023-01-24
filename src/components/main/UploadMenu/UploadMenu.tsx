@@ -14,6 +14,7 @@ import { useUpload } from "hooks";
 import { StyledMenuItem } from "./StyledMenuItem";
 
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
+import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -23,6 +24,9 @@ type UploadMenuProps = {
 
 export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
@@ -36,8 +40,9 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   ) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
-    await uploadFiles(files);
+    const imageShapeInfo = await uploadFiles(files);
     event.target.value = "";
+    setImageShape(imageShapeInfo);
     setFiles(files);
     onClose(event);
   };
@@ -87,12 +92,15 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
 
         {/* <DropboxMenuItem onClose={onClose} /> */}
       </Menu>
-      <ImageShapeDialog
-        files={files!}
-        open={openDimensionsDialogBox}
-        onClose={handleClose}
-        isUploadedFromAnnotator={false}
-      />
+      {files && (
+        <ImageShapeDialog
+          files={files}
+          open={openDimensionsDialogBox}
+          onClose={handleClose}
+          isUploadedFromAnnotator={false}
+          referenceImageShape={imageShape}
+        />
+      )}
     </>
   );
 };

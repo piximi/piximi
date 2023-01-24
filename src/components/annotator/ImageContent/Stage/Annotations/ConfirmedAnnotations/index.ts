@@ -1,1 +1,0 @@
-export { ConfirmedAnnotations } from "./ConfirmedAnnotations";

@@ -1,16 +1,16 @@
-import { ImageType, ImageViewer, Project } from "types";
+import { ImageType, Annotator, Project } from "types";
 
 export const imageNameSelector = ({
-  imageViewer,
+  annotator,
   project,
 }: {
-  imageViewer: ImageViewer;
+  annotator: Annotator;
   project: Project;
 }) => {
   if (!project.images.length) return;
 
   const image = project.images.find((image: ImageType) => {
-    return image.id === imageViewer.activeImageId;
+    return image.id === annotator.activeImageId;
   });
 
   if (!image) return;

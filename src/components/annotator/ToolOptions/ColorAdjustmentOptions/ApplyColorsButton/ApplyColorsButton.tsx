@@ -3,61 +3,62 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText } from "@mui/material";
 
-import { imageViewerFullImagesSelector } from "store/common";
-import {
-  activeImageColorsSelector,
-  activeImagePlaneSelector,
-  imageViewerSlice,
-} from "store/image-viewer";
+import { createRenderedTensor } from "image/utils/imageHelper";
+
+import { annotatorFullImagesSelector } from "store/common";
+import { AnnotatorSlice, activeImageColorsSelector } from "store/annotator";
 
 import { ImageType } from "types";
 
-import {
-  convertImageURIsToImageData,
-  mapChannelsToSpecifiedRGBImage,
-} from "image/imageHelper";
-
 export const ApplyColorsButton = () => {
-  const activeImageColors = useSelector(activeImageColorsSelector);
   const dispatch = useDispatch();
-  const images = useSelector(imageViewerFullImagesSelector);
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
 
-  const onApplyColorsClick = () => {
-    dispatch(
-      imageViewerSlice.actions.setCurrentColors({
-        currentColors: activeImageColors,
-      })
-    );
+  const activeImageColors = useSelector(activeImageColorsSelector);
+  const images = useSelector(annotatorFullImagesSelector);
 
-    const getUpdatedImages = async (): Promise<Array<ImageType>> => {
+  const onApplyColorsClick = async () => {
+    const newColor = activeImageColors.color.clone();
+
+    const getUpdatedImages = async () => {
       return Promise.all(
-        images.map(async (image: ImageType) => {
-          if (image.shape.channels !== activeImageColors.length) {
-            //if mismatch between image size and desired colors, don't do anything on the image
+        images.map(async (image) => {
+          // if mismatch between num channels, don't do anything to image
+          if (image.colors.color.shape[0] !== newColor.shape[0]) {
             return image;
           }
 
-          const activePlaneData = (
-            await convertImageURIsToImageData(
-              new Array(image.originalSrc[activeImagePlane])
-            )
-          )[0];
+          // dispose its old color
+          image.colors.color.dispose();
+          const imageColors = {
+            ...activeImageColors,
+            // give it a copy of its own
+            color: newColor.clone(),
+          };
 
-          const modifiedURI = mapChannelsToSpecifiedRGBImage(
-            activePlaneData,
-            activeImageColors,
-            image.shape.height,
-            image.shape.width
+          const updatedSrc = await createRenderedTensor(
+            image.data,
+            imageColors,
+            image.bitDepth,
+            image.activePlane
           );
 
-          return { ...image, colors: activeImageColors, src: modifiedURI };
+          return {
+            ...image,
+            colors: imageColors,
+            src: updatedSrc,
+          } as ImageType;
         })
       );
     };
 
-    getUpdatedImages().then((updatedImages: Array<ImageType>) => {
-      dispatch(imageViewerSlice.actions.setImages({ images: updatedImages }));
+    getUpdatedImages().then((updatedImages) => {
+      newColor.dispose();
+      dispatch(
+        AnnotatorSlice.actions.setImages({
+          images: updatedImages,
+          disposeColorTensors: false,
+        })
+      );
     });
   };
 

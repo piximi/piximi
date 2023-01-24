@@ -41,7 +41,7 @@ import {
 import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
-import { APPLICATION_COLORS } from "colorPalette";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;

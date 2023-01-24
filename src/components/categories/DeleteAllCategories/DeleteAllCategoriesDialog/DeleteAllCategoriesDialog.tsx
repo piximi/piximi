@@ -11,7 +11,7 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice } from "store/image-viewer";
+import { AnnotatorSlice } from "store/annotator";
 import { projectSlice } from "store/project";
 
 import {
@@ -50,13 +50,13 @@ export const DeleteAllCategoriesDialog = ({
   const deleteAllAnnotationCategories = () => {
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
+        AnnotatorSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })
       );
 
-      dispatch(imageViewerSlice.actions.deleteAllAnnotationCategories({}));
+      dispatch(AnnotatorSlice.actions.deleteAllAnnotationCategories({}));
 
       dispatch(projectSlice.actions.deleteAllAnnotationCategories({}));
     });

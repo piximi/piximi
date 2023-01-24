@@ -6,8 +6,12 @@ import { applicationSlice } from "store/application";
 import {
   classifierSlice,
   classifierFittedSelector,
-  classifierValidationDataSelector,
   evaluateClassifier,
+  preprocessClassifier,
+  createClassificationLabels,
+  classifierArchitectureOptionsSelector,
+  classifierPreprocessOptionsSelector,
+  classifierFitOptionsSelector,
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
 import { createdCategoriesSelector } from "store/project";
@@ -81,8 +85,33 @@ function* runEvaluation(
   model: LayersModel,
   categories: Array<Category>
 ) {
-  const validationData: ReturnType<typeof classifierValidationDataSelector> =
-    yield select(classifierValidationDataSelector);
+  const architectureOptions: ReturnType<
+    typeof classifierArchitectureOptionsSelector
+  > = yield select(classifierArchitectureOptionsSelector);
+
+  const preprocessOptions: ReturnType<
+    typeof classifierPreprocessOptionsSelector
+  > = yield select(classifierPreprocessOptionsSelector);
+
+  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
+    yield select(classifierFitOptionsSelector);
+
+  const {
+    labels: validationLabels,
+    disposeLabels: disposeValidationLabels,
+  }: ReturnType<typeof createClassificationLabels> = createClassificationLabels(
+    validationImages,
+    categories
+  );
+
+  const validationData: ReturnType<typeof preprocessClassifier> =
+    preprocessClassifier(
+      validationImages,
+      validationLabels,
+      architectureOptions.inputShape,
+      preprocessOptions,
+      fitOptions
+    );
 
   if (validationData === undefined) {
     yield handleError(
@@ -104,6 +133,8 @@ function* runEvaluation(
     yield handleError(error as Error, "Error computing the evaluation results");
     return;
   }
+
+  disposeValidationLabels();
 
   yield put(
     classifierSlice.actions.updateEvaluationResult({
