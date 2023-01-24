@@ -10,6 +10,7 @@ import {
   ShadowImageType,
   Point,
 } from "types";
+import { DataArray } from "image/utils/imageHelper";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -192,7 +193,7 @@ export const getAnnotationsInBox = (
  *          when creating an image from mask, the original width/height should be scaled by the same scale factor
  */
 export const colorOverlayROI = (
-  maskData: Uint8Array,
+  maskData: DataArray,
   boundingBox: [number, number, number, number],
   imageWidth: number,
   imageHeight: number,

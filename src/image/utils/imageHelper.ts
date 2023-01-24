@@ -42,9 +42,11 @@ const MIMETYPES = [
   "image/dicom",
 ] as const;
 
-export type MIMEType = typeof MIMETYPES[number];
+export type MIMEType = (typeof MIMETYPES)[number];
 
 export type BitDepth = ImageJS.BitDepth;
+
+export type DataArray = ImageJS.DataArray;
 
 export interface ImageShapeInfo {
   shape: ImageShapeEnum;
@@ -594,18 +596,7 @@ const getImageTensorData = async (
     throw Error("Tensor data should be stored as Float32Array");
   }
 
-  switch (bitDepth) {
-    case 1:
-      throw Error("Binary bit depth not (yet) supported");
-    case 8:
-      return Uint8Array.from(imageData);
-    case 16:
-      return Uint16Array.from(imageData);
-    case 32:
-      return imageData; // already Float32
-    default:
-      throw Error("Unrecognized bit depth");
-  }
+  return imageData as Float32Array;
 };
 
 /*
@@ -1049,4 +1040,22 @@ export const extractMinMax = (ranges: {
   }
 
   return { mins, maxs };
+};
+
+export const convertToDataArray = (
+  depth: number,
+  source: DataArray | Array<number>
+): DataArray => {
+  switch (depth) {
+    case 1:
+      throw Error("Binary bit depth not (yet) supported");
+    case 8:
+      return Uint8Array.from(source);
+    case 16:
+      return Uint16Array.from(source);
+    case 32:
+      return Float32Array.from(source);
+    default:
+      throw Error("Unrecognized bit depth");
+  }
 };

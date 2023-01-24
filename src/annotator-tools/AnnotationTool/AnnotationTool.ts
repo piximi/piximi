@@ -11,6 +11,8 @@ import {
   Point,
 } from "types";
 
+import { DataArray, convertToDataArray } from "image/utils/imageHelper";
+
 import { scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/common/imageHelper";
 
@@ -36,7 +38,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Raw msk data
    */
-  protected _maskData?: Uint8Array;
+  protected _maskData?: DataArray;
   /**
    * State of the annotation: Blank (not yet annotating), Annotating or Annotated
    */
@@ -103,11 +105,11 @@ export abstract class AnnotationTool extends Tool {
     this._mask = updatedMask;
   }
 
-  get maskData(): Uint8Array | undefined {
+  get maskData(): DataArray | undefined {
     return this._maskData;
   }
 
-  set maskData(updatedMask: Uint8Array | undefined) {
+  set maskData(updatedMask: DataArray | undefined) {
     this._maskData = updatedMask;
   }
 
@@ -235,11 +237,11 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the combined annotation areas
    */
   add(
-    newEncodedMaskData: Uint8Array,
+    newEncodedMaskData: DataArray,
     newBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._maskData || !this._boundingBox)
-      return [Uint8Array.from([]), [0, 0, 0, 0]];
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
     const newMaskData = newEncodedMaskData;
     const existingMaskData = this._maskData;
@@ -292,7 +294,10 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    return [Uint8Array.from(combinedMaskData), combinedBoundingBox];
+    return [
+      convertToDataArray(8, combinedMaskData) as Uint8Array,
+      combinedBoundingBox,
+    ];
   }
 
   /**
@@ -302,11 +307,11 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the intersected annotation areas.
    */
   intersect(
-    decodedMask1: Uint8Array,
+    decodedMask1: DataArray,
     boundingBox1: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._maskData || !this._boundingBox)
-      return [Uint8Array.from([]), [0, 0, 0, 0]];
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
     const maskData1 = decodedMask1;
     const maskData2 = this._maskData;
@@ -327,7 +332,7 @@ export abstract class AnnotationTool extends Tool {
 
     // Check if bounding box is valid: width and height of the intersection must be positive.
     if (intersectionBoundingBoxWidth < 0 || intersectionBoundingBoxHeight < 0) {
-      return [Uint8Array.from([]), [0, 0, 0, 0]];
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
     }
 
     const newMaskData = [];
@@ -362,9 +367,13 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    if (!newMaskData.length) return [Uint8Array.from([]), [0, 0, 0, 0]];
+    if (!newMaskData.length)
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
-    return [Uint8Array.from(newMaskData), intersectionBoundingBox];
+    return [
+      convertToDataArray(8, newMaskData) as Uint8Array,
+      intersectionBoundingBox,
+    ];
   }
 
   /**
@@ -374,7 +383,7 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the inverted annotation area
    */
   invert(
-    selectedMask: Uint8Array,
+    selectedMask: DataArray,
     selectedBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
     const mask = selectedMask;
@@ -431,7 +440,10 @@ export abstract class AnnotationTool extends Tool {
       height: invertedBoundingBox[3] - invertedBoundingBox[1],
     });
 
-    return [Uint8Array.from(croppedInvertedMask.data), invertedBoundingBox];
+    return [
+      convertToDataArray(8, croppedInvertedMask.data) as Uint8Array,
+      invertedBoundingBox,
+    ];
   }
 
   /**
@@ -442,11 +454,11 @@ export abstract class AnnotationTool extends Tool {
    * @returns Bounding box and mask of the difference of the annotation areas.
    */
   subtract(
-    encodedMinuendData: Uint8Array,
+    encodedMinuendData: DataArray,
     minuendBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
     if (!this._maskData || !this._boundingBox)
-      return [Uint8Array.from([]), [0, 0, 0, 0]];
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
     // decode the selected annotation data
     const minuendData = encodedMinuendData;
@@ -489,7 +501,7 @@ export abstract class AnnotationTool extends Tool {
 
     // Check if bounding box is valid: width and height of the intersection must be positive.
     if (resultingBoundingBoxWidth < 0 || resultingBoundingBoxHeight < 0) {
-      return [Uint8Array.from([]), [0, 0, 0, 0]];
+      return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
     }
 
     const resultingMaskData: number[] = [];
@@ -525,6 +537,9 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    return [Uint8Array.from(resultingMaskData), resultingBoundingBox];
+    return [
+      convertToDataArray(8, resultingMaskData) as Uint8Array,
+      resultingBoundingBox,
+    ];
   }
 }
