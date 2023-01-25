@@ -17,6 +17,8 @@ type CollapsibleListProps = {
   primary: string;
   closed?: boolean;
   backgroundColor?: string;
+  disablePadding?: boolean;
+  paddingLeft?: boolean;
 };
 
 export const CollapsibleList = ({
@@ -25,6 +27,8 @@ export const CollapsibleList = ({
   closed,
   backgroundColor,
   primary,
+  disablePadding,
+  paddingLeft,
 }: CollapsibleListProps) => {
   const [collapsed, setCollapsed] = React.useState(closed);
 
@@ -45,8 +49,17 @@ export const CollapsibleList = ({
         <ListItemText primary={primary} />
       </ListItem>
 
-      <Collapse in={collapsed} timeout="auto" unmountOnExit>
-        <List component="div" dense={dense} disablePadding>
+      <Collapse
+        in={collapsed}
+        timeout="auto"
+        unmountOnExit
+        sx={{ paddingLeft: paddingLeft ? "2rem" : "auto" }}
+      >
+        <List
+          component="div"
+          dense={dense}
+          disablePadding={disablePadding === false ? disablePadding : false}
+        >
           {children}
         </List>
       </Collapse>
