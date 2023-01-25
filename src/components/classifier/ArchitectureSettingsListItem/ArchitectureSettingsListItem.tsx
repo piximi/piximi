@@ -1,27 +1,9 @@
-import { useState } from "react";
-
-import {
-  Collapse,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  styled,
-} from "@mui/material";
-import {
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
+import { styled } from "@mui/material";
 
 import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
+import { CollapsibleList } from "components/common/CollapsibleList";
 
 export const ArchitectureSettingsListItem = () => {
-  const [collapsedClassifierSettingsList, setCollapsedClassifierSettingsList] =
-    useState<boolean>(false);
-
-  const onClasssifierSettingsListClick = () => {
-    setCollapsedClassifierSettingsList(!collapsedClassifierSettingsList);
-  };
-
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -29,34 +11,15 @@ export const ArchitectureSettingsListItem = () => {
   });
 
   return (
-    <>
-      <ListItem
-        button
-        onClick={onClasssifierSettingsListClick}
-        style={{ padding: "12px 0px" }}
-      >
-        <ListItemIcon>
-          {collapsedClassifierSettingsList ? (
-            <ExpandLessIcon />
-          ) : (
-            <ExpandMoreIcon />
-          )}
-        </ListItemIcon>
-
-        <ListItemText
-          primary="Architecture Settings"
-          style={{ fontSize: "20px" }}
-        />
-      </ListItem>
-      <Collapse
-        in={collapsedClassifierSettingsList}
-        timeout="auto"
-        unmountOnExit
-      >
-        <StyledForm noValidate autoComplete="off">
-          <ArchitectureSettingsGrid />
-        </StyledForm>
-      </Collapse>
-    </>
+    <CollapsibleList
+      dense={false}
+      primary="Architecture Settings"
+      disablePadding={false}
+      paddingLeft={true}
+    >
+      <StyledForm noValidate autoComplete="off">
+        <ArchitectureSettingsGrid />
+      </StyledForm>
+    </CollapsibleList>
   );
 };
