@@ -15,23 +15,30 @@ export class QuickAnnotationTool extends AnnotationTool {
   currentMask?: ImageJS.Image;
   map?: Uint8Array | Uint8ClampedArray;
   startAnnotating = false;
+  throttleTimer: boolean = false;
 
+  // throttled to prevent repeated expensive calls while resizing
   initializeSuperpixels(regionSize: number) {
-    this.regionSize = Math.round(regionSize);
+    if (this.throttleTimer) return;
+    this.throttleTimer = true;
+    setTimeout(() => {
+      this.regionSize = Math.round(regionSize);
 
-    const superpixels = this.computeSuperpixels();
+      const superpixels = this.computeSuperpixels();
 
-    if (!superpixels.length) return;
+      if (!superpixels.length) return;
 
-    this.superpixels = superpixels;
-    this.superpixelsMap = {};
+      this.superpixels = superpixels;
+      this.superpixelsMap = {};
 
-    superpixels.forEach((pixel: number, index: number) => {
-      if (!(pixel in this.superpixelsMap!)) {
-        this.superpixelsMap![pixel] = [];
-      }
-      this.superpixelsMap![pixel].push(index);
-    });
+      superpixels.forEach((pixel: number, index: number) => {
+        if (!(pixel in this.superpixelsMap!)) {
+          this.superpixelsMap![pixel] = [];
+        }
+        this.superpixelsMap![pixel].push(index);
+      });
+      this.throttleTimer = false;
+    }, 500);
   }
 
   computeSuperpixels() {
@@ -80,7 +87,8 @@ export class QuickAnnotationTool extends AnnotationTool {
       !this.superpixelsMap
     )
       return;
-
+    // fixes superpixel overflow
+    position.x = position.x === 512 ? 511 : position.x;
     const pixel =
       Math.round(position.x) + Math.round(position.y) * this.image.width;
 
