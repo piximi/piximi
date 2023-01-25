@@ -18,8 +18,8 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
@@ -154,7 +154,11 @@ export const FallBackDialog = (props: any) => {
               color="inherit"
               onClick={() => setExpanded((prev) => !prev)}
             >
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              {expanded ? (
+                <KeyboardArrowDownIcon />
+              ) : (
+                <KeyboardArrowRightIcon />
+              )}
             </IconButton>
           </Tooltip>
 
