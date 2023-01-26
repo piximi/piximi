@@ -17,8 +17,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
+          lfs: "true"
+      - name: Checkout LFS objects
+        run: git lfs checkout
       - name: Install Packages
         run: yarn install
+      - name: Lint code
+        run: yarn run --silent prettier --write --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
       - name: Build page
         run: yarn build
       - name: Deploy to gh-pages
