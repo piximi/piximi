@@ -85,9 +85,9 @@
     "@tensorflow/tfjs-node": "4.0.0",
     "babel-plugin-named-exports-order": "^0.0.2",
     "canvas": "^2.9.1",
-    "husky": "^4.3.6",
+    "husky": "^8.0.0",
     "jest-canvas-mock": "^2.3.0",
-    "lint-staged": "^10.5.3",
+    "lint-staged": "^13.1.0",
     "prettier": "^2.2.1",
     "prop-types": "^15.8.1",
     "react-test-renderer": "^18.2.0",
@@ -103,7 +103,8 @@
     "start-logger": "BROWSER='none' REACT_APP_LOG_LEVEL='1' react-scripts start",
     "test": "react-scripts test --env=./src/store/classifier/coroutines/custom-test-env.js",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "prepare": "husky install"
   },
   "browserslist": {
     "production": [
@@ -140,11 +141,6 @@
         }
       }
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
