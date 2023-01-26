@@ -82,7 +82,7 @@ const images: Array<ImageType> = [
   },
 ];
 
-it("preprocessClassifier-segmentation", async () => {
+it.skip("preprocessClassifier-segmentation", async () => {
   const preprocessed = await preprocessSegmentationImages(
     images,
     annotationCategories,

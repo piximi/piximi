@@ -24,7 +24,7 @@ jobs:
       - name: Lint code
         run: yarn run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
       - name: Run Tests
-        run: yarn test
+        run: yarn test --silent
         env:
           CI: true
       - name: Build page
