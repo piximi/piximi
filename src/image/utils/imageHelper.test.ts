@@ -180,7 +180,7 @@ describe("color generation", () => {
   });
 });
 
-describe("ImageJS Images -> Stacks -> Tensors ", async () => {
+describe("ImageJS Images -> Stacks -> Tensors ", () => {
   /*
   ======================
   Test Image Definitions
@@ -201,8 +201,6 @@ describe("ImageJS Images -> Stacks -> Tensors ", async () => {
   };
 
   type TestImages = PreloadedTestImages & { [key: string]: { data: File } };
-
-  let testData: TestImages;
 
   const testDataUnloaded: PreloadedTestImages = {
     // binary images
@@ -345,28 +343,32 @@ describe("ImageJS Images -> Stacks -> Tensors ", async () => {
     // TODO: post PR #407
   };
 
-  for (const im of Object.keys(testDataUnloaded)) {
-    const imProps = testDataUnloaded[im];
+  let testData: TestImages = {};
 
-    try {
-      imProps.data = await fileFromPath(
-        imProps.filepath,
-        imProps.mimetype,
-        false
-      );
-    } catch (err) {
-      console.error(err);
+  beforeAll(async () => {
+    for (const im of Object.keys(testDataUnloaded)) {
+      const imProps = testDataUnloaded[im];
+
+      try {
+        imProps.data = await fileFromPath(
+          imProps.filepath,
+          imProps.mimetype,
+          false
+        );
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
 
-  testData = testDataUnloaded as TestImages;
+    testData = testDataUnloaded as TestImages;
+  });
 
   /*
     / Test Image Definitions
     ========================
    */
 
-  it.each(Object.keys(testData))(
+  it.each(Object.keys(testDataUnloaded))(
     "should load correct image stack and metadata - %s",
     async (im) => {
       const {
@@ -395,7 +397,7 @@ describe("ImageJS Images -> Stacks -> Tensors ", async () => {
     }
   );
 
-  it.each(Object.keys(testData))(
+  it.each(Object.keys(testDataUnloaded))(
     "should convert to tensor of correct shape and data - %s",
     async (im) => {
       const {
