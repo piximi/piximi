@@ -284,7 +284,9 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   zip: any
 ): any => {
   images.forEach((current: ShadowImageType) => {
-    current.annotations.forEach((annotation: encodedAnnotationType) => {const height = current.shape.height;const width = current.shape.width;
+    current.annotations.forEach((annotation: encodedAnnotationType) => {
+      const height = current.shape.height;
+      const width = current.shape.width;
 
       const fullLabelImage = new ImageJS.Image(
         width,
