@@ -104,12 +104,12 @@ const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
 
 const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
   categoryGroup.create_dataset(
-    "color",
-    categories.map((cat) => cat.color)
-  );
-  categoryGroup.create_dataset(
     "category_id",
     categories.map((cat) => cat.id)
+  );
+  categoryGroup.create_dataset(
+    "color",
+    categories.map((cat) => cat.color)
   );
   categoryGroup.create_dataset(
     "name",
