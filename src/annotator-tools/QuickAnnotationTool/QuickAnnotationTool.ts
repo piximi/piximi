@@ -17,11 +17,7 @@ export class QuickAnnotationTool extends AnnotationTool {
   startAnnotating = false;
   throttleTimer: boolean = false;
 
-  // throttled to prevent repeated expensive calls while resizing
-  initializeSuperpixels(regionSize: number) {
-    if (this.throttleTimer) return;
-    this.throttleTimer = true;
-
+  _initializeSuperpixelse(regionSize: number) {
     this.regionSize = Math.round(regionSize);
 
     const superpixels = this.computeSuperpixels();
@@ -37,10 +33,21 @@ export class QuickAnnotationTool extends AnnotationTool {
       }
       this.superpixelsMap![pixel].push(index);
     });
+  }
 
-    setTimeout(() => {
-      this.throttleTimer = false;
-    }, 500);
+  // throttled to prevent repeated expensive calls while resizing
+  initializeSuperpixels(regionSize: number) {
+    if (process.env.NODE_ENV !== "test") {
+      if (this.throttleTimer) return;
+      this.throttleTimer = true;
+
+      setTimeout(() => {
+        this._initializeSuperpixelse(regionSize);
+        this.throttleTimer = false;
+      }, 500);
+    } else {
+      this._initializeSuperpixelse(regionSize);
+    }
   }
 
   computeSuperpixels() {
