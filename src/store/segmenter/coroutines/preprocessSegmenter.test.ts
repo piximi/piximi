@@ -1,16 +1,21 @@
-// @ts-nocheck
 // TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
+import {
+  convertToImage,
+  loadImageFileAsStack,
+  MIMEType,
+} from "image/utils/imageHelper";
+import { fileFromPath } from "image/utils/nodeImageHelper";
 import { Category } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
-import { generateDefaultChannels } from "image/imageHelper";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
+import { encodedAnnotationType } from "types";
 
 //jest.setTimeout(50000);
 
@@ -58,18 +63,16 @@ const annotationCategories: Array<Category> = [
   },
 ];
 
-const images: Array<ImageType> = [
+const preloadedImages: Array<{
+  src: string;
+  name: string;
+  mimetype: MIMEType;
+  annotations: Array<encodedAnnotationType>;
+}> = [
   {
-    categoryId: "00000000-0000-0000-0000-000000000000",
-    colors: generateDefaultChannels(inputShape.channels),
-    id: "00000000-1111-0000-0001-00000000000",
-    name: "cell-painting.png",
-    partition: Partition.Training,
-    visible: true,
-    shape: inputShape,
-    originalSrc: [[""]],
     src: "/static/media/cell-painting.f118ef087853056f08e6.png",
-    activePlane: 0,
+    name: "cell-painting.png",
+    mimetype: "image/png",
     annotations: [
       {
         boundingBox: [86, 149, 217, 240],
@@ -82,7 +85,32 @@ const images: Array<ImageType> = [
   },
 ];
 
-it.skip("preprocessClassifier-segmentation", async () => {
+const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
+  const file = await fileFromPath(src, mimetype, false, name);
+
+  return loadImageFileAsStack(file);
+};
+
+it.skip("preprocessSegmenter", async () => {
+  const images: Array<ImageType> = [];
+
+  for (const preIm of preloadedImages) {
+    const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
+    const im = await convertToImage(
+      imStack,
+      preIm.name,
+      undefined,
+      1,
+      imStack.length
+    );
+
+    images.push({
+      ...im,
+      annotations: preIm.annotations,
+      partition: Partition.Training,
+    });
+  }
+
   const preprocessed = await preprocessSegmentationImages(
     images,
     annotationCategories,
