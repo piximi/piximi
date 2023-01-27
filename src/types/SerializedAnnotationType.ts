@@ -1,6 +1,6 @@
 import * as T from "io-ts";
-import { SerializedAnnotationType } from "./runtime";
+import { SerializedAnnotationRType } from "./runtime";
 
 export type SerializedAnnotationType = T.TypeOf<
-  typeof SerializedAnnotationType
+  typeof SerializedAnnotationRType
 >;

@@ -13,8 +13,8 @@ import { ColorAnnotationOptions } from "./ColorAnnotationOptions";
 import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
 import { ObjectAnnotationOptions } from "./ObjectAnnotationOptions";
 import { ZoomOptions } from "./ZoomOptions";
-import { HandToolOptions } from "./HandToolOptions/HandToolOptions";
-import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions/ColorAdjustmentOptions/ColorAdjustmentOptions";
+import { HandToolOptions } from "./HandToolOptions";
+import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "./PointerSelectionOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 

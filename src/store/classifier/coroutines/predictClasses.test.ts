@@ -1,8 +1,8 @@
 import {
   loadLayersModel,
   io as tfio,
-  memory as tfmemory,
-  time as tftime,
+  memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
+  time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
   profile as tfprofile,
 } from "@tensorflow/tfjs-node";
 

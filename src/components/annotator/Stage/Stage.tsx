@@ -61,7 +61,7 @@ import { Box, Typography } from "@mui/material";
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
 import { selectedCategorySelector } from "store/common";
 import { Annotations } from "./Annotations";
-import { PenAnnotationToolTip } from "./PenAnnotationToolTip/PenAnnotationToolTip";
+import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
 import { PointerSelection } from "./Selection/PointerSelection";
 
 export const Stage = () => {

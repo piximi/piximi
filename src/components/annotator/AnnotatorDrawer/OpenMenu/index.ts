@@ -1,1 +1,1 @@
-import { OpenMenu } from "./OpenMenu";
+export { OpenMenu } from "./OpenMenu";

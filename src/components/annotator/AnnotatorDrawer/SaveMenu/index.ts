@@ -1,1 +1,1 @@
-import { SaveMenu } from "./SaveMenu";
+export { SaveMenu } from "./SaveMenu";

@@ -61,9 +61,11 @@ describe("color generation", () => {
   ], [2, 3, 2, 7], "float32");
 
   test("1 channel - greyscale", async () => {
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [Z, H, W, C] = dummyTensor.shape;
 
     const inputTensor = tidy("getImageSlice", () => {
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [grey, rest] = dummyTensor
         .slice([0], [1, H, W, C])
         // cast to 3D tensor
@@ -95,9 +97,11 @@ describe("color generation", () => {
   });
 
   test("3 channel - rgb", async () => {
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [Z, H, W, C] = dummyTensor.shape;
 
     const inputTensor = tidy("getImageSlice", () => {
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [rgb, rest] = dummyTensor
         .slice([0], [1, H, W, C])
         // cast to 3D tensor
@@ -133,6 +137,7 @@ describe("color generation", () => {
   });
 
   test("shold have all colors for all channels, and first visible", async () => {
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [Z, H, W, C] = dummyTensor.shape;
 
     const inputTensor = tidy("getImageSlice", () => {
@@ -180,7 +185,7 @@ describe("color generation", () => {
   });
 });
 
-describe("ImageJS Images -> Stacks -> Tensors ", () => {
+describe("ImageJS Images -> Stacks -> Tensors", () => {
   /*
   ======================
   Test Image Definitions
@@ -634,6 +639,7 @@ describe("Tensor -> Composite Image", () => {
     const expectedVisibleChannels = [0, 1, 2, 3];
 
     // prettier-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const inputTensorArray = 
     [
       [[[1111, 1112, 1113, 1114], [1121, 1122, 1123, 1124]],
@@ -989,6 +995,7 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURL = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1075,6 +1082,7 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageTensor, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURLs = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1166,6 +1174,7 @@ describe("Tensor -> Composite Image", () => {
     const filteredSlice = sliceVisibleChannels(imageSlice, visibleChannels);
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    //eslint-disable-next-line testing-library/render-result-naming-convention
     const renderedURL = await renderTensor(compositeImage, BITDEPTH, {
       useCanvas,
     });
@@ -1196,6 +1205,7 @@ describe("Tensor -> Composite Image", () => {
     );
     const filteredColors = sliceVisibleColors(colors, visibleChannels);
     const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars, testing-library/render-result-naming-convention
     const renderedURL = await renderTensor(compositeImage, BITDEPTH);
 
     // intermediary tensors should be disposed

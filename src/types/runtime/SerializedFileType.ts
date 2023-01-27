@@ -2,14 +2,14 @@ import * as T from "io-ts";
 import { getOrElseW } from "fp-ts/Either";
 import { failure } from "io-ts/PathReporter";
 
-const SerializedCategoryType = T.type({
+const SerializedCategoryRType = T.type({
   id: T.string,
   color: T.string, // 3 byte hex, eg "#a08cd2"
   name: T.string,
   visible: T.boolean,
 });
 
-export const SerializedAnnotationType = T.type({
+export const SerializedAnnotationRType = T.type({
   categoryId: T.string, // category id, matching id of a SerializedCategory
   id: T.string,
   mask: T.string, // e.g. "114 1 66 1 66 2 ..."
@@ -17,9 +17,9 @@ export const SerializedAnnotationType = T.type({
   boundingBox: T.array(T.number), // [x1, y1, width, height]
 });
 
-export const SerializedFileType = T.type({
-  categories: T.array(SerializedCategoryType),
-  annotations: T.array(SerializedAnnotationType),
+export const SerializedFileRType = T.type({
+  categories: T.array(SerializedCategoryRType),
+  annotations: T.array(SerializedAnnotationRType),
 });
 
 const toError = (errors: any) => {
@@ -28,5 +28,5 @@ const toError = (errors: any) => {
 
 export const validateFileType = (encodedFileContents: string) => {
   const annotations = JSON.parse(encodedFileContents);
-  return getOrElseW(toError)(SerializedFileType.decode(annotations));
+  return getOrElseW(toError)(SerializedFileRType.decode(annotations));
 };

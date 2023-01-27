@@ -1,4 +1,4 @@
 import * as T from "io-ts";
-import { SerializedFileType } from "./runtime";
+import { SerializedFileRType } from "./runtime";
 
-export type SerializedFileType = T.TypeOf<typeof SerializedFileType>;
+export type SerializedFileType = T.TypeOf<typeof SerializedFileRType>;
