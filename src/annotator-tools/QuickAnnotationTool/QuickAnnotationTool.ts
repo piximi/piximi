@@ -21,22 +21,24 @@ export class QuickAnnotationTool extends AnnotationTool {
   initializeSuperpixels(regionSize: number) {
     if (this.throttleTimer) return;
     this.throttleTimer = true;
+
+    this.regionSize = Math.round(regionSize);
+
+    const superpixels = this.computeSuperpixels();
+
+    if (!superpixels.length) return;
+
+    this.superpixels = superpixels;
+    this.superpixelsMap = {};
+
+    superpixels.forEach((pixel: number, index: number) => {
+      if (!(pixel in this.superpixelsMap!)) {
+        this.superpixelsMap![pixel] = [];
+      }
+      this.superpixelsMap![pixel].push(index);
+    });
+
     setTimeout(() => {
-      this.regionSize = Math.round(regionSize);
-
-      const superpixels = this.computeSuperpixels();
-
-      if (!superpixels.length) return;
-
-      this.superpixels = superpixels;
-      this.superpixelsMap = {};
-
-      superpixels.forEach((pixel: number, index: number) => {
-        if (!(pixel in this.superpixelsMap!)) {
-          this.superpixelsMap![pixel] = [];
-        }
-        this.superpixelsMap![pixel].push(index);
-      });
       this.throttleTimer = false;
     }, 500);
   }
