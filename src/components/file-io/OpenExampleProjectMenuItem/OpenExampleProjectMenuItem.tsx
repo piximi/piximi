@@ -58,29 +58,42 @@ export const OpenExampleProjectMenuItem = ({
     var exampleProjectFilePath: string;
     switch (exampleProject.exampleProjectEnum) {
       case ExampleProject.Mnist:
-        exampleProjectFilePath = (
-          await import("data/exampleProjects/mnistExampleProject.h5")
-        ).default;
+        exampleProjectFilePath =
+          process.env.NODE_ENV === "production"
+            ? "https://media.githubusercontent.com/media/piximi/piximi/gh-pages/static/media/mnistExampleProject.0120cf6d8ee9ac7102f4.h5?raw=true"
+            : (await import("data/exampleProjects/mnistExampleProject.h5"))
+                .default;
         break;
       case ExampleProject.CElegans:
-        exampleProjectFilePath = (
-          await import("data/exampleProjects/cElegansExampleProject.h5")
-        ).default;
+        exampleProjectFilePath =
+          process.env.NODE_ENV === "production"
+            ? "https://media.githubusercontent.com/media/piximi/piximi/gh-pages/static/media/cElegansExampleProject.7b80dd8ee50fd65ad9e0.h5?raw=true"
+            : (await import("data/exampleProjects/cElegansExampleProject.h5"))
+                .default;
         break;
       case ExampleProject.HumanU2OSCells:
-        exampleProjectFilePath = (
-          await import("data/exampleProjects/HumanU2OSCellsExampleProject.h5")
-        ).default;
+        exampleProjectFilePath =
+          process.env.NODE_ENV === "production"
+            ? "https://media.githubusercontent.com/media/piximi/piximi/gh-pages/static/media/HumanU2OSCellsExampleProject.aaae954392d637df7e52.h5?raw=true"
+            : (
+                await import(
+                  "data/exampleProjects/HumanU2OSCellsExampleProject.h5"
+                )
+              ).default;
         break;
       case ExampleProject.BBBC013:
-        exampleProjectFilePath = (
-          await import("data/exampleProjects/BBBC013ExampleProject.h5")
-        ).default;
+        exampleProjectFilePath =
+          process.env.NODE_ENV === "production"
+            ? "https://media.githubusercontent.com/media/piximi/piximi/gh-pages/static/media/BBBC013ExampleProject.70e1cd31613d8e7ce6a4.h5?raw=true"
+            : (await import("data/exampleProjects/BBBC013ExampleProject.h5"))
+                .default;
         break;
       case ExampleProject.PLP1:
-        exampleProjectFilePath = (
-          await import("data/exampleProjects/PLP1ExampleProject.h5")
-        ).default;
+        exampleProjectFilePath =
+          process.env.NODE_ENV === "production"
+            ? "https://media.githubusercontent.com/media/piximi/piximi/gh-pages/static/media/PLP1ExampleProject.62a63e8e2c6b8be20f0e.h5?raw=true"
+            : (await import("data/exampleProjects/PLP1ExampleProject.h5"))
+                .default;
         break;
       default:
         return;
