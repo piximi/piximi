@@ -15,7 +15,11 @@ import {
   CropSchema,
 } from "types";
 
-import { loadImageFileAsStack, convertToImage } from "image/utils/imageHelper";
+import {
+  loadImageFileAsStack,
+  convertToImage,
+  MIMEType,
+} from "image/utils/imageHelper";
 import { fileFromPath } from "image/utils/nodeImageHelper";
 
 jest.setTimeout(50000);
@@ -64,12 +68,20 @@ const categories: Array<Category> = [
   },
 ];
 
-const preloadedImages = [
-  { src: "https://picsum.photos/seed/piximi/224", name: "224.jpg" },
+const preloadedImages: Array<{
+  src: string;
+  name: string;
+  mimetype: MIMEType;
+}> = [
+  {
+    src: "https://picsum.photos/seed/piximi/224",
+    name: "224.jpg",
+    mimetype: "image/jpeg",
+  },
 ];
 
-const urlToStack = async (src: string, name: string) => {
-  const file = await fileFromPath(src, "image/png", true, "224.jpg");
+const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
+  const file = await fileFromPath(src, mimetype, true, name);
 
   return loadImageFileAsStack(file);
 };
@@ -78,7 +90,7 @@ it("preprocessClassifier", async () => {
   const images: Array<ImageType> = [];
 
   for (const preIm of preloadedImages) {
-    const imStack = await urlToStack(preIm.src, preIm.name);
+    const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
     const im = await convertToImage(
       imStack,
       preIm.name,
