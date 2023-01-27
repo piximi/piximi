@@ -1,0 +1,1 @@
+export { useImageOrigin } from "./useImageOrigin";
