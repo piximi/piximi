@@ -2,3 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn run --silent prettier --cache --write "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+
+yarn run eslint --max-warnings 0 "src/**/*.{js,jsx,ts,tsx}"

@@ -1,5 +1,5 @@
 export {
-  SerializedFileType,
-  SerializedAnnotationType,
+  SerializedFileRType,
+  SerializedAnnotationRType,
   validateFileType,
 } from "./SerializedFileType";

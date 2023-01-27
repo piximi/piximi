@@ -4,7 +4,7 @@ import SaveIcon from "@mui/icons-material/Save";
 
 import { useMenu, useTranslation } from "hooks";
 
-import { SaveMenu } from "../SaveMenu/SaveMenu";
+import { SaveMenu } from "../SaveMenu";
 
 export const SaveListItem = () => {
   const t = useTranslation();

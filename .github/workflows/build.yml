@@ -22,7 +22,7 @@ jobs:
       - name: Install Packages
         run: yarn install
       - name: Lint code
-        run: yarn run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+        run: yarn run --silent prettier --check --loglevel log "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}" && yarn run eslint "src/**/*.{js,jsx,ts,tsx}"
       - name: Run Tests
         run: yarn test --silent
         env:

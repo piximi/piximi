@@ -1,11 +1,4 @@
-import {
-  History,
-  LayersModel,
-  Tensor,
-  Tensor2D,
-  Tensor4D,
-} from "@tensorflow/tfjs";
-import { Dataset } from "@tensorflow/tfjs-data";
+import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";

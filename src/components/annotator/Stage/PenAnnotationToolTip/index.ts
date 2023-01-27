@@ -1,1 +1,1 @@
-import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
+export { PenAnnotationToolTip } from "./PenAnnotationToolTip";

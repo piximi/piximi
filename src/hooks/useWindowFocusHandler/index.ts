@@ -1,1 +1,1 @@
-import { useWindowFocusHandler } from "./useWindowFocusHandler";
+export { useWindowFocusHandler } from "./useWindowFocusHandler";
