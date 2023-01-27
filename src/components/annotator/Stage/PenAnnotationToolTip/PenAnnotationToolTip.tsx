@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
-import { generateDefaultColors } from "image/utils/imageHelper";
 
 import {
   penSelectionBrushSizeSelector,
