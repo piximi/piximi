@@ -4,7 +4,7 @@ on:
     types: [opened, synchronize]
   workflow_dispatch:
 jobs:
-  build_job:
+  test_job:
     runs-on: ubuntu-latest
     strategy:
       matrix:
