@@ -78,6 +78,6 @@ export const useDefaultImage = (location: DispatchLocation) => {
       activeAnnotatorImageId === undefined &&
       dispatchToImageViewer(location, dispatch);
 
-    dispatch(applicationSlice.actions.setInit());
+    dispatch(applicationSlice.actions.initialized());
   }, [dispatch, location, numProjectImages, activeAnnotatorImageId, init]);
 };

@@ -19,7 +19,7 @@ export const applicationSlice = createSlice({
   name: "settings",
   initialState: initialState,
   reducers: {
-    setInit(state: Settings) {
+    initialized(state: Settings) {
       state.init = true;
     },
     clearSelectedImages(state: Settings) {
