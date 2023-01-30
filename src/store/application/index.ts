@@ -8,6 +8,7 @@ export {
 
 // Selectors
 
+export { initSelector } from "./selectors/initSelector";
 export { alertStateSelector } from "./selectors/alertStateSelector";
 export { hotkeyViewSelector } from "./selectors/hotkeyViewSelector";
 export { imageSelectionColorSelector } from "./selectors/imageSelectionColorSelector";
