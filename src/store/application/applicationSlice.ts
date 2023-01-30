@@ -5,6 +5,7 @@ import { AlertStateType, defaultAlert } from "types/AlertStateType";
 import { ImageShapeInfo } from "image/utils/imageHelper";
 
 const initialState: Settings = {
+  init: false,
   selectedImages: [],
   tileSize: 1,
   themeMode: ThemeMode.Light,
@@ -18,6 +19,9 @@ export const applicationSlice = createSlice({
   name: "settings",
   initialState: initialState,
   reducers: {
+    setInit(state: Settings) {
+      state.init = true;
+    },
     clearSelectedImages(state: Settings) {
       state.selectedImages = [];
     },

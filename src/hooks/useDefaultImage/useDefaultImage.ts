@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+import { applicationSlice, initSelector } from "store/application";
 import { projectSlice, imagesCountSelector } from "store/project";
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { loadExampleImage } from "image/utils/loadExampleImage";
@@ -63,15 +64,20 @@ const dispatchToImageViewer = async (
 export const useDefaultImage = (location: DispatchLocation) => {
   const dispatch = useDispatch();
 
+  const init = useSelector(initSelector);
   const numProjectImages = useSelector(imagesCountSelector);
   const activeAnnotatorImageId = useSelector(activeImageIdSelector);
 
   useEffect(() => {
+    if (init) return;
+
     location === DispatchLocation.Project &&
       numProjectImages === 0 &&
       dispatchToProject(location, dispatch);
     location === DispatchLocation.ImageViewer &&
       activeAnnotatorImageId === undefined &&
       dispatchToImageViewer(location, dispatch);
-  }, [dispatch, location, numProjectImages, activeAnnotatorImageId]);
+
+    dispatch(applicationSlice.actions.setInit());
+  }, [dispatch, location, numProjectImages, activeAnnotatorImageId, init]);
 };
