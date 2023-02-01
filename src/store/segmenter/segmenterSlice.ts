@@ -2,7 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LossFunction } from "types/LossFunction";
 import { Metric } from "types/Metric";
 import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
-import { History, LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
+import {
+  History,
+  LayersModel,
+  Tensor,
+  data,
+  Rank,
+  GraphModel,
+} from "@tensorflow/tfjs";
 import { Shape } from "types/Shape";
 import { availableSegmenterModels, SegmenterModelProps } from "types/ModelType";
 import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
@@ -131,7 +138,7 @@ export const segmenterSlice = createSlice({
       action: PayloadAction<{
         inputShape: Shape;
         modelSelection: SegmenterModelProps;
-        model: LayersModel;
+        model: LayersModel | GraphModel;
       }>
     ) {
       state.inputShape = action.payload.inputShape;

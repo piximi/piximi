@@ -11,14 +11,23 @@ type ModelProps = {
   requiredChannels?: number;
   modelType: ModelType;
 };
+export interface DefaultModelProps extends ModelProps {}
 
 export interface UserUploadedModelProps extends ModelProps {
   src: string;
 }
 
-export interface DefaultModelProps extends ModelProps {}
-
 export type ClassifierModelProps = UserUploadedModelProps | DefaultModelProps;
+
+// export type SegmenterModelProps = UserUploadedModelProps | DefaultModelProps;
+
+export type SegmenterModelProps = {
+  modelName: string;
+  requiredChannels?: number;
+  modelType: ModelType;
+  src?: string;
+  modelArch?: string
+};
 
 export const availableClassifierModels: ClassifierModelProps[] = [
   {
@@ -32,7 +41,7 @@ export const availableClassifierModels: ClassifierModelProps[] = [
   },
 ];
 
-export type SegmenterModelProps = UserUploadedModelProps | DefaultModelProps;
+
 
 export const availableSegmenterModels: SegmenterModelProps[] = [
   {

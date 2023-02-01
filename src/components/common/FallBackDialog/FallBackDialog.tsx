@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 // import { useLocation } from "react-router-dom";
 import StackTrace from "stacktrace-js";
+import { LayersModel } from "@tensorflow/tfjs";
 
 import {
   AppBar,
@@ -256,7 +257,7 @@ export const FallBackDialog = (props: any) => {
         />
 
         <SaveFittedModelDialog
-          fittedModel={fittedSegmenterModel}
+          fittedModel={fittedSegmenterModel as LayersModel}
           modelProps={selectedSegmenterModelProps}
           modelTypeString={"Segmenter"}
           onClose={onSaveSegmenterDialogClose}

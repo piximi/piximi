@@ -1,10 +1,10 @@
-import { LayersModel } from "@tensorflow/tfjs";
+import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 import { SegmenterStoreType } from "types";
 
 export const segmenterFittedModelSelector = ({
   segmenter,
 }: {
   segmenter: SegmenterStoreType;
-}): LayersModel | undefined => {
+}): LayersModel | GraphModel | undefined => {
   return segmenter.fitted;
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { LayersModel } from "@tensorflow/tfjs";
+import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 
 import { Divider, Menu, MenuItem, MenuList } from "@mui/material";
 
@@ -56,11 +56,13 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
       })
     );
   };
+  
 
   const importSegmentationModel = (
     inputShape: Shape,
     modelName: string,
-    classifierModel: any
+    segmentationModel: any,
+    modelArch: string
   ) => {
     dispatch(
       segmenterSlice.actions.uploadUserSelectedModel({
@@ -68,8 +70,9 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         modelSelection: {
           modelName: modelName + " - uploaded",
           modelType: ModelType.UserUploaded,
+          modelArch:modelArch
         },
-        model: classifierModel as LayersModel,
+        model: segmentationModel as GraphModel,
       })
     );
   };
@@ -108,7 +111,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
       <ImportTensorflowModelDialog
         onClose={onMenuDialogClose(onCloseImportClassifierDialog)}
         open={openImportClassifierDialog}
-        modelType={"Classifier"}
+        modelType={"Classification"}
         dispatchFunction={importClassifierModel}
       />
 

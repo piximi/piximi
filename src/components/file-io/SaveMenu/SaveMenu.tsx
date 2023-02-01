@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-
+import { LayersModel } from "@tensorflow/tfjs";
 import { Menu, MenuItem } from "@mui/material";
 
 import { useDialog } from "hooks";
@@ -82,7 +82,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
       />
 
       <SaveFittedModelDialog
-        fittedModel={fittedSegmenter}
+        fittedModel={fittedSegmenter as LayersModel}
         modelProps={selectedSegmenterModelProps}
         modelTypeString={"Segmenter"}
         onClose={onMenuDialogClose(onSaveSegmenterDialogClose)}

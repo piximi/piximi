@@ -1,4 +1,11 @@
-import { History, LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
+import {
+  History,
+  LayersModel,
+  Tensor,
+  data,
+  Rank,
+  GraphModel,
+} from "@tensorflow/tfjs";
 import { FitOptions } from "./FitOptions";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
@@ -18,8 +25,8 @@ export type SegmenterStoreType = {
   trainingHistory?: History;
   predicted: boolean;
   evaluationResult: SegmenterEvaluationResultType;
-  compiled?: LayersModel;
-  fitted?: LayersModel;
+  compiled?: LayersModel | GraphModel;
+  fitted?: LayersModel | GraphModel;
   selectedModel: SegmenterModelProps;
   userUploadedModel?: SegmenterModelProps;
   trainDataSet?: data.Dataset<{

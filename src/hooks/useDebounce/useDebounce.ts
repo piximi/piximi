@@ -1,30 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
-export function useDebounce(
-  value: { x: number; y: number } | null,
+type PassedFunc = (...args:any[]) => void;
+type Timer = ReturnType<typeof setTimeout>
+
+export function useDebounce<Func extends PassedFunc>(
+  func:Func,
   delay: number
 ) {
   // State and setters for debounced value
-  const [debouncedValue, setDebouncedValue] = useState(value);
+ const timer = useRef<Timer>()
 
-  useEffect(
-    () => {
-      // Update debounced value after delay
-      const handler = setTimeout(() => {
-        if (value) {
-          setDebouncedValue(value);
-        }
-      }, delay);
+ useEffect(() => {
+   return () => {
+     if (!timer.current) return;
+     clearTimeout(timer.current);
+   };
+ }, []);
 
-      // Cancel the timeout if value changes (also on delay change or unmount)
-      // This is how we prevent debounced value from updating if value is changed ...
-      // .. within the delay period. Timeout gets cleared and restarted.
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    [value, delay] // Only re-call effect if value or delay changes
-  );
+ const debouncedFunction = ((...args) => {
+  const newTimer = setTimeout(()=>{
+    func(...args);
+  }, delay);
+  clearTimeout(timer.current);
+  timer.current = newTimer;
+ }) as Func
 
-  return debouncedValue;
+ 
+
+  return debouncedFunction;
 }
