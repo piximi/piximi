@@ -51,7 +51,7 @@ export function* evaluateSegmenterSaga({
       })
     );
   } else {
-    yield runSegmentationEvaluation(validationImages, model, categories);
+    // yield runSegmentationEvaluation(validationImages, model, categories);
   }
 
   yield put(

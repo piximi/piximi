@@ -30,6 +30,7 @@ import {
   LossFunction,
   OptimizationAlgorithm,
 } from "types";
+import { LayersModel } from "@tensorflow/tfjs";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -41,7 +42,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-
+  const [isModelPretrained, setIsModelPretrained] = useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
@@ -129,13 +130,13 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   useEffect(() => {
     if (annotatedImages.length === 0) {
       setNoLabeledImages(true);
-      if (!noLabeledImages) {
+      if (!noLabeledImages && !isModelPretrained) {
         setShowWarning(true);
       }
     } else {
       setNoLabeledImages(false);
     }
-  }, [annotatedImages, noLabeledImages]);
+  }, [annotatedImages, noLabeledImages, isModelPretrained]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
@@ -205,12 +206,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <FitSegmenterDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noLabeledImages}
+        disableFitting={noLabeledImages && !isModelPretrained}
         epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noLabeledImages && (
+      {showWarning && noLabeledImages && !isModelPretrained && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
@@ -262,11 +263,11 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
           </div>
         )}
 
-        {compiledModel && (
+        {/* {compiledModel  && (
           <div>
             <ModelSummaryTable compiledModel={compiledModel} />
           </div>
-        )}
+        )} */}
       </DialogContent>
     </Dialog>
   );

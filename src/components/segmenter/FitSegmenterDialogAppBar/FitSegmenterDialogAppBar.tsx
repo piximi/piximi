@@ -44,9 +44,9 @@ export const FitSegmenterDialogAppBar = ({
   const training = useSelector(segmenterTrainingFlagSelector);
 
   const onStopFitting = () => {
-    if (!compiled) return;
-    compiled.stopTraining = true;
-    dispatch(segmenterSlice.actions.updateCompiled({ compiled: compiled }));
+    // if (!compiled || !compiled.hasOwnProperty("stopTraining")) return;
+    // compiled.stopTraining = true;
+    // dispatch(segmenterSlice.actions.updateCompiled({ compiled: compiled }));
   };
 
   return (
