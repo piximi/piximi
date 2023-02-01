@@ -11,6 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import {
   Close as CloseIcon,
@@ -21,8 +22,6 @@ import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
-
-import { usePreferredMuiTheme } from "hooks";
 
 import { applicationSlice } from "store/application";
 
@@ -40,7 +39,7 @@ export const AlertDialog = ({
   setShowAlertDialog = undefined,
 }: AlertDialogProps) => {
   const dispatch = useDispatch();
-  const theme = usePreferredMuiTheme();
+  const theme = useTheme();
 
   const [expanded, setExpanded] = React.useState(false);
   const [showCreateGitHubIssue, setShowCreateGitHubIssue] =
