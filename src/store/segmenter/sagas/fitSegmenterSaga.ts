@@ -1,4 +1,4 @@
-import { LayersModel } from "@tensorflow/tfjs";
+import { LayersModel, Tensor1D, Tensor4D, data } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import shuffle from "lodash/shuffle";
 import { select, put } from "redux-saga/effects";
@@ -131,22 +131,32 @@ export function* fitSegmenterSaga({
 
   try {
     const trainData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =
-      yield preprocessSegmentationImages(
+      (yield preprocessSegmentationImages(
         trainImages,
         categories,
         architectureOptions.inputShape,
         preprocessingOptions,
-        fitOptions
-      );
+        fitOptions,
+        "training"
+      )) as data.Dataset<{
+        xs: Tensor4D;
+        ys: Tensor4D;
+        id: Tensor1D;
+      }>;
 
     const valData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =
-      yield preprocessSegmentationImages(
+      (yield preprocessSegmentationImages(
         valImages,
         categories,
         architectureOptions.inputShape,
         preprocessingOptions,
-        fitOptions
-      );
+        fitOptions,
+        "validation"
+      )) as data.Dataset<{
+        xs: Tensor4D;
+        ys: Tensor4D;
+        id: Tensor1D;
+      }>;
 
     var dataset = { train: trainData, val: valData };
   } catch (error) {
@@ -156,7 +166,9 @@ export function* fitSegmenterSaga({
   }
 
   yield put(
-    segmenterSlice.actions.updatePreprocessedSegmentationData({ data: dataset })
+    segmenterSlice.actions.updatePreprocessedSegmentationData({
+      data: dataset,
+    })
   );
 
   try {

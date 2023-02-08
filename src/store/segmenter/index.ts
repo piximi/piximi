@@ -35,6 +35,7 @@ export { createSegmentationModel } from "./coroutines/createSegmentationModel";
 export { evaluateSegmenter } from "./coroutines/evaluateSegmenter";
 export { fitSegmenter } from "./coroutines/fitSegmenter";
 export { predictSegmentations } from "./coroutines/predictSegmentations";
+export { predictSegmentationsFromGraph } from "./coroutines/predictSegmentationsFromGraph";
 export {
   decodeFromImgSrc,
   decodeFromOriginalSrc,

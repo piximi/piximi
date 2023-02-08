@@ -255,13 +255,19 @@ export const preprocessSegmentationImages = async (
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
-  fitOptions: FitOptions
+  fitOptions: FitOptions,
+  operation?: "training" | "validation" | "inference"
 ): Promise<
-  tfdata.Dataset<{
-    xs: Tensor4D;
-    ys: Tensor4D;
-    id: Tensor1D;
-  }>
+  | tfdata.Dataset<{
+      xs: Tensor4D;
+      ys: Tensor4D;
+      id: Tensor1D;
+    }>
+  | tfdata.Dataset<{
+      xs: Tensor3D;
+      ys: Tensor3D;
+      id: string;
+    }>
 > => {
   const createdCategoriesIDs = categories
     .filter((category) => {
@@ -283,11 +289,15 @@ export const preprocessSegmentationImages = async (
     .mapAsync(drawSegmentationMask.bind(null, createdCategoriesIDs))
     .mapAsync(resize.bind(null, inputShape));
 
-  const imageDataBatched = imageData.batch(fitOptions.batchSize);
+  if (!operation | (operation !== "inference")) {
+    const imageDataBatched = imageData.batch(fitOptions.batchSize);
 
-  return imageDataBatched as tfdata.Dataset<{
-    xs: Tensor4D;
-    ys: Tensor4D;
-    id: Tensor1D;
-  }>;
+    return imageDataBatched as tfdata.Dataset<{
+      xs: Tensor4D;
+      ys: Tensor4D;
+      id: Tensor1D;
+    }>;
+  } else {
+    return imageData;
+  }
 };

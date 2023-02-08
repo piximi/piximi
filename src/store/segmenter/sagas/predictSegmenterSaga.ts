@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
+import { LayersModel, Tensor, data, Rank, GraphModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -15,7 +14,7 @@ import {
   segmenterFitOptionsSelector,
   segmenterFittedModelSelector,
   segmenterSlice,
-  predictSegmentations,
+  predictSegmentationsFromGraph,
   preprocessSegmentationImages,
 } from "store/segmenter";
 import {
@@ -27,6 +26,7 @@ import {
   Partition,
   PreprocessOptions,
   Shape,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
 } from "types";
 import { getStackTraceFromError } from "utils";
 
@@ -34,41 +34,9 @@ export function* predictSegmenterSaga({
   payload: { execSaga },
 }: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
-
+  // inferenceImages: images from projectSlice that do not contain any annotations
   const inferenceImages: ReturnType<typeof unannotatedImagesSelector> =
     yield select(unannotatedImagesSelector);
-
-  yield put(
-    projectSlice.actions.updateSegmentationImagesPartition({
-      ids: inferenceImages.map((image) => image.id),
-      partition: Partition.Validation,
-    })
-  );
-
-  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
-    yield select(annotationCategoriesSelector);
-
-  const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
-    yield select(segmenterInputShapeSelector);
-
-  const preprocessOptions: ReturnType<
-    typeof segmenterPreprocessOptionsSelector
-  > = yield select(segmenterPreprocessOptionsSelector);
-
-  const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
-    yield select(segmenterFitOptionsSelector);
-
-  let model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
-    segmenterFittedModelSelector
-  );
-
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    return;
-  }
 
   if (!inferenceImages.length) {
     yield put(
@@ -80,16 +48,66 @@ export function* predictSegmenterSaga({
         },
       })
     );
-  } else {
-    yield runSegmentationPrediction(
-      inferenceImages,
-      annotationCategories,
-      inputShape,
-      preprocessOptions,
-      fitOptions,
-      model
+    yield put(
+      segmenterSlice.actions.updatePredicting({
+        predicting: false,
+      })
     );
+    return;
   }
+
+  // assign each of the inference images to the validation partition
+  yield put(
+    projectSlice.actions.updateSegmentationImagesPartition({
+      ids: inferenceImages.map((image) => image.id),
+      partition: Partition.Validation,
+    })
+  );
+
+  //   annotationCategories: the annotation categories in the project slice
+  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
+    yield select(annotationCategoriesSelector);
+  const createdCategories = annotationCategories.filter((category) => {
+    return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
+  });
+  // the expected input shape of the segmenter model
+  const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
+    yield select(segmenterInputShapeSelector);
+
+  // preprocessOption: {shuffle: true, rescaleOptions:{rescale:true, center: true}}
+  const preprocessOptions: ReturnType<
+    typeof segmenterPreprocessOptionsSelector
+  > = yield select(segmenterPreprocessOptionsSelector);
+  // fitOptions: {epochs: 10, batchSize:32, initialEpoch: 0}
+  const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
+    yield select(segmenterFitOptionsSelector);
+  // fitted Model
+  let model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
+    segmenterFittedModelSelector
+  );
+  // Seems strange to have this considering this saga will only be executed if there is a fitted model
+  if (model === undefined) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
+    );
+    yield put(
+      segmenterSlice.actions.updatePredicting({
+        predicting: false,
+      })
+    );
+    return;
+  }
+
+  yield runSegmentationPrediction(
+    inferenceImages,
+    annotationCategories,
+    createdCategories,
+    inputShape,
+    preprocessOptions,
+    fitOptions,
+    model
+  );
 
   yield put(
     segmenterSlice.actions.updatePredicting({
@@ -101,15 +119,16 @@ export function* predictSegmenterSaga({
 function* runSegmentationPrediction(
   inferenceImages: Array<ImageType>,
   categories: Array<Category>,
+  createdCategories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: LayersModel
+  model: LayersModel | GraphModel
 ) {
   var data: data.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
+    xs: Tensor<Rank.R3>;
+    ys: Tensor<Rank.R3>;
+    id: string;
   }>;
   try {
     data = yield preprocessSegmentationImages(
@@ -117,7 +136,8 @@ function* runSegmentationPrediction(
       categories,
       inputShape,
       preprocessOptions,
-      fitOptions
+      fitOptions,
+      "inference"
     );
   } catch (error) {
     yield handleError(
@@ -127,13 +147,17 @@ function* runSegmentationPrediction(
     return;
   }
 
-  var predictedAnnotations: Awaited<ReturnType<typeof predictSegmentations>>;
+  if (data) {
+    // bypass unused variable warning until used
+  }
+  var predictedAnnotations: Awaited<
+    ReturnType<typeof predictSegmentationsFromGraph>
+  >;
   try {
-    predictedAnnotations = yield predictSegmentations(
-      model,
-      data,
+    predictedAnnotations = yield predictSegmentationsFromGraph(
+      model as GraphModel,
       inferenceImages,
-      categories
+      createdCategories
     );
   } catch (error) {
     yield handleError(
@@ -142,18 +166,15 @@ function* runSegmentationPrediction(
     );
     return;
   }
-
   var index = 0;
   while (index < predictedAnnotations.length) {
-    const annotations = predictedAnnotations[index].annotations;
-    if (annotations.length) {
-      yield put(
-        projectSlice.actions.updateImageAnnotations({
-          imageId: predictedAnnotations[index].imageId,
-          annotations: annotations,
-        })
-      );
-    }
+    yield put(
+      projectSlice.actions.updateImageAnnotations({
+        imageId: predictedAnnotations[index].imageId,
+        annotations: predictedAnnotations[index].annotations,
+      })
+    );
+
     index++;
   }
 
