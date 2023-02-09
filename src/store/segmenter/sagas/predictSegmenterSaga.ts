@@ -16,6 +16,7 @@ import {
   segmenterSlice,
   predictSegmentationsFromGraph,
   preprocessSegmentationImages,
+  segmenterModelSelector,
 } from "store/segmenter";
 import {
   AlertStateType,
@@ -27,8 +28,11 @@ import {
   PreprocessOptions,
   Shape,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
+  ObjectDetectionType,
+  ModelType,
 } from "types";
 import { getStackTraceFromError } from "utils";
+import CLASSES from "data/model-data/cocossd-classes";
 
 export function* predictSegmenterSaga({
   payload: { execSaga },
@@ -70,7 +74,16 @@ export function* predictSegmenterSaga({
   const createdCategories = annotationCategories.filter((category) => {
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
-  // the expected input shape of the segmenter model
+  const selectedModel: ReturnType<typeof segmenterModelSelector> = yield select(
+    segmenterModelSelector
+  );
+  if (selectedModel.modelType === ModelType.CocoSSD) {
+    // unused variables/imports
+  }
+  let possibleClasses: { [key: string]: ObjectDetectionType } = {};
+  if (/*selectedModel.modelType === ModelType.CocoSSD*/ true) {
+    possibleClasses = CLASSES;
+  }
   const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
     yield select(segmenterInputShapeSelector);
 
@@ -106,7 +119,8 @@ export function* predictSegmenterSaga({
     inputShape,
     preprocessOptions,
     fitOptions,
-    model
+    model,
+    possibleClasses
   );
 
   yield put(
@@ -123,7 +137,8 @@ function* runSegmentationPrediction(
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: LayersModel | GraphModel
+  model: LayersModel | GraphModel,
+  possibleClasses: { [key: string]: ObjectDetectionType }
 ) {
   var data: data.Dataset<{
     xs: Tensor<Rank.R3>;
@@ -150,14 +165,13 @@ function* runSegmentationPrediction(
   if (data) {
     // bypass unused variable warning until used
   }
-  var predictedAnnotations: Awaited<
-    ReturnType<typeof predictSegmentationsFromGraph>
-  >;
+  var predictions: Awaited<ReturnType<typeof predictSegmentationsFromGraph>>;
   try {
-    predictedAnnotations = yield predictSegmentationsFromGraph(
+    predictions = yield predictSegmentationsFromGraph(
       model as GraphModel,
       inferenceImages,
-      createdCategories
+      createdCategories,
+      possibleClasses
     );
   } catch (error) {
     yield handleError(
@@ -166,7 +180,22 @@ function* runSegmentationPrediction(
     );
     return;
   }
+  const predictedAnnotations = predictions.annotations;
+  const foundCategories = predictions.categories;
+  console.log(foundCategories);
   var index = 0;
+  while (index < foundCategories.length) {
+    const foundCat = foundCategories[index];
+    yield put(
+      projectSlice.actions.createAnnotationCategory({
+        name: foundCat.name,
+        color: foundCat.color,
+        id: foundCat.id,
+      })
+    );
+    index++;
+  }
+  index = 0;
   while (index < predictedAnnotations.length) {
     yield put(
       projectSlice.actions.updateImageAnnotations({

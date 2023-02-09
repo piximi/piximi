@@ -23,6 +23,7 @@ export type OptimizerSettingsGridProps = {
   fitOptions: FitOptions;
   dispatchBatchSizeCallback: (batchSize: number) => void;
   dispatchEpochsCallback: (epochs: number) => void;
+  isModelPretrained?: boolean;
 };
 
 export const OptimizerSettingsGrid = ({
@@ -33,6 +34,7 @@ export const OptimizerSettingsGrid = ({
   fitOptions,
   dispatchBatchSizeCallback,
   dispatchLearningRateCallback,
+  isModelPretrained,
 }: OptimizerSettingsGridProps) => {
   const onOptimizationAlgorithmChange = (event: SelectChangeEvent) => {
     const target = event.target as HTMLInputElement; //target.value is string
@@ -58,6 +60,7 @@ export const OptimizerSettingsGrid = ({
               keySource={OptimizationAlgorithm}
               value={compileOptions.optimizationAlgorithm as string}
               onChange={onOptimizationAlgorithmChange}
+              disabled={isModelPretrained}
             />
           </Grid>
         </Grid>
@@ -70,6 +73,7 @@ export const OptimizerSettingsGrid = ({
               dispatchCallBack={dispatchLearningRateCallback}
               min={0}
               enableFloat={true}
+              disabled={isModelPretrained}
             />
           </Grid>
         </Grid>
@@ -82,6 +86,7 @@ export const OptimizerSettingsGrid = ({
               keySource={LossFunction}
               value={compileOptions.lossFunction as string}
               onChange={onLossFunctionChange}
+              disabled={isModelPretrained}
             />
           </Grid>
         </Grid>
@@ -93,6 +98,7 @@ export const OptimizerSettingsGrid = ({
               value={fitOptions.batchSize}
               dispatchCallBack={dispatchBatchSizeCallback}
               min={1}
+              disabled={isModelPretrained}
             />
           </Grid>
 
@@ -103,6 +109,7 @@ export const OptimizerSettingsGrid = ({
               value={fitOptions.epochs}
               dispatchCallBack={dispatchEpochsCallback}
               min={1}
+              disabled={isModelPretrained}
             />
           </Grid>
         </Grid>

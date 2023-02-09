@@ -9,11 +9,13 @@ import { CollapsibleList } from "../CollapsibleList";
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;
   dispatchTrainingPercentageCallback: (trainPercentage: number) => void;
+  isModelPretrained?: boolean;
 };
 
 export const DatasetSettingsListItem = ({
   trainingPercentage,
   dispatchTrainingPercentageCallback,
+  isModelPretrained,
 }: DatasetSettingsListItemProps) => {
   const dispatchTrainingPercentage = (trainPercentage: number) => {
     dispatchTrainingPercentageCallback(trainPercentage);
@@ -41,11 +43,12 @@ export const DatasetSettingsListItem = ({
               min={0}
               max={1}
               enableFloat={true}
+              disabled={isModelPretrained}
             />
           </Grid>
         </Grid>
       </StyledFormControl>
-      <ShuffleForm />
+      <ShuffleForm isModelPretrained={isModelPretrained} />
     </CollapsibleList>
   );
 };

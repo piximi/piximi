@@ -4,6 +4,7 @@ export enum ModelType {
   SimpleFCNSegmenter,
   FCNSegmenter,
   UserUploaded,
+  CocoSSD,
 }
 
 type ModelProps = {
@@ -26,7 +27,7 @@ export type SegmenterModelProps = {
   requiredChannels?: number;
   modelType: ModelType;
   src?: string;
-  modelArch?: string
+  modelArch?: string;
 };
 
 export const availableClassifierModels: ClassifierModelProps[] = [
@@ -41,8 +42,6 @@ export const availableClassifierModels: ClassifierModelProps[] = [
   },
 ];
 
-
-
 export const availableSegmenterModels: SegmenterModelProps[] = [
   {
     modelName: "SimpleFCNSegmenter",
@@ -51,5 +50,10 @@ export const availableSegmenterModels: SegmenterModelProps[] = [
   {
     modelName: "FCNSegmenter",
     modelType: ModelType.FCNSegmenter,
+  },
+  {
+    modelName: "Coco-SSD",
+    modelType: ModelType.CocoSSD,
+    modelArch: "graph",
   },
 ];

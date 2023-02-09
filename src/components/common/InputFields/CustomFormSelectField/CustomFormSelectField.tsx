@@ -7,16 +7,19 @@ type CustomFormSelectFieldProps = {
   keySource: object;
   value: string;
   onChange: (event: SelectChangeEvent) => void;
+  disabled?: boolean;
 };
 export const CustomFormSelectField = ({
   keySource,
   value,
   onChange,
+  disabled = false,
 }: CustomFormSelectFieldProps) => {
   return (
     <Select
       value={value} //TODO #130 fix so that multiple lossFunctions are shown, if we do have multiple loss functions
       onChange={onChange}
+      disabled={disabled}
       displayEmpty
       inputProps={{ "aria-label": "Without label" }}
       sx={(theme) => ({

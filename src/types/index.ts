@@ -92,7 +92,7 @@ export {
   availableClassifierModels,
   availableSegmenterModels,
 } from "./ModelType";
-
+export type { ObjectDetectionType } from "./ObjectDetectionClassType";
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";

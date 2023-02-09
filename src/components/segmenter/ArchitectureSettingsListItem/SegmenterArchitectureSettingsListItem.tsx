@@ -3,7 +3,13 @@ import { styled } from "@mui/material";
 import { SegmenterArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-export const SegmenterArchitectureSettingsListItem = () => {
+export const SegmenterArchitectureSettingsListItem = ({
+  setIsModelPretrained,
+  isModelPretrained,
+}: {
+  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelPretrained: boolean;
+}) => {
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -18,7 +24,10 @@ export const SegmenterArchitectureSettingsListItem = () => {
       paddingLeft={true}
     >
       <StyledForm noValidate autoComplete="off">
-        <SegmenterArchitectureSettingsGrid />
+        <SegmenterArchitectureSettingsGrid
+          setIsModelPretrained={setIsModelPretrained}
+          isModelPretrained={isModelPretrained}
+        />
       </StyledForm>
     </CollapsibleList>
   );

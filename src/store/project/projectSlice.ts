@@ -55,11 +55,11 @@ export const projectSlice = createSlice({
     },
     createAnnotationCategory(
       state,
-      action: PayloadAction<{ name: string; color: string }>
+      action: PayloadAction<{ name: string; color: string; id?: string }>
     ) {
       const category: Category = {
         color: action.payload.color,
-        id: uuidv4().toString(),
+        id: action.payload.id ? action.payload.id : uuidv4().toString(),
         name: action.payload.name,
         visible: true,
       };

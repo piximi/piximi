@@ -17,22 +17,36 @@ import { decodeFromImgSrc } from "./preprocessSegmenter";
 import {
   Category,
   ImageType,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
   RescaleOptions,
   decodedAnnotationType,
+  ObjectDetectionType,
 } from "types";
+import { CATEGORY_COLORS } from "utils/common/colorPalette";
+
+type FoundCategoryType = {
+  name: string;
+  color: string;
+  id: string;
+};
 
 export const predictSegmentationsFromGraph = async (
   model: GraphModel,
   inferenceImages: ImageType[],
-  createdCategories: Category[]
-): Promise<
-  Array<{ imageId: string; annotations: Array<decodedAnnotationType> }>
-> => {
+  createdCategories: Category[],
+  possibleClasses: { [key: string]: ObjectDetectionType }
+): Promise<{
+  annotations: Array<{
+    imageId: string;
+    annotations: Array<decodedAnnotationType>;
+  }>;
+  categories: Array<FoundCategoryType>;
+}> => {
   const predictedAnnotations: Array<{
     imageId: string;
     annotations: Array<decodedAnnotationType>;
   }> = [];
+
+  const foundCategories: Array<FoundCategoryType> = [];
 
   for await (const image of inferenceImages) {
     const channels = image.shape.channels;
@@ -101,12 +115,17 @@ export const predictSegmentationsFromGraph = async (
       boxes as Float32Array,
       indexes,
       classes,
-      createdCategories
+      possibleClasses,
+      createdCategories,
+      foundCategories
     );
 
-    predictedAnnotations.push({ imageId: image.id, annotations: annotations });
+    predictedAnnotations.push({
+      imageId: image.id,
+      annotations: annotations.foundAnnotations,
+    });
   }
-  return predictedAnnotations;
+  return { annotations: predictedAnnotations, categories: foundCategories };
 };
 
 const calculateMaxScores = (
@@ -137,8 +156,12 @@ const annotationObjectsFromResults = (
   bboxDims: Float32Array,
   indices: Float32Array,
   classes: Array<number>,
-  annotationCategories: Array<Category>
-): Array<decodedAnnotationType> => {
+  possibleClasses: { [key: string]: ObjectDetectionType },
+  annotationCategories: Array<Category>,
+  foundCategories: Array<FoundCategoryType>
+): {
+  foundAnnotations: Array<decodedAnnotationType>;
+} => {
   const annotationArray: Array<decodedAnnotationType> = [];
 
   const count = indices.length;
@@ -155,9 +178,35 @@ const annotationObjectsFromResults = (
 
     const annotationBbox = [minX, minY, maxX, maxY];
     const maskData = new Uint8Array((maxX - minX) * (maxY - minY)).fill(255);
-    const catID = annotationCategories[classes[indices[i]] + 1]
-      ? annotationCategories[classes[indices[i]] + 1].id
-      : UNKNOWN_ANNOTATION_CATEGORY_ID;
+    let catName = possibleClasses[classes[indices[i]] + 1].displayName;
+    catName = catName.slice(0, 1).toUpperCase().concat(catName.slice(1));
+    const category =
+      annotationCategories.filter((category) => {
+        return category.name === catName;
+      })[0] ||
+      foundCategories.filter((category) => {
+        return category.name === catName;
+      })[0];
+
+    let catID: string;
+    if (category) {
+      catID = category.id;
+    } else {
+      const usedColors = annotationCategories.map((category: Category) => {
+        return category.color;
+      });
+      const availableColos = Object.values(CATEGORY_COLORS).filter(
+        (color: string) => !usedColors.includes(color)
+      );
+      const catColor =
+        availableColos[Math.floor(Math.random() * availableColos.length)];
+      catID = uuid4();
+      foundCategories.push({
+        name: catName,
+        color: catColor,
+        id: catID,
+      });
+    }
 
     const id = uuid4();
     annotationArray.push({
@@ -168,6 +217,7 @@ const annotationObjectsFromResults = (
       plane: 1,
     });
   }
-
-  return annotationArray;
+  return {
+    foundAnnotations: annotationArray,
+  };
 };
