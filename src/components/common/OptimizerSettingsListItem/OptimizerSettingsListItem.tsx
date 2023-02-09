@@ -12,6 +12,7 @@ export const OptimizerSettingsListItem = ({
   fitOptions,
   dispatchBatchSizeCallback,
   dispatchLearningRateCallback,
+  isModelPretrained,
 }: OptimizerSettingsGridProps) => {
   return (
     <CollapsibleList
@@ -30,6 +31,7 @@ export const OptimizerSettingsListItem = ({
         fitOptions={fitOptions}
         dispatchBatchSizeCallback={dispatchBatchSizeCallback}
         dispatchLearningRateCallback={dispatchLearningRateCallback}
+        isModelPretrained={isModelPretrained}
       />
     </CollapsibleList>
   );

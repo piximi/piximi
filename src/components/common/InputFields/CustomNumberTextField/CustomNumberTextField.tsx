@@ -9,7 +9,7 @@ type CustomNumberTextFieldProps = {
   id: string;
   label: string;
   value: number;
-  dispatchCallBack: (arg: number) => void;
+  dispatchCallBack: Function;
   min?: number;
   max?: number;
   enableFloat?: boolean;
@@ -87,7 +87,11 @@ export const CustomNumberTextField = ({
   };
 
   const dispatchValue = () => {
-    dispatchCallBack(inputValue);
+    if (dispatchCallBack.toString().includes("inputID")) {
+      dispatchCallBack(inputValue, id);
+    } else {
+      dispatchCallBack(inputValue);
+    }
   };
 
   return (

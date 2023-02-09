@@ -15,7 +15,13 @@ import {
 
 import { availableSegmenterModels, SegmenterModelProps } from "types";
 
-export const SegmenterArchitectureSettingsGrid = () => {
+export const SegmenterArchitectureSettingsGrid = ({
+  setIsModelPretrained,
+  isModelPretrained,
+}: {
+  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelPretrained: boolean;
+}) => {
   const architectureOptions = useSelector(segmenterArchitectureOptionsSelector);
   const userUploadedModel = useSelector(segmenterUserUploadedModelSelector);
   const inputShape = useSelector(segmenterInputShapeSelector);
@@ -23,7 +29,6 @@ export const SegmenterArchitectureSettingsGrid = () => {
   const [selectedModel, setSelectedModel] = React.useState<SegmenterModelProps>(
     architectureOptions.selectedModel
   );
-
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     React.useState<boolean>(false);
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
@@ -37,19 +42,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
     modelOptions.push(userUploadedModel);
   }
 
-  React.useEffect(() => {
-    if (selectedModel.requiredChannels) {
-      setFixedNumberOfChannels(true);
-      setFixedNumberOfChannelsHelperText(
-        `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
-      );
-    } else {
-      setFixedNumberOfChannels(false);
-      setFixedNumberOfChannelsHelperText("");
-    }
-  }, [selectedModel]);
-
-  const onSelectedModelChange = (
+  const handleSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
     value: SegmenterModelProps | null
   ) => {
@@ -73,29 +66,45 @@ export const SegmenterArchitectureSettingsGrid = () => {
     );
   };
 
-  const dispatchRows = (height: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
-        inputShape: { ...inputShape, height: height },
-      })
-    );
+  const dispatchShape = (value: number, inputID: string) => {
+    switch (inputID) {
+      case "shape-rows":
+        dispatch(
+          segmenterSlice.actions.updateSegmentationInputShape({
+            inputShape: { ...inputShape, height: value },
+          })
+        );
+        return;
+      case "shape-cols":
+        dispatch(
+          segmenterSlice.actions.updateSegmentationInputShape({
+            inputShape: { ...inputShape, width: value },
+          })
+        );
+        return;
+      case "shape-channels":
+        dispatch(
+          segmenterSlice.actions.updateSegmentationInputShape({
+            inputShape: { ...inputShape, channels: value },
+          })
+        );
+    }
   };
 
-  const dispatchCols = (cols: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
-        inputShape: { ...inputShape, width: cols },
-      })
-    );
-  };
-
-  const dispatchChannels = (channels: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationInputShape({
-        inputShape: { ...inputShape, channels: channels },
-      })
-    );
-  };
+  React.useEffect(() => {
+    if (selectedModel.requiredChannels) {
+      setFixedNumberOfChannels(true);
+      setFixedNumberOfChannelsHelperText(
+        `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
+      );
+    } else if (selectedModel.modelArch && selectedModel.modelArch === "graph") {
+      setIsModelPretrained(true);
+    } else {
+      setIsModelPretrained(false);
+      setFixedNumberOfChannels(false);
+      setFixedNumberOfChannelsHelperText("");
+    }
+  }, [selectedModel, setIsModelPretrained]);
 
   return (
     <StyledFormControl>
@@ -104,7 +113,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
           <Autocomplete
             disableClearable={true}
             options={modelOptions}
-            onChange={onSelectedModelChange}
+            onChange={handleSelectedModelChange}
             getOptionLabel={(option: SegmenterModelProps) => option.modelName}
             sx={{ width: 300 }}
             renderInput={(params) => (
@@ -123,32 +132,34 @@ export const SegmenterArchitectureSettingsGrid = () => {
         </Grid>
       </Grid>
       <Grid container direction={"row"} spacing={2}>
-        <Grid item xs={1}>
+        <Grid item xs={2}>
           <CustomNumberTextField
             id="shape-rows"
             label="Input rows"
             value={inputShape.height}
-            dispatchCallBack={dispatchRows}
+            dispatchCallBack={dispatchShape}
             min={1}
+            disabled={isModelPretrained}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={2}>
           <CustomNumberTextField
             id="shape-cols"
             label="Input cols"
             value={inputShape.width}
-            dispatchCallBack={dispatchCols}
+            dispatchCallBack={dispatchShape}
             min={1}
+            disabled={isModelPretrained}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={2}>
           <CustomNumberTextField
             id="shape-channels"
             label="Input channels"
             value={inputShape.channels}
-            dispatchCallBack={dispatchChannels}
+            dispatchCallBack={dispatchShape}
             min={1}
-            disabled={fixedNumberOfChannels}
+            disabled={fixedNumberOfChannels || isModelPretrained}
           />
         </Grid>
       </Grid>

@@ -19,6 +19,7 @@ export { segmenterInputShapeSelector } from "./selectors/segmenterInputShapeSele
 export { segmenterTrainingFlagSelector } from "./selectors/segmenterTrainingFlagSelector";
 export { segmenterSelector } from "./selectors/segmenterSelector";
 export { segmenterPredictingFlagSelector } from "./selectors/segmenterPredictingFlagSelector";
+export { segmenterModelSelector } from "./selectors/segmenterModelSelector";
 
 // Sagas
 

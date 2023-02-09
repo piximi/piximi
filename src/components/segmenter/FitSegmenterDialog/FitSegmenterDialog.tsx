@@ -9,7 +9,7 @@ import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsLi
 import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-import { ModelSummaryTable } from "components/common/ModelSummary";
+//import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
@@ -17,7 +17,7 @@ import { alertStateSelector } from "store/application";
 import { annotatedImagesSelector } from "store/project";
 import {
   segmenterTrainingFlagSelector,
-  segmenterCompiledModelSelector,
+  //segmenterCompiledModelSelector,
   segmenterFitOptionsSelector,
   segmenterCompileOptionsSelector,
   segmenterTrainingPercentageSelector,
@@ -30,7 +30,7 @@ import {
   LossFunction,
   OptimizationAlgorithm,
 } from "types";
-import { LayersModel } from "@tensorflow/tfjs";
+//import { LayersModel } from "@tensorflow/tfjs";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -65,7 +65,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const currentlyTraining = useSelector(segmenterTrainingFlagSelector);
   const annotatedImages = useSelector(annotatedImagesSelector);
-  const compiledModel = useSelector(segmenterCompiledModelSelector);
+  //const compiledModel = useSelector(segmenterCompiledModelSelector);
   const alertState = useSelector(alertStateSelector);
 
   const fitOptions = useSelector(segmenterFitOptionsSelector);
@@ -206,7 +206,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <FitSegmenterDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noLabeledImages && !isModelPretrained}
+        disableFitting={noLabeledImages || isModelPretrained}
         epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
@@ -222,7 +222,10 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <SegmenterArchitectureSettingsListItem />
+          <SegmenterArchitectureSettingsListItem
+            setIsModelPretrained={setIsModelPretrained}
+            isModelPretrained={isModelPretrained}
+          />
 
           <OptimizerSettingsListItem
             compileOptions={compileOptions}
@@ -234,6 +237,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             fitOptions={fitOptions}
             dispatchBatchSizeCallback={dispatchBatchSizeCallback}
             dispatchLearningRateCallback={dispatchLearningRateCallback}
+            isModelPretrained={isModelPretrained}
           />
 
           <DatasetSettingsListItem
@@ -241,6 +245,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             dispatchTrainingPercentageCallback={
               dispatchTrainingPercentageCallback
             }
+            isModelPretrained={isModelPretrained}
           />
         </List>
 
