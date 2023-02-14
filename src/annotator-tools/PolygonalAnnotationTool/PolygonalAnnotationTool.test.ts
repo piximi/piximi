@@ -18,7 +18,7 @@ test("onMouseDown", async () => {
   expect(operator.annotation).toBe(undefined);
 
   expect(operator.anchor).toStrictEqual(undefined);
-  expect(operator.buffer).toStrictEqual([]);
+  expect(operator.buffer).toStrictEqual([{ x: 0, y: 0 }]);
   expect(operator.origin).toStrictEqual({ x: 0, y: 0 });
   expect(operator.points).toStrictEqual([]);
 });

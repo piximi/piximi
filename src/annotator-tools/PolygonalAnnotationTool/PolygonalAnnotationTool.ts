@@ -5,10 +5,30 @@ import { AnnotationStateType, Point } from "types";
 export class PolygonalAnnotationTool extends AnnotationTool {
   buffer: Array<Point> = [];
   points: Array<Point> = [];
+  private _initialMove: boolean = true;
+
+  set newAnchor(position: Point | undefined) {
+    if (position) {
+      this._initialMove = true;
+      this.anchor = position;
+    } else {
+      this._initialMove = true;
+      this.anchor = undefined;
+    }
+  }
+
+  set terminal(position: Point) {
+    if (this._initialMove) {
+      this._initialMove = false;
+      this.buffer.push(position);
+    } else {
+      this.buffer[this.buffer.length - 1] = position;
+    }
+  }
 
   deselect() {
     this.annotation = undefined;
-    this.anchor = undefined;
+    this.newAnchor = undefined;
     this.buffer = [];
     this.origin = undefined;
     this.points = [];
@@ -18,10 +38,9 @@ export class PolygonalAnnotationTool extends AnnotationTool {
   onMouseDown(position: { x: number; y: number }) {
     if (this.annotationState === AnnotationStateType.Annotated) return;
 
-    if (this.buffer && this.buffer.length === 0) {
-      if (!this.origin) {
-        this.origin = position;
-      }
+    if (!this.origin) {
+      this.origin = position;
+      this.buffer.push(position);
 
       this.setAnnotating();
     }
@@ -29,22 +48,9 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
   onMouseMove(position: { x: number; y: number }) {
     if (this.annotationState !== AnnotationStateType.Annotating) return;
+    if (this.anchor && pointsAreEqual(this.anchor, position)) return;
 
-    if (this.anchor) {
-      if (!pointsAreEqual(this.buffer.at(-1)!, this.anchor)) {
-        this.buffer.pop();
-      }
-
-      this.buffer = [...this.buffer, position];
-
-      return;
-    }
-
-    if (this.origin) {
-      this.buffer.pop();
-
-      this.buffer = [this.origin, position];
-    }
+    this.terminal = position;
   }
 
   onMouseUp(position: { x: number; y: number }) {
@@ -52,39 +58,33 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
     if (
       this.connected(position) &&
+      this.anchor &&
       this.origin &&
       this.buffer &&
       this.buffer.length > 0
     ) {
       this.buffer = [...this.buffer, position, this.origin];
-
       this.points = this.buffer;
-
-      this._boundingBox = this.computeBoundingBoxFromContours(this.points);
+      this.boundingBox = this.computeBoundingBoxFromContours(this.points);
 
       const maskImage = this.computeAnnotationMaskFromPoints();
+
       if (!maskImage) return;
 
       this.maskData = maskImage.data;
 
       this.buffer = [];
-
-      this.anchor = undefined;
+      this.newAnchor = undefined;
       this.origin = undefined;
 
       this.setAnnotated();
-      return;
-    }
-
-    if (this.anchor || (this.origin && this.buffer.length > 0)) {
-      this.anchor = this.buffer.at(-1);
-
-      return;
+    } else {
+      this.newAnchor = this.buffer.at(-1);
     }
   }
 
   private connected(
-    position: { x: number; y: number },
+    position: Point,
     threshold: number = 4
   ): boolean | undefined {
     if (!this.origin) return undefined;
