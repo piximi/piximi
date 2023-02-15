@@ -1,4 +1,5 @@
 export {
+  SerializedCOCOFileRType,
   SerializedFileRType,
   SerializedAnnotationRType,
   validateFileType,
