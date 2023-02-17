@@ -65,13 +65,12 @@ export class PolygonalAnnotationTool extends AnnotationTool {
     ) {
       this.buffer = [...this.buffer, position, this.origin];
       this.points = this.buffer;
-      this.boundingBox = this.computeBoundingBoxFromContours(this.points);
 
-      const maskImage = this.computeAnnotationMaskFromPoints();
+      this.setBoundingBoxFromContours(this.points);
 
-      if (!maskImage) return;
+      this.setAnnotationMaskFromPoints();
 
-      this.maskData = maskImage.data;
+      if (!this.maskData) return;
 
       this.buffer = [];
       this.newAnchor = undefined;

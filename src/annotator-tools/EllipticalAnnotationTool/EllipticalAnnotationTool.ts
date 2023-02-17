@@ -1,4 +1,3 @@
-import * as ImageJS from "image-js";
 import { AnnotationTool } from "../AnnotationTool";
 
 import { AnnotationStateType, Point } from "types";
@@ -36,11 +35,12 @@ export class EllipticalAnnotationTool extends AnnotationTool {
       return;
     this.points = this.convertToPoints();
 
-    this._boundingBox = this.computeBoundingBoxFromContours(this.points!);
-    const maskData = this.computeAnnotationMaskFromPoints() as ImageJS.Image;
-    if (!maskData) return;
+    this.setBoundingBoxFromContours(this.points);
 
-    this.maskData = maskData.data as Uint8Array;
+    this.setAnnotationMaskFromPoints();
+
+    if (!this.maskData) return;
+
     this.setAnnotated();
   }
 

@@ -224,6 +224,19 @@ export const projectSlice = createSlice({
       }
       state.annotationCategories.push(...newCategories);
     },
+    modifyAnnotationCategories(
+      state,
+      action: PayloadAction<{ categories: Array<Category> }>
+    ) {
+      const modified = action.payload.categories;
+
+      const unmodified = state.annotationCategories.filter(
+        (existingCat) =>
+          modified.findIndex((m) => m.id === existingCat.id) === -1
+      );
+
+      state.annotationCategories = [...unmodified, ...modified];
+    },
     setAnnotationCategoryVisibility(
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
