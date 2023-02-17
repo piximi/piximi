@@ -142,11 +142,11 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
       this.points = this.buffer;
 
-      this._boundingBox = this.computeBoundingBoxFromContours(this.points);
-      const maskImage = this.computeAnnotationMaskFromPoints();
-      if (!maskImage) return;
+      this.setBoundingBoxFromContours(this.points);
 
-      this.maskData = maskImage.data;
+      this.setAnnotationMaskFromPoints();
+
+      if (!this.maskData) return;
 
       this.buffer = [];
 

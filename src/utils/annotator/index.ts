@@ -36,4 +36,8 @@ export {
   getYMin,
   pointsToEdges,
   interpolateX,
+  computeBoundingBoxFromContours,
+  maskFromPoints,
 } from "./point-operations/point-operations";
+
+export { deserializeCOCOFile } from "./deserialize/deserializeCOCO";

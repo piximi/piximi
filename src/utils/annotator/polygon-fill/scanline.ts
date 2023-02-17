@@ -26,6 +26,9 @@ export function scanline(
     width: imageWidth,
     height: imageHeight,
     bitDepth: 8,
+    components: 1,
+    alpha: 0,
+    kind: "GREY" as ImageJS.ImageKind,
   });
 
   if (polygon.length < 3) return maskImage;
@@ -106,6 +109,6 @@ function drawSpans(spans: Array<number>, yScan: number, img: ImageJS.Image) {
  */
 function fillSpan(x1: number, x2: number, y: number, img: ImageJS.Image) {
   for (let x = x1; x < x2; x++) {
-    img.setPixelXY(x, y, [255, 255, 255, 255]);
+    img.setPixelXY(x, y, [255]);
   }
 }
