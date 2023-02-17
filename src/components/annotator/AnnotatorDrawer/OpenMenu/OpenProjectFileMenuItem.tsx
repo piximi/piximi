@@ -1,16 +1,23 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { AnnotatorSlice } from "store/annotator";
-import { projectSlice } from "store/project";
+import {
+  AnnotatorSlice,
+  activeImageSelector,
+  annotatorImagesSelector,
+} from "store/annotator";
+import {
+  annotationCategoriesSelector,
+  availableColorsSelector,
+  projectSlice,
+} from "store/project";
 
-import { deserializeAnnotations } from "image/utils/loadExampleImage";
+import { deserializeCOCOFile } from "utils/annotator";
 
 import { validateFileType } from "types/runtime";
-
-import { activeImageSelector } from "store/annotator";
+import { SerializedCOCOFileType } from "types";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -22,6 +29,14 @@ export const OpenProjectFileMenuItem = ({
   const dispatch = useDispatch();
 
   const activeImage = useSelector(activeImageSelector);
+
+  const existingAnnotationCategories = useSelector(
+    annotationCategoriesSelector
+  );
+
+  const existingImages = useSelector(annotatorImagesSelector);
+
+  const availableColors = useSelector(availableColorsSelector);
 
   const onOpenProjectFile = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -39,31 +54,35 @@ export const OpenProjectFileMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result && activeImage) {
-        const serializedAnnotations = validateFileType(
+        const cocoFile: SerializedCOCOFileType = validateFileType(
           event.target.result as string
         );
 
-        // TODO: BIG_MERGE - check if this is still correct
-        const deserializedAnnotations = deserializeAnnotations(
-          serializedAnnotations.annotations
-        );
+        const { modifiedImages, modifiedCategories, newCategories } =
+          deserializeCOCOFile(
+            cocoFile,
+            existingImages,
+            existingAnnotationCategories,
+            availableColors
+          );
 
-        const newAnnotations = [
-          ...activeImage.annotations,
-          ...deserializedAnnotations,
-        ];
-
-        dispatch(
-          projectSlice.actions.addAnnotationCategories({
-            categories: serializedAnnotations.categories,
-          })
-        );
-        dispatch(
-          AnnotatorSlice.actions.setImageInstances({
-            imageId: activeImage.id,
-            instances: newAnnotations,
-          })
-        );
+        batch(() => {
+          dispatch(
+            projectSlice.actions.modifyAnnotationCategories({
+              categories: modifiedCategories,
+            })
+          );
+          dispatch(
+            projectSlice.actions.addAnnotationCategories({
+              categories: newCategories,
+            })
+          );
+          dispatch(
+            AnnotatorSlice.actions.modifyImages({
+              images: modifiedImages,
+            })
+          );
+        });
       }
     };
 

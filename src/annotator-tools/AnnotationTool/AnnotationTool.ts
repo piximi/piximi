@@ -1,5 +1,4 @@
 import * as ImageJS from "image-js";
-import { min, max } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 import { Tool } from "../Tool";
@@ -13,8 +12,10 @@ import {
 
 import { DataArray, convertToDataArray } from "image/utils/imageHelper";
 
-import { scanline, simplifyPolygon } from "utils/annotator";
-import { connectPoints } from "utils/common/imageHelper";
+import {
+  computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
+  maskFromPoints as _maskFromPoints,
+} from "utils/annotator";
 
 export abstract class AnnotationTool extends Tool {
   /**
@@ -84,17 +85,8 @@ export abstract class AnnotationTool extends Tool {
     ];
   }
 
-  computeBoundingBoxFromContours(
-    contour: Array<Point>
-  ): [number, number, number, number] {
-    const xValues = contour.map((point) => point.x);
-    const yValues = contour.map((point) => point.y);
-    return [
-      Math.round(min(xValues)!),
-      Math.round(min(yValues)!),
-      Math.round(max(xValues)!),
-      Math.round(max(yValues)!),
-    ];
+  setBoundingBoxFromContours(contour: Array<Point>) {
+    this.boundingBox = _computeBoundingBoxFromContours(contour);
   }
 
   get mask(): Array<number> | undefined {
@@ -115,39 +107,17 @@ export abstract class AnnotationTool extends Tool {
 
   /**
    * Compute the mask image of the annotation polygon from the bounding box and the polygon points.
-   * @returns Mask image of the annotation.
    */
-  computeAnnotationMaskFromPoints() {
-    const boundingBox = this.boundingBox;
-    if (!boundingBox) return undefined;
-
-    const width = boundingBox[2] - boundingBox[0];
-    const height = boundingBox[3] - boundingBox[1];
-    if (width <= 0 || height <= 0) {
-      return undefined;
+  setAnnotationMaskFromPoints() {
+    if (!this.boundingBox || !this.points) {
+      return;
     }
 
-    const coordinates = this.points;
-
-    const connectedPoints = connectPoints(coordinates!); // get coordinates of connected points and draw boundaries of mask
-
-    const simplifiedPoints = simplifyPolygon(connectedPoints);
-
-    const maskImage = scanline(
-      simplifiedPoints,
-      this.image.width,
-      this.image.height
+    this.maskData = _maskFromPoints(
+      this.points,
+      { width: this.image.width, height: this.image.height },
+      this.boundingBox
     );
-
-    // @ts-ignore: getChannel API is not exposed
-    const greyScaleMask = maskImage.getChannel(0); // as ImageJS.Image;
-
-    return greyScaleMask.crop({
-      x: boundingBox[0],
-      y: boundingBox[1],
-      width: width,
-      height: height,
-    });
   }
 
   setAnnotating() {

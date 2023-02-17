@@ -91,6 +91,18 @@ export const annotatorSlice = createSlice({
 
       state.images.push(...updatedImages);
     },
+    modifyImages(
+      state,
+      action: PayloadAction<{ images: Array<ShadowImageType> }>
+    ) {
+      const modified = action.payload.images;
+
+      const unmodified = state.images.filter(
+        (existingIm) => modified.findIndex((m) => m.id === existingIm.id) === -1
+      );
+
+      state.images = [...unmodified, ...modified];
+    },
     clearCategoryAnnotations(
       state,
       action: PayloadAction<{ category: Category }>

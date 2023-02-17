@@ -5,6 +5,7 @@ import { AnnotationTool } from "../AnnotationTool";
 import { connectPoints } from "utils/common";
 
 import { AnnotationStateType, Point } from "types";
+import { computeBoundingBoxFromContours } from "utils/annotator";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;
@@ -66,7 +67,8 @@ export class PenAnnotationTool extends AnnotationTool {
       connectedPoints = connectPoints(this.points);
     }
     // Compute bounding box coordinates.
-    const boundingBox = this.computeBoundingBoxFromContours(connectedPoints);
+    // don't use this this.setBoundingBoxFromContours here
+    const boundingBox = computeBoundingBoxFromContours(connectedPoints);
 
     // Make sure the bounding box is valid.
     if (boundingBox.some((x) => Number.isNaN(x))) return undefined;

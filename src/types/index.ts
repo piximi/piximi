@@ -129,3 +129,10 @@ export { ToolType } from "./ToolType";
 export { ZoomModeType } from "./ZoomModeType";
 
 export type { ZoomToolOptionsType } from "./ZoomToolOptionsType";
+
+export type {
+  SerializedCOCOFileType,
+  SerializedCOCOAnnotationType,
+  SerializedCOCOImageType,
+  SerializedCOCOCategoryType,
+} from "./COCOTypes";

@@ -13,7 +13,7 @@ const SerializedCOCOInfoRtype = T.type({
   date_created: T.string,
 });
 
-const SerializedCOCOImageRType = T.type({
+export const SerializedCOCOImageRType = T.type({
   id: T.Integer,
   width: T.Integer,
   height: T.Integer,
@@ -30,16 +30,26 @@ const SerializedCOCOLicenseRType = T.type({
   url: T.string,
 });
 
-const SerializedCOCOAnnotationRType = T.type({
+// when iscrowd is true
+const SerializedCOCORLERType = T.type({
+  size: T.tuple([T.number, T.number]),
+  counts: T.array(T.Integer),
+});
+
+// when iscrowd is false
+const SerializedCOCOPolygonRType = T.array(T.array(T.number));
+
+export const SerializedCOCOAnnotationRType = T.type({
   id: T.Integer,
   image_id: T.Integer,
   category_id: T.Integer,
-  segmentation: T.array(T.array(T.number)),
+  segmentation: T.union([SerializedCOCOPolygonRType, SerializedCOCORLERType]),
   area: T.number,
   bbox: T.tuple([T.number, T.number, T.number, T.number]),
+  iscrowd: T.union([T.literal(0), T.literal(1)]),
 });
 
-const SerializedCOCOCategoryRType = T.type({
+export const SerializedCOCOCategoryRType = T.type({
   id: T.Integer,
   name: T.string,
   supercategory: T.string,
@@ -80,10 +90,11 @@ export const SerializedFileRType = T.type({
 //#endregion Basic Serialization Type
 
 const toError = (errors: any) => {
+  process.env.NODE_ENV !== "production" && console.log(errors);
   throw new Error(failure(errors).join("\n"));
 };
 
 export const validateFileType = (encodedFileContents: string) => {
   const annotations = JSON.parse(encodedFileContents);
-  return getOrElseW(toError)(SerializedFileRType.decode(annotations));
+  return getOrElseW(toError)(SerializedCOCOFileRType.decode(annotations));
 };

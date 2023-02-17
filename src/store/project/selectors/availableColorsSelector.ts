@@ -9,7 +9,14 @@ export const availableColorsSelector = ({
   const usedColors = project.categories.map((category: Category) => {
     return category.color;
   });
-  return Object.values(CATEGORY_COLORS).filter(
+  const availableColors = Object.values(CATEGORY_COLORS).filter(
     (color: string) => !usedColors.includes(color)
   );
+
+  if (availableColors.length === 0) {
+    // we're out of colors, recycle used ones
+    return usedColors;
+  } else {
+    return availableColors;
+  }
 };
