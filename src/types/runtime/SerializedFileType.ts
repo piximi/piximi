@@ -45,6 +45,7 @@ export const SerializedCOCOAnnotationRType = T.type({
   category_id: T.Integer,
   segmentation: T.union([SerializedCOCOPolygonRType, SerializedCOCORLERType]),
   area: T.number,
+  // x, y, width, height
   bbox: T.tuple([T.number, T.number, T.number, T.number]),
   iscrowd: T.union([T.literal(0), T.literal(1)]),
 });

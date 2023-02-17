@@ -45,13 +45,13 @@ const deserializeCOCOCategories = (
   }
 
   if (
-    process.env.NODE_ENV !== "development" &&
+    process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
     const numExisting = existingCategories.length;
     const numModified = Object.keys(modifiedCategories).length;
     const numNew = Object.keys(newCategories).length;
-    const numUnmodified = numExisting - (numNew + numModified);
+    const numUnmodified = numExisting - numModified;
 
     numModified !== numExisting &&
       console.log(
@@ -82,7 +82,7 @@ const deserializeCOCOImages = (
   }
 
   if (
-    process.env.NODE_ENV !== "development" &&
+    process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
     unfound.length > 0 &&
@@ -146,26 +146,35 @@ export const deserializeCOCOFile = (
       points.push({ y: polygon[i], x: polygon[i + 1] });
     }
 
+    // convert coco [x, y, width, height] to our [x1, y1, x2, y2]
+    const bbox = [
+      annotation.bbox[0],
+      annotation.bbox[1],
+      annotation.bbox[0] + annotation.bbox[2],
+      annotation.bbox[1] + annotation.bbox[3],
+    ] as [number, number, number, number];
+
     const maskData = maskFromPoints(
       points,
       { width: parentIm.shape.width, height: parentIm.shape.height },
-      annotation.bbox
+      bbox
     );
 
     // TODO: COCO - probably should only do this if not being assigned to active image
     const encodedMask = encode(maskData);
 
+    // TODO: COCO - cannot push  object is not extensible
     parentIm.annotations.push({
       id: uuidv4(),
       mask: encodedMask,
       plane: parentIm.activePlane,
-      boundingBox: annotation.bbox,
+      boundingBox: bbox,
       categoryId: parentCat.id,
     });
   }
 
   if (
-    process.env.NODE_ENV !== "development" &&
+    process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
     imageless.length > 0 &&
