@@ -9,6 +9,7 @@ import {
   SerializedCOCOImageType,
   Point,
   ShadowImageType,
+  encodedAnnotationType,
 } from "types";
 
 const deserializeCOCOCategories = (
@@ -22,7 +23,7 @@ const deserializeCOCOCategories = (
 
   let colorIdx = -1;
 
-  const modifiedCategories: { [id: number]: Category } = {};
+  const matchedCategories: { [id: number]: Category } = {};
   const newCategories: { [id: number]: Category } = {};
 
   for (const cocoCategory of serializedCategories) {
@@ -31,7 +32,7 @@ const deserializeCOCOCategories = (
     );
 
     if (matchingCat) {
-      modifiedCategories[cocoCategory.id] = matchingCat;
+      matchedCategories[cocoCategory.id] = matchingCat;
     } else {
       // no matching category exists, create one
       newCategories[cocoCategory.id] = {
@@ -49,17 +50,17 @@ const deserializeCOCOCategories = (
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
     const numExisting = existingCategories.length;
-    const numModified = Object.keys(modifiedCategories).length;
+    const numMatched = Object.keys(matchedCategories).length;
     const numNew = Object.keys(newCategories).length;
-    const numUnmodified = numExisting - numModified;
+    const numUnmatched = numExisting - numMatched;
 
-    numModified !== numExisting &&
+    numMatched !== numExisting &&
       console.log(
-        `Categories modified: ${numModified}, created: ${numNew}, unmodified: ${numUnmodified}`
+        `Categories matched: ${numMatched}, newly created: ${numNew}, unmatched: ${numUnmatched}`
       );
   }
 
-  return { modifiedCategories, newCategories };
+  return { matchedCategories, newCategories };
 };
 
 const deserializeCOCOImages = (
@@ -86,7 +87,12 @@ const deserializeCOCOImages = (
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
     unfound.length > 0 &&
-      console.log(`Could not find ${unfound.length} images: ${unfound}`);
+      console.log(
+        `Could not find ${unfound.length}/${serializedImages.length} images: ${unfound}`
+      );
+    const found = Object.keys(imIdMap);
+    found.length > 0 &&
+      console.log(`Found ${found.length}/${serializedImages.length} images`);
   }
 
   return imIdMap;
@@ -106,14 +112,20 @@ export const deserializeCOCOFile = (
 
   const imIdMap = deserializeCOCOImages(cocoFile.images, existingImages);
 
+  const annotations: {
+    [parentImId: string]: Array<encodedAnnotationType>;
+  } = {};
+
   const imageless: Array<number> = [];
   const catless: Array<number> = [];
-  const discarded: Array<number> = [];
+  const crowded: Array<number> = [];
+  const multipart: Array<number> = [];
+  let numKept: number = 0;
 
   for (const annotation of cocoFile.annotations) {
     const parentIm = imIdMap[annotation.image_id];
     const parentCat =
-      catIdMap.modifiedCategories[annotation.category_id] ||
+      catIdMap.matchedCategories[annotation.category_id] ||
       catIdMap.newCategories[annotation.category_id];
 
     if (!parentIm) {
@@ -123,7 +135,7 @@ export const deserializeCOCOFile = (
       catless.push(annotation.id);
       continue;
     } else if (annotation.iscrowd) {
-      discarded.push(annotation.id);
+      crowded.push(annotation.id);
       continue;
     }
 
@@ -133,10 +145,11 @@ export const deserializeCOCOFile = (
     const numPolygons = polygons.length;
 
     if (numPolygons !== 1) {
-      throw new Error(
-        `Unsupported number of polygons: annotation ${annotation.id} has ${numPolygons} polygons`
-      );
+      multipart.push(annotation.id);
+      continue;
     }
+
+    numKept += 1;
 
     // coco polygon points are arranged as: [y_1, x_1, y_2, x_2, ...]
     // where y_1 and x_1 are the y,x coordinates of point 1
@@ -148,10 +161,10 @@ export const deserializeCOCOFile = (
 
     // convert coco [x, y, width, height] to our [x1, y1, x2, y2]
     const bbox = [
-      annotation.bbox[0],
-      annotation.bbox[1],
-      annotation.bbox[0] + annotation.bbox[2],
-      annotation.bbox[1] + annotation.bbox[3],
+      Math.round(annotation.bbox[0]),
+      Math.round(annotation.bbox[1]),
+      Math.round(annotation.bbox[0] + annotation.bbox[2]),
+      Math.round(annotation.bbox[1] + annotation.bbox[3]),
     ] as [number, number, number, number];
 
     const maskData = maskFromPoints(
@@ -163,14 +176,19 @@ export const deserializeCOCOFile = (
     // TODO: COCO - probably should only do this if not being assigned to active image
     const encodedMask = encode(maskData);
 
-    // TODO: COCO - cannot push  object is not extensible
-    parentIm.annotations.push({
+    const newAnnotation = {
       id: uuidv4(),
       mask: encodedMask,
       plane: parentIm.activePlane,
       boundingBox: bbox,
       categoryId: parentCat.id,
-    });
+    };
+
+    if (annotations.hasOwnProperty(parentIm.id)) {
+      annotations[parentIm.id].push(newAnnotation);
+    } else {
+      annotations[parentIm.id] = [newAnnotation];
+    }
   }
 
   if (
@@ -185,11 +203,19 @@ export const deserializeCOCOFile = (
       console.log(
         `Could not associate ${catless.length} annotations with categories: ${catless}`
       );
+    crowded.length > 0 &&
+      console.log(`Dropped ${crowded.length} annotations with iscrowd=1`);
+    multipart.length > 0 &&
+      console.log(
+        `Dropped ${multipart.length} annotations with multiple polygon parts`
+      );
+    console.log(
+      `Created ${numKept}/${cocoFile.annotations.length} annotations`
+    );
   }
 
   return {
-    modifiedImages: Object.values(imIdMap),
-    modifiedCategories: Object.values(catIdMap.modifiedCategories),
+    newAnnotations: annotations,
     newCategories: Object.values(catIdMap.newCategories),
   };
 };
