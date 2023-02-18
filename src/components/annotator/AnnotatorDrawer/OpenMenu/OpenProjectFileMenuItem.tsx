@@ -58,28 +58,22 @@ export const OpenProjectFileMenuItem = ({
           event.target.result as string
         );
 
-        const { modifiedImages, modifiedCategories, newCategories } =
-          deserializeCOCOFile(
-            cocoFile,
-            existingImages,
-            existingAnnotationCategories,
-            availableColors
-          );
+        const { newAnnotations, newCategories } = deserializeCOCOFile(
+          cocoFile,
+          existingImages,
+          existingAnnotationCategories,
+          availableColors
+        );
 
         batch(() => {
-          dispatch(
-            projectSlice.actions.modifyAnnotationCategories({
-              categories: modifiedCategories,
-            })
-          );
           dispatch(
             projectSlice.actions.addAnnotationCategories({
               categories: newCategories,
             })
           );
           dispatch(
-            AnnotatorSlice.actions.modifyImages({
-              images: modifiedImages,
+            AnnotatorSlice.actions.setInstances({
+              instances: newAnnotations,
             })
           );
         });

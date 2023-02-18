@@ -91,18 +91,6 @@ export const annotatorSlice = createSlice({
 
       state.images.push(...updatedImages);
     },
-    modifyImages(
-      state,
-      action: PayloadAction<{ images: Array<ShadowImageType> }>
-    ) {
-      const modified = action.payload.images;
-
-      const unmodified = state.images.filter(
-        (existingIm) => modified.findIndex((m) => m.id === existingIm.id) === -1
-      );
-
-      state.images = [...unmodified, ...modified];
-    },
     clearCategoryAnnotations(
       state,
       action: PayloadAction<{ category: Category }>
@@ -315,6 +303,28 @@ export const annotatorSlice = createSlice({
           return image;
         } else {
           return { ...image, annotations: action.payload.instances };
+        }
+      });
+    },
+    setInstances(
+      state,
+      action: PayloadAction<{
+        instances: {
+          [imageId: string]: Array<encodedAnnotationType>;
+        };
+      }>
+    ) {
+      // add individual annotations to several images
+
+      state.images = state.images.map((im) => {
+        const annotationsToAdd = action.payload.instances[im.id];
+        if (annotationsToAdd) {
+          return {
+            ...im,
+            annotations: [...im.annotations, ...annotationsToAdd],
+          };
+        } else {
+          return im;
         }
       });
     },
