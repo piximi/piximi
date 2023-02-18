@@ -5,8 +5,8 @@ import { MenuItem, ListItemText } from "@mui/material";
 
 import {
   AnnotatorSlice,
-  activeImageSelector,
   annotatorImagesSelector,
+  activeImageIdSelector,
 } from "store/annotator";
 import {
   annotationCategoriesSelector,
@@ -28,7 +28,7 @@ export const OpenProjectFileMenuItem = ({
 }: OpenAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const activeImage = useSelector(activeImageSelector);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const existingAnnotationCategories = useSelector(
     annotationCategoriesSelector
@@ -53,7 +53,7 @@ export const OpenProjectFileMenuItem = ({
     const reader = new FileReader();
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
-      if (event.target && event.target.result && activeImage) {
+      if (event.target && event.target.result) {
         const cocoFile: SerializedCOCOFileType = validateFileType(
           event.target.result as string
         );
@@ -77,6 +77,16 @@ export const OpenProjectFileMenuItem = ({
             })
           );
         });
+        // when a deserialized annotation is associated with the active image
+        // this needs to invoke the decoding process for the in-view image
+        // annotations; prevImageId undefined to avoid encoding step
+        dispatch(
+          AnnotatorSlice.actions.setActiveImage({
+            imageId: activeImageId,
+            prevImageId: undefined,
+            execSaga: true,
+          })
+        );
       }
     };
 
