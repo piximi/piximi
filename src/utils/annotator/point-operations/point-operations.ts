@@ -75,7 +75,8 @@ export function computeBoundingBoxFromContours(
 export function maskFromPoints(
   coordinates: Array<Point>,
   imageDims: { width: number; height: number },
-  boundingBox?: [number, number, number, number]
+  boundingBox?: [number, number, number, number],
+  simplifyPoints: boolean = true
 ) {
   if (!boundingBox) {
     boundingBox = computeBoundingBoxFromContours(coordinates);
@@ -95,12 +96,14 @@ export function maskFromPoints(
   }
 
   // get coordinates of connected points and draw boundaries of mask
-  const connectedPoints = connectPoints(coordinates);
+  let connectedPoints = connectPoints(coordinates);
 
-  const simplifiedPoints = simplifyPolygon(connectedPoints);
+  if (simplifyPoints) {
+    connectedPoints = simplifyPolygon(connectedPoints);
+  }
 
   const greyScaleMask = scanline(
-    simplifiedPoints,
+    connectedPoints,
     imageDims.width,
     imageDims.height
   );
