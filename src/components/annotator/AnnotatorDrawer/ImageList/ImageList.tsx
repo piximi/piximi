@@ -44,7 +44,7 @@ export const ImageList = () => {
     activeImage!
   );
 
-  const ImageItemClickHandler = (
+  const handleImageItemClick = (
     evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
     image: ShadowImageType
   ) => {
@@ -60,7 +60,7 @@ export const ImageList = () => {
     }
   };
 
-  const ImageMenuOpenHandler = (
+  const handleImageMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
     image: ShadowImageType
   ) => {
@@ -84,7 +84,7 @@ export const ImageList = () => {
               key={image.id}
               id={image.id}
               onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                ImageItemClickHandler(evt, image)
+                handleImageItemClick(evt, image)
               }
               selected={image.id === activeImage?.id}
             >
@@ -112,7 +112,7 @@ export const ImageList = () => {
               <ListItemSecondaryAction>
                 <IconButton
                   edge="end"
-                  onClick={(event) => ImageMenuOpenHandler(event, image)}
+                  onClick={(event) => handleImageMenuOpen(event, image)}
                 >
                   <MoreHorizIcon />
                 </IconButton>
