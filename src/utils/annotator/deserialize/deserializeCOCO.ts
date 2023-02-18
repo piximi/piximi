@@ -120,6 +120,7 @@ export const deserializeCOCOFile = (
   const catless: Array<number> = [];
   const crowded: Array<number> = [];
   const multipart: Array<number> = [];
+  const malformed: Array<number> = [];
   let numKept: number = 0;
 
   for (const annotation of cocoFile.annotations) {
@@ -149,14 +150,20 @@ export const deserializeCOCOFile = (
       continue;
     }
 
-    numKept += 1;
-
-    // coco polygon points are arranged as: [y_1, x_1, y_2, x_2, ...]
+    // coco polygon points are arranged as: [x_1, y_1, x_2, y_2, ...]
     // where y_1 and x_1 are the y,x coordinates of point 1
     const polygon = polygons[0];
+
+    if (polygon.length % 2 !== 0) {
+      malformed.push(annotation.id);
+      continue;
+    }
+
+    numKept += 1;
+
     const points: Point[] = [];
-    for (let i = 0; i < polygon.length / 2; i += 2) {
-      points.push({ y: polygon[i], x: polygon[i + 1] });
+    for (let i = 0; i < polygon.length; i += 2) {
+      points.push({ x: polygon[i], y: polygon[i + 1] });
     }
 
     // convert coco [x, y, width, height] to our [x1, y1, x2, y2]
@@ -170,7 +177,8 @@ export const deserializeCOCOFile = (
     const maskData = maskFromPoints(
       points,
       { width: parentIm.shape.width, height: parentIm.shape.height },
-      bbox
+      bbox,
+      true
     );
 
     // TODO: COCO - probably should only do this if not being assigned to active image
@@ -202,6 +210,10 @@ export const deserializeCOCOFile = (
     catless.length > 0 &&
       console.log(
         `Could not associate ${catless.length} annotations with categories: ${catless}`
+      );
+    malformed.length > 0 &&
+      console.log(
+        `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`
       );
     crowded.length > 0 &&
       console.log(`Dropped ${crowded.length} annotations with iscrowd=1`);
