@@ -40,4 +40,5 @@ export {
   maskFromPoints,
 } from "./point-operations/point-operations";
 
-export { deserializeCOCOFile } from "./deserialize/deserializeCOCO";
+export { deserializeCOCOFile } from "./file-io/deserializeCOCO";
+export { serializeCOCOFile } from "./file-io/serializeCOCO";
