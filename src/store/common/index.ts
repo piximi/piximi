@@ -1,6 +1,5 @@
 // Selectors
 
-export { activeSerializedAnnotationsSelector } from "./selectors/activeSerializedAnnotationsSelector";
 export { categoryCountsSelector } from "./selectors/categoryCountsSelector";
 export { imageNameSelector } from "./selectors/imageNameSelector";
 export { imageDataSelector } from "./selectors/imageDataSelector";

@@ -111,7 +111,10 @@ export type { SerializedAnnotationType } from "./SerializedAnnotationType";
 
 export type { SerializedFileType } from "./SerializedFileType";
 
-export type { SerializedImageType } from "./SerializedImageType";
+export type {
+  SerializedImageType,
+  SerializedAnnotatorImageType,
+} from "./SerializedImageType";
 
 export type { Settings } from "./Settings";
 export { HotkeyView } from "./Settings";

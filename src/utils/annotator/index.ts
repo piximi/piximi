@@ -42,3 +42,7 @@ export {
 
 export { deserializeCOCOFile } from "./file-io/deserializeCOCO";
 export { serializeCOCOFile } from "./file-io/serializeCOCO";
+export {
+  deserializeAnnotations,
+  deserializeProjectFile,
+} from "./file-io/deserializeProject";

@@ -14,6 +14,7 @@ export {
   updateHighlightedCategory,
   updateImageCategories,
   updateImageCategoryFromHighlighted,
+  addAnnotationCategories,
 } from "./projectSlice";
 
 // Selectors

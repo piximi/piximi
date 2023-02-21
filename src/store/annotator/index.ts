@@ -36,6 +36,7 @@ export {
   setStagePosition,
   setVibrance,
   deleteAnnotationCategory,
+  setInstances,
 } from "./AnnotatorSlice";
 
 // Selectors

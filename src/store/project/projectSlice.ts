@@ -487,4 +487,5 @@ export const {
   setAnnotationCategories,
   updateImageAnnotations,
   clearAnnotations,
+  addAnnotationCategories,
 } = projectSlice.actions;

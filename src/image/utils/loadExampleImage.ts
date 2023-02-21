@@ -3,30 +3,10 @@ import {
   loadImageFileAsStack,
   convertToImage,
 } from "image/utils/imageHelper";
-import {
-  encodedAnnotationType,
-  Category,
-  SerializedAnnotationType,
-  SerializedFileType,
-} from "types";
 
-export const deserializeAnnotations = (
-  serializedAnnotations: Array<SerializedAnnotationType>
-) => {
-  const annotations: Array<encodedAnnotationType> = [];
+import { deserializeAnnotations } from "utils/annotator";
 
-  for (const annotation of serializedAnnotations) {
-    annotations.push({
-      id: annotation.id,
-      mask: annotation.mask.split(" ").map((e) => Number(e)),
-      plane: annotation.plane,
-      boundingBox: annotation.boundingBox as [number, number, number, number],
-      categoryId: annotation.categoryId,
-    });
-  }
-
-  return annotations;
-};
+import { Category, SerializedFileType } from "types";
 
 export const loadExampleImage = async (
   imagePath: string,
