@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { AnnotationStateType } from "types";
-import { drawRectangle } from "utils/common";
+import { drawRectangle } from "utils/annotator";
 
 export class ThresholdAnnotationTool extends AnnotationTool {
   threshold = 255;

@@ -24,7 +24,7 @@ import {
   CropSchema,
 } from "types";
 
-import { loadDataUrlAsStack, convertToImage } from "image/utils/imageHelper";
+import { loadDataUrlAsStack, convertToImage } from "utils/common/image";
 
 jest.setTimeout(100000);
 

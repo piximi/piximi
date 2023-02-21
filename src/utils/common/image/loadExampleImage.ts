@@ -2,7 +2,7 @@ import {
   fileFromPath,
   loadImageFileAsStack,
   convertToImage,
-} from "image/utils/imageHelper";
+} from "./imageHelper";
 
 import { deserializeAnnotations } from "utils/annotator";
 

@@ -10,7 +10,7 @@ import {
   ShadowImageType,
   Point,
 } from "types";
-import { DataArray } from "image/utils/imageHelper";
+import { DataArray } from "../common/image/imageHelper";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;

@@ -24,8 +24,8 @@ import {
   scaleColors,
   findMinMaxs,
   scaleImageTensor,
-} from "image/utils/imageHelper";
-import { fileFromPath } from "image/utils/nodeImageHelper";
+} from "./imageHelper";
+import { fileFromPath } from "./nodeImageHelper";
 
 // https://stackoverflow.com/questions/71365891/property-closeto-does-not-exist-on-type-expect
 interface CustomMatchers<R = unknown> {

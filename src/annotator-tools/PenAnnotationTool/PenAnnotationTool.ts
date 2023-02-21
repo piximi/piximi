@@ -2,10 +2,8 @@ import * as ImageJS from "image-js";
 
 import { AnnotationTool } from "../AnnotationTool";
 
-import { connectPoints } from "utils/common";
-
 import { AnnotationStateType, Point } from "types";
-import { computeBoundingBoxFromContours } from "utils/annotator";
+import { connectPoints, computeBoundingBoxFromContours } from "utils/annotator";
 
 export class PenAnnotationTool extends AnnotationTool {
   brushSize: number = 8;

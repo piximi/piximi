@@ -1,6 +1,6 @@
 import { min, max } from "lodash";
 import { Edge, Point } from "types";
-import { connectPoints } from "utils/common/imageHelper";
+import { connectPoints } from "utils/annotator";
 import { scanline } from "../polygon-fill/scanline";
 import { simplifyPolygon } from "../simplify/simplify";
 

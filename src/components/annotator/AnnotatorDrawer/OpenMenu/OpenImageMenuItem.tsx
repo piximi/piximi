@@ -5,7 +5,7 @@ import { ListItemText, MenuItem } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
-import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
+import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
 type OpenImageMenuItemProps = {
   onCloseMenu: () => void;

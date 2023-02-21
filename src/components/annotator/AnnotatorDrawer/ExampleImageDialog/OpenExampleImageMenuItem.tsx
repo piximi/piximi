@@ -7,7 +7,7 @@ import { activeImageIdSelector, AnnotatorSlice } from "store/annotator";
 
 import { SerializedFileType } from "types";
 
-import { loadExampleImage } from "image/utils/loadExampleImage";
+import { loadExampleImage } from "utils/common/image";
 
 type ExampleImageProject = {
   exampleImageTitle: string;
