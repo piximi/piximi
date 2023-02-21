@@ -18,7 +18,7 @@ import { projectSelector } from "store/project";
 
 import { HotkeyView } from "types";
 import { useHotkeys } from "hooks";
-import { serialize } from "utils/common/image/";
+import { serialize } from "utils/common/image/serialize";
 import { downloader } from "utils/common/fileHandlers";
 
 type SaveProjectDialogProps = {
