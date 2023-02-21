@@ -14,9 +14,8 @@ import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/common/imageHelper";
-import { activeSerializedAnnotationsSelector } from "store/common";
+import { serializeCOCOFile } from "utils/annotator";
 
-// TODO: post PR #407 - refactor all of this for new project format(s)
 type ExportAnnotationsAsMenuItemProps = {
   handleMenuClose: () => void;
   exportType: AnnotationExportType;
@@ -29,8 +28,8 @@ export const ExportAnnotationsAsMenuItem = ({
 }: ExportAnnotationsAsMenuItemProps) => {
   const images = useSelector(annotatorImagesSelector);
   const annotationCategories = useSelector(annotationCategoriesSelector);
-  const annotations = useSelector(activeSerializedAnnotationsSelector);
   const projectName = useSelector(projectNameSelector);
+  const categories = useSelector(annotationCategoriesSelector);
 
   const onExport = () => {
     handleMenuClose();
@@ -38,9 +37,10 @@ export const ExportAnnotationsAsMenuItem = ({
     let zip = new JSZip();
 
     switch (exportType) {
-      case AnnotationExportType.JSON:
-        if (!annotations) return;
-        const blob = new Blob([JSON.stringify(annotations)], {
+      case AnnotationExportType.COCO:
+        const serializedProject = serializeCOCOFile(images, categories);
+
+        const blob = new Blob([JSON.stringify(serializedProject)], {
           type: "application/json;charset=utf-8",
         });
         saveAs(blob, `${projectName}.json`);

@@ -5,6 +5,7 @@ import { Divider, Menu } from "@mui/material";
 import { OpenImageMenuItem } from "./OpenImageMenuItem";
 import { OpenProjectFileMenuItem } from "./OpenProjectFileMenuItem";
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
+import { ProjectFileType } from "types/runtime";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -17,7 +18,15 @@ export const OpenMenu = ({ anchorEl, onCloseMenu, open }: OpenMenuProps) => {
     <Menu open={open} anchorEl={anchorEl} onClose={onCloseMenu}>
       <OpenImageMenuItem onCloseMenu={onCloseMenu} />
 
-      <OpenProjectFileMenuItem onCloseMenu={onCloseMenu} />
+      <OpenProjectFileMenuItem
+        onCloseMenu={onCloseMenu}
+        projectType={ProjectFileType.PIXIMI}
+      />
+
+      <OpenProjectFileMenuItem
+        onCloseMenu={onCloseMenu}
+        projectType={ProjectFileType.COCO}
+      />
 
       <Divider />
 

@@ -18,7 +18,8 @@ export const annotatorFullImagesSelector = ({
       return {
         ...projectImage,
         ...shadowImage,
-        data: projectImage.data.clone(),
+        // TODO: COCO - disabled, possibly memory leak
+        // data: projectImage.data.clone(),
       };
     } else {
       return shadowImage as ImageType;

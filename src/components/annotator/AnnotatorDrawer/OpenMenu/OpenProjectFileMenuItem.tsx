@@ -14,17 +14,19 @@ import {
   projectSlice,
 } from "store/project";
 
-import { deserializeCOCOFile } from "utils/annotator";
+import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
-import { validateFileType } from "types/runtime";
-import { SerializedCOCOFileType } from "types";
+import { validateFileType, ProjectFileType } from "types/runtime";
+import { SerializedCOCOFileType, SerializedFileType } from "types";
 
 type OpenAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
+  projectType: ProjectFileType;
 };
 
 export const OpenProjectFileMenuItem = ({
   onCloseMenu,
+  projectType,
 }: OpenAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
 
@@ -54,16 +56,22 @@ export const OpenProjectFileMenuItem = ({
 
     reader.onload = async (event: ProgressEvent<FileReader>) => {
       if (event.target && event.target.result) {
-        const cocoFile: SerializedCOCOFileType = validateFileType(
-          event.target.result as string
-        );
+        const serializedProject: SerializedCOCOFileType | SerializedFileType =
+          validateFileType(event.target.result as string, projectType);
 
-        const { newAnnotations, newCategories } = deserializeCOCOFile(
-          cocoFile,
-          existingImages,
-          existingAnnotationCategories,
-          availableColors
-        );
+        const { imsToAnnotate, newCategories } =
+          projectType === ProjectFileType.PIXIMI
+            ? deserializeProjectFile(
+                serializedProject as SerializedFileType,
+                existingImages,
+                existingAnnotationCategories
+              )
+            : deserializeCOCOFile(
+                serializedProject as SerializedCOCOFileType,
+                existingImages,
+                existingAnnotationCategories,
+                availableColors
+              );
 
         batch(() => {
           dispatch(
@@ -73,10 +81,11 @@ export const OpenProjectFileMenuItem = ({
           );
           dispatch(
             AnnotatorSlice.actions.setInstances({
-              instances: newAnnotations,
+              instances: imsToAnnotate,
             })
           );
         });
+
         // when a deserialized annotation is associated with the active image
         // this needs to invoke the decoding process for the in-view image
         // annotations; prevImageId undefined to avoid encoding step
@@ -95,7 +104,13 @@ export const OpenProjectFileMenuItem = ({
 
   return (
     <MenuItem component="label">
-      <ListItemText primary="Open project file" />
+      <ListItemText
+        primary={
+          projectType === ProjectFileType.PIXIMI
+            ? "Open piximi project file"
+            : "Open coco project file"
+        }
+      />
       <input
         accept="application/json"
         hidden

@@ -35,8 +35,11 @@ export const ApplyColorsButton = () => {
             color: newColor.clone(),
           };
 
+          // TOO: COCO - necessary?
+          const imageData = image.data.clone();
+
           const updatedSrc = await createRenderedTensor(
-            image.data,
+            imageData,
             imageColors,
             image.bitDepth,
             image.activePlane
@@ -44,6 +47,7 @@ export const ApplyColorsButton = () => {
 
           return {
             ...image,
+            data: imageData,
             colors: imageColors,
             src: updatedSrc,
           } as ImageType;
