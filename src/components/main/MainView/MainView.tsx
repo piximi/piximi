@@ -20,7 +20,7 @@ import { visibleImagesSelector } from "store/common";
 import { AlertType, HotkeyView, ImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
+import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 

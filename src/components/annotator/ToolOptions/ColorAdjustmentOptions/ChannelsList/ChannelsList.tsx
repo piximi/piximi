@@ -20,11 +20,7 @@ import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
 import { imageBitDepthSelector, imageDataSelector } from "store/common";
 
-import {
-  rgbToHex,
-  scaleUpRange,
-  scaleDownRange,
-} from "image/utils/imageHelper";
+import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 import { useLocalGlobalState } from "hooks";

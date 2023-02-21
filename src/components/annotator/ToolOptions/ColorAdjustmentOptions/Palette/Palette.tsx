@@ -12,7 +12,7 @@ import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
 import { DEFAULT_COLORS } from "types";
 
-import { rgbToHex } from "image/utils/imageHelper";
+import { rgbToHex } from "utils/common/image";
 
 type PaletteProps = {
   channelIdx: number;

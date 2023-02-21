@@ -1,4 +1,4 @@
-import { DataArray } from "image/utils/imageHelper";
+import { DataArray } from "utils/common/image";
 
 export type encodedAnnotationType = {
   // x1, y1, W, H

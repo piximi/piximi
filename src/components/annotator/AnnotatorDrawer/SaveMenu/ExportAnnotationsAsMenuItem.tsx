@@ -13,7 +13,7 @@ import {
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
-} from "utils/common/imageHelper";
+} from "utils/annotator/imageHelper";
 import { serializeCOCOFile } from "utils/annotator";
 
 type ExportAnnotationsAsMenuItemProps = {

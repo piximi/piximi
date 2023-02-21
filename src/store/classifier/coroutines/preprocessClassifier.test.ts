@@ -19,8 +19,8 @@ import {
   loadImageFileAsStack,
   convertToImage,
   MIMEType,
-} from "image/utils/imageHelper";
-import { fileFromPath } from "image/utils/nodeImageHelper";
+} from "utils/common/image";
+import { fileFromPath } from "utils/common/image/nodeImageHelper";
 
 jest.setTimeout(50000);
 

@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { applicationSlice, initSelector } from "store/application";
 import { projectSlice, imagesCountSelector } from "store/project";
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
-import { loadExampleImage } from "image/utils/loadExampleImage";
+import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";

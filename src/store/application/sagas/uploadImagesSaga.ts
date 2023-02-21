@@ -21,7 +21,7 @@ import {
   ImageShapeEnum,
   loadImageFileAsStack,
   convertToImage,
-} from "image/utils/imageHelper";
+} from "utils/common/image";
 
 type ImageFileType = {
   fileName: string;

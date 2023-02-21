@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HotkeyView, Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
-import { ImageShapeInfo } from "image/utils/imageHelper";
+import { ImageShapeInfo } from "utils/common/image";
 
 const initialState: Settings = {
   init: false,

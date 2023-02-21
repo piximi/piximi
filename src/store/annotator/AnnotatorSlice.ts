@@ -18,7 +18,7 @@ import { Annotator } from "types/Annotator";
 import { Colors } from "types/tensorflow";
 import { AnnotationTool } from "annotator-tools";
 
-import { replaceDuplicateName } from "image/utils/imageHelper";
+import { replaceDuplicateName } from "utils/common/image";
 
 const initialState: Annotator = {
   annotationState: AnnotationStateType.Blank,

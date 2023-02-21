@@ -1,10 +1,10 @@
 import createGraph, { Graph, Node } from "ngraph.graph";
 
-import { DataArray } from "image-js";
+import { DataArray } from "utils/common/image";
 
 import { cachedAStarPathSearch, NodeHeap } from "..";
 
-import { getIdx } from "utils/common/imageHelper";
+import { getIdx } from "utils/annotator/imageHelper";
 import { Point } from "types";
 
 export interface PiximiGraph extends Graph {

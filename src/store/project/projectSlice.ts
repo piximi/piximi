@@ -13,7 +13,7 @@ import {
 import { ImageType, ShadowImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { replaceDuplicateName } from "image/utils/imageHelper";
+import { replaceDuplicateName } from "utils/common/image";
 import {
   decodedAnnotationType,
   encodedAnnotationType,

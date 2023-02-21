@@ -1,8 +1,8 @@
 import { tensor2d, tensor4d } from "@tensorflow/tfjs";
 import { Dataset, File, Group, ready } from "h5wasm";
 
-import { getFile } from "components/file-io/utils/file_handlers";
-import { createRenderedTensor, BitDepth } from "image/utils/imageHelper";
+import { getFile } from "utils/common";
+import { createRenderedTensor, BitDepth } from "./imageHelper";
 import {
   SerializedImageType,
   ImageType,

@@ -14,7 +14,7 @@ import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
 
 import { imageDataSelector } from "store/common";
 
-import { generateDefaultColors } from "image/utils/imageHelper";
+import { generateDefaultColors } from "utils/common/image";
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();

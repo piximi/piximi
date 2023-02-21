@@ -18,7 +18,7 @@ import {
 } from "store/application";
 import { getStackTraceFromError } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ImageShapeInfo, ImageShapeEnum } from "image/utils/imageHelper";
+import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 
 import { AlertType, HotkeyView } from "types";
 

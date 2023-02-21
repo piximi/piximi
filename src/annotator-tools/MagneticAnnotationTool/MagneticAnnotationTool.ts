@@ -6,8 +6,8 @@ import {
   makeGraph,
   PiximiGraph,
   pointsAreEqual,
+  getIdx,
 } from "utils/annotator";
-import { getIdx } from "utils/common";
 
 import { AnnotationStateType, Point } from "types";
 

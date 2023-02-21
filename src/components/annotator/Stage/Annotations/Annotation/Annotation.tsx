@@ -8,8 +8,7 @@ import { setSelectedAnnotations } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 
-import { hexToRGBA } from "utils/common/imageHelper";
-import { colorOverlayROI } from "utils/common/imageHelper";
+import { hexToRGBA, colorOverlayROI } from "utils/annotator";
 import { useImageOrigin } from "hooks";
 
 type AnnotationProps = {

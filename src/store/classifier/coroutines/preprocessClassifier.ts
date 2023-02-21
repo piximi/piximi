@@ -17,11 +17,7 @@ import {
   TensorContainer,
 } from "@tensorflow/tfjs";
 
-import {
-  denormalizeTensor,
-  getImageSlice,
-  BitDepth,
-} from "image/utils/imageHelper";
+import { denormalizeTensor, getImageSlice, BitDepth } from "utils/common/image";
 
 import { matchedCropPad, padToMatch } from "./cropUtil";
 
