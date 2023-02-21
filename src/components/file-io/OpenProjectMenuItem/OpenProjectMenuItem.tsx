@@ -8,8 +8,8 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 
-import { uploader } from "utils/common";
-import { deserialize } from "utils/common/image";
+import { uploader } from "utils/common/fileHandlers";
+import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
 

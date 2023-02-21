@@ -15,8 +15,8 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserialize } from "utils/common/image";
-import { uploader } from "utils/common";
+import { deserialize } from "utils/common/image/deserialize";
+import { uploader } from "utils/common/fileHandlers";
 
 type ExampleProjectProps = {
   projectName: string;
