@@ -46,3 +46,15 @@ export {
   deserializeAnnotations,
   deserializeProjectFile,
 } from "./file-io/deserializeProject";
+
+export {
+  getIdx,
+  connectPoints,
+  drawRectangle,
+  getAnnotationsInBox,
+  getOverlappingAnnotations,
+  generatePoints,
+  drawLine,
+  colorOverlayROI,
+  hexToRGBA,
+} from "./imageHelper";

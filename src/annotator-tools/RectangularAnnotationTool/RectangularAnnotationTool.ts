@@ -1,6 +1,6 @@
 import { AnnotationTool } from "../AnnotationTool";
 import { AnnotationStateType } from "types";
-import { drawRectangle } from "utils/common/imageHelper";
+import { drawRectangle } from "utils/annotator";
 
 export class RectangularAnnotationTool extends AnnotationTool {
   width?: number;

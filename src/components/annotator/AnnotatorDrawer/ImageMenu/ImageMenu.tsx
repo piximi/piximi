@@ -21,7 +21,7 @@ import {
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
-} from "utils/common/imageHelper";
+} from "utils/annotator/imageHelper";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;

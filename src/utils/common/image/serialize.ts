@@ -1,6 +1,6 @@
 import { Group, ready } from "h5wasm";
 
-import { getFile, to_blob } from "components/file-io/utils/file_handlers";
+import { getFile, to_blob } from "utils/common";
 import {
   encodedAnnotationType,
   Classifier,

@@ -18,8 +18,8 @@ import { projectSelector } from "store/project";
 
 import { HotkeyView } from "types";
 import { useHotkeys } from "hooks";
-import { serialize } from "image/utils/serialize";
-import { downloader } from "../utils/file_handlers";
+import { serialize } from "utils/common/image/";
+import { downloader } from "utils/common/fileHandlers";
 
 type SaveProjectDialogProps = {
   onClose: () => void;

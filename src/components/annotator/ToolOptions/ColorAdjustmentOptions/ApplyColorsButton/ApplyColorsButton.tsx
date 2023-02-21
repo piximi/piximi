@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText } from "@mui/material";
 
-import { createRenderedTensor } from "image/utils/imageHelper";
+import { createRenderedTensor } from "utils/common/image";
 
 import { annotatorFullImagesSelector } from "store/common";
 import { AnnotatorSlice, activeImageColorsSelector } from "store/annotator";

@@ -5,8 +5,8 @@ import {
   convertToImage,
   loadImageFileAsStack,
   MIMEType,
-} from "image/utils/imageHelper";
-import { fileFromPath } from "image/utils/nodeImageHelper";
+} from "utils/common/image";
+import { fileFromPath } from "utils/common/image/nodeImageHelper";
 import { Category } from "types/Category";
 import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";

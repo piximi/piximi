@@ -11,7 +11,7 @@ import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
 
 import { Colors } from "types/tensorflow";
 
-import { createRenderedTensor } from "image/utils/imageHelper";
+import { createRenderedTensor } from "utils/common/image";
 
 export function* activeImageIDChangeSaga({
   payload: { imageId, prevImageId, execSaga },

@@ -10,7 +10,7 @@ import {
   Point,
 } from "types";
 
-import { DataArray, convertToDataArray } from "image/utils/imageHelper";
+import { DataArray, convertToDataArray } from "utils/common/image";
 
 import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,

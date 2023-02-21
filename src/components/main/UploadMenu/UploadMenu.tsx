@@ -14,7 +14,7 @@ import { useUpload } from "hooks";
 import { StyledMenuItem } from "./StyledMenuItem";
 
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
-import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
+import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;

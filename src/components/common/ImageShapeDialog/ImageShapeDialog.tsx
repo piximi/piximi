@@ -15,8 +15,9 @@ import { CustomNumberTextField } from "components/common/InputFields";
 
 import { applicationSlice } from "store/application";
 
+import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
+
 import { HotkeyView } from "types";
-import { ImageShapeEnum, ImageShapeInfo } from "image/utils/imageHelper";
 
 type ImageShapeDialogProps = {
   files: FileList;

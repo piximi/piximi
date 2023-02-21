@@ -1,6 +1,6 @@
 import { Annotator, ShadowImageType } from "types";
 import { Colors, ColorsRaw } from "types/tensorflow";
-import { generateBlankColors } from "image/utils/imageHelper";
+import { generateBlankColors } from "utils/common/image";
 
 export const activeImageColorsRawSelector = ({
   annotator,
