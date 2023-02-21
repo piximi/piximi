@@ -22,7 +22,10 @@ import { replaceDuplicateName } from "image/utils/imageHelper";
 
 const initialState: Annotator = {
   annotationState: AnnotationStateType.Blank,
-  boundingClientRect: new DOMRect(),
+  boundingClientRect:
+    process.env.NODE_ENV !== "test"
+      ? new DOMRect()
+      : (undefined as unknown as DOMRect), // dummy for testing
   brightness: 0,
   currentIndex: 0,
   cursor: "default",
@@ -532,4 +535,5 @@ export const {
   setZoomSelection,
   deleteAnnotationCategory,
   updateStagedAnnotations,
+  setInstances,
 } = annotatorSlice.actions;

@@ -4,6 +4,8 @@ export {
   SerializedCOCOCategoryRType,
   SerializedCOCOImageRType,
   SerializedFileRType,
+  SerializedImageRType,
   SerializedAnnotationRType,
   validateFileType,
+  ProjectFileType,
 } from "./SerializedFileType";

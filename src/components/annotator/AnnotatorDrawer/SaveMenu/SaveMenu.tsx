@@ -44,8 +44,8 @@ const exportOptions = [
     type: AnnotationExportType.Matrix,
   },
   {
-    title: "Export Annotations as JSON",
-    type: AnnotationExportType.JSON,
+    title: "Export Annotations as COCO-formatted JSON",
+    type: AnnotationExportType.COCO,
   },
 ];
 

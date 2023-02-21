@@ -1,6 +1,8 @@
+import * as T from "io-ts";
 import { encodedAnnotationType } from "types";
 import { Partition } from "./Partition";
 import { ColorsRaw } from "./tensorflow";
+import { SerializedImageRType } from "./runtime";
 
 export type SerializedImageType = {
   name: string; // prev imageFilename
@@ -20,3 +22,7 @@ export type SerializedImageType = {
 
   src?: string;
 };
+
+export type SerializedAnnotatorImageType = T.TypeOf<
+  typeof SerializedImageRType
+>;

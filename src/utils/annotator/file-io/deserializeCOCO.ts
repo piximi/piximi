@@ -112,7 +112,7 @@ export const deserializeCOCOFile = (
 
   const imIdMap = deserializeCOCOImages(cocoFile.images, existingImages);
 
-  const annotations: {
+  const imsToAnnotate: {
     [parentImId: string]: Array<encodedAnnotationType>;
   } = {};
 
@@ -192,10 +192,10 @@ export const deserializeCOCOFile = (
       categoryId: parentCat.id,
     };
 
-    if (annotations.hasOwnProperty(parentIm.id)) {
-      annotations[parentIm.id].push(newAnnotation);
+    if (imsToAnnotate.hasOwnProperty(parentIm.id)) {
+      imsToAnnotate[parentIm.id].push(newAnnotation);
     } else {
-      annotations[parentIm.id] = [newAnnotation];
+      imsToAnnotate[parentIm.id] = [newAnnotation];
     }
   }
 
@@ -227,7 +227,7 @@ export const deserializeCOCOFile = (
   }
 
   return {
-    newAnnotations: annotations,
+    imsToAnnotate,
     newCategories: Object.values(catIdMap.newCategories),
   };
 };

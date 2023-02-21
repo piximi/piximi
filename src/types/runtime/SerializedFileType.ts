@@ -75,8 +75,14 @@ const SerializedCategoryRType = T.type({
   visible: T.boolean,
 });
 
+export const SerializedImageRType = T.type({
+  id: T.string,
+  name: T.string,
+});
+
 export const SerializedAnnotationRType = T.type({
   categoryId: T.string, // category id, matching id of a SerializedCategory
+  imageId: T.string, // image id, matching id of SerializedImage
   id: T.string,
   mask: T.string, // e.g. "114 1 66 1 66 2 ..."
   plane: T.number,
@@ -86,6 +92,7 @@ export const SerializedAnnotationRType = T.type({
 export const SerializedFileRType = T.type({
   categories: T.array(SerializedCategoryRType),
   annotations: T.array(SerializedAnnotationRType),
+  images: T.array(SerializedImageRType),
 });
 
 //#endregion Basic Serialization Type
@@ -95,7 +102,22 @@ const toError = (errors: any) => {
   throw new Error(failure(errors).join("\n"));
 };
 
-export const validateFileType = (encodedFileContents: string) => {
+export enum ProjectFileType {
+  COCO,
+  PIXIMI,
+}
+
+export const validateFileType = (
+  encodedFileContents: string,
+  projectType: ProjectFileType = ProjectFileType.PIXIMI
+) => {
   const annotations = JSON.parse(encodedFileContents);
-  return getOrElseW(toError)(SerializedCOCOFileRType.decode(annotations));
+  switch (projectType) {
+    case ProjectFileType.PIXIMI:
+      return getOrElseW(toError)(SerializedFileRType.decode(annotations));
+    case ProjectFileType.COCO:
+      return getOrElseW(toError)(SerializedCOCOFileRType.decode(annotations));
+    default:
+      throw new Error("Unrecognized project type", projectType);
+  }
 };

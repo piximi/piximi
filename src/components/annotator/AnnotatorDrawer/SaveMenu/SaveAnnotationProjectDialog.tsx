@@ -14,28 +14,31 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { activeSerializedAnnotationsSelector } from "store/common";
+import { annotatorFullImagesSelector } from "store/common";
 import { HotkeyView } from "types";
+import { serializeProject } from "utils/annotator/file-io/serializeProject";
+import { annotationCategoriesSelector } from "store/project";
 
 type SaveAnnotationProjectDialogProps = {
   onClose: () => void;
   open: boolean;
 };
 
-// TODO: post PR #407 - refactor project file (SerializedFileType) to host
-// annotations for all images in viewer, rather than just the active one
 export const SaveAnnotationProjectDialog = ({
   onClose,
   open,
 }: SaveAnnotationProjectDialogProps) => {
   const [projectName, setProjectName] = useState<string>("");
 
-  const serializedProject = useSelector(activeSerializedAnnotationsSelector);
+  const fullImages = useSelector(annotatorFullImagesSelector);
+  const categories = useSelector(annotationCategoriesSelector);
 
   const onSaveAllAnnotations = () => {
-    const parts = [JSON.stringify(serializedProject)];
+    const serializedProject = serializeProject(fullImages, categories);
 
-    const data = new Blob(parts, { type: "application/json;charset=utf-8" });
+    const data = new Blob([JSON.stringify(serializedProject)], {
+      type: "application/json;charset=utf-8",
+    });
 
     saveAs(data, `${projectName}.json`);
 
