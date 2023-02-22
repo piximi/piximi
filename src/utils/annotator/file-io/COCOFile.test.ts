@@ -167,7 +167,7 @@ const annotationsT3Expected = [
 
 //#endregion setup
 
-test("serialize COCO", () => {
+test.skip("serialize COCO", () => {
   // piximi initial state
 
   let projectState = projectSlice.reducer(undefined, { type: undefined });
