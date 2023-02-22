@@ -45,7 +45,7 @@ const reconcileCategories = (
   for (const cat of serializedCategories) {
     const existingCat = existingCategories.find((c) => c.name === cat.name);
     if (existingCat) {
-      // gets new id
+      // map to existing id
       catIdMap[cat.id] = existingCat.id;
       matchedCats.push(cat);
     } else {
@@ -92,15 +92,16 @@ const reconcileImages = (
   // incoming image id -> existing image id
   const imIdMap: { [imId: string]: string } = {};
 
+  const discardedAnnotations: Array<SerializedAnnotationType> = [];
   const discardedIms: Array<SerializedAnnotatorImageType> = [];
-  const moddedIms: Array<SerializedAnnotatorImageType> = [];
+  const matchedIms: Array<SerializedAnnotatorImageType> = [];
 
   for (const im of serializedImages) {
     const existingIm = existingImages.find((i) => i.name === im.name);
     if (existingIm) {
       // save id mapping
       imIdMap[im.id] = existingIm.id;
-      moddedIms.push({ ...im, id: existingIm.id });
+      matchedIms.push(existingIm);
     } else {
       // discarded
       discardedIms.push(im);
@@ -108,28 +109,36 @@ const reconcileImages = (
   }
 
   const imModdedAnnotations = serializedAnnotations
-    .filter((ann) => imIdMap.hasOwnProperty(ann.imageId))
+    .filter((ann) => {
+      if (imIdMap.hasOwnProperty(ann.imageId)) {
+        return true;
+      } else {
+        discardedAnnotations.push(ann);
+        return false;
+      }
+    })
     .map((ann) => ({ ...ann, imageId: imIdMap[ann.imageId] }));
 
   if (
     process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
-    const numDiscarded = discardedIms.length;
-    const numModded = moddedIms.length;
+    const numImsDiscarded = discardedIms.length;
+    const numAnnsDiscarded = discardedAnnotations.length;
+    const numMatched = matchedIms.length;
     const numExisting = existingImages.length;
 
-    numDiscarded > 0 &&
+    numImsDiscarded > 0 &&
       console.log(
-        `Discarded ${numDiscarded} / ${numExisting} images: ${discardedIms.map(
-          (im) => im.name
-        )}`
+        `Discarded ${numImsDiscarded} / ${numExisting} images`,
+        `and ${numAnnsDiscarded} associated annotations.`,
+        `Image names: ${discardedIms.map((im) => im.name)}`
       );
-    numModded > 0 &&
-      console.log(`Matched ${numModded} / ${numExisting} images`);
+    numMatched > 0 &&
+      console.log(`Matched ${numMatched} / ${numExisting} images`);
   }
 
-  return { moddedIms, imModdedAnnotations };
+  return { matchedIms, imModdedAnnotations };
 };
 
 export const deserializeProjectFile = (
@@ -145,7 +154,7 @@ export const deserializeProjectFile = (
   );
 
   // this must come second
-  const { moddedIms, imModdedAnnotations } = reconcileImages(
+  const { matchedIms, imModdedAnnotations } = reconcileImages(
     existingImages,
     serializedProject.images,
     catModdedAnnotations
@@ -160,7 +169,7 @@ export const deserializeProjectFile = (
     return idMap;
   }, {} as { [imageId: string]: Array<SerializedAnnotationType> });
 
-  const deserializedImages = moddedIms.reduce(
+  const deserializedImages = matchedIms.reduce(
     (idMap, im) => {
       const annotations = deserializeAnnotations(annMap[im.id]);
       idMap[im.id] = annotations;
