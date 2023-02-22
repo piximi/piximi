@@ -48,7 +48,13 @@ export const serializeCOCOFile = (
         category_id: catIdMap[ann.categoryId].id,
         segmentation: [[]],
         area: 0,
-        bbox: ann.boundingBox,
+        // x1, y1, width, height
+        bbox: [
+          ann.boundingBox[0],
+          ann.boundingBox[1],
+          ann.boundingBox[2] - ann.boundingBox[0],
+          ann.boundingBox[3] - ann.boundingBox[1],
+        ],
         iscrowd: 0,
       });
     }
