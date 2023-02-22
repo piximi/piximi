@@ -137,7 +137,7 @@ const im1AnnotationsT2: Array<encodedAnnotationType> = [
   },
 ];
 
-// annotations existe T1, but not T2
+// annotations exists T1, but not T2
 const im2AnnotationsT1: Array<encodedAnnotationType> = [
   {
     categoryId: T1T2UnmodifiedCat.id, // unknown
