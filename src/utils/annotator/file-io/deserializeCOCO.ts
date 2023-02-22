@@ -5,6 +5,7 @@ import { encode, maskFromPoints } from "utils/annotator";
 import {
   Category,
   SerializedCOCOFileType,
+  SerializedCOCOAnnotationType,
   SerializedCOCOCategoryType,
   SerializedCOCOImageType,
   Point,
@@ -12,46 +13,63 @@ import {
   encodedAnnotationType,
 } from "types";
 
-const deserializeCOCOCategories = (
-  serializedCategories: Array<SerializedCOCOCategoryType>,
+/*
+We want to match incoming categories to existing categories, if their names are the same,
+however their ids may differ. We can't change existing category ids because existing annotations
+refer to them. Instead we have to ensure incoming categories are given the proper ids, and then
+change the incoming annotations to refer to the updated incoming category id
+*/
+const reconcileCOCOCategories = (
   existingCategories: Array<Category>,
+  serializedCategories: Array<SerializedCOCOCategoryType>,
+  serializedAnnotations: Array<SerializedCOCOAnnotationType>,
   availableColors: Array<string> = []
 ) => {
   if (availableColors.length === 0) {
     availableColors = ["#000000"];
   }
+  // incoming cat id -> existing cat id
+  const catIdMap: { [catId: string]: string } = {};
 
   let colorIdx = -1;
 
-  const matchedCategories: { [id: number]: Category } = {};
-  const newCategories: { [id: number]: Category } = {};
+  const matchedCats: typeof serializedCategories = [];
+  const newCats: typeof existingCategories = [];
 
-  for (const cocoCategory of serializedCategories) {
-    const matchingCat = existingCategories.find(
-      (cat) => cat.name === cocoCategory.name
-    );
+  for (const cocoCat of serializedCategories) {
+    const existingCat = existingCategories.find((c) => c.name === cocoCat.name);
 
-    if (matchingCat) {
-      matchedCategories[cocoCategory.id] = matchingCat;
+    if (existingCat) {
+      // map to existing id
+      catIdMap[cocoCat.id] = existingCat.id;
+      matchedCats.push(cocoCat);
     } else {
       // no matching category exists, create one
-      newCategories[cocoCategory.id] = {
+      const newCat = {
         id: uuidv4(),
-        name: cocoCategory.name,
+        name: cocoCat.name,
         visible: true,
         // keep cycling through available colors
         color: availableColors[++colorIdx % availableColors.length],
       };
+
+      catIdMap[cocoCat.id] = newCat.id;
+      newCats.push(newCat);
     }
   }
+
+  const catModdedAnnotations = serializedAnnotations.map((ann) => ({
+    ...ann,
+    category_id: catIdMap[ann.category_id],
+  }));
 
   if (
     process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
+    const numMatched = matchedCats.length;
+    const numNew = newCats.length;
     const numExisting = existingCategories.length;
-    const numMatched = Object.keys(matchedCategories).length;
-    const numNew = Object.keys(newCategories).length;
     const numUnmatched = numExisting - numMatched;
 
     numMatched !== numExisting &&
@@ -60,42 +78,82 @@ const deserializeCOCOCategories = (
       );
   }
 
-  return { matchedCategories, newCategories };
+  return { newCats, catModdedAnnotations };
 };
 
-const deserializeCOCOImages = (
+/*
+We want to match incoming images to existing images, where their names are the same,
+however their ids may differ. We can't change existing image ids because existing components
+may refer to them. Instead we have to ensure incoming images are given the proper ids, and then
+change the incoming annotations to refer to the updated incoming image id.
+
+If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
+*/
+const reconcileImages = (
+  existingImages: Array<ShadowImageType>,
   serializedImages: Array<SerializedCOCOImageType>,
-  existingImages: Array<ShadowImageType>
+  // reconcileCOCOCategories changes 'category_id' type
+  serializedAnnotations: Array<
+    Omit<SerializedCOCOAnnotationType, "category_id"> & { category_id: string }
+  >
 ) => {
-  const imIdMap: { [id: number]: ShadowImageType } = {};
-  const unfound: Array<string> = [];
+  // incoming image id -> existing image id
+  const imIdMap: { [imId: string]: string } = {};
+
+  const discardedAnnotations: typeof serializedAnnotations = [];
+  const discardedIms: typeof serializedImages = [];
+  const matchedIms: typeof existingImages = [];
 
   for (const cocoIm of serializedImages) {
-    const matchingIm = existingImages.find(
-      (im) => im.name === cocoIm.file_name
-    );
-
-    if (matchingIm) {
-      imIdMap[cocoIm.id] = matchingIm;
+    const existingIm = existingImages.find((i) => i.name === cocoIm.file_name);
+    if (existingIm) {
+      // save id mapping
+      imIdMap[cocoIm.id] = existingIm.id;
+      // save refrence to modded image
+      matchedIms.push(existingIm);
     } else {
-      unfound.push(cocoIm.file_name);
+      // discard match-less images
+      discardedIms.push(cocoIm);
     }
   }
+
+  const imModdedAnnotations = serializedAnnotations
+    .filter((ann) => {
+      if (imIdMap.hasOwnProperty(ann.image_id)) {
+        return true;
+      } else {
+        // discarde image-less annotatiosn
+        discardedAnnotations.push(ann);
+        return false;
+      }
+    })
+    .map((ann) => ({ ...ann, image_id: imIdMap[ann.image_id] }));
 
   if (
     process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
-    unfound.length > 0 &&
+    const numImsDiscarded = discardedIms.length;
+    const numAnnsDiscarded = discardedAnnotations.length;
+    const numImsModded = matchedIms.length;
+    const numImsExisting = existingImages.length;
+    const numAnnsKept = imModdedAnnotations.length;
+
+    numImsDiscarded > 0 &&
       console.log(
-        `Could not find ${unfound.length}/${serializedImages.length} images: ${unfound}`
+        `Discarded ${numImsDiscarded} / ${numImsExisting} COCO images`,
+        `and ${numAnnsDiscarded} associated annotations.`,
+        `Image names: ${discardedIms.map((im) => im.file_name)}`,
+        `Annotation ids: ${discardedAnnotations.map((ann) => ann.id)}`
       );
-    const found = Object.keys(imIdMap);
-    found.length > 0 &&
-      console.log(`Found ${found.length}/${serializedImages.length} images`);
+    numImsModded > 0 &&
+      console.log(
+        `Matched ${numImsModded} / ${numImsExisting} COCO images`,
+        `with ${numAnnsKept} associated annotations`
+      );
   }
 
-  return imIdMap;
+  return { matchedIms, imModdedAnnotations };
 };
 
 export const deserializeCOCOFile = (
@@ -104,49 +162,53 @@ export const deserializeCOCOFile = (
   existingCategories: Array<Category>,
   availableColors: Array<string> = []
 ) => {
-  const catIdMap = deserializeCOCOCategories(
-    cocoFile.categories,
+  // this must come first
+  const { newCats, catModdedAnnotations } = reconcileCOCOCategories(
     existingCategories,
+    cocoFile.categories,
+    cocoFile.annotations,
     availableColors
   );
 
-  const imIdMap = deserializeCOCOImages(cocoFile.images, existingImages);
+  // this must come second
+  const { matchedIms, imModdedAnnotations } = reconcileImages(
+    existingImages,
+    cocoFile.images,
+    catModdedAnnotations
+  );
 
-  const imsToAnnotate: {
-    [parentImId: string]: Array<encodedAnnotationType>;
-  } = {};
-
-  const imageless: Array<number> = [];
-  const catless: Array<number> = [];
   const crowded: Array<number> = [];
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
-  let numKept: number = 0;
 
-  for (const annotation of cocoFile.annotations) {
-    const parentIm = imIdMap[annotation.image_id];
-    const parentCat =
-      catIdMap.matchedCategories[annotation.category_id] ||
-      catIdMap.newCategories[annotation.category_id];
+  const imsToAnnotate: {
+    [imageId: string]: Array<encodedAnnotationType>;
+  } = {};
+
+  for (const cocoAnn of imModdedAnnotations) {
+    const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);
 
     if (!parentIm) {
-      imageless.push(annotation.id);
+      if (process.env.NODE_ENV !== "production") {
+        console.error(
+          "Somehow received an imageless annotation that was not filtered out"
+        );
+      }
       continue;
-    } else if (!parentCat) {
-      catless.push(annotation.id);
-      continue;
-    } else if (annotation.iscrowd) {
-      crowded.push(annotation.id);
+    }
+
+    if (cocoAnn.iscrowd) {
+      crowded.push(cocoAnn.id);
       continue;
     }
 
     // will be number[][] when iscrowd is false
-    const polygons = annotation.segmentation as number[][];
+    const polygons = cocoAnn.segmentation as number[][];
 
     const numPolygons = polygons.length;
 
     if (numPolygons !== 1) {
-      multipart.push(annotation.id);
+      multipart.push(cocoAnn.id);
       continue;
     }
 
@@ -155,11 +217,9 @@ export const deserializeCOCOFile = (
     const polygon = polygons[0];
 
     if (polygon.length % 2 !== 0) {
-      malformed.push(annotation.id);
+      malformed.push(cocoAnn.id);
       continue;
     }
-
-    numKept += 1;
 
     const points: Point[] = [];
     for (let i = 0; i < polygon.length; i += 2) {
@@ -168,10 +228,10 @@ export const deserializeCOCOFile = (
 
     // convert coco [x, y, width, height] to our [x1, y1, x2, y2]
     const bbox = [
-      Math.round(annotation.bbox[0]),
-      Math.round(annotation.bbox[1]),
-      Math.round(annotation.bbox[0] + annotation.bbox[2]),
-      Math.round(annotation.bbox[1] + annotation.bbox[3]),
+      Math.round(cocoAnn.bbox[0]),
+      Math.round(cocoAnn.bbox[1]),
+      Math.round(cocoAnn.bbox[0] + cocoAnn.bbox[2]),
+      Math.round(cocoAnn.bbox[1] + cocoAnn.bbox[3]),
     ] as [number, number, number, number];
 
     const maskData = maskFromPoints(
@@ -181,7 +241,6 @@ export const deserializeCOCOFile = (
       true
     );
 
-    // TODO: COCO - probably should only do this if not being assigned to active image
     const encodedMask = encode(maskData);
 
     const newAnnotation = {
@@ -189,7 +248,7 @@ export const deserializeCOCOFile = (
       mask: encodedMask,
       plane: parentIm.activePlane,
       boundingBox: bbox,
-      categoryId: parentCat.id,
+      categoryId: cocoAnn.category_id,
     };
 
     if (imsToAnnotate.hasOwnProperty(parentIm.id)) {
@@ -203,14 +262,12 @@ export const deserializeCOCOFile = (
     process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "1"
   ) {
-    imageless.length > 0 &&
-      console.log(
-        `Could not associate ${imageless.length} annotations with images: ${imageless}`
-      );
-    catless.length > 0 &&
-      console.log(
-        `Could not associate ${catless.length} annotations with categories: ${catless}`
-      );
+    const numMalformed = malformed.length;
+    const numCrowded = crowded.length;
+    const numMultipart = multipart.length;
+    const numInFile = cocoFile.annotations.length;
+    const numKept = numInFile - (numMalformed + numCrowded + numMultipart);
+
     malformed.length > 0 &&
       console.log(
         `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`
@@ -221,13 +278,11 @@ export const deserializeCOCOFile = (
       console.log(
         `Dropped ${multipart.length} annotations with multiple polygon parts`
       );
-    console.log(
-      `Created ${numKept}/${cocoFile.annotations.length} annotations`
-    );
+    console.log(`Created ${numKept}/${numInFile} annotations`);
   }
 
   return {
     imsToAnnotate,
-    newCategories: Object.values(catIdMap.newCategories),
+    newCategories: newCats,
   };
 };
