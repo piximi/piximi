@@ -1,3 +1,4 @@
+import { decode, padMask, findContours } from "utils/annotator";
 import {
   Category,
   SerializedCOCOAnnotationType,
@@ -42,6 +43,14 @@ export const serializeCOCOFile = (
 
   for (const im of images) {
     for (const ann of im.annotations) {
+      const boxWidth = ann.boundingBox[2] - ann.boundingBox[0];
+      const boxHeight = ann.boundingBox[3] - ann.boundingBox[1];
+
+      const paddedMask = padMask(decode(ann.mask), boxWidth, boxHeight);
+      // +2 to W, H to account for padding on mask
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const contours = findContours(paddedMask, boxWidth + 2, boxHeight + 2);
+
       serializedAnnotations.push({
         id: annCount++,
         image_id: imIdMap[im.id].id,
@@ -49,12 +58,7 @@ export const serializeCOCOFile = (
         segmentation: [[]],
         area: 0,
         // x1, y1, width, height
-        bbox: [
-          ann.boundingBox[0],
-          ann.boundingBox[1],
-          ann.boundingBox[2] - ann.boundingBox[0],
-          ann.boundingBox[3] - ann.boundingBox[1],
-        ],
+        bbox: [ann.boundingBox[0], ann.boundingBox[1], boxWidth, boxHeight],
         iscrowd: 0,
       });
     }

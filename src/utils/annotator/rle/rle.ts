@@ -57,13 +57,23 @@ export const decodeAnnotations = async (
 export const encode = (
   decoded: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
 ): Array<number> => {
+  const bitDepth =
+    decoded.constructor === Uint16Array
+      ? 16
+      : decoded.constructor === Float32Array
+      ? 32
+      : 8; // Uint8[Clamped]Array
+
   let lastElement = decoded[0];
 
   let lastSequenceSize = 1;
 
   let encoded = [];
 
-  if (decoded[0] === 255) {
+  // Float32Array data usually holds normalized data between 0 and 1,
+  // in which case it must be denormalized before calling this func
+  // such that 0 -> 0 and 1 -> 2*16-1
+  if (decoded[0] === 2 ** bitDepth - 1) {
     encoded.push(0);
   }
 
