@@ -1,4 +1,9 @@
-import { decode, padMask, findContours } from "utils/annotator";
+import {
+  decode,
+  padMask,
+  findContours,
+  simplifyPolygon,
+} from "utils/annotator";
 import {
   Category,
   SerializedCOCOAnnotationType,
@@ -48,14 +53,33 @@ export const serializeCOCOFile = (
 
       const paddedMask = padMask(decode(ann.mask), boxWidth, boxHeight);
       // +2 to W, H to account for padding on mask
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const contours = findContours(paddedMask, boxWidth + 2, boxHeight + 2);
+      const outerBorder = contours.find((b) => b.seqNum === 2);
+
+      if (!outerBorder) {
+        process.env.NODE_ENV !== "production" &&
+          console.log(`Could not find outer border of annotation ${ann.id}`);
+        throw new Error(
+          `Could not determine contours of annotation belonging to image ${im.name}`
+        );
+      }
+
+      const SIMPLIFY = false;
+
+      // coco polygon points are arranged as: [x_1, y_1, x_2, y_2, ...]
+      const outerBorderPoints = (
+        SIMPLIFY ? simplifyPolygon(outerBorder.points) : outerBorder.points
+      )
+        // add x_1, y_1 coordinates of box to translate polygon
+        // points to wrt to image, rather than wrt mask
+        .map((p) => [p.x + ann.boundingBox[0], p.y + ann.boundingBox[1]])
+        .flat();
 
       serializedAnnotations.push({
         id: annCount++,
         image_id: imIdMap[im.id].id,
         category_id: catIdMap[ann.categoryId].id,
-        segmentation: [[]],
+        segmentation: [outerBorderPoints],
         area: 0,
         // x1, y1, width, height
         bbox: [ann.boundingBox[0], ann.boundingBox[1], boxWidth, boxHeight],
