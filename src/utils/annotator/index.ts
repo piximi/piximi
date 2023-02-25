@@ -39,6 +39,7 @@ export {
   computeBoundingBoxFromContours,
   maskFromPoints,
 } from "./point-operations/point-operations";
+export { findContours, padMask } from "./point-operations/find-contours";
 
 export { deserializeCOCOFile } from "./file-io/deserializeCOCO";
 export { serializeCOCOFile } from "./file-io/serializeCOCO";
