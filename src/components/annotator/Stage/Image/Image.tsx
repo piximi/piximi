@@ -35,6 +35,7 @@ const MemoizedKonvaImage = memo(
         filters={props.filters}
         visible={props.idx === props.activePlane}
         position={props.imagePosition}
+        key={props.idx}
       />
     );
   })
