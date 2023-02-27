@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, memo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 import Konva from "konva";
@@ -14,7 +14,33 @@ import {
 } from "store/annotator";
 import { Point } from "types";
 
-export const Image = React.forwardRef<Konva.Image>((_, ref) => {
+interface KonvaImageProps {
+  image: HTMLImageElement;
+  height: number;
+  width: number;
+  imagePosition: Point;
+  activePlane: number;
+  filters: any[];
+  idx: number;
+}
+
+const MemoizedKonvaImage = memo(
+  forwardRef<Konva.Image, KonvaImageProps>((props, ref) => {
+    return (
+      <ReactKonva.Image
+        height={props.height}
+        image={props.image}
+        ref={ref}
+        width={props.width}
+        filters={props.filters}
+        visible={props.idx === props.activePlane}
+        position={props.imagePosition}
+      />
+    );
+  })
+);
+
+export const Image = forwardRef<Konva.Image>((_, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
   const width = useSelector(scaledImageWidthSelector);
@@ -26,6 +52,7 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
   const [imagePosition, setImagePosition] = useState<Point>();
+
   useEffect(() => {
     setImages(
       renderedSrcs.map((src: string) => {
@@ -65,15 +92,16 @@ export const Image = React.forwardRef<Konva.Image>((_, ref) => {
   return (
     <>
       {images.map((image, idx) => (
-        <ReactKonva.Image
-          height={height}
+        <MemoizedKonvaImage
           image={image}
-          ref={ref}
-          width={width}
-          filters={filters}
-          visible={idx === activePlane}
+          height={height!}
+          width={width!}
+          imagePosition={imagePosition!}
+          activePlane={activePlane}
+          filters={filters!}
+          idx={idx}
           key={idx}
-          position={imagePosition}
+          ref={ref}
         />
       ))}
     </>

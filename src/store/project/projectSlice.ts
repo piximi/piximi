@@ -33,6 +33,7 @@ export const projectSlice = createSlice({
   name: "project",
   initialState: initialState,
   reducers: {
+    resetProject: () => initialState,
     addImages(state, action: PayloadAction<{ images: Array<ImageType> }>) {
       state.images = state.images.concat(action.payload.images);
     },

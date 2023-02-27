@@ -12,13 +12,16 @@ import { uploader } from "utils/common/fileHandlers";
 import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
+import { AnnotatorSlice } from "store/annotator";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
+  fromAnnotator?: boolean;
 };
 
 export const OpenProjectMenuItem = ({
   onMenuClose,
+  fromAnnotator = false,
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
@@ -38,7 +41,10 @@ export const OpenProjectMenuItem = ({
     deserialize(file.name)
       .then((res) => {
         batch(() => {
-          dispatch(applicationSlice.actions.clearSelectedImages());
+          dispatch(classifierSlice.actions.resetClassifier());
+          dispatch(segmenterSlice.actions.resetSegmenter());
+          dispatch(AnnotatorSlice.actions.resetAnnotator());
+          dispatch(projectSlice.actions.resetProject());
 
           dispatch(
             projectSlice.actions.setProject({
@@ -58,6 +64,32 @@ export const OpenProjectMenuItem = ({
             })
           );
         });
+
+        if (fromAnnotator) {
+          batch(() => {
+            dispatch(
+              applicationSlice.actions.selectAllImages({
+                ids: res.project.images.map((im) => im.id),
+              })
+            );
+            dispatch(
+              AnnotatorSlice.actions.setImages({
+                images: res.project.images.map((im) => ({
+                  ...im,
+                  color: { ...im.colors, color: im.colors.color.clone() },
+                })),
+                disposeColorTensors: true,
+              })
+            );
+            dispatch(
+              AnnotatorSlice.actions.setActiveImage({
+                imageId: res.project.images[0].id,
+                prevImageId: undefined,
+                execSaga: true,
+              })
+            );
+          });
+        }
       })
       .catch((err) => {
         const error: Error = err as Error;

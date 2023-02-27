@@ -5,7 +5,6 @@ import {
   Middleware,
   StoreEnhancer,
 } from "@reduxjs/toolkit";
-import * as Sentry from "@sentry/react";
 import logger from "redux-logger";
 
 import { reducer } from "../reducer";
@@ -13,9 +12,7 @@ import { rootSaga } from "../sagas";
 
 export const saga = createSagaMiddleware();
 
-const sentryReduxEnhancer = Sentry.createReduxEnhancer({});
-
-const enhancers: StoreEnhancer[] = [sentryReduxEnhancer];
+const enhancers: StoreEnhancer[] = [];
 
 /* In order to ensure that sagas are ran after the dispatched action,
  * always keep "saga" as the last item in the middleware array .

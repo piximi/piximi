@@ -6,6 +6,7 @@ import { OpenImageMenuItem } from "./OpenImageMenuItem";
 import { OpenProjectFileMenuItem } from "./OpenProjectFileMenuItem";
 import { OpenExampleImageMenuItem } from "./OpenExampleImageMenuItem";
 import { ProjectFileType } from "types/runtime";
+// import { OpenProjectMenuItem } from "components/file-io/OpenProjectMenuItem";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -16,7 +17,9 @@ type OpenMenuProps = {
 export const OpenMenu = ({ anchorEl, onCloseMenu, open }: OpenMenuProps) => {
   return (
     <Menu open={open} anchorEl={anchorEl} onClose={onCloseMenu}>
-      <OpenImageMenuItem onCloseMenu={onCloseMenu} />
+      {/* TODO: currently dangerous to use fromAnnotator
+                because of tensor reconciliation on discard changes */}
+      {/* <OpenProjectMenuItem onMenuClose={onCloseMenu} fromAnnotator /> */}
 
       <OpenProjectFileMenuItem
         onCloseMenu={onCloseMenu}
@@ -29,6 +32,8 @@ export const OpenMenu = ({ anchorEl, onCloseMenu, open }: OpenMenuProps) => {
       />
 
       <Divider />
+
+      <OpenImageMenuItem onCloseMenu={onCloseMenu} />
 
       <OpenExampleImageMenuItem onCloseMenu={onCloseMenu} />
     </Menu>

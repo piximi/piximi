@@ -17,7 +17,12 @@ import {
   createdAnnotatorCategoriesSelector,
   unknownAnnotationCategorySelector,
 } from "store/project";
-import { AnnotatorSlice } from "store/annotator";
+import {
+  activeImageSelector,
+  numStagedAnnotationsSelector,
+  AnnotatorSlice,
+  annotatorImagesSelector,
+} from "store/annotator";
 
 import { Category, CategoryType } from "types/Category";
 
@@ -37,6 +42,10 @@ export const AnnotatorDrawer = () => {
       })
     );
   };
+
+  const annotatorImages = useSelector(annotatorImagesSelector);
+  const activeImage = useSelector(activeImageSelector);
+  const numStagedAnnotations = useSelector(numStagedAnnotationsSelector);
 
   return (
     <Drawer
@@ -64,7 +73,13 @@ export const AnnotatorDrawer = () => {
 
       <Divider />
 
-      <ImageList />
+      {activeImage && (
+        <ImageList
+          activeImage={activeImage}
+          images={annotatorImages}
+          numStagedAnnotations={numStagedAnnotations}
+        />
+      )}
 
       <Divider />
 
