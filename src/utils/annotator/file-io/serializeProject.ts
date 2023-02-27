@@ -1,7 +1,7 @@
-import { Category, ImageType, SerializedAnnotationType } from "types";
+import { Category, ShadowImageType, SerializedAnnotationType } from "types";
 
 export const serializeProject = (
-  images: Array<ImageType>,
+  images: Array<ShadowImageType>,
   categories: Array<Category>
 ) => {
   const serializedImages = images.map((im) => ({ id: im.id, name: im.name }));

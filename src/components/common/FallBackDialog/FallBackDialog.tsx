@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import StackTrace from "stacktrace-js";
 
 import {
@@ -27,7 +27,6 @@ import { useDialogHotkey } from "hooks";
 
 import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
 import { SaveProjectDialog } from "components/file-io/SaveProjectDialog/SaveProjectDialog";
-import { SaveAnnotationProjectDialog } from "components/annotator/AnnotatorDrawer/SaveMenu/SaveAnnotationProjectDialog";
 
 import {
   classifierFittedSelector,
@@ -76,14 +75,8 @@ export const FallBackDialog = (props: any) => {
     open: openSaveProjectDialog,
   } = useDialogHotkey(HotkeyView.SaveProjectDialog);
 
-  const {
-    onClose: onSaveAnnotationProjectDialogClose,
-    onOpen: onSaveAnnotationProjectDialogOpen,
-    open: openAnnotationSaveProjectDialog,
-  } = useDialogHotkey(HotkeyView.SaveAnnotationProjectDialog);
-
-  const routPath = useLocation().pathname;
-  const inAnnotator = routPath === "/annotator";
+  // const routePath = useLocation().pathname;
+  // const inAnnotator = routePath === "/annotator";
 
   const {
     onClose: onSaveClassifierDialogClose,
@@ -247,14 +240,6 @@ export const FallBackDialog = (props: any) => {
               Save segmenter
             </Button>
           )}
-          {inAnnotator && (
-            <Button
-              variant="outlined"
-              onClick={onSaveAnnotationProjectDialogOpen}
-            >
-              Save Annotations
-            </Button>
-          )}
         </Stack>
 
         <SaveProjectDialog
@@ -276,11 +261,6 @@ export const FallBackDialog = (props: any) => {
           modelTypeString={"Segmenter"}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
-        />
-
-        <SaveAnnotationProjectDialog
-          onClose={onSaveAnnotationProjectDialogClose}
-          open={openAnnotationSaveProjectDialog}
         />
       </DialogContent>
     </Dialog>
