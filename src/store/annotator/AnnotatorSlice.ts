@@ -73,6 +73,7 @@ export const annotatorSlice = createSlice({
   initialState: initialState,
   name: "image-viewer-application",
   reducers: {
+    resetAnnotator: () => initialState,
     addImages(
       state,
       action: PayloadAction<{ newImages: Array<ShadowImageType> }>

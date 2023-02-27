@@ -78,8 +78,8 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
         setImageInstances({ instances: encoded, imageId: activeImageId! })
       );
     };
-    doEncoding(stagedAnnotations);
-  }, [dispatch, stagedAnnotations, activeImageId]);
+    open && doEncoding(stagedAnnotations);
+  }, [dispatch, open, stagedAnnotations, activeImageId]);
 
   return (
     <div>

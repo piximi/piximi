@@ -67,6 +67,7 @@ import { PointerSelection } from "./Selection/PointerSelection";
 export const Stage = () => {
   const store = useStore();
   const dispatch = useDispatch();
+
   const [firstMouseDown, setFirstMouseDown] = useState(false);
   const [tool, setTool] = useState<Tool>();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -509,6 +510,7 @@ export const Stage = () => {
     handleZoomDblClick(event);
     setCurrentMousePosition();
   };
+
   useEffect(() => {
     if (annotations.length) return;
 
@@ -559,6 +561,7 @@ export const Stage = () => {
     if (!stageRef || !stageRef.current) return;
     stageRef.current.container().style.cursor = cursor;
   }, [cursor]);
+
   useEffect(() => {
     setTool(annotationTool);
   }, [annotationTool, dispatch]);
