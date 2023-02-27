@@ -404,11 +404,19 @@ test("serialize project", () => {
     imagesT3Expected.map((im) => im.name)
   );
 
-  // expect category ids to be different, because they're uuid generated
+  // expect category and annotation ids to be different, because they're uuid generated
   // jest ignores undefined property keys
   expect(
-    annotationsT3Actual.map((ann) => ({ ...ann, categoryId: undefined }))
+    annotationsT3Actual.map((ann) => ({
+      ...ann,
+      id: undefined,
+      categoryId: undefined,
+    }))
   ).toEqual(
-    annotationsT3Expected.map((ann) => ({ ...ann, categoryId: undefined }))
+    annotationsT3Expected.map((ann) => ({
+      ...ann,
+      id: undefined,
+      categoryId: undefined,
+    }))
   );
 });
