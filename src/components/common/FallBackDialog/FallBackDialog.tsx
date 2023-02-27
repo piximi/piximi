@@ -60,9 +60,15 @@ export const FallBackDialog = (props: any) => {
             stacktrace.map((stackFrame) => stackFrame.toString()).join("\n")
           );
         })
-        .catch((err) => console.log("could not resolve stacktrace", err));
+        .catch((err) => console.error("could not resolve stacktrace", err));
     }
   }, [error]);
+
+  React.useEffect(() => {
+    if (stackTrace) {
+      process.env.NODE_ENV !== "production" && console.error(stackTrace);
+    }
+  }, [stackTrace]);
 
   const {
     onClose: onSaveProjectDialogClose,

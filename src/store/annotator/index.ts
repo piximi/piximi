@@ -78,6 +78,7 @@ export { selectedAnnotationsSelector } from "./selectors/selectedAnnotationsSele
 export { selectionModeSelector } from "./selectors/selectionModeSelector";
 export { soundEnabledSelector } from "./selectors/soundEnabledSelector";
 export { stagedAnnotationsSelector } from "./selectors/stagedAnnotationsSelector";
+export { numStagedAnnotationsSelector } from "./selectors/numStagedAnnotationsSelector";
 export { stageHeightSelector } from "./selectors/stageHeightSelector";
 export { stagePositionSelector } from "./selectors/stagePositionSelector";
 export { stageScaleSelector } from "./selectors/stageScaleSelector";
