@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import {
   encodedAnnotationType,
   Category,
@@ -14,7 +16,7 @@ export const deserializeAnnotations = (
 
   for (const annotation of serializedAnnotations) {
     annotations.push({
-      id: annotation.id,
+      id: uuidv4(),
       mask: annotation.mask.split(" ").map((e) => Number(e)),
       plane: annotation.plane,
       boundingBox: annotation.boundingBox as [number, number, number, number],
