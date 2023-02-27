@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
@@ -40,67 +40,74 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const availableColors = useSelector(availableColorsSelector);
 
-  const onImportProjectFile = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    onClose: () => void
-  ) => {
-    onClose();
+  const onImportProjectFile = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
+      onClose();
 
-    event.persist();
+      event.persist();
 
-    if (!event.currentTarget.files) return;
+      if (!event.currentTarget.files) return;
 
-    const file = event.currentTarget.files[0];
+      const file = event.currentTarget.files[0];
 
-    const reader = new FileReader();
+      const reader = new FileReader();
 
-    reader.onload = async (event: ProgressEvent<FileReader>) => {
-      if (event.target && event.target.result) {
-        const serializedProject: SerializedCOCOFileType | SerializedFileType =
-          validateFileType(event.target.result as string, projectType);
+      reader.onload = async (event: ProgressEvent<FileReader>) => {
+        if (event.target && event.target.result) {
+          const serializedProject: SerializedCOCOFileType | SerializedFileType =
+            validateFileType(event.target.result as string, projectType);
 
-        const { imsToAnnotate, newCategories } =
-          projectType === ProjectFileType.PIXIMI
-            ? deserializeProjectFile(
-                serializedProject as SerializedFileType,
-                existingImages,
-                existingAnnotationCategories
-              )
-            : deserializeCOCOFile(
-                serializedProject as SerializedCOCOFileType,
-                existingImages,
-                existingAnnotationCategories,
-                availableColors
-              );
+          const { imsToAnnotate, newCategories } =
+            projectType === ProjectFileType.PIXIMI
+              ? deserializeProjectFile(
+                  serializedProject as SerializedFileType,
+                  existingImages,
+                  existingAnnotationCategories
+                )
+              : deserializeCOCOFile(
+                  serializedProject as SerializedCOCOFileType,
+                  existingImages,
+                  existingAnnotationCategories,
+                  availableColors
+                );
 
-        batch(() => {
+          batch(() => {
+            dispatch(
+              projectSlice.actions.addAnnotationCategories({
+                categories: newCategories,
+              })
+            );
+            dispatch(
+              AnnotatorSlice.actions.setInstances({
+                instances: imsToAnnotate,
+              })
+            );
+          });
+
+          // when a deserialized annotation is associated with the active image
+          // this needs to invoke the decoding process for the in-view image
+          // annotations; prevImageId undefined to avoid encoding step
           dispatch(
-            projectSlice.actions.addAnnotationCategories({
-              categories: newCategories,
+            AnnotatorSlice.actions.setActiveImage({
+              imageId: activeImageId,
+              prevImageId: undefined,
+              execSaga: true,
             })
           );
-          dispatch(
-            AnnotatorSlice.actions.setInstances({
-              instances: imsToAnnotate,
-            })
-          );
-        });
+        }
+      };
 
-        // when a deserialized annotation is associated with the active image
-        // this needs to invoke the decoding process for the in-view image
-        // annotations; prevImageId undefined to avoid encoding step
-        dispatch(
-          AnnotatorSlice.actions.setActiveImage({
-            imageId: activeImageId,
-            prevImageId: undefined,
-            execSaga: true,
-          })
-        );
-      }
-    };
-
-    reader.readAsText(file);
-  };
+      reader.readAsText(file);
+    },
+    [
+      dispatch,
+      activeImageId,
+      existingAnnotationCategories,
+      availableColors,
+      existingImages,
+      projectType,
+    ]
+  );
 
   return (
     <MenuItem component="label">
