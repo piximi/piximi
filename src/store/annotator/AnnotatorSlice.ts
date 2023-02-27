@@ -133,13 +133,12 @@ export const annotatorSlice = createSlice({
         state.stagedAnnotations = [];
         state.selectedAnnotations = [];
         state.workingAnnotation = undefined;
-      } else {
-        state.images = state.images.map((image) => {
-          if (image.id === action.payload.imageId) {
-            return { ...image, annotations: [] };
-          } else return image;
-        });
       }
+      state.images = state.images.map((image) => {
+        if (image.id === action.payload.imageId) {
+          return { ...image, annotations: [] };
+        } else return image;
+      });
     },
     deleteAllInstances(state) {
       //deletes all instances across all images
