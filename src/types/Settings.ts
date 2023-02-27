@@ -16,7 +16,7 @@ export enum HotkeyView {
   MainImageGrid,
   MainImageGridAppBar,
   NewProjectDialog,
-  SaveAnnotationProjectDialog,
+  ExportAnnotationsDialog,
   SaveFittedModelDialog,
   SaveProjectDialog,
 }

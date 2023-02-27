@@ -281,7 +281,8 @@ export const hexToRGBA = (color: string, alpha?: number) => {
 export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   images: Array<ShadowImageType>,
   categories: Array<Category>,
-  zip: any
+  zip: any,
+  projectName: string
 ): any => {
   images.forEach((current: ShadowImageType) => {
     current.annotations.forEach((annotation: encodedAnnotationType) => {
@@ -340,14 +341,15 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
     });
   });
   zip.generateAsync({ type: "blob" }).then((blob: Blob) => {
-    saveAs(blob, "binary_instances.zip");
+    saveAs(blob, `${projectName}.zip`);
   });
 };
 
 export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
   images: Array<ShadowImageType>,
   categories: Array<Category>,
-  zip: any
+  zip: any,
+  projectName: string
 ): any => {
   images.forEach((current: ShadowImageType) => {
     const height = current.shape.height;
@@ -402,7 +404,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
     });
   });
   zip.generateAsync({ type: "blob" }).then((blob: Blob) => {
-    saveAs(blob, "labeled_semantic.zip");
+    saveAs(blob, `${projectName}.zip`);
   });
 };
 
@@ -412,7 +414,7 @@ export const saveAnnotationsAsLabelMatrix = (
   zip: any,
   random: boolean = false,
   binary: boolean = false
-): Array<Promise<unknown>> => {
+) => {
   return images
     .map((current: ShadowImageType) => {
       const height = current.shape.height;

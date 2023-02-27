@@ -125,7 +125,8 @@ export const ImageMenu = ({
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
       [selectedImage],
       annotationCategories,
-      zip
+      zip,
+      "binary_instances"
     );
   };
 
@@ -161,7 +162,8 @@ export const ImageMenu = ({
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
       [selectedImage],
       annotationCategories,
-      zip
+      zip,
+      "labeled_semantic"
     );
   };
 

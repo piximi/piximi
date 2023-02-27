@@ -8,13 +8,16 @@ import {
   projectNameSelector,
 } from "store/project";
 import { ListItemText, MenuItem } from "@mui/material";
-import { AnnotationExportType } from "types";
+import { AnnotationExportType, HotkeyView } from "types";
 import {
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 import { serializeCOCOFile } from "utils/annotator";
+import { serializeProject } from "utils/annotator/file-io/serializeProject";
+import { useDialogHotkey } from "hooks";
+import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 
 type ExportAnnotationsAsMenuItemProps = {
   handleMenuClose: () => void;
@@ -31,19 +34,31 @@ export const ExportAnnotationsAsMenuItem = ({
   const projectName = useSelector(projectNameSelector);
   const categories = useSelector(annotationCategoriesSelector);
 
-  const onExport = () => {
+  const onExport = (userProjectName: string) => {
     handleMenuClose();
 
     let zip = new JSZip();
 
     switch (exportType) {
-      case AnnotationExportType.COCO:
-        const serializedProject = serializeCOCOFile(images, categories);
+      case AnnotationExportType.PIXIMI:
+        const piximiSerializedProject = serializeProject(images, categories);
 
-        const blob = new Blob([JSON.stringify(serializedProject)], {
+        const data = new Blob([JSON.stringify(piximiSerializedProject)], {
           type: "application/json;charset=utf-8",
         });
-        saveAs(blob, `${projectName}.json`);
+
+        saveAs(data, `${userProjectName}.json`);
+
+        return;
+      case AnnotationExportType.COCO:
+        const cocoSerializedProject = serializeCOCOFile(images, categories);
+
+        const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
+          type: "application/json;charset=utf-8",
+        });
+
+        saveAs(blob, `${userProjectName}.json`);
+
         return;
 
       case AnnotationExportType.Matrix:
@@ -51,7 +66,7 @@ export const ExportAnnotationsAsMenuItem = ({
           saveAnnotationsAsLabelMatrix(images, annotationCategories, zip)
         ).then(() => {
           zip.generateAsync({ type: "blob" }).then((blob) => {
-            saveAs(blob, "labels.zip");
+            saveAs(blob, `${userProjectName}.zip`);
           });
         });
         return;
@@ -60,7 +75,8 @@ export const ExportAnnotationsAsMenuItem = ({
         saveAnnotationsAsBinaryInstanceSegmentationMasks(
           images,
           annotationCategories,
-          zip
+          zip,
+          userProjectName
         );
 
         return;
@@ -70,7 +86,7 @@ export const ExportAnnotationsAsMenuItem = ({
           saveAnnotationsAsLabelMatrix(images, annotationCategories, zip, true)
         ).then(() => {
           zip.generateAsync({ type: "blob" }).then((blob) => {
-            saveAs(blob, "labeled_instances.zip");
+            saveAs(blob, `${userProjectName}.zip`);
           });
         });
         return;
@@ -86,7 +102,7 @@ export const ExportAnnotationsAsMenuItem = ({
           )
         ).then(() => {
           zip.generateAsync({ type: "blob" }).then((blob) => {
-            saveAs(blob, "binary_semantics.zip");
+            saveAs(blob, `${userProjectName}.zip`);
           });
         });
         return;
@@ -95,15 +111,36 @@ export const ExportAnnotationsAsMenuItem = ({
         saveAnnotationsAsLabeledSemanticSegmentationMasks(
           images,
           annotationCategories,
-          zip
+          zip,
+          userProjectName
         );
         return;
     }
   };
 
+  const {
+    onClose: onCloseSaveAnnotatorDialog,
+    onOpen: onOpenSaveAnnotatorDialog,
+    open: openSaveAnnotatorDialog,
+  } = useDialogHotkey(HotkeyView.ExportAnnotationsDialog);
+
   return (
-    <MenuItem onClick={onExport}>
-      <ListItemText primary={title} />
-    </MenuItem>
+    <>
+      <MenuItem onClick={onOpenSaveAnnotatorDialog}>
+        <ListItemText primary={title} />
+      </MenuItem>
+
+      {openSaveAnnotatorDialog && (
+        <ExportAnnotationsDialog
+          onClose={() => {
+            onCloseSaveAnnotatorDialog();
+            handleMenuClose();
+          }}
+          open={openSaveAnnotatorDialog}
+          handleSave={onExport}
+          defaultName={projectName}
+        />
+      )}
+    </>
   );
 };

@@ -3,6 +3,7 @@ export enum AnnotationExportType {
   Matrix,
   BinarySemanticMasks,
   BinaryInstances,
-  COCO,
   LabeledInstances,
+  COCO,
+  PIXIMI,
 }

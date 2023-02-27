@@ -2,10 +2,9 @@ import React, { useEffect } from "react";
 
 import { Menu, MenuItem } from "@mui/material";
 
-import { useDialogHotkey, useMenu } from "hooks";
+import { useMenu } from "hooks";
 
-import { SaveAnnotationProjectDialog } from "./SaveAnnotationProjectDialog";
-import { AnnotationExportType, HotkeyView, decodedAnnotationType } from "types";
+import { AnnotationExportType, decodedAnnotationType } from "types";
 import { ExportAnnotationsAsMenuItem } from "./ExportAnnotationsAsMenuItem";
 import { encodeAnnotations } from "utils/annotator";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +21,10 @@ type SaveMenuProps = {
 };
 
 const exportOptions = [
+  {
+    title: "Piximi-formatted JSON",
+    type: AnnotationExportType.PIXIMI,
+  },
   {
     title: "Labeled Instance Masks",
     type: AnnotationExportType.LabeledInstances,
@@ -44,21 +47,16 @@ const exportOptions = [
     type: AnnotationExportType.Matrix,
   },
   {
-    title: "Export Annotations as COCO-formatted JSON",
+    title: "COCO-formatted JSON",
     type: AnnotationExportType.COCO,
   },
 ];
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   const dispatch = useDispatch();
+
   const activeImageId = useSelector(activeImageIdSelector);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-
-  const {
-    onClose: onCloseSaveAnnotatorDialog,
-    onOpen: onOpenSaveAnnotatorDialog,
-    open: openSaveAnnotatorDialog,
-  } = useDialogHotkey(HotkeyView.SaveAnnotationProjectDialog);
 
   const {
     anchorEl: subMenuAnchorEl,
@@ -71,6 +69,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
     onSubMenuClose();
     onClose();
   };
+
   useEffect(() => {
     const doEncoding = async (annotations: Array<decodedAnnotationType>) => {
       const encoded = await encodeAnnotations(annotations);
@@ -103,18 +102,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
             );
           })}
         </Menu>
-        <MenuItem onClick={onOpenSaveAnnotatorDialog}>
-          Save Annotation Project
-        </MenuItem>
       </Menu>
-
-      <SaveAnnotationProjectDialog
-        onClose={() => {
-          onCloseSaveAnnotatorDialog();
-          onMenusClose();
-        }}
-        open={openSaveAnnotatorDialog}
-      />
     </div>
   );
 };
