@@ -42,6 +42,7 @@ export const ExportAnnotationsDialog = ({
     "enter",
     () => {
       handleSave(projectName);
+      onClose();
     },
     HotkeyView.ExportAnnotationsDialog,
     { enableOnTags: ["INPUT"] },

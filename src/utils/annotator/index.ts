@@ -43,6 +43,7 @@ export { findContours, padMask } from "./point-operations/find-contours";
 
 export { deserializeCOCOFile } from "./file-io/deserializeCOCO";
 export { serializeCOCOFile } from "./file-io/serializeCOCO";
+export { serializeProject } from "./file-io/serializeProject";
 export {
   deserializeAnnotations,
   deserializeProjectFile,
