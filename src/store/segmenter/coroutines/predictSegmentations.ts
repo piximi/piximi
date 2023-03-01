@@ -11,10 +11,10 @@ import {
 import { decodeSegmentationMaskToAnnotations } from "./segmentationMasks";
 
 import {
-  encodedAnnotationType,
   Category,
   ImageType,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
+  decodedAnnotationType,
 } from "types";
 
 export const predictSegmentations = async (
@@ -26,12 +26,13 @@ export const predictSegmentations = async (
   }>,
   inferenceImages: ImageType[],
   categories: Category[]
-): Promise<
-  Array<{
-    annotations: Array<encodedAnnotationType>;
+): Promise<{
+  annotations: Array<{
     imageId: string;
-  }>
-> => {
+    annotations: Array<decodedAnnotationType>;
+  }>;
+  categories: Array<Category>;
+}> => {
   const createdCategories = categories.filter((category) => {
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
@@ -74,7 +75,7 @@ export const predictSegmentations = async (
   const predictions = await inferredTensors.preds.array();
 
   const predictedAnnotations: Array<{
-    annotations: Array<encodedAnnotationType>;
+    annotations: Array<decodedAnnotationType>;
     imageId: string;
   }> = imageIds.map((imageId, idx) => {
     const predictedSegmentationMap = predictions[idx];
@@ -92,5 +93,8 @@ export const predictSegmentations = async (
     return { imageId: imageId, annotations: annotations };
   });
 
-  return predictedAnnotations;
+  return {
+    annotations: predictedAnnotations,
+    categories: [],
+  };
 };

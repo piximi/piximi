@@ -20,11 +20,14 @@ import {
   FormLabel,
   Input,
   InputAdornment,
+  InputLabel,
   ListItemIcon,
   ListItemText,
   MenuItem,
   Radio,
   RadioGroup,
+  Select,
+  SelectChangeEvent,
   Typography,
 } from "@mui/material";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
@@ -39,6 +42,11 @@ import {
   Shape,
 } from "types";
 import LanguageIcon from "@mui/icons-material/Language";
+import Stardist2DBrightfieldModel from "data/model-data/stardist/model.json";
+//@ts-ignore
+import Stardist2DBrightfieldWeights1 from "data/model-data/stardist/group1-shard1of2.bin";
+//@ts-ignore
+import Stardist2DBrightfieldWeights2 from "data/model-data//stardist/group1-shard2of2.bin";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -63,9 +71,7 @@ export const ImportTensorflowModelDialog = ({
   const [segmentationModel, setSegmentationModel] = useState<
     GraphModel | LayersModel
   >();
-  const [modelUrl, setModelUrl] = useState<string>(
-    "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1"
-  );
+  const [modelUrl, setModelUrl] = useState<string>("");
   const [modelArch, setModelArch] = useState<string>("graph");
   const [modelName, setModelName] = useState<string>("");
   const [inputShape, setInputShape] = useState<Shape>({
@@ -80,6 +86,9 @@ export const ImportTensorflowModelDialog = ({
   const [isFromTFHub, setIsFromTFHub] = useState<boolean>(false);
   const [canLoadModel, setCanLoadModel] = useState<boolean>(false);
   const [modelSelected, setModelSelected] = useState<boolean>(false);
+  const [filesSelected, setFilesSelected] = useState<boolean>(false);
+  const [selectedPreTrainedModel, setSelectedPreTrainedModel] =
+    useState<string>("none");
 
   // Error Message
   const [alertState, setAlertState] = useState<AlertStateType>(defaultAlert);
@@ -87,7 +96,7 @@ export const ImportTensorflowModelDialog = ({
   const dispatchModelToStore = () => {
     dispatchFunction(
       inputShape,
-      modelName,
+      selectedPreTrainedModel ? selectedPreTrainedModel : modelName,
       modelType === "Classification" ? classifierModel : segmentationModel,
       modelArch
     );
@@ -127,7 +136,6 @@ export const ImportTensorflowModelDialog = ({
         let model = await loadGraphModel(modelUrl, {
           fromTFHub: true,
         });
-        console.log(model);
         setSegmentationModel(model);
         setModelSelected(true);
       } catch (err) {
@@ -175,6 +183,7 @@ export const ImportTensorflowModelDialog = ({
     if (!event.currentTarget.files) {
       return;
     }
+    setFilesSelected(true);
 
     let weightsFiles: Array<File> = [];
     let jsonFile = event.currentTarget.files[0];
@@ -218,6 +227,122 @@ export const ImportTensorflowModelDialog = ({
     }
   };
 
+  const handlePreTrainedModelChange = async (event: SelectChangeEvent) => {
+    setSelectedPreTrainedModel(event.target.value as string);
+    if ((event.target.value as string) === "Stardist Versitile H&E") {
+      const model_topology_blob = new Blob(
+        [JSON.stringify(Stardist2DBrightfieldModel)],
+        {
+          type: "application/json",
+        }
+      );
+      const model_topology = new File([model_topology_blob], "model.json", {
+        type: "application/json",
+      });
+
+      const model_weights_fetch1 = await fetch(Stardist2DBrightfieldWeights1);
+      const model_weights_blob1 = await model_weights_fetch1.blob();
+      const model_weights1 = new File(
+        [model_weights_blob1],
+        "group1-shard1of2.bin",
+        {
+          type: "application/octet-stream",
+        }
+      );
+
+      const model_weights_fetch2 = await fetch(Stardist2DBrightfieldWeights2);
+      const model_weights_blob2 = await model_weights_fetch2.blob();
+      const model_weights2 = new File(
+        [model_weights_blob2],
+        "group1-shard2of2.bin",
+        {
+          type: "application/octet-stream",
+        }
+      );
+      try {
+        const model = await loadGraphModel(
+          io.browserFiles([model_topology, model_weights1, model_weights2])
+        );
+        setSegmentationModel(model);
+        setModelSelected(true);
+
+        const modelShape = model.inputs[0].shape!.slice(1) as number[];
+        setInputShape((prevShape) => ({
+          ...prevShape,
+          height: modelShape[0],
+          width: modelShape[1],
+          channels: modelShape[2],
+        }));
+
+        // remove the file extension from the model name
+        const jsonFileName = model_topology.name.replace(/\..+$/, "");
+        setModelName(jsonFileName);
+      } catch (err) {
+        const error: Error = err as Error;
+
+        setAlertState({
+          alertType: AlertType.Warning,
+          name: "Failed to load tensorflow model",
+          description:
+            "Invalid files selected:\n" + error.name + "\n" + error.message,
+        });
+        setShowFileError(true);
+      }
+    }
+  };
+
+  const onSegmenterFilesSelected = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    event.persist();
+
+    if (!event.currentTarget.files) {
+      return;
+    }
+    setFilesSelected(true);
+    let weightsFiles: Array<File> = [];
+    let jsonFile = event.currentTarget.files[0];
+    for (let i = 0; i < event.currentTarget.files.length; i++) {
+      const file = event.currentTarget.files[i];
+      if (file.name.endsWith(".json")) {
+        jsonFile = file;
+      } else {
+        weightsFiles.push(file);
+      }
+    }
+
+    try {
+      const model = await loadGraphModel(
+        io.browserFiles([jsonFile, ...weightsFiles])
+      );
+      console.log(model);
+      setSegmentationModel(model);
+      setModelSelected(true);
+
+      const modelShape = model.inputs[0].shape!.slice(1) as number[];
+      setInputShape((prevShape) => ({
+        ...prevShape,
+        height: modelShape[0],
+        width: modelShape[1],
+        channels: modelShape[2],
+      }));
+
+      // remove the file extension from the model name
+      const jsonFileName = jsonFile.name.replace(/\..+$/, "");
+      setModelName(jsonFileName);
+    } catch (err) {
+      const error: Error = err as Error;
+
+      setAlertState({
+        alertType: AlertType.Warning,
+        name: "Failed to load tensorflow model",
+        description:
+          "Invalid files selected:\n" + error.name + "\n" + error.message,
+      });
+      setShowFileError(true);
+    }
+  };
+
   useHotkeys(
     "enter",
     () => dispatchModelToStore(),
@@ -238,17 +363,6 @@ export const ImportTensorflowModelDialog = ({
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
       <DialogTitle>Import {modelType} model</DialogTitle>
 
-      <input
-        accept="application/json|.bin"
-        hidden
-        type="file"
-        multiple
-        id="open-model-file"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          onClassifierFilesSelected(event)
-        }
-      />
-
       {showFileError && (
         <AlertDialog
           setShowAlertDialog={() => setShowFileError(false)}
@@ -257,25 +371,64 @@ export const ImportTensorflowModelDialog = ({
       )}
 
       <DialogContent>
-        <Typography gutterBottom>
+        <Typography>Upload model files from your computer.</Typography>
+        <Typography gutterBottom fontSize={"small"} sx={{ ml: 1 }}>
           Tensorflow requires a .json files containing the model description as
           well as the corresponding model weights (.bin file(s)).
         </Typography>
       </DialogContent>
 
       <label htmlFor="open-model-file">
-        <MenuItem component="span" dense>
+        <MenuItem component="span" dense sx={{ ml: 2 }}>
           <ListItemIcon>
             <FileOpenIcon />
           </ListItemIcon>
           <ListItemText primary="Select model files" />
         </MenuItem>
       </label>
+      <input
+        accept="application/json|.bin"
+        hidden
+        type="file"
+        multiple
+        id="open-model-file"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          modelType === "Classification"
+            ? onClassifierFilesSelected(event)
+            : onSegmenterFilesSelected(event)
+        }
+        disabled={modelUrl !== "" || selectedPreTrainedModel !== "none"}
+      />
+      <DialogContent>
+        <Typography gutterBottom>
+          Choose from a provided pre-trained model
+        </Typography>
+      </DialogContent>
+      <MenuItem>
+        <FormControl sx={{ width: "75%", ml: 2 }} size="small">
+          <InputLabel id="demo-simple-select-label">
+            Pre-trained Models
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={selectedPreTrainedModel}
+            label="Pre-trained Models"
+            onChange={handlePreTrainedModelChange}
+            disabled={filesSelected || modelUrl !== ""}
+          >
+            <MenuItem value={"none"}>None</MenuItem>
+            <MenuItem value={"Stardist Versitile H&E"}>
+              Stardist Versitile H&E
+            </MenuItem>
+          </Select>
+        </FormControl>
+      </MenuItem>
       <DialogContent>
         <Typography>Or upload a model from the internet.</Typography>
       </DialogContent>
       <MenuItem>
-        <FormControl fullWidth variant="standard">
+        <FormControl sx={{ width: "75%", ml: 2 }} variant="standard">
           <Input
             id="standard-adornment-amount"
             startAdornment={
@@ -285,6 +438,7 @@ export const ImportTensorflowModelDialog = ({
             }
             value={modelUrl}
             onChange={handleModelUrlChange}
+            disabled={filesSelected || selectedPreTrainedModel !== "none"}
           />
         </FormControl>
       </MenuItem>

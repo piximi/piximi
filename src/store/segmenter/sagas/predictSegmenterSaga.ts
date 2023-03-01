@@ -14,7 +14,6 @@ import {
   segmenterFitOptionsSelector,
   segmenterFittedModelSelector,
   segmenterSlice,
-  predictSegmentationsFromGraph,
   preprocessSegmentationImages,
   segmenterModelSelector,
 } from "store/segmenter";
@@ -30,9 +29,15 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ObjectDetectionType,
   ModelType,
+  decodedAnnotationType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 import CLASSES from "data/model-data/cocossd-classes";
+import {
+  predictCoco,
+  predictSegmentations,
+  predictStardist,
+} from "../coroutines";
 
 export function* predictSegmenterSaga({
   payload: { execSaga },
@@ -77,9 +82,6 @@ export function* predictSegmenterSaga({
   const selectedModel: ReturnType<typeof segmenterModelSelector> = yield select(
     segmenterModelSelector
   );
-  if (selectedModel.modelType === ModelType.CocoSSD) {
-    // unused variables/imports
-  }
   let possibleClasses: { [key: string]: ObjectDetectionType } = {};
   if (/*selectedModel.modelType === ModelType.CocoSSD*/ true) {
     possibleClasses = CLASSES;
@@ -120,7 +122,8 @@ export function* predictSegmenterSaga({
     preprocessOptions,
     fitOptions,
     model,
-    possibleClasses
+    possibleClasses,
+    selectedModel.modelType
   );
 
   yield put(
@@ -138,51 +141,95 @@ function* runSegmentationPrediction(
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
   model: LayersModel | GraphModel,
-  possibleClasses: { [key: string]: ObjectDetectionType }
+  possibleClasses: { [key: string]: ObjectDetectionType },
+  selectedModelType: ModelType
 ) {
-  var data: data.Dataset<{
-    xs: Tensor<Rank.R3>;
-    ys: Tensor<Rank.R3>;
-    id: string;
+  var predictions:
+    | Awaited<ReturnType<typeof predictCoco>>
+    | Awaited<ReturnType<typeof predictStardist>>
+    | Awaited<ReturnType<typeof predictSegmentations>>;
+  var predictedAnnotations: Array<{
+    imageId: string;
+    annotations: decodedAnnotationType[];
   }>;
-  try {
-    data = yield preprocessSegmentationImages(
-      inferenceImages,
-      categories,
-      inputShape,
-      preprocessOptions,
-      fitOptions,
-      "inference"
-    );
-  } catch (error) {
-    yield handleError(
-      error as Error,
-      "Error in preprocessing the inference data"
-    );
-    return;
+  var foundCategories: Category[];
+  switch (selectedModelType) {
+    case ModelType.CocoSSD:
+      try {
+        predictions = yield predictCoco(
+          model as GraphModel,
+          inferenceImages,
+          createdCategories,
+          possibleClasses
+        ) as ReturnType<typeof predictCoco>;
+        predictedAnnotations = predictions.annotations;
+        foundCategories = predictions.categories;
+      } catch (error) {
+        yield handleError(
+          error as Error,
+          "Error drawing the annotations on the inference images"
+        );
+        return;
+      }
+      break;
+    case ModelType.StardistVHE:
+      try {
+        predictions = yield predictStardist(
+          model as GraphModel,
+          inferenceImages,
+          createdCategories
+        );
+        predictedAnnotations = predictions.annotations;
+        foundCategories = predictions.categories;
+      } catch (error) {
+        yield handleError(
+          error as Error,
+          "Error drawing the annotations on the inference images"
+        );
+        return;
+      }
+      break;
+    default:
+      var data: data.Dataset<{
+        xs: Tensor<Rank.R4>;
+        ys: Tensor<Rank.R4>;
+        id: Tensor<Rank.R1>;
+      }>;
+      try {
+        data = yield preprocessSegmentationImages(
+          inferenceImages,
+          categories,
+          inputShape,
+          preprocessOptions,
+          fitOptions,
+          "inference"
+        );
+      } catch (error) {
+        yield handleError(
+          error as Error,
+          "Error in preprocessing the inference data"
+        );
+        return;
+      }
+      try {
+        predictions = yield predictSegmentations(
+          model as LayersModel,
+          data,
+          inferenceImages,
+          createdCategories
+        );
+        predictedAnnotations = predictions.annotations;
+        foundCategories = predictions.categories;
+      } catch (error) {
+        yield handleError(
+          error as Error,
+          "Error drawing the annotations on the inference images"
+        );
+        return;
+      }
+      break;
   }
 
-  if (data) {
-    // bypass unused variable warning until used
-  }
-  var predictions: Awaited<ReturnType<typeof predictSegmentationsFromGraph>>;
-  try {
-    predictions = yield predictSegmentationsFromGraph(
-      model as GraphModel,
-      inferenceImages,
-      createdCategories,
-      possibleClasses
-    );
-  } catch (error) {
-    yield handleError(
-      error as Error,
-      "Error drawing the annotations on the inference images"
-    );
-    return;
-  }
-  const predictedAnnotations = predictions.annotations;
-  const foundCategories = predictions.categories;
-  console.log(foundCategories);
   var index = 0;
   while (index < foundCategories.length) {
     const foundCat = foundCategories[index];

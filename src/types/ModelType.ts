@@ -5,6 +5,7 @@ export enum ModelType {
   FCNSegmenter,
   UserUploaded,
   CocoSSD,
+  StardistVHE,
 }
 
 type ModelProps = {
@@ -54,6 +55,11 @@ export const availableSegmenterModels: SegmenterModelProps[] = [
   {
     modelName: "Coco-SSD",
     modelType: ModelType.CocoSSD,
+    modelArch: "graph",
+  },
+  {
+    modelName: "Stardist Versitile H&E Nuclei",
+    modelType: ModelType.StardistVHE,
     modelArch: "graph",
   },
 ];

@@ -1,8 +1,13 @@
 //@ts-ignore
 import { v4 as uuidv4 } from "uuid";
 
-import { decode, encode } from "utils/annotator";
-import { encodedAnnotationType, Category, Shape } from "types";
+import { decode } from "utils/annotator";
+import {
+  encodedAnnotationType,
+  Category,
+  Shape,
+  decodedAnnotationType,
+} from "types";
 
 export const encodeAnnotationToSegmentationMask = (
   annotations: encodedAnnotationType[],
@@ -56,7 +61,7 @@ export const decodeSegmentationMaskToAnnotations = (
   segmentationMask: Array<Array<number>>,
   imageShape: Shape
 ) => {
-  const annotations: Array<encodedAnnotationType> = [];
+  const annotations: Array<decodedAnnotationType> = [];
 
   const segmentationMasks: Array<Array<Array<number>>> = Array.from(
     Array(createdCategories.length),
@@ -107,13 +112,12 @@ export const decodeSegmentationMaskToAnnotations = (
 
       // Create the run-length encoding of the cropped segmentation mask.
       const flattenedMask = croppedMask.flat(2) as unknown as Uint8Array;
-      const encodedMask = encode(flattenedMask);
 
       annotations.push({
         boundingBox: [x1, y1, x2, y2],
         categoryId: category.id,
         id: uuidv4(),
-        mask: encodedMask,
+        maskData: flattenedMask,
         plane: 0,
       });
     }

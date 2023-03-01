@@ -226,5 +226,7 @@ it("create-annotation-from-segmentation-mask", async () => {
     predictedAnnotations[0].boundingBox
   );
 
-  expect(annotations[0].mask).toStrictEqual(predictedAnnotations[0].mask);
+  expect(predictedSegmentationMask).toStrictEqual(
+    predictedAnnotations[0].maskData
+  );
 });

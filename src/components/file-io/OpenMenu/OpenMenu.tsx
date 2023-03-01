@@ -56,7 +56,6 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
       })
     );
   };
-  
 
   const importSegmentationModel = (
     inputShape: Shape,
@@ -70,7 +69,7 @@ export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         modelSelection: {
           modelName: modelName + " - uploaded",
           modelType: ModelType.UserUploaded,
-          modelArch:modelArch
+          modelArch: modelArch,
         },
         model: segmentationModel as GraphModel,
       })
