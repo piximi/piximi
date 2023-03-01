@@ -1,0 +1,2125 @@
+{
+  "format": "graph-model",
+  "generatedBy": "1.15.3",
+  "convertedBy": "TensorFlow.js Converter v3.19.0",
+  "signature": {
+    "inputs": {
+      "input": {
+        "name": "input:0",
+        "dtype": "DT_FLOAT",
+        "tensorShape": {
+          "dim": [
+            { "size": "-1" },
+            { "size": "-1" },
+            { "size": "-1" },
+            { "size": "3" }
+          ]
+        }
+      }
+    },
+    "outputs": {
+      "output": {
+        "name": "concatenate_4/concat:0",
+        "dtype": "DT_FLOAT",
+        "tensorShape": {
+          "dim": [
+            { "size": "-1" },
+            { "size": "-1" },
+            { "size": "-1" },
+            { "size": "33" }
+          ]
+        }
+      }
+    }
+  },
+  "modelTopology": {
+    "node": [
+      {
+        "name": "conv2d_transpose_1/strided_slice/stack",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice/stack_1",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice/stack_2",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_1/stack",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_1/stack_1",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_1/stack_2",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/mul/y",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_2/stack",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_2/stack_1",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_2/stack_2",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/mul_1/y",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/stack/3",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "1" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "prob/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "128" },
+                  { "size": "1" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "prob/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "middle_0/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "256" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "middle_0/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "256" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "middle_2/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "middle_2/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/strided_slice/stack",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/strided_slice/stack_1",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/strided_slice/stack_2",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/Const",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "2" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_2_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_2_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "down_level_2_no_1/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "down_level_2_no_1/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "concatenate_1/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_level_2_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "256" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_2_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_level_2_no_2/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_2_no_2/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/strided_slice/stack",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/strided_slice/stack_1",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/strided_slice/stack_2",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/Const",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "2" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_1_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "down_level_1_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_1_no_1/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_1_no_1/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "concatenate_2/concat/axis",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } }
+        }
+      },
+      {
+        "name": "up_level_1_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "128" },
+                  { "size": "64" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_1_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "64" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_level_1_no_2/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_1_no_2/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/strided_slice/stack",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/strided_slice/stack_1",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/strided_slice/stack_2",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/Const",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "2" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_1/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "conv2d_1/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "conv2d_2/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "conv2d_2/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "down_level_0_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_0_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_0_no_1/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "down_level_0_no_1/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "concatenate_3/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_level_0_no_0/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "64" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_0_no_0/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_0_no_2/kernel",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_level_0_no_2/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "features/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "3" },
+                  { "size": "3" },
+                  { "size": "32" },
+                  { "size": "128" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "features/bias",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "128" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "dist/kernel",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": {
+                "dim": [
+                  { "size": "1" },
+                  { "size": "1" },
+                  { "size": "128" },
+                  { "size": "32" }
+                ]
+              }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "dist/bias",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_FLOAT",
+              "tensorShape": { "dim": [{ "size": "32" }] }
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/strided_slice/stack",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/strided_slice/stack_1",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/strided_slice/stack_2",
+        "op": "Const",
+        "attr": {
+          "dtype": { "type": "DT_INT32" },
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "1" }] }
+            }
+          }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/Const",
+        "op": "Const",
+        "attr": {
+          "value": {
+            "tensor": {
+              "dtype": "DT_INT32",
+              "tensorShape": { "dim": [{ "size": "2" }] }
+            }
+          },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "concatenate_4/concat/axis",
+        "op": "Const",
+        "attr": {
+          "value": { "tensor": { "dtype": "DT_INT32", "tensorShape": {} } },
+          "dtype": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "input",
+        "op": "Placeholder",
+        "attr": {
+          "shape": {
+            "shape": {
+              "dim": [
+                { "size": "-1" },
+                { "size": "-1" },
+                { "size": "-1" },
+                { "size": "3" }
+              ]
+            }
+          },
+          "dtype": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "conv2d_1/Relu",
+        "op": "_FusedConv2D",
+        "input": ["input", "conv2d_1/kernel", "conv2d_1/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "use_cudnn_on_gpu": { "b": true },
+          "padding": { "s": "U0FNRQ==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "explicit_paddings": { "list": {} },
+          "num_args": { "i": "1" },
+          "data_format": { "s": "TkhXQw==" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 }
+        }
+      },
+      {
+        "name": "conv2d_2/Relu",
+        "op": "_FusedConv2D",
+        "input": ["conv2d_1/Relu", "conv2d_2/kernel", "conv2d_2/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "T": { "type": "DT_FLOAT" },
+          "use_cudnn_on_gpu": { "b": true },
+          "num_args": { "i": "1" },
+          "explicit_paddings": { "list": {} },
+          "padding": { "s": "U0FNRQ==" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "data_format": { "s": "TkhXQw==" },
+          "epsilon": { "f": 0.0 }
+        }
+      },
+      {
+        "name": "max_pooling2d_1/MaxPool",
+        "op": "MaxPool",
+        "input": ["conv2d_2/Relu"],
+        "attr": {
+          "padding": { "s": "VkFMSUQ=" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "explicit_paddings": { "list": {} },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" },
+          "ksize": { "list": { "i": ["1", "2", "2", "1"] } }
+        }
+      },
+      {
+        "name": "down_level_0_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "max_pooling2d_1/MaxPool",
+          "down_level_0_no_0/kernel",
+          "down_level_0_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "data_format": { "s": "TkhXQw==" },
+          "num_args": { "i": "1" },
+          "explicit_paddings": { "list": {} },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } }
+        }
+      },
+      {
+        "name": "down_level_0_no_1/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "down_level_0_no_0/Relu",
+          "down_level_0_no_1/kernel",
+          "down_level_0_no_1/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "T": { "type": "DT_FLOAT" },
+          "use_cudnn_on_gpu": { "b": true },
+          "padding": { "s": "U0FNRQ==" },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "data_format": { "s": "TkhXQw==" }
+        }
+      },
+      {
+        "name": "max_0/MaxPool",
+        "op": "MaxPool",
+        "input": ["down_level_0_no_1/Relu"],
+        "attr": {
+          "explicit_paddings": { "list": {} },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" },
+          "ksize": { "list": { "i": ["1", "2", "2", "1"] } },
+          "padding": { "s": "VkFMSUQ=" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } }
+        }
+      },
+      {
+        "name": "down_level_1_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "max_0/MaxPool",
+          "down_level_1_no_0/kernel",
+          "down_level_1_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "epsilon": { "f": 0.0 },
+          "explicit_paddings": { "list": {} },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "use_cudnn_on_gpu": { "b": true },
+          "data_format": { "s": "TkhXQw==" },
+          "num_args": { "i": "1" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "T": { "type": "DT_FLOAT" },
+          "padding": { "s": "U0FNRQ==" }
+        }
+      },
+      {
+        "name": "down_level_1_no_1/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "down_level_1_no_0/Relu",
+          "down_level_1_no_1/kernel",
+          "down_level_1_no_1/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "use_cudnn_on_gpu": { "b": true },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "epsilon": { "f": 0.0 },
+          "data_format": { "s": "TkhXQw==" },
+          "explicit_paddings": { "list": {} },
+          "T": { "type": "DT_FLOAT" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" }
+        }
+      },
+      {
+        "name": "max_1/MaxPool",
+        "op": "MaxPool",
+        "input": ["down_level_1_no_1/Relu"],
+        "attr": {
+          "data_format": { "s": "TkhXQw==" },
+          "ksize": { "list": { "i": ["1", "2", "2", "1"] } },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} },
+          "padding": { "s": "VkFMSUQ=" }
+        }
+      },
+      {
+        "name": "down_level_2_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "max_1/MaxPool",
+          "down_level_2_no_0/kernel",
+          "down_level_2_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "data_format": { "s": "TkhXQw==" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "epsilon": { "f": 0.0 },
+          "use_cudnn_on_gpu": { "b": true },
+          "T": { "type": "DT_FLOAT" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "padding": { "s": "U0FNRQ==" },
+          "explicit_paddings": { "list": {} }
+        }
+      },
+      {
+        "name": "down_level_2_no_1/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "down_level_2_no_0/Relu",
+          "down_level_2_no_1/kernel",
+          "down_level_2_no_1/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "use_cudnn_on_gpu": { "b": true },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "explicit_paddings": { "list": {} },
+          "data_format": { "s": "TkhXQw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" },
+          "num_args": { "i": "1" }
+        }
+      },
+      {
+        "name": "max_2/MaxPool",
+        "op": "MaxPool",
+        "input": ["down_level_2_no_1/Relu"],
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "ksize": { "list": { "i": ["1", "2", "2", "1"] } },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "padding": { "s": "VkFMSUQ=" },
+          "explicit_paddings": { "list": {} },
+          "data_format": { "s": "TkhXQw==" }
+        }
+      },
+      {
+        "name": "middle_0/Relu",
+        "op": "_FusedConv2D",
+        "input": ["max_2/MaxPool", "middle_0/kernel", "middle_0/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "num_args": { "i": "1" },
+          "use_cudnn_on_gpu": { "b": true },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "explicit_paddings": { "list": {} },
+          "data_format": { "s": "TkhXQw==" },
+          "epsilon": { "f": 0.0 },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "middle_2/Relu",
+        "op": "_FusedConv2D",
+        "input": ["middle_0/Relu", "middle_2/kernel", "middle_2/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "epsilon": { "f": 0.0 },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "T": { "type": "DT_FLOAT" },
+          "data_format": { "s": "TkhXQw==" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/Shape",
+        "op": "Shape",
+        "input": ["middle_2/Relu"],
+        "attr": {
+          "out_type": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/strided_slice",
+        "op": "StridedSlice",
+        "input": [
+          "up_sampling2d_1/Shape",
+          "up_sampling2d_1/strided_slice/stack",
+          "up_sampling2d_1/strided_slice/stack_1",
+          "up_sampling2d_1/strided_slice/stack_2"
+        ],
+        "attr": {
+          "new_axis_mask": { "i": "0" },
+          "end_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "ellipsis_mask": { "i": "0" },
+          "T": { "type": "DT_INT32" },
+          "begin_mask": { "i": "0" },
+          "shrink_axis_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "up_sampling2d_1/mul",
+        "op": "Mul",
+        "input": ["up_sampling2d_1/strided_slice", "up_sampling2d_1/Const"],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "up_sampling2d_1/ResizeNearestNeighbor",
+        "op": "ResizeNearestNeighbor",
+        "input": ["middle_2/Relu", "up_sampling2d_1/mul"],
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "align_corners": { "b": false },
+          "half_pixel_centers": { "b": false }
+        }
+      },
+      {
+        "name": "concatenate_1/concat",
+        "op": "ConcatV2",
+        "input": [
+          "up_sampling2d_1/ResizeNearestNeighbor",
+          "down_level_2_no_1/Relu",
+          "concatenate_1/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_level_2_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "concatenate_1/concat",
+          "up_level_2_no_0/kernel",
+          "up_level_2_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "epsilon": { "f": 0.0 },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "num_args": { "i": "1" },
+          "data_format": { "s": "TkhXQw==" },
+          "T": { "type": "DT_FLOAT" },
+          "explicit_paddings": { "list": {} }
+        }
+      },
+      {
+        "name": "up_level_2_no_2/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "up_level_2_no_0/Relu",
+          "up_level_2_no_2/kernel",
+          "up_level_2_no_2/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "padding": { "s": "U0FNRQ==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "data_format": { "s": "TkhXQw==" },
+          "explicit_paddings": { "list": {} },
+          "T": { "type": "DT_FLOAT" },
+          "use_cudnn_on_gpu": { "b": true },
+          "num_args": { "i": "1" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/Shape",
+        "op": "Shape",
+        "input": ["up_level_2_no_2/Relu"],
+        "attr": {
+          "out_type": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/strided_slice",
+        "op": "StridedSlice",
+        "input": [
+          "up_sampling2d_2/Shape",
+          "up_sampling2d_2/strided_slice/stack",
+          "up_sampling2d_2/strided_slice/stack_1",
+          "up_sampling2d_2/strided_slice/stack_2"
+        ],
+        "attr": {
+          "end_mask": { "i": "0" },
+          "new_axis_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "begin_mask": { "i": "0" },
+          "shrink_axis_mask": { "i": "0" },
+          "T": { "type": "DT_INT32" },
+          "ellipsis_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "up_sampling2d_2/mul",
+        "op": "Mul",
+        "input": ["up_sampling2d_2/strided_slice", "up_sampling2d_2/Const"],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "up_sampling2d_2/ResizeNearestNeighbor",
+        "op": "ResizeNearestNeighbor",
+        "input": ["up_level_2_no_2/Relu", "up_sampling2d_2/mul"],
+        "attr": {
+          "half_pixel_centers": { "b": false },
+          "align_corners": { "b": false },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "concatenate_2/concat",
+        "op": "ConcatV2",
+        "input": [
+          "up_sampling2d_2/ResizeNearestNeighbor",
+          "down_level_1_no_1/Relu",
+          "concatenate_2/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_level_1_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "concatenate_2/concat",
+          "up_level_1_no_0/kernel",
+          "up_level_1_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "num_args": { "i": "1" },
+          "data_format": { "s": "TkhXQw==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "explicit_paddings": { "list": {} },
+          "epsilon": { "f": 0.0 },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" }
+        }
+      },
+      {
+        "name": "up_level_1_no_2/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "up_level_1_no_0/Relu",
+          "up_level_1_no_2/kernel",
+          "up_level_1_no_2/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "epsilon": { "f": 0.0 },
+          "data_format": { "s": "TkhXQw==" },
+          "padding": { "s": "U0FNRQ==" },
+          "T": { "type": "DT_FLOAT" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "num_args": { "i": "1" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "explicit_paddings": { "list": {} },
+          "use_cudnn_on_gpu": { "b": true }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/Shape",
+        "op": "Shape",
+        "input": ["up_level_1_no_2/Relu"],
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "out_type": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/strided_slice",
+        "op": "StridedSlice",
+        "input": [
+          "up_sampling2d_3/Shape",
+          "up_sampling2d_3/strided_slice/stack",
+          "up_sampling2d_3/strided_slice/stack_1",
+          "up_sampling2d_3/strided_slice/stack_2"
+        ],
+        "attr": {
+          "begin_mask": { "i": "0" },
+          "end_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "T": { "type": "DT_INT32" },
+          "shrink_axis_mask": { "i": "0" },
+          "new_axis_mask": { "i": "0" },
+          "ellipsis_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "up_sampling2d_3/mul",
+        "op": "Mul",
+        "input": ["up_sampling2d_3/strided_slice", "up_sampling2d_3/Const"],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "up_sampling2d_3/ResizeNearestNeighbor",
+        "op": "ResizeNearestNeighbor",
+        "input": ["up_level_1_no_2/Relu", "up_sampling2d_3/mul"],
+        "attr": {
+          "half_pixel_centers": { "b": false },
+          "T": { "type": "DT_FLOAT" },
+          "align_corners": { "b": false }
+        }
+      },
+      {
+        "name": "concatenate_3/concat",
+        "op": "ConcatV2",
+        "input": [
+          "up_sampling2d_3/ResizeNearestNeighbor",
+          "down_level_0_no_1/Relu",
+          "concatenate_3/concat/axis"
+        ],
+        "attr": {
+          "N": { "i": "2" },
+          "T": { "type": "DT_FLOAT" },
+          "Tidx": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_level_0_no_0/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "concatenate_3/concat",
+          "up_level_0_no_0/kernel",
+          "up_level_0_no_0/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_args": { "i": "1" },
+          "use_cudnn_on_gpu": { "b": true },
+          "explicit_paddings": { "list": {} },
+          "epsilon": { "f": 0.0 },
+          "data_format": { "s": "TkhXQw==" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_level_0_no_2/Relu",
+        "op": "_FusedConv2D",
+        "input": [
+          "up_level_0_no_0/Relu",
+          "up_level_0_no_2/kernel",
+          "up_level_0_no_2/bias"
+        ],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_args": { "i": "1" },
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "data_format": { "s": "TkhXQw==" },
+          "explicit_paddings": { "list": {} },
+          "T": { "type": "DT_FLOAT" },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "epsilon": { "f": 0.0 },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } }
+        }
+      },
+      {
+        "name": "features/Relu",
+        "op": "_FusedConv2D",
+        "input": ["up_level_0_no_2/Relu", "features/kernel", "features/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "num_args": { "i": "1" },
+          "T": { "type": "DT_FLOAT" },
+          "data_format": { "s": "TkhXQw==" },
+          "explicit_paddings": { "list": {} },
+          "use_cudnn_on_gpu": { "b": true },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA==", "UmVsdQ=="] } },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "epsilon": { "f": 0.0 },
+          "padding": { "s": "U0FNRQ==" }
+        }
+      },
+      {
+        "name": "dist/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": ["features/Relu", "dist/kernel", "dist/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "data_format": { "s": "TkhXQw==" },
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "explicit_paddings": { "list": {} },
+          "use_cudnn_on_gpu": { "b": true },
+          "padding": { "s": "U0FNRQ==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "num_args": { "i": "1" },
+          "T": { "type": "DT_FLOAT" },
+          "epsilon": { "f": 0.0 }
+        }
+      },
+      {
+        "name": "prob/BiasAdd",
+        "op": "_FusedConv2D",
+        "input": ["features/Relu", "prob/kernel", "prob/bias"],
+        "device": "/device:CPU:0",
+        "attr": {
+          "fused_ops": { "list": { "s": ["Qmlhc0FkZA=="] } },
+          "explicit_paddings": { "list": {} },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "padding": { "s": "U0FNRQ==" },
+          "strides": { "list": { "i": ["1", "1", "1", "1"] } },
+          "T": { "type": "DT_FLOAT" },
+          "data_format": { "s": "TkhXQw==" },
+          "epsilon": { "f": 0.0 },
+          "use_cudnn_on_gpu": { "b": true },
+          "num_args": { "i": "1" }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/Shape",
+        "op": "Shape",
+        "input": ["dist/BiasAdd"],
+        "attr": {
+          "T": { "type": "DT_FLOAT" },
+          "out_type": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "prob/Sigmoid",
+        "op": "Sigmoid",
+        "input": ["prob/BiasAdd"],
+        "attr": { "T": { "type": "DT_FLOAT" } }
+      },
+      {
+        "name": "up_sampling2d_4/strided_slice",
+        "op": "StridedSlice",
+        "input": [
+          "up_sampling2d_4/Shape",
+          "up_sampling2d_4/strided_slice/stack",
+          "up_sampling2d_4/strided_slice/stack_1",
+          "up_sampling2d_4/strided_slice/stack_2"
+        ],
+        "attr": {
+          "T": { "type": "DT_INT32" },
+          "shrink_axis_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "ellipsis_mask": { "i": "0" },
+          "new_axis_mask": { "i": "0" },
+          "end_mask": { "i": "0" },
+          "begin_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/Shape",
+        "op": "Shape",
+        "input": ["prob/Sigmoid"],
+        "attr": {
+          "out_type": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/mul",
+        "op": "Mul",
+        "input": ["up_sampling2d_4/strided_slice", "up_sampling2d_4/Const"],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice",
+        "op": "StridedSlice",
+        "input": [
+          "conv2d_transpose_1/Shape",
+          "conv2d_transpose_1/strided_slice/stack",
+          "conv2d_transpose_1/strided_slice/stack_1",
+          "conv2d_transpose_1/strided_slice/stack_2"
+        ],
+        "attr": {
+          "end_mask": { "i": "0" },
+          "shrink_axis_mask": { "i": "1" },
+          "new_axis_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "begin_mask": { "i": "0" },
+          "T": { "type": "DT_INT32" },
+          "ellipsis_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_1",
+        "op": "StridedSlice",
+        "input": [
+          "conv2d_transpose_1/Shape",
+          "conv2d_transpose_1/strided_slice_1/stack",
+          "conv2d_transpose_1/strided_slice_1/stack_1",
+          "conv2d_transpose_1/strided_slice_1/stack_2"
+        ],
+        "attr": {
+          "end_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "new_axis_mask": { "i": "0" },
+          "begin_mask": { "i": "0" },
+          "T": { "type": "DT_INT32" },
+          "shrink_axis_mask": { "i": "1" },
+          "ellipsis_mask": { "i": "0" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/strided_slice_2",
+        "op": "StridedSlice",
+        "input": [
+          "conv2d_transpose_1/Shape",
+          "conv2d_transpose_1/strided_slice_2/stack",
+          "conv2d_transpose_1/strided_slice_2/stack_1",
+          "conv2d_transpose_1/strided_slice_2/stack_2"
+        ],
+        "attr": {
+          "ellipsis_mask": { "i": "0" },
+          "shrink_axis_mask": { "i": "1" },
+          "new_axis_mask": { "i": "0" },
+          "begin_mask": { "i": "0" },
+          "end_mask": { "i": "0" },
+          "Index": { "type": "DT_INT32" },
+          "T": { "type": "DT_INT32" }
+        }
+      },
+      {
+        "name": "up_sampling2d_4/ResizeNearestNeighbor",
+        "op": "ResizeNearestNeighbor",
+        "input": ["dist/BiasAdd", "up_sampling2d_4/mul"],
+        "attr": {
+          "align_corners": { "b": false },
+          "half_pixel_centers": { "b": false },
+          "T": { "type": "DT_FLOAT" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/mul",
+        "op": "Mul",
+        "input": [
+          "conv2d_transpose_1/strided_slice_1",
+          "conv2d_transpose_1/mul/y"
+        ],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "conv2d_transpose_1/mul_1",
+        "op": "Mul",
+        "input": [
+          "conv2d_transpose_1/strided_slice_2",
+          "conv2d_transpose_1/mul_1/y"
+        ],
+        "attr": { "T": { "type": "DT_INT32" } }
+      },
+      {
+        "name": "conv2d_transpose_1/stack",
+        "op": "Pack",
+        "input": [
+          "conv2d_transpose_1/strided_slice",
+          "conv2d_transpose_1/mul",
+          "conv2d_transpose_1/mul_1",
+          "conv2d_transpose_1/stack/3"
+        ],
+        "attr": {
+          "axis": { "i": "0" },
+          "T": { "type": "DT_INT32" },
+          "N": { "i": "4" }
+        }
+      },
+      {
+        "name": "conv2d_transpose_1/conv2d_transpose",
+        "op": "Conv2DBackpropInput",
+        "input": [
+          "conv2d_transpose_1/stack",
+          "conv2d_transpose_1/kernel",
+          "prob/Sigmoid"
+        ],
+        "attr": {
+          "padding": { "s": "U0FNRQ==" },
+          "use_cudnn_on_gpu": { "b": true },
+          "T": { "type": "DT_FLOAT" },
+          "data_format": { "s": "TkhXQw==" },
+          "strides": { "list": { "i": ["1", "2", "2", "1"] } },
+          "dilations": { "list": { "i": ["1", "1", "1", "1"] } },
+          "explicit_paddings": { "list": {} }
+        }
+      },
+      {
+        "name": "concatenate_4/concat",
+        "op": "ConcatV2",
+        "input": [
+          "conv2d_transpose_1/conv2d_transpose",
+          "up_sampling2d_4/ResizeNearestNeighbor",
+          "concatenate_4/concat/axis"
+        ],
+        "attr": {
+          "Tidx": { "type": "DT_INT32" },
+          "T": { "type": "DT_FLOAT" },
+          "N": { "i": "2" }
+        }
+      }
+    ],
+    "library": {},
+    "versions": { "producer": 987 }
+  },
+  "weightsManifest": [
+    {
+      "paths": ["group1-shard1of2.bin", "group1-shard2of2.bin"],
+      "weights": [
+        {
+          "name": "conv2d_transpose_1/strided_slice/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice_1/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice_1/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice_1/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "conv2d_transpose_1/mul/y", "shape": [], "dtype": "int32" },
+        {
+          "name": "conv2d_transpose_1/strided_slice_2/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice_2/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "conv2d_transpose_1/strided_slice_2/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "conv2d_transpose_1/mul_1/y", "shape": [], "dtype": "int32" },
+        { "name": "conv2d_transpose_1/stack/3", "shape": [], "dtype": "int32" },
+        {
+          "name": "conv2d_transpose_1/kernel",
+          "shape": [1, 1, 1, 1],
+          "dtype": "float32"
+        },
+        { "name": "prob/kernel", "shape": [1, 1, 128, 1], "dtype": "float32" },
+        { "name": "prob/bias", "shape": [1], "dtype": "float32" },
+        {
+          "name": "middle_0/kernel",
+          "shape": [3, 3, 128, 256],
+          "dtype": "float32"
+        },
+        { "name": "middle_0/bias", "shape": [256], "dtype": "float32" },
+        {
+          "name": "middle_2/kernel",
+          "shape": [3, 3, 256, 128],
+          "dtype": "float32"
+        },
+        { "name": "middle_2/bias", "shape": [128], "dtype": "float32" },
+        {
+          "name": "up_sampling2d_1/strided_slice/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_1/strided_slice/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_1/strided_slice/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "up_sampling2d_1/Const", "shape": [2], "dtype": "int32" },
+        {
+          "name": "down_level_2_no_0/kernel",
+          "shape": [3, 3, 64, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "down_level_2_no_0/bias",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        {
+          "name": "down_level_2_no_1/kernel",
+          "shape": [3, 3, 128, 128],
+          "dtype": "float32"
+        },
+        {
+          "name": "down_level_2_no_1/bias",
+          "shape": [128],
+          "dtype": "float32"
+        },
+        { "name": "concatenate_1/concat/axis", "shape": [], "dtype": "int32" },
+        {
+          "name": "up_level_2_no_0/kernel",
+          "shape": [3, 3, 256, 128],
+          "dtype": "float32"
+        },
+        { "name": "up_level_2_no_0/bias", "shape": [128], "dtype": "float32" },
+        {
+          "name": "up_level_2_no_2/kernel",
+          "shape": [3, 3, 128, 64],
+          "dtype": "float32"
+        },
+        { "name": "up_level_2_no_2/bias", "shape": [64], "dtype": "float32" },
+        {
+          "name": "up_sampling2d_2/strided_slice/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_2/strided_slice/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_2/strided_slice/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "up_sampling2d_2/Const", "shape": [2], "dtype": "int32" },
+        {
+          "name": "down_level_1_no_0/kernel",
+          "shape": [3, 3, 32, 64],
+          "dtype": "float32"
+        },
+        { "name": "down_level_1_no_0/bias", "shape": [64], "dtype": "float32" },
+        {
+          "name": "down_level_1_no_1/kernel",
+          "shape": [3, 3, 64, 64],
+          "dtype": "float32"
+        },
+        { "name": "down_level_1_no_1/bias", "shape": [64], "dtype": "float32" },
+        { "name": "concatenate_2/concat/axis", "shape": [], "dtype": "int32" },
+        {
+          "name": "up_level_1_no_0/kernel",
+          "shape": [3, 3, 128, 64],
+          "dtype": "float32"
+        },
+        { "name": "up_level_1_no_0/bias", "shape": [64], "dtype": "float32" },
+        {
+          "name": "up_level_1_no_2/kernel",
+          "shape": [3, 3, 64, 32],
+          "dtype": "float32"
+        },
+        { "name": "up_level_1_no_2/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "up_sampling2d_3/strided_slice/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_3/strided_slice/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_3/strided_slice/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "up_sampling2d_3/Const", "shape": [2], "dtype": "int32" },
+        {
+          "name": "conv2d_1/kernel",
+          "shape": [3, 3, 3, 32],
+          "dtype": "float32"
+        },
+        { "name": "conv2d_1/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "conv2d_2/kernel",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        { "name": "conv2d_2/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "down_level_0_no_0/kernel",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        { "name": "down_level_0_no_0/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "down_level_0_no_1/kernel",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        { "name": "down_level_0_no_1/bias", "shape": [32], "dtype": "float32" },
+        { "name": "concatenate_3/concat/axis", "shape": [], "dtype": "int32" },
+        {
+          "name": "up_level_0_no_0/kernel",
+          "shape": [3, 3, 64, 32],
+          "dtype": "float32"
+        },
+        { "name": "up_level_0_no_0/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "up_level_0_no_2/kernel",
+          "shape": [3, 3, 32, 32],
+          "dtype": "float32"
+        },
+        { "name": "up_level_0_no_2/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "features/kernel",
+          "shape": [3, 3, 32, 128],
+          "dtype": "float32"
+        },
+        { "name": "features/bias", "shape": [128], "dtype": "float32" },
+        { "name": "dist/kernel", "shape": [1, 1, 128, 32], "dtype": "float32" },
+        { "name": "dist/bias", "shape": [32], "dtype": "float32" },
+        {
+          "name": "up_sampling2d_4/strided_slice/stack",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_4/strided_slice/stack_1",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        {
+          "name": "up_sampling2d_4/strided_slice/stack_2",
+          "shape": [1],
+          "dtype": "int32"
+        },
+        { "name": "up_sampling2d_4/Const", "shape": [2], "dtype": "int32" },
+        { "name": "concatenate_4/concat/axis", "shape": [], "dtype": "int32" }
+      ]
+    }
+  ]
+}

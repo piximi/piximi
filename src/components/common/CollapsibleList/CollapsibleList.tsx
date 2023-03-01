@@ -6,6 +6,7 @@ import {
   ListItemText,
   Collapse,
   SxProps,
+  ListItemButton,
 } from "@mui/material";
 import {
   KeyboardArrowRight as KeyboardArrowRightIcon,
@@ -22,6 +23,7 @@ type CollapsibleListProps = {
   paddingLeft?: boolean;
   sx?: SxProps;
   onScroll?: (evt: React.UIEvent<HTMLDivElement, UIEvent>) => void;
+  secondary?: JSX.Element;
 };
 
 export const CollapsibleList = ({
@@ -34,10 +36,11 @@ export const CollapsibleList = ({
   paddingLeft,
   sx,
   onScroll,
+  secondary,
 }: CollapsibleListProps) => {
   const [collapsed, setCollapsed] = React.useState(closed);
 
-  const onClick = () => {
+  const handleClick = () => {
     setCollapsed(!collapsed);
   };
 
@@ -46,12 +49,14 @@ export const CollapsibleList = ({
       sx={{ backgroundColor: backgroundColor ? backgroundColor : "" }}
       dense={dense}
     >
-      <ListItem button onClick={onClick}>
-        <ListItemIcon>
-          {collapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-        </ListItemIcon>
+      <ListItem secondaryAction={secondary}>
+        <ListItemButton role={undefined} onClick={handleClick} disableGutters>
+          <ListItemIcon>
+            {collapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+          </ListItemIcon>
 
-        <ListItemText primary={primary} />
+          <ListItemText primary={primary} />
+        </ListItemButton>
       </ListItem>
 
       <Collapse
