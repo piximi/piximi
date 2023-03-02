@@ -102,6 +102,7 @@ export const ImageList = ({
           hideNextButton
           showFirstButton
           showLastButton
+          hidden={images.length <= NUM_IMS_SHOWN}
         />
         {images.slice(viewRange.start, viewRange.end).map((image) => {
           return (
