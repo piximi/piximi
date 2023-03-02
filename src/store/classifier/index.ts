@@ -1,6 +1,17 @@
 // Slices
 
 export { classifierSlice } from "./classifierSlice";
+export { fit } from "./classifierSlice";
+export { updateBatchSize } from "./classifierSlice";
+export { updateCompiled } from "./classifierSlice";
+export { updateEpochs } from "./classifierSlice";
+export { updateFitted } from "./classifierSlice";
+export { updateLearningRate } from "./classifierSlice";
+export { updateLossFunction } from "./classifierSlice";
+export { updateMetrics } from "./classifierSlice";
+export { updateOptimizationAlgorithm } from "./classifierSlice";
+export { updateTrainingPercentage } from "./classifierSlice";
+export { uploadUserSelectedModel } from "./classifierSlice";
 
 // Selectors
 

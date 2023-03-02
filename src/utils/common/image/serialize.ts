@@ -5,7 +5,7 @@ import {
   encodedAnnotationType,
   Classifier,
   ClassifierModelProps,
-  UserUploadedModelProps,
+  DefaultModelProps,
   FitOptions,
   ImageType,
   PreprocessOptions,
@@ -217,7 +217,7 @@ const serializeModelProps = (
   if (modelProps.hasOwnProperty("src")) {
     modelPropsGroup.create_attribute(
       "src",
-      (modelProps as UserUploadedModelProps).src
+      (modelProps as DefaultModelProps).src!
     );
   }
 

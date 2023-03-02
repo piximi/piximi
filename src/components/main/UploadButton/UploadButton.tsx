@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Button, Tooltip } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { AddPhotoAlternate as AddPhotoAltIcon } from "@mui/icons-material";
 
 import { useMenu } from "hooks";
 
@@ -19,7 +19,7 @@ export const UploadButton = () => {
             textTransform: "none",
           }}
           onClick={onOpen}
-          startIcon={<CloudUploadIcon />}
+          startIcon={<AddPhotoAltIcon />}
         >
           Open image
         </Button>

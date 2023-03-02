@@ -1,32 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, IconButton } from "@mui/material";
-import { Add as AddIcon, Save as SaveIcon } from "@mui/icons-material";
+import { Divider, IconButton, Tooltip } from "@mui/material";
+import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
+
+import { useDialog, useDialogHotkey } from "hooks";
+
+import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
+import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
 import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
+import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
   createdAnnotatorCategoriesSelector,
   unknownAnnotationCategorySelector,
 } from "store/project";
 
-import { CategoryType, HotkeyView, ModelType, Shape } from "types";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { CollapsibleList } from "components/common/CollapsibleList";
-import { useDialog, useDialogHotkey } from "hooks";
 import {
   segmenterArchitectureOptionsSelector,
   segmenterFittedModelSelector,
   segmenterSlice,
 } from "store/segmenter";
-import { GraphModel, LayersModel } from "@tensorflow/tfjs";
-import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
-import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
+
+import { CategoryType, HotkeyView, ModelType, Shape } from "types";
+import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
   const categories = useSelector(createdAnnotatorCategoriesSelector);
   const unknownCategory = useSelector(unknownAnnotationCategorySelector);
+  const fittedSegmenter = useSelector(segmenterFittedModelSelector);
+  const selectedSegmenterModelProps = useSelector(
+    segmenterArchitectureOptionsSelector
+  ).selectedModel;
 
   const {
     onClose: onCloseImportSegmenterDialog,
@@ -44,6 +51,7 @@ export const SegmenterList = () => {
   const importSegmentationModel = (
     inputShape: Shape,
     modelName: string,
+    modelType: number,
     segmentationModel: any,
     modelArch: string
   ) => {
@@ -51,14 +59,8 @@ export const SegmenterList = () => {
       segmenterSlice.actions.uploadUserSelectedModel({
         inputShape: inputShape,
         modelSelection: {
-          modelName:
-            modelName === "Stardist Versitile H&E"
-              ? "Stardist Versitile H&E"
-              : modelName + " - uploaded",
-          modelType:
-            modelName === "Stardist Versitile H&E"
-              ? ModelType.StardistVHE
-              : ModelType.UserUploaded,
+          modelName: modelName,
+          modelType: modelType as ModelType,
           modelArch: modelArch,
         },
         model: segmentationModel as GraphModel,
@@ -66,29 +68,34 @@ export const SegmenterList = () => {
     );
   };
 
-  const fittedSegmenter = useSelector(segmenterFittedModelSelector);
-  const selectedSegmenterModelProps = useSelector(
-    segmenterArchitectureOptionsSelector
-  ).selectedModel;
+  useEffect(() => {
+    const t = 0 as ModelType;
 
-  const addSegmenterButton = (
+    console.log(t === ModelType.None);
+  }, []);
+
+  const SegmenterIOButtons = (
     <>
-      <IconButton
-        size="small"
-        edge="end"
-        aria-label="comments"
-        onClick={onOpenImportSegmenterDialog}
-      >
-        <AddIcon />
-      </IconButton>
-      <IconButton
-        size="small"
-        edge="end"
-        aria-label="comments"
-        onClick={onSaveSegmenterDialogOpen}
-      >
-        <SaveIcon />
-      </IconButton>
+      <Tooltip title="Import Model">
+        <IconButton
+          size="small"
+          edge="end"
+          aria-label="import segmentation model"
+          onClick={onOpenImportSegmenterDialog}
+        >
+          <AddIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Save Model">
+        <IconButton
+          size="small"
+          edge="end"
+          aria-label="save segmentation model"
+          onClick={onSaveSegmenterDialogOpen}
+        >
+          <SaveIcon />
+        </IconButton>
+      </Tooltip>
     </>
   );
 
@@ -98,7 +105,7 @@ export const SegmenterList = () => {
         dense
         backgroundColor={APPLICATION_COLORS.segmenterList}
         primary="Segmenter"
-        secondary={addSegmenterButton}
+        secondary={SegmenterIOButtons}
       >
         <>
           <CategoriesList
@@ -119,7 +126,7 @@ export const SegmenterList = () => {
       <ImportTensorflowModelDialog
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
-        modelType={"Segmentation"}
+        modelKind={"Segmentation"}
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog

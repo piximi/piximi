@@ -1,16 +1,16 @@
 import {
   Tensor,
-  Rank,
-  tidy,
-  image as TFImage,
-  GraphModel,
-  expandDims,
-  dispose,
-  getBackend,
-  tensor2d,
-  setBackend,
   Tensor4D,
+  Rank,
+  GraphModel,
+  image as TFImage,
+  expandDims,
+  tidy,
+  dispose,
   tensor,
+  tensor2d,
+  getBackend,
+  setBackend,
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
@@ -25,7 +25,7 @@ import {
 } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { scanline, simplifyPolygon } from "utils/annotator";
-import { connectPoints } from "utils/common";
+import { connectPoints } from "utils/annotator";
 
 export const predictStardist = async (
   model: GraphModel,
@@ -61,29 +61,30 @@ export const predictStardist = async (
       image.shape.width % 16 === 0 ? 0 : 16 - (image.shape.width % 16);
     const padY =
       image.shape.height % 16 === 0 ? 0 : 16 - (image.shape.height % 16);
-    let imageTensor: Tensor4D;
-    if (!(padX === 0 && padY === 0)) {
-      imageTensor = expandedImage
-        .mirrorPad(
-          [
-            [0, 0],
+    const imageTensor = tidy(() => {
+      if (!(padX === 0 && padY === 0)) {
+        return expandedImage
+          .mirrorPad(
             [
-              padY % 2 === 0 ? padY / 2 : Math.floor(padY / 2),
-              padY % 2 === 0 ? padY / 2 : Math.ceil(padY / 2),
+              [0, 0],
+              [
+                padY % 2 === 0 ? padY / 2 : Math.floor(padY / 2),
+                padY % 2 === 0 ? padY / 2 : Math.ceil(padY / 2),
+              ],
+              [
+                padX % 2 === 0 ? padX / 2 : Math.floor(padX / 2),
+                padX % 2 === 0 ? padX / 2 : Math.ceil(padX / 2),
+              ],
+              [0, 0],
             ],
-            [
-              padX % 2 === 0 ? padX / 2 : Math.floor(padX / 2),
-              padX % 2 === 0 ? padX / 2 : Math.ceil(padX / 2),
-            ],
-            [0, 0],
-          ],
-          "reflect"
-        )
-        .asType("float32")
-        .div(255) as Tensor4D;
-    } else {
-      imageTensor = expandedImage.asType("float32").div(255) as Tensor4D;
-    }
+            "reflect"
+          )
+          .asType("float32")
+          .div(255) as Tensor4D;
+      } else {
+        return expandedImage.asType("float32").div(255) as Tensor4D;
+      }
+    });
 
     const results = model.execute(imageTensor) as Tensor<Rank.R4>;
     const annotationCategory = generateNewCategory(

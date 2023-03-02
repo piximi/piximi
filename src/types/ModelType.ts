@@ -1,4 +1,5 @@
 export enum ModelType {
+  None,
   SimpleCNN,
   MobileNet,
   SimpleFCNSegmenter,
@@ -12,24 +13,15 @@ type ModelProps = {
   modelName: string;
   requiredChannels?: number;
   modelType: ModelType;
+  src?: string;
+  pretrained?: boolean;
+  modelArch?: string;
 };
 export interface DefaultModelProps extends ModelProps {}
 
-export interface UserUploadedModelProps extends ModelProps {
-  src: string;
-}
+export type ClassifierModelProps = DefaultModelProps;
 
-export type ClassifierModelProps = UserUploadedModelProps | DefaultModelProps;
-
-// export type SegmenterModelProps = UserUploadedModelProps | DefaultModelProps;
-
-export type SegmenterModelProps = {
-  modelName: string;
-  requiredChannels?: number;
-  modelType: ModelType;
-  src?: string;
-  modelArch?: string;
-};
+export type SegmenterModelProps = DefaultModelProps;
 
 export const availableClassifierModels: ClassifierModelProps[] = [
   {
@@ -61,5 +53,6 @@ export const availableSegmenterModels: SegmenterModelProps[] = [
     modelName: "Stardist Versitile H&E Nuclei",
     modelType: ModelType.StardistVHE,
     modelArch: "graph",
+    pretrained: true,
   },
 ];
