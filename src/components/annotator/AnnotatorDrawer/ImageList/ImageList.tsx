@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { useDispatch } from "react-redux";
 
 import {
@@ -30,7 +30,58 @@ interface ImageListProps {
   numStagedAnnotations: number;
 }
 
-const NUM_IMS_SHOWN = 5;
+const NUM_IMS_SHOWN = 1000;
+
+interface ImageListItemProps {
+  image: ShadowImageType;
+  isActive: boolean;
+  onItemClick: (image: ShadowImageType) => void;
+  numStagedAnnotations: number;
+  onSecondaryClick: (target: HTMLElement, image: ShadowImageType) => void;
+}
+
+export const ImageListItem = memo(
+  ({
+    image,
+    isActive,
+    onItemClick,
+    onSecondaryClick,
+    numStagedAnnotations,
+  }: ImageListItemProps) => {
+    return (
+      <ListItemButton
+        key={image.id}
+        id={image.id}
+        onClick={() => onItemClick(image)}
+        selected={isActive}
+      >
+        <ListItemAvatar>
+          <Avatar alt={image.name} src={image.src} variant={"square"} />
+        </ListItemAvatar>
+        <ListItemText
+          id={image.id}
+          primary={image.name}
+          primaryTypographyProps={{ noWrap: true }}
+        />
+        {((isActive && image.annotations.length !== 0) ||
+          (isActive && numStagedAnnotations > 0)) && (
+          <Chip
+            label={isActive ? numStagedAnnotations : image.annotations.length}
+            size="small"
+          />
+        )}
+        <ListItemSecondaryAction>
+          <IconButton
+            edge="end"
+            onClick={(event) => onSecondaryClick(event.currentTarget, image)}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItemButton>
+    );
+  }
+);
 
 export const ImageList = ({
   images,
@@ -38,6 +89,8 @@ export const ImageList = ({
   numStagedAnnotations,
 }: ImageListProps) => {
   const dispatch = useDispatch();
+
+  const activeImageRef = React.useRef(activeImage);
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
@@ -59,29 +112,32 @@ export const ImageList = ({
     });
   };
 
-  const handleImageItemClick = (
-    evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-    image: ShadowImageType
-  ) => {
-    if (image.id !== activeImage!.id) {
-      dispatch(
-        setActiveImage({
-          imageId: image.id,
-          prevImageId: activeImage!.id,
-          execSaga: true,
-        })
-      );
-      setSelectedImage(image);
-    }
-  };
+  const handleImageItemClick = React.useCallback(
+    (image: ShadowImageType) => {
+      if (image.id !== activeImageRef.current.id) {
+        dispatch(
+          setActiveImage({
+            imageId: image.id,
+            prevImageId: activeImageRef.current.id,
+            execSaga: true,
+          })
+        );
+        setSelectedImage(image);
+        activeImageRef.current = image;
+        console.log(activeImageRef.current.name);
+        console.log(activeImageRef.current.id);
+      }
+    },
+    [dispatch, setSelectedImage]
+  );
 
-  const handleImageMenuOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    image: ShadowImageType
-  ) => {
-    setImageAnchorEl(event.currentTarget);
-    setSelectedImage(image);
-  };
+  const handleImageMenuOpen = React.useCallback(
+    (target: HTMLElement, image: ShadowImageType) => {
+      setImageAnchorEl(target);
+      setSelectedImage(image);
+    },
+    [setImageAnchorEl, setSelectedImage]
+  );
 
   const onImageMenuClose = () => {
     setImageAnchorEl(null);
@@ -106,44 +162,14 @@ export const ImageList = ({
         />
         {images.slice(viewRange.start, viewRange.end).map((image) => {
           return (
-            <ListItemButton
+            <ImageListItem
               key={image.id}
-              id={image.id}
-              onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                handleImageItemClick(evt, image)
-              }
-              selected={image.id === activeImage?.id}
-            >
-              <ListItemAvatar>
-                <Avatar alt={image.name} src={image.src} variant={"square"} />
-              </ListItemAvatar>
-              <ListItemText
-                id={image.id}
-                primary={image.name}
-                primaryTypographyProps={{ noWrap: true }}
-              />
-              {((image.id !== activeImage?.id &&
-                image.annotations.length !== 0) ||
-                (image.id === activeImage?.id &&
-                  numStagedAnnotations !== 0)) && (
-                <Chip
-                  label={
-                    image.id === activeImage?.id
-                      ? numStagedAnnotations
-                      : image.annotations.length
-                  }
-                  size="small"
-                />
-              )}
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  onClick={(event) => handleImageMenuOpen(event, image)}
-                >
-                  <MoreHorizIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItemButton>
+              image={image}
+              isActive={image.id === activeImage!.id}
+              onItemClick={handleImageItemClick}
+              numStagedAnnotations={numStagedAnnotations}
+              onSecondaryClick={handleImageMenuOpen}
+            />
           );
         })}
         <ImageMenu

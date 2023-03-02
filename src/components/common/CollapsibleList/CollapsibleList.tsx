@@ -55,11 +55,7 @@ export const CollapsibleList = ({
         unmountOnExit
         sx={{ paddingLeft: paddingLeft ? "2rem" : "auto" }}
       >
-        <List
-          component="div"
-          dense={dense}
-          disablePadding={disablePadding === false ? disablePadding : false}
-        >
+        <List component="div" dense={dense} disablePadding={disablePadding}>
           {children}
         </List>
       </Collapse>
