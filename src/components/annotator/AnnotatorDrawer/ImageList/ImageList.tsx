@@ -1,14 +1,15 @@
-import React, { memo } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 
 import {
   Avatar,
   Chip,
   IconButton,
-  ListItem,
+  ListItemButton,
   ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
+  Pagination,
 } from "@mui/material";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -29,102 +30,128 @@ interface ImageListProps {
   numStagedAnnotations: number;
 }
 
-// note: memoized to avoid rendering imageSrc constantly
-export const ImageList = memo(
-  ({ images, activeImage, numStagedAnnotations }: ImageListProps) => {
-    const dispatch = useDispatch();
+const NUM_IMS_SHOWN = 5;
 
-    const [imageAnchorEl, setImageAnchorEl] =
-      React.useState<null | HTMLElement>(null);
+export const ImageList = ({
+  images,
+  activeImage,
+  numStagedAnnotations,
+}: ImageListProps) => {
+  const dispatch = useDispatch();
 
-    const [selectedImage, setSelectedImage] = React.useState<ShadowImageType>(
-      activeImage!
-    );
+  const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
+    null
+  );
 
-    const handleImageItemClick = (
-      evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
-      image: ShadowImageType
-    ) => {
-      if (image.id !== activeImage!.id) {
-        dispatch(
-          setActiveImage({
-            imageId: image.id,
-            prevImageId: activeImage!.id,
-            execSaga: true,
-          })
-        );
-        setSelectedImage(image);
-      }
-    };
+  const [selectedImage, setSelectedImage] = React.useState<ShadowImageType>(
+    activeImage!
+  );
 
-    const handleImageMenuOpen = (
-      event: React.MouseEvent<HTMLButtonElement>,
-      image: ShadowImageType
-    ) => {
-      setImageAnchorEl(event.currentTarget);
+  const [viewRange, setViewRange] = React.useState<{
+    start: number;
+    end: number;
+  }>({ start: 0, end: NUM_IMS_SHOWN });
+
+  const handlePagination = (evt: React.ChangeEvent<unknown>, page: number) => {
+    setViewRange({
+      start: (page - 1) * NUM_IMS_SHOWN,
+      end: page * NUM_IMS_SHOWN,
+    });
+  };
+
+  const handleImageItemClick = (
+    evt: React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>,
+    image: ShadowImageType
+  ) => {
+    if (image.id !== activeImage!.id) {
+      dispatch(
+        setActiveImage({
+          imageId: image.id,
+          prevImageId: activeImage!.id,
+          execSaga: true,
+        })
+      );
       setSelectedImage(image);
-    };
+    }
+  };
 
-    const onImageMenuClose = () => {
-      setImageAnchorEl(null);
-    };
+  const handleImageMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    image: ShadowImageType
+  ) => {
+    setImageAnchorEl(event.currentTarget);
+    setSelectedImage(image);
+  };
 
-    const t = useTranslation();
+  const onImageMenuClose = () => {
+    setImageAnchorEl(null);
+  };
 
-    return (
-      <>
-        <CollapsibleList closed dense primary={t("Images")}>
-          {images.map((image) => {
-            return (
-              <ListItem
-                button
-                key={image.id}
+  const t = useTranslation();
+
+  return (
+    <>
+      <CollapsibleList closed dense primary={t("Images")}>
+        <Pagination
+          count={Math.ceil(images.length / NUM_IMS_SHOWN)}
+          onChange={handlePagination}
+          boundaryCount={0}
+          siblingCount={1}
+          size={"small"}
+          hidePrevButton
+          hideNextButton
+          showFirstButton
+          showLastButton
+        />
+        {images.slice(viewRange.start, viewRange.end).map((image) => {
+          return (
+            <ListItemButton
+              key={image.id}
+              id={image.id}
+              onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+                handleImageItemClick(evt, image)
+              }
+              selected={image.id === activeImage?.id}
+            >
+              <ListItemAvatar>
+                <Avatar alt={image.name} src={image.src} variant={"square"} />
+              </ListItemAvatar>
+              <ListItemText
                 id={image.id}
-                onClick={(evt: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                  handleImageItemClick(evt, image)
-                }
-                selected={image.id === activeImage?.id}
-              >
-                <ListItemAvatar>
-                  <Avatar alt={image.name} src={image.src} variant={"square"} />
-                </ListItemAvatar>
-                <ListItemText
-                  id={image.id}
-                  primary={image.name}
-                  primaryTypographyProps={{ noWrap: true }}
+                primary={image.name}
+                primaryTypographyProps={{ noWrap: true }}
+              />
+              {((image.id !== activeImage?.id &&
+                image.annotations.length !== 0) ||
+                (image.id === activeImage?.id &&
+                  numStagedAnnotations !== 0)) && (
+                <Chip
+                  label={
+                    image.id === activeImage?.id
+                      ? numStagedAnnotations
+                      : image.annotations.length
+                  }
+                  size="small"
                 />
-                {((image.id !== activeImage?.id &&
-                  image.annotations.length !== 0) ||
-                  (image.id === activeImage?.id &&
-                    numStagedAnnotations !== 0)) && (
-                  <Chip
-                    label={
-                      image.id === activeImage?.id
-                        ? numStagedAnnotations
-                        : image.annotations.length
-                    }
-                    size="small"
-                  />
-                )}
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => handleImageMenuOpen(event, image)}
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-          <ImageMenu
-            anchorElImageMenu={imageAnchorEl}
-            selectedImage={selectedImage}
-            onCloseImageMenu={onImageMenuClose}
-            openImageMenu={Boolean(imageAnchorEl)}
-          />
-        </CollapsibleList>
-      </>
-    );
-  }
-);
+              )}
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  onClick={(event) => handleImageMenuOpen(event, image)}
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          );
+        })}
+        <ImageMenu
+          anchorElImageMenu={imageAnchorEl}
+          selectedImage={selectedImage}
+          onCloseImageMenu={onImageMenuClose}
+          openImageMenu={Boolean(imageAnchorEl)}
+        />
+      </CollapsibleList>
+    </>
+  );
+};
