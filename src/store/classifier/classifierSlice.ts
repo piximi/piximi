@@ -241,4 +241,5 @@ export const {
   updateMetrics,
   updateOptimizationAlgorithm,
   updateTrainingPercentage,
+  uploadUserSelectedModel,
 } = classifierSlice.actions;

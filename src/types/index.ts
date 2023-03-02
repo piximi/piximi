@@ -84,7 +84,6 @@ export { Metric } from "./Metric";
 export type {
   ClassifierModelProps,
   SegmenterModelProps,
-  UserUploadedModelProps,
   DefaultModelProps,
 } from "./ModelType";
 export {
