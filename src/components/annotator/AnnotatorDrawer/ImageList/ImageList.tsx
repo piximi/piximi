@@ -9,7 +9,8 @@ import {
   ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
-  Pagination,
+  LinearProgress,
+  Grid,
 } from "@mui/material";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -30,14 +31,15 @@ interface ImageListProps {
   numStagedAnnotations: number;
 }
 
-const NUM_IMS_SHOWN = 1000;
+const NUM_BUFFERED_IMS = 20;
+const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 2);
 
 interface ImageListItemProps {
   image: ShadowImageType;
   isActive: boolean;
   onItemClick: (image: ShadowImageType) => void;
   numStagedAnnotations: number;
-  onSecondaryClick: (target: HTMLElement, image: ShadowImageType) => void;
+  onSecondaryClick: (target: HTMLElement) => void;
 }
 
 export const ImageListItem = memo(
@@ -73,7 +75,7 @@ export const ImageListItem = memo(
         <ListItemSecondaryAction>
           <IconButton
             edge="end"
-            onClick={(event) => onSecondaryClick(event.currentTarget, image)}
+            onClick={(event) => onSecondaryClick(event.currentTarget)}
           >
             <MoreHorizIcon />
           </IconButton>
@@ -89,6 +91,7 @@ export const ImageList = ({
   numStagedAnnotations,
 }: ImageListProps) => {
   const dispatch = useDispatch();
+  const t = useTranslation();
 
   const activeImageRef = React.useRef(activeImage);
 
@@ -96,21 +99,12 @@ export const ImageList = ({
     null
   );
 
-  const [selectedImage, setSelectedImage] = React.useState<ShadowImageType>(
-    activeImage!
-  );
+  const [bufferRange, setBufferRange] = React.useState({
+    start: 0,
+    end: NUM_BUFFERED_IMS,
+  });
 
-  const [viewRange, setViewRange] = React.useState<{
-    start: number;
-    end: number;
-  }>({ start: 0, end: NUM_IMS_SHOWN });
-
-  const handlePagination = (evt: React.ChangeEvent<unknown>, page: number) => {
-    setViewRange({
-      start: (page - 1) * NUM_IMS_SHOWN,
-      end: page * NUM_IMS_SHOWN,
-    });
-  };
+  const [scrollProgress, setScrollProgress] = React.useState(0);
 
   const handleImageItemClick = React.useCallback(
     (image: ShadowImageType) => {
@@ -122,63 +116,115 @@ export const ImageList = ({
             execSaga: true,
           })
         );
-        setSelectedImage(image);
         activeImageRef.current = image;
-        console.log(activeImageRef.current.name);
-        console.log(activeImageRef.current.id);
       }
     },
-    [dispatch, setSelectedImage]
+    [dispatch]
   );
 
   const handleImageMenuOpen = React.useCallback(
-    (target: HTMLElement, image: ShadowImageType) => {
+    (target: HTMLElement) => {
       setImageAnchorEl(target);
-      setSelectedImage(image);
     },
-    [setImageAnchorEl, setSelectedImage]
+    [setImageAnchorEl]
   );
 
   const onImageMenuClose = () => {
     setImageAnchorEl(null);
   };
 
-  const t = useTranslation();
+  const handleScroll = (evt: React.UIEvent<HTMLDivElement, UIEvent>) => {
+    const target = evt.target as HTMLDivElement;
+
+    if (
+      target.scrollHeight - target.scrollTop === target.clientHeight &&
+      bufferRange.end < images.length
+    ) {
+      const numToLoad = images.length - bufferRange.end;
+      const numHidden = NUM_BUFFERED_IMS - NUM_VIEW_IMS;
+      const newStart =
+        numToLoad < numHidden
+          ? bufferRange.start
+          : bufferRange.start + NUM_BUFFERED_IMS - NUM_VIEW_IMS + 1;
+
+      const newEnd = bufferRange.end + NUM_BUFFERED_IMS - NUM_VIEW_IMS + 1;
+
+      setBufferRange({
+        start: newStart,
+        end: newEnd,
+      });
+
+      setScrollProgress((newEnd / images.length) * 100);
+
+      target.scrollTop = 1;
+    } else if (target.scrollTop === 0 && bufferRange.start !== 0) {
+      const newStart = bufferRange.start - NUM_BUFFERED_IMS + NUM_VIEW_IMS - 1;
+      const newEnd = bufferRange.end - NUM_BUFFERED_IMS + NUM_VIEW_IMS - 1;
+
+      setBufferRange({
+        start: newStart,
+        end: newEnd,
+      });
+
+      setScrollProgress((newEnd / images.length) * 100);
+
+      target.scrollTop = target.scrollHeight - target.clientHeight - 1;
+    }
+  };
 
   return (
     <>
-      <CollapsibleList closed dense primary={t("Images")}>
-        <Pagination
-          count={Math.ceil(images.length / NUM_IMS_SHOWN)}
-          onChange={handlePagination}
-          boundaryCount={0}
-          siblingCount={1}
-          size={"small"}
-          hidePrevButton
-          hideNextButton
-          showFirstButton
-          showLastButton
-          hidden={images.length <= NUM_IMS_SHOWN}
-        />
-        {images.slice(viewRange.start, viewRange.end).map((image) => {
-          return (
-            <ImageListItem
-              key={image.id}
-              image={image}
-              isActive={image.id === activeImage!.id}
-              onItemClick={handleImageItemClick}
-              numStagedAnnotations={numStagedAnnotations}
-              onSecondaryClick={handleImageMenuOpen}
+      <Grid container>
+        <Grid item xs={11} direction="column">
+          <CollapsibleList
+            closed
+            dense
+            primary={t("Images")}
+            sx={{
+              height: `${3 * NUM_VIEW_IMS + 0.5}rem`,
+              overflowY: "scroll",
+              "::-webkit-scrollbar": { display: "none" },
+            }}
+            onScroll={handleScroll}
+          >
+            {images.slice(bufferRange.start, bufferRange.end).map((image) => {
+              return (
+                <ImageListItem
+                  key={image.id}
+                  image={image}
+                  isActive={image.id === activeImage!.id}
+                  onItemClick={handleImageItemClick}
+                  numStagedAnnotations={numStagedAnnotations}
+                  onSecondaryClick={handleImageMenuOpen}
+                />
+              );
+            })}
+          </CollapsibleList>
+        </Grid>
+
+        <Grid item xs={1} direction="column">
+          {images.length > NUM_BUFFERED_IMS && (
+            <LinearProgress
+              sx={{
+                width: 4,
+                height: `${3 * NUM_VIEW_IMS}rem`,
+                marginTop: "3em",
+                "& span.MuiLinearProgress-bar": {
+                  transform: `translateY(-${100 - scrollProgress}%) !important`, //has to have !important
+                },
+              }}
+              variant="determinate"
+              value={scrollProgress}
             />
-          );
-        })}
-        <ImageMenu
-          anchorElImageMenu={imageAnchorEl}
-          selectedImage={selectedImage}
-          onCloseImageMenu={onImageMenuClose}
-          openImageMenu={Boolean(imageAnchorEl)}
-        />
-      </CollapsibleList>
+          )}
+        </Grid>
+      </Grid>
+      <ImageMenu
+        anchorElImageMenu={imageAnchorEl}
+        selectedImage={activeImageRef.current}
+        onCloseImageMenu={onImageMenuClose}
+        openImageMenu={Boolean(imageAnchorEl)}
+      />
     </>
   );
 };
