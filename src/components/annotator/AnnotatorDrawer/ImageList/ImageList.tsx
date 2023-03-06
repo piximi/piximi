@@ -10,7 +10,7 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   LinearProgress,
-  Grid,
+  Box,
 } from "@mui/material";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -174,8 +174,12 @@ export const ImageList = ({
 
   return (
     <>
-      <Grid container>
-        <Grid item xs={11} direction="column">
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        gridTemplateRows="1fr"
+      >
+        <Box gridColumn="1 / 13" gridRow="1 / 2">
           <CollapsibleList
             closed
             dense
@@ -200,15 +204,16 @@ export const ImageList = ({
               );
             })}
           </CollapsibleList>
-        </Grid>
+        </Box>
 
-        <Grid item xs={1} direction="column">
+        <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
           {images.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
                 height: `${3 * NUM_VIEW_IMS}rem`,
                 marginTop: "3em",
+                marginLeft: "auto",
                 "& span.MuiLinearProgress-bar": {
                   transform: `translateY(-${100 - scrollProgress}%) !important`, //has to have !important
                 },
@@ -217,8 +222,8 @@ export const ImageList = ({
               value={scrollProgress}
             />
           )}
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
       <ImageMenu
         anchorElImageMenu={imageAnchorEl}
         selectedImage={activeImageRef.current}
