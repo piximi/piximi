@@ -1,18 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 
 import { Box } from "@mui/material";
-import { useBoundingClientRect, useDndFileDrop } from "hooks";
+import { useDndFileDrop } from "hooks";
 import { DispatchLocation, useDefaultImage } from "hooks/useDefaultImage";
 import { Stage } from "../Stage";
 import { dimensions } from "utils/common";
+import { useDispatch } from "react-redux";
+import { setStageHeight, setStageWidth } from "store/annotator";
 
 type StageWrapperProps = {
   onDrop: (files: FileList) => void;
 };
 
 export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  useBoundingClientRect(ref);
+  const dispatch = useDispatch();
 
   const [width, setWidth] = useState<number>(
     window.innerWidth -
@@ -22,20 +23,39 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
   const [height, setHeight] = useState<number>(
     window.innerHeight - dimensions.stageInfoHeight
   );
-  useEffect(() => {
+  useLayoutEffect(() => {
     const resizeHandler = () => {
-      setWidth(
+      const w =
         window.innerWidth -
-          dimensions.annotatorDrawerWidth -
-          dimensions.annotatorToolDrawerWidth
-      );
-      setHeight(window.innerHeight - dimensions.stageInfoHeight);
+        dimensions.annotatorDrawerWidth -
+        dimensions.annotatorToolDrawerWidth;
+      const h = window.innerHeight - dimensions.stageInfoHeight;
+      setWidth(w);
+      setHeight(h);
+      dispatch(setStageWidth({ stageWidth: w }));
+      dispatch(setStageHeight({ stageHeight: h }));
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
       window.removeEventListener("resize", resizeHandler);
     };
   });
+
+  useLayoutEffect(() => {
+    dispatch(
+      setStageWidth({
+        stageWidth:
+          window.innerWidth -
+          dimensions.annotatorDrawerWidth -
+          dimensions.annotatorToolDrawerWidth,
+      })
+    );
+    dispatch(
+      setStageHeight({
+        stageHeight: window.innerHeight - dimensions.stageInfoHeight,
+      })
+    );
+  }, [dispatch]);
 
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
 
@@ -51,7 +71,6 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
         transition: "width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         p: "1.5rem 1.5rem 0 1.5rem",
       })}
-      ref={ref}
     >
       <div ref={dropTarget}>
         <Stage />
