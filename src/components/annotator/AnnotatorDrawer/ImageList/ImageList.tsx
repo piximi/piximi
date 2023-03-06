@@ -72,7 +72,7 @@ export const ImageListItem = memo(
             size="small"
           />
         )}
-        <ListItemSecondaryAction>
+        <ListItemSecondaryAction sx={{ position: "static", transform: "none" }}>
           <IconButton
             edge="end"
             onClick={(event) => onSecondaryClick(event.currentTarget)}
