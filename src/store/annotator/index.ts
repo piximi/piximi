@@ -95,12 +95,12 @@ export { annotationObjectsSelector } from "./selectors/annotationObjectsSelector
 export {
   activeImageColorChangeSaga,
   activeImageIDChangeSaga,
-} from "./sagas/activeImageModifiedSaga";
+} from "./sagas/activeImagIDChangeSaga";
 export { annotationStateChangeSaga } from "./sagas/annotationStateChangeSaga";
 export { selectedCategorySaga } from "./sagas/selectedCategorySaga";
 export {
   watchActiveImageChangeSaga,
   watchActiveImageColorsChangeSaga,
-} from "./sagas/watchActiveImageModifiedSaga";
+} from "./sagas/watchActiveImageIDChangeSaga";
 export { watchAnnotationStateChangeSaga } from "./sagas/watchAnnotationStateChangeSaga";
 export { watchSelectedCategorySaga } from "./sagas/watchSelectedCategorySaga";

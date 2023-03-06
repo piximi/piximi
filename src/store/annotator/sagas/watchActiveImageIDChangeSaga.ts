@@ -3,7 +3,7 @@ import { takeLatest } from "redux-saga/effects";
 import {
   activeImageColorChangeSaga,
   activeImageIDChangeSaga,
-} from "./activeImageModifiedSaga";
+} from "./activeImagIDChangeSaga";
 
 import { AnnotatorSlice } from "store/annotator";
 
