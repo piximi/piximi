@@ -82,6 +82,7 @@ export const Stage = () => {
     x: number;
     y: number;
   }>();
+  const [pixelColor, setPixelColor] = useState<string>();
 
   const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
   const [draggable, setDraggable] = useState<boolean>(false);
@@ -621,6 +622,33 @@ export const Stage = () => {
     cursor,
   ]);
 
+  useEffect(() => {
+    if (!absolutePosition || outOfBounds || !annotationTool.image) return;
+    let y: number;
+    /* For some reason the full range of x values work, but only y < height  work
+       and when x >= width - 1, only y < height - 1 works in getPixelXY
+       */
+    if (absolutePosition.x >= annotationTool.image.width - 1) {
+      y = Math.min(annotationTool.image.height - 2, absolutePosition.y);
+    } else {
+      y = Math.min(annotationTool.image.height - 1, absolutePosition.y);
+    }
+    setPixelColor(
+      `${annotationTool.image
+        .getPixelXY(absolutePosition.x, y)
+        .reduce((prev, next) => {
+          return prev + `${next}, `;
+        }, "")
+        .slice(0, -2)}`
+    );
+  }, [
+    annotationTool,
+    absolutePosition,
+    absolutePosition?.x,
+    absolutePosition?.y,
+    outOfBounds,
+  ]);
+
   return (
     <>
       <ReactKonva.Stage
@@ -669,11 +697,12 @@ export const Stage = () => {
       </ReactKonva.Stage>
       <Box
         sx={{
-          width: stageWidth,
+          width: stageWidth - 24,
           height: dimensions.stageInfoHeight,
           justifyContent: "space-between",
           alignItems: "center",
           display: "flex",
+          pr: "1.5rem",
         }}
       >
         {!outOfBounds && absolutePosition && (
@@ -681,14 +710,7 @@ export const Stage = () => {
             <Typography>
               {`x: ${absolutePosition.x} y: ${absolutePosition.y} `}
             </Typography>
-            <Typography>
-              {`${annotationTool.image
-                .getPixelXY(absolutePosition.x, absolutePosition.y)
-                .reduce((prev, next) => {
-                  return prev + `${next}, `;
-                }, "")
-                .slice(0, -2)}`}
-            </Typography>
+            <Typography>{pixelColor}</Typography>
           </>
         )}
       </Box>
