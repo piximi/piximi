@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   AppBar,
@@ -16,11 +16,7 @@ import {
 
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 
-import {
-  segmenterCompiledModelSelector,
-  segmenterTrainingFlagSelector,
-  segmenterSlice,
-} from "store/segmenter";
+import { segmenterTrainingFlagSelector } from "store/segmenter";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type FitSegmenterDialogAppBarProps = {
@@ -38,9 +34,6 @@ export const FitSegmenterDialogAppBar = ({
   epochs,
   currentEpoch,
 }: FitSegmenterDialogAppBarProps) => {
-  const dispatch = useDispatch();
-
-  const compiled = useSelector(segmenterCompiledModelSelector);
   const training = useSelector(segmenterTrainingFlagSelector);
 
   const onStopFitting = () => {
