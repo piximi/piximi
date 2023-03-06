@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -67,12 +67,6 @@ export const SegmenterList = () => {
       })
     );
   };
-
-  useEffect(() => {
-    const t = 0 as ModelType;
-
-    console.log(t === ModelType.None);
-  }, []);
 
   const SegmenterIOButtons = (
     <>

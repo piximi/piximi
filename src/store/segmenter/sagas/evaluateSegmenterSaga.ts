@@ -1,18 +1,23 @@
-import { LayersModel } from "@tensorflow/tfjs";
+//import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
-import { annotationCategoriesSelector } from "store/project";
+//import { annotationCategoriesSelector } from "store/project";
 import {
   segmenterFittedModelSelector,
   segmenterValidationImagesSelector,
   segmenterSlice,
-  segmenterValDataSelector,
-  evaluateSegmenter,
+  //segmenterValDataSelector,
+  //evaluateSegmenter,
 } from "store/segmenter";
 
-import { Category, AlertType, AlertStateType, ImageType } from "types";
+import {
+  AlertType,
+  AlertStateType,
+  //Category,
+  //ImageType
+} from "types";
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateSegmenterSaga({
@@ -37,8 +42,8 @@ export function* evaluateSegmenterSaga({
 
   yield put(applicationSlice.actions.hideAlertState({}));
 
-  const categories: ReturnType<typeof annotationCategoriesSelector> =
-    yield select(annotationCategoriesSelector);
+  // const categories: ReturnType<typeof annotationCategoriesSelector> =
+  //   yield select(annotationCategoriesSelector);
 
   if (validationImages.length === 0) {
     yield put(
@@ -61,41 +66,41 @@ export function* evaluateSegmenterSaga({
   );
 }
 
-function* runSegmentationEvaluation(
-  validationImages: Array<ImageType>,
-  model: LayersModel,
-  categories: Array<Category>
-) {
-  const validationData: ReturnType<typeof segmenterValDataSelector> =
-    yield select(segmenterValDataSelector);
+// function* runSegmentationEvaluation(
+//   validationImages: Array<ImageType>,
+//   model: LayersModel,
+//   categories: Array<Category>
+// ) {
+//   const validationData: ReturnType<typeof segmenterValDataSelector> =
+//     yield select(segmenterValDataSelector);
 
-  if (validationData === undefined) {
-    yield handleError(
-      new Error("No selectable validation data in store"),
-      "Failed to get validation data"
-    );
-    return;
-  }
+//   if (validationData === undefined) {
+//     yield handleError(
+//       new Error("No selectable validation data in store"),
+//       "Failed to get validation data"
+//     );
+//     return;
+//   }
 
-  try {
-    var evaluationResult: Awaited<ReturnType<typeof evaluateSegmenter>> =
-      yield evaluateSegmenter(
-        model,
-        validationData,
-        validationImages,
-        categories
-      );
-  } catch (error) {
-    yield handleError(error as Error, "Error computing the evaluation results");
-    return;
-  }
+//   try {
+//     var evaluationResult: Awaited<ReturnType<typeof evaluateSegmenter>> =
+//       yield evaluateSegmenter(
+//         model,
+//         validationData,
+//         validationImages,
+//         categories
+//       );
+//   } catch (error) {
+//     yield handleError(error as Error, "Error computing the evaluation results");
+//     return;
+//   }
 
-  yield put(
-    segmenterSlice.actions.updateSegmentationEvaluationResult({
-      evaluationResult,
-    })
-  );
-}
+//   yield put(
+//     segmenterSlice.actions.updateSegmentationEvaluationResult({
+//       evaluationResult,
+//     })
+//   );
+// }
 
 function* handleError(error: Error, name: string) {
   const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
