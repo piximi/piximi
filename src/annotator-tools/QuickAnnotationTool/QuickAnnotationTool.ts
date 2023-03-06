@@ -97,7 +97,8 @@ export class QuickAnnotationTool extends AnnotationTool {
     )
       return;
     // fixes superpixel overflow
-    position.x = position.x === 512 ? 511 : position.x;
+    position.x =
+      position.x === this.image.width ? this.image.width - 1 : position.x;
     const pixel =
       Math.round(position.x) + Math.round(position.y) * this.image.width;
 

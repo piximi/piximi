@@ -32,8 +32,8 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
       const h = window.innerHeight - dimensions.stageInfoHeight;
       setWidth(w);
       setHeight(h);
-      dispatch(setStageWidth({ stageWidth: w }));
-      dispatch(setStageHeight({ stageHeight: h }));
+      dispatch(setStageWidth({ stageWidth: w - 48 }));
+      dispatch(setStageHeight({ stageHeight: h - 24 }));
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
@@ -47,12 +47,13 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
         stageWidth:
           window.innerWidth -
           dimensions.annotatorDrawerWidth -
-          dimensions.annotatorToolDrawerWidth,
+          dimensions.annotatorToolDrawerWidth -
+          48,
       })
     );
     dispatch(
       setStageHeight({
-        stageHeight: window.innerHeight - dimensions.stageInfoHeight,
+        stageHeight: window.innerHeight - dimensions.stageInfoHeight - 24,
       })
     );
   }, [dispatch]);
