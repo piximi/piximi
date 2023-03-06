@@ -6,7 +6,6 @@ import Konva from "konva";
 import {
   activeImagePlaneSelector,
   activeImageRenderedSrcsSelector,
-  boundingClientRectSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
   stageHeightSelector,
@@ -47,7 +46,6 @@ export const Image = forwardRef<Konva.Image>((_, ref) => {
   const width = useSelector(scaledImageWidthSelector);
   const height = useSelector(scaledImageHeightSelector);
   const [filters] = useState<Array<any>>();
-  const boundingClientRect = useSelector(boundingClientRectSelector);
   const normalizeFont = 1300;
   const [images, setImages] = useState<Array<HTMLImageElement>>();
   const stageWidth = useSelector(stageWidthSelector);
@@ -75,16 +73,15 @@ export const Image = forwardRef<Konva.Image>((_, ref) => {
     return (
       <>
         <ReactKonva.Text
-          x={
-            boundingClientRect.x +
-            (80 * boundingClientRect.width) / normalizeFont
-          } //center depending on window width
-          y={0.4 * boundingClientRect.height}
+          x={stageWidth / 6} //center depending on window width
+          y={0.4 * stageHeight}
+          width={(2 * stageWidth) / 3}
+          align="center"
           text={
             'To start annotating, drag and drop an image onto the canvas or click on "Open Image".'
           }
-          fill={"white"}
-          fontSize={(30 * boundingClientRect.width) / normalizeFont} //scale font depending on window width
+          fill={"black"}
+          fontSize={(30 * stageWidth) / normalizeFont} //scale font depending on window width
         />
       </>
     );
