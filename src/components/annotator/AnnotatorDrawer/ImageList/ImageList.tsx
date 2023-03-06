@@ -185,7 +185,7 @@ export const ImageList = ({
             dense
             primary={t("Images")}
             sx={{
-              height: `${3 * NUM_VIEW_IMS + 0.5}rem`,
+              maxHeight: `${3 * NUM_VIEW_IMS + 0.5}rem`,
               overflowY: "scroll",
               "::-webkit-scrollbar": { display: "none" },
             }}
