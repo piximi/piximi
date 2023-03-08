@@ -9,11 +9,13 @@ import { dimensions } from "utils/common";
 type StageWrapperProps = {
   onDrop: (files: FileList) => void;
   setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  persistOptions: boolean;
 };
 
 export const StageWrapper = ({
   onDrop,
   setOptionsVisibility,
+  persistOptions,
 }: StageWrapperProps) => {
   const [width, setWidth] = useState<number>(
     window.innerWidth -
@@ -53,7 +55,7 @@ export const StageWrapper = ({
         p: "1.5rem 1.5rem 0 1.5rem",
       })}
       onMouseEnter={() => {
-        setOptionsVisibility(false);
+        !persistOptions && setOptionsVisibility(false);
       }}
     >
       <div ref={dropTarget}>

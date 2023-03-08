@@ -27,6 +27,7 @@ export const AnnotatorView = () => {
 
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
+  const [persistOptions, setPersistOptions] = useState<boolean>(true);
 
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
@@ -138,6 +139,7 @@ export const AnnotatorView = () => {
         <StageWrapper
           onDrop={onDrop}
           setOptionsVisibility={setOptionsVisibile}
+          persistOptions={persistOptions}
         />
 
         {files?.length && (
@@ -155,6 +157,8 @@ export const AnnotatorView = () => {
         <ToolDrawer
           optionsVisibility={optionsVisible}
           setOptionsVisibility={setOptionsVisibile}
+          persistOptions={persistOptions}
+          setPersistOptions={setPersistOptions}
         />
       </Box>
     </ErrorBoundary>
