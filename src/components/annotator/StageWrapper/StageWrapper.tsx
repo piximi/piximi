@@ -5,16 +5,16 @@ import { useDndFileDrop } from "hooks";
 import { DispatchLocation, useDefaultImage } from "hooks/useDefaultImage";
 import { Stage } from "../Stage";
 import { dimensions } from "utils/common";
-import { useDispatch } from "react-redux";
-import { setStageHeight, setStageWidth } from "store/annotator";
 
 type StageWrapperProps = {
   onDrop: (files: FileList) => void;
+  setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
-  const dispatch = useDispatch();
-
+export const StageWrapper = ({
+  onDrop,
+  setOptionsVisibility,
+}: StageWrapperProps) => {
   const [width, setWidth] = useState<number>(
     window.innerWidth -
       dimensions.annotatorDrawerWidth -
@@ -25,38 +25,18 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
   );
   useLayoutEffect(() => {
     const resizeHandler = () => {
-      const w =
+      setWidth(
         window.innerWidth -
-        dimensions.annotatorDrawerWidth -
-        dimensions.annotatorToolDrawerWidth;
-      const h = window.innerHeight - dimensions.stageInfoHeight;
-      setWidth(w);
-      setHeight(h);
-      dispatch(setStageWidth({ stageWidth: w - 48 }));
-      dispatch(setStageHeight({ stageHeight: h - 24 }));
+          dimensions.annotatorDrawerWidth -
+          dimensions.annotatorToolDrawerWidth
+      );
+      setHeight(window.innerHeight - dimensions.stageInfoHeight);
     };
     window.addEventListener("resize", resizeHandler);
     return () => {
       window.removeEventListener("resize", resizeHandler);
     };
   });
-
-  useLayoutEffect(() => {
-    dispatch(
-      setStageWidth({
-        stageWidth:
-          window.innerWidth -
-          dimensions.annotatorDrawerWidth -
-          dimensions.annotatorToolDrawerWidth -
-          48,
-      })
-    );
-    dispatch(
-      setStageHeight({
-        stageHeight: window.innerHeight - dimensions.stageInfoHeight - 24,
-      })
-    );
-  }, [dispatch]);
 
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
 
@@ -72,9 +52,12 @@ export const StageWrapper = ({ onDrop }: StageWrapperProps) => {
         transition: "width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         p: "1.5rem 1.5rem 0 1.5rem",
       })}
+      onMouseEnter={() => {
+        setOptionsVisibility(false);
+      }}
     >
       <div ref={dropTarget}>
-        <Stage />
+        <Stage stageWidth={width - 48} stageHeight={height - 24} />
       </div>
     </Box>
   );

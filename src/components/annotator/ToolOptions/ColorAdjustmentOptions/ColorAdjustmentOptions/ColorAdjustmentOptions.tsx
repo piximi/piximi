@@ -8,7 +8,6 @@ import { useTranslation } from "hooks";
 import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
-import { InformationBox } from "../../InformationBox";
 
 import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
 
@@ -40,8 +39,6 @@ export const ColorAdjustmentOptions = () => {
 
   return (
     <>
-      <InformationBox description="…" name={t("Color adjustment")} />
-
       <Divider />
 
       <ZStackSlider />

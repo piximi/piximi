@@ -1,19 +1,11 @@
-import React from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Drawer } from "@mui/material";
 
-import { RectangularAnnotationOptions } from "./RectangularAnnotationOptions";
-import { EllipticalAnnotationOptions } from "./EllipticalAnnotationOptions";
 import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
-import { LassoAnnotationOptions } from "./LassoAnnotationOptions";
-import { PolygonalAnnotationOptions } from "./PolygonalAnnotationOptions";
-import { MagneticAnnotationOptions } from "./MagneticAnnotationOptions";
-import { ColorAnnotationOptions } from "./ColorAnnotationOptions";
 import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
-import { ObjectAnnotationOptions } from "./ObjectAnnotationOptions";
 import { ZoomOptions } from "./ZoomOptions";
-import { HandToolOptions } from "./HandToolOptions";
 import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "./PointerSelectionOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
@@ -28,7 +20,6 @@ import {
   ColorAdjustmentIcon,
   ColorSelectionIcon,
   EllipticalSelectionIcon,
-  HandIcon,
   LassoSelectionIcon,
   MagneticSelectionIcon,
   ObjectSelectionIcon,
@@ -38,106 +29,145 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "icons";
+import { InformationBox } from "./InformationBox";
+import { useTranslation } from "hooks";
+import { DefaultOptions } from "./DefaultOptions";
 
+type OperationType = {
+  icon: ReactElement;
+  method: ToolType;
+  name: string;
+  description: string;
+  options: ReactElement;
+  hotkey: string;
+};
+
+const operations: Array<OperationType> = [
+  {
+    icon: <ColorAdjustmentIcon />,
+    method: ToolType.ColorAdjustment,
+    name: "Channel Adjustment",
+    description: "-",
+    options: <ColorAdjustmentOptions />,
+    hotkey: "I",
+  },
+  {
+    icon: <RectangularSelectionIcon />,
+    method: ToolType.RectangularAnnotation,
+    name: "Rectangle Tool",
+    description: "Click and drag to create a rectangular annotation.",
+    options: <DefaultOptions />,
+    hotkey: "R",
+  },
+  {
+    icon: <EllipticalSelectionIcon />,
+    method: ToolType.EllipticalAnnotation,
+    name: "Ellipse Tool",
+    description: "Click and drag to create an elliptical annotation.",
+    options: <DefaultOptions />,
+    hotkey: "E",
+  },
+  {
+    icon: <PenSelectionIcon />,
+    method: ToolType.PenAnnotation,
+    name: "Pen Tool",
+    description: "-",
+    options: <PenSelectionIconOptions />,
+    hotkey: "D",
+  },
+  {
+    icon: <LassoSelectionIcon />,
+    method: ToolType.LassoAnnotation,
+    name: "Lasso Tool",
+    description: "-",
+    options: <DefaultOptions />,
+    hotkey: "L",
+  },
+  {
+    icon: <PolygonalSelectionIcon />,
+    method: ToolType.PolygonalAnnotation,
+    name: "Polygon Tool",
+    description: "-",
+    options: <DefaultOptions />,
+    hotkey: "P",
+  },
+  {
+    icon: <MagneticSelectionIcon />,
+    method: ToolType.MagneticAnnotation,
+    name: "Magnetic Tool",
+    description: "-",
+    options: <DefaultOptions />,
+    hotkey: "M",
+  },
+  {
+    icon: <ColorSelectionIcon />,
+    method: ToolType.ColorAnnotation,
+    name: "Color Tool",
+    description: "-",
+    options: <DefaultOptions />,
+    hotkey: "C",
+  },
+  {
+    icon: <RectangularSelectionIcon />,
+    method: ToolType.ThresholdAnnotation,
+    name: "Threshold Tool",
+    description: "Click and drag to create a rectangular annotation.",
+    options: <ThresholdAnnotationOptions />,
+    hotkey: "T",
+  },
+  {
+    icon: <QuickSelectionIcon />,
+    method: ToolType.QuickAnnotation,
+    name: "Quick Annotation Tool",
+    description: "-",
+    options: <QuickAnnotationOptions />,
+    hotkey: "Q",
+  },
+  {
+    icon: <ObjectSelectionIcon />,
+    method: ToolType.ObjectAnnotation,
+    name: "Object selection",
+    description: "-",
+    options: <DefaultOptions />,
+    hotkey: "O",
+  },
+  {
+    icon: <ZoomIcon />,
+    method: ToolType.Zoom,
+    name: "Zoom Tool",
+    description: "-",
+    options: <ZoomOptions />,
+    hotkey: "Z",
+  },
+  {
+    icon: <ObjectSelectionIcon />,
+    method: ToolType.Pointer,
+    name: "Selection Tool",
+    description: "-",
+    options: <PointerSelectionOptions />,
+    hotkey: "S",
+  },
+];
 export const ToolOptions = ({
   optionsVisibility,
 }: {
   optionsVisibility: boolean;
 }) => {
+  const [toolType, setToolType] = useState<OperationType>(operations[0]);
   const activeOperation = useSelector(toolTypeSelector);
+  const t = useTranslation();
 
-  const operations = [
-    {
-      icon: <ColorAdjustmentIcon />,
-      method: ToolType.ColorAdjustment,
-      name: "Color adjustment",
-      options: <ColorAdjustmentOptions />,
-    },
-    {
-      icon: <RectangularSelectionIcon />,
-      method: ToolType.RectangularAnnotation,
-      name: "Rectangular selection",
-      options: <RectangularAnnotationOptions />,
-    },
-    {
-      icon: <EllipticalSelectionIcon />,
-      method: ToolType.EllipticalAnnotation,
-      name: "Elliptical selection",
-      options: <EllipticalAnnotationOptions />,
-    },
-    {
-      icon: <PenSelectionIcon />,
-      method: ToolType.PenAnnotation,
-      name: "Pen selection",
-      options: <PenSelectionIconOptions />,
-    },
-    {
-      icon: <LassoSelectionIcon />,
-      method: ToolType.LassoAnnotation,
-      name: "Lasso selection",
-      options: <LassoAnnotationOptions />,
-    },
-    {
-      icon: <PolygonalSelectionIcon />,
-      method: ToolType.PolygonalAnnotation,
-      name: "Polygonal selection",
-      options: <PolygonalAnnotationOptions />,
-    },
-    {
-      icon: <MagneticSelectionIcon />,
-      method: ToolType.MagneticAnnotation,
-      name: "Magnetic selection",
-      options: <MagneticAnnotationOptions />,
-    },
-    {
-      icon: <ColorSelectionIcon />,
-      method: ToolType.ColorAnnotation,
-      name: "Color selection",
-      options: <ColorAnnotationOptions />,
-    },
-    {
-      icon: <RectangularSelectionIcon />,
-      method: ToolType.ThresholdAnnotation,
-      name: "Test selection",
-      options: <ThresholdAnnotationOptions />,
-    },
-    {
-      icon: <QuickSelectionIcon />,
-      method: ToolType.QuickAnnotation,
-      name: "Quick selection",
-      options: <QuickAnnotationOptions />,
-    },
-    {
-      icon: <ObjectSelectionIcon />,
-      method: ToolType.ObjectAnnotation,
-      name: "Object selection",
-      options: <ObjectAnnotationOptions />,
-    },
-    {
-      icon: <HandIcon />,
-      method: ToolType.Hand,
-      name: "Hand",
-      options: <HandToolOptions />,
-    },
-    {
-      icon: <ZoomIcon />,
-      method: ToolType.Zoom,
-      name: "Zoom",
-      options: <ZoomOptions />,
-    },
-    {
-      icon: <ObjectSelectionIcon />,
-      method: ToolType.Pointer,
-      name: "Pointer",
-      options: <PointerSelectionOptions />,
-    },
-  ];
+  useEffect(() => {
+    setToolType(
+      operations.filter((type) => type.method === activeOperation)[0]
+    );
+  }, [activeOperation]);
 
   return (
     <Drawer
       anchor="right"
       sx={{
-        flexShrink: 0,
+        "flexShrink": 0,
         "& .MuiDrawer-paper": {
           width: 240,
           right: 56,
@@ -147,8 +177,12 @@ export const ToolOptions = ({
       open={optionsVisibility}
     >
       <AppBarOffset />
-
-      {operations.filter((type) => type.method === activeOperation)[0].options}
+      <InformationBox
+        description={toolType!.description}
+        name={t(toolType!.name)}
+        hotkey={toolType!.hotkey}
+      />
+      {toolType!.options}
     </Drawer>
   );
 };

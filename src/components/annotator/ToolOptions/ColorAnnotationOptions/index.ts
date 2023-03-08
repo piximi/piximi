@@ -1,1 +1,0 @@
-export { ColorAnnotationOptions } from "./ColorAnnotationOptions";

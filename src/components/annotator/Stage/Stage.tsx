@@ -33,16 +33,15 @@ import {
   setStagePosition,
   setZoomSelection,
   stagedAnnotationsSelector,
-  stageHeightSelector,
   stagePositionSelector,
   stageScaleSelector,
-  stageWidthSelector,
   toolTypeSelector,
   workingAnnotationSelector,
   zoomSelectionSelector,
   setStagedAnnotations,
   setAnnotationState,
   setSelectedAnnotations,
+  setImageOrigin,
 } from "store/annotator";
 
 import { zoomToolOptionsSelector } from "store/tool-options";
@@ -64,7 +63,13 @@ import { Annotations } from "./Annotations";
 import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
 import { PointerSelection } from "./Selection/PointerSelection";
 
-export const Stage = () => {
+export const Stage = ({
+  stageWidth,
+  stageHeight,
+}: {
+  stageWidth: number;
+  stageHeight: number;
+}) => {
   const store = useStore();
   const dispatch = useDispatch();
 
@@ -99,8 +104,6 @@ export const Stage = () => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const selectionMode = useSelector(selectionModeSelector);
-  const stageHeight = useSelector(stageHeightSelector);
-  const stageWidth = useSelector(stageWidthSelector);
   const stagePosition = useSelector(stagePositionSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);
   const scaledImageWidth = useSelector(scaledImageWidthSelector);
@@ -559,11 +562,6 @@ export const Stage = () => {
   }, [selectedAnnotationsIds, workingAnnotation?.maskData]);
 
   useEffect(() => {
-    if (!stageRef || !stageRef.current) return;
-    stageRef.current.container().style.cursor = cursor;
-  }, [cursor]);
-
-  useEffect(() => {
     setTool(annotationTool);
   }, [annotationTool, dispatch]);
 
@@ -583,6 +581,7 @@ export const Stage = () => {
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
+
     const stage = stageRef.current;
     dispatch(
       setZoomSelection({
@@ -603,11 +602,6 @@ export const Stage = () => {
         stagePosition: { x: stage.x(), y: stage.y() },
       })
     );
-    if (draggable) {
-      stageRef.current.container().style.cursor = "grab";
-    } else {
-      stageRef.current.container().style.cursor = cursor;
-    }
   }, [
     draggable,
     stageRef,
@@ -619,8 +613,16 @@ export const Stage = () => {
     zoomSelection.minimum,
     zoomSelection.selecting,
     automaticCentering,
-    cursor,
   ]);
+
+  useEffect(() => {
+    if (!stageRef || !stageRef.current) return;
+    if (draggable) {
+      stageRef.current.container().style.cursor = "grab";
+    } else {
+      stageRef.current.container().style.cursor = cursor;
+    }
+  }, [draggable, cursor, stageRef]);
 
   useEffect(() => {
     if (!absolutePosition || outOfBounds || !annotationTool.image) return;
@@ -649,6 +651,27 @@ export const Stage = () => {
     outOfBounds,
   ]);
 
+  useEffect(() => {
+    if (!scaledImageHeight || !scaledImageWidth) return;
+    dispatch(
+      setImageOrigin({
+        origin: {
+          x: (stageWidth - scaledImageWidth) / 2,
+          y: (stageHeight - scaledImageHeight) / 2,
+        },
+      })
+    );
+  }, [stageWidth, stageHeight, scaledImageWidth, scaledImageHeight, dispatch]);
+
+  useEffect(() => {
+    if (!stageRef || !stageRef.current) return;
+    if (outOfBounds) {
+      stageRef.current.container().style.cursor = "not-allowed";
+    } else {
+      stageRef.current.container().style.cursor = cursor;
+    }
+  }, [outOfBounds, cursor, stageRef]);
+
   return (
     <>
       <ReactKonva.Stage
@@ -670,7 +693,11 @@ export const Stage = () => {
         <Provider store={store}>
           <DndProvider backend={HTML5Backend}>
             <Layer>
-              <Image ref={imageRef} />
+              <Image
+                ref={imageRef}
+                stageHeight={stageHeight}
+                stageWidth={stageWidth}
+              />
 
               <ZoomSelection />
 
@@ -683,6 +710,7 @@ export const Stage = () => {
                 currentPosition={transformedPosition}
                 absolutePosition={absolutePosition}
                 annotating={annotationState === AnnotationStateType.Annotating}
+                outOfBounds={outOfBounds}
               />
 
               <PointerSelection />

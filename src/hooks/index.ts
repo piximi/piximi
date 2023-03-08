@@ -1,6 +1,5 @@
 export { useAnimationFrame } from "./useAnimationFrame";
 export { useAnnotationTool } from "./useAnnotationTool";
-export { useBoundingClientRect } from "./useBoundingClientRect";
 export { useCollapseList } from "./useCollapseList";
 export { useContextMenu } from "./useContextMenu";
 export { useCursor } from "./useCursor";
@@ -10,7 +9,6 @@ export { useDndFileDrop } from "./useDndFileDrop";
 export { useDrawer } from "./useDrawer";
 export { useHandTool } from "./useHandTool";
 export { useImage } from "./useImage";
-export { useImageOrigin } from "./useImageOrigin";
 export { useAnnotatorKeyboardShortcuts } from "./useKeyboardShortcuts";
 export { useKeyPress } from "./useKeyPress";
 export { useMarchingAnts } from "./useMarchingAnts";

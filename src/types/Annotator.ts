@@ -20,7 +20,7 @@ export type Annotator = {
   activeImageRenderedSrcs: Array<string>;
   images: Array<ShadowImageType>;
   language: LanguageType;
-  offset: { x: number; y: number };
+  imageOrigin: { x: number; y: number };
   penSelectionBrushSize: number;
   pointerSelection: {
     dragging: boolean;

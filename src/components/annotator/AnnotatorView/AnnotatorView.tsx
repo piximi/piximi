@@ -135,7 +135,10 @@ export const AnnotatorView = () => {
 
         <AnnotatorDrawer />
 
-        <StageWrapper onDrop={onDrop} />
+        <StageWrapper
+          onDrop={onDrop}
+          setOptionsVisibility={setOptionsVisibile}
+        />
 
         {files?.length && (
           <ImageShapeDialog

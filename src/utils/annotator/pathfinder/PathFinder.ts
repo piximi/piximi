@@ -38,7 +38,7 @@ export function cachedAStarPathSearch(
     if (p1.x === p2.x || p1.y === p2.y) {
       return 1;
     }
-    return 1.41;
+    return 5;
   };
 
   const distance = (fromNode: Node, toNode: Node) => {

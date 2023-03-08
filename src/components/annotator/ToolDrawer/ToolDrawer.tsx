@@ -38,51 +38,51 @@ const toolMap: Record<
   string,
   { operation: OperationType; icon: (color: string) => ReactElement }
 > = {
-  Zoom: {
+  "Zoom Tool": {
     operation: OperationType.Zoom,
     icon: (color) => <Zoom color={color} />,
   },
-  "Color Adjustment": {
+  "Channel Adjustment": {
     operation: OperationType.ColorAdjustment,
     icon: (color) => <ColorAdjustment color={color} />,
   },
-  Pointer: {
+  "Selection Tool": {
     operation: OperationType.Pointer,
     icon: (color) => <Selection color={color} />,
   },
-  "Rectangular annotation": {
+  "Rectangle Tool": {
     operation: OperationType.RectangularAnnotation,
     icon: (color) => <RectangleAnnotation color={color} />,
   },
-  "Elliptical annotation": {
+  "Ellipse Tool": {
     operation: OperationType.EllipticalAnnotation,
     icon: (color) => <EllipticalAnnotation color={color} />,
   },
-  "Polygonal annotation": {
+  "Polygon Tool": {
     operation: OperationType.PolygonalAnnotation,
     icon: (color) => <PolygonAnnotation color={color} />,
   },
-  "Freehand annotation": {
+  "Pen Tool": {
     operation: OperationType.PenAnnotation,
     icon: (color) => <FreehandAnnotation color={color} />,
   },
-  "Lasso annotation (L)": {
+  "Lasso Tool": {
     operation: OperationType.LassoAnnotation,
     icon: (color) => <LassoAnnotation color={color} />,
   },
-  "Magnetic annotation": {
+  "Magnetic Tool": {
     operation: OperationType.MagneticAnnotation,
     icon: (color) => <MagneticAnnotation color={color} />,
   },
-  "Color annotation": {
+  "Color Tool": {
     operation: OperationType.ColorAnnotation,
     icon: (color) => <ColorAnnotation color={color} />,
   },
-  "Quick annotation": {
+  "Quick Annotation Tool": {
     operation: OperationType.QuickAnnotation,
     icon: (color) => <QuickAnnotation color={color} />,
   },
-  "Threshold annotation": {
+  "Threshold Tool": {
     operation: OperationType.ThresholdAnnotation,
     icon: (color) => <RectangleAnnotation color={color} />,
   },
@@ -115,14 +115,17 @@ export const ToolDrawer = ({
     <Drawer
       anchor="right"
       sx={{
-        flexShrink: 0,
-        whiteSpace: "nowrap",
-        width: 56,
+        "flexShrink": 0,
+        "whiteSpace": "nowrap",
+        "width": 56,
         "& > .MuiDrawer-paper": {
           width: 56,
         },
       }}
       variant="permanent"
+      onMouseEnter={() => {
+        setOptionsVisibility(true);
+      }}
     >
       <CustomToolTip
         name={`${optionsVisibility ? "Hide" : "Show"} Options`}

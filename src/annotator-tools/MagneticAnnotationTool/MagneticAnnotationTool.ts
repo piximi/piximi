@@ -233,6 +233,7 @@ export class MagneticAnnotationTool extends AnnotationTool {
 
     const options = { factor: this.factor };
 
+    //scharr filter?
     this.response = this.image.resize(options).grey().sobelFilter();
   }
 }

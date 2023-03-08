@@ -18,6 +18,7 @@ import {
   setSelectionMode,
   setStagedAnnotations,
   updateStagedAnnotations,
+  imageOriginSelector,
 } from "store/annotator";
 
 import useSound from "use-sound";
@@ -31,7 +32,6 @@ import {
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
-import { useImageOrigin } from "hooks";
 
 type box = {
   x: number;
@@ -69,6 +69,7 @@ export const AnnotationTransformer = ({
   const soundEnabled = useSelector(soundEnabledSelector);
   const imageWidth = useSelector(imageWidthSelector);
   const imageHeight = useSelector(imageHeightSelector);
+  const imageOrigin = useSelector(imageOriginSelector);
   const trRef = useRef<Konva.Transformer | null>(null);
 
   const dispatch = useDispatch();
@@ -79,8 +80,6 @@ export const AnnotationTransformer = ({
   const [playDeleteAnnotationSoundEffect] = useSound(
     deleteAnnotationSoundEffect
   );
-
-  const imageOrigin = useImageOrigin();
 
   /**
    * Obtain box coordinates in image space

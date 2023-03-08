@@ -36,7 +36,7 @@ const initialState: Annotator = {
   activeImageRenderedSrcs: [],
   images: [],
   language: LanguageType.English,
-  offset: { x: 0, y: 0 },
+  imageOrigin: { x: 0, y: 0 },
   penSelectionBrushSize: 10,
   pointerSelection: {
     dragging: false,
@@ -331,6 +331,12 @@ export const annotatorSlice = createSlice({
         }
       });
     },
+    setImageOrigin(
+      state,
+      action: PayloadAction<{ origin: { x: number; y: number } }>
+    ) {
+      state.imageOrigin = action.payload.origin;
+    },
     setImageSrc(state, action: PayloadAction<{ src: string }>) {
       if (!state.activeImageId) return;
       state.images = state.images.map((image) => {
@@ -357,12 +363,6 @@ export const annotatorSlice = createSlice({
     },
     setLanguage(state, action: PayloadAction<{ language: LanguageType }>) {
       state.language = action.payload.language;
-    },
-    setOffset(
-      state,
-      action: PayloadAction<{ offset: { x: number; y: number } }>
-    ) {
-      state.offset = action.payload.offset;
     },
     setOperation(state, action: PayloadAction<{ operation: ToolType }>) {
       state.toolType = action.payload.operation;
@@ -516,7 +516,7 @@ export const {
   setImageInstances,
   setImages,
   setLanguage,
-  setOffset,
+  setImageOrigin,
   setOperation,
   setPenSelectionBrushSize,
   setPointerSelection,

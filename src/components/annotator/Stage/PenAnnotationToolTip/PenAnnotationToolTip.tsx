@@ -16,11 +16,13 @@ type PenAnnotationToolTipProps = {
   currentPosition?: { x: number; y: number };
   absolutePosition?: { x: number; y: number };
   annotating: boolean;
+  outOfBounds: boolean;
 };
 export const PenAnnotationToolTip = ({
   annotating,
   currentPosition,
   absolutePosition,
+  outOfBounds,
 }: PenAnnotationToolTipProps) => {
   const toolType = useSelector(toolTypeSelector);
 
@@ -40,14 +42,6 @@ export const PenAnnotationToolTip = ({
   )
     return <></>;
 
-  if (
-    absolutePosition.x >= imageWidth ||
-    absolutePosition.y >= imageHeight ||
-    absolutePosition.x <= 0 ||
-    absolutePosition.y <= 0
-  )
-    return <></>;
-
   return (
     <>
       <ReactKonva.Ellipse
@@ -55,7 +49,7 @@ export const PenAnnotationToolTip = ({
         radiusY={penSelectionBrushSize / stageScale}
         x={currentPosition.x}
         y={currentPosition.y}
-        stroke="grey"
+        stroke={outOfBounds ? "black" : "white"}
         strokeWidth={2 / stageScale}
         dash={[2 / stageScale, 2 / stageScale]}
       />

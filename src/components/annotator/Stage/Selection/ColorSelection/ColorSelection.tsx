@@ -1,10 +1,11 @@
 import { useLayoutEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
 import { ColorAnnotationTool } from "annotator-tools";
-import { useImageOrigin } from "hooks";
+import { imageOriginSelector } from "store/annotator";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;
@@ -12,7 +13,7 @@ type ColorSelectionProps = {
 
 export const ColorSelection = ({ operator }: ColorSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
-  const imagePosition = useImageOrigin();
+  const imagePosition = useSelector(imageOriginSelector);
 
   useLayoutEffect(() => {
     let timerId: number;

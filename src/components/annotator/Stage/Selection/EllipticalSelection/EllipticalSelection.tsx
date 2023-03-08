@@ -2,10 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { useImageOrigin, useMarchingAnts } from "hooks";
+import { useMarchingAnts } from "hooks";
 
 import { EllipticalAnnotationTool } from "annotator-tools";
-import { stageScaleSelector } from "store/annotator";
+import { imageOriginSelector, stageScaleSelector } from "store/annotator";
 
 type EllipticalSelectionProps = {
   operator: EllipticalAnnotationTool;
@@ -13,7 +13,7 @@ type EllipticalSelectionProps = {
 
 export const EllipticalSelection = ({ operator }: EllipticalSelectionProps) => {
   const dashOffset = useMarchingAnts();
-  const imageOrigin = useImageOrigin();
+  const imageOrigin = useSelector(imageOriginSelector);
   const stageScale = useSelector(stageScaleSelector);
   if (!operator.center || !operator.radius) return null;
 

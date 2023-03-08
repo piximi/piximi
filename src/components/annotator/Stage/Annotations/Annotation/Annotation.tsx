@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { setSelectedAnnotations } from "store/annotator";
+import { setSelectedAnnotations, imageOriginSelector } from "store/annotator";
 
 import { decodedAnnotationType, Shape } from "types";
 
 import { hexToRGBA, colorOverlayROI } from "utils/annotator";
-import { useImageOrigin } from "hooks";
 
 type AnnotationProps = {
   annotation: decodedAnnotationType;
@@ -29,7 +28,7 @@ export const Annotation = ({
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
-  const imagePosition = useImageOrigin();
+  const imagePosition = useSelector(imageOriginSelector);
   const dispatch = useDispatch();
 
   useEffect(() => {
