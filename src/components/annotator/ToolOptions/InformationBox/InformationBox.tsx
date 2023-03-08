@@ -1,13 +1,19 @@
 import React from "react";
 
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
 type InformationBoxProps = {
   description: string;
   name: string;
+  hotkey?: string;
 };
 
-export const InformationBox = ({ description, name }: InformationBoxProps) => {
+export const InformationBox = ({
+  description,
+  name,
+  hotkey,
+}: InformationBoxProps) => {
   return (
     <AppBar
       sx={{
@@ -18,11 +24,18 @@ export const InformationBox = ({ description, name }: InformationBoxProps) => {
       }}
       color="default"
     >
-      <Toolbar disableGutters={true}>
-        <Typography variant="h6" color="inherit">
-          &nbsp;
-        </Typography>
-        <Typography style={{ marginLeft: 12 }}>{name}</Typography>
+      <Toolbar
+        sx={{ display: "flex", justifyContent: "space-around" }}
+        disableGutters={true}
+      >
+        <Typography sx={{ ml: 1 }}>{name}</Typography>
+        {hotkey && (
+          <Box display="flex">
+            <KeyboardKey letter="shift" />
+            <Typography>+</Typography>
+            <KeyboardKey letter={hotkey} />
+          </Box>
+        )}
       </Toolbar>
     </AppBar>
   );

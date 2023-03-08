@@ -1,1 +1,0 @@
-export { useBoundingClientRect } from "./useBoundingClientRect";

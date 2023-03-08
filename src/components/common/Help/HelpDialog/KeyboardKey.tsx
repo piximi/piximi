@@ -12,7 +12,7 @@ export const KeyboardKey = ({ letter }: KeyboardKeyProps) => {
         backgroundColor: "rgba(237, 242, 247, 1)",
         borderWidth: "1px 1px 3px",
         borderRadius: "6px",
-        fontSize: "0.8em",
+        fontSize: "0.75rem",
         paddingInline: "0.4em",
         whiteSpace: "nowrap",
         fontWeight: 700,

@@ -3,7 +3,7 @@ import React from "react";
 import { KeyboardKey } from "../Help/HelpDialog/KeyboardKey";
 type ToolHotkeyTitleProps = {
   toolName: string;
-  letter: string;
+  letter?: string;
   bold?: boolean;
 };
 export const ToolHotkeyTitle = ({
@@ -13,14 +13,21 @@ export const ToolHotkeyTitle = ({
 }: ToolHotkeyTitleProps) => {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Typography fontWeight={bold ? "fontWeightBold" : ""}>
+      <Typography
+        fontWeight={bold ? "fontWeightBold" : ""}
+        fontSize={"0.875rem"}
+      >
         {toolName}
       </Typography>
-      <Typography style={{ marginLeft: "5px" }}>(</Typography>
-      <KeyboardKey letter="shift" />
-      <Typography>+</Typography>
-      <KeyboardKey letter={letter} />
-      <Typography>)</Typography>
+      {letter && (
+        <>
+          <Typography style={{ marginLeft: "5px" }}>(</Typography>
+          <KeyboardKey letter="shift" />
+          <Typography>+</Typography>
+          <KeyboardKey letter={letter} />
+          <Typography>)</Typography>
+        </>
+      )}
     </Box>
   );
 };

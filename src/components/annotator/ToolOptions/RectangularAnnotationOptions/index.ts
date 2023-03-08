@@ -1,1 +1,0 @@
-export { RectangularAnnotationOptions } from "./RectangularAnnotationOptions";

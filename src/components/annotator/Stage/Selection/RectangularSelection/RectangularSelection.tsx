@@ -1,11 +1,11 @@
 import React from "react";
 import * as ReactKonva from "react-konva";
 
-import { useImageOrigin, useMarchingAnts } from "hooks";
+import { useMarchingAnts } from "hooks";
 
 import { RectangularAnnotationTool } from "annotator-tools";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "store/annotator";
+import { imageOriginSelector, stageScaleSelector } from "store/annotator";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool;
@@ -16,7 +16,7 @@ export const RectangularSelection = ({
 }: RectangularSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const imageOrigin = useImageOrigin();
+  const imageOrigin = useSelector(imageOriginSelector);
   const stageScale = useSelector(stageScaleSelector);
   if (!operator.origin || !operator.width || !operator.height) return null;
 

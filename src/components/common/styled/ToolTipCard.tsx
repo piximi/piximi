@@ -10,13 +10,9 @@ import {
 
 export const TooltipCard = ({
   children,
-  name,
-  letter,
   description,
 }: {
   children: React.ReactNode;
-  name: string;
-  letter: string;
   description: ReactElement;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -39,11 +35,12 @@ export const TooltipCard = ({
       onClose={onClose}
       onOpen={onOpen}
       open={open}
+      disableInteractive
       placement="left"
       title={
-        <Card sx={{ width: 210 }} variant="outlined">
+        <Card variant="outlined">
           <CardActionArea>
-            <CardContent>
+            <CardContent sx={{ p: 0.5 }}>
               <Typography
                 variant="body2"
                 color="textSecondary"

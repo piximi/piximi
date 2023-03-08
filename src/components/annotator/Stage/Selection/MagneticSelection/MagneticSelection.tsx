@@ -2,10 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { useImageOrigin, useMarchingAnts } from "hooks";
+import { useMarchingAnts } from "hooks";
 
 import { MagneticAnnotationTool } from "annotator-tools";
-import { stageScaleSelector } from "store/annotator";
+import { imageOriginSelector, stageScaleSelector } from "store/annotator";
 
 type MagneticSelectionProps = {
   operator: MagneticAnnotationTool;
@@ -14,7 +14,7 @@ type MagneticSelectionProps = {
 export const MagneticSelection = ({ operator }: MagneticSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const imageOrigin = useImageOrigin();
+  const imageOrigin = useSelector(imageOriginSelector);
   const stageScale = useSelector(stageScaleSelector);
   if (!operator.origin) return <></>;
 

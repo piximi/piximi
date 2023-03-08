@@ -6,10 +6,9 @@ import Konva from "konva";
 import {
   activeImagePlaneSelector,
   activeImageRenderedSrcsSelector,
+  imageOriginSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
-  stageHeightSelector,
-  stageWidthSelector,
 } from "store/annotator";
 import { Point } from "types";
 
@@ -40,7 +39,10 @@ const MemoizedKonvaImage = memo(
   })
 );
 
-export const Image = forwardRef<Konva.Image>((_, ref) => {
+export const Image = forwardRef<
+  Konva.Image,
+  { stageWidth: number; stageHeight: number }
+>(({ stageWidth, stageHeight }, ref) => {
   const activePlane = useSelector(activeImagePlaneSelector);
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
   const width = useSelector(scaledImageWidthSelector);
@@ -48,9 +50,7 @@ export const Image = forwardRef<Konva.Image>((_, ref) => {
   const [filters] = useState<Array<any>>();
   const normalizeFont = 1300;
   const [images, setImages] = useState<Array<HTMLImageElement>>();
-  const stageWidth = useSelector(stageWidthSelector);
-  const stageHeight = useSelector(stageHeightSelector);
-  const [imagePosition, setImagePosition] = useState<Point>();
+  const imagePosition = useSelector(imageOriginSelector);
 
   useEffect(() => {
     setImages(
@@ -61,13 +61,6 @@ export const Image = forwardRef<Konva.Image>((_, ref) => {
       })
     );
   }, [renderedSrcs, width]);
-
-  useEffect(() => {
-    setImagePosition({
-      x: (stageWidth - width!) / 2,
-      y: (stageHeight - height!) / 2,
-    });
-  }, [stageWidth, stageHeight, width, height]);
 
   if (!(images && images.length)) {
     return (

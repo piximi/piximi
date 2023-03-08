@@ -11,17 +11,16 @@ export const useCursor = () => {
 
   useEffect(() => {
     switch (toolType) {
+      case ToolType.RectangularAnnotation:
       case ToolType.EllipticalAnnotation:
         dispatch(AnnotatorSlice.actions.setCursor({ cursor: "crosshair" }));
 
         break;
       case ToolType.PenAnnotation:
-        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "default" }));
+        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "none" }));
 
         break;
-      case ToolType.RectangularAnnotation:
-        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "crosshair" }));
-        break;
+
       default:
         dispatch(AnnotatorSlice.actions.setCursor({ cursor: "pointer" }));
 

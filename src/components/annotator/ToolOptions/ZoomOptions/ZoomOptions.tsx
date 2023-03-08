@@ -22,8 +22,6 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
-import { InformationBox } from "../InformationBox";
-
 import {
   setStagePosition,
   stageHeightSelector,
@@ -150,8 +148,6 @@ export const ZoomOptions = () => {
   // @ts-ignore
   return (
     <>
-      <InformationBox description="…" name={t("Zoom")} />
-
       <Divider />
 
       <List

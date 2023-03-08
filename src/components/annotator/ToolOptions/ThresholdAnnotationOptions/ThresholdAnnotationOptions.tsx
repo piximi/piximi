@@ -3,10 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { useTranslation } from "hooks";
-
 import { AnnotationMode } from "../AnnotationMode";
-import { InformationBox } from "../InformationBox";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 import {
@@ -15,8 +12,6 @@ import {
 } from "store/annotator";
 
 export const ThresholdAnnotationOptions = () => {
-  const t = useTranslation();
-
   const thresholdValue = useSelector(thresholdAnnotationValueSelector);
 
   const [threshold, setThreshold] = useState<number>(thresholdValue);
@@ -34,11 +29,6 @@ export const ThresholdAnnotationOptions = () => {
 
   return (
     <>
-      <InformationBox
-        description="Click and drag to create a rectangular annotation."
-        name={t("Threshold annotation")}
-      />
-
       <Divider />
 
       <AnnotationMode />

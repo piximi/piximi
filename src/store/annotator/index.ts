@@ -5,7 +5,7 @@ export {
   setOperation,
   setSelectedAnnotations,
   setSelectedCategoryId,
-  setOffset,
+  setImageOrigin,
   setStageScale,
   setBoundingClientRect,
   setStageWidth,
@@ -64,7 +64,7 @@ export { annotatorSelectionModeSelector } from "./selectors/annotatorSelectionMo
 export { annotatorZoomModeSelector } from "./selectors/annotatorZoomModeSelector";
 export { imageWidthSelector } from "./selectors/imageWidthSelector";
 export { languageSelector } from "./selectors/languageSelector";
-export { offsetSelector } from "./selectors/offsetSelector";
+export { imageOriginSelector } from "./selectors/imageOriginSelector";
 export { penSelectionBrushSizeSelector } from "./selectors/penSelectionBrushSizeSelector";
 export { pointerSelectionSelector } from "./selectors/pointerSelectionSelector";
 export { quickSelectionRegionSizeSelector } from "./selectors/quickSelectionRegionSizeSelector";

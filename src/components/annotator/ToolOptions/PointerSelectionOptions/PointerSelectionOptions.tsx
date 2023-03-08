@@ -14,8 +14,6 @@ import { useTranslation } from "hooks";
 
 import { Label as LabelIcon } from "@mui/icons-material";
 
-import { InformationBox } from "../InformationBox";
-
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import {
@@ -78,8 +76,6 @@ export const PointerSelectionOptions = () => {
 
   return (
     <>
-      <InformationBox description="…" name={t("Select annotations")} />
-
       <Divider />
 
       <List>

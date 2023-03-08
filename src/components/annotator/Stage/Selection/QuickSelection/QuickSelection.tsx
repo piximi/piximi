@@ -1,8 +1,9 @@
 import { useLayoutEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { QuickAnnotationTool } from "annotator-tools";
-import { useImageOrigin } from "hooks";
+import { imageOriginSelector } from "store/annotator";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;
@@ -10,6 +11,7 @@ type QuickSelectionProps = {
 
 export const QuickSelection = ({ operator }: QuickSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
+  const imageOrigin = useSelector(imageOriginSelector);
 
   useLayoutEffect(() => {
     let timerId: number;
@@ -28,8 +30,6 @@ export const QuickSelection = ({ operator }: QuickSelectionProps) => {
 
     return () => cancelAnimationFrame(timerId);
   });
-
-  const imageOrigin = useImageOrigin();
 
   if (!operator.currentMask) return null;
 
