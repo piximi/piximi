@@ -12,11 +12,9 @@ export const ToolBarToolTitle = ({ toolName, letter }: ToolTitleProps) => {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Typography>{toolName}</Typography>
-      <Typography style={{ marginLeft: "5px" }}>(</Typography>
       <KeyboardKey letter="shift" />
       <Typography>+</Typography>
       <KeyboardKey letter={letter} />
-      <Typography>)</Typography>
     </Box>
   );
 };
