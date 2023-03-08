@@ -90,22 +90,26 @@ const toolMap: Record<
 export const ToolDrawer = ({
   optionsVisibility,
   setOptionsVisibility,
+  persistOptions,
+  setPersistOptions,
 }: {
   optionsVisibility: boolean;
   setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  persistOptions: boolean;
+  setPersistOptions: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeOperation = useSelector(toolTypeSelector);
 
-  const toggleOptionsHandler = () => {
-    setOptionsVisibility((visible) => !visible);
+  const togglePersistHandler = () => {
+    setPersistOptions((visible) => !visible);
   };
 
   useHotkeys(
     "shift+o",
     () => {
-      toggleOptionsHandler();
+      togglePersistHandler();
     },
     HotkeyView.Annotator
   );
@@ -124,19 +128,19 @@ export const ToolDrawer = ({
       }}
       variant="permanent"
       onMouseEnter={() => {
-        setOptionsVisibility(true);
+        !persistOptions && setOptionsVisibility(true);
       }}
     >
       <CustomToolTip
         name={`${optionsVisibility ? "Hide" : "Show"} Options`}
         letter="O"
       >
-        <ListItem button onClick={toggleOptionsHandler}>
+        <ListItem button onClick={togglePersistHandler}>
           <ListItemIcon sx={{ pt: "1rem" }}>
             <SvgIcon fontSize="small">
               <TuneIcon
                 sx={{
-                  color: !optionsVisibility
+                  color: !persistOptions
                     ? theme.palette.grey[400]
                     : theme.palette.primary.dark,
                 }}
