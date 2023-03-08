@@ -9,7 +9,10 @@ import {
   SvgIcon,
   useTheme,
 } from "@mui/material";
-import { Tune as TuneIcon } from "@mui/icons-material";
+import {
+  Lock as LockIcon,
+  LockOpen as LockOpenIcon,
+} from "@mui/icons-material";
 
 import { useHotkeys, useTranslation } from "hooks";
 
@@ -132,19 +135,13 @@ export const ToolDrawer = ({
       }}
     >
       <CustomToolTip
-        name={`${optionsVisibility ? "Hide" : "Show"} Options`}
+        name={`${persistOptions ? "Unlock" : "Lock"} Options`}
         letter="O"
       >
         <ListItem button onClick={togglePersistHandler}>
           <ListItemIcon sx={{ pt: "1rem" }}>
             <SvgIcon fontSize="small">
-              <TuneIcon
-                sx={{
-                  color: !persistOptions
-                    ? theme.palette.grey[400]
-                    : theme.palette.primary.dark,
-                }}
-              />
+              {persistOptions ? <LockIcon /> : <LockOpenIcon />}
             </SvgIcon>
           </ListItemIcon>
         </ListItem>
