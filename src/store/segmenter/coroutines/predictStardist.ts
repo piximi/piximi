@@ -20,7 +20,7 @@ import {
   Category,
   ImageType,
   RescaleOptions,
-  decodedAnnotationType,
+  DecodedAnnotationType,
   Point,
 } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
@@ -34,13 +34,13 @@ export const predictStardist = async (
 ): Promise<{
   annotations: Array<{
     imageId: string;
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
   }>;
   categories: Array<Category>;
 }> => {
   const predictedAnnotations: Array<{
     imageId: string;
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
   }> = [];
 
   const foundCategories: Array<Category> = [];
@@ -133,7 +133,7 @@ export const predictStardist = async (
       setBackend(prevBackend);
     }
 
-    const selectedAnnotations: Array<decodedAnnotationType> = [];
+    const selectedAnnotations: Array<DecodedAnnotationType> = [];
     indices.forEach((index) => {
       selectedAnnotations.push(generatedAnnotations[index]);
     });
@@ -218,7 +218,7 @@ export function generateAnnotations(
   width: number,
   height: number
 ) {
-  const generatedAnnotations: Array<decodedAnnotationType> = [];
+  const generatedAnnotations: Array<DecodedAnnotationType> = [];
   const generartedBBoxes: Array<[number, number, number, number]> = [];
   const scores: Array<number> = [];
   var i = 0;
@@ -236,7 +236,7 @@ export function generateAnnotations(
           width,
           height
         );
-        const annotation: decodedAnnotationType = {
+        const annotation: DecodedAnnotationType = {
           maskData: maskData,
           boundingBox: bbox,
           categoryId: categoryId,

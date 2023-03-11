@@ -30,7 +30,7 @@ export type Settings = {
   selectedImages: Array<string>;
   themeMode: ThemeMode;
   imageSelectionColor: string;
-  imageSelectionSize: number;
+  selectedImageBorderWidth: number;
   alertState: AlertStateType;
   hotkeyStack: HotkeyView[];
 };

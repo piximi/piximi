@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ImageListItem, Box, ImageListItemBar } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 import { ImageIconLabel } from "../MainImageGrid/ImageIconLabel";
 
@@ -12,7 +12,7 @@ type MainImageGridItemProps = {
   image: ImageType;
   selected: boolean;
   selectionColor: string;
-  selectionSize: number;
+  selectedImageBorderWidth: number;
 };
 
 export const MainImageGridItem = memo(
@@ -20,27 +20,41 @@ export const MainImageGridItem = memo(
     image,
     selected,
     selectionColor,
-    selectionSize,
+    selectedImageBorderWidth,
   }: MainImageGridItemProps) => {
     const dispatch = useDispatch();
     const scaleFactor = useSelector(tileSizeSelector);
 
     const getSize = (scaleFactor: number) => {
-      const width = (220 * scaleFactor).toString() + "px";
-      const height = (220 * scaleFactor).toString() + "px";
+      const sideLength = (220 * scaleFactor).toString() + "px";
 
       return {
-        width: width,
-        height: height,
+        width: sideLength,
+        height: sideLength,
         margin: "2px",
       };
+    };
+
+    const getIconPlacement = (image: ImageType, scaleFactor: number) => {
+      const imageWidth = image.shape.width;
+      const imageHeight = image.shape.height;
+      const containerSize = 220 * scaleFactor;
+      const scaleBy = imageWidth > imageHeight ? imageWidth : imageHeight;
+      const dimScaleFactor = containerSize / scaleBy;
+      const scaledWidth = dimScaleFactor * imageWidth;
+      const scaledHeight = dimScaleFactor * imageHeight;
+
+      const offsetY = Math.ceil((containerSize - scaledHeight) / 2);
+      const offsetX = Math.ceil((containerSize - scaledWidth) / 2);
+
+      return { top: `${offsetY}px`, left: `${offsetX}px` };
     };
 
     const getSelectionStatus = () => {
       return selected
         ? {
-            border: `solid ${selectionSize}px ${selectionColor}`,
-            borderRadius: `${selectionSize}px`,
+            border: `solid ${selectedImageBorderWidth}px ${selectionColor}`,
+            borderRadius: `${selectedImageBorderWidth}px`,
           }
         : { border: "none" };
     };
@@ -60,10 +74,11 @@ export const MainImageGridItem = memo(
     };
 
     return (
-      <ImageListItem
+      <Grid
+        item
+        position="relative" // must be a position element for absolutely positioned ImageIconLabel
         onClick={() => onSelectImage(image)}
-        style={getSize(scaleFactor)}
-        sx={getSelectionStatus()}
+        sx={{ ...getSize(scaleFactor), ...getSelectionStatus() }}
         onContextMenu={() => onContextSelectImage(image)}
       >
         <Box
@@ -79,15 +94,11 @@ export const MainImageGridItem = memo(
           }}
         />
 
-        <ImageListItemBar
-          position="top"
-          actionIcon={<ImageIconLabel image={image} />}
-          actionPosition="left"
-          sx={{
-            background: "transparent",
-          }}
+        <ImageIconLabel
+          image={image}
+          placement={getIconPlacement(image, scaleFactor)}
         />
-      </ImageListItem>
+      </Grid>
     );
   }
 );

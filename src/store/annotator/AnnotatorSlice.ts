@@ -8,8 +8,8 @@ import {
 } from "types/Category";
 import { ToolType } from "types/ToolType";
 import {
-  encodedAnnotationType,
-  decodedAnnotationType,
+  EncodedAnnotationType,
+  DecodedAnnotationType,
 } from "types/AnnotationType";
 import { AnnotationModeType } from "types/AnnotationModeType";
 import { AnnotationStateType } from "types/AnnotationStateType";
@@ -101,7 +101,7 @@ export const annotatorSlice = createSlice({
     ) {
       // for (let image of state.images) {
       //   image.annotations = image.annotations.filter(
-      //     (annotation: encodedAnnotationType) => {
+      //     (annotation: EncodedAnnotationType) => {
       //       return annotation.categoryId !== action.payload.category.id;
       //     }
       //   );
@@ -113,7 +113,7 @@ export const annotatorSlice = createSlice({
     deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: encodedAnnotationType) => {
+          (annotation: EncodedAnnotationType) => {
             return {
               ...annotation,
               categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -152,7 +152,7 @@ export const annotatorSlice = createSlice({
     ) {
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: encodedAnnotationType) => {
+          (annotation: EncodedAnnotationType) => {
             if (annotation.categoryId === action.payload.categoryID) {
               return {
                 ...annotation,
@@ -182,7 +182,7 @@ export const annotatorSlice = createSlice({
       state.images = state.images.map((image) => {
         if (image.id === state.activeImageId) {
           const updatedAnnotations = image.annotations.filter(
-            (annotation: encodedAnnotationType) => {
+            (annotation: EncodedAnnotationType) => {
               return !action.payload.ids.includes(annotation.id);
             }
           );
@@ -295,7 +295,7 @@ export const annotatorSlice = createSlice({
     setImageInstances(
       state,
       action: PayloadAction<{
-        instances: Array<encodedAnnotationType>;
+        instances: Array<EncodedAnnotationType>;
         imageId: string;
       }>
     ) {
@@ -313,7 +313,7 @@ export const annotatorSlice = createSlice({
       state,
       action: PayloadAction<{
         instances: {
-          [imageId: string]: Array<encodedAnnotationType>;
+          [imageId: string]: Array<EncodedAnnotationType>;
         };
       }>
     ) {
@@ -398,8 +398,8 @@ export const annotatorSlice = createSlice({
     setSelectedAnnotations(
       state,
       action: PayloadAction<{
-        selectedAnnotations: Array<decodedAnnotationType>;
-        workingAnnotation: decodedAnnotationType | undefined;
+        selectedAnnotations: Array<DecodedAnnotationType>;
+        workingAnnotation: DecodedAnnotationType | undefined;
       }>
     ) {
       state.selectedAnnotations = action.payload.selectedAnnotations.map(
@@ -424,7 +424,7 @@ export const annotatorSlice = createSlice({
     },
     setStagedAnnotations(
       state,
-      action: PayloadAction<{ annotations: decodedAnnotationType[] }>
+      action: PayloadAction<{ annotations: DecodedAnnotationType[] }>
     ) {
       state.stagedAnnotations = action.payload.annotations;
     },
@@ -468,7 +468,7 @@ export const annotatorSlice = createSlice({
     },
     updateStagedAnnotations(
       state,
-      action: PayloadAction<{ annotations?: decodedAnnotationType[] }>
+      action: PayloadAction<{ annotations?: DecodedAnnotationType[] }>
     ) {
       if (!action.payload.annotations) {
         if (!state.workingAnnotation) return;

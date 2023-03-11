@@ -1,9 +1,9 @@
-import { encodedAnnotationType, Shape } from "types";
+import { EncodedAnnotationType, Shape } from "types";
 
 export type AnnotatorImage = {
   categoryId?: string;
   id: string;
-  annotations: Array<encodedAnnotationType>;
+  annotations: Array<EncodedAnnotationType>;
   name: string;
   shape: Shape;
   originalSrc: string; // original image data

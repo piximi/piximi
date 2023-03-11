@@ -7,7 +7,7 @@ import {
 import { annotationCategoriesSelector } from "store/project";
 
 import {
-  decodedAnnotationType,
+  DecodedAnnotationType,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
@@ -21,7 +21,7 @@ export const selectedAnnotationObjectsSelector = createSelector(
   (activeImage, categories, selectedAnnotations) => {
     if (!activeImage) return [];
 
-    const getFillColor = (annotation: decodedAnnotationType) => {
+    const getFillColor = (annotation: DecodedAnnotationType) => {
       const annotationCategory = categories.find(
         (category: Category) => category.id === annotation.categoryId
       );
@@ -31,7 +31,7 @@ export const selectedAnnotationObjectsSelector = createSelector(
         : UNKNOWN_ANNOTATION_CATEGORY.id;
     };
 
-    return selectedAnnotations.map((annotation: decodedAnnotationType) => {
+    return selectedAnnotations.map((annotation: DecodedAnnotationType) => {
       return {
         annotation: annotation,
         imageShape: activeImage.shape,

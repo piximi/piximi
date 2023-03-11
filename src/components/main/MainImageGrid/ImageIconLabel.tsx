@@ -19,9 +19,10 @@ import {
 
 type ImageIconLabelProps = {
   image: ImageType;
+  placement: { top: string; left: string };
 };
 
-export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
+export const ImageIconLabel = ({ image, placement }: ImageIconLabelProps) => {
   const categories = useSelector(categoriesSelector);
 
   const { color: categoryColor, name: categoryName } = categories.find(
@@ -55,7 +56,7 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
     image.categoryId !== UNKNOWN_CLASS_CATEGORY_ID;
 
   return (
-    <>
+    <Box position="absolute" sx={placement}>
       <Tooltip
         title={categoryName}
         placement="right"
@@ -103,6 +104,6 @@ export const ImageIconLabel = ({ image }: ImageIconLabelProps) => {
       >
         <InfoOutlinedIcon sx={actionIconStyle} />
       </Tooltip>
-    </>
+    </Box>
   );
 };

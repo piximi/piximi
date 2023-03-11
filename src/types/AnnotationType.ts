@@ -1,6 +1,6 @@
 import { DataArray } from "utils/common/image";
 
-export type encodedAnnotationType = {
+export type EncodedAnnotationType = {
   // x1, y1, W, H
   boundingBox: [number, number, number, number];
   categoryId: string;
@@ -8,7 +8,7 @@ export type encodedAnnotationType = {
   mask: Array<number>;
   plane: number;
 };
-export type decodedAnnotationType = {
+export type DecodedAnnotationType = {
   // x1, y1, W, H
   boundingBox: [number, number, number, number];
   categoryId: string;

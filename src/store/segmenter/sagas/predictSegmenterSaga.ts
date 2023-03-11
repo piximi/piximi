@@ -29,7 +29,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ObjectDetectionType,
   ModelType,
-  decodedAnnotationType,
+  DecodedAnnotationType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 import CLASSES from "data/model-data/cocossd-classes";
@@ -150,7 +150,7 @@ function* runSegmentationPrediction(
     | Awaited<ReturnType<typeof predictSegmentations>>;
   var predictedAnnotations: Array<{
     imageId: string;
-    annotations: decodedAnnotationType[];
+    annotations: DecodedAnnotationType[];
   }>;
   var foundCategories: Category[];
   switch (selectedModelType) {

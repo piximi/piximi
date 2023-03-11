@@ -6,12 +6,12 @@ import Image from "image-js";
 
 import { setSelectedAnnotations, imageOriginSelector } from "store/annotator";
 
-import { decodedAnnotationType, Shape } from "types";
+import { DecodedAnnotationType, Shape } from "types";
 
 import { hexToRGBA, colorOverlayROI } from "utils/annotator";
 
 type AnnotationProps = {
-  annotation: decodedAnnotationType;
+  annotation: DecodedAnnotationType;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;

@@ -49,7 +49,7 @@ import { zoomToolOptionsSelector } from "store/tool-options";
 import {
   AnnotationModeType,
   AnnotationStateType,
-  decodedAnnotationType,
+  DecodedAnnotationType,
   HotkeyView,
   Point,
   ToolType,
@@ -235,7 +235,7 @@ export const Stage = ({
 
   const deleteAnnotations = (
     selectedAnnotationIds: Array<string>,
-    stagedAnnotations: Array<decodedAnnotationType>
+    stagedAnnotations: Array<DecodedAnnotationType>
   ) => {
     dispatch(
       setStagedAnnotations({
@@ -386,7 +386,8 @@ export const Stage = ({
         }
       }
 
-      if (!annotationTool) return;
+      if (!annotationTool || outOfBounds) return;
+      console.log(outOfBounds);
       annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);
@@ -405,6 +406,7 @@ export const Stage = ({
     firstMouseDown,
     selectionMode,
     toolType,
+    outOfBounds,
   ]);
 
   const onMouseMove = useMemo(() => {

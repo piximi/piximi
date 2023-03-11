@@ -1,4 +1,4 @@
-import { decodedAnnotationType, encodedAnnotationType } from "types";
+import { DecodedAnnotationType, EncodedAnnotationType } from "types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -22,8 +22,8 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: encodedAnnotationType | undefined
-): decodedAnnotationType | undefined => {
+  encodedAnnotation: EncodedAnnotationType | undefined
+): DecodedAnnotationType | undefined => {
   if (!encodedAnnotation) return undefined;
   const { mask, ...decodedAnnotation } = {
     maskData: Uint8Array.from(decode(encodedAnnotation.mask)),
@@ -34,8 +34,8 @@ export const decodeAnnotation = (
 };
 
 export const decodeAnnotations = async (
-  encodedAnnotations: Array<encodedAnnotationType>
-): Promise<Array<decodedAnnotationType>> => {
+  encodedAnnotations: Array<EncodedAnnotationType>
+): Promise<Array<DecodedAnnotationType>> => {
   return new Promise((resolve, reject) => {
     const decodedAnnotations = encodedAnnotations.map((annotation) => {
       const { mask, ...decdodedAnnotation } = {
@@ -95,8 +95,8 @@ export const encode = (
 };
 
 export const encodeAnnotation = (
-  decodedAnnotation: decodedAnnotationType | undefined
-): encodedAnnotationType | undefined => {
+  decodedAnnotation: DecodedAnnotationType | undefined
+): EncodedAnnotationType | undefined => {
   if (!decodedAnnotation) return undefined;
   const { maskData, ...encodedAnnotation } = {
     mask: encode(decodedAnnotation.maskData),
@@ -107,8 +107,8 @@ export const encodeAnnotation = (
 };
 
 export const encodeAnnotations = (
-  decodedAnnotations: Array<decodedAnnotationType>
-): Promise<Array<encodedAnnotationType>> => {
+  decodedAnnotations: Array<DecodedAnnotationType>
+): Promise<Array<EncodedAnnotationType>> => {
   return new Promise((resolve) => {
     const encodedAnnotations = decodedAnnotations.map((annotation) => {
       const { maskData, ...decdodedAnnotation } = {

@@ -18,7 +18,7 @@ import {
   Category,
   ImageType,
   RescaleOptions,
-  decodedAnnotationType,
+  DecodedAnnotationType,
   ObjectDetectionType,
 } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
@@ -31,13 +31,13 @@ export const predictCoco = async (
 ): Promise<{
   annotations: Array<{
     imageId: string;
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
   }>;
   categories: Array<Category>;
 }> => {
   const predictedAnnotations: Array<{
     imageId: string;
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
   }> = [];
 
   const foundCategories: Array<Category> = [];
@@ -154,9 +154,9 @@ const annotationObjectsFromResults = (
   annotationCategories: Array<Category>,
   foundCategories: Array<Category>
 ): {
-  foundAnnotations: Array<decodedAnnotationType>;
+  foundAnnotations: Array<DecodedAnnotationType>;
 } => {
-  const annotationArray: Array<decodedAnnotationType> = [];
+  const annotationArray: Array<DecodedAnnotationType> = [];
 
   const count = indices.length;
 

@@ -19,7 +19,8 @@ export const MainToolbar = () => {
   const [value, setValue] = React.useState<number>(1);
   const minZoom = 0.6;
   const maxZoom = 4;
-  const onChange = (event: Event, newValue: number | number[]) => {
+
+  const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
       applicationSlice.actions.updateTileSize({
@@ -69,7 +70,7 @@ export const MainToolbar = () => {
         min={minZoom}
         max={maxZoom}
         step={0.1}
-        onChange={onChange}
+        onChange={handleSizeChange}
         sx={{ width: "10%" }}
       />
       <Button onClick={onZoomIn}>

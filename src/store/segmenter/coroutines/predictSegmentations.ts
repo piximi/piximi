@@ -14,7 +14,7 @@ import {
   Category,
   ImageType,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  decodedAnnotationType,
+  DecodedAnnotationType,
 } from "types";
 
 export const predictSegmentations = async (
@@ -29,7 +29,7 @@ export const predictSegmentations = async (
 ): Promise<{
   annotations: Array<{
     imageId: string;
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
   }>;
   categories: Array<Category>;
 }> => {
@@ -75,7 +75,7 @@ export const predictSegmentations = async (
   const predictions = await inferredTensors.preds.array();
 
   const predictedAnnotations: Array<{
-    annotations: Array<decodedAnnotationType>;
+    annotations: Array<DecodedAnnotationType>;
     imageId: string;
   }> = imageIds.map((imageId, idx) => {
     const predictedSegmentationMap = predictions[idx];

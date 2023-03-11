@@ -31,7 +31,7 @@ import {
 
 import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 
-import { AnnotationExportType, decodedAnnotationType, HotkeyView } from "types";
+import { AnnotationExportType, DecodedAnnotationType, HotkeyView } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -101,7 +101,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   }, [onCloseSaveAnnotatorDialog, onSubMenuClose, onClose]);
 
   useEffect(() => {
-    const doEncoding = async (annotations: Array<decodedAnnotationType>) => {
+    const doEncoding = async (annotations: Array<DecodedAnnotationType>) => {
       const encoded = await encodeAnnotations(annotations);
       dispatch(
         setImageInstances({ instances: encoded, imageId: activeImageId! })
