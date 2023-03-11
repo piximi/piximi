@@ -4,8 +4,8 @@ import { saveAs } from "file-saver";
 import { decode, pointsAreEqual } from "utils/annotator";
 
 import {
-  encodedAnnotationType,
-  decodedAnnotationType,
+  EncodedAnnotationType,
+  DecodedAnnotationType,
   Category,
   ShadowImageType,
   Point,
@@ -132,12 +132,12 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<decodedAnnotationType>,
+  annotations: Array<DecodedAnnotationType>,
   imageWidth: number,
   imageHeight: number
 ) => {
   const overlappingAnnotations = annotations.filter(
-    (annotation: decodedAnnotationType) => {
+    (annotation: DecodedAnnotationType) => {
       const boundingBox = annotation.boundingBox;
       if (
         position.x >= boundingBox[0] &&
@@ -167,7 +167,7 @@ export const getOverlappingAnnotations = (
       return false;
     }
   );
-  return overlappingAnnotations.map((annotation: decodedAnnotationType) => {
+  return overlappingAnnotations.map((annotation: DecodedAnnotationType) => {
     return annotation.id;
   });
 };
@@ -175,9 +175,9 @@ export const getOverlappingAnnotations = (
 export const getAnnotationsInBox = (
   minimum: { x: number; y: number },
   maximum: { x: number; y: number },
-  annotations: Array<decodedAnnotationType>
+  annotations: Array<DecodedAnnotationType>
 ) => {
-  return annotations.filter((annotation: decodedAnnotationType) => {
+  return annotations.filter((annotation: DecodedAnnotationType) => {
     return (
       minimum.x <= annotation.boundingBox[0] &&
       minimum.y <= annotation.boundingBox[1] &&
@@ -285,7 +285,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   projectName: string
 ): any => {
   images.forEach((current: ShadowImageType) => {
-    current.annotations.forEach((annotation: encodedAnnotationType) => {
+    current.annotations.forEach((annotation: EncodedAnnotationType) => {
       const height = current.shape.height;
       const width = current.shape.width;
 

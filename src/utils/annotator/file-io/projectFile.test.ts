@@ -10,7 +10,7 @@ import {
 import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
 import { serializeProject } from "./serializeProject";
 import {
-  encodedAnnotationType,
+  EncodedAnnotationType,
   ImageType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
@@ -53,7 +53,7 @@ const T2OnlyCat = {
 };
 
 // annotations exist T1 and T2
-const im1AnnotationsT1: Array<encodedAnnotationType> = [
+const im1AnnotationsT1: Array<EncodedAnnotationType> = [
   {
     categoryId: T1T2UnmodifiedCat.id, //unknown
     id: uuidv4(),
@@ -116,7 +116,7 @@ const im1AnnotationsT1: Array<encodedAnnotationType> = [
   },
 ];
 
-const im1AnnotationsT2: Array<encodedAnnotationType> = [
+const im1AnnotationsT2: Array<EncodedAnnotationType> = [
   {
     categoryId: T1T2UnmodifiedCat.id,
     id: uuidv4(),
@@ -138,7 +138,7 @@ const im1AnnotationsT2: Array<encodedAnnotationType> = [
 ];
 
 // annotations exists T1, but not T2
-const im2AnnotationsT1: Array<encodedAnnotationType> = [
+const im2AnnotationsT1: Array<EncodedAnnotationType> = [
   {
     categoryId: T1T2UnmodifiedCat.id, // unknown
     id: uuidv4(),
@@ -177,7 +177,7 @@ const im2AnnotationsT1: Array<encodedAnnotationType> = [
 ];
 
 // annotations did not exist T1, exists T2
-const im3AnnotationsT2: Array<encodedAnnotationType> = [
+const im3AnnotationsT2: Array<EncodedAnnotationType> = [
   {
     categoryId: T1T2UnmodifiedCat.id, // unknown
     id: uuidv4(),
@@ -391,7 +391,7 @@ test("serialize project", () => {
 
   const annotationsT3Actual = imagesT3Actual.reduce(
     (annotations, im) => [...annotations, ...im.annotations],
-    [] as Array<encodedAnnotationType>
+    [] as Array<EncodedAnnotationType>
   );
 
   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);

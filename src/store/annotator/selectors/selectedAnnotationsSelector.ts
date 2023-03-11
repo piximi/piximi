@@ -1,10 +1,10 @@
-import { decodedAnnotationType, Annotator } from "types";
+import { DecodedAnnotationType, Annotator } from "types";
 
 export const selectedAnnotationsSelector = ({
   annotator,
 }: {
   annotator: Annotator;
-}): Array<decodedAnnotationType> => {
+}): Array<DecodedAnnotationType> => {
   // Get annotations from staged using selected Ids.
   const selectedStagedAnnotations = annotator.stagedAnnotations.filter(
     (annotation) => annotator.selectedAnnotations.includes(annotation.id)

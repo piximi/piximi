@@ -26,7 +26,7 @@ import useSound from "use-sound";
 import {
   AnnotationModeType,
   AnnotationStateType,
-  decodedAnnotationType,
+  DecodedAnnotationType,
 } from "types";
 
 import { AnnotationTool } from "annotator-tools";
@@ -107,7 +107,7 @@ export const AnnotationTransformer = ({
   const onTransformStart = () => {
     setTransforming(true);
     const selected = stagedAnnotations.find(
-      (annotation: decodedAnnotationType) => {
+      (annotation: DecodedAnnotationType) => {
         return annotation.id === annotationId;
       }
     );

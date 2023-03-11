@@ -26,7 +26,7 @@ import {
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
 import {
-  imageSelectionSizeSelector,
+  selectedImageBorderWidthSelector,
   imageSelectionColorSelector,
   applicationSlice,
   themeModeSelector,
@@ -51,11 +51,14 @@ type SettingsDialogProps = {
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const dispatch = useDispatch();
 
-  const initialSelectionSize = useSelector(imageSelectionSizeSelector);
+  const initialSelectedImageBorderWidth = useSelector(
+    selectedImageBorderWidthSelector
+  );
   const initialSelectionColor = useSelector(imageSelectionColorSelector);
 
-  const [selectionSize, setSelectionSize] =
-    useState<number>(initialSelectionSize);
+  const [selectionSize, setSelectionSize] = useState<number>(
+    initialSelectedImageBorderWidth
+  );
 
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor
@@ -64,7 +67,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const preClose = () => {
     batch(() => {
       dispatch(
-        applicationSlice.actions.setImageSelectionSize({ selectionSize })
+        applicationSlice.actions.setSelectedImageBorderWidth({ selectionSize })
       );
       dispatch(
         applicationSlice.actions.setImageSelectionColor({
@@ -231,16 +234,16 @@ type MUISwitchProps = {
 // source: https://mui.com/components/switches/
 const MaterialUISwitch = styled(Switch)<MUISwitchProps>(
   ({ theme, disable_icon, enable_icon }) => ({
-    width: 62,
-    height: 34,
-    padding: 7,
+    "width": 62,
+    "height": 34,
+    "padding": 7,
     "& .MuiSwitch-switchBase": {
-      margin: 1,
-      padding: 0,
-      transform: "translateX(6px)",
+      "margin": 1,
+      "padding": 0,
+      "transform": "translateX(6px)",
       "&.Mui-checked": {
-        color: "#fff",
-        transform: "translateX(22px)",
+        "color": "#fff",
+        "transform": "translateX(22px)",
         "& .MuiSwitch-thumb:before": {
           backgroundImage: `url(${disable_icon})`,
         },
@@ -252,9 +255,9 @@ const MaterialUISwitch = styled(Switch)<MUISwitchProps>(
       },
     },
     "& .MuiSwitch-thumb": {
-      backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#001e3c",
-      width: 32,
-      height: 32,
+      "backgroundColor": theme.palette.mode === "dark" ? "#003892" : "#001e3c",
+      "width": 32,
+      "height": 32,
       "&:before": {
         content: "''",
         position: "absolute",

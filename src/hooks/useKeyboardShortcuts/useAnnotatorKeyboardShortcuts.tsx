@@ -16,24 +16,24 @@ import {
 import {
   AnnotationModeType,
   AnnotationStateType,
-  decodedAnnotationType,
+  DecodedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
 import { AnnotationTool } from "annotator-tools";
 
 type useAnnotatorHotkeysProps = {
-  annotations: decodedAnnotationType[];
+  annotations: DecodedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deleteAnnotations: (
     selectedAnnotationIds: Array<string>,
-    stagedAnnotations: Array<decodedAnnotationType>
+    stagedAnnotations: Array<DecodedAnnotationType>
   ) => void;
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   onZoomDeselect: () => void;
-  workingAnnotation: decodedAnnotationType | undefined;
+  workingAnnotation: DecodedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;

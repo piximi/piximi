@@ -2,7 +2,7 @@ import { Group, ready } from "h5wasm";
 
 import { getFile, to_blob } from "../fileHandlers";
 import {
-  encodedAnnotationType,
+  EncodedAnnotationType,
   Classifier,
   ClassifierModelProps,
   DefaultModelProps,
@@ -22,7 +22,7 @@ import { Colors } from "types/tensorflow";
 
 const serializeImageAnnotations = (
   annotationsGroup: Group,
-  annotations: Array<encodedAnnotationType>
+  annotations: Array<EncodedAnnotationType>
 ) => {
   const bboxes = new Uint8Array(annotations.length * 4);
   const categories = annotations.map((an) => an.categoryId);

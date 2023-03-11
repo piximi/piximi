@@ -1,7 +1,7 @@
 import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
-import { decodedAnnotationType } from ".";
+import { DecodedAnnotationType } from ".";
 import { AnnotationStateType } from "./AnnotationStateType";
 import { ShadowImageType } from "./ImageType";
 
@@ -31,9 +31,9 @@ export type Annotator = {
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
   saturation: number;
-  workingAnnotation: decodedAnnotationType | undefined;
+  workingAnnotation: DecodedAnnotationType | undefined;
   selectedAnnotations: Array<string>;
-  stagedAnnotations: Array<decodedAnnotationType>;
+  stagedAnnotations: Array<DecodedAnnotationType>;
   stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;
   selectionMode: AnnotationModeType;

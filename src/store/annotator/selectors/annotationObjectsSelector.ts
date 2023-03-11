@@ -8,14 +8,14 @@ import {
 import { annotationCategoriesSelector } from "store/project";
 
 import {
-  decodedAnnotationType,
+  DecodedAnnotationType,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   Shape,
 } from "types";
 
 type AnnotationObject = {
-  annotation: decodedAnnotationType;
+  annotation: DecodedAnnotationType;
   imageShape: Shape;
   fillColor: string;
 };
@@ -30,7 +30,7 @@ export const annotationObjectsSelector = createSelector(
   (activeImage, categories, stagedAnnotations, workingAnnotation) => {
     if (!activeImage) return [];
 
-    const getFillColor = (annotation: decodedAnnotationType) => {
+    const getFillColor = (annotation: DecodedAnnotationType) => {
       const annotationCategory = categories.find(
         (category: Category) => category.id === annotation.categoryId
       );
@@ -44,7 +44,7 @@ export const annotationObjectsSelector = createSelector(
       const reducedAnnotations: AnnotationObject[] = stagedAnnotations.reduce(
         (
           objectArray: AnnotationObject[],
-          annotation: decodedAnnotationType
+          annotation: DecodedAnnotationType
         ) => {
           if (workingAnnotation.id !== annotation.id) {
             objectArray.push({
@@ -66,7 +66,7 @@ export const annotationObjectsSelector = createSelector(
         },
       ];
     } else {
-      return stagedAnnotations.map((annotation: decodedAnnotationType) => {
+      return stagedAnnotations.map((annotation: DecodedAnnotationType) => {
         return {
           annotation: annotation,
           imageShape: activeImage.shape,

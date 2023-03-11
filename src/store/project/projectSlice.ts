@@ -15,8 +15,8 @@ import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
 import { replaceDuplicateName } from "utils/common/image";
 import {
-  decodedAnnotationType,
-  encodedAnnotationType,
+  DecodedAnnotationType,
+  EncodedAnnotationType,
 } from "types/AnnotationType";
 import { encode } from "utils/annotator";
 
@@ -40,7 +40,7 @@ export const projectSlice = createSlice({
     clearAnnotations(state, action: PayloadAction<{ category: Category }>) {
       for (let image of state.images) {
         image.annotations = image.annotations.filter(
-          (annotation: encodedAnnotationType) => {
+          (annotation: EncodedAnnotationType) => {
             return annotation.categoryId !== action.payload.category.id;
           }
         );
@@ -89,7 +89,7 @@ export const projectSlice = createSlice({
 
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: encodedAnnotationType) => {
+          (annotation: EncodedAnnotationType) => {
             return {
               ...annotation,
               categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -119,7 +119,7 @@ export const projectSlice = createSlice({
 
       state.images = state.images.map((image) => {
         const instances = image.annotations.map(
-          (annotation: encodedAnnotationType) => {
+          (annotation: EncodedAnnotationType) => {
             if (annotation.categoryId === action.payload.categoryID) {
               return {
                 ...annotation,
@@ -260,7 +260,7 @@ export const projectSlice = createSlice({
     updateImageAnnotations(
       state,
       action: PayloadAction<{
-        annotations: Array<decodedAnnotationType>;
+        annotations: Array<DecodedAnnotationType>;
         imageId: string;
       }>
     ) {
@@ -269,7 +269,7 @@ export const projectSlice = createSlice({
           return image;
         } else {
           const encodedAnnotations = action.payload.annotations.map(
-            (annotation: decodedAnnotationType) => {
+            (annotation: DecodedAnnotationType) => {
               const { maskData, ...encodedAnnotation } = {
                 mask: encode(annotation.maskData),
                 ...annotation,

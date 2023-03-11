@@ -8,8 +8,8 @@ export { AnnotationStateType } from "./AnnotationStateType";
 export { AnnotationExportType } from "./AnnotationExportType";
 
 export type {
-  encodedAnnotationType,
-  decodedAnnotationType,
+  EncodedAnnotationType,
+  DecodedAnnotationType,
 } from "./AnnotationType";
 
 export type {

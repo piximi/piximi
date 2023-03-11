@@ -25,23 +25,40 @@ import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 
 export const MainView = () => {
-  const dispatch = useDispatch();
-
-  useDefaultImage(DispatchLocation.Project);
-
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
   });
+  const [files, setFiles] = useState<FileList>();
+
+  const dispatch = useDispatch();
+  const images = useSelector(visibleImagesSelector);
+  useDefaultImage(DispatchLocation.Project);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
+
+  useHotkeys(
+    "control+a",
+    () => selectAllImages(),
+    [HotkeyView.MainImageGrid, HotkeyView.MainImageGridAppBar],
+    [images]
+  );
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
   };
 
-  const [files, setFiles] = useState<FileList>();
+  const handleDrop = async (files: FileList) => {
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
+    setFiles(files);
+  };
 
-  const onUnload = (e: any) => {
+  const selectAllImages = () => {
+    const newSelected = images.map((image: ImageType) => image.id);
+    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
+  };
+
+  const handleUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
       return;
     } else {
@@ -96,31 +113,11 @@ export const MainView = () => {
   }, [handleError, handleUncaughtRejection]);
 
   useEffect(() => {
-    window.addEventListener("beforeunload", onUnload);
+    window.addEventListener("beforeunload", handleUnload);
     return () => {
-      window.removeEventListener("beforeunload", onUnload);
+      window.removeEventListener("beforeunload", handleUnload);
     };
   }, []);
-
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
-  const onDrop = async (files: FileList) => {
-    const imageShapeInfo = await uploadFiles(files);
-    setImageShape(imageShapeInfo);
-    setFiles(files);
-  };
-
-  const images = useSelector(visibleImagesSelector);
-  const selectAllImages = () => {
-    const newSelected = images.map((image: ImageType) => image.id);
-    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
-  };
-
-  useHotkeys(
-    "control+a",
-    () => selectAllImages(),
-    [HotkeyView.MainImageGrid, HotkeyView.MainImageGridAppBar],
-    [images]
-  );
 
   return (
     <div>
@@ -133,7 +130,7 @@ export const MainView = () => {
 
             <MainDrawer />
 
-            <MainImageGrid onDrop={onDrop} />
+            <MainImageGrid onDrop={handleDrop} />
 
             {files?.length && (
               <ImageShapeDialog

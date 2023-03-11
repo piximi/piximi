@@ -7,7 +7,7 @@ import {
   selectedAnnotationsSelector,
 } from "store/annotator";
 import { selectedCategorySelector } from "store/common";
-import { decodedAnnotationType } from "types";
+import { DecodedAnnotationType } from "types";
 
 export function* selectedCategorySaga({
   payload: { execSaga },
@@ -25,7 +25,7 @@ export function* selectedCategorySaga({
     yield select(workingAnnotationSelector);
 
   const updatedAnnotations = selectedAnnotations.map(
-    (annotation: decodedAnnotationType) => {
+    (annotation: DecodedAnnotationType) => {
       return { ...annotation, categoryId: selectedCategory.id };
     }
   );

@@ -27,7 +27,7 @@ export const AnnotatorView = () => {
 
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
-  const [persistOptions, setPersistOptions] = useState<boolean>(true);
+  const [persistOptions, setPersistOptions] = useState<boolean>(false);
 
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,

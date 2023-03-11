@@ -5,7 +5,7 @@ import { Tool } from "../Tool";
 
 import {
   AnnotationStateType,
-  decodedAnnotationType,
+  DecodedAnnotationType,
   Category,
   Point,
 } from "types";
@@ -47,7 +47,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: decodedAnnotationType;
+  annotation?: DecodedAnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];

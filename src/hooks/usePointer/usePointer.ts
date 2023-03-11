@@ -17,7 +17,7 @@ import {
   stagedAnnotationsSelector,
 } from "store/annotator";
 
-import { decodedAnnotationType, HotkeyView, ToolType } from "types";
+import { DecodedAnnotationType, HotkeyView, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
@@ -162,7 +162,7 @@ export const usePointer = () => {
         } else {
           //only include if not already selected
           const additionalAnnotations = annotationsInBox.filter(
-            (annotation: decodedAnnotationType) => {
+            (annotation: DecodedAnnotationType) => {
               return !selectedAnnotationsIds.includes(annotation.id);
             }
           );
@@ -207,7 +207,7 @@ export const usePointer = () => {
       imageHeight
     );
 
-    let currentAnnotation: decodedAnnotationType | undefined;
+    let currentAnnotation: DecodedAnnotationType | undefined;
 
     if (overlappingAnnotationsIds.length > 1) {
       dispatch(
@@ -221,13 +221,13 @@ export const usePointer = () => {
       const nextAnnotationId = overlappingAnnotationsIds[currentIndex];
 
       currentAnnotation = stagedAnnotations.find(
-        (annotation: decodedAnnotationType) => {
+        (annotation: DecodedAnnotationType) => {
           return annotation.id === nextAnnotationId;
         }
       );
     } else {
       currentAnnotation = stagedAnnotations.find(
-        (annotation: decodedAnnotationType) => {
+        (annotation: DecodedAnnotationType) => {
           return annotation.id === overlappingAnnotationsIds[0];
         }
       );

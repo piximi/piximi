@@ -10,7 +10,7 @@ const initialState: Settings = {
   tileSize: 1,
   themeMode: ThemeMode.Light,
   imageSelectionColor: "#FF6DB6",
-  imageSelectionSize: 5,
+  selectedImageBorderWidth: 5,
   alertState: defaultAlert,
   hotkeyStack: [],
 };
@@ -70,11 +70,11 @@ export const applicationSlice = createSlice({
     ) {
       state.imageSelectionColor = action.payload.selectionColor;
     },
-    setImageSelectionSize(
+    setSelectedImageBorderWidth(
       state: Settings,
       action: PayloadAction<{ selectionSize: number }>
     ) {
-      state.imageSelectionSize = action.payload.selectionSize;
+      state.selectedImageBorderWidth = action.payload.selectionSize;
     },
     setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
       state.themeMode = action.payload.mode;

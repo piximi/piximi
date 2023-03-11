@@ -15,7 +15,7 @@ import { RescaleOptions } from "types/RescaleOptions";
 import { FitOptions } from "types/FitOptions";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
-import { encodedAnnotationType } from "types";
+import { EncodedAnnotationType } from "types";
 
 //jest.setTimeout(50000);
 
@@ -67,7 +67,7 @@ const preloadedImages: Array<{
   src: string;
   name: string;
   mimetype: MIMEType;
-  annotations: Array<encodedAnnotationType>;
+  annotations: Array<EncodedAnnotationType>;
 }> = [
   {
     src: "/static/media/cell-painting.f118ef087853056f08e6.png",
