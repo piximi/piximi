@@ -13,7 +13,7 @@ import {
   setAnnotationCategoryVisibility,
 } from "store/project";
 
-import { Category, CategoryType, ImageType } from "types";
+import { Category, CategoryType, OldImageType } from "types";
 
 type CategoryItemCheckboxProps = {
   category: Category;
@@ -39,10 +39,10 @@ export const CategoryItemCheckbox = ({
         dispatch(
           deselectImages({
             ids: images
-              .filter((image: ImageType) => {
+              .filter((image: OldImageType) => {
                 return image.categoryId === category.id;
               })
-              .map((image: ImageType) => image.id),
+              .map((image: OldImageType) => image.id),
           })
         );
       }

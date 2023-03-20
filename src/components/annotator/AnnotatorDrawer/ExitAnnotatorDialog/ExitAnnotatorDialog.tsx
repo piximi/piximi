@@ -17,7 +17,7 @@ import {
 import { selectedImagesSelector } from "store/common";
 import { projectSlice } from "store/project";
 
-import { ImageType, ShadowImageType } from "types";
+import { OldImageType, ShadowImageType } from "types";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;
@@ -56,7 +56,7 @@ export const ExitAnnotatorDialog = ({
 
     const newImages = annotatorImages.filter((image: ShadowImageType) => {
       return newImagesIds.includes(image.id);
-    }) as Array<ImageType>;
+    }) as Array<OldImageType>;
 
     return { newImages, modifiedImages, deletedImagesIds };
   };
@@ -65,8 +65,8 @@ export const ExitAnnotatorDialog = ({
     if (selectedImagesIds.length === 0) {
       batch(() => {
         dispatch(
-          projectSlice.actions.setImages({
-            images: annotatorImages as Array<ImageType>,
+          projectSlice.actions.setProjectImages({
+            images: annotatorImages as Array<OldImageType>,
           })
         );
         dispatch(

@@ -1,4 +1,4 @@
-import { ImageType, Annotator, Project } from "types";
+import { OldImageType, Annotator, Project } from "types";
 
 export const imageNameSelector = ({
   annotator,
@@ -9,7 +9,7 @@ export const imageNameSelector = ({
 }) => {
   if (!project.images.length) return;
 
-  const image = project.images.find((image: ImageType) => {
+  const image = project.images.find((image: OldImageType) => {
     return image.id === annotator.activeImageId;
   });
 

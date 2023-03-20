@@ -110,19 +110,22 @@ export const annotatorSlice = createSlice({
         (annotation) => annotation.categoryId !== action.payload.category.id
       );
     },
-    deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
-      state.images = state.images.map((image) => {
-        const instances = image.annotations.map(
-          (annotation: EncodedAnnotationType) => {
-            return {
-              ...annotation,
-              categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
-            };
-          }
-        );
-
-        return { ...image, annotations: instances };
-      });
+    deleteAllAnnotationCategories(state) {
+      for (const im of state.images) {
+        for (let j = 0; j < im.annotations.length; j++) {
+          im.annotations[j].categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
+        }
+      }
+    },
+    deleteAnnotationCategory(
+      state,
+      action: PayloadAction<{ categoryID: string }>
+    ) {
+      for (const annotation of state.stagedAnnotations) {
+        if (annotation.categoryId === action.payload.categoryID) {
+          annotation.categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
+        }
+      }
     },
     deleteAllImageAnnotations(
       state,
@@ -146,50 +149,13 @@ export const annotatorSlice = createSlice({
         return { ...image, annotations: [] };
       });
     },
-    deleteAnnotationCategory(
-      state,
-      action: PayloadAction<{ categoryID: string }>
-    ) {
-      state.images = state.images.map((image) => {
-        const instances = image.annotations.map(
-          (annotation: EncodedAnnotationType) => {
-            if (annotation.categoryId === action.payload.categoryID) {
-              return {
-                ...annotation,
-                categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
-              };
-            } else {
-              return annotation;
-            }
-          }
-        );
 
-        return { ...image, annotations: instances };
-      });
-    },
     deleteImage(state, action: PayloadAction<{ id: string }>) {
       state.images = state.images.filter(
         (image) => image.id !== action.payload.id
       );
     },
-    deleteImageInstances(
-      //deletes given instance on active image
-      state,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      if (!state.activeImageId) return;
 
-      state.images = state.images.map((image) => {
-        if (image.id === state.activeImageId) {
-          const updatedAnnotations = image.annotations.filter(
-            (annotation: EncodedAnnotationType) => {
-              return !action.payload.ids.includes(annotation.id);
-            }
-          );
-          return { ...image, annotations: updatedAnnotations };
-        } else return image;
-      });
-    },
     setActiveImageRenderedSrcs(
       state,
       action: PayloadAction<{
@@ -484,7 +450,7 @@ export const annotatorSlice = createSlice({
         const stagedIDs = state.stagedAnnotations.map(
           (annotation) => annotation.id
         );
-        action.payload.annotations.forEach((annotation, idx) => {
+        action.payload.annotations.forEach((annotation) => {
           const annotationIndex = stagedIDs.findIndex(
             (id) => id === annotation.id
           );
@@ -505,6 +471,7 @@ export const {
   deleteImage,
   setActiveImage,
   setActiveImagePlane,
+  setActiveImageRenderedSrcs,
   setAnnotationState,
   setBoundingClientRect,
   setBrightness,

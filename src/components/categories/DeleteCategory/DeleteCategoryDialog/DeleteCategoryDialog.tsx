@@ -13,7 +13,7 @@ import { Category, CategoryType, HotkeyView } from "types";
 type DeleteCategoryDialogProps = {
   category: Category;
   categoryType: CategoryType;
-  deleteCategoryCallback: (categoryID: string) => void;
+  deleteCategoryCallback: (categoryId: string) => void;
   onClose: () => void;
   open: boolean;
 };

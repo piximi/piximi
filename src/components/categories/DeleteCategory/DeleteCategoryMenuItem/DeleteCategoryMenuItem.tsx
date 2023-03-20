@@ -72,10 +72,10 @@ export const DeleteCategoryMenuItem = ({
     }
   };
 
-  const deleteClassificationCategoryCallback = (categoryID: string) => {
+  const deleteClassificationCategoryCallback = (categoryId: string) => {
     dispatch(
       projectSlice.actions.deleteCategory({
-        id: categoryID,
+        id: categoryId,
       })
     );
   };
@@ -104,7 +104,7 @@ export const DeleteCategoryMenuItem = ({
     }
   };
 
-  const deleteAnnotationCategoryCallback = (categoryID: string) => {
+  const deleteAnnotationCategoryCallback = (categoryId: string) => {
     batch(() => {
       dispatch(
         AnnotatorSlice.actions.setSelectedCategoryId({
@@ -115,13 +115,14 @@ export const DeleteCategoryMenuItem = ({
 
       dispatch(
         AnnotatorSlice.actions.deleteAnnotationCategory({
-          categoryID: categoryID,
+          categoryID: categoryId,
         })
       );
 
       dispatch(
         projectSlice.actions.deleteAnnotationCategory({
-          categoryID: categoryID,
+          categoryID: categoryId,
+          execSaga: true,
         })
       );
     });

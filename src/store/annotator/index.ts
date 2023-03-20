@@ -2,6 +2,7 @@
 export {
   annotatorSlice as AnnotatorSlice,
   setActiveImage,
+  setActiveImageRenderedSrcs,
   setOperation,
   setSelectedAnnotations,
   setSelectedCategoryId,

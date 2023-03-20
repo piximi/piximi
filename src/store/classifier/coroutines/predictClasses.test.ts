@@ -8,7 +8,7 @@ import {
 
 import {
   Category,
-  ImageType,
+  OldImageType,
   Partition,
   Shape,
   RescaleOptions,
@@ -154,7 +154,7 @@ const inferrenceImagesUnloaded = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceImages: Array<ImageType> = [];
+  const inferrenceImages: Array<OldImageType> = [];
   const imageIds: Array<string> = [];
 
   for (const im of inferrenceImagesUnloaded) {

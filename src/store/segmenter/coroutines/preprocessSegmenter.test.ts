@@ -8,7 +8,7 @@ import {
 } from "utils/common/image";
 import { fileFromPath } from "utils/common/image/nodeImageHelper";
 import { Category } from "types/Category";
-import { ImageType } from "types/ImageType";
+import { OldImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
@@ -92,7 +92,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<ImageType> = [];
+  const images: Array<OldImageType> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);

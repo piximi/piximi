@@ -10,7 +10,7 @@ import { projectSlice } from "store/project";
 import {
   AlertStateType,
   AlertType,
-  ImageType,
+  OldImageType,
   GeneratorReturnType,
 } from "types";
 
@@ -73,7 +73,7 @@ export function* uploadImagesSaga({
     }
   }
 
-  const imagesToUpload: Array<ImageType> = [];
+  const imagesToUpload: Array<OldImageType> = [];
   for (const { imageStack, fileName } of imageFiles) {
     if (!checkImageShape(imageStack, channels, slices, referenceShape.shape)) {
       invalidImageFiles.push({

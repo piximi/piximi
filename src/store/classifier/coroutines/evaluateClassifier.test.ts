@@ -15,7 +15,7 @@ import {
 import {
   Category,
   ClassifierEvaluationResultType,
-  ImageType,
+  OldImageType,
   Partition,
   RescaleOptions,
   FitOptions,
@@ -145,7 +145,7 @@ const validationImagesUnloaded = [
 it("evaluateClassifier", async () => {
   // await setBackend("tensorflow");
 
-  const validationImages: ImageType[] = [];
+  const validationImages: OldImageType[] = [];
 
   for (const im of validationImagesUnloaded) {
     const imStack = await loadDataUrlAsStack(im.src);

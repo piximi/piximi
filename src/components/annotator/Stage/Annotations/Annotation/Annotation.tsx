@@ -55,6 +55,15 @@ export const Annotation = ({
     imageHeight,
     imagePosition,
   ]);
+  useEffect(() => {
+    if (
+      annotation.boundingBox[0] < 0 ||
+      annotation.boundingBox[2] > 512 ||
+      annotation.boundingBox[1] < 0 ||
+      annotation.boundingBox[3] > 512
+    )
+      console.log(annotation.boundingBox);
+  }, [annotation]);
 
   const onTransformEnd = () => {
     if (!selected) return;

@@ -1,3 +1,4 @@
+import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray } from "utils/common/image";
 
 export type EncodedAnnotationType = {
@@ -7,6 +8,9 @@ export type EncodedAnnotationType = {
   id: string;
   mask: Array<number>;
   plane: number;
+  data?: Tensor4D;
+  imageId?: string;
+  src?: string;
 };
 export type DecodedAnnotationType = {
   // x1, y1, W, H

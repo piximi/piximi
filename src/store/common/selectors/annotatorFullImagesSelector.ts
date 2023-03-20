@@ -1,4 +1,4 @@
-import { ImageType, Annotator, Project, ShadowImageType } from "types";
+import { OldImageType, Annotator, Project, ShadowImageType } from "types";
 
 export const annotatorFullImagesSelector = ({
   annotator,
@@ -6,10 +6,10 @@ export const annotatorFullImagesSelector = ({
 }: {
   annotator: Annotator;
   project: Project;
-}): Array<ImageType> => {
+}): Array<OldImageType> => {
   return annotator.images.map((shadowImage: ShadowImageType) => {
     const projectImage = project.images.find(
-      (im: ImageType) => im.id === shadowImage.id
+      (im: OldImageType) => im.id === shadowImage.id
     );
 
     if (projectImage) {
@@ -22,7 +22,7 @@ export const annotatorFullImagesSelector = ({
         // data: projectImage.data.clone(),
       };
     } else {
-      return shadowImage as ImageType;
+      return shadowImage as OldImageType;
     }
   });
 };

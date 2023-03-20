@@ -6,7 +6,7 @@ import {
 
 import {
   Category,
-  ImageType,
+  OldImageType,
   Shape,
   RescaleOptions,
   FitOptions,
@@ -87,7 +87,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it("preprocessClassifier", async () => {
-  const images: Array<ImageType> = [];
+  const images: Array<OldImageType> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);

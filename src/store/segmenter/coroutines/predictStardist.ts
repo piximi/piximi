@@ -18,7 +18,7 @@ import { decodeFromImgSrc } from "./preprocessSegmenter";
 
 import {
   Category,
-  ImageType,
+  OldImageType,
   RescaleOptions,
   DecodedAnnotationType,
   Point,
@@ -29,7 +29,7 @@ import { connectPoints } from "utils/annotator";
 
 export const predictStardist = async (
   model: GraphModel,
-  inferenceImages: ImageType[],
+  inferenceImages: OldImageType[],
   createdCategories: Category[]
 ): Promise<{
   annotations: Array<{

@@ -56,9 +56,11 @@ export const DeleteAllCategoriesDialog = ({
         })
       );
 
-      dispatch(AnnotatorSlice.actions.deleteAllAnnotationCategories({}));
+      dispatch(AnnotatorSlice.actions.deleteAllAnnotationCategories());
 
-      dispatch(projectSlice.actions.deleteAllAnnotationCategories({}));
+      dispatch(
+        projectSlice.actions.deleteAllAnnotationCategories({ execSaga: true })
+      );
     });
   };
 

@@ -1,5 +1,5 @@
 import { LayersModel, Tensor, data, Rank } from "@tensorflow/tfjs";
-import { Category, ImageType, SegmenterEvaluationResultType } from "types";
+import { Category, OldImageType, SegmenterEvaluationResultType } from "types";
 
 export const evaluateSegmenter = async (
   model: LayersModel,
@@ -8,7 +8,7 @@ export const evaluateSegmenter = async (
     ys: Tensor<Rank.R4>;
     id: Tensor<Rank.R1>;
   }>,
-  validationImages: ImageType[],
+  validationImages: OldImageType[],
   categories: Category[]
 ): Promise<SegmenterEvaluationResultType> => {
   // TODO #357: Implement evaluation of segmentation

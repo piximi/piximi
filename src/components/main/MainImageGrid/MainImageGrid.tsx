@@ -22,7 +22,7 @@ import {
 } from "store/application";
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
-import { HotkeyView, ImageType, Partition } from "types";
+import { HotkeyView, OldImageType, Partition } from "types";
 
 import { ColorModel, Image as ImageJS } from "image-js";
 import { tensor4d } from "@tensorflow/tfjs";
@@ -62,7 +62,7 @@ type MainImageGridProps = {
 
 export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
   const images = useSelector(visibleImagesSelector);
-  const [objIms, setObjIms] = useState<Array<ImageType>>([]);
+  const [objIms, setObjIms] = useState<Array<OldImageType>>([]);
   const imageSelectionColor = useSelector(imageSelectionColorSelector);
   const selectedImageBorderWidth = useSelector(
     selectedImageBorderWidthSelector
@@ -139,7 +139,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
 
   useEffect(() => {
     const getObjs = async () => {
-      const objArr: Array<ImageType> = [];
+      const objArr: Array<OldImageType> = [];
       for await (const image of images) {
         try {
           const normImageData = image.data.mul(255);
@@ -171,7 +171,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
               3,
             ]);
 
-            const obj: ImageType = {
+            const obj: OldImageType = {
               annotations: [],
               activePlane: annotation.plane,
               categoryId: annotation.categoryId,
@@ -200,14 +200,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     };
     getObjs();
   }, [images]);
-
-  useEffect(() => {
-    console.log(
-      images[0].annotations.map((a) => {
-        return a.boundingBox;
-      })
-    );
-  });
 
   return (
     <Box
@@ -252,7 +244,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 gap={2}
                 sx={{ transform: "translateZ(0)", height: "100%" }}
               >
-                {images.slice(0, max_images).map((image: ImageType) => (
+                {images.slice(0, max_images).map((image: OldImageType) => (
                   <MainImageGridItem
                     image={image}
                     selected={selectedImages.includes(image.id)}
@@ -306,7 +298,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 gap={2}
                 sx={{ transform: "translateZ(0)", height: "100%" }}
               >
-                {objIms.map((image: ImageType) => (
+                {objIms.map((image: OldImageType) => (
                   <MainImageGridItem
                     image={image}
                     selected={selectedImages.includes(image.id)}

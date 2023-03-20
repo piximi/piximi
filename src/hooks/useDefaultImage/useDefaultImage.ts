@@ -7,6 +7,7 @@ import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
+import { dataSlice } from "store/data";
 
 export enum DispatchLocation {
   Project,
@@ -18,15 +19,29 @@ const dispatchToProject = async (
   dispatch: ReturnType<typeof useDispatch>
 ) => {
   if (location !== DispatchLocation.Project) return;
-  const { image, categories } = await loadExampleImage(
-    colorImage,
-    cellPaintingAnnotations as SerializedFileType,
-    // imageFile.name points to
-    // "/static/media/cell-painting.f118ef087853056f08e6.png"
-    "cell-painting.png"
-  );
+  const { image, categories, annotationsEntity, annotationIds } =
+    await loadExampleImage(
+      colorImage,
+      cellPaintingAnnotations as SerializedFileType,
+      // imageFile.name points to
+      // "/static/media/cell-painting.f118ef087853056f08e6.png"
+      "cell-painting.png"
+    );
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
-  dispatch(projectSlice.actions.setImages({ images: [image] }));
+  dispatch(projectSlice.actions.setProjectImages({ images: [image] }));
+  dispatch(dataSlice.actions.setAnnotationCategories({ categories }));
+  dispatch(
+    dataSlice.actions.initData({
+      newImages: [image],
+      newAnnotations: image.annotations,
+    })
+  );
+  dispatch(
+    projectSlice.actions.setAnnotations({
+      annotations: annotationsEntity,
+      annotationIds: annotationIds,
+    })
+  );
 };
 
 const dispatchToImageViewer = async (
@@ -35,15 +50,29 @@ const dispatchToImageViewer = async (
 ) => {
   if (location !== DispatchLocation.ImageViewer) return;
 
-  const { image, categories } = await loadExampleImage(
-    colorImage,
-    cellPaintingAnnotations as SerializedFileType,
-    // imageFile.name points to
-    // "/static/media/cell-painting.f118ef087853056f08e6.png"
-    "cell-painting.png"
-  );
+  const { image, categories, annotationsEntity, annotationIds } =
+    await loadExampleImage(
+      colorImage,
+      cellPaintingAnnotations as SerializedFileType,
+      // imageFile.name points to
+      // "/static/media/cell-painting.f118ef087853056f08e6.png"
+      "cell-painting.png"
+    );
 
   dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
+  dispatch(dataSlice.actions.setAnnotationCategories({ categories }));
+  dispatch(
+    dataSlice.actions.initData({
+      newImages: [image],
+      newAnnotations: image.annotations,
+    })
+  );
+  dispatch(
+    projectSlice.actions.setAnnotations({
+      annotations: annotationsEntity,
+      annotationIds: annotationIds,
+    })
+  );
   batch(() => {
     dispatch(
       AnnotatorSlice.actions.setImages({

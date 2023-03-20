@@ -15,7 +15,7 @@ import { deserializeCOCOFile } from "./deserializeCOCO";
 
 import {
   EncodedAnnotationType,
-  ImageType,
+  OldImageType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 
@@ -105,41 +105,41 @@ const im3AnnotationsT2: Array<EncodedAnnotationType> = [
 ];
 
 // image exists T1 and T2
-const im1T1: ImageType = {
+const im1T1: OldImageType = {
   // 1clockTower.jpg
   ...expectedState.annotator.images[0],
   id: uuidv4(),
-  colors: undefined as unknown as ImageType["colors"],
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  colors: undefined as unknown as OldImageType["colors"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   annotations: im1AnnotationsT1,
 };
 
-const im1T2: ImageType = {
+const im1T2: OldImageType = {
   ...im1T1,
   id: uuidv4(),
   annotations: im1AnnotationsT2,
 };
 
 // image exists T1 only
-const im2T1: ImageType = {
+const im2T1: OldImageType = {
   // 2golfer.jpg
   ...expectedState.annotator.images[1],
   id: uuidv4(),
-  colors: undefined as unknown as ImageType["colors"],
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  colors: undefined as unknown as OldImageType["colors"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   annotations: im2AnnotationsT1,
 };
 
 // image exists T2 only
-const im3T2: ImageType = {
+const im3T2: OldImageType = {
   // 3twoSheep.jpg
   ...expectedState.annotator.images[2],
   id: uuidv4(),
-  colors: undefined as unknown as ImageType["colors"],
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  colors: undefined as unknown as OldImageType["colors"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   annotations: im3AnnotationsT2,
 };
 
