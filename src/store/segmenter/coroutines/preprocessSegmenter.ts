@@ -18,7 +18,7 @@ import {
 import * as ImageJS from "image-js";
 
 import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
-import { ImageType } from "types/ImageType";
+import { OldImageType } from "types/ImageType";
 import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
@@ -191,7 +191,10 @@ export const decodeImage = async (
       );
 };
 
-export const sampleGenerator = (images: Array<ImageType>, channels: number) => {
+export const sampleGenerator = (
+  images: Array<OldImageType>,
+  channels: number
+) => {
   const count = images.length;
 
   return function* () {
@@ -251,7 +254,7 @@ export const resize = async (
 };
 
 export const preprocessSegmentationImages = async (
-  images: Array<ImageType>,
+  images: Array<OldImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,

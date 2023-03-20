@@ -11,7 +11,7 @@ import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
 import { serializeProject } from "./serializeProject";
 import {
   EncodedAnnotationType,
-  ImageType,
+  OldImageType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
@@ -208,7 +208,7 @@ const im3AnnotationsT2: Array<EncodedAnnotationType> = [
 ];
 
 // image exists T1 and T2
-const im1T1: ImageType = {
+const im1T1: OldImageType = {
   annotations: im1AnnotationsT1,
   id: uuidv4(),
   name: "im1.png",
@@ -222,16 +222,16 @@ const im1T1: ImageType = {
   bitDepth: 8,
   activePlane: 0,
   // TODO: COCO - add serialization of Colors?
-  colors: undefined as unknown as ImageType["colors"],
+  colors: undefined as unknown as OldImageType["colors"],
   src: "",
   // full image props, also not needed so fake it
   categoryId: "",
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   visible: true,
 };
 
-const im1T2: ImageType = {
+const im1T2: OldImageType = {
   annotations: im1AnnotationsT2,
   id: uuidv4(),
   name: "im1.png",
@@ -244,17 +244,17 @@ const im1T2: ImageType = {
   // below not needed for serializing annotations file so fake it
   bitDepth: 8,
   activePlane: 0,
-  colors: undefined as unknown as ImageType["colors"],
+  colors: undefined as unknown as OldImageType["colors"],
   src: "",
   // full image props, also not needed so fake it
   categoryId: "",
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   visible: true,
 };
 
 // image exists T1 only
-const im2T1: ImageType = {
+const im2T1: OldImageType = {
   annotations: im2AnnotationsT1,
   id: uuidv4(),
   name: "im2.png",
@@ -267,17 +267,17 @@ const im2T1: ImageType = {
   // below not needed for serializing annotations file so fake it
   bitDepth: 8,
   activePlane: 0,
-  colors: undefined as unknown as ImageType["colors"],
+  colors: undefined as unknown as OldImageType["colors"],
   src: "",
   // full image props, also not needed so fake it
   categoryId: "",
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   visible: true,
 };
 
 // image exists T2 only
-const im3T2: ImageType = {
+const im3T2: OldImageType = {
   annotations: im3AnnotationsT2,
   id: uuidv4(),
   name: "im3.png",
@@ -290,12 +290,12 @@ const im3T2: ImageType = {
   // below not needed for serializing annotations file so fake it
   bitDepth: 8,
   activePlane: 0,
-  colors: undefined as unknown as ImageType["colors"],
+  colors: undefined as unknown as OldImageType["colors"],
   src: "",
   // full image props, also not needed so fake it
   categoryId: "",
-  data: undefined as unknown as ImageType["data"],
-  partition: undefined as unknown as ImageType["partition"],
+  data: undefined as unknown as OldImageType["data"],
+  partition: undefined as unknown as OldImageType["partition"],
   visible: true,
 };
 

@@ -1,4 +1,4 @@
-import { ImageType, Annotator, Project, ShadowImageType } from "types";
+import { OldImageType, Annotator, Project, ShadowImageType } from "types";
 
 export const imageBitDepthSelector = ({
   annotator,
@@ -15,7 +15,7 @@ export const imageBitDepthSelector = ({
    * so return image data from there instead
    */
   const image =
-    project.images.find((image: ImageType) => {
+    project.images.find((image: OldImageType) => {
       return image.id === annotator.activeImageId;
     }) ||
     annotator.images.find((image: ShadowImageType) => {

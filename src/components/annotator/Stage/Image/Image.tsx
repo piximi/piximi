@@ -4,12 +4,13 @@ import * as ReactKonva from "react-konva";
 import Konva from "konva";
 
 import {
-  activeImagePlaneSelector,
   activeImageRenderedSrcsSelector,
+  activeImagePlaneSelector,
   imageOriginSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
 } from "store/annotator";
+
 import { Point } from "types";
 
 interface KonvaImageProps {
@@ -43,7 +44,7 @@ export const Image = forwardRef<
   Konva.Image,
   { stageWidth: number; stageHeight: number }
 >(({ stageWidth, stageHeight }, ref) => {
-  const activePlane = useSelector(activeImagePlaneSelector);
+  const activePlane = useSelector(activeImagePlaneSelector)!;
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
   const width = useSelector(scaledImageWidthSelector);
   const height = useSelector(scaledImageHeightSelector);

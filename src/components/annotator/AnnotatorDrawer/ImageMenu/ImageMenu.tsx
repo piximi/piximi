@@ -22,6 +22,7 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
+import { dataSlice } from "store/data";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -50,6 +51,9 @@ export const ImageMenu = ({
       AnnotatorSlice.actions.deleteAllImageAnnotations({
         imageId: selectedImage.id,
       })
+    );
+    dispatch(
+      dataSlice.actions.deleteAllAnnotations({ imageId: selectedImage.id })
     );
     onCloseImageMenu(event);
   };

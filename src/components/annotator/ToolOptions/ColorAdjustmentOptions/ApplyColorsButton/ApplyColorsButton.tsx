@@ -8,7 +8,7 @@ import { createRenderedTensor } from "utils/common/image";
 import { annotatorFullImagesSelector } from "store/common";
 import { AnnotatorSlice, activeImageColorsSelector } from "store/annotator";
 
-import { ImageType } from "types";
+import { OldImageType } from "types";
 
 export const ApplyColorsButton = () => {
   const dispatch = useDispatch();
@@ -50,7 +50,7 @@ export const ApplyColorsButton = () => {
             data: imageData,
             colors: imageColors,
             src: updatedSrc,
-          } as ImageType;
+          } as OldImageType;
         })
       );
     };

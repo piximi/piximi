@@ -210,11 +210,29 @@ export const colorOverlayROI = (
   const boxHeight = endY - boundingBox[1];
 
   if (!boxWidth || !boxHeight) return undefined;
-
-  const croppedImage = new ImageJS.Image(boxWidth, boxHeight, maskData, {
-    components: 1,
-    alpha: 0,
-  }).resize({ factor: scalingFactor });
+  let croppedImage = new ImageJS.Image(
+    boxWidth,
+    boxHeight,
+    Array(boxHeight * boxWidth).fill(0),
+    {
+      components: 1,
+      alpha: 0,
+    }
+  ).resize({ factor: scalingFactor });
+  try {
+    croppedImage = new ImageJS.Image(boxWidth, boxHeight, maskData, {
+      components: 1,
+      alpha: 0,
+    }).resize({ factor: scalingFactor });
+  } catch (err) {
+    console.log(`boundingbox: ${boundingBox}`);
+    console.log(`boxWidth: ${boxWidth}`);
+    console.log(`boxHeight: ${boxHeight}`);
+    console.log(`bwxbh: ${boxHeight * boxWidth}`);
+    console.log(`maskData length: ${maskData.length}`);
+    console.log(`diff: ${boxHeight * boxWidth - maskData.length}`);
+    console.log(err);
+  }
 
   const colorROIImage = new ImageJS.Image(boxWidth, boxHeight, {
     components: 3,

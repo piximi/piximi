@@ -5,7 +5,7 @@ import { getFile } from "../fileHandlers";
 import { createRenderedTensor, BitDepth } from "./imageHelper";
 import {
   SerializedImageType,
-  ImageType,
+  OldImageType,
   Project,
   Classifier,
   EncodedAnnotationType,
@@ -64,7 +64,7 @@ export const deserializeImage = async (
     src:
       serializedImage.src ??
       createRenderedTensor(imageData, imageColors, serializedImage.bitDepth, 0),
-  } as ImageType;
+  } as OldImageType;
 };
 
 /*
@@ -145,7 +145,7 @@ const deserializeColorsGroup = (colorsGroup: Group): Colors => {
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group
-): Promise<ImageType> => {
+): Promise<OldImageType> => {
   const id = getAttr(imageGroup, "image_id") as string;
   const activePlane = getAttr(imageGroup, "active_plane") as number;
   const categoryId = getAttr(imageGroup, "class_category_id") as string;
@@ -199,7 +199,7 @@ const deserializeImageGroup = async (
 
 const deserializeImagesGroup = async (imagesGroup: Group) => {
   const imageNames = imagesGroup.keys();
-  const images: Array<ImageType> = [];
+  const images: Array<OldImageType> = [];
   for (const name of imageNames) {
     let imageGroup = getGroup(imagesGroup, name);
     let image = await deserializeImageGroup(name, imageGroup);

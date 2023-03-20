@@ -10,6 +10,7 @@ import createSagaMonitor from "@clarketm/saga-monitor";
 
 import { reducer } from "../reducer";
 import { rootSaga } from "../sagas";
+import { dataMiddleware } from "store/data/listenerMiddlewares";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -46,8 +47,8 @@ const enhancers: StoreEnhancer[] = [];
 let middleware: Middleware[] =
   process.env.NODE_ENV !== "production" &&
   process.env.REACT_APP_LOG_LEVEL === "2"
-    ? [logger, saga]
-    : [saga];
+    ? [dataMiddleware.middleware, logger, saga]
+    : [dataMiddleware.middleware, saga];
 
 const preloadedState = {};
 
@@ -60,5 +61,6 @@ const options = {
 };
 
 export const productionStore: EnhancedStore = configureStore(options);
+export type AppDispatch = typeof productionStore.dispatch;
 
 saga.run(rootSaga);

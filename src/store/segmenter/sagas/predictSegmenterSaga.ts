@@ -22,7 +22,7 @@ import {
   AlertType,
   Category,
   FitOptions,
-  ImageType,
+  OldImageType,
   Partition,
   PreprocessOptions,
   Shape,
@@ -134,7 +134,7 @@ export function* predictSegmenterSaga({
 }
 
 function* runSegmentationPrediction(
-  inferenceImages: Array<ImageType>,
+  inferenceImages: Array<OldImageType>,
   categories: Array<Category>,
   createdCategories: Array<Category>,
   inputShape: Shape,

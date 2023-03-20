@@ -1,12 +1,12 @@
 import { Project } from "types/Project";
-import { ImageType } from "types/ImageType";
+import { OldImageType } from "types/ImageType";
 
 export const unannotatedImagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<ImageType> => {
-  return project.images.filter((image: ImageType) => {
+}): Array<OldImageType> => {
+  return project.images.filter((image: OldImageType) => {
     return !image.annotations.length;
   });
 };

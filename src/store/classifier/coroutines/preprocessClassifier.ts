@@ -23,7 +23,7 @@ import { matchedCropPad, padToMatch } from "./cropUtil";
 
 import {
   Category,
-  ImageType,
+  OldImageType,
   Partition,
   Shape,
   FitOptions,
@@ -33,7 +33,7 @@ import {
 } from "types";
 
 export const createClassificationLabels = (
-  images: ImageType[],
+  images: OldImageType[],
   categories: Category[]
 ) => {
   const labels: Array<Tensor1D> = [];
@@ -64,7 +64,7 @@ export const createClassificationLabels = (
 };
 
 export const sampleGenerator = (
-  images: Array<ImageType>,
+  images: Array<OldImageType>,
   labels: Array<Tensor1D>
 ) => {
   const count = images.length;
@@ -305,7 +305,7 @@ const doShow = (
 //#endregion Debug stuff
 
 export const preprocessClassifier = (
-  images: Array<ImageType>,
+  images: Array<OldImageType>,
   labels: Array<Tensor1D>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,

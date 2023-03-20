@@ -6,6 +6,7 @@ export { AnnotationModeType } from "./AnnotationModeType";
 export { AnnotationStateType } from "./AnnotationStateType";
 
 export { AnnotationExportType } from "./AnnotationExportType";
+export type { AnnotationsEntityType } from "./AnnotationsEntityType";
 
 export type {
   EncodedAnnotationType,
@@ -61,7 +62,7 @@ export {
   defaultImageSortKey,
 } from "./ImageSortType";
 
-export type { ImageType, ShadowImageType } from "./ImageType";
+export type { OldImageType, ShadowImageType, ImageType } from "./ImageType";
 
 export type { Annotator } from "./Annotator";
 
@@ -138,3 +139,7 @@ export type {
   SerializedCOCOImageType,
   SerializedCOCOCategoryType,
 } from "./COCOTypes";
+
+export type { DataStoreSlice } from "./DataStoreType";
+export type { ImagesEntityType } from "./ImagesEntityType";
+export type { ImageType as NewImageType } from "./ImageType";

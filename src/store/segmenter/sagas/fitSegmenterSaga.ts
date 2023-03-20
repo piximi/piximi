@@ -30,7 +30,7 @@ import {
   ModelType,
   AlertStateType,
   AlertType,
-  ImageType,
+  OldImageType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 
@@ -59,7 +59,7 @@ export function* fitSegmenterSaga({
   // First assign train and val partition to all categorized images.
   const annotatedImagesIds = (
     preprocessingOptions.shuffle ? shuffle(annotatedImages) : annotatedImages
-  ).map((image: ImageType) => {
+  ).map((image: OldImageType) => {
     return image.id;
   });
 

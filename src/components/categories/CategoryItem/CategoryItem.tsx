@@ -16,7 +16,7 @@ import { CategoryItemMenu } from "../CategoryItemMenu";
 import { highlightedCategoriesSelector } from "store/project";
 import { categoryCountsSelector, selectedCategorySelector } from "store/common";
 
-import { Category, CategoryType, ImageType, State } from "types";
+import { Category, CategoryType, OldImageType, State } from "types";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
@@ -47,7 +47,7 @@ export const CategoryItem = ({
   const highlightedCategory = useSelector(highlightedCategoriesSelector);
   const selectedCategory = useSelector(selectedCategorySelector);
   const imageCount = useSelector((state: State) => {
-    return state.project.images.filter((image: ImageType) => {
+    return state.project.images.filter((image: OldImageType) => {
       return image.categoryId === category.id;
     }).length;
   });

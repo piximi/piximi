@@ -6,10 +6,10 @@ import { Box, Grid } from "@mui/material";
 import { ImageIconLabel } from "../MainImageGrid/ImageIconLabel";
 
 import { tileSizeSelector, applicationSlice } from "store/application";
-import { ImageType } from "types";
+import { OldImageType } from "types";
 
 type MainImageGridItemProps = {
-  image: ImageType;
+  image: OldImageType;
   selected: boolean;
   selectionColor: string;
   selectedImageBorderWidth: number;
@@ -35,7 +35,7 @@ export const MainImageGridItem = memo(
       };
     };
 
-    const getIconPlacement = (image: ImageType, scaleFactor: number) => {
+    const getIconPlacement = (image: OldImageType, scaleFactor: number) => {
       const imageWidth = image.shape.width;
       const imageHeight = image.shape.height;
       const containerSize = 220 * scaleFactor;
@@ -59,7 +59,7 @@ export const MainImageGridItem = memo(
         : { border: "none" };
     };
 
-    const onSelectImage = (image: ImageType) => {
+    const onSelectImage = (image: OldImageType) => {
       if (selected) {
         dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
       } else {
@@ -67,7 +67,7 @@ export const MainImageGridItem = memo(
       }
     };
 
-    const onContextSelectImage = (image: ImageType) => {
+    const onContextSelectImage = (image: OldImageType) => {
       if (!selected) {
         dispatch(applicationSlice.actions.selectImage({ id: image.id }));
       }

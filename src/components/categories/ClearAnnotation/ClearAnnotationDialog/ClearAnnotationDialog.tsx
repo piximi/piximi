@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Button,
@@ -8,10 +8,11 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { AnnotatorSlice } from "store/annotator";
+import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { projectSlice } from "store/project";
 
 import { Category } from "types";
+import { dataSlice } from "store/data";
 
 type ClearAnnotationDialogProps = {
   category: Category;
@@ -25,13 +26,22 @@ export const ClearAnnotationDialog = ({
   open,
 }: ClearAnnotationDialogProps) => {
   const dispatch = useDispatch();
+  const activeImage = useSelector(activeImageIdSelector);
 
   const onClear = () => {
     dispatch(
       AnnotatorSlice.actions.clearCategoryAnnotations({ category: category })
     );
 
-    dispatch(projectSlice.actions.clearAnnotations({ category: category }));
+    dispatch(
+      projectSlice.actions.clearCategoryAnnotations({ categoryID: category.id })
+    );
+    dispatch(
+      dataSlice.actions.deleteAnnotationsByCategory({
+        imageId: activeImage!,
+        categoryId: category.id,
+      })
+    );
 
     onClose();
   };

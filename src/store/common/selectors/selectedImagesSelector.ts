@@ -1,4 +1,4 @@
-import { Category, ImageType, Project, Settings } from "types";
+import { Category, OldImageType, Project, Settings } from "types";
 
 export const selectedImagesSelector = ({
   project,
@@ -17,7 +17,7 @@ export const selectedImagesSelector = ({
 
   return settings.selectedImages.filter((id: string) => {
     return (
-      project.images.filter((image: ImageType) => {
+      project.images.filter((image: OldImageType) => {
         return (
           id === image.id &&
           visibleCategories.includes(image.categoryId) &&

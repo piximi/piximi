@@ -15,6 +15,9 @@ export {
   updateImageCategories,
   updateImageCategoryFromHighlighted,
   addAnnotationCategories,
+  setProjectImages,
+  deleteAllAnnotationCategories,
+  deleteAnnotationCategory,
 } from "./projectSlice";
 
 // Selectors
@@ -41,3 +44,10 @@ export { unknownCategorySelector } from "./selectors/unknownCategorySelector";
 export { valImagesSelector } from "./selectors/valImagesSelector";
 export { visibleAnnotationCategoriesSelector } from "./selectors/visibleAnnotationCategoriesSelector";
 export { imagesCountSelector } from "./selectors/imagesCountSelector";
+
+// Sagas
+
+export {
+  watchDeleteAllAnnotationCategorySaga,
+  watchDeleteAnnotationCategorySaga,
+} from "./sagas/watchDeleteAnnotationCategorySaga";

@@ -1,11 +1,11 @@
-import { ImageType, Partition, Project } from "types";
+import { OldImageType, Partition, Project } from "types";
 
 export const testImagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<ImageType> => {
-  return project.images.filter((image: ImageType) => {
+}): Array<OldImageType> => {
+  return project.images.filter((image: OldImageType) => {
     return image.partition === Partition.Inference;
   });
 };

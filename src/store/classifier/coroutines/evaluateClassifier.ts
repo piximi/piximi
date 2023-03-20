@@ -12,7 +12,7 @@ import {
 import { Dataset } from "@tensorflow/tfjs-data";
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { Category } from "types/Category";
-import { ImageType } from "../../../types/ImageType";
+import { OldImageType } from "../../../types/ImageType";
 
 export const evaluateClassifier = async (
   model: LayersModel,
@@ -20,7 +20,7 @@ export const evaluateClassifier = async (
     xs: Tensor4D;
     ys: Tensor2D;
   }>,
-  validationImages: ImageType[],
+  validationImages: OldImageType[],
   categories: Category[]
 ): Promise<ClassifierEvaluationResultType> => {
   const categoryIDs = categories.map((c: Category) => c.id);

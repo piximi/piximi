@@ -1,5 +1,5 @@
 export const enum Partition {
-  Training = "Training",
-  Validation = "Validation",
-  Inference = "Inference",
+  Training = "Training", // images to be used for training the model
+  Validation = "Validation", // images to be used for validating a model
+  Inference = "Inference", // images to be used for inference
 }

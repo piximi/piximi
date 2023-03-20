@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   DEFAULT_COLORS,
-  ImageType,
+  OldImageType,
   Partition,
   UNKNOWN_CLASS_CATEGORY_ID,
 } from "types";
@@ -843,7 +843,7 @@ export const convertToImage = async (
     partition: Partition.Inference,
     src: coloredSliceURL,
     visible: true,
-  } as ImageType;
+  } as OldImageType;
 };
 
 /*

@@ -12,13 +12,13 @@ import { categoriesSelector } from "store/project";
 
 import {
   Category,
-  ImageType,
+  OldImageType,
   Partition,
   UNKNOWN_CLASS_CATEGORY_ID,
 } from "types";
 
 type ImageIconLabelProps = {
-  image: ImageType;
+  image: OldImageType;
   placement: { top: string; left: string };
 };
 

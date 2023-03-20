@@ -7,7 +7,7 @@ import {
   ClassifierModelProps,
   DefaultModelProps,
   FitOptions,
-  ImageType,
+  OldImageType,
   PreprocessOptions,
   Project,
   Category,
@@ -74,7 +74,7 @@ const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
   );
 };
 
-const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
+const serializeImages = (imagesGroup: Group, images: Array<OldImageType>) => {
   for (let i = 0; i < images.length; i++) {
     let im = images[i];
     let imGroup = imagesGroup.create_group(im.name);

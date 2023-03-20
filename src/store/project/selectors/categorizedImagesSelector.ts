@@ -1,11 +1,11 @@
-import { ImageType, Project, Partition } from "types";
+import { OldImageType, Project, Partition } from "types";
 
 export const categorizedImagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<ImageType> => {
-  return project.images.filter((image: ImageType) => {
+}): Array<OldImageType> => {
+  return project.images.filter((image: OldImageType) => {
     return image.partition !== Partition.Inference;
   });
 };

@@ -15,7 +15,7 @@ import {
 } from "store/classifier";
 import { valImagesSelector } from "store/common";
 import { createdCategoriesSelector } from "store/project";
-import { AlertStateType, AlertType, Category, ImageType } from "types";
+import { AlertStateType, AlertType, Category, OldImageType } from "types";
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateClassifierSaga({
@@ -81,7 +81,7 @@ export function* evaluateClassifierSaga({
 }
 
 function* runEvaluation(
-  validationImages: Array<ImageType>,
+  validationImages: Array<OldImageType>,
   model: LayersModel,
   categories: Array<Category>
 ) {

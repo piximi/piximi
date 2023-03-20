@@ -30,7 +30,7 @@ import { compile } from "store/common";
 import {
   AlertStateType,
   AlertType,
-  ImageType,
+  OldImageType,
   ModelType,
   Partition,
 } from "types";
@@ -72,7 +72,7 @@ export function* fitClassifierSaga({
     preprocessingOptions.shuffle
       ? shuffle(categorizedImages)
       : categorizedImages
-  ).map((image: ImageType) => {
+  ).map((image: OldImageType) => {
     return image.id;
   });
 

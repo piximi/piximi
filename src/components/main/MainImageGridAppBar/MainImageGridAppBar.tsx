@@ -39,7 +39,7 @@ import {
 import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 import { setActiveImage, AnnotatorSlice } from "store/annotator";
 
-import { HotkeyView, ImageType, ShadowImageType } from "types";
+import { HotkeyView, OldImageType, ShadowImageType } from "types";
 
 export const MainImageGridAppBar = () => {
   const dispatch = useDispatch();
@@ -102,7 +102,7 @@ export const MainImageGridAppBar = () => {
 
   const onOpenAnnotator = () => {
     const selected = selectedImages.map((id: string, idx: number) => {
-      const projectImage = images.find((image: ImageType) => {
+      const projectImage = images.find((image: OldImageType) => {
         return image.id === id;
       });
 

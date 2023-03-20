@@ -24,7 +24,7 @@ import {
   AlertType,
   Category,
   FitOptions,
-  ImageType,
+  OldImageType,
   PreprocessOptions,
   Shape,
 } from "types";
@@ -108,7 +108,7 @@ export function* predictClassifierSaga({
 }
 
 function* runPrediction(
-  testImages: Array<ImageType>,
+  testImages: Array<OldImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,

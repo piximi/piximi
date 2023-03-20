@@ -1,9 +1,9 @@
-import { ImageType, Project } from "types";
+import { OldImageType, Project } from "types";
 
 export const imagesSelector = ({
   project,
 }: {
   project: Project;
-}): Array<ImageType> => {
+}): Array<OldImageType> => {
   return project.images;
 };
