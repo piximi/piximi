@@ -1,3 +1,5 @@
+// TODO: fix
+export const foo = "foo";
 // // import { test } from "@jest/globals";
 // import { v4 as uuidv4 } from "uuid";
 
