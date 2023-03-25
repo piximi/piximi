@@ -12,7 +12,6 @@ import { useDialog, useTranslation } from "hooks";
 
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 
-import { unknownAnnotationCategorySelector } from "store/project";
 import {
   annotatorImagesSelector,
   AnnotatorSlice,
@@ -20,14 +19,10 @@ import {
   stagedAnnotationsSelector,
 } from "store/annotator";
 
-import { ShadowImageType } from "types";
+import { ShadowImageType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
 export const ClearAnnotationsListItem = () => {
   const dispatch = useDispatch();
-
-  const unknownAnnotationCategory = useSelector(
-    unknownAnnotationCategorySelector
-  );
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
@@ -73,7 +68,7 @@ export const ClearAnnotationsListItem = () => {
       );
       dispatch(
         AnnotatorSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: unknownAnnotationCategory.id,
+          selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })
       );

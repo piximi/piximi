@@ -16,16 +16,16 @@ import { decodeFromImgSrc } from "./preprocessSegmenter";
 
 import {
   Category,
-  OldImageType,
   RescaleOptions,
   DecodedAnnotationType,
   ObjectDetectionType,
+  ImageType,
 } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 export const predictCoco = async (
   model: GraphModel,
-  inferenceImages: OldImageType[],
+  inferenceImages: ImageType[],
   createdCategories: Category[],
   possibleClasses: { [key: string]: ObjectDetectionType }
 ): Promise<{

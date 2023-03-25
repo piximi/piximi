@@ -13,6 +13,7 @@ import {
 
 import { classifierSelector } from "store/classifier";
 import { projectSelector } from "store/project";
+import { dataProjectSelector } from "store/data";
 // TODO: implement segmenter serialization
 // import { segmenterSelector } from "store/segmenter";
 
@@ -33,11 +34,12 @@ export const SaveProjectDialog = ({
   const classifier = useSelector(classifierSelector);
 
   const project = useSelector(projectSelector);
+  const data = useSelector(dataProjectSelector);
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
   const onSaveProjectClick = async () => {
-    serialize(projectName, project, classifier)
+    serialize(projectName, project, data, classifier)
       .then((f) => {
         downloader(f, `${projectName}.h5`);
       })

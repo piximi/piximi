@@ -88,8 +88,7 @@ export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotatio
 export { toolTypeSelector } from "./selectors/toolTypeSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
-export { stagedAnnotationObjectsSelector } from "./selectors/stagedAnnotationObjectsSelector";
-export { annotationObjectsSelector } from "./selectors/annotationObjectsSelector";
+export { selectedAnnotationCategoryIdSelector } from "./selectors/selectedAnnotationCategoryIdSelector";
 
 // Sagas
 

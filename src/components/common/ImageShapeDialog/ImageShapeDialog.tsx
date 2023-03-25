@@ -13,7 +13,7 @@ import {
 
 import { CustomNumberTextField } from "components/common/InputFields";
 
-import { applicationSlice } from "store/application";
+import { dataSlice } from "store/data";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
@@ -69,7 +69,7 @@ export const ImageShapeDialog = ({
     setInvalidImageShape(false);
 
     dispatch(
-      applicationSlice.actions.uploadImages({
+      dataSlice.actions.uploadImages({
         files: files,
         channels: channels,
         slices: slices,

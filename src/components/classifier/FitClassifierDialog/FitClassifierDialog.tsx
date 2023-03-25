@@ -24,7 +24,7 @@ import {
   classifierTrainingPercentageSelector,
   classifierSlice,
 } from "store/classifier";
-import { categorizedImagesSelector } from "store/project";
+import { selectInferenceImages } from "store/data";
 
 import {
   AlertStateType,
@@ -67,7 +67,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   >([]);
 
   const currentlyTraining = useSelector(classifierTrainingFlagSelector);
-  const categorizedImages = useSelector(categorizedImagesSelector);
+  const categorizedImages = useSelector(selectInferenceImages);
   const compiledModel = useSelector(classifierCompiledSelector);
   const alertState = useSelector(alertStateSelector);
 

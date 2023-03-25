@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { ListItemText, Menu, MenuItem } from "@mui/material";
 import { saveAs } from "file-saver";
@@ -7,31 +7,20 @@ import JSZip from "jszip";
 
 import { useDialogHotkey, useMenu } from "hooks";
 
-import {
-  encodeAnnotations,
-  serializeCOCOFile,
-  serializeProject,
-} from "utils/annotator";
+import { serializeCOCOFile, serializeProject } from "utils/annotator";
 import {
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
   saveAnnotationsAsLabelMatrix,
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import {
-  annotationCategoriesSelector,
-  projectNameSelector,
-} from "store/project";
-import {
-  annotatorImagesSelector,
-  activeImageIdSelector,
-  setImageInstances,
-  stagedAnnotationsSelector,
-} from "store/annotator";
+import { projectNameSelector } from "store/project";
+import { selectAllCategories, selectAllAnnotationCategories } from "store/data";
+import { annotatorImagesSelector } from "store/annotator";
 
 import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 
-import { AnnotationExportType, DecodedAnnotationType, HotkeyView } from "types";
+import { AnnotationExportType, HotkeyView } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -72,13 +61,10 @@ const exportOptions = [
 ];
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
-  const dispatch = useDispatch();
-
-  const activeImageId = useSelector(activeImageIdSelector);
   const images = useSelector(annotatorImagesSelector);
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-  const annotationCategories = useSelector(annotationCategoriesSelector);
-  const categories = useSelector(annotationCategoriesSelector);
+
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
+  const categories = useSelector(selectAllCategories);
   const projectName = useSelector(projectNameSelector);
 
   const {
@@ -99,16 +85,6 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
     onSubMenuClose();
     onClose();
   }, [onCloseSaveAnnotatorDialog, onSubMenuClose, onClose]);
-
-  useEffect(() => {
-    const doEncoding = async (annotations: Array<DecodedAnnotationType>) => {
-      const encoded = await encodeAnnotations(annotations);
-      dispatch(
-        setImageInstances({ instances: encoded, imageId: activeImageId! })
-      );
-    };
-    open && doEncoding(stagedAnnotations);
-  }, [dispatch, open, stagedAnnotations, activeImageId]);
 
   const [onProjectName, setOnProjectName] = useState<
     ((userProjectName: string) => void) | null

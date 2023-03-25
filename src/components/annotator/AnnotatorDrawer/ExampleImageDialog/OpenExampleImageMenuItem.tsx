@@ -2,7 +2,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
-import { projectSlice } from "store/project";
+import { dataSlice } from "store/data";
 import { activeImageIdSelector, AnnotatorSlice } from "store/annotator";
 
 import { SerializedFileType } from "types";
@@ -41,18 +41,20 @@ export const OpenExampleImageMenuItem = ({
   const openExampleImage = async () => {
     onClose();
 
-    const { image, categories } = await loadExampleImage(
+    const { image, annotationCategories } = await loadExampleImage(
       exampleImageProject.exampleImageData,
       exampleImageProject.exampleImageAnnotationsFile as SerializedFileType,
       exampleImageProject.exampleImageName
     );
 
     // TODO: BIG_MERGE - check if this is still correct
-    dispatch(projectSlice.actions.addAnnotationCategories({ categories }));
+    dispatch(
+      dataSlice.actions.addAnnotationCategories({ annotationCategories })
+    );
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.addImages({
-          newImages: [image],
+        dataSlice.actions.addImages({
+          images: [image],
         })
       );
       dispatch(

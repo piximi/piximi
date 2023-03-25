@@ -31,21 +31,21 @@ import { DeleteImagesDialog } from "../DeleteImagesDialog";
 import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
 import {
-  applicationSlice,
   hotkeyViewSelector,
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { visibleImagesSelector, selectedImagesSelector } from "store/common";
+import { projectSlice, selectedImagesSelector } from "store/project";
+import { selectVisibleImages } from "store/data";
 import { setActiveImage, AnnotatorSlice } from "store/annotator";
 
-import { HotkeyView, OldImageType, ShadowImageType } from "types";
+import { HotkeyView, ImageType, ShadowImageType } from "types";
 
 export const MainImageGridAppBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const images = useSelector(visibleImagesSelector);
+  const images = useSelector(selectVisibleImages);
   const selectedImages: Array<string> = useSelector(selectedImagesSelector);
   const currentHotkeyView = useSelector(hotkeyViewSelector);
 
@@ -102,7 +102,7 @@ export const MainImageGridAppBar = () => {
 
   const onOpenAnnotator = () => {
     const selected = selectedImages.map((id: string, idx: number) => {
-      const projectImage = images.find((image: OldImageType) => {
+      const projectImage = images.find((image: ImageType) => {
         return image.id === id;
       });
 
@@ -120,7 +120,7 @@ export const MainImageGridAppBar = () => {
       const annotatorImage: ShadowImageType = {
         id: projectImage.id,
         name: projectImage.name,
-        annotations: projectImage.annotations,
+        annotations: [],
         src: projectImage.src,
         activePlane: projectImage.activePlane,
         shape: projectImage.shape,
@@ -158,12 +158,12 @@ export const MainImageGridAppBar = () => {
   const selectAllImages = () => {
     setShowSelectAllButton(false);
     const newSelected = images.map((image) => image.id);
-    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
+    dispatch(projectSlice.actions.selectAllImages({ ids: newSelected }));
   };
 
   const unselectImages = () => {
     setShowSelectAllButton(true);
-    dispatch(applicationSlice.actions.clearSelectedImages());
+    dispatch(projectSlice.actions.clearSelectedImages());
   };
 
   useHotkeys("esc", () => unselectImages(), HotkeyView.MainImageGridAppBar);

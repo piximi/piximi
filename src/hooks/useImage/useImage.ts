@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
-import { imagesSelector } from "store/project";
+import { selectAllImages } from "store/data";
 
 export const useImage = () => {
-  const image = useSelector(imagesSelector)[0];
+  const image = useSelector(selectAllImages)[0];
 
   if (!image || !image.shape) return;
 

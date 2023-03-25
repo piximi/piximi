@@ -3,11 +3,12 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
+
 import {
-  projectSlice,
-  annotationCategoriesSelector,
-  unannotatedImagesSelector,
-} from "store/project";
+  dataSlice,
+  selectUnannotatedImages,
+  selectAnnotationCategories,
+} from "store/data";
 import {
   segmenterInputShapeSelector,
   segmenterPreprocessOptionsSelector,
@@ -22,7 +23,6 @@ import {
   AlertType,
   Category,
   FitOptions,
-  OldImageType,
   Partition,
   PreprocessOptions,
   Shape,
@@ -30,6 +30,7 @@ import {
   ObjectDetectionType,
   ModelType,
   DecodedAnnotationType,
+  ImageType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 import CLASSES from "data/model-data/cocossd-classes";
@@ -44,8 +45,8 @@ export function* predictSegmenterSaga({
 }: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
   // inferenceImages: images from projectSlice that do not contain any annotations
-  const inferenceImages: ReturnType<typeof unannotatedImagesSelector> =
-    yield select(unannotatedImagesSelector);
+  const inferenceImages: ReturnType<typeof selectUnannotatedImages> =
+    yield select(selectUnannotatedImages);
 
   if (!inferenceImages.length) {
     yield put(
@@ -67,15 +68,16 @@ export function* predictSegmenterSaga({
 
   // assign each of the inference images to the validation partition
   yield put(
-    projectSlice.actions.updateSegmentationImagesPartition({
-      ids: inferenceImages.map((image) => image.id),
-      partition: Partition.Validation,
+    dataSlice.actions.updateSegmentationImagesPartition({
+      imageIdsByPartition: {
+        [Partition.Validation]: inferenceImages.map((image) => image.id),
+      },
     })
   );
 
   //   annotationCategories: the annotation categories in the project slice
-  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
-    yield select(annotationCategoriesSelector);
+  const annotationCategories: ReturnType<typeof selectAnnotationCategories> =
+    yield select(selectAnnotationCategories);
   const createdCategories = annotationCategories.filter((category) => {
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
@@ -134,7 +136,7 @@ export function* predictSegmenterSaga({
 }
 
 function* runSegmentationPrediction(
-  inferenceImages: Array<OldImageType>,
+  inferenceImages: Array<ImageType>,
   categories: Array<Category>,
   createdCategories: Array<Category>,
   inputShape: Shape,
@@ -234,7 +236,7 @@ function* runSegmentationPrediction(
   while (index < foundCategories.length) {
     const foundCat = foundCategories[index];
     yield put(
-      projectSlice.actions.createAnnotationCategory({
+      dataSlice.actions.createAnnotationCategory({
         name: foundCat.name,
         color: foundCat.color,
         id: foundCat.id,
@@ -245,7 +247,7 @@ function* runSegmentationPrediction(
   index = 0;
   while (index < predictedAnnotations.length) {
     yield put(
-      projectSlice.actions.updateImageAnnotations({
+      dataSlice.actions.updateImageAnnotations({
         imageId: predictedAnnotations[index].imageId,
         annotations: predictedAnnotations[index].annotations,
       })

@@ -19,8 +19,7 @@ export type DataStoreSlice = {
   images: { ids: Array<ImageID>; entities: ImagesEntityType };
 
   annotations: EntityState<EncodedAnnotationType>;
-  lookup: Record<
-    CatID,
-    Record<ImageID, Record<AnnotationCatID, Array<AnnotationID>>>
-  >;
+  annotationsByImage: Record<ImageID, Array<AnnotationID>>;
+  annotationsByCategory: Record<AnnotationCatID, Array<AnnotationID>>;
+  imagesByCategory: Record<CatID, Array<ImageID>>;
 };

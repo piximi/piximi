@@ -13,10 +13,7 @@ import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import {
-  createdAnnotatorCategoriesSelector,
-  unknownAnnotationCategorySelector,
-} from "store/project";
+import { selectCreatedAnnotatorCategories } from "store/data";
 
 import {
   segmenterArchitectureOptionsSelector,
@@ -24,12 +21,17 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import { CategoryType, HotkeyView, ModelType, Shape } from "types";
+import {
+  CategoryType,
+  HotkeyView,
+  ModelType,
+  Shape,
+  UNKNOWN_ANNOTATION_CATEGORY,
+} from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
-  const categories = useSelector(createdAnnotatorCategoriesSelector);
-  const unknownCategory = useSelector(unknownAnnotationCategorySelector);
+  const categories = useSelector(selectCreatedAnnotatorCategories);
   const fittedSegmenter = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
     segmenterArchitectureOptionsSelector
@@ -104,7 +106,7 @@ export const SegmenterList = () => {
         <>
           <CategoriesList
             createdCategories={categories}
-            unknownCategory={unknownCategory}
+            unknownCategory={UNKNOWN_ANNOTATION_CATEGORY}
             predicted={false}
             categoryType={CategoryType.AnnotationCategory}
             onCategoryClickCallBack={() => {

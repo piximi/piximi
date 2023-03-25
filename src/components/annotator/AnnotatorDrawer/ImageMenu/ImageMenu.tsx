@@ -7,7 +7,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { annotationCategoriesSelector } from "store/project";
+import { dataSlice, selectAllCategories } from "store/data";
 import {
   activeImageSelector,
   annotatorImagesSelector,
@@ -22,7 +22,6 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
-import { dataSlice } from "store/data";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -39,7 +38,7 @@ export const ImageMenu = ({
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(annotationCategoriesSelector);
+  const annotationCategories = useSelector(selectAllCategories);
   const images = useSelector(annotatorImagesSelector);
   const activeImage = useSelector(activeImageSelector);
 
@@ -48,12 +47,14 @@ export const ImageMenu = ({
   ) => {
     if (!selectedImage) return;
     dispatch(
-      AnnotatorSlice.actions.deleteAllImageAnnotations({
+      dataSlice.actions.deleteAllAnnotationsByImage({
         imageId: selectedImage.id,
       })
     );
     dispatch(
-      dataSlice.actions.deleteAllAnnotations({ imageId: selectedImage.id })
+      dataSlice.actions.deleteAllAnnotationsByImage({
+        imageId: selectedImage.id,
+      })
     );
     onCloseImageMenu(event);
   };
@@ -86,7 +87,12 @@ export const ImageMenu = ({
         );
       }
 
-      dispatch(AnnotatorSlice.actions.deleteImage({ id: selectedImage.id }));
+      dispatch(
+        dataSlice.actions.deleteImages({
+          imageIds: [selectedImage.id],
+          disposeColorTensors: true,
+        })
+      );
     });
 
     onCloseImageMenu(event);

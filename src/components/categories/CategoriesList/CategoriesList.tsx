@@ -19,6 +19,7 @@ type CategoriesListProps = {
   onCategoryClickCallBack: (category: Category) => void;
 };
 
+// TODO: Make background white
 export const CategoriesList = (props: CategoriesListProps) => {
   const {
     createdCategories: categories,

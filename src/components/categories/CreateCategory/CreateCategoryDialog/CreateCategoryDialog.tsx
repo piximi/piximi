@@ -18,13 +18,12 @@ import { useHotkeys } from "hooks";
 import { ColorIcon } from "components/common/ColorIcon";
 
 import {
-  availableColorsSelector,
-  categoriesSelector,
-  createAnnotationCategory,
-  createCategory,
-} from "store/project";
+  dataSlice,
+  selectAllCategories,
+  selectUnusedCategoryColors,
+} from "store/data";
 
-import { Category, CategoryType, HotkeyView } from "types";
+import { CategoryType, HotkeyView } from "types";
 
 type CreateCategoryDialogProps = {
   categoryType: CategoryType;
@@ -39,10 +38,8 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const availableColors = useSelector(availableColorsSelector);
-  const usedCategoryNames = useSelector(categoriesSelector).map(
-    (category: Category) => category.name
-  );
+  const availableColors = useSelector(selectUnusedCategoryColors);
+  const usedCategory = useSelector(selectAllCategories);
 
   const [color, setColor] = useState<string>(sample(availableColors)!);
   const [name, setName] = useState<string>("");
@@ -61,9 +58,16 @@ export const CreateCategoryDialog = ({
   const onCreate = () => {
     if (validateInput(name)) {
       if (categoryType === CategoryType.ClassifierCategory) {
-        dispatch(createCategory({ name: name, color: color }));
+        dispatch(
+          dataSlice.actions.createCategory({ name: name, color: color })
+        );
       } else {
-        dispatch(createAnnotationCategory({ name: name, color: color }));
+        dispatch(
+          dataSlice.actions.createAnnotationCategory({
+            name: name,
+            color: color,
+          })
+        );
       }
 
       onCloseDialog();
@@ -87,7 +91,9 @@ export const CreateCategoryDialog = ({
     if (categoryName === "") {
       helperText = "Please type a category name.";
       validInput = false;
-    } else if (usedCategoryNames.includes(categoryName)) {
+    } else if (
+      usedCategory.map((category) => category.name).includes(categoryName)
+    ) {
       helperText =
         "Category names must be unique. A category with this name already exits.";
       validInput = false;

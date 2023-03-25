@@ -5,11 +5,12 @@ import { Box, Grid } from "@mui/material";
 
 import { ImageIconLabel } from "../MainImageGrid/ImageIconLabel";
 
-import { tileSizeSelector, applicationSlice } from "store/application";
-import { OldImageType } from "types";
+import { tileSizeSelector } from "store/application";
+import { projectSlice } from "store/project";
+import { ImageType } from "types";
 
 type MainImageGridItemProps = {
-  image: OldImageType;
+  image: ImageType;
   selected: boolean;
   selectionColor: string;
   selectedImageBorderWidth: number;
@@ -35,7 +36,7 @@ export const MainImageGridItem = memo(
       };
     };
 
-    const getIconPlacement = (image: OldImageType, scaleFactor: number) => {
+    const getIconPlacement = (image: ImageType, scaleFactor: number) => {
       const imageWidth = image.shape.width;
       const imageHeight = image.shape.height;
       const containerSize = 220 * scaleFactor;
@@ -51,6 +52,7 @@ export const MainImageGridItem = memo(
     };
 
     const getSelectionStatus = () => {
+      // TODO: Change to always have border so image sie doesnt change
       return selected
         ? {
             border: `solid ${selectedImageBorderWidth}px ${selectionColor}`,
@@ -59,17 +61,17 @@ export const MainImageGridItem = memo(
         : { border: "none" };
     };
 
-    const onSelectImage = (image: OldImageType) => {
+    const onSelectImage = (image: ImageType) => {
       if (selected) {
-        dispatch(applicationSlice.actions.deselectImage({ id: image.id }));
+        dispatch(projectSlice.actions.deselectImage({ id: image.id }));
       } else {
-        dispatch(applicationSlice.actions.selectImage({ id: image.id }));
+        dispatch(projectSlice.actions.selectImage({ id: image.id }));
       }
     };
 
-    const onContextSelectImage = (image: OldImageType) => {
+    const onContextSelectImage = (image: ImageType) => {
       if (!selected) {
-        dispatch(applicationSlice.actions.selectImage({ id: image.id }));
+        dispatch(projectSlice.actions.selectImage({ id: image.id }));
       }
     };
 

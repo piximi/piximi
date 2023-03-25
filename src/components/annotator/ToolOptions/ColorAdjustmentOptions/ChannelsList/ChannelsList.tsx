@@ -18,7 +18,7 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
 
-import { imageBitDepthSelector, imageDataSelector } from "store/common";
+import { selectActiveImageBitDepth, selectActiveImageData } from "store/data";
 
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 
@@ -28,9 +28,9 @@ import { useLocalGlobalState } from "hooks";
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 
-  const imageData = useSelector(imageDataSelector);
+  const imageData = useSelector(selectActiveImageData);
 
-  const imageBitDepth = useSelector(imageBitDepthSelector);
+  const imageBitDepth = useSelector(selectActiveImageBitDepth);
 
   const {
     localState: localActiveImageColors,
@@ -110,7 +110,7 @@ export const ChannelsList = () => {
           key={index}
           disabled={!isVisible}
           sx={{
-            width: "50%",
+            "width": "50%",
             "& .MuiSlider-track": {
               color: (theme) =>
                 isVisible

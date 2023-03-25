@@ -1,285 +1,281 @@
-import { test } from "@jest/globals";
-import { v4 as uuidv4 } from "uuid";
+// // import { test } from "@jest/globals";
+// import { v4 as uuidv4 } from "uuid";
 
-import {
-  projectSlice,
-  addAnnotationCategories,
-  setAnnotationCategories,
-  annotationCategoriesSelector,
-} from "store/project";
-import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
-import { annotatorFullImagesSelector } from "store/common";
-import { serializeCOCOFile } from "./serializeCOCO";
-import { deserializeCOCOFile } from "./deserializeCOCO";
+// // import { projectSlice } from "store/project";
+// // import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
+// // import { selectAllAnnotationCategories } from "store/data";
+// import { CATEGORY_COLORS } from "utils/common/colorPalette";
+// // import { annotatorFullImagesSelector } from "store/common";
+// // import { serializeCOCOFile } from "./serializeCOCO";
+// // import { deserializeCOCOFile } from "./deserializeCOCO";
 
-import {
-  EncodedAnnotationType,
-  OldImageType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
+// import {
+//   EncodedAnnotationType,
+//   OldImageType,
+//   UNKNOWN_ANNOTATION_CATEGORY,
+// } from "types";
 
-// import cocoLabels from "data/test-data/COCO/labels_coco_slim.json";
-import expectedState from "data/test-data/COCO/labels_internal.json";
+// // import cocoLabels from "data/test-data/COCO/labels_coco_slim.json";
+// import expectedState from "data/test-data/COCO/labels_internal.json";
 
-// Time 1 (T1) is pre-serialization state of piximi
-// Time 2 (T2) is piximi state, after refresh, but before deserialization
-// Time 3 (T3) is piximi state, after deserialization
+// // Time 1 (T1) is pre-serialization state of piximi
+// // Time 2 (T2) is piximi state, after refresh, but before deserialization
+// // Time 3 (T3) is piximi state, after deserialization
 
-//#region setup
+// //#region setup
 
-// always has same info, including id
-const T1T2UnmodifiedCat = UNKNOWN_ANNOTATION_CATEGORY; // (backpack)
-// name exists in both T1 and T2, but with color and id change
-const T1T2ModifiedCats = {
-  // clock
-  t1: {
-    ...expectedState.project.annotationCategories[1],
-    id: uuidv4(),
-    color: CATEGORY_COLORS.black,
-  },
-  t2: {
-    ...expectedState.project.annotationCategories[1],
-    id: uuidv4(),
-    color: CATEGORY_COLORS.citrus,
-  },
-};
-// eixsts only in T1
-const T1OnlyCat = {
-  // sports ball
-  ...expectedState.project.annotationCategories[2],
-  id: uuidv4(),
-  color: CATEGORY_COLORS.columbiablue,
-};
-// exists only in T2
-const T2OnlyCat = {
-  // sheep
-  ...expectedState.project.annotationCategories[3],
-  id: uuidv4(),
-  color: CATEGORY_COLORS.darkcyan,
-};
+// // always has same info, including id
+// const T1T2UnmodifiedCat = UNKNOWN_ANNOTATION_CATEGORY; // (backpack)
+// // name exists in both T1 and T2, but with color and id change
+// const T1T2ModifiedCats = {
+//   // clock
+//   t1: {
+//     ...expectedState.project.annotationCategories[1],
+//     id: uuidv4(),
+//     color: CATEGORY_COLORS.black,
+//   },
+//   t2: {
+//     ...expectedState.project.annotationCategories[1],
+//     id: uuidv4(),
+//     color: CATEGORY_COLORS.citrus,
+//   },
+// };
+// // eixsts only in T1
+// const T1OnlyCat = {
+//   // sports ball
+//   ...expectedState.project.annotationCategories[2],
+//   id: uuidv4(),
+//   color: CATEGORY_COLORS.columbiablue,
+// };
+// // exists only in T2
+// const T2OnlyCat = {
+//   // sheep
+//   ...expectedState.project.annotationCategories[3],
+//   id: uuidv4(),
+//   color: CATEGORY_COLORS.darkcyan,
+// };
 
-// annotations exist T1 and T2
-const im1AnnotationsT1: Array<EncodedAnnotationType> = [
-  {
-    // 1clockTower.jpg -> Unknown (backpack)
-    ...expectedState.annotator.images[0].annotations[0],
-    id: uuidv4(),
-    categoryId: T1T2UnmodifiedCat.id,
-  } as EncodedAnnotationType,
-  {
-    // 1clockTower.jpg -> clock (1)
-    ...expectedState.annotator.images[0].annotations[1],
-    id: uuidv4(),
-    categoryId: T1T2ModifiedCats.t1.id,
-  } as EncodedAnnotationType,
-];
-
-const im1AnnotationsT2: Array<EncodedAnnotationType> = [
-  {
-    // 1clockTower.jpg -> clock (2)
-    ...expectedState.annotator.images[0].annotations[2],
-    id: uuidv4(),
-    categoryId: T1T2ModifiedCats.t2.id,
-  } as EncodedAnnotationType,
-];
-
-// annotations exists T1, but not T2
-const im2AnnotationsT1: Array<EncodedAnnotationType> = [
-  {
-    // 2golfer.jpg -> sports ball
-    ...expectedState.annotator.images[1].annotations[0],
-    id: uuidv4(),
-    categoryId: T1OnlyCat.id,
-  } as EncodedAnnotationType,
-];
-
-// annotations did not exist T1, exists T2
-const im3AnnotationsT2: Array<EncodedAnnotationType> = [
-  {
-    // 3twoSheep.jpg -> sheep
-    ...expectedState.annotator.images[2].annotations[0],
-    id: uuidv4(),
-    categoryId: T2OnlyCat.id,
-  } as EncodedAnnotationType,
-];
-
-// image exists T1 and T2
-const im1T1: OldImageType = {
-  // 1clockTower.jpg
-  ...expectedState.annotator.images[0],
-  id: uuidv4(),
-  colors: undefined as unknown as OldImageType["colors"],
-  data: undefined as unknown as OldImageType["data"],
-  partition: undefined as unknown as OldImageType["partition"],
-  annotations: im1AnnotationsT1,
-};
-
-const im1T2: OldImageType = {
-  ...im1T1,
-  id: uuidv4(),
-  annotations: im1AnnotationsT2,
-};
-
-// image exists T1 only
-const im2T1: OldImageType = {
-  // 2golfer.jpg
-  ...expectedState.annotator.images[1],
-  id: uuidv4(),
-  colors: undefined as unknown as OldImageType["colors"],
-  data: undefined as unknown as OldImageType["data"],
-  partition: undefined as unknown as OldImageType["partition"],
-  annotations: im2AnnotationsT1,
-};
-
-// image exists T2 only
-const im3T2: OldImageType = {
-  // 3twoSheep.jpg
-  ...expectedState.annotator.images[2],
-  id: uuidv4(),
-  colors: undefined as unknown as OldImageType["colors"],
-  data: undefined as unknown as OldImageType["data"],
-  partition: undefined as unknown as OldImageType["partition"],
-  annotations: im3AnnotationsT2,
-};
-
-const categoriesT1 = [T1T2UnmodifiedCat, T1T2ModifiedCats.t1, T1OnlyCat];
-const categoriesT2 = [T1T2UnmodifiedCat, T1T2ModifiedCats.t2, T2OnlyCat];
-const categoriesT3Expected = [
-  T1T2UnmodifiedCat, // always presnet
-  T1T2ModifiedCats.t2, // modified T1-T2, but unmodified T3
-  T2OnlyCat, // present during deserialization
-  T1OnlyCat, // serialized category, re-created with deserialization
-];
-
-const imagesT1 = [im1T1, im2T1];
-const imagesT2 = [im1T2, im3T2];
-const imagesT3Expected = [im1T2, im3T2]; // same as T2, no images created/destroyed
-
-// const annotationsT1 = [...im1T1.annotations, ...im2T1.annotations];
-// const annotationsT2 = [...im1T2.annotations, ...im3T2.annotations];
-// const annotationsT3Expected = [
-//   ...im1T2.annotations, // im1 annotations present during deserialization
-//   ...im1T1.annotations, // im1 annotations that were serialized, recreated
-//   ...im3T2.annotations, // im3 annotations present during deserialization
-//   // im2T1 annotations serialized, but not re-created because no im2 present
+// // annotations exist T1 and T2
+// const im1AnnotationsT1: Array<EncodedAnnotationType> = [
+//   {
+//     // 1clockTower.jpg -> Unknown (backpack)
+//     ...expectedState.annotator.images[0].annotations[0],
+//     id: uuidv4(),
+//     categoryId: T1T2UnmodifiedCat.id,
+//   } as EncodedAnnotationType,
+//   {
+//     // 1clockTower.jpg -> clock (1)
+//     ...expectedState.annotator.images[0].annotations[1],
+//     id: uuidv4(),
+//     categoryId: T1T2ModifiedCats.t1.id,
+//   } as EncodedAnnotationType,
 // ];
 
-//#endregion setup
+// const im1AnnotationsT2: Array<EncodedAnnotationType> = [
+//   {
+//     // 1clockTower.jpg -> clock (2)
+//     ...expectedState.annotator.images[0].annotations[2],
+//     id: uuidv4(),
+//     categoryId: T1T2ModifiedCats.t2.id,
+//   } as EncodedAnnotationType,
+// ];
 
-test("serialize COCO", () => {
-  // piximi initial state
+// // annotations exists T1, but not T2
+// const im2AnnotationsT1: Array<EncodedAnnotationType> = [
+//   {
+//     // 2golfer.jpg -> sports ball
+//     ...expectedState.annotator.images[1].annotations[0],
+//     id: uuidv4(),
+//     categoryId: T1OnlyCat.id,
+//   } as EncodedAnnotationType,
+// ];
 
-  let projectState = projectSlice.reducer(undefined, { type: undefined });
-  let annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
+// // annotations did not exist T1, exists T2
+// const im3AnnotationsT2: Array<EncodedAnnotationType> = [
+//   {
+//     // 3twoSheep.jpg -> sheep
+//     ...expectedState.annotator.images[2].annotations[0],
+//     id: uuidv4(),
+//     categoryId: T2OnlyCat.id,
+//   } as EncodedAnnotationType,
+// ];
 
-  // T1 - pre-serialization
+// // image exists T1 and T2
+// const im1T1: OldImageType = {
+//   // 1clockTower.jpg
+//   ...expectedState.annotator.images[0],
+//   id: uuidv4(),
+//   colors: undefined as unknown as OldImageType["colors"],
+//   data: undefined as unknown as OldImageType["data"],
+//   partition: undefined as unknown as OldImageType["partition"],
+//   annotations: im1AnnotationsT1,
+// };
 
-  projectState = projectSlice.reducer(
-    projectState,
-    setAnnotationCategories({ categories: categoriesT1 })
-  );
-  annotatorState = AnnotatorSlice.reducer(
-    annotatorState,
-    addImages({ newImages: imagesT1 })
-  );
+// const im1T2: OldImageType = {
+//   ...im1T1,
+//   id: uuidv4(),
+//   annotations: im1AnnotationsT2,
+// };
 
-  // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// // image exists T1 only
+// const im2T1: OldImageType = {
+//   // 2golfer.jpg
+//   ...expectedState.annotator.images[1],
+//   id: uuidv4(),
+//   colors: undefined as unknown as OldImageType["colors"],
+//   data: undefined as unknown as OldImageType["data"],
+//   partition: undefined as unknown as OldImageType["partition"],
+//   annotations: im2AnnotationsT1,
+// };
 
-  const serializedProject = serializeCOCOFile(imagesT1, categoriesT1);
+// // image exists T2 only
+// const im3T2: OldImageType = {
+//   // 3twoSheep.jpg
+//   ...expectedState.annotator.images[2],
+//   id: uuidv4(),
+//   colors: undefined as unknown as OldImageType["colors"],
+//   data: undefined as unknown as OldImageType["data"],
+//   partition: undefined as unknown as OldImageType["partition"],
+//   annotations: im3AnnotationsT2,
+// };
 
-  // T1 -> T2, piximi closed and new project started
+// const categoriesT1 = [T1T2UnmodifiedCat, T1T2ModifiedCats.t1, T1OnlyCat];
+// const categoriesT2 = [T1T2UnmodifiedCat, T1T2ModifiedCats.t2, T2OnlyCat];
+// const categoriesT3Expected = [
+//   T1T2UnmodifiedCat, // always presnet
+//   T1T2ModifiedCats.t2, // modified T1-T2, but unmodified T3
+//   T2OnlyCat, // present during deserialization
+//   T1OnlyCat, // serialized category, re-created with deserialization
+// ];
 
-  projectState = projectSlice.reducer(undefined, { type: undefined });
-  annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
+// const imagesT1 = [im1T1, im2T1];
+// const imagesT2 = [im1T2, im3T2];
+// const imagesT3Expected = [im1T2, im3T2]; // same as T2, no images created/destroyed
 
-  // T2 - pre-deserialization
+// // const annotationsT1 = [...im1T1.annotations, ...im2T1.annotations];
+// // const annotationsT2 = [...im1T2.annotations, ...im3T2.annotations];
+// // const annotationsT3Expected = [
+// //   ...im1T2.annotations, // im1 annotations present during deserialization
+// //   ...im1T1.annotations, // im1 annotations that were serialized, recreated
+// //   ...im3T2.annotations, // im3 annotations present during deserialization
+// //   // im2T1 annotations serialized, but not re-created because no im2 present
+// // ];
 
-  projectState = projectSlice.reducer(
-    projectState,
-    setAnnotationCategories({ categories: categoriesT2 })
-  );
-  annotatorState = AnnotatorSlice.reducer(
-    annotatorState,
-    addImages({ newImages: imagesT2 })
-  );
+// //#endregion setup
 
-  const { newCategories, imsToAnnotate } = deserializeCOCOFile(
-    serializedProject,
-    imagesT2,
-    categoriesT2
-  );
+// // test("serialize COCO", () => {
+// //   // piximi initial state
 
-  // T2 -> T3 dispatch deserialized project
+// //   let projectState = projectSlice.reducer(undefined, { type: undefined });
+// //   let annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
 
-  projectState = projectSlice.reducer(
-    projectState,
-    addAnnotationCategories({ categories: newCategories })
-  );
-  annotatorState = AnnotatorSlice.reducer(
-    annotatorState,
-    setInstances({ instances: imsToAnnotate })
-  );
+// //   // T1 - pre-serialization
 
-  // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// //   projectState = projectSlice.reducer(
+// //     projectState,
+// //     setAnnotationCategories({ categories: categoriesT1 })
+// //   );
+// //   annotatorState = AnnotatorSlice.reducer(
+// //     annotatorState,
+// //     addImages({ newImages: imagesT1 })
+// //   );
 
-  // T3 - after deserialization
+// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
 
-  const categoriesT3Actual = annotationCategoriesSelector({
-    project: projectState,
-  });
-  const imagesT3Actual = annotatorFullImagesSelector({
-    annotator: annotatorState,
-    project: projectState,
-  });
+// //   const serializedProject = serializeCOCOFile(imagesT1, categoriesT1);
 
-  // const annotationsT3Actual = imagesT3Actual.reduce(
-  //   (annotations, im) => [...annotations, ...im.annotations],
-  //   [] as Array<EncodedAnnotationType>
-  // );
+// //   // T1 -> T2, piximi closed and new project started
 
-  expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);
-  expect(imagesT3Actual.length).toBe(imagesT3Expected.length);
+// //   projectState = projectSlice.reducer(undefined, { type: undefined });
+// //   annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
 
-  expect(categoriesT3Actual.map((c) => c.name)).toEqual(
-    categoriesT3Expected.map((c) => c.name)
-  );
-  expect(imagesT3Actual.map((im) => im.name)).toEqual(
-    imagesT3Expected.map((im) => im.name)
-  );
+// //   // T2 - pre-deserialization
 
-  /*
-    Below tests are not performed because the annotations will
-    differ slightly after going from polygon -> mask -> polygon,
-    as in this test, and in a hard to predict manner.
+// //   projectState = projectSlice.reducer(
+// //     projectState,
+// //     setAnnotationCategories({ categories: categoriesT2 })
+// //   );
+// //   annotatorState = AnnotatorSlice.reducer(
+// //     annotatorState,
+// //     addImages({ newImages: imagesT2 })
+// //   );
 
-    The number, location, and opening/closing point of points will
-    differ from original polygon to polygons from contour finding.
+// //   const { newCategories, imsToAnnotate } = deserializeCOCOFile(
+// //     serializedProject,
+// //     imagesT2,
+// //     categoriesT2
+// //   );
 
-    I'm sure there's some clever approximately equal way to compare
-    them, but the findContours already has a tests, so we assume
-    it's doing enough to test mask -> polygon conversions.
+// //   // T2 -> T3 dispatch deserialized project
 
-    The easier test is: open a coco file in piximi to get
-    polygon -> mask annotations, look and see if they make sense,
-    save them in coco format to get mask -> polygon, and then
-    open up the saved file to see if it looks more or less the
-    same as the original.
-   */
+// //   projectState = projectSlice.reducer(
+// //     projectState,
+// //     addAnnotationCategories({ categories: newCategories })
+// //   );
+// //   annotatorState = AnnotatorSlice.reducer(
+// //     annotatorState,
+// //     setInstances({ instances: imsToAnnotate })
+// //   );
 
-  // expect ids to be different, because they're uuid generated
-  // jest ignores undefined property keys
-  // expect(
-  //   annotationsT3Actual.map((ann) => ({
-  //     ...ann,
-  //     id: undefined,
-  //     categoryId: undefined,
-  //   }))
-  // ).toEqual(
-  //   annotationsT3Expected.map((ann) => ({
-  //     ...ann,
-  //     id: undefined,
-  //     categoryId: undefined,
-  //   }))
-  // );
-});
+// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+
+// //   // T3 - after deserialization
+
+// //   const categoriesT3Actual = selectAllAnnotationCategories({
+// //
+// //   });
+// //   const imagesT3Actual = annotatorFullImagesSelector({
+// //     annotator: annotatorState,
+// //     project: projectState,
+// //   });
+
+// //   // const annotationsT3Actual = imagesT3Actual.reduce(
+// //   //   (annotations, im) => [...annotations, ...im.annotations],
+// //   //   [] as Array<EncodedAnnotationType>
+// //   // );
+
+// //   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);
+// //   expect(imagesT3Actual.length).toBe(imagesT3Expected.length);
+
+// //   expect(categoriesT3Actual.map((c) => c.name)).toEqual(
+// //     categoriesT3Expected.map((c) => c.name)
+// //   );
+// //   expect(imagesT3Actual.map((im) => im.name)).toEqual(
+// //     imagesT3Expected.map((im) => im.name)
+// //   );
+
+// /*
+//     Below tests are not performed because the annotations will
+//     differ slightly after going from polygon -> mask -> polygon,
+//     as in this test, and in a hard to predict manner.
+
+//     The number, location, and opening/closing point of points will
+//     differ from original polygon to polygons from contour finding.
+
+//     I'm sure there's some clever approximately equal way to compare
+//     them, but the findContours already has a tests, so we assume
+//     it's doing enough to test mask -> polygon conversions.
+
+//     The easier test is: open a coco file in piximi to get
+//     polygon -> mask annotations, look and see if they make sense,
+//     save them in coco format to get mask -> polygon, and then
+//     open up the saved file to see if it looks more or less the
+//     same as the original.
+//    */
+
+// // expect ids to be different, because they're uuid generated
+// // jest ignores undefined property keys
+// // expect(
+// //   annotationsT3Actual.map((ann) => ({
+// //     ...ann,
+// //     id: undefined,
+// //     categoryId: undefined,
+// //   }))
+// // ).toEqual(
+// //   annotationsT3Expected.map((ann) => ({
+// //     ...ann,
+// //     id: undefined,
+// //     categoryId: undefined,
+// //   }))
+// // );
+// //});

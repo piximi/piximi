@@ -58,7 +58,8 @@ import {
 import { dimensions } from "utils/common";
 import { Box, Typography } from "@mui/material";
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
-import { selectedCategorySelector } from "store/common";
+import { selectedAnnotationCategoryIdSelector } from "store/annotator";
+import { selectCategoryById } from "store/data";
 import { Annotations } from "./Annotations";
 import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
 import { PointerSelection } from "./Selection/PointerSelection";
@@ -102,7 +103,12 @@ export const Stage = ({
   // useSelector
   const toolType = useSelector(toolTypeSelector);
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const selectedCategory = useSelector(selectedCategorySelector);
+  const selectedAnnotationCategoryId = useSelector(
+    selectedAnnotationCategoryIdSelector
+  );
+  const selectedCategory = useSelector(
+    selectCategoryById(selectedAnnotationCategoryId)
+  );
   const selectionMode = useSelector(selectionModeSelector);
   const stagePosition = useSelector(stagePositionSelector);
   const activeImagePlane = useSelector(activeImagePlaneSelector);

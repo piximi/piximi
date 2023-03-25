@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { annotationCategoriesSelector } from "store/project";
+import { selectAllAnnotationCategories } from "store/data";
 import {
   AnnotatorSlice,
   setOperation,
@@ -54,7 +54,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 }: useAnnotatorHotkeysProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(annotationCategoriesSelector);
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
   const images = useSelector(annotatorImagesSelector);
   const activeImageId = useSelector(activeImageIdSelector);
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);

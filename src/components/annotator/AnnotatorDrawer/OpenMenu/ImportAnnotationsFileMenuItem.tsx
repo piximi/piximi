@@ -9,10 +9,10 @@ import {
   activeImageIdSelector,
 } from "store/annotator";
 import {
-  annotationCategoriesSelector,
-  availableColorsSelector,
-  projectSlice,
-} from "store/project";
+  dataSlice,
+  selectAllCategories,
+  selectUnusedCategoryColors,
+} from "store/data";
 
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
@@ -32,13 +32,11 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const activeImageId = useSelector(activeImageIdSelector);
 
-  const existingAnnotationCategories = useSelector(
-    annotationCategoriesSelector
-  );
+  const existingAnnotationCategories = useSelector(selectAllCategories);
 
   const existingImages = useSelector(annotatorImagesSelector);
 
-  const availableColors = useSelector(availableColorsSelector);
+  const availableColors = useSelector(selectUnusedCategoryColors);
 
   const onImportProjectFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {
@@ -73,12 +71,12 @@ export const ImportAnnotationsFileMenuItem = ({
 
           batch(() => {
             dispatch(
-              projectSlice.actions.addAnnotationCategories({
-                categories: newCategories,
+              dataSlice.actions.addAnnotationCategories({
+                annotationCategories: newCategories,
               })
             );
             dispatch(
-              AnnotatorSlice.actions.setInstances({
+              dataSlice.actions.setImageInstances({
                 instances: imsToAnnotate,
               })
             );

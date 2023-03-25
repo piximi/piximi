@@ -123,7 +123,15 @@ const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
   );
 };
 
-const serializeProject = (projectGroup: Group, project: Project) => {
+const serializeProject = (
+  projectGroup: Group,
+  project: Project,
+  data: {
+    images: Array<OldImageType>;
+    categories: Array<Category>;
+    annotationCategories: Array<Category>;
+  }
+) => {
   projectGroup.create_attribute("name", project.name);
 
   const imagesGroup = projectGroup.create_group("images");
@@ -131,14 +139,14 @@ const serializeProject = (projectGroup: Group, project: Project) => {
     "sort_key",
     project.imageSortKey.imageSortKeyName
   );
-  serializeImages(imagesGroup, project.images);
+  serializeImages(imagesGroup, data.images);
 
   const categoriesGroup = projectGroup.create_group("categories");
-  serializeCategories(categoriesGroup, project.categories);
+  serializeCategories(categoriesGroup, data.categories);
   const annotationCategoriesGroup = projectGroup.create_group(
     "annotationCategories"
   );
-  serializeCategories(annotationCategoriesGroup, project.annotationCategories);
+  serializeCategories(annotationCategoriesGroup, data.annotationCategories);
 };
 
 /*
@@ -297,6 +305,11 @@ const serializeClassifier = (
 export const serialize = async (
   name: string,
   projectSlice: Project,
+  data: {
+    images: Array<OldImageType>;
+    categories: Array<Category>;
+    annotationCategories: Array<Category>;
+  },
   classifierSlice: Classifier
 ) => {
   const { FS } = await ready;
@@ -306,7 +319,7 @@ export const serialize = async (
   f.create_attribute("version", "0.1.0");
 
   const projectGroup = f.create_group("project");
-  serializeProject(projectGroup, projectSlice);
+  serializeProject(projectGroup, projectSlice, data);
 
   const classifierGroup = f.create_group("classifier");
   serializeClassifier(classifierGroup, classifierSlice);

@@ -12,19 +12,19 @@ import {
   preprocessClassifier,
   createClassificationLabels,
 } from "store/classifier";
-import {
-  createdCategoriesSelector,
-  projectSlice,
-  testImagesSelector,
-} from "store/project";
 import { applicationSlice } from "store/application";
+import {
+  dataSlice,
+  selectCreatedCategories,
+  selectInferenceImages,
+} from "store/data";
 
 import {
   AlertStateType,
   AlertType,
   Category,
   FitOptions,
-  OldImageType,
+  ImageType,
   PreprocessOptions,
   Shape,
 } from "types";
@@ -36,12 +36,12 @@ export function* predictClassifierSaga({
 }: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const testImages: ReturnType<typeof testImagesSelector> = yield select(
-    testImagesSelector
+  const testImages: ReturnType<typeof selectInferenceImages> = yield select(
+    selectInferenceImages
   );
 
-  const categories: ReturnType<typeof createdCategoriesSelector> = yield select(
-    createdCategoriesSelector
+  const categories: ReturnType<typeof selectCreatedCategories> = yield select(
+    selectCreatedCategories
   );
 
   const architectureOptions: ReturnType<
@@ -108,7 +108,7 @@ export function* predictClassifierSaga({
 }
 
 function* runPrediction(
-  testImages: Array<OldImageType>,
+  testImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
@@ -148,8 +148,8 @@ function* runPrediction(
   disposeTestLabels();
 
   yield put(
-    projectSlice.actions.updateImagesCategories({
-      ids: imageIds,
+    dataSlice.actions.updateCategoriesOfImages({
+      imageIds: imageIds,
       categoryIds: categoryIds,
     })
   );

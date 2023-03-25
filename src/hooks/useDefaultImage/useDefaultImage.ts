@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { applicationSlice, initSelector } from "store/application";
-import { projectSlice, imagesCountSelector } from "store/project";
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
-import { dataSlice } from "store/data";
+import { dataSlice, selectImageCount } from "store/data";
 
 export enum DispatchLocation {
   Project,
@@ -19,29 +18,26 @@ const dispatchToProject = async (
   dispatch: ReturnType<typeof useDispatch>
 ) => {
   if (location !== DispatchLocation.Project) return;
-  const { image, categories, annotationsEntity, annotationIds } =
-    await loadExampleImage(
-      colorImage,
-      cellPaintingAnnotations as SerializedFileType,
-      // imageFile.name points to
-      // "/static/media/cell-painting.f118ef087853056f08e6.png"
-      "cell-painting.png"
+  const { image, annotationCategories, annotations } = await loadExampleImage(
+    colorImage,
+    cellPaintingAnnotations as SerializedFileType,
+    // imageFile.name points to
+    // "/static/media/cell-painting.f118ef087853056f08e6.png"
+    "cell-painting.png"
+  );
+
+  batch(() => {
+    dispatch(
+      dataSlice.actions.setImages({
+        images: [image],
+        disposeColorTensors: true,
+      })
     );
-  dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
-  dispatch(projectSlice.actions.setProjectImages({ images: [image] }));
-  dispatch(dataSlice.actions.setAnnotationCategories({ categories }));
-  dispatch(
-    dataSlice.actions.initData({
-      newImages: [image],
-      newAnnotations: image.annotations,
-    })
-  );
-  dispatch(
-    projectSlice.actions.setAnnotations({
-      annotations: annotationsEntity,
-      annotationIds: annotationIds,
-    })
-  );
+    dispatch(
+      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+    );
+    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+  });
 };
 
 const dispatchToImageViewer = async (
@@ -50,29 +46,27 @@ const dispatchToImageViewer = async (
 ) => {
   if (location !== DispatchLocation.ImageViewer) return;
 
-  const { image, categories, annotationsEntity, annotationIds } =
-    await loadExampleImage(
-      colorImage,
-      cellPaintingAnnotations as SerializedFileType,
-      // imageFile.name points to
-      // "/static/media/cell-painting.f118ef087853056f08e6.png"
-      "cell-painting.png"
-    );
+  const { image, annotationCategories, annotations } = await loadExampleImage(
+    colorImage,
+    cellPaintingAnnotations as SerializedFileType,
+    // imageFile.name points to
+    // "/static/media/cell-painting.f118ef087853056f08e6.png"
+    "cell-painting.png"
+  );
 
-  dispatch(projectSlice.actions.setAnnotationCategories({ categories }));
-  dispatch(dataSlice.actions.setAnnotationCategories({ categories }));
-  dispatch(
-    dataSlice.actions.initData({
-      newImages: [image],
-      newAnnotations: image.annotations,
-    })
-  );
-  dispatch(
-    projectSlice.actions.setAnnotations({
-      annotations: annotationsEntity,
-      annotationIds: annotationIds,
-    })
-  );
+  batch(() => {
+    dispatch(
+      dataSlice.actions.setImages({
+        images: [image],
+        disposeColorTensors: true,
+      })
+    );
+    dispatch(
+      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+    );
+    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+  });
+
   batch(() => {
     dispatch(
       AnnotatorSlice.actions.setImages({
@@ -94,7 +88,7 @@ export const useDefaultImage = (location: DispatchLocation) => {
   const dispatch = useDispatch();
 
   const init = useSelector(initSelector);
-  const numProjectImages = useSelector(imagesCountSelector);
+  const numProjectImages = useSelector(selectImageCount);
   const activeAnnotatorImageId = useSelector(activeImageIdSelector);
 
   useEffect(() => {

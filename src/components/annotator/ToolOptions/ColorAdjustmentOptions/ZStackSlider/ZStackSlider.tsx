@@ -4,15 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import {
-  AnnotatorSlice,
   activeImageSelector,
   activeImagePlaneSelector,
+  activeImageRenderedSrcsSelector,
 } from "store/annotator";
+import { dataSlice } from "store/data";
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();
   const activeImage = useSelector(activeImageSelector);
   const activePlane = useSelector(activeImagePlaneSelector);
+  const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
 
   if (!activeImage || activeImage!.shape.planes === 1)
     return <React.Fragment />;
@@ -20,8 +22,10 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        AnnotatorSlice.actions.setActiveImagePlane({
-          activeImagePlane: newValue,
+        dataSlice.actions.setImageActivePlane({
+          imageId: activeImage.id,
+          activePlane: newValue,
+          renderedSrc: renderedSrcs[newValue],
         })
       );
     }

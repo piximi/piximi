@@ -10,8 +10,9 @@ import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { MainImageGridAppBar } from "../MainImageGridAppBar";
 
 import {
-  updateImageCategoryFromHighlighted,
   updateHighlightedCategory,
+  highlightedCategoriesSelector,
+  selectedImagesSelector,
 } from "store/project";
 
 import {
@@ -20,12 +21,11 @@ import {
   selectedImageBorderWidthSelector,
   unregisterHotkeyView,
 } from "store/application";
-import { visibleImagesSelector, selectedImagesSelector } from "store/common";
 
-import { HotkeyView, OldImageType, Partition } from "types";
+import { dataSlice, selectVisibleImages } from "store/data";
 
-import { ColorModel, Image as ImageJS } from "image-js";
-import { tensor4d } from "@tensorflow/tfjs";
+import { HotkeyView, ImageType } from "types";
+
 interface TabPanelProps {
   children?: ReactElement;
   index: number;
@@ -61,12 +61,12 @@ type MainImageGridProps = {
 };
 
 export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
-  const images = useSelector(visibleImagesSelector);
-  const [objIms, setObjIms] = useState<Array<OldImageType>>([]);
+  const images = useSelector(selectVisibleImages);
   const imageSelectionColor = useSelector(imageSelectionColorSelector);
   const selectedImageBorderWidth = useSelector(
     selectedImageBorderWidthSelector
   );
+  const highlightedCategory = useSelector(highlightedCategoriesSelector);
   const selectedImages = useSelector(selectedImagesSelector);
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
@@ -112,8 +112,9 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     "shift",
     () => {
       dispatch(
-        updateImageCategoryFromHighlighted({
-          ids: selectedImages,
+        dataSlice.actions.updateImageCategories({
+          imageIds: selectedImages,
+          categoryId: highlightedCategory,
         })
       );
 
@@ -136,70 +137,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
       dispatch(unregisterHotkeyView({}));
     };
   }, [dispatch]);
-
-  useEffect(() => {
-    const getObjs = async () => {
-      const objArr: Array<OldImageType> = [];
-      for await (const image of images) {
-        try {
-          const normImageData = image.data.mul(255);
-
-          const imDataArray = (await normImageData.arraySync()) as number[][][];
-          normImageData.dispose();
-          const flatImageData = imDataArray.flat(3);
-          const renderedIm = new ImageJS({
-            width: image.shape.width,
-            height: image.shape.height,
-            data: flatImageData,
-            colorModel: "RGB" as ColorModel,
-            alpha: 0,
-          });
-
-          image.annotations.forEach((annotation) => {
-            const bbox = annotation.boundingBox;
-            const objectImage = renderedIm.crop({
-              x: Math.abs(bbox[0]),
-              y: Math.abs(bbox[1]),
-              width: Math.abs(Math.min(512, bbox[2]) - bbox[0]),
-              height: Math.abs(Math.min(512, bbox[3]) - bbox[1]),
-            });
-            const objSrc = objectImage.toDataURL();
-            const data = tensor4d(Float32Array.from(objectImage.data), [
-              1,
-              objectImage.height,
-              objectImage.width,
-              3,
-            ]);
-
-            const obj: OldImageType = {
-              annotations: [],
-              activePlane: annotation.plane,
-              categoryId: annotation.categoryId,
-              colors: image.colors,
-              bitDepth: image.bitDepth,
-              id: annotation.id,
-              name: "object",
-              shape: {
-                planes: 1,
-                height: objectImage.height,
-                width: objectImage.width,
-                channels: 3,
-              },
-              data: data, // [Z, H, W, C]
-              partition: Partition.Training,
-              visible: true,
-              src: objSrc,
-            };
-            objArr.push(obj);
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-      setObjIms(objArr);
-    };
-    getObjs();
-  }, [images]);
 
   return (
     <Box
@@ -244,7 +181,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 gap={2}
                 sx={{ transform: "translateZ(0)", height: "100%" }}
               >
-                {images.slice(0, max_images).map((image: OldImageType) => (
+                {images.slice(0, max_images).map((image: ImageType) => (
                   <MainImageGridItem
                     image={image}
                     selected={selectedImages.includes(image.id)}
@@ -298,7 +235,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 gap={2}
                 sx={{ transform: "translateZ(0)", height: "100%" }}
               >
-                {objIms.map((image: OldImageType) => (
+                {[].map((image: ImageType) => (
                   <MainImageGridItem
                     image={image}
                     selected={selectedImages.includes(image.id)}

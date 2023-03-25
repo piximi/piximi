@@ -14,7 +14,7 @@ import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
 import { DialogTransition } from "components/common/DialogTransition";
 
 import { alertStateSelector } from "store/application";
-import { annotatedImagesSelector } from "store/project";
+import { selectAnnotatedImages } from "store/data";
 import {
   segmenterTrainingFlagSelector,
   //segmenterCompiledModelSelector,
@@ -64,7 +64,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   >([]);
 
   const currentlyTraining = useSelector(segmenterTrainingFlagSelector);
-  const annotatedImages = useSelector(annotatedImagesSelector);
+  const annotatedImages = useSelector(selectAnnotatedImages);
   //const compiledModel = useSelector(segmenterCompiledModelSelector);
   const alertState = useSelector(alertStateSelector);
 

@@ -1,11 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { ShadowImageType } from "types/ImageType";
-import {
-  Category,
-  UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-} from "types/Category";
+import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
 import { ToolType } from "types/ToolType";
 import {
   EncodedAnnotationType,
@@ -51,7 +47,7 @@ const initialState: Annotator = {
   selectedAnnotations: [],
   stagedAnnotations: [],
   stagedAnnotationsHaveBeenUpdated: false,
-  selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
+  selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   selectionMode: AnnotationModeType.New,
   soundEnabled: true,
   stageHeight: 1000,

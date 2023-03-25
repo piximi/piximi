@@ -1,6 +1,5 @@
 export {
   applicationSlice,
-  deselectImages,
   setThemeMode,
   registerHotkeyView,
   unregisterHotkeyView,
@@ -17,6 +16,3 @@ export { themeModeSelector } from "./selectors/themeModeSelector";
 export { tileSizeSelector } from "./selectors/tileSizeSelector";
 
 // Sagas
-
-export { uploadImagesSaga } from "./sagas/uploadImagesSaga";
-export { watchUploadImagesSaga } from "./sagas/watchUploadImagesSaga";

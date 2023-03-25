@@ -17,6 +17,7 @@ import { projectSlice } from "store/project";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import { deserialize } from "utils/common/image/deserialize";
 import { uploader } from "utils/common/fileHandlers";
+import { dataSlice } from "store/data";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -108,11 +109,20 @@ export const OpenExampleProjectMenuItem = ({
     const deserializedProject = await deserialize(exampleProjectFile.name);
 
     const project = deserializedProject.project;
+    const data = deserializedProject.data;
     const classifier = deserializedProject.classifier;
 
     dispatch(applicationSlice.actions.clearSelectedImages());
 
     batch(() => {
+      dispatch(
+        dataSlice.actions.initData({
+          images: data.images,
+          annotations: data.annotations,
+          categories: data.categories,
+          annotationCategories: data.annotationCategories,
+        })
+      );
       dispatch(projectSlice.actions.setProject({ project }));
 
       dispatch(

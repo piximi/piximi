@@ -11,7 +11,7 @@ import { ChannelsList } from "../ChannelsList";
 
 import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
 
-import { imageDataSelector } from "store/common";
+import { selectActiveImageData } from "store/data";
 
 import { generateDefaultColors } from "utils/common/image";
 
@@ -22,7 +22,7 @@ export const ColorAdjustmentOptions = () => {
 
   const imageShape = useSelector(imageShapeSelector);
 
-  const imageData = useSelector(imageDataSelector);
+  const imageData = useSelector(selectActiveImageData);
 
   const onResetChannelsClick = async () => {
     if (!imageShape || !imageData) return;

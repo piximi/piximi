@@ -6,7 +6,7 @@ import {
   imageInstancesSelector,
   stagedAnnotationsSelector,
 } from "store/annotator";
-import { imageSelector } from "store/common";
+import { selectActiveImage } from "store/data";
 import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
 
 import { Colors } from "types/tensorflow";
@@ -21,7 +21,9 @@ export function* activeImageIDChangeSaga({
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
-  const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
+  const image: ReturnType<typeof selectActiveImage> = yield select(
+    selectActiveImage
+  );
 
   if (!image) {
     yield put(
@@ -109,7 +111,9 @@ export function* activeImageColorChangeSaga({
 }>) {
   if (!execSaga) return;
 
-  const image: ReturnType<typeof imageSelector> = yield select(imageSelector);
+  const image: ReturnType<typeof selectActiveImage> = yield select(
+    selectActiveImage
+  );
 
   if (!image) return;
 

@@ -1,15 +1,21 @@
-import { OldImageType, Annotator, Project, ShadowImageType } from "types";
+import {
+  OldImageType,
+  Annotator,
+  ShadowImageType,
+  DataStoreSlice,
+  ImageType,
+} from "types";
 
 export const annotatorFullImagesSelector = ({
   annotator,
-  project,
+  data,
 }: {
   annotator: Annotator;
-  project: Project;
+  data: DataStoreSlice;
 }): Array<OldImageType> => {
   return annotator.images.map((shadowImage: ShadowImageType) => {
-    const projectImage = project.images.find(
-      (im: OldImageType) => im.id === shadowImage.id
+    const projectImage = Object.values(data.images.entities).find(
+      (im: ImageType) => im.id === shadowImage.id
     );
 
     if (projectImage) {
