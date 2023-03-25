@@ -122,9 +122,9 @@ export const ToolDrawer = ({
     <Drawer
       anchor="right"
       sx={{
-        "flexShrink": 0,
-        "whiteSpace": "nowrap",
-        "width": 56,
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+        width: 56,
         "& > .MuiDrawer-paper": {
           width: 56,
         },

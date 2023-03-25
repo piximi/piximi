@@ -49,8 +49,8 @@ export const AnnotatorDrawer = () => {
     <Drawer
       anchor="left"
       sx={{
-        "flexShrink": 0,
-        "width": (theme) => theme.spacing(32),
+        flexShrink: 0,
+        width: (theme) => theme.spacing(32),
         "& > .MuiDrawer-paper": {
           width: (theme) => theme.spacing(32),
         },
