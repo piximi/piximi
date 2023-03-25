@@ -110,7 +110,7 @@ export const ChannelsList = () => {
           key={index}
           disabled={!isVisible}
           sx={{
-            "width": "50%",
+            width: "50%",
             "& .MuiSlider-track": {
               color: (theme) =>
                 isVisible
