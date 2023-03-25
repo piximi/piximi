@@ -27,7 +27,6 @@ export const DeleteAllAnnotationsDialog = ({
   const onDelete = () => {
     console.log("pressed");
     batch(() => {
-      dispatch(AnnotatorSlice.actions.deleteAllInstances());
       dispatch(
         AnnotatorSlice.actions.setStagedAnnotations({ annotations: [] })
       );

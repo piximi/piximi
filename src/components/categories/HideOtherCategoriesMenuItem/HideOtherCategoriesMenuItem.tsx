@@ -3,10 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { MenuItem, Typography } from "@mui/material";
 
-import {
-  updateOtherCategoryVisibility,
-  updateOtherAnnotationCategoryVisibility,
-} from "store/project";
+import { dataSlice } from "store/data";
 
 import { Category, CategoryType } from "types";
 
@@ -29,9 +26,15 @@ export const HideOtherCategoriesMenuItem = ({
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (categoryType === CategoryType.ClassifierCategory) {
-      dispatch(updateOtherCategoryVisibility({ id: category.id }));
+      dispatch(
+        dataSlice.actions.setOtherCategoriesInvisible({ id: category.id })
+      );
     } else {
-      dispatch(updateOtherAnnotationCategoryVisibility({ id: category.id }));
+      dispatch(
+        dataSlice.actions.setOtherAnnotationCategoriesInvisible({
+          id: category.id,
+        })
+      );
     }
 
     onCloseCategoryMenu(event);

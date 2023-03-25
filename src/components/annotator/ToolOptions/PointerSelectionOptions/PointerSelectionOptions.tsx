@@ -21,7 +21,7 @@ import {
   selectedAnnotationsSelector,
   stagedAnnotationsSelector,
 } from "store/annotator";
-import { annotationCategoriesSelector } from "store/project";
+import { selectAllAnnotationCategories } from "store/data";
 
 import { Category } from "types";
 
@@ -34,7 +34,7 @@ export const PointerSelectionOptions = () => {
 
   const selectedAnnotations = useSelector(selectedAnnotationsSelector);
   const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-  const annotationCategories = useSelector(annotationCategoriesSelector);
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
 
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];

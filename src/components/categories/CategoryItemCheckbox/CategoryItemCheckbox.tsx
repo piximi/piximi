@@ -6,14 +6,11 @@ import {
   LabelOutlined as LabelOutlinedIcon,
 } from "@mui/icons-material";
 
-import { deselectImages } from "store/application";
-import { visibleImagesSelector } from "store/common";
-import {
-  updateCategoryVisibility,
-  setAnnotationCategoryVisibility,
-} from "store/project";
+import { deselectImages } from "store/project";
 
-import { Category, CategoryType, OldImageType } from "types";
+import { dataSlice, selectImagesByCategory } from "store/data";
+
+import { Category, CategoryType } from "types";
 
 type CategoryItemCheckboxProps = {
   category: Category;
@@ -26,7 +23,7 @@ export const CategoryItemCheckbox = ({
 }: CategoryItemCheckboxProps) => {
   const dispatch = useDispatch();
 
-  const images = useSelector(visibleImagesSelector);
+  const categoryImages = useSelector(selectImagesByCategory(category.id));
 
   const onHideCategory = () => {
     const payload = {
@@ -38,18 +35,14 @@ export const CategoryItemCheckbox = ({
       if (category.visible) {
         dispatch(
           deselectImages({
-            ids: images
-              .filter((image: OldImageType) => {
-                return image.categoryId === category.id;
-              })
-              .map((image: OldImageType) => image.id),
+            ids: categoryImages,
           })
         );
       }
 
-      dispatch(updateCategoryVisibility(payload));
+      dispatch(dataSlice.actions.setCategoryVisibility(payload));
     } else {
-      dispatch(setAnnotationCategoryVisibility(payload));
+      dispatch(dataSlice.actions.setAnnotationCategoryVisibility(payload));
     }
   };
 

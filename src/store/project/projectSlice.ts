@@ -1,29 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { filter } from "lodash";
-import { v4 as uuidv4 } from "uuid";
 
 import { Project } from "types/Project";
-import {
-  Category,
-  UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CLASS_CATEGORY,
-  UNKNOWN_CLASS_CATEGORY_ID,
-} from "types/Category";
-import { OldImageType, ShadowImageType } from "types/ImageType";
-import { Partition } from "types/Partition";
 import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
-import { replaceDuplicateName } from "utils/common/image";
-import { DecodedAnnotationType } from "types/AnnotationType";
-import { encode } from "utils/annotator";
-import { AnnotationsEntityType } from "types";
-import { memory } from "@tensorflow/tfjs";
 
 export const initialState: Project = {
-  categories: [UNKNOWN_CLASS_CATEGORY],
-  annotationCategories: [UNKNOWN_ANNOTATION_CATEGORY],
-  images: [],
-  annotations: { ids: [], entries: {} },
+  selectedImageIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey,
   highlightedCategory: null,
@@ -34,211 +15,41 @@ export const projectSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetProject: () => initialState,
-    addImages(state, action: PayloadAction<{ images: Array<OldImageType> }>) {
-      state.images = state.images.concat(action.payload.images);
+    clearSelectedImages(state) {
+      state.selectedImageIds = [];
     },
-    clearCategoryAnnotations(
-      state,
-      action: PayloadAction<{ categoryID: string }>
-    ) {
-      for (const im of state.images) {
-        const annotations: typeof im.annotations = [];
-        for (let j = 0; j < im.annotations.length; j++) {
-          if (im.annotations[j].categoryId === action.payload.categoryID) {
-            im.annotations[j].data?.dispose();
-          } else {
-            annotations.push(im.annotations[j]);
-          }
-        }
-        im.annotations = annotations;
-      }
-    },
-    clearPredictions(state, action: PayloadAction<{}>) {
-      state.images.forEach((image) => {
-        if (image.partition === Partition.Inference) {
-          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
-        }
-      });
-    },
-    createAnnotationCategory(
-      state,
-      action: PayloadAction<{ name: string; color: string; id?: string }>
-    ) {
-      const category: Category = {
-        color: action.payload.color,
-        id: action.payload.id ? action.payload.id : uuidv4().toString(),
-        name: action.payload.name,
-        visible: true,
-      };
-      state.annotationCategories.push(category);
-    },
-    createCategory(
-      state,
-      action: PayloadAction<{ name: string; color: string }>
-    ) {
-      const category: Category = {
-        color: action.payload.color,
-        id: uuidv4().toString(),
-        name: action.payload.name,
-        visible: true,
-      };
-      state.categories.push(category);
-    },
-    createNewProject(state, action: PayloadAction<{ name: string }>) {
-      state.name = action.payload.name;
-      state.categories = [UNKNOWN_CLASS_CATEGORY];
-      state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
-      state.images = [];
-      state.imageSortKey = defaultImageSortKey;
-    },
-    deleteAllAnnotationCategories(
-      state,
-      action: PayloadAction<{ execSaga: boolean }>
-    ) {
-      state.annotationCategories = [UNKNOWN_ANNOTATION_CATEGORY];
-    },
-    deleteAnnotationCategory(
-      state,
-      action: PayloadAction<{ categoryID: string; execSaga: boolean }>
-    ) {
-      state.annotationCategories = state.annotationCategories.filter(
-        (category: Category) => category.id !== action.payload.categoryID
+    deselectImage(state, action: PayloadAction<{ id: string }>) {
+      state.selectedImageIds = state.selectedImageIds.filter(
+        (id: string) => id !== action.payload.id
       );
     },
-    deleteAllCategories(state, action: PayloadAction<{}>) {
-      state.categories = [UNKNOWN_CLASS_CATEGORY];
+    deselectImages(state, action: PayloadAction<{ ids: Array<string> }>) {
+      state.selectedImageIds = state.selectedImageIds.filter(
+        (id: string) => !action.payload.ids.includes(id)
+      );
+    },
+    selectAllImages(state, action: PayloadAction<{ ids: Array<string> }>) {
+      state.selectedImageIds = [];
 
-      state.images = state.images.map((image) => {
-        image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
-        image.partition = Partition.Inference;
-        return image;
-      });
+      state.selectedImageIds = action.payload.ids;
+    },
+    selectImage(state, action: PayloadAction<{ id: string }>) {
+      state.selectedImageIds.push(action.payload.id);
+    },
+    selectOneImage(state, action: PayloadAction<{ id: string }>) {
+      state.selectedImageIds = [];
+
+      state.selectedImageIds.push(action.payload.id);
     },
 
-    deleteCategory(state, action: PayloadAction<{ id: string }>) {
-      state.categories = filter(state.categories, (category: Category) => {
-        return category.id !== action.payload.id;
-      });
-      state.images = state.images.map((image) => {
-        if (image.categoryId === action.payload.id) {
-          image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
-          image.partition = Partition.Inference;
-        }
-        return image;
-      });
-    },
-    deleteImages(state, action: PayloadAction<{ ids: Array<string> }>) {
-      const remainingImages: typeof state.images = [];
-      console.log(memory());
-      for (const im of state.images) {
-        if (action.payload.ids.includes(im.id)) {
-          im.data.dispose();
-          im.colors.color.dispose();
-        } else {
-          remainingImages.push(im);
-        }
-      }
-      console.log(memory());
-
-      //state.images = remainingImages;
+    createNewProject(state, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
+      state.imageSortKey = defaultImageSortKey;
     },
     setProject(state, action: PayloadAction<{ project: Project }>) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.project;
       return action.payload.project;
-    },
-    setAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: AnnotationsEntityType;
-        annotationIds: Array<string>;
-      }>
-    ) {
-      state.annotations.ids = action.payload.annotationIds;
-      state.annotations.entries = action.payload.annotations;
-    },
-    reconcileImages(
-      state,
-      action: PayloadAction<{
-        images: Array<ShadowImageType>;
-      }>
-    ) {
-      action.payload.images.forEach((shadowImage: ShadowImageType) => {
-        const projectImageIdx = state.images.findIndex((image) => {
-          return shadowImage.id === image.id;
-        });
-
-        if (projectImageIdx >= 0) {
-          const projectImage = state.images[projectImageIdx];
-
-          projectImage.colors.color.dispose();
-
-          state.images[projectImageIdx] = {
-            ...projectImage,
-            ...shadowImage,
-          };
-        }
-      });
-    },
-    setAnnotationCategories(
-      state,
-      action: PayloadAction<{ categories: Array<Category> }>
-    ) {
-      const replaceUnknown =
-        action.payload.categories.find(
-          (cat) => cat.id === UNKNOWN_ANNOTATION_CATEGORY_ID
-        ) === undefined;
-      if (replaceUnknown) {
-        state.annotationCategories = [
-          UNKNOWN_ANNOTATION_CATEGORY,
-          ...action.payload.categories,
-        ];
-      } else {
-        state.annotationCategories = action.payload.categories;
-      }
-    },
-    addAnnotationCategories(
-      state,
-      action: PayloadAction<{ categories: Array<Category> }>
-    ) {
-      const newCategories = [];
-      for (const newCategory of action.payload.categories) {
-        const idExists = state.annotationCategories.find(
-          (c) => c.id === newCategory.id
-        );
-        if (idExists) {
-          newCategories.push({
-            ...newCategory,
-            id: uuidv4(),
-          });
-        } else {
-          newCategories.push(newCategory);
-        }
-      }
-      state.annotationCategories.push(...newCategories);
-    },
-    setAnnotationCategoryVisibility(
-      state,
-      action: PayloadAction<{ categoryId: string; visible: boolean }>
-    ) {
-      const index = state.annotationCategories.findIndex(
-        (category: Category) => {
-          return category.id === action.payload.categoryId;
-        }
-      );
-      state.annotationCategories[index].visible = action.payload.visible;
-    },
-    setCategories(
-      state,
-      action: PayloadAction<{ categories: Array<Category> }>
-    ) {
-      state.categories = [...state.categories, ...action.payload.categories];
-    },
-    setProjectImages(
-      state,
-      action: PayloadAction<{ images: Array<OldImageType> }>
-    ) {
-      state.images = action.payload.images;
     },
     sortImagesBySelectedKey(
       state,
@@ -247,243 +58,29 @@ export const projectSlice = createSlice({
       const selectedSortKey = action.payload.imageSortKey;
       state.imageSortKey = selectedSortKey;
 
-      (state.images as OldImageType[]).sort(selectedSortKey.comparerFunction);
+      //(state.images as OldImageType[]).sort(selectedSortKey.comparerFunction);
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
-    },
-    updateImageAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: Array<DecodedAnnotationType>;
-        imageId: string;
-      }>
-    ) {
-      state.images = state.images.map((image) => {
-        if (action.payload.imageId !== image.id) {
-          return image;
-        } else {
-          const encodedAnnotations = action.payload.annotations.map(
-            (annotation: DecodedAnnotationType) => {
-              const { maskData, ...encodedAnnotation } = {
-                mask: encode(annotation.maskData),
-                ...annotation,
-              };
-              return encodedAnnotation;
-            }
-          );
-          return { ...image, annotations: encodedAnnotations };
-        }
-      });
-    },
-    updateImageCategories(
-      state,
-      action: PayloadAction<{ ids: Array<string>; categoryId: string }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryId;
-          if (action.payload.categoryId === UNKNOWN_CLASS_CATEGORY_ID) {
-            //If assigned category is unknown, then this image is moved to inference set, else it is assigned to training set
-            state.images[index].partition = Partition.Inference;
-          } else {
-            state.images[index].partition = Partition.Training;
-          }
-        }
-      });
-    },
-    updateImageCategory(
-      // unused
-      state,
-      action: PayloadAction<{ id: string; categoryId: string }>
-    ) {
-      const index = state.images.findIndex((image) => {
-        return image.id === action.payload.id;
-      });
-      if (index >= 0) {
-        state.images[index].categoryId = action.payload.categoryId;
-      }
-    },
-    updateImageCategoryFromHighlighted(
-      state,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          if (state.highlightedCategory)
-            state.images[index].categoryId = state.highlightedCategory;
-        }
-      });
-    },
-    updateImagesCategories(
-      state,
-      action: PayloadAction<{ ids: Array<string>; categoryIds: Array<string> }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].categoryId = action.payload.categoryIds[idx];
-        }
-      });
-    },
-    updateImagesPartition(
-      state,
-      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].partition = action.payload.partition;
-        }
-      });
-    },
-
-    updateCategory(
-      state,
-      action: PayloadAction<{ id: string; name: string; color: string }>
-    ) {
-      const index = state.categories.findIndex((category: Category) => {
-        return category.id === action.payload.id;
-      });
-      state.categories[index].name = action.payload.name;
-      state.categories[index].color = action.payload.color;
     },
     updateHighlightedCategory(
       state,
       action: PayloadAction<{ categoryIndex: number }>
     ) {
-      const index = action.payload.categoryIndex;
-      if (!isNaN(index) && index < state.categories.length) {
-        const categoryId = state.categories[action.payload.categoryIndex].id;
-        state.highlightedCategory = categoryId;
-      } else {
-        state.highlightedCategory = null;
-      }
-    },
-    updateCategoryVisibility(
-      state,
-      action: PayloadAction<{ categoryId: string; visible: boolean }>
-    ) {
-      const index = state.categories.findIndex((category: Category) => {
-        return category.id === action.payload.categoryId;
-      });
-
-      state.categories[index].visible = action.payload.visible;
-    },
-    updateLabeledImagesVisibility(
-      state,
-      action: PayloadAction<{ visibility: boolean }>
-    ) {
-      state.images.forEach((image) => {
-        if (image.partition !== Partition.Inference) {
-          image.visible = action.payload.visibility;
-        }
-      });
-    },
-    updateOtherAnnotationCategoryVisibility(
-      state,
-      action: PayloadAction<{ id?: string }>
-    ) {
-      for (let category of state.annotationCategories) {
-        category.visible =
-          action.payload.id === undefined
-            ? true
-            : category.id === action.payload.id;
-      }
-    },
-    updateOtherCategoryVisibility(
-      state,
-      action: PayloadAction<{ id?: string }>
-    ) {
-      for (let category of state.categories) {
-        category.visible =
-          action.payload.id === undefined
-            ? true
-            : category.id === action.payload.id;
-      }
-    },
-
-    updateSegmentationImagesPartition(
-      state,
-      action: PayloadAction<{ ids: Array<string>; partition: Partition }>
-    ) {
-      action.payload.ids.forEach((imageId, idx) => {
-        const index = state.images.findIndex((image) => {
-          return image.id === imageId;
-        });
-        if (index >= 0) {
-          state.images[index].partition = action.payload.partition;
-        }
-      });
-    },
-    updateAnnotationCategory(
-      state,
-      action: PayloadAction<{ id: string; name: string; color: string }>
-    ) {
-      const index = state.annotationCategories.findIndex(
-        (category: Category) => {
-          return category.id === action.payload.id;
-        }
-      );
-      state.annotationCategories[index].name = action.payload.name;
-      state.annotationCategories[index].color = action.payload.color;
-    },
-    uploadImages(
-      state,
-      action: PayloadAction<{ newImages: Array<OldImageType> }>
-    ) {
-      const imageNames = state.images.map((image) => {
-        return image.name.split(".")[0];
-      });
-      const updatedImages = action.payload.newImages.map(
-        (image: OldImageType, i: number) => {
-          const initialName = image.name.split(".")[0]; //get name before file extension
-          //add filename extension to updatedName
-          const updatedName =
-            replaceDuplicateName(initialName, imageNames) +
-            "." +
-            image.name.split(".").slice(1);
-          return { ...image, name: updatedName };
-        }
-      );
-
-      state.images.push(...updatedImages);
+      // const index = action.payload.categoryIndex;
+      // if (!isNaN(index) && index < state.categories.length) {
+      //   const categoryId = state.categories[action.payload.categoryIndex].id;
+      //   state.highlightedCategory = categoryId;
+      // } else {
+      //   state.highlightedCategory = null;
+      // }
     },
   },
 });
 
 export const {
-  createCategory,
-  createAnnotationCategory,
-  uploadImages,
   createNewProject,
-  deleteCategory,
-  deleteAnnotationCategory,
-  deleteAllAnnotationCategories,
-  updateCategory,
-  updateAnnotationCategory,
-  updateCategoryVisibility,
+  deselectImage,
+  deselectImages,
   updateHighlightedCategory,
-  setAnnotationCategoryVisibility,
-  updateImageCategories,
-  updateImageCategory,
-  updateImageCategoryFromHighlighted,
-  updateOtherCategoryVisibility,
-  updateOtherAnnotationCategoryVisibility,
-  updateSegmentationImagesPartition,
-  setAnnotationCategories,
-  setProjectImages,
-  updateImageAnnotations,
-  clearCategoryAnnotations,
-  addAnnotationCategories,
 } = projectSlice.actions;

@@ -29,7 +29,7 @@ import {
   stageWidthSelector,
   zoomSelectionSelector,
 } from "store/annotator";
-import { imageSelector } from "store/common";
+import { selectActiveImage } from "store/data";
 import {
   zoomToolOptionsSelector,
   setZoomToolOptions,
@@ -51,7 +51,7 @@ export const ZoomOptions = () => {
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
   const stageScale = useSelector(stageScaleSelector);
-  const image = useSelector(imageSelector);
+  const image = useSelector(selectActiveImage);
   const { centerPoint } = useSelector(zoomSelectionSelector);
 
   const t = useTranslation();

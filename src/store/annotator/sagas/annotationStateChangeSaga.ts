@@ -7,10 +7,16 @@ import {
   workingAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
+  selectedAnnotationCategoryIdSelector,
 } from "store/annotator";
-import { selectedCategorySelector } from "store/common";
+import { selectAnnotationCategoryById } from "store/data";
 
-import { AnnotationModeType, AnnotationStateType, ToolType } from "types";
+import {
+  AnnotationModeType,
+  AnnotationStateType,
+  Category,
+  ToolType,
+} from "types";
 
 import { AnnotationTool } from "annotator-tools";
 
@@ -34,9 +40,14 @@ export function* annotationStateChangeSaga({
   const activeImagePlane: ReturnType<typeof activeImagePlaneSelector> =
     yield select(activeImagePlaneSelector);
 
+  const selectedAnnotationCategoryId: ReturnType<
+    typeof selectedAnnotationCategoryIdSelector
+  > = yield select(selectedAnnotationCategoryIdSelector);
+
   if (selectionMode === AnnotationModeType.New) {
-    const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-      yield select(selectedCategorySelector);
+    const selectedCategory: Category = yield select(
+      selectAnnotationCategoryById(selectedAnnotationCategoryId)
+    );
 
     annotationTool.annotate(selectedCategory, activeImagePlane);
 
@@ -105,8 +116,9 @@ export function* annotationStateChangeSaga({
     );
 
     if (annotationTool.maskData.length) {
-      const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-        yield select(selectedCategorySelector);
+      const selectedCategory: Category = yield select(
+        selectAnnotationCategoryById(selectedAnnotationCategoryId)
+      );
       annotationTool.annotate(selectedCategory, activeImagePlane);
     }
   }

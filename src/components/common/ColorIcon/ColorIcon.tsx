@@ -5,7 +5,7 @@ import { CirclePicker, ColorResult } from "react-color";
 import { Avatar, IconButton, Popover, Box } from "@mui/material";
 import { Label } from "@mui/icons-material";
 
-import { availableColorsSelector } from "store/project";
+import { selectUnusedCategoryColors } from "store/data";
 
 type ColorIconButtonProps = {
   color: string;
@@ -18,7 +18,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
-  const availableColors = useSelector(availableColorsSelector);
+  const availableColors = useSelector(selectUnusedCategoryColors);
 
   const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
     setColorMenuAnchorEl(event.currentTarget);

@@ -14,9 +14,13 @@ import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
 import { CategoryItemMenu } from "../CategoryItemMenu";
 
 import { highlightedCategoriesSelector } from "store/project";
-import { categoryCountsSelector, selectedCategorySelector } from "store/common";
+import {
+  selectImageCountByCategory,
+  selectAnnotationCountByCategory,
+  selectSelectedAnnotationCategory,
+} from "store/data";
 
-import { Category, CategoryType, OldImageType, State } from "types";
+import { Category, CategoryType } from "types";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
@@ -45,22 +49,19 @@ export const CategoryItem = ({
   };
 
   const highlightedCategory = useSelector(highlightedCategoriesSelector);
-  const selectedCategory = useSelector(selectedCategorySelector);
-  const imageCount = useSelector((state: State) => {
-    return state.project.images.filter((image: OldImageType) => {
-      return image.categoryId === category.id;
-    }).length;
-  });
-
-  const categoryCounts = useSelector(categoryCountsSelector);
+  const selectedCategory = useSelector(selectSelectedAnnotationCategory);
+  const imageCount = useSelector(selectImageCountByCategory(category.id));
+  const annotationCount = useSelector(
+    selectAnnotationCountByCategory(category.id)
+  );
 
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
     categoryType === CategoryType.ClassifierCategory
       ? setCount(imageCount)
-      : setCount(categoryCounts[category.id]);
-  }, [category.id, categoryCounts, categoryType, imageCount]);
+      : setCount(annotationCount);
+  }, [category.id, annotationCount, categoryType, imageCount]);
 
   const onCategoryClick = () => {
     onCategoryClickCallBack(category);

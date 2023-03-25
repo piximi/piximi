@@ -6,16 +6,17 @@ import {
   workingAnnotationSelector,
   selectedAnnotationsSelector,
 } from "store/annotator";
-import { selectedCategorySelector } from "store/common";
-import { DecodedAnnotationType } from "types";
+import { selectAnnotationCategoryById } from "store/data";
+import { Category, DecodedAnnotationType } from "types";
 
 export function* selectedCategorySaga({
-  payload: { execSaga },
+  payload: { selectedCategoryId, execSaga },
 }: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const selectedCategory: ReturnType<typeof selectedCategorySelector> =
-    yield select(selectedCategorySelector);
+  const selectedCategory: Category = yield select(
+    selectAnnotationCategoryById(selectedCategoryId)
+  );
 
   const selectedAnnotations: ReturnType<typeof selectedAnnotationsSelector> =
     yield select(selectedAnnotationsSelector);

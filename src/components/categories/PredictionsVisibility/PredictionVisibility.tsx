@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
@@ -12,12 +12,13 @@ import {
 import { useTranslation } from "hooks";
 
 import { classifierSlice } from "store/classifier";
-import { projectSlice } from "store/project";
+import { dataSlice, selectInferenceImages } from "store/data";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();
 
   const [showLabeledImages, setShowLabeledImages] = React.useState(true);
+  const inferenceImages = useSelector(selectInferenceImages);
 
   const t = useTranslation();
 
@@ -26,19 +27,23 @@ export const PredictionVisibility = () => {
 
     setShowLabeledImages(updatedShowLabeledImages);
     dispatch(
-      projectSlice.actions.updateLabeledImagesVisibility({
-        visibility: updatedShowLabeledImages,
+      dataSlice.actions.setVisibilityOfImages({
+        visible: updatedShowLabeledImages,
+        imageIds: inferenceImages.map((image) => image.id),
       })
     );
   };
 
   const clearPredictions = () => {
-    dispatch(projectSlice.actions.clearPredictions({}));
+    dispatch(dataSlice.actions.clearPredictions({}));
 
     if (!showLabeledImages) {
       setShowLabeledImages(true);
       dispatch(
-        projectSlice.actions.updateLabeledImagesVisibility({ visibility: true })
+        dataSlice.actions.setVisibilityOfImages({
+          visible: true,
+          imageIds: inferenceImages.map((image) => image.id),
+        })
       );
     }
 

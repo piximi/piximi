@@ -8,22 +8,22 @@ import {
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
 
-import { categoriesSelector } from "store/project";
+import { selectAllCategories } from "store/data";
 
 import {
   Category,
-  OldImageType,
+  ImageType,
   Partition,
   UNKNOWN_CLASS_CATEGORY_ID,
 } from "types";
 
 type ImageIconLabelProps = {
-  image: OldImageType;
+  image: ImageType;
   placement: { top: string; left: string };
 };
 
 export const ImageIconLabel = ({ image, placement }: ImageIconLabelProps) => {
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(selectAllCategories);
 
   const { color: categoryColor, name: categoryName } = categories.find(
     (category: Category) => {

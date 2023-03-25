@@ -9,10 +9,10 @@ import {
 } from "@mui/material";
 
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
-import { projectSlice } from "store/project";
+
+import { dataSlice } from "store/data";
 
 import { Category } from "types";
-import { dataSlice } from "store/data";
 
 type ClearAnnotationDialogProps = {
   category: Category;
@@ -34,10 +34,7 @@ export const ClearAnnotationDialog = ({
     );
 
     dispatch(
-      projectSlice.actions.clearCategoryAnnotations({ categoryID: category.id })
-    );
-    dispatch(
-      dataSlice.actions.deleteAnnotationsByCategory({
+      dataSlice.actions.deleteImageAnnotationsByCategory({
         imageId: activeImage!,
         categoryId: category.id,
       })

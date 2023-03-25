@@ -21,6 +21,7 @@ import {
   Metric,
   LossFunction,
   OptimizationAlgorithm,
+  ImageType,
 } from "types";
 import { Colors } from "types/tensorflow";
 import { sortKeyByName } from "types/ImageSortType";
@@ -242,13 +243,27 @@ const deserializeCategoriesGroup = (categoriesGroup: Group) => {
 
 const deserializeProjectGroup = async (
   projectGroup: Group
-): Promise<Project> => {
+): Promise<{
+  project: Project;
+  data: {
+    images: Array<ImageType>;
+    annotations: Array<EncodedAnnotationType>;
+    categories: Array<Category>;
+    annotationCategories: Array<Category>;
+  };
+}> => {
   const name = getAttr(projectGroup, "name") as string;
 
   const imagesGroup = getGroup(projectGroup, "images");
   const sortKeyName = getAttr(imagesGroup, "sort_key") as string;
   const imageSortKey = sortKeyByName(sortKeyName);
-  const images = await deserializeImagesGroup(imagesGroup);
+  const oldImages = await deserializeImagesGroup(imagesGroup);
+  const annotations: Array<EncodedAnnotationType> = [];
+  const images: Array<ImageType> = oldImages.map((image) => {
+    const { annotations, ...newImage } = image;
+    annotations.push(...annotations);
+    return newImage;
+  });
 
   const categoriesGroup = getGroup(projectGroup, "categories");
   const categories = deserializeCategoriesGroup(categoriesGroup);
@@ -262,12 +277,12 @@ const deserializeProjectGroup = async (
   );
 
   return {
-    ...initialProjectState,
-    name,
-    categories,
-    annotationCategories,
-    imageSortKey: imageSortKey,
-    images,
+    project: {
+      ...initialProjectState,
+      name,
+      imageSortKey: imageSortKey,
+    },
+    data: { images, annotations, categories, annotationCategories },
   };
 };
 
@@ -403,7 +418,7 @@ export const deserialize = async (filename: string) => {
   }
 
   const projectGroup = getGroup(f, "project");
-  const project = await deserializeProjectGroup(projectGroup);
+  const { project, data } = await deserializeProjectGroup(projectGroup);
 
   const classifierGroup = getGroup(f, "classifier");
   const classifier = deserializeClassifierGroup(classifierGroup);
@@ -417,6 +432,7 @@ export const deserialize = async (filename: string) => {
   return {
     project,
     classifier,
+    data,
     segmenter: initialSegmenterState,
   };
 };

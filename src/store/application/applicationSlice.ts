@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HotkeyView, Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
-import { ImageShapeInfo } from "utils/common/image";
 
 const initialState: Settings = {
   init: false,
@@ -48,22 +47,7 @@ export const applicationSlice = createSlice({
     ) {
       state.hotkeyStack.push(action.payload.hotkeyView);
     },
-    selectAllImages(
-      state: Settings,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      state.selectedImages = [];
 
-      state.selectedImages = action.payload.ids;
-    },
-    selectImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages.push(action.payload.id);
-    },
-    selectOneImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages = [];
-
-      state.selectedImages.push(action.payload.id);
-    },
     setImageSelectionColor(
       state: Settings,
       action: PayloadAction<{ selectionColor: string }>
@@ -95,32 +79,14 @@ export const applicationSlice = createSlice({
     ) {
       state.tileSize = action.payload.newValue!;
     },
-
-    uploadImages(
-      state,
-      action: PayloadAction<{
-        files: FileList;
-        channels: number;
-        slices: number;
-        referenceShape: ImageShapeInfo;
-        isUploadedFromAnnotator: boolean;
-        execSaga: boolean;
-      }>
-    ) {},
   },
 });
 
 export const {
-  clearSelectedImages,
-  deselectImage,
-  deselectImages,
   updateTileSize,
   hideAlertState,
   registerHotkeyView,
-  selectImage,
-  selectOneImage,
   setThemeMode,
   unregisterHotkeyView,
   updateAlertState,
-  uploadImages,
 } = applicationSlice.actions;

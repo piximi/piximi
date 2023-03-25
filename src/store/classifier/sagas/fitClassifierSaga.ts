@@ -17,22 +17,22 @@ import {
   preprocessClassifier,
 } from "store/classifier";
 import {
-  categorizedImagesSelector,
-  createdCategoriesCountSelector,
-  createdCategoriesSelector,
-  projectSlice,
-  trainImagesSelector,
-  valImagesSelector,
-} from "store/project";
+  dataSlice,
+  selectCreatedCategories,
+  selectTrainingImages,
+  selectValidationImages,
+  selectInferenceImages,
+  selectCreatedCategoryCount,
+} from "store/data";
 import { applicationSlice } from "store/application";
 import { compile } from "store/common";
 
 import {
   AlertStateType,
   AlertType,
-  OldImageType,
   ModelType,
   Partition,
+  ImageType,
 } from "types";
 
 import { getStackTraceFromError } from "utils";
@@ -57,8 +57,8 @@ export function* fitClassifierSaga({
     typeof classifierTrainingPercentageSelector
   > = yield select(classifierTrainingPercentageSelector);
 
-  const categorizedImages: ReturnType<typeof categorizedImagesSelector> =
-    yield select(categorizedImagesSelector);
+  const categorizedImages: ReturnType<typeof selectInferenceImages> =
+    yield select(selectInferenceImages);
 
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);
@@ -72,7 +72,7 @@ export function* fitClassifierSaga({
     preprocessingOptions.shuffle
       ? shuffle(categorizedImages)
       : categorizedImages
-  ).map((image: OldImageType) => {
+  ).map((image: ImageType) => {
     return image.id;
   });
 
@@ -86,16 +86,11 @@ export function* fitClassifierSaga({
   const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
   yield put(
-    projectSlice.actions.updateImagesPartition({
-      ids: trainDataIds,
-      partition: Partition.Training,
-    })
-  );
-
-  yield put(
-    projectSlice.actions.updateImagesPartition({
-      ids: valDataIds,
-      partition: Partition.Validation,
+    dataSlice.actions.updateImagesPartition({
+      imageIdsByPartition: {
+        [Partition.Training]: trainDataIds,
+        [Partition.Validation]: valDataIds,
+      },
     })
   );
 
@@ -103,7 +98,7 @@ export function* fitClassifierSaga({
     typeof classifierArchitectureOptionsSelector
   > = yield select(classifierArchitectureOptionsSelector);
 
-  const classes: number = yield select(createdCategoriesCountSelector);
+  const classes: number = yield select(selectCreatedCategoryCount);
 
   var model: ReturnType<typeof classifierCompiledSelector>;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
@@ -140,14 +135,14 @@ export function* fitClassifierSaga({
     classifierSlice.actions.updateCompiled({ compiled: compiledModel })
   );
 
-  const categories: ReturnType<typeof createdCategoriesSelector> = yield select(
-    createdCategoriesSelector
+  const categories: ReturnType<typeof selectCreatedCategories> = yield select(
+    selectCreatedCategories
   );
-  const trainImages: ReturnType<typeof trainImagesSelector> = yield select(
-    trainImagesSelector
+  const trainImages: ReturnType<typeof selectTrainingImages> = yield select(
+    selectTrainingImages
   );
-  const valImages: ReturnType<typeof valImagesSelector> = yield select(
-    valImagesSelector
+  const valImages: ReturnType<typeof selectValidationImages> = yield select(
+    selectValidationImages
   );
 
   try {

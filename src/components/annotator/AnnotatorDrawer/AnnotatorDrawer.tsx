@@ -13,10 +13,7 @@ import { SaveListItem } from "./SaveListItem";
 import { ClearAnnotationsListItem } from "./ClearAnnotations";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
-import {
-  createdAnnotatorCategoriesSelector,
-  unknownAnnotationCategorySelector,
-} from "store/project";
+import { selectCreatedAnnotatorCategories } from "store/data";
 import {
   activeImageSelector,
   numStagedAnnotationsSelector,
@@ -24,13 +21,14 @@ import {
   annotatorImagesSelector,
 } from "store/annotator";
 
-import { Category, CategoryType } from "types/Category";
+import {
+  Category,
+  CategoryType,
+  UNKNOWN_ANNOTATION_CATEGORY,
+} from "types/Category";
 
 export const AnnotatorDrawer = () => {
-  const createdCategories = useSelector(createdAnnotatorCategoriesSelector);
-  const unknownAnnotationCategory = useSelector(
-    unknownAnnotationCategorySelector
-  );
+  const createdCategories = useSelector(selectCreatedAnnotatorCategories);
 
   const dispatch = useDispatch();
 
@@ -85,7 +83,7 @@ export const AnnotatorDrawer = () => {
 
       <CategoriesList
         createdCategories={createdCategories}
-        unknownCategory={unknownAnnotationCategory}
+        unknownCategory={UNKNOWN_ANNOTATION_CATEGORY}
         predicted={false}
         categoryType={CategoryType.AnnotationCategory}
         onCategoryClickCallBack={onCategoryClickCallBack}

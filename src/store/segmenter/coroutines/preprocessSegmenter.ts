@@ -18,7 +18,7 @@ import {
 import * as ImageJS from "image-js";
 
 import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
-import { OldImageType } from "types/ImageType";
+import { ImageType } from "types/ImageType";
 import { Shape } from "types/Shape";
 import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
@@ -254,7 +254,7 @@ export const resize = async (
 };
 
 export const preprocessSegmentationImages = async (
-  images: Array<OldImageType>,
+  images: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,

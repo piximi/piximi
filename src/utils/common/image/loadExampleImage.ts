@@ -8,12 +8,7 @@ import { ColorModel, Image as ImageJS } from "image-js";
 
 import { deserializeAnnotations } from "utils/annotator";
 
-import {
-  AnnotationsEntityType,
-  Category,
-  EncodedAnnotationType,
-  SerializedFileType,
-} from "types";
+import { Category, EncodedAnnotationType, SerializedFileType } from "types";
 
 export const loadExampleImage = async (
   imagePath: string,
@@ -34,9 +29,7 @@ export const loadExampleImage = async (
     serializedAnnotations.annotations
   );
 
-  let annotationsEntity: AnnotationsEntityType = {};
   const annotations: Array<EncodedAnnotationType> = [];
-  const annotationIds: Array<string> = [];
 
   const normImageData = image.data.mul(255);
 
@@ -66,14 +59,6 @@ export const loadExampleImage = async (
       objectImage.width,
       3,
     ]);
-    annotationsEntity[annotation.id] = {
-      ...annotation,
-      data: data,
-      src: objSrc,
-      imageId: image.id,
-      boundingBox: bbox,
-    };
-    annotationIds.push(annotation.id);
     annotations.push({
       ...annotation,
       data: data,
@@ -85,7 +70,11 @@ export const loadExampleImage = async (
 
   image.annotations.push(...annotations);
 
-  const categories = serializedAnnotations.categories as Category[];
+  const annotationCategories = serializedAnnotations.categories as Category[];
 
-  return { image, categories, annotationsEntity, annotationIds };
+  return {
+    image,
+    annotationCategories,
+    annotations,
+  };
 };

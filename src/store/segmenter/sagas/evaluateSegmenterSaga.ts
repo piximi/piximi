@@ -3,10 +3,13 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
+import {
+  //selectAnnotationCategories,
+  selectSegmenterValidationImages,
+} from "store/data";
 //import { annotationCategoriesSelector } from "store/project";
 import {
   segmenterFittedModelSelector,
-  segmenterValidationImagesSelector,
   segmenterSlice,
   //segmenterValDataSelector,
   //evaluateSegmenter,
@@ -37,13 +40,13 @@ export function* evaluateSegmenterSaga({
     return;
   }
 
-  const validationImages: ReturnType<typeof segmenterValidationImagesSelector> =
-    yield select(segmenterValidationImagesSelector);
+  const validationImages: ReturnType<typeof selectSegmenterValidationImages> =
+    yield select(selectSegmenterValidationImages);
 
   yield put(applicationSlice.actions.hideAlertState({}));
 
-  // const categories: ReturnType<typeof annotationCategoriesSelector> =
-  //   yield select(annotationCategoriesSelector);
+  // const categories: ReturnType<typeof selectAnnotationCategories> =
+  //   yield select(selectAnnotationCategories);
 
   if (validationImages.length === 0) {
     yield put(
@@ -56,7 +59,7 @@ export function* evaluateSegmenterSaga({
       })
     );
   } else {
-    // yield runSegmentationEvaluation(validationImages, model, categories);
+    //yield runSegmentationEvaluation(validationImages, model, categories);
   }
 
   yield put(

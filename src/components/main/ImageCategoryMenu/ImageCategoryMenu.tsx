@@ -5,7 +5,7 @@ import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
 import { applicationSlice } from "store/application";
-import { categoriesSelector, updateImageCategories } from "store/project";
+import { dataSlice, selectAllCategories } from "store/data";
 
 import { Category } from "types";
 
@@ -28,7 +28,7 @@ export const ImageCategoryMenu = ({
   open,
   container,
 }: ImageCategoryMenuProps) => {
-  const categories = useSelector(categoriesSelector);
+  const categories = useSelector(selectAllCategories);
 
   const dispatch = useDispatch();
 
@@ -38,7 +38,12 @@ export const ImageCategoryMenu = ({
   ) => {
     onClose();
 
-    dispatch(updateImageCategories({ ids: imageIds, categoryId: categoryId }));
+    dispatch(
+      dataSlice.actions.updateImageCategories({
+        imageIds: imageIds,
+        categoryId: categoryId,
+      })
+    );
     dispatch(applicationSlice.actions.clearSelectedImages());
   };
 

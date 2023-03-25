@@ -13,9 +13,7 @@ import {
 } from "@mui/material";
 
 import { ColorIcon } from "components/common/ColorIcon";
-
-import { updateCategory, updateAnnotationCategory } from "store/project";
-
+import { dataSlice } from "store/data";
 import { Category, CategoryType, HotkeyView } from "types";
 
 type EditCategoryDialogProps = {
@@ -48,7 +46,7 @@ export const EditCategoryDialog = ({
   const onEdit = () => {
     if (categoryType === CategoryType.ClassifierCategory) {
       dispatch(
-        updateCategory({
+        dataSlice.actions.updateCategory({
           id: category.id,
           name: name,
           color: color,
@@ -56,7 +54,7 @@ export const EditCategoryDialog = ({
       );
     } else {
       dispatch(
-        updateAnnotationCategory({
+        dataSlice.actions.updateAnnotationCategory({
           id: category.id,
           name: name,
           color: color,

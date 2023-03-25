@@ -12,7 +12,7 @@ import { decodeSegmentationMaskToAnnotations } from "./segmentationMasks";
 
 import {
   Category,
-  OldImageType,
+  ImageType,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   DecodedAnnotationType,
 } from "types";
@@ -24,7 +24,7 @@ export const predictSegmentations = async (
     ys: Tensor<Rank.R4>;
     id: Tensor<Rank.R1>;
   }>,
-  inferenceImages: OldImageType[],
+  inferenceImages: ImageType[],
   categories: Category[]
 ): Promise<{
   annotations: Array<{

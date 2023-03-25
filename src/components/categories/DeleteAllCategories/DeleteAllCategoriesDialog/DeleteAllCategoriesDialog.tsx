@@ -12,7 +12,7 @@ import {
 import { useHotkeys } from "hooks";
 
 import { AnnotatorSlice } from "store/annotator";
-import { projectSlice } from "store/project";
+import { dataSlice } from "store/data";
 
 import {
   CategoryType,
@@ -44,7 +44,7 @@ export const DeleteAllCategoriesDialog = ({
   };
 
   const deleteAllClassifierCategories = () => {
-    dispatch(projectSlice.actions.deleteAllCategories({}));
+    dispatch(dataSlice.actions.deleteAllCategories({}));
   };
 
   const deleteAllAnnotationCategories = () => {
@@ -56,11 +56,7 @@ export const DeleteAllCategoriesDialog = ({
         })
       );
 
-      dispatch(AnnotatorSlice.actions.deleteAllAnnotationCategories());
-
-      dispatch(
-        projectSlice.actions.deleteAllAnnotationCategories({ execSaga: true })
-      );
+      dispatch(dataSlice.actions.deleteAllAnnotationCategories({}));
     });
   };
 

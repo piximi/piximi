@@ -15,9 +15,10 @@ import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeD
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
 import { applicationSlice } from "store/application";
-import { visibleImagesSelector } from "store/data";
+import { projectSlice } from "store/project";
+import { selectVisibleImages } from "store/data";
 
-import { AlertType, HotkeyView, ImageType } from "types";
+import { AlertType, HotkeyView } from "types";
 
 import { getStackTraceFromError } from "utils";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
@@ -32,7 +33,7 @@ export const MainView = () => {
   const [files, setFiles] = useState<FileList>();
 
   const dispatch = useDispatch();
-  const images = useSelector(visibleImagesSelector);
+  const images = useSelector(selectVisibleImages);
   useDefaultImage(DispatchLocation.Project);
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
 
@@ -53,10 +54,13 @@ export const MainView = () => {
     setFiles(files);
   };
 
-  const selectAllImages = () => {
-    const newSelected = images.map((image: ImageType) => image.id);
-    dispatch(applicationSlice.actions.selectAllImages({ ids: newSelected }));
-  };
+  const selectAllImages = useCallback(() => {
+    dispatch(
+      projectSlice.actions.selectAllImages({
+        ids: images.map((image) => image.id),
+      })
+    );
+  }, [images, dispatch]);
 
   const handleUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {

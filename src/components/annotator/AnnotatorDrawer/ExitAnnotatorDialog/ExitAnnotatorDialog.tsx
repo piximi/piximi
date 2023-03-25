@@ -14,8 +14,7 @@ import {
   annotatorImagesSelector,
   activeImageIdSelector,
 } from "store/annotator";
-import { selectedImagesSelector } from "store/common";
-import { projectSlice } from "store/project";
+import { selectedImagesSelector } from "store/project";
 
 import { OldImageType, ShadowImageType } from "types";
 
@@ -62,51 +61,15 @@ export const ExitAnnotatorDialog = ({
   };
 
   const onSaveAnnotations = () => {
-    if (selectedImagesIds.length === 0) {
-      batch(() => {
-        dispatch(
-          projectSlice.actions.setProjectImages({
-            images: annotatorImages as Array<OldImageType>,
-          })
-        );
-        dispatch(
-          AnnotatorSlice.actions.setImages({
-            images: [],
-            disposeColorTensors: false,
-          })
-        );
-        dispatch(
-          AnnotatorSlice.actions.setActiveImage({
-            imageId: undefined,
-            prevImageId: activeImageId,
-            execSaga: true,
-          })
-        );
-      });
-    } else {
-      const { newImages, modifiedImages, deletedImagesIds } = getImageSets();
-
-      batch(() => {
-        dispatch(projectSlice.actions.addImages({ images: newImages }));
-        dispatch(projectSlice.actions.deleteImages({ ids: deletedImagesIds }));
-        dispatch(
-          projectSlice.actions.reconcileImages({ images: modifiedImages })
-        );
-        dispatch(
-          AnnotatorSlice.actions.setImages({
-            images: [],
-            disposeColorTensors: false,
-          })
-        );
-        dispatch(
-          AnnotatorSlice.actions.setActiveImage({
-            imageId: undefined,
-            prevImageId: activeImageId,
-            execSaga: true,
-          })
-        );
-      });
-    }
+    batch(() => {
+      dispatch(
+        AnnotatorSlice.actions.setActiveImage({
+          imageId: undefined,
+          prevImageId: activeImageId,
+          execSaga: true,
+        })
+      );
+    });
 
     onReturnToProject();
   };
@@ -119,13 +82,6 @@ export const ExitAnnotatorDialog = ({
     }
 
     batch(() => {
-      dispatch(
-        AnnotatorSlice.actions.setImages({
-          images: [],
-          disposeColorTensors: true,
-        })
-      );
-
       dispatch(
         AnnotatorSlice.actions.setActiveImage({
           imageId: undefined,

@@ -4,12 +4,13 @@ import shuffle from "lodash/shuffle";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
-
 import {
-  annotatedImagesSelector,
-  projectSlice,
-  annotationCategoriesSelector,
-} from "store/project";
+  dataSlice,
+  selectAnnotatedImages,
+  selectAnnotationCategories,
+  selectSegmenterTrainingImages,
+  selectSegmenterValidationImages,
+} from "store/data";
 import {
   segmenterTrainingPercentageSelector,
   segmenterFitOptionsSelector,
@@ -18,8 +19,6 @@ import {
   segmenterCompiledModelSelector,
   segmenterCompileOptionsSelector,
   segmenterSlice,
-  segmenterTrainImagesSelector,
-  segmenterValidationImagesSelector,
   createSegmentationModel,
   preprocessSegmentationImages,
   fitSegmenter,
@@ -30,7 +29,7 @@ import {
   ModelType,
   AlertStateType,
   AlertType,
-  OldImageType,
+  ImageType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 
@@ -46,8 +45,8 @@ export function* fitSegmenterSaga({
     typeof segmenterTrainingPercentageSelector
   > = yield select(segmenterTrainingPercentageSelector);
 
-  const annotatedImages: ReturnType<typeof annotatedImagesSelector> =
-    yield select(annotatedImagesSelector);
+  const annotatedImages: ReturnType<typeof selectAnnotatedImages> =
+    yield select(selectAnnotatedImages);
 
   const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
     yield select(segmenterFitOptionsSelector);
@@ -59,7 +58,7 @@ export function* fitSegmenterSaga({
   // First assign train and val partition to all categorized images.
   const annotatedImagesIds = (
     preprocessingOptions.shuffle ? shuffle(annotatedImages) : annotatedImages
-  ).map((image: OldImageType) => {
+  ).map((image: ImageType) => {
     return image.id;
   });
 
@@ -71,18 +70,12 @@ export function* fitSegmenterSaga({
 
   const trainDataIds = annotatedImagesIds.splice(0, trainDataLength);
   const valDataIds = annotatedImagesIds.splice(-valDataLength, valDataLength);
-
   yield put(
-    projectSlice.actions.updateSegmentationImagesPartition({
-      ids: trainDataIds,
-      partition: Partition.Training,
-    })
-  );
-
-  yield put(
-    projectSlice.actions.updateSegmentationImagesPartition({
-      ids: valDataIds,
-      partition: Partition.Validation,
+    dataSlice.actions.updateSegmentationImagesPartition({
+      imageIdsByPartition: {
+        [Partition.Training]: trainDataIds,
+        [Partition.Validation]: valDataIds,
+      },
     })
   );
 
@@ -90,8 +83,8 @@ export function* fitSegmenterSaga({
     typeof segmenterArchitectureOptionsSelector
   > = yield select(segmenterArchitectureOptionsSelector);
 
-  const annotationCategories: ReturnType<typeof annotationCategoriesSelector> =
-    yield select(annotationCategoriesSelector);
+  const annotationCategories: ReturnType<typeof selectAnnotationCategories> =
+    yield select(selectAnnotationCategories);
 
   var model: LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
@@ -121,13 +114,13 @@ export function* fitSegmenterSaga({
 
   yield put(segmenterSlice.actions.updateCompiled({ compiled: compiledModel }));
 
-  const categories: ReturnType<typeof annotationCategoriesSelector> =
-    yield select(annotationCategoriesSelector);
+  const categories: ReturnType<typeof selectAnnotationCategories> =
+    yield select(selectAnnotationCategories);
 
-  const trainImages: ReturnType<typeof segmenterTrainImagesSelector> =
-    yield select(segmenterTrainImagesSelector);
-  const valImages: ReturnType<typeof segmenterValidationImagesSelector> =
-    yield select(segmenterValidationImagesSelector);
+  const trainImages: ReturnType<typeof selectSegmenterTrainingImages> =
+    yield select(selectSegmenterTrainingImages);
+  const valImages: ReturnType<typeof selectSegmenterValidationImages> =
+    yield select(selectSegmenterValidationImages);
 
   try {
     const trainData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =

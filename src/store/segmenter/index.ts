@@ -4,8 +4,6 @@ export { segmenterSlice } from "./segmenterSlice";
 
 // Selectors
 
-export { segmenterTrainImagesSelector } from "./selectors/segmenterTrainImagesSelector";
-export { segmenterValidationImagesSelector } from "./selectors/segmenterValidationImagesSelector";
 export { segmenterTrainingPercentageSelector } from "./selectors/segmenterTrainingPercentageSelector";
 export { segmenterFitOptionsSelector } from "./selectors/segmenterFitOptionsSelector";
 export { segmenterCompileOptionsSelector } from "./selectors/segmenterCompileOptionsSelector";
