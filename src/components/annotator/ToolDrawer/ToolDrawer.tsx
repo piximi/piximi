@@ -91,12 +91,10 @@ const toolMap: Record<
   },
 };
 export const ToolDrawer = ({
-  optionsVisibility,
   setOptionsVisibility,
   persistOptions,
   setPersistOptions,
 }: {
-  optionsVisibility: boolean;
   setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
   persistOptions: boolean;
   setPersistOptions: React.Dispatch<React.SetStateAction<boolean>>;
@@ -122,9 +120,9 @@ export const ToolDrawer = ({
     <Drawer
       anchor="right"
       sx={{
-        "flexShrink": 0,
-        "whiteSpace": "nowrap",
-        "width": 56,
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+        width: 56,
         "& > .MuiDrawer-paper": {
           width: 56,
         },

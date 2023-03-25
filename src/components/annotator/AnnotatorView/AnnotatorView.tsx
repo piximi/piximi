@@ -155,7 +155,6 @@ export const AnnotatorView = () => {
         <ToolOptions optionsVisibility={optionsVisible} />
 
         <ToolDrawer
-          optionsVisibility={optionsVisible}
           setOptionsVisibility={setOptionsVisibile}
           persistOptions={persistOptions}
           setPersistOptions={setPersistOptions}
