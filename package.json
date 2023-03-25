@@ -157,8 +157,5 @@
   },
   "jest": {
     "resetMocks": false
-  },
-  "prettier": {
-    "quoteProps": "consistent"
   }
 }

@@ -51,7 +51,7 @@ function TabPanel(props: TabPanelProps) {
 
 function a11yProps(index: number) {
   return {
-    "id": `simple-tab-${index}`,
+    id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
@@ -200,14 +200,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     };
     getObjs();
   }, [images]);
-
-  useEffect(() => {
-    console.log(
-      images[0].annotations.map((a) => {
-        return a.boundingBox;
-      })
-    );
-  });
 
   return (
     <Box
