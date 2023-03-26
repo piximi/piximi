@@ -7,13 +7,13 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice, selectAllCategories } from "store/data";
 import {
-  activeImageSelector,
-  annotatorImagesSelector,
-  AnnotatorSlice,
-  setStagedAnnotations,
-} from "store/annotator";
+  dataSlice,
+  selectAllCategories,
+  selectActiveImage,
+  selectSelectedImages,
+} from "store/data";
+import { AnnotatorSlice, setStagedAnnotations } from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -39,8 +39,8 @@ export const ImageMenu = ({
   const dispatch = useDispatch();
 
   const annotationCategories = useSelector(selectAllCategories);
-  const images = useSelector(annotatorImagesSelector);
-  const activeImage = useSelector(activeImageSelector);
+  const images = useSelector(selectSelectedImages);
+  const activeImage = useSelector(selectActiveImage);
 
   const ClearAnnotationsClickHandler = (
     event: React.MouseEvent<HTMLElement, MouseEvent>

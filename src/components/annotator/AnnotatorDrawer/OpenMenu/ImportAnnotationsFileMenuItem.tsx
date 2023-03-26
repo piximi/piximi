@@ -3,21 +3,22 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import {
-  AnnotatorSlice,
-  annotatorImagesSelector,
-  activeImageIdSelector,
-} from "store/annotator";
+import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import {
   dataSlice,
   selectAllCategories,
   selectUnusedCategoryColors,
+  selectSelectedImages,
 } from "store/data";
 
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
 import { validateFileType, ProjectFileType } from "types/runtime";
-import { SerializedCOCOFileType, SerializedFileType } from "types";
+import {
+  SerializedCOCOFileType,
+  SerializedFileType,
+  ShadowImageType,
+} from "types";
 
 type ImportAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -34,7 +35,9 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const existingAnnotationCategories = useSelector(selectAllCategories);
 
-  const existingImages = useSelector(annotatorImagesSelector);
+  const existingImages = useSelector(selectSelectedImages).map((image) => {
+    return { ...image, annotations: [] } as ShadowImageType;
+  });
 
   const availableColors = useSelector(selectUnusedCategoryColors);
 

@@ -14,7 +14,10 @@ export { selectAnnotatedImages } from "./selectors/selectAnnotatedImages";
 export { selectAnnotationCategories } from "./selectors/selectAnnotationCategories";
 export { selectSegmenterTrainingImages } from "./selectors/selectSegmenterTrainingImages";
 export { selectSegmenterValidationImages } from "./selectors/selectSegmenterValidationImages";
-export { selectAllImages } from "./selectors/selectAllImages";
+export {
+  selectAllImages,
+  selectSelectedImages,
+} from "./selectors/selectAllImages";
 export { selectAllCategories } from "./selectors/selectAllCategories";
 export { selectUnannotatedImages } from "./selectors/selectUnannotatedImages";
 export { selectInferenceImages } from "./selectors/selectInferenceImages";
@@ -23,14 +26,30 @@ export { selectValidationImages } from "./selectors/selectValidationImages";
 export { selectCreatedCategoryCount } from "./selectors/selectCreatedCategoryCount";
 export { selectCategoryById } from "./selectors/selectCategoryById";
 export { selectAnnotationCategoryById } from "./selectors/selectAnnotationCategoryById";
-export { selectActiveImageBitDepth } from "./selectors/selectActiveImageBitDepth";
-export { selectActiveImageData } from "./selectors/selectActiveImageData";
-export { selectActiveImageName } from "./selectors/selectActiveImageName";
-export { selectActiveImage } from "./selectors/selectActiveImage";
+export {
+  selectActiveImage,
+  selectActiveImageBitDepth,
+  selectActiveImageColor,
+  selectActiveImageData,
+  selectActiveImageName,
+  selectActiveImageRawColor,
+  selectActiveImageActivePlane,
+  selectActiveImageChannels,
+  selectActiveImageHeight,
+  selectActiveImageShape,
+  selectActiveImageWidth,
+  selectActiveImageSrc,
+} from "./selectors/selectActiveImage";
 export { selectAllAnnotationCategories } from "./selectors/selectAllAnnotationCategories";
 export { selectAllVisibleAnnotationCategories } from "./selectors/selectAllVisibleAnnotationCategories";
 export { selectActiveAnnotationObjects } from "./selectors/selectActiveAnnotationObjects";
-export { selectAllAnnotations } from "./selectors/selectAllAnnotations";
+export {
+  selectAllAnnotations,
+  selectSelectedAnnotations,
+  selectStagedAnnotations,
+  selectWorkingAnnotation,
+} from "./selectors/selectAllAnnotations";
+
 export {
   selectUnusedCategoryColors,
   selectUnusedAnnotationCategoryColors,

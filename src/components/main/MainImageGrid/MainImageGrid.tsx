@@ -12,7 +12,7 @@ import { MainImageGridAppBar } from "../MainImageGridAppBar";
 import {
   updateHighlightedCategory,
   highlightedCategoriesSelector,
-  selectedImagesSelector,
+  selectedImagesIdSelector,
 } from "store/project";
 
 import {
@@ -67,7 +67,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     selectedImageBorderWidthSelector
   );
   const highlightedCategory = useSelector(highlightedCategoriesSelector);
-  const selectedImages = useSelector(selectedImagesSelector);
+  const selectedImages = useSelector(selectedImagesIdSelector);
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();

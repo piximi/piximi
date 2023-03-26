@@ -35,7 +35,7 @@ import {
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { projectSlice, selectedImagesSelector } from "store/project";
+import { projectSlice, selectedImagesIdSelector } from "store/project";
 import { selectVisibleImages } from "store/data";
 import { setActiveImage, AnnotatorSlice } from "store/annotator";
 
@@ -46,7 +46,7 @@ export const MainImageGridAppBar = () => {
   const navigate = useNavigate();
 
   const images = useSelector(selectVisibleImages);
-  const selectedImages: Array<string> = useSelector(selectedImagesSelector);
+  const selectedImages: Array<string> = useSelector(selectedImagesIdSelector);
   const currentHotkeyView = useSelector(hotkeyViewSelector);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =

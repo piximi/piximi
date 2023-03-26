@@ -44,8 +44,10 @@ const initialState: Annotator = {
   thresholdAnnotationValue: 150,
   saturation: 0,
   workingAnnotation: undefined,
-  selectedAnnotations: [],
+  workingAnnotationId: undefined,
+  selectedAnnotationIds: [],
   stagedAnnotations: [],
+  stagedAnnotationIds: [],
   stagedAnnotationsHaveBeenUpdated: false,
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   selectionMode: AnnotationModeType.New,
@@ -130,7 +132,7 @@ export const annotatorSlice = createSlice({
       //deletes all instances across a given image
       if (action.payload.imageId === state.activeImageId) {
         state.stagedAnnotations = [];
-        state.selectedAnnotations = [];
+        state.selectedAnnotationIds = [];
         state.workingAnnotation = undefined;
       }
       state.images = state.images.map((image) => {
@@ -210,7 +212,7 @@ export const annotatorSlice = createSlice({
       state.activeImageId = action.payload.imageId;
 
       // reset selected annotations
-      state.selectedAnnotations = [];
+      state.selectedAnnotationIds = [];
       state.workingAnnotation = undefined;
     },
     setActiveImagePlane(
@@ -364,7 +366,7 @@ export const annotatorSlice = createSlice({
         workingAnnotation: DecodedAnnotationType | undefined;
       }>
     ) {
-      state.selectedAnnotations = action.payload.selectedAnnotations.map(
+      state.selectedAnnotationIds = action.payload.selectedAnnotations.map(
         (annotation) => annotation.id
       );
       state.workingAnnotation = action.payload.workingAnnotation;

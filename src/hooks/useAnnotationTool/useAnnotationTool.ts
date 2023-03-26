@@ -3,13 +3,13 @@ import * as ImageJS from "image-js";
 import { useSelector } from "react-redux";
 
 import {
-  imageSrcSelector,
   penSelectionBrushSizeSelector,
   quickSelectionRegionSizeSelector,
   stageScaleSelector,
   thresholdAnnotationValueSelector,
   toolTypeSelector,
 } from "store/annotator";
+import { selectActiveImageSrc } from "store/data";
 
 import { ToolType } from "types";
 import {
@@ -27,7 +27,7 @@ import {
 } from "annotator-tools";
 
 export const useAnnotationTool = () => {
-  const src = useSelector(imageSrcSelector);
+  const src = useSelector(selectActiveImageSrc);
   const operation = useSelector(toolTypeSelector);
   const stageScale = useSelector(stageScaleSelector);
 

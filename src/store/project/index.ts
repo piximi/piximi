@@ -14,5 +14,5 @@ export { imageSortKeySelector } from "./selectors/imageSortKeySelector";
 export { projectSelector } from "./selectors/projectSelector";
 export { projectNameSelector } from "./selectors/projectNameSelector";
 
-export { selectedImagesSelector } from "./selectors/selectedImagesSelector";
+export { selectedImagesIdSelector } from "./selectors/selectedImagesIdSelector";
 // Sagas

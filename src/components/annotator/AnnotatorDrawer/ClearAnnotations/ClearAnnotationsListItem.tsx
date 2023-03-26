@@ -13,11 +13,10 @@ import { useDialog, useTranslation } from "hooks";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 
 import {
-  annotatorImagesSelector,
   AnnotatorSlice,
   selectedAnnotationsIdsSelector,
-  stagedAnnotationsSelector,
 } from "store/annotator";
+import { selectSelectedImages, selectStagedAnnotations } from "store/data";
 
 import { ShadowImageType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
@@ -25,9 +24,11 @@ export const ClearAnnotationsListItem = () => {
   const dispatch = useDispatch();
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
+  const stagedAnnotations = useSelector(selectStagedAnnotations);
 
-  const annotatorImages = useSelector(annotatorImagesSelector);
+  const annotatorImages = useSelector(selectSelectedImages).map((image) => {
+    return { ...image, annotations: [] } as ShadowImageType;
+  });
 
   const {
     onClose: onCloseDeleteAllAnnotationsDialog,

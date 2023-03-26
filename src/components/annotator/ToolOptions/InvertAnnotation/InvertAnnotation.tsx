@@ -11,7 +11,8 @@ import {
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import { AnnotatorSlice, workingAnnotationSelector } from "store/annotator";
+import { AnnotatorSlice } from "store/annotator";
+import { selectWorkingAnnotation } from "store/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 
@@ -19,7 +20,7 @@ export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
   const [annotationTool] = useAnnotationTool();
-  const workingAnnotation = useSelector(workingAnnotationSelector);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
 
   const onInvertClick = () => {
     if (!annotationTool) return;

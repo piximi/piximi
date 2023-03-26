@@ -1,6 +1,6 @@
 import { Project } from "types";
 
-export const selectedImagesSelector = ({
+export const selectedImagesIdSelector = ({
   project,
 }: {
   project: Project;

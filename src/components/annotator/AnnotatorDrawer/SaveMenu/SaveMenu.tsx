@@ -15,12 +15,15 @@ import {
 } from "utils/annotator/imageHelper";
 
 import { projectNameSelector } from "store/project";
-import { selectAllCategories, selectAllAnnotationCategories } from "store/data";
-import { annotatorImagesSelector } from "store/annotator";
+import {
+  selectAllCategories,
+  selectAllAnnotationCategories,
+  selectSelectedImages,
+} from "store/data";
 
 import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 
-import { AnnotationExportType, HotkeyView } from "types";
+import { AnnotationExportType, HotkeyView, ShadowImageType } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -61,7 +64,9 @@ const exportOptions = [
 ];
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
-  const images = useSelector(annotatorImagesSelector);
+  const images = useSelector(selectSelectedImages).map((image) => {
+    return { ...image, annotations: [] } as ShadowImageType;
+  });
 
   const annotationCategories = useSelector(selectAllAnnotationCategories);
   const categories = useSelector(selectAllCategories);

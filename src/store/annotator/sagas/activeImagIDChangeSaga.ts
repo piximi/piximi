@@ -1,12 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import {
-  AnnotatorSlice,
-  imageInstancesSelector,
-  stagedAnnotationsSelector,
-} from "store/annotator";
-import { selectActiveImage } from "store/data";
+import { AnnotatorSlice, imageInstancesSelector } from "store/annotator";
+import { selectActiveImage, selectStagedAnnotations } from "store/data";
 import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
 
 import { Colors } from "types/tensorflow";
@@ -56,11 +52,11 @@ export function* activeImageIDChangeSaga({
   );
 
   let previousStagedAnnotations:
-    | ReturnType<typeof stagedAnnotationsSelector>
+    | ReturnType<typeof selectStagedAnnotations>
     | undefined;
 
   if (prevImageId) {
-    previousStagedAnnotations = yield select(stagedAnnotationsSelector);
+    previousStagedAnnotations = yield select(selectStagedAnnotations);
   }
 
   const imageAnnotations: ReturnType<typeof imageInstancesSelector> =

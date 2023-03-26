@@ -15,11 +15,11 @@ import {
 import { useTranslation } from "hooks";
 
 import {
-  annotationStateSelector,
   AnnotatorSlice,
-  workingAnnotationSelector,
+  annotationStateSelector,
   selectionModeSelector,
 } from "store/annotator";
+import { selectWorkingAnnotation } from "store/data";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
 
@@ -32,7 +32,7 @@ export const AnnotationMode = () => {
 
   const annotationState = useSelector(annotationStateSelector);
 
-  const workingAnnotation = useSelector(workingAnnotationSelector);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
 
   const [disableAnnotationEdits, setDisabledAnnotationEdit] =
     React.useState(true);

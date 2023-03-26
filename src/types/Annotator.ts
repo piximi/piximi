@@ -32,8 +32,10 @@ export type Annotator = {
   thresholdAnnotationValue: number;
   saturation: number;
   workingAnnotation: DecodedAnnotationType | undefined;
-  selectedAnnotations: Array<string>;
+  workingAnnotationId: string | undefined;
+  selectedAnnotationIds: Array<string>;
   stagedAnnotations: Array<DecodedAnnotationType>;
+  stagedAnnotationIds: Array<string>;
   stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;
   selectionMode: AnnotationModeType;

@@ -5,5 +5,5 @@ export const selectedAnnotationsIdsSelector = ({
 }: {
   annotator: Annotator;
 }): Array<string> => {
-  return annotator.selectedAnnotations;
+  return annotator.selectedAnnotationIds;
 };

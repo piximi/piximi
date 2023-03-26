@@ -6,12 +6,15 @@ import {
   AnnotatorSlice,
   setOperation,
   setSelectedCategoryId,
-  selectedAnnotationsSelector,
-  stagedAnnotationsSelector,
-  annotatorImagesSelector,
   activeImageIdSelector,
   soundEnabledSelector,
 } from "store/annotator";
+
+import {
+  selectSelectedImages,
+  selectSelectedAnnotations,
+  selectStagedAnnotations,
+} from "store/data";
 
 import {
   AnnotationModeType,
@@ -55,10 +58,10 @@ export const useAnnotatorKeyboardShortcuts = ({
   const dispatch = useDispatch();
 
   const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const images = useSelector(annotatorImagesSelector);
+  const images = useSelector(selectSelectedImages);
   const activeImageId = useSelector(activeImageIdSelector);
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
+  const selectedAnnotations = useSelector(selectSelectedAnnotations);
+  const stagedAnnotations = useSelector(selectStagedAnnotations);
 
   const confirmAnnotations = () => {
     if (

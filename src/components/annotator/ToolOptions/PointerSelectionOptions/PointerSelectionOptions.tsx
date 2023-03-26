@@ -16,12 +16,12 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
+import { AnnotatorSlice } from "store/annotator";
 import {
-  AnnotatorSlice,
-  selectedAnnotationsSelector,
-  stagedAnnotationsSelector,
-} from "store/annotator";
-import { selectAllAnnotationCategories } from "store/data";
+  selectAllAnnotationCategories,
+  selectSelectedAnnotations,
+  selectStagedAnnotations,
+} from "store/data";
 
 import { Category } from "types";
 
@@ -32,8 +32,8 @@ export const PointerSelectionOptions = () => {
 
   const dispatch = useDispatch();
 
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
+  const selectedAnnotations = useSelector(selectSelectedAnnotations);
+  const stagedAnnotations = useSelector(selectStagedAnnotations);
   const annotationCategories = useSelector(selectAllAnnotationCategories);
 
   const onSelectAll = () => {

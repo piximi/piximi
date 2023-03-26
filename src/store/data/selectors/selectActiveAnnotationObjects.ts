@@ -54,11 +54,6 @@ export const selectActiveAnnotationObjects = createSelector(
   ) => {
     if (!activeImageShape) return [];
 
-    console.log(`activeImageShape: ${activeImageShape}`);
-    console.log(` activeAnnotationIds: ${activeAnnotationIds}`);
-    console.log(`annotationEntities: ${annotationEntities}`);
-    console.log(`categoryEntities: ${categoryEntities}`);
-
     const annotationObjects = activeAnnotationIds.map((annotationId) => {
       const annotation = decodeAnnotation(annotationEntities[annotationId])!;
       const fillColor = categoryEntities[annotation.categoryId].color;

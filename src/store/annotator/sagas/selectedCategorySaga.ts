@@ -1,12 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
+import { AnnotatorSlice } from "store/annotator";
 import {
-  AnnotatorSlice,
-  workingAnnotationSelector,
-  selectedAnnotationsSelector,
-} from "store/annotator";
-import { selectAnnotationCategoryById } from "store/data";
+  selectAnnotationCategoryById,
+  selectWorkingAnnotation,
+  selectSelectedAnnotations,
+} from "store/data";
 import { Category, DecodedAnnotationType } from "types";
 
 export function* selectedCategorySaga({
@@ -18,12 +18,12 @@ export function* selectedCategorySaga({
     selectAnnotationCategoryById(selectedCategoryId)
   );
 
-  const selectedAnnotations: ReturnType<typeof selectedAnnotationsSelector> =
-    yield select(selectedAnnotationsSelector);
+  const selectedAnnotations: ReturnType<typeof selectSelectedAnnotations> =
+    yield select(selectSelectedAnnotations);
   if (!selectedAnnotations.length) return;
 
-  const workingAnnotation: ReturnType<typeof workingAnnotationSelector> =
-    yield select(workingAnnotationSelector);
+  const workingAnnotation: ReturnType<typeof selectWorkingAnnotation> =
+    yield select(selectWorkingAnnotation);
 
   const updatedAnnotations = selectedAnnotations.map(
     (annotation: DecodedAnnotationType) => {

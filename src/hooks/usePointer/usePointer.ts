@@ -5,17 +5,20 @@ import { useHotkeys } from "hooks";
 import {
   AnnotatorSlice,
   currentIndexSelector,
-  imageHeightSelector,
-  imageWidthSelector,
   pointerSelectionSelector,
   selectedAnnotationsIdsSelector,
-  selectedAnnotationsSelector,
   toolTypeSelector,
   setSelectedAnnotations,
   setSelectedCategoryId,
   setPointerSelection,
-  stagedAnnotationsSelector,
 } from "store/annotator";
+
+import {
+  selectActiveImageHeight,
+  selectActiveImageWidth,
+  selectSelectedAnnotations,
+  selectStagedAnnotations,
+} from "store/data";
 
 import { DecodedAnnotationType, HotkeyView, ToolType } from "types";
 
@@ -31,17 +34,17 @@ export const usePointer = () => {
 
   const toolType = useSelector(toolTypeSelector);
 
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
+  const selectedAnnotations = useSelector(selectSelectedAnnotations);
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
 
   const pointerSelection = useSelector(pointerSelectionSelector);
 
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
+  const stagedAnnotations = useSelector(selectStagedAnnotations);
 
-  const imageWidth = useSelector(imageWidthSelector);
+  const imageWidth = useSelector(selectActiveImageWidth);
 
-  const imageHeight = useSelector(imageHeightSelector);
+  const imageHeight = useSelector(selectActiveImageHeight);
 
   let overlappingAnnotationsIds: Array<string> = [];
 
