@@ -16,9 +16,13 @@ import { Palette } from "../Palette";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
+import { AnnotatorSlice } from "store/annotator";
 
-import { selectActiveImageBitDepth, selectActiveImageData } from "store/data";
+import {
+  selectActiveImageBitDepth,
+  selectActiveImageData,
+  selectActiveImageRawColor,
+} from "store/data";
 
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 
@@ -37,7 +41,7 @@ export const ChannelsList = () => {
     setLocalState: setLocalActiveImageColors,
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
-    activeImageColorsRawSelector,
+    selectActiveImageRawColor,
     AnnotatorSlice.actions.setImageColors,
     { range: {}, visible: {}, color: [] }
   );

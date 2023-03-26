@@ -3,13 +3,15 @@ import { put, select } from "redux-saga/effects";
 
 import {
   AnnotatorSlice,
-  activeImagePlaneSelector,
-  workingAnnotationSelector,
   selectionModeSelector,
   toolTypeSelector,
   selectedAnnotationCategoryIdSelector,
 } from "store/annotator";
-import { selectAnnotationCategoryById } from "store/data";
+import {
+  selectAnnotationCategoryById,
+  selectActiveImageActivePlane,
+  selectWorkingAnnotation,
+} from "store/data";
 
 import {
   AnnotationModeType,
@@ -37,8 +39,8 @@ export function* annotationStateChangeSaga({
   const selectionMode: ReturnType<typeof selectionModeSelector> = yield select(
     selectionModeSelector
   );
-  const activeImagePlane: ReturnType<typeof activeImagePlaneSelector> =
-    yield select(activeImagePlaneSelector);
+  const activeImagePlane: ReturnType<typeof selectActiveImageActivePlane> =
+    yield select(selectActiveImageActivePlane);
 
   const selectedAnnotationCategoryId: ReturnType<
     typeof selectedAnnotationCategoryIdSelector
@@ -49,7 +51,7 @@ export function* annotationStateChangeSaga({
       selectAnnotationCategoryById(selectedAnnotationCategoryId)
     );
 
-    annotationTool.annotate(selectedCategory, activeImagePlane);
+    annotationTool.annotate(selectedCategory, activeImagePlane!);
 
     if (!annotationTool.annotation) return;
 
@@ -66,8 +68,8 @@ export function* annotationStateChangeSaga({
 
     if (toolType === ToolType.Zoom) return;
 
-    const workingAnnotation: ReturnType<typeof workingAnnotationSelector> =
-      yield select(workingAnnotationSelector);
+    const workingAnnotation: ReturnType<typeof selectWorkingAnnotation> =
+      yield select(selectWorkingAnnotation);
 
     if (annotationTool.annotationState !== AnnotationStateType.Annotated)
       return;
@@ -119,7 +121,7 @@ export function* annotationStateChangeSaga({
       const selectedCategory: Category = yield select(
         selectAnnotationCategoryById(selectedAnnotationCategoryId)
       );
-      annotationTool.annotate(selectedCategory, activeImagePlane);
+      annotationTool.annotate(selectedCategory, activeImagePlane!);
     }
   }
 }

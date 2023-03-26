@@ -5,5 +5,5 @@ export const selectAllAnnotationCategories = ({
 }: {
   data: DataStoreSlice;
 }) => {
-  return Object.values(data.categories.entities);
+  return Object.values(data.annotationCategories.entities);
 };

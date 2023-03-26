@@ -4,15 +4,10 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import {
-  imageWidthSelector,
-  workingAnnotationSelector,
-  selectedAnnotationsSelector,
   soundEnabledSelector,
   activeImageIdSelector,
   cursorSelector,
-  imageHeightSelector,
   setSelectedAnnotations,
-  stagedAnnotationsSelector,
   stageScaleSelector,
   setAnnotationState,
   setSelectionMode,
@@ -20,6 +15,14 @@ import {
   updateStagedAnnotations,
   imageOriginSelector,
 } from "store/annotator";
+
+import {
+  selectActiveImageHeight,
+  selectActiveImageWidth,
+  selectWorkingAnnotation,
+  selectSelectedAnnotations,
+  selectStagedAnnotations,
+} from "store/data";
 
 import useSound from "use-sound";
 
@@ -60,15 +63,15 @@ export const AnnotationTransformer = ({
 }: AnnotationTransformerProps) => {
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
-  const stagedAnnotations = useSelector(stagedAnnotationsSelector);
-  const workingAnnotation = useSelector(workingAnnotationSelector);
-  const selectedAnnotations = useSelector(selectedAnnotationsSelector);
+  const stagedAnnotations = useSelector(selectStagedAnnotations);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeImageId = useSelector(activeImageIdSelector);
   const stageScale = useSelector(stageScaleSelector);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(soundEnabledSelector);
-  const imageWidth = useSelector(imageWidthSelector);
-  const imageHeight = useSelector(imageHeightSelector);
+  const imageWidth = useSelector(selectActiveImageWidth);
+  const imageHeight = useSelector(selectActiveImageHeight);
   const imageOrigin = useSelector(imageOriginSelector);
   const trRef = useRef<Konva.Transformer | null>(null);
 

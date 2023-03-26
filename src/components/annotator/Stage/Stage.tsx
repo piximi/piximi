@@ -23,7 +23,6 @@ import { ZoomSelection } from "./Selection/ZoomSelection";
 import { Selection } from "./Selection";
 
 import {
-  activeImagePlaneSelector,
   annotationStateSelector,
   cursorSelector,
   scaledImageHeightSelector,
@@ -32,17 +31,20 @@ import {
   selectionModeSelector,
   setStagePosition,
   setZoomSelection,
-  stagedAnnotationsSelector,
   stagePositionSelector,
   stageScaleSelector,
   toolTypeSelector,
-  workingAnnotationSelector,
   zoomSelectionSelector,
   setStagedAnnotations,
   setAnnotationState,
   setSelectedAnnotations,
   setImageOrigin,
 } from "store/annotator";
+import {
+  selectActiveImageActivePlane,
+  selectStagedAnnotations,
+  selectWorkingAnnotation,
+} from "store/data";
 
 import { zoomToolOptionsSelector } from "store/tool-options";
 
@@ -111,13 +113,13 @@ export const Stage = ({
   );
   const selectionMode = useSelector(selectionModeSelector);
   const stagePosition = useSelector(stagePositionSelector);
-  const activeImagePlane = useSelector(activeImagePlaneSelector);
+  const activeImagePlane = useSelector(selectActiveImageActivePlane);
   const scaledImageWidth = useSelector(scaledImageWidthSelector);
   const scaledImageHeight = useSelector(scaledImageHeightSelector);
   const stageScale = useSelector(stageScaleSelector);
-  const annotations = useSelector(stagedAnnotationsSelector);
+  const annotations = useSelector(selectStagedAnnotations);
   const annotationState = useSelector(annotationStateSelector);
-  const workingAnnotation = useSelector(workingAnnotationSelector);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
   const cursor = useSelector(cursorSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
   const automaticCentering = useSelector(zoomToolOptionsSelector);
@@ -317,7 +319,7 @@ export const Stage = ({
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool?.annotate(selectedCategory, activeImagePlane);
+      annotationTool?.annotate(selectedCategory, activeImagePlane!);
     };
     return func;
   }, [

@@ -8,7 +8,8 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { AnnotatorSlice, activeImageColorsRawSelector } from "store/annotator";
+import { AnnotatorSlice } from "store/annotator";
+import { selectActiveImageRawColor } from "store/data";
 
 import { DEFAULT_COLORS } from "types";
 
@@ -23,7 +24,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
 
   const open = Boolean(anchorEl);
 
-  const colors = useSelector(activeImageColorsRawSelector);
+  const colors = useSelector(selectActiveImageRawColor);
 
   const dispatch = useDispatch();
 

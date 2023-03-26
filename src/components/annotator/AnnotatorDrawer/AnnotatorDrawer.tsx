@@ -13,19 +13,19 @@ import { SaveListItem } from "./SaveListItem";
 import { ClearAnnotationsListItem } from "./ClearAnnotations";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
-import { selectCreatedAnnotatorCategories } from "store/data";
 import {
-  activeImageSelector,
-  numStagedAnnotationsSelector,
-  AnnotatorSlice,
-  annotatorImagesSelector,
-} from "store/annotator";
+  selectCreatedAnnotatorCategories,
+  selectActiveImage,
+  selectSelectedImages,
+} from "store/data";
+import { numStagedAnnotationsSelector, AnnotatorSlice } from "store/annotator";
 
 import {
   Category,
   CategoryType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types/Category";
+import { ShadowImageType } from "types";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotatorCategories);
@@ -41,8 +41,8 @@ export const AnnotatorDrawer = () => {
     );
   };
 
-  const annotatorImages = useSelector(annotatorImagesSelector);
-  const activeImage = useSelector(activeImageSelector);
+  const annotatorImages = useSelector(selectSelectedImages);
+  const activeImage = useSelector(selectActiveImage);
   const numStagedAnnotations = useSelector(numStagedAnnotationsSelector);
 
   return (
@@ -73,8 +73,10 @@ export const AnnotatorDrawer = () => {
 
       {activeImage && (
         <ImageList
-          activeImage={activeImage}
-          images={annotatorImages}
+          activeImage={{ ...activeImage, annotations: [] } as ShadowImageType}
+          images={annotatorImages.map((image) => {
+            return { ...image, annotations: [] } as ShadowImageType;
+          })}
           numStagedAnnotations={numStagedAnnotations}
         />
       )}

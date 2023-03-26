@@ -5,11 +5,11 @@ import Konva from "konva";
 
 import {
   activeImageRenderedSrcsSelector,
-  activeImagePlaneSelector,
   imageOriginSelector,
   scaledImageHeightSelector,
   scaledImageWidthSelector,
 } from "store/annotator";
+import { selectActiveImageActivePlane } from "store/data";
 
 import { Point } from "types";
 
@@ -44,7 +44,7 @@ export const Image = forwardRef<
   Konva.Image,
   { stageWidth: number; stageHeight: number }
 >(({ stageWidth, stageHeight }, ref) => {
-  const activePlane = useSelector(activeImagePlaneSelector)!;
+  const activePlane = useSelector(selectActiveImageActivePlane)!;
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
   const width = useSelector(scaledImageWidthSelector);
   const height = useSelector(scaledImageHeightSelector);

@@ -6,14 +6,15 @@ import { ListItem, ListItemText } from "@mui/material";
 import { createRenderedTensor } from "utils/common/image";
 
 import { annotatorFullImagesSelector } from "store/common";
-import { AnnotatorSlice, activeImageColorsSelector } from "store/annotator";
+import { AnnotatorSlice } from "store/annotator";
+import { selectActiveImageColor } from "store/data";
 
 import { OldImageType } from "types";
 
 export const ApplyColorsButton = () => {
   const dispatch = useDispatch();
 
-  const activeImageColors = useSelector(activeImageColorsSelector);
+  const activeImageColors = useSelector(selectActiveImageColor);
   const images = useSelector(annotatorFullImagesSelector);
 
   const onApplyColorsClick = async () => {

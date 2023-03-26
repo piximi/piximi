@@ -9,12 +9,9 @@ import {
   Stack,
 } from "@mui/material";
 
-import {
-  AnnotatorSlice,
-  annotatorImagesSelector,
-  activeImageIdSelector,
-} from "store/annotator";
-import { selectedImagesSelector } from "store/project";
+import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { selectSelectedImages } from "store/data";
+import { selectedImagesIdSelector } from "store/project";
 
 import { OldImageType, ShadowImageType } from "types";
 
@@ -31,8 +28,10 @@ export const ExitAnnotatorDialog = ({
 }: ExitAnnotatorDialogProps) => {
   const dispatch = useDispatch();
 
-  const annotatorImages = useSelector(annotatorImagesSelector);
-  const selectedImagesIds = useSelector(selectedImagesSelector);
+  const annotatorImages = useSelector(selectSelectedImages).map((image) => {
+    return { ...image, annotations: [] } as ShadowImageType;
+  });
+  const selectedImagesIds = useSelector(selectedImagesIdSelector);
 
   const activeImageId = useSelector(activeImageIdSelector);
 

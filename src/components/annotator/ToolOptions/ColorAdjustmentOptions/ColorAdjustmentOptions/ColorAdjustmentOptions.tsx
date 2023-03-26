@@ -9,9 +9,8 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { AnnotatorSlice, imageShapeSelector } from "store/annotator";
-
-import { selectActiveImageData } from "store/data";
+import { AnnotatorSlice } from "store/annotator";
+import { selectActiveImageData, selectActiveImageShape } from "store/data";
 
 import { generateDefaultColors } from "utils/common/image";
 
@@ -20,7 +19,7 @@ export const ColorAdjustmentOptions = () => {
 
   const dispatch = useDispatch();
 
-  const imageShape = useSelector(imageShapeSelector);
+  const imageShape = useSelector(selectActiveImageShape);
 
   const imageData = useSelector(selectActiveImageData);
 
