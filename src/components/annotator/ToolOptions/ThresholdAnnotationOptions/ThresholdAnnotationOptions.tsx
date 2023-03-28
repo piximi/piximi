@@ -7,7 +7,7 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   thresholdAnnotationValueSelector,
 } from "store/annotator";
 
@@ -24,7 +24,7 @@ export const ThresholdAnnotationOptions = () => {
 
   useEffect(() => {
     const payload = { thresholdAnnotationValue: threshold };
-    dispatch(AnnotatorSlice.actions.setThresholdAnnotationValue(payload));
+    dispatch(imageViewerSlice.actions.setThresholdAnnotationValue(payload));
   }, [dispatch, threshold]);
 
   return (

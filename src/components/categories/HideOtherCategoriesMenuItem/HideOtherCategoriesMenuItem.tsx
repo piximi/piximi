@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { MenuItem, Typography } from "@mui/material";
 
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 import { Category, CategoryType } from "types";
 
@@ -27,11 +27,11 @@ export const HideOtherCategoriesMenuItem = ({
   ) => {
     if (categoryType === CategoryType.ClassifierCategory) {
       dispatch(
-        DataSlice.actions.setOtherCategoriesInvisible({ id: category.id })
+        dataSlice.actions.setOtherCategoriesInvisible({ id: category.id })
       );
     } else {
       dispatch(
-        DataSlice.actions.setOtherAnnotationCategoriesInvisible({
+        dataSlice.actions.setOtherAnnotationCategoriesInvisible({
           id: category.id,
         })
       );

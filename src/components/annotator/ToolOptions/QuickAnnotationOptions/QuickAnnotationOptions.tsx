@@ -7,7 +7,7 @@ import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   quickSelectionRegionSizeSelector,
 } from "store/annotator";
 
@@ -28,7 +28,7 @@ export const QuickAnnotationOptions = () => {
 
   const onChangeCommitted = (event: any, changed: number | number[]) => {
     const payload = { quickSelectionRegionSize: changed as number };
-    dispatch(AnnotatorSlice.actions.setQuickSelectionRegionSize(payload));
+    dispatch(imageViewerSlice.actions.setQuickSelectionRegionSize(payload));
   };
 
   return (

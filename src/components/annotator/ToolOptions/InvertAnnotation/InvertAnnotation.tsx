@@ -11,8 +11,8 @@ import {
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import { AnnotatorSlice } from "store/annotator";
-import { DataSlice, selectWorkingAnnotation } from "store/data";
+import { imageViewerSlice } from "store/annotator";
+import { dataSlice, selectWorkingAnnotation } from "store/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { encode } from "utils/annotator";
@@ -36,14 +36,14 @@ export const InvertAnnotation = () => {
     const mask = encode(invertedMask);
 
     dispatch(
-      DataSlice.actions.updateAnnotation({
+      dataSlice.actions.updateAnnotation({
         annotationId: workingAnnotation.id,
         updates: { mask, boundingBox: invertedBoundingBox },
       })
     );
 
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: [workingAnnotation.id],
         workingAnnotationId: workingAnnotation.id,
       })

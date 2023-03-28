@@ -32,7 +32,7 @@ import {
   themeModeSelector,
   setThemeMode,
 } from "store/application";
-import { soundEnabledSelector, AnnotatorSlice } from "store/annotator";
+import { soundEnabledSelector, imageViewerSlice } from "store/annotator";
 import { selectUnusedCategoryColors } from "store/data";
 
 import { ThemeMode } from "types";
@@ -129,7 +129,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
 //   const onLanguageChange = (event: SelectChangeEvent) => {
 //     dispatch(
-//       AnnotatorSlice.actions.setLanguage({
+//       imageViewerSlice.actions.setLanguage({
 //         language: event.target.value as LanguageType,
 //       })
 //     );
@@ -170,7 +170,7 @@ const SoundSettings = () => {
 
   const toggleSoundEnabled = () => {
     dispatch(
-      AnnotatorSlice.actions.setSoundEnabled({
+      imageViewerSlice.actions.setSoundEnabled({
         soundEnabled: !soundEnabled,
       })
     );

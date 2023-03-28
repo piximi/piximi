@@ -3,9 +3,9 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
 import {
-  DataSlice,
+  dataSlice,
   selectAllCategories,
   selectUnusedCategoryColors,
   selectSelectedImages,
@@ -74,12 +74,12 @@ export const ImportAnnotationsFileMenuItem = ({
 
           batch(() => {
             dispatch(
-              DataSlice.actions.addAnnotationCategories({
+              dataSlice.actions.addAnnotationCategories({
                 annotationCategories: newCategories,
               })
             );
             dispatch(
-              DataSlice.actions.setImageInstances({
+              dataSlice.actions.setImageInstances({
                 instances: imsToAnnotate,
               })
             );
@@ -89,7 +89,7 @@ export const ImportAnnotationsFileMenuItem = ({
           // this needs to invoke the decoding process for the in-view image
           // annotations; prevImageId undefined to avoid encoding step
           dispatch(
-            AnnotatorSlice.actions.setActiveImageId({
+            imageViewerSlice.actions.setActiveImageId({
               imageId: activeImageId,
               prevImageId: undefined,
               execSaga: true,

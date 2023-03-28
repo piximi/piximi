@@ -11,8 +11,8 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { AnnotatorSlice } from "store/annotator";
-import { DataSlice } from "store/data";
+import { imageViewerSlice } from "store/annotator";
+import { dataSlice } from "store/data";
 
 import {
   CategoryType,
@@ -44,19 +44,19 @@ export const DeleteAllCategoriesDialog = ({
   };
 
   const deleteAllClassifierCategories = () => {
-    dispatch(DataSlice.actions.deleteAllCategories({}));
+    dispatch(dataSlice.actions.deleteAllCategories({}));
   };
 
   const deleteAllAnnotationCategories = () => {
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setSelectedCategoryId({
+        imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })
       );
 
-      dispatch(DataSlice.actions.deleteAllAnnotationCategories({}));
+      dispatch(dataSlice.actions.deleteAllAnnotationCategories({}));
     });
   };
 

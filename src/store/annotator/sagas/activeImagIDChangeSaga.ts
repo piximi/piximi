@@ -1,9 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import { AnnotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "store/annotator";
 import {
-  DataSlice,
+  dataSlice,
   selectActiveImage,
   selectActiveImageAnnotationIds,
 } from "store/data";
@@ -25,7 +25,7 @@ export function* activeImageIDChangeSaga({
 
   if (!image) {
     yield put(
-      AnnotatorSlice.actions.setActiveImageRenderedSrcs({
+      imageViewerSlice.actions.setActiveImageRenderedSrcs({
         renderedSrcs: [],
       })
     );
@@ -36,7 +36,7 @@ export function* activeImageIDChangeSaga({
   > = yield select(selectActiveImageAnnotationIds);
 
   yield put(
-    AnnotatorSlice.actions.setActiveAnnotationIds({
+    imageViewerSlice.actions.setActiveAnnotationIds({
       annotationIds: activeImageAnnotationIds,
     })
   );
@@ -52,7 +52,7 @@ export function* activeImageIDChangeSaga({
   const tmpRenderedSrc = Array(image.shape.planes);
   tmpRenderedSrc[image.activePlane] = image.src;
   yield put(
-    AnnotatorSlice.actions.setActiveImageRenderedSrcs({
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({
       renderedSrcs: tmpRenderedSrc,
     })
   );
@@ -68,7 +68,7 @@ export function* activeImageIDChangeSaga({
   );
 
   yield put(
-    AnnotatorSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
   );
 }
 
@@ -106,13 +106,13 @@ export function* activeImageColorChangeSaga({
   );
 
   yield put(
-    DataSlice.actions.updateStagedImage({
+    dataSlice.actions.updateStagedImage({
       imageId: image.id,
       updates: { src: renderedSrcs[image.activePlane] },
     })
   );
 
   yield put(
-    AnnotatorSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
   );
 }

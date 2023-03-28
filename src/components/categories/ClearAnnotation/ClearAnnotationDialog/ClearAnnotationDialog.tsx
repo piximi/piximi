@@ -10,7 +10,7 @@ import {
 
 import { activeImageIdSelector } from "store/annotator";
 
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 import { Category } from "types";
 
@@ -30,7 +30,7 @@ export const ClearAnnotationDialog = ({
 
   const onClear = () => {
     dispatch(
-      DataSlice.actions.deleteStagedAnnotationsByCategory({
+      dataSlice.actions.deleteStagedAnnotationsByCategory({
         imageId: activeImage!,
         categoryId: category.id,
       })

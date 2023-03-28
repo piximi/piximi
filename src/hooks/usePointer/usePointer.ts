@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   currentIndexSelector,
   pointerSelectionSelector,
   selectedAnnotationsIdsSelector,
@@ -214,7 +214,7 @@ export const usePointer = () => {
 
     if (overlappingAnnotationsIds.length > 1) {
       dispatch(
-        AnnotatorSlice.actions.setCurrentIndex({
+        imageViewerSlice.actions.setCurrentIndex({
           currentIndex:
             currentIndex + 1 === overlappingAnnotationsIds.length
               ? 0
@@ -235,7 +235,7 @@ export const usePointer = () => {
         }
       );
       dispatch(
-        AnnotatorSlice.actions.setCurrentIndex({
+        imageViewerSlice.actions.setCurrentIndex({
           currentIndex: 0,
         })
       );

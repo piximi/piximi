@@ -9,7 +9,7 @@ import {
   Stack,
 } from "@mui/material";
 
-import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
 import { selectSelectedImages } from "store/data";
 import { selectedImagesIdSelector } from "store/project";
 
@@ -62,7 +62,7 @@ export const ExitAnnotatorDialog = ({
   const onSaveAnnotations = () => {
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
           execSaga: true,
@@ -82,7 +82,7 @@ export const ExitAnnotatorDialog = ({
 
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
           execSaga: true,

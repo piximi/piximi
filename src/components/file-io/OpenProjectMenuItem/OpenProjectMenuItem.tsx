@@ -12,8 +12,8 @@ import { uploader } from "utils/common/fileHandlers";
 import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
-import { AnnotatorSlice } from "store/annotator";
-import { DataSlice } from "store/data";
+import { imageViewerSlice } from "store/annotator";
+import { dataSlice } from "store/data";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -44,11 +44,11 @@ export const OpenProjectMenuItem = ({
         batch(() => {
           dispatch(classifierSlice.actions.resetClassifier());
           dispatch(segmenterSlice.actions.resetSegmenter());
-          dispatch(AnnotatorSlice.actions.resetAnnotator());
+          dispatch(imageViewerSlice.actions.resetAnnotator());
           dispatch(projectSlice.actions.resetProject());
 
           dispatch(
-            DataSlice.actions.initData({
+            dataSlice.actions.initData({
               images: res.data.images,
               annotations: res.data.annotations,
               categories: res.data.categories,
@@ -77,7 +77,7 @@ export const OpenProjectMenuItem = ({
         if (fromAnnotator) {
           batch(() => {
             dispatch(
-              AnnotatorSlice.actions.setActiveImageId({
+              imageViewerSlice.actions.setActiveImageId({
                 imageId: res.data.images[0].id,
                 prevImageId: undefined,
                 execSaga: true,

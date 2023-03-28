@@ -58,9 +58,9 @@ const initialState: Annotator = {
   },
 };
 
-export const annotatorSlice = createSlice({
+export const imageViewerSlice = createSlice({
   initialState: initialState,
-  name: "image-viewer-application",
+  name: "image-viewer",
   reducers: {
     resetAnnotator: () => initialState,
 
@@ -75,7 +75,7 @@ export const annotatorSlice = createSlice({
       action: PayloadAction<{ annotationIds: Array<string> }>
     ) {
       for (const annotationId of action.payload.annotationIds) {
-        annotatorSlice.caseReducers.addActiveAnnotationId(state, {
+        imageViewerSlice.caseReducers.addActiveAnnotationId(state, {
           type: "addActiveAnnotationId",
           payload: { annotationId },
         });
@@ -110,7 +110,7 @@ export const annotatorSlice = createSlice({
       }>
     ) {
       state.activeAnnotationIds = [];
-      annotatorSlice.caseReducers.addActiveAnnotationIds(state, {
+      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
         type: "addActiveAnnotationIds",
         payload: { annotationIds: action.payload.annotationIds },
       });
@@ -313,4 +313,4 @@ export const {
   setStageWidth,
   setVibrance,
   setZoomSelection,
-} = annotatorSlice.actions;
+} = imageViewerSlice.actions;

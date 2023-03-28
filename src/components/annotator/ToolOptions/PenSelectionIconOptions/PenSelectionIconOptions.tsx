@@ -5,7 +5,10 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import { AnnotatorSlice, penSelectionBrushSizeSelector } from "store/annotator";
+import {
+  imageViewerSlice,
+  penSelectionBrushSizeSelector,
+} from "store/annotator";
 
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();
@@ -17,7 +20,7 @@ export const PenSelectionIconOptions = () => {
   const onChange = (event: any, changed: number | number[]) => {
     const payload = { penSelectionBrushSize: changed as number };
 
-    dispatch(AnnotatorSlice.actions.setPenSelectionBrushSize(payload));
+    dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
   };
 
   return (

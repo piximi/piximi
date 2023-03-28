@@ -1,4 +1,4 @@
-export { dataSlice as DataSlice } from "./DataSlice";
+export { dataSlice } from "./dataSlice";
 
 export { selectVisibleImages } from "./selectors/selectVisibleImages";
 export { dataProjectSelector } from "./selectors/dataProjectSelector";
@@ -16,7 +16,7 @@ export { selectSegmenterValidationImages } from "./selectors/selectSegmenterVali
 export {
   selectAllImages,
   selectSelectedImages,
-} from "./selectors/selectAllImages";
+} from "./selectors/selectImages";
 export { selectAllCategories } from "./selectors/selectAllCategories";
 export { selectUnannotatedImages } from "./selectors/selectUnannotatedImages";
 export { selectInferenceImages } from "./selectors/selectInferenceImages";
@@ -50,7 +50,7 @@ export {
   selectSelectedAnnotations,
   selectStagedAnnotations,
   selectWorkingAnnotation,
-} from "./selectors/selectAllAnnotations";
+} from "./selectors/selectAnnotations";
 export { selectAnnotationsByImageObject } from "./selectors/selectAnnotationsByImageObject";
 
 export {

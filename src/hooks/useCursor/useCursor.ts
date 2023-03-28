@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { ToolType } from "types";
-import { AnnotatorSlice, toolTypeSelector } from "store/annotator";
+import { imageViewerSlice, toolTypeSelector } from "store/annotator";
 
 export const useCursor = () => {
   const toolType = useSelector(toolTypeSelector);
@@ -13,16 +13,16 @@ export const useCursor = () => {
     switch (toolType) {
       case ToolType.RectangularAnnotation:
       case ToolType.EllipticalAnnotation:
-        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "crosshair" }));
+        dispatch(imageViewerSlice.actions.setCursor({ cursor: "crosshair" }));
 
         break;
       case ToolType.PenAnnotation:
-        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "none" }));
+        dispatch(imageViewerSlice.actions.setCursor({ cursor: "none" }));
 
         break;
 
       default:
-        dispatch(AnnotatorSlice.actions.setCursor({ cursor: "pointer" }));
+        dispatch(imageViewerSlice.actions.setCursor({ cursor: "pointer" }));
 
         break;
     }

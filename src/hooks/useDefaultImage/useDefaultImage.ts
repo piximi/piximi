@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { applicationSlice, initSelector } from "store/application";
-import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
-import { DataSlice, selectImageCount } from "store/data";
+import { dataSlice, selectImageCount } from "store/data";
 
 export enum DispatchLocation {
   Project,
@@ -28,15 +28,15 @@ const dispatchToProject = async (
 
   batch(() => {
     dispatch(
-      DataSlice.actions.setImages({
+      dataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
       })
     );
     dispatch(
-      DataSlice.actions.setAnnotationCategories({ annotationCategories })
+      dataSlice.actions.setAnnotationCategories({ annotationCategories })
     );
-    dispatch(DataSlice.actions.setAnnotations({ annotations }));
+    dispatch(dataSlice.actions.setAnnotations({ annotations }));
   });
 };
 
@@ -56,20 +56,20 @@ const dispatchToImageViewer = async (
 
   batch(() => {
     dispatch(
-      DataSlice.actions.setImages({
+      dataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
       })
     );
     dispatch(
-      DataSlice.actions.setAnnotationCategories({ annotationCategories })
+      dataSlice.actions.setAnnotationCategories({ annotationCategories })
     );
-    dispatch(DataSlice.actions.setAnnotations({ annotations }));
+    dispatch(dataSlice.actions.setAnnotations({ annotations }));
   });
 
   batch(() => {
     dispatch(
-      AnnotatorSlice.actions.setActiveImageId({
+      imageViewerSlice.actions.setActiveImageId({
         imageId: image.id,
         prevImageId: undefined, // no previous images
         execSaga: true,

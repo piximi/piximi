@@ -4,7 +4,7 @@ export const foo = "foo";
 // import { v4 as uuidv4 } from "uuid";
 
 // import { projectSlice } from "store/project";
-// import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
+// import { addImages, imageViewerSlice, setInstances } from "store/annotator";
 // import { serializeProject } from "./serializeProject";
 // import {
 //   AnnotationType,
@@ -324,7 +324,7 @@ export const foo = "foo";
 // //   // piximi initial state
 
 // //   let projectState = projectSlice.reducer(undefined, { type: undefined });
-// //   let annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
+// //   let annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
 
 // //   // T1 - pre-serialization
 
@@ -332,19 +332,19 @@ export const foo = "foo";
 // //     projectState,
 // //     setAnnotationCategories({ categories: categoriesT1 })
 // //   );
-// //   annotatorState = AnnotatorSlice.reducer(
+// //   annotatorState = imageViewerSlice.reducer(
 // //     annotatorState,
 // //     addImages({ newImages: imagesT1 })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
+// //   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   const serializedProject = serializeProject(imagesT1, categoriesT1);
 
 // //   // T1 -> T2, piximi closed and new project started
 
 // //   projectState = projectSlice.reducer(undefined, { type: undefined });
-// //   annotatorState = AnnotatorSlice.reducer(undefined, { type: undefined });
+// //   annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
 
 // //   // T2 - pre-deserialization
 
@@ -352,7 +352,7 @@ export const foo = "foo";
 // //     projectState,
 // //     setAnnotationCategories({ categories: categoriesT2 })
 // //   );
-// //   annotatorState = AnnotatorSlice.reducer(
+// //   annotatorState = imageViewerSlice.reducer(
 // //     annotatorState,
 // //     addImages({ newImages: imagesT2 })
 // //   );
@@ -369,12 +369,12 @@ export const foo = "foo";
 // //     projectState,
 // //     addAnnotationCategories({ categories: newCategories })
 // //   );
-// //   annotatorState = AnnotatorSlice.reducer(
+// //   annotatorState = imageViewerSlice.reducer(
 // //     annotatorState,
 // //     setInstances({ instances: imsToAnnotate })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
+// //   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   // T3 - after deserialization
 

@@ -1,6 +1,6 @@
 // Slice
 export {
-  annotatorSlice as AnnotatorSlice,
+  imageViewerSlice,
   setActiveImageId,
   setActiveImageRenderedSrcs,
   setOperation,
@@ -28,7 +28,7 @@ export {
   setStageHeight,
   setStagePosition,
   setVibrance,
-} from "./AnnotatorSlice";
+} from "./imageViewerSlice";
 
 // Selectors
 export { workingAnnotationIdSelector } from "./selectors/workingAnnotationIdSelector";

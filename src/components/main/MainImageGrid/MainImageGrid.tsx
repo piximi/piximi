@@ -22,7 +22,7 @@ import {
   unregisterHotkeyView,
 } from "store/application";
 
-import { DataSlice, selectVisibleImages } from "store/data";
+import { dataSlice, selectVisibleImages } from "store/data";
 
 import { HotkeyView, ImageType } from "types";
 
@@ -112,7 +112,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
     "shift",
     () => {
       dispatch(
-        DataSlice.actions.updateImageCategories({
+        dataSlice.actions.updateImageCategories({
           imageIds: selectedImages,
           categoryId: highlightedCategory,
         })

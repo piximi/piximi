@@ -5,19 +5,19 @@ import {
   activeImageIDChangeSaga,
 } from "./activeImagIDChangeSaga";
 
-import { AnnotatorSlice } from "store/annotator";
-import { DataSlice } from "store/data";
+import { imageViewerSlice } from "store/annotator";
+import { dataSlice } from "store/data";
 
 export function* watchActiveImageChangeSaga() {
   yield takeLatest(
-    AnnotatorSlice.actions.setActiveImageId,
+    imageViewerSlice.actions.setActiveImageId,
     activeImageIDChangeSaga
   );
 }
 
 export function* watchActiveImageColorsChangeSaga() {
   yield takeLatest(
-    DataSlice.actions.updateStagedImage.type,
+    dataSlice.actions.updateStagedImage.type,
     activeImageColorChangeSaga
   );
 }
