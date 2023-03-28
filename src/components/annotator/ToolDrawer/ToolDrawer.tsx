@@ -18,7 +18,7 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
-import { AnnotatorSlice, toolTypeSelector } from "store/annotator";
+import { imageViewerSlice, toolTypeSelector } from "store/annotator";
 
 import { HotkeyView, ToolType as OperationType } from "types";
 
@@ -155,7 +155,7 @@ export const ToolDrawer = ({
               name={t(name)}
               onClick={() => {
                 dispatch(
-                  AnnotatorSlice.actions.setOperation({
+                  imageViewerSlice.actions.setOperation({
                     operation: toolMap[name].operation,
                   })
                 );

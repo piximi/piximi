@@ -7,9 +7,9 @@ import { useDialogHotkey } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
-import { AnnotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "store/annotator";
 import {
-  DataSlice,
+  dataSlice,
   selectImageCountByCategory,
   selectAnnotationCountByCategory,
 } from "store/data";
@@ -71,7 +71,7 @@ export const DeleteCategoryMenuItem = ({
 
   const deleteClassificationCategoryCallback = (categoryId: string) => {
     dispatch(
-      DataSlice.actions.deleteCategory({
+      dataSlice.actions.deleteCategory({
         categoryId: categoryId,
       })
     );
@@ -88,18 +88,18 @@ export const DeleteCategoryMenuItem = ({
 
   const deleteAnnotationCategoryCallback = (categoryId: string) => {
     dispatch(
-      DataSlice.actions.deleteAnnotationCategory({ categoryId: category.id })
+      dataSlice.actions.deleteAnnotationCategory({ categoryId: category.id })
     );
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setSelectedCategoryId({
+        imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })
       );
 
       dispatch(
-        DataSlice.actions.deleteAnnotationCategory({
+        dataSlice.actions.deleteAnnotationCategory({
           categoryId: categoryId,
         })
       );

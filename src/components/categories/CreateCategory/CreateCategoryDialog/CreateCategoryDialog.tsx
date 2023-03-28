@@ -18,7 +18,7 @@ import { useHotkeys } from "hooks";
 import { ColorIcon } from "components/common/ColorIcon";
 
 import {
-  DataSlice,
+  dataSlice,
   selectAllCategories,
   selectUnusedCategoryColors,
 } from "store/data";
@@ -59,11 +59,11 @@ export const CreateCategoryDialog = ({
     if (validateInput(name)) {
       if (categoryType === CategoryType.ClassifierCategory) {
         dispatch(
-          DataSlice.actions.createCategory({ name: name, color: color })
+          dataSlice.actions.createCategory({ name: name, color: color })
         );
       } else {
         dispatch(
-          DataSlice.actions.createAnnotationCategory({
+          dataSlice.actions.createAnnotationCategory({
             name: name,
             color: color,
           })

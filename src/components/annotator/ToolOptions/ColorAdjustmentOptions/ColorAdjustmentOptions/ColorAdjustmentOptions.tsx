@@ -11,7 +11,7 @@ import { ChannelsList } from "../ChannelsList";
 
 import { activeImageIdSelector } from "store/annotator";
 import {
-  DataSlice,
+  dataSlice,
   selectActiveImageData,
   selectActiveImageShape,
 } from "store/data";
@@ -35,7 +35,7 @@ export const ColorAdjustmentOptions = () => {
     const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
-      DataSlice.actions.updateStagedImage({
+      dataSlice.actions.updateStagedImage({
         imageId: imageId!,
         updates: { colors: defaultColors },
         disposeColors: true,

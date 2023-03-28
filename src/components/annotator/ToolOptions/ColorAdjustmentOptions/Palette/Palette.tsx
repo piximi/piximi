@@ -9,7 +9,7 @@ import {
 } from "@mui/icons-material";
 
 import { activeImageIdSelector } from "store/annotator";
-import { DataSlice, selectActiveImageRawColor } from "store/data";
+import { dataSlice, selectActiveImageRawColor } from "store/data";
 
 import { DEFAULT_COLORS } from "types";
 
@@ -48,7 +48,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      DataSlice.actions.updateStagedImage({
+      dataSlice.actions.updateStagedImage({
         imageId: activeImageId!,
         updates: { colors: { ...colors, color: tensor2d(updatedColors) } },
         disposeColors: true,

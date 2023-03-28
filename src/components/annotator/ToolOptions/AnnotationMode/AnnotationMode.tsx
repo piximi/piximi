@@ -15,7 +15,7 @@ import {
 import { useTranslation } from "hooks";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   annotationStateSelector,
   selectionModeSelector,
 } from "store/annotator";
@@ -47,7 +47,7 @@ export const AnnotationMode = () => {
       setDisabledAnnotationEdit(true);
       if (annotationMode !== AnnotationModeType.New) {
         dispatch(
-          AnnotatorSlice.actions.setSelectionMode({
+          imageViewerSlice.actions.setSelectionMode({
             selectionMode: AnnotationModeType.New,
           })
         );
@@ -59,14 +59,14 @@ export const AnnotationMode = () => {
     const payload = {
       selectionMode: parseInt((event.target as HTMLInputElement).value),
     };
-    dispatch(AnnotatorSlice.actions.setSelectionMode(payload));
+    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
   };
 
   const onClickLabel = (event: any, mode: AnnotationModeType) => {
     const payload = {
       selectionMode: mode,
     };
-    dispatch(AnnotatorSlice.actions.setSelectionMode(payload));
+    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
   };
 
   const t = useTranslation();

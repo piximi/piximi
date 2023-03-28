@@ -14,7 +14,7 @@ import {
 } from "store/classifier";
 import { applicationSlice } from "store/application";
 import {
-  DataSlice,
+  dataSlice,
   selectCreatedCategories,
   selectInferenceImages,
 } from "store/data";
@@ -148,7 +148,7 @@ function* runPrediction(
   disposeTestLabels();
 
   yield put(
-    DataSlice.actions.updateCategoriesOfImages({
+    dataSlice.actions.updateCategoriesOfImages({
       imageIds: imageIds,
       categoryIds: categoryIds,
     })

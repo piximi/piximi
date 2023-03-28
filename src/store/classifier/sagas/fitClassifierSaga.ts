@@ -17,7 +17,7 @@ import {
   preprocessClassifier,
 } from "store/classifier";
 import {
-  DataSlice,
+  dataSlice,
   selectCreatedCategories,
   selectTrainingImages,
   selectValidationImages,
@@ -86,7 +86,7 @@ export function* fitClassifierSaga({
   const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
   yield put(
-    DataSlice.actions.updateImagesPartition({
+    dataSlice.actions.updateImagesPartition({
       imageIdsByPartition: {
         [Partition.Training]: trainDataIds,
         [Partition.Validation]: valDataIds,

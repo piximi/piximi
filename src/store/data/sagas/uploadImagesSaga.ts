@@ -3,9 +3,9 @@ import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
 import { applicationSlice } from "store/application";
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 import {
   AlertStateType,
@@ -130,10 +130,10 @@ export function* uploadImagesSaga({
 
   if (imagesToUpload.length) {
     console.log("here");
-    yield put(DataSlice.actions.addImages({ images: imagesToUpload }));
+    yield put(dataSlice.actions.addImages({ images: imagesToUpload }));
     if (isUploadedFromAnnotator) {
       yield put(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: imagesToUpload[0].id,
           prevImageId: activeImageId,
           execSaga: true,

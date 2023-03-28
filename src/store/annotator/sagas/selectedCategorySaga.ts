@@ -4,7 +4,7 @@ import { put, select } from "redux-saga/effects";
 import {
   selectAnnotationCategoryById,
   selectSelectedAnnotations,
-  DataSlice,
+  dataSlice,
 } from "store/data";
 import { Category, DecodedAnnotationType } from "types";
 
@@ -28,6 +28,6 @@ export function* selectedCategorySaga({
   );
 
   yield put(
-    DataSlice.actions.updateAnnotations({ updates: updatedAnnotations })
+    dataSlice.actions.updateAnnotations({ updates: updatedAnnotations })
   );
 }

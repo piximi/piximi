@@ -14,7 +14,7 @@ import {
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { HotkeyView } from "types";
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -40,7 +40,7 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
       })
     );
     dispatch(
-      DataSlice.actions.initData({
+      dataSlice.actions.initData({
         images: [],
         annotations: [],
         categories: [],

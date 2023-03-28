@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   selectionModeSelector,
   toolTypeSelector,
   selectedAnnotationCategoryIdSelector,
@@ -11,7 +11,7 @@ import {
   selectAnnotationCategoryById,
   selectActiveImageActivePlane,
   selectWorkingAnnotation,
-  DataSlice,
+  dataSlice,
 } from "store/data";
 
 import {
@@ -59,10 +59,10 @@ export function* annotationStateChangeSaga({
 
     const annotation = encodeAnnotation(annotationTool.annotation);
 
-    yield put(DataSlice.actions.addAnnotation({ annotation: annotation! }));
+    yield put(dataSlice.actions.addAnnotation({ annotation: annotation! }));
 
     yield put(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: [annotationTool.annotation.id],
         workingAnnotationId: annotationTool.annotation.id,
       })
@@ -118,10 +118,10 @@ export function* annotationStateChangeSaga({
 
     const annotation = encodeAnnotation(combinedSelectedAnnotation);
 
-    yield put(DataSlice.actions.addAnnotation({ annotation: annotation! }));
+    yield put(dataSlice.actions.addAnnotation({ annotation: annotation! }));
 
     yield put(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: [combinedSelectedAnnotation.id],
         workingAnnotationId: combinedSelectedAnnotation.id,
       })

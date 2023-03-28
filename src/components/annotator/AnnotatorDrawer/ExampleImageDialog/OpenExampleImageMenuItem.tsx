@@ -2,8 +2,8 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
-import { DataSlice } from "store/data";
-import { activeImageIdSelector, AnnotatorSlice } from "store/annotator";
+import { dataSlice } from "store/data";
+import { activeImageIdSelector, imageViewerSlice } from "store/annotator";
 
 import { SerializedFileType } from "types";
 
@@ -48,16 +48,16 @@ export const OpenExampleImageMenuItem = ({
     );
 
     dispatch(
-      DataSlice.actions.addAnnotationCategories({ annotationCategories })
+      dataSlice.actions.addAnnotationCategories({ annotationCategories })
     );
     batch(() => {
       dispatch(
-        DataSlice.actions.addImages({
+        dataSlice.actions.addImages({
           images: [image],
         })
       );
       dispatch(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: image.id,
           prevImageId: activeImageId,
           execSaga: true,

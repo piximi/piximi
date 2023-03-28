@@ -17,7 +17,7 @@ import { projectSlice } from "store/project";
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import { deserialize } from "utils/common/image/deserialize";
 import { uploader } from "utils/common/fileHandlers";
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -116,7 +116,7 @@ export const OpenExampleProjectMenuItem = ({
 
     batch(() => {
       dispatch(
-        DataSlice.actions.initData({
+        dataSlice.actions.initData({
           images: data.images,
           annotations: data.annotations,
           categories: data.categories,

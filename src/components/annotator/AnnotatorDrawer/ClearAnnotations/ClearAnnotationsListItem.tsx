@@ -13,7 +13,7 @@ import { useDialog, useTranslation } from "hooks";
 import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   selectedAnnotationsIdsSelector,
 } from "store/annotator";
 import { selectSelectedImages, selectStagedAnnotations } from "store/data";
@@ -55,13 +55,13 @@ export const ClearAnnotationsListItem = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setSelectedAnnotationIds({
+        imageViewerSlice.actions.setSelectedAnnotationIds({
           selectedAnnotationIds: [],
           workingAnnotationId: undefined,
         })
       );
       dispatch(
-        AnnotatorSlice.actions.setSelectedCategoryId({
+        imageViewerSlice.actions.setSelectedCategoryId({
           selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
           execSaga: true,
         })

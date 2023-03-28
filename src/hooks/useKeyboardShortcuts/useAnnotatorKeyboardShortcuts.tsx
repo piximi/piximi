@@ -3,7 +3,7 @@ import { useHotkeys } from "hooks";
 
 import { selectAllAnnotationCategories } from "store/data";
 import {
-  AnnotatorSlice,
+  imageViewerSlice,
   setOperation,
   setSelectedCategoryId,
   activeImageIdSelector,
@@ -76,7 +76,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
-        AnnotatorSlice.actions.setSelectionMode({
+        imageViewerSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );
@@ -307,7 +307,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,
@@ -334,7 +334,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        AnnotatorSlice.actions.setActiveImageId({
+        imageViewerSlice.actions.setActiveImageId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,

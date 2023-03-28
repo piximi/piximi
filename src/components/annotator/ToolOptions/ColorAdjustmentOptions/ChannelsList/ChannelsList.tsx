@@ -19,7 +19,7 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 import { activeImageIdSelector } from "store/annotator";
 
 import {
-  DataSlice,
+  dataSlice,
   selectActiveImageBitDepth,
   selectActiveImageData,
   selectActiveImageRawColor,
@@ -44,7 +44,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    DataSlice.actions.updateStagedImage,
+    dataSlice.actions.updateStagedImage,
     { range: {}, visible: {}, color: [] }
   );
 
@@ -90,7 +90,7 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      DataSlice.actions.updateStagedImage({
+      dataSlice.actions.updateStagedImage({
         imageId: activeImageId!,
         updates: { colors: newColors },
         disposeColors: true,

@@ -16,7 +16,7 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { AnnotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "store/annotator";
 import {
   selectAllAnnotationCategories,
   selectSelectedAnnotations,
@@ -39,7 +39,7 @@ export const PointerSelectionOptions = () => {
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: allAnnotations.map((an) => an.id),
         workingAnnotationId: allAnnotations[0].id,
       })
@@ -48,7 +48,7 @@ export const PointerSelectionOptions = () => {
 
   const onSelectNone = () => {
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: [],
         workingAnnotationId: undefined,
       })
@@ -67,7 +67,7 @@ export const PointerSelectionOptions = () => {
       return annotation.categoryId === category.id;
     });
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotationIds({
+      imageViewerSlice.actions.setSelectedAnnotationIds({
         selectedAnnotationIds: desiredAnnotations.map((an) => an.id),
         workingAnnotationId: desiredAnnotations[0].id,
       })

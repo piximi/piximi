@@ -5,7 +5,7 @@ import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
 import {
-  DataSlice,
+  dataSlice,
   selectAnnotatedImages,
   selectAnnotationCategories,
   selectSegmenterTrainingImages,
@@ -71,7 +71,7 @@ export function* fitSegmenterSaga({
   const trainDataIds = annotatedImagesIds.splice(0, trainDataLength);
   const valDataIds = annotatedImagesIds.splice(-valDataLength, valDataLength);
   yield put(
-    DataSlice.actions.updateSegmentationImagesPartition({
+    dataSlice.actions.updateSegmentationImagesPartition({
       imageIdsByPartition: {
         [Partition.Training]: trainDataIds,
         [Partition.Validation]: valDataIds,

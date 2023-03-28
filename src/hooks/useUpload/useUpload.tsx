@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 
-import { DataSlice } from "store/data";
+import { dataSlice } from "store/data";
 
 import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
 
@@ -21,7 +21,7 @@ export const useUpload = (
         )
       ) {
         dispatch(
-          DataSlice.actions.uploadImages({
+          dataSlice.actions.uploadImages({
             files: files,
             channels: imageShapeInfo.shape === ImageShapeEnum.GreyScale ? 1 : 3,
             slices: 1,
@@ -32,7 +32,7 @@ export const useUpload = (
         );
       } else if (imageShapeInfo.shape === ImageShapeEnum.DicomImage) {
         dispatch(
-          DataSlice.actions.uploadImages({
+          dataSlice.actions.uploadImages({
             files: files,
             channels: 1,
             slices: 1,
