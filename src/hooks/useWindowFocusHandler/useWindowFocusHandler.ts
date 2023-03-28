@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { imageViewerSlice, selectionModeSelector } from "store/annotator";
+import { imageViewerSlice, selectionModeSelector } from "store/imageViewer";
 
 import { AnnotationModeType } from "types";
 

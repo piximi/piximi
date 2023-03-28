@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { languageSelector } from "store/annotator";
+import { languageSelector } from "store/imageViewer";
 import { de, en, fas, fi, fr, gr, hi, hu } from "translations";
 import { LanguageType } from "types";
 

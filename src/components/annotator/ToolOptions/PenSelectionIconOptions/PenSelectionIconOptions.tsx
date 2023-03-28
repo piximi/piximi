@@ -8,7 +8,7 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import {
   imageViewerSlice,
   penSelectionBrushSizeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();

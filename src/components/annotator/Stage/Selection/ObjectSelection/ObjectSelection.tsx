@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
-import { stageScaleSelector } from "store/annotator";
+import { stageScaleSelector } from "store/imageViewer";
 
 import { ObjectAnnotationTool } from "annotator-tools";
 

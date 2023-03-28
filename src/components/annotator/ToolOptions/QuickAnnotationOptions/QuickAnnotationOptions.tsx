@@ -9,7 +9,7 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import {
   imageViewerSlice,
   quickSelectionRegionSizeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 export const QuickAnnotationOptions = () => {
   const quickSelectionRegionSize = useSelector(

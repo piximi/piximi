@@ -5,7 +5,7 @@ import { useMarchingAnts } from "hooks";
 
 import { RectangularAnnotationTool } from "annotator-tools";
 import { useSelector } from "react-redux";
-import { imageOriginSelector, stageScaleSelector } from "store/annotator";
+import { imageOriginSelector, stageScaleSelector } from "store/imageViewer";
 
 type RectangularSelectionProps = {
   operator: RectangularAnnotationTool;

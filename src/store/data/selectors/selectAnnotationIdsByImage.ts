@@ -1,8 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { selectAnnotationsByImageObject } from "./selectAnnotationsByImageObject";
+import { selectAnnotationsByImageEntity } from "./selectDataEntities";
 
 export const selectAnnotationIdsByImage = createSelector(
-  [selectAnnotationsByImageObject, (state, imageId) => imageId],
+  [selectAnnotationsByImageEntity, (state, imageId: string) => imageId],
   (annotationsByImage, imageId) => {
     return annotationsByImage[imageId];
   }

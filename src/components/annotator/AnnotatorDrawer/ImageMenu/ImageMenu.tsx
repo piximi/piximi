@@ -13,9 +13,9 @@ import {
   selectActiveImage,
   selectSelectedImages,
 } from "store/data";
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 
-import { ShadowImageType } from "types";
+import { ImageType } from "types";
 
 import {
   saveAnnotationsAsLabelMatrix,
@@ -25,11 +25,12 @@ import {
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
-  selectedImage: ShadowImageType;
+  selectedImage: ImageType;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
 
+// TODO: handle reconciliation here, pass annotations to export function
 export const ImageMenu = ({
   anchorElImageMenu,
   selectedImage,
@@ -42,7 +43,7 @@ export const ImageMenu = ({
   const images = useSelector(selectSelectedImages);
   const activeImage = useSelector(selectActiveImage);
 
-  const ClearAnnotationsClickHandler = (
+  const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
@@ -51,15 +52,11 @@ export const ImageMenu = ({
         imageId: selectedImage.id,
       })
     );
-    dispatch(
-      dataSlice.actions.deleteAllAnnotationsByImage({
-        imageId: selectedImage.id,
-      })
-    );
+
     onCloseImageMenu(event);
   };
 
-  const DeleteImageHandler = (
+  const handleDeleteImage = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
@@ -97,7 +94,7 @@ export const ImageMenu = ({
     onCloseImageMenu(event);
   };
 
-  const ExportLabeledInstanceMasksHandler = (
+  const handleExportLabeledInstanceMasks = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -109,7 +106,7 @@ export const ImageMenu = ({
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [selectedImage],
+        [{ ...selectedImage, annotations: [] }],
         annotationCategories,
         zip,
         true
@@ -121,7 +118,7 @@ export const ImageMenu = ({
     });
   };
 
-  const ExportBinaryInstanceMasksHandler = (
+  const handleExportBinaryInstanceMasks = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -132,51 +129,14 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
-      [selectedImage],
+      [{ ...selectedImage, annotations: [] }],
       annotationCategories,
       zip,
       "binary_instances"
     );
   };
 
-  const ExportLabelsHandler = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    setAnchorEl(null);
-    onCloseImageMenu(event);
-
-    let zip = new JSZip();
-
-    if (!selectedImage) return;
-
-    Promise.all(
-      saveAnnotationsAsLabelMatrix([selectedImage], annotationCategories, zip)
-    ).then(() => {
-      zip.generateAsync({ type: "blob" }).then((blob) => {
-        saveAs(blob, "labels.zip");
-      });
-    });
-  };
-
-  const ExportLabeledSemanticMasksHAndler = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    setAnchorEl(null);
-    onCloseImageMenu(event);
-
-    let zip = new JSZip();
-
-    if (!selectedImage) return;
-
-    saveAnnotationsAsLabeledSemanticSegmentationMasks(
-      [selectedImage],
-      annotationCategories,
-      zip,
-      "labeled_semantic"
-    );
-  };
-
-  const ExportBinarySemanticMasksHandler = (
+  const handleExportLabels = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     setAnchorEl(null);
@@ -188,7 +148,48 @@ export const ImageMenu = ({
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [selectedImage],
+        [{ ...selectedImage, annotations: [] }],
+        annotationCategories,
+        zip
+      )
+    ).then(() => {
+      zip.generateAsync({ type: "blob" }).then((blob) => {
+        saveAs(blob, "labels.zip");
+      });
+    });
+  };
+
+  const handleExportLabeledSemanticMasks = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    setAnchorEl(null);
+    onCloseImageMenu(event);
+
+    let zip = new JSZip();
+
+    if (!selectedImage) return;
+
+    saveAnnotationsAsLabeledSemanticSegmentationMasks(
+      [{ ...selectedImage, annotations: [] }],
+      annotationCategories,
+      zip,
+      "labeled_semantic"
+    );
+  };
+
+  const handleExportBinarySemanticMasks = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    setAnchorEl(null);
+    onCloseImageMenu(event);
+
+    let zip = new JSZip();
+
+    if (!selectedImage) return;
+
+    Promise.all(
+      saveAnnotationsAsLabelMatrix(
+        [{ ...selectedImage, annotations: [] }],
         annotationCategories,
         zip,
         false,
@@ -234,27 +235,27 @@ export const ImageMenu = ({
           >
             <MenuList dense variant="menu">
               <div>
-                <MenuItem onClick={ExportLabeledInstanceMasksHandler}>
+                <MenuItem onClick={handleExportLabeledInstanceMasks}>
                   <Typography variant="inherit">
                     {t("Labeled instance masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={ExportBinaryInstanceMasksHandler}>
+                <MenuItem onClick={handleExportBinaryInstanceMasks}>
                   <Typography variant="inherit">
                     {t("Binary instance masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={ExportLabeledSemanticMasksHAndler}>
+                <MenuItem onClick={handleExportLabeledSemanticMasks}>
                   <Typography variant="inherit">
                     {t("Labeled semantic masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={ExportBinarySemanticMasksHandler}>
+                <MenuItem onClick={handleExportBinarySemanticMasks}>
                   <Typography variant="inherit">
                     {t("Binary semantic masks")}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={ExportLabelsHandler}>
+                <MenuItem onClick={handleExportLabels}>
                   <Typography variant="inherit">
                     {t("Label matrices")}
                   </Typography>
@@ -263,10 +264,10 @@ export const ImageMenu = ({
             </MenuList>
           </Menu>
           <Divider />
-          <MenuItem onClick={ClearAnnotationsClickHandler}>
+          <MenuItem onClick={handleClearAnnotations}>
             <Typography variant="inherit">{t("Clear Annotations")}</Typography>
           </MenuItem>
-          <MenuItem onClick={DeleteImageHandler}>
+          <MenuItem onClick={handleDeleteImage}>
             <Typography variant="inherit">{t("Delete Image")}</Typography>
           </MenuItem>
         </div>

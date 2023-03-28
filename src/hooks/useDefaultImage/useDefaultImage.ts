@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { applicationSlice, initSelector } from "store/application";
-import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
 import { dataSlice, selectImageCount } from "store/data";
+import { projectSlice } from "store/project";
 
 export enum DispatchLocation {
   Project,
@@ -65,9 +66,8 @@ const dispatchToImageViewer = async (
       dataSlice.actions.setAnnotationCategories({ annotationCategories })
     );
     dispatch(dataSlice.actions.setAnnotations({ annotations }));
-  });
 
-  batch(() => {
+    dispatch(projectSlice.actions.selectImage({ id: image.id }));
     dispatch(
       imageViewerSlice.actions.setActiveImageId({
         imageId: image.id,

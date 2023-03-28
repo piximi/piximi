@@ -11,7 +11,7 @@ import {
 
 import { useHotkeys } from "hooks";
 
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 
 import {

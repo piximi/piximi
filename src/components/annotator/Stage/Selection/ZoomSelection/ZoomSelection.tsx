@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector, zoomSelectionSelector } from "store/annotator";
+import { stageScaleSelector, zoomSelectionSelector } from "store/imageViewer";
 
 export const ZoomSelection = () => {
   const { dragging, minimum, maximum, selecting } = useSelector(

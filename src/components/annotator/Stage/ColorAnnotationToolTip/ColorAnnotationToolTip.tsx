@@ -6,7 +6,7 @@ import {
   annotationStateSelector,
   stageScaleSelector,
   toolTypeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import { AnnotationStateType, ToolType } from "types";
 

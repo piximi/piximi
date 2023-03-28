@@ -11,7 +11,7 @@ import {
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice, selectWorkingAnnotation } from "store/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";

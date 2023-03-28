@@ -1,11 +1,11 @@
-import { Category, Annotator, DataStoreSlice } from "types";
+import { Category, ImageViewer, DataStoreSlice } from "types";
 
 export const selectSelectedAnnotationCategory = ({
-  annotator,
+  imageViewer,
   data,
 }: {
-  annotator: Annotator;
+  imageViewer: ImageViewer;
   data: DataStoreSlice;
 }): Category => {
-  return data.annotationCategories.entities[annotator.selectedCategoryId];
+  return data.annotationCategories.entities[imageViewer.selectedCategoryId];
 };

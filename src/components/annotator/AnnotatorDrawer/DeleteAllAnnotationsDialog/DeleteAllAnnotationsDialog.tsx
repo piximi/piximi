@@ -9,7 +9,7 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 

@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
 import { dataSlice } from "store/data";
-import { activeImageIdSelector, imageViewerSlice } from "store/annotator";
+import { activeImageIdSelector, imageViewerSlice } from "store/imageViewer";
 
 import { SerializedFileType } from "types";
 

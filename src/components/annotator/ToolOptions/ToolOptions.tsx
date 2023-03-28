@@ -12,7 +12,7 @@ import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 
 import { AppBarOffset } from "components/styled/AppBarOffset";
 
-import { toolTypeSelector } from "store/annotator";
+import { toolTypeSelector } from "store/imageViewer";
 
 import { ToolType } from "types";
 

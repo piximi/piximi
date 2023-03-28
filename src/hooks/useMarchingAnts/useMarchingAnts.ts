@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { stageScaleSelector } from "store/annotator";
+import { stageScaleSelector } from "store/imageViewer";
 
 export const useMarchingAnts = () => {
   const [dashOffset, setDashOffset] = useState<number>(0);

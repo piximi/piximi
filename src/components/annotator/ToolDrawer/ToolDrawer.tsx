@@ -18,7 +18,7 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
-import { imageViewerSlice, toolTypeSelector } from "store/annotator";
+import { imageViewerSlice, toolTypeSelector } from "store/imageViewer";
 
 import { HotkeyView, ToolType as OperationType } from "types";
 

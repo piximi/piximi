@@ -9,7 +9,7 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { activeImageIdSelector } from "store/annotator";
+import { activeImageIdSelector } from "store/imageViewer";
 import {
   dataSlice,
   selectActiveImageData,

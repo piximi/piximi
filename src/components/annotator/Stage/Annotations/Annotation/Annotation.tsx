@@ -4,7 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { imageOriginSelector } from "store/annotator";
+import { imageOriginSelector } from "store/imageViewer";
 
 import { DecodedAnnotationType, Shape } from "types";
 

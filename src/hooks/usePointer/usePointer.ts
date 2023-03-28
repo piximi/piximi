@@ -11,7 +11,7 @@ import {
   setSelectedAnnotationIds,
   setSelectedCategoryId,
   setPointerSelection,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import {
   selectActiveImageHeight,
