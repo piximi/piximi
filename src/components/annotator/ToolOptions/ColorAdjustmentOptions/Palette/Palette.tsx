@@ -8,8 +8,8 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { AnnotatorSlice } from "store/annotator";
-import { selectActiveImageRawColor } from "store/data";
+import { activeImageIdSelector } from "store/annotator";
+import { DataSlice, selectActiveImageRawColor } from "store/data";
 
 import { DEFAULT_COLORS } from "types";
 
@@ -25,6 +25,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
   const open = Boolean(anchorEl);
 
   const colors = useSelector(selectActiveImageRawColor);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const dispatch = useDispatch();
 
@@ -47,8 +48,10 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      AnnotatorSlice.actions.setImageColors({
-        colors: { ...colors, color: tensor2d(updatedColors) },
+      DataSlice.actions.updateStagedImage({
+        imageId: activeImageId!,
+        updates: { colors: { ...colors, color: tensor2d(updatedColors) } },
+        disposeColors: true,
         execSaga: true,
       })
     );

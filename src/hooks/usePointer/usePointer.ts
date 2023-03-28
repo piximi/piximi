@@ -8,7 +8,7 @@ import {
   pointerSelectionSelector,
   selectedAnnotationsIdsSelector,
   toolTypeSelector,
-  setSelectedAnnotations,
+  setSelectedAnnotationIds,
   setSelectedCategoryId,
   setPointerSelection,
 } from "store/annotator";
@@ -150,9 +150,9 @@ export const usePointer = () => {
         if (!shift) {
           batch(() => {
             dispatch(
-              setSelectedAnnotations({
-                selectedAnnotations: annotationsInBox,
-                workingAnnotation: annotationsInBox[0],
+              setSelectedAnnotationIds({
+                selectedAnnotationIds: annotationsInBox.map((an) => an.id),
+                workingAnnotationId: annotationsInBox[0].id,
               })
             );
             dispatch(
@@ -170,12 +170,12 @@ export const usePointer = () => {
             }
           );
           dispatch(
-            setSelectedAnnotations({
-              selectedAnnotations: [
-                ...selectedAnnotations,
-                ...additionalAnnotations,
+            setSelectedAnnotationIds({
+              selectedAnnotationIds: [
+                ...selectedAnnotations.map((an) => an.id),
+                ...additionalAnnotations.map((an) => an.id),
               ],
-              workingAnnotation: annotationsInBox[0],
+              workingAnnotationId: annotationsInBox[0].id,
             })
           );
         }
@@ -246,9 +246,9 @@ export const usePointer = () => {
     if (!shift) {
       batch(() => {
         dispatch(
-          setSelectedAnnotations({
-            selectedAnnotations: [currentAnnotation!],
-            workingAnnotation: currentAnnotation,
+          setSelectedAnnotationIds({
+            selectedAnnotationIds: [currentAnnotation!.id],
+            workingAnnotationId: currentAnnotation?.id,
           })
         );
         dispatch(
@@ -263,9 +263,12 @@ export const usePointer = () => {
     if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
       //include newly selected annotation if not already selected
       dispatch(
-        setSelectedAnnotations({
-          selectedAnnotations: [...selectedAnnotations, currentAnnotation],
-          workingAnnotation: currentAnnotation,
+        setSelectedAnnotationIds({
+          selectedAnnotationIds: [
+            ...selectedAnnotations.map((an) => an.id),
+            currentAnnotation.id,
+          ],
+          workingAnnotationId: currentAnnotation.id,
         })
       );
     }

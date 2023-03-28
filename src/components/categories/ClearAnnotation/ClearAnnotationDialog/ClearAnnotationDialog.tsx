@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
+import { activeImageIdSelector } from "store/annotator";
 
-import { dataSlice } from "store/data";
+import { DataSlice } from "store/data";
 
 import { Category } from "types";
 
@@ -30,11 +30,7 @@ export const ClearAnnotationDialog = ({
 
   const onClear = () => {
     dispatch(
-      AnnotatorSlice.actions.clearCategoryAnnotations({ category: category })
-    );
-
-    dispatch(
-      dataSlice.actions.deleteImageAnnotationsByCategory({
+      DataSlice.actions.deleteStagedAnnotationsByCategory({
         imageId: activeImage!,
         categoryId: category.id,
       })

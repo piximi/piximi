@@ -2,8 +2,8 @@ import { takeLeading } from "redux-saga/effects";
 
 import { uploadImagesSaga } from "./uploadImagesSaga";
 
-import { dataSlice } from "../dataSlice";
+import { DataSlice } from "store/data";
 
 export function* watchUploadImagesSaga() {
-  yield takeLeading(dataSlice.actions.uploadImages, uploadImagesSaga);
+  yield takeLeading(DataSlice.actions.uploadImages, uploadImagesSaga);
 }

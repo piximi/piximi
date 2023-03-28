@@ -10,7 +10,7 @@ import {
   SerializedCOCOImageType,
   Point,
   ShadowImageType,
-  EncodedAnnotationType,
+  AnnotationType,
 } from "types";
 
 /*
@@ -182,7 +182,7 @@ export const deserializeCOCOFile = (
   const malformed: Array<number> = [];
 
   const imsToAnnotate: {
-    [imageId: string]: Array<EncodedAnnotationType>;
+    [imageId: string]: Array<AnnotationType>;
   } = {};
 
   for (const cocoAnn of imModdedAnnotations) {

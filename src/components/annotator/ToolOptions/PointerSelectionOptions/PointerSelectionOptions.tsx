@@ -39,18 +39,18 @@ export const PointerSelectionOptions = () => {
   const onSelectAll = () => {
     const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: allAnnotations,
-        workingAnnotation: allAnnotations[0],
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: allAnnotations.map((an) => an.id),
+        workingAnnotationId: allAnnotations[0].id,
       })
     );
   };
 
   const onSelectNone = () => {
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [],
-        workingAnnotation: undefined,
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: [],
+        workingAnnotationId: undefined,
       })
     );
   };
@@ -67,9 +67,9 @@ export const PointerSelectionOptions = () => {
       return annotation.categoryId === category.id;
     });
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: desiredAnnotations,
-        workingAnnotation: desiredAnnotations[0],
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: desiredAnnotations.map((an) => an.id),
+        workingAnnotationId: desiredAnnotations[0].id,
       })
     );
   };

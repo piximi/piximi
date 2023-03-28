@@ -8,10 +8,7 @@ export { AnnotationStateType } from "./AnnotationStateType";
 export { AnnotationExportType } from "./AnnotationExportType";
 export type { AnnotationsEntityType } from "./AnnotationsEntityType";
 
-export type {
-  EncodedAnnotationType,
-  DecodedAnnotationType,
-} from "./AnnotationType";
+export type { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
 
 export type {
   ClassifierArchitectureOptions,
@@ -62,8 +59,14 @@ export {
   defaultImageSortKey,
 } from "./ImageSortType";
 
-export type { OldImageType, ShadowImageType, ImageType } from "./ImageType";
+export type {
+  OldImageType,
+  ShadowImageType,
+  ImageType,
+  stagedImageType,
+} from "./ImageType";
 
+export type { Colors, ColorsRaw } from "./tensorflow";
 export type { Annotator } from "./Annotator";
 
 export type { AnnotatorImage } from "./AnnotatorImage";

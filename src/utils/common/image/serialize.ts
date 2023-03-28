@@ -2,7 +2,7 @@ import { Group, ready } from "h5wasm";
 
 import { getFile, to_blob } from "../fileHandlers";
 import {
-  EncodedAnnotationType,
+  AnnotationType,
   Classifier,
   ClassifierModelProps,
   DefaultModelProps,
@@ -22,14 +22,14 @@ import { Colors } from "types/tensorflow";
 
 const serializeImageAnnotations = (
   annotationsGroup: Group,
-  annotations: Array<EncodedAnnotationType>
+  annotations: Array<AnnotationType>
 ) => {
   const bboxes = new Uint8Array(annotations.length * 4);
   const categories = annotations.map((an) => an.categoryId);
   const ids = annotations.map((an) => an.id);
   const maskLengths = new Uint8Array(annotations.length);
   const masks = new Uint8Array(
-    annotations.reduce((prev, curr) => prev + curr.mask.length, 0)
+    annotations.reduce((prev, curr) => prev + curr.mask!.length, 0)
   );
   const planes = Uint8Array.from(annotations.map((an) => an.plane));
 
@@ -37,9 +37,9 @@ const serializeImageAnnotations = (
   for (let i = 0; i < annotations.length; i++) {
     let annotation = annotations[i];
     bboxes.set(annotation.boundingBox, i * 4);
-    maskLengths[i] = annotation.mask.length;
-    masks.set(annotation.mask, maskStartIdx);
-    maskStartIdx += annotation.mask.length;
+    maskLengths[i] = annotation.mask!.length;
+    masks.set(annotation.mask!, maskStartIdx);
+    maskStartIdx += annotation.mask!.length;
   }
 
   annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");

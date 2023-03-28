@@ -1,5 +1,5 @@
 import * as T from "io-ts";
-import { EncodedAnnotationType } from "types";
+import { AnnotationType } from "types";
 import { Partition } from "./Partition";
 import { ColorsRaw } from "./tensorflow";
 import { SerializedImageRType } from "./runtime";
@@ -18,7 +18,7 @@ export type SerializedImageType = {
 
   partition: Partition; // prev imagePartition
   categoryId: string; // prev imageCategoryId
-  annotations: Array<EncodedAnnotationType>;
+  annotations: Array<AnnotationType>;
 
   src?: string;
 };

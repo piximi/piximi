@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "hooks";
 
 import { classifierSlice } from "store/classifier";
-import { dataSlice, selectInferenceImages } from "store/data";
+import { DataSlice, selectInferenceImages } from "store/data";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ export const PredictionVisibility = () => {
 
     setShowLabeledImages(updatedShowLabeledImages);
     dispatch(
-      dataSlice.actions.setVisibilityOfImages({
+      DataSlice.actions.setVisibilityOfImages({
         visible: updatedShowLabeledImages,
         imageIds: inferenceImages.map((image) => image.id),
       })
@@ -35,12 +35,12 @@ export const PredictionVisibility = () => {
   };
 
   const clearPredictions = () => {
-    dispatch(dataSlice.actions.clearPredictions({}));
+    dispatch(DataSlice.actions.clearPredictions({}));
 
     if (!showLabeledImages) {
       setShowLabeledImages(true);
       dispatch(
-        dataSlice.actions.setVisibilityOfImages({
+        DataSlice.actions.setVisibilityOfImages({
           visible: true,
           imageIds: inferenceImages.map((image) => image.id),
         })

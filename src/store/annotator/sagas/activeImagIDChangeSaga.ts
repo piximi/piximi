@@ -1,11 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import { AnnotatorSlice, imageInstancesSelector } from "store/annotator";
-import { selectActiveImage, selectStagedAnnotations } from "store/data";
-import { decodeAnnotations, encodeAnnotations } from "utils/annotator";
-
-import { Colors } from "types/tensorflow";
+import { AnnotatorSlice } from "store/annotator";
+import {
+  DataSlice,
+  selectActiveImage,
+  selectActiveImageAnnotationIds,
+} from "store/data";
+import { ImageType } from "types";
 
 import { createRenderedTensor } from "utils/common/image";
 
@@ -29,12 +31,16 @@ export function* activeImageIDChangeSaga({
     );
     return;
   }
+  const activeImageAnnotationIds: ReturnType<
+    typeof selectActiveImageAnnotationIds
+  > = yield select(selectActiveImageAnnotationIds);
 
   yield put(
-    AnnotatorSlice.actions.setImageSrc({
-      src: image.src,
+    AnnotatorSlice.actions.setActiveAnnotationIds({
+      annotationIds: activeImageAnnotationIds,
     })
   );
+
   /*
    * Since converting each plane to image data, and mapping them to RGBs
    * can take some time, there is a a window of time where the previous
@@ -50,39 +56,6 @@ export function* activeImageIDChangeSaga({
       renderedSrcs: tmpRenderedSrc,
     })
   );
-
-  let previousStagedAnnotations:
-    | ReturnType<typeof selectStagedAnnotations>
-    | undefined;
-
-  if (prevImageId) {
-    previousStagedAnnotations = yield select(selectStagedAnnotations);
-  }
-
-  const imageAnnotations: ReturnType<typeof imageInstancesSelector> =
-    yield select(imageInstancesSelector);
-
-  const newDecodedAnnotations: Awaited<ReturnType<typeof decodeAnnotations>> =
-    yield call(decodeAnnotations, imageAnnotations);
-
-  yield put(
-    AnnotatorSlice.actions.setStagedAnnotations({
-      annotations: newDecodedAnnotations,
-    })
-  );
-
-  if (previousStagedAnnotations) {
-    const previousEncodedAnnotations: Awaited<
-      ReturnType<typeof encodeAnnotations>
-    > = yield call(encodeAnnotations, previousStagedAnnotations);
-
-    yield put(
-      AnnotatorSlice.actions.setImageInstances({
-        instances: previousEncodedAnnotations,
-        imageId: prevImageId!,
-      })
-    );
-  }
 
   const renderedSrcs: Awaited<
     ReturnType<typeof createRenderedTensor<undefined>>
@@ -100,9 +73,10 @@ export function* activeImageIDChangeSaga({
 }
 
 export function* activeImageColorChangeSaga({
-  payload: { colors, execSaga },
+  payload: { imageId, updates, execSaga },
 }: PayloadAction<{
-  colors: Colors;
+  imageId: string;
+  updates: Partial<ImageType>;
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
@@ -112,6 +86,8 @@ export function* activeImageColorChangeSaga({
   );
 
   if (!image) return;
+  const { colors } = updates;
+  if (!colors) return;
 
   const colorsEditable = {
     range: { ...colors.range },
@@ -130,8 +106,9 @@ export function* activeImageColorChangeSaga({
   );
 
   yield put(
-    AnnotatorSlice.actions.setImageSrc({
-      src: renderedSrcs[image.activePlane],
+    DataSlice.actions.updateStagedImage({
+      imageId: image.id,
+      updates: { src: renderedSrcs[image.activePlane] },
     })
   );
 

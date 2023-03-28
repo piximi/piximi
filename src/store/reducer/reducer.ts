@@ -5,7 +5,7 @@ import { AnnotatorSlice } from "store/annotator";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 import { toolOptionsSlice } from "store/tool-options";
-import { dataSlice } from "store/data/dataSlice";
+import { DataSlice } from "store/data/";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -14,7 +14,7 @@ const reducers = {
   project: projectSlice.reducer,
   settings: applicationSlice.reducer,
   toolOptions: toolOptionsSlice.reducer,
-  data: dataSlice.reducer,
+  data: DataSlice.reducer,
 };
 
 export const reducer = combineReducers(reducers);

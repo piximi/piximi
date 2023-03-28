@@ -16,9 +16,10 @@ import { Palette } from "../Palette";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { AnnotatorSlice } from "store/annotator";
+import { activeImageIdSelector } from "store/annotator";
 
 import {
+  DataSlice,
   selectActiveImageBitDepth,
   selectActiveImageData,
   selectActiveImageRawColor,
@@ -33,6 +34,7 @@ export const ChannelsList = () => {
   const dispatch = useDispatch();
 
   const imageData = useSelector(selectActiveImageData);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const imageBitDepth = useSelector(selectActiveImageBitDepth);
 
@@ -42,7 +44,7 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    AnnotatorSlice.actions.setImageColors,
+    DataSlice.actions.updateStagedImage,
     { range: {}, visible: {}, color: [] }
   );
 
@@ -67,10 +69,14 @@ export const ChannelsList = () => {
 
   const handleSliderChangeCommitted = async () => {
     dispatchActiveImageColors({
-      colors: {
-        ...localActiveImageColors,
-        color: tensor2d(localActiveImageColors.color),
+      imageId: activeImageId!,
+      updates: {
+        colors: {
+          ...localActiveImageColors,
+          color: tensor2d(localActiveImageColors.color),
+        },
       },
+      disposeColors: true,
       execSaga: true,
     });
   };
@@ -84,8 +90,10 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      AnnotatorSlice.actions.setImageColors({
-        colors: newColors,
+      DataSlice.actions.updateStagedImage({
+        imageId: activeImageId!,
+        updates: { colors: newColors },
+        disposeColors: true,
         execSaga: true,
       })
     );

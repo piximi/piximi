@@ -4,11 +4,12 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { setSelectedAnnotations, imageOriginSelector } from "store/annotator";
+import { imageOriginSelector } from "store/annotator";
 
 import { DecodedAnnotationType, Shape } from "types";
 
-import { hexToRGBA, colorOverlayROI } from "utils/annotator";
+import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
+import { DataSlice } from "store/data";
 
 type AnnotationProps = {
   annotation: DecodedAnnotationType;
@@ -55,15 +56,6 @@ export const Annotation = ({
     imageHeight,
     imagePosition,
   ]);
-  useEffect(() => {
-    if (
-      annotation.boundingBox[0] < 0 ||
-      annotation.boundingBox[2] > 512 ||
-      annotation.boundingBox[1] < 0 ||
-      annotation.boundingBox[3] > 512
-    )
-      console.log(annotation.boundingBox);
-  }, [annotation]);
 
   const onTransformEnd = () => {
     if (!selected) return;
@@ -112,10 +104,15 @@ export const Annotation = ({
       maskData: Uint8Array.from(resizedMaskROI.data),
     };
 
+    const tempUpdated = {
+      ...updatedAnnotation,
+      mask: encode(resizedMaskROI.data),
+    };
+
     dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [updatedAnnotation],
-        workingAnnotation: updatedAnnotation,
+      DataSlice.actions.updateAnnotation({
+        annotationId: updatedAnnotation.id,
+        updates: tempUpdated,
       })
     );
   };

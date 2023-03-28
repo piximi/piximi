@@ -21,7 +21,7 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { ImageMenu } from "../ImageMenu";
 
-import { setActiveImage } from "store/annotator";
+import { setActiveImageId } from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -110,7 +110,7 @@ export const ImageList = ({
     (image: ShadowImageType) => {
       if (image.id !== activeImageRef.current.id) {
         dispatch(
-          setActiveImage({
+          setActiveImageId({
             imageId: image.id,
             prevImageId: activeImageRef.current.id,
             execSaga: true,

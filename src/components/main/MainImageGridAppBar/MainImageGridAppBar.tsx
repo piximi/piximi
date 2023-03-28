@@ -37,7 +37,7 @@ import {
 } from "store/application";
 import { projectSlice, selectedImagesIdSelector } from "store/project";
 import { selectVisibleImages } from "store/data";
-import { setActiveImage, AnnotatorSlice } from "store/annotator";
+import { setActiveImageId } from "store/annotator";
 
 import { HotkeyView, ImageType, ShadowImageType } from "types";
 
@@ -138,13 +138,7 @@ export const MainImageGridAppBar = () => {
 
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setImages({
-          images: selected,
-          disposeColorTensors: true,
-        })
-      );
-      dispatch(
-        setActiveImage({
+        setActiveImageId({
           imageId: selected.length > 0 ? selected[0].id : undefined,
           prevImageId: undefined,
           execSaga: true,

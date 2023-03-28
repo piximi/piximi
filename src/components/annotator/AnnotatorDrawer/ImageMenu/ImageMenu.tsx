@@ -8,12 +8,12 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 import { useTranslation } from "hooks";
 
 import {
-  dataSlice,
+  DataSlice,
   selectAllCategories,
   selectActiveImage,
   selectSelectedImages,
 } from "store/data";
-import { AnnotatorSlice, setStagedAnnotations } from "store/annotator";
+import { AnnotatorSlice } from "store/annotator";
 
 import { ShadowImageType } from "types";
 
@@ -47,12 +47,12 @@ export const ImageMenu = ({
   ) => {
     if (!selectedImage) return;
     dispatch(
-      dataSlice.actions.deleteAllAnnotationsByImage({
+      DataSlice.actions.deleteAllAnnotationsByImage({
         imageId: selectedImage.id,
       })
     );
     dispatch(
-      dataSlice.actions.deleteAllAnnotationsByImage({
+      DataSlice.actions.deleteAllAnnotationsByImage({
         imageId: selectedImage.id,
       })
     );
@@ -75,11 +75,10 @@ export const ImageMenu = ({
           newActiveImageId =
             activeImageIdx === 0 ? images[1].id : images[activeImageIdx - 1].id;
         } else {
-          dispatch(setStagedAnnotations({ annotations: [] }));
         }
 
         dispatch(
-          AnnotatorSlice.actions.setActiveImage({
+          AnnotatorSlice.actions.setActiveImageId({
             imageId: newActiveImageId,
             prevImageId: undefined,
             execSaga: true,
@@ -88,7 +87,7 @@ export const ImageMenu = ({
       }
 
       dispatch(
-        dataSlice.actions.deleteImages({
+        DataSlice.actions.deleteImages({
           imageIds: [selectedImage.id],
           disposeColorTensors: true,
         })

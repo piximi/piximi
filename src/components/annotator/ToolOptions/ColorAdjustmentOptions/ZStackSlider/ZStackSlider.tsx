@@ -5,7 +5,7 @@ import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { activeImageRenderedSrcsSelector } from "store/annotator";
 import {
-  dataSlice,
+  DataSlice,
   selectActiveImage,
   selectActiveImageActivePlane,
 } from "store/data";
@@ -22,7 +22,7 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        dataSlice.actions.setImageActivePlane({
+        DataSlice.actions.setImageActivePlane({
           imageId: activeImage.id,
           activePlane: newValue,
           renderedSrc: renderedSrcs[newValue],

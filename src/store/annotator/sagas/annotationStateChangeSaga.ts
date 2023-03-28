@@ -11,6 +11,7 @@ import {
   selectAnnotationCategoryById,
   selectActiveImageActivePlane,
   selectWorkingAnnotation,
+  DataSlice,
 } from "store/data";
 
 import {
@@ -21,6 +22,7 @@ import {
 } from "types";
 
 import { AnnotationTool } from "annotator-tools";
+import { encodeAnnotation } from "utils/annotator";
 
 export function* annotationStateChangeSaga({
   payload: { annotationState, annotationTool, execSaga },
@@ -55,10 +57,14 @@ export function* annotationStateChangeSaga({
 
     if (!annotationTool.annotation) return;
 
+    const annotation = encodeAnnotation(annotationTool.annotation);
+
+    yield put(DataSlice.actions.addAnnotation({ annotation: annotation! }));
+
     yield put(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [annotationTool.annotation],
-        workingAnnotation: annotationTool.annotation,
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: [annotationTool.annotation.id],
+        workingAnnotationId: annotationTool.annotation.id,
       })
     );
   } else {
@@ -110,10 +116,14 @@ export function* annotationStateChangeSaga({
 
     if (!combinedSelectedAnnotation) return;
 
+    const annotation = encodeAnnotation(combinedSelectedAnnotation);
+
+    yield put(DataSlice.actions.addAnnotation({ annotation: annotation! }));
+
     yield put(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [combinedSelectedAnnotation],
-        workingAnnotation: combinedSelectedAnnotation,
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: [combinedSelectedAnnotation.id],
+        workingAnnotationId: combinedSelectedAnnotation.id,
       })
     );
 

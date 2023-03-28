@@ -1,4 +1,4 @@
-import { DecodedAnnotationType, EncodedAnnotationType } from "types";
+import { DecodedAnnotationType, AnnotationType } from "types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -22,11 +22,11 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: EncodedAnnotationType | undefined
+  encodedAnnotation: AnnotationType | undefined
 ): DecodedAnnotationType | undefined => {
   if (!encodedAnnotation) return undefined;
   const { mask, ...decodedAnnotation } = {
-    maskData: Uint8Array.from(decode(encodedAnnotation.mask)),
+    maskData: Uint8Array.from(decode(encodedAnnotation.mask!)),
     ...encodedAnnotation,
   };
 
@@ -34,12 +34,12 @@ export const decodeAnnotation = (
 };
 
 export const decodeAnnotations = async (
-  encodedAnnotations: Array<EncodedAnnotationType>
+  encodedAnnotations: Array<AnnotationType>
 ): Promise<Array<DecodedAnnotationType>> => {
   return new Promise((resolve, reject) => {
     const decodedAnnotations = encodedAnnotations.map((annotation) => {
       const { mask, ...decdodedAnnotation } = {
-        maskData: Uint8Array.from(decode(annotation.mask)),
+        maskData: Uint8Array.from(decode(annotation.mask!)),
         ...annotation,
       };
       return decdodedAnnotation;
@@ -96,7 +96,7 @@ export const encode = (
 
 export const encodeAnnotation = (
   decodedAnnotation: DecodedAnnotationType | undefined
-): EncodedAnnotationType | undefined => {
+): AnnotationType | undefined => {
   if (!decodedAnnotation) return undefined;
   const { maskData, ...encodedAnnotation } = {
     mask: encode(decodedAnnotation.maskData),
@@ -108,7 +108,7 @@ export const encodeAnnotation = (
 
 export const encodeAnnotations = (
   decodedAnnotations: Array<DecodedAnnotationType>
-): Promise<Array<EncodedAnnotationType>> => {
+): Promise<Array<AnnotationType>> => {
   return new Promise((resolve) => {
     const encodedAnnotations = decodedAnnotations.map((annotation) => {
       const { maskData, ...decdodedAnnotation } = {

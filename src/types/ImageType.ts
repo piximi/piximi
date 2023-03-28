@@ -1,10 +1,10 @@
 import { Tensor4D } from "@tensorflow/tfjs";
 import { BitDepth } from "image-js";
-import { Shape, EncodedAnnotationType, Partition } from "types";
+import { Shape, AnnotationType, Partition } from "types";
 import { Colors } from "./tensorflow";
 
 export type OldImageType = {
-  annotations: Array<EncodedAnnotationType>;
+  annotations: Array<AnnotationType>;
   activePlane: number;
   categoryId: string;
   colors: Colors;
@@ -19,7 +19,7 @@ export type OldImageType = {
 };
 
 export type ShadowImageType = {
-  annotations: Array<EncodedAnnotationType>;
+  annotations: Array<AnnotationType>;
   activePlane: number;
   categoryId?: string;
   colors: Colors;
@@ -47,3 +47,5 @@ export type ImageType = {
   visible: boolean;
   src: string; // The URI to be displayed on the canvas
 };
+
+export type stagedImageType = { id: string } & Partial<ImageType>;

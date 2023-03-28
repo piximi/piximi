@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { Visibility as VisibilityIcon } from "@mui/icons-material";
 
-import { dataSlice, selectVisibleImages, selectAllImages } from "store/data";
+import { DataSlice, selectVisibleImages, selectAllImages } from "store/data";
 
 import { CategoryType } from "types";
 
@@ -24,9 +24,9 @@ export const ShowAllCategoriesListItem = ({
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (categoryType === CategoryType.ClassifierCategory) {
-      dispatch(dataSlice.actions.setOtherCategoriesInvisible({}));
+      dispatch(DataSlice.actions.setOtherCategoriesInvisible({}));
     } else {
-      dispatch(dataSlice.actions.setOtherAnnotationCategoriesInvisible({}));
+      dispatch(DataSlice.actions.setOtherAnnotationCategoriesInvisible({}));
     }
   };
 

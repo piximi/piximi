@@ -8,7 +8,7 @@ import { ColorModel, Image as ImageJS } from "image-js";
 
 import { deserializeAnnotations } from "utils/annotator";
 
-import { Category, EncodedAnnotationType, SerializedFileType } from "types";
+import { Category, AnnotationType, SerializedFileType } from "types";
 
 export const loadExampleImage = async (
   imagePath: string,
@@ -29,7 +29,7 @@ export const loadExampleImage = async (
     serializedAnnotations.annotations
   );
 
-  const annotations: Array<EncodedAnnotationType> = [];
+  const annotations: Array<AnnotationType> = [];
 
   const normImageData = image.data.mul(255);
 

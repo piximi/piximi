@@ -12,9 +12,10 @@ import {
 import { useAnnotationTool, useTranslation } from "hooks";
 
 import { AnnotatorSlice } from "store/annotator";
-import { selectWorkingAnnotation } from "store/data";
+import { DataSlice, selectWorkingAnnotation } from "store/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+import { encode } from "utils/annotator";
 
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();
@@ -32,20 +33,19 @@ export const InvertAnnotation = () => {
       workingAnnotation.boundingBox
     );
 
+    const mask = encode(invertedMask);
+
     dispatch(
-      AnnotatorSlice.actions.setSelectedAnnotations({
-        selectedAnnotations: [
-          {
-            ...workingAnnotation,
-            boundingBox: invertedBoundingBox,
-            maskData: invertedMask,
-          },
-        ],
-        workingAnnotation: {
-          ...workingAnnotation,
-          boundingBox: invertedBoundingBox,
-          maskData: invertedMask,
-        },
+      DataSlice.actions.updateAnnotation({
+        annotationId: workingAnnotation.id,
+        updates: { mask, boundingBox: invertedBoundingBox },
+      })
+    );
+
+    dispatch(
+      AnnotatorSlice.actions.setSelectedAnnotationIds({
+        selectedAnnotationIds: [workingAnnotation.id],
+        workingAnnotationId: workingAnnotation.id,
       })
     );
   };
