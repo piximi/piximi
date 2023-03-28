@@ -72,8 +72,6 @@ export const useAnnotatorKeyboardShortcuts = ({
     )
       return;
 
-    dispatch(AnnotatorSlice.actions.updateStagedAnnotations({}));
-
     deselectAnnotation();
 
     if (selectionMode !== AnnotationModeType.New)
@@ -309,7 +307,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx - 1].id;
       dispatch(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,
@@ -336,7 +334,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
       const newActiveImageId = images[activeImageIdx + 1].id;
       dispatch(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: newActiveImageId,
           prevImageId: activeImageId,
           execSaga: true,

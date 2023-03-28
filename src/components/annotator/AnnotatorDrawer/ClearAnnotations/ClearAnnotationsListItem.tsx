@@ -55,16 +55,9 @@ export const ClearAnnotationsListItem = () => {
     if (!selectedAnnotationsIds) return;
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setStagedAnnotations({
-          annotations: stagedAnnotations.filter(
-            (annotation) => !selectedAnnotationsIds.includes(annotation.id)
-          ),
-        })
-      );
-      dispatch(
-        AnnotatorSlice.actions.setSelectedAnnotations({
-          selectedAnnotations: [],
-          workingAnnotation: undefined,
+        AnnotatorSlice.actions.setSelectedAnnotationIds({
+          selectedAnnotationIds: [],
+          workingAnnotationId: undefined,
         })
       );
       dispatch(

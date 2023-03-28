@@ -12,7 +12,7 @@ export const foo = "foo";
 // // import { deserializeCOCOFile } from "./deserializeCOCO";
 
 // import {
-//   EncodedAnnotationType,
+//   AnnotationType,
 //   OldImageType,
 //   UNKNOWN_ANNOTATION_CATEGORY,
 // } from "types";
@@ -58,48 +58,48 @@ export const foo = "foo";
 // };
 
 // // annotations exist T1 and T2
-// const im1AnnotationsT1: Array<EncodedAnnotationType> = [
+// const im1AnnotationsT1: Array<AnnotationType> = [
 //   {
 //     // 1clockTower.jpg -> Unknown (backpack)
 //     ...expectedState.annotator.images[0].annotations[0],
 //     id: uuidv4(),
 //     categoryId: T1T2UnmodifiedCat.id,
-//   } as EncodedAnnotationType,
+//   } as AnnotationType,
 //   {
 //     // 1clockTower.jpg -> clock (1)
 //     ...expectedState.annotator.images[0].annotations[1],
 //     id: uuidv4(),
 //     categoryId: T1T2ModifiedCats.t1.id,
-//   } as EncodedAnnotationType,
+//   } as AnnotationType,
 // ];
 
-// const im1AnnotationsT2: Array<EncodedAnnotationType> = [
+// const im1AnnotationsT2: Array<AnnotationType> = [
 //   {
 //     // 1clockTower.jpg -> clock (2)
 //     ...expectedState.annotator.images[0].annotations[2],
 //     id: uuidv4(),
 //     categoryId: T1T2ModifiedCats.t2.id,
-//   } as EncodedAnnotationType,
+//   } as AnnotationType,
 // ];
 
 // // annotations exists T1, but not T2
-// const im2AnnotationsT1: Array<EncodedAnnotationType> = [
+// const im2AnnotationsT1: Array<AnnotationType> = [
 //   {
 //     // 2golfer.jpg -> sports ball
 //     ...expectedState.annotator.images[1].annotations[0],
 //     id: uuidv4(),
 //     categoryId: T1OnlyCat.id,
-//   } as EncodedAnnotationType,
+//   } as AnnotationType,
 // ];
 
 // // annotations did not exist T1, exists T2
-// const im3AnnotationsT2: Array<EncodedAnnotationType> = [
+// const im3AnnotationsT2: Array<AnnotationType> = [
 //   {
 //     // 3twoSheep.jpg -> sheep
 //     ...expectedState.annotator.images[2].annotations[0],
 //     id: uuidv4(),
 //     categoryId: T2OnlyCat.id,
-//   } as EncodedAnnotationType,
+//   } as AnnotationType,
 // ];
 
 // // image exists T1 and T2
@@ -182,7 +182,7 @@ export const foo = "foo";
 // //     addImages({ newImages: imagesT1 })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   const serializedProject = serializeCOCOFile(imagesT1, categoriesT1);
 
@@ -219,7 +219,7 @@ export const foo = "foo";
 // //     setInstances({ instances: imsToAnnotate })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   // T3 - after deserialization
 
@@ -233,7 +233,7 @@ export const foo = "foo";
 
 // //   // const annotationsT3Actual = imagesT3Actual.reduce(
 // //   //   (annotations, im) => [...annotations, ...im.annotations],
-// //   //   [] as Array<EncodedAnnotationType>
+// //   //   [] as Array<AnnotationType>
 // //   // );
 
 // //   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);

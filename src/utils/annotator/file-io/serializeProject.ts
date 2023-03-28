@@ -21,7 +21,7 @@ export const serializeProject = (
         categoryId: ann.categoryId,
         imageId: im.id,
         id: ann.id,
-        mask: ann.mask.join(" "),
+        mask: ann.mask!.join(" "),
         plane: ann.plane,
         boundingBox: ann.boundingBox,
       });

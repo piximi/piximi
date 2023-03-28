@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { dataSlice } from "store/data";
+import { DataSlice } from "store/data";
 import { projectSlice } from "store/project";
 import { HotkeyView } from "types";
 
@@ -28,7 +28,7 @@ export const DeleteImagesDialog = ({
 
   const onDelete = () => {
     dispatch(
-      dataSlice.actions.deleteImages({
+      DataSlice.actions.deleteImages({
         imageIds: imageIds,
         disposeColorTensors: true,
       })

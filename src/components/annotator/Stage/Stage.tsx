@@ -6,6 +6,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import throttle from "lodash/throttle";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { Box, Typography } from "@mui/material";
 
 import {
   useAnnotationTool,
@@ -21,12 +22,13 @@ import { Image } from "./Image";
 import { Layer } from "./Layer";
 import { ZoomSelection } from "./Selection/ZoomSelection";
 import { Selection } from "./Selection";
+import { Annotations } from "./Annotations";
+import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
+import { PointerSelection } from "./Selection/PointerSelection";
 
 import {
   annotationStateSelector,
   cursorSelector,
-  scaledImageHeightSelector,
-  scaledImageWidthSelector,
   selectedAnnotationsIdsSelector,
   selectionModeSelector,
   setStagePosition,
@@ -35,15 +37,18 @@ import {
   stageScaleSelector,
   toolTypeSelector,
   zoomSelectionSelector,
-  setStagedAnnotations,
   setAnnotationState,
-  setSelectedAnnotations,
+  setSelectedAnnotationIds,
   setImageOrigin,
+  selectedAnnotationCategoryIdSelector,
 } from "store/annotator";
 import {
   selectActiveImageActivePlane,
   selectStagedAnnotations,
   selectWorkingAnnotation,
+  selectCategoryById,
+  selectActiveImageScaledHeight,
+  selectActiveImageScaledWidth,
 } from "store/data";
 
 import { zoomToolOptionsSelector } from "store/tool-options";
@@ -58,13 +63,8 @@ import {
 } from "types";
 
 import { dimensions } from "utils/common";
-import { Box, Typography } from "@mui/material";
+
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
-import { selectedAnnotationCategoryIdSelector } from "store/annotator";
-import { selectCategoryById } from "store/data";
-import { Annotations } from "./Annotations";
-import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
-import { PointerSelection } from "./Selection/PointerSelection";
 
 export const Stage = ({
   stageWidth,
@@ -114,8 +114,8 @@ export const Stage = ({
   const selectionMode = useSelector(selectionModeSelector);
   const stagePosition = useSelector(stagePositionSelector);
   const activeImagePlane = useSelector(selectActiveImageActivePlane);
-  const scaledImageWidth = useSelector(scaledImageWidthSelector);
-  const scaledImageHeight = useSelector(scaledImageHeightSelector);
+  const scaledImageWidth = useSelector(selectActiveImageScaledWidth);
+  const scaledImageHeight = useSelector(selectActiveImageScaledHeight);
   const stageScale = useSelector(stageScaleSelector);
   const annotations = useSelector(selectStagedAnnotations);
   const annotationState = useSelector(annotationStateSelector);
@@ -244,15 +244,7 @@ export const Stage = ({
   const deleteAnnotations = (
     selectedAnnotationIds: Array<string>,
     stagedAnnotations: Array<DecodedAnnotationType>
-  ) => {
-    dispatch(
-      setStagedAnnotations({
-        annotations: stagedAnnotations.filter(
-          (annotation) => !selectedAnnotationIds.includes(annotation.id)
-        ),
-      })
-    );
-  };
+  ) => {};
 
   const deselectAllTransformers = () => {
     if (!stageRef || !stageRef.current) return;
@@ -288,9 +280,9 @@ export const Stage = ({
 
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        workingAnnotation: undefined,
+      setSelectedAnnotationIds({
+        selectedAnnotationIds: [],
+        workingAnnotationId: undefined,
       })
     );
   }, [dispatch]);

@@ -5,7 +5,7 @@ import * as DicomParser from "dicom-parser";
 
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import { applicationSlice } from "store/application";
-import { dataSlice } from "../dataSlice";
+import { DataSlice } from "store/data";
 
 import {
   AlertStateType,
@@ -130,13 +130,10 @@ export function* uploadImagesSaga({
 
   if (imagesToUpload.length) {
     console.log("here");
-    yield put(dataSlice.actions.addImages({ images: imagesToUpload }));
+    yield put(DataSlice.actions.addImages({ images: imagesToUpload }));
     if (isUploadedFromAnnotator) {
       yield put(
-        AnnotatorSlice.actions.addImages({ newImages: imagesToUpload })
-      );
-      yield put(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: imagesToUpload[0].id,
           prevImageId: activeImageId,
           execSaga: true,

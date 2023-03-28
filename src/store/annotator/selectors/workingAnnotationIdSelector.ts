@@ -4,6 +4,5 @@ export const workingAnnotationIdSelector = ({
 }: {
   annotator: Annotator;
 }): string | undefined => {
-  if (!annotator.workingAnnotation) return undefined;
-  else return annotator.workingAnnotation.id;
+  return annotator.workingAnnotationId;
 };

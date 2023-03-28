@@ -8,7 +8,7 @@ import {
 
 import { deselectImages } from "store/project";
 
-import { dataSlice, selectImagesByCategory } from "store/data";
+import { DataSlice, selectImagesByCategory } from "store/data";
 
 import { Category, CategoryType } from "types";
 
@@ -40,9 +40,9 @@ export const CategoryItemCheckbox = ({
         );
       }
 
-      dispatch(dataSlice.actions.setCategoryVisibility(payload));
+      dispatch(DataSlice.actions.setCategoryVisibility(payload));
     } else {
-      dispatch(dataSlice.actions.setAnnotationCategoryVisibility(payload));
+      dispatch(DataSlice.actions.setAnnotationCategoryVisibility(payload));
     }
   };
 

@@ -5,7 +5,7 @@ import { put, select } from "redux-saga/effects";
 import { applicationSlice } from "store/application";
 
 import {
-  dataSlice,
+  DataSlice,
   selectUnannotatedImages,
   selectAnnotationCategories,
 } from "store/data";
@@ -68,7 +68,7 @@ export function* predictSegmenterSaga({
 
   // assign each of the inference images to the validation partition
   yield put(
-    dataSlice.actions.updateSegmentationImagesPartition({
+    DataSlice.actions.updateSegmentationImagesPartition({
       imageIdsByPartition: {
         [Partition.Validation]: inferenceImages.map((image) => image.id),
       },
@@ -236,7 +236,7 @@ function* runSegmentationPrediction(
   while (index < foundCategories.length) {
     const foundCat = foundCategories[index];
     yield put(
-      dataSlice.actions.createAnnotationCategory({
+      DataSlice.actions.createAnnotationCategory({
         name: foundCat.name,
         color: foundCat.color,
         id: foundCat.id,
@@ -247,7 +247,7 @@ function* runSegmentationPrediction(
   index = 0;
   while (index < predictedAnnotations.length) {
     yield put(
-      dataSlice.actions.updateImageAnnotations({
+      DataSlice.actions.updateImageAnnotations({
         imageId: predictedAnnotations[index].imageId,
         annotations: predictedAnnotations[index].annotations,
       })

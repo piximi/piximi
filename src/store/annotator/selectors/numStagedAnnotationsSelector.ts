@@ -12,5 +12,5 @@ export const numStagedAnnotationsSelector = ({
 }: {
   annotator: Annotator;
 }) => {
-  return annotator.stagedAnnotations.length;
+  return annotator.stagedAnnotationIds.length;
 };

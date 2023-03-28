@@ -1,13 +1,10 @@
 import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
-import { DecodedAnnotationType } from ".";
 import { AnnotationStateType } from "./AnnotationStateType";
-import { ShadowImageType } from "./ImageType";
 
 export type Annotator = {
   annotationState: AnnotationStateType;
-  boundingClientRect: DOMRect;
   brightness: number;
   contrast: number;
   currentIndex: number;
@@ -16,9 +13,9 @@ export type Annotator = {
   exposure: number;
   hue: number;
   activeImageId?: string;
+  activeAnnotationIds: Array<string>;
   previousImageId?: string;
   activeImageRenderedSrcs: Array<string>;
-  images: Array<ShadowImageType>;
   language: LanguageType;
   imageOrigin: { x: number; y: number };
   penSelectionBrushSize: number;
@@ -31,10 +28,8 @@ export type Annotator = {
   quickSelectionRegionSize: number;
   thresholdAnnotationValue: number;
   saturation: number;
-  workingAnnotation: DecodedAnnotationType | undefined;
   workingAnnotationId: string | undefined;
   selectedAnnotationIds: Array<string>;
-  stagedAnnotations: Array<DecodedAnnotationType>;
   stagedAnnotationIds: Array<string>;
   stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;

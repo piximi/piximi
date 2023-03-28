@@ -1,22 +1,16 @@
 // Slice
 export {
   annotatorSlice as AnnotatorSlice,
-  setActiveImage,
+  setActiveImageId,
   setActiveImageRenderedSrcs,
   setOperation,
-  setSelectedAnnotations,
+  setSelectedAnnotationIds,
   setSelectedCategoryId,
   setImageOrigin,
   setStageScale,
-  setBoundingClientRect,
   setStageWidth,
   setPointerSelection,
   setZoomSelection,
-  updateStagedAnnotations,
-  addImages,
-  deleteAllInstances,
-  deleteImage,
-  setActiveImagePlane,
   setAnnotationState,
   setBrightness,
   setContrast,
@@ -24,24 +18,19 @@ export {
   setCursor,
   setExposure,
   setHue,
-  setImageInstances,
-  setImages,
   setLanguage,
   setPenSelectionBrushSize,
   setQuickSelectionRegionSize,
   setSaturation,
   setSelectionMode,
   setSoundEnabled,
-  setStagedAnnotations,
+  setStagedAnnotationIds,
   setStageHeight,
   setStagePosition,
   setVibrance,
-  deleteAnnotationCategory,
-  setInstances,
 } from "./AnnotatorSlice";
 
 // Selectors
-export { imageInstancesSelector } from "./selectors/imageInstancesSelector";
 export { workingAnnotationIdSelector } from "./selectors/workingAnnotationIdSelector";
 export { numStagedAnnotationsSelector } from "./selectors/numStagedAnnotationsSelector";
 
@@ -51,7 +40,6 @@ export { selectedAnnotationCategoryIdSelector } from "./selectors/selectedAnnota
 export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
 export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
 export { annotationStateSelector } from "./selectors/annotationStateSelector";
-export { boundingClientRectSelector } from "./selectors/boundingClientRectSelector";
 export { brightnessSelector } from "./selectors/brightnessSelector";
 export { contrastSelector } from "./selectors/contrastSelector";
 export { currentIndexSelector } from "./selectors/currentIndexSelector";
@@ -79,8 +67,6 @@ export { stagePositionSelector } from "./selectors/stagePositionSelector";
 export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { imageOriginSelector } from "./selectors/imageOriginSelector";
-export { scaledImageHeightSelector } from "./selectors/scaledImageHeightSelector";
-export { scaledImageWidthSelector } from "./selectors/scaledImageWidthSelector";
 
 // Sagas
 
@@ -92,7 +78,7 @@ export { annotationStateChangeSaga } from "./sagas/annotationStateChangeSaga";
 export { selectedCategorySaga } from "./sagas/selectedCategorySaga";
 export {
   watchActiveImageChangeSaga,
-  watchActiveImageColorsChangeSaga,
+  //watchActiveImageColorsChangeSaga,
 } from "./sagas/watchActiveImageIDChangeSaga";
 export { watchAnnotationStateChangeSaga } from "./sagas/watchAnnotationStateChangeSaga";
 export { watchSelectedCategorySaga } from "./sagas/watchSelectedCategorySaga";

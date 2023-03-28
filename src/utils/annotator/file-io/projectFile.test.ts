@@ -7,7 +7,7 @@ export const foo = "foo";
 // import { addImages, AnnotatorSlice, setInstances } from "store/annotator";
 // import { serializeProject } from "./serializeProject";
 // import {
-//   EncodedAnnotationType,
+//   AnnotationType,
 //   OldImageType,
 //   UNKNOWN_ANNOTATION_CATEGORY,
 // } from "types";
@@ -50,7 +50,7 @@ export const foo = "foo";
 // };
 
 // // annotations exist T1 and T2
-// const im1AnnotationsT1: Array<EncodedAnnotationType> = [
+// const im1AnnotationsT1: Array<AnnotationType> = [
 //   {
 //     categoryId: T1T2UnmodifiedCat.id, //unknown
 //     id: uuidv4(),
@@ -113,7 +113,7 @@ export const foo = "foo";
 //   },
 // ];
 
-// const im1AnnotationsT2: Array<EncodedAnnotationType> = [
+// const im1AnnotationsT2: Array<AnnotationType> = [
 //   {
 //     categoryId: T1T2UnmodifiedCat.id,
 //     id: uuidv4(),
@@ -135,7 +135,7 @@ export const foo = "foo";
 // ];
 
 // // annotations exists T1, but not T2
-// const im2AnnotationsT1: Array<EncodedAnnotationType> = [
+// const im2AnnotationsT1: Array<AnnotationType> = [
 //   {
 //     categoryId: T1T2UnmodifiedCat.id, // unknown
 //     id: uuidv4(),
@@ -174,7 +174,7 @@ export const foo = "foo";
 // ];
 
 // // annotations did not exist T1, exists T2
-// const im3AnnotationsT2: Array<EncodedAnnotationType> = [
+// const im3AnnotationsT2: Array<AnnotationType> = [
 //   {
 //     categoryId: T1T2UnmodifiedCat.id, // unknown
 //     id: uuidv4(),
@@ -337,7 +337,7 @@ export const foo = "foo";
 // //     addImages({ newImages: imagesT1 })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   const serializedProject = serializeProject(imagesT1, categoriesT1);
 
@@ -374,7 +374,7 @@ export const foo = "foo";
 // //     setInstances({ instances: imsToAnnotate })
 // //   );
 
-// //   // AnnotatorSlice.actions.setActiveImage({ imageId: "", prevImageId: "", execSaga: true })
+// //   // AnnotatorSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
 // //   // T3 - after deserialization
 
@@ -388,7 +388,7 @@ export const foo = "foo";
 
 // //   const annotationsT3Actual = imagesT3Actual.reduce(
 // //     (annotations, im) => [...annotations, ...im.annotations],
-// //     [] as Array<EncodedAnnotationType>
+// //     [] as Array<AnnotationType>
 // //   );
 
 // //   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);

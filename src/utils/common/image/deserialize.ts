@@ -8,7 +8,7 @@ import {
   OldImageType,
   Project,
   Classifier,
-  EncodedAnnotationType,
+  AnnotationType,
   Partition,
   Category,
   FitOptions,
@@ -76,7 +76,7 @@ export const deserializeImage = async (
 
 const deserializeAnnotationsGroup = (
   annotationsGroup: Group
-): Array<EncodedAnnotationType> => {
+): Array<AnnotationType> => {
   const bboxes = getDataset(annotationsGroup, "bounding_box")
     .value as Uint8Array;
   const categories = getDataset(annotationsGroup, "annotation_category_id")
@@ -87,7 +87,7 @@ const deserializeAnnotationsGroup = (
     .value as Uint8Array;
   const planes = getDataset(annotationsGroup, "plane").value as Uint8Array;
 
-  let annotations: Array<EncodedAnnotationType> = [];
+  let annotations: Array<AnnotationType> = [];
   let bboxIdx = 0;
   let maskIdx = 0;
   for (let i = 0; i < ids.length; i++) {
@@ -247,7 +247,7 @@ const deserializeProjectGroup = async (
   project: Project;
   data: {
     images: Array<ImageType>;
-    annotations: Array<EncodedAnnotationType>;
+    annotations: Array<AnnotationType>;
     categories: Array<Category>;
     annotationCategories: Array<Category>;
   };
@@ -258,7 +258,7 @@ const deserializeProjectGroup = async (
   const sortKeyName = getAttr(imagesGroup, "sort_key") as string;
   const imageSortKey = sortKeyByName(sortKeyName);
   const oldImages = await deserializeImagesGroup(imagesGroup);
-  const annotations: Array<EncodedAnnotationType> = [];
+  const annotations: Array<AnnotationType> = [];
   const images: Array<ImageType> = oldImages.map((image) => {
     const { annotations, ...newImage } = image;
     annotations.push(...annotations);

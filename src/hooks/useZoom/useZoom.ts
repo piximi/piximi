@@ -5,13 +5,13 @@ import {
   stageScaleSelector,
   toolTypeSelector,
   zoomSelectionSelector,
-  scaledImageWidthSelector,
   setZoomSelection,
   setStageScale,
   setStagePosition,
   stageWidthSelector,
   stagePositionSelector,
 } from "store/annotator";
+import { selectActiveImageScaledWidth } from "store/data";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
@@ -28,7 +28,7 @@ export const useZoom = () => {
   const toolType = useSelector(toolTypeSelector);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
-  const imageWidth = useSelector(scaledImageWidthSelector);
+  const imageWidth = useSelector(selectActiveImageScaledWidth);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
     if (!center) return;

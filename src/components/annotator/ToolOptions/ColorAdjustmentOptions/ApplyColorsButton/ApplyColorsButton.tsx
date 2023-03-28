@@ -1,21 +1,17 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { ListItem, ListItemText } from "@mui/material";
 
 import { createRenderedTensor } from "utils/common/image";
 
-import { annotatorFullImagesSelector } from "store/common";
-import { AnnotatorSlice } from "store/annotator";
-import { selectActiveImageColor } from "store/data";
+import { selectActiveImageColor, selectSelectedImages } from "store/data";
 
 import { OldImageType } from "types";
 
 export const ApplyColorsButton = () => {
-  const dispatch = useDispatch();
-
   const activeImageColors = useSelector(selectActiveImageColor);
-  const images = useSelector(annotatorFullImagesSelector);
+  const images = useSelector(selectSelectedImages);
 
   const onApplyColorsClick = async () => {
     const newColor = activeImageColors.color.clone();
@@ -58,12 +54,6 @@ export const ApplyColorsButton = () => {
 
     getUpdatedImages().then((updatedImages) => {
       newColor.dispose();
-      dispatch(
-        AnnotatorSlice.actions.setImages({
-          images: updatedImages,
-          disposeColorTensors: false,
-        })
-      );
     });
   };
 

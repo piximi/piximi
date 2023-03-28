@@ -6,7 +6,7 @@ import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
-import { dataSlice, selectImageCount } from "store/data";
+import { DataSlice, selectImageCount } from "store/data";
 
 export enum DispatchLocation {
   Project,
@@ -28,15 +28,15 @@ const dispatchToProject = async (
 
   batch(() => {
     dispatch(
-      dataSlice.actions.setImages({
+      DataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
       })
     );
     dispatch(
-      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+      DataSlice.actions.setAnnotationCategories({ annotationCategories })
     );
-    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+    dispatch(DataSlice.actions.setAnnotations({ annotations }));
   });
 };
 
@@ -56,26 +56,20 @@ const dispatchToImageViewer = async (
 
   batch(() => {
     dispatch(
-      dataSlice.actions.setImages({
+      DataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
       })
     );
     dispatch(
-      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+      DataSlice.actions.setAnnotationCategories({ annotationCategories })
     );
-    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+    dispatch(DataSlice.actions.setAnnotations({ annotations }));
   });
 
   batch(() => {
     dispatch(
-      AnnotatorSlice.actions.setImages({
-        images: [image],
-        disposeColorTensors: true,
-      })
-    );
-    dispatch(
-      AnnotatorSlice.actions.setActiveImage({
+      AnnotatorSlice.actions.setActiveImageId({
         imageId: image.id,
         prevImageId: undefined, // no previous images
         execSaga: true,

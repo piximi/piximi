@@ -1,12 +1,13 @@
 import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray } from "utils/common/image";
 
-export type EncodedAnnotationType = {
+export type AnnotationType = {
   // x1, y1, W, H
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;
-  mask: Array<number>;
+  mask?: Array<number>;
+  maskData?: DataArray;
   plane: number;
   data?: Tensor4D;
   imageId?: string;
@@ -20,3 +21,8 @@ export type DecodedAnnotationType = {
   maskData: DataArray;
   plane: number;
 };
+
+export type StagedAnnotationType = {
+  id: string;
+  deleted?: boolean;
+} & Partial<AnnotationType>;

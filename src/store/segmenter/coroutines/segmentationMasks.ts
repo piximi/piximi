@@ -2,15 +2,10 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { decode } from "utils/annotator";
-import {
-  EncodedAnnotationType,
-  Category,
-  Shape,
-  DecodedAnnotationType,
-} from "types";
+import { AnnotationType, Category, Shape, DecodedAnnotationType } from "types";
 
 export const encodeAnnotationToSegmentationMask = (
-  annotations: EncodedAnnotationType[],
+  annotations: AnnotationType[],
   imageShape: Shape,
   createdCategoriesIDs: Array<string>
 ) => {
@@ -30,7 +25,7 @@ export const encodeAnnotationToSegmentationMask = (
     const annotationIndex =
       createdCategoriesIDs.findIndex((id) => id === annotation.categoryId) + 1;
     // Get the binary annotation mask from the run-length encoded annotation.
-    const decodedAnnotation = decode(annotation.mask);
+    const decodedAnnotation = decode(annotation.mask!);
 
     const x1 = annotation.boundingBox[0];
     const y1 = annotation.boundingBox[1];

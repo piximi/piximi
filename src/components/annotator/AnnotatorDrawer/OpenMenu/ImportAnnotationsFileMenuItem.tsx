@@ -5,7 +5,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 
 import { AnnotatorSlice, activeImageIdSelector } from "store/annotator";
 import {
-  dataSlice,
+  DataSlice,
   selectAllCategories,
   selectUnusedCategoryColors,
   selectSelectedImages,
@@ -74,12 +74,12 @@ export const ImportAnnotationsFileMenuItem = ({
 
           batch(() => {
             dispatch(
-              dataSlice.actions.addAnnotationCategories({
+              DataSlice.actions.addAnnotationCategories({
                 annotationCategories: newCategories,
               })
             );
             dispatch(
-              dataSlice.actions.setImageInstances({
+              DataSlice.actions.setImageInstances({
                 instances: imsToAnnotate,
               })
             );
@@ -89,7 +89,7 @@ export const ImportAnnotationsFileMenuItem = ({
           // this needs to invoke the decoding process for the in-view image
           // annotations; prevImageId undefined to avoid encoding step
           dispatch(
-            AnnotatorSlice.actions.setActiveImage({
+            AnnotatorSlice.actions.setActiveImageId({
               imageId: activeImageId,
               prevImageId: undefined,
               execSaga: true,

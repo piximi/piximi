@@ -28,12 +28,9 @@ export const DeleteAllAnnotationsDialog = ({
     console.log("pressed");
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setStagedAnnotations({ annotations: [] })
-      );
-      dispatch(
-        AnnotatorSlice.actions.setSelectedAnnotations({
-          workingAnnotation: undefined,
-          selectedAnnotations: [],
+        AnnotatorSlice.actions.setSelectedAnnotationIds({
+          workingAnnotationId: undefined,
+          selectedAnnotationIds: [],
         })
       );
       dispatch(

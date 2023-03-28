@@ -7,12 +7,10 @@ import {
   soundEnabledSelector,
   activeImageIdSelector,
   cursorSelector,
-  setSelectedAnnotations,
+  setSelectedAnnotationIds,
   stageScaleSelector,
   setAnnotationState,
   setSelectionMode,
-  setStagedAnnotations,
-  updateStagedAnnotations,
   imageOriginSelector,
 } from "store/annotator";
 
@@ -119,9 +117,9 @@ export const AnnotationTransformer = ({
 
     if (!transformed) {
       dispatch(
-        setSelectedAnnotations({
-          selectedAnnotations: [selected],
-          workingAnnotation: selected,
+        setSelectedAnnotationIds({
+          selectedAnnotationIds: [selected.id],
+          workingAnnotationId: selected.id,
         })
       );
     }
@@ -174,9 +172,9 @@ export const AnnotationTransformer = ({
     );
 
     dispatch(
-      setSelectedAnnotations({
-        selectedAnnotations: [],
-        workingAnnotation: undefined,
+      setSelectedAnnotationIds({
+        selectedAnnotationIds: [],
+        workingAnnotationId: undefined,
       })
     );
 
@@ -188,8 +186,6 @@ export const AnnotationTransformer = ({
     container.style.cursor = cursor;
 
     if (!activeImageId) return;
-
-    dispatch(updateStagedAnnotations({}));
 
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
@@ -222,19 +218,11 @@ export const AnnotationTransformer = ({
 
     if (!activeImageId) return;
 
-    dispatch(updateStagedAnnotations({}));
-
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
 
     cancelAnnotation();
-    dispatch(
-      setStagedAnnotations({
-        annotations: stagedAnnotations.filter(
-          (annotation) => annotation.id !== annotationId
-        ),
-      })
-    );
+
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 

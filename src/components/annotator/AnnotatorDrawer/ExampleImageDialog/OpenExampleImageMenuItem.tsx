@@ -2,7 +2,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
-import { dataSlice } from "store/data";
+import { DataSlice } from "store/data";
 import { activeImageIdSelector, AnnotatorSlice } from "store/annotator";
 
 import { SerializedFileType } from "types";
@@ -47,18 +47,17 @@ export const OpenExampleImageMenuItem = ({
       exampleImageProject.exampleImageName
     );
 
-    // TODO: BIG_MERGE - check if this is still correct
     dispatch(
-      dataSlice.actions.addAnnotationCategories({ annotationCategories })
+      DataSlice.actions.addAnnotationCategories({ annotationCategories })
     );
     batch(() => {
       dispatch(
-        dataSlice.actions.addImages({
+        DataSlice.actions.addImages({
           images: [image],
         })
       );
       dispatch(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: image.id,
           prevImageId: activeImageId,
           execSaga: true,

@@ -1,27 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { ShadowImageType } from "types/ImageType";
-import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
-import { ToolType } from "types/ToolType";
 import {
-  EncodedAnnotationType,
-  DecodedAnnotationType,
-} from "types/AnnotationType";
-import { AnnotationModeType } from "types/AnnotationModeType";
-import { AnnotationStateType } from "types/AnnotationStateType";
-import { LanguageType } from "types/LanguageType";
-import { Annotator } from "types/Annotator";
-import { Colors } from "types/tensorflow";
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
+  ToolType,
+  AnnotationModeType,
+  AnnotationStateType,
+  LanguageType,
+  Annotator,
+} from "types";
+
 import { AnnotationTool } from "annotator-tools";
 
-import { replaceDuplicateName } from "utils/common/image";
+import { mutatingFilter } from "utils/common/helpers";
 
 const initialState: Annotator = {
   annotationState: AnnotationStateType.Blank,
-  boundingClientRect:
-    process.env.NODE_ENV !== "test"
-      ? new DOMRect()
-      : (undefined as unknown as DOMRect), // dummy for testing
   brightness: 0,
   currentIndex: 0,
   cursor: "default",
@@ -29,8 +22,8 @@ const initialState: Annotator = {
   exposure: 0,
   hue: 0,
   activeImageId: undefined,
+  activeAnnotationIds: [],
   activeImageRenderedSrcs: [],
-  images: [],
   language: LanguageType.English,
   imageOrigin: { x: 0, y: 0 },
   penSelectionBrushSize: 10,
@@ -43,10 +36,8 @@ const initialState: Annotator = {
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   saturation: 0,
-  workingAnnotation: undefined,
   workingAnnotationId: undefined,
   selectedAnnotationIds: [],
-  stagedAnnotations: [],
   stagedAnnotationIds: [],
   stagedAnnotationsHaveBeenUpdated: false,
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
@@ -72,86 +63,57 @@ export const annotatorSlice = createSlice({
   name: "image-viewer-application",
   reducers: {
     resetAnnotator: () => initialState,
-    addImages(
+
+    addActiveAnnotationId(
       state,
-      action: PayloadAction<{ newImages: Array<ShadowImageType> }>
+      action: PayloadAction<{ annotationId: string }>
     ) {
-      //we look for image name duplicates and append number if such duplicates are found
-      const imageNames = state.images.map((image) => {
-        return image.name.split(".")[0];
-      });
-
-      const updatedImages = action.payload.newImages.map((image) => {
-        const initialName = image.name.split(".")[0]; //get name before file extension
-        //add filename extension to updatedName
-        const updatedName =
-          replaceDuplicateName(initialName, imageNames) +
-          "." +
-          image.name.split(".")[1];
-        return { ...image, name: updatedName };
-      });
-
-      state.images.push(...updatedImages);
+      state.activeAnnotationIds.push(action.payload.annotationId);
     },
-    clearCategoryAnnotations(
+    addActiveAnnotationIds(
       state,
-      action: PayloadAction<{ category: Category }>
+      action: PayloadAction<{ annotationIds: Array<string> }>
     ) {
-      // for (let image of state.images) {
-      //   image.annotations = image.annotations.filter(
-      //     (annotation: EncodedAnnotationType) => {
-      //       return annotation.categoryId !== action.payload.category.id;
-      //     }
-      //   );
-      // }
-      state.stagedAnnotations = state.stagedAnnotations.filter(
-        (annotation) => annotation.categoryId !== action.payload.category.id
+      for (const annotationId of action.payload.annotationIds) {
+        annotatorSlice.caseReducers.addActiveAnnotationId(state, {
+          type: "addActiveAnnotationId",
+          payload: { annotationId },
+        });
+      }
+    },
+    deleteActiveAnnotationId(
+      state,
+      action: PayloadAction<{
+        annotationId: string;
+      }>
+    ) {
+      mutatingFilter(
+        state.activeAnnotationIds,
+        (annotationId) => annotationId !== action.payload.annotationId
       );
     },
-    deleteAllAnnotationCategories(state) {
-      for (const im of state.images) {
-        for (let j = 0; j < im.annotations.length; j++) {
-          im.annotations[j].categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
-        }
-      }
-    },
-    deleteAnnotationCategory(
+    deleteActiveAnnotationIds(
       state,
-      action: PayloadAction<{ categoryID: string }>
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+      }>
     ) {
-      for (const annotation of state.stagedAnnotations) {
-        if (annotation.categoryId === action.payload.categoryID) {
-          annotation.categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
-        }
-      }
-    },
-    deleteAllImageAnnotations(
-      state,
-      action: PayloadAction<{ imageId: string }>
-    ) {
-      //deletes all instances across a given image
-      if (action.payload.imageId === state.activeImageId) {
-        state.stagedAnnotations = [];
-        state.selectedAnnotationIds = [];
-        state.workingAnnotation = undefined;
-      }
-      state.images = state.images.map((image) => {
-        if (image.id === action.payload.imageId) {
-          return { ...image, annotations: [] };
-        } else return image;
-      });
-    },
-    deleteAllInstances(state) {
-      //deletes all instances across all images
-      state.images = state.images.map((image) => {
-        return { ...image, annotations: [] };
-      });
-    },
-
-    deleteImage(state, action: PayloadAction<{ id: string }>) {
-      state.images = state.images.filter(
-        (image) => image.id !== action.payload.id
+      mutatingFilter(
+        state.activeAnnotationIds,
+        (annotationId) => !action.payload.annotationIds.includes(annotationId)
       );
+    },
+    setActiveAnnotationIds(
+      state,
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+      }>
+    ) {
+      state.activeAnnotationIds = [];
+      annotatorSlice.caseReducers.addActiveAnnotationIds(state, {
+        type: "addActiveAnnotationIds",
+        payload: { annotationIds: action.payload.annotationIds },
+      });
     },
 
     setActiveImageRenderedSrcs(
@@ -171,12 +133,6 @@ export const annotatorSlice = createSlice({
       }>
     ) {
       state.annotationState = action.payload.annotationState;
-    },
-    setBoundingClientRect(
-      state,
-      action: PayloadAction<{ boundingClientRect: DOMRect }>
-    ) {
-      state.boundingClientRect = action.payload.boundingClientRect;
     },
     setBrightness(state, action: PayloadAction<{ brightness: number }>) {
       state.brightness = action.payload.brightness;
@@ -201,129 +157,26 @@ export const annotatorSlice = createSlice({
     setHue(state, action: PayloadAction<{ hue: number }>) {
       state.hue = action.payload.hue;
     },
-    setActiveImage: (
+    setActiveImageId(
       state,
       action: PayloadAction<{
         imageId: string | undefined;
         prevImageId: string | undefined;
         execSaga: boolean;
       }>
-    ) => {
+    ) {
       state.activeImageId = action.payload.imageId;
 
       // reset selected annotations
       state.selectedAnnotationIds = [];
-      state.workingAnnotation = undefined;
-    },
-    setActiveImagePlane(
-      state,
-      action: PayloadAction<{ activeImagePlane: number }>
-    ) {
-      if (!state.activeImageId) return;
-
-      const newPlane = action.payload.activeImagePlane;
-
-      if (newPlane < 0 || newPlane >= state.activeImageRenderedSrcs.length)
-        return;
-
-      state.images = state.images.map((image) => {
-        if (state.activeImageId !== image.id) {
-          return image;
-        } else {
-          return {
-            ...image,
-            activePlane: newPlane,
-            // change rendered src to match new active plane
-            src: state.activeImageRenderedSrcs[newPlane],
-          };
-        }
-      });
-    },
-    setImageColors(
-      state,
-      action: PayloadAction<{
-        colors: Colors;
-        execSaga: boolean;
-      }>
-    ) {
-      if (!state.activeImageId) return;
-      state.images = state.images.map((image) => {
-        if (state.activeImageId !== image.id) {
-          return image;
-        } else {
-          image.colors.color.dispose();
-          return { ...image, colors: action.payload.colors };
-        }
-      });
-    },
-    setImageInstances(
-      state,
-      action: PayloadAction<{
-        instances: Array<EncodedAnnotationType>;
-        imageId: string;
-      }>
-    ) {
-      //update corresponding image object in array of Images stored in state
-
-      state.images = state.images.map((image) => {
-        if (action.payload.imageId !== image.id) {
-          return image;
-        } else {
-          return { ...image, annotations: action.payload.instances };
-        }
-      });
-    },
-    setInstances(
-      state,
-      action: PayloadAction<{
-        instances: {
-          [imageId: string]: Array<EncodedAnnotationType>;
-        };
-      }>
-    ) {
-      // add individual annotations to several images
-
-      state.images = state.images.map((im) => {
-        const annotationsToAdd = action.payload.instances[im.id];
-        if (annotationsToAdd) {
-          return {
-            ...im,
-            annotations: [...im.annotations, ...annotationsToAdd],
-          };
-        } else {
-          return im;
-        }
-      });
+      state.stagedAnnotationIds = [];
+      state.workingAnnotationId = undefined;
     },
     setImageOrigin(
       state,
       action: PayloadAction<{ origin: { x: number; y: number } }>
     ) {
       state.imageOrigin = action.payload.origin;
-    },
-    setImageSrc(state, action: PayloadAction<{ src: string }>) {
-      if (!state.activeImageId) return;
-      state.images = state.images.map((image) => {
-        if (state.activeImageId !== image.id) {
-          return image;
-        } else {
-          return { ...image, src: action.payload.src };
-        }
-      });
-    },
-    setImages(
-      state,
-      action: PayloadAction<{
-        images: Array<ShadowImageType>;
-        disposeColorTensors: boolean;
-      }>
-    ) {
-      if (action.payload.disposeColorTensors) {
-        for (const im of state.images) {
-          action.payload.disposeColorTensors && im.colors.color.dispose();
-        }
-      }
-      state.images = action.payload.images;
     },
     setLanguage(state, action: PayloadAction<{ language: LanguageType }>) {
       state.language = action.payload.language;
@@ -359,17 +212,16 @@ export const annotatorSlice = createSlice({
     setSaturation(state, action: PayloadAction<{ saturation: number }>) {
       state.saturation = action.payload.saturation;
     },
-    setSelectedAnnotations(
+    setSelectedAnnotationIds(
       state,
       action: PayloadAction<{
-        selectedAnnotations: Array<DecodedAnnotationType>;
-        workingAnnotation: DecodedAnnotationType | undefined;
+        selectedAnnotationIds: Array<string>;
+        workingAnnotationId: string | undefined;
       }>
     ) {
-      state.selectedAnnotationIds = action.payload.selectedAnnotations.map(
-        (annotation) => annotation.id
-      );
-      state.workingAnnotation = action.payload.workingAnnotation;
+      state.selectedAnnotationIds = action.payload.selectedAnnotationIds;
+
+      state.workingAnnotationId = action.payload.workingAnnotationId;
     },
     setSelectedCategoryId(
       state,
@@ -386,11 +238,11 @@ export const annotatorSlice = createSlice({
     setSoundEnabled(state, action: PayloadAction<{ soundEnabled: boolean }>) {
       state.soundEnabled = action.payload.soundEnabled;
     },
-    setStagedAnnotations(
+    setStagedAnnotationIds(
       state,
-      action: PayloadAction<{ annotations: DecodedAnnotationType[] }>
+      action: PayloadAction<{ annotationIds: string[] }>
     ) {
-      state.stagedAnnotations = action.payload.annotations;
+      state.stagedAnnotationIds = action.payload.annotationIds;
     },
     setStageHeight(state, action: PayloadAction<{ stageHeight: number }>) {
       state.stageHeight = action.payload.stageHeight;
@@ -430,56 +282,19 @@ export const annotatorSlice = createSlice({
     ) {
       state.zoomSelection = action.payload.zoomSelection;
     },
-    updateStagedAnnotations(
-      state,
-      action: PayloadAction<{ annotations?: DecodedAnnotationType[] }>
-    ) {
-      if (!action.payload.annotations) {
-        if (!state.workingAnnotation) return;
-        const stagedIDIndex = state.stagedAnnotations.findIndex(
-          (annotation) => annotation.id === state.workingAnnotation!.id
-        );
-        if (stagedIDIndex >= 0) {
-          state.stagedAnnotations[stagedIDIndex] = state.workingAnnotation;
-        } else {
-          state.stagedAnnotations.push(state.workingAnnotation);
-        }
-      } else {
-        const stagedIDs = state.stagedAnnotations.map(
-          (annotation) => annotation.id
-        );
-        action.payload.annotations.forEach((annotation) => {
-          const annotationIndex = stagedIDs.findIndex(
-            (id) => id === annotation.id
-          );
-          if (annotationIndex === -1) {
-            state.stagedAnnotations.push(annotation!);
-          } else {
-            state.stagedAnnotations[annotationIndex] = annotation!;
-          }
-        });
-      }
-    },
   },
 });
 
 export const {
-  addImages,
-  deleteAllInstances,
-  deleteImage,
-  setActiveImage,
-  setActiveImagePlane,
+  setActiveImageId,
   setActiveImageRenderedSrcs,
   setAnnotationState,
-  setBoundingClientRect,
   setBrightness,
   setContrast,
   setCurrentIndex,
   setCursor,
   setExposure,
   setHue,
-  setImageInstances,
-  setImages,
   setLanguage,
   setImageOrigin,
   setOperation,
@@ -487,18 +302,15 @@ export const {
   setPointerSelection,
   setQuickSelectionRegionSize,
   setSaturation,
-  setSelectedAnnotations,
+  setSelectedAnnotationIds,
   setSelectionMode,
   setSelectedCategoryId,
   setSoundEnabled,
-  setStagedAnnotations,
+  setStagedAnnotationIds,
   setStageHeight,
   setStagePosition,
   setStageScale,
   setStageWidth,
   setVibrance,
   setZoomSelection,
-  deleteAnnotationCategory,
-  updateStagedAnnotations,
-  setInstances,
 } = annotatorSlice.actions;

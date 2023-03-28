@@ -18,6 +18,7 @@ import {
   selectActiveImage,
   selectSelectedImages,
 } from "store/data";
+
 import { numStagedAnnotationsSelector, AnnotatorSlice } from "store/annotator";
 
 import {

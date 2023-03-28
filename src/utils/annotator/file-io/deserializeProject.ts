@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import {
-  EncodedAnnotationType,
+  AnnotationType,
   Category,
   SerializedAnnotationType,
   SerializedFileType,
@@ -12,7 +12,7 @@ import {
 export const deserializeAnnotations = (
   serializedAnnotations: Array<SerializedAnnotationType>
 ) => {
-  const annotations: Array<EncodedAnnotationType> = [];
+  const annotations: Array<AnnotationType> = [];
 
   for (const annotation of serializedAnnotations) {
     annotations.push({
@@ -178,7 +178,7 @@ export const deserializeProjectFile = (
       return idMap;
     },
     {} as {
-      [imageId: string]: Array<EncodedAnnotationType>;
+      [imageId: string]: Array<AnnotationType>;
     }
   );
 

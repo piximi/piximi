@@ -9,8 +9,12 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { AnnotatorSlice } from "store/annotator";
-import { selectActiveImageData, selectActiveImageShape } from "store/data";
+import { activeImageIdSelector } from "store/annotator";
+import {
+  DataSlice,
+  selectActiveImageData,
+  selectActiveImageShape,
+} from "store/data";
 
 import { generateDefaultColors } from "utils/common/image";
 
@@ -23,14 +27,18 @@ export const ColorAdjustmentOptions = () => {
 
   const imageData = useSelector(selectActiveImageData);
 
+  const imageId = useSelector(activeImageIdSelector);
+
   const onResetChannelsClick = async () => {
     if (!imageShape || !imageData) return;
 
     const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
-      AnnotatorSlice.actions.setImageColors({
-        colors: defaultColors,
+      DataSlice.actions.updateStagedImage({
+        imageId: imageId!,
+        updates: { colors: defaultColors },
+        disposeColors: true,
         execSaga: true,
       })
     );

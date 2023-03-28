@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 import { decode, pointsAreEqual } from "utils/annotator";
 
 import {
-  EncodedAnnotationType,
+  AnnotationType,
   DecodedAnnotationType,
   Category,
   ShadowImageType,
@@ -303,7 +303,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
   projectName: string
 ): any => {
   images.forEach((current: ShadowImageType) => {
-    current.annotations.forEach((annotation: EncodedAnnotationType) => {
+    current.annotations.forEach((annotation: AnnotationType) => {
       const height = current.shape.height;
       const width = current.shape.width;
 
@@ -313,7 +313,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
         new Uint8Array().fill(0),
         { components: 1, alpha: 0 }
       );
-      const decoded = decode(annotation.mask);
+      const decoded = decode(annotation.mask!);
       const boundingBox = annotation.boundingBox;
       const endX = Math.min(width, boundingBox[2]);
       const endY = Math.min(height, boundingBox[3]);
@@ -385,7 +385,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 
       for (let annotation of current.annotations) {
         if (annotation.categoryId !== category.id) continue;
-        const decoded = decode(annotation.mask);
+        const decoded = decode(annotation.mask!);
         const boundingBox = annotation.boundingBox;
         const endX = Math.min(width, boundingBox[2]);
         const endY = Math.min(height, boundingBox[3]);
@@ -460,7 +460,7 @@ export const saveAnnotationsAsLabelMatrix = (
               g = g + 1;
             }
             if (annotation.categoryId !== category.id) continue;
-            const decoded = decode(annotation.mask);
+            const decoded = decode(annotation.mask!);
             const boundingBox = annotation.boundingBox;
             const endX = Math.min(width, boundingBox[2]);
             const endY = Math.min(height, boundingBox[3]);

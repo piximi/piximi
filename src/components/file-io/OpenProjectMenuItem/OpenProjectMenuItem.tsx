@@ -13,7 +13,7 @@ import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
 import { AnnotatorSlice } from "store/annotator";
-import { dataSlice } from "store/data";
+import { DataSlice } from "store/data";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -48,7 +48,7 @@ export const OpenProjectMenuItem = ({
           dispatch(projectSlice.actions.resetProject());
 
           dispatch(
-            dataSlice.actions.initData({
+            DataSlice.actions.initData({
               images: res.data.images,
               annotations: res.data.annotations,
               categories: res.data.categories,
@@ -77,17 +77,7 @@ export const OpenProjectMenuItem = ({
         if (fromAnnotator) {
           batch(() => {
             dispatch(
-              AnnotatorSlice.actions.setImages({
-                images: res.data.images.map((im) => ({
-                  ...im,
-                  color: { ...im.colors, color: im.colors.color.clone() },
-                  annotations: [],
-                })),
-                disposeColorTensors: true,
-              })
-            );
-            dispatch(
-              AnnotatorSlice.actions.setActiveImage({
+              AnnotatorSlice.actions.setActiveImageId({
                 imageId: res.data.images[0].id,
                 prevImageId: undefined,
                 execSaga: true,

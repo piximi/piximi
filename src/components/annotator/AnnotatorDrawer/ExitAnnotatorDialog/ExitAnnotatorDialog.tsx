@@ -62,7 +62,7 @@ export const ExitAnnotatorDialog = ({
   const onSaveAnnotations = () => {
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
           execSaga: true,
@@ -82,7 +82,7 @@ export const ExitAnnotatorDialog = ({
 
     batch(() => {
       dispatch(
-        AnnotatorSlice.actions.setActiveImage({
+        AnnotatorSlice.actions.setActiveImageId({
           imageId: undefined,
           prevImageId: activeImageId,
           execSaga: true,

@@ -9,7 +9,7 @@ import {
   watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
   watchActiveImageChangeSaga,
-  watchActiveImageColorsChangeSaga,
+  //watchActiveImageColorsChangeSaga,
 } from "store/annotator";
 import {
   watchFitSegmenterSaga,
@@ -30,7 +30,7 @@ export function* rootSaga() {
     fork(watchAnnotationStateChangeSaga),
     fork(watchSelectedCategorySaga),
     fork(watchActiveImageChangeSaga),
-    fork(watchActiveImageColorsChangeSaga),
+    //fork(watchActiveImageColorsChangeSaga),
   ];
 
   const segmenterEffects = [

@@ -37,25 +37,37 @@ const selectActiveImageShape = createSelector(
     return activeImage.shape;
   }
 );
-
+const selectStagedAnnotationEntities = ({ data }: { data: DataStoreSlice }) => {
+  return data.stagedAnnotations.entities;
+};
 // Note: re-selects on activeImageId, image.entities, annotationsByImage, annotations.entities, annotationCategories.entities
 export const selectActiveAnnotationObjects = createSelector(
   [
     selectActiveImageShape,
     selectActiveAnnotationIds,
     selectAnnotationEntities,
+    selectStagedAnnotationEntities,
     selectAnnotationCategoryEntities,
   ],
   (
     activeImageShape,
     activeAnnotationIds,
     annotationEntities,
+    stagedAnnotationEntities,
     categoryEntities
   ) => {
     if (!activeImageShape) return [];
 
     const annotationObjects = activeAnnotationIds.map((annotationId) => {
-      const annotation = decodeAnnotation(annotationEntities[annotationId])!;
+      let encodedAnnotation = annotationEntities[annotationId]!;
+      if (stagedAnnotationEntities[annotationId]) {
+        encodedAnnotation = {
+          ...annotationEntities[annotationId]!,
+          ...stagedAnnotationEntities[annotationId]!,
+        };
+      }
+      const annotation = decodeAnnotation(encodedAnnotation)!;
+
       const fillColor = categoryEntities[annotation.categoryId].color;
       return {
         annotation,

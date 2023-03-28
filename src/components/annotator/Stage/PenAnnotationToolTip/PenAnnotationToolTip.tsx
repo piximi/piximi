@@ -4,11 +4,13 @@ import * as ReactKonva from "react-konva";
 
 import {
   penSelectionBrushSizeSelector,
-  scaledImageHeightSelector,
-  scaledImageWidthSelector,
   stageScaleSelector,
   toolTypeSelector,
 } from "store/annotator";
+import {
+  selectActiveImageScaledHeight,
+  selectActiveImageScaledWidth,
+} from "store/data";
 
 import { ToolType } from "types";
 
@@ -28,8 +30,8 @@ export const PenAnnotationToolTip = ({
 
   const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
 
-  const imageWidth = useSelector(scaledImageWidthSelector);
-  const imageHeight = useSelector(scaledImageHeightSelector);
+  const imageWidth = useSelector(selectActiveImageScaledWidth);
+  const imageHeight = useSelector(selectActiveImageScaledHeight);
   const stageScale = useSelector(stageScaleSelector);
 
   if (
