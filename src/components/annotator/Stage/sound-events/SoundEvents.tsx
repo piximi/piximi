@@ -3,7 +3,7 @@ import { memo } from "react";
 import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
-import { soundEnabledSelector } from "store/annotator";
+import { soundEnabledSelector } from "store/imageViewer";
 
 import { HotkeyView } from "types";
 

@@ -28,7 +28,7 @@ import {
   stageScaleSelector,
   stageWidthSelector,
   zoomSelectionSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import { selectActiveImage } from "store/data";
 import {
   zoomToolOptionsSelector,

@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "hooks";
 
 import { LassoAnnotationTool } from "annotator-tools";
-import { imageOriginSelector, stageScaleSelector } from "store/annotator";
+import { imageOriginSelector, stageScaleSelector } from "store/imageViewer";
 
 type LassoSelectionProps = {
   operator: LassoAnnotationTool;

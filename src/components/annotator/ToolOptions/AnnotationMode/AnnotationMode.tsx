@@ -18,7 +18,7 @@ import {
   imageViewerSlice,
   annotationStateSelector,
   selectionModeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import { selectWorkingAnnotation } from "store/data";
 
 import { AnnotationModeType, AnnotationStateType } from "types";

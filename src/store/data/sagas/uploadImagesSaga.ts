@@ -3,7 +3,7 @@ import { put, select } from "redux-saga/effects";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
 import { applicationSlice } from "store/application";
 import { dataSlice } from "store/data";
 

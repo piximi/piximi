@@ -12,7 +12,7 @@ import { uploader } from "utils/common/fileHandlers";
 import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 
 type OpenProjectMenuItemProps = {

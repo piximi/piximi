@@ -16,7 +16,7 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 import {
   selectAllAnnotationCategories,
   selectSelectedAnnotations,

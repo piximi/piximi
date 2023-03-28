@@ -7,7 +7,7 @@ import { useDialogHotkey } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
-import { imageViewerSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 import {
   dataSlice,
   selectImageCountByCategory,

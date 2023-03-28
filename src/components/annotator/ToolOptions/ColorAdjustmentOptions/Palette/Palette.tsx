@@ -8,7 +8,7 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { activeImageIdSelector } from "store/annotator";
+import { activeImageIdSelector } from "store/imageViewer";
 import { dataSlice, selectActiveImageRawColor } from "store/data";
 
 import { DEFAULT_COLORS } from "types";

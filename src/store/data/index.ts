@@ -13,6 +13,7 @@ export { selectAnnotatedImages } from "./selectors/selectAnnotatedImages";
 export { selectAnnotationCategories } from "./selectors/selectAnnotationCategories";
 export { selectSegmenterTrainingImages } from "./selectors/selectSegmenterTrainingImages";
 export { selectSegmenterValidationImages } from "./selectors/selectSegmenterValidationImages";
+export { selectAnnotationIdsByImage } from "./selectors/selectAnnotationIdsByImage";
 export {
   selectAllImages,
   selectSelectedImages,
@@ -44,14 +45,13 @@ export {
 export { selectAllAnnotationCategories } from "./selectors/selectAllAnnotationCategories";
 export { selectAllVisibleAnnotationCategories } from "./selectors/selectAllVisibleAnnotationCategories";
 export { selectActiveAnnotationObjects } from "./selectors/selectActiveAnnotationObjects";
-export { selectActiveImageAnnotationIds } from "./selectors/selectActiveImageAnnotationIds";
 export {
   selectAllAnnotations,
   selectSelectedAnnotations,
   selectStagedAnnotations,
   selectWorkingAnnotation,
+  selectTotalAnnotationCountByImage,
 } from "./selectors/selectAnnotations";
-export { selectAnnotationsByImageObject } from "./selectors/selectAnnotationsByImageObject";
 
 export {
   selectUnusedCategoryColors,

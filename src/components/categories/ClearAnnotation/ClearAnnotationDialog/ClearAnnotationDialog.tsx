@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { activeImageIdSelector } from "store/annotator";
+import { activeImageIdSelector } from "store/imageViewer";
 
 import { dataSlice } from "store/data";
 

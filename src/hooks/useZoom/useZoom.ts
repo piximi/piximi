@@ -10,7 +10,7 @@ import {
   setStagePosition,
   stageWidthSelector,
   stagePositionSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import { selectActiveImageScaledWidth } from "store/data";
 import { zoomToolOptionsSelector } from "store/tool-options";
 

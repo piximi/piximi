@@ -6,7 +6,7 @@ import {
   penSelectionBrushSizeSelector,
   stageScaleSelector,
   toolTypeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import {
   selectActiveImageScaledHeight,
   selectActiveImageScaledWidth,

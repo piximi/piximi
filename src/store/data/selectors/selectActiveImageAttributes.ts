@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { activeImageIdSelector, stageScaleSelector } from "store/annotator";
+import { activeImageIdSelector, stageScaleSelector } from "store/imageViewer";
 import { selectImageEntities } from "./selectImageEntities";
 import { Colors, ColorsRaw } from "types/tensorflow";
 import { generateBlankColors } from "utils/common/image";

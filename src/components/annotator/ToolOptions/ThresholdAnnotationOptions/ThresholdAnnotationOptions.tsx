@@ -9,7 +9,7 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import {
   imageViewerSlice,
   thresholdAnnotationValueSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 export const ThresholdAnnotationOptions = () => {
   const thresholdValue = useSelector(thresholdAnnotationValueSelector);

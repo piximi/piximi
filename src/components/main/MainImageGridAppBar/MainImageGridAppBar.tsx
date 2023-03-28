@@ -37,7 +37,7 @@ import {
 } from "store/application";
 import { projectSlice, selectedImagesIdSelector } from "store/project";
 import { selectVisibleImages } from "store/data";
-import { setActiveImageId } from "store/annotator";
+import { setActiveImageId } from "store/imageViewer";
 
 import { HotkeyView, ImageType, ShadowImageType } from "types";
 

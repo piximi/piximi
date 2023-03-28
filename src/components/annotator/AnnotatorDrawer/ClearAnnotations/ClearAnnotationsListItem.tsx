@@ -15,7 +15,7 @@ import { DeleteAllAnnotationsDialog } from "../DeleteAllAnnotationsDialog";
 import {
   imageViewerSlice,
   selectedAnnotationsIdsSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import { selectSelectedImages, selectStagedAnnotations } from "store/data";
 
 import { ShadowImageType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";

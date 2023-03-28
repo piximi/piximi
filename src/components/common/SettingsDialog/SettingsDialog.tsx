@@ -32,7 +32,7 @@ import {
   themeModeSelector,
   setThemeMode,
 } from "store/application";
-import { soundEnabledSelector, imageViewerSlice } from "store/annotator";
+import { soundEnabledSelector, imageViewerSlice } from "store/imageViewer";
 import { selectUnusedCategoryColors } from "store/data";
 
 import { ThemeMode } from "types";

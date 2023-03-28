@@ -6,7 +6,7 @@ import Konva from "konva";
 import {
   activeImageRenderedSrcsSelector,
   imageOriginSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import {
   selectActiveImageActivePlane,
   selectActiveImageScaledWidth,

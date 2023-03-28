@@ -8,7 +8,7 @@ import {
   setSelectedCategoryId,
   activeImageIdSelector,
   soundEnabledSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import {
   selectSelectedImages,

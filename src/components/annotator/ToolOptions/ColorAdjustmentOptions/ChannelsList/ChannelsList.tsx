@@ -16,7 +16,7 @@ import { Palette } from "../Palette";
 
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { activeImageIdSelector } from "store/annotator";
+import { activeImageIdSelector } from "store/imageViewer";
 
 import {
   dataSlice,

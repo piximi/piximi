@@ -3,7 +3,7 @@ import { AnnotationModeType } from "./AnnotationModeType";
 import { LanguageType } from "./LanguageType";
 import { AnnotationStateType } from "./AnnotationStateType";
 
-export type Annotator = {
+export type ImageViewer = {
   annotationState: AnnotationStateType;
   brightness: number;
   contrast: number;

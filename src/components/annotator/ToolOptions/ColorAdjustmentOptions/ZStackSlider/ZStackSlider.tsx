@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { activeImageRenderedSrcsSelector } from "store/annotator";
+import { activeImageRenderedSrcsSelector } from "store/imageViewer";
 import {
   dataSlice,
   selectActiveImage,

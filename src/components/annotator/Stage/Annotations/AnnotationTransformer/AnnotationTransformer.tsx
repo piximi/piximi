@@ -12,7 +12,7 @@ import {
   setAnnotationState,
   setSelectionMode,
   imageOriginSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import {
   selectActiveImageHeight,

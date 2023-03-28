@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
-import { selectedAnnotationsIdsSelector } from "store/annotator";
+import { selectedAnnotationsIdsSelector } from "store/imageViewer";
 import { selectActiveAnnotationObjects } from "store/data";
 
 import { AnnotationTool } from "annotator-tools";
@@ -25,7 +25,6 @@ export const Annotations = ({
 }: AnnotationsProps) => {
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
   const annotationObjects = useSelector(selectActiveAnnotationObjects);
-
   return (
     <>
       {annotationObjects.map((annotationObject) => (

@@ -2,17 +2,17 @@ import { createSelector } from "@reduxjs/toolkit";
 import {
   selectStagedAnnotationIds,
   workingAnnotationIdSelector,
-} from "store/annotator";
-import { DataStoreSlice, DecodedAnnotationType } from "types";
+} from "store/imageViewer";
+import { DecodedAnnotationType } from "types";
 import { selectAnnotationEntities } from "./selectAnotationEntities";
 import { decodeAnnotation } from "utils/annotator";
+import {
+  selectAnnotationsByImageEntity,
+  selectStagedAnnotationEntities,
+} from "./selectDataEntities";
 
 export const selectAllAnnotations = createSelector(
-  [
-    ({ data }: { data: DataStoreSlice }) => {
-      return data.annotations.entities;
-    },
-  ],
+  [selectAnnotationEntities],
   (annotationEntities) => {
     return Object.values(annotationEntities);
   }
@@ -49,5 +49,36 @@ export const selectSelectedAnnotations = createSelector(
     return [...stagedIds, workingId].map(
       (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
     );
+  }
+);
+
+export const selectTotalAnnotationCountByImage = createSelector(
+  [
+    selectAnnotationsByImageEntity,
+    selectStagedAnnotationEntities,
+    (state, imageId) => imageId,
+  ],
+  (annotationsByImage, stagedAnnotationsEntities, imageId) => {
+    let count = 0;
+    const stagedImageAnnotations: typeof stagedAnnotationsEntities = {};
+    for (const stagedAnnotationId in stagedAnnotationsEntities) {
+      if (stagedAnnotationsEntities[stagedAnnotationId]!.imageId === imageId) {
+        stagedImageAnnotations[stagedAnnotationId] =
+          stagedAnnotationsEntities[stagedAnnotationId];
+      }
+    }
+    for (const annotationId of annotationsByImage[imageId]) {
+      if (stagedImageAnnotations[annotationId]) {
+        if (!stagedImageAnnotations[annotationId]?.deleted) {
+          count++;
+        }
+        delete stagedImageAnnotations[annotationId];
+        continue;
+      }
+      count++;
+    }
+    count += Object.keys(stagedImageAnnotations).length;
+
+    return count;
   }
 );

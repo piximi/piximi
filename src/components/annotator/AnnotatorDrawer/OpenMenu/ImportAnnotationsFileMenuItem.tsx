@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice, activeImageIdSelector } from "store/annotator";
+import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
 import {
   dataSlice,
   selectAllCategories,

@@ -22,14 +22,13 @@ import {
 import {
   numStagedAnnotationsSelector,
   imageViewerSlice,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import {
   Category,
   CategoryType,
   UNKNOWN_ANNOTATION_CATEGORY,
 } from "types/Category";
-import { ShadowImageType } from "types";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotatorCategories);
@@ -77,10 +76,8 @@ export const AnnotatorDrawer = () => {
 
       {activeImage && (
         <ImageList
-          activeImage={{ ...activeImage, annotations: [] } as ShadowImageType}
-          images={annotatorImages.map((image) => {
-            return { ...image, annotations: [] } as ShadowImageType;
-          })}
+          activeImage={activeImage}
+          images={annotatorImages}
           numStagedAnnotations={numStagedAnnotations}
         />
       )}

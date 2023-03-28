@@ -41,7 +41,7 @@ import {
   setSelectedAnnotationIds,
   setImageOrigin,
   selectedAnnotationCategoryIdSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import {
   selectActiveImageActivePlane,
   selectStagedAnnotations,

@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Avatar,
@@ -21,13 +21,14 @@ import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { ImageMenu } from "../ImageMenu";
 
-import { setActiveImageId } from "store/annotator";
+import { setActiveImageId } from "store/imageViewer";
 
-import { ShadowImageType } from "types";
+import { ImageType } from "types";
+import { selectTotalAnnotationCountByImage } from "store/data";
 
 interface ImageListProps {
-  images: Array<ShadowImageType>;
-  activeImage: ShadowImageType;
+  images: Array<ImageType>;
+  activeImage: ImageType;
   numStagedAnnotations: number;
 }
 
@@ -35,9 +36,9 @@ const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 2);
 
 interface ImageListItemProps {
-  image: ShadowImageType;
+  image: ImageType;
   isActive: boolean;
-  onItemClick: (image: ShadowImageType) => void;
+  onItemClick: (image: ImageType) => void;
   numStagedAnnotations: number;
   onSecondaryClick: (target: HTMLElement) => void;
 }
@@ -50,6 +51,9 @@ export const ImageListItem = memo(
     onSecondaryClick,
     numStagedAnnotations,
   }: ImageListItemProps) => {
+    const annotationCount = useSelector((state) =>
+      selectTotalAnnotationCountByImage(state, image.id)
+    );
     return (
       <ListItemButton
         key={image.id}
@@ -65,13 +69,8 @@ export const ImageListItem = memo(
           primary={image.name}
           primaryTypographyProps={{ noWrap: true }}
         />
-        {((isActive && image.annotations.length !== 0) ||
-          (isActive && numStagedAnnotations > 0)) && (
-          <Chip
-            label={isActive ? numStagedAnnotations : image.annotations.length}
-            size="small"
-          />
-        )}
+        <Chip label={annotationCount} size="small" />
+
         <ListItemSecondaryAction sx={{ position: "static", transform: "none" }}>
           <IconButton
             edge="end"
@@ -107,7 +106,7 @@ export const ImageList = ({
   const [scrollProgress, setScrollProgress] = React.useState(0);
 
   const handleImageItemClick = React.useCallback(
-    (image: ShadowImageType) => {
+    (image: ImageType) => {
       if (image.id !== activeImageRef.current.id) {
         dispatch(
           setActiveImageId({

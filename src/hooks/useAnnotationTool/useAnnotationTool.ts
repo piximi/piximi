@@ -8,7 +8,7 @@ import {
   stageScaleSelector,
   thresholdAnnotationValueSelector,
   toolTypeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 import { selectActiveImageSrc } from "store/data";
 
 import { ToolType } from "types";

@@ -6,7 +6,7 @@ import {
   imageOriginSelector,
   pointerSelectionSelector,
   toolTypeSelector,
-} from "store/annotator";
+} from "store/imageViewer";
 
 import { ToolType } from "types";
 
