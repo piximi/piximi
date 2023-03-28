@@ -1,4 +1,4 @@
-export { dataSlice as DataSlice } from "./dataSlice";
+export { dataSlice as DataSlice } from "./DataSlice";
 
 export { selectVisibleImages } from "./selectors/selectVisibleImages";
 export { dataProjectSelector } from "./selectors/dataProjectSelector";
