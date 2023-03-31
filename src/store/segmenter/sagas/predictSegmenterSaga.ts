@@ -7,7 +7,7 @@ import { applicationSlice } from "store/application";
 import {
   dataSlice,
   selectUnannotatedImages,
-  selectAnnotationCategories,
+  selectAllAnnotationCategories,
 } from "store/data";
 import {
   segmenterInputShapeSelector,
@@ -76,8 +76,8 @@ export function* predictSegmenterSaga({
   );
 
   //   annotationCategories: the annotation categories in the project slice
-  const annotationCategories: ReturnType<typeof selectAnnotationCategories> =
-    yield select(selectAnnotationCategories);
+  const annotationCategories: ReturnType<typeof selectAllAnnotationCategories> =
+    yield select(selectAllAnnotationCategories);
   const createdCategories = annotationCategories.filter((category) => {
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });

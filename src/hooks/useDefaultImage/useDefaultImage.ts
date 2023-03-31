@@ -67,7 +67,7 @@ const dispatchToImageViewer = async (
     );
     dispatch(dataSlice.actions.setAnnotations({ annotations }));
 
-    dispatch(projectSlice.actions.selectImage({ id: image.id }));
+    dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
     dispatch(
       imageViewerSlice.actions.setActiveImageId({
         imageId: image.id,

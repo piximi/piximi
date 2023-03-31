@@ -64,6 +64,7 @@ export type {
   ShadowImageType,
   ImageType,
   stagedImageType,
+  ImageAttributeType,
 } from "./ImageType";
 
 export type { Colors, ColorsRaw } from "./tensorflow";
@@ -145,4 +146,3 @@ export type {
 
 export type { DataStoreSlice } from "./DataStoreType";
 export type { ImagesEntityType } from "./ImagesEntityType";
-export type { ImageType as NewImageType } from "./ImageType";

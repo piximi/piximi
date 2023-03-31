@@ -7,7 +7,7 @@ import { applicationSlice } from "store/application";
 import {
   dataSlice,
   selectAnnotatedImages,
-  selectAnnotationCategories,
+  selectAllAnnotationCategories,
   selectSegmenterTrainingImages,
   selectSegmenterValidationImages,
 } from "store/data";
@@ -83,8 +83,8 @@ export function* fitSegmenterSaga({
     typeof segmenterArchitectureOptionsSelector
   > = yield select(segmenterArchitectureOptionsSelector);
 
-  const annotationCategories: ReturnType<typeof selectAnnotationCategories> =
-    yield select(selectAnnotationCategories);
+  const annotationCategories: ReturnType<typeof selectAllAnnotationCategories> =
+    yield select(selectAllAnnotationCategories);
 
   var model: LayersModel;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
@@ -114,8 +114,8 @@ export function* fitSegmenterSaga({
 
   yield put(segmenterSlice.actions.updateCompiled({ compiled: compiledModel }));
 
-  const categories: ReturnType<typeof selectAnnotationCategories> =
-    yield select(selectAnnotationCategories);
+  const categories: ReturnType<typeof selectAllAnnotationCategories> =
+    yield select(selectAllAnnotationCategories);
 
   const trainImages: ReturnType<typeof selectSegmenterTrainingImages> =
     yield select(selectSegmenterTrainingImages);

@@ -3,14 +3,31 @@ import {
   selectStagedAnnotationIds,
   workingAnnotationIdSelector,
 } from "store/imageViewer";
-import { DecodedAnnotationType } from "types";
-import { selectAnnotationEntities } from "./selectAnotationEntities";
+import { DataStoreSlice, DecodedAnnotationType } from "types";
 import { decodeAnnotation } from "utils/annotator";
-import {
-  selectAnnotationsByImageEntity,
-  selectStagedAnnotationEntities,
-} from "./selectDataEntities";
 
+export const selectAnnotationEntities = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
+  return data.annotations.entities;
+};
+export const selectAnnotationsByImageEntity = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
+  return data.annotationsByImage;
+};
+
+export const selectStagedAnnotationEntities = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
+  return data.stagedAnnotations.entities;
+};
 export const selectAllAnnotations = createSelector(
   [selectAnnotationEntities],
   (annotationEntities) => {
@@ -67,7 +84,8 @@ export const selectTotalAnnotationCountByImage = createSelector(
           stagedAnnotationsEntities[stagedAnnotationId];
       }
     }
-    for (const annotationId of annotationsByImage[imageId]) {
+    const imageAnnotations = annotationsByImage[imageId] ?? [];
+    for (const annotationId of imageAnnotations) {
       if (stagedImageAnnotations[annotationId]) {
         if (!stagedImageAnnotations[annotationId]?.deleted) {
           count++;
@@ -82,3 +100,17 @@ export const selectTotalAnnotationCountByImage = createSelector(
     return count;
   }
 );
+
+//TODO: incorporate stagedAnnotations
+export const selectAnnotationIdsByImage = createSelector(
+  [selectAnnotationsByImageEntity, (state, imageId: string) => imageId],
+  (annotationsByImage, imageId) => {
+    return annotationsByImage[imageId];
+  }
+);
+
+export const selectAnnotationCountByCategory =
+  (categoryId: string) =>
+  ({ data }: { data: DataStoreSlice }) => {
+    return data.annotationsByCategory[categoryId]?.length;
+  };

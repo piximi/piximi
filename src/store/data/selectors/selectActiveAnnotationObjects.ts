@@ -3,11 +3,11 @@ import { createSelector } from "@reduxjs/toolkit";
 import { decodeAnnotation } from "utils/annotator";
 import { selectActiveAnnotationIds } from "store/imageViewer";
 import { selectActiveImageShape } from "./selectActiveImageAttributes";
+import { selectAnnotationCategoryEntities } from "./annotationCategorySelectors";
 import {
-  selectAnnotationCategoryEntities,
   selectAnnotationEntities,
   selectStagedAnnotationEntities,
-} from "./selectDataEntities";
+} from "./annotationSelectors";
 
 // Note: re-selects on activeImageId, image.entities, annotationsByImage, annotations.entities, annotationCategories.entities
 export const selectActiveAnnotationObjects = createSelector(

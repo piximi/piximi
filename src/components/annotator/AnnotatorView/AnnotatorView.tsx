@@ -6,10 +6,11 @@ import { useUpload } from "hooks";
 import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";
 import { ToolDrawer } from "../ToolDrawer";
+import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
 import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
 import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
+
 import {
   alertStateSelector,
   applicationSlice,

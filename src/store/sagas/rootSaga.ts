@@ -1,5 +1,5 @@
 import { all, fork } from "redux-saga/effects";
-import { watchUploadImagesSaga } from "store/data";
+//import { watchUploadImagesSaga } from "store/data";
 import {
   watchEvaluateClassifierSaga,
   watchFitClassifierSaga,
@@ -8,7 +8,7 @@ import {
 import {
   watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
-  watchActiveImageChangeSaga,
+  //watchActiveImageChangeSaga,
   //watchActiveImageColorsChangeSaga,
 } from "store/imageViewer";
 import {
@@ -24,12 +24,12 @@ export function* rootSaga() {
     fork(watchEvaluateClassifierSaga),
   ];
 
-  const applicationEffects = [fork(watchUploadImagesSaga)];
+  //const applicationEffects = [fork(watchUploadImagesSaga)];
 
   const annotatorEffects = [
     fork(watchAnnotationStateChangeSaga),
     fork(watchSelectedCategorySaga),
-    fork(watchActiveImageChangeSaga),
+    //fork(watchActiveImageChangeSaga),
     //fork(watchActiveImageColorsChangeSaga),
   ];
 
@@ -43,6 +43,6 @@ export function* rootSaga() {
     ...classifierEffects,
     ...segmenterEffects,
     ...annotatorEffects,
-    ...applicationEffects,
+    //...applicationEffects,
   ]);
 }

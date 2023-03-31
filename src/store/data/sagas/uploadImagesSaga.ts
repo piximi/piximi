@@ -22,6 +22,7 @@ import {
   loadImageFileAsStack,
   convertToImage,
 } from "utils/common/image";
+import { projectSlice } from "store/project";
 
 type ImageFileType = {
   fileName: string;
@@ -51,7 +52,6 @@ export function* uploadImagesSaga({
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
-  console.log("here");
 
   const activeImageId: ReturnType<typeof activeImageIdSelector> = yield select(
     activeImageIdSelector
@@ -129,9 +129,13 @@ export function* uploadImagesSaga({
   }
 
   if (imagesToUpload.length) {
-    console.log("here");
-    yield put(dataSlice.actions.addImages({ images: imagesToUpload }));
     if (isUploadedFromAnnotator) {
+      yield put(dataSlice.actions.addStagedImages({ images: imagesToUpload }));
+      yield put(
+        projectSlice.actions.selectImages({
+          imageIds: imagesToUpload.map((image) => image.id),
+        })
+      );
       yield put(
         imageViewerSlice.actions.setActiveImageId({
           imageId: imagesToUpload[0].id,
@@ -139,6 +143,8 @@ export function* uploadImagesSaga({
           execSaga: true,
         })
       );
+    } else {
+      yield put(dataSlice.actions.addImages({ images: imagesToUpload }));
     }
   }
 }

@@ -48,4 +48,9 @@ export type ImageType = {
   src: string; // The URI to be displayed on the canvas
 };
 
-export type stagedImageType = { id: string } & Partial<ImageType>;
+export type stagedImageType = {
+  id: string;
+  deleted?: boolean;
+} & Partial<ImageType>;
+
+export type ImageAttributeType = keyof ImageType;

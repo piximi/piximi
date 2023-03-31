@@ -7,12 +7,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import {
-  dataSlice,
-  selectAllCategories,
-  selectActiveImage,
-  selectSelectedImages,
-} from "store/data";
+import { dataSlice, selectAllCategories } from "store/data";
 import { imageViewerSlice } from "store/imageViewer";
 
 import { ImageType } from "types";
@@ -22,10 +17,12 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
+import { projectSlice } from "store/project";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
   selectedImage: ImageType;
+  previousImageId: string | undefined;
   onCloseImageMenu: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   openImageMenu: boolean;
 };
@@ -34,14 +31,13 @@ type ImageMenuProps = {
 export const ImageMenu = ({
   anchorElImageMenu,
   selectedImage,
+  previousImageId,
   onCloseImageMenu,
   openImageMenu,
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
 
   const annotationCategories = useSelector(selectAllCategories);
-  const images = useSelector(selectSelectedImages);
-  const activeImage = useSelector(selectActiveImage);
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
@@ -60,29 +56,20 @@ export const ImageMenu = ({
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
+    console.log("~* HandleDeleteImage *~");
+    console.log("--- selectedImageId: ", selectedImage.id);
+    console.log("--- previousImageId: ", previousImageId);
+    console.log(" ");
 
     batch(() => {
-      if (activeImage && selectedImage.id === activeImage.id) {
-        let newActiveImageId = undefined;
-        const activeImageIdx = images.findIndex(
-          (image) => image.id === activeImage.id
-        );
-
-        if (images.length > 1) {
-          newActiveImageId =
-            activeImageIdx === 0 ? images[1].id : images[activeImageIdx - 1].id;
-        } else {
-        }
-
-        dispatch(
-          imageViewerSlice.actions.setActiveImageId({
-            imageId: newActiveImageId,
-            prevImageId: undefined,
-            execSaga: true,
-          })
-        );
-      }
-
+      dispatch(
+        imageViewerSlice.actions.setActiveImageId({
+          imageId: previousImageId,
+          prevImageId: undefined,
+          execSaga: true,
+        })
+      );
+      dispatch(projectSlice.actions.deselectImage({ id: selectedImage.id }));
       dispatch(
         dataSlice.actions.deleteImages({
           imageIds: [selectedImage.id],
@@ -102,11 +89,11 @@ export const ImageMenu = ({
 
     let zip = new JSZip();
 
-    if (!selectedImage) return;
+    if (!selectedImage.id) return;
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage, annotations: [] }],
+        [{ ...selectedImage!, annotations: [] }],
         annotationCategories,
         zip,
         true
