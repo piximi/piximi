@@ -205,6 +205,13 @@ export const ImageListItem = memo(
       <ListItem
         key={image.id}
         id={image.id}
+        selected={isActive}
+        sx={{
+          pl: 0,
+          "&:hover": {
+            backgroundColor: "rgba(0, 0, 0, 0.04)",
+          },
+        }}
         secondaryAction={
           <IconButton
             edge="end"
@@ -217,8 +224,11 @@ export const ImageListItem = memo(
         <ListItemButton
           key={image.id}
           id={image.id}
+          sx={{
+            "&.MuiListItemButton-root": { pr: 0 },
+            "&:hover": { backgroundColor: "transparent" },
+          }}
           onClick={() => onItemClick(image)}
-          selected={isActive}
         >
           <ListItemAvatar>
             <Avatar alt={image.name} src={image.src} variant={"square"} />
