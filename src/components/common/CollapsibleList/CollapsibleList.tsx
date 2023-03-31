@@ -24,6 +24,7 @@ type CollapsibleListProps = {
   sx?: SxProps;
   onScroll?: (evt: React.UIEvent<HTMLDivElement, UIEvent>) => void;
   secondary?: JSX.Element;
+  disabled?: boolean;
 };
 
 export const CollapsibleList = ({
@@ -37,6 +38,7 @@ export const CollapsibleList = ({
   sx,
   onScroll,
   secondary,
+  disabled,
 }: CollapsibleListProps) => {
   const [collapsed, setCollapsed] = React.useState(closed);
 
@@ -44,15 +46,29 @@ export const CollapsibleList = ({
     setCollapsed(!collapsed);
   };
 
+  React.useEffect(() => {
+    console.log(closed);
+    console.log(collapsed);
+  });
+
   return (
     <List
       sx={{ backgroundColor: backgroundColor ? backgroundColor : "" }}
       dense={dense}
     >
       <ListItem secondaryAction={secondary}>
-        <ListItemButton role={undefined} onClick={handleClick} disableGutters>
+        <ListItemButton
+          role={undefined}
+          onClick={handleClick}
+          disableGutters
+          disabled={disabled}
+        >
           <ListItemIcon>
-            {collapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+            {!collapsed ? (
+              <KeyboardArrowDownIcon />
+            ) : (
+              <KeyboardArrowRightIcon />
+            )}
           </ListItemIcon>
 
           <ListItemText primary={primary} />
@@ -60,7 +76,7 @@ export const CollapsibleList = ({
       </ListItem>
 
       <Collapse
-        in={collapsed}
+        in={!collapsed}
         timeout="auto"
         unmountOnExit
         sx={{ paddingLeft: paddingLeft ? "2rem" : "auto" }}

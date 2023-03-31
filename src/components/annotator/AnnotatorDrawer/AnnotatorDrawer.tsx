@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Divider, Drawer, List } from "@mui/material";
@@ -15,14 +15,10 @@ import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
 import {
   selectCreatedAnnotatorCategories,
-  selectActiveImage,
-  selectSelectedImages,
+  selectImageViewerImages,
 } from "store/data";
 
-import {
-  numStagedAnnotationsSelector,
-  imageViewerSlice,
-} from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
 
 import {
   Category,
@@ -44,9 +40,11 @@ export const AnnotatorDrawer = () => {
     );
   };
 
-  const annotatorImages = useSelector(selectSelectedImages);
-  const activeImage = useSelector(selectActiveImage);
-  const numStagedAnnotations = useSelector(numStagedAnnotationsSelector);
+  const annotatorImages = useSelector(selectImageViewerImages);
+
+  useEffect(() => {
+    //console.log(annotatorImages);
+  });
 
   return (
     <Drawer
@@ -74,13 +72,7 @@ export const AnnotatorDrawer = () => {
 
       <Divider />
 
-      {activeImage && (
-        <ImageList
-          activeImage={activeImage}
-          images={annotatorImages}
-          numStagedAnnotations={numStagedAnnotations}
-        />
-      )}
+      <ImageList images={annotatorImages} />
 
       <Divider />
 

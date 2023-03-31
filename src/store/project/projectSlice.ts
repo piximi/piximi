@@ -33,13 +33,27 @@ export const projectSlice = createSlice({
 
       state.selectedImageIds = action.payload.ids;
     },
-    selectImage(state, action: PayloadAction<{ id: string }>) {
-      state.selectedImageIds.push(action.payload.id);
+    selectImage(state, action: PayloadAction<{ imageId: string }>) {
+      state.selectedImageIds.push(action.payload.imageId);
     },
-    selectOneImage(state, action: PayloadAction<{ id: string }>) {
+    selectImages(state, action: PayloadAction<{ imageIds: Array<string> }>) {
+      for (const imageId of action.payload.imageIds) {
+        projectSlice.caseReducers.selectImage(state, {
+          type: "selectImage",
+          payload: { imageId },
+        });
+      }
+    },
+    setselectedImages(
+      state,
+      action: PayloadAction<{ imageIds: Array<string> }>
+    ) {
       state.selectedImageIds = [];
 
-      state.selectedImageIds.push(action.payload.id);
+      projectSlice.caseReducers.selectImages(state, {
+        type: "selectImages",
+        payload: { imageIds: action.payload.imageIds },
+      });
     },
 
     createNewProject(state, action: PayloadAction<{ name: string }>) {
@@ -80,6 +94,10 @@ export const projectSlice = createSlice({
 
 export const {
   createNewProject,
+  selectImage,
+  selectImages,
+  selectAllImages,
+  setselectedImages,
   deselectImage,
   deselectImages,
   updateHighlightedCategory,

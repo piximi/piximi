@@ -19,10 +19,10 @@ export function* activeImageIDChangeSaga({
   execSaga: boolean;
 }>) {
   if (!execSaga) return;
+
   const image: ReturnType<typeof selectActiveImage> = yield select(
     selectActiveImage
   );
-
   if (!image) {
     yield put(
       imageViewerSlice.actions.setActiveImageRenderedSrcs({
@@ -104,7 +104,6 @@ export function* activeImageColorChangeSaga({
     image.bitDepth,
     undefined
   );
-
   yield put(
     dataSlice.actions.updateStagedImage({
       imageId: image.id,

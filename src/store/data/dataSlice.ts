@@ -377,26 +377,7 @@ export const dataSlice = createSlice({
     setImageSrc(state, action: PayloadAction<{ imgId: string; src: string }>) {
       state.images.entities[action.payload.imgId].src = action.payload.src;
     },
-    updateStagedImage(
-      state,
-      action: PayloadAction<{
-        imageId: string;
-        updates: Partial<ImageType>;
-        disposeColors?: boolean;
-        disposeData?: boolean;
-        execSaga?: boolean;
-      }>
-    ) {
-      const { imageId, updates, disposeColors, disposeData } = action.payload;
-      if (state.stagedImages.ids.includes(imageId)) {
-        disposeColors &&
-          state.stagedImages.entities[imageId]!.colors?.color.dispose();
-        disposeData && state.stagedImages.entities[imageId]!.data?.dispose();
-        Object.assign(state.stagedImages.entities[imageId]!, updates);
-        return;
-      }
-      state.stagedImages.entities[imageId] = { id: imageId, ...updates };
-    },
+
     setImageInstances(
       state,
       action: PayloadAction<{
@@ -546,30 +527,56 @@ export const dataSlice = createSlice({
         state.images.entities[imageId].visible = action.payload.visible;
       }
     },
-    deleteImage(
+    hardDeleteImage(
       state,
       action: PayloadAction<{ imageId: string; disposeColorTensor: boolean }>
     ) {
-      const imageId = action.payload.imageId;
-      if (!state.images.ids.includes(imageId)) return;
-
-      const catId = state.images.entities[imageId].categoryId;
-
-      dataSlice.caseReducers.deleteAllAnnotationsByImage(state, {
-        type: "deleteAllAnnotationsByImage",
-        payload: { imageId },
-      });
-      mutatingFilter(
-        state.imagesByCategory[catId],
-        (_imageId: string) => _imageId !== imageId
-      );
-      delete state.annotationsByImage[imageId];
-      state.images.entities[imageId].data.dispose();
-      if (action.payload.disposeColorTensor) {
-        state.images.entities[imageId].colors.color.dispose();
+      const { imageId, disposeColorTensor } = action.payload;
+      if (
+        !state.images.ids.includes(imageId) &&
+        !state.stagedImages.ids.includes(imageId)
+      )
+        return;
+      if (state.images.ids.includes(imageId)) {
+        const catId = state.images.entities[imageId].categoryId;
+        dataSlice.caseReducers.deleteAllAnnotationsByImage(state, {
+          type: "deleteAllAnnotationsByImage",
+          payload: { imageId },
+        });
+        mutatingFilter(
+          state.imagesByCategory[catId],
+          (_imageId: string) => _imageId !== imageId
+        );
+        delete state.annotationsByImage[imageId];
+        state.images.entities[imageId].data.dispose();
+        if (disposeColorTensor) {
+          state.images.entities[imageId].colors.color.dispose();
+        }
+        delete state.images.entities[imageId];
+        state.images.ids = Object.keys(state.images.entities);
       }
-      delete state.images.entities[imageId];
-      state.images.ids = Object.keys(state.images.entities);
+      if (state.stagedImages.ids.includes(imageId)) {
+        state.stagedImages.entities[imageId]?.colors?.color.dispose();
+        state.stagedImages.entities[imageId]?.data?.dispose();
+        delete state.stagedImages.entities[imageId];
+        state.stagedImages.ids = Object.keys(state.stagedImages.entities);
+      } else {
+        return;
+      }
+    },
+    deleteImage(
+      state,
+      action: PayloadAction<{ imageId: string; disposeColorTensor?: boolean }>
+    ) {
+      const { imageId } = action.payload;
+      if (state.stagedImages.ids.includes(imageId)) {
+        state.stagedImages.entities[imageId]?.data?.dispose();
+        state.stagedImages.entities[imageId]?.colors?.color.dispose();
+      } else {
+        state.stagedImages.ids.push(imageId);
+      }
+
+      state.stagedImages.entities[imageId] = { id: imageId, deleted: true };
     },
 
     deleteImages(
@@ -598,6 +605,57 @@ export const dataSlice = createSlice({
         type: "deleteImages",
         payload: { imageIds, disposeColorTensors },
       });
+    },
+    addStagedImage(
+      state,
+      action: PayloadAction<{
+        image: ImageType;
+      }>
+    ) {
+      const { image } = action.payload;
+      let imageCaregory = image.categoryId;
+      if (!state.categories.ids.includes(imageCaregory)) {
+        image.categoryId = UNKNOWN_CLASS_CATEGORY_ID;
+        imageCaregory = UNKNOWN_CLASS_CATEGORY_ID;
+      }
+      state.stagedImages.ids.push(image.id);
+      state.stagedImages.entities[image.id] = image;
+
+      state.imagesByCategory[imageCaregory].push(image.id);
+      state.annotationsByImage[image.id] = [];
+    },
+    addStagedImages(
+      state,
+      action: PayloadAction<{
+        images: Array<ImageType>;
+      }>
+    ) {
+      for (const image of action.payload.images) {
+        dataSlice.caseReducers.addStagedImage(state, {
+          type: "addStagedImage",
+          payload: { image },
+        });
+      }
+    },
+    updateStagedImage(
+      state,
+      action: PayloadAction<{
+        imageId: string;
+        updates: Partial<ImageType>;
+        disposeColors?: boolean;
+        disposeData?: boolean;
+        execSaga?: boolean;
+      }>
+    ) {
+      const { imageId, updates, disposeColors, disposeData } = action.payload;
+      if (state.stagedImages.ids.includes(imageId)) {
+        disposeColors &&
+          state.stagedImages.entities[imageId]!.colors?.color.dispose();
+        disposeData && state.stagedImages.entities[imageId]!.data?.dispose();
+        Object.assign(state.stagedImages.entities[imageId]!, updates);
+        return;
+      }
+      state.stagedImages.entities[imageId] = { id: imageId, ...updates };
     },
     addAnnotation(
       state,
@@ -690,20 +748,23 @@ export const dataSlice = createSlice({
     },
     deleteAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
       const annotationId = action.payload.annotationId;
-      if (!state.annotations.ids.includes(annotationId)) return;
-      console.log("here-3");
-      const { imageId, categoryId } = state.annotations.entities[annotationId]!;
-      mutatingFilter(
-        state.annotationsByCategory[categoryId],
-        (_annotationId) => _annotationId !== annotationId
-      );
-      mutatingFilter(
-        state.annotationsByImage[imageId!],
-        (_annotationId) => _annotationId !== annotationId
-      );
-      state.annotations.entities[annotationId]?.data?.dispose();
-      delete state.annotations.entities[annotationId];
-      state.annotations.ids = Object.keys(state.annotations.entities);
+      if (state.annotations.ids.includes(annotationId)) {
+        const { imageId, categoryId } =
+          state.annotations.entities[annotationId]!;
+        mutatingFilter(
+          state.annotationsByCategory[categoryId],
+          (_annotationId) => _annotationId !== annotationId
+        );
+        mutatingFilter(
+          state.annotationsByImage[imageId!],
+          (_annotationId) => _annotationId !== annotationId
+        );
+        state.annotations.entities[annotationId]?.data?.dispose();
+        delete state.annotations.entities[annotationId];
+        state.annotations.ids = Object.keys(state.annotations.entities);
+      }
+      if (state.stagedAnnotations.ids.includes(annotationId)) {
+      }
     },
     deleteAnnotations(
       state,
@@ -836,6 +897,8 @@ export const {
   uploadImages,
   initData,
   setImageSrc,
+  addStagedImage,
+  addStagedImages,
   updateImageCategories,
   updateCategoriesOfImages,
   updateSegmentationImagesPartition,

@@ -65,13 +65,13 @@ export const MainImageGridItem = memo(
       if (selected) {
         dispatch(projectSlice.actions.deselectImage({ id: image.id }));
       } else {
-        dispatch(projectSlice.actions.selectImage({ id: image.id }));
+        dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
       }
     };
 
     const onContextSelectImage = (image: ImageType) => {
       if (!selected) {
-        dispatch(projectSlice.actions.selectImage({ id: image.id }));
+        dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
       }
     };
 

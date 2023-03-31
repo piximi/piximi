@@ -1,16 +1,24 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { activeImageIdSelector, stageScaleSelector } from "store/imageViewer";
-import { selectImageEntities } from "./selectImageEntities";
+import { stageScaleSelector } from "store/imageViewer";
 import { Colors, ColorsRaw } from "types/tensorflow";
 import { generateBlankColors } from "utils/common/image";
-import { selectStagedImageEntities } from "./selectStagedImageEntities";
 import { selectActiveImage } from "./selectActiveImage";
+//import { ImageAttributeType, ImageType } from "types";
 
+//TODO: get this to work
+// export const selectImageAttibutes = createSelector([selectActiveImage,(state, attrs:Array<ImageAttributeType>) => attrs
+// ],(activeImage, attrs)=>{
+//   if(!activeImage) return
+//   const attrObj: Partial<ImageType>= {}
+//   for (const attr of attrs){
+//     attrObj[attr] = activeImage[attr] as typeof attrObj[attr]
+//   }
+// })
 export const selectActiveImageBitDepth = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId!].bitDepth;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.bitDepth;
   }
 );
 
@@ -45,71 +53,70 @@ export const selectActiveImageColor = createSelector(
 );
 
 export const selectActiveImageData = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId!].data;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.data;
   }
 );
 
 export const selectActiveImageName = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].name;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.name;
   }
 );
 export const selectActiveImageActivePlane = createSelector(
-  [activeImageIdSelector, selectImageEntities, selectStagedImageEntities],
-  (activeImageId, imageEntities, stagedImageEntities) => {
-    if (!activeImageId) return;
-    if (
-      stagedImageEntities[activeImageId] &&
-      stagedImageEntities[activeImageId]?.activePlane
-    ) {
-      return stagedImageEntities[activeImageId]!.activePlane;
-    }
-    return imageEntities[activeImageId].activePlane;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+
+    return activeImage.activePlane;
   }
 );
 
 export const selectActiveImageShape = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].shape;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.shape;
   }
 );
 
 export const selectActiveImageHeight = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].shape.height;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.shape.height;
   }
 );
 
 export const selectActiveImageWidth = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].shape.width;
+  [selectActiveImage],
+  (activeImage) => {
+    console.log("~* selectActiveImageWidth *~");
+    console.log(" --- activeImage: ", activeImage);
+    console.log(" ");
+
+    if (!activeImage) return;
+    return activeImage.shape.width;
   }
 );
 
 export const selectActiveImageChannels = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].shape.channels;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.shape.channels;
   }
 );
 
 export const selectActiveImageSrc = createSelector(
-  [activeImageIdSelector, selectImageEntities],
-  (activeImageId, imageEntities) => {
-    if (!activeImageId) return;
-    return imageEntities[activeImageId].src;
+  [selectActiveImage],
+  (activeImage) => {
+    if (!activeImage) return;
+    return activeImage.src;
   }
 );
 
