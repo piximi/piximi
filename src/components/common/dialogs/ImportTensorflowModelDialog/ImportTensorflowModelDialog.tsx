@@ -86,25 +86,31 @@ export const ImportTensorflowModelDialog = ({
       modelKind === "Classification"
         ? availableClassifierModels.reduce(
             (
-              names: Array<{ name: string; type: ModelType }>,
+              trainedModels: Array<{ name: string; type: ModelType }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
-                names.push({ name: model.modelName, type: model.modelType });
+                trainedModels.push({
+                  name: model.modelName,
+                  type: model.modelType,
+                });
               }
-              return names;
+              return trainedModels;
             },
             []
           )
         : availableSegmenterModels.reduce(
             (
-              names: Array<{ name: string; type: ModelType }>,
+              trainedModels: Array<{ name: string; type: ModelType }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
-                names.push({ name: model.modelName, type: model.modelType });
+                trainedModels.push({
+                  name: model.modelName,
+                  type: model.modelType,
+                });
               }
-              return names;
+              return trainedModels;
             },
             []
           );

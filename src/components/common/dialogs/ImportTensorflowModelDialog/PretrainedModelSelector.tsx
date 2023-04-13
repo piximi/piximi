@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LayersModel, io, loadGraphModel, GraphModel } from "@tensorflow/tfjs";
+import { LayersModel, io, GraphModel } from "@tensorflow/tfjs";
 
 import {
   DialogContent,
@@ -12,12 +12,7 @@ import {
 } from "@mui/material";
 
 import { ModelType, Shape } from "types";
-
-import Stardist2DBrightfieldModel from "data/model-data/stardist/model.json";
-//@ts-ignore
-import Stardist2DBrightfieldWeights1 from "data/model-data/stardist/group1-shard1of2.bin";
-//@ts-ignore
-import Stardist2DBrightfieldWeights2 from "data/model-data//stardist/group1-shard2of2.bin";
+import { loadStardist } from "utils/common/model-loaders";
 
 export const PretrainedModelSelector = ({
   values,
@@ -48,51 +43,12 @@ export const PretrainedModelSelector = ({
 
   const loadModel = async (selectedPreTrainedModel: number) => {
     if (selectedPreTrainedModel === ModelType.StardistVHE) {
-      let modelTopology: File;
-      let modelWeights1: File;
-      let modelWeights2: File;
       try {
-        const model_topology_blob = new Blob(
-          [JSON.stringify(Stardist2DBrightfieldModel)],
-          {
-            type: "application/json",
-          }
-        );
-        modelTopology = new File([model_topology_blob], "model.json", {
-          type: "application/json",
-        });
-
-        const model_weights_fetch1 = await fetch(Stardist2DBrightfieldWeights1);
-        const model_weights_blob1 = await model_weights_fetch1.blob();
-        modelWeights1 = new File(
-          [model_weights_blob1],
-          "group1-shard1of2.bin",
-          {
-            type: "application/octet-stream",
-          }
-        );
-
-        const model_weights_fetch2 = await fetch(Stardist2DBrightfieldWeights2);
-        const model_weights_blob2 = await model_weights_fetch2.blob();
-        modelWeights2 = new File(
-          [model_weights_blob2],
-          "group1-shard2of2.bin",
-          {
-            type: "application/octet-stream",
-          }
-        );
-      } catch (err) {
-        const error: Error = err as Error;
-        setErrMessage(error.message);
-        return;
-      }
-      try {
-        const model = await loadGraphModel(
-          io.browserFiles([modelTopology, modelWeights1, modelWeights2])
-        );
+        const model = await loadStardist();
         setSegmentationModel(model);
 
         const modelShape = model.inputs[0].shape!.slice(1) as number[];
+
         setInputShape((prevShape) => ({
           ...prevShape,
           height: modelShape[0],
@@ -107,6 +63,7 @@ export const PretrainedModelSelector = ({
       }
     }
   };
+
   return (
     <>
       <DialogContent>
