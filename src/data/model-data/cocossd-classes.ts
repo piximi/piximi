@@ -17,7 +17,7 @@
 
 import { ObjectDetectionType } from "types";
 
-const CLASSES: { [key: string]: ObjectDetectionType } = {
+const COCO_CLASSES: { [key: string]: ObjectDetectionType } = {
   1: {
     name: "/m/01g317",
     id: 1,
@@ -420,4 +420,4 @@ const CLASSES: { [key: string]: ObjectDetectionType } = {
   },
 };
 
-export default CLASSES;
+export default COCO_CLASSES;

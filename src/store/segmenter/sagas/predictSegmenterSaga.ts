@@ -33,7 +33,7 @@ import {
   ImageType,
 } from "types";
 import { getStackTraceFromError } from "utils";
-import CLASSES from "data/model-data/cocossd-classes";
+import COCO_CLASSES from "data/model-data/cocossd-classes";
 import {
   predictCoco,
   predictSegmentations,
@@ -58,11 +58,13 @@ export function* predictSegmenterSaga({
         },
       })
     );
+
     yield put(
       segmenterSlice.actions.updatePredicting({
         predicting: false,
       })
     );
+
     return;
   }
 
@@ -81,13 +83,17 @@ export function* predictSegmenterSaga({
   const createdCategories = annotationCategories.filter((category) => {
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
+
   const selectedModel: ReturnType<typeof segmenterModelSelector> = yield select(
     segmenterModelSelector
   );
+
   let possibleClasses: { [key: string]: ObjectDetectionType } = {};
-  if (/*selectedModel.modelType === ModelType.CocoSSD*/ true) {
-    possibleClasses = CLASSES;
+
+  if (selectedModel.modelType === ModelType.CocoSSD) {
+    possibleClasses = COCO_CLASSES;
   }
+
   const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
     yield select(segmenterInputShapeSelector);
 
@@ -95,13 +101,16 @@ export function* predictSegmenterSaga({
   const preprocessOptions: ReturnType<
     typeof segmenterPreprocessOptionsSelector
   > = yield select(segmenterPreprocessOptionsSelector);
+
   // fitOptions: {epochs: 10, batchSize:32, initialEpoch: 0}
   const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
     yield select(segmenterFitOptionsSelector);
+
   // fitted Model
   let model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
     segmenterFittedModelSelector
   );
+
   // Seems strange to have this considering this saga will only be executed if there is a fitted model
   if (model === undefined) {
     yield handleError(
