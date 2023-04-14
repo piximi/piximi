@@ -38,6 +38,7 @@ export const SegmenterExecListItem = () => {
       setHelperText("No trained model");
     }
   }, [fitted]);
+
   return (
     <Grid
       container
