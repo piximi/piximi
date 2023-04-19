@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { CategoryItem } from "../CategoryItem";
+import { CategoryItem, AnnotationCategoryItem } from "../CategoryItem";
 import { CreateCategoryItem } from "../CreateCategory";
 
 import { PredictionVisibility } from "../PredictionsVisibility/";
@@ -46,16 +46,21 @@ export const CategoriesList = (props: CategoriesListProps) => {
   return (
     <CollapsibleList dense primary="Categories">
       <CategoryItem
-        categoryType={categoryType}
         category={unknownCategory}
         key={unknownCategory.id}
         id={unknownCategory.id}
         onCategoryClickCallBack={onCategoryClickCallBack}
       />
       {categories.map((category: Category) => {
-        return (
+        return categoryType === CategoryType.ClassifierCategory ? (
           <CategoryItem
-            categoryType={categoryType}
+            category={category}
+            key={category.id}
+            id={category.id}
+            onCategoryClickCallBack={onCategoryClickCallBack}
+          />
+        ) : (
+          <AnnotationCategoryItem
             category={category}
             key={category.id}
             id={category.id}

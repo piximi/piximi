@@ -8,11 +8,27 @@ import { mutatingFilter } from "utils/common/helpers";
 export const selectImageCount = ({ data }: { data: DataStoreSlice }) => {
   return data.images.ids.length;
 };
-export const selectImagesByCategory =
-  (categoryId: string) =>
-  ({ data }: { data: DataStoreSlice }) => {
-    return data.imagesByCategory[categoryId] ?? [];
-  };
+export const selectImagesByCategoryEntity = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
+  return data.imagesByCategory;
+};
+export const selectImagesByCategory = () =>
+  createSelector(
+    [selectImagesByCategoryEntity, (_, categoryId) => categoryId],
+    (imagesByCategory, categoryId) => {
+      return imagesByCategory[categoryId];
+    }
+  );
+export const selectImageCountByCategory = () =>
+  createSelector(
+    [selectImagesByCategoryEntity, (_, categoryId) => categoryId],
+    (imagesByCategory, categoryId) => {
+      return imagesByCategory[categoryId]?.length ?? 0;
+    }
+  );
 export const selectInferenceImages = ({ data }: { data: DataStoreSlice }) => {
   return Object.values(data.images.entities).filter(
     (image) => image.partition === Partition.Inference
@@ -64,11 +80,6 @@ export const selectStagedImageEntities = ({
 }) => {
   return data.stagedImages.entities;
 };
-export const selectImageCountByCategory =
-  (categoryId: string) =>
-  ({ data }: { data: DataStoreSlice }) => {
-    return data.imagesByCategory[categoryId]?.length;
-  };
 
 export const selectImageEntities = ({ data }: { data: DataStoreSlice }) => {
   return data.images.entities;
@@ -137,13 +148,6 @@ export const selectImageViewerImages = createSelector(
     return returnedImages;
   }
 );
-export const selectImagesByCategoryEntity = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return data.imagesByCategory;
-};
 
 export const selectVisibleImages = createSelector(
   [
@@ -155,7 +159,6 @@ export const selectVisibleImages = createSelector(
   (imageCategories, imagesByCategory, imageEntities, stagedImageEntities) => {
     const visibleImages: ImageType[] = [];
     for (const categoryId of imageCategories) {
-      console.log(categoryId);
       for (const imageId of imagesByCategory[categoryId]) {
         const combinedImage = {
           ...imageEntities[imageId],

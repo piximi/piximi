@@ -50,7 +50,8 @@ export function* annotationStateChangeSaga({
 
   if (selectionMode === AnnotationModeType.New) {
     const selectedCategory: Category = yield select(
-      selectAnnotationCategoryById(selectedAnnotationCategoryId)
+      selectAnnotationCategoryById!,
+      selectedAnnotationCategoryId
     );
 
     annotationTool.annotate(selectedCategory, activeImagePlane!);
@@ -129,7 +130,8 @@ export function* annotationStateChangeSaga({
 
     if (annotationTool.maskData.length) {
       const selectedCategory: Category = yield select(
-        selectAnnotationCategoryById(selectedAnnotationCategoryId)
+        selectAnnotationCategoryById,
+        selectedAnnotationCategoryId
       );
       annotationTool.annotate(selectedCategory, activeImagePlane!);
     }

@@ -14,7 +14,8 @@ export function* selectedCategorySaga({
   if (!execSaga) return;
 
   const selectedCategory: Category = yield select(
-    selectAnnotationCategoryById(selectedCategoryId)
+    selectAnnotationCategoryById,
+    selectedCategoryId
   );
 
   const selectedAnnotations: ReturnType<typeof selectSelectedAnnotations> =

@@ -5,47 +5,41 @@ import { Divider, Menu, MenuList } from "@mui/material";
 import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
 import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
 
-import { DeleteCategoryMenuItem } from "../DeleteCategory";
 import { EditCategoryMenuItem } from "../EditCategory";
 import { ClearAnnotationMenuItem } from "../ClearAnnotation";
 
-import {
-  Category,
-  CategoryType,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CLASS_CATEGORY_ID,
-} from "types";
+import { Category, CategoryType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 import { useDispatch } from "react-redux";
 import { dataSlice } from "store/data";
+import { DeleteAnnotationCategoryMenuItem } from "../DeleteCategory/DeleteCategoryMenuItem/DeleteAnnotationCategoryMenuItem";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
-  categoryType: CategoryType;
   onCloseCategoryMenu: () => void;
   onOpenCategoryMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
   openCategoryMenu: boolean;
 };
 
-export const CategoryItemMenu = ({
+export const AnnotationCategoryItemMenu = ({
   anchorElCategoryMenu,
   category,
-  categoryType,
   onCloseCategoryMenu,
   openCategoryMenu,
 }: CategoryItemMenuProps) => {
   const dispatch = useDispatch();
-
-  const hideOtherCategories = (
+  const handleHideOtherCategories = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     dispatch(
-      dataSlice.actions.setOtherCategoriesInvisible({ id: category.id })
+      dataSlice.actions.setOtherAnnotationCategoriesInvisible({
+        id: category.id,
+      })
     );
 
     onCloseCategoryMenu();
   };
-  const onHideCategory = (
+  const handleHideCategory = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>
   ) => {
     const payload = {
@@ -53,10 +47,11 @@ export const CategoryItemMenu = ({
       visible: !category.visible,
     };
 
-    dispatch(dataSlice.actions.setCategoryVisibility(payload));
+    dispatch(dataSlice.actions.setAnnotationCategoryVisibility(payload));
 
     onCloseCategoryMenu();
   };
+
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
@@ -67,38 +62,35 @@ export const CategoryItemMenu = ({
     >
       <MenuList dense variant="menu">
         <HideOtherCategoriesMenuItem
-          handleHideOtherCategories={hideOtherCategories}
+          handleHideOtherCategories={handleHideOtherCategories}
         />
 
         <HideOrShowCategoryMenuItem
           category={category}
-          handleHideCategory={onHideCategory}
+          handleHideCategory={handleHideCategory}
         />
 
-        {category.id !== UNKNOWN_CLASS_CATEGORY_ID &&
-          category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
-            <div>
-              <Divider />
+        {category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
+          <div>
+            <Divider />
 
-              <DeleteCategoryMenuItem
-                category={category}
-                onCloseCategoryMenu={onCloseCategoryMenu}
-              />
+            <DeleteAnnotationCategoryMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
 
-              <EditCategoryMenuItem
-                category={category}
-                categoryType={CategoryType.ClassifierCategory}
-                onCloseCategoryMenu={onCloseCategoryMenu}
-              />
+            <EditCategoryMenuItem
+              category={category}
+              categoryType={CategoryType.AnnotationCategory}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
 
-              {categoryType === CategoryType.AnnotationCategory && (
-                <ClearAnnotationMenuItem
-                  category={category}
-                  onCloseCategoryMenu={onCloseCategoryMenu}
-                />
-              )}
-            </div>
-          )}
+            <ClearAnnotationMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
+          </div>
+        )}
       </MenuList>
     </Menu>
   );

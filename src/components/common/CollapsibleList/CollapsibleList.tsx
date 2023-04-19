@@ -46,11 +46,6 @@ export const CollapsibleList = ({
     setCollapsed(!collapsed);
   };
 
-  React.useEffect(() => {
-    console.log(closed);
-    console.log(collapsed);
-  });
-
   return (
     <List
       sx={{ backgroundColor: backgroundColor ? backgroundColor : "" }}

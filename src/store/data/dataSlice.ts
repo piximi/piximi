@@ -15,9 +15,33 @@ import { Colors } from "types/tensorflow";
 import { DataStoreSlice } from "types";
 import { ImageShapeInfo, replaceDuplicateName } from "utils/common/image";
 import { mutatingFilter } from "utils/common/helpers";
+import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
+
+const categoriesAdapter = createDeferredEntityAdapter<Category>();
+export const annotationCategoriesAdapter =
+  createDeferredEntityAdapter<Category>();
 
 export const initialState = (): DataStoreSlice => {
   return {
+    categories_: categoriesAdapter.getInitialState({
+      ids: [UNKNOWN_CLASS_CATEGORY_ID],
+      entities: {
+        [UNKNOWN_CLASS_CATEGORY_ID]: {
+          saved: UNKNOWN_CLASS_CATEGORY,
+          changes: {},
+        },
+      },
+    }),
+
+    annotationCategories_: annotationCategoriesAdapter.getInitialState({
+      ids: [UNKNOWN_ANNOTATION_CATEGORY_ID],
+      entities: {
+        [UNKNOWN_ANNOTATION_CATEGORY_ID]: {
+          saved: UNKNOWN_ANNOTATION_CATEGORY,
+          changes: {},
+        },
+      },
+    }),
     categories: {
       ids: [UNKNOWN_CLASS_CATEGORY_ID],
       entities: { [UNKNOWN_CLASS_CATEGORY_ID]: UNKNOWN_CLASS_CATEGORY },
@@ -37,6 +61,7 @@ export const initialState = (): DataStoreSlice => {
     imagesByCategory: { [UNKNOWN_CLASS_CATEGORY_ID]: [] },
   };
 };
+
 // TODO: use createEntities with sorting for entity values
 export const dataSlice = createSlice({
   name: "data",
@@ -74,6 +99,11 @@ export const dataSlice = createSlice({
         type: "addAnnotations",
         payload: { annotations: newAnnotations },
       });
+      categoriesAdapter.setMany(state.categories_, newCategories);
+      annotationCategoriesAdapter.setMany(
+        state.annotationCategories_,
+        newAnnotationCategories
+      );
     },
     resetData: () => initialState(),
     addCategory(
@@ -87,6 +117,7 @@ export const dataSlice = createSlice({
       state.categories.ids.push(category.id);
       state.categories.entities[category.id] = category;
       state.imagesByCategory[category.id] = [];
+      categoriesAdapter.addOne(state.categories_, category);
     },
     addCategories(
       state,
@@ -100,6 +131,7 @@ export const dataSlice = createSlice({
           payload: { category },
         });
       }
+      categoriesAdapter.addMany(state.categories_, action.payload.categories);
     },
     createCategory(
       state,
@@ -121,6 +153,13 @@ export const dataSlice = createSlice({
         visible: true,
       } as Category;
       state.imagesByCategory[id] = [];
+
+      categoriesAdapter.addOne(state.categories_, {
+        id: id,
+        name: action.payload.name,
+        color: action.payload.color,
+        visible: true,
+      } as Category);
     },
     updateCategory(
       state,
@@ -132,12 +171,28 @@ export const dataSlice = createSlice({
         name: action.payload.name,
         color: action.payload.color,
       };
+
+      categoriesAdapter.updateOne(state.categories_, {
+        id: action.payload.id,
+        changes: { name: action.payload.name, color: action.payload.color },
+      });
     },
     setOtherCategoriesInvisible(state, action: PayloadAction<{ id?: string }>) {
       for (let id of state.categories.ids) {
         state.categories.entities[id].visible =
           action.payload.id === undefined ? true : id === action.payload.id;
       }
+      const idsToUpdate = state.categories_.ids.filter((id) => {
+        return (
+          id !== action.payload.id &&
+          state.categories_.entities[id].saved.visible !== false &&
+          state.categories_.entities[id].changes?.visible !== false
+        );
+      });
+      const changes = idsToUpdate.map((id) => {
+        return { id: id, changes: { visible: false } };
+      });
+      categoriesAdapter.updateMany(state.categories_, changes);
     },
     setCategoryVisibility(
       state,
@@ -145,6 +200,11 @@ export const dataSlice = createSlice({
     ) {
       state.categories.entities[action.payload.categoryId].visible =
         action.payload.visible;
+
+      categoriesAdapter.updateOne(state.categories_, {
+        id: action.payload.categoryId,
+        changes: { visible: action.payload.visible },
+      });
     },
     setCategories(
       state,
@@ -167,6 +227,8 @@ export const dataSlice = createSlice({
         state.categories.entities[category.id] = category;
         state.imagesByCategory[category.id] = [];
       }
+
+      categoriesAdapter.setMany(state.categories_, action.payload.categories);
     },
     deleteCategory(state, action: PayloadAction<{ categoryId: string }>) {
       const categoryId = action.payload.categoryId;
@@ -182,6 +244,7 @@ export const dataSlice = createSlice({
 
       delete state.categories.entities[categoryId];
       state.categories.ids = Object.keys(state.categories.entities);
+      categoriesAdapter.removeOne(state.categories_, action.payload.categoryId);
     },
     deleteAllCategories(state, action: PayloadAction<{}>) {
       const categories = [...state.categories.ids];
@@ -191,6 +254,7 @@ export const dataSlice = createSlice({
           payload: { categoryId },
         });
       });
+      categoriesAdapter.removeAll(state.categories_);
     },
     createAnnotationCategory(
       state,
@@ -223,6 +287,7 @@ export const dataSlice = createSlice({
       state.annotationCategories.ids.push(category.id);
       state.annotationCategories.entities[category.id] = category;
       state.annotationsByCategory[category.id] = [];
+      annotationCategoriesAdapter.addOne(state.annotationCategories_, category);
     },
     addAnnotationCategories(
       state,
@@ -234,6 +299,10 @@ export const dataSlice = createSlice({
           payload: { annotationCategory },
         });
       }
+      annotationCategoriesAdapter.addMany(
+        state.annotationCategories_,
+        action.payload.annotationCategories
+      );
     },
     updateAnnotationCategory(
       state,
@@ -246,6 +315,10 @@ export const dataSlice = createSlice({
         name: action.payload.name,
         color: action.payload.color,
       };
+      annotationCategoriesAdapter.updateOne(state.annotationCategories_, {
+        id: action.payload.id,
+        changes: { name: action.payload.name, color: action.payload.color },
+      });
     },
     setAnnotationCategories(
       state,
@@ -270,6 +343,10 @@ export const dataSlice = createSlice({
         state.annotationCategories.entities[category.id] = category;
         state.annotationsByCategory[category.id] = [];
       }
+      annotationCategoriesAdapter.setMany(
+        state.annotationCategories_,
+        action.payload.annotationCategories
+      );
     },
     setAnnotationCategoryVisibility(
       state,
@@ -277,6 +354,10 @@ export const dataSlice = createSlice({
     ) {
       state.annotationCategories.entities[action.payload.categoryId].visible =
         action.payload.visible;
+      annotationCategoriesAdapter.updateOne(state.annotationCategories_, {
+        id: action.payload.categoryId,
+        changes: { visible: action.payload.visible },
+      });
     },
     setOtherAnnotationCategoriesInvisible(
       state,
@@ -286,6 +367,17 @@ export const dataSlice = createSlice({
         state.annotationCategories.entities[id].visible =
           action.payload.id === undefined ? true : id === action.payload.id;
       }
+      const idsToUpdate = state.annotationCategories_.ids.filter((id) => {
+        return (
+          id !== action.payload.id &&
+          state.annotationCategories_.entities[id].saved.visible !== false &&
+          state.annotationCategories_.entities[id].changes?.visible !== false
+        );
+      });
+      const changes = idsToUpdate.map((id) => {
+        return { id: id, changes: { visible: false } };
+      });
+      categoriesAdapter.updateMany(state.annotationCategories_, changes);
     },
     deleteAnnotationCategory(
       state,
@@ -299,6 +391,10 @@ export const dataSlice = createSlice({
       state.annotationCategories.ids = Object.keys(
         state.annotationCategories.entities
       );
+      annotationCategoriesAdapter.removeOne(
+        state.annotationCategories_,
+        action.payload.categoryId
+      );
     },
     deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
       const annotationCategoryIds = [...state.annotations.ids] as Array<string>;
@@ -309,6 +405,14 @@ export const dataSlice = createSlice({
           payload: { categoryId },
         });
       });
+
+      const idsToDelete = state.annotationCategories_.ids.filter(
+        (id) => id !== UNKNOWN_ANNOTATION_CATEGORY_ID
+      );
+      annotationCategoriesAdapter.removeMany(
+        state.annotationCategories_,
+        idsToDelete
+      );
 
       state.annotationCategories = initialState().annotationCategories;
     },

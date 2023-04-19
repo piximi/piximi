@@ -8,6 +8,7 @@ import {
   selectAnnotationEntities,
   selectStagedAnnotationEntities,
 } from "./annotationSelectors";
+import { AnnotationType, DecodedAnnotationType, Shape } from "types";
 
 // Note: re-selects on activeImageId, image.entities, annotationsByImage, annotations.entities, annotationCategories.entities
 export const selectActiveAnnotationObjects = createSelector(
@@ -24,26 +25,40 @@ export const selectActiveAnnotationObjects = createSelector(
     annotationEntities,
     stagedAnnotationEntities,
     categoryEntities
-  ) => {
+  ): Array<{
+    annotation: DecodedAnnotationType;
+    fillColor: string;
+    imageShape: Shape;
+  }> => {
     if (!activeImageShape) return [];
 
-    const annotationObjects = activeAnnotationIds.map((annotationId) => {
-      let encodedAnnotation = annotationEntities[annotationId]!;
-      if (stagedAnnotationEntities[annotationId]) {
-        encodedAnnotation = {
-          ...annotationEntities[annotationId]!,
-          ...stagedAnnotationEntities[annotationId]!,
-        };
+    const annotationObjects: Array<{
+      annotation: DecodedAnnotationType;
+      fillColor: string;
+      imageShape: Shape;
+    }> = [];
+
+    for (const annotationId of activeAnnotationIds) {
+      if (
+        stagedAnnotationEntities[annotationId] &&
+        stagedAnnotationEntities[annotationId]?.deleted
+      ) {
+        continue;
       }
+      const encodedAnnotation = {
+        ...annotationEntities[annotationId],
+        ...stagedAnnotationEntities[annotationId],
+      } as AnnotationType;
+
       const annotation = decodeAnnotation(encodedAnnotation)!;
 
       const fillColor = categoryEntities[annotation.categoryId].color;
-      return {
+      annotationObjects.push({
         annotation,
         fillColor,
         imageShape: activeImageShape,
-      };
-    });
+      });
+    }
 
     return annotationObjects;
   }

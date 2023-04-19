@@ -1,5 +1,5 @@
-import React from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import React, { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, Typography } from "@mui/material";
 
@@ -7,35 +7,26 @@ import { useDialogHotkey } from "hooks";
 
 import { DeleteCategoryDialog } from "../DeleteCategoryDialog";
 
-import { imageViewerSlice } from "store/imageViewer";
-import {
-  dataSlice,
-  selectImageCountByCategory,
-  selectAnnotationCountByCategory,
-} from "store/data";
+import { dataSlice, selectImageCountByCategory } from "store/data";
 
-import {
-  Category,
-  CategoryType,
-  HotkeyView,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-} from "types";
+import { Category, CategoryType, HotkeyView } from "types";
 
 type DeleteCategoryMenuItemProps = {
   category: Category;
-  categoryType: CategoryType;
   onCloseCategoryMenu: () => void;
 };
 
 export const DeleteCategoryMenuItem = ({
   category,
-  categoryType,
   onCloseCategoryMenu,
 }: DeleteCategoryMenuItemProps) => {
+  const memoizedSelectImageCountByCategory = useMemo(
+    selectImageCountByCategory,
+    []
+  );
   const dispatch = useDispatch();
-  const imageCount = useSelector(selectImageCountByCategory(category.id));
-  const annotationCount = useSelector(
-    selectAnnotationCountByCategory(category.id)
+  const imageCount = useSelector((state) =>
+    memoizedSelectImageCountByCategory(state, category.id)
   );
 
   const {
@@ -44,20 +35,10 @@ export const DeleteCategoryMenuItem = ({
     open: openDeleteCategoryDialog,
   } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
 
-  const {
-    onClose: onCloseDeleteAnnotationCategoryDialog,
-    onOpen: onOpenDeleteAnnotationCategoryDialog,
-    open: openDeleteAnnotationCategoryDialog,
-  } = useDialogHotkey(HotkeyView.DeleteAnnotationCategoryDialog);
-
   const onDeleteCategory = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>
   ) => {
-    if (categoryType === CategoryType.ClassifierCategory) {
-      deleteClassificationCategory();
-    } else {
-      deleteAnnotationCategory();
-    }
+    deleteClassificationCategory();
   };
 
   const deleteClassificationCategory = () => {
@@ -77,41 +58,8 @@ export const DeleteCategoryMenuItem = ({
     );
   };
 
-  const deleteAnnotationCategory = () => {
-    if (annotationCount) {
-      onOpenDeleteAnnotationCategoryDialog();
-    } // Warn user that these annotations will be relabeled as unknown.
-    else {
-      deleteAnnotationCategoryCallback(category.id);
-    }
-  };
-
-  const deleteAnnotationCategoryCallback = (categoryId: string) => {
-    dispatch(
-      dataSlice.actions.deleteAnnotationCategory({ categoryId: category.id })
-    );
-    batch(() => {
-      dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
-          execSaga: true,
-        })
-      );
-
-      dispatch(
-        dataSlice.actions.deleteAnnotationCategory({
-          categoryId: categoryId,
-        })
-      );
-    });
-  };
-
   const onClose = () => {
-    if (categoryType === CategoryType.ClassifierCategory) {
-      onCloseDeleteCategoryDialog();
-    } else {
-      onCloseDeleteAnnotationCategoryDialog();
-    }
+    onCloseDeleteCategoryDialog();
 
     onCloseCategoryMenu();
   };
@@ -125,17 +73,9 @@ export const DeleteCategoryMenuItem = ({
       <DeleteCategoryDialog
         category={category}
         deleteCategoryCallback={deleteClassificationCategoryCallback}
-        categoryType={categoryType}
+        categoryType={CategoryType.ClassifierCategory}
         onClose={onClose}
         open={openDeleteCategoryDialog}
-      />
-
-      <DeleteCategoryDialog
-        category={category}
-        deleteCategoryCallback={deleteAnnotationCategoryCallback}
-        categoryType={categoryType}
-        onClose={onClose}
-        open={openDeleteAnnotationCategoryDialog}
       />
     </>
   );
