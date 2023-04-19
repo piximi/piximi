@@ -62,7 +62,6 @@ export const selectVisibleCategories = createSelector(
 export const selectVisibleCategoryIds = createSelector(
   [selectCategoryEntities],
   (categoryEntities) => {
-    console.log(Object.keys(categoryEntities));
     return Object.keys(categoryEntities).filter(
       (categoryId) => categoryEntities[categoryId].visible
     );

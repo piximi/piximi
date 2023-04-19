@@ -10,18 +10,17 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
-import { CategoryItemMenu } from "../CategoryItemMenu";
-
 import { highlightedCategoriesSelector } from "store/project";
 import {
-  selectImageCountByCategory,
+  selectAnnotationCountByCategory,
   selectSelectedAnnotationCategory,
 } from "store/data";
 
-import { Category, CategoryType } from "types";
+import { Category } from "types";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { AnnotationCategoryItemCheckbox } from "../CategoryItemCheckbox/AnnotationCategoryItemCheckbox";
+import { AnnotationCategoryItemMenu } from "../CategoryItemMenu/AnnotationCategoryItemMenu";
 
 type CategoryItemProps = {
   category: Category;
@@ -29,13 +28,13 @@ type CategoryItemProps = {
   onCategoryClickCallBack: (category: Category) => void;
 };
 
-export const CategoryItem = ({
+export const AnnotationCategoryItem = ({
   category,
   id,
   onCategoryClickCallBack,
 }: CategoryItemProps) => {
-  const memoizedSelectImageCountByCategory = useMemo(
-    selectImageCountByCategory,
+  const memoizedSelectAnnotationCountByCategory = useMemo(
+    selectAnnotationCountByCategory,
     []
   );
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -51,15 +50,16 @@ export const CategoryItem = ({
 
   const highlightedCategory = useSelector(highlightedCategoriesSelector);
   const selectedCategory = useSelector(selectSelectedAnnotationCategory);
-  const imageCount = useSelector((state) =>
-    memoizedSelectImageCountByCategory(state, category.id)
+
+  const annotationCount = useSelector((state) =>
+    memoizedSelectAnnotationCountByCategory(state, category.id)
   );
 
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
-    setCount(imageCount);
-  }, [imageCount]);
+    setCount(annotationCount);
+  }, [annotationCount]);
 
   const onCategoryClick = () => {
     onCategoryClickCallBack(category);
@@ -80,7 +80,7 @@ export const CategoryItem = ({
               : "none",
         }}
       >
-        <CategoryItemCheckbox category={category} />
+        <AnnotationCategoryItemCheckbox category={category} />
 
         <ListItemText
           id={id}
@@ -107,10 +107,9 @@ export const CategoryItem = ({
         </ListItemSecondaryAction>
       </ListItem>
 
-      <CategoryItemMenu
+      <AnnotationCategoryItemMenu
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={category}
-        categoryType={CategoryType.ClassifierCategory}
         onCloseCategoryMenu={onCloseCategoryMenu}
         onOpenCategoryMenu={onOpenCategoryMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Divider, Drawer, List } from "@mui/material";
@@ -41,10 +41,6 @@ export const AnnotatorDrawer = () => {
   };
 
   const annotatorImages = useSelector(selectImageViewerImages);
-
-  useEffect(() => {
-    //console.log(annotatorImages);
-  });
 
   return (
     <Drawer

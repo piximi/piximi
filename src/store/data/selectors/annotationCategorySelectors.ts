@@ -1,55 +1,47 @@
-import { DataStoreSlice, Category, ImageViewer } from "types";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types/Category";
 import { sortBy } from "lodash";
+import { annotationCategoriesAdapter } from "../dataSlice";
+import { RootState } from "store/reducer/reducer";
+import { createSelector } from "@reduxjs/toolkit";
+import { selectedAnnotationCategoryIdSelector } from "store/imageViewer";
 
-export const selectAllAnnotationCategories = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return Object.values(data.annotationCategories.entities);
-};
-export const selectAnnotationCategoryEntities = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return data.annotationCategories.entities;
-};
-export const selectAllVisibleAnnotationCategories = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return Object.values(data.categories.entities).filter(
-    (category) => category.visible === true
+export const annotationCategorySelectors =
+  annotationCategoriesAdapter.getSelectors(
+    (state: RootState) => state.data.annotationCategories_
   );
-};
+export const selectAllAnnotationCategories =
+  annotationCategorySelectors.selectAll;
+
+export const selectAnnotationCategoryIds =
+  annotationCategorySelectors.selectIds;
+
+export const selectAnnotationCategoryEntities =
+  annotationCategorySelectors.selectEntities;
+
+export const selectAllVisibleAnnotationCategories = createSelector(
+  selectAllAnnotationCategories,
+  (entities) => {
+    return entities.filter((entity) => entity.visible);
+  }
+);
+
 export const selectAnnotationCategoryById =
-  (categoryId: string) =>
-  ({ data }: { data: DataStoreSlice }) => {
-    return data.annotationCategories.entities[categoryId];
-  };
+  annotationCategorySelectors.selectById;
 
-export const selectCreatedAnnotatorCategories = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  const categories = Object.values(data.annotationCategories.entities).filter(
-    (category) => category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID
-  );
+export const selectCreatedAnnotatorCategories = createSelector(
+  selectAllAnnotationCategories,
+  (categories) => {
+    const filteredCategories = categories.filter(
+      (category) => category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID
+    );
 
-  return sortBy(categories, "name");
-};
+    return sortBy(filteredCategories, "name");
+  }
+);
 
-//TODO: reselect
-export const selectSelectedAnnotationCategory = ({
-  imageViewer,
-  data,
-}: {
-  imageViewer: ImageViewer;
-  data: DataStoreSlice;
-}): Category => {
-  return data.annotationCategories.entities[imageViewer.selectedCategoryId];
-};
+export const selectSelectedAnnotationCategory = createSelector(
+  [selectedAnnotationCategoryIdSelector, selectAnnotationCategoryEntities],
+  (selectedId, categoryEntities) => {
+    return categoryEntities[selectedId];
+  }
+);

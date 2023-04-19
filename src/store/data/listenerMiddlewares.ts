@@ -238,6 +238,18 @@ startAppListening({
   },
 });
 
+startAppListening({
+  actionCreator: dataSlice.actions.deleteAllAnnotationsByImage,
+  effect: (action, listenerAPI) => {
+    const imageId = action.payload.imageId;
+    if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setActiveAnnotationIds({ annotationIds: [] })
+      );
+    }
+  },
+});
+
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: ImageJS.Stack;
   if (imageTypeEnum === ImageShapeEnum.DicomImage) {

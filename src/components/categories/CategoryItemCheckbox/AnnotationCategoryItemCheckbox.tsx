@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { Checkbox, ListItemIcon } from "@mui/material";
 import {
@@ -6,26 +6,18 @@ import {
   LabelOutlined as LabelOutlinedIcon,
 } from "@mui/icons-material";
 
-import { deselectImages } from "store/project";
-
-import { dataSlice, selectImagesByCategory } from "store/data";
+import { dataSlice } from "store/data";
 
 import { Category } from "types";
-import { useMemo } from "react";
 
 type CategoryItemCheckboxProps = {
   category: Category;
 };
 
-export const CategoryItemCheckbox = ({
+export const AnnotationCategoryItemCheckbox = ({
   category,
 }: CategoryItemCheckboxProps) => {
   const dispatch = useDispatch();
-
-  const memoizedSelectImagesByCategory = useMemo(selectImagesByCategory, []);
-  const categoryImages = useSelector((state) =>
-    memoizedSelectImagesByCategory(state, category.id)
-  );
 
   const onHideCategory = () => {
     const payload = {
@@ -33,15 +25,7 @@ export const CategoryItemCheckbox = ({
       visible: !category.visible,
     };
 
-    if (category.visible) {
-      dispatch(
-        deselectImages({
-          ids: categoryImages,
-        })
-      );
-    }
-
-    dispatch(dataSlice.actions.setCategoryVisibility(payload));
+    dispatch(dataSlice.actions.setAnnotationCategoryVisibility(payload));
   };
 
   return (
