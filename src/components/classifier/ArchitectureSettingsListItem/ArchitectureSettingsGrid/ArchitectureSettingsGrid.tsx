@@ -120,7 +120,7 @@ export const ArchitectureSettingsGrid = () => {
             )}
             value={selectedModel}
             isOptionEqualToValue={(option, value) =>
-              option.modelType === value.modelType &&
+              option.theModel === value.theModel &&
               option.modelName === value.modelName
             }
           />

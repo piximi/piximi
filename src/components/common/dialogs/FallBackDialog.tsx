@@ -251,7 +251,7 @@ export const FallBackDialog = (props: any) => {
         <SaveFittedModelDialog
           fittedModel={fittedClassifierModel}
           modelProps={selectedClassifierModelProps}
-          modelTypeString={"Classifier"}
+          modelKind={"Classifier"}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
         />
@@ -259,7 +259,7 @@ export const FallBackDialog = (props: any) => {
         <SaveFittedModelDialog
           fittedModel={fittedSegmenterModel as LayersModel}
           modelProps={selectedSegmenterModelProps}
-          modelTypeString={"Segmenter"}
+          modelKind={"Segmenter"}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
         />

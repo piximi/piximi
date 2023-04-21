@@ -25,9 +25,10 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
 import { Shape } from "types";
+import { ModelArchitecture } from "types/ModelType";
 
 export const CloudUpload = ({
-  modelType,
+  modelKind,
   modelArch,
   setSegmentationModel,
   setClassifierModel,
@@ -35,8 +36,8 @@ export const CloudUpload = ({
   setModelName,
   setModelArch,
 }: {
-  modelType: string;
-  modelArch: string;
+  modelKind: string;
+  modelArch: ModelArchitecture;
   setSegmentationModel: React.Dispatch<
     React.SetStateAction<
       LayersModel | GraphModel<string | io.IOHandler> | undefined
@@ -49,7 +50,7 @@ export const CloudUpload = ({
   >;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
   setModelName: React.Dispatch<React.SetStateAction<string>>;
-  setModelArch: React.Dispatch<React.SetStateAction<string>>;
+  setModelArch: React.Dispatch<React.SetStateAction<ModelArchitecture>>;
 }) => {
   const [isFromTFHub, setIsFromTFHub] = useState<boolean>(false);
   const [errMessage, setErrMessage] = useState<string>("");
@@ -88,14 +89,18 @@ export const CloudUpload = ({
   const handleModelArchChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setModelArch((event.target as HTMLInputElement).value);
+    setModelArch(
+      event.target.value === "Graph"
+        ? ModelArchitecture.Graph
+        : ModelArchitecture.Layers
+    );
   };
 
   const loadModel = async () => {
     let model: GraphModel | LayersModel;
 
     try {
-      if (modelArch === "graph") {
+      if (modelArch === ModelArchitecture.Graph) {
         model = await loadGraphModel(modelUrl, {
           fromTFHub: isFromTFHub,
         });
@@ -105,7 +110,7 @@ export const CloudUpload = ({
         });
       }
 
-      modelType === "Segmentation"
+      modelKind === "Segmentation"
         ? setSegmentationModel(model)
         : setClassifierModel(model as LayersModel);
       const modelShape = model.inputs[0].shape!.slice(1) as number[];
@@ -178,12 +183,12 @@ export const CloudUpload = ({
             onChange={handleModelArchChange}
           >
             <FormControlLabel
-              value="graph"
+              value="Graph"
               control={<Radio />}
               label="Graph Model"
             />
             <FormControlLabel
-              value="layers"
+              value="Layers"
               control={<Radio />}
               label="Layers Model"
             />

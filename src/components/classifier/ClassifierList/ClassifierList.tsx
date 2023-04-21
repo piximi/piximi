@@ -22,8 +22,9 @@ import {
 
 import { selectCreatedImageCategories } from "store/data";
 
-import { CategoryType, HotkeyView, ModelType, Shape } from "types";
+import { Category, CategoryType, HotkeyView, TheModel, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelArchitecture } from "types/ModelType";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
@@ -56,7 +57,8 @@ export const ClassifierList = () => {
         inputShape: inputShape,
         modelSelection: {
           modelName: modelName + " - uploaded",
-          modelType: ModelType.UserUploaded,
+          theModel: TheModel.UserUploaded,
+          modelArch: ModelArchitecture.Layers,
         },
         model: classifierModel as LayersModel,
       })
@@ -118,7 +120,7 @@ export const ClassifierList = () => {
       <SaveFittedModelDialog
         fittedModel={fittedClassifier}
         modelProps={selectedClassifierModelProps}
-        modelTypeString={"Classifier"}
+        modelKind={"Classifier"}
         onClose={onSaveClassifierDialogClose}
         open={openSaveClassifierDialog}
       />
