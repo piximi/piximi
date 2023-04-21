@@ -33,7 +33,7 @@ import {
   setThemeMode,
 } from "store/application";
 import { soundEnabledSelector, imageViewerSlice } from "store/imageViewer";
-import { selectUnusedCategoryColors } from "store/data";
+import { selectUnusedImageCategoryColors } from "store/data";
 
 import { ThemeMode } from "types";
 
@@ -322,7 +322,7 @@ const ColorPalette = ({
   selectionColor: string;
   setSelectionColor(newColor: string): void;
 }) => {
-  const availableColors = useSelector(selectUnusedCategoryColors);
+  const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);

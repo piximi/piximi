@@ -95,10 +95,6 @@ export const selectActiveImageHeight = createSelector(
 export const selectActiveImageWidth = createSelector(
   [selectActiveImage],
   (activeImage) => {
-    console.log("~* selectActiveImageWidth *~");
-    console.log(" --- activeImage: ", activeImage);
-    console.log(" ");
-
     if (!activeImage) return;
     return activeImage.shape.width;
   }

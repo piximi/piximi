@@ -3,26 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Autocomplete, TextField } from "@mui/material";
 
-import { imageSortKeySelector, projectSlice } from "store/project";
+import { projectSlice, selectImageSortType } from "store/project";
 
 import { availableImageSortKeys, ImageSortKeyType, ImageSortKey } from "types";
 
 export const ImageSortSelection = () => {
   const dispatch = useDispatch();
 
-  const [selectedImageSortKey, setSelectedImageSortKey] =
-    React.useState<ImageSortKeyType>(useSelector(imageSortKeySelector));
+  const selectedImageSortKey = useSelector(selectImageSortType);
 
   const onImageSortKeyChange = (
     event: SyntheticEvent<Element, Event>,
     value: ImageSortKeyType | null
   ) => {
     const selectedSortKey = value as ImageSortKeyType;
-    setSelectedImageSortKey(selectedSortKey);
 
     dispatch(
       projectSlice.actions.sortImagesBySelectedKey({
-        imageSortKey: selectedSortKey,
+        imageSortKey: selectedSortKey.imageSortKey,
       })
     );
   };

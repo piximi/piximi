@@ -46,7 +46,7 @@ import {
   selectActiveImageActivePlane,
   selectStagedAnnotations,
   selectWorkingAnnotation,
-  selectCategoryById,
+  selectAnnotationCategoryById,
   selectActiveImageScaledHeight,
   selectActiveImageScaledWidth,
 } from "store/data";
@@ -65,6 +65,7 @@ import {
 import { dimensions } from "utils/common";
 
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
+import { RootState } from "store/reducer/reducer";
 
 export const Stage = ({
   stageWidth,
@@ -108,8 +109,8 @@ export const Stage = ({
   const selectedAnnotationCategoryId = useSelector(
     selectedAnnotationCategoryIdSelector
   );
-  const selectedCategory = useSelector(
-    selectCategoryById(selectedAnnotationCategoryId)
+  const selectedCategory = useSelector((state: RootState) =>
+    selectAnnotationCategoryById(state, selectedAnnotationCategoryId!)
   );
   const selectionMode = useSelector(selectionModeSelector);
   const stagePosition = useSelector(stagePositionSelector);
@@ -311,7 +312,7 @@ export const Stage = ({
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool?.annotate(selectedCategory, activeImagePlane!);
+      annotationTool?.annotate(selectedCategory!, activeImagePlane!);
     };
     return func;
   }, [

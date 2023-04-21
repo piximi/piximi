@@ -256,7 +256,7 @@ const deserializeProjectGroup = async (
 
   const imagesGroup = getGroup(projectGroup, "images");
   const sortKeyName = getAttr(imagesGroup, "sort_key") as string;
-  const imageSortKey = sortKeyByName(sortKeyName);
+  const imageSortKey = sortKeyByName(sortKeyName).imageSortKey;
   const oldImages = await deserializeImagesGroup(imagesGroup);
   const annotations: Array<AnnotationType> = [];
   const images: Array<ImageType> = oldImages.map((image) => {

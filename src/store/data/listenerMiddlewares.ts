@@ -141,7 +141,7 @@ startAppListening({
       if (isUploadedFromAnnotator) {
         batch(() => {
           listenerAPI.dispatch(
-            dataSlice.actions.addStagedImages({ images: imagesToUpload })
+            dataSlice.actions.addImages({ images: imagesToUpload })
           );
           listenerAPI.dispatch(
             projectSlice.actions.selectImages({
@@ -193,7 +193,6 @@ startAppListening({
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageId,
   effect: async (action, listenerAPI) => {
-    console.log("...heard imageViewer.setActiveImageId");
     const newActiveId = action.payload.imageId;
     const newState = listenerAPI.getState();
     if (!newActiveId) {

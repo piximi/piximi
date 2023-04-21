@@ -7,7 +7,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice, selectAllCategories } from "store/data";
+import { dataSlice, selectAllImageCategories } from "store/data";
 import { imageViewerSlice } from "store/imageViewer";
 
 import { ImageType } from "types";
@@ -37,7 +37,7 @@ export const ImageMenu = ({
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(selectAllCategories);
+  const annotationCategories = useSelector(selectAllImageCategories);
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>

@@ -16,7 +16,7 @@ import {
 
 import { projectNameSelector } from "store/project";
 import {
-  selectAllCategories,
+  selectAllImageCategories,
   selectAllAnnotationCategories,
   selectSelectedImages,
 } from "store/data";
@@ -69,7 +69,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
   });
 
   const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const categories = useSelector(selectAllCategories);
+  const categories = useSelector(selectAllImageCategories);
   const projectName = useSelector(projectNameSelector);
 
   const {

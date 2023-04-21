@@ -1,4 +1,4 @@
-import { PayloadAction } from "@reduxjs/toolkit";
+import { Draft, PayloadAction } from "@reduxjs/toolkit";
 export declare type IsAny<T, True, False = never> = true | false extends (
   T extends never ? true : false
 )
@@ -94,6 +94,15 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     action: PayloadAction<T>
   ): S;
+  addOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entity: T
+  ): S;
+
+  addOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    action: PayloadAction<T>
+  ): S;
 
   addMany<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
@@ -101,6 +110,14 @@ export interface DeferredEntityStateAdapter<T> {
   ): S;
   addMany<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
+    entities: PayloadAction<readonly T[] | Record<EntityId, T>>
+  ): S;
+  addMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: readonly T[] | Record<EntityId, T>
+  ): S;
+  addMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
     entities: PayloadAction<readonly T[] | Record<EntityId, T>>
   ): S;
 
@@ -112,6 +129,14 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     action: PayloadAction<T>
   ): S;
+  setOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entity: T
+  ): S;
+  setOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    action: PayloadAction<T>
+  ): S;
   setMany<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
     entities: readonly T[] | Record<EntityId, T>
@@ -120,12 +145,28 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     entities: PayloadAction<readonly T[] | Record<EntityId, T>>
   ): S;
+  setMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: readonly T[] | Record<EntityId, T>
+  ): S;
+  setMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: PayloadAction<readonly T[] | Record<EntityId, T>>
+  ): S;
   setAll<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
     entities: readonly T[] | Record<EntityId, T>
   ): S;
   setAll<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
+    entities: PayloadAction<readonly T[] | Record<EntityId, T>>
+  ): S;
+  setAll<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: readonly T[] | Record<EntityId, T>
+  ): S;
+  setAll<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
     entities: PayloadAction<readonly T[] | Record<EntityId, T>>
   ): S;
 
@@ -137,7 +178,14 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     key: PayloadAction<EntityId>
   ): S;
-
+  removeOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    key: EntityId
+  ): S;
+  removeOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    key: PayloadAction<EntityId>
+  ): S;
   removeMany<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
     keys: readonly EntityId[]
@@ -146,9 +194,20 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     keys: PayloadAction<readonly EntityId[]>
   ): S;
+  removeMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    keys: readonly EntityId[]
+  ): S;
+  removeMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    keys: PayloadAction<readonly EntityId[]>
+  ): S;
 
   removeAll<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>
+  ): S;
+  removeAll<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>
   ): S;
 
   updateOne<S extends DeferredEntityState<T>>(
@@ -157,6 +216,14 @@ export interface DeferredEntityStateAdapter<T> {
   ): S;
   updateOne<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
+    update: PayloadAction<Changes<T>>
+  ): S;
+  updateOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    update: Changes<T>
+  ): S;
+  updateOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
     update: PayloadAction<Changes<T>>
   ): S;
 
@@ -168,6 +235,14 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     updates: PayloadAction<ReadonlyArray<Changes<T>>>
   ): S;
+  updateMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    updates: ReadonlyArray<Changes<T>>
+  ): S;
+  updateMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    updates: PayloadAction<ReadonlyArray<Changes<T>>>
+  ): S;
 
   upsertOne<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
@@ -175,6 +250,14 @@ export interface DeferredEntityStateAdapter<T> {
   ): S;
   upsertOne<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
+    entity: PayloadAction<T>
+  ): S;
+  upsertOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entity: T
+  ): S;
+  upsertOne<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
     entity: PayloadAction<T>
   ): S;
 
@@ -186,12 +269,28 @@ export interface DeferredEntityStateAdapter<T> {
     state: DeferredPreventAny<S, T>,
     entities: PayloadAction<readonly T[] | Record<EntityId, T>>
   ): S;
+  upsertMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: readonly T[] | Record<EntityId, T>
+  ): S;
+  upsertMany<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    entities: PayloadAction<readonly T[] | Record<EntityId, T>>
+  ): S;
   reconcile<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
     keep: boolean
   ): S;
   reconcile<S extends DeferredEntityState<T>>(
     state: DeferredPreventAny<S, T>,
+    keep: PayloadAction<boolean>
+  ): S;
+  reconcile<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
+    keep: boolean
+  ): S;
+  reconcile<S extends DeferredEntityState<T>>(
+    state: Draft<DeferredPreventAny<S, T>>,
     keep: PayloadAction<boolean>
   ): S;
 }

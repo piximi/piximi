@@ -5,7 +5,7 @@ import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
 import { applicationSlice } from "store/application";
-import { dataSlice, selectAllCategories } from "store/data";
+import { dataSlice, selectAllImageCategories } from "store/data";
 
 import { Category } from "types";
 
@@ -28,7 +28,7 @@ export const ImageCategoryMenu = ({
   open,
   container,
 }: ImageCategoryMenuProps) => {
-  const categories = useSelector(selectAllCategories);
+  const categories = useSelector(selectAllImageCategories);
 
   const dispatch = useDispatch();
 

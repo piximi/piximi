@@ -50,14 +50,13 @@ export {
 } from "./selectors/annotationSelectors";
 
 export {
-  selectAllCategories,
-  selectCategoryById,
-  selectCategoryEntities,
-  selectCreatedCategories,
-  selectCreatedCategoryCount,
-  selectImageCategories,
-  selectUnusedCategoryColors,
-  selectVisibleCategories,
+  selectAllImageCategories,
+  selectImageCategoryById,
+  selectImageCategoryEntities,
+  selectCreatedImageCategories,
+  selectCreatedImageCategoryCount,
+  selectUnusedImageCategoryColors,
+  selectVisibleImageCategories,
   selectVisibleCategoryIds,
 } from "./selectors/imageCategorySelectors";
 

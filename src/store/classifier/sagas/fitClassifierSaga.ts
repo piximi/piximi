@@ -18,11 +18,11 @@ import {
 } from "store/classifier";
 import {
   dataSlice,
-  selectCreatedCategories,
+  selectCreatedImageCategories,
   selectTrainingImages,
   selectValidationImages,
   selectInferenceImages,
-  selectCreatedCategoryCount,
+  selectCreatedImageCategoryCount,
 } from "store/data";
 import { applicationSlice } from "store/application";
 import { compile } from "store/common";
@@ -57,6 +57,7 @@ export function* fitClassifierSaga({
     typeof classifierTrainingPercentageSelector
   > = yield select(classifierTrainingPercentageSelector);
 
+  // TODO: need only ids
   const categorizedImages: ReturnType<typeof selectInferenceImages> =
     yield select(selectInferenceImages);
 
@@ -98,7 +99,7 @@ export function* fitClassifierSaga({
     typeof classifierArchitectureOptionsSelector
   > = yield select(classifierArchitectureOptionsSelector);
 
-  const classes: number = yield select(selectCreatedCategoryCount);
+  const classes: number = yield select(selectCreatedImageCategoryCount);
 
   var model: ReturnType<typeof classifierCompiledSelector>;
   if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
@@ -135,9 +136,8 @@ export function* fitClassifierSaga({
     classifierSlice.actions.updateCompiled({ compiled: compiledModel })
   );
 
-  const categories: ReturnType<typeof selectCreatedCategories> = yield select(
-    selectCreatedCategories
-  );
+  const categories: ReturnType<typeof selectCreatedImageCategories> =
+    yield select(selectCreatedImageCategories);
   const trainImages: ReturnType<typeof selectTrainingImages> = yield select(
     selectTrainingImages
   );

@@ -21,7 +21,7 @@ import {
   classifierEvaluationFlagSelector,
   classifierSlice,
 } from "store/classifier";
-import { selectCreatedCategories } from "store/data";
+import { selectCreatedImageCategories } from "store/data";
 
 import { Category } from "types";
 
@@ -37,7 +37,7 @@ export const EvaluateClassifierListItem = (
   const dispatch = useDispatch();
   const t = useTranslation();
 
-  const categories: Category[] = useSelector(selectCreatedCategories);
+  const categories: Category[] = useSelector(selectCreatedImageCategories);
   const evaluationResult = useSelector(classifierEvaluationResultSelector);
   const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
   const evaluationFlag = useSelector(classifierEvaluationFlagSelector);

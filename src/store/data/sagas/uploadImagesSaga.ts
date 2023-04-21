@@ -130,7 +130,7 @@ export function* uploadImagesSaga({
 
   if (imagesToUpload.length) {
     if (isUploadedFromAnnotator) {
-      yield put(dataSlice.actions.addStagedImages({ images: imagesToUpload }));
+      yield put(dataSlice.actions.addImages({ images: imagesToUpload }));
       yield put(
         projectSlice.actions.selectImages({
           imageIds: imagesToUpload.map((image) => image.id),

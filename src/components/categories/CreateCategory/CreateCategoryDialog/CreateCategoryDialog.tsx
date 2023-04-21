@@ -19,8 +19,8 @@ import { ColorIcon } from "components/common/ColorIcon";
 
 import {
   dataSlice,
-  selectAllCategories,
-  selectUnusedCategoryColors,
+  selectAllImageCategories,
+  selectUnusedImageCategoryColors,
 } from "store/data";
 
 import { CategoryType, HotkeyView } from "types";
@@ -38,8 +38,8 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const dispatch = useDispatch();
 
-  const availableColors = useSelector(selectUnusedCategoryColors);
-  const usedCategory = useSelector(selectAllCategories);
+  const availableColors = useSelector(selectUnusedImageCategoryColors);
+  const usedCategory = useSelector(selectAllImageCategories);
 
   const [color, setColor] = useState<string>(sample(availableColors)!);
   const [name, setName] = useState<string>("");

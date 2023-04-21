@@ -118,13 +118,6 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
     }
   };
 
-  React.useEffect(() => {
-    console.log("~* ImageList *~");
-    console.log(" --- activeImageId: ", activeImageId);
-    console.log(" --- images: ", images);
-    console.log(" ");
-  });
-
   return (
     <>
       <Box

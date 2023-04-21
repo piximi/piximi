@@ -1,6 +1,11 @@
 import { EntityState } from "@reduxjs/toolkit";
 import { Category } from "./Category";
-import { AnnotationType, ImagesEntityType, stagedImageType } from "types";
+import {
+  AnnotationType,
+  ImageType,
+  ImagesEntityType,
+  stagedImageType,
+} from "types";
 import { StagedAnnotationType } from "./AnnotationType";
 import { DeferredEntityState } from "store/entities";
 
@@ -9,17 +14,10 @@ type ImageID = string;
 type AnnotationID = string;
 type AnnotationCatID = string;
 export type DataStoreSlice = {
-  categories_: DeferredEntityState<Category>;
-  annotationCategories_: DeferredEntityState<Category>;
-  categories: {
-    ids: Array<CatID>;
-    entities: { [key: CatID]: Category };
-  };
-  annotationCategories: {
-    ids: Array<AnnotationCatID>;
-    entities: { [key: AnnotationCatID]: Category };
-  };
+  annotationCategories: DeferredEntityState<Category>;
+  categories: DeferredEntityState<Category>;
   images: { ids: Array<ImageID>; entities: ImagesEntityType };
+  images_: DeferredEntityState<ImageType>;
   stagedImages: EntityState<stagedImageType>;
   annotations: EntityState<AnnotationType>;
   stagedAnnotations: EntityState<StagedAnnotationType>;

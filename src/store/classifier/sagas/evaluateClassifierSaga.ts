@@ -13,7 +13,10 @@ import {
   classifierPreprocessOptionsSelector,
   classifierFitOptionsSelector,
 } from "store/classifier";
-import { selectCreatedCategories, selectValidationImages } from "store/data";
+import {
+  selectCreatedImageCategories,
+  selectValidationImages,
+} from "store/data";
 import { AlertStateType, AlertType, Category, ImageType } from "types";
 import { getStackTraceFromError } from "utils";
 
@@ -41,9 +44,8 @@ export function* evaluateClassifierSaga({
 
   yield put(applicationSlice.actions.hideAlertState({}));
 
-  const categories: ReturnType<typeof selectCreatedCategories> = yield select(
-    selectCreatedCategories
-  );
+  const categories: ReturnType<typeof selectCreatedImageCategories> =
+    yield select(selectCreatedImageCategories);
 
   const outputLayerSize = model.outputs[0].shape[1] as number;
 

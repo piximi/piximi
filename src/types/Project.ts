@@ -1,8 +1,8 @@
-import { ImageSortKeyType } from "./ImageSortType";
+import { ImageSortKey } from "./ImageSortType";
 
 export type Project = {
   name: string;
   selectedImageIds: Array<string>;
-  imageSortKey: ImageSortKeyType;
+  imageSortKey: ImageSortKey;
   highlightedCategory: string | null;
 };
