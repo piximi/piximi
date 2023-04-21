@@ -14,8 +14,53 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
+<<<<<<< HEAD
 import { availableSegmenterModels } from "types/ModelType";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+||||||| parent of aea4e5ca ([mod] Add model architecture to type)
+import { availableSegmenterModels, SegmenterModelProps } from "types";
+
+export const SegmenterArchitectureSettingsGrid = ({
+  setIsModelPretrained,
+  isModelPretrained,
+}: {
+  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelPretrained: boolean;
+}) => {
+  const architectureOptions = useSelector(segmenterArchitectureOptionsSelector);
+  const userUploadedModel = useSelector(segmenterUserUploadedModelSelector);
+  const inputShape = useSelector(segmenterInputShapeSelector);
+
+  const [selectedModel, setSelectedModel] = React.useState<SegmenterModelProps>(
+    architectureOptions.selectedModel
+  );
+  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
+    React.useState<boolean>(false);
+  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
+    React.useState<string>("");
+=======
+import { availableSegmenterModels, SegmenterModelProps } from "types";
+import { ModelArchitecture } from "types/ModelType";
+
+export const SegmenterArchitectureSettingsGrid = ({
+  setIsModelPretrained,
+  isModelPretrained,
+}: {
+  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelPretrained: boolean;
+}) => {
+  const architectureOptions = useSelector(segmenterArchitectureOptionsSelector);
+  const userUploadedModel = useSelector(segmenterUserUploadedModelSelector);
+  const inputShape = useSelector(segmenterInputShapeSelector);
+
+  const [selectedModel, setSelectedModel] = React.useState<SegmenterModelProps>(
+    architectureOptions.selectedModel
+  );
+  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
+    React.useState<boolean>(false);
+  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
+    React.useState<string>("");
+>>>>>>> aea4e5ca ([mod] Add model architecture to type)
 
 export const SegmenterArchitectureSettingsGrid = () => {
   const dispatch = useDispatch();
@@ -85,6 +130,14 @@ export const SegmenterArchitectureSettingsGrid = () => {
       setFixedNumberOfChannelsHelperText(
         `${selectedModel.name} requires ${selectedModel.requiredChannels} channels!`
       );
+<<<<<<< HEAD
+||||||| parent of aea4e5ca ([mod] Add model architecture to type)
+    } else if (selectedModel.modelArch && selectedModel.modelArch === "graph") {
+      setIsModelPretrained(true);
+=======
+    } else if (selectedModel.modelArch === ModelArchitecture.Graph) {
+      setIsModelPretrained(true);
+>>>>>>> aea4e5ca ([mod] Add model architecture to type)
     } else {
       setFixedNumberOfChannels(false);
       setFixedNumberOfChannelsHelperText("");
@@ -109,7 +162,19 @@ export const SegmenterArchitectureSettingsGrid = () => {
               />
             )}
             value={selectedModel}
+<<<<<<< HEAD
             isOptionEqualToValue={(option, value) => value.name === option.name}
+||||||| parent of aea4e5ca ([mod] Add model architecture to type)
+            isOptionEqualToValue={(option, value) =>
+              option.modelType === value.modelType &&
+              option.modelName === value.modelName
+            }
+=======
+            isOptionEqualToValue={(option, value) =>
+              option.theModel === value.theModel &&
+              option.modelName === value.modelName
+            }
+>>>>>>> aea4e5ca ([mod] Add model architecture to type)
           />
         </Grid>
       </Grid>
