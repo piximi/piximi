@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -13,10 +13,7 @@ import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
-import {
-  selectAllAnnotationCategories,
-  selectCreatedAnnotatorCategories,
-} from "store/data";
+import { selectCreatedAnnotatorCategories } from "store/data";
 
 import {
   segmenterArchitectureOptionsSelector,
@@ -35,7 +32,6 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotatorCategories);
-  const t = useSelector(selectAllAnnotationCategories);
   const fittedSegmenter = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
     segmenterArchitectureOptionsSelector
@@ -98,10 +94,6 @@ export const SegmenterList = () => {
       </Tooltip>
     </>
   );
-
-  useEffect(() => {
-    console.log(t);
-  }, [t]);
 
   return (
     <>

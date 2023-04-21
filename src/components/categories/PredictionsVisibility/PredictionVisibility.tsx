@@ -14,6 +14,8 @@ import { useTranslation } from "hooks";
 import { classifierSlice } from "store/classifier";
 import { dataSlice, selectInferenceImages } from "store/data";
 
+//TODO: need full image selector here?
+
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();
 

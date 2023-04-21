@@ -20,14 +20,14 @@ import {
   uploadUserSelectedModel,
 } from "store/classifier";
 
-import { selectCreatedCategories } from "store/data";
+import { selectCreatedImageCategories } from "store/data";
 
 import { Category, CategoryType, HotkeyView, ModelType, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { UNKNOWN_CLASS_CATEGORY } from "types/Category";
 
 export const ClassifierList = () => {
-  const categories = useSelector(selectCreatedCategories);
+  const categories = useSelector(selectCreatedImageCategories);
   const unknownCategory = UNKNOWN_CLASS_CATEGORY;
   const predicted = useSelector(classifierPredictedSelector);
   const fittedClassifier = useSelector(classifierFittedSelector);

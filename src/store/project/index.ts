@@ -10,7 +10,10 @@ export {
 // Selectors
 
 export { highlightedCategoriesSelector } from "./selectors/highlightedCategorySelector";
-export { imageSortKeySelector } from "./selectors/imageSortKeySelector";
+export {
+  imageSortKeySelector,
+  selectImageSortType,
+} from "./selectors/imageSortKeySelector";
 export { projectSelector } from "./selectors/projectSelector";
 export { projectNameSelector } from "./selectors/projectNameSelector";
 

@@ -6,8 +6,8 @@ import { MenuItem, ListItemText } from "@mui/material";
 import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
 import {
   dataSlice,
-  selectAllCategories,
-  selectUnusedCategoryColors,
+  selectAllImageCategories,
+  selectUnusedImageCategoryColors,
   selectSelectedImages,
 } from "store/data";
 
@@ -33,13 +33,13 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const activeImageId = useSelector(activeImageIdSelector);
 
-  const existingAnnotationCategories = useSelector(selectAllCategories);
+  const existingAnnotationCategories = useSelector(selectAllImageCategories);
 
   const existingImages = useSelector(selectSelectedImages).map((image) => {
     return { ...image, annotations: [] } as ShadowImageType;
   });
 
-  const availableColors = useSelector(selectUnusedCategoryColors);
+  const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const onImportProjectFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, onClose: () => void) => {

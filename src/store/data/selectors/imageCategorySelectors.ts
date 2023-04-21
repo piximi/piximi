@@ -1,69 +1,67 @@
-import { DataStoreSlice } from "types";
 import { createSelector } from "@reduxjs/toolkit";
 import { UNKNOWN_CLASS_CATEGORY_ID } from "types/Category";
 import { sortBy } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
+import { categoriesAdapter } from "../dataSlice";
+import { RootState } from "store/reducer/reducer";
 
-export const selectImageCategories = ({ data }: { data: DataStoreSlice }) => {
-  return data.categories.ids;
-};
-export const selectAllCategories = ({ data }: { data: DataStoreSlice }) => {
-  return Object.values(data.categories.entities);
-};
-export const selectCategoryById =
-  (categoryId: string) =>
-  ({ data }: { data: DataStoreSlice }) => {
-    return data.categories.entities[categoryId];
-  };
+const imageCategorySelectors = categoriesAdapter.getSelectors(
+  (state: RootState) => state.data.categories
+);
 
-export const selectCreatedCategories = ({ data }: { data: DataStoreSlice }) => {
-  const categories = Object.values(data.categories.entities).filter(
-    (category) => category.id !== UNKNOWN_CLASS_CATEGORY_ID
-  );
+export const selectImageCategoryIds = imageCategorySelectors.selectIds;
+export const selectImageCategoryEntities =
+  imageCategorySelectors.selectEntities;
 
-  return sortBy(categories, "name");
-};
-export const selectCreatedCategoryCount = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return data.categories.ids.length - 1;
-};
+export const selectAllImageCategories = imageCategorySelectors.selectAll;
 
-export const selectUnusedCategoryColors = createSelector(
-  [({ data }: { data: DataStoreSlice }) => data.categories.entities],
-  (allCategories) => {
-    const usedCategoryColors = Object.values(allCategories).map(
-      (category) => category.color
+export const selectImageCategoryById = imageCategorySelectors.selectById;
+
+export const selectCreatedImageCategories = createSelector(
+  selectAllImageCategories,
+  (categories) => {
+    const filteredCategories = categories.filter(
+      (category) => category.id !== UNKNOWN_CLASS_CATEGORY_ID
     );
-    const unusedCategoryColors: Array<string> = [];
-    Object.values(CATEGORY_COLORS).forEach((color) => {
-      if (usedCategoryColors.includes(color)) return;
-      unusedCategoryColors.push(color);
-    });
-    return unusedCategoryColors;
+    return sortBy(filteredCategories, "name");
+  }
+);
+export const selectCreatedImageCategoryCount = createSelector(
+  selectImageCategoryIds,
+  (ids) => {
+    return ids.length - 1;
   }
 );
 
-export const selectCategoryEntities = ({ data }: { data: DataStoreSlice }) => {
-  return data.categories.entities;
-};
-
-export const selectVisibleCategories = createSelector(
-  [selectCategoryEntities],
-  (categoryEntities) => {
-    return Object.values(categoryEntities).filter(
-      (category) => category.visible
-    );
+export const selectVisibleImageCategories = createSelector(
+  selectAllImageCategories,
+  (entities) => {
+    return entities.filter((entity) => entity.visible);
   }
 );
 
 export const selectVisibleCategoryIds = createSelector(
-  [selectCategoryEntities],
-  (categoryEntities) => {
-    return Object.keys(categoryEntities).filter(
-      (categoryId) => categoryEntities[categoryId].visible
-    );
+  [selectVisibleImageCategories],
+  (visibleCategories) => {
+    return visibleCategories.map((category) => category.id);
+  }
+);
+
+export const selectUsedImageCategoryColors = createSelector(
+  selectCreatedImageCategories,
+  (categories) => {
+    return categories.map((category) => category.color);
+  }
+);
+
+export const selectUnusedImageCategoryColors = createSelector(
+  selectUsedImageCategoryColors,
+  (usedColors) => {
+    const unusedCategoryColors: Array<string> = [];
+    Object.values(CATEGORY_COLORS).forEach((color) => {
+      if (usedColors.includes(color)) return;
+      unusedCategoryColors.push(color);
+    });
+    return unusedCategoryColors;
   }
 );

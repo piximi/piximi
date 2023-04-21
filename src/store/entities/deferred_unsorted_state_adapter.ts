@@ -239,6 +239,7 @@ export function createUnsortedDeferredStateAdapter<T>(
   }
 
   return {
+    //@ts-ignore
     removeAll: createSingleArgumentDeferredStateOperator(removeAllMutably),
     addOne: createDeferredStateOperator(addOneMutably),
     addMany: createDeferredStateOperator(addManyMutably),

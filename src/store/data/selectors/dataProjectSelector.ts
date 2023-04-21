@@ -21,7 +21,11 @@ export const dataProjectSelector = ({
 
   return {
     images,
-    categories: Object.values(data.categories.entities),
-    annotationCategories: Object.values(data.annotationCategories.entities),
+    categories: Object.values(data.categories.entities).map(
+      (entity) => entity.saved
+    ),
+    annotationCategories: Object.values(data.annotationCategories.entities).map(
+      (entity) => entity.saved
+    ),
   };
 };

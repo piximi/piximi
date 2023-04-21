@@ -4,6 +4,12 @@ import { DataStoreSlice, ImageType, Partition } from "types";
 
 import { selectVisibleCategoryIds } from "./imageCategorySelectors";
 import { mutatingFilter } from "utils/common/helpers";
+// import { imagesAdapter } from "../dataSlice";
+// import { RootState } from "store/reducer/reducer";
+
+// const imageSelectors = imagesAdapter.getSelectors(
+//   (state: RootState) => state.data.images_
+// );
 
 export const selectImageCount = ({ data }: { data: DataStoreSlice }) => {
   return data.images.ids.length;
@@ -138,12 +144,6 @@ export const selectImageViewerImages = createSelector(
     let returnedImages = imageIds.map((imageId) => {
       return { ...imageEntities[imageId], ...stagedImageEntities[imageId] };
     });
-    console.log("~* selectImageViewerImages *~");
-    console.log(" --- selectedImageIds: ", imageIds);
-    console.log(" --- imageEntities: ", imageEntities);
-    console.log(" --- stagedImageEntities: ", stagedImageEntities);
-    console.log(" --- returnedImages: ", returnedImages);
-    console.log(" ");
 
     return returnedImages;
   }

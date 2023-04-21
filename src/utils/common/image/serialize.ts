@@ -13,6 +13,7 @@ import {
   Category,
 } from "types";
 import { Colors } from "types/tensorflow";
+import { sortTypeByKey } from "types/ImageSortType";
 
 /* 
    =====================
@@ -135,10 +136,8 @@ const serializeProject = (
   projectGroup.create_attribute("name", project.name);
 
   const imagesGroup = projectGroup.create_group("images");
-  imagesGroup.create_attribute(
-    "sort_key",
-    project.imageSortKey.imageSortKeyName
-  );
+  const imageSortKeyName = sortTypeByKey(project.imageSortKey).imageSortKeyName;
+  imagesGroup.create_attribute("sort_key", imageSortKeyName);
   serializeImages(imagesGroup, data.images);
 
   const categoriesGroup = projectGroup.create_group("categories");

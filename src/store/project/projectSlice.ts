@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Project } from "types/Project";
-import { defaultImageSortKey, ImageSortKeyType } from "types/ImageSortType";
+import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
 
 export const initialState: Project = {
   selectedImageIds: [],
   name: "Untitled project",
-  imageSortKey: defaultImageSortKey,
+  imageSortKey: defaultImageSortKey.imageSortKey,
   highlightedCategory: null,
 };
 
@@ -58,7 +58,7 @@ export const projectSlice = createSlice({
 
     createNewProject(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
-      state.imageSortKey = defaultImageSortKey;
+      state.imageSortKey = defaultImageSortKey.imageSortKey;
     },
     setProject(state, action: PayloadAction<{ project: Project }>) {
       // WARNING, don't do below (overwrites draft object)
@@ -67,7 +67,7 @@ export const projectSlice = createSlice({
     },
     sortImagesBySelectedKey(
       state,
-      action: PayloadAction<{ imageSortKey: ImageSortKeyType }>
+      action: PayloadAction<{ imageSortKey: ImageSortKey }>
     ) {
       const selectedSortKey = action.payload.imageSortKey;
       state.imageSortKey = selectedSortKey;

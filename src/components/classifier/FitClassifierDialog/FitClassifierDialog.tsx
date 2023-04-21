@@ -38,6 +38,7 @@ type FitClassifierDialogProps = {
   openedDialog: boolean;
 };
 
+//TODO: need full inference images here, or just count?
 export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
 

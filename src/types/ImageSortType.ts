@@ -48,3 +48,14 @@ export const sortKeyByName = (name: string): ImageSortKeyType => {
     return defaultImageSortKey;
   }
 };
+export const sortTypeByKey = (key: ImageSortKey): ImageSortKeyType => {
+  const sortKeyIdx = availableImageSortKeys
+    .map((e) => e.imageSortKey)
+    .indexOf(key);
+
+  if (sortKeyIdx >= 0) {
+    return availableImageSortKeys[sortKeyIdx];
+  } else {
+    return defaultImageSortKey;
+  }
+};

@@ -15,7 +15,7 @@ import {
 import { applicationSlice } from "store/application";
 import {
   dataSlice,
-  selectCreatedCategories,
+  selectCreatedImageCategories,
   selectInferenceImages,
 } from "store/data";
 
@@ -40,9 +40,8 @@ export function* predictClassifierSaga({
     selectInferenceImages
   );
 
-  const categories: ReturnType<typeof selectCreatedCategories> = yield select(
-    selectCreatedCategories
-  );
+  const categories: ReturnType<typeof selectCreatedImageCategories> =
+    yield select(selectCreatedImageCategories);
 
   const architectureOptions: ReturnType<
     typeof classifierArchitectureOptionsSelector
