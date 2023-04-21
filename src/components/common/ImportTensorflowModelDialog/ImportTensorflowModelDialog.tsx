@@ -12,11 +12,11 @@ import { CloudUpload } from "./CloudUpload";
 import {
   DefaultModelProps,
   HotkeyView,
-  ModelType,
   Shape,
   availableClassifierModels,
   availableSegmenterModels,
 } from "types";
+import { ModelArchitecture, TheModel } from "types/ModelType";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -25,9 +25,9 @@ type ImportTensorflowModelDialogProps = {
   dispatchFunction: (
     inputShape: Shape,
     modelName: string,
-    modelType: number,
+    theModel: TheModel,
     classifierModel: any,
-    modelArch: string
+    modelArch: ModelArchitecture
   ) => void;
 };
 
@@ -44,7 +44,9 @@ export const ImportTensorflowModelDialog = ({
   const [segmentationModel, setSegmentationModel] = useState<
     GraphModel | LayersModel | undefined
   >();
-  const [modelArch, setModelArch] = useState<string>("graph");
+  const [modelArch, setModelArch] = useState<ModelArchitecture>(
+    ModelArchitecture.Graph
+  );
   const [modelName, setModelName] = useState<string>("");
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
@@ -53,15 +55,15 @@ export const ImportTensorflowModelDialog = ({
     planes: 1,
   });
   const [pretrainedModels, setPretrainedModels] = useState<
-    Array<{ name: string; type: ModelType }>
+    Array<{ name: string; theModel: TheModel }>
   >([]);
-  const [modelType, setModelType] = useState<number>(0);
+  const [theModel, setTheModel] = useState<number>(0);
 
   const dispatchModelToStore = () => {
     dispatchFunction(
       inputShape,
       modelName,
-      modelType,
+      theModel,
       modelKind === "Classification" ? classifierModel : segmentationModel,
       modelArch
     );
@@ -86,13 +88,13 @@ export const ImportTensorflowModelDialog = ({
       modelKind === "Classification"
         ? availableClassifierModels.reduce(
             (
-              trainedModels: Array<{ name: string; type: ModelType }>,
+              trainedModels: Array<{ name: string; theModel: TheModel }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
                 trainedModels.push({
                   name: model.modelName,
-                  type: model.modelType,
+                  theModel: model.theModel,
                 });
               }
               return trainedModels;
@@ -101,13 +103,13 @@ export const ImportTensorflowModelDialog = ({
           )
         : availableSegmenterModels.reduce(
             (
-              trainedModels: Array<{ name: string; type: ModelType }>,
+              trainedModels: Array<{ name: string; theModel: TheModel }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
                 trainedModels.push({
                   name: model.modelName,
-                  type: model.modelType,
+                  theModel: model.theModel,
                 });
               }
               return trainedModels;
@@ -123,7 +125,7 @@ export const ImportTensorflowModelDialog = ({
       <DialogTitle>Import {modelKind} model</DialogTitle>
 
       <LocalFileUpload
-        modelType={modelKind}
+        modelKind={modelKind}
         modelArch={modelArch}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}
@@ -132,15 +134,18 @@ export const ImportTensorflowModelDialog = ({
       />
 
       <PretrainedModelSelector
-        values={[{ name: "None", type: ModelType.None }, ...pretrainedModels]}
+        values={[
+          { name: "None", theModel: TheModel.None },
+          ...pretrainedModels,
+        ]}
         setSegmentationModel={setSegmentationModel}
         setInputShape={setInputShape}
         setModelName={setModelName}
-        setModelType={setModelType}
+        setTheModel={setTheModel}
       />
 
       <CloudUpload
-        modelType={modelKind}
+        modelKind={modelKind}
         modelArch={modelArch}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}

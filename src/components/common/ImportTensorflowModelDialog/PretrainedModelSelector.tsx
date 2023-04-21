@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ModelType, Shape } from "types";
+import { TheModel, Shape } from "types";
 import { loadStardist } from "utils/common/model-loaders";
 
 export const PretrainedModelSelector = ({
@@ -19,9 +19,9 @@ export const PretrainedModelSelector = ({
   setSegmentationModel,
   setInputShape,
   setModelName,
-  setModelType,
+  setTheModel,
 }: {
-  values: Array<{ name: string; type: ModelType }>;
+  values: Array<{ name: string; theModel: TheModel }>;
   setSegmentationModel: React.Dispatch<
     React.SetStateAction<
       LayersModel | GraphModel<string | io.IOHandler> | undefined
@@ -29,20 +29,20 @@ export const PretrainedModelSelector = ({
   >;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
   setModelName: React.Dispatch<React.SetStateAction<string>>;
-  setModelType: React.Dispatch<React.SetStateAction<number>>;
+  setTheModel: React.Dispatch<React.SetStateAction<TheModel>>;
 }) => {
   const [errMessage, setErrMessage] = useState<string>("");
   const [selectedPreTrainedModel, setSelectedPreTrainedModel] =
-    useState<number>(ModelType.None);
+    useState<number>(TheModel.None);
 
   const handlePreTrainedModelChange = async (event: SelectChangeEvent) => {
     setSelectedPreTrainedModel(Number(event.target.value));
-    setModelType(Number(event.target.value));
+    setTheModel(Number(event.target.value));
     await loadModel(Number(event.target.value));
   };
 
   const loadModel = async (selectedPreTrainedModel: number) => {
-    if (selectedPreTrainedModel === ModelType.StardistVHE) {
+    if (selectedPreTrainedModel === TheModel.StardistVHE) {
       try {
         const model = await loadStardist();
         setSegmentationModel(model);
@@ -56,11 +56,21 @@ export const PretrainedModelSelector = ({
           channels: modelShape[2],
         }));
 
-        setModelName(ModelType[selectedPreTrainedModel]);
+        setModelName(TheModel[selectedPreTrainedModel]);
       } catch (err) {
         const error: Error = err as Error;
         setErrMessage(error.message);
       }
+    } else if (selectedPreTrainedModel === TheModel.CocoSSD) {
+      // const model = await loadCocoSSD();
+      // const modelShape = model.inputs[0].shape!.slice(1) as number[];
+      // setInputShape((prevShape) => ({
+      //   ...prevShape,
+      //   height: modelShape[0],
+      //   width: modelShape[1],
+      //   channels: modelShape[2],
+      // }));
+      // setSegmentationModel(undefined);
     }
   };
 
@@ -84,7 +94,10 @@ export const PretrainedModelSelector = ({
             onChange={handlePreTrainedModelChange}
           >
             {values.map((model) => (
-              <MenuItem key={`Pretrained-${model.type}`} value={model.type}>
+              <MenuItem
+                key={`Pretrained-${model.theModel}`}
+                value={model.theModel}
+              >
                 {model.name}
               </MenuItem>
             ))}
