@@ -1,4 +1,4 @@
-import { ModelType, SegmenterArchitectureOptions } from "types";
+import { TheModel, SegmenterArchitectureOptions } from "types";
 import {
   createFCNSegmenterModel,
   createSimpleFCNSegmenterModel,
@@ -8,14 +8,14 @@ export const createSegmentationModel = async (
   architectureOptions: SegmenterArchitectureOptions,
   numClasses: number
 ) => {
-  switch (architectureOptions.selectedModel.modelType) {
-    case ModelType.FCNSegmenter: {
+  switch (architectureOptions.selectedModel.theModel) {
+    case TheModel.FCNSegmenter: {
       return createFCNSegmenterModel(
         architectureOptions.inputShape,
         numClasses
       );
     }
-    case ModelType.SimpleFCNSegmenter: {
+    case TheModel.SimpleFCNSegmenter: {
       return createSimpleFCNSegmenterModel(
         architectureOptions.inputShape,
         numClasses

@@ -1,4 +1,4 @@
-import { ClassifierArchitectureOptions, ModelType } from "types";
+import { ClassifierArchitectureOptions, TheModel } from "types";
 import { createSimpleCNN } from "../../coroutine-models/simpleCNN";
 import { createMobileNet } from "../../coroutine-models/mobileNet";
 
@@ -6,11 +6,11 @@ export const createClassifierModel = async (
   modelOptions: ClassifierArchitectureOptions,
   classes: number
 ) => {
-  switch (modelOptions.selectedModel.modelType) {
-    case ModelType.SimpleCNN: {
+  switch (modelOptions.selectedModel.theModel) {
+    case TheModel.SimpleCNN: {
       return createSimpleCNN(modelOptions.inputShape, classes);
     }
-    case ModelType.MobileNet: {
+    case TheModel.MobileNet: {
       return createMobileNet(modelOptions.inputShape, classes);
     }
     default: {

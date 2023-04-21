@@ -230,7 +230,9 @@ const serializeModelProps = (
 
   modelPropsGroup.create_attribute("model_name", modelProps.modelName);
 
-  modelPropsGroup.create_attribute("model_type", modelProps.modelType);
+  modelPropsGroup.create_attribute("the_model", modelProps.theModel);
+
+  modelPropsGroup.create_attribute("model_arch", modelProps.modelArch);
 
   modelProps.requiredChannels &&
     modelPropsGroup.create_attribute(

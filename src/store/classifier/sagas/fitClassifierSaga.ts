@@ -28,7 +28,7 @@ import { compile } from "store/coroutines";
 import {
   AlertStateType,
   AlertType,
-  ModelType,
+  TheModel,
   Partition,
   ImageType,
 } from "types";
@@ -102,7 +102,7 @@ export function* fitClassifierSaga({
   const classes: number = yield select(selectCreatedImageCategoryCount);
 
   var model: ReturnType<typeof classifierCompiledSelector>;
-  if (architectureOptions.selectedModel.modelType === ModelType.UserUploaded) {
+  if (architectureOptions.selectedModel.theModel === TheModel.UserUploaded) {
     model = yield select(classifierCompiledSelector);
   } else {
     try {

@@ -28,9 +28,9 @@ import {
   Shape,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ObjectDetectionType,
-  ModelType,
-  DecodedAnnotationType,
   ImageType,
+  TheModel,
+  DecodedAnnotationType,
 } from "types";
 import { getStackTraceFromError } from "utils";
 import COCO_CLASSES from "data/model-data/cocossd-classes";
@@ -69,6 +69,7 @@ export function* predictSegmenterSaga({
   }
 
   // assign each of the inference images to the validation partition
+  // TODO - segmenter: they should go in the inference partition
   yield put(
     dataSlice.actions.updateSegmentationImagesPartition({
       imageIdsByPartition: {
@@ -90,7 +91,7 @@ export function* predictSegmenterSaga({
 
   let possibleClasses: { [key: string]: ObjectDetectionType } = {};
 
-  if (selectedModel.modelType === ModelType.CocoSSD) {
+  if (selectedModel.theModel === TheModel.CocoSSD) {
     possibleClasses = COCO_CLASSES;
   }
 
@@ -134,7 +135,7 @@ export function* predictSegmenterSaga({
     fitOptions,
     model,
     possibleClasses,
-    selectedModel.modelType
+    selectedModel.theModel
   );
 
   yield put(
@@ -153,7 +154,7 @@ function* runSegmentationPrediction(
   fitOptions: FitOptions,
   model: LayersModel | GraphModel,
   possibleClasses: { [key: string]: ObjectDetectionType },
-  selectedModelType: ModelType
+  selectedModel: TheModel
 ) {
   var predictions:
     | Awaited<ReturnType<typeof predictCoco>>
@@ -164,8 +165,8 @@ function* runSegmentationPrediction(
     annotations: DecodedAnnotationType[];
   }>;
   var foundCategories: Category[];
-  switch (selectedModelType) {
-    case ModelType.CocoSSD:
+  switch (selectedModel) {
+    case TheModel.CocoSSD:
       try {
         predictions = yield predictCoco(
           model as GraphModel,
@@ -183,7 +184,7 @@ function* runSegmentationPrediction(
         return;
       }
       break;
-    case ModelType.StardistVHE:
+    case TheModel.StardistVHE:
       try {
         predictions = yield predictStardist(
           model as GraphModel,
