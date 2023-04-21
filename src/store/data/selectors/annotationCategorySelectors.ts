@@ -5,12 +5,9 @@ import { RootState } from "store/reducer/reducer";
 import { createSelector } from "@reduxjs/toolkit";
 import { selectedAnnotationCategoryIdSelector } from "store/imageViewer";
 
-export const annotationCategorySelectors =
-  annotationCategoriesAdapter.getSelectors(
-    (state: RootState) => state.data.annotationCategories_
-  );
-export const selectAllAnnotationCategories =
-  annotationCategorySelectors.selectAll;
+const annotationCategorySelectors = annotationCategoriesAdapter.getSelectors(
+  (state: RootState) => state.data.annotationCategories
+);
 
 export const selectAnnotationCategoryIds =
   annotationCategorySelectors.selectIds;
@@ -18,12 +15,8 @@ export const selectAnnotationCategoryIds =
 export const selectAnnotationCategoryEntities =
   annotationCategorySelectors.selectEntities;
 
-export const selectAllVisibleAnnotationCategories = createSelector(
-  selectAllAnnotationCategories,
-  (entities) => {
-    return entities.filter((entity) => entity.visible);
-  }
-);
+export const selectAllAnnotationCategories =
+  annotationCategorySelectors.selectAll;
 
 export const selectAnnotationCategoryById =
   annotationCategorySelectors.selectById;
@@ -36,6 +29,19 @@ export const selectCreatedAnnotatorCategories = createSelector(
     );
 
     return sortBy(filteredCategories, "name");
+  }
+);
+export const selectCreatedAnnotationCategoryCount = createSelector(
+  selectAnnotationCategoryIds,
+  (ids) => {
+    return ids.length - 1;
+  }
+);
+
+export const selectAllVisibleAnnotationCategories = createSelector(
+  selectAllAnnotationCategories,
+  (entities) => {
+    return entities.filter((entity) => entity.visible);
   }
 );
 
