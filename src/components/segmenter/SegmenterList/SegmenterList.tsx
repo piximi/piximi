@@ -21,8 +21,9 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import { CategoryType, HotkeyView, ModelType, Shape } from "types";
+import { CategoryType, HotkeyView, TheModel, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelArchitecture } from "types/ModelType";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
@@ -47,16 +48,16 @@ export const SegmenterList = () => {
   const importSegmentationModel = (
     inputShape: Shape,
     modelName: string,
-    modelType: number,
+    theModel: number,
     segmentationModel: any,
-    modelArch: string
+    modelArch: ModelArchitecture
   ) => {
     dispatch(
       segmenterSlice.actions.uploadUserSelectedModel({
         inputShape: inputShape,
         modelSelection: {
           modelName: modelName,
-          modelType: modelType as ModelType,
+          theModel: theModel as TheModel,
           modelArch: modelArch,
         },
         model: segmentationModel as GraphModel,
@@ -119,7 +120,7 @@ export const SegmenterList = () => {
       <SaveFittedModelDialog
         fittedModel={fittedSegmenter as LayersModel}
         modelProps={selectedSegmenterModelProps}
-        modelTypeString={"Segmenter"}
+        modelKind={"Segmenter"}
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}
       />

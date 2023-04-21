@@ -18,17 +18,18 @@ import {
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 import { Shape } from "types";
+import { ModelArchitecture } from "types/ModelType";
 
 export const LocalFileUpload = ({
-  modelType,
+  modelKind,
   modelArch,
   setSegmentationModel,
   setClassifierModel,
   setInputShape,
   setModelName,
 }: {
-  modelType: string;
-  modelArch: string;
+  modelKind: string;
+  modelArch: ModelArchitecture;
   setSegmentationModel: React.Dispatch<
     React.SetStateAction<
       LayersModel | GraphModel<string | io.IOHandler> | undefined
@@ -48,7 +49,7 @@ export const LocalFileUpload = ({
     let model: GraphModel | LayersModel;
 
     try {
-      if (modelArch === "graph") {
+      if (modelArch === ModelArchitecture.Graph) {
         model = await loadGraphModel(
           io.browserFiles([jsonFile, ...weightsFiles])
         );
@@ -58,7 +59,7 @@ export const LocalFileUpload = ({
         );
       }
 
-      modelType === "Segmentation"
+      modelKind === "Segmentation"
         ? setSegmentationModel(model)
         : setClassifierModel(model as LayersModel);
 
@@ -82,8 +83,8 @@ export const LocalFileUpload = ({
 
   const handleFilesSelected = async (
     event: React.ChangeEvent<HTMLInputElement>,
-    modelType: string,
-    modelArch: string
+    modelKind: string,
+    modelArch: ModelArchitecture
   ) => {
     event.persist();
 
@@ -129,7 +130,7 @@ export const LocalFileUpload = ({
         multiple
         id="open-model-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          handleFilesSelected(event, modelType, modelArch)
+          handleFilesSelected(event, modelKind, modelArch)
         }
       />
       <Typography
