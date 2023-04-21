@@ -16,6 +16,7 @@ import {
 } from "store/segmenter";
 
 import { availableSegmenterModels, SegmenterModelProps } from "types";
+import { ModelArchitecture } from "types/ModelType";
 
 export const SegmenterArchitectureSettingsGrid = ({
   setIsModelPretrained,
@@ -99,7 +100,7 @@ export const SegmenterArchitectureSettingsGrid = ({
       setFixedNumberOfChannelsHelperText(
         `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
       );
-    } else if (selectedModel.modelArch && selectedModel.modelArch === "graph") {
+    } else if (selectedModel.modelArch === ModelArchitecture.Graph) {
       setIsModelPretrained(true);
     } else {
       setIsModelPretrained(false);
@@ -127,7 +128,7 @@ export const SegmenterArchitectureSettingsGrid = ({
             )}
             value={selectedModel}
             isOptionEqualToValue={(option, value) =>
-              option.modelType === value.modelType &&
+              option.theModel === value.theModel &&
               option.modelName === value.modelName
             }
           />

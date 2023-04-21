@@ -17,7 +17,7 @@ import { SegmenterModelProps, ClassifierModelProps, HotkeyView } from "types";
 type SaveFittedModelDialogProps = {
   modelProps: ClassifierModelProps | SegmenterModelProps;
   fittedModel: LayersModel | undefined;
-  modelTypeString: string;
+  modelKind: string;
   onClose: () => void;
   open: boolean;
 };
@@ -25,7 +25,7 @@ type SaveFittedModelDialogProps = {
 export const SaveFittedModelDialog = ({
   modelProps,
   fittedModel,
-  modelTypeString,
+  modelKind,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
@@ -57,7 +57,7 @@ export const SaveFittedModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save {modelTypeString}</DialogTitle>
+      <DialogTitle>Save {modelKind}</DialogTitle>
 
       <DialogContent>
         <Grid container spacing={1}>
@@ -66,7 +66,7 @@ export const SaveFittedModelDialog = ({
               autoFocus
               fullWidth
               id="name"
-              label={modelTypeString + " name"}
+              label={modelKind + " name"}
               margin="dense"
               onChange={onNameChange}
               helperText={
@@ -90,7 +90,7 @@ export const SaveFittedModelDialog = ({
           color="primary"
           disabled={noFittedModel}
         >
-          Save {modelTypeString}
+          Save {modelKind}
         </Button>
       </DialogActions>
     </Dialog>
