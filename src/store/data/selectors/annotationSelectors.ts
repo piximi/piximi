@@ -5,28 +5,18 @@ import {
 } from "store/imageViewer";
 import { DataStoreSlice, DecodedAnnotationType } from "types";
 import { decodeAnnotation } from "utils/annotator";
+import { annotationsAdapter } from "../dataSlice";
+import { RootState } from "store/reducer/reducer";
 
-export const selectAnnotationEntities = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return data.annotations.entities;
-};
-export const selectStagedAnnotationEntities = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return data.stagedAnnotations.entities;
-};
-
-export const selectAllAnnotations = createSelector(
-  [selectAnnotationEntities, selectStagedAnnotationEntities],
-  (annotationEntities, stagedAnnotationEntities) => {
-    return Object.values(annotationEntities);
-  }
+const annotationSelectors = annotationsAdapter.getSelectors(
+  (state: RootState) => state.data.annotations
 );
+
+export const selectAnnotationEntities = annotationSelectors.selectEntities;
+export const selectAllAnnotations = annotationSelectors.selectAll;
+export const selectAllAnnotationIds = annotationSelectors.selectIds;
+export const selectAnnotationById = annotationSelectors.selectEntities;
+export const selectTotalAnnotationCount = annotationSelectors.selectTotal;
 
 export const selectAnnotationsByImageDict = ({
   data,
@@ -36,13 +26,58 @@ export const selectAnnotationsByImageDict = ({
   return data.annotationsByImage;
 };
 
-export const selectAnnotationsByCategoryEntity = ({
+export const selectAnnotationIdsByImage = createSelector(
+  [selectAnnotationsByImageDict, (state, imageId: string) => imageId],
+  (annotationsByImage, imageId) => {
+    return annotationsByImage[imageId];
+  }
+);
+
+export const selectTotalAnnotationCountByImage = createSelector(
+  [
+    selectAnnotationsByImageDict,
+    selectAllAnnotationIds,
+    (state, imageId) => imageId,
+  ],
+  (annotationsByImage, annotationIds, imageId) => {
+    let count = 0;
+
+    for (const id of annotationsByImage[imageId]) {
+      if (annotationIds.includes(id)) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+);
+
+export const selectAnnotationsByCategoryDict = ({
   data,
 }: {
   data: DataStoreSlice;
 }) => {
   return data.annotationsByCategory;
 };
+
+// TODO: O(NxM)
+export const selectAnnotationCountByCategory = () =>
+  createSelector(
+    [
+      selectAllAnnotationIds,
+      selectAnnotationsByCategoryDict,
+      (state, categoryId: string) => categoryId,
+    ],
+    (annotationIds, annotationsByCategory, categoryId) => {
+      let count = 0;
+      for (const id of annotationsByCategory[categoryId]) {
+        if (annotationIds.includes(id)) {
+          count++;
+        }
+      }
+      return count;
+    }
+  );
 
 export const selectWorkingAnnotation = createSelector(
   [workingAnnotationIdSelector, selectAnnotationEntities],
@@ -77,57 +112,3 @@ export const selectSelectedAnnotations = createSelector(
     );
   }
 );
-
-export const selectDeletedAnnotationIds = createSelector(
-  [selectStagedAnnotationEntities],
-  (stagedAnnotationEntities) => {
-    return Object.keys(stagedAnnotationEntities).filter(
-      (annotationId) => stagedAnnotationEntities[annotationId]?.deleted
-    );
-  }
-);
-
-export const selectTotalAnnotationCountByImage = createSelector(
-  [
-    selectAnnotationsByImageDict,
-    selectDeletedAnnotationIds,
-    (state, imageId) => imageId,
-  ],
-  (annotationsByImage, deletedAnnotations, imageId) => {
-    let count = 0;
-
-    for (const id of annotationsByImage[imageId]) {
-      if (!deletedAnnotations.includes(id)) {
-        count++;
-      }
-    }
-
-    return count;
-  }
-);
-
-export const selectAnnotationIdsByImage = createSelector(
-  [selectAnnotationsByImageDict, (state, imageId: string) => imageId],
-  (annotationsByImage, imageId) => {
-    return annotationsByImage[imageId];
-  }
-);
-
-// TODO: O(NxM)
-export const selectAnnotationCountByCategory = () =>
-  createSelector(
-    [
-      selectDeletedAnnotationIds,
-      selectAnnotationsByCategoryEntity,
-      (state, categoryId: string) => categoryId,
-    ],
-    (deletedAnnotations, annotationsByCategory, categoryId) => {
-      let count = 0;
-      for (const id of annotationsByCategory[categoryId]) {
-        if (!deletedAnnotations.includes(id)) {
-          count++;
-        }
-      }
-      return count;
-    }
-  );

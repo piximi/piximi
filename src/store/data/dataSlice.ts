@@ -24,27 +24,7 @@ export const annotationCategoriesAdapter =
   createDeferredEntityAdapter<Category>();
 
 export const imagesAdapter = createDeferredEntityAdapter<ImageType>();
-
-type ImageState = {
-  ids: string[];
-  images: Record<string, { saved: ImageType; changes: Deferred<ImageType> }>;
-};
-
-const initialImageState = (): ImageState => {
-  return { ids: [], images: {} };
-};
-
-export const imageSlice = createSlice({
-  name: "images",
-  initialState: initialImageState,
-  reducers: {
-    addImage(state, action: PayloadAction<{ image: ImageType }>) {
-      const image = action.payload.image;
-      state.ids.push(image.id);
-      state.images[image.id].saved = image;
-    },
-  },
-});
+export const annotationsAdapter = createDeferredEntityAdapter<AnnotationType>();
 
 export const initialState = (): DataStoreSlice => {
   return {
@@ -68,8 +48,7 @@ export const initialState = (): DataStoreSlice => {
       },
     }),
     images: imagesAdapter.getInitialState(),
-    annotations: { ids: [], entities: {} },
-    stagedAnnotations: { ids: [], entities: {} },
+    annotations: annotationsAdapter.getInitialState(),
     annotationsByImage: {},
     annotationsByCategory: { [UNKNOWN_ANNOTATION_CATEGORY_ID]: [] },
     imagesByCategory: { [UNKNOWN_CLASS_CATEGORY_ID]: [] },
@@ -317,8 +296,10 @@ export const dataSlice = createSlice({
         }
       }
       for (const annotationId of state.annotations.ids) {
-        state.annotations.entities[annotationId]!.categoryId =
-          UNKNOWN_ANNOTATION_CATEGORY_ID;
+        annotationsAdapter.updateOne(state.annotations, {
+          id: annotationId,
+          changes: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
+        });
       }
       for (const category of action.payload.annotationCategories) {
         dataSlice.caseReducers.setAnnotationCategory(state, {
@@ -478,10 +459,6 @@ export const dataSlice = createSlice({
     ) {
       Object.entries(action.payload.instances).forEach(
         ([imageId, annotations]) => {
-          for (const annotation of annotations) {
-            state.annotations.ids.push(annotation.id);
-            state.annotations.entities[annotation.id] = annotation;
-          }
           state.annotationsByImage[imageId] = annotations.map(
             (annotation) => annotation.id
           );
@@ -743,8 +720,7 @@ export const dataSlice = createSlice({
         state.annotationsByCategory[annotation.categoryId].push(annotation.id);
       }
       state.annotationsByImage[annotation.imageId!].push(annotation.id);
-      state.annotations.ids.push(annotation.id);
-      state.annotations.entities[annotation.id] = annotation;
+      annotationsAdapter.addOne(state.annotations, action.payload.annotation);
     },
     addAnnotations(
       state,
@@ -757,14 +733,6 @@ export const dataSlice = createSlice({
         });
       }
     },
-    addAnnotationsByImage(
-      state,
-      action: PayloadAction<{
-        instances: {
-          [imageId: string]: Array<AnnotationType>;
-        };
-      }>
-    ) {},
     setAnnotations(
       state,
       action: PayloadAction<{
@@ -797,12 +765,17 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         annotationId: string;
-        updates: Partial<AnnotationType>;
+        updates: Deferred<AnnotationType>;
       }>
     ) {
       const { annotationId, updates } = action.payload;
       if (!state.annotations.ids.includes(annotationId)) return;
       Object.assign(state.annotations.entities[annotationId]!, updates);
+
+      annotationsAdapter.updateOne(state.annotations, {
+        id: action.payload.annotationId,
+        changes: action.payload.updates,
+      });
     },
     updateAnnotations(
       state,
@@ -821,8 +794,14 @@ export const dataSlice = createSlice({
     deleteAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
       const annotationId = action.payload.annotationId;
       if (state.annotations.ids.includes(annotationId)) {
-        const { imageId, categoryId } =
-          state.annotations.entities[annotationId]!;
+        const imageId = getDeferredProperty(
+          state.annotations.entities[annotationId],
+          "imageId"
+        ) as string;
+        const categoryId = getDeferredProperty(
+          state.annotations.entities[annotationId],
+          "categoryId"
+        ) as string;
         mutatingFilter(
           state.annotationsByCategory[categoryId],
           (_annotationId) => _annotationId !== annotationId
@@ -831,11 +810,7 @@ export const dataSlice = createSlice({
           state.annotationsByImage[imageId!],
           (_annotationId) => _annotationId !== annotationId
         );
-        state.annotations.entities[annotationId]?.data?.dispose();
-        delete state.annotations.entities[annotationId];
-        state.annotations.ids = Object.keys(state.annotations.entities);
-      }
-      if (state.stagedAnnotations.ids.includes(annotationId)) {
+        annotationsAdapter.removeOne(state.annotations, annotationId);
       }
     },
     deleteAnnotations(
@@ -861,14 +836,17 @@ export const dataSlice = createSlice({
         payload: { annotationIds },
       });
     },
-    deleteAllAnnotations(state, action: PayloadAction<{}>) {
-      const annotationIds = [...state.annotations.ids] as Array<string>;
+    deleteAllAnnotationsByCategory(
+      state,
+      action: PayloadAction<{ categoryId: string }>
+    ) {
+      const annotationIds =
+        state.annotationsByCategory[action.payload.categoryId];
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
         payload: { annotationIds },
       });
     },
-
     deleteImageAnnotationsByCategory(
       state,
       action: PayloadAction<{ imageId: string; categoryId: string }>
@@ -876,7 +854,12 @@ export const dataSlice = createSlice({
       const { imageId, categoryId } = action.payload;
       const annotationIds = state.annotationsByCategory[categoryId].filter(
         (annotationId) => {
-          return state.annotations.entities[annotationId]?.imageId === imageId;
+          return (
+            getDeferredProperty(
+              state.annotations.entities[annotationId],
+              "imageId"
+            ) === imageId
+          );
         }
       );
 
@@ -885,65 +868,10 @@ export const dataSlice = createSlice({
         payload: { annotationIds },
       });
     },
-    updateStagedAnnotations(
-      state,
-      action: PayloadAction<{ annotations: Array<AnnotationType> }>
-    ) {
-      for (const annotation of action.payload.annotations) {
-        if (state.stagedAnnotations.ids.includes(annotation.id)) {
-          Object.assign(
-            state.stagedAnnotations.entities[annotation.id]!,
-            annotation
-          );
-        } else {
-          state.stagedAnnotations.ids.push(annotation.id);
-          state.stagedAnnotations.entities[annotation.id] = annotation;
-        }
-      }
-    },
-    deleteStagedAnnotation(
-      state,
-      action: PayloadAction<{
-        annotationId: string;
-      }>
-    ) {
-      const id = action.payload.annotationId;
-      if (state.stagedAnnotations.entities[id]) {
-        state.stagedAnnotations.entities[id] = { id, deleted: true };
-      } else {
-        state.stagedAnnotations.ids.push(id);
-        state.stagedAnnotations.entities[id] = { id, deleted: true };
-      }
-    },
-    deleteStagedAnnotations(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>
-    ) {
-      for (const id of action.payload.annotationIds) {
-        dataSlice.caseReducers.deleteStagedAnnotation(state, {
-          type: "deleteStagedAnnotation",
-          payload: { annotationId: id },
-        });
-      }
-    },
-    deleteStagedAnnotationsByCategory(
-      state,
-      action: PayloadAction<{
-        imageId: string;
-        categoryId: string;
-      }>
-    ) {
-      const { imageId, categoryId } = action.payload;
-      const annotationIds = state.annotationsByCategory[categoryId].filter(
-        (annotationId) => {
-          return state.annotations.entities[annotationId]?.imageId === imageId;
-        }
-      );
-
-      dataSlice.caseReducers.deleteStagedAnnotations(state, {
-        type: "deleteStagedAnnotation",
+    deleteAllAnnotations(state, action: PayloadAction<{}>) {
+      const annotationIds = [...state.annotations.ids] as Array<string>;
+      dataSlice.caseReducers.deleteAnnotations(state, {
+        type: "deleteAnnotations",
         payload: { annotationIds },
       });
     },
@@ -975,12 +903,9 @@ export const {
   updateImage,
   setImages,
   setVisibilityOfImages,
-  deleteStagedAnnotation,
   setImageActivePlane,
   updateImageAnnotations,
   updateAnnotation,
   updateAnnotations,
   deleteImageAnnotationsByCategory,
-  deleteStagedAnnotationsByCategory,
-  deleteStagedAnnotations,
 } = dataSlice.actions;
