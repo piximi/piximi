@@ -30,7 +30,7 @@ export const ClearAnnotationDialog = ({
 
   const onClear = () => {
     dispatch(
-      dataSlice.actions.deleteStagedAnnotationsByCategory({
+      dataSlice.actions.deleteImageAnnotationsByCategory({
         imageId: activeImage!,
         categoryId: category.id,
       })

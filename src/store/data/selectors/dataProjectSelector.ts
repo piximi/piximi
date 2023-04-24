@@ -13,9 +13,12 @@ export const dataProjectSelector = ({
     (image) => {
       const annotationIds = data.annotationsByImage[image.saved.id];
       const annotations = Object.values(data.annotations.entities).filter(
-        (annotation) => annotationIds.includes(annotation!.id)
+        (annotation) => annotationIds.includes(annotation!.saved.id)
       );
-      return { ...image.saved, annotations } as OldImageType;
+      return {
+        ...image.saved,
+        annotations: annotations.map((entity) => entity.saved),
+      } as OldImageType;
     }
   );
 

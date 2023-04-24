@@ -210,8 +210,8 @@ startAppListening({
       ...savedActiveImage,
       ...activeImageChanges,
     } as ImageType;
-    const deletedAnnotations = newState.data.stagedAnnotations.ids.filter(
-      (id) => newState.data.stagedAnnotations.entities[id]?.deleted === true
+    const deletedAnnotations = newState.data.annotations.ids.filter(
+      (id) => newState.data.annotations.entities[id].changes?.deleted === true
     ) as Array<string>;
     const activeAnnotationIds = [];
     for (const id of newState.data.annotationsByImage[newActiveId]) {
