@@ -4,8 +4,8 @@ import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
 import {
+  selectImagesByPartition,
   //selectAnnotationCategories,
-  selectSegmenterValidationImages,
 } from "store/data";
 //import { annotationCategoriesSelector } from "store/project";
 import {
@@ -18,6 +18,7 @@ import {
 import {
   AlertType,
   AlertStateType,
+  Partition,
   //Category,
   //ImageType
 } from "types";
@@ -40,8 +41,10 @@ export function* evaluateSegmenterSaga({
     return;
   }
 
-  const validationImages: ReturnType<typeof selectSegmenterValidationImages> =
-    yield select(selectSegmenterValidationImages);
+  const validationImages: ReturnType<typeof selectImagesByPartition> =
+    yield select((state) =>
+      selectImagesByPartition(state, Partition.Validation)
+    );
 
   yield put(applicationSlice.actions.hideAlertState({}));
 

@@ -12,7 +12,8 @@ import {
 import { useTranslation } from "hooks";
 
 import { classifierSlice } from "store/classifier";
-import { dataSlice, selectInferenceImages } from "store/data";
+import { dataSlice, selectImagesByPartition } from "store/data";
+import { Partition } from "types";
 
 //TODO: need full image selector here?
 
@@ -20,7 +21,9 @@ export const PredictionVisibility = () => {
   const dispatch = useDispatch();
 
   const [showLabeledImages, setShowLabeledImages] = React.useState(true);
-  const inferenceImages = useSelector(selectInferenceImages);
+  const inferenceImages = useSelector((state) =>
+    selectImagesByPartition(state, Partition.Training)
+  );
 
   const t = useTranslation();
 

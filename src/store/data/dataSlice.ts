@@ -17,6 +17,7 @@ import { ImageShapeInfo, replaceDuplicateName } from "utils/common/image";
 import { mutatingFilter } from "utils/common/helpers";
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 import { Changes, Deferred, EntityId } from "store/entities/models";
+import { getDeferredProperty } from "store/entities/utils";
 
 export const categoriesAdapter = createDeferredEntityAdapter<Category>();
 export const annotationCategoriesAdapter =
@@ -66,9 +67,7 @@ export const initialState = (): DataStoreSlice => {
         },
       },
     }),
-    images_: imagesAdapter.getInitialState(),
-    images: { ids: [], entities: {} },
-    stagedImages: { ids: [], entities: {} },
+    images: imagesAdapter.getInitialState(),
     annotations: { ids: [], entities: {} },
     stagedAnnotations: { ids: [], entities: {} },
     annotationsByImage: {},
@@ -208,10 +207,10 @@ export const dataSlice = createSlice({
       for (const category of action.payload.categories) {
         state.imagesByCategory[category.id] = [];
       }
-      const changes = state.images_.ids.map((id) => {
+      const changes = state.images.ids.map((id) => {
         return { id, changes: { categoryId: UNKNOWN_CLASS_CATEGORY_ID } };
       });
-      imagesAdapter.updateMany(state.images_, changes);
+      imagesAdapter.updateMany(state.images, changes);
       categoriesAdapter.setMany(state.categories, action.payload.categories);
     },
     deleteCategory(state, action: PayloadAction<{ categoryId: string }>) {
@@ -230,7 +229,7 @@ export const dataSlice = createSlice({
       delete state.imagesByCategory[categoryId];
       // ----
 
-      imagesAdapter.updateMany(state.images_, imageChanges);
+      imagesAdapter.updateMany(state.images, imageChanges);
       categoriesAdapter.removeOne(state.categories, action.payload.categoryId);
     },
     deleteAllCategories(state, action: PayloadAction<{}>) {
@@ -403,7 +402,7 @@ export const dataSlice = createSlice({
 
       const initialName = image.name.split(".")[0]; //get name before file extension
       const imageNames = Object.values(state.images.entities).map(
-        (image) => image.name
+        (image) => getDeferredProperty(image, "name") as string
       );
       //add filename extension to updatedName
       const updatedName =
@@ -419,10 +418,8 @@ export const dataSlice = createSlice({
         state.imagesByCategory[UNKNOWN_CLASS_CATEGORY_ID].push(image.id);
       }
 
-      state.images.ids.push(image.id);
-      state.images.entities[image.id] = image;
       state.annotationsByImage[image.id] = [];
-      imagesAdapter.addOne(state.images_, image);
+      imagesAdapter.addOne(state.images, image);
     },
     addImages(state, action: PayloadAction<{ images: Array<ImageType> }>) {
       for (const image of action.payload.images) {
@@ -463,11 +460,10 @@ export const dataSlice = createSlice({
         payload: { images },
       });
 
-      imagesAdapter.setAll(state.images_, action.payload.images);
+      imagesAdapter.setAll(state.images, action.payload.images);
     },
     setImageSrc(state, action: PayloadAction<{ imgId: string; src: string }>) {
-      state.images.entities[action.payload.imgId].src = action.payload.src;
-      imagesAdapter.updateOne(state.images_, {
+      imagesAdapter.updateOne(state.images, {
         id: action.payload.imgId,
         changes: { src: action.payload.src },
       });
@@ -500,11 +496,7 @@ export const dataSlice = createSlice({
         renderedSrc: string;
       }>
     ) {
-      state.images.entities[action.payload.imageId].src =
-        action.payload.renderedSrc;
-      state.images.entities[action.payload.imageId].activePlane =
-        action.payload.activePlane;
-      imagesAdapter.updateOne(state.images_, {
+      imagesAdapter.updateOne(state.images, {
         id: action.payload.imageId,
         changes: {
           src: action.payload.renderedSrc,
@@ -520,9 +512,7 @@ export const dataSlice = createSlice({
         execSaga: boolean;
       }>
     ) {
-      state.images.entities[action.payload.imageId].colors =
-        action.payload.colors;
-      imagesAdapter.updateOne(state.images_, {
+      imagesAdapter.updateOne(state.images, {
         id: action.payload.imageId,
         changes: { colors: action.payload.colors },
       });
@@ -536,18 +526,19 @@ export const dataSlice = createSlice({
       }>
     ) {},
     clearPredictions(state, action: PayloadAction<{}>) {
-      state.images_.ids.forEach((imageId) => {
+      state.images.ids.forEach((imageId) => {
         if (
-          state.images_.entities[imageId].saved.partition ===
+          state.images.entities[imageId].saved.partition ===
             Partition.Inference ||
-          (state.images_.entities[imageId].changes.partition &&
-            state.images_.entities[imageId].changes.partition ===
+          (state.images.entities[imageId].changes.partition &&
+            state.images.entities[imageId].changes.partition ===
               Partition.Inference)
         ) {
-          const predictedCategory =
-            state.images_.entities[imageId].changes.categoryId ??
-            state.images_.entities[imageId].saved.categoryId;
-          imagesAdapter.updateOne(state.images_, {
+          const predictedCategory = getDeferredProperty(
+            state.images.entities[imageId],
+            "categoryId"
+          ) as string;
+          imagesAdapter.updateOne(state.images, {
             id: imageId,
             changes: { categoryId: UNKNOWN_CLASS_CATEGORY_ID },
           });
@@ -572,21 +563,24 @@ export const dataSlice = createSlice({
     ) {
       const newCategoryId = action.payload.categoryId;
       if (!newCategoryId) return;
+
+      for (const imageId of action.payload.imageIds) {
+        const categoryId = getDeferredProperty(
+          state.images.entities[imageId],
+          "categoryId"
+        ) as string;
+        state.imagesByCategory[categoryId] = state.imagesByCategory[
+          categoryId
+        ].filter((currentImageId) => currentImageId !== imageId);
+        state.imagesByCategory[newCategoryId].push(imageId);
+      }
       const changes = action.payload.imageIds.map((id) => {
         return {
           id,
           changes: { categoryId: action.payload.categoryId },
         } as Changes<ImageType>;
       });
-      imagesAdapter.updateMany(state.images_, changes);
-      for (const imageId of action.payload.imageIds) {
-        const categoryId = state.images.entities[imageId].categoryId;
-        state.images.entities[imageId].categoryId = newCategoryId;
-        state.imagesByCategory[categoryId] = state.imagesByCategory[
-          categoryId
-        ].filter((currentImageId) => currentImageId !== imageId);
-        state.imagesByCategory[newCategoryId].push(imageId);
-      }
+      imagesAdapter.updateMany(state.images, changes);
     },
     updateCategoriesOfImages(
       state,
@@ -599,22 +593,26 @@ export const dataSlice = createSlice({
       if (imageIds.length !== categoryIds.length) {
         return;
       }
+
+      imageIds.forEach((imageId, idx) => {
+        const categoryId = categoryIds[idx];
+        const previousCategoryId = getDeferredProperty(
+          state.images.entities[imageId],
+          "categoryId"
+        ) as string;
+        state.imagesByCategory[categoryId].push(imageId);
+        mutatingFilter(
+          state.imagesByCategory[previousCategoryId],
+          (previousImageId) => previousImageId !== imageId
+        );
+      });
       const changes = action.payload.imageIds.map((id, idx) => {
         return {
           id,
           changes: { categoryId: action.payload.categoryIds[idx] },
         } as Changes<ImageType>;
       });
-      imagesAdapter.updateMany(state.images_, changes);
-      imageIds.forEach((imageId, idx) => {
-        const categoryId = categoryIds[idx];
-        const previousCategoryId = state.images.entities[imageId].categoryId;
-        state.images.entities[imageId].categoryId = categoryId;
-        state.imagesByCategory[categoryId].push(imageId);
-        state.imagesByCategory[previousCategoryId] = state.imagesByCategory[
-          previousCategoryId
-        ].filter((previousImageId) => previousImageId !== imageId);
-      });
+      imagesAdapter.updateMany(state.images, changes);
     },
     updateImagesPartition(
       state,
@@ -622,13 +620,6 @@ export const dataSlice = createSlice({
         imageIdsByPartition: Record<string, Array<string>>;
       }>
     ) {
-      Object.entries(action.payload.imageIdsByPartition).forEach(
-        ([partition, imageIds]) => {
-          for (const imageId of imageIds) {
-            state.images.entities[imageId].partition = partition as Partition;
-          }
-        }
-      );
       const changes: Changes<ImageType>[] = [];
       Object.entries(action.payload.imageIdsByPartition).forEach(
         ([partition, imageIds]) => {
@@ -640,7 +631,7 @@ export const dataSlice = createSlice({
           }
         }
       );
-      imagesAdapter.updateMany(state.images_, changes);
+      imagesAdapter.updateMany(state.images, changes);
     },
 
     updateLabeledImagesVisibility(
@@ -660,13 +651,6 @@ export const dataSlice = createSlice({
         imageIdsByPartition: Record<string, Array<string>>;
       }>
     ) {
-      Object.entries(action.payload.imageIdsByPartition).forEach(
-        ([partition, imageIds]) => {
-          for (const imageId of imageIds) {
-            state.images.entities[imageId].partition = partition as Partition;
-          }
-        }
-      );
       const changes: Changes<ImageType>[] = [];
       Object.entries(action.payload.imageIdsByPartition).forEach(
         ([partition, imageIds]) => {
@@ -678,71 +662,23 @@ export const dataSlice = createSlice({
           }
         }
       );
-      imagesAdapter.updateMany(state.images_, changes);
+      imagesAdapter.updateMany(state.images, changes);
     },
     setVisibilityOfImages(
       state,
       action: PayloadAction<{ visible: boolean; imageIds: Array<string> }>
     ) {
-      for (const imageId of action.payload.imageIds) {
-        state.images.entities[imageId].visible = action.payload.visible;
-      }
       const changes = action.payload.imageIds.map((id) => {
         return { id, changes: { visible: action.payload.visible } };
       });
-      imagesAdapter.updateMany(state.images_, changes);
+      imagesAdapter.updateMany(state.images, changes);
     },
-    hardDeleteImage(
-      state,
-      action: PayloadAction<{ imageId: string; disposeColorTensor: boolean }>
-    ) {
-      const { imageId, disposeColorTensor } = action.payload;
-      if (
-        !state.images.ids.includes(imageId) &&
-        !state.stagedImages.ids.includes(imageId)
-      )
-        return;
-      if (state.images.ids.includes(imageId)) {
-        const catId = state.images.entities[imageId].categoryId;
-        dataSlice.caseReducers.deleteAllAnnotationsByImage(state, {
-          type: "deleteAllAnnotationsByImage",
-          payload: { imageId },
-        });
-        mutatingFilter(
-          state.imagesByCategory[catId],
-          (_imageId: string) => _imageId !== imageId
-        );
-        delete state.annotationsByImage[imageId];
-        state.images.entities[imageId].data.dispose();
-        if (disposeColorTensor) {
-          state.images.entities[imageId].colors.color.dispose();
-        }
-        delete state.images.entities[imageId];
-        state.images.ids = Object.keys(state.images.entities);
-      }
-      if (state.stagedImages.ids.includes(imageId)) {
-        state.stagedImages.entities[imageId]?.colors?.color.dispose();
-        state.stagedImages.entities[imageId]?.data?.dispose();
-        delete state.stagedImages.entities[imageId];
-        state.stagedImages.ids = Object.keys(state.stagedImages.entities);
-      } else {
-        return;
-      }
-    },
+
     deleteImage(
       state,
       action: PayloadAction<{ imageId: string; disposeColorTensor?: boolean }>
     ) {
-      const { imageId } = action.payload;
-      if (state.stagedImages.ids.includes(imageId)) {
-        state.stagedImages.entities[imageId]?.data?.dispose();
-        state.stagedImages.entities[imageId]?.colors?.color.dispose();
-      } else {
-        state.stagedImages.ids.push(imageId);
-      }
-
-      state.stagedImages.entities[imageId] = { id: imageId, deleted: true };
-      imagesAdapter.removeOne(state.images_, action.payload.imageId);
+      imagesAdapter.removeOne(state.images, action.payload.imageId);
     },
 
     deleteImages(
@@ -766,42 +702,32 @@ export const dataSlice = createSlice({
       action: PayloadAction<{ disposeColorTensors: boolean }>
     ) {
       const disposeColorTensors = action.payload.disposeColorTensors;
-      const imageIds = [...state.images.ids];
+      const imageIds = [...state.images.ids] as string[];
       dataSlice.caseReducers.deleteImages(state, {
         type: "deleteImages",
         payload: { imageIds, disposeColorTensors },
       });
     },
 
-    updateStagedImage(
+    updateImage(
       state,
       action: PayloadAction<{
         imageId: string;
         updates: Partial<ImageType>;
-        disposeColors?: boolean;
-        disposeData?: boolean;
         execSaga?: boolean;
       }>
     ) {
-      const { imageId, updates, disposeColors, disposeData } = action.payload;
-      if (state.stagedImages.ids.includes(imageId)) {
-        disposeColors &&
-          state.stagedImages.entities[imageId]!.colors?.color.dispose();
-        disposeData && state.stagedImages.entities[imageId]!.data?.dispose();
-        Object.assign(state.stagedImages.entities[imageId]!, updates);
+      const { imageId, updates } = action.payload;
 
-        return;
-      }
-      if (state.images_.ids.includes(imageId)) {
+      if (state.images.ids.includes(imageId)) {
         const changes = {
           id: imageId,
           changes: updates as Deferred<ImageType>,
         };
 
-        imagesAdapter.updateOne(state.images_, changes);
+        imagesAdapter.updateOne(state.images, changes);
         return;
       }
-      state.stagedImages.entities[imageId] = { id: imageId, ...updates };
     },
     addAnnotation(
       state,
@@ -1046,7 +972,7 @@ export const {
   updateImageCategories,
   updateCategoriesOfImages,
   updateSegmentationImagesPartition,
-  updateStagedImage,
+  updateImage,
   setImages,
   setVisibilityOfImages,
   deleteStagedAnnotation,

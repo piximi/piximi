@@ -16,7 +16,7 @@ import { applicationSlice } from "store/application";
 import {
   dataSlice,
   selectCreatedImageCategories,
-  selectInferenceImages,
+  selectImagesByPartition,
 } from "store/data";
 
 import {
@@ -25,6 +25,7 @@ import {
   Category,
   FitOptions,
   ImageType,
+  Partition,
   PreprocessOptions,
   Shape,
 } from "types";
@@ -36,8 +37,8 @@ export function* predictClassifierSaga({
 }: PayloadAction<{ execSaga: boolean }>) {
   if (!execSaga) return;
 
-  const testImages: ReturnType<typeof selectInferenceImages> = yield select(
-    selectInferenceImages
+  const testImages: ReturnType<typeof selectImagesByPartition> = yield select(
+    (state) => selectImagesByPartition(state, Partition.Inference)
   );
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =

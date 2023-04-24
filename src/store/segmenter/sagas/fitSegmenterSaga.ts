@@ -8,8 +8,7 @@ import {
   dataSlice,
   selectAnnotatedImages,
   selectAllAnnotationCategories,
-  selectSegmenterTrainingImages,
-  selectSegmenterValidationImages,
+  selectImagesByPartition,
 } from "store/data";
 import {
   segmenterTrainingPercentageSelector,
@@ -117,10 +116,12 @@ export function* fitSegmenterSaga({
   const categories: ReturnType<typeof selectAllAnnotationCategories> =
     yield select(selectAllAnnotationCategories);
 
-  const trainImages: ReturnType<typeof selectSegmenterTrainingImages> =
-    yield select(selectSegmenterTrainingImages);
-  const valImages: ReturnType<typeof selectSegmenterValidationImages> =
-    yield select(selectSegmenterValidationImages);
+  const trainImages: ReturnType<typeof selectImagesByPartition> = yield select(
+    (state) => selectImagesByPartition(state, Partition.Training)
+  );
+  const valImages: ReturnType<typeof selectImagesByPartition> = yield select(
+    (state) => selectImagesByPartition(state, Partition.Validation)
+  );
 
   try {
     const trainData: Awaited<ReturnType<typeof preprocessSegmentationImages>> =

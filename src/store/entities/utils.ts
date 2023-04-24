@@ -4,6 +4,7 @@ import type {
   Deferred,
   IdSelector,
   Changes,
+  DeferredEntity,
 } from "./models";
 
 export function selectIdValue<T>(entity: T, selectId: IdSelector<T>) {
@@ -34,6 +35,13 @@ export function ensureEntitiesArray<T>(
 }
 
 /* Deferred */
+
+export function getDeferredProperty<T>(
+  entity: DeferredEntity<T>,
+  property: keyof T
+) {
+  return entity.changes[property] ?? entity.saved[property];
+}
 
 export function splitAddedDeferredEntities<T>(
   newEntities: readonly T[] | Record<EntityId, T>,

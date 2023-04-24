@@ -44,8 +44,12 @@ export const ChannelsList = () => {
     dispatchState: dispatchActiveImageColors,
   } = useLocalGlobalState(
     selectActiveImageRawColor,
-    dataSlice.actions.updateStagedImage,
-    { range: {}, visible: {}, color: [] }
+    dataSlice.actions.updateImage,
+    {
+      range: {},
+      visible: {},
+      color: [],
+    }
   );
 
   const handleSliderChange = useMemo(
@@ -76,7 +80,6 @@ export const ChannelsList = () => {
           color: tensor2d(localActiveImageColors.color),
         },
       },
-      disposeColors: true,
       execSaga: true,
     });
   };
@@ -90,10 +93,9 @@ export const ChannelsList = () => {
     newColors.visible[index] = enabled;
 
     dispatch(
-      dataSlice.actions.updateStagedImage({
+      dataSlice.actions.updateImage({
         imageId: activeImageId!,
         updates: { colors: newColors },
-        disposeColors: true,
         execSaga: true,
       })
     );

@@ -8,7 +8,7 @@ import { RootState } from "store/reducer/reducer";
 import { selectAnnotationsByImageDict } from "./annotationSelectors";
 
 const imageSelectors = imagesAdapter.getSelectors(
-  (state: RootState) => state.data.images_
+  (state: RootState) => state.data.images
 );
 
 export const selectImageIds = imageSelectors.selectIds;
@@ -49,42 +49,6 @@ export const selectImagesByPartition = createSelector(
     return images.filter((image) => image.partition === partition);
   }
 );
-
-//TODO replace the following four with above
-export const selectInferenceImages = ({ data }: { data: DataStoreSlice }) => {
-  return Object.values(data.images.entities).filter(
-    (image) => image.partition === Partition.Inference
-  );
-};
-export const selectSegmenterTrainingImages = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return Object.values(data.images.entities).filter(
-    (image) => image.partition === Partition.Training
-  );
-};
-export const selectSegmenterValidationImages = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
-  return Object.values(data.images.entities).filter(
-    (image) => image.partition === Partition.Validation
-  );
-};
-export const selectTrainingImages = ({ data }: { data: DataStoreSlice }) => {
-  return Object.values(data.images.entities).filter(
-    (image) => image.partition === Partition.Training
-  );
-};
-
-export const selectValidationImages = ({ data }: { data: DataStoreSlice }) => {
-  return Object.values(data.images.entities).filter(
-    (image) => image.partition === Partition.Validation
-  );
-};
 
 export const selectSelectedImages = createSelector(
   [selectedImagesIdSelector, selectImageEntities],

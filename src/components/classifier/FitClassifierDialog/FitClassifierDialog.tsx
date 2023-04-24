@@ -24,13 +24,14 @@ import {
   classifierTrainingPercentageSelector,
   classifierSlice,
 } from "store/classifier";
-import { selectInferenceImages } from "store/data";
+import { selectImagesByPartition } from "store/data";
 
 import {
   AlertStateType,
   AlertType,
   OptimizationAlgorithm,
   LossFunction,
+  Partition,
 } from "types";
 
 type FitClassifierDialogProps = {
@@ -68,7 +69,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   >([]);
 
   const currentlyTraining = useSelector(classifierTrainingFlagSelector);
-  const categorizedImages = useSelector(selectInferenceImages);
+  const categorizedImages = useSelector((state) =>
+    selectImagesByPartition(state, Partition.Inference)
+  );
   const compiledModel = useSelector(classifierCompiledSelector);
   const alertState = useSelector(alertStateSelector);
 

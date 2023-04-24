@@ -35,10 +35,9 @@ export const ColorAdjustmentOptions = () => {
     const defaultColors = await generateDefaultColors(imageData);
 
     dispatch(
-      dataSlice.actions.updateStagedImage({
+      dataSlice.actions.updateImage({
         imageId: imageId!,
         updates: { colors: defaultColors },
-        disposeColors: true,
         execSaga: true,
       })
     );
