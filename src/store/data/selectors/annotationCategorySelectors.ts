@@ -11,13 +11,10 @@ const annotationCategorySelectors = annotationCategoriesAdapter.getSelectors(
 
 export const selectAnnotationCategoryIds =
   annotationCategorySelectors.selectIds;
-
 export const selectAnnotationCategoryEntities =
   annotationCategorySelectors.selectEntities;
-
 export const selectAllAnnotationCategories =
   annotationCategorySelectors.selectAll;
-
 export const selectAnnotationCategoryById =
   annotationCategorySelectors.selectById;
 

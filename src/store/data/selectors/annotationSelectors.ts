@@ -28,7 +28,7 @@ export const selectAllAnnotations = createSelector(
   }
 );
 
-export const selectAnnotationsByImageEntity = ({
+export const selectAnnotationsByImageDict = ({
   data,
 }: {
   data: DataStoreSlice;
@@ -89,9 +89,8 @@ export const selectDeletedAnnotationIds = createSelector(
 
 export const selectTotalAnnotationCountByImage = createSelector(
   [
-    selectAnnotationsByImageEntity,
+    selectAnnotationsByImageDict,
     selectDeletedAnnotationIds,
-
     (state, imageId) => imageId,
   ],
   (annotationsByImage, deletedAnnotations, imageId) => {
@@ -108,7 +107,7 @@ export const selectTotalAnnotationCountByImage = createSelector(
 );
 
 export const selectAnnotationIdsByImage = createSelector(
-  [selectAnnotationsByImageEntity, (state, imageId: string) => imageId],
+  [selectAnnotationsByImageDict, (state, imageId: string) => imageId],
   (annotationsByImage, imageId) => {
     return annotationsByImage[imageId];
   }

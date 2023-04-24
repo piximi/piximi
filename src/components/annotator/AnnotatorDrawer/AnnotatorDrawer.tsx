@@ -15,7 +15,7 @@ import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
 import {
   selectCreatedAnnotatorCategories,
-  selectImageViewerImages,
+  selectSelectedImages,
 } from "store/data";
 
 import { imageViewerSlice } from "store/imageViewer";
@@ -40,7 +40,7 @@ export const AnnotatorDrawer = () => {
     );
   };
 
-  const annotatorImages = useSelector(selectImageViewerImages);
+  const annotatorImages = useSelector(selectSelectedImages);
 
   return (
     <Drawer
