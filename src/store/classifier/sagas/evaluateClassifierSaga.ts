@@ -15,9 +15,15 @@ import {
 } from "store/classifier";
 import {
   selectCreatedImageCategories,
-  selectValidationImages,
+  selectImagesByPartition,
 } from "store/data";
-import { AlertStateType, AlertType, Category, ImageType } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  Category,
+  ImageType,
+  Partition,
+} from "types";
 import { getStackTraceFromError } from "utils";
 
 export function* evaluateClassifierSaga({
@@ -39,8 +45,10 @@ export function* evaluateClassifierSaga({
     return;
   }
 
-  const validationImages: ReturnType<typeof selectValidationImages> =
-    yield select(selectValidationImages);
+  const validationImages: ReturnType<typeof selectImagesByPartition> =
+    yield select((state) =>
+      selectImagesByPartition(state, Partition.Validation)
+    );
 
   yield put(applicationSlice.actions.hideAlertState({}));
 

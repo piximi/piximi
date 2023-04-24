@@ -17,7 +17,7 @@ export function* watchActiveImageChangeSaga() {
 
 export function* watchActiveImageColorsChangeSaga() {
   yield takeLatest(
-    dataSlice.actions.updateStagedImage.type,
+    dataSlice.actions.updateImage.type,
     activeImageColorChangeSaga
   );
 }

@@ -11,11 +11,11 @@ export const dataProjectSelector = ({
 } => {
   const images: Array<OldImageType> = Object.values(data.images.entities).map(
     (image) => {
-      const annotationIds = data.annotationsByImage[image.id];
+      const annotationIds = data.annotationsByImage[image.saved.id];
       const annotations = Object.values(data.annotations.entities).filter(
         (annotation) => annotationIds.includes(annotation!.id)
       );
-      return { ...image, annotations } as OldImageType;
+      return { ...image.saved, annotations } as OldImageType;
     }
   );
 

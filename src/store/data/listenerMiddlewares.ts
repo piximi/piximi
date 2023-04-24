@@ -203,11 +203,12 @@ startAppListening({
       );
       return;
     }
-    const storedActiveImage = newState.data.images.entities[newActiveId];
-    const stagedActiveImage = newState.data.stagedImages.entities[newActiveId];
+    const savedActiveImage = newState.data.images.entities[newActiveId].saved;
+    const activeImageChanges =
+      newState.data.images.entities[newActiveId].changes;
     const updatedActiveImage = {
-      ...storedActiveImage,
-      ...stagedActiveImage,
+      ...savedActiveImage,
+      ...activeImageChanges,
     } as ImageType;
     const deletedAnnotations = newState.data.stagedAnnotations.ids.filter(
       (id) => newState.data.stagedAnnotations.entities[id]?.deleted === true

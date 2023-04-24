@@ -105,7 +105,7 @@ export function* activeImageColorChangeSaga({
     undefined
   );
   yield put(
-    dataSlice.actions.updateStagedImage({
+    dataSlice.actions.updateImage({
       imageId: image.id,
       updates: { src: renderedSrcs[image.activePlane] },
     })

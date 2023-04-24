@@ -19,9 +19,7 @@ import {
 import {
   dataSlice,
   selectCreatedImageCategories,
-  selectTrainingImages,
-  selectValidationImages,
-  selectInferenceImages,
+  selectImagesByPartition,
   selectCreatedImageCategoryCount,
 } from "store/data";
 import { applicationSlice } from "store/application";
@@ -58,8 +56,10 @@ export function* fitClassifierSaga({
   > = yield select(classifierTrainingPercentageSelector);
 
   // TODO: need only ids
-  const categorizedImages: ReturnType<typeof selectInferenceImages> =
-    yield select(selectInferenceImages);
+  const categorizedImages: ReturnType<typeof selectImagesByPartition> =
+    yield select((state) =>
+      selectImagesByPartition(state, Partition.Inference)
+    );
 
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);
@@ -138,11 +138,11 @@ export function* fitClassifierSaga({
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
-  const trainImages: ReturnType<typeof selectTrainingImages> = yield select(
-    selectTrainingImages
+  const trainImages: ReturnType<typeof selectImagesByPartition> = yield select(
+    (state) => selectImagesByPartition(state, Partition.Training)
   );
-  const valImages: ReturnType<typeof selectValidationImages> = yield select(
-    selectValidationImages
+  const valImages: ReturnType<typeof selectImagesByPartition> = yield select(
+    (state) => selectImagesByPartition(state, Partition.Validation)
   );
 
   try {

@@ -12,12 +12,8 @@ export {
   selectImageEntities,
   selectImagesByCategory,
   selectImagesByCategoryDict,
-  selectInferenceImages,
-  selectSegmenterTrainingImages,
-  selectSegmenterValidationImages,
-  selectTrainingImages,
+  selectImagesByPartition,
   selectUnannotatedImages,
-  selectValidationImages,
 } from "./selectors/imageSelectors";
 export {
   selectActiveImageBitDepth,
