@@ -6,6 +6,9 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Application } from "./components/Application";
 import { productionStore } from "./store";
+import ReactGA from "react-ga4";
+
+ReactGA.initialize("G-5P5KZ3V7GL");
 
 ReactDOM.render(
   <Provider store={productionStore}>
