@@ -69,6 +69,7 @@ export { stagePositionSelector } from "./selectors/stagePositionSelector";
 export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { imageOriginSelector } from "./selectors/imageOriginSelector";
+export { selectHiddenAnnotationCategoryIds } from "./selectors/selectHiddenAnnotationCategoryIds";
 
 // Sagas
 

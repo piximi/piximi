@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import {
   selectStagedAnnotationIds,
   workingAnnotationIdSelector,
+  selectActiveAnnotationIds,
 } from "store/imageViewer";
 import { DataStoreSlice, DecodedAnnotationType } from "types";
 import { decodeAnnotation } from "utils/annotator";
@@ -66,9 +67,10 @@ export const selectAnnotationCountByCategory = () =>
     [
       selectAllAnnotationIds,
       selectAnnotationsByCategoryDict,
-      (state, categoryId: string) => categoryId,
+      (state, categoryId) => categoryId,
     ],
     (annotationIds, annotationsByCategory, categoryId) => {
+      if (!Object.keys(annotationsByCategory).includes(categoryId)) return;
       let count = 0;
       for (const id of annotationsByCategory[categoryId]) {
         if (annotationIds.includes(id)) {
@@ -93,6 +95,27 @@ export const selectStagedAnnotations = createSelector(
     return annotationIds.map(
       (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
     );
+  }
+);
+export const selectActiveAnnotations = createSelector(
+  [selectActiveAnnotationIds, selectAnnotationEntities],
+  (annotationIds, annotationEntities): Array<DecodedAnnotationType> => {
+    if (!annotationIds.length) return [];
+    return annotationIds.map(
+      (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
+    );
+  }
+);
+
+export const selectActiveAnnotationIdsByCategory = createSelector(
+  [selectActiveAnnotations, (_, categoryId) => categoryId],
+  (activeAnnotations, categoryId) => {
+    return activeAnnotations.reduce((ids: string[], annotation) => {
+      if (annotation.categoryId === categoryId) {
+        ids.push(annotation.id);
+      }
+      return ids;
+    }, []);
   }
 );
 

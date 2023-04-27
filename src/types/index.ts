@@ -18,9 +18,11 @@ export type {
 export type { Category } from "./Category";
 export {
   CategoryType,
+  UNKNOWN_CLASS_CATEGORY,
   UNKNOWN_CLASS_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_CATEGORY_NAME,
 } from "./Category";
 
 export type { Classifier } from "./Classifier";

@@ -308,31 +308,6 @@ export const dataSlice = createSlice({
         });
       }
     },
-    setAnnotationCategoryVisibility(
-      state,
-      action: PayloadAction<{ categoryId: string; visible: boolean }>
-    ) {
-      annotationCategoriesAdapter.updateOne(state.annotationCategories, {
-        id: action.payload.categoryId,
-        changes: { visible: action.payload.visible },
-      });
-    },
-    setOtherAnnotationCategoriesInvisible(
-      state,
-      action: PayloadAction<{ id?: string }>
-    ) {
-      const idsToUpdate = state.annotationCategories.ids.filter((id) => {
-        return (
-          id !== action.payload.id &&
-          state.annotationCategories.entities[id].saved.visible !== false &&
-          state.annotationCategories.entities[id].changes?.visible !== false
-        );
-      });
-      const changes = idsToUpdate.map((id) => {
-        return { id: id, changes: { visible: false } };
-      });
-      categoriesAdapter.updateMany(state.annotationCategories, changes);
-    },
     deleteAnnotationCategory(
       state,
       action: PayloadAction<{ categoryId: EntityId }>
@@ -770,11 +745,10 @@ export const dataSlice = createSlice({
     ) {
       const { annotationId, updates } = action.payload;
       if (!state.annotations.ids.includes(annotationId)) return;
-      Object.assign(state.annotations.entities[annotationId]!, updates);
 
       annotationsAdapter.updateOne(state.annotations, {
-        id: action.payload.annotationId,
-        changes: action.payload.updates,
+        id: annotationId,
+        changes: updates,
       });
     },
     updateAnnotations(
@@ -888,8 +862,6 @@ export const {
   addAnnotationCategories,
   updateAnnotationCategory,
   setAnnotationCategories,
-  setAnnotationCategoryVisibility,
-  setOtherAnnotationCategoriesInvisible,
   deleteAnnotationCategory,
   deleteAllAnnotationCategories,
   addAnnotations,

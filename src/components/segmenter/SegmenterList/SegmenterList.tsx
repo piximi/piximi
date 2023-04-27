@@ -21,13 +21,7 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import {
-  CategoryType,
-  HotkeyView,
-  ModelType,
-  Shape,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types";
+import { CategoryType, HotkeyView, ModelType, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
@@ -106,12 +100,8 @@ export const SegmenterList = () => {
         <>
           <CategoriesList
             createdCategories={categories}
-            unknownCategory={UNKNOWN_ANNOTATION_CATEGORY}
             predicted={false}
             categoryType={CategoryType.AnnotationCategory}
-            onCategoryClickCallBack={() => {
-              return;
-            }}
           />
 
           <Divider />

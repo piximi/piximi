@@ -5,4 +5,5 @@ export type Project = {
   selectedImageIds: Array<string>;
   imageSortKey: ImageSortKey;
   highlightedCategory: string | null;
+  hiddenImageCategoryIds: string[];
 };
