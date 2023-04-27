@@ -18,4 +18,5 @@ export { projectSelector } from "./selectors/projectSelector";
 export { projectNameSelector } from "./selectors/projectNameSelector";
 
 export { selectedImagesIdSelector } from "./selectors/selectedImagesIdSelector";
+export { selectHiddenImageCategoryIds } from "./selectors/selectHiddenImageCategoryIds";
 // Sagas

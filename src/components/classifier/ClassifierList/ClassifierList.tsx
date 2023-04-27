@@ -22,13 +22,11 @@ import {
 
 import { selectCreatedImageCategories } from "store/data";
 
-import { Category, CategoryType, HotkeyView, ModelType, Shape } from "types";
+import { CategoryType, HotkeyView, ModelType, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { UNKNOWN_CLASS_CATEGORY } from "types/Category";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
-  const unknownCategory = UNKNOWN_CLASS_CATEGORY;
   const predicted = useSelector(classifierPredictedSelector);
   const fittedClassifier = useSelector(classifierFittedSelector);
   const selectedClassifierModelProps = useSelector(
@@ -47,8 +45,6 @@ export const ClassifierList = () => {
     onOpen: onSaveClassifierDialogOpen,
     open: openSaveClassifierDialog,
   } = useDialog();
-
-  const onCategoryClickCallBack = (category: Category) => {};
 
   const importClassifierModel = (
     inputShape: Shape,
@@ -103,10 +99,8 @@ export const ClassifierList = () => {
         <>
           <CategoriesList
             createdCategories={categories}
-            unknownCategory={unknownCategory}
             predicted={predicted}
             categoryType={CategoryType.ClassifierCategory}
-            onCategoryClickCallBack={onCategoryClickCallBack}
           />
 
           <Divider />

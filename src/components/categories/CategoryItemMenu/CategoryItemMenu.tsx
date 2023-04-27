@@ -1,62 +1,38 @@
 import React from "react";
 
-import { Divider, Menu, MenuList } from "@mui/material";
+import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
-import { HideOrShowCategoryMenuItem } from "../HideOrShowCategoryMenuItem";
-import { HideOtherCategoriesMenuItem } from "../HideOtherCategoriesMenuItem";
-
-import { DeleteCategoryMenuItem } from "../DeleteCategory";
 import { EditCategoryMenuItem } from "../EditCategory";
 import { ClearAnnotationMenuItem } from "../ClearAnnotation";
+import { DeleteAnnotationCategoryMenuItem } from "../DeleteCategory/DeleteCategoryMenuItem/DeleteAnnotationCategoryMenuItem";
 
-import {
-  Category,
-  CategoryType,
-  UNKNOWN_ANNOTATION_CATEGORY_ID,
-  UNKNOWN_CLASS_CATEGORY_ID,
-} from "types";
-import { useDispatch } from "react-redux";
-import { dataSlice } from "store/data";
+import { Category, CategoryType, UNKNOWN_CATEGORY_NAME } from "types";
 
 type CategoryItemMenuProps = {
   anchorElCategoryMenu: any;
   category: Category;
-  categoryType: CategoryType;
+  categoryHidden: boolean;
   onCloseCategoryMenu: () => void;
-  onOpenCategoryMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleHideOtherCategories: (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    category: Category
+  ) => void;
+  handleHideCategory: (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    category: Category
+  ) => void;
   openCategoryMenu: boolean;
 };
 
 export const CategoryItemMenu = ({
   anchorElCategoryMenu,
   category,
-  categoryType,
+  categoryHidden,
   onCloseCategoryMenu,
+  handleHideOtherCategories,
+  handleHideCategory,
   openCategoryMenu,
 }: CategoryItemMenuProps) => {
-  const dispatch = useDispatch();
-
-  const hideOtherCategories = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    dispatch(
-      dataSlice.actions.setOtherCategoriesInvisible({ id: category.id })
-    );
-
-    onCloseCategoryMenu();
-  };
-  const onHideCategory = (
-    event: React.MouseEvent<HTMLLIElement, MouseEvent>
-  ) => {
-    const payload = {
-      categoryId: category.id,
-      visible: !category.visible,
-    };
-
-    dispatch(dataSlice.actions.setCategoryVisibility(payload));
-
-    onCloseCategoryMenu();
-  };
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
@@ -66,39 +42,45 @@ export const CategoryItemMenu = ({
       transformOrigin={{ horizontal: "center", vertical: "top" }}
     >
       <MenuList dense variant="menu">
-        <HideOtherCategoriesMenuItem
-          handleHideOtherCategories={hideOtherCategories}
-        />
+        <MenuItem
+          onClick={(event) => {
+            handleHideOtherCategories(event, category);
+          }}
+        >
+          <Typography variant="inherit">Hide other categories</Typography>
+        </MenuItem>
 
-        <HideOrShowCategoryMenuItem
-          category={category}
-          handleHideCategory={onHideCategory}
-        />
+        <MenuItem
+          onClick={(event) => {
+            handleHideCategory(event, category);
+          }}
+        >
+          <Typography variant="inherit">
+            {categoryHidden ? "Show" : "Hide"} category
+          </Typography>
+        </MenuItem>
 
-        {category.id !== UNKNOWN_CLASS_CATEGORY_ID &&
-          category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID && (
-            <div>
-              <Divider />
+        {category.name !== UNKNOWN_CATEGORY_NAME && (
+          <div>
+            <Divider />
 
-              <DeleteCategoryMenuItem
-                category={category}
-                onCloseCategoryMenu={onCloseCategoryMenu}
-              />
+            <DeleteAnnotationCategoryMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
 
-              <EditCategoryMenuItem
-                category={category}
-                categoryType={CategoryType.ClassifierCategory}
-                onCloseCategoryMenu={onCloseCategoryMenu}
-              />
+            <EditCategoryMenuItem
+              category={category}
+              categoryType={CategoryType.AnnotationCategory}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
 
-              {categoryType === CategoryType.AnnotationCategory && (
-                <ClearAnnotationMenuItem
-                  category={category}
-                  onCloseCategoryMenu={onCloseCategoryMenu}
-                />
-              )}
-            </div>
-          )}
+            <ClearAnnotationMenuItem
+              category={category}
+              onCloseCategoryMenu={onCloseCategoryMenu}
+            />
+          </div>
+        )}
       </MenuList>
     </Menu>
   );

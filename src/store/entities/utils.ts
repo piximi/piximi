@@ -36,10 +36,10 @@ export function ensureEntitiesArray<T>(
 
 /* Deferred */
 
-export function getDeferredProperty<T>(
+export function getDeferredProperty<T, S extends keyof T>(
   entity: DeferredEntity<T>,
-  property: keyof T
-) {
+  property: S
+): T[S] | NonNullable<Deferred<T>[S]> {
   return entity.changes[property] ?? entity.saved[property];
 }
 

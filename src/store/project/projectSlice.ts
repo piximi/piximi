@@ -2,12 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Project } from "types/Project";
 import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
+import { mutatingFilter } from "utils/common/helpers";
 
 export const initialState: Project = {
   selectedImageIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
   highlightedCategory: null,
+  hiddenImageCategoryIds: [],
 };
 
 export const projectSlice = createSlice({
@@ -54,6 +56,72 @@ export const projectSlice = createSlice({
         type: "selectImages",
         payload: { imageIds: action.payload.imageIds },
       });
+    },
+    hideCategory(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      !state.hiddenImageCategoryIds.includes(action.payload.categoryId) &&
+        state.hiddenImageCategoryIds.push(action.payload.categoryId);
+    },
+    hideCategories(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        projectSlice.caseReducers.hideCategory(state, {
+          type: "hideCategory",
+          payload: { categoryId },
+        });
+      }
+    },
+    showCategory(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      mutatingFilter(
+        state.hiddenImageCategoryIds,
+        (categoryId) => categoryId !== action.payload.categoryId
+      );
+    },
+    showCategories(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        projectSlice.caseReducers.showCategory(state, {
+          type: "showCategory",
+          payload: { categoryId },
+        });
+      }
+    },
+    showAllCategories(state, action: PayloadAction<{}>) {
+      state.hiddenImageCategoryIds = [];
+    },
+    toggleCategoryVisibility(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      const { categoryId } = action.payload;
+
+      if (state.hiddenImageCategoryIds.includes(categoryId)) {
+        mutatingFilter(
+          state.hiddenImageCategoryIds,
+          (id) => id !== action.payload.categoryId
+        );
+      } else {
+        state.hiddenImageCategoryIds.push(categoryId);
+      }
     },
 
     createNewProject(state, action: PayloadAction<{ name: string }>) {

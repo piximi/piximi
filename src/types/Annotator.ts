@@ -15,6 +15,7 @@ export type ImageViewer = {
   activeImageId?: string;
   activeAnnotationIds: Array<string>;
   previousImageId?: string;
+  hiddenCategoryIds: string[];
   activeImageRenderedSrcs: Array<string>;
   language: LanguageType;
   imageOrigin: { x: number; y: number };

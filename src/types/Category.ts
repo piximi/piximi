@@ -17,6 +17,9 @@ export enum CategoryType {
 
 export const UNKNOWN_CLASS_CATEGORY_ID: string =
   "00000000-0000-0000-0000-000000000000";
+export const UNKNOWN_ANNOTATION_CATEGORY_ID: string =
+  "00000000-0000-1111-0000-000000000000";
+export const UNKNOWN_CATEGORY_NAME: string = "Unknown";
 
 export const UNKNOWN_CLASS_CATEGORY: Category = {
   color: UNKNOWN_CLASS_CATEGORY_COLOR,
@@ -24,9 +27,6 @@ export const UNKNOWN_CLASS_CATEGORY: Category = {
   name: "Unknown",
   visible: true,
 };
-
-export const UNKNOWN_ANNOTATION_CATEGORY_ID: string =
-  "00000000-0000-1111-0000-000000000000";
 
 export const UNKNOWN_ANNOTATION_CATEGORY: Category = {
   color: UNKNOWN_ANNOTATION_CATEGORY_COLOR,

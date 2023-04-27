@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { Divider, Drawer, List } from "@mui/material";
 
@@ -18,27 +18,10 @@ import {
   selectSelectedImages,
 } from "store/data";
 
-import { imageViewerSlice } from "store/imageViewer";
-
-import {
-  Category,
-  CategoryType,
-  UNKNOWN_ANNOTATION_CATEGORY,
-} from "types/Category";
+import { CategoryType } from "types/Category";
 
 export const AnnotatorDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotatorCategories);
-
-  const dispatch = useDispatch();
-
-  const onCategoryClickCallBack = (category: Category) => {
-    dispatch(
-      imageViewerSlice.actions.setSelectedCategoryId({
-        selectedCategoryId: category.id,
-        execSaga: true,
-      })
-    );
-  };
 
   const annotatorImages = useSelector(selectSelectedImages);
 
@@ -74,10 +57,7 @@ export const AnnotatorDrawer = () => {
 
       <CategoriesList
         createdCategories={createdCategories}
-        unknownCategory={UNKNOWN_ANNOTATION_CATEGORY}
-        predicted={false}
         categoryType={CategoryType.AnnotationCategory}
-        onCategoryClickCallBack={onCategoryClickCallBack}
       />
 
       <Divider />

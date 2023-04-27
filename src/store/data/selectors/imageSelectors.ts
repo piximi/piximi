@@ -28,13 +28,12 @@ export const selectImagesByCategoryDict = ({
   return data.imagesByCategory;
 };
 
-export const selectImagesByCategory = () =>
-  createSelector(
-    [selectImagesByCategoryDict, (_, categoryId) => categoryId],
-    (imagesByCategory, categoryId) => {
-      return imagesByCategory[categoryId];
-    }
-  );
+export const selectImagesByCategory = createSelector(
+  [selectImagesByCategoryDict, (_, categoryId) => categoryId],
+  (imagesByCategory, categoryId) => {
+    return imagesByCategory[categoryId];
+  }
+);
 export const selectImageCountByCategory = () =>
   createSelector(
     [selectImagesByCategoryDict, (_, categoryId) => categoryId],

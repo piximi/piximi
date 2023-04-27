@@ -40,6 +40,7 @@ export {
   selectTotalAnnotationCountByImage,
   selectAnnotationIdsByImage,
   selectAnnotationCountByCategory,
+  selectActiveAnnotationIdsByCategory,
 } from "./selectors/annotationSelectors";
 
 export {

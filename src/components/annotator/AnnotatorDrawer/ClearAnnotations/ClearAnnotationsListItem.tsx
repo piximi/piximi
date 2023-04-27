@@ -16,19 +16,13 @@ import {
   imageViewerSlice,
   selectedAnnotationsIdsSelector,
 } from "store/imageViewer";
-import { selectSelectedImages, selectStagedAnnotations } from "store/data";
 
-import { ShadowImageType, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
+import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 
 export const ClearAnnotationsListItem = () => {
   const dispatch = useDispatch();
 
   const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
-  const stagedAnnotations = useSelector(selectStagedAnnotations);
-
-  const annotatorImages = useSelector(selectSelectedImages).map((image) => {
-    return { ...image, annotations: [] } as ShadowImageType;
-  });
 
   const {
     onClose: onCloseDeleteAllAnnotationsDialog,
@@ -37,18 +31,7 @@ export const ClearAnnotationsListItem = () => {
   } = useDialog();
 
   const ClearAllAnnotationsHandler = () => {
-    const existingAnnotations = annotatorImages
-      .map((image: ShadowImageType) => {
-        return [...image.annotations];
-      })
-      .flat();
-    if (
-      existingAnnotations.length ||
-      stagedAnnotations.length ||
-      selectedAnnotationsIds.length
-    ) {
-      onOpenDeleteAllAnnotationsDialog();
-    }
+    onOpenDeleteAllAnnotationsDialog();
   };
 
   const onClearSelectedAnnotations = () => {

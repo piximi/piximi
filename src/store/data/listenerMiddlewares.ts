@@ -21,6 +21,7 @@ import {
 } from "utils/common/image";
 import { projectSlice } from "store/project";
 import { batch } from "react-redux";
+import { getDeferredProperty } from "store/entities/utils";
 
 export const dataMiddleware = createListenerMiddleware();
 
@@ -210,12 +211,22 @@ startAppListening({
       ...savedActiveImage,
       ...activeImageChanges,
     } as ImageType;
-    const deletedAnnotations = newState.data.annotations.ids.filter(
-      (id) => newState.data.annotations.entities[id].changes?.deleted === true
-    ) as Array<string>;
+
     const activeAnnotationIds = [];
     for (const id of newState.data.annotationsByImage[newActiveId]) {
-      if (!deletedAnnotations.includes(id)) {
+      const annotationCategory = getDeferredProperty(
+        newState.data.annotations.entities[id],
+        "categoryId"
+      );
+      const annotationIsDeleted =
+        newState.data.annotations.entities[id].changes.deleted;
+
+      const hiddenCategoryIds = newState.imageViewer.hiddenCategoryIds;
+
+      if (
+        !annotationIsDeleted &&
+        !hiddenCategoryIds.includes(annotationCategory)
+      ) {
         activeAnnotationIds.push(id);
       }
     }
@@ -234,6 +245,44 @@ startAppListening({
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    );
+  },
+});
+
+startAppListening({
+  predicate: (action, currentState, previousState) => {
+    return (
+      currentState.imageViewer.hiddenCategoryIds !==
+      previousState.imageViewer.hiddenCategoryIds
+    );
+  },
+  effect: async (action, listenerAPI) => {
+    const currentState = listenerAPI.getState();
+    const activeImageId = currentState.imageViewer.activeImageId;
+    if (!activeImageId) return;
+    const activeAnnotationIds = [];
+    for (const id of currentState.data.annotationsByImage[activeImageId]) {
+      const annotationCategory = getDeferredProperty(
+        currentState.data.annotations.entities[id],
+        "categoryId"
+      );
+      const annotationIsDeleted =
+        currentState.data.annotations.entities[id].changes.deleted;
+
+      const hiddenCategoryIds = currentState.imageViewer.hiddenCategoryIds;
+
+      if (
+        !annotationIsDeleted &&
+        !hiddenCategoryIds.includes(annotationCategory)
+      ) {
+        activeAnnotationIds.push(id);
+      }
+    }
+
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveAnnotationIds({
+        annotationIds: activeAnnotationIds,
+      })
     );
   },
 });

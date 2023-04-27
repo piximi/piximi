@@ -17,33 +17,23 @@ import { Label as LabelIcon } from "@mui/icons-material";
 import { CollapsibleList } from "components/common/CollapsibleList";
 
 import { imageViewerSlice } from "store/imageViewer";
-import {
-  selectAllAnnotationCategories,
-  selectSelectedAnnotations,
-  selectStagedAnnotations,
-} from "store/data";
+import { selectAllAnnotationCategories } from "store/data";
 
 import { Category } from "types";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
+import { selectActiveAnnotations } from "store/data/selectors/annotationSelectors";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();
 
   const dispatch = useDispatch();
 
-  const selectedAnnotations = useSelector(selectSelectedAnnotations);
-  const stagedAnnotations = useSelector(selectStagedAnnotations);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
   const annotationCategories = useSelector(selectAllAnnotationCategories);
 
   const onSelectAll = () => {
-    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
-    dispatch(
-      imageViewerSlice.actions.setSelectedAnnotationIds({
-        selectedAnnotationIds: allAnnotations.map((an) => an.id),
-        workingAnnotationId: allAnnotations[0].id,
-      })
-    );
+    dispatch(imageViewerSlice.actions.setAllSelectedAnnotationIds({}));
   };
 
   const onSelectNone = () => {
@@ -60,16 +50,21 @@ export const PointerSelectionOptions = () => {
       | React.MouseEvent<HTMLLIElement>
       | React.MouseEvent<HTMLAnchorElement>
       | React.MouseEvent<HTMLDivElement>,
-    category: Category
+    categoryId: string
   ) => {
-    const allAnnotations = [...selectedAnnotations, ...stagedAnnotations];
-    const desiredAnnotations = allAnnotations.filter((annotation) => {
-      return annotation.categoryId === category.id;
-    });
+    const desiredAnnotationIds = activeAnnotations.reduce(
+      (ids: string[], annotation) => {
+        if (annotation.categoryId === categoryId) {
+          ids.push(annotation.id);
+        }
+        return ids;
+      },
+      []
+    );
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotationIds({
-        selectedAnnotationIds: desiredAnnotations.map((an) => an.id),
-        workingAnnotationId: desiredAnnotations[0].id,
+        selectedAnnotationIds: desiredAnnotationIds,
+        workingAnnotationId: desiredAnnotationIds[0],
       })
     );
   };
@@ -106,7 +101,7 @@ export const PointerSelectionOptions = () => {
             <ListItem
               button
               id={category.id}
-              onClick={(event) => onSelectCategory(event, category)}
+              onClick={(event) => onSelectCategory(event, category.id)}
               key={idx}
             >
               <ListItemIcon>

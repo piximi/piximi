@@ -1,120 +1,109 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 import {
+  Checkbox,
   Chip,
   IconButton,
   ListItem,
+  ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
 } from "@mui/material";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
-import { CategoryItemCheckbox } from "../CategoryItemCheckbox";
-import { CategoryItemMenu } from "../CategoryItemMenu";
+import {
+  Label as LabelIcon,
+  LabelOutlined as LabelOutlinedIcon,
+  MoreHoriz as MoreHorizIcon,
+} from "@mui/icons-material";
 
 import { highlightedCategoriesSelector } from "store/project";
-import {
-  selectImageCountByCategory,
-  selectSelectedAnnotationCategory,
-} from "store/data";
+import { selectSelectedAnnotationCategory } from "store/data";
 
-import { Category, CategoryType } from "types";
+import { Category } from "types";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type CategoryItemProps = {
   category: Category;
   id: string;
-  onCategoryClickCallBack: (category: Category) => void;
+  categoryisVisible: boolean;
+  handleToggleCategory: (category: Category) => void;
+  handleSelectCategory: (category: Category) => void;
+  onOpenCategoryMenu: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    category: Category
+  ) => void;
+  objectCount: number;
 };
 
 export const CategoryItem = ({
   category,
   id,
-  onCategoryClickCallBack,
+  categoryisVisible,
+  handleToggleCategory,
+  handleSelectCategory,
+  onOpenCategoryMenu,
+  objectCount,
 }: CategoryItemProps) => {
-  const memoizedSelectImageCountByCategory = useMemo(
-    selectImageCountByCategory,
-    []
-  );
-  const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
-    React.useState<null | HTMLElement>(null);
-
-  const onOpenCategoryMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setCategoryMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCloseCategoryMenu = () => {
-    setCategoryMenuAnchorEl(null);
-  };
-
   const highlightedCategory = useSelector(highlightedCategoriesSelector);
   const selectedCategory = useSelector(selectSelectedAnnotationCategory);
-  const imageCount = useSelector((state) =>
-    memoizedSelectImageCountByCategory(state, category.id)
-  );
-
-  const [count, setCount] = React.useState(0);
-
-  React.useEffect(() => {
-    setCount(imageCount);
-  }, [imageCount]);
 
   const onCategoryClick = () => {
-    onCategoryClickCallBack(category);
+    handleSelectCategory(category);
   };
 
   return (
-    <React.Fragment>
-      <ListItem
-        dense
-        button
-        id={category.id}
-        onClick={onCategoryClick}
-        selected={category.id === selectedCategory.id}
-        sx={{
-          backgroundColor:
-            category.id === highlightedCategory
-              ? APPLICATION_COLORS.highlightColor
-              : "none",
-        }}
-      >
-        <CategoryItemCheckbox category={category} />
-
-        <ListItemText
-          id={id}
-          primary={category.name}
-          primaryTypographyProps={{ noWrap: true }}
+    <ListItem
+      dense
+      button
+      id={category.id}
+      onClick={onCategoryClick}
+      selected={category.id === selectedCategory.id}
+      sx={{
+        backgroundColor:
+          category.id === highlightedCategory
+            ? APPLICATION_COLORS.highlightColor
+            : "none",
+      }}
+    >
+      <ListItemIcon>
+        <Checkbox
+          checked={categoryisVisible}
+          checkedIcon={<LabelIcon style={{ color: category.color }} />}
+          disableRipple
+          edge="start"
+          icon={<LabelOutlinedIcon style={{ color: category.color }} />}
+          tabIndex={-1}
+          onChange={() => handleToggleCategory(category)}
         />
+      </ListItemIcon>
 
-        <Chip
-          label={count}
-          size="small"
-          sx={{
-            height: "20px",
-            borderWidth: "2px",
-            fontSize: "0.875rem",
-            color: "white",
-            backgroundColor: category.color,
-          }}
-        />
-
-        <ListItemSecondaryAction>
-          <IconButton edge="end" onClick={onOpenCategoryMenu}>
-            <MoreHorizIcon />
-          </IconButton>
-        </ListItemSecondaryAction>
-      </ListItem>
-
-      <CategoryItemMenu
-        anchorElCategoryMenu={categoryMenuAnchorEl}
-        category={category}
-        categoryType={CategoryType.ClassifierCategory}
-        onCloseCategoryMenu={onCloseCategoryMenu}
-        onOpenCategoryMenu={onOpenCategoryMenu}
-        openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+      <ListItemText
+        id={id}
+        primary={category.name}
+        primaryTypographyProps={{ noWrap: true }}
       />
-    </React.Fragment>
+
+      <Chip
+        label={objectCount}
+        size="small"
+        sx={{
+          height: "20px",
+          borderWidth: "2px",
+          fontSize: "0.875rem",
+          color: "white",
+          backgroundColor: category.color,
+        }}
+      />
+
+      <ListItemSecondaryAction>
+        <IconButton
+          edge="end"
+          onClick={(event) => onOpenCategoryMenu(event, category)}
+        >
+          <MoreHorizIcon />
+        </IconButton>
+      </ListItemSecondaryAction>
+    </ListItem>
   );
 };

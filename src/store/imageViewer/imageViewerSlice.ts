@@ -26,6 +26,7 @@ const initialState: ImageViewer = {
   activeImageRenderedSrcs: [],
   language: LanguageType.English,
   imageOrigin: { x: 0, y: 0 },
+  hiddenCategoryIds: [],
   penSelectionBrushSize: 10,
   pointerSelection: {
     dragging: false,
@@ -114,6 +115,72 @@ export const imageViewerSlice = createSlice({
         type: "addActiveAnnotationIds",
         payload: { annotationIds: action.payload.annotationIds },
       });
+    },
+    hideCategory(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      !state.hiddenCategoryIds.includes(action.payload.categoryId) &&
+        state.hiddenCategoryIds.push(action.payload.categoryId);
+    },
+    hideCategories(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        imageViewerSlice.caseReducers.hideCategory(state, {
+          type: "hideCategory",
+          payload: { categoryId },
+        });
+      }
+    },
+    showCategory(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      mutatingFilter(
+        state.hiddenCategoryIds,
+        (categoryId) => categoryId !== action.payload.categoryId
+      );
+    },
+    showCategories(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        imageViewerSlice.caseReducers.showCategory(state, {
+          type: "showCategory",
+          payload: { categoryId },
+        });
+      }
+    },
+    showAllCategories(state, action: PayloadAction<{}>) {
+      state.hiddenCategoryIds = [];
+    },
+    toggleCategoryVisibility(
+      state,
+      action: PayloadAction<{
+        categoryId: string;
+      }>
+    ) {
+      const { categoryId } = action.payload;
+
+      if (state.hiddenCategoryIds.includes(categoryId)) {
+        mutatingFilter(
+          state.hiddenCategoryIds,
+          (id) => id !== action.payload.categoryId
+        );
+      } else {
+        state.hiddenCategoryIds.push(categoryId);
+      }
     },
 
     setActiveImageRenderedSrcs(
@@ -222,6 +289,12 @@ export const imageViewerSlice = createSlice({
       state.selectedAnnotationIds = action.payload.selectedAnnotationIds;
 
       state.workingAnnotationId = action.payload.workingAnnotationId;
+    },
+    setAllSelectedAnnotationIds(state, action: PayloadAction<{}>) {
+      state.selectedAnnotationIds = state.activeAnnotationIds;
+
+      state.workingAnnotationId =
+        state.workingAnnotationId ?? state.activeAnnotationIds[0];
     },
     setSelectedCategoryId(
       state,
