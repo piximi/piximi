@@ -1,0 +1,1 @@
+export { MaterialUISwitch } from "./MaterialUISwitch";
