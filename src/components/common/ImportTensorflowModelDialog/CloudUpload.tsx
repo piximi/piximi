@@ -25,19 +25,18 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
 import { Shape } from "types";
-import { ModelArchitecture } from "types/ModelType";
 
 export const CloudUpload = ({
   modelKind,
-  modelArch,
+  isGraph,
   setSegmentationModel,
   setClassifierModel,
   setInputShape,
   setModelName,
-  setModelArch,
+  setIsGraph,
 }: {
   modelKind: string;
-  modelArch: ModelArchitecture;
+  isGraph: boolean;
   setSegmentationModel: React.Dispatch<
     React.SetStateAction<
       LayersModel | GraphModel<string | io.IOHandler> | undefined
@@ -50,7 +49,7 @@ export const CloudUpload = ({
   >;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
   setModelName: React.Dispatch<React.SetStateAction<string>>;
-  setModelArch: React.Dispatch<React.SetStateAction<ModelArchitecture>>;
+  setIsGraph: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [isFromTFHub, setIsFromTFHub] = useState<boolean>(false);
   const [errMessage, setErrMessage] = useState<string>("");
@@ -86,21 +85,14 @@ export const CloudUpload = ({
     verifySourceMatchDebounced(event.target.value, isFromTFHub);
   };
 
-  const handleModelArchChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setModelArch(
-      event.target.value === "Graph"
-        ? ModelArchitecture.Graph
-        : ModelArchitecture.Layers
-    );
-  };
+  const handleModelTypeChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setIsGraph(event.target.value === "Graph");
 
   const loadModel = async () => {
     let model: GraphModel | LayersModel;
 
     try {
-      if (modelArch === ModelArchitecture.Graph) {
+      if (isGraph) {
         model = await loadGraphModel(modelUrl, {
           fromTFHub: isFromTFHub,
         });
@@ -179,8 +171,8 @@ export const CloudUpload = ({
             row
             aria-labelledby="model-type-radio-buttons-group-label"
             name="model-type-radio-buttons-group"
-            value={modelArch}
-            onChange={handleModelArchChange}
+            value={isGraph ? "Graph" : "Layers"}
+            onChange={handleModelTypeChange}
           >
             <FormControlLabel
               value="Graph"
