@@ -20,23 +20,12 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-<<<<<<< HEAD
 import { CategoryType, HotkeyView, Shape } from "types";
-||||||| parent of aea4e5ca ([mod] Add model architecture to type)
-import { CategoryType, HotkeyView, ModelType, Shape } from "types";
-=======
-import { CategoryType, HotkeyView, TheModel, Shape } from "types";
->>>>>>> aea4e5ca ([mod] Add model architecture to type)
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-<<<<<<< HEAD
 import { ModelTask } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
-||||||| parent of aea4e5ca ([mod] Add model architecture to type)
-=======
-import { ModelArchitecture } from "types/ModelType";
->>>>>>> aea4e5ca ([mod] Add model architecture to type)
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
@@ -64,7 +53,6 @@ export const SegmenterList = () => {
       if (model instanceof CocoSSD) {
         await model.loadModel();
 
-<<<<<<< HEAD
         const cocoCategories = model.constructCategories();
         dispatch(
           dataSlice.actions.setAnnotationCategories({
@@ -87,45 +75,6 @@ export const SegmenterList = () => {
         }, should be ${ModelTask[ModelTask.Segmentation]}`
       );
     }
-||||||| parent of aea4e5ca ([mod] Add model architecture to type)
-  const importSegmentationModel = (
-    inputShape: Shape,
-    modelName: string,
-    modelType: number,
-    segmentationModel: any,
-    modelArch: string
-  ) => {
-    dispatch(
-      segmenterSlice.actions.uploadUserSelectedModel({
-        inputShape: inputShape,
-        modelSelection: {
-          modelName: modelName,
-          modelType: modelType as ModelType,
-          modelArch: modelArch,
-        },
-        model: segmentationModel as GraphModel,
-      })
-    );
-=======
-  const importSegmentationModel = (
-    inputShape: Shape,
-    modelName: string,
-    theModel: number,
-    segmentationModel: any,
-    modelArch: ModelArchitecture
-  ) => {
-    dispatch(
-      segmenterSlice.actions.uploadUserSelectedModel({
-        inputShape: inputShape,
-        modelSelection: {
-          modelName: modelName,
-          theModel: theModel as TheModel,
-          modelArch: modelArch,
-        },
-        model: segmentationModel as GraphModel,
-      })
-    );
->>>>>>> aea4e5ca ([mod] Add model architecture to type)
   };
 
   const SegmenterIOButtons = (
@@ -181,18 +130,8 @@ export const SegmenterList = () => {
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog
-<<<<<<< HEAD
         model={selectedModel}
         modelStatus={modelStatus}
-||||||| parent of aea4e5ca ([mod] Add model architecture to type)
-        fittedModel={fittedSegmenter as LayersModel}
-        modelProps={selectedSegmenterModelProps}
-        modelTypeString={"Segmenter"}
-=======
-        fittedModel={fittedSegmenter as LayersModel}
-        modelProps={selectedSegmenterModelProps}
-        modelKind={"Segmenter"}
->>>>>>> aea4e5ca ([mod] Add model architecture to type)
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}
       />
