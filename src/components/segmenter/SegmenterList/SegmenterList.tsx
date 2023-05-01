@@ -21,9 +21,8 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import { CategoryType, HotkeyView, TheModel, Shape } from "types";
+import { CategoryType, HotkeyView, ModelArchitecture, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelArchitecture } from "types/ModelType";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
@@ -48,17 +47,17 @@ export const SegmenterList = () => {
   const importSegmentationModel = (
     inputShape: Shape,
     modelName: string,
-    theModel: number,
+    modelArch: number,
     segmentationModel: any,
-    modelArch: ModelArchitecture
+    graph: boolean
   ) => {
     dispatch(
       segmenterSlice.actions.uploadUserSelectedModel({
         inputShape: inputShape,
         modelSelection: {
           modelName: modelName,
-          theModel: theModel as TheModel,
-          modelArch: modelArch,
+          modelArch: modelArch as ModelArchitecture,
+          graph: graph,
         },
         model: segmentationModel as GraphModel,
       })

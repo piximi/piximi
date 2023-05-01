@@ -12,7 +12,7 @@
     "fitting": false,
     "learningRate": 0.01,
     "lossFunction": "Categorical (softmax) cross entropy",
-    "selectedModel": { "modelName": "SimpleCNN", "theModel": 0 },
+    "selectedModel": { "modelName": "SimpleCNN", "modelArch": 0 },
     "metrics": ["Categorical accuracy"],
     "optimizationAlgorithm": "Adam",
     "predicting": false,

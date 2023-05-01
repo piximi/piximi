@@ -40,7 +40,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-  const [isModelPretrained, setIsModelPretrained] = useState<boolean>(false);
+  const [isModelTrainable, setIsModelTrainable] = useState<boolean>(true);
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
@@ -128,13 +128,13 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   useEffect(() => {
     if (annotatedImages.length === 0) {
       setNoLabeledImages(true);
-      if (!noLabeledImages && !isModelPretrained) {
+      if (!noLabeledImages && isModelTrainable) {
         setShowWarning(true);
       }
     } else {
       setNoLabeledImages(false);
     }
-  }, [annotatedImages, noLabeledImages, isModelPretrained]);
+  }, [annotatedImages, noLabeledImages, isModelTrainable]);
 
   const trainingHistoryCallback = (epoch: number, logs: any) => {
     const epochCount = epoch + 1;
@@ -204,12 +204,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <FitSegmenterDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noLabeledImages || isModelPretrained}
+        disableFitting={noLabeledImages || !isModelTrainable}
         epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noLabeledImages && !isModelPretrained && (
+      {showWarning && noLabeledImages && isModelTrainable && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
@@ -221,8 +221,8 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <DialogContent>
         <List dense>
           <SegmenterArchitectureSettingsListItem
-            setIsModelPretrained={setIsModelPretrained}
-            isModelPretrained={isModelPretrained}
+            setIsModelTrainable={setIsModelTrainable}
+            isModelTrainable={isModelTrainable}
           />
 
           <OptimizerSettingsListItem
@@ -235,7 +235,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             fitOptions={fitOptions}
             dispatchBatchSizeCallback={dispatchBatchSizeCallback}
             dispatchLearningRateCallback={dispatchLearningRateCallback}
-            isModelPretrained={isModelPretrained}
+            isModelTrainable={isModelTrainable}
           />
 
           <DatasetSettingsListItem
@@ -243,7 +243,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             dispatchTrainingPercentageCallback={
               dispatchTrainingPercentageCallback
             }
-            isModelPretrained={isModelPretrained}
+            isModelTrainable={isModelTrainable}
           />
         </List>
 
