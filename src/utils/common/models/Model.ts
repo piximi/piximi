@@ -1,13 +1,37 @@
-import { TheModel, ModelArchitecture } from "types/ModelType";
+import { GraphModel, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { ModelArchitecture, ModelTask } from "types/ModelType";
 
 export abstract class Model {
-  theModel: TheModel;
+  modelArch: ModelArchitecture;
+  modelName: string;
+  task: ModelTask;
+  graph: boolean;
+  src: string;
+  pretrained: boolean;
+  requiredChannels?: number;
 
   constructor(
-    modelArchitecure: ModelArchitecture,
-    theModel: TheModel,
-    modelName: string
+    modelArch: ModelArchitecture,
+    modelName: string,
+    task: ModelTask,
+    graph: boolean,
+    src: string,
+    pretrained: boolean,
+    requiredChannels?: number
   ) {
-    this.theModel = theModel;
+    this.modelArch = modelArch;
+    this.modelName = modelName;
+    this.task = task;
+    this.graph = graph;
+    this.src = src;
+    this.pretrained = pretrained;
+    this.requiredChannels = requiredChannels;
   }
+
+  abstract preprocess(data: Tensor): Tensor;
+  abstract train(data: Tensor, labels: Tensor): void;
+  abstract predict(data: Tensor): Tensor;
+  abstract embedding(data: Tensor): Tensor;
+  abstract load(): LayersModel | GraphModel;
+  abstract dispose(): void;
 }

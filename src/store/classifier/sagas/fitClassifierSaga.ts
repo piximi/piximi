@@ -28,7 +28,12 @@ import { compile } from "store/coroutines";
 import {
   AlertStateType,
   AlertType,
+<<<<<<< HEAD
   TheModel,
+=======
+  ImageType,
+  ModelArchitecture,
+>>>>>>> 8ee9fc4b ([mod] Clean up model type enums)
   Partition,
   ImageType,
 } from "types";
@@ -102,7 +107,10 @@ export function* fitClassifierSaga({
   const classes: number = yield select(selectCreatedImageCategoryCount);
 
   var model: ReturnType<typeof classifierCompiledSelector>;
-  if (architectureOptions.selectedModel.theModel === TheModel.UserUploaded) {
+  if (
+    architectureOptions.selectedModel.modelArch ===
+    ModelArchitecture.UserUploaded
+  ) {
     model = yield select(classifierCompiledSelector);
   } else {
     try {

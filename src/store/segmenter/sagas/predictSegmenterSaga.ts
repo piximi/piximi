@@ -29,8 +29,8 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ObjectDetectionType,
   ImageType,
-  TheModel,
   DecodedAnnotationType,
+  ModelArchitecture,
 } from "types";
 import { getStackTraceFromError } from "utils";
 import COCO_CLASSES from "data/model-data/cocossd-classes";
@@ -91,7 +91,7 @@ export function* predictSegmenterSaga({
 
   let possibleClasses: { [key: string]: ObjectDetectionType } = {};
 
-  if (selectedModel.theModel === TheModel.CocoSSD) {
+  if (selectedModel.modelArch === ModelArchitecture.CocoSSD) {
     possibleClasses = COCO_CLASSES;
   }
 
@@ -135,7 +135,7 @@ export function* predictSegmenterSaga({
     fitOptions,
     model,
     possibleClasses,
-    selectedModel.theModel
+    selectedModel.modelArch
   );
 
   yield put(
@@ -154,7 +154,7 @@ function* runSegmentationPrediction(
   fitOptions: FitOptions,
   model: LayersModel | GraphModel,
   possibleClasses: { [key: string]: ObjectDetectionType },
-  selectedModel: TheModel
+  selectedModel: ModelArchitecture
 ) {
   var predictions:
     | Awaited<ReturnType<typeof predictCoco>>
@@ -166,7 +166,7 @@ function* runSegmentationPrediction(
   }>;
   var foundCategories: Category[];
   switch (selectedModel) {
-    case TheModel.CocoSSD:
+    case ModelArchitecture.CocoSSD:
       try {
         predictions = yield predictCoco(
           model as GraphModel,
@@ -184,7 +184,7 @@ function* runSegmentationPrediction(
         return;
       }
       break;
-    case TheModel.StardistVHE:
+    case ModelArchitecture.StardistVHE:
       try {
         predictions = yield predictStardist(
           model as GraphModel,

@@ -16,14 +16,13 @@ import {
 } from "store/segmenter";
 
 import { availableSegmenterModels, SegmenterModelProps } from "types";
-import { ModelArchitecture } from "types/ModelType";
 
 export const SegmenterArchitectureSettingsGrid = ({
-  setIsModelPretrained,
-  isModelPretrained,
+  setIsModelTrainable,
+  isModelTrainable,
 }: {
-  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
-  isModelPretrained: boolean;
+  setIsModelTrainable: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelTrainable: boolean;
 }) => {
   const architectureOptions = useSelector(segmenterArchitectureOptionsSelector);
   const userUploadedModel = useSelector(segmenterUserUploadedModelSelector);
@@ -100,14 +99,13 @@ export const SegmenterArchitectureSettingsGrid = ({
       setFixedNumberOfChannelsHelperText(
         `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
       );
-    } else if (selectedModel.modelArch === ModelArchitecture.Graph) {
-      setIsModelPretrained(true);
     } else {
-      setIsModelPretrained(false);
       setFixedNumberOfChannels(false);
       setFixedNumberOfChannelsHelperText("");
     }
-  }, [selectedModel, setIsModelPretrained]);
+
+    setIsModelTrainable(!selectedModel.graph);
+  }, [selectedModel, setIsModelTrainable]);
 
   return (
     <StyledFormControl>
@@ -128,7 +126,7 @@ export const SegmenterArchitectureSettingsGrid = ({
             )}
             value={selectedModel}
             isOptionEqualToValue={(option, value) =>
-              option.theModel === value.theModel &&
+              option.modelArch === value.modelArch &&
               option.modelName === value.modelName
             }
           />
@@ -142,7 +140,7 @@ export const SegmenterArchitectureSettingsGrid = ({
             value={inputShape.height}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={isModelPretrained}
+            disabled={!isModelTrainable}
           />
         </Grid>
         <Grid item xs={2}>
@@ -152,7 +150,7 @@ export const SegmenterArchitectureSettingsGrid = ({
             value={inputShape.width}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={isModelPretrained}
+            disabled={!isModelTrainable}
           />
         </Grid>
         <Grid item xs={2}>
@@ -162,7 +160,7 @@ export const SegmenterArchitectureSettingsGrid = ({
             value={inputShape.channels}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={fixedNumberOfChannels || isModelPretrained}
+            disabled={fixedNumberOfChannels || !isModelTrainable}
           />
         </Grid>
       </Grid>

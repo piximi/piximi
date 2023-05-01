@@ -1,4 +1,4 @@
-export enum TheModel {
+export enum ModelArchitecture {
   None,
   SimpleCNN,
   MobileNet,
@@ -9,18 +9,18 @@ export enum TheModel {
   StardistVHE,
 }
 
-export enum ModelArchitecture {
-  Graph,
-  Layers,
+export enum ModelTask {
+  Classification,
+  Segmentation,
 }
 
 type ModelProps = {
   modelName: string;
   requiredChannels?: number;
-  theModel: TheModel;
+  modelArch: ModelArchitecture;
   src?: string;
   pretrained?: boolean;
-  modelArch: ModelArchitecture;
+  graph: boolean;
 };
 export interface DefaultModelProps extends ModelProps {}
 
@@ -31,28 +31,28 @@ export type SegmenterModelProps = DefaultModelProps;
 export const availableClassifierModels: ClassifierModelProps[] = [
   {
     modelName: "SimpleCNN",
-    theModel: TheModel.SimpleCNN,
-    modelArch: ModelArchitecture.Layers,
+    modelArch: ModelArchitecture.SimpleCNN,
+    graph: false,
   },
   {
     modelName: "MobileNet",
     requiredChannels: 3,
-    theModel: TheModel.MobileNet,
-    modelArch: ModelArchitecture.Layers,
+    modelArch: ModelArchitecture.MobileNet,
+    graph: false,
   },
 ];
 
 export const availableSegmenterModels: SegmenterModelProps[] = [
   {
     modelName: "Coco-SSD",
-    theModel: TheModel.CocoSSD,
-    modelArch: ModelArchitecture.Graph,
+    modelArch: ModelArchitecture.CocoSSD,
+    graph: true,
     pretrained: true,
   },
   {
     modelName: "Stardist Versitile H&E Nuclei",
-    theModel: TheModel.StardistVHE,
-    modelArch: ModelArchitecture.Graph,
+    modelArch: ModelArchitecture.StardistVHE,
+    graph: true,
     pretrained: true,
   },
 ];
