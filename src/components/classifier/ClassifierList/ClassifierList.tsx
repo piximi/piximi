@@ -22,9 +22,14 @@ import {
 
 import { selectCreatedImageCategories } from "store/data";
 
-import { Category, CategoryType, HotkeyView, TheModel, Shape } from "types";
+import {
+  Category,
+  CategoryType,
+  HotkeyView,
+  ModelArchitecture,
+  Shape,
+} from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelArchitecture } from "types/ModelType";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
@@ -57,8 +62,8 @@ export const ClassifierList = () => {
         inputShape: inputShape,
         modelSelection: {
           modelName: modelName + " - uploaded",
-          theModel: TheModel.UserUploaded,
-          modelArch: ModelArchitecture.Layers,
+          modelArch: ModelArchitecture.UserUploaded,
+          graph: false,
         },
         model: classifierModel as LayersModel,
       })

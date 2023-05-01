@@ -16,7 +16,7 @@ import {
   availableClassifierModels,
   availableSegmenterModels,
 } from "types";
-import { ModelArchitecture, TheModel } from "types/ModelType";
+import { ModelArchitecture } from "types/ModelType";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -25,9 +25,9 @@ type ImportTensorflowModelDialogProps = {
   dispatchFunction: (
     inputShape: Shape,
     modelName: string,
-    theModel: TheModel,
+    modelArch: ModelArchitecture,
     classifierModel: any,
-    modelArch: ModelArchitecture
+    graph: boolean
   ) => void;
 };
 
@@ -44,9 +44,7 @@ export const ImportTensorflowModelDialog = ({
   const [segmentationModel, setSegmentationModel] = useState<
     GraphModel | LayersModel | undefined
   >();
-  const [modelArch, setModelArch] = useState<ModelArchitecture>(
-    ModelArchitecture.Graph
-  );
+  const [isGraph, setIsGraph] = useState<boolean>(true);
   const [modelName, setModelName] = useState<string>("");
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
@@ -55,17 +53,17 @@ export const ImportTensorflowModelDialog = ({
     planes: 1,
   });
   const [pretrainedModels, setPretrainedModels] = useState<
-    Array<{ name: string; theModel: TheModel }>
+    Array<{ name: string; modelArch: ModelArchitecture }>
   >([]);
-  const [theModel, setTheModel] = useState<number>(0);
+  const [modelArch, setModelArch] = useState<number>(0);
 
   const dispatchModelToStore = () => {
     dispatchFunction(
       inputShape,
       modelName,
-      theModel,
+      modelArch,
       modelKind === "Classification" ? classifierModel : segmentationModel,
-      modelArch
+      isGraph
     );
 
     closeDialog();
@@ -88,13 +86,16 @@ export const ImportTensorflowModelDialog = ({
       modelKind === "Classification"
         ? availableClassifierModels.reduce(
             (
-              trainedModels: Array<{ name: string; theModel: TheModel }>,
+              trainedModels: Array<{
+                name: string;
+                modelArch: ModelArchitecture;
+              }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
                 trainedModels.push({
                   name: model.modelName,
-                  theModel: model.theModel,
+                  modelArch: model.modelArch,
                 });
               }
               return trainedModels;
@@ -103,13 +104,16 @@ export const ImportTensorflowModelDialog = ({
           )
         : availableSegmenterModels.reduce(
             (
-              trainedModels: Array<{ name: string; theModel: TheModel }>,
+              trainedModels: Array<{
+                name: string;
+                modelArch: ModelArchitecture;
+              }>,
               model: DefaultModelProps
             ) => {
               if (model.pretrained) {
                 trainedModels.push({
                   name: model.modelName,
-                  theModel: model.theModel,
+                  modelArch: model.modelArch,
                 });
               }
               return trainedModels;
@@ -126,7 +130,7 @@ export const ImportTensorflowModelDialog = ({
 
       <LocalFileUpload
         modelKind={modelKind}
-        modelArch={modelArch}
+        isGraph={isGraph}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}
         setInputShape={setInputShape}
@@ -135,23 +139,23 @@ export const ImportTensorflowModelDialog = ({
 
       <PretrainedModelSelector
         values={[
-          { name: "None", theModel: TheModel.None },
+          { name: "None", modelArch: ModelArchitecture.None },
           ...pretrainedModels,
         ]}
         setSegmentationModel={setSegmentationModel}
         setInputShape={setInputShape}
         setModelName={setModelName}
-        setTheModel={setTheModel}
+        setModelArch={setModelArch}
       />
 
       <CloudUpload
         modelKind={modelKind}
-        modelArch={modelArch}
+        isGraph={isGraph}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}
         setInputShape={setInputShape}
         setModelName={setModelName}
-        setModelArch={setModelArch}
+        setIsGraph={setIsGraph}
       />
 
       <DialogActions>

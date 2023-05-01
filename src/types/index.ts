@@ -96,7 +96,7 @@ export type {
   DefaultModelProps,
 } from "./ModelType";
 export {
-  TheModel,
+  ModelArchitecture,
   availableClassifierModels,
   availableSegmenterModels,
 } from "./ModelType";

@@ -4,11 +4,11 @@ import { CollapsibleList } from "components/common/styled-components/Collapsible
 import { SegmenterArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
 
 export const SegmenterArchitectureSettingsListItem = ({
-  setIsModelPretrained,
-  isModelPretrained,
+  setIsModelTrainable,
+  isModelTrainable,
 }: {
-  setIsModelPretrained: React.Dispatch<React.SetStateAction<boolean>>;
-  isModelPretrained: boolean;
+  setIsModelTrainable: React.Dispatch<React.SetStateAction<boolean>>;
+  isModelTrainable: boolean;
 }) => {
   const StyledForm = styled("form")({
     // width: '100%',
@@ -25,8 +25,8 @@ export const SegmenterArchitectureSettingsListItem = ({
     >
       <StyledForm noValidate autoComplete="off">
         <SegmenterArchitectureSettingsGrid
-          setIsModelPretrained={setIsModelPretrained}
-          isModelPretrained={isModelPretrained}
+          setIsModelTrainable={setIsModelTrainable}
+          isModelTrainable={isModelTrainable}
         />
       </StyledForm>
     </CollapsibleList>

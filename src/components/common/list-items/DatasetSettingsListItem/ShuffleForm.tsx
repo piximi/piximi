@@ -15,9 +15,9 @@ import {
 } from "store/classifier";
 
 export const ShuffleForm = ({
-  isModelPretrained,
+  isModelTrainable,
 }: {
-  isModelPretrained?: boolean;
+  isModelTrainable?: boolean;
 }) => {
   const shuffle = useSelector(classifierShuffleOptionsSelector);
 
@@ -53,7 +53,7 @@ export const ShuffleForm = ({
                   onChange={onCheckboxChange}
                   name="rescale"
                   color="primary"
-                  disabled={isModelPretrained}
+                  disabled={!isModelTrainable}
                 />
               }
               label="shuffle on split"
