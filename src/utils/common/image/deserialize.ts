@@ -16,7 +16,7 @@ import {
   CropOptions,
   RescaleOptions,
   ClassifierModelProps,
-  TheModel,
+  ModelArchitecture,
   CropSchema,
   Metric,
   LossFunction,
@@ -28,7 +28,6 @@ import { sortKeyByName } from "types/ImageSortType";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import { ModelArchitecture } from "types/ModelType";
 
 /*
   =====================
@@ -341,21 +340,20 @@ const deserializeSelectedModelGroup = (
   selectedModelGroup: Group
 ): ClassifierModelProps => {
   const modelName = getAttr(selectedModelGroup, "model_name") as string;
-  const theModel = getAttr(
-    selectedModelGroup,
-    "the_model"
-  ) as number as TheModel;
   const modelArch = getAttr(
     selectedModelGroup,
-    "model_arch"
+    "model_architecture"
   ) as number as ModelArchitecture;
+
+  const graph = Boolean(getAttr(selectedModelGroup, "model_graph_B"));
+
   const srcAttr = selectedModelGroup.attrs["src"];
   const src = srcAttr ? (srcAttr.value as string) : null;
 
   if (src) {
-    return { modelName, theModel, modelArch, src };
+    return { modelName, modelArch, graph, src };
   } else {
-    return { modelName, theModel, modelArch };
+    return { modelName, modelArch, graph };
   }
 };
 

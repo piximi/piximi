@@ -10,13 +10,13 @@ import {
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;
   dispatchTrainingPercentageCallback: (trainPercentage: number) => void;
-  isModelPretrained?: boolean;
+  isModelTrainable?: boolean;
 };
 
 export const DatasetSettingsListItem = ({
   trainingPercentage,
   dispatchTrainingPercentageCallback,
-  isModelPretrained,
+  isModelTrainable,
 }: DatasetSettingsListItemProps) => {
   const dispatchTrainingPercentage = (trainPercentage: number) => {
     dispatchTrainingPercentageCallback(trainPercentage);
@@ -44,12 +44,12 @@ export const DatasetSettingsListItem = ({
               min={0}
               max={1}
               enableFloat={true}
-              disabled={isModelPretrained}
+              disabled={!isModelTrainable}
             />
           </Grid>
         </Grid>
       </StyledFormControl>
-      <ShuffleForm isModelPretrained={isModelPretrained} />
+      <ShuffleForm isModelTrainable={isModelTrainable} />
     </CollapsibleList>
   );
 };

@@ -25,7 +25,7 @@ import {
 import { compile } from "store/coroutines";
 import {
   Partition,
-  TheModel,
+  ModelArchitecture,
   AlertStateType,
   AlertType,
   ImageType,
@@ -86,7 +86,10 @@ export function* fitSegmenterSaga({
     yield select(selectAllAnnotationCategories);
 
   var model: LayersModel;
-  if (architectureOptions.selectedModel.theModel === TheModel.UserUploaded) {
+  if (
+    architectureOptions.selectedModel.modelArch ===
+    ModelArchitecture.UserUploaded
+  ) {
     model = yield select(segmenterCompiledModelSelector);
   } else {
     try {
