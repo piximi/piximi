@@ -1,3 +1,4 @@
+// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
 import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 import { ModelArchitecture, Shape } from "types";
-import { loadStardist } from "utils/common/model-loaders";
+import { loadStardist } from "utils/common/models";
 
 export const PretrainedModelSelector = ({
   values,

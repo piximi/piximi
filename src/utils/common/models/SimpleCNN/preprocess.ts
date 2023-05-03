@@ -1,4 +1,3 @@
-// TODO - segmenter: delete this, moved to `model-preprocessors/classifier.ts`
 import {
   Tensor1D,
   Tensor2D,
@@ -20,76 +19,69 @@ import {
 
 import { denormalizeTensor, getImageSlice, BitDepth } from "utils/common/image";
 
-import { matchedCropPad, padToMatch } from "./cropUtil";
+import { matchedCropPad, padToMatch } from "../utils/crop";
 
 import {
   Category,
+  ImageType,
   Partition,
   Shape,
   FitOptions,
   PreprocessOptions,
-  UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
   CropSchema,
-  ImageType,
 } from "types";
 
-export const createClassificationLabels = (
+const createClassificationIdxs = (
   images: ImageType[],
   categories: Category[]
 ) => {
-  const labels: Array<Tensor1D> = [];
+  const categoryIdxs: number[] = [];
 
-  for (const image of images) {
-    const labelIdx = categories.findIndex((category: Category) => {
-      if (category.id !== UNKNOWN_IMAGE_CATEGORY_ID) {
-        return category.id === image.categoryId;
+  for (const im of images) {
+    const idx = categories.findIndex((cat: Category) => {
+      if (cat.id !== UNKNOWN_CLASS_CATEGORY_ID) {
+        return cat.id === im.categoryId;
       } else {
         throw Error(
-          `image "${image.name}" has an unrecognized category id of "${image.categoryId}"`
+          `image "${im.name}" has an unrecognized category id of "${im.categoryId}"`
         );
       }
     });
 
-    const label = oneHot(labelIdx, categories.length) as Tensor1D;
-
-    labels.push(label);
+    categoryIdxs.push(idx);
   }
 
-  const disposeLabels = () => {
-    for (const label of labels) {
-      label.dispose();
-    }
-  };
-
-  return { labels, disposeLabels };
+  return categoryIdxs;
 };
 
 export const sampleGenerator = (
   images: Array<ImageType>,
-  labels: Array<Tensor1D>
+  categories: Array<Category>
 ) => {
   const count = images.length;
+  const categoryIdxs = createClassificationIdxs(images, categories);
 
   return function* () {
     let index = 0;
 
     while (index < count) {
       const image = images[index];
-      const label = labels[index];
-
       const dataPlane = getImageSlice(image.data, image.activePlane);
 
+      const label = categoryIdxs[index];
+      const oneHotLabel = oneHot(label, categories.length) as Tensor1D;
+
       /*
-       we clone the "label" tensor below, because it will be disposed internally
-       when passing it to TF for fit/evaluate/predict
+       dataPlane and oneHotLabel will be disposed by TF after passing it to fit/evaluate/predict
  
-       we don't clone the "image" tensor because "getImageSlice" is already giving
+       we don't clone the "dataPlane" tensor because "getImageSlice" is already giving
        us a new, disposable, tensor derived from "image"
       */
 
       yield {
         xs: dataPlane,
-        ys: label.clone(),
+        ys: oneHotLabel,
       };
 
       index++;
@@ -305,18 +297,26 @@ const doShow = (
 };
 //#endregion Debug stuff
 
-export const preprocessClassifier = (
-  images: Array<ImageType>,
-  labels: Array<Tensor1D>,
-  inputShape: Shape,
-  preprocessOptions: PreprocessOptions,
-  fitOptions: FitOptions
-): tfdata.Dataset<{
+type PreprocessArgs = {
+  images: Array<ImageType>;
+  categories: Array<Category>;
+  inputShape: Shape;
+  preprocessOptions: PreprocessOptions;
+  fitOptions: FitOptions;
+};
+
+export const preprocessClassifier = ({
+  images,
+  categories,
+  inputShape,
+  preprocessOptions,
+  fitOptions,
+}: PreprocessArgs): tfdata.Dataset<{
   xs: Tensor4D;
   ys: Tensor2D;
 }> => {
   let imageSet: typeof images;
-  let labelSet: typeof labels;
+  let catSet: typeof categories;
 
   if (
     preprocessOptions.cropOptions.numCrops > 1 &&
@@ -326,16 +326,16 @@ export const preprocessClassifier = (
     imageSet = images.flatMap((im) =>
       Array(preprocessOptions.cropOptions.numCrops).fill(im)
     );
-    labelSet = labels.flatMap((label) =>
-      Array(preprocessOptions.cropOptions.numCrops).fill(label)
+    catSet = categories.flatMap((cat) =>
+      Array(preprocessOptions.cropOptions.numCrops).fill(cat)
     );
   } else {
     imageSet = images;
-    labelSet = labels;
+    catSet = categories;
   }
 
   let imageData = tfdata
-    .generator(sampleGenerator(imageSet, labelSet))
+    .generator(sampleGenerator(imageSet, catSet))
     .map(
       cropResize.bind(
         null,

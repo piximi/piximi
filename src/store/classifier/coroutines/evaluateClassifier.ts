@@ -1,3 +1,4 @@
+// TODO - segmenter: Moved to SimpleCNN concrete model class
 import {
   LayersModel,
   Tensor,
