@@ -1,3 +1,4 @@
+// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
 import {
   loadLayersModel,
   io as tfio,

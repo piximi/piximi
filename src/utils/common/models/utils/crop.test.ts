@@ -1,3 +1,5 @@
+// TODO - segmenter: Remove this, moved to models folder
+
 import * as tf from "@tensorflow/tfjs-node";
 import { matchedCropPad, padToMatch } from "./crop";
 
