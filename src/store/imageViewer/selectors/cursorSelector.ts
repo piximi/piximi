@@ -1,8 +1,8 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 export const cursorSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): string => {
   return imageViewer.cursor;
 };

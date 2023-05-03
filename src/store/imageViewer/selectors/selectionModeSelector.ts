@@ -1,9 +1,9 @@
-import { AnnotationModeType, ImageViewer } from "types";
+import { AnnotationModeType, ImageViewerStore } from "types";
 
 export const selectionModeSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): AnnotationModeType => {
   return imageViewer.selectionMode;
 };

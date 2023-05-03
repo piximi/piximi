@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
-import { languageSelector } from "store/imageViewer";
+import { selectLanguageType } from "store/application";
 import { de, en, fas, fi, fr, gr, hi, hu } from "translations";
 import { LanguageType } from "types";
 
 export const useTranslation = () => {
-  const language = useSelector(languageSelector);
+  const language = useSelector(selectLanguageType);
 
   const t = (word: string) => {
     switch (language) {

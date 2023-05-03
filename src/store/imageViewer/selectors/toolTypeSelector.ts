@@ -1,9 +1,9 @@
-import { ImageViewer, ToolType } from "types";
+import { ImageViewerStore, ToolType } from "types";
 
 export const toolTypeSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): ToolType => {
   return imageViewer.toolType;
 };

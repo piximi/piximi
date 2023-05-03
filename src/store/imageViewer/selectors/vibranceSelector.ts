@@ -1,9 +1,9 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 
 export const vibranceSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }) => {
   return imageViewer.vibrance;
 };

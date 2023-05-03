@@ -1,5 +1,6 @@
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType } from "./AlertStateType";
+import { LanguageType } from "./LanguageType";
 
 export enum HotkeyView {
   Annotator,
@@ -33,4 +34,6 @@ export type Settings = {
   selectedImageBorderWidth: number;
   alertState: AlertStateType;
   hotkeyStack: HotkeyView[];
+  language: LanguageType;
+  soundEnabled: boolean;
 };

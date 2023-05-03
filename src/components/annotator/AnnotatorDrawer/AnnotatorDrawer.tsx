@@ -12,7 +12,6 @@ import { OpenListItem } from "./OpenListItem";
 import { SaveListItem } from "./SaveListItem";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
-import { AnnotationCategoryList } from "components/categories/CategoriesList/AnnotationCategoryList";
 
 import {
   selectCreatedAnnotationCategories,
@@ -57,10 +56,6 @@ export const AnnotatorDrawer = () => {
       <Divider />
 
       <CategoriesList
-        createdCategories={createdCategories}
-        categoryType={CategoryType.AnnotationCategory}
-      />
-      <AnnotationCategoryList
         createdCategories={createdCategories}
         categoryType={CategoryType.AnnotationCategory}
       />

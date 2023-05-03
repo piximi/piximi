@@ -3,7 +3,7 @@ import { memo } from "react";
 import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
-import { soundEnabledSelector } from "store/imageViewer";
+import { selectSoundEnabled } from "store/application";
 
 import { HotkeyView } from "types";
 
@@ -26,7 +26,7 @@ import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
   so this component was made just to get rid of the annoying warnings.
  */
 export const SoundEvents = memo(() => {
-  const soundEnabled = useSelector(soundEnabledSelector);
+  const soundEnabled = useSelector(selectSoundEnabled);
 
   const [playCreateAnnotationSoundEffect, { sound: creeateAnnotationSound }] =
     useSound(createAnnotationSoundEffect, { soundEnabled });

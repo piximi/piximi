@@ -1,9 +1,9 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 
 export const selectedAnnotationCategoryIdSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }) => {
   return imageViewer.selectedCategoryId;
 };

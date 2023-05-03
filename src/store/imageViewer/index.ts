@@ -18,12 +18,10 @@ export {
   setCursor,
   setExposure,
   setHue,
-  setLanguage,
   setPenSelectionBrushSize,
   setQuickSelectionRegionSize,
   setSaturation,
   setSelectionMode,
-  setSoundEnabled,
   setStagedAnnotationIds,
   setStageHeight,
   setStagePosition,
@@ -49,10 +47,8 @@ export { cursorSelector } from "./selectors/cursorSelector";
 export { exposureSelector } from "./selectors/exposureSelector";
 export { hueSelector } from "./selectors/hueSelector";
 export { annotatorSelectionModeSelector } from "./selectors/annotatorSelectionModeSelector";
-export { languageSelector } from "./selectors/languageSelector";
 export { saturationSelector } from "./selectors/saturationSelector";
 export { selectionModeSelector } from "./selectors/selectionModeSelector";
-export { soundEnabledSelector } from "./selectors/soundEnabledSelector";
 export { vibranceSelector } from "./selectors/vibranceSelector";
 
 export { thresholdAnnotationValueSelector } from "./selectors/thresholdAnnotationValueSelector";
