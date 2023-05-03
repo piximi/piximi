@@ -7,12 +7,13 @@ import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
 import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 
-import { ModelSummaryTable } from "components/common/ModelSummary";
-import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
-import { DialogTransition } from "components/common/DialogTransition";
+import {
+  ModelSummaryTable,
+  TrainingHistoryPlot,
+} from "components/common/styled-components";
+import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem/OptimizerSettingsListItem";
+import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
+import { AlertDialog, DialogTransition } from "components/common/dialogs/";
 
 import { alertStateSelector } from "store/application";
 import {

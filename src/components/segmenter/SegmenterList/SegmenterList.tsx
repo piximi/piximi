@@ -7,13 +7,13 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
+import { ImportTensorflowModelDialog } from "components/common/dialogs";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
 import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
-import { CollapsibleList } from "components/common/CollapsibleList";
 
-import { selectCreatedAnnotatorCategories } from "store/data";
+import { selectCreatedAnnotationCategories } from "store/data";
 
 import {
   segmenterArchitectureOptionsSelector,
@@ -25,7 +25,7 @@ import { CategoryType, HotkeyView, ModelType, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const SegmenterList = () => {
-  const categories = useSelector(selectCreatedAnnotatorCategories);
+  const categories = useSelector(selectCreatedAnnotationCategories);
   const fittedSegmenter = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
     segmenterArchitectureOptionsSelector

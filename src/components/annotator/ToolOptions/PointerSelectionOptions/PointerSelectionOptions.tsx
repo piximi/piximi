@@ -9,20 +9,19 @@ import {
   ListItemText,
   SvgIcon,
 } from "@mui/material";
+import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { Label as LabelIcon } from "@mui/icons-material";
-
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllAnnotationCategories } from "store/data";
+import { selectActiveAnnotations } from "store/data/selectors/annotationSelectors";
 
 import { Category } from "types";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
-import { selectActiveAnnotations } from "store/data/selectors/annotationSelectors";
 
 export const PointerSelectionOptions = () => {
   const t = useTranslation();

@@ -1,7 +1,12 @@
-import { fromIdxToCoord, PiximiGraph, PiximiNode } from "..";
-import { NodeHeap } from "./NodeHeap";
-
 import { Node } from "ngraph.graph";
+
+import {
+  fromIdxToCoord,
+  PiximiGraph,
+  PiximiNode,
+} from "../graph-helper/GraphHelper";
+import { NodeHeap } from "../pathfinder/NodeHeap";
+
 import { Point } from "types";
 
 /**

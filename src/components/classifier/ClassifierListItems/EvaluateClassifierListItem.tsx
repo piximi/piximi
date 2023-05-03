@@ -13,7 +13,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import { useDialog, useTranslation } from "hooks";
 
 import { EvaluateClassifierDialog } from "../EvaluateClassifierDialog/EvaluateClassifierDialog";
-import { DisabledListItemButton } from "components/common/DisabledListItemButton/DisabledListItemButton";
+import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton/DisabledListItemButton";
 
 import { alertStateSelector } from "store/application";
 import {

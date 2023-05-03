@@ -1,1 +1,0 @@
-export { ClearAnnotationMenuItem } from "./ClearAnnotationMenuItem";

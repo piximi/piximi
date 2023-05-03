@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { SegmenterArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
-import { CollapsibleList } from "components/common/CollapsibleList";
 
 export const SegmenterArchitectureSettingsListItem = ({
   setIsModelPretrained,

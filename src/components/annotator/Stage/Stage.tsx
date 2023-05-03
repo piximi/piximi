@@ -29,7 +29,6 @@ import { PointerSelection } from "./Selection/PointerSelection";
 import {
   annotationStateSelector,
   cursorSelector,
-  selectedAnnotationsIdsSelector,
   selectionModeSelector,
   setStagePosition,
   setZoomSelection,
@@ -41,6 +40,7 @@ import {
   setSelectedAnnotationIds,
   setImageOrigin,
   selectedAnnotationCategoryIdSelector,
+  selectSelectedAnnotationIds,
 } from "store/imageViewer";
 import {
   selectActiveImageActivePlane,
@@ -50,6 +50,7 @@ import {
   selectActiveImageScaledHeight,
   selectActiveImageScaledWidth,
 } from "store/data";
+import { RootState } from "store/reducer/reducer";
 
 import { zoomToolOptionsSelector } from "store/tool-options";
 
@@ -65,7 +66,6 @@ import {
 import { dimensions } from "utils/common";
 
 import { ObjectAnnotationTool, Tool } from "annotator-tools";
-import { RootState } from "store/reducer/reducer";
 
 export const Stage = ({
   stageWidth,
@@ -105,7 +105,7 @@ export const Stage = ({
 
   // useSelector
   const toolType = useSelector(toolTypeSelector);
-  const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
+  const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
   const selectedAnnotationCategoryId = useSelector(
     selectedAnnotationCategoryIdSelector
   );
@@ -738,9 +738,7 @@ export const Stage = ({
       >
         {!outOfBounds && absolutePosition && (
           <>
-            <Typography>
-              {`x: ${absolutePosition.x} y: ${absolutePosition.y} `}
-            </Typography>
+            <Typography>{`x: ${absolutePosition.x} y: ${absolutePosition.y} `}</Typography>
             <Typography>{pixelColor}</Typography>
           </>
         )}

@@ -34,6 +34,13 @@ export function ensureEntitiesArray<T>(
   return entities;
 }
 
+export function getProperty<T, S extends keyof T>(
+  entity: T,
+  property: S
+): T[S] {
+  return entity[property];
+}
+
 /* Deferred */
 
 export function getDeferredProperty<T, S extends keyof T>(

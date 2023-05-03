@@ -12,7 +12,7 @@ import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 
 import { useTranslation } from "hooks";
 
-import { DisabledListItemButton } from "components/common/DisabledListItemButton";
+import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton";
 
 import {
   segmenterSlice,

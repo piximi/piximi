@@ -3,15 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Dialog, DialogContent, List } from "@mui/material";
 
+import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
+import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
+//import { ModelSummaryTable } from "components/common/ModelSummary";
+import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
+import { DialogTransition, AlertDialog } from "components/common/dialogs";
 import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
-
-import { OptimizerSettingsListItem } from "components/common/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "components/common/DatasetSettingsListItem/DatasetSettingsListItem";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
-//import { ModelSummaryTable } from "components/common/ModelSummary";
-import { TrainingHistoryPlot } from "components/common/TrainingHistoryPlot";
-import { DialogTransition } from "components/common/DialogTransition";
 
 import { alertStateSelector } from "store/application";
 import { selectAnnotatedImages } from "store/data";

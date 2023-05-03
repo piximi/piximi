@@ -6,11 +6,11 @@ import {
   imageViewerSlice,
   currentIndexSelector,
   pointerSelectionSelector,
-  selectedAnnotationsIdsSelector,
   toolTypeSelector,
   setSelectedAnnotationIds,
   setSelectedCategoryId,
   setPointerSelection,
+  selectSelectedAnnotationIds,
 } from "store/imageViewer";
 
 import {
@@ -36,7 +36,7 @@ export const usePointer = () => {
 
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
 
-  const selectedAnnotationsIds = useSelector(selectedAnnotationsIdsSelector);
+  const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
 
   const pointerSelection = useSelector(pointerSelectionSelector);
 

@@ -12,9 +12,11 @@ import {
   Slider,
 } from "@mui/material";
 
-import { Palette } from "../Palette";
+import { useLocalGlobalState } from "hooks";
 
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
+import { Palette } from "../Palette";
 
 import { activeImageIdSelector } from "store/imageViewer";
 
@@ -25,10 +27,7 @@ import {
   selectActiveImageRawColor,
 } from "store/data";
 
-import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
-
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
-import { useLocalGlobalState } from "hooks";
 
 export const ChannelsList = () => {
   const dispatch = useDispatch();

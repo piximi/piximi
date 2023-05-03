@@ -6,13 +6,12 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
+import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
+import { ImageShapeDialog, FallBackDialog } from "components/common/dialogs";
 
 import { MainDrawer } from "../MainDrawer";
 import { MainImageGrid } from "../MainImageGrid";
 import { MainAppBar } from "../MainAppBar";
-
-import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
 
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
@@ -22,8 +21,6 @@ import { AlertType, HotkeyView } from "types";
 
 import { getStackTraceFromError } from "utils";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
-
-import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 
 export const MainView = () => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);

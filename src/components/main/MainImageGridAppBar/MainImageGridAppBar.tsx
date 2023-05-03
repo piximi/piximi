@@ -25,10 +25,9 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
+import { DeleteImagesDialog } from "components/common/dialogs";
+import { KeyboardKey } from "components/common/styled-components/Help/HelpDialog/KeyboardKey";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
-import { DeleteImagesDialog } from "../DeleteImagesDialog";
-
-import { KeyboardKey } from "components/common/Help/HelpDialog/KeyboardKey";
 
 import {
   hotkeyViewSelector,

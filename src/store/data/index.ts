@@ -52,6 +52,7 @@ export {
   selectUnusedImageCategoryColors,
   selectVisibleImageCategories,
   selectVisibleCategoryIds,
+  selectImageCategoryNames,
 } from "./selectors/imageCategorySelectors";
 
 export {
@@ -59,8 +60,13 @@ export {
   selectAllVisibleAnnotationCategories,
   selectAnnotationCategoryById,
   selectAnnotationCategoryEntities,
-  selectCreatedAnnotatorCategories,
+  selectCreatedAnnotationCategories,
   selectSelectedAnnotationCategory,
+  selectAnnotationCategoryIds,
+  selectAnnotationCategoryNames,
+  selectCreatedAnnotationCategoryCount,
+  selectUnusedAnnotationCategoryColors,
+  selectUsedAnnotationCategoryColors,
 } from "./selectors/annotationCategorySelectors";
 
 export { uploadImagesSaga } from "./sagas/uploadImagesSaga";

@@ -2,14 +2,18 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box, CssBaseline } from "@mui/material";
+
 import { useUpload } from "hooks";
+import {
+  FallBackDialog,
+  ImageShapeDialog,
+  AlertDialog,
+} from "components/common/dialogs";
+
 import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";
 import { ToolDrawer } from "../ToolDrawer";
 import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
-import { FallBackDialog } from "components/common/FallBackDialog/FallBackDialog";
-import { ImageShapeDialog } from "components/common/ImageShapeDialog/ImageShapeDialog";
-import { AlertDialog } from "components/common/AlertDialog/AlertDialog";
 
 import {
   alertStateSelector,
@@ -17,6 +21,7 @@ import {
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
+
 import { getStackTraceFromError } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
@@ -25,7 +30,6 @@ import { AlertType, HotkeyView } from "types";
 
 export const AnnotatorView = () => {
   const dispatch = useDispatch();
-
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
   const [persistOptions, setPersistOptions] = useState<boolean>(false);
@@ -35,12 +39,17 @@ export const AnnotatorView = () => {
   });
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
+  const alertState = useSelector(alertStateSelector);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
   };
-
-  const alertState = useSelector(alertStateSelector);
+  const onDrop = async (files: FileList) => {
+    const imageShapeInfo = await uploadFiles(files);
+    setImageShape(imageShapeInfo);
+    setFiles(files);
+  };
 
   const onUnload = (e: any) => {
     if (process.env.NODE_ENV === "development") {
@@ -72,6 +81,7 @@ export const AnnotatorView = () => {
 
   const handleUncaughtRejection = useCallback(
     async (e: any) => {
+      console.log("me?");
       e.preventDefault();
       dispatch(
         applicationSlice.actions.updateAlertState({
@@ -99,13 +109,6 @@ export const AnnotatorView = () => {
       dispatch(unregisterHotkeyView({}));
     };
   }, [dispatch]);
-
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
-  const onDrop = async (files: FileList) => {
-    const imageShapeInfo = await uploadFiles(files);
-    setImageShape(imageShapeInfo);
-    setFiles(files);
-  };
 
   useEffect(() => {
     window.addEventListener("error", handleError);

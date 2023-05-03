@@ -3,14 +3,17 @@ import { useSelector } from "react-redux";
 
 import { Drawer } from "@mui/material";
 
+import { useTranslation } from "hooks";
+import { AppBarOffset } from "components/common/styled-components";
+
 import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
 import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
 import { ZoomOptions } from "./ZoomOptions";
 import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "./PointerSelectionOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
-
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import { InformationBox } from "./InformationBox";
+import { DefaultOptions } from "./DefaultOptions";
 
 import { toolTypeSelector } from "store/imageViewer";
 
@@ -29,9 +32,6 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "icons";
-import { InformationBox } from "./InformationBox";
-import { useTranslation } from "hooks";
-import { DefaultOptions } from "./DefaultOptions";
 
 type OperationType = {
   icon: ReactElement;

@@ -148,3 +148,4 @@ export type {
 
 export type { DataStoreSlice } from "./DataStoreType";
 export type { ImagesEntityType } from "./ImagesEntityType";
+export type { PartialBy } from "./utility/PartialBy";
