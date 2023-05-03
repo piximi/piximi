@@ -27,8 +27,8 @@ import {
   applicationSlice,
   themeModeSelector,
   setThemeMode,
+  selectSoundEnabled,
 } from "store/application";
-import { soundEnabledSelector, imageViewerSlice } from "store/imageViewer";
 import { selectUnusedImageCategoryColors } from "store/data";
 
 import { ThemeMode } from "types";
@@ -85,7 +85,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
     React.useState<null | HTMLButtonElement>(null);
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
 
-  const soundEnabled = useSelector(soundEnabledSelector);
+  const soundEnabled = useSelector(selectSoundEnabled);
 
   const preClose = () => {
     batch(() => {
@@ -125,7 +125,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
   const toggleSoundEnabled = () => {
     dispatch(
-      imageViewerSlice.actions.setSoundEnabled({
+      applicationSlice.actions.setSoundEnabled({
         soundEnabled: !soundEnabled,
       })
     );

@@ -1,8 +1,8 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 export const quickSelectionRegionSizeSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }) => {
   return imageViewer.quickSelectionRegionSize;
 };

@@ -1,7 +1,7 @@
-import { ImageViewer } from "./ImageViewerStore";
+import { ImageViewerStore } from "./ImageViewerStore";
 
 export type HistoryStateType = {
-  future: Array<ImageViewer>;
-  past: Array<ImageViewer>;
-  present: ImageViewer;
+  future: Array<ImageViewerStore>;
+  past: Array<ImageViewerStore>;
+  present: ImageViewerStore;
 };

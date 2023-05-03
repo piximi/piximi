@@ -14,5 +14,7 @@ export { imageSelectionColorSelector } from "./selectors/imageSelectionColorSele
 export { selectedImageBorderWidthSelector } from "./selectors/selectedImageBorderWidthSelector";
 export { themeModeSelector } from "./selectors/themeModeSelector";
 export { tileSizeSelector } from "./selectors/tileSizeSelector";
+export { selectLanguageType } from "./selectors/selectLanguageType";
+export { selectSoundEnabled } from "./selectors/selectSoundEnabled";
 
 // Sagas

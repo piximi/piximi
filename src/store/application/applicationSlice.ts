@@ -2,12 +2,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HotkeyView, Settings } from "../../types/Settings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
+import { LanguageType } from "types";
 
 const initialState: Settings = {
   init: false,
   selectedImages: [],
   tileSize: 1,
   themeMode: ThemeMode.Light,
+  language: LanguageType.English,
+  soundEnabled: true,
   imageSelectionColor: "#FF6DB6",
   selectedImageBorderWidth: 5,
   alertState: defaultAlert,
@@ -47,7 +50,9 @@ export const applicationSlice = createSlice({
     ) {
       state.hotkeyStack.push(action.payload.hotkeyView);
     },
-
+    setLanguage(state, action: PayloadAction<{ language: LanguageType }>) {
+      state.language = action.payload.language;
+    },
     setImageSelectionColor(
       state: Settings,
       action: PayloadAction<{ selectionColor: string }>
@@ -62,6 +67,9 @@ export const applicationSlice = createSlice({
     },
     setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
       state.themeMode = action.payload.mode;
+    },
+    setSoundEnabled(state, action: PayloadAction<{ soundEnabled: boolean }>) {
+      state.soundEnabled = action.payload.soundEnabled;
     },
     unregisterHotkeyView(state, action: PayloadAction<{}>) {
       state.hotkeyStack.pop();

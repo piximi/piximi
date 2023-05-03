@@ -1,5 +1,5 @@
 // import { createSelector } from "@reduxjs/toolkit";
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 // import { stagedAnnotationsSelector } from "./stagedAnnotationsSelector";
 
 // export const numStagedAnnotationsSelector = createSelector(
@@ -10,7 +10,7 @@ import { ImageViewer } from "types";
 export const numStagedAnnotationsSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }) => {
   return imageViewer.stagedAnnotationIds.length;
 };

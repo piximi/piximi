@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
+import { selectSoundEnabled } from "store/application";
 import {
-  soundEnabledSelector,
   activeImageIdSelector,
   cursorSelector,
   setSelectedAnnotationIds,
@@ -67,7 +67,7 @@ export const AnnotationTransformer = ({
   const activeImageId = useSelector(activeImageIdSelector);
   const stageScale = useSelector(stageScaleSelector);
   const cursor = useSelector(cursorSelector);
-  const soundEnabled = useSelector(soundEnabledSelector);
+  const soundEnabled = useSelector(selectSoundEnabled);
   const imageWidth = useSelector(selectActiveImageWidth);
   const imageHeight = useSelector(selectActiveImageHeight);
   const imageOrigin = useSelector(imageOriginSelector);

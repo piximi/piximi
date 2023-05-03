@@ -1,9 +1,9 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 
 export const activeImageIdSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): string | undefined => {
   return imageViewer.activeImageId;
 };

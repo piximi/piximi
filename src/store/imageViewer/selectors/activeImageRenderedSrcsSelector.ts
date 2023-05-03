@@ -1,9 +1,9 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 
 export const activeImageRenderedSrcsSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): Array<string> => {
   return imageViewer.activeImageRenderedSrcs;
 };

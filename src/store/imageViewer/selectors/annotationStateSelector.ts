@@ -1,9 +1,9 @@
-import { AnnotationStateType, ImageViewer } from "types";
+import { AnnotationStateType, ImageViewerStore } from "types";
 
 export const annotationStateSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): AnnotationStateType => {
   return imageViewer.annotationState;
 };

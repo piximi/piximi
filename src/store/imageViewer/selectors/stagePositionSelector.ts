@@ -1,8 +1,8 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 export const stagePositionSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): { x: number; y: number } => {
   return imageViewer.stagePosition;
 };

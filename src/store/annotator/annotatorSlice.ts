@@ -296,7 +296,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.imageOrigin = action.payload.origin;
     },
-
     setOperation(state, action: PayloadAction<{ operation: ToolType }>) {
       state.toolType = action.payload.operation;
     },
@@ -335,7 +334,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.selectionMode = action.payload.selectionMode;
     },
-
     setStagedAnnotationIds(
       state,
       action: PayloadAction<{ annotationIds: string[] }>

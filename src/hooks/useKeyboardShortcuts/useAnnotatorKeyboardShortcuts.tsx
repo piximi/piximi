@@ -7,7 +7,6 @@ import {
   setOperation,
   setSelectedCategoryId,
   activeImageIdSelector,
-  soundEnabledSelector,
 } from "store/imageViewer";
 
 import {
@@ -15,6 +14,7 @@ import {
   selectSelectedAnnotations,
   selectStagedAnnotations,
 } from "store/data";
+import { selectSoundEnabled } from "store/application";
 
 import {
   AnnotationModeType,
@@ -87,7 +87,7 @@ export const useAnnotatorKeyboardShortcuts = ({
     deselectAllTransformers();
   };
 
-  const soundEnabled = useSelector(soundEnabledSelector);
+  const soundEnabled = useSelector(selectSoundEnabled);
   /*
    * Select category (1-9)
    */

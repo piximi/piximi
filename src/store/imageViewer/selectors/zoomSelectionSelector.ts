@@ -1,9 +1,9 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 
 export const zoomSelectionSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }): {
   dragging: boolean;
   minimum: { x: number; y: number } | undefined;

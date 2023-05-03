@@ -1,8 +1,8 @@
-import { ImageViewer } from "types";
+import { ImageViewerStore } from "types";
 export const penSelectionBrushSizeSelector = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewer;
+  imageViewer: ImageViewerStore;
 }) => {
   return imageViewer.penSelectionBrushSize;
 };
