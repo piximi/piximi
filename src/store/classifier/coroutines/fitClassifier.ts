@@ -1,3 +1,4 @@
+// TODO -segmenter: Remove this, done in Concrete model class, e.g. `SimpleCNN`
 import { History, LayersModel, Tensor2D, Tensor4D } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { FitOptions } from "../../../types/FitOptions";

@@ -1,3 +1,4 @@
+// TODO - segmenter: This is now in `SimpleCNN.ts` concrete model class
 import { Tensor1D, Tensor2D, Tensor4D, tidy, argMax } from "@tensorflow/tfjs";
 import { Dataset } from "@tensorflow/tfjs-data";
 import { LayersModel } from "@tensorflow/tfjs";

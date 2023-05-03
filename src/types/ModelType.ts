@@ -18,10 +18,11 @@ type ModelProps = {
   modelName: string;
   requiredChannels?: number;
   modelArch: ModelArchitecture;
+  graph: boolean;
   src?: string;
   pretrained?: boolean;
-  graph: boolean;
 };
+
 export interface DefaultModelProps extends ModelProps {}
 
 export type ClassifierModelProps = DefaultModelProps;

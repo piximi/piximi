@@ -1,4 +1,3 @@
-// TODO - segmenter: Remove this, now in SimpleCNN concrete Model
 import {
   loadLayersModel,
   io as tfio,
@@ -9,7 +8,7 @@ import {
 
 import {
   Category,
-  OldImageType,
+  ImageType,
   Partition,
   Shape,
   RescaleOptions,
@@ -20,11 +19,7 @@ import {
 } from "types";
 
 import { loadDataUrlAsStack, convertToImage } from "utils/common/image";
-import {
-  preprocessClassifier,
-  createClassificationLabels,
-} from "./preprocessClassifier";
-import { predictClasses } from "./predictClasses";
+import { SimpleCNN } from "./SimpleCNN";
 
 jest.setTimeout(100000);
 
@@ -114,7 +109,7 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessingOptions: PreprocessOptions = {
+const preprocessOptions: PreprocessOptions = {
   shuffle: false,
   rescaleOptions,
   cropOptions,
@@ -155,7 +150,7 @@ const inferrenceImagesUnloaded = [
 it("predict", async () => {
   // await setBackend("tensorflow");
 
-  const inferrenceImages: Array<OldImageType> = [];
+  const inferrenceImages: Array<ImageType> = [];
   const imageIds: Array<string> = [];
 
   for (const im of inferrenceImagesUnloaded) {
@@ -170,17 +165,6 @@ it("predict", async () => {
     inferrenceImages.push({ ...loadedIm, ...im });
     imageIds.push(im.id);
   }
-
-  const { labels: inferrenceLabels, disposeLabels: disposeInferrenceLabels } =
-    createClassificationLabels(inferrenceImages, categories);
-
-  const inferrenceData = preprocessClassifier(
-    inferrenceImages,
-    inferrenceLabels,
-    inputShape,
-    preprocessingOptions,
-    fitOptions
-  );
 
   const fs = require("fs");
   const path = require("path");
@@ -202,23 +186,27 @@ it("predict", async () => {
     "mnist_classifier.weights.bin"
   );
 
-  const model = await loadLayersModel(
+  const loaded_model = await loadLayersModel(
     tfio.browserFiles([jsonFile, weightsFile])
   );
+
+  const model = new SimpleCNN();
+  model._model = loaded_model;
+  model.loadInference(inferrenceImages, {
+    categories,
+    inputShape,
+    preprocessOptions,
+    fitOptions,
+  });
 
   // console.log("weights file:", tfmemory().numTensors, tfmemory().numBytes);
 
   const profile = await tfprofile(async () => {
-    const res = await predictClasses(
-      //@ts-ignore
-      model,
-      inferrenceData,
-      categories
-    );
+    const res = await model.predict(categories);
     return res;
   });
 
-  disposeInferrenceLabels();
+  model.dispose();
 
   const categoryIds = profile.result as string[];
 

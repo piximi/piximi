@@ -1,19 +1,17 @@
-// TODO - segmenter: REmove this file when done, should now be in `loadSimpleCNN.ts`
-
 import { sequential, layers, initializers } from "@tensorflow/tfjs";
 
-import { Shape } from "../../types/Shape";
-
-import { productionStore } from "store/stores";
+import { Shape } from "types/Shape";
 
 /**
  * Creates simple convolutional neural network, for example used for mnist classification problem
  * from: https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/
  */
-export const createSimpleCNN = (inputShape: Shape, numClasses: number) => {
-  const shuffle =
-    productionStore.getState().classifier.preprocessOptions.shuffle;
-  const seed = shuffle ? Math.random() : 0.42;
+export const createSimpleCNN = (
+  inputShape: Shape,
+  numClasses: number,
+  randomizeWeights: boolean
+) => {
+  const seed = randomizeWeights ? Math.random() : 0.42;
 
   const imageWidth = inputShape.width;
   const imageHeight = inputShape.height;
