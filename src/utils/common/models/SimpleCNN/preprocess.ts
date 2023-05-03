@@ -1,4 +1,3 @@
-// TODO - segmenter: delete this, moved to `model-preprocessors/classifier.ts`
 import {
   Tensor1D,
   Tensor2D,
@@ -29,7 +28,7 @@ import {
   Shape,
   FitOptions,
   PreprocessOptions,
-  UNKNOWN_IMAGE_CATEGORY_ID,
+  UNKNOWN_CLASS_CATEGORY_ID,
   CropSchema,
 } from "types";
 
@@ -41,7 +40,7 @@ const createClassificationIdxs = (
 
   for (const im of images) {
     const idx = categories.findIndex((cat: Category) => {
-      if (cat.id !== UNKNOWN_IMAGE_CATEGORY_ID) {
+      if (cat.id !== UNKNOWN_CLASS_CATEGORY_ID) {
         return cat.id === im.categoryId;
       } else {
         throw Error(

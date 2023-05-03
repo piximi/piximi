@@ -1,3 +1,5 @@
+// TODO - segmenter: Remove this, moved to models folder
+
 const Environment = require("jest-environment-jsdom");
 
 /**
