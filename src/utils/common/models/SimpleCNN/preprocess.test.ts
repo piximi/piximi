@@ -1,19 +1,19 @@
-// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
 import "@tensorflow/tfjs-node";
-import {
-  preprocessClassifier,
-  createClassificationLabels,
-} from "./preprocessClassifier";
+import { SimpleCNN } from "./SimpleCNN";
 
 import {
   Category,
-  OldImageType,
+  ImageType,
   Shape,
   RescaleOptions,
   FitOptions,
   PreprocessOptions,
   CropOptions,
   CropSchema,
+  LossFunction,
+  OptimizationAlgorithm,
+  Metric,
+  CompileOptions,
 } from "types";
 
 import {
@@ -42,7 +42,7 @@ const cropOptions: CropOptions = {
   cropSchema: CropSchema.None,
 };
 
-const preprocessingOptions: PreprocessOptions = {
+const preprocessOptions: PreprocessOptions = {
   shuffle: true,
   rescaleOptions,
   cropOptions,
@@ -52,6 +52,13 @@ const fitOptions: FitOptions = {
   epochs: 10,
   batchSize: 32,
   initialEpoch: 0,
+};
+
+const compileOptions: CompileOptions = {
+  learningRate: 0.01,
+  lossFunction: LossFunction.CategoricalCrossEntropy,
+  metrics: [Metric.CategoricalAccuracy],
+  optimizationAlgorithm: OptimizationAlgorithm.Adam,
 };
 
 const categories: Array<Category> = [
@@ -88,7 +95,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it("preprocessClassifier", async () => {
-  const images: Array<OldImageType> = [];
+  const images: Array<ImageType> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
@@ -102,23 +109,26 @@ it("preprocessClassifier", async () => {
     images.push(im);
   }
 
-  const { labels: imageLabels, disposeLabels } = createClassificationLabels(
-    images,
-    categories
-  );
-
-  const preprocessed = preprocessClassifier(
-    images,
-    imageLabels,
+  const model = new SimpleCNN();
+  model.loadModel({
     inputShape,
-    preprocessingOptions,
-    fitOptions
-  );
+    numClasses: categories.length,
+    randomizeWeights: preprocessOptions.shuffle,
+    compileOptions,
+  });
+  model.loadTraining(images, {
+    categories,
+    inputShape,
+    preprocessOptions,
+    fitOptions,
+  });
+
+  expect(model._trainingDataset).toBeDefined();
 
   // future warning: toArrayForTest is undocumented
-  const items = await preprocessed.toArrayForTest();
+  const items = await model._trainingDataset!.toArrayForTest();
 
-  disposeLabels();
+  model.dispose();
 
   expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
   expect(items[0]["ys"].shape).toEqual([1, 2]);

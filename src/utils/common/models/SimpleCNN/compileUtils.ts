@@ -1,13 +1,10 @@
-// TODO - sgementer: Delete this file when done, should be in `compileClassifier.ts`
-import { LayersModel, ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
-import { CompileOptions } from "../../types/CompileOptions";
-import { LossFunction } from "../../types/LossFunction";
-import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { Metric } from "../../types/Metric";
+import { ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
+import { CompileOptions } from "types/CompileOptions";
+import { LossFunction } from "types/LossFunction";
+import { OptimizationAlgorithm } from "types/OptimizationAlgorithm";
+import { Metric } from "types/Metric";
 
-export const compile = (opened: LayersModel, options: CompileOptions) => {
-  const compiled = opened;
-
+export const createCompileArgs = (options: CompileOptions) => {
   const loss = (): ModelCompileArgs["loss"] => {
     switch (options.lossFunction) {
       case LossFunction.AbsoluteDifference: {
@@ -104,11 +101,9 @@ export const compile = (opened: LayersModel, options: CompileOptions) => {
     }
   };
 
-  compiled.compile({
+  return {
     loss: loss(),
     metrics: metrics(),
     optimizer: optimizer(),
-  });
-
-  return compiled;
+  };
 };
