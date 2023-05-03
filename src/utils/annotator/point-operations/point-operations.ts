@@ -1,8 +1,10 @@
 import { min, max } from "lodash";
-import { Edge, Point } from "types";
-import { connectPoints } from "utils/annotator";
+
+import { connectPoints } from "../imageHelper";
 import { scanline } from "../polygon-fill/scanline";
 import { simplifyPolygon } from "../simplify/simplify";
+
+import { Edge, Point } from "types";
 
 export const pointsAreEqual = (p1: Point, p2: Point) => {
   return p1.x === p2.x && p1.y === p2.y;

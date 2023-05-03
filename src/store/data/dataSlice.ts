@@ -1,23 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
+import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
+import { Changes, Deferred, EntityId } from "store/entities/models";
+import { getDeferredProperty } from "store/entities/utils";
+
 import {
+  ImageType,
+  Partition,
+  DecodedAnnotationType,
+  AnnotationType,
+  DataStoreSlice,
+  PartialBy,
+  Colors,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_CLASS_CATEGORY,
   UNKNOWN_CLASS_CATEGORY_ID,
-} from "types/Category";
-import { ImageType } from "types/ImageType";
-import { Partition } from "types/Partition";
-import { DecodedAnnotationType, AnnotationType } from "types/AnnotationType";
-import { Colors } from "types/tensorflow";
-import { DataStoreSlice } from "types";
+} from "types";
 import { ImageShapeInfo, replaceDuplicateName } from "utils/common/image";
 import { mutatingFilter } from "utils/common/helpers";
-import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
-import { Changes, Deferred, EntityId } from "store/entities/models";
-import { getDeferredProperty } from "store/entities/utils";
 
 export const categoriesAdapter = createDeferredEntityAdapter<Category>();
 export const annotationCategoriesAdapter =
@@ -76,8 +79,8 @@ export const dataSlice = createSlice({
         categories: newCategories,
         annotationCategories: newAnnotationCategories,
       } = action.payload;
-      dataSlice.caseReducers.addCategories(state, {
-        type: "addCategories",
+      dataSlice.caseReducers.addImageCategories(state, {
+        type: "addImageCategories",
         payload: { categories: newCategories },
       });
       dataSlice.caseReducers.addAnnotationCategories(state, {
@@ -94,7 +97,7 @@ export const dataSlice = createSlice({
       });
     },
     resetData: () => initialState(),
-    addCategory(
+    addImageCategory(
       state,
       action: PayloadAction<{
         category: Category;
@@ -105,20 +108,20 @@ export const dataSlice = createSlice({
       state.imagesByCategory[category.id] = [];
       categoriesAdapter.addOne(state.categories, category);
     },
-    addCategories(
+    addImageCategories(
       state,
       action: PayloadAction<{
         categories: Array<Category>;
       }>
     ) {
       for (const category of action.payload.categories) {
-        dataSlice.caseReducers.addCategory(state, {
-          type: "addCategory",
+        dataSlice.caseReducers.addImageCategory(state, {
+          type: "addImageCategory",
           payload: { category },
         });
       }
     },
-    createCategory(
+    createImageCategory(
       state,
       action: PayloadAction<{ name: string; color: string }>
     ) {
@@ -139,16 +142,22 @@ export const dataSlice = createSlice({
         visible: true,
       } as Category);
     },
-    updateCategory(
+    updateImageCategory(
       state,
-      action: PayloadAction<{ id: string; name: string; color: string }>
+      action: PayloadAction<{
+        updates: PartialBy<Category, "color" | "name" | "visible">;
+      }>
     ) {
+      const { id, ...updates } = action.payload.updates;
       categoriesAdapter.updateOne(state.categories, {
-        id: action.payload.id,
-        changes: { name: action.payload.name, color: action.payload.color },
+        id: id,
+        changes: updates,
       });
     },
-    setOtherCategoriesInvisible(state, action: PayloadAction<{ id?: string }>) {
+    setOtherImageCategoriesInvisible(
+      state,
+      action: PayloadAction<{ id?: string }>
+    ) {
       const idsToUpdate = state.categories.ids.filter((id) => {
         return (
           id !== action.payload.id &&
@@ -161,7 +170,7 @@ export const dataSlice = createSlice({
       });
       categoriesAdapter.updateMany(state.categories, changes);
     },
-    setCategoryVisibility(
+    setImageCategoryVisibility(
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
@@ -170,7 +179,7 @@ export const dataSlice = createSlice({
         changes: { visible: action.payload.visible },
       });
     },
-    setCategories(
+    setImageCategories(
       state,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
@@ -192,7 +201,32 @@ export const dataSlice = createSlice({
       imagesAdapter.updateMany(state.images, changes);
       categoriesAdapter.setMany(state.categories, action.payload.categories);
     },
-    deleteCategory(state, action: PayloadAction<{ categoryId: string }>) {
+    upsertImageCategory(
+      state,
+      action: PayloadAction<{
+        category: PartialBy<Category, "id" | "visible">;
+      }>
+    ) {
+      const { category } = action.payload;
+
+      if (!category.id) {
+        dataSlice.caseReducers.createImageCategory(state, {
+          type: "createImageCategory",
+          payload: { name: category.name!, color: category.color! },
+        });
+      } else {
+        dataSlice.caseReducers.updateImageCategory(state, {
+          type: "updateAnnotationCategory",
+          payload: {
+            updates: category as PartialBy<
+              Category,
+              "color" | "name" | "visible"
+            >,
+          },
+        });
+      }
+    },
+    deleteImageCategory(state, action: PayloadAction<{ categoryId: string }>) {
       const categoryId = action.payload.categoryId;
 
       // ---- Look Up Reference
@@ -211,12 +245,23 @@ export const dataSlice = createSlice({
       imagesAdapter.updateMany(state.images, imageChanges);
       categoriesAdapter.removeOne(state.categories, action.payload.categoryId);
     },
-    deleteAllCategories(state, action: PayloadAction<{}>) {
+    deleteImageCategories(
+      state,
+      action: PayloadAction<{ categoryIds: string[] }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        dataSlice.caseReducers.deleteImageCategory(state, {
+          type: "deleteImageCategory",
+          payload: { categoryId },
+        });
+      }
+    },
+    deleteAllImageCategories(state, action: PayloadAction<{}>) {
       // Must create new ids array, otherwise the array will change as deletions occur
       const categories = [...state.categories.ids];
       categories.forEach((categoryId) => {
-        dataSlice.caseReducers.deleteCategory(state, {
-          type: "deleteCategory",
+        dataSlice.caseReducers.deleteImageCategory(state, {
+          type: "deleteImageCategory",
           payload: { categoryId: categoryId as string },
         });
       });
@@ -266,11 +311,14 @@ export const dataSlice = createSlice({
     },
     updateAnnotationCategory(
       state,
-      action: PayloadAction<{ id: string; name: string; color: string }>
+      action: PayloadAction<{
+        updates: PartialBy<Category, "color" | "name" | "visible">;
+      }>
     ) {
+      const { id, ...updates } = action.payload.updates;
       annotationCategoriesAdapter.updateOne(state.annotationCategories, {
-        id: action.payload.id,
-        changes: { name: action.payload.name, color: action.payload.color },
+        id: id,
+        changes: updates,
       });
     },
     setAnnotationCategory(
@@ -308,6 +356,31 @@ export const dataSlice = createSlice({
         });
       }
     },
+    upsertAnnotationCategory(
+      state,
+      action: PayloadAction<{
+        category: PartialBy<Category, "id" | "visible">;
+      }>
+    ) {
+      const { category } = action.payload;
+
+      if (!category.id) {
+        dataSlice.caseReducers.createAnnotationCategory(state, {
+          type: "createAnnotationCategory",
+          payload: { name: category.name!, color: category.color! },
+        });
+      } else {
+        dataSlice.caseReducers.updateAnnotationCategory(state, {
+          type: "updateAnnotationCategory",
+          payload: {
+            updates: category as PartialBy<
+              Category,
+              "color" | "name" | "visible"
+            >,
+          },
+        });
+      }
+    },
     deleteAnnotationCategory(
       state,
       action: PayloadAction<{ categoryId: EntityId }>
@@ -334,24 +407,26 @@ export const dataSlice = createSlice({
         });
       }
     },
+    deleteAnnotationCategories(
+      state,
+      action: PayloadAction<{ categoryIds: string[] }>
+    ) {
+      for (const categoryId of action.payload.categoryIds) {
+        dataSlice.caseReducers.deleteAnnotationCategory(state, {
+          type: "deleteAnnotationCategory",
+          payload: { categoryId },
+        });
+      }
+    },
     deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
       const idsToDelete = state.annotationCategories.ids.filter(
         (id) => id !== UNKNOWN_ANNOTATION_CATEGORY_ID
       );
 
-      idsToDelete.forEach((categoryId) => {
-        dataSlice.caseReducers.deleteAnnotationCategory(state, {
-          type: "deleteAnnotationCategory",
-          payload: { categoryId },
-        });
+      dataSlice.caseReducers.deleteAnnotationCategories(state, {
+        type: "deleteAnnotationCategories",
+        payload: { categoryIds: idsToDelete as string[] },
       });
-
-      annotationCategoriesAdapter.removeMany(
-        state.annotationCategories,
-        idsToDelete
-      );
-
-      state.annotationCategories = initialState().annotationCategories;
     },
     addImage(state, action: PayloadAction<{ image: ImageType }>) {
       const image = action.payload.image;
@@ -853,11 +928,11 @@ export const dataSlice = createSlice({
 });
 
 export const {
-  createCategory,
-  updateCategory,
-  setCategoryVisibility,
-  setOtherCategoriesInvisible,
-  deleteCategory,
+  createImageCategory,
+  updateImageCategory,
+  setImageCategoryVisibility,
+  setOtherImageCategoriesInvisible,
+  deleteImageCategory,
   createAnnotationCategory,
   addAnnotationCategories,
   updateAnnotationCategory,

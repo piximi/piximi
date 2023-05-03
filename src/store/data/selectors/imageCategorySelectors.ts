@@ -1,9 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { UNKNOWN_CLASS_CATEGORY_ID } from "types/Category";
 import { sortBy } from "lodash";
+
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { categoriesAdapter } from "../dataSlice";
 import { RootState } from "store/reducer/reducer";
+
+import { UNKNOWN_CLASS_CATEGORY_ID } from "types";
 
 const imageCategorySelectors = categoriesAdapter.getSelectors(
   (state: RootState) => state.data.categories
@@ -63,5 +65,12 @@ export const selectUnusedImageCategoryColors = createSelector(
       unusedCategoryColors.push(color);
     });
     return unusedCategoryColors;
+  }
+);
+
+export const selectImageCategoryNames = createSelector(
+  selectAllImageCategories,
+  (categories) => {
+    return categories.map((category) => category.name);
   }
 );

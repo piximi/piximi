@@ -64,7 +64,18 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetAnnotator: () => initialState,
-
+    setActiveAnnotationIds(
+      state,
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+      }>
+    ) {
+      state.activeAnnotationIds = [];
+      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
+        type: "addActiveAnnotationIds",
+        payload: { annotationIds: action.payload.annotationIds },
+      });
+    },
     addActiveAnnotationId(
       state,
       action: PayloadAction<{ annotationId: string }>
@@ -82,7 +93,7 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-    deleteActiveAnnotationId(
+    removeActiveAnnotationId(
       state,
       action: PayloadAction<{
         annotationId: string;
@@ -93,29 +104,64 @@ export const imageViewerSlice = createSlice({
         (annotationId) => annotationId !== action.payload.annotationId
       );
     },
-    deleteActiveAnnotationIds(
+    removeActiveAnnotationIds(
       state,
       action: PayloadAction<{
         annotationIds: Array<string>;
       }>
     ) {
+      for (const annotationId of action.payload.annotationIds) {
+        imageViewerSlice.caseReducers.removeActiveAnnotationId(state, {
+          type: "removeActiveAnnotationId",
+          payload: { annotationId },
+        });
+      }
+    },
+    setSelectedAnnotationIds(
+      state,
+      action: PayloadAction<{
+        selectedAnnotationIds: Array<string>;
+        workingAnnotationId: string | undefined;
+      }>
+    ) {
+      state.selectedAnnotationIds = action.payload.selectedAnnotationIds;
+
+      state.workingAnnotationId = action.payload.workingAnnotationId;
+    },
+    setAllSelectedAnnotationIds(state, action: PayloadAction<{}>) {
+      state.selectedAnnotationIds = state.activeAnnotationIds;
+
+      state.workingAnnotationId =
+        state.workingAnnotationId ?? state.activeAnnotationIds[0];
+    },
+    removeSelectedAnnotationId(
+      state,
+      action: PayloadAction<{
+        annotationId: string;
+      }>
+    ) {
+      if (state.workingAnnotationId === action.payload.annotationId) {
+        state.workingAnnotationId = undefined;
+      }
       mutatingFilter(
-        state.activeAnnotationIds,
-        (annotationId) => !action.payload.annotationIds.includes(annotationId)
+        state.selectedAnnotationIds,
+        (annotationId) => annotationId !== action.payload.annotationId
       );
     },
-    setActiveAnnotationIds(
+    removeSelectedAnnotationIds(
       state,
       action: PayloadAction<{
-        annotationIds: Array<string>;
+        annotationIds: string[];
       }>
     ) {
-      state.activeAnnotationIds = [];
-      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
-        type: "addActiveAnnotationIds",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
+      for (const annotationId of action.payload.annotationIds) {
+        imageViewerSlice.caseReducers.removeSelectedAnnotationId(state, {
+          type: "removeSelectedAnnotationId",
+          payload: { annotationId },
+        });
+      }
     },
+
     hideCategory(
       state,
       action: PayloadAction<{
@@ -138,6 +184,7 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
+
     showCategory(
       state,
       action: PayloadAction<{
@@ -182,7 +229,21 @@ export const imageViewerSlice = createSlice({
         state.hiddenCategoryIds.push(categoryId);
       }
     },
+    setActiveImageId(
+      state,
+      action: PayloadAction<{
+        imageId: string | undefined;
+        prevImageId: string | undefined;
+        execSaga: boolean;
+      }>
+    ) {
+      state.activeImageId = action.payload.imageId;
 
+      // reset selected annotations
+      state.selectedAnnotationIds = [];
+      state.stagedAnnotationIds = [];
+      state.workingAnnotationId = undefined;
+    },
     setActiveImageRenderedSrcs(
       state,
       action: PayloadAction<{
@@ -190,6 +251,13 @@ export const imageViewerSlice = createSlice({
       }>
     ) {
       state.activeImageRenderedSrcs = action.payload.renderedSrcs;
+    },
+
+    setSelectedCategoryId(
+      state,
+      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
+    ) {
+      state.selectedCategoryId = action.payload.selectedCategoryId;
     },
     setAnnotationState(
       state,
@@ -224,21 +292,7 @@ export const imageViewerSlice = createSlice({
     setHue(state, action: PayloadAction<{ hue: number }>) {
       state.hue = action.payload.hue;
     },
-    setActiveImageId(
-      state,
-      action: PayloadAction<{
-        imageId: string | undefined;
-        prevImageId: string | undefined;
-        execSaga: boolean;
-      }>
-    ) {
-      state.activeImageId = action.payload.imageId;
 
-      // reset selected annotations
-      state.selectedAnnotationIds = [];
-      state.stagedAnnotationIds = [];
-      state.workingAnnotationId = undefined;
-    },
     setImageOrigin(
       state,
       action: PayloadAction<{ origin: { x: number; y: number } }>
@@ -279,29 +333,7 @@ export const imageViewerSlice = createSlice({
     setSaturation(state, action: PayloadAction<{ saturation: number }>) {
       state.saturation = action.payload.saturation;
     },
-    setSelectedAnnotationIds(
-      state,
-      action: PayloadAction<{
-        selectedAnnotationIds: Array<string>;
-        workingAnnotationId: string | undefined;
-      }>
-    ) {
-      state.selectedAnnotationIds = action.payload.selectedAnnotationIds;
 
-      state.workingAnnotationId = action.payload.workingAnnotationId;
-    },
-    setAllSelectedAnnotationIds(state, action: PayloadAction<{}>) {
-      state.selectedAnnotationIds = state.activeAnnotationIds;
-
-      state.workingAnnotationId =
-        state.workingAnnotationId ?? state.activeAnnotationIds[0];
-    },
-    setSelectedCategoryId(
-      state,
-      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
-    ) {
-      state.selectedCategoryId = action.payload.selectedCategoryId;
-    },
     setSelectionMode(
       state,
       action: PayloadAction<{ selectionMode: AnnotationModeType }>

@@ -17,14 +17,14 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useTranslation } from "hooks";
 
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 
 import { ImageMenu } from "../ImageMenu";
 
 import { activeImageIdSelector, setActiveImageId } from "store/imageViewer";
+import { selectTotalAnnotationCountByImage } from "store/data";
 
 import { ImageType } from "types";
-import { selectTotalAnnotationCountByImage } from "store/data";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 2);

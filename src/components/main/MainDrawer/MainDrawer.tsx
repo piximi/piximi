@@ -2,10 +2,12 @@ import React from "react";
 
 import { Divider, Drawer } from "@mui/material";
 
-import { ApplicationOptionsList } from "../../common/ApplicationOptionsList";
 import { FileList } from "components/file-io/FileList";
 import { ClassifierList } from "components/classifier/ClassifierList";
-import { AppBarOffset } from "components/styled/AppBarOffset";
+import {
+  AppBarOffset,
+  ApplicationOptionsList,
+} from "components/common/styled-components";
 import { SegmenterList } from "components/segmenter/SegmenterList/SegmenterList";
 
 export const MainDrawer = () => {

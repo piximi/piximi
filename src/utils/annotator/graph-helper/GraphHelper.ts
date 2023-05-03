@@ -1,11 +1,11 @@
 import createGraph, { Graph, Node } from "ngraph.graph";
 
-import { DataArray } from "utils/common/image";
+import { NodeHeap } from "../pathfinder/NodeHeap";
+import { cachedAStarPathSearch } from "../pathfinder/PathFinder";
 
-import { cachedAStarPathSearch, NodeHeap } from "..";
-
-import { getIdx } from "utils/annotator/imageHelper";
 import { Point } from "types";
+import { getIdx } from "utils/annotator/imageHelper";
+import { DataArray } from "utils/common/image";
 
 export interface PiximiGraph extends Graph {
   fromId: number;

@@ -7,9 +7,9 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { ImportTensorflowModelDialog } from "components/common/ImportTensorflowModelDialog";
+import { ImportTensorflowModelDialog } from "components/common/dialogs";
 import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { ClassifierExecListItem } from "../ClassifierExecListItem";
 import { CategoriesList } from "components/categories/CategoriesList";
 
@@ -100,7 +100,7 @@ export const ClassifierList = () => {
           <CategoriesList
             createdCategories={categories}
             predicted={predicted}
-            categoryType={CategoryType.ClassifierCategory}
+            categoryType={CategoryType.ImageCategory}
           />
 
           <Divider />

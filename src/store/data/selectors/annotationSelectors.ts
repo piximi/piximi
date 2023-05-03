@@ -1,13 +1,17 @@
 import { createSelector } from "@reduxjs/toolkit";
+
 import {
   selectStagedAnnotationIds,
   workingAnnotationIdSelector,
   selectActiveAnnotationIds,
+  selectSelectedAnnotationIds,
 } from "store/imageViewer";
-import { DataStoreSlice, DecodedAnnotationType } from "types";
-import { decodeAnnotation } from "utils/annotator";
 import { annotationsAdapter } from "../dataSlice";
 import { RootState } from "store/reducer/reducer";
+
+import { DataStoreSlice, DecodedAnnotationType } from "types";
+
+import { decodeAnnotation } from "utils/annotator";
 
 const annotationSelectors = annotationsAdapter.getSelectors(
   (state: RootState) => state.data.annotations
@@ -121,16 +125,20 @@ export const selectActiveAnnotationIdsByCategory = createSelector(
 
 export const selectSelectedAnnotations = createSelector(
   [
-    selectStagedAnnotationIds,
+    selectSelectedAnnotationIds,
     workingAnnotationIdSelector,
     selectAnnotationEntities,
   ],
-  (stagedIds, workingId, annotationEntities): Array<DecodedAnnotationType> => {
+  (
+    selectedIds,
+    workingId,
+    annotationEntities
+  ): Array<DecodedAnnotationType> => {
     if (!workingId)
-      return stagedIds.map(
+      return selectedIds.map(
         (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
       );
-    return [...stagedIds, workingId].map(
+    return [...selectedIds, workingId].map(
       (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
     );
   }

@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 
 import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
-import { CollapsibleList } from "components/common/CollapsibleList";
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 
 export const ArchitectureSettingsListItem = () => {
   const StyledForm = styled("form")({

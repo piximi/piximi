@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Grid, TextField, Alert, Autocomplete } from "@mui/material";
 
-import { CustomNumberTextField } from "components/common/InputFields";
-import { StyledFormControl } from "components/common/StyledFormControl";
+import {
+  CustomNumberTextField,
+  StyledFormControl,
+} from "components/common/styled-components";
 
 import {
   segmenterArchitectureOptionsSelector,

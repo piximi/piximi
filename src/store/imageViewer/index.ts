@@ -38,7 +38,6 @@ export {
   selectActiveAnnotationIdsCount,
 } from "./selectors/selectActiveAnnotationIds";
 export { selectStagedAnnotationIds } from "./selectors/selectStagedAnnotationIds";
-export { selectedAnnotationsIdsSelector } from "./selectors/selectedAnnotationsIdsSelector";
 export { selectedAnnotationCategoryIdSelector } from "./selectors/selectedAnnotationCategoryIdSelector";
 export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
 export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
@@ -70,6 +69,10 @@ export { stageScaleSelector } from "./selectors/stageScaleSelector";
 export { stageWidthSelector } from "./selectors/stageWidthSelector";
 export { imageOriginSelector } from "./selectors/imageOriginSelector";
 export { selectHiddenAnnotationCategoryIds } from "./selectors/selectHiddenAnnotationCategoryIds";
+export {
+  selectSelectedAnnotationIds,
+  selectSelectedAnnotationIdsCount,
+} from "./selectors/selectSelectedAnnotationIds";
 
 // Sagas
 

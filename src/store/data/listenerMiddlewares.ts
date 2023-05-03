@@ -1,27 +1,25 @@
+import { batch } from "react-redux";
 import { createListenerMiddleware, addListener } from "@reduxjs/toolkit";
 import type { TypedStartListening, TypedAddListener } from "@reduxjs/toolkit";
-import { RootState } from "store/reducer/reducer";
-import { AppDispatch } from "store/stores/productionStore";
-import { uploadImages } from "./dataSlice";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
+import { RootState } from "store/reducer/reducer";
+import { AppDispatch } from "store/stores/productionStore";
+import { dataSlice, uploadImages } from "./dataSlice";
+import { getDeferredProperty } from "store/entities/utils";
 import { imageViewerSlice } from "store/imageViewer";
 import { applicationSlice } from "store/application";
-import { dataSlice } from "store/data";
-import { createRenderedTensor } from "utils/common/image";
+import { projectSlice } from "store/project";
 import { AlertStateType, AlertType, ImageType, OldImageType } from "types";
 
 import { getStackTraceFromError } from "utils";
-
+import { createRenderedTensor } from "utils/common/image";
 import {
   ImageShapeEnum,
   loadImageFileAsStack,
   convertToImage,
 } from "utils/common/image";
-import { projectSlice } from "store/project";
-import { batch } from "react-redux";
-import { getDeferredProperty } from "store/entities/utils";
 
 export const dataMiddleware = createListenerMiddleware();
 
@@ -298,6 +296,37 @@ startAppListening({
     }
   },
 });
+
+// startAppListening({
+//   actionCreator: dataSlice.actions.deleteAnnotations,
+//   effect: (action, listenerAPI) => {
+//     listenerAPI.dispatch(
+//       imageViewerSlice.actions.removeActiveAnnotationIds({
+//         annotationIds: action.payload.annotationIds,
+//       })
+//     );
+//     listenerAPI.dispatch(
+//       imageViewerSlice.actions.removeSelectedAnnotationIds({
+//         annotationIds: action.payload.annotationIds,
+//       })
+//     );
+//   },
+// });
+// startAppListening({
+//   actionCreator: dataSlice.actions.deleteAnnotation,
+//   effect: (action, listenerAPI) => {
+//     listenerAPI.dispatch(
+//       imageViewerSlice.actions.removeActiveAnnotationId({
+//         annotationId: action.payload.annotationId,
+//       })
+//     );
+//     listenerAPI.dispatch(
+//       imageViewerSlice.actions.removeSelectedAnnotationId({
+//         annotationId: action.payload.annotationId,
+//       })
+//     );
+//   },
+// });
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: ImageJS.Stack;

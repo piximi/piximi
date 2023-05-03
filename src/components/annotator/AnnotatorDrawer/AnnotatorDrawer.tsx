@@ -4,24 +4,25 @@ import { useSelector } from "react-redux";
 import { Divider, Drawer, List } from "@mui/material";
 
 import { CategoriesList } from "components/categories/CategoriesList";
-import { AppBarOffset } from "components/styled/AppBarOffset";
-import { ApplicationOptionsList } from "components/common/ApplicationOptionsList";
+import { AppBarOffset } from "components/common/styled-components";
+import { ApplicationOptionsList } from "components/common/styled-components/ApplicationOptionsList";
 
 import { ImageList } from "./ImageList";
 import { OpenListItem } from "./OpenListItem";
 import { SaveListItem } from "./SaveListItem";
-import { ClearAnnotationsListItem } from "./ClearAnnotations";
+import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
+import { AnnotationCategoryList } from "components/categories/CategoriesList/AnnotationCategoryList";
 
 import {
-  selectCreatedAnnotatorCategories,
+  selectCreatedAnnotationCategories,
   selectSelectedImages,
 } from "store/data";
 
 import { CategoryType } from "types/Category";
 
 export const AnnotatorDrawer = () => {
-  const createdCategories = useSelector(selectCreatedAnnotatorCategories);
+  const createdCategories = useSelector(selectCreatedAnnotationCategories);
 
   const annotatorImages = useSelector(selectSelectedImages);
 
@@ -59,10 +60,14 @@ export const AnnotatorDrawer = () => {
         createdCategories={createdCategories}
         categoryType={CategoryType.AnnotationCategory}
       />
+      <AnnotationCategoryList
+        createdCategories={createdCategories}
+        categoryType={CategoryType.AnnotationCategory}
+      />
 
       <Divider />
 
-      <ClearAnnotationsListItem />
+      <ClearAnnotationsGroup />
 
       <Divider />
 

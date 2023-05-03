@@ -10,8 +10,10 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 
-import { StyledFormControl } from "components/common/StyledFormControl";
-import { CustomNumberTextField } from "components/common/InputFields";
+import {
+  CustomNumberTextField,
+  StyledFormControl,
+} from "components/common/styled-components";
 
 import {
   classifierCropOptionsSelector,

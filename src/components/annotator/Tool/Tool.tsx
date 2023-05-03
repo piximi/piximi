@@ -2,8 +2,10 @@ import React from "react";
 
 import { ListItem, ListItemIcon, SvgIcon } from "@mui/material";
 
-import { TooltipCard } from "components/common/styled/ToolTipCard";
-import { ToolHotkeyTitle } from "components/common/styled/ToolHotkeyTitle";
+import {
+  ToolHotkeyTitle,
+  TooltipCard,
+} from "components/common/styled-components";
 
 type ToolProps = {
   children: React.ReactNode;

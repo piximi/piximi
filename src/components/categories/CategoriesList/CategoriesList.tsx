@@ -1,18 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
+
+import {
+  Checkbox,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
+
+import {
+  Label as LabelIcon,
+  LabelOutlined as LabelOutlinedIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
+
+import { useDialogHotkey, useCategoryHandlers } from "hooks";
+
+import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import {
+  DeleteObjectsDialog,
+  UpsertCategoriesDialog,
+} from "components/common/dialogs";
 
 import { CategoryItem } from "../CategoryItem";
-import { CreateCategoryItem } from "../CreateCategory";
-
-import { PredictionVisibility } from "../PredictionsVisibility/";
-import { DeleteAllCategoriesItem } from "../DeleteAllCategories";
-import { Visibility as VisibilityIcon } from "@mui/icons-material";
-import { CollapsibleList } from "components/common/CollapsibleList";
-
-import { Category, CategoryType } from "types";
-
-import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import { useCategoryHandlers } from "hooks/useCategoryHandlers.ts/useCategoryHandlers";
 import { CategoryItemMenu } from "../CategoryItemMenu";
+import { PredictionVisibility } from "../PredictionsVisibility/";
+
+import { Category, CategoryType, HotkeyView } from "types";
 
 type CategoriesListProps = {
   createdCategories: Array<Category>;
@@ -20,7 +35,7 @@ type CategoriesListProps = {
   predicted?: boolean;
 };
 
-// TODO: Make background white
+// TODO: Make background different color (or find another way to differentiate list from section)
 export const CategoriesList = (props: CategoriesListProps) => {
   const { createdCategories: categories, categoryType, predicted } = props;
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -31,12 +46,28 @@ export const CategoriesList = (props: CategoriesListProps) => {
     selectedCategory,
     unknownCategory,
     hasHidden,
+    usedCategoryInfo,
     objectCountByCategory,
     handleSelectCategory,
-    handleToggleCategory,
+    handleToggleCategoryVisibility,
     handleHideOtherCategories,
     handleShowAllCategories,
-  } = useCategoryHandlers(CategoryType.AnnotationCategory, categories);
+    dispatchDeleteObjectsOfCategory,
+    dispatchDeleteCategories,
+    dispatchUpsertCategory,
+  } = useCategoryHandlers(categoryType, categories);
+
+  const {
+    onClose: handleCloseCreateCategoryDialog,
+    onOpen: handleOpenCreateCategoryDialog,
+    open: isCreateCategoryDialogOpen,
+  } = useDialogHotkey(HotkeyView.CreateCategoryDialog);
+
+  const {
+    onClose: handleCloseDeleteCategoryDialog,
+    onOpen: handleOpenDeleteCategoryDialog,
+    open: isDeleteCategoryDialogOpen,
+  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -49,89 +80,116 @@ export const CategoriesList = (props: CategoriesListProps) => {
   const onCloseCategoryMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
-  const handleHideOtherCategoriesAndClose = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>,
-    category: Category
-  ) => {
-    handleHideOtherCategories(event, category);
+  const handleHideOtherCategoriesAndClose = (category: Category) => {
+    handleHideOtherCategories(category);
     onCloseCategoryMenu();
   };
 
-  const handleToggleCategoryAndClose = (
-    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    category: Category
-  ) => {
-    handleToggleCategory(category);
+  const handleToggleCategoryVisibilityAndClose = (category: Category) => {
+    handleToggleCategoryVisibility(category);
 
     onCloseCategoryMenu();
   };
+  const handleDeleteAllCategories = () => {
+    dispatchDeleteCategories(categories);
+  };
+
+  useEffect(() => {
+    objectCountByCategory(unknownCategory.id);
+  }, [objectCountByCategory, unknownCategory]);
 
   return (
-    <CollapsibleList dense primary="Categories">
-      <CategoryItem
-        category={unknownCategory}
-        key={unknownCategory.id}
-        id={unknownCategory.id}
-        objectCount={objectCountByCategory(unknownCategory.id)}
-        categoryisVisible={categoryIsVisible(unknownCategory.id)}
-        handleToggleCategory={handleToggleCategory}
-        handleSelectCategory={handleSelectCategory}
-        onOpenCategoryMenu={onOpenCategoryMenu}
-      />
-      {categories.map((category: Category) => {
+    <CollapsibleList
+      dense
+      primary="Categories"
+      secondary={
+        <Tooltip title={`${hasHidden ? "Show" : "Hide"} All`}>
+          <ListItemIcon sx={{ color: "inherit" }}>
+            <Checkbox
+              checked={!hasHidden}
+              checkedIcon={<LabelIcon />}
+              disableRipple
+              icon={<LabelOutlinedIcon />}
+              tabIndex={-1}
+              sx={{ color: "inherit", "&.Mui-checked": { color: "inherit" } }}
+              onChange={() => {
+                if (!hasHidden) {
+                  handleHideOtherCategories();
+                } else {
+                  handleShowAllCategories();
+                }
+              }}
+            />
+          </ListItemIcon>
+        </Tooltip>
+      }
+    >
+      {[unknownCategory, ...categories].map((category: Category) => {
         return (
           <CategoryItem
             category={category}
             id={category.id}
             key={category.id}
+            selectedCategory={selectedCategory ?? unknownCategory}
             objectCount={objectCountByCategory(category.id)}
             categoryisVisible={categoryIsVisible(category.id)}
-            handleToggleCategory={handleToggleCategory}
+            handleToggleCategoryVisibility={handleToggleCategoryVisibility}
             handleSelectCategory={handleSelectCategory}
-            onOpenCategoryMenu={onOpenCategoryMenu}
+            handleOpenCategoryMenu={onOpenCategoryMenu}
           />
         );
       })}
+
+      {
+        predicted && <PredictionVisibility /> //TODO - UI: Should dissapear or be disabled?
+      }
+      <ListItemButton onClick={handleOpenCreateCategoryDialog}>
+        <ListItemIcon>
+          <AddIcon />
+        </ListItemIcon>
+
+        <ListItemText primary="Create category" />
+      </ListItemButton>
+
+      {
+        categories.length > 0 && (
+          <ListItemButton onClick={handleOpenDeleteCategoryDialog}>
+            <ListItemIcon>
+              <DeleteIcon color="disabled" />
+            </ListItemIcon>
+
+            <ListItemText primary={"Delete all categories"} />
+          </ListItemButton>
+        ) //TODO - UI: Should dissapear or be disabled?
+      }
       <CategoryItemMenu
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={selectedCategory ?? unknownCategory}
         categoryHidden={
           !categoryIsVisible(selectedCategory?.id ?? unknownCategory.id)
         }
-        onCloseCategoryMenu={onCloseCategoryMenu}
-        handleHideCategory={handleToggleCategoryAndClose}
+        handleCloseCategoryMenu={onCloseCategoryMenu}
+        usedCategoryInfo={usedCategoryInfo}
+        dispatchDeleteObjectsOfCategory={dispatchDeleteObjectsOfCategory}
+        handleHideCategory={handleToggleCategoryVisibilityAndClose}
         handleHideOtherCategories={handleHideOtherCategoriesAndClose}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
+        dispatchUpsertCategory={dispatchUpsertCategory}
+        dispatchDeleteCategories={dispatchDeleteCategories}
       />
-
-      {predicted && <PredictionVisibility />}
-
-      <CreateCategoryItem categoryType={categoryType} />
-
-      {categories.length > 0 && (
-        <DeleteAllCategoriesItem categoryType={categoryType} />
-      )}
-      <ShowAllCategoriesListItem
-        disabled={!hasHidden()}
-        handleShowAll={handleShowAllCategories}
+      <UpsertCategoriesDialog
+        usedCategoryInfo={usedCategoryInfo}
+        dispatchUpsertCategory={dispatchUpsertCategory}
+        onClose={handleCloseCreateCategoryDialog}
+        open={isCreateCategoryDialogOpen}
+      />
+      <DeleteObjectsDialog
+        title="Delete All Categories"
+        content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
+        deleteObjectCallback={handleDeleteAllCategories}
+        onClose={handleCloseDeleteCategoryDialog}
+        open={isDeleteCategoryDialogOpen}
       />
     </CollapsibleList>
-  );
-};
-
-export const ShowAllCategoriesListItem = ({
-  disabled,
-  handleShowAll,
-}: {
-  disabled?: boolean;
-  handleShowAll: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
-}) => {
-  return (
-    <ListItemButton disabled={disabled} onClick={handleShowAll}>
-      <ListItemIcon>
-        <VisibilityIcon color="disabled" />
-      </ListItemIcon>
-      <ListItemText primary="Show All Categories" />
-    </ListItemButton>
   );
 };

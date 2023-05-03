@@ -11,7 +11,7 @@ export type Category = {
 };
 
 export enum CategoryType {
-  ClassifierCategory,
+  ImageCategory,
   AnnotationCategory,
 }
 

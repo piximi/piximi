@@ -1,7 +1,9 @@
 import * as ImageJS from "image-js";
 import { saveAs } from "file-saver";
 
-import { decode, pointsAreEqual } from "utils/annotator";
+import { DataArray } from "../common/image/imageHelper";
+import { decode } from "./rle/rle";
+import { pointsAreEqual } from "./point-operations/point-operations";
 
 import {
   AnnotationType,
@@ -10,7 +12,6 @@ import {
   ShadowImageType,
   Point,
 } from "types";
-import { DataArray } from "../common/image/imageHelper";
 
 export const generatePoints = (buffer: Array<number> | undefined) => {
   if (!buffer) return undefined;
@@ -311,7 +312,10 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
         width,
         height,
         new Uint8Array().fill(0),
-        { components: 1, alpha: 0 }
+        {
+          components: 1,
+          alpha: 0,
+        }
       );
       const decoded = decode(annotation.mask!);
       const boundingBox = annotation.boundingBox;
@@ -377,7 +381,10 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
       width,
       height,
       new Uint8Array().fill(0),
-      { components: 1, alpha: 0 }
+      {
+        components: 1,
+        alpha: 0,
+      }
     );
     categories.forEach((category: Category) => {
       const categoryColor = hexToRGBA(category.color);
@@ -444,7 +451,10 @@ export const saveAnnotationsAsLabelMatrix = (
             width,
             height,
             new Uint8Array().fill(0),
-            { components: 1, alpha: 0 }
+            {
+              components: 1,
+              alpha: 0,
+            }
           );
           let r = binary ? 255 : 1;
           let g = binary ? 255 : 1;

@@ -1,5 +1,5 @@
 import * as ImageJS from "image-js";
-import { Edge, Point } from "types";
+
 import {
   getXofYMax,
   getXofYMin,
@@ -7,7 +7,9 @@ import {
   getYMin,
   interpolateX,
   pointsToEdges,
-} from "utils/annotator";
+} from "../point-operations/point-operations";
+
+import { Edge, Point } from "types";
 
 /**
  * Scan Line Polygon Fill (SLPF) algorithm to fill the annotation polygon.

@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select } from "redux-saga/effects";
 
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "../imageViewerSlice";
 import {
   dataSlice,
   selectActiveImage,

@@ -1,19 +1,32 @@
 import { createSelector } from "@reduxjs/toolkit";
+
+import { getProperty } from "store/entities/utils";
 import { stageScaleSelector } from "store/imageViewer";
-import { Colors, ColorsRaw } from "types/tensorflow";
-import { generateBlankColors } from "utils/common/image";
 import { selectActiveImage } from "./selectActiveImage";
-//import { ImageAttributeType, ImageType } from "types";
+
+import { ImageAttributeType, ImageType, Colors, ColorsRaw } from "types";
+
+import { generateBlankColors } from "utils/common/image";
 
 //TODO: get this to work
-// export const selectImageAttibutes = createSelector([selectActiveImage,(state, attrs:Array<ImageAttributeType>) => attrs
-// ],(activeImage, attrs)=>{
-//   if(!activeImage) return
-//   const attrObj: Partial<ImageType>= {}
-//   for (const attr of attrs){
-//     attrObj[attr] = activeImage[attr] as typeof attrObj[attr]
-//   }
-// })
+export const selectActiveImageAttributes = createSelector(
+  [
+    selectActiveImage,
+    <S extends ImageAttributeType>(state: any, attrs: Array<S>) => attrs,
+  ],
+  <S extends ImageAttributeType>(
+    activeImage: ImageType | undefined,
+    attrs: S[]
+  ) => {
+    console.log("Ive been ran");
+    if (!activeImage) return;
+    const attrObj: Partial<ImageType> = {};
+    for (const attr of attrs) {
+      attrObj[attr] = getProperty(activeImage, attr) as ImageType[S];
+    }
+    return attrObj;
+  }
+);
 export const selectActiveImageBitDepth = createSelector(
   [selectActiveImage],
   (activeImage) => {
