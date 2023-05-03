@@ -1,26 +1,34 @@
-import { GraphModel, LayersModel, Tensor } from "@tensorflow/tfjs";
-import { ModelArchitecture, ModelTask } from "types/ModelType";
+import { History } from "@tensorflow/tfjs";
+
+import { ImageType } from "types";
+import { ModelTask } from "types/ModelType";
+
+type ModelArgs = {
+  name: string;
+  task: ModelTask;
+  graph: boolean;
+  src: string;
+  pretrained: boolean;
+  requiredChannels?: number;
+};
 
 export abstract class Model {
-  modelArch: ModelArchitecture;
-  modelName: string;
+  name: string;
   task: ModelTask;
   graph: boolean;
   src: string;
   pretrained: boolean;
   requiredChannels?: number;
 
-  constructor(
-    modelArch: ModelArchitecture,
-    modelName: string,
-    task: ModelTask,
-    graph: boolean,
-    src: string,
-    pretrained: boolean,
-    requiredChannels?: number
-  ) {
-    this.modelArch = modelArch;
-    this.modelName = modelName;
+  constructor({
+    name,
+    task,
+    graph,
+    src,
+    pretrained,
+    requiredChannels,
+  }: ModelArgs) {
+    this.name = name;
     this.task = task;
     this.graph = graph;
     this.src = src;
@@ -28,10 +36,18 @@ export abstract class Model {
     this.requiredChannels = requiredChannels;
   }
 
-  abstract preprocess(data: Tensor): Tensor;
-  abstract train(data: Tensor, labels: Tensor): void;
-  abstract predict(data: Tensor): Tensor;
-  abstract embedding(data: Tensor): Tensor;
-  abstract load(): LayersModel | GraphModel;
+  abstract loadModel(loadModelArgs: any): void;
+  abstract loadTraining(images: ImageType[], preprocessingArgs: any): void;
+  abstract loadValidation(images: ImageType[], preprocessingArgs: any): void;
+  abstract loadInference(images: ImageType[], preprocessingArgs: any): void;
+
+  abstract train(options: any, callbacks: any): Promise<History>;
+  abstract predict(options: any, callbacks: any): any;
+
   abstract dispose(): void;
+
+  abstract modelLoaded(): boolean;
+  abstract trainingLoaded(): boolean;
+  abstract validationLoaded(): boolean;
+  abstract inferenceLoaded(): boolean;
 }
