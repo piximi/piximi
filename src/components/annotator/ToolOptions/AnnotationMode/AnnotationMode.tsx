@@ -14,11 +14,11 @@ import {
 
 import { useTranslation } from "hooks";
 
+import { annotatorSlice } from "store/annotator";
 import {
-  imageViewerSlice,
-  annotationStateSelector,
-  selectionModeSelector,
-} from "store/imageViewer";
+  selectAnnotationState,
+  selectAnnotationSelectionMode,
+} from "store/annotator/selectors";
 import { selectWorkingAnnotation } from "store/data";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
@@ -28,9 +28,9 @@ import { RadioCheckedIcon, RadioUncheckedIcon } from "icons";
 export const AnnotationMode = () => {
   const dispatch = useDispatch();
 
-  const annotationMode = useSelector(selectionModeSelector);
+  const annotationMode = useSelector(selectAnnotationSelectionMode);
 
-  const annotationState = useSelector(annotationStateSelector);
+  const annotationState = useSelector(selectAnnotationState);
 
   const workingAnnotation = useSelector(selectWorkingAnnotation);
 
@@ -47,7 +47,7 @@ export const AnnotationMode = () => {
       setDisabledAnnotationEdit(true);
       if (annotationMode !== AnnotationModeType.New) {
         dispatch(
-          imageViewerSlice.actions.setSelectionMode({
+          annotatorSlice.actions.setSelectionMode({
             selectionMode: AnnotationModeType.New,
           })
         );
@@ -59,14 +59,14 @@ export const AnnotationMode = () => {
     const payload = {
       selectionMode: parseInt((event.target as HTMLInputElement).value),
     };
-    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
+    dispatch(annotatorSlice.actions.setSelectionMode(payload));
   };
 
   const onClickLabel = (event: any, mode: AnnotationModeType) => {
     const payload = {
       selectionMode: mode,
     };
-    dispatch(imageViewerSlice.actions.setSelectionMode(payload));
+    dispatch(annotatorSlice.actions.setSelectionMode(payload));
   };
 
   const t = useTranslation();

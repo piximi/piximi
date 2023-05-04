@@ -109,12 +109,13 @@ test("select", async () => {
     name: "foo",
     visible: true,
   };
-  operator.annotate(category, 1);
+  operator.annotate(category, 1, "");
 
   expect(operator.annotation).toMatchObject({
     boundingBox: [182, 175, 218, 212],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     plane: 1,
+    imageId: "",
   });
 });
 
@@ -142,7 +143,7 @@ test("deselect", async () => {
     name: "foo",
     visible: true,
   };
-  operator.annotate(category, 1);
+  operator.annotate(category, 1, "");
 
   operator.deselect();
 

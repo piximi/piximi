@@ -2,11 +2,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
+import { stageScaleSelector } from "store/imageViewer";
 import {
-  penSelectionBrushSizeSelector,
-  stageScaleSelector,
-  toolTypeSelector,
-} from "store/imageViewer";
+  selectPenSelectionBrushSize,
+  selectToolType,
+} from "store/annotator/selectors";
 import {
   selectActiveImageScaledHeight,
   selectActiveImageScaledWidth,
@@ -26,9 +26,9 @@ export const PenAnnotationToolTip = ({
   absolutePosition,
   outOfBounds,
 }: PenAnnotationToolTipProps) => {
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
 
-  const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
+  const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
 
   const imageWidth = useSelector(selectActiveImageScaledWidth);
   const imageHeight = useSelector(selectActiveImageScaledHeight);

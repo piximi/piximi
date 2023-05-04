@@ -18,7 +18,8 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../Tool";
 
-import { imageViewerSlice, toolTypeSelector } from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import { selectToolType } from "store/annotator/selectors";
 
 import { HotkeyView, ToolType as OperationType } from "types";
 
@@ -103,7 +104,7 @@ export const ToolDrawer = ({
 }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const activeOperation = useSelector(toolTypeSelector);
+  const activeOperation = useSelector(selectToolType);
 
   const togglePersistHandler = () => {
     setPersistOptions((visible) => !visible);
@@ -155,7 +156,7 @@ export const ToolDrawer = ({
               name={t(name)}
               onClick={() => {
                 dispatch(
-                  imageViewerSlice.actions.setOperation({
+                  annotatorSlice.actions.setToolType({
                     operation: toolMap[name].operation,
                   })
                 );

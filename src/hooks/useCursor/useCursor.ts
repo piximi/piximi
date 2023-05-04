@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { ToolType } from "types";
-import { imageViewerSlice, toolTypeSelector } from "store/imageViewer";
+import { imageViewerSlice } from "store/imageViewer";
+import { selectToolType } from "store/annotator/selectors";
 
 export const useCursor = () => {
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
 
   const dispatch = useDispatch();
 

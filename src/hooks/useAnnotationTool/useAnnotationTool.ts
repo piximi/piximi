@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import * as ImageJS from "image-js";
 import { useSelector } from "react-redux";
 
+import { stageScaleSelector } from "store/imageViewer";
 import {
-  penSelectionBrushSizeSelector,
-  quickSelectionRegionSizeSelector,
-  stageScaleSelector,
-  thresholdAnnotationValueSelector,
-  toolTypeSelector,
-} from "store/imageViewer";
+  selectPenSelectionBrushSize,
+  selectQuickSelectionRegionSize,
+  selectToolType,
+  selectThresholdAnnotationValue,
+} from "store/annotator/selectors";
 import { selectActiveImageSrc } from "store/data";
 
 import { ToolType } from "types";
@@ -28,20 +28,18 @@ import {
 
 export const useAnnotationTool = () => {
   const src = useSelector(selectActiveImageSrc);
-  const operation = useSelector(toolTypeSelector);
+  const operation = useSelector(selectToolType);
   const stageScale = useSelector(stageScaleSelector);
 
   const [operator, setOperator] = useState<AnnotationTool>();
 
   const [image, setImage] = useState<ImageJS.Image>();
 
-  const penSelectionBrushSize = useSelector(penSelectionBrushSizeSelector);
+  const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
 
-  const quickSelectionRegionSize = useSelector(
-    quickSelectionRegionSizeSelector
-  );
+  const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
 
-  const threshold = useSelector(thresholdAnnotationValueSelector);
+  const threshold = useSelector(selectThresholdAnnotationValue);
 
   useEffect(() => {
     if (!src) return;

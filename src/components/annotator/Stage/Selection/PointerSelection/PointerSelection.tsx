@@ -2,19 +2,19 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
+import { imageOriginSelector } from "store/imageViewer";
 import {
-  imageOriginSelector,
-  pointerSelectionSelector,
-  toolTypeSelector,
-} from "store/imageViewer";
+  selectPointerSelection,
+  selectToolType,
+} from "store/annotator/selectors";
 
 import { ToolType } from "types";
 
 export const PointerSelection = () => {
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
 
   const { dragging, minimum, maximum, selecting } = useSelector(
-    pointerSelectionSelector
+    selectPointerSelection
   );
   const imagePosition = useSelector(imageOriginSelector);
 

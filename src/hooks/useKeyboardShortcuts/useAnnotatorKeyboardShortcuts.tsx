@@ -4,10 +4,11 @@ import { useHotkeys } from "hooks";
 import { selectAllAnnotationCategories } from "store/data";
 import {
   imageViewerSlice,
-  setOperation,
   setSelectedCategoryId,
   activeImageIdSelector,
 } from "store/imageViewer";
+
+import { annotatorSlice } from "store/annotator";
 
 import {
   selectSelectedImages,
@@ -76,7 +77,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
     if (selectionMode !== AnnotationModeType.New)
       dispatch(
-        imageViewerSlice.actions.setSelectionMode({
+        annotatorSlice.actions.setSelectionMode({
           selectionMode: AnnotationModeType.New,
         })
       );
@@ -115,7 +116,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+c",
     () => {
-      dispatch(setOperation({ operation: ToolType.ColorAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.ColorAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -125,7 +130,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+d",
     () => {
-      dispatch(setOperation({ operation: ToolType.PenAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.PenAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -135,7 +144,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+e",
     () => {
-      dispatch(setOperation({ operation: ToolType.EllipticalAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.EllipticalAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -145,7 +158,9 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+h",
     () => {
-      dispatch(setOperation({ operation: ToolType.Hand }));
+      dispatch(
+        annotatorSlice.actions.setToolType({ operation: ToolType.Hand })
+      );
     },
     HotkeyView.Annotator
   );
@@ -155,7 +170,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+i",
     () => {
-      dispatch(setOperation({ operation: ToolType.ColorAdjustment }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.ColorAdjustment,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -165,7 +184,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+l",
     () => {
-      dispatch(setOperation({ operation: ToolType.LassoAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.LassoAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -175,7 +198,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+m",
     () => {
-      dispatch(setOperation({ operation: ToolType.MagneticAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.MagneticAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -185,7 +212,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+p",
     () => {
-      dispatch(setOperation({ operation: ToolType.PolygonalAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.PolygonalAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -195,7 +226,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+q",
     () => {
-      dispatch(setOperation({ operation: ToolType.QuickAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.QuickAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -205,7 +240,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+r",
     () => {
-      dispatch(setOperation({ operation: ToolType.RectangularAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.RectangularAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -215,7 +254,9 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+s",
     () => {
-      dispatch(setOperation({ operation: ToolType.Pointer }));
+      dispatch(
+        annotatorSlice.actions.setToolType({ operation: ToolType.Pointer })
+      );
     },
     HotkeyView.Annotator
   );
@@ -226,7 +267,11 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+t",
     () => {
-      dispatch(setOperation({ operation: ToolType.ThresholdAnnotation }));
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.ThresholdAnnotation,
+        })
+      );
     },
     HotkeyView.Annotator
   );
@@ -237,7 +282,9 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "shift+z",
     () => {
-      dispatch(setOperation({ operation: ToolType.Zoom }));
+      dispatch(
+        annotatorSlice.actions.setToolType({ operation: ToolType.Zoom })
+      );
     },
     HotkeyView.Annotator
   );

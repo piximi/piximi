@@ -2,51 +2,40 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  ToolType,
-  AnnotationModeType,
-  AnnotationStateType,
   ImageViewerStore,
+  ColorAdjustmentOptionsType,
 } from "types";
-
-import { AnnotationTool } from "annotator-tools";
 
 import { mutatingFilter } from "utils/common/helpers";
 
 const initialState: ImageViewerStore = {
-  annotationState: AnnotationStateType.Blank,
-  brightness: 0,
+  colorAdjustment: {
+    blackPoint: 0,
+    brightness: 0,
+    contrast: 0,
+    exposure: 0,
+    highlights: 0,
+    hue: 0,
+    saturation: 0,
+    shadows: 0,
+    vibrance: 0,
+  },
   currentIndex: 0,
   cursor: "default",
-  contrast: 0,
-  exposure: 0,
-  hue: 0,
   activeImageId: undefined,
   activeAnnotationIds: [],
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
   hiddenCategoryIds: [],
-  penSelectionBrushSize: 10,
-  pointerSelection: {
-    dragging: false,
-    minimum: undefined,
-    maximum: undefined,
-    selecting: false,
-  },
-  quickSelectionRegionSize: 40,
-  thresholdAnnotationValue: 150,
-  saturation: 0,
   workingAnnotationId: undefined,
   selectedAnnotationIds: [],
   stagedAnnotationIds: [],
   stagedAnnotationsHaveBeenUpdated: false,
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
-  selectionMode: AnnotationModeType.New,
   stageHeight: 1000,
   stageScale: 1,
   stageWidth: 1000,
   stagePosition: { x: 0, y: 0 },
-  toolType: ToolType.RectangularAnnotation,
-  vibrance: 0,
   zoomSelection: {
     dragging: false,
     minimum: undefined,
@@ -256,22 +245,15 @@ export const imageViewerSlice = createSlice({
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },
-    setAnnotationState(
+    updateColorAdjustments(
       state,
       action: PayloadAction<{
-        annotationState: AnnotationStateType;
-        annotationTool: AnnotationTool | undefined;
-        execSaga: boolean;
+        changes: Partial<ColorAdjustmentOptionsType>;
       }>
     ) {
-      state.annotationState = action.payload.annotationState;
+      Object.assign(state.colorAdjustment, action.payload.changes);
     },
-    setBrightness(state, action: PayloadAction<{ brightness: number }>) {
-      state.brightness = action.payload.brightness;
-    },
-    setContrast(state, action: PayloadAction<{ contrast: number }>) {
-      state.contrast = action.payload.contrast;
-    },
+
     setCurrentIndex(state, action: PayloadAction<{ currentIndex: number }>) {
       state.currentIndex = action.payload.currentIndex;
     },
@@ -283,12 +265,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
-    setExposure(state, action: PayloadAction<{ exposure: number }>) {
-      state.exposure = action.payload.exposure;
-    },
-    setHue(state, action: PayloadAction<{ hue: number }>) {
-      state.hue = action.payload.hue;
-    },
 
     setImageOrigin(
       state,
@@ -297,51 +273,6 @@ export const imageViewerSlice = createSlice({
       state.imageOrigin = action.payload.origin;
     },
 
-    setOperation(state, action: PayloadAction<{ operation: ToolType }>) {
-      state.toolType = action.payload.operation;
-    },
-    setPenSelectionBrushSize(
-      state,
-      action: PayloadAction<{ penSelectionBrushSize: number }>
-    ) {
-      state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
-    },
-    setPointerSelection(
-      state,
-      action: PayloadAction<{
-        pointerSelection: {
-          dragging: boolean;
-          minimum: { x: number; y: number } | undefined;
-          maximum: { x: number; y: number } | undefined;
-          selecting: boolean;
-        };
-      }>
-    ) {
-      state.pointerSelection = action.payload.pointerSelection;
-    },
-    setQuickSelectionRegionSize(
-      state,
-      action: PayloadAction<{ quickSelectionRegionSize: number }>
-    ) {
-      state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
-    },
-    setSaturation(state, action: PayloadAction<{ saturation: number }>) {
-      state.saturation = action.payload.saturation;
-    },
-
-    setSelectionMode(
-      state,
-      action: PayloadAction<{ selectionMode: AnnotationModeType }>
-    ) {
-      state.selectionMode = action.payload.selectionMode;
-    },
-
-    setStagedAnnotationIds(
-      state,
-      action: PayloadAction<{ annotationIds: string[] }>
-    ) {
-      state.stagedAnnotationIds = action.payload.annotationIds;
-    },
     setStageHeight(state, action: PayloadAction<{ stageHeight: number }>) {
       state.stageHeight = action.payload.stageHeight;
     },
@@ -356,15 +287,6 @@ export const imageViewerSlice = createSlice({
     },
     setStageWidth(state, action: PayloadAction<{ stageWidth: number }>) {
       state.stageWidth = action.payload.stageWidth;
-    },
-    setThresholdAnnotationValue(
-      state,
-      action: PayloadAction<{ thresholdAnnotationValue: number }>
-    ) {
-      state.thresholdAnnotationValue = action.payload.thresholdAnnotationValue;
-    },
-    setVibrance(state, action: PayloadAction<{ vibrance: number }>) {
-      state.vibrance = action.payload.vibrance;
     },
     setZoomSelection(
       state,
@@ -386,27 +308,14 @@ export const imageViewerSlice = createSlice({
 export const {
   setActiveImageId,
   setActiveImageRenderedSrcs,
-  setAnnotationState,
-  setBrightness,
-  setContrast,
   setCurrentIndex,
   setCursor,
-  setExposure,
-  setHue,
   setImageOrigin,
-  setOperation,
-  setPenSelectionBrushSize,
-  setPointerSelection,
-  setQuickSelectionRegionSize,
-  setSaturation,
   setSelectedAnnotationIds,
-  setSelectionMode,
   setSelectedCategoryId,
-  setStagedAnnotationIds,
   setStageHeight,
   setStagePosition,
   setStageScale,
   setStageWidth,
-  setVibrance,
   setZoomSelection,
 } = imageViewerSlice.actions;

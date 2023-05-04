@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
+import { stageScaleSelector } from "store/imageViewer";
 import {
-  annotationStateSelector,
-  stageScaleSelector,
-  toolTypeSelector,
-} from "store/imageViewer";
+  selectAnnotationState,
+  selectToolType,
+} from "store/annotator/selectors";
 
 import { AnnotationStateType, ToolType } from "types";
 
@@ -24,9 +24,9 @@ export const ColorAnnotationToolTip = ({
   tolerance,
 }: ColorAnnotationToolTipProps) => {
   const [text, setText] = useState<string>("Tolerance: 0%");
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
   const stageScale = useSelector(stageScaleSelector);
-  const annotationState = useSelector(annotationStateSelector);
+  const annotationState = useSelector(selectAnnotationState);
 
   useEffect(() => {
     if (!toolTipPosition) return;

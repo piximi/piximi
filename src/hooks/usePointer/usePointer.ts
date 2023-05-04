@@ -5,13 +5,16 @@ import { useHotkeys } from "hooks";
 import {
   imageViewerSlice,
   currentIndexSelector,
-  pointerSelectionSelector,
-  toolTypeSelector,
   setSelectedAnnotationIds,
   setSelectedCategoryId,
-  setPointerSelection,
   selectSelectedAnnotationIds,
 } from "store/imageViewer";
+
+import { annotatorSlice } from "store/annotator";
+import {
+  selectPointerSelection,
+  selectToolType,
+} from "store/annotator/selectors";
 
 import {
   selectActiveImageHeight,
@@ -32,13 +35,13 @@ export const usePointer = () => {
 
   const delta = 10;
 
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
 
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
 
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
 
-  const pointerSelection = useSelector(pointerSelectionSelector);
+  const changes = useSelector(selectPointerSelection);
 
   const stagedAnnotations = useSelector(selectStagedAnnotations);
 
@@ -67,9 +70,8 @@ export const usePointer = () => {
 
   const onMouseDown = (position: { x: number; y: number }) => {
     dispatch(
-      setPointerSelection({
-        pointerSelection: {
-          ...pointerSelection,
+      annotatorSlice.actions.updatePointerSelection({
+        changes: {
           dragging: false,
           minimum: position,
           selecting: true,
@@ -79,14 +81,12 @@ export const usePointer = () => {
   };
 
   const onMouseMove = (position: { x: number; y: number }) => {
-    if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
-      return;
+    if (!position || !changes.selecting || !changes.minimum) return;
 
     dispatch(
-      setPointerSelection({
-        pointerSelection: {
-          ...pointerSelection,
-          dragging: Math.abs(position.x - pointerSelection.minimum.x) >= delta,
+      annotatorSlice.actions.updatePointerSelection({
+        changes: {
+          dragging: Math.abs(position.x - changes.minimum.x) >= delta,
           maximum: position,
         },
       })
@@ -94,36 +94,22 @@ export const usePointer = () => {
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    if (!position || !pointerSelection.selecting || !pointerSelection.minimum)
-      return;
-    if (pointerSelection.dragging) {
+    if (!position || !changes.selecting || !changes.minimum) return;
+    if (changes.dragging) {
       // correct minimum or maximum in the case where user may have selected rectangle from right to left
       const maximum: { x: number; y: number } = {
-        x:
-          pointerSelection.minimum.x > position.x
-            ? pointerSelection.minimum.x
-            : position.x,
-        y:
-          pointerSelection.minimum.y > position.y
-            ? pointerSelection.minimum.y
-            : position.y,
+        x: changes.minimum.x > position.x ? changes.minimum.x : position.x,
+        y: changes.minimum.y > position.y ? changes.minimum.y : position.y,
       };
       const minimum: { x: number; y: number } = {
-        x:
-          pointerSelection.minimum.x > position.x
-            ? position.x
-            : pointerSelection.minimum.x,
-        y:
-          pointerSelection.minimum.y > position.y
-            ? position.y
-            : pointerSelection.minimum.y,
+        x: changes.minimum.x > position.x ? position.x : changes.minimum.x,
+        y: changes.minimum.y > position.y ? position.y : changes.minimum.y,
       };
 
       if (!minimum || !stagedAnnotations.length) {
         dispatch(
-          setPointerSelection({
-            pointerSelection: {
-              ...pointerSelection,
+          annotatorSlice.actions.updatePointerSelection({
+            changes: {
               selecting: false,
             },
           })
@@ -185,8 +171,8 @@ export const usePointer = () => {
     }
 
     dispatch(
-      setPointerSelection({
-        pointerSelection: { ...pointerSelection, selecting: false },
+      annotatorSlice.actions.updatePointerSelection({
+        changes: { selecting: false },
       })
     );
   };

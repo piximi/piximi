@@ -3,7 +3,6 @@ import { KonvaEventObject } from "konva/lib/Node";
 
 import {
   stageScaleSelector,
-  toolTypeSelector,
   zoomSelectionSelector,
   setZoomSelection,
   setStageScale,
@@ -11,6 +10,7 @@ import {
   stageWidthSelector,
   stagePositionSelector,
 } from "store/imageViewer";
+import { selectToolType } from "store/annotator/selectors";
 import { selectActiveImageScaledWidth } from "store/data";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
@@ -25,7 +25,7 @@ export const useZoom = () => {
   const stageScale = useSelector(stageScaleSelector);
   const stageWidth = useSelector(stageWidthSelector);
   const stagePosition = useSelector(stagePositionSelector);
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
   const imageWidth = useSelector(selectActiveImageScaledWidth);
