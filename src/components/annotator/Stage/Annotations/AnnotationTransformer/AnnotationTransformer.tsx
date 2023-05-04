@@ -9,26 +9,22 @@ import {
   cursorSelector,
   setSelectedAnnotationIds,
   stageScaleSelector,
-  setAnnotationState,
-  setSelectionMode,
   imageOriginSelector,
+  selectActiveAnnotationIds,
 } from "store/imageViewer";
+
+import { annotatorSlice } from "store/annotator";
 
 import {
   selectActiveImageHeight,
   selectActiveImageWidth,
   selectWorkingAnnotation,
   selectSelectedAnnotations,
-  selectStagedAnnotations,
 } from "store/data";
 
 import useSound from "use-sound";
 
-import {
-  AnnotationModeType,
-  AnnotationStateType,
-  DecodedAnnotationType,
-} from "types";
+import { AnnotationModeType, AnnotationStateType } from "types";
 
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
@@ -61,7 +57,7 @@ export const AnnotationTransformer = ({
 }: AnnotationTransformerProps) => {
   const [transforming, setTransforming] = useState<boolean>(false);
   const [transformed, setTransformed] = useState<boolean>(false);
-  const stagedAnnotations = useSelector(selectStagedAnnotations);
+  const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
   const workingAnnotation = useSelector(selectWorkingAnnotation);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeImageId = useSelector(activeImageIdSelector);
@@ -107,19 +103,17 @@ export const AnnotationTransformer = ({
 
   const onTransformStart = () => {
     setTransforming(true);
-    const selected = stagedAnnotations.find(
-      (annotation: DecodedAnnotationType) => {
-        return annotation.id === annotationId;
-      }
-    );
+    const selected = activeAnnotationIds.find((id: string) => {
+      return id === annotationId;
+    });
 
     if (!selected) return;
 
     if (!transformed) {
       dispatch(
         setSelectedAnnotationIds({
-          selectedAnnotationIds: [selected.id],
-          workingAnnotationId: selected.id,
+          selectedAnnotationIds: [selected],
+          workingAnnotationId: selected,
         })
       );
     }
@@ -157,16 +151,15 @@ export const AnnotationTransformer = ({
       annotationTool.deselect();
     } else {
       dispatch(
-        setAnnotationState({
+        annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool: annotationTool,
-          execSaga: true,
         })
       );
     }
 
     dispatch(
-      setSelectionMode({
+      annotatorSlice.actions.setSelectionMode({
         selectionMode: AnnotationModeType.New,
       })
     );
@@ -247,14 +240,10 @@ export const AnnotationTransformer = ({
   }
 
   useEffect(() => {
-    if (
-      !stagedAnnotations
-        .map((annotation) => annotation.id)
-        .includes(annotationId)
-    ) {
+    if (!activeAnnotationIds.includes(annotationId)) {
       setTransformed(true);
     }
-  }, [stagedAnnotations, annotationId]);
+  }, [activeAnnotationIds, annotationId]);
 
   return (
     <>

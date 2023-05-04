@@ -27,21 +27,24 @@ import { PenAnnotationToolTip } from "./PenAnnotationToolTip";
 import { PointerSelection } from "./Selection/PointerSelection";
 
 import {
-  annotationStateSelector,
   cursorSelector,
-  selectionModeSelector,
   setStagePosition,
   setZoomSelection,
   stagePositionSelector,
   stageScaleSelector,
-  toolTypeSelector,
   zoomSelectionSelector,
-  setAnnotationState,
   setSelectedAnnotationIds,
   setImageOrigin,
   selectedAnnotationCategoryIdSelector,
   selectSelectedAnnotationIds,
+  activeImageIdSelector,
 } from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import {
+  selectAnnotationState,
+  selectAnnotationSelectionMode,
+  selectToolType,
+} from "store/annotator/selectors";
 import {
   selectActiveImageActivePlane,
   selectStagedAnnotations,
@@ -104,7 +107,7 @@ export const Stage = ({
   const labelGroupRef = useRef<Konva.Group>();
 
   // useSelector
-  const toolType = useSelector(toolTypeSelector);
+  const toolType = useSelector(selectToolType);
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
   const selectedAnnotationCategoryId = useSelector(
     selectedAnnotationCategoryIdSelector
@@ -112,18 +115,19 @@ export const Stage = ({
   const selectedCategory = useSelector((state: RootState) =>
     selectAnnotationCategoryById(state, selectedAnnotationCategoryId!)
   );
-  const selectionMode = useSelector(selectionModeSelector);
+  const selectionMode = useSelector(selectAnnotationSelectionMode);
   const stagePosition = useSelector(stagePositionSelector);
   const activeImagePlane = useSelector(selectActiveImageActivePlane);
   const scaledImageWidth = useSelector(selectActiveImageScaledWidth);
   const scaledImageHeight = useSelector(selectActiveImageScaledHeight);
   const stageScale = useSelector(stageScaleSelector);
   const annotations = useSelector(selectStagedAnnotations);
-  const annotationState = useSelector(annotationStateSelector);
+  const annotationState = useSelector(selectAnnotationState);
   const workingAnnotation = useSelector(selectWorkingAnnotation);
   const cursor = useSelector(cursorSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
   const automaticCentering = useSelector(zoomToolOptionsSelector);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   useHotkeys(
     "alt",
@@ -261,10 +265,9 @@ export const Stage = ({
   const deselectAnnotation = useCallback(() => {
     if (!annotationTool) {
       dispatch(
-        setAnnotationState({
+        annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
-          execSaga: true,
         })
       );
 
@@ -291,10 +294,9 @@ export const Stage = ({
   const onAnnotating = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotating,
           annotationTool,
-          execSaga: true,
         })
       );
     };
@@ -304,15 +306,18 @@ export const Stage = ({
   const onAnnotated = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Annotated,
           annotationTool,
-          execSaga: true,
         })
       );
 
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool?.annotate(selectedCategory!, activeImagePlane!);
+      annotationTool?.annotate(
+        selectedCategory!,
+        activeImagePlane!,
+        activeImageId!
+      );
     };
     return func;
   }, [
@@ -321,15 +326,15 @@ export const Stage = ({
     activeImagePlane,
     selectionMode,
     dispatch,
+    activeImageId,
   ]);
 
   const onDeselect = useMemo(() => {
     const func = () => {
       dispatch(
-        setAnnotationState({
+        annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
           annotationTool,
-          execSaga: true,
         })
       );
     };
@@ -368,7 +373,7 @@ export const Stage = ({
       )
         return;
 
-      const transformed = getTransformedPosition(
+      const transformedPosition = getTransformedPosition(
         currentPosition,
         stageRef.current
       );
@@ -376,7 +381,7 @@ export const Stage = ({
         onPointerMouseDown(absolutePosition!);
         return;
       } else if (toolType === ToolType.Zoom) {
-        onZoomMouseDown(transformed!, event);
+        onZoomMouseDown(transformedPosition!, event);
         return;
       }
       if (annotationState === AnnotationStateType.Annotated) {
@@ -388,7 +393,6 @@ export const Stage = ({
       }
 
       if (!annotationTool || outOfBounds) return;
-      console.log(outOfBounds);
       annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);

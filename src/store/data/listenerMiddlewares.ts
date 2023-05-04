@@ -1,17 +1,20 @@
 import { batch } from "react-redux";
-import { createListenerMiddleware, addListener } from "@reduxjs/toolkit";
-import type { TypedStartListening, TypedAddListener } from "@reduxjs/toolkit";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
-import { RootState } from "store/reducer/reducer";
-import { AppDispatch } from "store/stores/productionStore";
 import { dataSlice, uploadImages } from "./dataSlice";
 import { getDeferredProperty } from "store/entities/utils";
 import { imageViewerSlice } from "store/imageViewer";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
-import { AlertStateType, AlertType, ImageType, OldImageType } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  AppStartListening,
+  ImageType,
+  OldImageType,
+} from "types";
 
 import { getStackTraceFromError } from "utils";
 import { createRenderedTensor } from "utils/common/image";
@@ -23,15 +26,9 @@ import {
 
 export const dataMiddleware = createListenerMiddleware();
 
-export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
-
 export const startAppListening =
   dataMiddleware.startListening as AppStartListening;
 
-export const addAppListener = addListener as TypedAddListener<
-  RootState,
-  AppDispatch
->;
 type ImageFileType = {
   fileName: string;
   imageStack: ImageJS.Stack;
@@ -42,7 +39,7 @@ type ImageFileError = {
   error: string;
 };
 startAppListening({
-  predicate: (action, currentState: RootState, previousState: RootState) => {
+  predicate: (action, currentState, previousState) => {
     return (
       currentState.data.annotations.ids !== previousState.data.annotations.ids
     );

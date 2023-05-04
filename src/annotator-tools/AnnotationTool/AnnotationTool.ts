@@ -3,12 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Tool } from "../Tool";
 
-import {
-  AnnotationStateType,
-  DecodedAnnotationType,
-  Category,
-  Point,
-} from "types";
+import { AnnotationStateType, Category, Point, AnnotationType } from "types";
 
 import { DataArray, convertToDataArray } from "utils/common/image";
 
@@ -47,7 +42,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: DecodedAnnotationType;
+  annotation?: AnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];
@@ -164,13 +159,14 @@ export abstract class AnnotationTool extends Tool {
    * @param plane Index of the image plane that corresponds to the annotation.
    * @returns
    */
-  annotate(category: Category, plane: number): void {
+  annotate(category: Category, plane: number, imageId: string): void {
     if (!this.boundingBox || !this.maskData) return;
 
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
       id: this.annotation ? this.annotation.id : uuidv4(),
+      imageId,
       maskData: this.maskData,
       plane: plane,
     };

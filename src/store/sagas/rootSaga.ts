@@ -6,7 +6,6 @@ import {
   watchPredictClassifierSaga,
 } from "store/classifier";
 import {
-  watchAnnotationStateChangeSaga,
   watchSelectedCategorySaga,
   //watchActiveImageChangeSaga,
   //watchActiveImageColorsChangeSaga,
@@ -26,8 +25,7 @@ export function* rootSaga() {
 
   //const applicationEffects = [fork(watchUploadImagesSaga)];
 
-  const annotatorEffects = [
-    fork(watchAnnotationStateChangeSaga),
+  const imageViewerEffects = [
     fork(watchSelectedCategorySaga),
     //fork(watchActiveImageChangeSaga),
     //fork(watchActiveImageColorsChangeSaga),
@@ -42,7 +40,7 @@ export function* rootSaga() {
   yield all([
     ...classifierEffects,
     ...segmenterEffects,
-    ...annotatorEffects,
+    ...imageViewerEffects,
     //...applicationEffects,
   ]);
 }

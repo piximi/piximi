@@ -5,22 +5,20 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import {
-  imageViewerSlice,
-  penSelectionBrushSizeSelector,
-} from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import { selectPenSelectionBrushSize } from "store/annotator/selectors";
 
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();
 
   const penSelectionBrushSizeBrushSize = useSelector(
-    penSelectionBrushSizeSelector
+    selectPenSelectionBrushSize
   );
 
   const onChange = (event: any, changed: number | number[]) => {
     const payload = { penSelectionBrushSize: changed as number };
 
-    dispatch(imageViewerSlice.actions.setPenSelectionBrushSize(payload));
+    dispatch(annotatorSlice.actions.setPenSelectionBrushSize(payload));
   };
 
   return (

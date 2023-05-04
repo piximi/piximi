@@ -43,6 +43,14 @@ export function getProperty<T, S extends keyof T>(
 
 /* Deferred */
 
+export function getCompleteEntity<T>(entity: DeferredEntity<T>): T | undefined {
+  if (entity.changes.deleted) return;
+  const { added, deleted, ...completeEntity } = {
+    ...entity.saved,
+    ...entity.changes,
+  };
+  return completeEntity as T;
+}
 export function getDeferredProperty<T, S extends keyof T>(
   entity: DeferredEntity<T>,
   property: S

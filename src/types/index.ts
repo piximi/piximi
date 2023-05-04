@@ -3,11 +3,13 @@ export { AlertType, defaultAlert } from "./AlertStateType";
 
 export { AnnotationModeType } from "./AnnotationModeType";
 
+export type { AnnotatorStore } from "./AnnotatorStore";
+
 export { AnnotationStateType } from "./AnnotationStateType";
 
 export { AnnotationExportType } from "./AnnotationExportType";
 export type { AnnotationsEntityType } from "./AnnotationsEntityType";
-
+export type { AppStartListening } from "./AppStartListening";
 export type { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
 
 export type {
@@ -78,8 +80,6 @@ export { AnnotatorOperation } from "./AnnotatorOperation";
 
 export { AnnotatorSelectionMode } from "./AnnotatorSelectionMode";
 
-export type { AnnotatorState } from "./AnnotatorState";
-
 export { AnnotatorZoomMode } from "./AnnotatorZoomMode";
 
 export { LanguageType } from "./LanguageType";
@@ -108,6 +108,7 @@ export type { Point, Edge } from "./Polygon";
 export type { PreprocessOptions } from "./PreprocessOptions";
 
 export type { Project } from "./Project";
+export type { PointerSelectionType } from "./PointerSelectionType";
 
 export type { RescaleOptions } from "./RescaleOptions";
 

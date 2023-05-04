@@ -15,7 +15,7 @@ import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { InformationBox } from "./InformationBox";
 import { DefaultOptions } from "./DefaultOptions";
 
-import { toolTypeSelector } from "store/imageViewer";
+import { selectToolType } from "store/annotator/selectors";
 
 import { ToolType } from "types";
 
@@ -154,7 +154,7 @@ export const ToolOptions = ({
   optionsVisibility: boolean;
 }) => {
   const [toolType, setToolType] = useState<OperationType>(operations[0]);
-  const activeOperation = useSelector(toolTypeSelector);
+  const activeOperation = useSelector(selectToolType);
   const t = useTranslation();
 
   useEffect(() => {

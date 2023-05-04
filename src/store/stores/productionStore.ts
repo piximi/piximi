@@ -11,6 +11,7 @@ import createSagaMonitor from "@clarketm/saga-monitor";
 import { reducer } from "../reducer";
 import { rootSaga } from "../sagas";
 import { dataMiddleware } from "store/data/listenerMiddlewares";
+import { annotatorMiddleware } from "store/annotator/annotatorListeners";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -44,18 +45,23 @@ const enhancers: StoreEnhancer[] = [];
  *
  * For infor on changing the execution order, see https://github.com/redux-saga/redux-saga/issues/148
  */
-let middleware: Middleware[] =
+let loggingMiddleware: Middleware[] =
   process.env.NODE_ENV !== "production" &&
   process.env.REACT_APP_LOG_LEVEL === "2"
     ? [dataMiddleware.middleware, logger, saga]
     : [dataMiddleware.middleware, saga];
+
+let listenerMiddlewares: Middleware[] = [
+  dataMiddleware.middleware,
+  annotatorMiddleware.middleware,
+];
 
 const preloadedState = {};
 
 const options = {
   devTools: true,
   enhancers: enhancers,
-  middleware: middleware,
+  middleware: [...listenerMiddlewares, ...loggingMiddleware],
   preloadedState: preloadedState,
   reducer: reducer,
 };

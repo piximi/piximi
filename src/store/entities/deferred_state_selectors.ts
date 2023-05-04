@@ -6,6 +6,7 @@ import type {
   Dictionary,
 } from "./models";
 import { createDraftSafeSelector } from "@reduxjs/toolkit";
+import { getCompleteEntity } from "./utils";
 
 export function createDeferredSelectorsFactory<T>() {
   function getSelectors(): DeferredEntitySelectors<T, DeferredEntityState<T>>;
@@ -22,12 +23,11 @@ export function createDeferredSelectorsFactory<T>() {
     // Select all but deleted entities (draft safe because new object returnd)
     const selectAvailableEntities = createDraftSafeSelector(
       selectEntities,
-      (entities) => {
+      (entities): Record<string, T> => {
         const availible: Record<string, T> = {};
         for (const id of Object.keys(entities)) {
           if (!entities[id].changes.deleted) {
-            const { deleted, added, ...filteredChanges } = entities[id].changes;
-            availible[id] = { ...entities[id].saved, ...filteredChanges };
+            availible[id] = getCompleteEntity(entities[id])!;
           }
         }
         return availible;

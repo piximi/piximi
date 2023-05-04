@@ -6,15 +6,11 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import {
-  imageViewerSlice,
-  quickSelectionRegionSizeSelector,
-} from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import { selectQuickSelectionRegionSize } from "store/annotator/selectors";
 
 export const QuickAnnotationOptions = () => {
-  const quickSelectionRegionSize = useSelector(
-    quickSelectionRegionSizeSelector
-  );
+  const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
 
   const [regionSize, setRegionSize] = useState<number>(
     quickSelectionRegionSize
@@ -28,7 +24,7 @@ export const QuickAnnotationOptions = () => {
 
   const onChangeCommitted = (event: any, changed: number | number[]) => {
     const payload = { quickSelectionRegionSize: changed as number };
-    dispatch(imageViewerSlice.actions.setQuickSelectionRegionSize(payload));
+    dispatch(annotatorSlice.actions.setQuickSelectionRegionSize(payload));
   };
 
   return (

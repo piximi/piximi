@@ -6,13 +6,11 @@ import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-import {
-  imageViewerSlice,
-  thresholdAnnotationValueSelector,
-} from "store/imageViewer";
+import { annotatorSlice } from "store/annotator";
+import { selectThresholdAnnotationValue } from "store/annotator/selectors";
 
 export const ThresholdAnnotationOptions = () => {
-  const thresholdValue = useSelector(thresholdAnnotationValueSelector);
+  const thresholdValue = useSelector(selectThresholdAnnotationValue);
 
   const [threshold, setThreshold] = useState<number>(thresholdValue);
 
@@ -24,7 +22,7 @@ export const ThresholdAnnotationOptions = () => {
 
   useEffect(() => {
     const payload = { thresholdAnnotationValue: threshold };
-    dispatch(imageViewerSlice.actions.setThresholdAnnotationValue(payload));
+    dispatch(annotatorSlice.actions.setThresholdAnnotationValue(payload));
   }, [dispatch, threshold]);
 
   return (
