@@ -3,18 +3,17 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { History, LayersModel } from "@tensorflow/tfjs";
+import { History } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
-import {
-  availableClassifierModels,
-  ClassifierModelProps,
-} from "../../types/ModelType";
+import { concreteClassifierModels, ModelStatus } from "../../types/ModelType";
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
+import { TrainingCallbacks } from "utils/common/models/Model";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 export const initialState: Classifier = {
-  evaluating: false,
+  modelStatus: ModelStatus.Uninitialized,
   inputShape: {
     planes: 1,
     height: 256,
@@ -26,14 +25,11 @@ export const initialState: Classifier = {
     batchSize: 32,
     initialEpoch: 0,
   },
-  fitting: false,
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModel: availableClassifierModels[0],
+  selectedModel: concreteClassifierModels[0],
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
-  predicting: false,
-  predicted: false,
   preprocessOptions: {
     shuffle: true,
     rescaleOptions: {
@@ -61,38 +57,14 @@ export const classifierSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetClassifier: () => initialState,
-    fit(
-      state,
-      action: PayloadAction<{
-        onEpochEnd: any;
-        execSaga: boolean;
-      }>
-    ) {
-      state.fitting = true;
-    },
-    predict(state, action: PayloadAction<{ execSaga: boolean }>) {
-      state.predicting = true;
-    },
-    evaluate(
-      state,
-      action: PayloadAction<{
-        execSaga: boolean;
-      }>
-    ) {
-      state.evaluating = true;
-    },
     setClassifier(state, action: PayloadAction<{ classifier: Classifier }>) {
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.classifier;
       return action.payload.classifier;
     },
     setDefaults(state, action: PayloadAction<{}>) {
-      state.evaluating = false;
-      state.fitting = false;
-      state.predicting = false;
-      state.compiled = undefined;
-      state.fitted = undefined;
-      state.userUploadedModel = undefined;
+      // TODO - segmenter: dispose() and state.selectedModel = SimpleCNN(), or whatever
+      state.modelStatus = ModelStatus.Uninitialized;
       state.evaluationResult = {
         confusionMatrix: [],
         accuracy: -1,
@@ -102,35 +74,30 @@ export const classifierSlice = createSlice({
         f1Score: -1,
       };
     },
+    updateModelStatus(
+      state,
+      action: PayloadAction<{
+        modelStatus: ModelStatus;
+        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+        execSaga: boolean;
+      }>
+    ) {
+      state.modelStatus = action.payload.modelStatus;
+    },
     updateBatchSize(state, action: PayloadAction<{ batchSize: number }>) {
       const { batchSize } = action.payload;
 
       state.fitOptions.batchSize = batchSize;
-    },
-    updateCompiled(state, action: PayloadAction<{ compiled: LayersModel }>) {
-      const { compiled } = action.payload;
-
-      state.compiled = compiled;
     },
     updateEpochs(state, action: PayloadAction<{ epochs: number }>) {
       const { epochs } = action.payload;
 
       state.fitOptions.epochs = epochs;
     },
-    updateFitted(
-      state,
-      action: PayloadAction<{ fitted: LayersModel; status: History }>
-    ) {
-      const { fitted, status } = action.payload;
+    updateFitted(state, action: PayloadAction<{ history: History }>) {
+      state.modelStatus = ModelStatus.Trained;
 
-      state.fitted = fitted;
-
-      state.history = status;
-
-      state.fitting = false;
-    },
-    updateFitting(state, action: PayloadAction<{ fitting: boolean }>) {
-      state.fitting = false;
+      state.history = action.payload.history;
     },
     updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
       state.inputShape = action.payload.inputShape;
@@ -155,26 +122,19 @@ export const classifierSlice = createSlice({
     },
     updateSelectedModel(
       state,
-      action: PayloadAction<{ model: ClassifierModelProps }>
+      action: PayloadAction<{ model: SequentialClassifier }>
     ) {
       state.selectedModel = action.payload.model;
-    },
-    updatePredicted(state, action: PayloadAction<{ predicted: boolean }>) {
-      state.predicted = action.payload.predicted;
     },
     uploadUserSelectedModel(
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        modelSelection: ClassifierModelProps;
-        model: LayersModel;
+        modelSelection: SequentialClassifier;
       }>
     ) {
       state.inputShape = action.payload.inputShape;
-      state.fitted = action.payload.model;
-      state.compiled = action.payload.model;
       state.selectedModel = action.payload.modelSelection;
-      state.userUploadedModel = action.payload.modelSelection;
     },
     updateOptimizationAlgorithm(
       state,
@@ -207,16 +167,6 @@ export const classifierSlice = createSlice({
 
       state.trainingPercentage = trainingPercentage;
     },
-    updateEvaluating(state, action: PayloadAction<{ evaluating: boolean }>) {
-      const { evaluating } = action.payload;
-
-      state.evaluating = evaluating;
-    },
-    updatePredicting(state, action: PayloadAction<{ predicting: boolean }>) {
-      const { predicting } = action.payload;
-
-      state.predicting = predicting;
-    },
     updateEvaluationResult(
       state,
       action: PayloadAction<{
@@ -231,9 +181,7 @@ export const classifierSlice = createSlice({
 });
 
 export const {
-  fit,
   updateBatchSize,
-  updateCompiled,
   updateEpochs,
   updateFitted,
   updateLearningRate,
@@ -242,4 +190,5 @@ export const {
   updateOptimizationAlgorithm,
   updateTrainingPercentage,
   uploadUserSelectedModel,
+  updateModelStatus,
 } = classifierSlice.actions;

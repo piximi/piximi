@@ -10,22 +10,23 @@ import {
 
 import {
   classifierArchitectureOptionsSelector,
-  classifierUploadedModelSelector,
+  // classifierUploadedModelSelector,
   classifierInputShapeSelector,
   classifierSlice,
 } from "store/classifier";
 
-import { availableClassifierModels, ClassifierModelProps } from "types";
+import { concreteClassifierModels } from "types/ModelType";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 export const ArchitectureSettingsGrid = () => {
   const architectureOptions = useSelector(
     classifierArchitectureOptionsSelector
   );
-  const userUploadedModel = useSelector(classifierUploadedModelSelector);
+  // const userUploadedModel = useSelector(classifierUploadedModelSelector);
   const inputShape = useSelector(classifierInputShapeSelector);
 
   const [selectedModel, setSelectedModel] =
-    React.useState<ClassifierModelProps>(architectureOptions.selectedModel);
+    React.useState<SequentialClassifier>(architectureOptions.selectedModel);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     React.useState<boolean>(false);
@@ -34,18 +35,18 @@ export const ArchitectureSettingsGrid = () => {
 
   const dispatch = useDispatch();
 
-  const modelOptions: ClassifierModelProps[] =
-    availableClassifierModels.slice();
+  const modelOptions = concreteClassifierModels.slice();
 
-  if (userUploadedModel) {
-    modelOptions.push(userUploadedModel);
-  }
+  // TODO - segmenter: hook this back up
+  // if (userUploadedModel) {
+  //   modelOptions.push(userUploadedModel);
+  // }
 
   React.useEffect(() => {
     if (selectedModel.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
-        `${selectedModel.modelName} requires ${selectedModel.requiredChannels} channels!`
+        `${selectedModel.name} requires ${selectedModel.requiredChannels} channels!`
       );
     } else {
       setFixedNumberOfChannels(false);
@@ -55,9 +56,9 @@ export const ArchitectureSettingsGrid = () => {
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
-    value: ClassifierModelProps | null
+    value: SequentialClassifier | null
   ) => {
-    const selectedModel = value as ClassifierModelProps;
+    const selectedModel = value as SequentialClassifier;
     setSelectedModel(selectedModel);
 
     // if the selected model requires a specific number of input channels, dispatch that number to the store
@@ -109,7 +110,7 @@ export const ArchitectureSettingsGrid = () => {
             disableClearable={true}
             options={modelOptions}
             onChange={onSelectedModelChange}
-            getOptionLabel={(option: ClassifierModelProps) => option.modelName}
+            getOptionLabel={(option: SequentialClassifier) => option.name}
             sx={{ width: 300 }}
             renderInput={(params) => (
               <TextField
@@ -119,10 +120,7 @@ export const ArchitectureSettingsGrid = () => {
               />
             )}
             value={selectedModel}
-            isOptionEqualToValue={(option, value) =>
-              option.modelArch === value.modelArch &&
-              option.modelName === value.modelName
-            }
+            isOptionEqualToValue={(option, value) => value.name === option.name}
           />
         </Grid>
       </Grid>

@@ -1,5 +1,5 @@
 import "@tensorflow/tfjs-node";
-import { SimpleCNN } from "./SimpleCNN";
+import { SequentialClassifier } from "./AbstractClassifier";
 
 import {
   Category,
@@ -10,10 +10,6 @@ import {
   PreprocessOptions,
   CropOptions,
   CropSchema,
-  LossFunction,
-  OptimizationAlgorithm,
-  Metric,
-  CompileOptions,
 } from "types";
 
 import {
@@ -22,8 +18,23 @@ import {
   MIMEType,
 } from "utils/common/image";
 import { fileFromPath } from "utils/common/image/nodeImageHelper";
+import { ModelTask } from "types/ModelType";
 
 jest.setTimeout(50000);
+
+class GenericClassifier extends SequentialClassifier {
+  constructor() {
+    super({
+      name: "GenericClassifier",
+      task: ModelTask.Classification,
+      graph: false,
+      src: "",
+      pretrained: false,
+    });
+  }
+
+  loadModel() {}
+}
 
 const inputShape: Shape = {
   planes: 1,
@@ -52,13 +63,6 @@ const fitOptions: FitOptions = {
   epochs: 10,
   batchSize: 32,
   initialEpoch: 0,
-};
-
-const compileOptions: CompileOptions = {
-  learningRate: 0.01,
-  lossFunction: LossFunction.CategoricalCrossEntropy,
-  metrics: [Metric.CategoricalAccuracy],
-  optimizationAlgorithm: OptimizationAlgorithm.Adam,
 };
 
 const categories: Array<Category> = [
@@ -109,13 +113,7 @@ it("preprocessClassifier", async () => {
     images.push(im);
   }
 
-  const model = new SimpleCNN();
-  model.loadModel({
-    inputShape,
-    numClasses: categories.length,
-    randomizeWeights: preprocessOptions.shuffle,
-    compileOptions,
-  });
+  const model = new GenericClassifier();
   model.loadTraining(images, {
     categories,
     inputShape,
@@ -127,8 +125,6 @@ it("preprocessClassifier", async () => {
 
   // future warning: toArrayForTest is undocumented
   const items = await model._trainingDataset!.toArrayForTest();
-
-  model.dispose();
 
   expect(items[0]["xs"].shape).toEqual([1, 224, 224, 3]);
   expect(items[0]["ys"].shape).toEqual([1, 2]);

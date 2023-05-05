@@ -251,14 +251,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
           <div>
             <TrainingHistoryPlot
               metric={"accuracy"}
-              currentEpoch={currentEpoch}
               trainingValues={trainingAccuracy}
               validationValues={validationAccuracy}
             />
 
             <TrainingHistoryPlot
               metric={"loss"}
-              currentEpoch={currentEpoch}
               trainingValues={trainingLoss}
               validationValues={validationLoss}
               dynamicYRange={true}

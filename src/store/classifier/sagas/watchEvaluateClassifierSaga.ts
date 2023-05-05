@@ -5,7 +5,7 @@ import { classifierSlice } from "store/classifier";
 
 export function* watchEvaluateClassifierSaga() {
   yield takeLeading(
-    classifierSlice.actions.evaluate.type,
+    classifierSlice.actions.updateModelStatus.type,
     evaluateClassifierSaga
   );
 }

@@ -15,8 +15,6 @@ import {
   PreprocessOptions,
   CropOptions,
   RescaleOptions,
-  ClassifierModelProps,
-  ModelArchitecture,
   CropSchema,
   Metric,
   LossFunction,
@@ -28,6 +26,9 @@ import { sortKeyByName } from "types/ImageSortType";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
+import { Model } from "../models/Model";
+import { ModelTask } from "types/ModelType";
+import { SimpleCNN } from "../models/SimpleCNN/SimpleCNN";
 
 /*
   =====================
@@ -336,25 +337,32 @@ const deserializePreprocessOptionsGroup = (
   return { cropOptions, rescaleOptions, shuffle };
 };
 
-const deserializeSelectedModelGroup = (
-  selectedModelGroup: Group
-): ClassifierModelProps => {
-  const modelName = getAttr(selectedModelGroup, "model_name") as string;
-  const modelArch = getAttr(
-    selectedModelGroup,
-    "model_architecture"
-  ) as number as ModelArchitecture;
+// TODO - Segmenter: temp unused
+// eslint-disable-next-line
+const deserializeSelectedModelGroup = (selectedModelGroup: Group): Model => {
+  const name = getAttr(selectedModelGroup, "model_name") as string;
+  const task = getAttr(selectedModelGroup, "model_task") as number as ModelTask;
 
   const graph = Boolean(getAttr(selectedModelGroup, "model_graph_B"));
 
-  const srcAttr = selectedModelGroup.attrs["src"];
-  const src = srcAttr ? (srcAttr.value as string) : null;
+  const pretrained = Boolean(getAttr(selectedModelGroup, "model_pretrained_B"));
 
-  if (src) {
-    return { modelName, modelArch, graph, src };
-  } else {
-    return { modelName, modelArch, graph };
-  }
+  const requiredChannelsAttr = selectedModelGroup.attrs["required_channels"];
+  const requiredChannels = requiredChannelsAttr
+    ? (requiredChannelsAttr.value as number)
+    : undefined;
+
+  const src = getAttr(selectedModelGroup, "src") as string;
+
+  // TODO - segmenter: actually convert this to a model
+  return {
+    name,
+    task,
+    graph,
+    pretrained,
+    requiredChannels,
+    src,
+  } as unknown as Model;
 };
 
 const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
@@ -389,8 +397,12 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
     preprocessOptionsGroup
   );
 
-  const selectedModelGroup = getGroup(classifierGroup, "selected_model");
-  const selectedModel = deserializeSelectedModelGroup(selectedModelGroup);
+  // const selectedModelGroup = getGroup(classifierGroup, "selected_model");
+  // TODO - segmenter: remove typecast, should be generic Model
+  // const selectedModel = deserializeSelectedModelGroup(
+  //   selectedModelGroup
+  // ) as SequentialClassifier;
+  const selectedModel = new SimpleCNN();
 
   return {
     ...initialClassifierState,

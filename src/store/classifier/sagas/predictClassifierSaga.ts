@@ -6,11 +6,11 @@ import {
   classifierSlice,
   classifierArchitectureOptionsSelector,
   classifierFitOptionsSelector,
-  classifierFittedSelector,
   classifierPreprocessOptionsSelector,
   predictClasses,
   preprocessClassifier,
   createClassificationLabels,
+  classifierSelectedModelSelector,
 } from "store/classifier";
 import { applicationSlice } from "store/application";
 import {
@@ -29,13 +29,14 @@ import {
   PreprocessOptions,
   Shape,
 } from "types";
+import { ModelStatus } from "types/ModelType";
 
 import { getStackTraceFromError } from "utils";
 
 export function* predictClassifierSaga({
-  payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>) {
-  if (!execSaga) return;
+  payload: { modelStatus, execSaga },
+}: PayloadAction<{ modelStatus: ModelStatus; execSaga: boolean }>) {
+  if (modelStatus !== ModelStatus.Predicting || !execSaga) return;
 
   const testImages: ReturnType<typeof selectImagesByPartition> = yield select(
     (state) => selectImagesByPartition(state, Partition.Inference)
@@ -55,8 +56,8 @@ export function* predictClassifierSaga({
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);
 
-  let model: ReturnType<typeof classifierFittedSelector> = yield select(
-    classifierFittedSelector
+  let model: ReturnType<typeof classifierSelectedModelSelector> = yield select(
+    classifierSelectedModelSelector
   );
 
   if (model === undefined) {
@@ -67,6 +68,7 @@ export function* predictClassifierSaga({
     return;
   }
 
+  // @ts-ignore, TODO - segmenter
   const outputLayerSize = model.outputs[0].shape[1] as number;
 
   if (!testImages.length) {
@@ -96,11 +98,13 @@ export function* predictClassifierSaga({
       architectureOptions.inputShape,
       preprocessOptions,
       fitOptions,
+      // @ts-ignore, TODO - segmenter
       model
     );
   }
 
   yield put(
+    // @ts-ignore, TODO - segmenter
     classifierSlice.actions.updatePredicting({
       predicting: false,
     })
@@ -155,6 +159,7 @@ function* runPrediction(
   );
 
   yield put(
+    // @ts-ignore, TODO - segmenter
     classifierSlice.actions.updatePredicted({
       predicted: true,
     })

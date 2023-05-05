@@ -17,8 +17,8 @@ import { AlertDialog, DialogTransition } from "components/common/dialogs/";
 
 import { alertStateSelector } from "store/application";
 import {
-  classifierTrainingFlagSelector,
-  classifierCompiledSelector,
+  classifierSelectedModelSelector,
+  classifierModelStatusSelector,
   classifierCompileOptionsSelector,
   classifierFitOptionsSelector,
   classifierEpochsSelector,
@@ -34,6 +34,8 @@ import {
   LossFunction,
   Partition,
 } from "types";
+import { ModelStatus } from "types/ModelType";
+import { TrainingCallbacks } from "utils/common/models/Model";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -47,6 +49,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
+  const [totalEpochs, setTotalEpochs] = useState<number>(0);
 
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [noCategorizedImages, setNoCategorizedImages] =
@@ -69,11 +72,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(classifierTrainingFlagSelector);
   const categorizedImages = useSelector((state) =>
     selectImagesByPartition(state, Partition.Inference)
   );
-  const compiledModel = useSelector(classifierCompiledSelector);
+  const selectedModel = useSelector(classifierSelectedModelSelector);
+  const modelStatus = useSelector(classifierModelStatusSelector);
   const alertState = useSelector(alertStateSelector);
 
   const compileOptions = useSelector(classifierCompileOptionsSelector);
@@ -173,33 +176,42 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
   }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
 
-  const trainingHistoryCallback = (epoch: number, logs: any) => {
-    const epochCount = epoch + 1;
-    const trainingEpochIndicator = epochCount - 0.5;
-    setCurrentEpoch(epochCount);
+  const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
+    epoch,
+    logs
+  ) => {
+    const nextEpoch = totalEpochs + epoch + 1;
+    const trainingEpochIndicator = nextEpoch - 0.5;
+    setTotalEpochs(nextEpoch);
+    setCurrentEpoch((currentEpoch) => currentEpoch + 1);
+
+    if (!logs) return;
 
     if (logs.categoricalAccuracy) {
       setTrainingAccuracy((prevState) =>
         prevState.concat({
           x: trainingEpochIndicator,
-          y: logs.categoricalAccuracy,
+          y: logs.categoricalAccuracy as number,
         })
       );
     }
     if (logs.val_categoricalAccuracy) {
       setValidationAccuracy((prevState) =>
-        prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
+        prevState.concat({
+          x: nextEpoch,
+          y: logs.val_categoricalAccuracy as number,
+        })
       );
     }
     if (logs.loss) {
       setTrainingLoss((prevState) =>
-        prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
       );
     }
 
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
-        prevState.concat({ x: epochCount, y: logs.val_loss })
+        prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
       );
     }
 
@@ -217,16 +229,26 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   };
 
   const onFit = async () => {
-    if (!currentlyTraining) {
+    setCurrentEpoch(0);
+    if (modelStatus === ModelStatus.Uninitialized) {
       cleanUpStates();
-    }
 
-    dispatch(
-      classifierSlice.actions.fit({
-        onEpochEnd: trainingHistoryCallback,
-        execSaga: true,
-      })
-    );
+      dispatch(
+        classifierSlice.actions.updateModelStatus({
+          modelStatus: ModelStatus.InitFit,
+          onEpochEnd: trainingHistoryCallback,
+          execSaga: true,
+        })
+      );
+    } else {
+      dispatch(
+        classifierSlice.actions.updateModelStatus({
+          modelStatus: ModelStatus.Training,
+          onEpochEnd: trainingHistoryCallback,
+          execSaga: true,
+        })
+      );
+    }
   };
 
   return (
@@ -284,14 +306,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           <div>
             <TrainingHistoryPlot
               metric={"accuracy"}
-              currentEpoch={currentEpoch}
               trainingValues={trainingAccuracy}
               validationValues={validationAccuracy}
             />
 
             <TrainingHistoryPlot
               metric={"loss"}
-              currentEpoch={currentEpoch}
               trainingValues={trainingLoss}
               validationValues={validationLoss}
               dynamicYRange={true}
@@ -299,9 +319,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           </div>
         )}
 
-        {compiledModel && (
+        {modelStatus >= ModelStatus.Training && (
           <div>
-            <ModelSummaryTable compiledModel={compiledModel} />
+            {/*  TODO - segmenter: pass in actual model class */}
+            <ModelSummaryTable loadedModel={selectedModel._model!} />
           </div>
         )}
       </DialogContent>

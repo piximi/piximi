@@ -1,17 +1,17 @@
-import { History, LayersModel, Tensor } from "@tensorflow/tfjs";
+import { History, Tensor } from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 import { FitOptions } from "./FitOptions";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
-import { ClassifierModelProps } from "./ModelType";
 import { ClassifierEvaluationResultType } from "./EvaluationResultType";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { ModelStatus } from "./ModelType";
 
 export type Classifier = {
   // pre-fit state
-  userUploadedModel?: ClassifierModelProps;
-  selectedModel: ClassifierModelProps;
+  selectedModel: SequentialClassifier;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;
@@ -20,17 +20,11 @@ export type Classifier = {
   optimizationAlgorithm: OptimizationAlgorithm;
   trainingPercentage: number;
   metrics: Array<Metric>;
-  // post-fit results
-  compiled?: LayersModel;
   history?: History;
   // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
   // post-prediction results
   predictions?: Tensor;
   // status flags
-  fitting: boolean;
-  fitted?: LayersModel;
-  evaluating: boolean;
-  predicting: boolean;
-  predicted: boolean;
+  modelStatus: ModelStatus;
 };
