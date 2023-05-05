@@ -20,8 +20,13 @@ import {
 } from "store/classifier";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+<<<<<<< HEAD
 import { ModelStatus } from "types/ModelType";
 import { LayersModel } from "@tensorflow/tfjs";
+||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)
+=======
+import { ModelStatus } from "types/ModelType";
+>>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -44,6 +49,7 @@ export const FitClassifierDialogAppBar = ({
   const modelStatus = useSelector(classifierModelStatusSelector);
 
   const onStopFitting = () => {
+<<<<<<< HEAD
     if (modelStatus !== ModelStatus.Training) return;
     // TODO - segmenter: move into model class
     (selectedModel._model! as LayersModel).stopTraining = true;
@@ -54,6 +60,21 @@ export const FitClassifierDialogAppBar = ({
         modelStatus: ModelStatus.Trained,
       })
     );
+||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)
+    if (!compiled) return;
+    compiled.stopTraining = true;
+    dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+=======
+    if (modelStatus !== ModelStatus.Training) return;
+    selectedModel._model!.stopTraining = true;
+    // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        execSaga: true,
+        modelStatus: ModelStatus.Trained,
+      })
+    );
+>>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)
   };
 
   return (

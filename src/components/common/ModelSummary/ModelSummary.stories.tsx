@@ -42,5 +42,11 @@ const Template: ComponentStory<typeof ModelSummaryTable> = (args) => (
 );
 
 export const Primary = Template.bind({});
+<<<<<<< HEAD
 // TODO - segmenter: replace with Model
 Primary.args = { loadedModel: simpleCNN._model! as LayersModel };
+||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)
+Primary.args = { compiledModel: simpleCNN };
+=======
+Primary.args = { loadedModel: simpleCNN };
+>>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running)

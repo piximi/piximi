@@ -90,6 +90,7 @@ export function* predictClassifierSaga({
       inputShape,
       preprocessOptions,
       fitOptions,
+      // @ts-ignore, TODO - segmenter
       model
     );
     finalModelStatus = ModelStatus.Suggesting;
