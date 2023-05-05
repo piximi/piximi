@@ -1,3 +1,4 @@
+// @ts-nocheck ; TODO - segmenter: this is no longer required
 import { ClassifierArchitectureOptions, ModelArchitecture } from "types";
 import { createSimpleCNN } from "../../coroutine-models/simpleCNN";
 import { createMobileNet } from "../../coroutine-models/mobileNet";

@@ -4,5 +4,8 @@ import { fitClassifierSaga } from "./fitClassifierSaga";
 import { classifierSlice } from "store/classifier";
 
 export function* watchFitClassifierSaga() {
-  yield takeLeading(classifierSlice.actions.fit.type, fitClassifierSaga);
+  yield takeLeading(
+    classifierSlice.actions.updateModelStatus.type,
+    fitClassifierSaga
+  );
 }

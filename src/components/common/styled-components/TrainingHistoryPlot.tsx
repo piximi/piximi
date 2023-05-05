@@ -8,7 +8,6 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 type TrainingHistoryPlotProps = {
   metric: string;
-  currentEpoch: number;
   trainingValues: { x: number; y: number }[];
   validationValues: { x: number; y: number }[];
   dynamicYRange?: boolean;
@@ -17,7 +16,6 @@ type TrainingHistoryPlotProps = {
 export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
   const {
     metric,
-    currentEpoch,
     trainingValues,
     validationValues,
     dynamicYRange = false,
@@ -35,9 +33,9 @@ export const TrainingHistoryPlot = (props: TrainingHistoryPlotProps) => {
     data: validationValues,
   };
 
-  const stepSize = Math.ceil(currentEpoch / 30);
-  const epochRange = range(0, currentEpoch + 1, stepSize);
-  const pointSizeAdjustment = Math.floor(currentEpoch / 20);
+  const stepSize = Math.ceil(trainingValues.length / 30);
+  const epochRange = range(0, trainingValues.length + 1, stepSize);
+  const pointSizeAdjustment = Math.floor(trainingValues.length / 20);
 
   const min = dynamicYRange ? "auto" : 0;
   const max = dynamicYRange ? "auto" : 1;

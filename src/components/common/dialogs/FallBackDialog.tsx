@@ -30,8 +30,8 @@ import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedMode
 import { SaveProjectDialog } from "components/file-io/dialogs/SaveProjectDialog/SaveProjectDialog";
 
 import {
-  classifierFittedSelector,
   classifierSelectedModelSelector,
+  classifierModelStatusSelector,
 } from "store/classifier";
 import {
   segmenterFittedModelSelector,
@@ -42,6 +42,7 @@ import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelStatus } from "types/ModelType";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -91,11 +92,8 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
-  const fittedClassifierModel = useSelector(classifierFittedSelector);
-  const selectedClassifierModelProps = useSelector(
-    classifierSelectedModelSelector
-  );
-  const fittedClassifier = fittedClassifierModel ? true : false;
+  const selectedModel = useSelector(classifierSelectedModelSelector);
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
   const fittedSegmenterModel = useSelector(segmenterFittedModelSelector);
   const selectedSegmenterModelProps = useSelector(
@@ -231,7 +229,7 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-          {fittedClassifier && (
+          {modelStatus === ModelStatus.Trained && (
             <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
               Save classifier
             </Button>
@@ -249,8 +247,9 @@ export const FallBackDialog = (props: any) => {
         />
 
         <SaveFittedModelDialog
-          fittedModel={fittedClassifierModel}
-          modelProps={selectedClassifierModelProps}
+          // TODO - segmenter: pass in the model class itself
+          fittedModel={selectedModel._model!}
+          modelName={selectedModel.name}
           modelKind={"Classifier"}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
@@ -258,7 +257,7 @@ export const FallBackDialog = (props: any) => {
 
         <SaveFittedModelDialog
           fittedModel={fittedSegmenterModel as LayersModel}
-          modelProps={selectedSegmenterModelProps}
+          modelName={selectedSegmenterModelProps.modelName}
           modelKind={"Segmenter"}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}

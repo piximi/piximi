@@ -14,12 +14,13 @@ import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
 import {
-  classifierCompiledSelector,
-  classifierTrainingFlagSelector,
+  classifierModelStatusSelector,
+  classifierSelectedModelSelector,
   classifierSlice,
 } from "store/classifier";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelStatus } from "types/ModelType";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -38,13 +39,19 @@ export const FitClassifierDialogAppBar = ({
 }: FitClassifierDialogAppBarProps) => {
   const dispatch = useDispatch();
 
-  const compiled = useSelector(classifierCompiledSelector);
-  const training = useSelector(classifierTrainingFlagSelector);
+  const selectedModel = useSelector(classifierSelectedModelSelector);
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
   const onStopFitting = () => {
-    if (!compiled) return;
-    compiled.stopTraining = true;
-    dispatch(classifierSlice.actions.updateCompiled({ compiled: compiled }));
+    if (modelStatus !== ModelStatus.Training) return;
+    selectedModel._model!.stopTraining = true;
+    // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        execSaga: true,
+        modelStatus: ModelStatus.Trained,
+      })
+    );
   };
 
   return (
@@ -71,14 +78,17 @@ export const FitClassifierDialogAppBar = ({
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {training && (
+        {(modelStatus === ModelStatus.InitFit ||
+          modelStatus === ModelStatus.Loading ||
+          modelStatus === ModelStatus.Training) && (
           <FitClassifierProgressBar
             epochs={epochs}
             currentEpoch={currentEpoch}
           />
         )}
 
-        {!training && (
+        {(modelStatus === ModelStatus.Uninitialized ||
+          modelStatus >= ModelStatus.Trained) && (
           <Tooltip
             title={
               disableFitting
@@ -104,7 +114,7 @@ export const FitClassifierDialogAppBar = ({
           <span>
             <IconButton
               onClick={onStopFitting}
-              disabled={!training}
+              disabled={modelStatus !== ModelStatus.Training}
               color="primary"
             >
               <Stop />
