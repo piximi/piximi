@@ -118,7 +118,7 @@ export const SegmenterList = () => {
       />
       <SaveFittedModelDialog
         fittedModel={fittedSegmenter as LayersModel}
-        modelProps={selectedSegmenterModelProps}
+        modelName={selectedSegmenterModelProps.modelName}
         modelKind={"Segmenter"}
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}

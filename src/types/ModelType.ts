@@ -1,3 +1,6 @@
+import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
+import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
+
 export enum ModelArchitecture {
   None,
   SimpleCNN,
@@ -14,6 +17,17 @@ export enum ModelTask {
   Segmentation,
 }
 
+export enum ModelStatus {
+  Uninitialized,
+  InitFit,
+  Loading,
+  Training,
+  Trained,
+  Predicting,
+  Suggesting,
+  Evaluating,
+}
+
 type ModelProps = {
   modelName: string;
   requiredChannels?: number;
@@ -28,6 +42,8 @@ export interface DefaultModelProps extends ModelProps {}
 export type ClassifierModelProps = DefaultModelProps;
 
 export type SegmenterModelProps = DefaultModelProps;
+
+export const concreteClassifierModels = [new SimpleCNN(), new MobileNet()];
 
 export const availableClassifierModels: ClassifierModelProps[] = [
   {

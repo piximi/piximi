@@ -17,8 +17,9 @@ import { DisabledListItemButton } from "components/common/list-items/DisabledLis
 
 import {
   classifierSlice,
-  classifierPredictionFlagSelector,
+  classifierModelStatusSelector,
 } from "store/classifier";
+import { ModelStatus } from "types/ModelType";
 
 type PredictClassifierListItemProps = {
   disabled: boolean;
@@ -35,14 +36,19 @@ export const PredictClassifierListItem = (
   const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
 
   const onPredict = () => {
-    dispatch(classifierSlice.actions.predict({ execSaga: true }));
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Predicting,
+        execSaga: true,
+      })
+    );
   };
 
-  const predicting = useSelector(classifierPredictionFlagSelector);
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
   useEffect(() => {
-    setIsPredicting(predicting);
-  }, [predicting]);
+    setIsPredicting(modelStatus === ModelStatus.Predicting);
+  }, [modelStatus]);
 
   return (
     <Grid item xs={4}>

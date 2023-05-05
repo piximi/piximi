@@ -4,8 +4,6 @@ import { getFile, to_blob } from "../fileHandlers";
 import {
   AnnotationType,
   Classifier,
-  ClassifierModelProps,
-  DefaultModelProps,
   FitOptions,
   OldImageType,
   PreprocessOptions,
@@ -14,6 +12,7 @@ import {
 } from "types";
 import { Colors } from "types/tensorflow";
 import { sortTypeByKey } from "types/ImageSortType";
+import { Model } from "../models/Model";
 
 /* 
    =====================
@@ -217,32 +216,31 @@ const serializePreprocessOptions = (
   );
 };
 
-const serializeModelProps = (
-  modelPropsGroup: Group,
-  modelProps: ClassifierModelProps
-) => {
-  if (modelProps.hasOwnProperty("src")) {
-    modelPropsGroup.create_attribute(
-      "src",
-      (modelProps as DefaultModelProps).src!
-    );
-  }
+const serializeModelProps = (modelPropsGroup: Group, model: Model) => {
+  modelPropsGroup.create_attribute("model_name", model.name);
 
-  modelPropsGroup.create_attribute("model_name", modelProps.modelName);
+  modelPropsGroup.create_attribute("model_tak", model.task);
 
-  modelPropsGroup.create_attribute("model_architecture", modelProps.modelArch);
+  modelPropsGroup.create_attribute("src", model.src);
 
   modelPropsGroup.create_attribute(
     "model_graph_B",
-    Number(modelProps.graph),
+    Number(model.graph),
     undefined,
     "<B"
   );
 
-  modelProps.requiredChannels &&
+  modelPropsGroup.create_attribute(
+    "model_pretrained_B",
+    Number(model.pretrained),
+    undefined,
+    "<B"
+  );
+
+  model.requiredChannels &&
     modelPropsGroup.create_attribute(
       "required_channels",
-      modelProps.requiredChannels,
+      model.requiredChannels,
       undefined,
       "<B"
     );
@@ -295,11 +293,6 @@ const serializeClassifier = (
 
   const selectedModelGroup = classifierGroup.create_group("selected_model");
   serializeModelProps(selectedModelGroup, classifier.selectedModel);
-
-  if (classifier.userUploadedModel) {
-    const userModelGroup = classifierGroup.create_group("user_uploaded");
-    serializeModelProps(userModelGroup, classifier.userUploadedModel);
-  }
 };
 
 /*

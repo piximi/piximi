@@ -1,5 +1,4 @@
 import React from "react";
-import { LayersModel } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Divider, IconButton, Tooltip } from "@mui/material";
@@ -14,27 +13,23 @@ import { ClassifierExecListItem } from "../ClassifierExecListItem";
 import { CategoriesList } from "components/categories/CategoriesList";
 
 import {
-  classifierFittedSelector,
-  classifierPredictedSelector,
+  classifierModelStatusSelector,
   classifierSelectedModelSelector,
   uploadUserSelectedModel,
 } from "store/classifier";
 
 import { selectCreatedImageCategories } from "store/data";
 
-import {
-  Category,
-  CategoryType,
-  HotkeyView,
-  ModelArchitecture,
-  Shape,
-} from "types";
+import { CategoryType, HotkeyView, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
+import { ModelStatus } from "types/ModelType";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
-  const predicted = useSelector(classifierPredictedSelector);
-  const fittedClassifier = useSelector(classifierFittedSelector);
+
+  const modelStatus = useSelector(classifierModelStatusSelector);
+  // TODO - segmenter: search everywhere for "selectedClassifierModelProps" and change (search the whole codebase)
   const selectedClassifierModelProps = useSelector(
     classifierSelectedModelSelector
   );
@@ -57,15 +52,17 @@ export const ClassifierList = () => {
     modelName: string,
     classifierModel: any
   ) => {
+    // TODO - segmenter: actually make this user uploaded
+    const modelSelection = new SimpleCNN();
+    // const modelSelection = new UserUploadedModel({
+    //   name: modelName " - uploaded",
+    //   modelArch: ModelArchitecture.UserUploaded,
+    //   graph: false
+    // })
     dispatch(
       uploadUserSelectedModel({
         inputShape: inputShape,
-        modelSelection: {
-          modelName: modelName + " - uploaded",
-          modelArch: ModelArchitecture.UserUploaded,
-          graph: false,
-        },
-        model: classifierModel as LayersModel,
+        modelSelection,
       })
     );
   };
@@ -107,8 +104,8 @@ export const ClassifierList = () => {
         <>
           <CategoriesList
             createdCategories={categories}
-            predicted={predicted}
             categoryType={CategoryType.ImageCategory}
+            predicted={modelStatus === ModelStatus.Suggesting}
           />
 
           <Divider />
@@ -123,8 +120,9 @@ export const ClassifierList = () => {
         dispatchFunction={importClassifierModel}
       />
       <SaveFittedModelDialog
-        fittedModel={fittedClassifier}
-        modelProps={selectedClassifierModelProps}
+        // TODO - segmenter: pass in the model class instead, with save method
+        fittedModel={selectedClassifierModelProps._model!}
+        modelName={selectedClassifierModelProps.name}
         modelKind={"Classifier"}
         onClose={onSaveClassifierDialogClose}
         open={openSaveClassifierDialog}

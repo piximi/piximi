@@ -63,13 +63,13 @@ const columns: readonly Column[] = [
 ];
 
 type ModelSummaryTableProps = {
-  compiledModel: LayersModel;
+  loadedModel: LayersModel;
 };
 
 export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
-  const { compiledModel } = props;
+  const { loadedModel } = props;
 
-  const modelSummary = getModelSummary(compiledModel);
+  const modelSummary = getModelSummary(loadedModel);
 
   return (
     <Container sx={{ maxHeight: 400, width: 900 }}>

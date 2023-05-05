@@ -12,10 +12,11 @@ import {
   TextField,
 } from "@mui/material";
 
-import { SegmenterModelProps, ClassifierModelProps, HotkeyView } from "types";
+import { HotkeyView } from "types";
 
+// TODO - segmenter: All of this
 type SaveFittedModelDialogProps = {
-  modelProps: ClassifierModelProps | SegmenterModelProps;
+  modelName: string;
   fittedModel: LayersModel | undefined;
   modelKind: string;
   onClose: () => void;
@@ -23,15 +24,13 @@ type SaveFittedModelDialogProps = {
 };
 
 export const SaveFittedModelDialog = ({
-  modelProps,
+  modelName,
   fittedModel,
   modelKind,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
-  const [classifierName, setClassifierName] = useState<string>(
-    modelProps.modelName
-  );
+  const [classifierName, setClassifierName] = useState<string>(modelName);
 
   const noFittedModel = fittedModel ? false : true;
 

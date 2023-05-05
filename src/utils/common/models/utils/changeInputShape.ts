@@ -1,4 +1,3 @@
-// TODO - segmenter: remove, now in concrete models
 import {
   Sequential,
   sequential,
@@ -6,10 +5,7 @@ import {
   serialization,
 } from "@tensorflow/tfjs";
 
-export const changeInputShape = async (
-  model: Sequential,
-  inputShape: number[]
-) => {
+export const changeInputShape = (model: Sequential, inputShape: number[]) => {
   const newModel = sequential();
   newModel.add(layers.inputLayer({ inputShape: inputShape }));
   const map = serialization.SerializationMap.getMap().classNameMap;
