@@ -1,4 +1,3 @@
-// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
 import "@tensorflow/tfjs-node";
 import { SequentialClassifier } from "./AbstractClassifier";
 

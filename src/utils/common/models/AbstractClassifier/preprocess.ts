@@ -1,4 +1,3 @@
-// TODO - segmenter: delete this, moved to `model-preprocessors/classifier.ts`
 import {
   Tensor1D,
   Tensor2D,
