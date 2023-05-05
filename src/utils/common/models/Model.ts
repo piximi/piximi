@@ -1,4 +1,5 @@
 import { History } from "@tensorflow/tfjs";
+import { CallbackList } from "@tensorflow/tfjs-layers";
 
 import { ImageType } from "types";
 import { ModelTask } from "types/ModelType";
@@ -12,7 +13,11 @@ type ModelArgs = {
   requiredChannels?: number;
 };
 
-export abstract class Model {
+export type TrainingCallbacks = {
+  onEpochEnd: CallbackList["onEpochEnd"];
+};
+
+export abstract class Model<L = never> {
   name: string;
   task: ModelTask;
   graph: boolean;
@@ -36,7 +41,7 @@ export abstract class Model {
     this.requiredChannels = requiredChannels;
   }
 
-  abstract loadModel(loadModelArgs: any): void;
+  abstract loadModel(loadModelArgs: L): void;
   abstract loadTraining(images: ImageType[], preprocessingArgs: any): void;
   abstract loadValidation(images: ImageType[], preprocessingArgs: any): void;
   abstract loadInference(images: ImageType[], preprocessingArgs: any): void;
@@ -50,4 +55,6 @@ export abstract class Model {
   abstract trainingLoaded(): boolean;
   abstract validationLoaded(): boolean;
   abstract inferenceLoaded(): boolean;
+
+  //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
 }

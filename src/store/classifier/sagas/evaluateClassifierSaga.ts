@@ -1,4 +1,4 @@
-// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
+// ts-nocheck ; TODO - segmenter
 import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
@@ -6,13 +6,13 @@ import { put, select } from "redux-saga/effects";
 import { applicationSlice } from "store/application";
 import {
   classifierSlice,
-  classifierFittedSelector,
   evaluateClassifier,
   preprocessClassifier,
   createClassificationLabels,
   classifierArchitectureOptionsSelector,
   classifierPreprocessOptionsSelector,
   classifierFitOptionsSelector,
+  classifierSelectedModelSelector,
 } from "store/classifier";
 import {
   selectCreatedImageCategories,
@@ -26,25 +26,18 @@ import {
   Partition,
 } from "types";
 import { getStackTraceFromError } from "utils";
+import { ModelStatus } from "types/ModelType";
 
 export function* evaluateClassifierSaga({
-  payload: { execSaga },
+  payload: { execSaga, modelStatus },
 }: PayloadAction<{
   execSaga: boolean;
+  modelStatus: ModelStatus;
 }>) {
-  if (!execSaga) return;
+  if (modelStatus !== ModelStatus.Evaluating || !execSaga) return;
 
-  const model: ReturnType<typeof classifierFittedSelector> = yield select(
-    classifierFittedSelector
-  );
-
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    return;
-  }
+  const selectedModel: ReturnType<typeof classifierSelectedModelSelector> =
+    yield select(classifierSelectedModelSelector);
 
   const validationImages: ReturnType<typeof selectImagesByPartition> =
     yield select((state) =>
@@ -56,7 +49,7 @@ export function* evaluateClassifierSaga({
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
 
-  const outputLayerSize = model.outputs[0].shape[1] as number;
+  const outputLayerSize = selectedModel._model!.outputs[0].shape[1] as number;
 
   if (validationImages.length === 0) {
     yield put(
@@ -79,12 +72,13 @@ export function* evaluateClassifierSaga({
       })
     );
   } else {
-    yield runEvaluation(validationImages, model, categories);
+    yield runEvaluation(validationImages, selectedModel._model!, categories);
   }
 
   yield put(
-    classifierSlice.actions.updateEvaluating({
-      evaluating: false,
+    classifierSlice.actions.updateModelStatus({
+      modelStatus: ModelStatus.Trained,
+      execSaga: false,
     })
   );
 }

@@ -15,15 +15,15 @@ import { useDialog, useTranslation } from "hooks";
 import { EvaluateClassifierDialog } from "../EvaluateClassifierDialog/EvaluateClassifierDialog";
 import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton/DisabledListItemButton";
 
-import { alertStateSelector } from "store/application";
 import {
   classifierEvaluationResultSelector,
-  classifierEvaluationFlagSelector,
+  classifierModelStatusSelector,
   classifierSlice,
 } from "store/classifier";
 import { selectCreatedImageCategories } from "store/data";
 
 import { Category } from "types";
+import { ModelStatus } from "types/ModelType";
 
 type EvaluateClassifierListItemProps = {
   disabled: boolean;
@@ -38,28 +38,31 @@ export const EvaluateClassifierListItem = (
   const t = useTranslation();
 
   const categories: Category[] = useSelector(selectCreatedImageCategories);
+  const modelStatus = useSelector(classifierModelStatusSelector);
   const evaluationResult = useSelector(classifierEvaluationResultSelector);
-  const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
-  const evaluationFlag = useSelector(classifierEvaluationFlagSelector);
-  const alertState = useSelector(alertStateSelector);
 
   const onEvaluate = async () => {
-    dispatch(classifierSlice.actions.evaluate({ execSaga: true }));
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Evaluating,
+        execSaga: true,
+      })
+    );
   };
 
   useEffect(() => {
-    if (isEvaluating && !evaluationFlag && !alertState.visible) {
+    // TODO - segmenter: actually want this after evaluating is complete
+    if (modelStatus === ModelStatus.Evaluating) {
       onOpen();
     }
-    setIsEvaluating(evaluationFlag);
-  }, [alertState.visible, evaluationFlag, isEvaluating, onOpen]);
+  }, [modelStatus, onOpen]);
 
   return (
     <Grid item xs={4}>
       <DisabledListItemButton {...props} onClick={onEvaluate}>
         <Stack sx={{ alignItems: "center" }}>
           <ListItemIcon sx={{ justifyContent: "center" }}>
-            {isEvaluating ? (
+            {modelStatus === ModelStatus.Evaluating ? (
               <CircularProgress disableShrink size={24} />
             ) : (
               <AssessmentIcon />

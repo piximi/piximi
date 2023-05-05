@@ -1,20 +1,16 @@
-import { enableDebugMode, ENV } from "@tensorflow/tfjs";
+import { enableDebugMode, ENV, History } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { shuffle, take, takeRight } from "lodash";
 import { put, select } from "redux-saga/effects";
 
 import {
   classifierSlice,
-  classifierArchitectureOptionsSelector,
-  classifierCompiledSelector,
   classifierCompileOptionsSelector,
   classifierFitOptionsSelector,
   classifierPreprocessOptionsSelector,
   classifierTrainingPercentageSelector,
-  fitClassifier,
-  createClassifierModel,
-  createClassificationLabels,
-  preprocessClassifier,
+  classifierSelectedModelSelector,
+  classifierInputShapeSelector,
 } from "store/classifier";
 import {
   dataSlice,
@@ -23,61 +19,27 @@ import {
   selectCreatedImageCategoryCount,
 } from "store/data";
 import { applicationSlice } from "store/application";
-import { compile } from "store/coroutines";
 
-import {
-  AlertStateType,
-  AlertType,
-<<<<<<< HEAD
-  TheModel,
-=======
-  ImageType,
-  ModelArchitecture,
->>>>>>> 8ee9fc4b ([mod] Clean up model type enums)
-  Partition,
-  ImageType,
-} from "types";
+import { AlertStateType, AlertType, ImageType, Partition } from "types";
+import { ModelStatus } from "types/ModelType";
+import { TrainingCallbacks } from "utils/common/models/Model";
 
 import { getStackTraceFromError } from "utils";
+import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
+import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 
-export function* fitClassifierSaga({
-  payload: { onEpochEnd, execSaga },
-}: PayloadAction<{
-  onEpochEnd: any;
-  execSaga: boolean;
-}>) {
-  if (!execSaga) return;
-
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "3" &&
-    enableDebugMode();
-
-  process.env.NODE_ENV !== "production" &&
-    process.env.REACT_APP_LOG_LEVEL === "2" &&
-    console.log("tensorflow flags:", ENV.features);
-
-  const trainingPercentage: ReturnType<
-    typeof classifierTrainingPercentageSelector
-  > = yield select(classifierTrainingPercentageSelector);
-
-  // TODO: need only ids
-  const categorizedImages: ReturnType<typeof selectImagesByPartition> =
-    yield select((state) =>
-      selectImagesByPartition(state, Partition.Inference)
-    );
-
-  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
-    yield select(classifierFitOptionsSelector);
-
-  const preprocessingOptions: ReturnType<
-    typeof classifierPreprocessOptionsSelector
-  > = yield select(classifierPreprocessOptionsSelector);
-
+function* assignDataPartitions({
+  preprocessOptions,
+  categorizedImages,
+  trainingPercentage,
+}: {
+  preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
+  categorizedImages: ReturnType<typeof selectImagesByPartition>;
+  trainingPercentage: number;
+}) {
   //first assign train and val partition to all categorized images
   const categorizedImagesIds = (
-    preprocessingOptions.shuffle
-      ? shuffle(categorizedImages)
-      : categorizedImages
+    preprocessOptions.shuffle ? shuffle(categorizedImages) : categorizedImages
   ).map((image: ImageType) => {
     return image.id;
   });
@@ -99,50 +61,51 @@ export function* fitClassifierSaga({
       },
     })
   );
+}
 
-  const architectureOptions: ReturnType<
-    typeof classifierArchitectureOptionsSelector
-  > = yield select(classifierArchitectureOptionsSelector);
-
-  const classes: number = yield select(selectCreatedImageCategoryCount);
-
-  var model: ReturnType<typeof classifierCompiledSelector>;
-  if (
-    architectureOptions.selectedModel.modelArch ===
-    ModelArchitecture.UserUploaded
-  ) {
-    model = yield select(classifierCompiledSelector);
-  } else {
-    try {
-      model = yield createClassifierModel(architectureOptions, classes);
-    } catch (error) {
-      yield handleError(error as Error, "Failed to create tensorflow model");
+function* loadClassifier({
+  model,
+  inputShape,
+  preprocessOptions,
+  compileOptions,
+  fitOptions,
+  numClasses,
+}: {
+  model: ReturnType<typeof classifierSelectedModelSelector>;
+  inputShape: ReturnType<typeof classifierInputShapeSelector>;
+  preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
+  compileOptions: ReturnType<typeof classifierCompileOptionsSelector>;
+  fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
+  numClasses: number;
+}) {
+  try {
+    if (model instanceof SimpleCNN) {
+      yield (model as SimpleCNN).loadModel({
+        inputShape,
+        numClasses,
+        randomizeWeights: preprocessOptions.shuffle,
+        compileOptions,
+      });
+    } else if (model instanceof MobileNet) {
+      // TODO - segmenter: useCustomTopLayer or not?
+      yield (model as MobileNet).loadModel({
+        inputShape,
+        numClasses,
+        compileOptions,
+        freeze: false,
+        useCustomTopLayer: true,
+      });
+    } else {
+      // TODO - segmenter: do a block for UserUPloadedModel
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "1" &&
+        console.warn("Unhandled architecture", model.name);
       return;
     }
-  }
-
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    return;
-  }
-
-  const compileOptions: ReturnType<typeof classifierCompileOptionsSelector> =
-    yield select(classifierCompileOptionsSelector);
-
-  var compiledModel: ReturnType<typeof compile>;
-  try {
-    compiledModel = yield compile(model, compileOptions);
   } catch (error) {
-    yield handleError(error as Error, "Failed to compile tensorflow model");
+    yield handleError(error as Error, "Failed to create tensorflow model");
     return;
   }
-
-  yield put(
-    classifierSlice.actions.updateCompiled({ compiled: compiledModel })
-  );
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
@@ -154,49 +117,37 @@ export function* fitClassifierSaga({
   );
 
   try {
-    var {
-      labels: trainLabels,
-      disposeLabels: disposeTrainLabels,
-    }: Awaited<ReturnType<typeof createClassificationLabels>> =
-      yield createClassificationLabels(trainImages, categories);
-
-    var {
-      labels: valLabels,
-      disposeLabels: disposeValLabels,
-    }: Awaited<ReturnType<typeof createClassificationLabels>> =
-      yield createClassificationLabels(valImages, categories);
-
-    var trainData: Awaited<ReturnType<typeof preprocessClassifier>> =
-      yield preprocessClassifier(
-        trainImages,
-        trainLabels,
-        architectureOptions.inputShape,
-        preprocessingOptions,
-        fitOptions
-      );
-
-    var valData: Awaited<ReturnType<typeof preprocessClassifier>> =
-      yield preprocessClassifier(
-        valImages,
-        valLabels,
-        architectureOptions.inputShape,
-        preprocessingOptions,
-        fitOptions
-      );
+    const loadDataArgs = {
+      categories,
+      inputShape,
+      preprocessOptions,
+      fitOptions,
+    };
+    model.loadTraining(trainImages, loadDataArgs);
+    model.loadValidation(valImages, loadDataArgs);
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
     return;
   }
+}
 
+function* fitClassifier({
+  model,
+  onEpochEnd,
+  fitOptions,
+}: {
+  model: ReturnType<typeof classifierSelectedModelSelector>;
+  onEpochEnd?: TrainingCallbacks["onEpochEnd"];
+  fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
+}) {
   try {
-    var { fitted, status }: Awaited<ReturnType<typeof fitClassifier>> =
-      yield fitClassifier(
-        compiledModel,
-        { train: trainData, val: valData },
-        fitOptions,
-        onEpochEnd
-      );
+    if (!onEpochEnd && process.env.NODE_ENV !== "production") {
+      console.warn("Epoch end callback not provided");
+    }
+    var history: History = yield model.train(fitOptions, {
+      onEpochEnd: onEpochEnd!,
+    });
   } catch (error) {
     process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
@@ -204,11 +155,100 @@ export function* fitClassifierSaga({
   }
 
   yield put(
-    classifierSlice.actions.updateFitted({ fitted: fitted, status: status })
+    // end model training: Training -> Trained
+    classifierSlice.actions.updateFitted({ history })
   );
+}
 
-  disposeTrainLabels();
-  disposeValLabels();
+export function* fitClassifierSaga({
+  payload: { modelStatus, onEpochEnd, execSaga },
+}: PayloadAction<{
+  onEpochEnd?: TrainingCallbacks["onEpochEnd"];
+  execSaga: boolean;
+  modelStatus: ModelStatus;
+}>) {
+  if (!execSaga) return;
+  if (
+    modelStatus !== ModelStatus.InitFit &&
+    modelStatus !== ModelStatus.Training
+  )
+    return;
+
+  process.env.NODE_ENV !== "production" &&
+    process.env.REACT_APP_LOG_LEVEL === "3" &&
+    enableDebugMode();
+
+  process.env.NODE_ENV !== "production" &&
+    process.env.REACT_APP_LOG_LEVEL === "2" &&
+    console.log("tensorflow flags:", ENV.features);
+
+  const trainingPercentage: ReturnType<
+    typeof classifierTrainingPercentageSelector
+  > = yield select(classifierTrainingPercentageSelector);
+
+  const categorizedImages: ReturnType<typeof selectImagesByPartition> =
+    yield select((state) =>
+      selectImagesByPartition(state, Partition.Inference)
+    );
+
+  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
+    yield select(classifierFitOptionsSelector);
+
+  const preprocessOptions: ReturnType<
+    typeof classifierPreprocessOptionsSelector
+  > = yield select(classifierPreprocessOptionsSelector);
+
+  const inputShape: ReturnType<typeof classifierInputShapeSelector> =
+    yield select(classifierInputShapeSelector);
+
+  const numClasses: number = yield select(selectCreatedImageCategoryCount);
+
+  const selectedModel: ReturnType<typeof classifierSelectedModelSelector> =
+    yield select(classifierSelectedModelSelector);
+
+  const compileOptions: ReturnType<typeof classifierCompileOptionsSelector> =
+    yield select(classifierCompileOptionsSelector);
+
+  // if Unititialized -> InitFit, then load first, else skip straight to traing
+  if (modelStatus === ModelStatus.InitFit) {
+    yield put(
+      classifierSlice.actions.updateModelStatus({
+        execSaga: false,
+        modelStatus: ModelStatus.Loading,
+      })
+    );
+
+    yield assignDataPartitions({
+      preprocessOptions,
+      categorizedImages,
+      trainingPercentage,
+    });
+
+    yield loadClassifier({
+      model: selectedModel,
+      inputShape,
+      preprocessOptions,
+      compileOptions,
+      fitOptions,
+      numClasses,
+    });
+
+    yield put(
+      classifierSlice.actions.updateModelStatus({
+        execSaga: false,
+        modelStatus: ModelStatus.Training,
+      })
+    );
+  }
+
+  yield fitClassifier({ model: selectedModel, onEpochEnd, fitOptions });
+
+  yield put(
+    classifierSlice.actions.updateModelStatus({
+      execSaga: false,
+      modelStatus: ModelStatus.Trained,
+    })
+  );
 }
 
 function* handleError(error: Error, errorName: string) {
@@ -229,8 +269,9 @@ function* handleError(error: Error, errorName: string) {
   );
 
   yield put(
-    classifierSlice.actions.updateFitting({
-      fitting: false,
+    classifierSlice.actions.updateModelStatus({
+      execSaga: false,
+      modelStatus: ModelStatus.Uninitialized,
     })
   );
 }

@@ -9,36 +9,40 @@ import {
   EvaluateClassifierListItem,
 } from "../ClassifierListItems";
 
-import {
-  classifierFittedSelector,
-  classifierTrainingFlagSelector,
-} from "store/classifier";
+import { classifierModelStatusSelector } from "store/classifier";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelStatus } from "types/ModelType";
 
 export const ClassifierExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const fitted = useSelector(classifierFittedSelector);
-  const training = useSelector(classifierTrainingFlagSelector);
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
   useEffect(() => {
-    if (training) {
-      setDisabled(true);
-      setHelperText("Disabled during training");
-    }
-  }, [training]);
-
-  useEffect(() => {
-    if (fitted) {
+    if (modelStatus === ModelStatus.Trained) {
       setDisabled(false);
-    } else {
-      setDisabled(true);
-      setHelperText("No trained model");
+      return;
     }
-  }, [fitted]);
+
+    setDisabled(true);
+
+    if (
+      modelStatus === ModelStatus.InitFit ||
+      modelStatus === ModelStatus.Loading ||
+      modelStatus === ModelStatus.Training
+    ) {
+      setHelperText("Disabled during training");
+    } else if (modelStatus === ModelStatus.Evaluating) {
+      setHelperText("Evaluating...");
+    } else if (modelStatus === ModelStatus.Predicting) {
+      setHelperText("Predcting...");
+    } else {
+      setHelperText("No Trained Model");
+    }
+  }, [modelStatus]);
 
   return (
     <Grid
