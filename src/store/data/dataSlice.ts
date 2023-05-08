@@ -705,7 +705,21 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ imageId: string; disposeColorTensor?: boolean }>
     ) {
+      const { imageId } = action.payload;
+      const imageCategoryId = getDeferredProperty(
+        state.images.entities[imageId],
+        "categoryId"
+      );
+      mutatingFilter(
+        state.imagesByCategory[imageCategoryId],
+        (id) => id !== imageId
+      );
       imagesAdapter.removeOne(state.images, action.payload.imageId);
+      dataSlice.caseReducers.deleteAnnotations(state, {
+        type: "deleteAnnotations",
+        payload: { annotationIds: state.annotationsByImage[imageId] },
+      });
+      delete state.annotationsByImage[imageId];
     },
 
     deleteImages(

@@ -1,8 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { selectedImagesIdSelector } from "store/project";
+import {
+  selectHiddenImageCategoryIds,
+  selectedImagesIdSelector,
+} from "store/project";
 import { DataStoreSlice, ImageType, Partition } from "types";
 
-import { selectVisibleCategoryIds } from "./imageCategorySelectors";
 import { imagesAdapter } from "../dataSlice";
 import { RootState } from "store/reducer/reducer";
 import { selectAnnotationsByImageDict } from "./annotationSelectors";
@@ -57,12 +59,16 @@ export const selectSelectedImages = createSelector(
 );
 
 export const selectVisibleImages = createSelector(
-  [selectVisibleCategoryIds, selectImagesByCategoryDict, selectImageEntities],
-  (visibleCategories, imagesByCategory, imageEntities) => {
+  [
+    selectHiddenImageCategoryIds,
+    selectImagesByCategoryDict,
+    selectImageEntities,
+  ],
+  (hiddenCategories, imagesByCategory, imageEntities) => {
     const visibleImages: ImageType[] = [];
-    for (const categoryId of visibleCategories) {
-      for (const imageId of imagesByCategory[categoryId]) {
-        if (imageEntities[imageId].visible) {
+    for (const categoryId of Object.keys(imagesByCategory)) {
+      if (!hiddenCategories.includes(categoryId)) {
+        for (const imageId of imagesByCategory[categoryId]) {
           visibleImages.push(imageEntities[imageId]);
         }
       }
