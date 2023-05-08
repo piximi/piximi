@@ -1,7 +1,7 @@
 import React from "react";
 
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
-import { KeyboardKey } from "components/common/styled-components/Help/HelpDialog/KeyboardKey";
+import { KeyboardKey } from "components/common/styled-components/KeyboardKey";
 
 type InformationBoxProps = {
   description: string;

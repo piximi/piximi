@@ -1,7 +1,6 @@
 export { AlertDialog } from "./AlertDialog";
 export { CustomDialog } from "./CustomDialog";
-export { DeleteImagesDialog } from "./DeleteImagesDialog";
-export { DeleteObjectsDialog } from "./DeleteObjectsDialog";
+export { DialogWithAction } from "./DeleteObjectsDialog";
 export { DialogTransition } from "./DialogTransition";
 export { FallBackDialog } from "./FallBackDialog";
 export { ImageShapeDialog } from "./ImageShapeDialog";

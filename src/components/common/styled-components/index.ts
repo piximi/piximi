@@ -6,6 +6,4 @@ export { CustomFormSelectField } from "./CustomFormSelectField";
 export { CustomNumberTextField } from "./CustomNumberTextField";
 export { ModelSummaryTable } from "./ModelSummary";
 export { StyledFormControl } from "./StyledFormControl";
-export { ToolHotkeyTitle } from "./ToolHotkeyTitle";
-export { TooltipCard } from "./ToolTipCard";
 export { TrainingHistoryPlot } from "./TrainingHistoryPlot";

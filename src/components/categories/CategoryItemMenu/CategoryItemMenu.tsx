@@ -4,7 +4,7 @@ import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 import {
-  DeleteObjectsDialog,
+  DialogWithAction,
   UpsertCategoriesDialog,
 } from "components/common/dialogs";
 
@@ -53,9 +53,9 @@ export const CategoryItemMenu = ({
     dispatchDeleteCategories(category);
   };
   const {
-    onClose: handleCloseDeleteObjectsDialog,
-    onOpen: handleOpenDeleteObjectsDialog,
-    open: isDeleteObjectsDialogOpen,
+    onClose: handleCloseDialogWithAction,
+    onOpen: handleOpenDialogWithAction,
+    open: isDialogWithActionOpen,
   } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
   const handleDeleteObjects = () => {
     dispatchDeleteObjectsOfCategory(category.id);
@@ -104,7 +104,7 @@ export const CategoryItemMenu = ({
               <Typography variant="inherit">Edit Category</Typography>
             </MenuItem>
 
-            <MenuItem onClick={handleOpenDeleteObjectsDialog}>
+            <MenuItem onClick={handleOpenDialogWithAction}>
               <Typography variant="inherit">Clear Annotations</Typography>
             </MenuItem>
           </div>
@@ -117,20 +117,20 @@ export const CategoryItemMenu = ({
         onClose={() => handleMenuCloseWith(hendleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
       />
-      <DeleteObjectsDialog
+      <DialogWithAction
         title={`Delete "${category.name}" Category`}
         content={`Objects categorized as "${category.name}" will NOT be deleted, and instead will be labeled as
         "Unknown".`}
-        deleteObjectCallback={handleDeleteCategory}
+        handleConfirmCallback={handleDeleteCategory}
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
         open={isDeleteCategoryDialogOpen}
       />
-      <DeleteObjectsDialog
+      <DialogWithAction
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted.`}
-        deleteObjectCallback={handleDeleteObjects}
-        onClose={() => handleMenuCloseWith(handleCloseDeleteObjectsDialog)}
-        open={isDeleteObjectsDialogOpen}
+        handleConfirmCallback={handleDeleteObjects}
+        onClose={() => handleMenuCloseWith(handleCloseDialogWithAction)}
+        open={isDialogWithActionOpen}
       />
     </Menu>
   );

@@ -25,9 +25,9 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { DeleteImagesDialog } from "components/common/dialogs";
-import { KeyboardKey } from "components/common/styled-components/Help/HelpDialog/KeyboardKey";
+import { DialogWithAction } from "components/common/dialogs";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
+import { TooltipTitle } from "components/common/tooltips";
 
 import {
   hotkeyViewSelector,
@@ -35,7 +35,7 @@ import {
   unregisterHotkeyView,
 } from "store/application";
 import { projectSlice, selectedImagesIdSelector } from "store/project";
-import { selectVisibleImages } from "store/data";
+import { dataSlice, selectVisibleImages } from "store/data";
 import { setActiveImageId } from "store/imageViewer";
 
 import { HotkeyView, ImageType, ShadowImageType } from "types";
@@ -55,41 +55,22 @@ export const MainImageGridAppBar = () => {
   const [showSelectAllButton, setShowSelectAllButton] =
     React.useState<boolean>(true);
 
-  React.useEffect(() => {
-    if (selectedImages.length > 0) {
-      setShowImageGridAppBar(true);
-    } else {
-      setShowImageGridAppBar(false);
-    }
-
-    images.length === selectedImages.length
-      ? setShowSelectAllButton(false)
-      : setShowSelectAllButton(true);
-  }, [selectedImages, images]);
-
-  useEffect(() => {
-    if (
-      showImageGridAppBar &&
-      currentHotkeyView !== HotkeyView.MainImageGridAppBar
-    ) {
-      dispatch(
-        registerHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
-      );
-    } else if (
-      !showImageGridAppBar &&
-      currentHotkeyView === HotkeyView.MainImageGridAppBar
-    ) {
-      if (currentHotkeyView === HotkeyView.MainImageGridAppBar) {
-        dispatch(unregisterHotkeyView({}));
-      }
-    }
-  }, [showImageGridAppBar, currentHotkeyView, dispatch]);
-
   const {
-    onClose: onCloseDeleteImagesDialog,
+    onClose: handleCloseDeleteImagesDialog,
     onOpen: onOpenDeleteImagesDialog,
-    open: openDeleteImagesDialog,
+    open: deleteImagesDialogisOpen,
   } = useDialogHotkey(HotkeyView.DeleteImagesDialog);
+
+  const handleAndDispatchDeleteImages = () => {
+    dispatch(
+      dataSlice.actions.deleteImages({
+        imageIds: selectedImages,
+        disposeColorTensors: true,
+      })
+    );
+    dispatch(projectSlice.actions.clearSelectedImages());
+    handleCloseDeleteImagesDialog();
+  };
 
   const onOpenCategoriesMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     setCategoryMenuAnchorEl(event.currentTarget);
@@ -166,36 +147,35 @@ export const MainImageGridAppBar = () => {
     HotkeyView.MainImageGridAppBar
   );
 
-  const tooltipTitle = (
-    tooltip: string,
-    firstKey: string,
-    secondKey?: string
-  ) => {
-    return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", typography: "caption" }}
-      >
-        <Typography variant="caption">{tooltip}</Typography>
-        <Typography variant="caption" style={{ marginLeft: "5px" }}>
-          (
-        </Typography>
-        {secondKey && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              typography: "caption",
-            }}
-          >
-            <KeyboardKey letter={firstKey} />
-            <Typography variant="caption">+</Typography>
-          </Box>
-        )}
-        <KeyboardKey letter={secondKey ? secondKey : firstKey} />
-        <Typography variant="caption">)</Typography>
-      </Box>
-    );
-  };
+  useEffect(() => {
+    if (
+      showImageGridAppBar &&
+      currentHotkeyView !== HotkeyView.MainImageGridAppBar
+    ) {
+      dispatch(
+        registerHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
+      );
+    } else if (
+      !showImageGridAppBar &&
+      currentHotkeyView === HotkeyView.MainImageGridAppBar
+    ) {
+      if (currentHotkeyView === HotkeyView.MainImageGridAppBar) {
+        dispatch(unregisterHotkeyView({}));
+      }
+    }
+  }, [showImageGridAppBar, currentHotkeyView, dispatch]);
+
+  React.useEffect(() => {
+    if (selectedImages.length > 0) {
+      setShowImageGridAppBar(true);
+    } else {
+      setShowImageGridAppBar(false);
+    }
+
+    images.length === selectedImages.length
+      ? setShowSelectAllButton(false)
+      : setShowSelectAllButton(true);
+  }, [selectedImages, images]);
 
   return (
     <>
@@ -204,7 +184,7 @@ export const MainImageGridAppBar = () => {
           <Toolbar>
             <Tooltip
               placement="bottom"
-              title={tooltipTitle("Unselect images", "esc")}
+              title={TooltipTitle("Unselect images", "esc")}
             >
               <IconButton
                 sx={{ marginRight: (theme) => theme.spacing(2) }}
@@ -239,7 +219,7 @@ export const MainImageGridAppBar = () => {
             {showSelectAllButton ? (
               <Tooltip
                 placement="bottom"
-                title={tooltipTitle("Select all images", "control", "a")}
+                title={TooltipTitle("Select all images", "control", "a")}
               >
                 <IconButton color="inherit" onClick={selectAllImages}>
                   <SelectAllIcon />
@@ -248,7 +228,7 @@ export const MainImageGridAppBar = () => {
             ) : (
               <Tooltip
                 placement="bottom"
-                title={tooltipTitle("Unselect images", "esc")}
+                title={TooltipTitle("Unselect images", "esc")}
               >
                 <IconButton color="inherit" onClick={unselectImages}>
                   <DeselectIcon />
@@ -258,7 +238,7 @@ export const MainImageGridAppBar = () => {
 
             <Tooltip
               placement="bottom"
-              title={tooltipTitle("Delete selected images", "delete")}
+              title={TooltipTitle("Delete selected images", "delete")}
             >
               <IconButton color="inherit" onClick={onOpenDeleteImagesDialog}>
                 <DeleteIcon />
@@ -275,10 +255,14 @@ export const MainImageGridAppBar = () => {
         open={Boolean(categoryMenuAnchorEl as HTMLElement)}
       />
 
-      <DeleteImagesDialog
-        imageIds={selectedImages}
-        onClose={onCloseDeleteImagesDialog}
-        open={openDeleteImagesDialog}
+      <DialogWithAction
+        title={`Delete ${selectedImages.length} image${
+          selectedImages.length > 1 ? "s" : ""
+        }?`}
+        content="Images will be deleted from the project."
+        handleConfirmCallback={handleAndDispatchDeleteImages}
+        open={deleteImagesDialogisOpen}
+        onClose={handleCloseDeleteImagesDialog}
       />
     </>
   );

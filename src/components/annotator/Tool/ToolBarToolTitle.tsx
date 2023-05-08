@@ -2,7 +2,7 @@ import React from "react";
 
 import { Box, Typography } from "@mui/material";
 
-import { KeyboardKey } from "components/common/styled-components/Help/HelpDialog/KeyboardKey";
+import { KeyboardKey } from "components/common/styled-components/KeyboardKey";
 
 type ToolTitleProps = {
   toolName: string;

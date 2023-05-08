@@ -10,23 +10,23 @@ import { useHotkeys } from "hooks";
 
 import { HotkeyView } from "types";
 
-type DeleteObjectsDialogProps = {
+type DialogWithActionProps = {
   title: string;
   content: string;
-  deleteObjectCallback: () => void;
+  handleConfirmCallback: () => void;
   onClose: () => void;
   open: boolean;
 };
 
-export const DeleteObjectsDialog = ({
+export const DialogWithAction = ({
   title,
   content,
-  deleteObjectCallback,
+  handleConfirmCallback,
   onClose,
   open,
-}: DeleteObjectsDialogProps) => {
-  const handleDeleteCategory = () => {
-    deleteObjectCallback();
+}: DialogWithActionProps) => {
+  const handleConfirm = () => {
+    handleConfirmCallback();
 
     onClose();
   };
@@ -34,11 +34,11 @@ export const DeleteObjectsDialog = ({
   useHotkeys(
     "enter",
     () => {
-      handleDeleteCategory();
+      handleConfirm();
     },
     HotkeyView.DeleteCategoryDialog,
     { enableOnTags: ["INPUT"] },
-    [handleDeleteCategory]
+    [handleConfirm]
   );
 
   return (
@@ -52,8 +52,8 @@ export const DeleteObjectsDialog = ({
           Cancel
         </Button>
 
-        <Button onClick={handleDeleteCategory} color="primary">
-          Delete
+        <Button onClick={handleConfirm} color="primary">
+          Confirm
         </Button>
       </DialogActions>
     </Dialog>
