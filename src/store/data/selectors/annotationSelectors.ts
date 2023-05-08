@@ -1,7 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
 import {
-  selectStagedAnnotationIds,
   workingAnnotationIdSelector,
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
@@ -92,15 +91,7 @@ export const selectWorkingAnnotation = createSelector(
     return decodeAnnotation(annotationEntities[annotationId]!)!;
   }
 );
-export const selectStagedAnnotations = createSelector(
-  [selectStagedAnnotationIds, selectAnnotationEntities],
-  (annotationIds, annotationEntities): Array<DecodedAnnotationType> => {
-    if (!annotationIds.length) return [];
-    return annotationIds.map(
-      (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
-    );
-  }
-);
+
 export const selectActiveAnnotations = createSelector(
   [selectActiveAnnotationIds, selectAnnotationEntities],
   (annotationIds, annotationEntities): Array<DecodedAnnotationType> => {

@@ -12,8 +12,6 @@ export type ImageViewerStore = {
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
   selectedAnnotationIds: Array<string>;
-  stagedAnnotationIds: Array<string>;
-  stagedAnnotationsHaveBeenUpdated: boolean;
   selectedCategoryId: string;
   stageHeight: number;
   stageScale: number;

@@ -4,7 +4,6 @@ import * as ImageJS from "image-js";
 import * as DicomParser from "dicom-parser";
 
 import { dataSlice, uploadImages } from "./dataSlice";
-import { getDeferredProperty } from "store/entities/utils";
 import { imageViewerSlice } from "store/imageViewer";
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
@@ -12,42 +11,26 @@ import {
   AlertStateType,
   AlertType,
   AppStartListening,
-  ImageType,
+  ImageFileError,
+  ImageFileType,
   OldImageType,
 } from "types";
 
 import { getStackTraceFromError } from "utils";
-import { createRenderedTensor } from "utils/common/image";
 import {
   ImageShapeEnum,
   loadImageFileAsStack,
   convertToImage,
+  createRenderedTensor,
 } from "utils/common/image";
+import { getCompleteEntity } from "store/entities/utils";
 
 export const dataMiddleware = createListenerMiddleware();
 
 export const startAppListening =
   dataMiddleware.startListening as AppStartListening;
 
-type ImageFileType = {
-  fileName: string;
-  imageStack: ImageJS.Stack;
-};
-
-type ImageFileError = {
-  fileName: string;
-  error: string;
-};
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    return (
-      currentState.data.annotations.ids !== previousState.data.annotations.ids
-    );
-  },
-  effect: (action, listenerAPI) => {
-    //console.log((listenerAPI.getState() as any).data.annotations.ids);
-  },
-});
+//TODO - Change OldImageType
 
 startAppListening({
   actionCreator: uploadImages,
@@ -161,127 +144,6 @@ startAppListening({
   },
 });
 
-// startAppListening({
-//   predicate: (action, currentState: RootState, previousState: RootState) => {
-//     return currentState.annotator.activeImageId !== previousState.annotator.activeImageId;
-//   },
-//   effect: async (action, listenerAPI) => {
-//     const currentStore = listenerAPI.getState().data;
-//     if (!currentStore.activeImage) return;
-//     const image = currentStore.images.entities[currentStore.activeImage];
-//     const tmpRenderedSrc = Array(image.shape.planes);
-//     tmpRenderedSrc[image.activePlane] = image.src;
-//     listenerAPI.dispatch(
-//       setActiveImageRenderedSrcs({ renderedSrcs: tmpRenderedSrc })
-//     );
-//     const renderedSrcs = await createRenderedTensor(
-//       image.data,
-//       image.colors,
-//       image.bitDepth,
-//       undefined
-//     );
-//     listenerAPI.dispatch(
-//       setActiveImageRenderedSrcs({ renderedSrcs: renderedSrcs })
-//     );
-//   },
-// });
-
-startAppListening({
-  actionCreator: imageViewerSlice.actions.setActiveImageId,
-  effect: async (action, listenerAPI) => {
-    const newActiveId = action.payload.imageId;
-    const newState = listenerAPI.getState();
-    if (!newActiveId) {
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setActiveImageRenderedSrcs({
-          renderedSrcs: [],
-        })
-      );
-      return;
-    }
-    const savedActiveImage = newState.data.images.entities[newActiveId].saved;
-    const activeImageChanges =
-      newState.data.images.entities[newActiveId].changes;
-    const updatedActiveImage = {
-      ...savedActiveImage,
-      ...activeImageChanges,
-    } as ImageType;
-
-    const activeAnnotationIds = [];
-    for (const id of newState.data.annotationsByImage[newActiveId]) {
-      const annotationCategory = getDeferredProperty(
-        newState.data.annotations.entities[id],
-        "categoryId"
-      );
-      const annotationIsDeleted =
-        newState.data.annotations.entities[id].changes.deleted;
-
-      const hiddenCategoryIds = newState.imageViewer.hiddenCategoryIds;
-
-      if (
-        !annotationIsDeleted &&
-        !hiddenCategoryIds.includes(annotationCategory)
-      ) {
-        activeAnnotationIds.push(id);
-      }
-    }
-
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveAnnotationIds({
-        annotationIds: activeAnnotationIds,
-      })
-    );
-    const renderedSrcs = await createRenderedTensor(
-      updatedActiveImage.data,
-      updatedActiveImage.colors,
-      updatedActiveImage.bitDepth,
-      undefined
-    );
-
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
-    );
-  },
-});
-
-startAppListening({
-  predicate: (action, currentState, previousState) => {
-    return (
-      currentState.imageViewer.hiddenCategoryIds !==
-      previousState.imageViewer.hiddenCategoryIds
-    );
-  },
-  effect: async (action, listenerAPI) => {
-    const currentState = listenerAPI.getState();
-    const activeImageId = currentState.imageViewer.activeImageId;
-    if (!activeImageId) return;
-    const activeAnnotationIds = [];
-    for (const id of currentState.data.annotationsByImage[activeImageId]) {
-      const annotationCategory = getDeferredProperty(
-        currentState.data.annotations.entities[id],
-        "categoryId"
-      );
-      const annotationIsDeleted =
-        currentState.data.annotations.entities[id].changes.deleted;
-
-      const hiddenCategoryIds = currentState.imageViewer.hiddenCategoryIds;
-
-      if (
-        !annotationIsDeleted &&
-        !hiddenCategoryIds.includes(annotationCategory)
-      ) {
-        activeAnnotationIds.push(id);
-      }
-    }
-
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveAnnotationIds({
-        annotationIds: activeAnnotationIds,
-      })
-    );
-  },
-});
-
 startAppListening({
   actionCreator: dataSlice.actions.deleteAllAnnotationsByImage,
   effect: (action, listenerAPI) => {
@@ -294,36 +156,40 @@ startAppListening({
   },
 });
 
-// startAppListening({
-//   actionCreator: dataSlice.actions.deleteAnnotations,
-//   effect: (action, listenerAPI) => {
-//     listenerAPI.dispatch(
-//       imageViewerSlice.actions.removeActiveAnnotationIds({
-//         annotationIds: action.payload.annotationIds,
-//       })
-//     );
-//     listenerAPI.dispatch(
-//       imageViewerSlice.actions.removeSelectedAnnotationIds({
-//         annotationIds: action.payload.annotationIds,
-//       })
-//     );
-//   },
-// });
-// startAppListening({
-//   actionCreator: dataSlice.actions.deleteAnnotation,
-//   effect: (action, listenerAPI) => {
-//     listenerAPI.dispatch(
-//       imageViewerSlice.actions.removeActiveAnnotationId({
-//         annotationId: action.payload.annotationId,
-//       })
-//     );
-//     listenerAPI.dispatch(
-//       imageViewerSlice.actions.removeSelectedAnnotationId({
-//         annotationId: action.payload.annotationId,
-//       })
-//     );
-//   },
-// });
+startAppListening({
+  actionCreator: dataSlice.actions.updateImage,
+  effect: async (action, listenerAPI) => {
+    const { imageId, updates } = action.payload;
+    const colors = updates.colors;
+    const currentState = listenerAPI.getState();
+    if (!colors || imageId !== currentState.imageViewer.activeImageId) return;
+
+    const image = getCompleteEntity(
+      currentState.data.images.entities[imageId]
+    )!;
+
+    const colorsEditable = {
+      range: { ...colors.range },
+      visible: { ...colors.visible },
+      color: colors.color,
+    };
+    const renderedSrcs = await createRenderedTensor(
+      image.data,
+      colorsEditable,
+      image.bitDepth,
+      undefined
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions.updateImage({
+        imageId: imageId,
+        updates: { src: renderedSrcs[image.activePlane] },
+      })
+    );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    );
+  },
+});
 
 async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
   let imageStack: ImageJS.Stack;

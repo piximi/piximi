@@ -38,7 +38,7 @@ export const PointerSelectionOptions = () => {
   const onSelectNone = () => {
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotationIds({
-        selectedAnnotationIds: [],
+        annotationIds: [],
         workingAnnotationId: undefined,
       })
     );
@@ -62,7 +62,7 @@ export const PointerSelectionOptions = () => {
     );
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotationIds({
-        selectedAnnotationIds: desiredAnnotationIds,
+        annotationIds: desiredAnnotationIds,
         workingAnnotationId: desiredAnnotationIds[0],
       })
     );

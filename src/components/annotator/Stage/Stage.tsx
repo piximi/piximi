@@ -47,11 +47,11 @@ import {
 } from "store/annotator/selectors";
 import {
   selectActiveImageActivePlane,
-  selectStagedAnnotations,
   selectWorkingAnnotation,
   selectAnnotationCategoryById,
   selectActiveImageScaledHeight,
   selectActiveImageScaledWidth,
+  selectActiveAnnotations,
 } from "store/data";
 import { RootState } from "store/reducer/reducer";
 
@@ -121,7 +121,7 @@ export const Stage = ({
   const scaledImageWidth = useSelector(selectActiveImageScaledWidth);
   const scaledImageHeight = useSelector(selectActiveImageScaledHeight);
   const stageScale = useSelector(stageScaleSelector);
-  const annotations = useSelector(selectStagedAnnotations);
+  const annotations = useSelector(selectActiveAnnotations);
   const annotationState = useSelector(selectAnnotationState);
   const workingAnnotation = useSelector(selectWorkingAnnotation);
   const cursor = useSelector(cursorSelector);
@@ -247,7 +247,7 @@ export const Stage = ({
   };
 
   const deleteAnnotations = (
-    selectedAnnotationIds: Array<string>,
+    annotationIds: Array<string>,
     stagedAnnotations: Array<DecodedAnnotationType>
   ) => {};
 
@@ -285,7 +285,7 @@ export const Stage = ({
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
       setSelectedAnnotationIds({
-        selectedAnnotationIds: [],
+        annotationIds: [],
         workingAnnotationId: undefined,
       })
     );

@@ -44,7 +44,7 @@ export const InvertAnnotation = () => {
 
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotationIds({
-        selectedAnnotationIds: [workingAnnotation.id],
+        annotationIds: [workingAnnotation.id],
         workingAnnotationId: workingAnnotation.id,
       })
     );

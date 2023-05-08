@@ -35,7 +35,7 @@ export { selectActiveAnnotationObjects } from "./selectors/selectActiveAnnotatio
 export {
   selectAllAnnotations,
   selectSelectedAnnotations,
-  selectStagedAnnotations,
+  selectActiveAnnotations,
   selectWorkingAnnotation,
   selectTotalAnnotationCountByImage,
   selectAnnotationIdsByImage,
@@ -68,6 +68,3 @@ export {
   selectUnusedAnnotationCategoryColors,
   selectUsedAnnotationCategoryColors,
 } from "./selectors/annotationCategorySelectors";
-
-export { uploadImagesSaga } from "./sagas/uploadImagesSaga";
-export { watchUploadImagesSaga } from "./sagas/watchUploadImagesSaga";

@@ -112,7 +112,7 @@ export const AnnotationTransformer = ({
     if (!transformed) {
       dispatch(
         setSelectedAnnotationIds({
-          selectedAnnotationIds: [selected],
+          annotationIds: [selected],
           workingAnnotationId: selected,
         })
       );
@@ -166,7 +166,7 @@ export const AnnotationTransformer = ({
 
     dispatch(
       setSelectedAnnotationIds({
-        selectedAnnotationIds: [],
+        annotationIds: [],
         workingAnnotationId: undefined,
       })
     );

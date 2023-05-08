@@ -15,7 +15,7 @@ import { imageViewerSlice } from "store/imageViewer";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
-export const startAppListening =
+const startAppListening =
   annotatorMiddleware.startListening as AppStartListening;
 
 startAppListening({
@@ -60,7 +60,7 @@ startAppListening({
       );
       listenerAPI.dispatch(
         imageViewerSlice.actions.setSelectedAnnotationIds({
-          selectedAnnotationIds: [annotation!.id],
+          annotationIds: [annotation!.id],
           workingAnnotationId: annotation!.id,
         })
       );
@@ -128,7 +128,7 @@ startAppListening({
 
       listenerAPI.dispatch(
         imageViewerSlice.actions.setSelectedAnnotationIds({
-          selectedAnnotationIds: [annotation!.id],
+          annotationIds: [annotation!.id],
           workingAnnotationId: annotation!.id,
         })
       );
