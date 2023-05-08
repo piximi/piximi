@@ -27,6 +27,8 @@ export {
   UNKNOWN_CATEGORY_NAME,
 } from "./Category";
 
+export type { ImageFileError, ImageFileType } from "./ImageFileType";
+
 export type { Classifier } from "./Classifier";
 
 export type { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";

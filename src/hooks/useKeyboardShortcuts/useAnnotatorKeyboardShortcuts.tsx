@@ -13,7 +13,7 @@ import { annotatorSlice } from "store/annotator";
 import {
   selectSelectedImages,
   selectSelectedAnnotations,
-  selectStagedAnnotations,
+  selectActiveAnnotations,
 } from "store/data";
 import { selectSoundEnabled } from "store/application";
 
@@ -30,7 +30,7 @@ type useAnnotatorHotkeysProps = {
   annotations: DecodedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deleteAnnotations: (
-    selectedAnnotationIds: Array<string>,
+    annotationIds: Array<string>,
     stagedAnnotations: Array<DecodedAnnotationType>
   ) => void;
   deselectAllAnnotations: () => void;
@@ -62,7 +62,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   const images = useSelector(selectSelectedImages);
   const activeImageId = useSelector(activeImageIdSelector);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
-  const stagedAnnotations = useSelector(selectStagedAnnotations);
+  const stagedAnnotations = useSelector(selectActiveAnnotations);
 
   const confirmAnnotations = () => {
     if (

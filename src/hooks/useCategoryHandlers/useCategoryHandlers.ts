@@ -110,9 +110,9 @@ export const useCategoryHandlers = (
 
   const handleShowAllCategories = useCallback(() => {
     if (categoryType === CategoryType.ImageCategory) {
-      dispatch(projectSlice.actions.showAllCategories({}));
+      dispatch(projectSlice.actions.showCategories({}));
     }
-    dispatch(imageViewerSlice.actions.showAllCategories({}));
+    dispatch(imageViewerSlice.actions.showCategories({}));
   }, [categoryType, dispatch]);
 
   const imageCategoryIsVisible = useCallback(

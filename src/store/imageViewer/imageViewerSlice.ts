@@ -29,8 +29,6 @@ const initialState: ImageViewerStore = {
   hiddenCategoryIds: [],
   workingAnnotationId: undefined,
   selectedAnnotationIds: [],
-  stagedAnnotationIds: [],
-  stagedAnnotationsHaveBeenUpdated: false,
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
   stageScale: 1,
@@ -50,18 +48,6 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetAnnotator: () => initialState,
-    setActiveAnnotationIds(
-      state,
-      action: PayloadAction<{
-        annotationIds: Array<string>;
-      }>
-    ) {
-      state.activeAnnotationIds = [];
-      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
-        type: "addActiveAnnotationIds",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
-    },
     addActiveAnnotationId(
       state,
       action: PayloadAction<{ annotationId: string }>
@@ -78,6 +64,18 @@ export const imageViewerSlice = createSlice({
           payload: { annotationId },
         });
       }
+    },
+    setActiveAnnotationIds(
+      state,
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+      }>
+    ) {
+      state.activeAnnotationIds = [];
+      imageViewerSlice.caseReducers.addActiveAnnotationIds(state, {
+        type: "addActiveAnnotationIds",
+        payload: { annotationIds: action.payload.annotationIds },
+      });
     },
     removeActiveAnnotationId(
       state,
@@ -103,19 +101,42 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
+    addSelectedAnnotationId(
+      state,
+      action: PayloadAction<{ annotationId: string }>
+    ) {
+      state.selectedAnnotationIds.push(action.payload.annotationId);
+    },
+    addSelectedAnnotationIds(
+      state,
+      action: PayloadAction<{ annotationIds: Array<string> }>
+    ) {
+      for (const annotationId of action.payload.annotationIds) {
+        imageViewerSlice.caseReducers.addSelectedAnnotationId(state, {
+          type: "addSelectedAnnotationId",
+          payload: { annotationId },
+        });
+      }
+    },
     setSelectedAnnotationIds(
       state,
       action: PayloadAction<{
-        selectedAnnotationIds: Array<string>;
-        workingAnnotationId: string | undefined;
+        annotationIds: Array<string>;
+        workingAnnotationId?: string;
       }>
     ) {
-      state.selectedAnnotationIds = action.payload.selectedAnnotationIds;
-
-      state.workingAnnotationId = action.payload.workingAnnotationId;
+      state.selectedAnnotationIds = [];
+      imageViewerSlice.caseReducers.addSelectedAnnotationIds(state, {
+        type: "addSelectedAnnotationIds",
+        payload: { annotationIds: action.payload.annotationIds },
+      });
     },
     setAllSelectedAnnotationIds(state, action: PayloadAction<{}>) {
-      state.selectedAnnotationIds = state.activeAnnotationIds;
+      state.selectedAnnotationIds = [];
+      imageViewerSlice.caseReducers.addSelectedAnnotationIds(state, {
+        type: "addSelectedAnnotationIds",
+        payload: { annotationIds: state.activeAnnotationIds },
+      });
 
       state.workingAnnotationId =
         state.workingAnnotationId ?? state.activeAnnotationIds[0];
@@ -147,7 +168,6 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-
     hideCategory(
       state,
       action: PayloadAction<{
@@ -170,7 +190,6 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
-
     showCategory(
       state,
       action: PayloadAction<{
@@ -185,18 +204,19 @@ export const imageViewerSlice = createSlice({
     showCategories(
       state,
       action: PayloadAction<{
-        categoryIds: string[];
+        categoryIds?: string[];
       }>
     ) {
+      if (!action.payload.categoryIds) {
+        state.hiddenCategoryIds = [];
+        return;
+      }
       for (const categoryId of action.payload.categoryIds) {
         imageViewerSlice.caseReducers.showCategory(state, {
           type: "showCategory",
           payload: { categoryId },
         });
       }
-    },
-    showAllCategories(state, action: PayloadAction<{}>) {
-      state.hiddenCategoryIds = [];
     },
     toggleCategoryVisibility(
       state,
@@ -205,7 +225,6 @@ export const imageViewerSlice = createSlice({
       }>
     ) {
       const { categoryId } = action.payload;
-
       if (state.hiddenCategoryIds.includes(categoryId)) {
         mutatingFilter(
           state.hiddenCategoryIds,
@@ -214,6 +233,12 @@ export const imageViewerSlice = createSlice({
       } else {
         state.hiddenCategoryIds.push(categoryId);
       }
+    },
+    setSelectedCategoryId(
+      state,
+      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
+    ) {
+      state.selectedCategoryId = action.payload.selectedCategoryId;
     },
     setActiveImageId(
       state,
@@ -224,10 +249,8 @@ export const imageViewerSlice = createSlice({
       }>
     ) {
       state.activeImageId = action.payload.imageId;
-
       // reset selected annotations
       state.selectedAnnotationIds = [];
-      state.stagedAnnotationIds = [];
       state.workingAnnotationId = undefined;
     },
     setActiveImageRenderedSrcs(
@@ -238,12 +261,11 @@ export const imageViewerSlice = createSlice({
     ) {
       state.activeImageRenderedSrcs = action.payload.renderedSrcs;
     },
-
-    setSelectedCategoryId(
+    setImageOrigin(
       state,
-      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
+      action: PayloadAction<{ origin: { x: number; y: number } }>
     ) {
-      state.selectedCategoryId = action.payload.selectedCategoryId;
+      state.imageOrigin = action.payload.origin;
     },
     updateColorAdjustments(
       state,
@@ -253,7 +275,6 @@ export const imageViewerSlice = createSlice({
     ) {
       Object.assign(state.colorAdjustment, action.payload.changes);
     },
-
     setCurrentIndex(state, action: PayloadAction<{ currentIndex: number }>) {
       state.currentIndex = action.payload.currentIndex;
     },
@@ -265,14 +286,6 @@ export const imageViewerSlice = createSlice({
     ) {
       state.cursor = action.payload.cursor;
     },
-
-    setImageOrigin(
-      state,
-      action: PayloadAction<{ origin: { x: number; y: number } }>
-    ) {
-      state.imageOrigin = action.payload.origin;
-    },
-
     setStageHeight(state, action: PayloadAction<{ stageHeight: number }>) {
       state.stageHeight = action.payload.stageHeight;
     },

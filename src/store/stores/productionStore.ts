@@ -10,8 +10,9 @@ import createSagaMonitor from "@clarketm/saga-monitor";
 
 import { reducer } from "../reducer";
 import { rootSaga } from "../sagas";
-import { dataMiddleware } from "store/data/listenerMiddlewares";
+import { dataMiddleware } from "store/data/dataListeners";
 import { annotatorMiddleware } from "store/annotator/annotatorListeners";
+import { imageViewerMiddleware } from "../imageViewer/imageViewerListeners";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -54,6 +55,7 @@ let loggingMiddleware: Middleware[] =
 let listenerMiddlewares: Middleware[] = [
   dataMiddleware.middleware,
   annotatorMiddleware.middleware,
+  imageViewerMiddleware.middleware,
 ];
 
 const preloadedState = {};

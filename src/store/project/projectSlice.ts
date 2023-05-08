@@ -93,18 +93,19 @@ export const projectSlice = createSlice({
     showCategories(
       state,
       action: PayloadAction<{
-        categoryIds: string[];
+        categoryIds?: string[];
       }>
     ) {
+      if (!action.payload.categoryIds) {
+        state.hiddenImageCategoryIds = [];
+        return;
+      }
       for (const categoryId of action.payload.categoryIds) {
         projectSlice.caseReducers.showCategory(state, {
           type: "showCategory",
           payload: { categoryId },
         });
       }
-    },
-    showAllCategories(state, action: PayloadAction<{}>) {
-      state.hiddenImageCategoryIds = [];
     },
     toggleCategoryVisibility(
       state,

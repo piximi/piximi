@@ -20,7 +20,7 @@ import {
   selectActiveImageHeight,
   selectActiveImageWidth,
   selectSelectedAnnotations,
-  selectStagedAnnotations,
+  selectActiveAnnotations,
 } from "store/data";
 
 import { DecodedAnnotationType, HotkeyView, ToolType } from "types";
@@ -43,7 +43,7 @@ export const usePointer = () => {
 
   const changes = useSelector(selectPointerSelection);
 
-  const stagedAnnotations = useSelector(selectStagedAnnotations);
+  const stagedAnnotations = useSelector(selectActiveAnnotations);
 
   const imageWidth = useSelector(selectActiveImageWidth);
 
@@ -137,7 +137,7 @@ export const usePointer = () => {
           batch(() => {
             dispatch(
               setSelectedAnnotationIds({
-                selectedAnnotationIds: annotationsInBox.map((an) => an.id),
+                annotationIds: annotationsInBox.map((an) => an.id),
                 workingAnnotationId: annotationsInBox[0].id,
               })
             );
@@ -157,7 +157,7 @@ export const usePointer = () => {
           );
           dispatch(
             setSelectedAnnotationIds({
-              selectedAnnotationIds: [
+              annotationIds: [
                 ...selectedAnnotations.map((an) => an.id),
                 ...additionalAnnotations.map((an) => an.id),
               ],
@@ -233,7 +233,7 @@ export const usePointer = () => {
       batch(() => {
         dispatch(
           setSelectedAnnotationIds({
-            selectedAnnotationIds: [currentAnnotation!.id],
+            annotationIds: [currentAnnotation!.id],
             workingAnnotationId: currentAnnotation?.id,
           })
         );
@@ -250,7 +250,7 @@ export const usePointer = () => {
       //include newly selected annotation if not already selected
       dispatch(
         setSelectedAnnotationIds({
-          selectedAnnotationIds: [
+          annotationIds: [
             ...selectedAnnotations.map((an) => an.id),
             currentAnnotation.id,
           ],
