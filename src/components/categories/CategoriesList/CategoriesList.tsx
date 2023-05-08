@@ -19,7 +19,7 @@ import { useDialogHotkey, useCategoryHandlers } from "hooks";
 
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import {
-  DeleteObjectsDialog,
+  DialogWithAction,
   UpsertCategoriesDialog,
 } from "components/common/dialogs";
 
@@ -183,10 +183,10 @@ export const CategoriesList = (props: CategoriesListProps) => {
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
       />
-      <DeleteObjectsDialog
+      <DialogWithAction
         title="Delete All Categories"
         content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
-        deleteObjectCallback={handleDeleteAllCategories}
+        handleConfirmCallback={handleDeleteAllCategories}
         onClose={handleCloseDeleteCategoryDialog}
         open={isDeleteCategoryDialogOpen}
       />

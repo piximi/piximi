@@ -1,5 +1,5 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
-import { ToolHotkeyTitle } from "../../ToolHotkeyTitle";
+import { ToolHotkeyTitle } from "../../../tooltips/ToolHotkeyTitle";
 
 import { CollapsibleHelpContent } from "../HelpDialog/CollapsibleHelpContent";
 import { ToolTitleProps } from "../HelpDialog/HelpWindowToolTitle";

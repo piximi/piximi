@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import { KeyboardKey } from "./Help/HelpDialog/KeyboardKey";
+import { KeyboardKey } from "../styled-components/KeyboardKey";
 type ToolHotkeyTitleProps = {
   toolName: string;
   letter?: string;

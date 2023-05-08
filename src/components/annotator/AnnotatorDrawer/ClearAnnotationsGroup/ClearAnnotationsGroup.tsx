@@ -11,7 +11,7 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialog, useTranslation } from "hooks";
 
-import { DeleteObjectsDialog } from "components/common/dialogs";
+import { DialogWithAction } from "components/common/dialogs";
 import {
   imageViewerSlice,
   selectActiveAnnotationIds,
@@ -93,14 +93,14 @@ export const ClearAnnotationsGroup = () => {
           <ListItemText primary={t("Clear all annotations")} />
         </ListItemButton>
 
-        <DeleteObjectsDialog
+        <DialogWithAction
           title={`Delete ${deleteOp}  annotations`}
           content={`${
             deleteOp === "all"
               ? activeAnnotationsIds.length
               : selectActiveAnnotationIds.length
           } annotations will be deleted`}
-          deleteObjectCallback={handleDeleteAnnotations}
+          handleConfirmCallback={handleDeleteAnnotations}
           onClose={handleCloseDeleteAnnotationsDialog}
           open={isDeleteAnnotationsDialogOpen}
         />
