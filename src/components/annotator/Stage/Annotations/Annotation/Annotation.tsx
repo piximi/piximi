@@ -4,7 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { imageOriginSelector } from "store/imageViewer";
+import { imageOriginSelector, stageScaleSelector } from "store/imageViewer";
 
 import { DecodedAnnotationType, Shape } from "types";
 
@@ -25,7 +25,7 @@ export const Annotation = ({
   selected,
 }: AnnotationProps) => {
   const annotatorRef = useRef<Konva.Image | null>(null);
-
+  const stageScale = useSelector(stageScaleSelector);
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
@@ -73,7 +73,6 @@ export const Annotation = ({
 
     const maskData = annotation.maskData;
     const boundingBox = annotation.boundingBox;
-    console.log(boundingBox);
 
     const roiWidth = boundingBox[2] - boundingBox[0];
     const roiHeight = boundingBox[3] - boundingBox[1];
@@ -122,12 +121,13 @@ export const Annotation = ({
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}
-      x={annotation.boundingBox[0] + imagePosition.x}
-      y={annotation.boundingBox[1] + imagePosition.y}
+      x={annotation.boundingBox[0] * stageScale + imagePosition.x}
+      y={annotation.boundingBox[1] * stageScale + imagePosition.y}
       width={Math.round(annotation.boundingBox[2] - annotation.boundingBox[0])}
       height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}
       strokeWidth={100}
+      scale={{ x: stageScale, y: stageScale }}
     />
   );
 };

@@ -115,21 +115,9 @@ export const selectActiveAnnotationIdsByCategory = createSelector(
 );
 
 export const selectSelectedAnnotations = createSelector(
-  [
-    selectSelectedAnnotationIds,
-    workingAnnotationIdSelector,
-    selectAnnotationEntities,
-  ],
-  (
-    selectedIds,
-    workingId,
-    annotationEntities
-  ): Array<DecodedAnnotationType> => {
-    if (!workingId)
-      return selectedIds.map(
-        (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
-      );
-    return [...selectedIds, workingId].map(
+  [selectSelectedAnnotationIds, selectAnnotationEntities],
+  (selectedIds, annotationEntities): Array<DecodedAnnotationType> => {
+    return selectedIds.map(
       (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
     );
   }
