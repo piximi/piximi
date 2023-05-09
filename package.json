@@ -93,6 +93,7 @@
     "prop-types": "^15.8.1",
     "react-test-renderer": "^18.2.0",
     "ts-node": "^10.9.1",
+    "ts-prune": "^0.10.3",
     "tslib": "^2.4.0",
     "webpack": "^5.74.0"
   },
@@ -105,7 +106,8 @@
     "test": "react-scripts test --env=./src/store/classifier/coroutines/custom-test-env.js",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prune-dead": "ts-prune"
   },
   "browserslist": {
     "production": [
