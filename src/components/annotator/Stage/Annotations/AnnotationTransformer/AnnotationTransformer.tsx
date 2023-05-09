@@ -68,6 +68,8 @@ export const AnnotationTransformer = ({
   const imageHeight = useSelector(selectActiveImageHeight);
   const imageOrigin = useSelector(imageOriginSelector);
   const trRef = useRef<Konva.Transformer | null>(null);
+  const [xPos, setXPos] = useState<number>(0);
+  const [yPos, setYPos] = useState<number>(0);
 
   const dispatch = useDispatch();
 
@@ -219,25 +221,28 @@ export const AnnotationTransformer = ({
     if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
-  let posX = 0;
-  let posY = 0;
+  useEffect(() => {
+    if (workingAnnotation && selectedAnnotations.length === 1) {
+      setXPos(
+        Math.max(
+          workingAnnotation.boundingBox[0],
+          workingAnnotation.boundingBox[2]
+        ) + imageOrigin.x
+      );
 
-  if (workingAnnotation && selectedAnnotations.length === 1) {
-    posX =
-      Math.max(
-        workingAnnotation.boundingBox[0],
-        workingAnnotation.boundingBox[2]
-      ) + imageOrigin.x;
-
-    posY = Math.max(
-      workingAnnotation.boundingBox[1],
-      workingAnnotation.boundingBox[3]
-    );
-    posY =
-      posY + 56 > imageHeight!
-        ? imageHeight! - 65 + imageOrigin.y
-        : posY + imageOrigin.y;
-  }
+      const tempYPos = Math.max(
+        workingAnnotation.boundingBox[1],
+        workingAnnotation.boundingBox[3]
+      );
+      setYPos(
+        tempYPos + 56 > imageHeight!
+          ? imageHeight! - 65 + imageOrigin.y
+          : tempYPos + imageOrigin.y
+      );
+    }
+    console.log(workingAnnotation);
+    console.log(selectedAnnotations.length);
+  }, [workingAnnotation, selectedAnnotations.length, imageHeight, imageOrigin]);
 
   useEffect(() => {
     if (!activeAnnotationIds.includes(annotationId)) {
@@ -264,7 +269,7 @@ export const AnnotationTransformer = ({
             <>
               <ReactKonva.Group
                 id={"label-group"}
-                position={{ x: posX, y: posY }}
+                position={{ x: xPos, y: yPos }}
                 scaleX={1 / stageScale}
                 scaleY={1 / stageScale}
               >

@@ -125,7 +125,11 @@ export const imageViewerSlice = createSlice({
         workingAnnotationId?: string;
       }>
     ) {
+      const { annotationIds, workingAnnotationId } = action.payload;
       state.selectedAnnotationIds = [];
+      state.workingAnnotationId = workingAnnotationId
+        ? workingAnnotationId
+        : annotationIds[0];
       imageViewerSlice.caseReducers.addSelectedAnnotationIds(state, {
         type: "addSelectedAnnotationIds",
         payload: { annotationIds: action.payload.annotationIds },
