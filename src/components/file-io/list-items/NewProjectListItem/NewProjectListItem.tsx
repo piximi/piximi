@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { useDialogHotkey } from "hooks";
 
-import { NewProjectDialog } from "../NewProjectDialog";
+import { NewProjectDialog } from "../../dialogs/NewProjectDialog";
 import { HotkeyView } from "types";
 
 export const NewProjectListItem = () => {

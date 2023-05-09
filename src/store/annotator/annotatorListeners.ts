@@ -3,7 +3,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   AnnotationModeType,
   AnnotationStateType,
-  AppStartListening,
+  TypedAppStartListening,
   DecodedAnnotationType,
   ToolType,
 } from "types";
@@ -16,7 +16,7 @@ import { imageViewerSlice } from "store/imageViewer";
 export const annotatorMiddleware = createListenerMiddleware();
 
 const startAppListening =
-  annotatorMiddleware.startListening as AppStartListening;
+  annotatorMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
   actionCreator: annotatorSlice.actions.setAnnotationState,

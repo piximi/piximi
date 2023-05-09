@@ -9,7 +9,7 @@ import { useDialog, useDialogHotkey } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/common/dialogs";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
-import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
+import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedModelDialog";
 import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
 
@@ -96,6 +96,7 @@ export const SegmenterList = () => {
         backgroundColor={APPLICATION_COLORS.segmenterList}
         primary="Segmenter"
         secondary={SegmenterIOButtons}
+        closed={true}
       >
         <>
           <CategoriesList

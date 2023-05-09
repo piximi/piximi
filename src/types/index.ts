@@ -9,7 +9,7 @@ export { AnnotationStateType } from "./AnnotationStateType";
 
 export { AnnotationExportType } from "./AnnotationExportType";
 export type { AnnotationsEntityType } from "./AnnotationsEntityType";
-export type { AppStartListening } from "./AppStartListening";
+export type { TypedAppStartListening } from "./TypedAppStartListening";
 export type { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
 
 export type {
