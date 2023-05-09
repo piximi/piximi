@@ -1,18 +1,22 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
-import { ToolHotkeyTitle } from "../../../tooltips/ToolHotkeyTitle";
+import { ToolHotkeyTitle } from "../../../common/tooltips/ToolHotkeyTitle";
 
-import { CollapsibleHelpContent } from "../HelpDialog/CollapsibleHelpContent";
-import { ToolTitleProps } from "../HelpDialog/HelpWindowToolTitle";
+import { CollapsibleList } from "../../../common/styled-components/CollapsibleList";
 
-export type Subtopic = {
+type Subtopic = {
   subtitle: string;
   tootleTitle?: ToolTitleProps;
   descriptions: Array<string>;
 };
 
-export type HelpTopic = {
+type HelpTopic = {
   topic: string;
   subtopics: Array<Subtopic>;
+};
+
+type ToolTitleProps = {
+  toolName: string;
+  letter: string;
 };
 
 export type HelpContentType = {
@@ -23,20 +27,25 @@ export type HelpContentType = {
 
 export const HelpContent = (helpContent: Array<HelpTopic>) => {
   return (
-    <div>
+    <Box>
       {helpContent.map((helpContent: HelpTopic, idx: number) => {
         return (
-          <CollapsibleHelpContent
+          <CollapsibleList
             key={idx}
-            primary={helpContent.topic}
-            closed={false}
+            primary={
+              <Typography variant="h6" fontSize={18}>
+                {helpContent.topic}
+              </Typography>
+            }
+            closed={true}
             dense={true}
           >
             <Container>
               {helpContent.subtopics.map(
                 (subTopic: Subtopic, subtopicIndex: number) => {
+                  console.log("subtopicIndex", subtopicIndex);
                   return (
-                    <div key={subtopicIndex}>
+                    <Box key={subtopicIndex}>
                       {subTopic.tootleTitle ? (
                         <ToolHotkeyTitle
                           toolName={subTopic.tootleTitle.toolName}
@@ -44,34 +53,32 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                           bold={true}
                         />
                       ) : (
-                        <Typography component={"span"}>
-                          <Box fontWeight="fontWeightBold">
-                            {subTopic.subtitle}
-                          </Box>
+                        <Typography paddingBottom={1} fontWeight="bold">
+                          {subTopic.subtitle}
                         </Typography>
                       )}
                       {subTopic.descriptions.map(
                         (description: string, descriptionIndex: number) => {
                           return (
-                            <div key={descriptionIndex}>
-                              <Typography component={"span"}>
+                            <Box key={descriptionIndex}>
+                              <Typography fontSize={14}>
                                 {description}
                               </Typography>
-                              <br />
-                            </div>
+                            </Box>
                           );
                         }
                       )}
-                      <Divider />
-                      <br />
-                    </div>
+                      {subtopicIndex < helpContent.subtopics.length - 1 && (
+                        <Divider sx={{ my: 2 }} />
+                      )}
+                    </Box>
                   );
                 }
               )}
             </Container>
-          </CollapsibleHelpContent>
+          </CollapsibleList>
         );
       })}
-    </div>
+    </Box>
   );
 };

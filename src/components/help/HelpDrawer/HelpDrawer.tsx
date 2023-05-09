@@ -12,9 +12,10 @@ import {
 } from "@mui/material";
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
+import { AppBarOffset } from "../../common/styled-components/AppBarOffset";
+import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
+
 import { applicationSlice } from "store/application";
-import { AppBarOffset } from "../../AppBarOffset";
-import { HelpContent, HelpContentType } from "../HelpContent/HelpContent";
 
 import { AlertType } from "types";
 
@@ -29,8 +30,8 @@ export const HelpDrawer = () => {
   const location = useLocation();
   const helpContent: HelpContentType =
     location.pathname === "/annotator"
-      ? require("../HelpContent/AnnotatorHelpContent.json")
-      : require("../HelpContent/ClassifierHelpContent.json");
+      ? require("./HelpContent/AnnotatorHelpContent.json")
+      : require("./HelpContent/ClassifierHelpContent.json");
 
   const handleError = (error: Error, info: { componentStack: string }) => {
     dispatch(

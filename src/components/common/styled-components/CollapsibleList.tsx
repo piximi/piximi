@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   List,
   ListItem,
@@ -16,7 +16,7 @@ import {
 type CollapsibleListProps = {
   children: any;
   dense: boolean;
-  primary: string;
+  primary: ReactNode;
   closed?: boolean;
   backgroundColor?: string;
   disablePadding?: boolean;
