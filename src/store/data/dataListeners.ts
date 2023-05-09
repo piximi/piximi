@@ -10,7 +10,7 @@ import { projectSlice } from "store/project";
 import {
   AlertStateType,
   AlertType,
-  AppStartListening,
+  TypedAppStartListening,
   ImageFileError,
   ImageFileType,
   OldImageType,
@@ -28,7 +28,7 @@ import { getCompleteEntity } from "store/entities/utils";
 export const dataMiddleware = createListenerMiddleware();
 
 export const startAppListening =
-  dataMiddleware.startListening as AppStartListening;
+  dataMiddleware.startListening as TypedAppStartListening;
 
 //TODO - Change OldImageType
 

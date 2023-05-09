@@ -4,7 +4,7 @@ import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { SaveMenu } from "../SaveMenu";
+import { SaveMenu } from "../../menus/SaveMenu";
 import { useMenu } from "hooks";
 
 export const SaveListItem = () => {

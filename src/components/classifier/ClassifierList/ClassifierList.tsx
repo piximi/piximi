@@ -8,7 +8,7 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 import { useDialog, useDialogHotkey } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/common/dialogs";
-import { SaveFittedModelDialog } from "components/file-io/SaveFittedModelDialog";
+import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedModelDialog";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { ClassifierExecListItem } from "../ClassifierExecListItem";
 import { CategoriesList } from "components/categories/CategoriesList";
@@ -94,6 +94,7 @@ export const ClassifierList = () => {
         dense
         backgroundColor={APPLICATION_COLORS.classifierList}
         primary="Classifier"
+        closed={true}
         secondary={ClassifierIOButtons}
       >
         <>

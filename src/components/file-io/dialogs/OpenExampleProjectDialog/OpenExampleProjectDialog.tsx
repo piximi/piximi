@@ -10,7 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { useTranslation } from "hooks";
 
-import { OpenExampleProjectMenuItem } from "../OpenExampleProjectMenuItem";
+import { OpenExampleProjectMenuItem } from "../../menus/OpenExampleProjectMenuItem";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import mnistExampleProjectIcon from "data/exampleProjects/mnistExampleProjectIcon.png";

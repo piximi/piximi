@@ -1,12 +1,12 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { AppStartListening, ImageType } from "types";
+import { ImageType, TypedAppStartListening } from "types";
 import { imageViewerSlice } from "./imageViewerSlice";
 import { getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/image";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
-  imageViewerMiddleware.startListening as AppStartListening;
+  imageViewerMiddleware.startListening as TypedAppStartListening;
 
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageId,

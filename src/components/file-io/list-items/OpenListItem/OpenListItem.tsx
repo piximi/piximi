@@ -4,7 +4,7 @@ import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
-import { OpenMenu } from "../OpenMenu";
+import { OpenMenu } from "../../menus/OpenMenu";
 import { useMenu } from "hooks";
 
 export const OpenListItem = () => {
