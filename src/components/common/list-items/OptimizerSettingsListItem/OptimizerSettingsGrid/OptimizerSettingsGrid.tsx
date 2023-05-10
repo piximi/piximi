@@ -23,7 +23,7 @@ export type OptimizerSettingsGridProps = {
   fitOptions: FitOptions;
   dispatchBatchSizeCallback: (batchSize: number) => void;
   dispatchEpochsCallback: (epochs: number) => void;
-  isModelTrainable?: boolean;
+  isModelTrainable: boolean;
 };
 
 export const OptimizerSettingsGrid = ({
