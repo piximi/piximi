@@ -292,6 +292,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             fitOptions={fitOptions}
             dispatchBatchSizeCallback={dispatchBatchSizeCallback}
             dispatchLearningRateCallback={dispatchLearningRateCallback}
+            isModelTrainable={!selectedModel.graph}
           />
 
           <DatasetSettingsListItem
@@ -299,6 +300,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             dispatchTrainingPercentageCallback={
               dispatchTrainingPercentageCallback
             }
+            isModelTrainable={!selectedModel.graph}
           />
         </List>
 
