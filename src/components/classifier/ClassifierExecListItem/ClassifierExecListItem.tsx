@@ -39,6 +39,8 @@ export const ClassifierExecListItem = () => {
       setHelperText("Evaluating...");
     } else if (modelStatus === ModelStatus.Predicting) {
       setHelperText("Predcting...");
+    } else if (modelStatus === ModelStatus.Suggesting) {
+      setHelperText("Accept/Reject suggested predictions first");
     } else {
       setHelperText("No Trained Model");
     }
