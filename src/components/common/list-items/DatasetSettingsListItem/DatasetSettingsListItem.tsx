@@ -10,7 +10,7 @@ import {
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;
   dispatchTrainingPercentageCallback: (trainPercentage: number) => void;
-  isModelTrainable?: boolean;
+  isModelTrainable: boolean;
 };
 
 export const DatasetSettingsListItem = ({
