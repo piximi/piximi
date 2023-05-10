@@ -34,11 +34,17 @@ type LoadDataArgs = {
 };
 
 export abstract class SequentialClassifier<L = never> extends Model<L> {
+  // TODO - segmenter: use protected once all the other _model accessors are refactored
   _model?: LayersModel;
+  //protected _model?: LayersModel;
   _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  //protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  //protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _history?: History;
+  //protected _history?: History;
 
   loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs): void {
     this._trainingDataset = preprocessClassifier({
@@ -256,19 +262,23 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
     this._model.dispose();
   }
 
-  modelLoaded(): boolean {
+  get modelLoaded(): boolean {
     return this._model !== undefined;
   }
 
-  trainingLoaded(): boolean {
+  get numClasses(): number {
+    return this._model?.outputShape[1] as number;
+  }
+
+  get trainingLoaded(): boolean {
     return this._trainingDataset !== undefined;
   }
 
-  validationLoaded(): boolean {
+  get validationLoaded(): boolean {
     return this._validationDataset !== undefined;
   }
 
-  inferenceLoaded(): boolean {
+  get inferenceLoaded(): boolean {
     return this._inferenceDataset !== undefined;
   }
 
