@@ -18,12 +18,12 @@ export type TrainingCallbacks = {
 };
 
 export abstract class Model<L = never> {
-  name: string;
-  task: ModelTask;
-  graph: boolean;
-  src: string;
-  pretrained: boolean;
-  requiredChannels?: number;
+  readonly name: string;
+  readonly task: ModelTask;
+  readonly graph: boolean;
+  readonly src: string;
+  readonly pretrained: boolean;
+  readonly requiredChannels?: number;
 
   constructor({
     name,
@@ -51,10 +51,10 @@ export abstract class Model<L = never> {
 
   abstract dispose(): void;
 
-  abstract modelLoaded(): boolean;
-  abstract trainingLoaded(): boolean;
-  abstract validationLoaded(): boolean;
-  abstract inferenceLoaded(): boolean;
+  abstract get modelLoaded(): boolean;
+  abstract get trainingLoaded(): boolean;
+  abstract get validationLoaded(): boolean;
+  abstract get inferenceLoaded(): boolean;
 
   //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
 }
