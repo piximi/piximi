@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 
-import { applicationSlice } from "store/application";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
@@ -111,8 +110,6 @@ export const OpenExampleProjectMenuItem = ({
     const project = deserializedProject.project;
     const data = deserializedProject.data;
     const classifier = deserializedProject.classifier;
-
-    dispatch(applicationSlice.actions.clearSelectedImages());
 
     batch(() => {
       dispatch(

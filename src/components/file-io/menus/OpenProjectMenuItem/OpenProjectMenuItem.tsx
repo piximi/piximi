@@ -44,7 +44,7 @@ export const OpenProjectMenuItem = ({
         batch(() => {
           dispatch(classifierSlice.actions.resetClassifier());
           dispatch(segmenterSlice.actions.resetSegmenter());
-          dispatch(imageViewerSlice.actions.resetAnnotator());
+          dispatch(imageViewerSlice.actions.resetImageViewer());
           dispatch(projectSlice.actions.resetProject());
 
           dispatch(

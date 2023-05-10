@@ -13,6 +13,7 @@ import { rootSaga } from "../sagas";
 import { dataMiddleware } from "store/data/dataListeners";
 import { annotatorMiddleware } from "store/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "../imageViewer/imageViewerListeners";
+import { projectMiddleware } from "../project/projectListeners";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -56,6 +57,7 @@ let listenerMiddlewares: Middleware[] = [
   dataMiddleware.middleware,
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
+  projectMiddleware.middleware,
 ];
 
 const preloadedState = {};

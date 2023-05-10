@@ -138,7 +138,6 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
       dispatch(unregisterHotkeyView({}));
     };
   }, [dispatch]);
-
   return (
     <Box
       sx={(theme) => ({

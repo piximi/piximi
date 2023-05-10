@@ -17,6 +17,16 @@ export const projectSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetProject: () => initialState,
+
+    createNewProject(state, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
+      state.imageSortKey = defaultImageSortKey.imageSortKey;
+    },
+    setProject(state, action: PayloadAction<{ project: Project }>) {
+      // WARNING, don't do below (overwrites draft object)
+      // state = action.payload.project;
+      return action.payload.project;
+    },
     clearSelectedImages(state) {
       state.selectedImageIds = [];
     },
@@ -125,15 +135,6 @@ export const projectSlice = createSlice({
       }
     },
 
-    createNewProject(state, action: PayloadAction<{ name: string }>) {
-      state.name = action.payload.name;
-      state.imageSortKey = defaultImageSortKey.imageSortKey;
-    },
-    setProject(state, action: PayloadAction<{ project: Project }>) {
-      // WARNING, don't do below (overwrites draft object)
-      // state = action.payload.project;
-      return action.payload.project;
-    },
     sortImagesBySelectedKey(
       state,
       action: PayloadAction<{ imageSortKey: ImageSortKey }>

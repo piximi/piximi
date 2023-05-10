@@ -43,7 +43,6 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
             <Container>
               {helpContent.subtopics.map(
                 (subTopic: Subtopic, subtopicIndex: number) => {
-                  console.log("subtopicIndex", subtopicIndex);
                   return (
                     <Box key={subtopicIndex}>
                       {subTopic.tootleTitle ? (

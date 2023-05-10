@@ -636,28 +636,28 @@ describe("Unsorted State Adapter", () => {
         adapter.removeAll(draft);
       });
       expect(result).toMatchInlineSnapshot(`
-       {
-         "entities": {
-           "af": {
-             "changes": {
+       Object {
+         "entities": Object {
+           "af": Object {
+             "changes": Object {
                "deleted": true,
              },
-             "saved": {
+             "saved": Object {
                "id": "af",
                "title": "Animal Farm",
              },
            },
-           "tgg": {
-             "changes": {
+           "tgg": Object {
+             "changes": Object {
                "deleted": true,
              },
-             "saved": {
+             "saved": Object {
                "id": "tgg",
                "title": "The Great Gatsby",
              },
            },
          },
-         "ids": [
+         "ids": Array [
            "tgg",
            "af",
          ],
@@ -671,19 +671,19 @@ describe("Unsorted State Adapter", () => {
       });
 
       expect(result).toMatchInlineSnapshot(`
-      {
-        "entities": {
-          "tgg": {
-            "changes": {
+      Object {
+        "entities": Object {
+          "tgg": Object {
+            "changes": Object {
               "added": true,
             },
-            "saved": {
+            "saved": Object {
               "id": "tgg",
               "title": "The Great Gatsby",
             },
           },
         },
-        "ids": [
+        "ids": Array [
           "tgg",
         ],
       }
@@ -696,28 +696,28 @@ describe("Unsorted State Adapter", () => {
       });
 
       expect(result).toMatchInlineSnapshot(`
-       {
-         "entities": {
-           "af": {
-             "changes": {
+       Object {
+         "entities": Object {
+           "af": Object {
+             "changes": Object {
                "added": true,
              },
-             "saved": {
+             "saved": Object {
                "id": "af",
                "title": "Animal Farm",
              },
            },
-           "tgg": {
-             "changes": {
+           "tgg": Object {
+             "changes": Object {
                "added": true,
              },
-             "saved": {
+             "saved": Object {
                "id": "tgg",
                "title": "The Great Gatsby",
              },
            },
          },
-         "ids": [
+         "ids": Array [
            "tgg",
            "af",
          ],
@@ -731,28 +731,28 @@ describe("Unsorted State Adapter", () => {
       });
 
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "af": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "af": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "af",
                 "title": "Animal Farm",
               },
             },
-            "tgg": {
-              "changes": {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
             "af",
           ],
@@ -771,20 +771,20 @@ describe("Unsorted State Adapter", () => {
       });
 
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "tgg": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
                 "title": "A New Hope",
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
           ],
         }
@@ -812,42 +812,42 @@ describe("Unsorted State Adapter", () => {
       });
 
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "aco": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "aco": Object {
+              "changes": Object {
                 "added": true,
                 "title": "Third Change",
               },
-              "saved": {
+              "saved": Object {
                 "id": "aco",
                 "title": "A Clockwork Orange",
               },
             },
-            "tgg": {
-              "changes": {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
                 "title": "Second Change",
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
-            "th": {
-              "changes": {
+            "th": Object {
+              "changes": Object {
                 "added": true,
                 "author": "Fourth Change",
                 "title": "First Change",
               },
-              "saved": {
+              "saved": Object {
                 "author": "J. R. R. Tolkien",
                 "id": "th",
                 "title": "The Hobbit",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
             "aco",
             "th",
@@ -861,19 +861,19 @@ describe("Unsorted State Adapter", () => {
         adapter.upsertOne(draft, TheGreatGatsby);
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "tgg": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
           ],
         }
@@ -889,20 +889,20 @@ describe("Unsorted State Adapter", () => {
         });
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "tgg": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
                 "title": "A New Hope",
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
           ],
         }
@@ -921,29 +921,29 @@ describe("Unsorted State Adapter", () => {
         ]);
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "af": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "af": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "af",
                 "title": "Animal Farm",
               },
             },
-            "tgg": {
-              "changes": {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
                 "title": "A New Hope",
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
             "af",
           ],
@@ -956,19 +956,19 @@ describe("Unsorted State Adapter", () => {
         adapter.setOne(draft, TheGreatGatsby);
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "tgg": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "tgg": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
           ],
         }
@@ -984,21 +984,21 @@ describe("Unsorted State Adapter", () => {
         });
       });
       expect(result).toMatchInlineSnapshot(`
-       {
-         "entities": {
-           "th": {
-             "changes": {
+       Object {
+         "entities": Object {
+           "th": Object {
+             "changes": Object {
                "id": "th",
                "title": "Silmarillion",
              },
-             "saved": {
+             "saved": Object {
                "author": "J. R. R. Tolkien",
                "id": "th",
                "title": "The Hobbit",
              },
            },
          },
-         "ids": [
+         "ids": Array [
            "th",
          ],
        }
@@ -1017,30 +1017,30 @@ describe("Unsorted State Adapter", () => {
         ]);
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "af": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "af": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "af",
                 "title": "Animal Farm",
               },
             },
-            "th": {
-              "changes": {
+            "th": Object {
+              "changes": Object {
                 "id": "th",
                 "title": "Silmarillion",
               },
-              "saved": {
+              "saved": Object {
                 "author": "J. R. R. Tolkien",
                 "id": "th",
                 "title": "The Hobbit",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "th",
             "af",
           ],
@@ -1054,28 +1054,28 @@ describe("Unsorted State Adapter", () => {
         adapter.removeOne(draft, TheGreatGatsby.id);
       });
       expect(result).toMatchInlineSnapshot(`
-        {
-          "entities": {
-            "af": {
-              "changes": {
+        Object {
+          "entities": Object {
+            "af": Object {
+              "changes": Object {
                 "added": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "af",
                 "title": "Animal Farm",
               },
             },
-            "tgg": {
-              "changes": {
+            "tgg": Object {
+              "changes": Object {
                 "deleted": true,
               },
-              "saved": {
+              "saved": Object {
                 "id": "tgg",
                 "title": "The Great Gatsby",
               },
             },
           },
-          "ids": [
+          "ids": Array [
             "tgg",
             "af",
           ],
@@ -1093,37 +1093,37 @@ describe("Unsorted State Adapter", () => {
         adapter.removeMany(draft, [TheGreatGatsby.id, AnimalFarm.id]);
       });
       expect(result).toMatchInlineSnapshot(`
-     {
-       "entities": {
-         "aco": {
-           "changes": {
+     Object {
+       "entities": Object {
+         "aco": Object {
+           "changes": Object {
              "added": true,
            },
-           "saved": {
+           "saved": Object {
              "id": "aco",
              "title": "A Clockwork Orange",
            },
          },
-         "af": {
-           "changes": {
+         "af": Object {
+           "changes": Object {
              "deleted": true,
            },
-           "saved": {
+           "saved": Object {
              "id": "af",
              "title": "Animal Farm",
            },
          },
-         "tgg": {
-           "changes": {
+         "tgg": Object {
+           "changes": Object {
              "deleted": true,
            },
-           "saved": {
+           "saved": Object {
              "id": "tgg",
              "title": "The Great Gatsby",
            },
          },
        },
-       "ids": [
+       "ids": Array [
          "tgg",
          "af",
          "aco",

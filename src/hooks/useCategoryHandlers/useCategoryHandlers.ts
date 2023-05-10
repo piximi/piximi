@@ -52,13 +52,14 @@ export const useCategoryHandlers = (
             categoryIndex: 0,
           })
         );
+      } else {
+        dispatch(
+          imageViewerSlice.actions.setSelectedCategoryId({
+            selectedCategoryId: category.id,
+            execSaga: true,
+          })
+        );
       }
-      dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: category.id,
-          execSaga: true,
-        })
-      );
     },
     [categoryType, dispatch]
   );
@@ -71,39 +72,51 @@ export const useCategoryHandlers = (
             categoryId: category.id,
           })
         );
+      } else {
+        dispatch(
+          imageViewerSlice.actions.toggleCategoryVisibility({
+            categoryId: category.id,
+          })
+        );
       }
-      dispatch(
-        imageViewerSlice.actions.toggleCategoryVisibility({
-          categoryId: category.id,
-        })
-      );
     },
     [categoryType, dispatch]
   );
 
   const handleHideOtherCategories = useCallback(
     (category?: Category) => {
-      const otherCategories = [
-        ...categories,
-        UNKNOWN_ANNOTATION_CATEGORY,
-      ].reduce((otherIds: string[], otherCategory: Category) => {
-        if (!category || otherCategory.id !== category.id) {
-          otherIds.push(otherCategory.id);
-        }
-        return otherIds;
-      }, []);
+      let otherCategories: string[];
       if (categoryType === CategoryType.ImageCategory) {
+        otherCategories = [...categories, UNKNOWN_CLASS_CATEGORY].reduce(
+          (otherIds: string[], otherCategory: Category) => {
+            if (!category || otherCategory.id !== category.id) {
+              otherIds.push(otherCategory.id);
+            }
+            return otherIds;
+          },
+          []
+        );
         dispatch(
           projectSlice.actions.hideCategories({
             categoryIds: otherCategories,
           })
         );
+      } else {
+        otherCategories = [...categories, UNKNOWN_ANNOTATION_CATEGORY].reduce(
+          (otherIds: string[], otherCategory: Category) => {
+            if (!category || otherCategory.id !== category.id) {
+              otherIds.push(otherCategory.id);
+            }
+            return otherIds;
+          },
+          []
+        );
+        dispatch(
+          imageViewerSlice.actions.hideCategories({
+            categoryIds: otherCategories,
+          })
+        );
       }
-      dispatch(
-        imageViewerSlice.actions.hideCategories({
-          categoryIds: otherCategories,
-        })
-      );
     },
     [categories, categoryType, dispatch]
   );
@@ -111,8 +124,9 @@ export const useCategoryHandlers = (
   const handleShowAllCategories = useCallback(() => {
     if (categoryType === CategoryType.ImageCategory) {
       dispatch(projectSlice.actions.showCategories({}));
+    } else {
+      dispatch(imageViewerSlice.actions.showCategories({}));
     }
-    dispatch(imageViewerSlice.actions.showCategories({}));
   }, [categoryType, dispatch]);
 
   const imageCategoryIsVisible = useCallback(
@@ -215,41 +229,41 @@ export const useCategoryHandlers = (
 
   if (categoryType === CategoryType.ImageCategory) {
     return {
-      categoryIsVisible: imageCategoryIsVisible,
       selectedCategory,
+      dispatchDeleteCategories,
+      dispatchUpsertCategory,
+      handleSelectCategory,
+      handleToggleCategoryVisibility,
+      handleHideOtherCategories,
+      handleShowAllCategories,
+      categoryIsVisible: imageCategoryIsVisible,
       hasHidden: hasHiddenImageCategories,
       objectCountByCategory: ImageCountByCategory,
-      dispatchDeleteCategories,
       dispatchDeleteObjectsOfCategory: dispatchDeleteImagesOfCategory,
-      dispatchUpsertCategory,
       usedCategoryInfo: {
         names: usedImageCategoryNames,
         colors: usedImageCategoryColors,
       },
       unknownCategory: UNKNOWN_CLASS_CATEGORY,
+    };
+  } else {
+    return {
+      selectedCategory,
+      dispatchDeleteCategories,
+      dispatchUpsertCategory,
       handleSelectCategory,
       handleToggleCategoryVisibility,
       handleHideOtherCategories,
       handleShowAllCategories,
-    };
-  } else {
-    return {
       categoryIsVisible: annotationCategoryIsVisible,
-      selectedCategory,
       hasHidden: hasHiddenAnnotationCategories,
       objectCountByCategory: annotationCountByCategory,
-      dispatchDeleteCategories,
       dispatchDeleteObjectsOfCategory: dispatchDeleteAnnotationsOfCategory,
-      dispatchUpsertCategory,
       usedCategoryInfo: {
         names: usedImageCategoryNames,
         colors: usedImageCategoryColors,
       },
       unknownCategory: UNKNOWN_ANNOTATION_CATEGORY,
-      handleSelectCategory,
-      handleToggleCategoryVisibility,
-      handleHideOtherCategories,
-      handleShowAllCategories,
     };
   }
 };
