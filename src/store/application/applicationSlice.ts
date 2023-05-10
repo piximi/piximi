@@ -24,6 +24,9 @@ export const applicationSlice = createSlice({
     initialized(state: Settings) {
       state.init = true;
     },
+    resetApplicationSetings(state: Settings) {
+      return initialState;
+    },
     clearSelectedImages(state: Settings) {
       state.selectedImages = [];
     },

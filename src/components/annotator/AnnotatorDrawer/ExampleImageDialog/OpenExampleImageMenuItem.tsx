@@ -4,6 +4,7 @@ import { ListItem, ListItemText, Typography } from "@mui/material";
 
 import { dataSlice } from "store/data";
 import { activeImageIdSelector, imageViewerSlice } from "store/imageViewer";
+import { projectSlice } from "store/project";
 
 import { SerializedFileType } from "types";
 
@@ -41,21 +42,23 @@ export const OpenExampleImageMenuItem = ({
   const openExampleImage = async () => {
     onClose();
 
-    const { image, annotationCategories } = await loadExampleImage(
+    const { image, annotations, annotationCategories } = await loadExampleImage(
       exampleImageProject.exampleImageData,
       exampleImageProject.exampleImageAnnotationsFile as SerializedFileType,
       exampleImageProject.exampleImageName
     );
+    console.log("clicked");
 
-    dispatch(
-      dataSlice.actions.addAnnotationCategories({ annotationCategories })
-    );
     batch(() => {
       dispatch(
-        dataSlice.actions.addImages({
+        dataSlice.actions.initData({
           images: [image],
+          annotations: annotations,
+          annotationCategories: annotationCategories,
+          categories: [],
         })
       );
+
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
           imageId: image.id,
@@ -63,6 +66,7 @@ export const OpenExampleImageMenuItem = ({
           execSaga: true,
         })
       );
+      dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
     });
   };
 

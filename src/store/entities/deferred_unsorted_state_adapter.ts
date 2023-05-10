@@ -24,7 +24,6 @@ export function createUnsortedDeferredStateAdapter<T>(
 
   function addOneMutably(entity: T, state: R): void {
     const key = selectIdValue(entity, selectId);
-
     if (key in state.entities) {
       if (state.entities[key].changes.deleted) {
         state.entities[key].saved = entity;
@@ -32,7 +31,6 @@ export function createUnsortedDeferredStateAdapter<T>(
       }
       return;
     }
-
     state.ids.push(key);
     state.entities[key] = {
       saved: entity,

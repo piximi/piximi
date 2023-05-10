@@ -81,7 +81,6 @@ export const AnnotatorView = () => {
 
   const handleUncaughtRejection = useCallback(
     async (e: any) => {
-      console.log("me?");
       e.preventDefault();
       dispatch(
         applicationSlice.actions.updateAlertState({

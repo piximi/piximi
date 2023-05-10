@@ -58,11 +58,12 @@ export const initialState = (): DataStoreSlice => {
   };
 };
 
-// TODO: use createEntities with sorting for entity values
+// TODO: Allow each data type to be added individually, i.e. images without image categories, annotations without images.
 export const dataSlice = createSlice({
   name: "data",
   initialState: initialState,
   reducers: {
+    resetData: () => initialState(),
     initData(
       state,
       action: PayloadAction<{
@@ -72,31 +73,33 @@ export const dataSlice = createSlice({
         annotationCategories: Array<Category>;
       }>
     ) {
-      Object.assign(state, initialState());
       const {
         images: newImages,
         annotations: newAnnotations,
         categories: newCategories,
         annotationCategories: newAnnotationCategories,
       } = action.payload;
+      dataSlice.caseReducers.resetData();
       dataSlice.caseReducers.addImageCategories(state, {
-        type: "addImageCategories",
+        type: "setImageCategories",
         payload: { categories: newCategories },
       });
+
       dataSlice.caseReducers.addAnnotationCategories(state, {
-        type: "addAnnotationCategories",
+        type: "setAnnotationCategories",
         payload: { annotationCategories: newAnnotationCategories },
       });
+
       dataSlice.caseReducers.addImages(state, {
-        type: "addImages",
+        type: "setImages",
         payload: { images: newImages },
       });
+
       dataSlice.caseReducers.addAnnotations(state, {
-        type: "addAnnotations",
+        type: "setAnnotations",
         payload: { annotations: newAnnotations },
       });
     },
-    resetData: () => initialState(),
     addImageCategory(
       state,
       action: PayloadAction<{
@@ -104,6 +107,7 @@ export const dataSlice = createSlice({
       }>
     ) {
       const category = action.payload.category;
+      console.log(category);
       if (state.categories.ids.includes(category.id)) return;
       state.imagesByCategory[category.id] = [];
       categoriesAdapter.addOne(state.categories, category);
@@ -115,6 +119,7 @@ export const dataSlice = createSlice({
       }>
     ) {
       for (const category of action.payload.categories) {
+        console.log(category);
         dataSlice.caseReducers.addImageCategory(state, {
           type: "addImageCategory",
           payload: { category },
@@ -183,7 +188,6 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ categories: Array<Category> }>
     ) {
-      state.categories = initialState().categories;
       for (const category in state.imagesByCategory) {
         if (category !== UNKNOWN_CLASS_CATEGORY_ID) {
           state.imagesByCategory[UNKNOWN_CLASS_CATEGORY_ID].push(
@@ -199,7 +203,7 @@ export const dataSlice = createSlice({
         return { id, changes: { categoryId: UNKNOWN_CLASS_CATEGORY_ID } };
       });
       imagesAdapter.updateMany(state.images, changes);
-      categoriesAdapter.setMany(state.categories, action.payload.categories);
+      categoriesAdapter.setAll(state.categories, action.payload.categories);
     },
     upsertImageCategory(
       state,
@@ -430,7 +434,7 @@ export const dataSlice = createSlice({
     },
     addImage(state, action: PayloadAction<{ image: ImageType }>) {
       const image = action.payload.image;
-
+      //console.log(image);
       const initialName = image.name.split(".")[0]; //get name before file extension
       const imageNames = Object.values(state.images.entities).map(
         (image) => getDeferredProperty(image, "name") as string
@@ -441,6 +445,7 @@ export const dataSlice = createSlice({
         "." +
         image.name.split(".").slice(1);
       image.name = updatedName;
+      //console.log(image.name);
 
       if (state.categories.ids.includes(image.categoryId)) {
         state.imagesByCategory[image.categoryId].push(image.id);
@@ -477,7 +482,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         images: Array<ImageType>;
-        disposeColorTensors: boolean;
+        disposeColorTensors?: boolean;
       }>
     ) {
       const images = action.payload.images;

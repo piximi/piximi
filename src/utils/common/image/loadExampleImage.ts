@@ -16,7 +16,9 @@ export const loadExampleImage = async (
   imageName?: string
 ) => {
   const imageFile = await fileFromPath(imagePath);
+
   const imageStack = await loadImageFileAsStack(imageFile);
+
   const image = await convertToImage(
     imageStack,
     imageName ? imageName : imageFile.name,
@@ -28,11 +30,9 @@ export const loadExampleImage = async (
   const deserializedAnnotations = deserializeAnnotations(
     serializedAnnotations.annotations
   );
-
   const annotations: Array<AnnotationType> = [];
 
   const normImageData = image.data.mul(255);
-
   const imDataArray = (await normImageData.arraySync()) as number[][][];
   normImageData.dispose();
   const flatImageData = imDataArray.flat(3);
@@ -49,8 +49,8 @@ export const loadExampleImage = async (
     const objectImage = renderedIm.crop({
       x: Math.abs(bbox[0]),
       y: Math.abs(bbox[1]),
-      width: Math.abs(Math.min(512, bbox[2]) - bbox[0]),
-      height: Math.abs(Math.min(512, bbox[3]) - bbox[1]),
+      width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
+      height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
     });
     const objSrc = objectImage.toDataURL();
     const data = tf.tensor4d(Float32Array.from(objectImage.data), [

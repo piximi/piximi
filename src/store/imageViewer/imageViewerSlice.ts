@@ -47,7 +47,7 @@ export const imageViewerSlice = createSlice({
   initialState: initialState,
   name: "image-viewer",
   reducers: {
-    resetAnnotator: () => initialState,
+    resetImageViewer: () => initialState,
     addActiveAnnotationId(
       state,
       action: PayloadAction<{ annotationId: string }>
