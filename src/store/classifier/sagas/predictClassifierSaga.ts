@@ -1,4 +1,3 @@
-import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -7,9 +6,6 @@ import {
   classifierArchitectureOptionsSelector,
   classifierFitOptionsSelector,
   classifierPreprocessOptionsSelector,
-  predictClasses,
-  preprocessClassifier,
-  createClassificationLabels,
   classifierSelectedModelSelector,
 } from "store/classifier";
 import { applicationSlice } from "store/application";
@@ -32,6 +28,7 @@ import {
 import { ModelStatus } from "types/ModelType";
 
 import { getStackTraceFromError } from "utils";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 export function* predictClassifierSaga({
   payload: { modelStatus, execSaga },
@@ -60,16 +57,7 @@ export function* predictClassifierSaga({
     classifierSelectedModelSelector
   );
 
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    return;
-  }
-
-  // @ts-ignore, TODO - segmenter
-  const outputLayerSize = model.outputs[0].shape[1] as number;
+  let finalModelStatus = ModelStatus.Trained;
 
   if (!testImages.length) {
     yield put(
@@ -81,15 +69,20 @@ export function* predictClassifierSaga({
         },
       })
     );
-  } else if (outputLayerSize !== categories.length) {
+  } else if (model.numClasses !== categories.length) {
     yield put(
       applicationSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Warning,
           name: "The output shape of your model does not correspond to the number of categories!",
-          description: `The trained model has an output shape of ${outputLayerSize} but there are ${categories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
+          description: `The trained model has an output shape of ${model.numClasses} but there are ${categories.length} categories in  the project.\nMake sure these numbers match by retraining the model with the given setup or upload a corresponding new model.`,
         },
       })
+    );
+  } else if (!model.modelLoaded) {
+    yield handleError(
+      new Error("No selectable model in store"),
+      "Failed to get tensorflow model"
     );
   } else {
     yield runPrediction(
@@ -98,15 +91,15 @@ export function* predictClassifierSaga({
       architectureOptions.inputShape,
       preprocessOptions,
       fitOptions,
-      // @ts-ignore, TODO - segmenter
       model
     );
+    finalModelStatus = ModelStatus.Suggesting;
   }
 
   yield put(
-    // @ts-ignore, TODO - segmenter
-    classifierSlice.actions.updatePredicting({
-      predicting: false,
+    classifierSlice.actions.updateModelStatus({
+      modelStatus: finalModelStatus,
+      execSaga: false,
     })
   );
 }
@@ -117,20 +110,15 @@ function* runPrediction(
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: LayersModel
+  model: SequentialClassifier
 ) {
   try {
-    var { labels: testLabels, disposeLabels: disposeTestLabels } =
-      createClassificationLabels(testImages, categories);
-
-    var dataSet: Awaited<ReturnType<typeof preprocessClassifier>> =
-      yield preprocessClassifier(
-        testImages,
-        testLabels,
-        inputShape,
-        preprocessOptions,
-        fitOptions
-      );
+    model.loadInference(testImages, {
+      categories,
+      inputShape,
+      preprocessOptions,
+      fitOptions,
+    });
   } catch (error) {
     yield handleError(
       error as Error,
@@ -139,29 +127,14 @@ function* runPrediction(
     return;
   }
 
-  try {
-    var categoryIds: Awaited<ReturnType<typeof predictClasses>> =
-      yield predictClasses(model, dataSet, categories); //returns an array of Image ID and an array of corresponding categories ID
-  } catch (error) {
-    yield handleError(error as Error, "Error predicting the inference data");
-    return;
-  }
-
   const imageIds = testImages.map((img) => img.id);
-
-  disposeTestLabels();
+  const categoryIds: Awaited<ReturnType<typeof model.predict>> =
+    yield model.predict(categories);
 
   yield put(
     dataSlice.actions.updateCategoriesOfImages({
       imageIds: imageIds,
       categoryIds: categoryIds,
-    })
-  );
-
-  yield put(
-    // @ts-ignore, TODO - segmenter
-    classifierSlice.actions.updatePredicted({
-      predicted: true,
     })
   );
 }

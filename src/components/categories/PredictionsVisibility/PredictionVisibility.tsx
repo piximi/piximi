@@ -1,4 +1,3 @@
-// @ts-nocheck ; TODO - segmenter
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,12 +15,13 @@ import { classifierSlice } from "store/classifier";
 import { dataSlice, selectImagesByPartition } from "store/data";
 import { Partition } from "types";
 
-//TODO: need full image selector here?
+import { ModelStatus } from "types/ModelType";
 
 export const PredictionVisibility = () => {
   const dispatch = useDispatch();
 
   const [showLabeledImages, setShowLabeledImages] = React.useState(true);
+  //TODO: need full image selector here?
   const inferenceImages = useSelector((state) =>
     selectImagesByPartition(state, Partition.Training)
   );
@@ -53,7 +53,12 @@ export const PredictionVisibility = () => {
       );
     }
 
-    dispatch(classifierSlice.actions.updatePredicted({ predicted: false }));
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Trained,
+        execSaga: false,
+      })
+    );
   };
 
   return (
