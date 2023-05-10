@@ -41,7 +41,11 @@ export const EvaluateClassifierListItem = (
   const modelStatus = useSelector(classifierModelStatusSelector);
   const evaluationResult = useSelector(classifierEvaluationResultSelector);
 
+  const [waitingForResults, setWaitingForResults] = React.useState(false);
+
   const onEvaluate = async () => {
+    setWaitingForResults(true);
+
     dispatch(
       classifierSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Evaluating,
@@ -51,11 +55,11 @@ export const EvaluateClassifierListItem = (
   };
 
   useEffect(() => {
-    // TODO - segmenter: actually want this after evaluating is complete
-    if (modelStatus === ModelStatus.Evaluating) {
+    if (modelStatus === ModelStatus.Trained && waitingForResults) {
+      setWaitingForResults(false);
       onOpen();
     }
-  }, [modelStatus, onOpen]);
+  }, [modelStatus, onOpen, waitingForResults]);
 
   return (
     <Grid item xs={4}>
