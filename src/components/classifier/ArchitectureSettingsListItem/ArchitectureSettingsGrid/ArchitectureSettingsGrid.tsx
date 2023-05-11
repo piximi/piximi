@@ -73,6 +73,7 @@ export const ArchitectureSettingsGrid = () => {
       );
     }
 
+    // TODO - segmenter: probably towrad the end, resolve problem with select -> train -> select new ...
     dispatch(
       classifierSlice.actions.updateSelectedModel({ model: selectedModel })
     );

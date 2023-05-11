@@ -158,6 +158,13 @@ function* fitClassifier({
     // end model training: Training -> Trained
     classifierSlice.actions.updateFitted({ history })
   );
+
+  yield put(
+    classifierSlice.actions.updateModelStatus({
+      execSaga: false,
+      modelStatus: ModelStatus.Trained,
+    })
+  );
 }
 
 export function* fitClassifierSaga({
@@ -242,13 +249,6 @@ export function* fitClassifierSaga({
   }
 
   yield fitClassifier({ model: selectedModel, onEpochEnd, fitOptions });
-
-  yield put(
-    classifierSlice.actions.updateModelStatus({
-      execSaga: false,
-      modelStatus: ModelStatus.Trained,
-    })
-  );
 }
 
 function* handleError(error: Error, errorName: string) {

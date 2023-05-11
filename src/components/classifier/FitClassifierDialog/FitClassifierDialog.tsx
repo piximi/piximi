@@ -321,7 +321,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
           </div>
         )}
 
-        {modelStatus >= ModelStatus.Training && (
+        {modelStatus > ModelStatus.Training && (
           <div>
             {/*  TODO - segmenter: pass in actual model class */}
             <ModelSummaryTable loadedModel={selectedModel._model!} />
