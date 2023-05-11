@@ -42,7 +42,7 @@ import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus, ModelTask } from "types/ModelType";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -250,7 +250,7 @@ export const FallBackDialog = (props: any) => {
           // TODO - segmenter: pass in the model class itself
           fittedModel={selectedModel._model!}
           modelName={selectedModel.name}
-          modelKind={"Classifier"}
+          modelTask={ModelTask.Classification}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
         />
@@ -258,7 +258,7 @@ export const FallBackDialog = (props: any) => {
         <SaveFittedModelDialog
           fittedModel={fittedSegmenterModel as LayersModel}
           modelName={selectedSegmenterModelProps.modelName}
-          modelKind={"Segmenter"}
+          modelTask={ModelTask.Segmentation}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
         />

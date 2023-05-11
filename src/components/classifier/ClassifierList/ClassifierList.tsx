@@ -23,7 +23,7 @@ import { selectCreatedImageCategories } from "store/data";
 import { CategoryType, HotkeyView, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus, ModelTask } from "types/ModelType";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
@@ -116,14 +116,14 @@ export const ClassifierList = () => {
       <ImportTensorflowModelDialog
         onClose={onCloseImportClassifierDialog}
         open={openImportClassifierDialog}
-        modelKind={"Classification"}
+        modelTask={ModelTask.Classification}
         dispatchFunction={importClassifierModel}
       />
       <SaveFittedModelDialog
         // TODO - segmenter: pass in the model class instead, with save method
         fittedModel={selectedClassifierModelProps._model!}
         modelName={selectedClassifierModelProps.name}
-        modelKind={"Classifier"}
+        modelTask={ModelTask.Classification}
         onClose={onSaveClassifierDialogClose}
         open={openSaveClassifierDialog}
       />

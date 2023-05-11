@@ -13,12 +13,13 @@ import {
 } from "@mui/material";
 
 import { HotkeyView } from "types";
+import { ModelTask } from "types/ModelType";
 
 // TODO - segmenter: All of this
 type SaveFittedModelDialogProps = {
   modelName: string;
   fittedModel: LayersModel | undefined;
-  modelKind: string;
+  modelTask: ModelTask;
   onClose: () => void;
   open: boolean;
 };
@@ -26,7 +27,7 @@ type SaveFittedModelDialogProps = {
 export const SaveFittedModelDialog = ({
   modelName,
   fittedModel,
-  modelKind,
+  modelTask,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
@@ -56,7 +57,7 @@ export const SaveFittedModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save {modelKind}</DialogTitle>
+      <DialogTitle>Save {modelName}</DialogTitle>
 
       <DialogContent>
         <Grid container spacing={1}>
@@ -65,7 +66,7 @@ export const SaveFittedModelDialog = ({
               autoFocus
               fullWidth
               id="name"
-              label={modelKind + " name"}
+              label={modelName}
               margin="dense"
               onChange={onNameChange}
               helperText={
@@ -89,7 +90,7 @@ export const SaveFittedModelDialog = ({
           color="primary"
           disabled={noFittedModel}
         >
-          Save {modelKind}
+          Save {modelName}
         </Button>
       </DialogActions>
     </Dialog>
