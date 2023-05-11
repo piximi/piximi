@@ -1,4 +1,4 @@
-// TODO - segmenter: remove, now in concrete models
+// TODO - segmenter: Remove, now in concrete models
 import {
   Sequential,
   sequential,
