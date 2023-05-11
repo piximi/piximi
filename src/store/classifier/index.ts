@@ -37,17 +37,3 @@ export { predictClassifierSaga } from "./sagas/predictClassifierSaga";
 export { watchEvaluateClassifierSaga } from "./sagas/watchEvaluateClassifierSaga";
 export { watchFitClassifierSaga } from "./sagas/watchFitClassifierSaga";
 export { watchPredictClassifierSaga } from "./sagas/watchPredictClassifierSaga";
-
-// Coroutines
-
-export { matchedCropPad } from "./coroutines/cropUtil";
-export { evaluateClassifier } from "./coroutines/evaluateClassifier";
-export { fitClassifier } from "./coroutines/fitClassifier";
-export { createClassifierModel } from "./coroutines/createClassifierModel";
-export { predictClasses } from "./coroutines/predictClasses";
-export {
-  cropResize,
-  sampleGenerator,
-  preprocessClassifier,
-  createClassificationLabels,
-} from "./coroutines/preprocessClassifier";
