@@ -1,9 +1,14 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { ModelSummaryTable } from "./ModelSummary";
-import { train } from "@tensorflow/tfjs";
-import { createSimpleCNN } from "store/coroutine-models/simpleCNN";
+import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { Shape } from "types/Shape";
+import {
+  CompileOptions,
+  LossFunction,
+  Metric,
+  OptimizationAlgorithm,
+} from "types";
 
 export default {
   title: "Model summary table",
@@ -16,13 +21,19 @@ const inputShape: Shape = {
   height: 28,
   width: 28,
 };
+const compileOptions: CompileOptions = {
+  learningRate: 0.001,
+  lossFunction: LossFunction.MeanSquaredError,
+  metrics: [Metric.CategoricalAccuracy],
+  optimizationAlgorithm: OptimizationAlgorithm.Adadelta,
+};
 
-const simpleCNN = createSimpleCNN(inputShape, 10);
-
-simpleCNN.compile({
-  loss: "meanSquaredError",
-  metrics: "categoricalAccuracy",
-  optimizer: train.adadelta(0.015),
+const simpleCNN = new SimpleCNN();
+simpleCNN.loadModel({
+  inputShape,
+  numClasses: 10,
+  randomizeWeights: false,
+  compileOptions,
 });
 
 const Template: ComponentStory<typeof ModelSummaryTable> = (args) => (
@@ -30,4 +41,5 @@ const Template: ComponentStory<typeof ModelSummaryTable> = (args) => (
 );
 
 export const Primary = Template.bind({});
-Primary.args = { loadedModel: simpleCNN };
+// TODO - segmenter: replace with Model
+Primary.args = { loadedModel: simpleCNN._model! };
