@@ -23,6 +23,7 @@ import {
 
 import { CategoryType, HotkeyView, ModelArchitecture, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelTask } from "types/ModelType";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
@@ -113,13 +114,13 @@ export const SegmenterList = () => {
       <ImportTensorflowModelDialog
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
-        modelKind={"Segmentation"}
+        modelTask={ModelTask.Segmentation}
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog
         fittedModel={fittedSegmenter as LayersModel}
         modelName={selectedSegmenterModelProps.modelName}
-        modelKind={"Segmenter"}
+        modelTask={ModelTask.Segmentation}
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}
       />

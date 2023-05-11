@@ -25,9 +25,10 @@ import LanguageIcon from "@mui/icons-material/Language";
 
 import { useDebounce } from "hooks";
 import { Shape } from "types";
+import { ModelTask } from "types/ModelType";
 
 export const CloudUpload = ({
-  modelKind,
+  modelTask,
   isGraph,
   setSegmentationModel,
   setClassifierModel,
@@ -35,7 +36,7 @@ export const CloudUpload = ({
   setModelName,
   setIsGraph,
 }: {
-  modelKind: string;
+  modelTask: ModelTask;
   isGraph: boolean;
   setSegmentationModel: React.Dispatch<
     React.SetStateAction<
@@ -102,7 +103,7 @@ export const CloudUpload = ({
         });
       }
 
-      modelKind === "Segmentation"
+      modelTask === ModelTask.Segmentation
         ? setSegmentationModel(model)
         : setClassifierModel(model as LayersModel);
       const modelShape = model.inputs[0].shape!.slice(1) as number[];
