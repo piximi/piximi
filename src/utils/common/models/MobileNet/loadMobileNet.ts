@@ -29,14 +29,16 @@ export const createMobileNet = async ({
   resource: string;
   freeze: boolean;
   useCustomTopLayer: boolean;
-  defaultInputShape: number[];
+  defaultInputShape: [number, number, number];
   lastLayerName: string;
 }) => {
-  const imageWidth = inputShape.width;
-  const imageHeight = inputShape.height;
+  const input_shape: [number, number, number] = [
+    inputShape.width,
+    inputShape.height,
+    inputShape.channels,
+  ];
 
-  // the number of input channels cannot be changed
-  const input_shape: number[] = [imageWidth, imageHeight, 3];
+  // TODO - segmenter: lots of dispose() needed to be done throughout here, I think
 
   const mobilenet = await loadLayersModel(resource);
 
@@ -49,8 +51,8 @@ export const createMobileNet = async ({
   }
 
   let model = backbone;
-  if (!_.isEqual(inputShape, defaultInputShape)) {
-    model = changeInputShape(model, input_shape);
+  if (!_.isEqual(input_shape, defaultInputShape)) {
+    model = changeInputShape(model, input_shape, defaultInputShape);
   }
 
   if (freeze) {
