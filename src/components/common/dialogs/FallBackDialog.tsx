@@ -41,7 +41,7 @@ import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus, ModelTask } from "types/ModelType";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -91,19 +91,8 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
-<<<<<<< HEAD:src/components/common/dialogs/FallBackDialog.tsx
   const selectedClassifierModel = useSelector(classifierSelectedModelSelector);
   const classifierModelStatus = useSelector(classifierModelStatusSelector);
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
-  const fittedClassifierModel = useSelector(classifierFittedSelector);
-  const selectedClassifierModelProps = useSelector(
-    classifierSelectedModelSelector
-  );
-  const fittedClassifier = fittedClassifierModel ? true : false;
-=======
-  const selectedModel = useSelector(classifierSelectedModelSelector);
-  const modelStatus = useSelector(classifierModelStatusSelector);
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
 
   const selectedSegmenterModel = useSelector(segmenterModelSelector);
   const segmenterModelStatus = useSelector(segmenterModelStatusSelector);
@@ -236,13 +225,7 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-<<<<<<< HEAD:src/components/common/dialogs/FallBackDialog.tsx
           {classifierModelStatus === ModelStatus.Trained && (
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
-          {fittedClassifier && (
-=======
-          {modelStatus === ModelStatus.Trained && (
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
             <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
               Save classifier
             </Button>
@@ -260,36 +243,15 @@ export const FallBackDialog = (props: any) => {
         />
 
         <SaveFittedModelDialog
-<<<<<<< HEAD:src/components/common/dialogs/FallBackDialog.tsx
           model={selectedClassifierModel}
           modelStatus={classifierModelStatus}
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
-          fittedModel={fittedClassifierModel}
-          modelProps={selectedClassifierModelProps}
-          modelKind={"Classifier"}
-=======
-          // TODO - segmenter: pass in the model class itself
-          fittedModel={selectedModel._model!}
-          modelName={selectedModel.name}
-          modelKind={"Classifier"}
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
         />
 
         <SaveFittedModelDialog
-<<<<<<< HEAD:src/components/common/dialogs/FallBackDialog.tsx
           model={selectedSegmenterModel}
           modelStatus={segmenterModelStatus}
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
-          fittedModel={fittedSegmenterModel as LayersModel}
-          modelProps={selectedSegmenterModelProps}
-          modelKind={"Segmenter"}
-=======
-          fittedModel={fittedSegmenterModel as LayersModel}
-          modelName={selectedSegmenterModelProps.modelName}
-          modelKind={"Segmenter"}
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/common/FallBackDialog/FallBackDialog.tsx
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
         />

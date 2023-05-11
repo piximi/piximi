@@ -16,12 +16,12 @@ import {
   availableClassifierModels,
   availableSegmenterModels,
 } from "types";
-import { ModelArchitecture } from "types/ModelType";
+import { ModelArchitecture, ModelTask } from "types/ModelType";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
   open: boolean;
-  modelKind: "Segmentation" | "Classification";
+  modelTask: ModelTask;
   dispatchFunction: (
     inputShape: Shape,
     modelName: string,
@@ -34,7 +34,7 @@ type ImportTensorflowModelDialogProps = {
 export const ImportTensorflowModelDialog = ({
   onClose,
   open,
-  modelKind,
+  modelTask,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
   // Uploaded Model States
@@ -62,7 +62,9 @@ export const ImportTensorflowModelDialog = ({
       inputShape,
       modelName,
       modelArch,
-      modelKind === "Classification" ? classifierModel : segmentationModel,
+      modelTask === ModelTask.Classification
+        ? classifierModel
+        : segmentationModel,
       isGraph
     );
 
@@ -83,7 +85,7 @@ export const ImportTensorflowModelDialog = ({
 
   useEffect(() => {
     const models =
-      modelKind === "Classification"
+      modelTask === ModelTask.Classification
         ? availableClassifierModels.reduce(
             (
               trainedModels: Array<{
@@ -122,14 +124,20 @@ export const ImportTensorflowModelDialog = ({
           );
 
     setPretrainedModels(models);
-  }, [modelKind]);
+  }, [modelTask]);
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
-      <DialogTitle>Import {modelKind} model</DialogTitle>
+      <DialogTitle>
+        Import{" "}
+        {modelTask === ModelTask.Classification
+          ? "Classification"
+          : "Segmentation"}{" "}
+        model
+      </DialogTitle>
 
       <LocalFileUpload
-        modelKind={modelKind}
+        modelTask={modelTask}
         isGraph={isGraph}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}
@@ -149,7 +157,7 @@ export const ImportTensorflowModelDialog = ({
       />
 
       <CloudUpload
-        modelKind={modelKind}
+        modelTask={modelTask}
         isGraph={isGraph}
         setSegmentationModel={setSegmentationModel}
         setClassifierModel={setClassifierModel}
@@ -167,12 +175,16 @@ export const ImportTensorflowModelDialog = ({
           onClick={dispatchModelToStore}
           color="primary"
           disabled={
-            modelKind === "Classification"
+            modelTask === ModelTask.Classification
               ? !classifierModel
               : !segmentationModel
           }
         >
-          Open {modelKind} model
+          Open{" "}
+          {modelTask === ModelTask.Classification
+            ? "Classification"
+            : "Segmentation"}{" "}
+          model
         </Button>
       </DialogActions>
     </Dialog>
