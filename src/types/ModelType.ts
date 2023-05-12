@@ -32,7 +32,7 @@ type ModelProps = {
   modelName: string;
   requiredChannels?: number;
   modelArch: ModelArchitecture;
-  graph: boolean;
+  graph: boolean; // Model Format, Graph if true, Layers if false
   src?: string;
   pretrained?: boolean;
 };
