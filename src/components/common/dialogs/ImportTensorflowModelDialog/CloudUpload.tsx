@@ -86,8 +86,9 @@ export const CloudUpload = ({
     verifySourceMatchDebounced(event.target.value, isFromTFHub);
   };
 
-  const handleModelTypeChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setIsGraph(event.target.value === "Graph");
+  const handleModelFormatChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => setIsGraph(event.target.value === "Graph");
 
   const loadModel = async () => {
     let model: GraphModel | LayersModel;
@@ -166,14 +167,14 @@ export const CloudUpload = ({
       <MenuItem>
         <FormControl>
           <FormLabel id="model-type-radio-buttons-group-label">
-            Model Type
+            Model Format
           </FormLabel>
           <RadioGroup
             row
             aria-labelledby="model-type-radio-buttons-group-label"
             name="model-type-radio-buttons-group"
             value={isGraph ? "Graph" : "Layers"}
-            onChange={handleModelTypeChange}
+            onChange={handleModelFormatChange}
           >
             <FormControlLabel
               value="Graph"
@@ -193,7 +194,7 @@ export const CloudUpload = ({
                   onChange={handleSourceChange}
                 />
               }
-              label="TF Hub"
+              label="From TF Hub?"
             />
           </RadioGroup>
         </FormControl>
