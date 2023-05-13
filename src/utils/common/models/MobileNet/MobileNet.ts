@@ -18,8 +18,9 @@ export class MobileNet extends SequentialClassifier<LoadModelArgs> {
       name: "MobileNet",
       task: ModelTask.Classification,
       graph: false,
-      src: "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json",
       pretrained: false,
+      trainable: true,
+      src: "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json",
     });
   }
 
@@ -33,7 +34,7 @@ export class MobileNet extends SequentialClassifier<LoadModelArgs> {
     this._model = await createMobileNet({
       inputShape,
       numClasses,
-      resource: this.src,
+      resource: this.src!,
       freeze,
       useCustomTopLayer,
       defaultInputShape: [224, 224, 3],

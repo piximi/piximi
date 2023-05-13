@@ -1,10 +1,10 @@
-import { SegmenterModelProps } from "types/ModelType";
 import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export const segmenterUserUploadedModelSelector = ({
   segmenter,
 }: {
   segmenter: SegmenterStoreType;
-}): SegmenterModelProps | undefined => {
+}): Segmenter | undefined => {
   return segmenter.userUploadedModel;
 };

@@ -28,6 +28,7 @@ import { ModelTask } from "types/ModelType";
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
   const fittedSegmenter = useSelector(segmenterFittedModelSelector);
+  // TODO - segmenter: remove props in name, here and everywhere
   const selectedSegmenterModelProps = useSelector(
     segmenterArchitectureOptionsSelector
   ).selectedModel;
@@ -46,21 +47,22 @@ export const SegmenterList = () => {
   const dispatch = useDispatch();
 
   const importSegmentationModel = (
+    model: GraphModel | LayersModel,
+    modelArch: ModelArchitecture,
+    graph: boolean,
     inputShape: Shape,
-    modelName: string,
-    modelArch: number,
-    segmentationModel: any,
-    graph: boolean
+    modelName: string
   ) => {
     dispatch(
       segmenterSlice.actions.uploadUserSelectedModel({
-        inputShape: inputShape,
+        inputShape,
         modelSelection: {
-          modelName: modelName,
-          modelArch: modelArch as ModelArchitecture,
-          graph: graph,
+          // @ts-ignore TODO - segmenter
+          modelName,
+          modelArch,
+          graph,
         },
-        model: segmentationModel as GraphModel,
+        model,
       })
     );
   };
@@ -115,11 +117,12 @@ export const SegmenterList = () => {
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
         modelTask={ModelTask.Segmentation}
+        // @ts-ignore TODO - segmenter
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog
         fittedModel={fittedSegmenter as LayersModel}
-        modelName={selectedSegmenterModelProps.modelName}
+        modelName={selectedSegmenterModelProps.name}
         modelTask={ModelTask.Segmentation}
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}

@@ -95,11 +95,7 @@ export type {
   SegmenterModelProps,
   DefaultModelProps,
 } from "./ModelType";
-export {
-  ModelArchitecture,
-  availableClassifierModels,
-  availableSegmenterModels,
-} from "./ModelType";
+export { ModelArchitecture } from "./ModelType";
 export type { ObjectDetectionType } from "./ObjectDetectionClassType";
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 

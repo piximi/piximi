@@ -28,8 +28,8 @@ class GenericClassifier extends SequentialClassifier {
       name: "GenericClassifier",
       task: ModelTask.Classification,
       graph: false,
-      src: "",
       pretrained: false,
+      trainable: false,
     });
   }
 

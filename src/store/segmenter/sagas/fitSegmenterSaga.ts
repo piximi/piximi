@@ -87,7 +87,7 @@ export function* fitSegmenterSaga({
 
   var model: LayersModel;
   if (
-    architectureOptions.selectedModel.modelArch ===
+    architectureOptions.selectedModel.architecture ===
     ModelArchitecture.UserUploaded
   ) {
     model = yield select(segmenterCompiledModelSelector);
