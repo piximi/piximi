@@ -1,11 +1,4 @@
 import React, { useState } from "react";
-import {
-  LayersModel,
-  loadLayersModel,
-  io,
-  loadGraphModel,
-  GraphModel,
-} from "@tensorflow/tfjs";
 
 import {
   DialogContent,
@@ -19,77 +12,86 @@ import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 import { Shape } from "types";
 import { ModelTask } from "types/ModelType";
+import { Model } from "utils/common/models/Model";
+import { UploadedClassifier } from "utils/common/models/UploadedClassifier/UploadedClassifier";
 
 export const LocalFileUpload = ({
   modelTask,
   isGraph,
-  setSegmentationModel,
-  setClassifierModel,
+  setModel,
   setInputShape,
-  setModelName,
 }: {
   modelTask: ModelTask;
   isGraph: boolean;
-  setSegmentationModel: React.Dispatch<
-    React.SetStateAction<
-      LayersModel | GraphModel<string | io.IOHandler> | undefined
-    >
-  >;
-  setClassifierModel: React.Dispatch<
-    React.SetStateAction<
-      LayersModel | GraphModel<string | io.IOHandler> | undefined
-    >
-  >;
+  setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
-  setModelName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [errMessage, setErrMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
-  const loadModel = async (jsonFile: File, weightsFiles: Array<File>) => {
-    let model: GraphModel | LayersModel;
+  const loadModel = async (descFile: File, weightsFiles: Array<File>) => {
+    setErrMessage("");
+    setSuccessMessage("");
 
-    try {
-      if (isGraph) {
-        model = await loadGraphModel(
-          io.browserFiles([jsonFile, ...weightsFiles])
-        );
-      } else {
-        model = await loadLayersModel(
-          io.browserFiles([jsonFile, ...weightsFiles])
-        );
+    // remove the file extension from the model name
+    const modelName = descFile.name.replace(/\..+$/, "");
+
+    if (modelTask === ModelTask.Classification) {
+      const model = new UploadedClassifier({
+        TFHub: false,
+        descFile,
+        weightsFiles,
+        name: modelName,
+        task: modelTask,
+        graph: isGraph,
+        pretrained: true,
+        trainable: isGraph,
+      });
+
+      try {
+        await model.upload();
+      } catch (err) {
+        setErrMessage(`Model upload failed: ${err}`);
+        return;
       }
 
-      modelTask === ModelTask.Segmentation
-        ? setSegmentationModel(model)
-        : setClassifierModel(model as LayersModel);
+      const inputShape = model.defaultInputShape;
 
-      const modelShape = model.inputs[0].shape!.slice(1) as number[];
       setInputShape((prevShape) => ({
         ...prevShape,
-        height: modelShape[0],
-        width: modelShape[1],
-        channels: modelShape[2],
+        height: inputShape[0],
+        width: inputShape[1],
+        channels: inputShape[2],
       }));
 
-      // remove the file extension from the model name
-      const jsonFileName = jsonFile.name.replace(/\..+$/, "");
-      setModelName(jsonFileName);
-    } catch (err) {
-      const error: Error = err as Error;
+      setModel(model);
 
-      setErrMessage(error.message);
+      setSuccessMessage(
+        `Successfully uploaded Classification ${
+          isGraph ? "Graph" : "Layers"
+        } Model ("${model.name}")`
+      );
+    } else {
+      // TODO - segmenter
+      setErrMessage("Uploaded segmenter not yet supported");
     }
   };
 
   const handleFilesSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    modelTask: ModelTask,
-    graph: boolean
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     event.persist();
 
     if (!event.currentTarget.files) {
+      setErrMessage("No files selected");
       return;
+    } else if (event.currentTarget.files.length < 2) {
+      setErrMessage(
+        "Must include model description (.json) and at least one weights file (.bin)"
+      );
+      return;
+    } else {
+      setErrMessage("");
     }
 
     let weightsFiles: Array<File> = [];
@@ -98,10 +100,13 @@ export const LocalFileUpload = ({
       const file = event.currentTarget.files[i];
       if (file.name.endsWith(".json")) {
         jsonFile = file;
+        // jsonFile.type === "application/json"
       } else {
         weightsFiles.push(file);
+        // file.type === "application/macbinary"
       }
     }
+
     await loadModel(jsonFile, weightsFiles);
   };
 
@@ -130,7 +135,7 @@ export const LocalFileUpload = ({
         multiple
         id="open-model-file"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          handleFilesSelected(event, modelTask, isGraph)
+          handleFilesSelected(event)
         }
       />
       <Typography
@@ -141,6 +146,15 @@ export const LocalFileUpload = ({
         }}
       >
         {errMessage}
+      </Typography>
+      <Typography
+        style={{
+          whiteSpace: "pre-line",
+          fontSize: "0.75rem",
+          color: "green",
+        }}
+      >
+        {successMessage}
       </Typography>
     </>
   );

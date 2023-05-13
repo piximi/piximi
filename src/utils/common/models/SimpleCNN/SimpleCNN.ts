@@ -11,14 +11,15 @@ type LoadModelArgs = {
   compileOptions: CompileOptions;
   randomizeWeights: boolean;
 };
+
 export class SimpleCNN extends SequentialClassifier<LoadModelArgs> {
   constructor() {
     super({
       name: "SimpleCNN",
       task: ModelTask.Classification,
       graph: false,
-      src: "",
       pretrained: false,
+      trainable: true,
     });
   }
 

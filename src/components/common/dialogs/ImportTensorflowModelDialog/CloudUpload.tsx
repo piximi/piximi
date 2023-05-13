@@ -1,11 +1,4 @@
 import React, { useState } from "react";
-import {
-  LayersModel,
-  loadLayersModel,
-  io,
-  loadGraphModel,
-  GraphModel,
-} from "@tensorflow/tfjs";
 
 import {
   Button,
@@ -13,11 +6,8 @@ import {
   DialogContent,
   FormControl,
   FormControlLabel,
-  FormLabel,
   InputAdornment,
   MenuItem,
-  Radio,
-  RadioGroup,
   TextField,
   Typography,
 } from "@mui/material";
@@ -26,52 +16,33 @@ import LanguageIcon from "@mui/icons-material/Language";
 import { useDebounce } from "hooks";
 import { Shape } from "types";
 import { ModelTask } from "types/ModelType";
+import { Model } from "utils/common/models/Model";
+import { UploadedClassifier } from "utils/common/models/UploadedClassifier/UploadedClassifier";
 
 export const CloudUpload = ({
   modelTask,
   isGraph,
-  setSegmentationModel,
-  setClassifierModel,
+  setModel,
   setInputShape,
-  setModelName,
-  setIsGraph,
 }: {
   modelTask: ModelTask;
   isGraph: boolean;
-  setSegmentationModel: React.Dispatch<
-    React.SetStateAction<
-      LayersModel | GraphModel<string | io.IOHandler> | undefined
-    >
-  >;
-  setClassifierModel: React.Dispatch<
-    React.SetStateAction<
-      LayersModel | GraphModel<string | io.IOHandler> | undefined
-    >
-  >;
+  setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
-  setModelName: React.Dispatch<React.SetStateAction<string>>;
-  setIsGraph: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [isFromTFHub, setIsFromTFHub] = useState<boolean>(false);
-  const [errMessage, setErrMessage] = useState<string>("");
-  const [modelUrl, setModelUrl] = useState<string>("");
+  const [errMessage, setErrMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [modelUrl, setModelUrl] = useState("");
+  const [isFromTFHub, setIsFromTFHub] = useState(false);
+
   const verifySourceMatch = (url: string, isFromTFHub: boolean) => {
-    if (isFromTFHub) {
-      if (url === "") {
-        setErrMessage("URL must point to TFHub");
-        return;
-      }
-      if (!url.includes("tfhub.dev/tensorflow")) {
-        setErrMessage("URL must point to TFHub");
-        return;
-      } else {
-        setErrMessage("");
-        return;
-      }
-    } else {
-      setErrMessage("");
+    if (isFromTFHub && !UploadedClassifier.verifyTFHubUrl(url)) {
+      setErrMessage("URL must point to TFHub");
       return;
     }
+
+    setErrMessage("");
+    return;
   };
 
   const verifySourceMatchDebounced = useDebounce(verifySourceMatch, 1000);
@@ -86,41 +57,47 @@ export const CloudUpload = ({
     verifySourceMatchDebounced(event.target.value, isFromTFHub);
   };
 
-  const handleModelFormatChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => setIsGraph(event.target.value === "Graph");
-
   const loadModel = async () => {
-    let model: GraphModel | LayersModel;
+    setErrMessage("");
+    setSuccessMessage("");
 
-    try {
-      if (isGraph) {
-        model = await loadGraphModel(modelUrl, {
-          fromTFHub: isFromTFHub,
-        });
-      } else {
-        model = await loadLayersModel(modelUrl, {
-          fromTFHub: isFromTFHub,
-        });
+    if (modelTask === ModelTask.Classification) {
+      const model = new UploadedClassifier({
+        name: "User Uploaded Classifier",
+        task: modelTask,
+        pretrained: true,
+        trainable: isGraph,
+        TFHub: isFromTFHub,
+        graph: isGraph,
+        src: modelUrl,
+      });
+
+      try {
+        await model.upload();
+      } catch (err) {
+        setErrMessage(`Failed to download model: ${err}`);
+        return;
       }
 
-      modelTask === ModelTask.Segmentation
-        ? setSegmentationModel(model)
-        : setClassifierModel(model as LayersModel);
-      const modelShape = model.inputs[0].shape!.slice(1) as number[];
+      const inputShape = model.defaultInputShape;
+
       setInputShape((prevShape) => ({
         ...prevShape,
-        height: modelShape[0],
-        width: modelShape[1],
-        channels: modelShape[2],
+        height: inputShape[0],
+        width: inputShape[1],
+        channels: inputShape[2],
       }));
 
-      // remove the file extension from the model name
-      setModelName("UserUploaded");
-    } catch (err) {
-      const error: Error = err as Error;
+      setModel(model);
 
-      setErrMessage(error.message);
+      setSuccessMessage(
+        `Successfully uploaded Classification ${
+          isGraph ? "Graph" : "Layers"
+        } Model ("${model.name}")`
+      );
+    } else {
+      // TODO - segmenter
+      setErrMessage("Segmenter loading by url not yet supported");
     }
   };
 
@@ -155,6 +132,25 @@ export const CloudUpload = ({
           >
             {errMessage}
           </Typography>
+          <Typography
+            style={{
+              whiteSpace: "pre-line",
+              fontSize: "0.75rem",
+              color: "green",
+            }}
+          >
+            {successMessage}
+          </Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={isFromTFHub}
+                onChange={handleSourceChange}
+              />
+            }
+            label="From TF Hub?"
+          />
         </FormControl>
         <Button
           onClick={async () => loadModel()}
@@ -163,41 +159,6 @@ export const CloudUpload = ({
         >
           Load Model
         </Button>
-      </MenuItem>
-      <MenuItem>
-        <FormControl>
-          <FormLabel id="model-type-radio-buttons-group-label">
-            Model Format
-          </FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="model-type-radio-buttons-group-label"
-            name="model-type-radio-buttons-group"
-            value={isGraph ? "Graph" : "Layers"}
-            onChange={handleModelFormatChange}
-          >
-            <FormControlLabel
-              value="Graph"
-              control={<Radio />}
-              label="Graph Model"
-            />
-            <FormControlLabel
-              value="Layers"
-              control={<Radio />}
-              label="Layers Model"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={isFromTFHub}
-                  onChange={handleSourceChange}
-                />
-              }
-              label="From TF Hub?"
-            />
-          </RadioGroup>
-        </FormControl>
       </MenuItem>
     </>
   );

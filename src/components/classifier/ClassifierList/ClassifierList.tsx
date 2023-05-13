@@ -22,8 +22,10 @@ import { selectCreatedImageCategories } from "store/data";
 
 import { CategoryType, HotkeyView, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { ModelStatus, ModelTask } from "types/ModelType";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { Model } from "utils/common/models/Model";
+import { LayersModel } from "@tensorflow/tfjs";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
@@ -47,24 +49,21 @@ export const ClassifierList = () => {
     open: openSaveClassifierDialog,
   } = useDialog();
 
-  const importClassifierModel = (
-    inputShape: Shape,
-    modelName: string,
-    classifierModel: any
-  ) => {
-    // TODO - segmenter: actually make this user uploaded
-    const modelSelection = new SimpleCNN();
-    // const modelSelection = new UserUploadedModel({
-    //   name: modelName " - uploaded",
-    //   modelArch: ModelArchitecture.UserUploaded,
-    //   graph: false
-    // })
-    dispatch(
-      uploadUserSelectedModel({
-        inputShape: inputShape,
-        modelSelection,
-      })
-    );
+  const importClassifierModel = (model: Model, inputShape: Shape) => {
+    if (model instanceof SequentialClassifier) {
+      dispatch(
+        uploadUserSelectedModel({
+          inputShape: inputShape,
+          model,
+        })
+      );
+    } else if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `Attempting to dispatch a model with task ${
+          ModelTask[model.task]
+        }, should be ${ModelTask[ModelTask.Classification]}`
+      );
+    }
   };
 
   const ClassifierIOButtons = (
@@ -121,7 +120,7 @@ export const ClassifierList = () => {
       />
       <SaveFittedModelDialog
         // TODO - segmenter: pass in the model class instead, with save method
-        fittedModel={selectedClassifierModelProps._model!}
+        fittedModel={selectedClassifierModelProps._model! as LayersModel}
         modelName={selectedClassifierModelProps.name}
         modelTask={ModelTask.Classification}
         onClose={onSaveClassifierDialogClose}
