@@ -8,8 +8,9 @@ type ModelArgs = {
   name: string;
   task: ModelTask;
   graph: boolean;
-  src: string;
   pretrained: boolean;
+  trainable: boolean;
+  src?: string;
   requiredChannels?: number;
 };
 
@@ -21,23 +22,26 @@ export abstract class Model<L = never> {
   readonly name: string;
   readonly task: ModelTask;
   readonly graph: boolean;
-  readonly src: string;
   readonly pretrained: boolean;
+  readonly trainable: boolean;
+  readonly src?: string;
   readonly requiredChannels?: number;
 
   constructor({
     name,
     task,
     graph,
-    src,
     pretrained,
+    trainable,
+    src,
     requiredChannels,
   }: ModelArgs) {
     this.name = name;
     this.task = task;
     this.graph = graph;
-    this.src = src;
     this.pretrained = pretrained;
+    this.trainable = trainable;
+    this.src = src;
     this.requiredChannels = requiredChannels;
   }
 

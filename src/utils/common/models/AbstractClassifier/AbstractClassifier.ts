@@ -11,6 +11,8 @@ import {
   oneHot,
   math,
   metrics,
+  GraphModel,
+  zeros,
 } from "@tensorflow/tfjs";
 
 import { preprocessClassifier } from "./preprocess";
@@ -35,7 +37,7 @@ type LoadDataArgs = {
 
 export abstract class SequentialClassifier<L = never> extends Model<L> {
   // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _model?: LayersModel;
+  _model?: LayersModel | GraphModel;
   //protected _model?: LayersModel;
   _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -45,22 +47,23 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
   //protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _history?: History;
   //protected _history?: History;
+  private _cachedNumClasses?: number;
 
-  loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs): void {
+  loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._trainingDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  loadValidation(images: ImageType[], preprocessingArgs: LoadDataArgs): void {
+  loadValidation(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._validationDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs): void {
+  loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._inferenceDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
@@ -83,15 +86,26 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
       throw Error(`"${this.name}" Model's validation data not loaded`);
     }
 
-    const args = {
-      callbacks: [callbacks],
-      epochs: options.epochs,
-      validationData: this._validationDataset,
-    };
+    if (this.trainable) {
+      throw Error(`"${this.name}" Model is not trainable`);
+    }
 
-    const history = await this._model.fitDataset(this._trainingDataset, args);
+    if (!this.graph) {
+      const args = {
+        callbacks: [callbacks],
+        epochs: options.epochs,
+        validationData: this._validationDataset,
+      };
 
-    return history;
+      const history = await (this._model as LayersModel).fitDataset(
+        this._trainingDataset,
+        args
+      );
+
+      return history;
+    } else {
+      throw Error(`"${this.name}" Graph Model training not implemented`);
+    }
   }
 
   async predict(categories: Array<Category>): Promise<string[]> {
@@ -151,7 +165,9 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
     // ref this._model because it may go undefined during async ops
     const model = this._model;
 
-    const numClasses = this._model.outputShape[1] as number;
+    const numClasses = this._model.outputs[0].shape![1] as number;
+    // only for Layers model
+    // const numClasses = this._model.outputShape[1] as number;
 
     const inferredBatchTensors = await this._validationDataset
       .map((items) => {
@@ -255,30 +271,57 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
     };
   }
 
-  dispose(): void {
+  dispose() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
     this._model.dispose();
   }
 
-  get modelLoaded(): boolean {
+  get modelLoaded() {
     return this._model !== undefined;
   }
 
-  get numClasses(): number {
-    return this._model?.outputShape[1] as number;
+  get numClasses() {
+    if (!this._model) return undefined;
+
+    const outputShape = this._model.outputs[0].shape;
+
+    if (outputShape) {
+      // idx 0 is the batch dim
+      return outputShape[1] as number;
+    } else if (this._cachedNumClasses) {
+      return this._cachedNumClasses;
+    } else {
+      // sometimes models don't list their output shape (often graph models)
+      // in this case run inference on dummy data, and get shape of output
+      // we cache it to avoid expensive recalculation
+
+      const _numClasses = tidy(() => {
+        const dummyData = zeros(this.defaultInputShape).expandDims(0);
+        const pred = this._model!.predict(dummyData) as Tensor;
+        return pred.shape[1] as number;
+      });
+
+      this._cachedNumClasses = _numClasses;
+
+      return this._cachedNumClasses;
+    }
   }
 
-  get trainingLoaded(): boolean {
+  get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
+
+  get trainingLoaded() {
     return this._trainingDataset !== undefined;
   }
 
-  get validationLoaded(): boolean {
+  get validationLoaded() {
     return this._validationDataset !== undefined;
   }
 
-  get inferenceLoaded(): boolean {
+  get inferenceLoaded() {
     return this._inferenceDataset !== undefined;
   }
 

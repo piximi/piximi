@@ -221,7 +221,7 @@ const serializeModelProps = (modelPropsGroup: Group, model: Model) => {
 
   modelPropsGroup.create_attribute("model_tak", model.task);
 
-  modelPropsGroup.create_attribute("src", model.src);
+  model.src && modelPropsGroup.create_attribute("src", model.src);
 
   modelPropsGroup.create_attribute(
     "model_graph_B",

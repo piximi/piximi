@@ -11,10 +11,11 @@ import {
   GraphModel,
 } from "@tensorflow/tfjs";
 import { Shape } from "types/Shape";
-import { availableSegmenterModels, SegmenterModelProps } from "types/ModelType";
+import { availableSegmenterModels } from "types/ModelType";
 import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
 import { CropSchema } from "types/CropOptions";
 import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export const initialState: SegmenterStoreType = {
   fitting: false,
@@ -124,10 +125,7 @@ export const segmenterSlice = createSlice({
     ) {
       state.compileOptions.metrics = action.payload.metrics;
     },
-    updateSelectedModel(
-      state,
-      action: PayloadAction<{ model: SegmenterModelProps }>
-    ) {
+    updateSelectedModel(state, action: PayloadAction<{ model: Segmenter }>) {
       state.selectedModel = action.payload.model;
     },
     updatePredicted(state, action: PayloadAction<{ predicted: boolean }>) {
@@ -137,7 +135,7 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        modelSelection: SegmenterModelProps;
+        modelSelection: Segmenter;
         model: LayersModel | GraphModel;
       }>
     ) {

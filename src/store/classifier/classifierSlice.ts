@@ -130,11 +130,16 @@ export const classifierSlice = createSlice({
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        modelSelection: SequentialClassifier;
+        model: SequentialClassifier;
       }>
     ) {
-      state.inputShape = action.payload.inputShape;
-      state.selectedModel = action.payload.modelSelection;
+      const { model, inputShape } = action.payload;
+      state.inputShape = inputShape;
+      state.selectedModel = model;
+
+      if (model.pretrained) {
+        state.modelStatus = ModelStatus.Trained;
+      }
     },
     updateOptimizationAlgorithm(
       state,
