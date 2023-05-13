@@ -1,5 +1,7 @@
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export enum ModelArchitecture {
   None,
@@ -43,33 +45,25 @@ export type ClassifierModelProps = DefaultModelProps;
 
 export type SegmenterModelProps = DefaultModelProps;
 
-export const concreteClassifierModels = [new SimpleCNN(), new MobileNet()];
-
-export const availableClassifierModels: ClassifierModelProps[] = [
-  {
-    modelName: "SimpleCNN",
-    modelArch: ModelArchitecture.SimpleCNN,
-    graph: false,
-  },
-  {
-    modelName: "MobileNet",
-    requiredChannels: 3,
-    modelArch: ModelArchitecture.MobileNet,
-    graph: false,
-  },
+export const concreteClassifierModels: Array<SequentialClassifier> = [
+  new SimpleCNN(),
+  new MobileNet(),
 ];
 
-export const availableSegmenterModels: SegmenterModelProps[] = [
-  {
-    modelName: "Coco-SSD",
-    modelArch: ModelArchitecture.CocoSSD,
+// TODO - segmenter: Replace these with concrete classes when Segmenter becomes abstract
+export const availableSegmenterModels: Array<Segmenter> = [
+  new Segmenter(ModelArchitecture.CocoSSD, {
+    name: "Coco-SSD",
+    task: ModelTask.Segmentation,
     graph: true,
     pretrained: true,
-  },
-  {
-    modelName: "Stardist Versitile H&E Nuclei",
-    modelArch: ModelArchitecture.StardistVHE,
+    trainable: false,
+  }),
+  new Segmenter(ModelArchitecture.StardistVHE, {
+    name: "Stardist Versitile H&E Nuclei",
+    task: ModelTask.Segmentation,
     graph: true,
     pretrained: true,
-  },
+    trainable: false,
+  }),
 ];

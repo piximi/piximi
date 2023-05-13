@@ -1,9 +1,10 @@
-import { SegmenterModelProps, SegmenterStoreType } from "types";
+import { SegmenterStoreType } from "types";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export const segmenterModelSelector = ({
   segmenter,
 }: {
   segmenter: SegmenterStoreType;
-}): SegmenterModelProps => {
+}): Segmenter => {
   return segmenter.selectedModel;
 };

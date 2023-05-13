@@ -1,6 +1,6 @@
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
-import { SegmenterModelProps } from "./ModelType";
 import { Shape } from "./Shape";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export type ClassifierArchitectureOptions = {
   selectedModel: SequentialClassifier;
@@ -8,6 +8,6 @@ export type ClassifierArchitectureOptions = {
 };
 
 export type SegmenterArchitectureOptions = {
-  selectedModel: SegmenterModelProps;
+  selectedModel: Segmenter;
   inputShape: Shape;
 };

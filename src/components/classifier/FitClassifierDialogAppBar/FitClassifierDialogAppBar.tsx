@@ -21,6 +21,7 @@ import {
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
+import { LayersModel } from "@tensorflow/tfjs";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -44,7 +45,8 @@ export const FitClassifierDialogAppBar = ({
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training) return;
-    selectedModel._model!.stopTraining = true;
+    // TODO - segmenter: move into model class
+    (selectedModel._model! as LayersModel).stopTraining = true;
     // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
     dispatch(
       classifierSlice.actions.updateModelStatus({

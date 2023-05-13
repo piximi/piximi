@@ -9,9 +9,9 @@ import {
 import { FitOptions } from "./FitOptions";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
-import { SegmenterModelProps } from "./ModelType";
 import { SegmenterEvaluationResultType } from "./EvaluationResultType";
 import { CompileOptions } from "./CompileOptions";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export type SegmenterStoreType = {
   fitting: boolean;
@@ -27,8 +27,8 @@ export type SegmenterStoreType = {
   evaluationResult: SegmenterEvaluationResultType;
   compiled?: LayersModel | GraphModel;
   fitted?: LayersModel | GraphModel;
-  selectedModel: SegmenterModelProps;
-  userUploadedModel?: SegmenterModelProps;
+  selectedModel: Segmenter;
+  userUploadedModel?: Segmenter;
   trainDataSet?: data.Dataset<{
     xs: Tensor<Rank.R4>;
     ys: Tensor<Rank.R4>;

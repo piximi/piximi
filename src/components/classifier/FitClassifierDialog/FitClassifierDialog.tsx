@@ -36,6 +36,7 @@ import {
 } from "types";
 import { ModelStatus } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
+import { LayersModel } from "@tensorflow/tfjs";
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
@@ -324,7 +325,9 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         {modelStatus > ModelStatus.Training && (
           <div>
             {/*  TODO - segmenter: pass in actual model class */}
-            <ModelSummaryTable loadedModel={selectedModel._model!} />
+            <ModelSummaryTable
+              loadedModel={selectedModel._model! as LayersModel}
+            />
           </div>
         )}
       </DialogContent>

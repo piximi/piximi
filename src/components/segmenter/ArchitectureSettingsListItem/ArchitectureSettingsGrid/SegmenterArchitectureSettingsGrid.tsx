@@ -1,3 +1,4 @@
+// @ts-nocheck TODO - segementer
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -15,7 +16,8 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import { availableSegmenterModels, SegmenterModelProps } from "types";
+import { SegmenterModelProps } from "types";
+import { availableSegmenterModels } from "types/ModelType";
 
 export const SegmenterArchitectureSettingsGrid = ({
   setIsModelTrainable,

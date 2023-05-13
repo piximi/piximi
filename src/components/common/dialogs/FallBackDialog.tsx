@@ -248,7 +248,7 @@ export const FallBackDialog = (props: any) => {
 
         <SaveFittedModelDialog
           // TODO - segmenter: pass in the model class itself
-          fittedModel={selectedModel._model!}
+          fittedModel={selectedModel._model! as LayersModel}
           modelName={selectedModel.name}
           modelTask={ModelTask.Classification}
           onClose={onSaveClassifierDialogClose}
@@ -257,6 +257,7 @@ export const FallBackDialog = (props: any) => {
 
         <SaveFittedModelDialog
           fittedModel={fittedSegmenterModel as LayersModel}
+          // @ts-ignore TODO - segmenter
           modelName={selectedSegmenterModelProps.modelName}
           modelTask={ModelTask.Segmentation}
           onClose={onSaveSegmenterDialogClose}
