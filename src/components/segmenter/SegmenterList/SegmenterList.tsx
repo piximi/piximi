@@ -127,6 +127,7 @@ export const SegmenterList = () => {
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
         modelTask={ModelTask.Segmentation}
+        // @ts-ignore TODO - segmenter
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog

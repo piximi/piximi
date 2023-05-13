@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { LayersModel, io, GraphModel } from "@tensorflow/tfjs";
+import React, { useEffect, useState } from "react";
 
 import {
   DialogContent,
@@ -11,67 +10,33 @@ import {
   Typography,
 } from "@mui/material";
 
-import { ModelArchitecture, Shape } from "types";
-import { loadStardist } from "utils/common/models";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { availableSegmenterModels } from "types/ModelType";
+import { Model } from "utils/common/models/Model";
+import { range } from "lodash";
 
 export const PretrainedModelSelector = ({
   values,
-  setSegmentationModel,
-  setInputShape,
-  setModelName,
-  setModelArch,
+  setModel,
 }: {
-  values: Array<{ name: string; modelArch: ModelArchitecture }>;
-  setSegmentationModel: React.Dispatch<
-    React.SetStateAction<
-      LayersModel | GraphModel<string | io.IOHandler> | undefined
-    >
-  >;
-  setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
-  setModelName: React.Dispatch<React.SetStateAction<string>>;
-  setModelArch: React.Dispatch<React.SetStateAction<ModelArchitecture>>;
+  values: Array<SequentialClassifier | (typeof availableSegmenterModels)[0]>;
+  setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
 }) => {
-  const [errMessage, setErrMessage] = useState<string>("");
-  const [selectedPreTrainedModel, setSelectedPreTrainedModel] =
-    useState<number>(ModelArchitecture.None);
+  // const [errMessage, setErrMessage] = useState<string>("");
+  const [modelIdxs, setModelIdxs] = useState<number[]>(
+    range(-1, values.length)
+  );
+  const [selectedIdxVal, setSelectedIdxVal] = useState("-1");
+
+  useEffect(() => {
+    setModelIdxs(range(-1, values.length));
+  }, [values]);
 
   const handlePreTrainedModelChange = async (event: SelectChangeEvent) => {
-    setSelectedPreTrainedModel(Number(event.target.value));
-    setModelArch(Number(event.target.value));
-    await loadModel(Number(event.target.value));
-  };
-
-  const loadModel = async (selectedPreTrainedModel: number) => {
-    if (selectedPreTrainedModel === ModelArchitecture.StardistVHE) {
-      try {
-        const model = await loadStardist();
-        setSegmentationModel(model);
-
-        const modelShape = model.inputs[0].shape!.slice(1) as number[];
-
-        setInputShape((prevShape) => ({
-          ...prevShape,
-          height: modelShape[0],
-          width: modelShape[1],
-          channels: modelShape[2],
-        }));
-
-        setModelName(ModelArchitecture[selectedPreTrainedModel]);
-      } catch (err) {
-        const error: Error = err as Error;
-        setErrMessage(error.message);
-      }
-    } else if (selectedPreTrainedModel === ModelArchitecture.CocoSSD) {
-      // const model = await loadCocoSSD();
-      // const modelShape = model.inputs[0].shape!.slice(1) as number[];
-      // setInputShape((prevShape) => ({
-      //   ...prevShape,
-      //   height: modelShape[0],
-      //   width: modelShape[1],
-      //   channels: modelShape[2],
-      // }));
-      // setSegmentationModel(undefined);
-    }
+    const idxVal = event.target.value;
+    setSelectedIdxVal(idxVal);
+    const idx = Number(idxVal);
+    setModel(idx >= 0 ? values[idx] : undefined);
   };
 
   return (
@@ -89,20 +54,18 @@ export const PretrainedModelSelector = ({
           <Select
             labelId="pretrained-select-label"
             id="pretrained-simple-select"
-            value={String(selectedPreTrainedModel)}
+            value={selectedIdxVal}
+            //value={selectedIdx === -1 ? "None" : String(values[selectedIdx])}
             label="Pre-trained Models"
             onChange={handlePreTrainedModelChange}
           >
-            {values.map((model) => (
-              <MenuItem
-                key={`Pretrained-${model.modelArch}`}
-                value={model.modelArch}
-              >
-                {model.name}
+            {modelIdxs.map((idx) => (
+              <MenuItem key={`Pretrained-${idx}`} value={String(idx)}>
+                {idx === -1 ? "None" : values[idx].name}
               </MenuItem>
             ))}
           </Select>
-          <Typography
+          {/* <Typography
             style={{
               whiteSpace: "pre-line",
               fontSize: "0.75rem",
@@ -110,7 +73,7 @@ export const PretrainedModelSelector = ({
             }}
           >
             {errMessage}
-          </Typography>
+          </Typography> */}
         </FormControl>
       </MenuItem>
     </>
