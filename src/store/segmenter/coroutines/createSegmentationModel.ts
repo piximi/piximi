@@ -8,7 +8,7 @@ export const createSegmentationModel = async (
   architectureOptions: SegmenterArchitectureOptions,
   numClasses: number
 ) => {
-  switch (architectureOptions.selectedModel.modelArch) {
+  switch (architectureOptions.selectedModel.architecture) {
     case ModelArchitecture.FCNSegmenter: {
       return createFCNSegmenterModel(
         architectureOptions.inputShape,

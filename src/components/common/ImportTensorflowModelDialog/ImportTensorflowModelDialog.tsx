@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { LayersModel, GraphModel } from "@tensorflow/tfjs";
 
 import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
 
@@ -9,26 +8,21 @@ import { LocalFileUpload } from "./LocalFileUpload";
 import { PretrainedModelSelector } from "./PretrainedModelSelector";
 import { CloudUpload } from "./CloudUpload";
 
+import { HotkeyView, Shape } from "types";
 import {
-  DefaultModelProps,
-  HotkeyView,
-  Shape,
-  availableClassifierModels,
+  ModelTask,
+  concreteClassifierModels,
   availableSegmenterModels,
-} from "types";
-import { ModelArchitecture, ModelTask } from "types/ModelType";
+} from "types/ModelType";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { Model } from "utils/common/models/Model";
+import { ModelFormatSelection } from "./ModelFormatSelection";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
   open: boolean;
   modelTask: ModelTask;
-  dispatchFunction: (
-    inputShape: Shape,
-    modelName: string,
-    modelArch: ModelArchitecture,
-    classifierModel: any,
-    graph: boolean
-  ) => void;
+  dispatchFunction: (model: Model, inputShape: Shape) => void;
 };
 
 export const ImportTensorflowModelDialog = ({
@@ -37,36 +31,28 @@ export const ImportTensorflowModelDialog = ({
   modelTask,
   dispatchFunction,
 }: ImportTensorflowModelDialogProps) => {
-  // Uploaded Model States
-  const [classifierModel, setClassifierModel] = useState<
-    GraphModel | LayersModel | undefined
-  >();
-  const [segmentationModel, setSegmentationModel] = useState<
-    GraphModel | LayersModel | undefined
-  >();
-  const [isGraph, setIsGraph] = useState<boolean>(true);
-  const [modelName, setModelName] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<Model>();
   const [inputShape, setInputShape] = useState<Shape>({
     height: 256,
     width: 256,
     channels: 3,
     planes: 1,
   });
+  const [isGraph, setIsGraph] = useState(false);
+
+  // TODO - segmenter: replace typeof with actual known type
   const [pretrainedModels, setPretrainedModels] = useState<
-    Array<{ name: string; modelArch: ModelArchitecture }>
+    Array<SequentialClassifier | (typeof availableSegmenterModels)[0]>
   >([]);
-  const [modelArch, setModelArch] = useState<number>(0);
 
   const dispatchModelToStore = () => {
-    dispatchFunction(
-      inputShape,
-      modelName,
-      modelArch,
-      modelTask === ModelTask.Classification
-        ? classifierModel
-        : segmentationModel,
-      isGraph
-    );
+    if (!selectedModel) {
+      process.env.NODE_ENV !== "production" &&
+        console.warn("Attempting to dispatch undefined model");
+      return;
+    }
+
+    dispatchFunction(selectedModel, inputShape);
 
     closeDialog();
   };
@@ -84,44 +70,11 @@ export const ImportTensorflowModelDialog = ({
   );
 
   useEffect(() => {
+    // TODO - segmenter: map over and only include pretrained === true
     const models =
       modelTask === ModelTask.Classification
-        ? availableClassifierModels.reduce(
-            (
-              trainedModels: Array<{
-                name: string;
-                modelArch: ModelArchitecture;
-              }>,
-              model: DefaultModelProps
-            ) => {
-              if (model.pretrained) {
-                trainedModels.push({
-                  name: model.modelName,
-                  modelArch: model.modelArch,
-                });
-              }
-              return trainedModels;
-            },
-            []
-          )
-        : availableSegmenterModels.reduce(
-            (
-              trainedModels: Array<{
-                name: string;
-                modelArch: ModelArchitecture;
-              }>,
-              model: DefaultModelProps
-            ) => {
-              if (model.pretrained) {
-                trainedModels.push({
-                  name: model.modelName,
-                  modelArch: model.modelArch,
-                });
-              }
-              return trainedModels;
-            },
-            []
-          );
+        ? concreteClassifierModels
+        : availableSegmenterModels;
 
     setPretrainedModels(models);
   }, [modelTask]);
@@ -136,34 +89,25 @@ export const ImportTensorflowModelDialog = ({
         model
       </DialogTitle>
 
+      <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+
       <LocalFileUpload
         modelTask={modelTask}
         isGraph={isGraph}
-        setSegmentationModel={setSegmentationModel}
-        setClassifierModel={setClassifierModel}
+        setModel={setSelectedModel}
         setInputShape={setInputShape}
-        setModelName={setModelName}
       />
 
       <PretrainedModelSelector
-        values={[
-          { name: "None", modelArch: ModelArchitecture.None },
-          ...pretrainedModels,
-        ]}
-        setSegmentationModel={setSegmentationModel}
-        setInputShape={setInputShape}
-        setModelName={setModelName}
-        setModelArch={setModelArch}
+        values={pretrainedModels}
+        setModel={setSelectedModel}
       />
 
       <CloudUpload
         modelTask={modelTask}
         isGraph={isGraph}
-        setSegmentationModel={setSegmentationModel}
-        setClassifierModel={setClassifierModel}
+        setModel={setSelectedModel}
         setInputShape={setInputShape}
-        setModelName={setModelName}
-        setIsGraph={setIsGraph}
       />
 
       <DialogActions>
@@ -174,11 +118,7 @@ export const ImportTensorflowModelDialog = ({
         <Button
           onClick={dispatchModelToStore}
           color="primary"
-          disabled={
-            modelTask === ModelTask.Classification
-              ? !classifierModel
-              : !segmentationModel
-          }
+          disabled={!selectedModel}
         >
           Open{" "}
           {modelTask === ModelTask.Classification
