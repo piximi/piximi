@@ -28,19 +28,6 @@ export const selectPenSelectionBrushSize = ({
   return annotator.penSelectionBrushSize;
 };
 
-export const selectPointerSelection = ({
-  annotator,
-}: {
-  annotator: AnnotatorStore;
-}): {
-  dragging: boolean;
-  minimum: { x: number; y: number } | undefined;
-  maximum: { x: number; y: number } | undefined;
-  selecting: boolean;
-} => {
-  return annotator.pointerSelection;
-};
-
 export const selectQuickSelectionRegionSize = ({
   annotator,
 }: {

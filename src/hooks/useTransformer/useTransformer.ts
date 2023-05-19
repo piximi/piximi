@@ -1,27 +1,27 @@
-import React, { RefObject } from "react";
-import { Transformer } from "konva/lib/shapes/Transformer";
-import { Shape } from "konva/lib/Shape";
+import { RefObject } from "react";
+import Konva from "konva";
 
-export const useTransformer = (
-  ref: RefObject<Shape>,
-  annotated?: boolean,
-  annotating?: boolean
-) => {
-  const transformer = React.useRef<Transformer>(null);
+export const useTransformer = (stageRef: RefObject<Konva.Stage>) => {
+  const detachTransformer = (annotationId: string) => {
+    if (!stageRef || !stageRef.current) return;
+    const transformerId = "tr-".concat(annotationId);
+    const transformer = stageRef.current.findOne(`#${transformerId}`);
 
-  React.useEffect(() => {
-    if (annotated && !annotating) {
-      if (ref && ref.current && transformer && transformer.current) {
-        transformer.current.nodes([ref.current]);
+    if (!transformer) return;
 
-        const layer = transformer.current.getLayer();
+    (transformer as Konva.Transformer).detach();
+    (transformer as Konva.Transformer).getLayer()?.batchDraw();
+  };
+  const deselectAllTransformers = () => {
+    if (!stageRef || !stageRef.current) return;
 
-        if (layer) {
-          layer.batchDraw();
-        }
-      }
-    }
-  }, [annotated, annotating, ref]);
+    // const transformers = stageRef.current.find("Transformer").toArray();
+    const transformers = stageRef.current.find("Transformer");
+    transformers.forEach((tr: any) => {
+      (tr as Konva.Transformer).detach();
+      (tr as Konva.Transformer).getLayer()?.batchDraw();
+    });
+  };
 
-  return transformer;
+  return { detachTransformer, deselectAllTransformers };
 };

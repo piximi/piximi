@@ -227,7 +227,9 @@ export const AnnotationTransformer = ({
         Math.max(
           workingAnnotation.boundingBox[0],
           workingAnnotation.boundingBox[2]
-        ) + imageOrigin.x
+        ) *
+          stageScale +
+          imageOrigin.x
       );
 
       const tempYPos = Math.max(
@@ -235,14 +237,18 @@ export const AnnotationTransformer = ({
         workingAnnotation.boundingBox[3]
       );
       setYPos(
-        tempYPos + 56 > imageHeight!
-          ? imageHeight! - 65 + imageOrigin.y
-          : tempYPos + imageOrigin.y
+        (tempYPos + 56) * stageScale > imageHeight!
+          ? (imageHeight! - 65) * stageScale + imageOrigin.y
+          : tempYPos * stageScale + imageOrigin.y
       );
     }
-    console.log(workingAnnotation);
-    console.log(selectedAnnotations.length);
-  }, [workingAnnotation, selectedAnnotations.length, imageHeight, imageOrigin]);
+  }, [
+    workingAnnotation,
+    selectedAnnotations.length,
+    imageHeight,
+    imageOrigin,
+    stageScale,
+  ]);
 
   useEffect(() => {
     if (!activeAnnotationIds.includes(annotationId)) {

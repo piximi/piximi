@@ -3,24 +3,33 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { imageOriginSelector } from "store/imageViewer";
-import {
-  selectPointerSelection,
-  selectToolType,
-} from "store/annotator/selectors";
 
-import { ToolType } from "types";
+type PointerSelectionProps = {
+  dragging: boolean;
+  minimum:
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined;
+  maximum:
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined;
+  selecting: boolean;
+};
 
-export const PointerSelection = () => {
-  const toolType = useSelector(selectToolType);
-
-  const { dragging, minimum, maximum, selecting } = useSelector(
-    selectPointerSelection
-  );
+export const PointerSelection = ({
+  dragging,
+  minimum,
+  maximum,
+  selecting,
+}: PointerSelectionProps) => {
   const imagePosition = useSelector(imageOriginSelector);
 
   if (!minimum || !maximum || !selecting || !dragging) return <></>;
-
-  if (toolType !== ToolType.Pointer) return <></>;
 
   return (
     <>

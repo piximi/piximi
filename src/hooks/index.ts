@@ -1,13 +1,9 @@
-export { useAnimationFrame } from "./useAnimationFrame";
 export { useAnnotationTool } from "./useAnnotationTool";
-export { useCollapseList } from "./useCollapseList";
 export { useContextMenu } from "./useContextMenu";
-export { useCursor } from "./useCursor";
 export { useDebounce } from "./useDebounce";
 export { useDialog, useDialogHotkey } from "./useDialog";
 export { useDndFileDrop } from "./useDndFileDrop";
 export { useDrawer } from "./useDrawer";
-export { useHandTool } from "./useHandTool";
 export { useImage } from "./useImage";
 export { useAnnotatorKeyboardShortcuts } from "./useKeyboardShortcuts";
 export { useKeyPress } from "./useKeyPress";
@@ -24,5 +20,7 @@ export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";
 export { useCategoryHandlers } from "./useCategoryHandlers";
+export { usePointerLocation } from "./usePointerLocation/usePointerLocation";
+
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

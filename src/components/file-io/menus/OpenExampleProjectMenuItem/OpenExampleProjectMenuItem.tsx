@@ -110,7 +110,7 @@ export const OpenExampleProjectMenuItem = ({
     const project = deserializedProject.project;
     const data = deserializedProject.data;
     const classifier = deserializedProject.classifier;
-
+    //TODO: keeps images, fix that
     batch(() => {
       dispatch(
         dataSlice.actions.initData({

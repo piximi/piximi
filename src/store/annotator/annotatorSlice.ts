@@ -5,7 +5,6 @@ import {
   AnnotationModeType,
   AnnotationStateType,
   AnnotatorStore,
-  PointerSelectionType,
 } from "types";
 
 import { AnnotationTool } from "annotator-tools";
@@ -13,12 +12,6 @@ import { AnnotationTool } from "annotator-tools";
 const initialState: AnnotatorStore = {
   annotationState: AnnotationStateType.Blank,
   penSelectionBrushSize: 10,
-  pointerSelection: {
-    dragging: false,
-    minimum: undefined,
-    maximum: undefined,
-    selecting: false,
-  },
   quickSelectionRegionSize: 40,
   thresholdAnnotationValue: 150,
   selectionMode: AnnotationModeType.New,
@@ -50,14 +43,6 @@ export const annotatorSlice = createSlice({
     ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
-    updatePointerSelection(
-      state,
-      action: PayloadAction<{
-        changes: Partial<PointerSelectionType>;
-      }>
-    ) {
-      Object.assign(state.pointerSelection, action.payload.changes);
-    },
     setQuickSelectionRegionSize(
       state,
       action: PayloadAction<{ quickSelectionRegionSize: number }>
@@ -84,7 +69,6 @@ export const annotatorSlice = createSlice({
 export const {
   setAnnotationState,
   setPenSelectionBrushSize,
-  updatePointerSelection,
   setQuickSelectionRegionSize,
   setSelectionMode,
   setToolType,

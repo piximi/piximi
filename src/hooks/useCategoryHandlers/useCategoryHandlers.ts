@@ -6,7 +6,10 @@ import {
   selectImageCategoryNames,
   selectImagesByCategoryDict,
 } from "store/data";
-import { selectAnnotationsByCategoryDict } from "store/data/selectors/annotationSelectors";
+import {
+  selectActiveAnnotationCountsByCategory,
+  selectAnnotationsByCategoryDict,
+} from "store/data/selectors/annotationSelectors";
 import { selectUsedImageCategoryColors } from "store/data/selectors/imageCategorySelectors";
 
 import {
@@ -38,6 +41,9 @@ export const useCategoryHandlers = (
   const annotationsByCategory = useSelector(selectAnnotationsByCategoryDict);
   const usedImageCategoryNames = useSelector(selectImageCategoryNames);
   const usedImageCategoryColors = useSelector(selectUsedImageCategoryColors);
+  const activeAnnotationCountsByCategory = useSelector(
+    selectActiveAnnotationCountsByCategory
+  );
 
   //TODO - categories: Figure out uses of selected in store
 
@@ -159,9 +165,9 @@ export const useCategoryHandlers = (
   );
   const annotationCountByCategory = useCallback(
     (categoryId: string): number => {
-      return annotationsByCategory[categoryId].length ?? 0;
+      return activeAnnotationCountsByCategory[categoryId] ?? 0;
     },
-    [annotationsByCategory]
+    [activeAnnotationCountsByCategory]
   );
 
   const dispatchDeleteCategories = useCallback(

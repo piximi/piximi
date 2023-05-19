@@ -143,3 +143,23 @@ startAppListening({
     }
   },
 });
+startAppListening({
+  actionCreator: annotatorSlice.actions.setToolType,
+  effect: (action, listenerAPI) => {
+    const { operation } = action.payload;
+    let cursor: string;
+    switch (operation) {
+      case ToolType.RectangularAnnotation:
+      case ToolType.EllipticalAnnotation:
+        cursor = "crosshair";
+        break;
+      case ToolType.PenAnnotation:
+        cursor = "none";
+        break;
+      default:
+        cursor = "pointer";
+    }
+
+    listenerAPI.dispatch(imageViewerSlice.actions.setCursor({ cursor }));
+  },
+});

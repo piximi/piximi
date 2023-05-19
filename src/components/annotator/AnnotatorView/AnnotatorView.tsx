@@ -1,4 +1,10 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  createContext,
+  useRef,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box, CssBaseline } from "@mui/material";
@@ -27,9 +33,15 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 
 import { AlertType, HotkeyView } from "types";
+import Konva from "konva";
+
+export const StageContext = createContext<React.RefObject<Konva.Stage> | null>(
+  null
+);
 
 export const AnnotatorView = () => {
   const dispatch = useDispatch();
+  const stageRef = useRef<Konva.Stage>(null);
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
   const [persistOptions, setPersistOptions] = useState<boolean>(false);
@@ -119,51 +131,53 @@ export const AnnotatorView = () => {
   }, [handleError, handleUncaughtRejection]);
 
   return (
-    <ErrorBoundary FallbackComponent={FallBackDialog}>
-      <Box sx={{ display: "flex" }}>
-        {alertState.visible && (
-          <AppBar
-            sx={{
-              borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
-              boxShadow: "none",
-              zIndex: 2000,
-            }}
-            color="inherit"
-            position="fixed"
-          >
-            <AlertDialog alertState={alertState} />
-          </AppBar>
-        )}
+    <StageContext.Provider value={stageRef}>
+      <ErrorBoundary FallbackComponent={FallBackDialog}>
+        <Box sx={{ display: "flex" }}>
+          {alertState.visible && (
+            <AppBar
+              sx={{
+                borderBottom: `1px solid ${APPLICATION_COLORS.borderColor}`,
+                boxShadow: "none",
+                zIndex: 2000,
+              }}
+              color="inherit"
+              position="fixed"
+            >
+              <AlertDialog alertState={alertState} />
+            </AppBar>
+          )}
 
-        <CssBaseline />
+          <CssBaseline />
 
-        <AnnotatorDrawer />
+          <AnnotatorDrawer />
 
-        <StageWrapper
-          onDrop={onDrop}
-          setOptionsVisibility={setOptionsVisibile}
-          persistOptions={persistOptions}
-        />
-
-        {files?.length && (
-          <ImageShapeDialog
-            files={files}
-            open={openDimensionsDialogBox}
-            onClose={handleClose}
-            isUploadedFromAnnotator={true}
-            referenceImageShape={imageShape}
+          <StageWrapper
+            onDrop={onDrop}
+            setOptionsVisibility={setOptionsVisibile}
+            persistOptions={persistOptions}
           />
-        )}
 
-        <ToolOptions optionsVisibility={optionsVisible} />
+          {files?.length && (
+            <ImageShapeDialog
+              files={files}
+              open={openDimensionsDialogBox}
+              onClose={handleClose}
+              isUploadedFromAnnotator={true}
+              referenceImageShape={imageShape}
+            />
+          )}
 
-        <ToolDrawer
-          optionsVisibility={optionsVisible}
-          setOptionsVisibility={setOptionsVisibile}
-          persistOptions={persistOptions}
-          setPersistOptions={setPersistOptions}
-        />
-      </Box>
-    </ErrorBoundary>
+          <ToolOptions optionsVisibility={optionsVisible} />
+
+          <ToolDrawer
+            optionsVisibility={optionsVisible}
+            setOptionsVisibility={setOptionsVisibile}
+            persistOptions={persistOptions}
+            setPersistOptions={setPersistOptions}
+          />
+        </Box>
+      </ErrorBoundary>
+    </StageContext.Provider>
   );
 };

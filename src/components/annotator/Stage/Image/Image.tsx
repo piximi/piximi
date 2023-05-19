@@ -1,16 +1,13 @@
-import React, { forwardRef, memo, useEffect, useState } from "react";
+import React, { forwardRef, memo, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 import Konva from "konva";
 
-import {
-  activeImageRenderedSrcsSelector,
-  imageOriginSelector,
-} from "store/imageViewer";
+import { imageOriginSelector } from "store/imageViewer";
 import {
   selectActiveImageActivePlane,
-  selectActiveImageScaledWidth,
-  selectActiveImageScaledHeight,
+  selectActiveImageWidth,
+  selectActiveImageHeight,
 } from "store/data";
 
 import { Point } from "types";
@@ -44,45 +41,13 @@ const MemoizedKonvaImage = memo(
 
 export const Image = forwardRef<
   Konva.Image,
-  { stageWidth: number; stageHeight: number }
->(({ stageWidth, stageHeight }, ref) => {
+  { stageWidth: number; stageHeight: number; images: HTMLImageElement[] }
+>(({ stageWidth, stageHeight, images }, ref) => {
   const activePlane = useSelector(selectActiveImageActivePlane)!;
-  const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
-  const width = useSelector(selectActiveImageScaledWidth);
-  const height = useSelector(selectActiveImageScaledHeight);
+  const width = useSelector(selectActiveImageWidth);
+  const height = useSelector(selectActiveImageHeight);
   const [filters] = useState<Array<any>>();
-  const normalizeFont = 1300;
-  const [images, setImages] = useState<Array<HTMLImageElement>>();
   const imagePosition = useSelector(imageOriginSelector);
-
-  useEffect(() => {
-    setImages(
-      renderedSrcs.map((src: string) => {
-        const imgElem = document.createElement("img");
-        imgElem.src = src;
-        return imgElem;
-      })
-    );
-  }, [renderedSrcs, width]);
-
-  if (!(images && images.length)) {
-    return (
-      <>
-        <ReactKonva.Text
-          x={stageWidth / 6} //center depending on window width
-          y={0.4 * stageHeight}
-          width={(2 * stageWidth) / 3}
-          align="center"
-          text={
-            'To start annotating, drag and drop an image onto the canvas or click on "Open Image".'
-          }
-          fill={"black"}
-          fontSize={(30 * stageWidth) / normalizeFont} //scale font depending on window width
-        />
-      </>
-    );
-  }
-
   return (
     <>
       {images.map((image, idx) => (
