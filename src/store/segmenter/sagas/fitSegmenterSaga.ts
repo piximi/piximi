@@ -22,7 +22,7 @@ import {
   preprocessSegmentationImages,
   fitSegmenter,
 } from "store/segmenter";
-import { compile } from "store/common";
+import { compile } from "store/coroutines";
 import {
   Partition,
   ModelType,

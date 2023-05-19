@@ -10,50 +10,38 @@ import {
   selectSelectedAnnotationIds,
 } from "store/imageViewer";
 
-import { annotatorSlice } from "store/annotator";
-import {
-  selectPointerSelection,
-  selectToolType,
-} from "store/annotator/selectors";
+import { selectToolType } from "store/annotator/selectors";
 
 import {
   selectActiveImageHeight,
   selectActiveImageWidth,
-  selectSelectedAnnotations,
   selectActiveAnnotations,
 } from "store/data";
 
-import { DecodedAnnotationType, HotkeyView, ToolType } from "types";
+import { DecodedAnnotationType, HotkeyView, Point, ToolType } from "types";
 
 import {
   getAnnotationsInBox,
   getOverlappingAnnotations,
 } from "utils/annotator";
 
+const delta = 10;
 export const usePointer = () => {
-  const dispatch = useDispatch();
-
-  const delta = 10;
-
-  const toolType = useSelector(selectToolType);
-
-  const selectedAnnotations = useSelector(selectSelectedAnnotations);
-
-  const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
-
-  const changes = useSelector(selectPointerSelection);
-
-  const stagedAnnotations = useSelector(selectActiveAnnotations);
-
-  const imageWidth = useSelector(selectActiveImageWidth);
-
-  const imageHeight = useSelector(selectActiveImageHeight);
-
   let overlappingAnnotationsIds: Array<string> = [];
 
-  const currentIndex = useSelector(currentIndexSelector);
-
+  const [dragging, setDragging] = useState<boolean>(false);
+  const [minimum, setMinimum] = useState<Point | undefined>();
+  const [maximum, setMaximum] = useState<Point | undefined>();
+  const [selecting, setSelecting] = useState<boolean>(false);
   const [shift, setShift] = useState<boolean>(false);
+
+  const dispatch = useDispatch();
+  const toolType = useSelector(selectToolType);
+  const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
+  const imageWidth = useSelector(selectActiveImageWidth);
+  const imageHeight = useSelector(selectActiveImageHeight);
+  const currentIndex = useSelector(currentIndexSelector);
 
   useHotkeys(
     "shift",
@@ -69,67 +57,49 @@ export const usePointer = () => {
   );
 
   const onMouseDown = (position: { x: number; y: number }) => {
-    dispatch(
-      annotatorSlice.actions.updatePointerSelection({
-        changes: {
-          dragging: false,
-          minimum: position,
-          selecting: true,
-        },
-      })
-    );
+    setDragging(false);
+    setMinimum(position);
+    setSelecting(true);
   };
 
   const onMouseMove = (position: { x: number; y: number }) => {
-    if (!position || !changes.selecting || !changes.minimum) return;
+    if (!position || !selecting || !minimum) return;
 
-    dispatch(
-      annotatorSlice.actions.updatePointerSelection({
-        changes: {
-          dragging: Math.abs(position.x - changes.minimum.x) >= delta,
-          maximum: position,
-        },
-      })
-    );
+    setDragging(Math.abs(position.x - minimum.x) >= delta);
+    setMaximum(position);
   };
 
   const onMouseUp = (position: { x: number; y: number }) => {
-    if (!position || !changes.selecting || !changes.minimum) return;
-    if (changes.dragging) {
+    if (!position || !selecting || !minimum) return;
+    if (dragging) {
       // correct minimum or maximum in the case where user may have selected rectangle from right to left
-      const maximum: { x: number; y: number } = {
-        x: changes.minimum.x > position.x ? changes.minimum.x : position.x,
-        y: changes.minimum.y > position.y ? changes.minimum.y : position.y,
+      const maximumNew: { x: number; y: number } = {
+        x: minimum.x > position.x ? minimum.x : position.x,
+        y: minimum.y > position.y ? minimum.y : position.y,
       };
-      const minimum: { x: number; y: number } = {
-        x: changes.minimum.x > position.x ? position.x : changes.minimum.x,
-        y: changes.minimum.y > position.y ? position.y : changes.minimum.y,
+      const minimumNew: { x: number; y: number } = {
+        x: minimum.x > position.x ? position.x : minimum.x,
+        y: minimum.y > position.y ? position.y : minimum.y,
       };
 
-      if (!minimum || !stagedAnnotations.length) {
-        dispatch(
-          annotatorSlice.actions.updatePointerSelection({
-            changes: {
-              selecting: false,
-            },
-          })
-        );
+      if (!minimumNew || !activeAnnotations.length) {
+        setSelecting(false);
         return;
       }
 
       const scaledMinimum = {
-        x: minimum.x,
-        y: minimum.y,
+        x: minimumNew.x,
+        y: minimumNew.y,
       };
       const scaledMaximum = {
-        x: maximum.x,
-        y: maximum.y,
+        x: maximumNew.x,
+        y: maximumNew.y,
       };
 
       const annotationsInBox = getAnnotationsInBox(
         scaledMinimum,
         scaledMaximum,
-        stagedAnnotations
+        activeAnnotations
       );
 
       if (annotationsInBox.length) {
@@ -152,13 +122,13 @@ export const usePointer = () => {
           //only include if not already selected
           const additionalAnnotations = annotationsInBox.filter(
             (annotation: DecodedAnnotationType) => {
-              return !selectedAnnotationsIds.includes(annotation.id);
+              return !selectedAnnotationIds.includes(annotation.id);
             }
           );
           dispatch(
             setSelectedAnnotationIds({
               annotationIds: [
-                ...selectedAnnotations.map((an) => an.id),
+                ...selectedAnnotationIds,
                 ...additionalAnnotations.map((an) => an.id),
               ],
               workingAnnotationId: annotationsInBox[0].id,
@@ -170,11 +140,7 @@ export const usePointer = () => {
       onClick(position);
     }
 
-    dispatch(
-      annotatorSlice.actions.updatePointerSelection({
-        changes: { selecting: false },
-      })
-    );
+    setSelecting(false);
   };
 
   const onClick = (position: { x: number; y: number }) => {
@@ -182,7 +148,7 @@ export const usePointer = () => {
 
     if (!position) return;
 
-    if (!stagedAnnotations.length || !imageWidth || !imageHeight) return;
+    if (!activeAnnotations.length || !imageWidth || !imageHeight) return;
 
     const scaledCurrentPosition = {
       x: position.x,
@@ -191,7 +157,7 @@ export const usePointer = () => {
 
     overlappingAnnotationsIds = getOverlappingAnnotations(
       scaledCurrentPosition,
-      stagedAnnotations,
+      activeAnnotations,
       imageWidth,
       imageHeight
     );
@@ -209,13 +175,13 @@ export const usePointer = () => {
       );
       const nextAnnotationId = overlappingAnnotationsIds[currentIndex];
 
-      currentAnnotation = stagedAnnotations.find(
+      currentAnnotation = activeAnnotations.find(
         (annotation: DecodedAnnotationType) => {
           return annotation.id === nextAnnotationId;
         }
       );
     } else {
-      currentAnnotation = stagedAnnotations.find(
+      currentAnnotation = activeAnnotations.find(
         (annotation: DecodedAnnotationType) => {
           return annotation.id === overlappingAnnotationsIds[0];
         }
@@ -246,19 +212,25 @@ export const usePointer = () => {
       });
     }
 
-    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
+    if (shift && !selectedAnnotationIds.includes(currentAnnotation.id)) {
       //include newly selected annotation if not already selected
       dispatch(
         setSelectedAnnotationIds({
-          annotationIds: [
-            ...selectedAnnotations.map((an) => an.id),
-            currentAnnotation.id,
-          ],
+          annotationIds: [...selectedAnnotationIds, currentAnnotation.id],
           workingAnnotationId: currentAnnotation.id,
         })
       );
     }
   };
 
-  return { onMouseDown, onMouseUp, onMouseMove, onPointerClick: onClick };
+  return {
+    onMouseDown,
+    onMouseUp,
+    onMouseMove,
+    onPointerClick: onClick,
+    dragging,
+    selecting,
+    minimum,
+    maximum,
+  };
 };

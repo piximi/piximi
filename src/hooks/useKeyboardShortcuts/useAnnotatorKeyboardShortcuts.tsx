@@ -36,7 +36,7 @@ type useAnnotatorHotkeysProps = {
   deselectAllAnnotations: () => void;
   deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
-  onZoomDeselect: () => void;
+  resetZoomSelection: () => void;
   workingAnnotation: DecodedAnnotationType | undefined;
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
@@ -50,7 +50,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   deselectAllAnnotations,
   deselectAllTransformers,
   deselectAnnotation,
-  onZoomDeselect,
+  resetZoomSelection,
   workingAnnotation,
   selectedAnnotationsIds,
   selectionMode,
@@ -319,7 +319,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       deselectAnnotation();
 
       if (toolType !== ToolType.Zoom) return;
-      onZoomDeselect();
+      resetZoomSelection();
     },
     HotkeyView.Annotator,
     [annotations, annotationTool, soundEnabled, toolType]

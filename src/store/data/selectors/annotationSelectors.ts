@@ -64,7 +64,6 @@ export const selectAnnotationsByCategoryDict = ({
   return data.annotationsByCategory;
 };
 
-// TODO: O(NxM)
 export const selectAnnotationCountByCategory = () =>
   createSelector(
     [
@@ -74,13 +73,8 @@ export const selectAnnotationCountByCategory = () =>
     ],
     (annotationIds, annotationsByCategory, categoryId) => {
       if (!Object.keys(annotationsByCategory).includes(categoryId)) return;
-      let count = 0;
-      for (const id of annotationsByCategory[categoryId]) {
-        if (annotationIds.includes(id)) {
-          count++;
-        }
-      }
-      return count;
+
+      return annotationsByCategory[categoryId].length;
     }
   );
 
@@ -120,5 +114,20 @@ export const selectSelectedAnnotations = createSelector(
     return selectedIds.map(
       (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
     );
+  }
+);
+export const selectActiveAnnotationCountsByCategory = createSelector(
+  selectActiveAnnotations,
+  (annotations) => {
+    const countsByCategory: Record<string, number> = {};
+    for (const annotation of annotations) {
+      const category = annotation.categoryId;
+      if (Object.keys(countsByCategory).includes(category)) {
+        countsByCategory[category]++;
+      } else {
+        countsByCategory[category] = 1;
+      }
+    }
+    return countsByCategory;
   }
 );

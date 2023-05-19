@@ -27,28 +27,22 @@ import {
 } from "annotator-tools";
 
 export const useAnnotationTool = () => {
+  const [operator, setOperator] = useState<AnnotationTool>();
+  const [image, setImage] = useState<ImageJS.Image>();
+
   const src = useSelector(selectActiveImageSrc);
   const operation = useSelector(selectToolType);
   const stageScale = useSelector(stageScaleSelector);
-
-  const [operator, setOperator] = useState<AnnotationTool>();
-
-  const [image, setImage] = useState<ImageJS.Image>();
-
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
-
   const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
-
   const threshold = useSelector(selectThresholdAnnotationValue);
 
   useEffect(() => {
     if (!src) return;
-
     const loadImage = async () => {
       const image = await ImageJS.Image.load(src, { ignorePalette: true });
       setImage(image);
     };
-
     loadImage();
   }, [src]);
 

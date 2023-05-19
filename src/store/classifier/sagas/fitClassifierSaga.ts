@@ -23,7 +23,7 @@ import {
   selectCreatedImageCategoryCount,
 } from "store/data";
 import { applicationSlice } from "store/application";
-import { compile } from "store/common";
+import { compile } from "store/coroutines";
 
 import {
   AlertStateType,

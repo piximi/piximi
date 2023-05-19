@@ -2,40 +2,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 
 import {
-  stageScaleSelector,
   zoomSelectionSelector,
   setZoomSelection,
   setStageScale,
-  setStagePosition,
   stageWidthSelector,
-  stagePositionSelector,
+  activeImageIdSelector,
 } from "store/imageViewer";
 import { selectToolType } from "store/annotator/selectors";
-import { selectActiveImageScaledWidth } from "store/data";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
 import { useState } from "react";
+import Konva from "konva";
 
-export const useZoom = () => {
+export const useZoom = (stage?: Konva.Stage | null) => {
   const delta = 10;
   const [selectStart, setSelectStart] = useState<{ x: number; y: number }>();
 
   const dispatch = useDispatch();
-  const stageScale = useSelector(stageScaleSelector);
   const stageWidth = useSelector(stageWidthSelector);
-  const stagePosition = useSelector(stagePositionSelector);
   const toolType = useSelector(selectToolType);
   const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
   const zoomSelection = useSelector(zoomSelectionSelector);
-  const imageWidth = useSelector(selectActiveImageScaledWidth);
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
-    if (!center) return;
-    dispatch(setStageScale({ stageScale: newScale }));
+    if (!center || !stage) return;
+
+    const stageX = stage.x();
+    const stageY = stage.y();
+    const stageScale = stage.scaleX();
+
     const mousePointTo = {
-      x: (center.x - stagePosition.x) / stageScale,
-      y: (center.y - stagePosition.y) / stageScale,
+      x: (center.x - stageX!) / stageScale,
+      y: (center.y - stageY!) / stageScale,
     };
 
     var newPos = {
@@ -43,10 +43,13 @@ export const useZoom = () => {
       y: center.y - mousePointTo.y * newScale,
     };
 
-    dispatch(setStagePosition({ stagePosition: newPos }));
+    stage.position(newPos);
+    stage.scale({ x: newScale, y: newScale });
+
+    dispatch(setStageScale({ stageScale: newScale }));
   };
 
-  const deselect = () => {
+  const resetZoomSelection = () => {
     dispatch(
       setZoomSelection({
         zoomSelection: {
@@ -60,7 +63,7 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseDown = (
+  const handleZoomMouseDown = (
     position: { x: number; y: number },
     event: KonvaEventObject<MouseEvent>
   ) => {
@@ -79,7 +82,7 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseMove = (
+  const handleZoomMouseMove = (
     position: { x: number; y: number },
     event: KonvaEventObject<MouseEvent>
   ) => {
@@ -105,11 +108,11 @@ export const useZoom = () => {
     );
   };
 
-  const onMouseUp = (
+  const handleZoomMouseUp = (
     position: { x: number; y: number },
     event: KonvaEventObject<MouseEvent>
   ) => {
-    if (!imageWidth || !zoomSelection.selecting) return;
+    if (!activeImageId || !zoomSelection.selecting || !stage) return;
     if (zoomSelection.dragging) {
       const stage = event.target.getStage()!;
       const _position = stage.getPointerPosition()!;
@@ -126,7 +129,7 @@ export const useZoom = () => {
       const selectedWidth = Math.abs(_position.x - selectStart.x);
       const newScale = Math.max(
         Math.min(stageWidth / selectedWidth, 5),
-        stageScale
+        stage.scaleX()
       );
       let topLeft;
       if (selectStart.x < _position.x) {
@@ -155,9 +158,9 @@ export const useZoom = () => {
     );
   };
 
-  const onWheel = (event: KonvaEventObject<WheelEvent>) => {
+  const handleZoomScroll = (event: KonvaEventObject<WheelEvent>) => {
     event.evt.preventDefault();
-    if (!imageWidth) return;
+    if (!activeImageId) return;
     const stage = event.target.getStage()!;
     const scaleBy = 1.035;
 
@@ -171,7 +174,10 @@ export const useZoom = () => {
     let center;
 
     if (automaticCentering) {
-      center = zoomSelection.centerPoint;
+      center = {
+        x: (stage.width() / 2) * stage.scaleX() + stage.x(),
+        y: (stage.height() / 2) * stage.scaleX() + stage.y(),
+      };
     } else {
       center = stage.getPointerPosition() as Point;
     }
@@ -200,9 +206,9 @@ export const useZoom = () => {
     });
   };
 
-  const handleDblClick = (event: KonvaEventObject<MouseEvent>) => {
+  const handleZoomDblClick = (event: KonvaEventObject<MouseEvent>) => {
     event.evt.preventDefault();
-    if (!imageWidth) return;
+    if (!activeImageId) return;
     const stage = event.target.getStage()!;
     const scaleBy = 1.2;
 
@@ -213,7 +219,13 @@ export const useZoom = () => {
         ? Math.min(5, oldScale * scaleBy)
         : Math.max(0.25, oldScale / scaleBy);
 
-    let center = stage.getPointerPosition() as Point;
+    let center;
+
+    if (automaticCentering) {
+      center = zoomSelection.centerPoint;
+    } else {
+      center = stage.getPointerPosition() as Point;
+    }
 
     if (!center) return;
     zoomAndOffset(newScale, center);
@@ -241,12 +253,12 @@ export const useZoom = () => {
   };
 
   return {
-    deselect,
-    onMouseDown,
-    onMouseMove,
-    onMouseUp,
-    onWheel,
+    resetZoomSelection,
+    handleZoomMouseDown,
+    handleZoomMouseMove,
+    handleZoomMouseUp,
+    handleZoomScroll,
     zoomAndOffset,
-    handleDblClick,
+    handleZoomDblClick,
   };
 };

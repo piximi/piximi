@@ -1,8 +1,8 @@
 import { LayersModel, ModelCompileArgs, train, losses } from "@tensorflow/tfjs";
-import { CompileOptions } from "../../../types/CompileOptions";
-import { LossFunction } from "../../../types/LossFunction";
-import { OptimizationAlgorithm } from "../../../types/OptimizationAlgorithm";
-import { Metric } from "../../../types/Metric";
+import { CompileOptions } from "../../types/CompileOptions";
+import { LossFunction } from "../../types/LossFunction";
+import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
+import { Metric } from "../../types/Metric";
 
 export const compile = (opened: LayersModel, options: CompileOptions) => {
   const compiled = opened;

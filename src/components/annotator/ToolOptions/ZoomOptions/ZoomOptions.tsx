@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
@@ -22,10 +22,10 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import {
   setStagePosition,
   stageHeightSelector,
-  stageScaleSelector,
   stageWidthSelector,
   zoomSelectionSelector,
 } from "store/imageViewer";
@@ -50,13 +50,13 @@ export const ZoomOptions = () => {
   const options = useSelector(zoomToolOptionsSelector);
   const stageWidth = useSelector(stageWidthSelector);
   const stageHeight = useSelector(stageHeightSelector);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageRef = useContext(StageContext);
   const image = useSelector(selectActiveImage);
   const { centerPoint } = useSelector(zoomSelectionSelector);
 
   const t = useTranslation();
 
-  const { zoomAndOffset } = useZoom();
+  const { zoomAndOffset } = useZoom(stageRef?.current);
 
   const onAutomaticCenteringChange = () => {
     const payload = {
@@ -92,12 +92,12 @@ export const ZoomOptions = () => {
 
     if (!image || !image.shape) return;
 
-    const imageWidth = image && image.shape ? image.shape.width : 512;
-    const imageHeight = image && image.shape ? image.shape.height : 512;
-    const newScale =
-      imageHeight / stageHeight > imageWidth / stageWidth
-        ? stageHeight / imageHeight
-        : stageWidth / imageWidth;
+    const imageWidth = image.shape.width;
+    const imageHeight = image.shape.height;
+    const newScale = Math.min(
+      stageHeight / imageHeight,
+      stageWidth / imageWidth
+    );
 
     dispatch(setZoomToolOptions(payload));
     zoomAndOffset(newScale, { x: stageWidth / 2, y: stageHeight / 2 });
@@ -135,11 +135,15 @@ export const ZoomOptions = () => {
     }
   };
   const onResetClick = () => {
+    stageRef?.current?.position({
+      x: ((1 - stageRef?.current?.scaleX()!) * stageWidth) / 2,
+      y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,
+    });
     dispatch(
       setStagePosition({
         stagePosition: {
-          x: ((1 - stageScale) * stageWidth) / 2,
-          y: ((1 - stageScale) * stageHeight) / 2,
+          x: ((1 - stageRef?.current?.scaleX()!) * stageWidth) / 2,
+          y: ((1 - stageRef?.current?.scaleX()!) * stageHeight) / 2,
         },
       })
     );
@@ -168,7 +172,7 @@ export const ZoomOptions = () => {
                   onSliderChange(value as number)
                 }
                 valueLabelDisplay="auto"
-                value={stageScale}
+                value={stageRef?.current?.scaleX()!}
                 min={0.25}
                 max={5}
                 step={0.01}

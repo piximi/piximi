@@ -17,7 +17,7 @@ const initialState: ToolOptionsStateType = {
     vibrance: 0,
   },
   zoom: {
-    automaticCentering: true,
+    automaticCentering: false,
     mode: ZoomModeType.In,
     scale: 1.0,
     toActualSize: false,

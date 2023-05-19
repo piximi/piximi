@@ -47,7 +47,6 @@ export const OpenExampleImageMenuItem = ({
       exampleImageProject.exampleImageAnnotationsFile as SerializedFileType,
       exampleImageProject.exampleImageName
     );
-    console.log("clicked");
 
     batch(() => {
       dispatch(
