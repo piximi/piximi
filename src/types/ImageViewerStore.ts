@@ -1,5 +1,6 @@
 import { AnnotationType } from "./AnnotationType";
 import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
+import { ZoomToolOptionsType } from "./ZoomToolOptionsType";
 
 export type ImageViewerStore = {
   colorAdjustment: ColorAdjustmentOptionsType;
@@ -26,4 +27,5 @@ export type ImageViewerStore = {
     selecting: boolean;
     centerPoint: { x: number; y: number } | undefined;
   };
+  zoomOptions: ZoomToolOptionsType;
 };

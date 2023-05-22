@@ -5,6 +5,8 @@ import {
   ImageViewerStore,
   ColorAdjustmentOptionsType,
   AnnotationType,
+  ZoomModeType,
+  ZoomToolOptionsType,
 } from "types";
 
 import { mutatingFilter } from "utils/common/helpers";
@@ -42,6 +44,13 @@ const initialState: ImageViewerStore = {
     maximum: undefined,
     selecting: false,
     centerPoint: undefined,
+  },
+  zoomOptions: {
+    automaticCentering: false,
+    mode: ZoomModeType.In,
+    scale: 1.0,
+    toActualSize: false,
+    toFit: false,
   },
 };
 
@@ -342,6 +351,12 @@ export const imageViewerSlice = createSlice({
     ) {
       Object.assign(state.zoomSelection, action.payload.changes);
     },
+    setZoomToolOptions(
+      state,
+      action: PayloadAction<{ options: ZoomToolOptionsType }>
+    ) {
+      state.zoomOptions = action.payload.options;
+    },
   },
 });
 
@@ -358,4 +373,5 @@ export const {
   setStageScale,
   setStageWidth,
   setZoomSelection,
+  setZoomToolOptions,
 } = imageViewerSlice.actions;

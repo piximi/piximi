@@ -4,7 +4,6 @@ import { classifierSlice } from "store/classifier";
 import { imageViewerSlice } from "store/imageViewer";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
-import { toolOptionsSlice } from "store/tool-options";
 import { dataSlice } from "store/data/";
 import { annotatorSlice } from "store/annotator";
 
@@ -14,7 +13,6 @@ const reducers = {
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
   settings: applicationSlice.reducer,
-  toolOptions: toolOptionsSlice.reducer,
   data: dataSlice.reducer,
   annotator: annotatorSlice.reducer,
 };

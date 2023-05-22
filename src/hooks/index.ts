@@ -9,7 +9,7 @@ export { useAnnotatorKeyboardShortcuts } from "./useKeyboardShortcuts";
 export { useKeyPress } from "./useKeyPress";
 export { useMarchingAnts } from "./useMarchingAnts";
 export { useMenu } from "./useMenu";
-export { useStageHandlers } from "./usePointer";
+export { useStageHandlers } from "./useStageHandlers";
 export { useSelection } from "./useSelection";
 export { usePreferredMuiTheme, usePreferredNivoTheme } from "./useTheme";
 export { useTransformer } from "./useTransformer";

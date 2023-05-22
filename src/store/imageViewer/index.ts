@@ -13,6 +13,7 @@ export {
   setCursor,
   setStageHeight,
   setStagePosition,
+  setZoomToolOptions,
 } from "./imageViewerSlice";
 
 // Selectors
@@ -38,3 +39,4 @@ export {
   selectSelectedAnnotationIdsCount,
 } from "./selectors/selectSelectedAnnotationIds";
 export { selectColorAdjustments } from "./selectors/selectColorAdjustments";
+export { zoomToolOptionsSelector } from "./selectors/zoomToolOptionsSelector";

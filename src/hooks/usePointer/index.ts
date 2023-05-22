@@ -1,1 +1,0 @@
-export { useStageHandlers } from "./usePointer";
