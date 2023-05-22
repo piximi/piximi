@@ -1,5 +1,4 @@
 import { ChangeEvent, useState } from "react";
-import { LayersModel } from "@tensorflow/tfjs";
 import { useHotkeys } from "hooks";
 
 import {
@@ -13,36 +12,35 @@ import {
 } from "@mui/material";
 
 import { HotkeyView } from "types";
-import { ModelTask } from "types/ModelType";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { ModelStatus } from "types/ModelType";
 
-// TODO - segmenter: All of this
 type SaveFittedModelDialogProps = {
-  modelName: string;
-  fittedModel: LayersModel | undefined;
-  modelTask: ModelTask;
+  // TODO - segmenter: change to Model
+  model: SequentialClassifier | Segmenter;
+  modelStatus: ModelStatus;
   onClose: () => void;
   open: boolean;
 };
 
 export const SaveFittedModelDialog = ({
-  modelName,
-  fittedModel,
-  modelTask,
+  model,
+  modelStatus,
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
-  const [classifierName, setClassifierName] = useState<string>(modelName);
-
-  const noFittedModel = fittedModel ? false : true;
+  const [name, setName] = useState<string>(model.name);
 
   const onSaveClassifierClick = async () => {
-    await fittedModel!.save(`downloads://${classifierName}`);
+    // TODO - segmenter
+    await model._model!.save(`downloads://${name}`);
 
     onClose();
   };
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setClassifierName(event.target.value);
+    setName(event.target.value);
   };
 
   useHotkeys(
@@ -57,7 +55,7 @@ export const SaveFittedModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save {modelName}</DialogTitle>
+      <DialogTitle>Save {model.name}</DialogTitle>
 
       <DialogContent>
         <Grid container spacing={1}>
@@ -66,15 +64,15 @@ export const SaveFittedModelDialog = ({
               autoFocus
               fullWidth
               id="name"
-              label={modelName}
+              label={model.name}
               margin="dense"
               onChange={onNameChange}
               helperText={
-                noFittedModel
+                modelStatus !== ModelStatus.Trained
                   ? "There is no trained model that could be saved."
                   : ""
               }
-              error={noFittedModel}
+              error={modelStatus !== ModelStatus.Trained}
             />
           </Grid>
         </Grid>
@@ -88,9 +86,9 @@ export const SaveFittedModelDialog = ({
         <Button
           onClick={onSaveClassifierClick}
           color="primary"
-          disabled={noFittedModel}
+          disabled={modelStatus !== ModelStatus.Trained}
         >
-          Save {modelName}
+          Save {name}
         </Button>
       </DialogActions>
     </Dialog>
