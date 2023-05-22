@@ -11,7 +11,7 @@ import {
 } from "store/imageViewer";
 
 import { selectToolType } from "store/annotator/selectors";
-import { zoomToolOptionsSelector } from "store/tool-options";
+import { zoomToolOptionsSelector } from "store/imageViewer";
 
 import { Point, ToolType, ZoomModeType } from "types";
 

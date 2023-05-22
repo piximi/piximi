@@ -28,12 +28,10 @@ import {
   stageHeightSelector,
   stageWidthSelector,
   zoomSelectionSelector,
-} from "store/imageViewer";
-import { selectActiveImage } from "store/data";
-import {
   zoomToolOptionsSelector,
   setZoomToolOptions,
-} from "store/tool-options";
+} from "store/imageViewer";
+import { selectActiveImage } from "store/data";
 
 import { ZoomModeType } from "types";
 
