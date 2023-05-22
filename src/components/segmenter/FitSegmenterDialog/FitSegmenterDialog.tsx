@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { LayersModel } from "@tensorflow/tfjs";
 
 import { Dialog, DialogContent, List } from "@mui/material";
 
 import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
-//import { ModelSummaryTable } from "components/common/ModelSummary";
 import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
 import { DialogTransition, AlertDialog } from "components/common/dialogs";
 import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import { ModelSummaryTable } from "components/common/styled-components";
 
 import { alertStateSelector } from "store/application";
 import { selectAnnotatedImages } from "store/data";
 import {
-  segmenterTrainingFlagSelector,
-  //segmenterCompiledModelSelector,
   segmenterFitOptionsSelector,
   segmenterCompileOptionsSelector,
   segmenterTrainingPercentageSelector,
   segmenterSlice,
+  segmenterModelSelector,
+  segmenterModelStatusSelector,
 } from "store/segmenter";
 
 import {
@@ -28,7 +29,8 @@ import {
   LossFunction,
   OptimizationAlgorithm,
 } from "types";
-//import { LayersModel } from "@tensorflow/tfjs";
+import { TrainingCallbacks } from "utils/common/models/Model";
+import { ModelStatus } from "types/ModelType";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -37,10 +39,12 @@ type FitSegmenterDialogProps = {
 
 export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const dispatch = useDispatch();
+
   const { closeDialog, openedDialog } = props;
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-  const [isModelTrainable, setIsModelTrainable] = useState<boolean>(true);
+  const [totalEpochs, setTotalEpochs] = useState<number>(0);
+
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
@@ -61,14 +65,15 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const currentlyTraining = useSelector(segmenterTrainingFlagSelector);
   const annotatedImages = useSelector(selectAnnotatedImages);
   //const compiledModel = useSelector(segmenterCompiledModelSelector);
+  const selectedModel = useSelector(segmenterModelSelector);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
+
   const alertState = useSelector(alertStateSelector);
 
   const fitOptions = useSelector(segmenterFitOptionsSelector);
   const compileOptions = useSelector(segmenterCompileOptionsSelector);
-
   const trainingPercentage = useSelector(segmenterTrainingPercentageSelector);
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
@@ -128,41 +133,86 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   useEffect(() => {
     if (annotatedImages.length === 0) {
       setNoLabeledImages(true);
-      if (!noLabeledImages && isModelTrainable) {
+      if (!noLabeledImages && selectedModel.trainable) {
         setShowWarning(true);
       }
     } else {
       setNoLabeledImages(false);
     }
-  }, [annotatedImages, noLabeledImages, isModelTrainable]);
+  }, [annotatedImages, noLabeledImages, selectedModel]);
 
-  const trainingHistoryCallback = (epoch: number, logs: any) => {
-    const epochCount = epoch + 1;
-    const trainingEpochIndicator = epochCount - 0.5;
-    setCurrentEpoch(epochCount);
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      annotatedImages.length > 0
+    ) {
+      const trainingSize = Math.round(
+        annotatedImages.length * trainingPercentage
+      );
+      const validationSize = annotatedImages.length - trainingSize;
+
+      console.log(
+        `Set training size to Round[${annotatedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
+        `; val size to ${annotatedImages.length} - ${trainingSize} = ${validationSize}`
+      );
+
+      console.log(
+        `Set training batches per epoch to RoundUp[${trainingSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Set validation batches per epoch to RoundUp[${validationSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
+        `; validation is ${validationSize % fitOptions.batchSize}`
+      );
+    }
+  }, [fitOptions.batchSize, trainingPercentage, annotatedImages.length]);
+
+  const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
+    epoch,
+    logs
+  ) => {
+    const nextEpoch = totalEpochs + epoch + 1;
+    const trainingEpochIndicator = nextEpoch - 0.5;
+
+    setTotalEpochs(nextEpoch);
+    setCurrentEpoch((currentEpoch) => currentEpoch + 1);
+
+    if (!logs) return;
 
     if (logs.categoricalAccuracy) {
       setTrainingAccuracy((prevState) =>
         prevState.concat({
           x: trainingEpochIndicator,
-          y: logs.categoricalAccuracy,
+          y: logs.categoricalAccuracy as number,
         })
       );
     }
     if (logs.val_categoricalAccuracy) {
       setValidationAccuracy((prevState) =>
-        prevState.concat({ x: epochCount, y: logs.val_categoricalAccuracy })
+        prevState.concat({
+          x: nextEpoch,
+          y: logs.val_categoricalAccuracy as number,
+        })
       );
     }
     if (logs.loss) {
       setTrainingLoss((prevState) =>
-        prevState.concat({ x: trainingEpochIndicator, y: logs.loss })
+        prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
       );
     }
 
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
-        prevState.concat({ x: epochCount, y: logs.val_loss })
+        prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
       );
     }
 
@@ -180,16 +230,26 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   };
 
   const onFit = async () => {
-    if (!currentlyTraining) {
+    setCurrentEpoch(0);
+    if (modelStatus === ModelStatus.Uninitialized) {
       cleanUpStates();
-    }
 
-    dispatch(
-      segmenterSlice.actions.fitSegmenter({
-        onEpochEnd: trainingHistoryCallback,
-        execSaga: true,
-      })
-    );
+      dispatch(
+        segmenterSlice.actions.updateModelStatus({
+          modelStatus: ModelStatus.InitFit,
+          onEpochEnd: trainingHistoryCallback,
+          execSaga: true,
+        })
+      );
+    } else {
+      dispatch(
+        segmenterSlice.actions.updateModelStatus({
+          modelStatus: ModelStatus.Training,
+          onEpochEnd: trainingHistoryCallback,
+          execSaga: true,
+        })
+      );
+    }
   };
 
   return (
@@ -204,12 +264,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       <FitSegmenterDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noLabeledImages || !isModelTrainable}
+        disableFitting={noLabeledImages || !selectedModel.trainable}
         epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noLabeledImages && isModelTrainable && (
+      {showWarning && noLabeledImages && selectedModel.trainable && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
@@ -220,10 +280,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
       <DialogContent>
         <List dense>
-          <SegmenterArchitectureSettingsListItem
-            setIsModelTrainable={setIsModelTrainable}
-            isModelTrainable={isModelTrainable}
-          />
+          <SegmenterArchitectureSettingsListItem />
 
           <OptimizerSettingsListItem
             compileOptions={compileOptions}
@@ -235,7 +292,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             fitOptions={fitOptions}
             dispatchBatchSizeCallback={dispatchBatchSizeCallback}
             dispatchLearningRateCallback={dispatchLearningRateCallback}
-            isModelTrainable={isModelTrainable}
+            isModelTrainable={selectedModel.trainable}
           />
 
           <DatasetSettingsListItem
@@ -243,7 +300,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
             dispatchTrainingPercentageCallback={
               dispatchTrainingPercentageCallback
             }
-            isModelTrainable={isModelTrainable}
+            isModelTrainable={selectedModel.trainable}
           />
         </List>
 
@@ -264,11 +321,14 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
           </div>
         )}
 
-        {/* {compiledModel  && (
+        {modelStatus > ModelStatus.Training && (
           <div>
-            <ModelSummaryTable compiledModel={compiledModel} />
+            {/*  TODO - segmenter: pass in actual model class */}
+            <ModelSummaryTable
+              loadedModel={selectedModel._model! as LayersModel}
+            />
           </div>
-        )} */}
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -6,7 +6,7 @@ import { segmenterSlice } from "store/segmenter";
 
 export function* watchPredictSegmenterSaga() {
   yield takeLeading(
-    segmenterSlice.actions.predictSegmenter.type,
+    segmenterSlice.actions.updateModelStatus.type,
     predictSegmenterSaga
   );
 }

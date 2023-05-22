@@ -1,4 +1,3 @@
-import { LayersModel, Tensor, data, Rank, GraphModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
@@ -13,13 +12,11 @@ import {
   segmenterInputShapeSelector,
   segmenterPreprocessOptionsSelector,
   segmenterFitOptionsSelector,
-  segmenterFittedModelSelector,
   segmenterSlice,
-  preprocessSegmentationImages,
   segmenterModelSelector,
 } from "store/segmenter";
 import {
-  AlertStateType,
+  //AlertStateType,
   AlertType,
   Category,
   FitOptions,
@@ -28,23 +25,19 @@ import {
   PreprocessOptions,
   Shape,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  ObjectDetectionType,
-  ModelArchitecture,
   DecodedAnnotationType,
 } from "types";
-import { getStackTraceFromError } from "utils";
+//import { getStackTraceFromError } from "utils";
 import COCO_CLASSES from "data/model-data/cocossd-classes";
-import {
-  predictCoco,
-  predictSegmentations,
-  predictStardist,
-} from "../coroutines";
+import { ModelStatus } from "types/ModelType";
+import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export function* predictSegmenterSaga({
-  payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>) {
-  if (!execSaga) return;
-  // inferenceImages: images from projectSlice that do not contain any annotations
+  payload: { execSaga, modelStatus },
+}: PayloadAction<{ modelStatus: ModelStatus; execSaga: boolean }>) {
+  if (!execSaga || modelStatus !== ModelStatus.Predicting) return;
+
   const inferenceImages: ReturnType<typeof selectUnannotatedImages> =
     yield select(selectUnannotatedImages);
 
@@ -60,8 +53,9 @@ export function* predictSegmenterSaga({
     );
 
     yield put(
-      segmenterSlice.actions.updatePredicting({
-        predicting: false,
+      segmenterSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Trained,
+        execSaga: false,
       })
     );
 
@@ -86,14 +80,15 @@ export function* predictSegmenterSaga({
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
 
-  const selectedModel: ReturnType<typeof segmenterModelSelector> = yield select(
+  const model: ReturnType<typeof segmenterModelSelector> = yield select(
     segmenterModelSelector
   );
 
-  let possibleClasses: { [key: string]: ObjectDetectionType } = {};
+  let possibleClasses: {
+    [key: string]: { name: string; id: number; displayName: string };
+  } = {};
 
-  // TODO - segmenter: instance of COCO
-  if (selectedModel.architecture === ModelArchitecture.CocoSSD) {
+  if (model instanceof CocoSSD) {
     possibleClasses = COCO_CLASSES;
   }
 
@@ -109,142 +104,44 @@ export function* predictSegmenterSaga({
   const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
     yield select(segmenterFitOptionsSelector);
 
-  // fitted Model
-  let model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
-    segmenterFittedModelSelector
-  );
-
-  // Seems strange to have this considering this saga will only be executed if there is a fitted model
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    yield put(
-      segmenterSlice.actions.updatePredicting({
-        predicting: false,
-      })
-    );
-    return;
-  }
-
   yield runSegmentationPrediction(
+    model,
     inferenceImages,
     annotationCategories,
     createdCategories,
     inputShape,
     preprocessOptions,
     fitOptions,
-    model,
-    possibleClasses,
-    selectedModel.architecture
+    possibleClasses
   );
 
   yield put(
-    segmenterSlice.actions.updatePredicting({
-      predicting: false,
+    segmenterSlice.actions.updateModelStatus({
+      modelStatus: ModelStatus.Suggesting,
+      execSaga: false,
     })
   );
 }
 
 function* runSegmentationPrediction(
+  model: Segmenter,
   inferenceImages: Array<ImageType>,
   categories: Array<Category>,
   createdCategories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions,
-  model: LayersModel | GraphModel,
-  possibleClasses: { [key: string]: ObjectDetectionType },
-  selectedModel: ModelArchitecture
+  possibleClasses: {
+    [key: string]: { name: string; id: number; displayName: string };
+  }
 ) {
-  var predictions:
-    | Awaited<ReturnType<typeof predictCoco>>
-    | Awaited<ReturnType<typeof predictStardist>>
-    | Awaited<ReturnType<typeof predictSegmentations>>;
-  var predictedAnnotations: Array<{
+  let predictedAnnotations: Array<{
     imageId: string;
     annotations: DecodedAnnotationType[];
-  }>;
-  var foundCategories: Category[];
-  switch (selectedModel) {
-    case ModelArchitecture.CocoSSD:
-      try {
-        predictions = yield predictCoco(
-          model as GraphModel,
-          inferenceImages,
-          createdCategories,
-          possibleClasses
-        ) as ReturnType<typeof predictCoco>;
-        predictedAnnotations = predictions.annotations;
-        foundCategories = predictions.categories;
-      } catch (error) {
-        yield handleError(
-          error as Error,
-          "Error drawing the annotations on the inference images"
-        );
-        return;
-      }
-      break;
-    case ModelArchitecture.StardistVHE:
-      try {
-        predictions = yield predictStardist(
-          model as GraphModel,
-          inferenceImages,
-          createdCategories
-        );
-        predictedAnnotations = predictions.annotations;
-        foundCategories = predictions.categories;
-      } catch (error) {
-        yield handleError(
-          error as Error,
-          "Error drawing the annotations on the inference images"
-        );
-        return;
-      }
-      break;
-    default:
-      var data: data.Dataset<{
-        xs: Tensor<Rank.R4>;
-        ys: Tensor<Rank.R4>;
-        id: Tensor<Rank.R1>;
-      }>;
-      try {
-        data = yield preprocessSegmentationImages(
-          inferenceImages,
-          categories,
-          inputShape,
-          preprocessOptions,
-          fitOptions,
-          "inference"
-        );
-      } catch (error) {
-        yield handleError(
-          error as Error,
-          "Error in preprocessing the inference data"
-        );
-        return;
-      }
-      try {
-        predictions = yield predictSegmentations(
-          model as LayersModel,
-          data,
-          inferenceImages,
-          createdCategories
-        );
-        predictedAnnotations = predictions.annotations;
-        foundCategories = predictions.categories;
-      } catch (error) {
-        yield handleError(
-          error as Error,
-          "Error drawing the annotations on the inference images"
-        );
-        return;
-      }
-      break;
-  }
+  }> = model.predict("options", "callbacks");
 
-  var index = 0;
+  const foundCategories: Category[] = [];
+  let index = 0;
   while (index < foundCategories.length) {
     const foundCat = foundCategories[index];
     yield put(
@@ -256,6 +153,7 @@ function* runSegmentationPrediction(
     );
     index++;
   }
+
   index = 0;
   while (index < predictedAnnotations.length) {
     yield put(
@@ -267,28 +165,22 @@ function* runSegmentationPrediction(
 
     index++;
   }
-
-  yield put(
-    segmenterSlice.actions.updatePredicted({
-      predicted: true,
-    })
-  );
 }
 
-function* handleError(error: Error, name: string) {
-  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
-    yield getStackTraceFromError(error);
+// function* handleError(error: Error, name: string) {
+//   const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+//     yield getStackTraceFromError(error);
 
-  const alertState: AlertStateType = {
-    alertType: AlertType.Error,
-    name: name,
-    description: `${error.name}:\n${error.message}`,
-    stackTrace: stackTrace,
-  };
+//   const alertState: AlertStateType = {
+//     alertType: AlertType.Error,
+//     name: name,
+//     description: `${error.name}:\n${error.message}`,
+//     stackTrace: stackTrace,
+//   };
 
-  yield put(
-    applicationSlice.actions.updateAlertState({
-      alertState: alertState,
-    })
-  );
-}
+//   yield put(
+//     applicationSlice.actions.updateAlertState({
+//       alertState: alertState,
+//     })
+//   );
+// }

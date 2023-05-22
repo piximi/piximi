@@ -17,7 +17,7 @@ enum LoadState {
   Loaded,
 }
 
-export class UploadedClassifier extends SequentialClassifier<LoadModelArgs> {
+export class UploadedClassifier extends SequentialClassifier {
   readonly TFHub: boolean;
   protected _ioHandler?: ReturnType<typeof io.browserFiles>;
   protected _loadState: LoadState;
@@ -69,16 +69,8 @@ export class UploadedClassifier extends SequentialClassifier<LoadModelArgs> {
     }
   }
 
-  static verifyTFHubUrl(url: string) {
-    return url.includes("tfhub.dev");
-  }
-
   async upload(): Promise<void> {
-    if (
-      this.src &&
-      this.TFHub &&
-      !UploadedClassifier.verifyTFHubUrl(this.src)
-    ) {
+    if (this.src && this.TFHub && !Model.verifyTFHubUrl(this.src)) {
       throw new Error(`Expected TFHub Url: ${this.src}`);
     }
 

@@ -1,42 +1,88 @@
-import { ImageType, ModelArchitecture } from "types";
-import { Model } from "../Model";
-import { History } from "@tensorflow/tfjs";
+import { Model, TrainingCallbacks } from "../Model";
+import {
+  GraphModel,
+  History,
+  LayersModel,
+  Tensor,
+  Tensor2D,
+  Tensor4D,
+  data as tfdata,
+  tidy,
+  zeros,
+} from "@tensorflow/tfjs";
 
-export class Segmenter extends Model {
+export abstract class Segmenter extends Model {
+  // TODO - segmenter: use protected once all the other _model accessors are refactored
+  _model?: LayersModel | GraphModel;
+  //protected _model?: LayersModel;
+  _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  //protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  _inferenceDataset?: tfdata.Dataset<Tensor4D>;
+  // protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
   _history?: History;
-  readonly architecture: ModelArchitecture;
+  //protected _history?: History;
+  private _cachedOutputShape?: number[];
 
-  constructor(
-    architecture: ModelArchitecture,
-    modelArgs: ConstructorParameters<typeof Model>[0]
-  ) {
-    super(modelArgs);
-    this.architecture = architecture;
+  dispose() {
+    if (!this._model) {
+      throw Error(`"${this.name}" Model not loaded`);
+    }
+    this._model.dispose();
   }
 
-  loadModel(): void {}
-  loadTraining(images: ImageType[], preprocessingArgs: any): void {}
-  loadValidation(images: ImageType[], preprocessingArgs: any): void {}
-  loadInference(images: ImageType[], preprocessingArgs: any): void {}
-
-  async train(options: any, callbacks: any): Promise<History> {
-    return this._history!;
+  get modelLoaded() {
+    return this._model !== undefined;
   }
 
-  predict(options: any, callbacks: any): any {}
+  get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
 
-  dispose(): void {}
+  get defaultOutputShape() {
+    if (!this._model) {
+      throw Error(`"${this.name}" Model not loaded`);
+    }
 
-  get modelLoaded(): boolean {
-    return false;
+    const outputShape = this._model.outputs[0].shape;
+
+    if (outputShape) {
+      // idx 0 is the batch dim
+      return (outputShape as number[]).slice(1);
+    } else if (this._cachedOutputShape) {
+      return this._cachedOutputShape;
+    } else {
+      // sometimes models don't list their output shape (often graph models)
+      // in this case run inference on dummy data, and get shape of output
+      // we cache it to avoid expensive recalculation
+
+      // add a batch dimension
+      const dummyShape = [1, this.defaultInputShape].flat();
+
+      const _outputShape = tidy(() => {
+        const dummyData = zeros(dummyShape);
+        const pred = this._model!.predict(dummyData) as Tensor;
+        return pred.shape.slice(1) as number[];
+      });
+
+      this._cachedOutputShape = _outputShape;
+
+      return this._cachedOutputShape;
+    }
   }
-  get trainingLoaded(): boolean {
-    return false;
+
+  get trainingLoaded() {
+    return this._trainingDataset !== undefined;
   }
-  get validationLoaded(): boolean {
-    return false;
+
+  get validationLoaded() {
+    return this._validationDataset !== undefined;
   }
-  get inferenceLoaded(): boolean {
-    return false;
+
+  get inferenceLoaded() {
+    return this._inferenceDataset !== undefined;
   }
+
+  onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
 }

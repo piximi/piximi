@@ -9,35 +9,42 @@ import {
   EvaluateSegmenterListItem,
 } from "../SegmenterListItems";
 
-import {
-  segmenterFittedModelSelector,
-  segmenterTrainingFlagSelector,
-} from "store/segmenter";
+import { segmenterModelStatusSelector } from "store/segmenter";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import { ModelStatus } from "types/ModelType";
 
 export const SegmenterExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
-  const fitted = useSelector(segmenterFittedModelSelector);
-  const training = useSelector(segmenterTrainingFlagSelector);
+
+  const modelStatus = useSelector(segmenterModelStatusSelector);
 
   useEffect(() => {
-    if (training) {
-      setDisabled(true);
-      setHelperText("Disabled during training");
-    }
-  }, [training]);
-
-  useEffect(() => {
-    if (fitted) {
+    if (modelStatus === ModelStatus.Trained) {
       setDisabled(false);
-    } else {
-      setDisabled(true);
-      setHelperText("No trained model");
+      return;
     }
-  }, [fitted]);
+
+    setDisabled(true);
+
+    if (
+      modelStatus === ModelStatus.InitFit ||
+      modelStatus === ModelStatus.Loading ||
+      modelStatus === ModelStatus.Training
+    ) {
+      setHelperText("Disabled during training");
+    } else if (modelStatus === ModelStatus.Evaluating) {
+      setHelperText("Evaluating...");
+    } else if (modelStatus === ModelStatus.Predicting) {
+      setHelperText("Predcting...");
+    } else if (modelStatus === ModelStatus.Suggesting) {
+      setHelperText("Accept/Reject suggested predictions first");
+    } else {
+      setHelperText("No Trained Model");
+    }
+  }, [modelStatus]);
 
   return (
     <Grid

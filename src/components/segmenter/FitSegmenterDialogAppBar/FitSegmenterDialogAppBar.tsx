@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   AppBar,
@@ -16,8 +16,14 @@ import {
 
 import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 
-import { segmenterTrainingFlagSelector } from "store/segmenter";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
+import {
+  segmenterModelSelector,
+  segmenterModelStatusSelector,
+  segmenterSlice,
+} from "store/segmenter";
+import { ModelStatus } from "types/ModelType";
+import { LayersModel } from "@tensorflow/tfjs";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;
@@ -34,12 +40,22 @@ export const FitSegmenterDialogAppBar = ({
   epochs,
   currentEpoch,
 }: FitSegmenterDialogAppBarProps) => {
-  const training = useSelector(segmenterTrainingFlagSelector);
+  const dispatch = useDispatch();
+
+  const selectedModel = useSelector(segmenterModelSelector);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
 
   const onStopFitting = () => {
-    // if (!compiled || !compiled.hasOwnProperty("stopTraining")) return;
-    // compiled.stopTraining = true;
-    // dispatch(segmenterSlice.actions.updateCompiled({ compiled: compiled }));
+    if (modelStatus !== ModelStatus.Training) return;
+    // TODO - segmenter: move into model class
+    (selectedModel._model! as LayersModel).stopTraining = true;
+    // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
+    dispatch(
+      segmenterSlice.actions.updateModelStatus({
+        execSaga: true,
+        modelStatus: ModelStatus.Trained,
+      })
+    );
   };
 
   return (
@@ -66,14 +82,17 @@ export const FitSegmenterDialogAppBar = ({
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {training && (
+        {(modelStatus === ModelStatus.InitFit ||
+          modelStatus === ModelStatus.Loading ||
+          modelStatus === ModelStatus.Training) && (
           <FitSegmenterProgressBar
             epochs={epochs}
             currentEpoch={currentEpoch}
           />
         )}
 
-        {!training && (
+        {(modelStatus === ModelStatus.Uninitialized ||
+          modelStatus >= ModelStatus.Trained) && (
           <Tooltip
             title={
               disableFitting
@@ -99,7 +118,7 @@ export const FitSegmenterDialogAppBar = ({
           <span>
             <IconButton
               onClick={onStopFitting}
-              disabled={!training}
+              disabled={modelStatus !== ModelStatus.Training}
               color="primary"
             >
               <Stop />

@@ -25,16 +25,12 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus, ModelTask } from "types/ModelType";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { Model } from "utils/common/models/Model";
-import { LayersModel } from "@tensorflow/tfjs";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
 
   const modelStatus = useSelector(classifierModelStatusSelector);
-  // TODO - segmenter: search everywhere for "selectedClassifierModelProps" and change (search the whole codebase)
-  const selectedClassifierModelProps = useSelector(
-    classifierSelectedModelSelector
-  );
+  const selectedModel = useSelector(classifierSelectedModelSelector);
 
   const dispatch = useDispatch();
 
@@ -120,9 +116,8 @@ export const ClassifierList = () => {
       />
       <SaveFittedModelDialog
         // TODO - segmenter: pass in the model class instead, with save method
-        fittedModel={selectedClassifierModelProps._model! as LayersModel}
-        modelName={selectedClassifierModelProps.name}
-        modelTask={ModelTask.Classification}
+        model={selectedModel}
+        modelStatus={modelStatus}
         onClose={onSaveClassifierDialogClose}
         open={openSaveClassifierDialog}
       />

@@ -1,1 +1,0 @@
-export { ArchitectureSettingsListItem } from "./ArchitectureSettingsListItem";

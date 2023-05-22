@@ -14,7 +14,7 @@ import {
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { decodeFromImgSrc } from "./preprocessSegmenter";
+import { decodeFromImgSrc } from "../FullyConnectedSegmenter/preprocessSegmenter";
 
 import {
   Category,

@@ -1,9 +1,9 @@
 import { styled } from "@mui/material";
 
-import { ArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/ArchitectureSettingsGrid";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { ClassifierArchitectureSettingsGrid } from "./ClassifierArchitectureSettingsGrid/ClassifierArchitectureSettingsGrid";
 
-export const ArchitectureSettingsListItem = () => {
+export const ClassifierArchitectureSettingsListItem = () => {
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -18,7 +18,7 @@ export const ArchitectureSettingsListItem = () => {
       paddingLeft={true}
     >
       <StyledForm noValidate autoComplete="off">
-        <ArchitectureSettingsGrid />
+        <ClassifierArchitectureSettingsGrid />
       </StyledForm>
     </CollapsibleList>
   );
