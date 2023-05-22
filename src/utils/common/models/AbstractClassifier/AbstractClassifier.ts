@@ -47,12 +47,7 @@ export abstract class SequentialClassifier extends Model {
   //protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _history?: History;
   //protected _history?: History;
-<<<<<<< HEAD
   private _cachedOutputShape?: number[];
-||||||| parent of f4900ba9 ([mod,opt,add] Add cloud and local classifier support)
-=======
-  private _cachedNumClasses?: number;
->>>>>>> f4900ba9 ([mod,opt,add] Add cloud and local classifier support)
 
   loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._trainingDataset = preprocessClassifier({

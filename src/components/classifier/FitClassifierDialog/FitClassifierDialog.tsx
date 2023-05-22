@@ -77,7 +77,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   );
   const selectedModel = useSelector(classifierSelectedModelSelector);
   const modelStatus = useSelector(classifierModelStatusSelector);
-
   const alertState = useSelector(alertStateSelector);
 
   const fitOptions = useSelector(classifierFitOptionsSelector);
