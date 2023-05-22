@@ -1,1 +1,1 @@
-export { usePointer } from "./usePointer";
+export { useStageHandlers } from "./usePointer";

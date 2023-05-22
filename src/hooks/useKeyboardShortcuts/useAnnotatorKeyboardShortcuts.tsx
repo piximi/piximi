@@ -27,14 +27,12 @@ import {
 import { AnnotationTool } from "annotator-tools";
 
 type useAnnotatorHotkeysProps = {
-  annotations: DecodedAnnotationType[];
   annotationTool: AnnotationTool | undefined;
   deleteAnnotations: (
     annotationIds: Array<string>,
     stagedAnnotations: Array<DecodedAnnotationType>
   ) => void;
   deselectAllAnnotations: () => void;
-  deselectAllTransformers: () => void;
   deselectAnnotation: () => void;
   resetZoomSelection: () => void;
   workingAnnotation: DecodedAnnotationType | undefined;
@@ -44,11 +42,9 @@ type useAnnotatorHotkeysProps = {
 };
 
 export const useAnnotatorKeyboardShortcuts = ({
-  annotations,
   annotationTool,
   deleteAnnotations,
   deselectAllAnnotations,
-  deselectAllTransformers,
   deselectAnnotation,
   resetZoomSelection,
   workingAnnotation,
@@ -85,7 +81,6 @@ export const useAnnotatorKeyboardShortcuts = ({
     if (!selectedAnnotationsIds.length) return;
 
     deselectAllAnnotations();
-    deselectAllTransformers();
   };
 
   const soundEnabled = useSelector(selectSoundEnabled);
@@ -296,7 +291,6 @@ export const useAnnotatorKeyboardShortcuts = ({
     HotkeyView.Annotator,
     [
       activeImageId,
-      annotations,
       annotationTool,
       annotationTool?.annotationState,
       selectedAnnotations,
@@ -314,7 +308,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       if (!annotationTool) return;
 
       deselectAllAnnotations();
-      deselectAllTransformers();
 
       deselectAnnotation();
 
@@ -322,7 +315,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       resetZoomSelection();
     },
     HotkeyView.Annotator,
-    [annotations, annotationTool, soundEnabled, toolType]
+    [annotationTool, soundEnabled, toolType]
   );
 
   useHotkeys(
@@ -330,12 +323,11 @@ export const useAnnotatorKeyboardShortcuts = ({
     () => {
       deleteAnnotations(selectedAnnotationsIds, stagedAnnotations);
       deselectAllAnnotations();
-      deselectAllTransformers();
 
       deselectAnnotation();
     },
     HotkeyView.Annotator,
-    [selectedAnnotationsIds, annotations, soundEnabled]
+    [selectedAnnotationsIds, soundEnabled]
   );
 
   useHotkeys(

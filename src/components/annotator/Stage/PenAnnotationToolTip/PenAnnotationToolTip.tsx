@@ -1,16 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector } from "store/imageViewer";
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
+
 import {
   selectPenSelectionBrushSize,
   selectToolType,
 } from "store/annotator/selectors";
-import {
-  selectActiveImageScaledHeight,
-  selectActiveImageScaledWidth,
-} from "store/data";
+import { selectActiveImageHeight, selectActiveImageWidth } from "store/data";
 
 import { ToolType } from "types";
 
@@ -30,9 +28,9 @@ export const PenAnnotationToolTip = ({
 
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
 
-  const imageWidth = useSelector(selectActiveImageScaledWidth);
-  const imageHeight = useSelector(selectActiveImageScaledHeight);
-  const stageScale = useSelector(stageScaleSelector);
+  const imageWidth = useSelector(selectActiveImageWidth);
+  const imageHeight = useSelector(selectActiveImageHeight);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
 
   if (
     toolType !== ToolType.PenAnnotation ||

@@ -54,6 +54,11 @@ startAppListening({
         dataSlice.actions.addAnnotation({ annotation: annotation! })
       );
       listenerAPI.dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({
+          annotation: annotation!,
+        })
+      );
+      listenerAPI.dispatch(
         imageViewerSlice.actions.addActiveAnnotationId({
           annotationId: annotation!.id,
         })

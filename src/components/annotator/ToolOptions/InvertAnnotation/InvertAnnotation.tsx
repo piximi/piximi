@@ -20,7 +20,7 @@ import { encode } from "utils/annotator";
 export const InvertAnnotation = () => {
   const dispatch = useDispatch();
 
-  const [annotationTool] = useAnnotationTool();
+  const { annotationTool } = useAnnotationTool();
   const workingAnnotation = useSelector(selectWorkingAnnotation);
 
   const onInvertClick = () => {

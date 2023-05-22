@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as ImageJS from "image-js";
 import { useSelector } from "react-redux";
 
-import { stageScaleSelector } from "store/imageViewer";
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import {
   selectPenSelectionBrushSize,
   selectQuickSelectionRegionSize,
@@ -32,7 +32,7 @@ export const useAnnotationTool = () => {
 
   const src = useSelector(selectActiveImageSrc);
   const operation = useSelector(selectToolType);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   const penSelectionBrushSize = useSelector(selectPenSelectionBrushSize);
   const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
   const threshold = useSelector(selectThresholdAnnotationValue);
@@ -114,5 +114,21 @@ export const useAnnotationTool = () => {
     }
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
 
-  return [operator!];
+  return {
+    annotationTool: operator!,
+    ToolSelecton: {
+      /*!(
+                annotationState !== AnnotationStateType.Annotating &&
+                toolType !== ToolType.QuickAnnotation
+              ) && <Selection tool={annotationTool} toolType={toolType} />}
+              <PenAnnotationToolTip
+                currentPosition={positionByStage}
+                absolutePosition={absolutePosition}
+                annotating={annotationState === AnnotationStateType.Annotating}
+                outOfBounds={outOfBounds}
+              />
+              {/* <PointerSelection /> })
+            */
+    },
+  };
 };

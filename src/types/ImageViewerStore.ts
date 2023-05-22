@@ -1,3 +1,4 @@
+import { AnnotationType } from "./AnnotationType";
 import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
 
 export type ImageViewerStore = {
@@ -11,6 +12,7 @@ export type ImageViewerStore = {
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
+  workingAnnotation: AnnotationType | undefined;
   selectedAnnotationIds: Array<string>;
   selectedCategoryId: string;
   stageHeight: number;

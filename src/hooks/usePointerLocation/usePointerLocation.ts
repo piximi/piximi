@@ -8,9 +8,6 @@ export const usePointerLocation = (
   stageRef: React.RefObject<Konva.Stage | null>,
   originalImage: ImageJS.Image | undefined
 ) => {
-  const [firstMouseDown, setFirstMouseDown] = useState(false);
-  const [positionByImage, setPositionByImage] = useState<Point>();
-  const [currentPosition, setCurrentPosition] = useState<Point>();
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
   const [positionByStage, setPositionByStage] = useState<Point>();
   const [outOfBounds, setOutOfBounds] = useState<boolean>(false);
@@ -51,10 +48,9 @@ export const usePointerLocation = (
     if (!position) return;
 
     const relative = getRelativePosition(position, imageRef.current);
-    setPositionByImage(relative);
 
     if (!relative) return;
-    setCurrentPosition(position);
+
     setPositionByStage(getRelativePosition(position, stageRef.current));
 
     const absolute = {
@@ -110,20 +106,11 @@ export const usePointerLocation = (
   }, [originalImage, absolutePosition?.x, absolutePosition?.y, outOfBounds]);
 
   return {
-    firstMouseDown,
-    setFirstMouseDown,
-    currentPosition,
-    pixelColor,
-    setCurrentPosition,
     absolutePosition,
-    setAbsolutePosition,
     positionByStage,
-    positionByImage,
-    setPositionByStage,
     outOfBounds,
-    setOutOfBounds,
+    pixelColor,
     getPositionFromImage,
-    getRelativePosition,
     setCurrentMousePosition,
   };
 };
