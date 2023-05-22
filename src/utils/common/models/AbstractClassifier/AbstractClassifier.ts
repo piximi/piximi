@@ -35,7 +35,7 @@ type LoadDataArgs = {
   fitOptions: FitOptions;
 };
 
-export abstract class SequentialClassifier<L = never> extends Model<L> {
+export abstract class SequentialClassifier extends Model {
   // TODO - segmenter: use protected once all the other _model accessors are refactored
   _model?: LayersModel | GraphModel;
   //protected _model?: LayersModel;
@@ -47,7 +47,7 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
   //protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _history?: History;
   //protected _history?: History;
-  private _cachedNumClasses?: number;
+  private _cachedOutputShape?: number[];
 
   loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._trainingDataset = preprocessClassifier({
@@ -123,6 +123,8 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
     const inferredBatchTensors = await this._inferenceDataset
       .map((items) => {
         const batchPred = tidy(() => {
+          // we're mapping over batches already, but predict also
+          // takes a batch size option which defaults at 32
           const batchProbs = model.predict(items.xs) as Tensor2D;
           return argMax(batchProbs, 1) as Tensor1D;
         });
@@ -283,34 +285,40 @@ export abstract class SequentialClassifier<L = never> extends Model<L> {
   }
 
   get numClasses() {
-    if (!this._model) return undefined;
+    return this.defaultOutputShape[1];
+  }
+
+  get defaultInputShape() {
+    return this._model?.inputs[0].shape!.slice(1) as number[];
+  }
+
+  get defaultOutputShape() {
+    if (!this._model) {
+      throw Error(`"${this.name}" Model not loaded`);
+    }
 
     const outputShape = this._model.outputs[0].shape;
 
     if (outputShape) {
       // idx 0 is the batch dim
-      return outputShape[1] as number;
-    } else if (this._cachedNumClasses) {
-      return this._cachedNumClasses;
+      return (outputShape as number[]).slice(1);
+    } else if (this._cachedOutputShape) {
+      return this._cachedOutputShape;
     } else {
       // sometimes models don't list their output shape (often graph models)
       // in this case run inference on dummy data, and get shape of output
       // we cache it to avoid expensive recalculation
 
-      const _numClasses = tidy(() => {
+      const _outputShape = tidy(() => {
         const dummyData = zeros(this.defaultInputShape).expandDims(0);
         const pred = this._model!.predict(dummyData) as Tensor;
-        return pred.shape[1] as number;
+        return pred.shape.slice(1) as number[];
       });
 
-      this._cachedNumClasses = _numClasses;
+      this._cachedOutputShape = _outputShape;
 
-      return this._cachedNumClasses;
+      return this._cachedOutputShape;
     }
-  }
-
-  get defaultInputShape() {
-    return this._model?.inputs[0].shape!.slice(1) as number[];
   }
 
   get trainingLoaded() {

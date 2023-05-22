@@ -12,7 +12,7 @@ type LoadModelArgs = {
   useCustomTopLayer: boolean;
 };
 
-export class MobileNet extends SequentialClassifier<LoadModelArgs> {
+export class MobileNet extends SequentialClassifier {
   constructor() {
     super({
       name: "MobileNet",

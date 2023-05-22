@@ -5,7 +5,7 @@ import { segmenterSlice } from "store/segmenter";
 
 export function* watchEvaluateSegmenterSaga() {
   yield takeLeading(
-    segmenterSlice.actions.evaluateSegmenter.type,
+    segmenterSlice.actions.updateModelStatus.type,
     evaluateSegmenterSaga
   );
 }

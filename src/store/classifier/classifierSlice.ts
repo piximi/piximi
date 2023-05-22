@@ -6,7 +6,7 @@ import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
 import { History } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
-import { concreteClassifierModels, ModelStatus } from "../../types/ModelType";
+import { availableClassifierModels, ModelStatus } from "../../types/ModelType";
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { TrainingCallbacks } from "utils/common/models/Model";
@@ -27,7 +27,7 @@ export const initialState: Classifier = {
   },
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModel: concreteClassifierModels[0],
+  selectedModel: availableClassifierModels[0],
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   preprocessOptions: {

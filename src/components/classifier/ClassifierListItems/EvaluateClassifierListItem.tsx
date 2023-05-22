@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -41,7 +41,7 @@ export const EvaluateClassifierListItem = (
   const modelStatus = useSelector(classifierModelStatusSelector);
   const evaluationResult = useSelector(classifierEvaluationResultSelector);
 
-  const [waitingForResults, setWaitingForResults] = React.useState(false);
+  const [waitingForResults, setWaitingForResults] = useState(false);
 
   const onEvaluate = async () => {
     setWaitingForResults(true);

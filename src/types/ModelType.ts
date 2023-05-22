@@ -1,7 +1,10 @@
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
+import { FullyCOnnectedSegmenter } from "utils/common/models/FullyConnectedSegmenter/FullyConnectedSegmenter";
+import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 
 export enum ModelArchitecture {
   None,
@@ -30,40 +33,13 @@ export enum ModelStatus {
   Evaluating,
 }
 
-type ModelProps = {
-  modelName: string;
-  requiredChannels?: number;
-  modelArch: ModelArchitecture;
-  graph: boolean; // Model Format, Graph if true, Layers if false
-  src?: string;
-  pretrained?: boolean;
-};
-
-export interface DefaultModelProps extends ModelProps {}
-
-export type ClassifierModelProps = DefaultModelProps;
-
-export type SegmenterModelProps = DefaultModelProps;
-
-export const concreteClassifierModels: Array<SequentialClassifier> = [
+export const availableClassifierModels: Array<SequentialClassifier> = [
   new SimpleCNN(),
   new MobileNet(),
 ];
 
-// TODO - segmenter: Replace these with concrete classes when Segmenter becomes abstract
 export const availableSegmenterModels: Array<Segmenter> = [
-  new Segmenter(ModelArchitecture.CocoSSD, {
-    name: "Coco-SSD",
-    task: ModelTask.Segmentation,
-    graph: true,
-    pretrained: true,
-    trainable: false,
-  }),
-  new Segmenter(ModelArchitecture.StardistVHE, {
-    name: "Stardist Versitile H&E Nuclei",
-    task: ModelTask.Segmentation,
-    graph: true,
-    pretrained: true,
-    trainable: false,
-  }),
+  new CocoSSD(),
+  new FullyCOnnectedSegmenter(),
+  new StardistVHE(),
 ];

@@ -1,5 +1,5 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   CircularProgress,
@@ -14,7 +14,8 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton";
 
-import { segmenterSlice } from "store/segmenter";
+import { segmenterModelStatusSelector, segmenterSlice } from "store/segmenter";
+import { ModelStatus } from "types/ModelType";
 
 type EvaluateSegmenterListItemProps = {
   disabled: boolean;
@@ -27,19 +28,33 @@ export const EvaluateSegmenterListItem = (
   const dispatch = useDispatch();
   const t = useTranslation();
 
-  const [isEvaluating, setIsEvaluating] = React.useState<boolean>(false);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
+
+  const [waitingForResults, setWaitingForResults] = React.useState(false);
 
   const onEvaluate = async () => {
-    setIsEvaluating(true);
-    dispatch(segmenterSlice.actions.evaluateSegmenter({ execSaga: true }));
+    setWaitingForResults(true);
+
+    dispatch(
+      segmenterSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Evaluating,
+        execSaga: true,
+      })
+    );
   };
+
+  useEffect(() => {
+    if (modelStatus === ModelStatus.Trained && waitingForResults) {
+      setWaitingForResults(false);
+    }
+  }, [modelStatus, waitingForResults]);
 
   return (
     <Grid item xs={4}>
       <DisabledListItemButton {...props} onClick={onEvaluate}>
         <Stack sx={{ alignItems: "center" }}>
           <ListItemIcon sx={{ justifyContent: "center" }}>
-            {isEvaluating ? (
+            {modelStatus === ModelStatus.Evaluating ? (
               <CircularProgress disableShrink size={24} />
             ) : (
               <AssessmentIcon />

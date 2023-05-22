@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -29,11 +29,10 @@ type PredictClassifierListItemProps = {
 export const PredictClassifierListItem = (
   props: PredictClassifierListItemProps
 ) => {
+  const t = useTranslation();
   const dispatch = useDispatch();
 
-  const t = useTranslation();
-
-  const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
   const onPredict = () => {
     dispatch(
@@ -44,18 +43,12 @@ export const PredictClassifierListItem = (
     );
   };
 
-  const modelStatus = useSelector(classifierModelStatusSelector);
-
-  useEffect(() => {
-    setIsPredicting(modelStatus === ModelStatus.Predicting);
-  }, [modelStatus]);
-
   return (
     <Grid item xs={4}>
       <DisabledListItemButton {...props} onClick={onPredict}>
         <Stack sx={{ alignItems: "center" }}>
           <ListItemIcon sx={{ justifyContent: "center" }}>
-            {isPredicting ? (
+            {modelStatus === ModelStatus.Predicting ? (
               <CircularProgress disableShrink size={24} />
             ) : (
               <LabelImportantIcon />

@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 // import { useLocation } from "react-router-dom";
 import StackTrace from "stacktrace-js";
-import { LayersModel } from "@tensorflow/tfjs";
 
 import {
   AppBar,
@@ -34,15 +33,15 @@ import {
   classifierModelStatusSelector,
 } from "store/classifier";
 import {
-  segmenterFittedModelSelector,
-  segmenterArchitectureOptionsSelector,
+  segmenterModelSelector,
+  segmenterModelStatusSelector,
 } from "store/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
 
 import { createGitHubIssue } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
-import { ModelStatus, ModelTask } from "types/ModelType";
+import { ModelStatus } from "types/ModelType";
 
 export const FallBackDialog = (props: any) => {
   const error = props.error as Error;
@@ -92,14 +91,11 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
-  const selectedModel = useSelector(classifierSelectedModelSelector);
-  const modelStatus = useSelector(classifierModelStatusSelector);
+  const selectedClassifierModel = useSelector(classifierSelectedModelSelector);
+  const classifierModelStatus = useSelector(classifierModelStatusSelector);
 
-  const fittedSegmenterModel = useSelector(segmenterFittedModelSelector);
-  const selectedSegmenterModelProps = useSelector(
-    segmenterArchitectureOptionsSelector
-  ).selectedModel;
-  const fittedSegmenter = fittedSegmenterModel ? true : false;
+  const selectedSegmenterModel = useSelector(segmenterModelSelector);
+  const segmenterModelStatus = useSelector(segmenterModelStatusSelector);
 
   const errorState: AlertStateType = {
     alertType: AlertType.Error,
@@ -229,12 +225,12 @@ export const FallBackDialog = (props: any) => {
           <Button variant="outlined" onClick={onSaveProjectDialogOpen}>
             Save project
           </Button>
-          {modelStatus === ModelStatus.Trained && (
+          {classifierModelStatus === ModelStatus.Trained && (
             <Button variant="outlined" onClick={onSaveClassifierDialogOpen}>
               Save classifier
             </Button>
           )}
-          {fittedSegmenter && (
+          {segmenterModelStatus === ModelStatus.Trained && (
             <Button variant="outlined" onClick={onSaveSegmenterDialogOpen}>
               Save segmenter
             </Button>
@@ -247,19 +243,15 @@ export const FallBackDialog = (props: any) => {
         />
 
         <SaveFittedModelDialog
-          // TODO - segmenter: pass in the model class itself
-          fittedModel={selectedModel._model! as LayersModel}
-          modelName={selectedModel.name}
-          modelTask={ModelTask.Classification}
+          model={selectedClassifierModel}
+          modelStatus={classifierModelStatus}
           onClose={onSaveClassifierDialogClose}
           open={openSaveClassifierDialog}
         />
 
         <SaveFittedModelDialog
-          fittedModel={fittedSegmenterModel as LayersModel}
-          // @ts-ignore TODO - segmenter
-          modelName={selectedSegmenterModelProps.modelName}
-          modelTask={ModelTask.Segmentation}
+          model={selectedSegmenterModel}
+          modelStatus={segmenterModelStatus}
           onClose={onSaveSegmenterDialogClose}
           open={openSaveSegmenterDialog}
         />

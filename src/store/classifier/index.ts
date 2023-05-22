@@ -14,7 +14,6 @@ export { updateModelStatus } from "./classifierSlice";
 
 // Selectors
 
-export { classifierArchitectureOptionsSelector } from "./selectors/classifierArchitectureOptionsSelector";
 export { classifierSelector } from "./selectors/classifierSelector";
 export { classifierCompileOptionsSelector } from "./selectors/classifierCompileOptionsSelector";
 export { classifierCropOptionsSelector } from "./selectors/classifierCropOptionsSelector";

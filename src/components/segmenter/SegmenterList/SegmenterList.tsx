@@ -1,5 +1,4 @@
 import React from "react";
-import { GraphModel, LayersModel } from "@tensorflow/tfjs";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Divider, IconButton, Tooltip } from "@mui/material";
@@ -13,58 +12,69 @@ import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedMode
 import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
 
-import { selectCreatedAnnotationCategories } from "store/data";
+import { dataSlice, selectCreatedAnnotationCategories } from "store/data";
 
 import {
-  segmenterArchitectureOptionsSelector,
-  segmenterFittedModelSelector,
+  segmenterModelSelector,
+  segmenterModelStatusSelector,
   segmenterSlice,
 } from "store/segmenter";
 
-import { CategoryType, HotkeyView, ModelArchitecture, Shape } from "types";
+import { CategoryType, HotkeyView, Shape } from "types";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelTask } from "types/ModelType";
+import { Model } from "utils/common/models/Model";
+import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
-  const fittedSegmenter = useSelector(segmenterFittedModelSelector);
-  // TODO - segmenter: remove props in name, here and everywhere
-  const selectedSegmenterModelProps = useSelector(
-    segmenterArchitectureOptionsSelector
-  ).selectedModel;
+
+  const dispatch = useDispatch();
+
+  const selectedModel = useSelector(segmenterModelSelector);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
 
   const {
     onClose: onCloseImportSegmenterDialog,
     onOpen: onOpenImportSegmenterDialog,
     open: openImportSegmenterDialog,
   } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
+
   const {
     onClose: onSaveSegmenterDialogClose,
     onOpen: onSaveSegmenterDialogOpen,
     open: openSaveSegmenterDialog,
   } = useDialog();
 
-  const dispatch = useDispatch();
+  const importSegmentationModel = async (model: Model, inputShape: Shape) => {
+    if (model instanceof Segmenter) {
+      // TODO - segmenter: generalize this to something like if model.requiredCategories
+      if (model instanceof CocoSSD) {
+        await model.loadModel();
 
-  const importSegmentationModel = (
-    model: GraphModel | LayersModel,
-    modelArch: ModelArchitecture,
-    graph: boolean,
-    inputShape: Shape,
-    modelName: string
-  ) => {
-    dispatch(
-      segmenterSlice.actions.uploadUserSelectedModel({
-        inputShape,
-        modelSelection: {
-          // @ts-ignore TODO - segmenter
-          modelName,
-          modelArch,
-          graph,
-        },
-        model,
-      })
-    );
+        const cocoCategories = model.constructCategories();
+        dispatch(
+          dataSlice.actions.setAnnotationCategories({
+            annotationCategories: cocoCategories,
+            isPermanent: true,
+          })
+        );
+      }
+
+      dispatch(
+        segmenterSlice.actions.uploadUserSelectedModel({
+          inputShape,
+          model,
+        })
+      );
+    } else if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `Attempting to dispatch a model with task ${
+          ModelTask[model.task]
+        }, should be ${ModelTask[ModelTask.Segmentation]}`
+      );
+    }
   };
 
   const SegmenterIOButtons = (
@@ -117,13 +127,11 @@ export const SegmenterList = () => {
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
         modelTask={ModelTask.Segmentation}
-        // @ts-ignore TODO - segmenter
         dispatchFunction={importSegmentationModel}
       />
       <SaveFittedModelDialog
-        fittedModel={fittedSegmenter as LayersModel}
-        modelName={selectedSegmenterModelProps.name}
-        modelTask={ModelTask.Segmentation}
+        model={selectedModel}
+        modelStatus={modelStatus}
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}
       />

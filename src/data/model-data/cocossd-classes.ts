@@ -15,9 +15,9 @@
  * =============================================================================
  */
 
-import { ObjectDetectionType } from "types";
-
-const COCO_CLASSES: { [key: string]: ObjectDetectionType } = {
+const COCO_CLASSES: {
+  [key: string]: { name: string; id: number; displayName: string };
+} = {
   1: {
     name: "/m/01g317",
     id: 1,

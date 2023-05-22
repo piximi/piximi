@@ -15,16 +15,18 @@ export type Classifier = {
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;
+
   learningRate: number;
   lossFunction: LossFunction;
   optimizationAlgorithm: OptimizationAlgorithm;
-  trainingPercentage: number;
   metrics: Array<Metric>;
+
+  trainingPercentage: number;
   history?: History;
   // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
   // post-prediction results
-  predictions?: Tensor;
+  predictions?: Tensor; // TODO - segmenter
   // status flags
   modelStatus: ModelStatus;
 };
