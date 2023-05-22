@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
+import { imageOriginSelector } from "store/imageViewer";
 import { LassoAnnotationTool } from "annotator-tools";
-import { imageOriginSelector, stageScaleSelector } from "store/imageViewer";
 
 type LassoSelectionProps = {
   operator: LassoAnnotationTool;
@@ -14,7 +15,7 @@ type LassoSelectionProps = {
 export const LassoSelection = ({ operator }: LassoSelectionProps) => {
   const dashOffset = useMarchingAnts();
   const imageOrigin = useSelector(imageOriginSelector);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   if (!operator.origin) return <></>;
 
   return (

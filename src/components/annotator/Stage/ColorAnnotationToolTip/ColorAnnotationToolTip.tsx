@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { stageScaleSelector } from "store/imageViewer";
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import {
   selectAnnotationState,
   selectToolType,
@@ -25,7 +25,7 @@ export const ColorAnnotationToolTip = ({
 }: ColorAnnotationToolTipProps) => {
   const [text, setText] = useState<string>("Tolerance: 0%");
   const toolType = useSelector(selectToolType);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   const annotationState = useSelector(selectAnnotationState);
 
   useEffect(() => {

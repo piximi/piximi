@@ -1,10 +1,9 @@
-import { useLayoutEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { stageScaleSelector } from "store/imageViewer";
+import { useContext, useLayoutEffect, useState } from "react";
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 
 export const useMarchingAnts = () => {
   const [dashOffset, setDashOffset] = useState<number>(0);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   useLayoutEffect(() => {
     let timerId: number;
     const f = () => {

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import * as ReactKonva from "react-konva";
 import { useSelector } from "react-redux";
 
 import { useMarchingAnts } from "hooks";
 
-import { imageOriginSelector, stageScaleSelector } from "store/imageViewer";
-
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
+import { imageOriginSelector } from "store/imageViewer";
 import { PolygonalAnnotationTool } from "annotator-tools";
 
 type PolygonalSelectionProps = {
@@ -15,7 +15,7 @@ type PolygonalSelectionProps = {
 export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   const imageOrigin = useSelector(imageOriginSelector);
 
   if (!operator.origin) return <></>;

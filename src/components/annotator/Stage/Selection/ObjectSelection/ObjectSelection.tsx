@@ -1,11 +1,9 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useContext } from "react";
 import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
-import { stageScaleSelector } from "store/imageViewer";
-
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import { ObjectAnnotationTool } from "annotator-tools";
 
 type ObjectSelectionProps = {
@@ -15,7 +13,7 @@ type ObjectSelectionProps = {
 export const ObjectSelection = ({ operator }: ObjectSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const stageScale = useSelector(stageScaleSelector);
+  const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
 
   if (!operator.origin || !operator.width || !operator.height) return null;
 

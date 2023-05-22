@@ -4,6 +4,7 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ImageViewerStore,
   ColorAdjustmentOptionsType,
+  AnnotationType,
 } from "types";
 
 import { mutatingFilter } from "utils/common/helpers";
@@ -28,6 +29,7 @@ const initialState: ImageViewerStore = {
   imageOrigin: { x: 0, y: 0 },
   hiddenCategoryIds: [],
   workingAnnotationId: undefined,
+  workingAnnotation: undefined,
   selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
@@ -172,6 +174,13 @@ export const imageViewerSlice = createSlice({
         });
       }
     },
+    setWorkingAnnotation(
+      state,
+      action: PayloadAction<{ annotation: AnnotationType }>
+    ) {
+      state.workingAnnotation = action.payload.annotation;
+    },
+
     hideCategory(
       state,
       action: PayloadAction<{

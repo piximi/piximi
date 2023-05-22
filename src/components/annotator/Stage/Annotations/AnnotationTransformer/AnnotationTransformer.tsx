@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
+import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import { selectSoundEnabled } from "store/application";
 import {
   activeImageIdSelector,
   cursorSelector,
   setSelectedAnnotationIds,
-  stageScaleSelector,
   imageOriginSelector,
   selectActiveAnnotationIds,
 } from "store/imageViewer";
@@ -30,6 +30,14 @@ import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 
+const buttonWidth = 65;
+const buttonHeight = 26;
+const buttonGap = 6;
+const labelPosition = {
+  x: -buttonWidth,
+  y1: buttonGap,
+  y2: buttonHeight + buttonGap * 2,
+};
 type box = {
   x: number;
   y: number;
@@ -61,7 +69,7 @@ export const AnnotationTransformer = ({
   const workingAnnotation = useSelector(selectWorkingAnnotation);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeImageId = useSelector(activeImageIdSelector);
-  const stageScale = useSelector(stageScaleSelector);
+  const stageRef = useContext(StageContext);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(selectSoundEnabled);
   const imageWidth = useSelector(selectActiveImageWidth);
@@ -122,6 +130,7 @@ export const AnnotationTransformer = ({
   };
 
   const boundingBoxFunc = (oldBox: box, newBox: box) => {
+    const stageScale = stageRef?.current?.scaleX() ?? 1;
     const relativeNewBox = getRelativeBox(newBox, stageScale);
 
     if (!imageWidth || !imageHeight || !relativeNewBox) return oldBox;
@@ -223,32 +232,24 @@ export const AnnotationTransformer = ({
 
   useEffect(() => {
     if (workingAnnotation && selectedAnnotations.length === 1) {
-      setXPos(
+      const newX =
         Math.max(
           workingAnnotation.boundingBox[0],
           workingAnnotation.boundingBox[2]
-        ) *
-          stageScale +
-          imageOrigin.x
-      );
+        ) + imageOrigin.x;
+      setXPos(newX);
 
-      const tempYPos = Math.max(
+      const yMax = Math.max(
         workingAnnotation.boundingBox[1],
         workingAnnotation.boundingBox[3]
       );
-      setYPos(
-        (tempYPos + 56) * stageScale > imageHeight!
-          ? (imageHeight! - 65) * stageScale + imageOrigin.y
-          : tempYPos * stageScale + imageOrigin.y
-      );
+      const newY =
+        yMax + 56 > imageHeight!
+          ? imageHeight! - 65 + imageOrigin.y
+          : yMax + imageOrigin.y;
+      setYPos(newY);
     }
-  }, [
-    workingAnnotation,
-    selectedAnnotations.length,
-    imageHeight,
-    imageOrigin,
-    stageScale,
-  ]);
+  }, [workingAnnotation, selectedAnnotations.length, imageHeight, imageOrigin]);
 
   useEffect(() => {
     if (!activeAnnotationIds.includes(annotationId)) {
@@ -276,13 +277,13 @@ export const AnnotationTransformer = ({
               <ReactKonva.Group
                 id={"label-group"}
                 position={{ x: xPos, y: yPos }}
-                scaleX={1 / stageScale}
-                scaleY={1 / stageScale}
+                scaleX={1 / (stageRef?.current?.scaleX() ?? 1)}
+                scaleY={1 / (stageRef?.current?.scaleX() ?? 1)}
               >
                 <ReactKonva.Label
                   position={{
-                    x: -58,
-                    y: 6,
+                    x: labelPosition.x,
+                    y: labelPosition.y1,
                   }}
                   onClick={
                     transformed
@@ -311,16 +312,16 @@ export const AnnotationTransformer = ({
                     fontSize={14}
                     padding={6}
                     text={transformed ? "Confirm" : "Delete"}
-                    width={65}
-                    height={26}
+                    width={buttonWidth}
+                    height={buttonHeight}
                     align={"center"}
                     name={"transformer-button"}
                   />
                 </ReactKonva.Label>
                 <ReactKonva.Label
                   position={{
-                    x: -58,
-                    y: 35,
+                    x: labelPosition.x,
+                    y: labelPosition.y2,
                   }}
                   onClick={cancelAnnotationHandler}
                   onTap={cancelAnnotationHandler}
@@ -341,8 +342,8 @@ export const AnnotationTransformer = ({
                     fontSize={14}
                     padding={6}
                     text={"Cancel"}
-                    width={65}
-                    height={26}
+                    width={buttonWidth}
+                    height={buttonHeight}
                     align={"center"}
                     name={"transformer-button"}
                   />

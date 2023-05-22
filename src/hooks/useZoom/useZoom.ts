@@ -1,19 +1,19 @@
+import { useState } from "react";
+import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 
 import {
   zoomSelectionSelector,
   setZoomSelection,
-  setStageScale,
   stageWidthSelector,
   activeImageIdSelector,
 } from "store/imageViewer";
+
 import { selectToolType } from "store/annotator/selectors";
 import { zoomToolOptionsSelector } from "store/tool-options";
 
 import { Point, ToolType, ZoomModeType } from "types";
-import { useState } from "react";
-import Konva from "konva";
 
 export const useZoom = (stage?: Konva.Stage | null) => {
   const delta = 10;
@@ -45,8 +45,6 @@ export const useZoom = (stage?: Konva.Stage | null) => {
 
     stage.position(newPos);
     stage.scale({ x: newScale, y: newScale });
-
-    dispatch(setStageScale({ stageScale: newScale }));
   };
 
   const resetZoomSelection = () => {
