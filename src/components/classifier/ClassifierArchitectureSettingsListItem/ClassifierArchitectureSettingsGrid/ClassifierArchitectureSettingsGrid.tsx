@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
@@ -9,40 +9,30 @@ import {
 } from "components/common/styled-components";
 
 import {
-  classifierArchitectureOptionsSelector,
-  // classifierUploadedModelSelector,
   classifierInputShapeSelector,
+  classifierSelectedModelSelector,
   classifierSlice,
 } from "store/classifier";
 
-import { concreteClassifierModels } from "types/ModelType";
+import { availableClassifierModels } from "types/ModelType";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
-export const ArchitectureSettingsGrid = () => {
-  const architectureOptions = useSelector(
-    classifierArchitectureOptionsSelector
-  );
-  // const userUploadedModel = useSelector(classifierUploadedModelSelector);
-  const inputShape = useSelector(classifierInputShapeSelector);
-
-  const [selectedModel, setSelectedModel] =
-    React.useState<SequentialClassifier>(architectureOptions.selectedModel);
-
-  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
-    React.useState<boolean>(false);
-  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
-    React.useState<string>("");
-
+export const ClassifierArchitectureSettingsGrid = () => {
   const dispatch = useDispatch();
 
-  const modelOptions = concreteClassifierModels.slice();
+  const inputShape = useSelector(classifierInputShapeSelector);
+  const selectedModel = useSelector(classifierSelectedModelSelector);
 
-  // TODO - segmenter: hook this back up
-  // if (userUploadedModel) {
-  //   modelOptions.push(userUploadedModel);
-  // }
+  const [fixedNumberOfChannels, setFixedNumberOfChannels] =
+    useState<boolean>(false);
 
-  React.useEffect(() => {
+  const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
+    useState<string>("");
+
+  // TOOD: why copy?
+  const modelOptions = availableClassifierModels.slice();
+
+  useEffect(() => {
     if (selectedModel.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
@@ -58,25 +48,24 @@ export const ArchitectureSettingsGrid = () => {
     event: React.SyntheticEvent<Element, Event>,
     value: SequentialClassifier | null
   ) => {
-    const selectedModel = value as SequentialClassifier;
-    setSelectedModel(selectedModel);
+    const _selectedModel = value as SequentialClassifier;
+
+    // TODO - segmenter: probably towrad the end, resolve problem with select -> train -> select new ...
+    dispatch(
+      classifierSlice.actions.updateSelectedModel({ model: _selectedModel })
+    );
 
     // if the selected model requires a specific number of input channels, dispatch that number to the store
-    if (selectedModel.requiredChannels) {
+    if (_selectedModel.requiredChannels) {
       dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
             ...inputShape,
-            channels: selectedModel.requiredChannels,
+            channels: _selectedModel.requiredChannels,
           },
         })
       );
     }
-
-    // TODO - segmenter: probably towrad the end, resolve problem with select -> train -> select new ...
-    dispatch(
-      classifierSlice.actions.updateSelectedModel({ model: selectedModel })
-    );
   };
 
   const dispatchRows = (height: number) => {
@@ -133,6 +122,7 @@ export const ArchitectureSettingsGrid = () => {
             value={inputShape.height}
             dispatchCallBack={dispatchRows}
             min={1}
+            disabled={!selectedModel.trainable}
           />
         </Grid>
         <Grid item xs={1}>
@@ -142,6 +132,7 @@ export const ArchitectureSettingsGrid = () => {
             value={inputShape.width}
             dispatchCallBack={dispatchCols}
             min={1}
+            disabled={!selectedModel.trainable}
           />
         </Grid>
         <Grid item xs={1}>
@@ -151,7 +142,7 @@ export const ArchitectureSettingsGrid = () => {
             value={inputShape.channels}
             dispatchCallBack={dispatchChannels}
             min={1}
-            disabled={fixedNumberOfChannels}
+            disabled={fixedNumberOfChannels || !selectedModel.trainable}
           />
         </Grid>
       </Grid>

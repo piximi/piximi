@@ -12,11 +12,6 @@ export type { AnnotationsEntityType } from "./AnnotationsEntityType";
 export type { TypedAppStartListening } from "./TypedAppStartListening";
 export type { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
 
-export type {
-  ClassifierArchitectureOptions,
-  SegmenterArchitectureOptions,
-} from "./ArchitectureOptions";
-
 export type { Category } from "./Category";
 export {
   CategoryType,
@@ -90,13 +85,7 @@ export { LossFunction } from "./LossFunction";
 
 export { Metric } from "./Metric";
 
-export type {
-  ClassifierModelProps,
-  SegmenterModelProps,
-  DefaultModelProps,
-} from "./ModelType";
 export { ModelArchitecture } from "./ModelType";
-export type { ObjectDetectionType } from "./ObjectDetectionClassType";
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";
