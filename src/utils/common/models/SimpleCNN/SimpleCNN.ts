@@ -12,7 +12,7 @@ type LoadModelArgs = {
   randomizeWeights: boolean;
 };
 
-export class SimpleCNN extends SequentialClassifier<LoadModelArgs> {
+export class SimpleCNN extends SequentialClassifier {
   constructor() {
     super({
       name: "SimpleCNN",

@@ -1,45 +1,26 @@
-//import { LayersModel } from "@tensorflow/tfjs";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
+import { selectImagesByPartition } from "store/data";
+
 import {
-  selectImagesByPartition,
-  //selectAnnotationCategories,
-} from "store/data";
-//import { annotationCategoriesSelector } from "store/project";
-import {
-  segmenterFittedModelSelector,
   segmenterSlice,
-  //segmenterValDataSelector,
-  //evaluateSegmenter,
+  //segmenterModelSelector,
 } from "store/segmenter";
 
-import {
-  AlertType,
-  AlertStateType,
-  Partition,
-  //Category,
-  //ImageType
-} from "types";
-import { getStackTraceFromError } from "utils";
+import { AlertType, /*AlertStateType,*/ Partition } from "types";
+import { ModelStatus } from "types/ModelType";
+//import { getStackTraceFromError } from "utils";
 
 export function* evaluateSegmenterSaga({
-  payload: { execSaga },
-}: PayloadAction<{ execSaga: boolean }>) {
-  if (!execSaga) return;
+  payload: { execSaga, modelStatus },
+}: PayloadAction<{ execSaga: boolean; modelStatus: ModelStatus }>) {
+  if (!execSaga || modelStatus !== ModelStatus.Evaluating) return;
 
-  const model: ReturnType<typeof segmenterFittedModelSelector> = yield select(
-    segmenterFittedModelSelector
-  );
-
-  if (model === undefined) {
-    yield handleError(
-      new Error("No selectable model in store"),
-      "Failed to get tensorflow model"
-    );
-    return;
-  }
+  // const model: ReturnType<typeof segmenterModelSelector> = yield select(
+  //   segmenterModelSelector
+  //);
 
   const validationImages: ReturnType<typeof selectImagesByPartition> =
     yield select((state) =>
@@ -47,9 +28,6 @@ export function* evaluateSegmenterSaga({
     );
 
   yield put(applicationSlice.actions.hideAlertState({}));
-
-  // const categories: ReturnType<typeof selectAnnotationCategories> =
-  //   yield select(selectAnnotationCategories);
 
   if (validationImages.length === 0) {
     yield put(
@@ -61,67 +39,30 @@ export function* evaluateSegmenterSaga({
         },
       })
     );
-  } else {
-    //yield runSegmentationEvaluation(validationImages, model, categories);
   }
 
   yield put(
-    segmenterSlice.actions.updateEvaluating({
-      evaluating: false,
+    segmenterSlice.actions.updateModelStatus({
+      modelStatus: ModelStatus.Trained,
+      execSaga: false,
     })
   );
 }
 
-// function* runSegmentationEvaluation(
-//   validationImages: Array<ImageType>,
-//   model: LayersModel,
-//   categories: Array<Category>
-// ) {
-//   const validationData: ReturnType<typeof segmenterValDataSelector> =
-//     yield select(segmenterValDataSelector);
+// function* handleError(error: Error, name: string) {
+//   const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+//     yield getStackTraceFromError(error);
 
-//   if (validationData === undefined) {
-//     yield handleError(
-//       new Error("No selectable validation data in store"),
-//       "Failed to get validation data"
-//     );
-//     return;
-//   }
-
-//   try {
-//     var evaluationResult: Awaited<ReturnType<typeof evaluateSegmenter>> =
-//       yield evaluateSegmenter(
-//         model,
-//         validationData,
-//         validationImages,
-//         categories
-//       );
-//   } catch (error) {
-//     yield handleError(error as Error, "Error computing the evaluation results");
-//     return;
-//   }
+//   const alertState: AlertStateType = {
+//     alertType: AlertType.Error,
+//     name: name,
+//     description: `${error.name}:\n${error.message}`,
+//     stackTrace: stackTrace,
+//   };
 
 //   yield put(
-//     segmenterSlice.actions.updateSegmentationEvaluationResult({
-//       evaluationResult,
+//     applicationSlice.actions.updateAlertState({
+//       alertState: alertState,
 //     })
 //   );
 // }
-
-function* handleError(error: Error, name: string) {
-  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
-    yield getStackTraceFromError(error);
-
-  const alertState: AlertStateType = {
-    alertType: AlertType.Error,
-    name: name,
-    description: `${error.name}:\n${error.message}`,
-    stackTrace: stackTrace,
-  };
-
-  yield put(
-    applicationSlice.actions.updateAlertState({
-      alertState: alertState,
-    })
-  );
-}

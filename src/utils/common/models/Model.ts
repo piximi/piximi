@@ -18,7 +18,7 @@ export type TrainingCallbacks = {
   onEpochEnd: CallbackList["onEpochEnd"];
 };
 
-export abstract class Model<L = never> {
+export abstract class Model {
   readonly name: string;
   readonly task: ModelTask;
   readonly graph: boolean;
@@ -45,13 +45,14 @@ export abstract class Model<L = never> {
     this.requiredChannels = requiredChannels;
   }
 
-  abstract loadModel(loadModelArgs: L): void;
+  abstract loadModel(loadModelArgs: any): void;
   abstract loadTraining(images: ImageType[], preprocessingArgs: any): void;
   abstract loadValidation(images: ImageType[], preprocessingArgs: any): void;
   abstract loadInference(images: ImageType[], preprocessingArgs: any): void;
 
   abstract train(options: any, callbacks: any): Promise<History>;
   abstract predict(options: any, callbacks: any): any;
+  abstract evaluate(): any;
 
   abstract dispose(): void;
 
@@ -60,5 +61,12 @@ export abstract class Model<L = never> {
   abstract get validationLoaded(): boolean;
   abstract get inferenceLoaded(): boolean;
 
+  abstract get defaultInputShape(): number[];
+  abstract get defaultOutputShape(): number[];
+
   //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
+
+  static verifyTFHubUrl(url: string) {
+    return url.includes("tfhub.dev");
+  }
 }

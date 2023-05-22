@@ -11,7 +11,7 @@ import { CloudUpload } from "./CloudUpload";
 import { HotkeyView, Shape } from "types";
 import {
   ModelTask,
-  concreteClassifierModels,
+  availableClassifierModels,
   availableSegmenterModels,
 } from "types/ModelType";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
@@ -73,7 +73,7 @@ export const ImportTensorflowModelDialog = ({
     // TODO - segmenter: map over and only include pretrained === true
     const models =
       modelTask === ModelTask.Classification
-        ? concreteClassifierModels
+        ? availableClassifierModels
         : availableSegmenterModels;
 
     setPretrainedModels(models);

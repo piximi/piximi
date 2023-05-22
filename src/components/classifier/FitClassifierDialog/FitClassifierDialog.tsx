@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dialog, DialogContent, List } from "@mui/material";
 
 import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
-import { ArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
+import { ClassifierArchitectureSettingsListItem } from "../ClassifierArchitectureSettingsListItem";
 import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 
 import {
@@ -21,7 +21,6 @@ import {
   classifierModelStatusSelector,
   classifierCompileOptionsSelector,
   classifierFitOptionsSelector,
-  classifierEpochsSelector,
   classifierTrainingPercentageSelector,
   classifierSlice,
 } from "store/classifier";
@@ -78,11 +77,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   );
   const selectedModel = useSelector(classifierSelectedModelSelector);
   const modelStatus = useSelector(classifierModelStatusSelector);
+
   const alertState = useSelector(alertStateSelector);
 
-  const compileOptions = useSelector(classifierCompileOptionsSelector);
   const fitOptions = useSelector(classifierFitOptionsSelector);
-  const epochs = useSelector(classifierEpochsSelector);
+  const compileOptions = useSelector(classifierCompileOptionsSelector);
   const trainingPercentage = useSelector(classifierTrainingPercentageSelector);
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
@@ -134,13 +133,13 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   useEffect(() => {
     if (categorizedImages.length === 0) {
       setNoCategorizedImages(true);
-      if (!noCategorizedImages) {
+      if (!noCategorizedImages && selectedModel.trainable) {
         setShowWarning(true);
       }
     } else {
       setNoCategorizedImages(false);
     }
-  }, [categorizedImages, noCategorizedImages]);
+  }, [categorizedImages, noCategorizedImages, selectedModel]);
 
   useEffect(() => {
     if (
@@ -183,6 +182,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ) => {
     const nextEpoch = totalEpochs + epoch + 1;
     const trainingEpochIndicator = nextEpoch - 0.5;
+
     setTotalEpochs(nextEpoch);
     setCurrentEpoch((currentEpoch) => currentEpoch + 1);
 
@@ -263,12 +263,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       <FitClassifierDialogAppBar
         closeDialog={closeDialog}
         fit={onFit}
-        disableFitting={noCategorizedImages}
-        epochs={epochs}
+        disableFitting={noCategorizedImages || !selectedModel.trainable}
+        epochs={fitOptions.epochs}
         currentEpoch={currentEpoch}
       />
 
-      {showWarning && noCategorizedImages && (
+      {showWarning && noCategorizedImages && selectedModel.trainable && (
         <AlertDialog
           setShowAlertDialog={setShowWarning}
           alertState={noLabeledImageAlert}
@@ -281,7 +281,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         <List dense>
           <PreprocessingSettingsListItem />
 
-          <ArchitectureSettingsListItem />
+          <ClassifierArchitectureSettingsListItem />
 
           <OptimizerSettingsListItem
             compileOptions={compileOptions}
@@ -293,7 +293,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             fitOptions={fitOptions}
             dispatchBatchSizeCallback={dispatchBatchSizeCallback}
             dispatchLearningRateCallback={dispatchLearningRateCallback}
-            isModelTrainable={!selectedModel.graph}
+            isModelTrainable={selectedModel.trainable}
           />
 
           <DatasetSettingsListItem
@@ -301,7 +301,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
             dispatchTrainingPercentageCallback={
               dispatchTrainingPercentageCallback
             }
-            isModelTrainable={!selectedModel.graph}
+            isModelTrainable={selectedModel.trainable}
           />
         </List>
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -14,10 +14,8 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton";
 
-import {
-  segmenterSlice,
-  segmenterPredictingFlagSelector,
-} from "store/segmenter";
+import { segmenterSlice, segmenterModelStatusSelector } from "store/segmenter";
+import { ModelStatus } from "types/ModelType";
 
 type PredictSegmenterListItemProps = {
   disabled: boolean;
@@ -27,28 +25,26 @@ type PredictSegmenterListItemProps = {
 export const PredictSegmenterListItem = (
   props: PredictSegmenterListItemProps
 ) => {
+  const t = useTranslation();
   const dispatch = useDispatch();
 
-  const t = useTranslation();
-
-  const [isPredicting, setIsPredicting] = React.useState<boolean>(false);
-
   const onPredict = () => {
-    dispatch(segmenterSlice.actions.predictSegmenter({ execSaga: true }));
+    dispatch(
+      segmenterSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Predicting,
+        execSaga: true,
+      })
+    );
   };
 
-  const predicting = useSelector(segmenterPredictingFlagSelector);
-
-  useEffect(() => {
-    setIsPredicting(predicting);
-  }, [predicting]);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
 
   return (
     <Grid item xs={4}>
       <DisabledListItemButton {...props} onClick={onPredict}>
         <Stack sx={{ alignItems: "center" }}>
           <ListItemIcon sx={{ justifyContent: "center" }}>
-            {isPredicting ? (
+            {modelStatus === ModelStatus.Predicting ? (
               <CircularProgress disableShrink size={24} />
             ) : (
               <LabelImportantIcon />

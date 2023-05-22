@@ -12,31 +12,20 @@ import { PreprocessOptions } from "./PreprocessOptions";
 import { SegmenterEvaluationResultType } from "./EvaluationResultType";
 import { CompileOptions } from "./CompileOptions";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { ModelStatus } from "./ModelType";
 
 export type SegmenterStoreType = {
-  fitting: boolean;
-  evaluating: boolean;
-  predicting: boolean;
-  preprocessOptions: PreprocessOptions;
-  compileOptions: CompileOptions;
-  fitOptions: FitOptions;
+  // pre-fit state
+  selectedModel: Segmenter;
   inputShape: Shape;
+  preprocessOptions: PreprocessOptions;
+  fitOptions: FitOptions;
+
+  compileOptions: CompileOptions;
+
   trainingPercentage: number;
   trainingHistory?: History;
-  predicted: boolean;
   evaluationResult: SegmenterEvaluationResultType;
-  compiled?: LayersModel | GraphModel;
-  fitted?: LayersModel | GraphModel;
-  selectedModel: Segmenter;
-  userUploadedModel?: Segmenter;
-  trainDataSet?: data.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
-  }>;
-  valDataSet?: data.Dataset<{
-    xs: Tensor<Rank.R4>;
-    ys: Tensor<Rank.R4>;
-    id: Tensor<Rank.R1>;
-  }>;
+
+  modelStatus: ModelStatus;
 };

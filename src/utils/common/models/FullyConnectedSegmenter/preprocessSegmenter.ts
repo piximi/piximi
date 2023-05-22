@@ -54,6 +54,8 @@ export const drawSegmentationMask = async (
   });
 };
 
+// TODO - segmenter: delete as much here as possible
+// or move to imageHelper, or model/utils
 export const decodeFromImgSrc = async (
   channels: number,
   rescaleOptions: RescaleOptions,
