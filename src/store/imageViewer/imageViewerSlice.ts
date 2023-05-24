@@ -185,11 +185,17 @@ export const imageViewerSlice = createSlice({
     },
     setWorkingAnnotation(
       state,
-      action: PayloadAction<{ annotation: AnnotationType }>
+      action: PayloadAction<{ annotation: AnnotationType | undefined }>
     ) {
       state.workingAnnotation = action.payload.annotation;
     },
-
+    updateWorkingAnnotation(
+      state,
+      action: PayloadAction<{ changes: Partial<AnnotationType> }>
+    ) {
+      if (!state.workingAnnotation) return;
+      Object.assign(state.workingAnnotation, action.payload.changes);
+    },
     hideCategory(
       state,
       action: PayloadAction<{

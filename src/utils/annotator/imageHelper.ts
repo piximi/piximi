@@ -133,9 +133,7 @@ Given a click at a position, return all overlapping annotations ids
  */
 export const getOverlappingAnnotations = (
   position: { x: number; y: number },
-  annotations: Array<DecodedAnnotationType>,
-  imageWidth: number,
-  imageHeight: number
+  annotations: Array<DecodedAnnotationType>
 ) => {
   const overlappingAnnotations = annotations.filter(
     (annotation: DecodedAnnotationType) => {

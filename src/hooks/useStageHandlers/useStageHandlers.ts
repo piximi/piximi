@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
@@ -12,6 +12,7 @@ import {
   setSelectedAnnotationIds,
   setSelectedCategoryId,
   selectSelectedAnnotationIds,
+  activeImageIdSelector,
 } from "store/imageViewer";
 
 import {
@@ -19,12 +20,7 @@ import {
   selectToolType,
 } from "store/annotator/selectors";
 
-import {
-  selectActiveImageHeight,
-  selectActiveImageWidth,
-  selectActiveAnnotations,
-  selectWorkingAnnotation,
-} from "store/data";
+import { selectActiveAnnotations, selectWorkingAnnotation } from "store/data";
 import { annotatorSlice } from "store/annotator";
 
 import {
@@ -43,6 +39,8 @@ import {
 import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools";
 
 const delta = 10;
+const transformerClassName = "Transformer";
+const transformerButtonAttrNAme = "transformer-button";
 
 export const useStageHandlers = (
   stageRef: React.RefObject<Konva.Stage> | null,
@@ -54,9 +52,6 @@ export const useStageHandlers = (
   outOfBounds: boolean,
   setCurrentMousePosition: () => void
 ) => {
-  const [overlappingAnnotationsIds, setOverlappingAnnotationIds] = useState<
-    Array<string>
-  >([]);
   const [firstMouseDown, setFirstMouseDown] = useState(false);
   const [dragging, setDragging] = useState<boolean>(false);
   const [minimum, setMinimum] = useState<Point | undefined>();
@@ -69,12 +64,8 @@ export const useStageHandlers = (
   const toolType = useSelector(selectToolType);
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
   const activeAnnotations = useSelector(selectActiveAnnotations);
-  const imageWidth = useSelector(selectActiveImageWidth);
-  const imageHeight = useSelector(selectActiveImageHeight);
+  const activeImageId = useSelector(activeImageIdSelector);
   const currentIndex = useSelector(currentIndexSelector);
-  const saveLabelRef = useRef<Konva.Label>();
-  const clearLabelRef = useRef<Konva.Label>();
-  const labelGroupRef = useRef<Konva.Group>();
 
   const {
     handleZoomDblClick,
@@ -85,28 +76,9 @@ export const useStageHandlers = (
     resetZoomSelection,
   } = useZoom(stageRef?.current);
 
-  const detachTransformer = useCallback(
-    (transformerId: string) => {
-      if (!stageRef || !stageRef.current) return;
-      const transformer = stageRef.current.findOne(`#${transformerId}`);
-      if (!transformer) return;
-      (transformer as Konva.Transformer).detach();
-      (transformer as Konva.Transformer).getLayer()?.batchDraw();
-    },
-    [stageRef]
-  );
-  const detachAllTransformers = useCallback(() => {
-    if (!stageRef || !stageRef.current) return;
-    // const transformers = stageRef.current.find("Transformer").toArray();
-    const transformers = stageRef.current.find("Transformer");
-    transformers.forEach((tr: any) => {
-      (tr as Konva.Transformer).detach();
-      (tr as Konva.Transformer).getLayer()?.batchDraw();
-    });
-  }, [stageRef]);
-
   const deselectAnnotation = useCallback(() => {
     if (!annotationTool) {
+      console.log("deselect me");
       dispatch(
         annotatorSlice.actions.setAnnotationState({
           annotationState: AnnotationStateType.Blank,
@@ -116,15 +88,13 @@ export const useStageHandlers = (
       return;
     }
     annotationTool.deselect();
-    if (!workingAnnotation) return;
-    const transformerId = "tr-".concat(workingAnnotation.id);
-    detachTransformer(transformerId);
-  }, [annotationTool, workingAnnotation, dispatch, detachTransformer]);
+  }, [annotationTool, dispatch]);
 
   const deleteAnnotations = (
     annotationIds: Array<string>,
     stagedAnnotations: Array<DecodedAnnotationType>
   ) => {};
+
   const deselectAllAnnotations = useCallback(() => {
     dispatch(
       setSelectedAnnotationIds({
@@ -132,8 +102,7 @@ export const useStageHandlers = (
         workingAnnotationId: undefined,
       })
     );
-    detachAllTransformers();
-  }, [dispatch, detachAllTransformers]);
+  }, [dispatch]);
 
   useHotkeys(
     "shift",
@@ -164,214 +133,6 @@ export const useStageHandlers = (
     },
     [minimum, selecting]
   );
-
-  const handleMouseDown = (
-    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
-  ) => {
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "2" &&
-      console.log(event);
-    if (
-      !event.target.getParent() ||
-      // TODO: shouldn't be using string for className here -- Nodar
-      event.target.getParent().className === "Transformer" ||
-      event.target.attrs.name === "transformer-button"
-    )
-      return;
-    memoizedOnMouseDown(event as KonvaEventObject<MouseEvent>);
-  };
-  const memoizedOnMouseDown = useMemo(() => {
-    const func = (event: KonvaEventObject<MouseEvent>) => {
-      if (!firstMouseDown) {
-        setFirstMouseDown(true);
-      }
-      if (
-        !stageRef ||
-        !stageRef.current ||
-        !positionByStage ||
-        !absolutePosition ||
-        draggable ||
-        toolType === ToolType.ColorAdjustment
-      )
-        return;
-
-      if (toolType === ToolType.Pointer) {
-        onPointerMouseDown(absolutePosition!);
-        return;
-      } else if (toolType === ToolType.Zoom) {
-        handleZoomMouseDown(positionByStage!, event);
-        return;
-      }
-      if (annotationState === AnnotationStateType.Annotated) {
-        deselectAnnotation();
-        if (selectionMode === AnnotationModeType.New) {
-          deselectAllAnnotations();
-          return;
-        }
-      }
-      if (!annotationTool || outOfBounds) return;
-      console.log("mouseDown");
-      annotationTool.onMouseDown(absolutePosition);
-    };
-    const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
-  }, [
-    onPointerMouseDown,
-    handleZoomMouseDown,
-    absolutePosition,
-    positionByStage,
-    draggable,
-    annotationState,
-    annotationTool,
-    deselectAllAnnotations,
-    deselectAnnotation,
-    firstMouseDown,
-    selectionMode,
-    toolType,
-    outOfBounds,
-    stageRef,
-  ]);
-  const handleMouseMove = useMemo(() => {
-    const func = (event: KonvaEventObject<MouseEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
-      setCurrentMousePosition();
-      if (!positionByStage) return;
-      if (toolType === ToolType.ColorAdjustment) return;
-      if (toolType === ToolType.Zoom) {
-        handleZoomMouseMove(positionByStage, event);
-      } else if (toolType === ToolType.Pointer) {
-        handlePointerMouseMove(absolutePosition!);
-      } else {
-        if (!annotationTool) return;
-        annotationTool.onMouseMove(absolutePosition!);
-      }
-    };
-    const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
-  }, [
-    stageRef,
-    handlePointerMouseMove,
-    handleZoomMouseMove,
-    setCurrentMousePosition,
-    positionByStage,
-    draggable,
-    annotationTool,
-    toolType,
-    absolutePosition,
-  ]);
-
-  const handleTouchMove = useMemo(() => {
-    const func = (event: KonvaEventObject<TouchEvent>) => {
-      if (!stageRef || !stageRef.current || draggable) return;
-      setCurrentMousePosition();
-      if (!absolutePosition) return;
-      handlePointerMouseMove(absolutePosition);
-    };
-    const throttled = throttle(func, 5);
-    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
-  }, [
-    stageRef,
-    handlePointerMouseMove,
-    setCurrentMousePosition,
-    absolutePosition,
-    draggable,
-  ]);
-
-  const onClick = useCallback(
-    (position: { x: number; y: number }) => {
-      if (toolType !== ToolType.Pointer) return;
-
-      if (!position) return;
-
-      if (!activeAnnotations.length || !imageWidth || !imageHeight) return;
-
-      const scaledCurrentPosition = {
-        x: position.x,
-        y: position.y,
-      };
-
-      setOverlappingAnnotationIds(
-        getOverlappingAnnotations(
-          scaledCurrentPosition,
-          activeAnnotations,
-          imageWidth,
-          imageHeight
-        )
-      );
-
-      let currentAnnotation: DecodedAnnotationType | undefined;
-
-      if (overlappingAnnotationsIds.length > 1) {
-        dispatch(
-          imageViewerSlice.actions.setCurrentIndex({
-            currentIndex:
-              currentIndex + 1 === overlappingAnnotationsIds.length
-                ? 0
-                : currentIndex + 1,
-          })
-        );
-        const nextAnnotationId = overlappingAnnotationsIds[currentIndex];
-
-        currentAnnotation = activeAnnotations.find(
-          (annotation: DecodedAnnotationType) => {
-            return annotation.id === nextAnnotationId;
-          }
-        );
-      } else {
-        currentAnnotation = activeAnnotations.find(
-          (annotation: DecodedAnnotationType) => {
-            return annotation.id === overlappingAnnotationsIds[0];
-          }
-        );
-        dispatch(
-          imageViewerSlice.actions.setCurrentIndex({
-            currentIndex: 0,
-          })
-        );
-      }
-
-      if (!currentAnnotation) return;
-
-      if (!shift) {
-        batch(() => {
-          dispatch(
-            setSelectedAnnotationIds({
-              annotationIds: [currentAnnotation!.id],
-              workingAnnotationId: currentAnnotation?.id,
-            })
-          );
-          dispatch(
-            setSelectedCategoryId({
-              selectedCategoryId: currentAnnotation!.categoryId,
-              execSaga: false,
-            })
-          );
-        });
-      }
-
-      if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
-        //include newly selected annotation if not already selected
-        dispatch(
-          setSelectedAnnotationIds({
-            annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
-            workingAnnotationId: currentAnnotation.id,
-          })
-        );
-      }
-    },
-    [
-      activeAnnotations,
-      currentIndex,
-      dispatch,
-      imageHeight,
-      imageWidth,
-      overlappingAnnotationsIds,
-      selectedAnnotationsIds,
-      shift,
-      toolType,
-    ]
-  );
-
   const handlePointerMouseUp = useCallback(
     (position: { x: number; y: number }) => {
       if (!position || !selecting || !minimum) return;
@@ -440,8 +201,6 @@ export const useStageHandlers = (
             );
           }
         }
-      } else {
-        onClick(position);
       }
 
       setSelecting(false);
@@ -451,12 +210,207 @@ export const useStageHandlers = (
       dispatch,
       dragging,
       minimum,
-      onClick,
       selectedAnnotationsIds,
       selecting,
       shift,
     ]
   );
+  const handleClick = useCallback(() => {
+    if (
+      toolType !== ToolType.Pointer ||
+      !absolutePosition ||
+      !activeAnnotations.length ||
+      !activeImageId
+    )
+      return;
+    const overlappingAnnotationIds = getOverlappingAnnotations(
+      absolutePosition,
+      activeAnnotations
+    );
+    if (overlappingAnnotationIds.length === 0) {
+      deselectAllAnnotations();
+      return;
+    }
+
+    let currentAnnotation: DecodedAnnotationType | undefined;
+
+    if (overlappingAnnotationIds.length > 1) {
+      dispatch(
+        imageViewerSlice.actions.setCurrentIndex({
+          currentIndex:
+            currentIndex + 1 === overlappingAnnotationIds.length
+              ? 0
+              : currentIndex + 1,
+        })
+      );
+      const nextAnnotationId = overlappingAnnotationIds[currentIndex];
+
+      currentAnnotation = activeAnnotations.find(
+        (annotation: DecodedAnnotationType) => {
+          return annotation.id === nextAnnotationId;
+        }
+      );
+    } else {
+      currentAnnotation = activeAnnotations.find(
+        (annotation: DecodedAnnotationType) => {
+          return annotation.id === overlappingAnnotationIds[0];
+        }
+      );
+      dispatch(
+        imageViewerSlice.actions.setCurrentIndex({
+          currentIndex: 0,
+        })
+      );
+    }
+
+    if (!currentAnnotation) return;
+
+    if (!shift) {
+      batch(() => {
+        dispatch(
+          setSelectedAnnotationIds({
+            annotationIds: [currentAnnotation!.id],
+            workingAnnotationId: currentAnnotation?.id,
+          })
+        );
+        dispatch(
+          setSelectedCategoryId({
+            selectedCategoryId: currentAnnotation!.categoryId,
+            execSaga: false,
+          })
+        );
+      });
+    }
+
+    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
+      //include newly selected annotation if not already selected
+      dispatch(
+        setSelectedAnnotationIds({
+          annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
+          workingAnnotationId: currentAnnotation.id,
+        })
+      );
+    }
+  }, [
+    activeAnnotations,
+    currentIndex,
+    dispatch,
+    activeImageId,
+    selectedAnnotationsIds,
+    shift,
+    toolType,
+    deselectAllAnnotations,
+    absolutePosition,
+  ]);
+  const handleMouseDown = (
+    event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
+  ) => {
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "2" &&
+      console.log(event);
+    if (
+      !event.target.getParent() ||
+      event.target.getParent().className === transformerClassName ||
+      event.target.attrs.name === transformerButtonAttrNAme
+    )
+      return;
+    memoizedOnMouseDown(event as KonvaEventObject<MouseEvent>);
+  };
+  const memoizedOnMouseDown = useMemo(() => {
+    const func = (event: KonvaEventObject<MouseEvent>) => {
+      if (!firstMouseDown) {
+        setFirstMouseDown(true);
+      }
+      if (
+        !stageRef ||
+        !stageRef.current ||
+        !positionByStage ||
+        !absolutePosition ||
+        draggable ||
+        toolType === ToolType.ColorAdjustment
+      )
+        return;
+
+      if (toolType === ToolType.Pointer) {
+        onPointerMouseDown(absolutePosition!);
+        return;
+      } else if (toolType === ToolType.Zoom) {
+        handleZoomMouseDown(positionByStage!, event);
+        return;
+      }
+      if (annotationState === AnnotationStateType.Annotated) {
+        deselectAnnotation();
+        if (selectionMode === AnnotationModeType.New) {
+          deselectAllAnnotations();
+          return;
+        }
+      }
+      if (!annotationTool || outOfBounds) return;
+      annotationTool.onMouseDown(absolutePosition);
+    };
+    const throttled = throttle(func, 5);
+    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
+  }, [
+    onPointerMouseDown,
+    handleZoomMouseDown,
+    absolutePosition,
+    positionByStage,
+    draggable,
+    annotationState,
+    annotationTool,
+    deselectAllAnnotations,
+    deselectAnnotation,
+    firstMouseDown,
+    selectionMode,
+    toolType,
+    outOfBounds,
+    stageRef,
+  ]);
+  const handleMouseMove = useMemo(() => {
+    const func = (event: KonvaEventObject<MouseEvent>) => {
+      if (!stageRef || !stageRef.current || draggable) return;
+      setCurrentMousePosition();
+      if (!positionByStage) return;
+      if (toolType === ToolType.ColorAdjustment) return;
+      if (toolType === ToolType.Zoom) {
+        handleZoomMouseMove(positionByStage, event);
+      } else if (toolType === ToolType.Pointer) {
+        handlePointerMouseMove(absolutePosition!);
+      } else {
+        if (!annotationTool) return;
+        annotationTool.onMouseMove(absolutePosition!);
+      }
+    };
+    const throttled = throttle(func, 5);
+    return (event: KonvaEventObject<MouseEvent>) => throttled(event);
+  }, [
+    stageRef,
+    handlePointerMouseMove,
+    handleZoomMouseMove,
+    setCurrentMousePosition,
+    positionByStage,
+    draggable,
+    annotationTool,
+    toolType,
+    absolutePosition,
+  ]);
+
+  const handleTouchMove = useMemo(() => {
+    const func = (event: KonvaEventObject<TouchEvent>) => {
+      if (!stageRef || !stageRef.current || draggable) return;
+      setCurrentMousePosition();
+      if (!absolutePosition) return;
+      handlePointerMouseMove(absolutePosition);
+    };
+    const throttled = throttle(func, 5);
+    return (event: KonvaEventObject<TouchEvent>) => throttled(event);
+  }, [
+    stageRef,
+    handlePointerMouseMove,
+    setCurrentMousePosition,
+    absolutePosition,
+    draggable,
+  ]);
 
   const handleMouseUp = useMemo(() => {
     const func = async (
@@ -516,37 +470,12 @@ export const useStageHandlers = (
     toolType,
   });
 
-  useEffect(() => {
-    if (!stageRef || !stageRef.current) return;
-    selectedAnnotationsIds.forEach((annotationId) => {
-      if (!stageRef || !stageRef.current) return;
-      const transformerId = "tr-".concat(annotationId);
-      const transformer = stageRef.current.findOne(`#${transformerId}`);
-      const line = stageRef.current.findOne(`#${annotationId}`);
-      if (!line) return;
-      if (!transformer) return;
-      (transformer as Konva.Transformer).nodes([line]);
-      const layer = (transformer as Konva.Transformer).getLayer();
-      if (!layer) return;
-      layer.batchDraw();
-      // Not ideal but this figures out which label is which
-      const label = stageRef.current.find(`#label`);
-      if (label.length > 1) {
-        saveLabelRef.current = label[0] as Konva.Label;
-        clearLabelRef.current = label[1] as Konva.Label;
-      }
-      const group = stageRef.current.find("#label-group");
-      labelGroupRef.current = group[0] as Konva.Group;
-    });
-  }, [stageRef, selectedAnnotationsIds, workingAnnotation?.maskData]);
-
   return {
     onPointerMouseDown,
-
     handleMouseUp,
     handleMouseMove,
     handleTouchMove,
-    onPointerClick: onClick,
+    handleClick,
     handleZoomWheel,
     handleDblClickToZoom,
     dragging,

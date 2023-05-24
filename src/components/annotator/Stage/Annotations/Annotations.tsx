@@ -5,7 +5,10 @@ import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
 import { selectSelectedAnnotationIds } from "store/imageViewer";
-import { selectActiveAnnotationObjects } from "store/data";
+import {
+  selectActiveAnnotationObjects,
+  selectWorkingAnnotationObject,
+} from "store/data";
 
 import { AnnotationTool } from "annotator-tools";
 
@@ -25,10 +28,12 @@ export const Annotations = ({
 }: AnnotationsProps) => {
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
   const annotationObjects = useSelector(selectActiveAnnotationObjects);
+  const workingAnnotationObject = useSelector(selectWorkingAnnotationObject);
+
   return (
     <>
-      {annotationObjects.map((annotationObject) => (
-        <React.Fragment key={`group-${annotationObject.annotation.id}`}>
+      {[...annotationObjects, ...workingAnnotationObject].map(
+        (annotationObject) => (
           <Annotation
             key={annotationObject.annotation.id}
             annotation={annotationObject.annotation}
@@ -36,15 +41,23 @@ export const Annotations = ({
             fillColor={annotationObject.fillColor}
             selected={true}
           />
-          {selectedAnnotationsIds.includes(annotationObject.annotation.id) && (
-            <AnnotationTransformer
-              key={`tr-${annotationObject.annotation.id}`}
-              transformPosition={transformPosition}
-              annotationId={annotationObject.annotation.id}
-              annotationTool={annotationTool}
-            />
-          )}
-        </React.Fragment>
+        )
+      )}
+      {selectedAnnotationsIds.map((selectedAnnotationId) => (
+        <AnnotationTransformer
+          key={`tr-${selectedAnnotationId}`}
+          transformPosition={transformPosition}
+          annotationId={selectedAnnotationId}
+          annotationTool={annotationTool}
+        />
+      ))}
+      {workingAnnotationObject.map((workingAnnotationId) => (
+        <AnnotationTransformer
+          key={`tr-${workingAnnotationId.annotation.id}`}
+          transformPosition={transformPosition}
+          annotationId={workingAnnotationId.annotation.id}
+          annotationTool={annotationTool}
+        />
       ))}
     </>
   );

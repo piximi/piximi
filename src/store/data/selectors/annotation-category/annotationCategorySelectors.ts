@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { sortBy } from "lodash";
 
-import { annotationCategoriesAdapter } from "../dataSlice";
+import { annotationCategoriesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 import { selectedAnnotationCategoryIdSelector } from "store/imageViewer";
 

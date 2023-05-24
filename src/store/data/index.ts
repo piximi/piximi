@@ -14,7 +14,8 @@ export {
   selectImagesByCategoryDict,
   selectImagesByPartition,
   selectUnannotatedImages,
-} from "./selectors/imageSelectors";
+  selectImageIds,
+} from "./selectors/image/imageSelectors";
 export {
   selectActiveImageBitDepth,
   selectActiveImageColor,
@@ -29,9 +30,13 @@ export {
   selectActiveImageWidth,
   selectActiveImageScaledWidth,
   selectActiveImageSrc,
-} from "./selectors/selectActiveImageAttributes";
-export { selectActiveImage } from "./selectors/selectActiveImage";
-export { selectActiveAnnotationObjects } from "./selectors/selectActiveAnnotationObjects";
+  selectActiveImageAttributes,
+} from "./selectors/image/selectActiveImageAttributes";
+export { selectActiveImage } from "./selectors/image/selectActiveImage";
+export {
+  selectActiveAnnotationObjects,
+  selectWorkingAnnotationObject,
+} from "./selectors/annotation/selectActiveAnnotationObjects";
 export {
   selectAllAnnotations,
   selectSelectedAnnotations,
@@ -41,7 +46,14 @@ export {
   selectAnnotationIdsByImage,
   selectAnnotationCountByCategory,
   selectActiveAnnotationIdsByCategory,
-} from "./selectors/annotationSelectors";
+  selectActiveAnnotationCountsByCategory,
+  selectAllAnnotationIds,
+  selectAnnotationById,
+  selectAnnotationEntities,
+  selectAnnotationsByCategoryDict,
+  selectAnnotationsByImageDict,
+  selectTotalAnnotationCount,
+} from "./selectors/annotation/annotationSelectors";
 
 export {
   selectAllImageCategories,
@@ -53,7 +65,9 @@ export {
   selectVisibleImageCategories,
   selectVisibleCategoryIds,
   selectImageCategoryNames,
-} from "./selectors/imageCategorySelectors";
+  selectUsedImageCategoryColors,
+  selectImageCategoryIds,
+} from "./selectors/image-category/imageCategorySelectors";
 
 export {
   selectAllAnnotationCategories,
@@ -67,4 +81,4 @@ export {
   selectCreatedAnnotationCategoryCount,
   selectUnusedAnnotationCategoryColors,
   selectUsedAnnotationCategoryColors,
-} from "./selectors/annotationCategorySelectors";
+} from "./selectors/annotation-category/annotationCategorySelectors";
