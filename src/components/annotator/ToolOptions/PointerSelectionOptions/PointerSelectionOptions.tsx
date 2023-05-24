@@ -1,14 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  SvgIcon,
-} from "@mui/material";
+import { Divider, List, ListItem, ListItemIcon, ListItemText, SvgIcon } from "@mui/material";
 import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
@@ -17,7 +10,7 @@ import { CollapsibleList } from "components/common/styled-components/Collapsible
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllAnnotationCategories } from "store/data";
-import { selectActiveAnnotations } from "store/data/selectors/annotation/annotationSelectors";
+import { selectActiveAnnotations } from "store/data/selectors/annotation/";
 
 import { Category } from "types";
 
@@ -51,15 +44,12 @@ export const PointerSelectionOptions = () => {
       | React.MouseEvent<HTMLDivElement>,
     categoryId: string
   ) => {
-    const desiredAnnotationIds = activeAnnotations.reduce(
-      (ids: string[], annotation) => {
-        if (annotation.categoryId === categoryId) {
-          ids.push(annotation.id);
-        }
-        return ids;
-      },
-      []
-    );
+    const desiredAnnotationIds = activeAnnotations.reduce((ids: string[], annotation) => {
+      if (annotation.categoryId === categoryId) {
+        ids.push(annotation.id);
+      }
+      return ids;
+    }, []);
     dispatch(
       imageViewerSlice.actions.setSelectedAnnotationIds({
         annotationIds: desiredAnnotationIds,
