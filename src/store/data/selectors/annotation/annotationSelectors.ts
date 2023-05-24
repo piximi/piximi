@@ -5,7 +5,7 @@ import {
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
 } from "store/imageViewer";
-import { annotationsAdapter } from "../dataSlice";
+import { annotationsAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 
 import { DataStoreSlice, DecodedAnnotationType } from "types";

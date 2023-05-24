@@ -17,7 +17,7 @@ import { CollapsibleList } from "components/common/styled-components/Collapsible
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllAnnotationCategories } from "store/data";
-import { selectActiveAnnotations } from "store/data/selectors/annotationSelectors";
+import { selectActiveAnnotations } from "store/data/selectors/annotation/annotationSelectors";
 
 import { Category } from "types";
 

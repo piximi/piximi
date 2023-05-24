@@ -10,7 +10,7 @@ import {
 import { annotatorSlice } from "./annotatorSlice";
 import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { encodeAnnotation } from "utils/annotator";
-import { dataSlice } from "store/data";
+//import { dataSlice } from "store/data";
 import { imageViewerSlice } from "store/imageViewer";
 
 export const annotatorMiddleware = createListenerMiddleware();
@@ -22,7 +22,6 @@ startAppListening({
   actionCreator: annotatorSlice.actions.setAnnotationState,
   effect: async (action, listenerAPI) => {
     const { imageViewer, data, annotator } = listenerAPI.getState();
-
     const { annotationState, annotationTool } = action.payload;
 
     if (!annotationTool || annotationState !== AnnotationStateType.Annotated)
@@ -50,25 +49,25 @@ startAppListening({
         annotationTool.annotation as DecodedAnnotationType
       );
 
-      listenerAPI.dispatch(
-        dataSlice.actions.addAnnotation({ annotation: annotation! })
-      );
+      // listenerAPI.dispatch(
+      //   dataSlice.actions.addAnnotation({ annotation: annotation! })
+      // );
       listenerAPI.dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({
           annotation: annotation!,
         })
       );
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.addActiveAnnotationId({
-          annotationId: annotation!.id,
-        })
-      );
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [annotation!.id],
-          workingAnnotationId: annotation!.id,
-        })
-      );
+      // listenerAPI.dispatch(
+      //   imageViewerSlice.actions.addActiveAnnotationId({
+      //     annotationId: annotation!.id,
+      //   })
+      // );
+      // listenerAPI.dispatch(
+      //   imageViewerSlice.actions.setSelectedAnnotationIds({
+      //     annotationIds: [annotation!.id],
+      //     workingAnnotationId: annotation!.id,
+      //   })
+      // );
     } else {
       const toolType = annotator.toolType;
 
@@ -122,19 +121,24 @@ startAppListening({
 
       const annotation = encodeAnnotation(combinedSelectedAnnotation);
 
-      listenerAPI.dispatch(
-        dataSlice.actions.addAnnotation({ annotation: annotation! })
-      );
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.addActiveAnnotationId({
-          annotationId: annotation!.id,
-        })
-      );
+      // listenerAPI.dispatch(
+      //   dataSlice.actions.addAnnotation({ annotation: annotation! })
+      // );
+      // listenerAPI.dispatch(
+      //   imageViewerSlice.actions.addActiveAnnotationId({
+      //     annotationId: annotation!.id,
+      //   })
+      // );
 
+      // listenerAPI.dispatch(
+      //   imageViewerSlice.actions.setSelectedAnnotationIds({
+      //     annotationIds: [annotation!.id],
+      //     workingAnnotationId: annotation!.id,
+      //   })
+      // );
       listenerAPI.dispatch(
-        imageViewerSlice.actions.setSelectedAnnotationIds({
-          annotationIds: [annotation!.id],
-          workingAnnotationId: annotation!.id,
+        imageViewerSlice.actions.setWorkingAnnotation({
+          annotation: annotation!,
         })
       );
 

@@ -1,8 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { selectActiveAnnotationIds } from "store/imageViewer";
-import { selectActiveImageShape } from "./selectActiveImageAttributes";
-import { selectAnnotationCategoryEntities } from "./annotationCategorySelectors";
+import {
+  selectActiveAnnotationIds,
+  selectWorkingAnnotation,
+} from "store/imageViewer";
+import { selectActiveImageShape } from "../image/selectActiveImageAttributes";
+import { selectAnnotationCategoryEntities } from "../annotation-category/annotationCategorySelectors";
 import { selectAnnotationEntities } from "./annotationSelectors";
 
 import { DecodedAnnotationType, Shape } from "types";
@@ -15,12 +18,14 @@ export const selectActiveAnnotationObjects = createSelector(
     selectActiveAnnotationIds,
     selectAnnotationEntities,
     selectAnnotationCategoryEntities,
+    selectWorkingAnnotation,
   ],
   (
     activeImageShape,
     activeAnnotationIds,
     annotationEntities,
-    categoryEntities
+    categoryEntities,
+    workingAnnotation
   ): Array<{
     annotation: DecodedAnnotationType;
     fillColor: string;
@@ -35,7 +40,11 @@ export const selectActiveAnnotationObjects = createSelector(
     }> = [];
 
     for (const annotationId of activeAnnotationIds) {
-      if (!annotationEntities[annotationId]) continue;
+      if (
+        !annotationEntities[annotationId] ||
+        annotationId === workingAnnotation?.id
+      )
+        continue;
       const annotation = decodeAnnotation(annotationEntities[annotationId])!;
 
       const fillColor = categoryEntities[annotation.categoryId].color;
@@ -47,5 +56,27 @@ export const selectActiveAnnotationObjects = createSelector(
     }
 
     return annotationObjects;
+  }
+);
+
+export const selectWorkingAnnotationObject = createSelector(
+  [
+    selectWorkingAnnotation,
+    selectActiveImageShape,
+    selectAnnotationCategoryEntities,
+  ],
+  (workingAnnotation, activeImageShape, categoryEntities) => {
+    if (!workingAnnotation || !activeImageShape) return [];
+    const annotation = decodeAnnotation(workingAnnotation)!;
+    const fillColor = categoryEntities[workingAnnotation.categoryId].color;
+    const imageShape = activeImageShape;
+    console.log(annotation, fillColor, imageShape);
+    return [
+      {
+        annotation: decodeAnnotation(workingAnnotation)!,
+        fillColor: categoryEntities[workingAnnotation.categoryId].color,
+        imageShape: activeImageShape,
+      },
+    ];
   }
 );

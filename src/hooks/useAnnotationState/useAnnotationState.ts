@@ -80,6 +80,4 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
     annotationTool.registerOnDeselectHandler(onDeselect);
   }, [annotationTool, onAnnotated, onAnnotating, onDeselect]);
-
-  //return { onAnnotating, onDeselect, onAnnotated };
 };

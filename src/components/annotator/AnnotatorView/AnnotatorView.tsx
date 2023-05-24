@@ -5,11 +5,13 @@ import React, {
   createContext,
   useRef,
 } from "react";
+import Konva from "konva";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
+
 import {
   FallBackDialog,
   ImageShapeDialog,
@@ -33,7 +35,6 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 
 import { AlertType, HotkeyView } from "types";
-import Konva from "konva";
 
 export const StageContext = createContext<React.RefObject<Konva.Stage> | null>(
   null

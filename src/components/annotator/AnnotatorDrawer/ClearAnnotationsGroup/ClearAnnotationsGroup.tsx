@@ -19,7 +19,7 @@ import {
 } from "store/imageViewer";
 import { dataSlice } from "store/data";
 
-type DeleteType = "all" | "selected";
+type DeleteType = "ALL" | "SELECTED";
 //TODO :Figurte out why only seeing one annotatin on delete selected
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
@@ -39,8 +39,8 @@ export const ClearAnnotationsGroup = () => {
   };
 
   const handleDeleteAnnotations = () => {
-    if (deleteOp === "all") {
-      batch(() => {
+    batch(() => {
+      if (deleteOp === "ALL") {
         dispatch(
           imageViewerSlice.actions.removeSelectedAnnotationIds({
             annotationIds: activeAnnotationsIds,
@@ -56,9 +56,7 @@ export const ClearAnnotationsGroup = () => {
             annotationIds: activeAnnotationsIds,
           })
         );
-      });
-    } else {
-      batch(() => {
+      } else {
         dispatch(
           imageViewerSlice.actions.removeSelectedAnnotationIds({
             annotationIds: selectedAnnotationsIds,
@@ -74,8 +72,11 @@ export const ClearAnnotationsGroup = () => {
             annotationIds: selectedAnnotationsIds,
           })
         );
-      });
-    }
+      }
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      );
+    });
   };
 
   const t = useTranslation();
@@ -84,7 +85,7 @@ export const ClearAnnotationsGroup = () => {
     <>
       <List dense>
         <ListItemButton
-          onClick={() => handleOpenAndTrack("all")}
+          onClick={() => handleOpenAndTrack("ALL")}
           disabled={activeAnnotationsIds.length === 0}
         >
           <ListItemIcon>
@@ -96,7 +97,7 @@ export const ClearAnnotationsGroup = () => {
         <DialogWithAction
           title={`Delete ${deleteOp}  annotations`}
           content={`${
-            deleteOp === "all"
+            deleteOp === "ALL"
               ? activeAnnotationsIds.length
               : selectActiveAnnotationIds.length
           } annotations will be deleted`}
@@ -106,7 +107,7 @@ export const ClearAnnotationsGroup = () => {
         />
 
         <ListItemButton
-          onClick={() => handleOpenAndTrack("selected")}
+          onClick={() => handleOpenAndTrack("SELECTED")}
           disabled={selectedAnnotationsIds.length === 0}
         >
           <ListItemIcon>

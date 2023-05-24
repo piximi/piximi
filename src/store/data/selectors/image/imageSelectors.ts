@@ -5,9 +5,9 @@ import {
 } from "store/project";
 import { DataStoreSlice, ImageType, Partition } from "types";
 
-import { imagesAdapter } from "../dataSlice";
+import { imagesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
-import { selectAnnotationsByImageDict } from "./annotationSelectors";
+import { selectAnnotationsByImageDict } from "../annotation/annotationSelectors";
 
 const imageSelectors = imagesAdapter.getSelectors(
   (state: RootState) => state.data.images

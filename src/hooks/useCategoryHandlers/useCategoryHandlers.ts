@@ -5,12 +5,10 @@ import {
   dataSlice,
   selectImageCategoryNames,
   selectImagesByCategoryDict,
-} from "store/data";
-import {
+  selectUsedImageCategoryColors,
   selectActiveAnnotationCountsByCategory,
   selectAnnotationsByCategoryDict,
-} from "store/data/selectors/annotationSelectors";
-import { selectUsedImageCategoryColors } from "store/data/selectors/imageCategorySelectors";
+} from "store/data";
 
 import {
   imageViewerSlice,

@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { sortBy } from "lodash";
 
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
-import { categoriesAdapter } from "../dataSlice";
+import { categoriesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 
 import { UNKNOWN_CLASS_CATEGORY_ID } from "types";
