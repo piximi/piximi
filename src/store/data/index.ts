@@ -15,8 +15,6 @@ export {
   selectImagesByPartition,
   selectUnannotatedImages,
   selectImageIds,
-} from "./selectors/image/imageSelectors";
-export {
   selectActiveImageBitDepth,
   selectActiveImageColor,
   selectActiveImageData,
@@ -25,18 +23,12 @@ export {
   selectActiveImageActivePlane,
   selectActiveImageChannels,
   selectActiveImageHeight,
-  selectActiveImageScaledHeight,
   selectActiveImageShape,
   selectActiveImageWidth,
-  selectActiveImageScaledWidth,
   selectActiveImageSrc,
   selectActiveImageAttributes,
-} from "./selectors/image/selectActiveImageAttributes";
-export { selectActiveImage } from "./selectors/image/selectActiveImage";
-export {
-  selectActiveAnnotationObjects,
-  selectWorkingAnnotationObject,
-} from "./selectors/annotation/selectActiveAnnotationObjects";
+  selectActiveImage,
+} from "./selectors/image";
 export {
   selectAllAnnotations,
   selectSelectedAnnotations,
@@ -53,7 +45,9 @@ export {
   selectAnnotationsByCategoryDict,
   selectAnnotationsByImageDict,
   selectTotalAnnotationCount,
-} from "./selectors/annotation/annotationSelectors";
+  selectActiveAnnotationObjects,
+  selectWorkingAnnotationObject,
+} from "./selectors/annotation";
 
 export {
   selectAllImageCategories,
@@ -81,4 +75,4 @@ export {
   selectCreatedAnnotationCategoryCount,
   selectUnusedAnnotationCategoryColors,
   selectUsedAnnotationCategoryColors,
-} from "./selectors/annotation-category/annotationCategorySelectors";
+} from "./selectors/annotation-category";

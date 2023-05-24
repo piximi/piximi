@@ -3,24 +3,18 @@ import { sortBy } from "lodash";
 
 import { annotationCategoriesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
-import { selectedAnnotationCategoryIdSelector } from "store/imageViewer";
 
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
-export const annotationCategorySelectors =
-  annotationCategoriesAdapter.getSelectors(
-    (state: RootState) => state.data.annotationCategories
-  );
+export const annotationCategorySelectors = annotationCategoriesAdapter.getSelectors(
+  (state: RootState) => state.data.annotationCategories
+);
 
-export const selectAnnotationCategoryIds =
-  annotationCategorySelectors.selectIds;
-export const selectAnnotationCategoryEntities =
-  annotationCategorySelectors.selectEntities;
-export const selectAllAnnotationCategories =
-  annotationCategorySelectors.selectAll;
-export const selectAnnotationCategoryById =
-  annotationCategorySelectors.selectById;
+export const selectAnnotationCategoryIds = annotationCategorySelectors.selectIds;
+export const selectAnnotationCategoryEntities = annotationCategorySelectors.selectEntities;
+export const selectAllAnnotationCategories = annotationCategorySelectors.selectAll;
+export const selectAnnotationCategoryById = annotationCategorySelectors.selectById;
 
 export const selectCreatedAnnotationCategories = createSelector(
   selectAllAnnotationCategories,
@@ -43,13 +37,6 @@ export const selectAllVisibleAnnotationCategories = createSelector(
   selectAllAnnotationCategories,
   (entities) => {
     return entities.filter((entity) => entity.visible);
-  }
-);
-
-export const selectSelectedAnnotationCategory = createSelector(
-  [selectedAnnotationCategoryIdSelector, selectAnnotationCategoryEntities],
-  (selectedId, categoryEntities) => {
-    return categoryEntities[selectedId];
   }
 );
 

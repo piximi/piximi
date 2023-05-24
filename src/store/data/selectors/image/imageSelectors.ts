@@ -1,17 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
-import {
-  selectHiddenImageCategoryIds,
-  selectedImagesIdSelector,
-} from "store/project";
-import { DataStoreSlice, ImageType, Partition } from "types";
+
+import { RootState } from "store/reducer/reducer";
 
 import { imagesAdapter } from "../../dataSlice";
-import { RootState } from "store/reducer/reducer";
 import { selectAnnotationsByImageDict } from "../annotation/annotationSelectors";
 
-const imageSelectors = imagesAdapter.getSelectors(
-  (state: RootState) => state.data.images
-);
+import { DataStoreSlice, Partition } from "types";
+
+const imageSelectors = imagesAdapter.getSelectors((state: RootState) => state.data.images);
 
 export const selectImageIds = imageSelectors.selectIds;
 export const selectImageEntities = imageSelectors.selectEntities;
@@ -22,11 +18,7 @@ export const selectImageCount = createSelector(selectAllImages, (images) => {
   return images.length;
 });
 
-export const selectImagesByCategoryDict = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
+export const selectImagesByCategoryDict = ({ data }: { data: DataStoreSlice }) => {
   return data.imagesByCategory;
 };
 
@@ -48,32 +40,6 @@ export const selectImagesByPartition = createSelector(
   [selectAllImages, (_, partition: Partition) => partition],
   (images, partition) => {
     return images.filter((image) => image.partition === partition);
-  }
-);
-
-export const selectSelectedImages = createSelector(
-  [selectedImagesIdSelector, selectImageEntities],
-  (imageIds, imageEntities) => {
-    return imageIds.map((imageId) => imageEntities[imageId]);
-  }
-);
-
-export const selectVisibleImages = createSelector(
-  [
-    selectHiddenImageCategoryIds,
-    selectImagesByCategoryDict,
-    selectImageEntities,
-  ],
-  (hiddenCategories, imagesByCategory, imageEntities) => {
-    const visibleImages: ImageType[] = [];
-    for (const categoryId of Object.keys(imagesByCategory)) {
-      if (!hiddenCategories.includes(categoryId)) {
-        for (const imageId of imagesByCategory[categoryId]) {
-          visibleImages.push(imageEntities[imageId]);
-        }
-      }
-    }
-    return visibleImages;
   }
 );
 
