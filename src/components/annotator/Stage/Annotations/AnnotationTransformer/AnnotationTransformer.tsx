@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
@@ -20,7 +20,6 @@ import { annotatorSlice } from "store/annotator";
 import {
   dataSlice,
   selectActiveImageHeight,
-  selectActiveImageWidth,
   selectSelectedAnnotations,
 } from "store/data";
 
@@ -40,35 +39,18 @@ const labelPosition = {
   y1: buttonGap,
   y2: buttonHeight + buttonGap * 2,
 };
-type box = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-};
 
 type AnnotationTransformerProps = {
-  transformPosition: ({
-    x,
-    y,
-  }: {
-    x: number;
-    y: number;
-  }) => { x: number; y: number } | undefined;
   annotationId: string;
   annotationTool?: AnnotationTool;
 };
 
 export const AnnotationTransformer = ({
-  transformPosition,
   annotationId,
   annotationTool,
 }: AnnotationTransformerProps) => {
   const stageRef = useContext(StageContext);
 
-  const [transforming, setTransforming] = useState<boolean>(false);
-  const [transformed, setTransformed] = useState<boolean>(false);
   const [xPos, setXPos] = useState<number>(0);
   const [yPos, setYPos] = useState<number>(0);
 
@@ -78,7 +60,6 @@ export const AnnotationTransformer = ({
   const activeImageId = useSelector(activeImageIdSelector);
   const cursor = useSelector(cursorSelector);
   const soundEnabled = useSelector(selectSoundEnabled);
-  const imageWidth = useSelector(selectActiveImageWidth);
   const imageHeight = useSelector(selectActiveImageHeight);
   const imageOrigin = useSelector(imageOriginSelector);
 
@@ -96,76 +77,7 @@ export const AnnotationTransformer = ({
     deleteAnnotationSoundEffect
   );
 
-  /**
-   * Obtain box coordinates in image space
-   * @param boundBox -
-   * @returns {box}
-   */
-  const getRelativeBox = (
-    boundBox: box,
-    scaleFactor: number
-  ): box | undefined => {
-    const relativePosition = transformPosition({
-      x: boundBox.x,
-      y: boundBox.y,
-    });
-    if (!relativePosition) return;
-    return {
-      x: relativePosition.x / scaleFactor,
-      y: relativePosition.y / scaleFactor,
-      height: boundBox.height / scaleFactor,
-      width: boundBox.width / scaleFactor,
-      rotation: 0,
-    };
-  };
-
-  const onTransformStart = () => {
-    setTransforming(true);
-    const selected = activeAnnotationIds.find((id: string) => {
-      return id === annotationId;
-    });
-
-    if (!selected) return;
-
-    if (!transformed) {
-      dispatch(
-        setSelectedAnnotationIds({
-          annotationIds: [selected],
-          workingAnnotationId: selected,
-        })
-      );
-    }
-  };
-
-  const boundingBoxFunc = (oldBox: box, newBox: box) => {
-    const stageScale = stageRef?.current?.scaleX() ?? 1;
-    const relativeNewBox = getRelativeBox(newBox, stageScale);
-
-    if (!imageWidth || !imageHeight || !relativeNewBox) return oldBox;
-
-    const minimumBoxDim = 5;
-
-    if (
-      relativeNewBox.width < minimumBoxDim ||
-      relativeNewBox.height < minimumBoxDim
-    )
-      return oldBox;
-
-    if (
-      Math.floor(relativeNewBox.x + relativeNewBox.width) > imageWidth ||
-      Math.floor(relativeNewBox.y + relativeNewBox.height) > imageHeight ||
-      relativeNewBox.x < 0 ||
-      relativeNewBox.y < 0
-    ) {
-      return oldBox;
-    }
-    if (!transformed) {
-      setTransformed(true);
-    }
-    return newBox;
-  };
-
-  const cancelAnnotation = () => {
+  const clearAnnotation = () => {
     if (annotationTool) {
       annotationTool.deselect();
     } else {
@@ -176,24 +88,28 @@ export const AnnotationTransformer = ({
         })
       );
     }
+    batch(() => {
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      );
+      dispatch(
+        annotatorSlice.actions.setSelectionMode({
+          selectionMode: AnnotationModeType.New,
+        })
+      );
 
-    dispatch(
-      annotatorSlice.actions.setSelectionMode({
-        selectionMode: AnnotationModeType.New,
-      })
-    );
-
-    dispatch(
-      setSelectedAnnotationIds({
-        annotationIds: [],
-        workingAnnotationId: undefined,
-      })
-    );
-
-    setTransformed(false);
+      dispatch(
+        setSelectedAnnotationIds({
+          annotationIds: [],
+          workingAnnotationId: undefined,
+        })
+      );
+    });
   };
 
-  const confirmAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
+  const handleConfirmOrDeleteAnnotation = (
+    event: Konva.KonvaEventObject<Event>
+  ) => {
     if (!activeImageId) return;
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
@@ -201,47 +117,35 @@ export const AnnotationTransformer = ({
     trRef.current!.detach();
     trRef.current!.getLayer()?.batchDraw();
 
-    dispatch(
-      dataSlice.actions.addAnnotation({ annotation: workingAnnotation! })
-    );
-    dispatch(
-      imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
-    );
-
-    cancelAnnotation();
-    if (soundEnabled) playCreateAnnotationSoundEffect();
+    if (activeAnnotationIds.includes(annotationId)) {
+      dispatch(
+        dataSlice.actions.deleteAnnotation({ annotationId: annotationId })
+      );
+      if (soundEnabled) playDeleteAnnotationSoundEffect();
+    } else {
+      dispatch(
+        dataSlice.actions.addAnnotation({ annotation: workingAnnotation! })
+      );
+      if (soundEnabled) playCreateAnnotationSoundEffect();
+    }
+    clearAnnotation();
   };
 
   const cancelAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
-
-    cancelAnnotation();
+    clearAnnotation();
     if (soundEnabled) playDeleteAnnotationSoundEffect();
   };
 
-  const onMouseEnter = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseEnter = (event: Konva.KonvaEventObject<MouseEvent>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = "pointer";
   };
 
-  const onMouseLeave = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleMouseLeave = (event: Konva.KonvaEventObject<MouseEvent>) => {
     const container = stageRef!.current!.container();
     container.style.cursor = cursor;
-  };
-
-  const deleteAnnotationHandler = (event: Konva.KonvaEventObject<Event>) => {
-    const container = stageRef!.current!.container();
-    container.style.cursor = cursor;
-
-    if (!activeImageId) return;
-
-    trRef.current!.detach();
-    trRef.current!.getLayer()?.batchDraw();
-
-    cancelAnnotation();
-
-    if (soundEnabled) playCreateAnnotationSoundEffect();
   };
 
   useEffect(() => {
@@ -264,12 +168,6 @@ export const AnnotationTransformer = ({
       setYPos(newY);
     }
   }, [workingAnnotation, selectedAnnotations.length, imageHeight, imageOrigin]);
-
-  useEffect(() => {
-    if (!activeAnnotationIds.includes(annotationId)) {
-      setTransformed(true);
-    }
-  }, [activeAnnotationIds, annotationId]);
 
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
@@ -298,24 +196,18 @@ export const AnnotationTransformer = ({
     };
   }, [annotationId, stageRef]);
 
-  useEffect(() => {
-    console.log(workingAnnotation && transforming);
-  });
-
   return (
     <>
       <ReactKonva.Group>
         <ReactKonva.Transformer
-          boundBoxFunc={boundingBoxFunc}
-          onTransformStart={onTransformStart}
-          onTransformEnd={() => {
-            setTransforming(false);
-          }}
           id={"tr-".concat(annotationId)}
           ref={trRef}
           rotateEnabled={false}
+          resizeEnabled={false}
+          borderStrokeWidth={1}
+          borderStroke="white" //TODO: It would be pretty cool if the border color could set depending on the primary color of the underlying image for contrast
         />
-        {workingAnnotation && !transforming && (
+        {workingAnnotation && (
           <>
             <ReactKonva.Group
               id={"label-group"}
@@ -328,19 +220,11 @@ export const AnnotationTransformer = ({
                   x: labelPosition.x,
                   y: labelPosition.y1,
                 }}
-                onClick={
-                  transformed
-                    ? confirmAnnotationHandler
-                    : deleteAnnotationHandler
-                }
-                onTap={
-                  transformed
-                    ? confirmAnnotationHandler
-                    : deleteAnnotationHandler
-                }
+                onClick={handleConfirmOrDeleteAnnotation}
+                onTap={handleConfirmOrDeleteAnnotation}
                 id={"label"}
-                onMouseEnter={onMouseEnter}
-                onMouseLeave={onMouseLeave}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <ReactKonva.Tag
                   cornerRadius={3}
@@ -354,7 +238,11 @@ export const AnnotationTransformer = ({
                   fill={"white"}
                   fontSize={14}
                   padding={6}
-                  text={transformed ? "Confirm" : "Delete"}
+                  text={
+                    activeAnnotationIds.includes(annotationId)
+                      ? "Delete"
+                      : "Confirm"
+                  }
                   width={buttonWidth}
                   height={buttonHeight}
                   align={"center"}
@@ -369,8 +257,8 @@ export const AnnotationTransformer = ({
                 onClick={cancelAnnotationHandler}
                 onTap={cancelAnnotationHandler}
                 id={"label"}
-                onMouseEnter={onMouseEnter}
-                onMouseLeave={onMouseLeave}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <ReactKonva.Tag
                   cornerRadius={3}

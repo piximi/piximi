@@ -32,12 +32,18 @@ const dispatchToProject = async (
       dataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
+        isPermanent: true,
       })
     );
     dispatch(
-      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+      dataSlice.actions.setAnnotationCategories({
+        annotationCategories,
+        isPermanent: true,
+      })
     );
-    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+    dispatch(
+      dataSlice.actions.setAnnotations({ annotations, isPermanent: true })
+    );
   });
 };
 
@@ -60,12 +66,18 @@ const dispatchToImageViewer = async (
       dataSlice.actions.setImages({
         images: [image],
         disposeColorTensors: true,
+        isPermanent: true,
       })
     );
     dispatch(
-      dataSlice.actions.setAnnotationCategories({ annotationCategories })
+      dataSlice.actions.setAnnotationCategories({
+        annotationCategories,
+        isPermanent: true,
+      })
     );
-    dispatch(dataSlice.actions.setAnnotations({ annotations }));
+    dispatch(
+      dataSlice.actions.setAnnotations({ annotations, isPermanent: true })
+    );
 
     dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
     dispatch(

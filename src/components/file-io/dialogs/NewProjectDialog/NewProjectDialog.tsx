@@ -21,6 +21,7 @@ type NewProjectDialogProps = {
   open: boolean;
 };
 
+// TODO: Should alert since data will be deleted
 export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
   const dispatch = useDispatch();
 

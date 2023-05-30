@@ -66,7 +66,7 @@ export function createUnsortedDeferredStateAdapter<T>(
       };
       return;
     }
-    state.entities[key].changes = entity as Deferred<T>;
+    state.entities[key].changes = { ...entity, added: true } as Deferred<T>;
   }
 
   function setManyMutably(

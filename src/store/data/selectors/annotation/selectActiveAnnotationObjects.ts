@@ -54,7 +54,6 @@ export const selectActiveAnnotationObjects = createSelector(
         imageShape: activeImageShape,
       });
     }
-
     return annotationObjects;
   }
 );
@@ -66,17 +65,16 @@ export const selectWorkingAnnotationObject = createSelector(
     selectAnnotationCategoryEntities,
   ],
   (workingAnnotation, activeImageShape, categoryEntities) => {
-    if (!workingAnnotation || !activeImageShape) return [];
-    const annotation = decodeAnnotation(workingAnnotation)!;
+    if (!workingAnnotation || !activeImageShape) return;
+    const annotation = !workingAnnotation.maskData
+      ? decodeAnnotation(workingAnnotation)!
+      : workingAnnotation;
     const fillColor = categoryEntities[workingAnnotation.categoryId].color;
     const imageShape = activeImageShape;
-    console.log(annotation, fillColor, imageShape);
-    return [
-      {
-        annotation: decodeAnnotation(workingAnnotation)!,
-        fillColor: categoryEntities[workingAnnotation.categoryId].color,
-        imageShape: activeImageShape,
-      },
-    ];
+    return {
+      annotation: annotation,
+      fillColor: fillColor,
+      imageShape: imageShape,
+    };
   }
 );

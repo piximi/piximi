@@ -54,12 +54,13 @@ export const Stage = ({
   // useRef
   const imageRef = useRef<Konva.Image | null>(null);
   const stageRef = useContext(StageContext);
+
   // useSelector
   const toolType = useSelector(selectToolType);
   const stagePosition = useSelector(stagePositionSelector);
   const imageWidth = useSelector(selectActiveImageWidth);
   const imageHeight = useSelector(selectActiveImageHeight);
-  const stageScale = stageRef?.current?.scaleX() ?? 1;
+
   const annotationState = useSelector(selectAnnotationState);
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
 
@@ -71,7 +72,6 @@ export const Stage = ({
     absolutePosition,
     outOfBounds,
     setCurrentMousePosition,
-    getPositionFromImage,
     positionByStage,
     pixelColor,
   } = usePointerLocation(imageRef, stageRef!, annotationTool?.image);
@@ -140,12 +140,13 @@ export const Stage = ({
     HotkeyView.Annotator,
     { keydown: true, keyup: true }
   );
+
   return (
     <>
       <ReactKonva.Stage
         draggable={draggable}
         height={stageHeight}
-        onClick={(evt) => handleClick()}
+        onClick={() => handleClick()}
         onMouseDown={(evt) => handleMouseDown(evt)}
         onTouchStart={(evt) => handleMouseDown(evt)}
         onMouseMove={(evt) => handleMouseMove(evt)}
@@ -155,7 +156,6 @@ export const Stage = ({
         onWheel={(evt) => handleZoomWheel(evt)}
         onDblClick={(evt) => handleDblClickToZoom(evt)}
         position={stagePosition}
-        scale={{ x: stageScale, y: stageScale }}
         ref={stageRef}
         width={stageWidth}
       >
@@ -195,10 +195,7 @@ export const Stage = ({
                   draggable={draggable}
                   toolType={toolType}
                 />
-                <Annotations
-                  transformPosition={getPositionFromImage}
-                  annotationTool={annotationTool}
-                />
+                <Annotations annotationTool={annotationTool} />
               </Layer>
             </DndProvider>
           </StageContext.Provider>

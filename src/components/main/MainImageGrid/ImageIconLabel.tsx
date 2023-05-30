@@ -14,7 +14,7 @@ import {
   Category,
   ImageType,
   Partition,
-  UNKNOWN_CLASS_CATEGORY_ID,
+  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 
 type ImageIconLabelProps = {
@@ -53,7 +53,7 @@ export const ImageIconLabel = ({ image, placement }: ImageIconLabelProps) => {
 
   const predictedLabel =
     image.partition === Partition.Inference &&
-    image.categoryId !== UNKNOWN_CLASS_CATEGORY_ID;
+    image.categoryId !== UNKNOWN_IMAGE_CATEGORY_ID;
 
   return (
     <Box position="absolute" sx={placement}>

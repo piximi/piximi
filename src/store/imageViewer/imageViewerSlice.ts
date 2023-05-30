@@ -380,4 +380,5 @@ export const {
   setStageWidth,
   setZoomSelection,
   setZoomToolOptions,
+  setWorkingAnnotation,
 } = imageViewerSlice.actions;

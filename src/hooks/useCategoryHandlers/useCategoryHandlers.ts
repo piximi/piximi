@@ -22,7 +22,7 @@ import {
   CategoryType,
   PartialBy,
   UNKNOWN_ANNOTATION_CATEGORY,
-  UNKNOWN_CLASS_CATEGORY,
+  UNKNOWN_IMAGE_CATEGORY,
 } from "types";
 
 export const useCategoryHandlers = (
@@ -91,7 +91,7 @@ export const useCategoryHandlers = (
     (category?: Category) => {
       let otherCategories: string[];
       if (categoryType === CategoryType.ImageCategory) {
-        otherCategories = [...categories, UNKNOWN_CLASS_CATEGORY].reduce(
+        otherCategories = [...categories, UNKNOWN_IMAGE_CATEGORY].reduce(
           (otherIds: string[], otherCategory: Category) => {
             if (!category || otherCategory.id !== category.id) {
               otherIds.push(otherCategory.id);
@@ -248,7 +248,7 @@ export const useCategoryHandlers = (
         names: usedImageCategoryNames,
         colors: usedImageCategoryColors,
       },
-      unknownCategory: UNKNOWN_CLASS_CATEGORY,
+      unknownCategory: UNKNOWN_IMAGE_CATEGORY,
     };
   } else {
     return {

@@ -6,13 +6,13 @@ import Image from "image-js";
 
 import { imageOriginSelector } from "store/imageViewer";
 
-import { DecodedAnnotationType, Shape } from "types";
+import { AnnotationType, Shape } from "types";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 import { dataSlice } from "store/data";
 
 type AnnotationProps = {
-  annotation: DecodedAnnotationType;
+  annotation: AnnotationType;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;
@@ -34,7 +34,7 @@ export const Annotation = ({
   useEffect(() => {
     const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
     const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
-    if (!boxWidth || !boxHeight) return;
+    if (!boxWidth || !boxHeight || !annotation.maskData) return;
     if (Math.round(boxWidth) <= 0 || Math.round(boxHeight) <= 0) return;
     const color = hexToRGBA(fillColor, 0);
     setImageMask(
@@ -55,10 +55,10 @@ export const Annotation = ({
     imageHeight,
   ]);
 
+  //TODO: Remove Transformations on annotations
   const onTransformEnd = () => {
-    if (!selected) return;
-
-    if (!imageWidth || !imageHeight) return;
+    if (!selected || !imageWidth || !imageHeight || !annotation.maskData)
+      return;
 
     const node = annotatorRef.current;
     if (!node) return;
@@ -119,8 +119,8 @@ export const Annotation = ({
       ref={annotatorRef}
       id={annotation.id}
       image={imageMask}
-      x={annotation.boundingBox[0] /** stageScale*/ + imagePosition.x}
-      y={annotation.boundingBox[1] /** stageScale */ + imagePosition.y}
+      x={annotation.boundingBox[0] + imagePosition.x}
+      y={annotation.boundingBox[1] + imagePosition.y}
       width={Math.round(annotation.boundingBox[2] - annotation.boundingBox[0])}
       height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}

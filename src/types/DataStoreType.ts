@@ -8,7 +8,7 @@ type AnnotationID = string;
 type AnnotationCatID = string;
 export type DataStoreSlice = {
   annotationCategories: DeferredEntityState<Category>;
-  categories: DeferredEntityState<Category>;
+  imageCategories: DeferredEntityState<Category>;
   images: DeferredEntityState<ImageType>;
   annotations: DeferredEntityState<AnnotationType>;
   annotationsByImage: Record<ImageID, Array<AnnotationID>>;
