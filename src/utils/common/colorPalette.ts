@@ -18,7 +18,7 @@ export const CATEGORY_COLORS = {
   citrus: "#a89d00",
 };
 
-export const UNKNOWN_CLASS_CATEGORY_COLOR = "#AAAAAA";
+export const UNKNOWN_IMAGE_CATEGORY_COLOR = "#AAAAAA";
 export const UNKNOWN_ANNOTATION_CATEGORY_COLOR = "#920000";
 
 export const APPLICATION_COLORS = {

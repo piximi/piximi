@@ -24,7 +24,7 @@ export const dataProjectSelector = ({
 
   return {
     images,
-    categories: Object.values(data.categories.entities).map(
+    categories: Object.values(data.imageCategories.entities).map(
       (entity) => entity.saved
     ),
     annotationCategories: Object.values(data.annotationCategories.entities).map(

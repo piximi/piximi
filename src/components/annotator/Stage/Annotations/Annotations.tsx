@@ -13,27 +13,27 @@ import {
 import { AnnotationTool } from "annotator-tools";
 
 type AnnotationsProps = {
-  transformPosition: ({
-    x,
-    y,
-  }: {
-    x: number;
-    y: number;
-  }) => { x: number; y: number } | undefined;
   annotationTool: AnnotationTool;
 };
-export const Annotations = ({
-  transformPosition,
-  annotationTool,
-}: AnnotationsProps) => {
+export const Annotations = ({ annotationTool }: AnnotationsProps) => {
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
   const annotationObjects = useSelector(selectActiveAnnotationObjects);
   const workingAnnotationObject = useSelector(selectWorkingAnnotationObject);
 
   return (
     <>
-      {[...annotationObjects, ...workingAnnotationObject].map(
-        (annotationObject) => (
+      {annotationObjects
+        .filter((annotationObject) => {
+          if (workingAnnotationObject) {
+            return (
+              workingAnnotationObject.annotation.id !==
+              annotationObject.annotation.id
+            );
+          } else {
+            return true;
+          }
+        })
+        .map((annotationObject) => (
           <Annotation
             key={annotationObject.annotation.id}
             annotation={annotationObject.annotation}
@@ -41,24 +41,38 @@ export const Annotations = ({
             fillColor={annotationObject.fillColor}
             selected={true}
           />
-        )
+        ))}
+      {selectedAnnotationsIds
+        .filter((annotationId) => {
+          if (workingAnnotationObject) {
+            return workingAnnotationObject.annotation.id !== annotationId;
+          } else {
+            return true;
+          }
+        })
+        .map((selectedAnnotationId) => (
+          <AnnotationTransformer
+            key={`tr-${selectedAnnotationId}`}
+            annotationId={selectedAnnotationId}
+            annotationTool={annotationTool}
+          />
+        ))}
+      {workingAnnotationObject && (
+        <>
+          <Annotation
+            key={workingAnnotationObject.annotation.id}
+            annotation={workingAnnotationObject.annotation}
+            imageShape={workingAnnotationObject.imageShape}
+            fillColor={workingAnnotationObject.fillColor}
+            selected={true}
+          />
+          <AnnotationTransformer
+            key={`tr-${workingAnnotationObject.annotation.id}`}
+            annotationId={workingAnnotationObject.annotation.id}
+            annotationTool={annotationTool}
+          />
+        </>
       )}
-      {selectedAnnotationsIds.map((selectedAnnotationId) => (
-        <AnnotationTransformer
-          key={`tr-${selectedAnnotationId}`}
-          transformPosition={transformPosition}
-          annotationId={selectedAnnotationId}
-          annotationTool={annotationTool}
-        />
-      ))}
-      {workingAnnotationObject.map((workingAnnotationId) => (
-        <AnnotationTransformer
-          key={`tr-${workingAnnotationId.annotation.id}`}
-          transformPosition={transformPosition}
-          annotationId={workingAnnotationId.annotation.id}
-          annotationTool={annotationTool}
-        />
-      ))}
     </>
   );
 };

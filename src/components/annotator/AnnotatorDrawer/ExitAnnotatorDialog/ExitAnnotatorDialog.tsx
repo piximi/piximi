@@ -1,5 +1,4 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import { intersection, difference } from "lodash";
 
 import {
   Button,
@@ -10,10 +9,7 @@ import {
 } from "@mui/material";
 
 import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
-import { selectSelectedImages } from "store/data";
-import { selectedImagesIdSelector } from "store/project";
-
-import { OldImageType, ShadowImageType } from "types";
+import { dataSlice } from "store/data";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;
@@ -28,38 +24,9 @@ export const ExitAnnotatorDialog = ({
 }: ExitAnnotatorDialogProps) => {
   const dispatch = useDispatch();
 
-  const annotatorImages = useSelector(selectSelectedImages).map((image) => {
-    return { ...image, annotations: [] } as ShadowImageType;
-  });
-  const selectedImagesIds = useSelector(selectedImagesIdSelector);
-
   const activeImageId = useSelector(activeImageIdSelector);
 
-  // TODO: post PR #407 - make these selectors
-  const getImageSets = () => {
-    const annotatorImagesIds = annotatorImages.map(
-      (image: ShadowImageType) => image.id
-    );
-
-    const modifiedImagesIds = intersection(
-      selectedImagesIds,
-      annotatorImagesIds
-    );
-    const deletedImagesIds = difference(selectedImagesIds, modifiedImagesIds);
-    const newImagesIds = difference(annotatorImagesIds, modifiedImagesIds);
-
-    const modifiedImages = annotatorImages.filter((image: ShadowImageType) => {
-      return modifiedImagesIds.includes(image.id);
-    });
-
-    const newImages = annotatorImages.filter((image: ShadowImageType) => {
-      return newImagesIds.includes(image.id);
-    }) as Array<OldImageType>;
-
-    return { newImages, modifiedImages, deletedImagesIds };
-  };
-
-  const onSaveAnnotations = () => {
+  const onSaveChanges = () => {
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
@@ -68,18 +35,13 @@ export const ExitAnnotatorDialog = ({
           execSaga: true,
         })
       );
+      dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
     });
 
     onReturnToProject();
   };
 
-  const onDiscardAnnotations = () => {
-    const { newImages } = getImageSets();
-
-    for (const im of newImages) {
-      im.data.dispose();
-    }
-
+  const onDiscardChanges = () => {
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setActiveImageId({
@@ -88,6 +50,7 @@ export const ExitAnnotatorDialog = ({
           execSaga: true,
         })
       );
+      dispatch(dataSlice.actions.reconcile({ keepChanges: false }));
     });
 
     onReturnToProject();
@@ -108,12 +71,12 @@ export const ExitAnnotatorDialog = ({
         Stay on this page
       </Button>
 
-      <Button onClick={onDiscardAnnotations} color="primary">
-        Discard changes and return to project
+      <Button onClick={onDiscardChanges} color="primary">
+        Discard changes and exit
       </Button>
 
-      <Button onClick={onSaveAnnotations} color="primary">
-        Save annotations and return to project
+      <Button onClick={onSaveChanges} color="primary">
+        Save changes and exit
       </Button>
       <Stack />
     </Dialog>

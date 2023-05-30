@@ -17,7 +17,7 @@ import {
   DEFAULT_COLORS,
   OldImageType,
   Partition,
-  UNKNOWN_CLASS_CATEGORY_ID,
+  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
 
@@ -207,7 +207,9 @@ export const getImageFileInformation = async (
     const buffer = await file.arrayBuffer();
     const image: ImageJS.Image | ImageJS.Stack = await ImageJS.Image.load(
       buffer,
-      { ignorePalette: true }
+      {
+        ignorePalette: true,
+      }
     );
 
     return { ...getImageInformation(image), ext };
@@ -835,7 +837,7 @@ export const convertToImage = async (
     annotations: [],
     colors: colors,
     bitDepth,
-    categoryId: UNKNOWN_CLASS_CATEGORY_ID,
+    categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
     id: uuidv4(),
     name: filename,
     shape: { planes, height, width, channels },

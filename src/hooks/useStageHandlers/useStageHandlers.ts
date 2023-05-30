@@ -116,6 +116,11 @@ export const useStageHandlers = (
     HotkeyView.Annotator,
     { keyup: true, keydown: true }
   );
+
+  /*
+   * * HANDLE POINTER FUNCTIONS * *
+   */
+
   const onPointerMouseDown = useCallback(
     (position: { x: number; y: number }) => {
       setDragging(false);
@@ -124,6 +129,7 @@ export const useStageHandlers = (
     },
     []
   );
+
   const handlePointerMouseMove = useCallback(
     (position: { x: number; y: number }) => {
       if (!position || !selecting || !minimum) return;
@@ -133,6 +139,7 @@ export const useStageHandlers = (
     },
     [minimum, selecting]
   );
+
   const handlePointerMouseUp = useCallback(
     (position: { x: number; y: number }) => {
       if (!position || !selecting || !minimum) return;
@@ -215,6 +222,11 @@ export const useStageHandlers = (
       shift,
     ]
   );
+
+  /*
+   * * HANDLE CLICK * *
+   */
+
   const handleClick = useCallback(() => {
     if (
       toolType !== ToolType.Pointer ||
@@ -229,6 +241,9 @@ export const useStageHandlers = (
     );
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
+      dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+      );
       return;
     }
 
@@ -274,6 +289,11 @@ export const useStageHandlers = (
           })
         );
         dispatch(
+          imageViewerSlice.actions.setWorkingAnnotation({
+            annotation: currentAnnotation!,
+          })
+        );
+        dispatch(
           setSelectedCategoryId({
             selectedCategoryId: currentAnnotation!.categoryId,
             execSaga: false,
@@ -302,6 +322,11 @@ export const useStageHandlers = (
     deselectAllAnnotations,
     absolutePosition,
   ]);
+
+  /*
+   * * HANDLE MOUSE DOWN * *
+   */
+
   const handleMouseDown = (
     event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
   ) => {
@@ -366,6 +391,11 @@ export const useStageHandlers = (
     outOfBounds,
     stageRef,
   ]);
+
+  /*
+   * * HANDLE MOUSE MOVE * *
+   */
+
   const handleMouseMove = useMemo(() => {
     const func = (event: KonvaEventObject<MouseEvent>) => {
       if (!stageRef || !stageRef.current || draggable) return;
@@ -412,6 +442,10 @@ export const useStageHandlers = (
     draggable,
   ]);
 
+  /*
+   * * HANDLE MOUSE UP * *
+   */
+
   const handleMouseUp = useMemo(() => {
     const func = async (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
@@ -450,6 +484,10 @@ export const useStageHandlers = (
     toolType,
   ]);
 
+  /*
+   * * HANDLE ZOOM * *
+   */
+
   const handleZoomWheel = (event: KonvaEventObject<WheelEvent>) => {
     handleZoomScroll(event);
     setCurrentMousePosition();
@@ -458,6 +496,7 @@ export const useStageHandlers = (
     handleZoomDblClick(event);
     setCurrentMousePosition();
   };
+
   useAnnotatorKeyboardShortcuts({
     annotationTool,
     deleteAnnotations,
