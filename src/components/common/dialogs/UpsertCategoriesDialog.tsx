@@ -116,7 +116,11 @@ export const UpsertCategoriesDialog = ({
           alignItems="center"
           gap={2}
         >
-          <ColorIcon color={color} onColorChange={onColorChange} />
+          <ColorIcon
+            color={color}
+            unusedColors={usedCategoryInfo.colors}
+            onColorChange={onColorChange}
+          />
 
           <TextField
             error={invalidName}
