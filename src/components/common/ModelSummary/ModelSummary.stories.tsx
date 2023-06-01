@@ -1,6 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { ModelSummaryTable } from "./ModelSummary";
+import { ModelSummaryTable } from "../styled-components/ModelSummary";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { Shape } from "types/Shape";
 import {
