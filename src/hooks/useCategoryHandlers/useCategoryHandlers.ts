@@ -53,8 +53,6 @@ export const useCategoryHandlers = (
     selectActiveAnnotationCountsByCategory
   );
 
-  //TODO - categories: Figure out uses of selected in store
-
   const handleSelectCategory = useCallback(
     (category: Category) => {
       setSelectedCategory(category);
@@ -201,9 +199,10 @@ export const useCategoryHandlers = (
 
           dispatch(
             dataSlice.actions.deleteAnnotationCategories({
+              // need to recast catagories as an array because inside batch
               categoryIds: (categories as Category[]).map(
                 (category) => category.id
-              ), //TODO - syntax: Why need to explicitly give type here but not for Classifier Category
+              ),
             })
           );
         });

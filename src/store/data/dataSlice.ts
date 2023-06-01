@@ -543,7 +543,7 @@ export const dataSlice = createSlice({
       });
     },
 
-    //TODO: this shoukd be annotation
+    //TODO: this should be annotation
     setImageInstances(
       state,
       action: PayloadAction<{
