@@ -64,7 +64,7 @@ export const dataSlice = createSlice({
   name: "data",
   initialState: initialState,
   reducers: {
-    resetData: () => initialState(),
+    resetData: (state) => initialState(),
     initData(
       state,
       action: PayloadAction<{
@@ -80,7 +80,6 @@ export const dataSlice = createSlice({
         categories: newCategories,
         annotationCategories: newAnnotationCategories,
       } = action.payload;
-      dataSlice.caseReducers.resetData();
       dataSlice.caseReducers.addImageCategories(state, {
         type: "setImageCategories",
         payload: { categories: newCategories, isPermanent: true },
