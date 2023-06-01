@@ -5,9 +5,11 @@ import {
   dataSlice,
   selectImageCategoryNames,
   selectImagesByCategoryDict,
-  selectUsedImageCategoryColors,
+  selectUnusedImageCategoryColors,
   selectActiveAnnotationCountsByCategory,
   selectAnnotationsByCategoryDict,
+  selectUnusedAnnotationCategoryColors,
+  selectAnnotationCategoryNames,
 } from "store/data";
 
 import {
@@ -38,7 +40,15 @@ export const useCategoryHandlers = (
   const imagesByCategories = useSelector(selectImagesByCategoryDict);
   const annotationsByCategory = useSelector(selectAnnotationsByCategoryDict);
   const usedImageCategoryNames = useSelector(selectImageCategoryNames);
-  const usedImageCategoryColors = useSelector(selectUsedImageCategoryColors);
+  const usedAnnotationCategoryNames = useSelector(
+    selectAnnotationCategoryNames
+  );
+  const unusedImageCategoryColors = useSelector(
+    selectUnusedImageCategoryColors
+  );
+  const unusedAnnotationCategoryColors = useSelector(
+    selectUnusedAnnotationCategoryColors
+  );
   const activeAnnotationCountsByCategory = useSelector(
     selectActiveAnnotationCountsByCategory
   );
@@ -246,7 +256,7 @@ export const useCategoryHandlers = (
       dispatchDeleteObjectsOfCategory: dispatchDeleteImagesOfCategory,
       usedCategoryInfo: {
         names: usedImageCategoryNames,
-        colors: usedImageCategoryColors,
+        colors: unusedImageCategoryColors,
       },
       unknownCategory: UNKNOWN_IMAGE_CATEGORY,
     };
@@ -264,8 +274,8 @@ export const useCategoryHandlers = (
       objectCountByCategory: annotationCountByCategory,
       dispatchDeleteObjectsOfCategory: dispatchDeleteAnnotationsOfCategory,
       usedCategoryInfo: {
-        names: usedImageCategoryNames,
-        colors: usedImageCategoryColors,
+        names: usedAnnotationCategoryNames,
+        colors: unusedAnnotationCategoryColors,
       },
       unknownCategory: UNKNOWN_ANNOTATION_CATEGORY,
     };

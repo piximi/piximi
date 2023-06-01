@@ -1,24 +1,24 @@
 import * as React from "react";
-import { useSelector } from "react-redux";
 import { CirclePicker, ColorResult } from "react-color";
 
 import { Avatar, IconButton, Popover, Box } from "@mui/material";
 import { Label } from "@mui/icons-material";
 
-import { selectUnusedImageCategoryColors } from "store/data";
-
 type ColorIconButtonProps = {
   color: string;
   onColorChange: (color: any) => void;
+  unusedColors?: string[];
 };
 
-export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
+export const ColorIcon = ({
+  color,
+  onColorChange,
+  unusedColors,
+}: ColorIconButtonProps) => {
   const [colorMenuAnchorEl, setColorMenuAnchorEl] =
     React.useState<null | HTMLButtonElement>(null);
 
   const colorPopupOpen = Boolean(colorMenuAnchorEl);
-
-  const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const onOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
     setColorMenuAnchorEl(event.currentTarget);
@@ -55,7 +55,7 @@ export const ColorIcon = ({ color, onColorChange }: ColorIconButtonProps) => {
         }}
       >
         <Box sx={{ margin: "16px" }}>
-          <CirclePicker colors={availableColors} onChange={onChange} />
+          <CirclePicker colors={unusedColors} onChange={onChange} />
         </Box>
       </Popover>
     </React.Fragment>
