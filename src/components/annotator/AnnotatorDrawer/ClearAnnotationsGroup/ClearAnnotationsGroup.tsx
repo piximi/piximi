@@ -20,7 +20,6 @@ import {
 import { dataSlice } from "store/data";
 
 type DeleteType = "ALL" | "SELECTED";
-//TODO :Figurte out why only seeing one annotatin on delete selected
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);

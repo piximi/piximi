@@ -92,13 +92,15 @@ export const CategoryItem = ({
         <Chip
           label={objectCount}
           size="small"
-          sx={{
-            height: "1.5em",
-            minWidth: "2.5em",
-            borderWidth: "2px",
-            fontSize: "0.875rem",
-            color: "white",
-            backgroundColor: "inherit",
+          sx={(theme) => {
+            return {
+              height: "1.5em",
+              minWidth: "2.5em",
+              borderWidth: "2px",
+              fontSize: "0.875rem",
+              color: theme.palette.text.primary,
+              backgroundColor: APPLICATION_COLORS.highlightColor,
+            };
           }}
         />
       </ListItemButton>

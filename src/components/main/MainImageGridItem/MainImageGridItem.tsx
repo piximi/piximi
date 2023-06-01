@@ -52,7 +52,7 @@ export const MainImageGridItem = memo(
     };
 
     const getSelectionStatus = () => {
-      // TODO: Change to always have border so image sie doesnt change
+      // TODO: Change to always have border so image size doesnt change
       return selected
         ? {
             border: `solid ${selectedImageBorderWidth}px ${selectionColor}`,
