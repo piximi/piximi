@@ -7,6 +7,8 @@ import { decodeAnnotation } from "utils/annotator";
 export const selectSelectedAnnotations = createSelector(
   [selectSelectedAnnotationIds, selectAnnotationEntities],
   (selectedIds, annotationEntities): Array<DecodedAnnotationType> => {
-    return selectedIds.map((annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!);
+    return selectedIds.map(
+      (annotationId) => decodeAnnotation(annotationEntities[annotationId]!)!
+    );
   }
 );

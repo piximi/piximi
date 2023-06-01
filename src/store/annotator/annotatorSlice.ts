@@ -1,6 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { ToolType, AnnotationModeType, AnnotationStateType, AnnotatorStore } from "types";
+import {
+  ToolType,
+  AnnotationModeType,
+  AnnotationStateType,
+  AnnotatorStore,
+} from "types";
 
 import { AnnotationTool } from "annotator-tools";
 
@@ -32,7 +37,10 @@ export const annotatorSlice = createSlice({
     setToolType(state, action: PayloadAction<{ operation: ToolType }>) {
       state.toolType = action.payload.operation;
     },
-    setPenSelectionBrushSize(state, action: PayloadAction<{ penSelectionBrushSize: number }>) {
+    setPenSelectionBrushSize(
+      state,
+      action: PayloadAction<{ penSelectionBrushSize: number }>
+    ) {
       state.penSelectionBrushSize = action.payload.penSelectionBrushSize;
     },
     setQuickSelectionRegionSize(
@@ -42,7 +50,10 @@ export const annotatorSlice = createSlice({
       state.quickSelectionRegionSize = action.payload.quickSelectionRegionSize;
     },
 
-    setSelectionMode(state, action: PayloadAction<{ selectionMode: AnnotationModeType }>) {
+    setSelectionMode(
+      state,
+      action: PayloadAction<{ selectionMode: AnnotationModeType }>
+    ) {
       state.selectionMode = action.payload.selectionMode;
     },
 
