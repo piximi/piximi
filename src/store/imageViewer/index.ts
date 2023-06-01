@@ -41,3 +41,4 @@ export {
 export { selectColorAdjustments } from "./selectors/selectColorAdjustments";
 export { zoomToolOptionsSelector } from "./selectors/zoomToolOptionsSelector";
 export { selectWorkingAnnotation } from "./selectors/selectWorkingAnnotation";
+export { selectImageIsloading } from "./selectors/selectImageIsLoading";

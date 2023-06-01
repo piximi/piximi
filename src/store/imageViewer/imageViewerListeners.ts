@@ -11,6 +11,9 @@ const startAppListening =
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageId,
   effect: async (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: true })
+    );
     const newActiveId = action.payload.imageId;
     const newState = listenerAPI.getState();
     if (!newActiveId) {
@@ -62,6 +65,9 @@ startAppListening({
 
     listenerAPI.dispatch(
       imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
     );
   },
 });

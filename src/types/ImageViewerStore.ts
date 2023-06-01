@@ -28,4 +28,5 @@ export type ImageViewerStore = {
     centerPoint: { x: number; y: number } | undefined;
   };
   zoomOptions: ZoomToolOptionsType;
+  imageIsLoading: boolean;
 };
