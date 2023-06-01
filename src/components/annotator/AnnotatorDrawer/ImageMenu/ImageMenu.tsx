@@ -7,7 +7,7 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice, selectAllImageCategories } from "store/data";
+import { dataSlice, selectAllAnnotationCategories } from "store/data";
 import { imageViewerSlice } from "store/imageViewer";
 
 import { ImageType } from "types";
@@ -18,6 +18,7 @@ import {
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
 import { projectSlice } from "store/project";
+import { selectAnnotationsByImage } from "store/data/selectors/annotation/annotationSelectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;
@@ -27,7 +28,6 @@ type ImageMenuProps = {
   openImageMenu: boolean;
 };
 
-// TODO: handle reconciliation here, pass annotations to export function
 export const ImageMenu = ({
   anchorElImageMenu,
   selectedImage,
@@ -37,7 +37,8 @@ export const ImageMenu = ({
 }: ImageMenuProps) => {
   const dispatch = useDispatch();
 
-  const annotationCategories = useSelector(selectAllImageCategories);
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
+  const annotations = useSelector(selectAnnotationsByImage)(selectedImage?.id);
 
   const handleClearAnnotations = (
     event: React.MouseEvent<HTMLElement, MouseEvent>
@@ -86,10 +87,11 @@ export const ImageMenu = ({
     let zip = new JSZip();
 
     if (!selectedImage.id) return;
+    console.log(annotations.length);
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage!, annotations: [] }],
+        [{ ...selectedImage!, annotations }],
         annotationCategories,
         zip,
         true
@@ -112,7 +114,7 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
-      [{ ...selectedImage, annotations: [] }],
+      [{ ...selectedImage, annotations }],
       annotationCategories,
       zip,
       "binary_instances"
@@ -131,7 +133,7 @@ export const ImageMenu = ({
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage, annotations: [] }],
+        [{ ...selectedImage, annotations }],
         annotationCategories,
         zip
       )
@@ -153,7 +155,7 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
-      [{ ...selectedImage, annotations: [] }],
+      [{ ...selectedImage, annotations }],
       annotationCategories,
       zip,
       "labeled_semantic"
@@ -172,7 +174,7 @@ export const ImageMenu = ({
 
     Promise.all(
       saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage, annotations: [] }],
+        [{ ...selectedImage, annotations }],
         annotationCategories,
         zip,
         false,
