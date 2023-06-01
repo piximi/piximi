@@ -14,7 +14,7 @@ import {
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { Category, decodedAnnotationType } from "types";
+import { Category, DecodedAnnotationType } from "types";
 
 export const predictCoco = async (
   model: GraphModel,
@@ -125,7 +125,7 @@ const buildDetectedObjects = (
   classes: Array<number>,
   categories: Array<Category>
 ) => {
-  const annotations: Array<decodedAnnotationType> = [];
+  const annotations: Array<DecodedAnnotationType> = [];
   const count = indices.length;
 
   for (let i = 0; i < count; i++) {

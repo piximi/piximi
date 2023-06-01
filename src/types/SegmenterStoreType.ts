@@ -1,10 +1,10 @@
 import {
   History,
-  LayersModel,
+  /*LayersModel,
   Tensor,
   data,
   Rank,
-  GraphModel,
+  GraphModel,*/
 } from "@tensorflow/tfjs";
 import { FitOptions } from "./FitOptions";
 import { Shape } from "./Shape";

@@ -1,5 +1,5 @@
 import {
-  GraphModel,
+  //GraphModel,
   History,
   LayersModel,
   loadGraphModel,
@@ -8,7 +8,7 @@ import {
 import { ModelTask } from "types/ModelType";
 import { Category, FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
-import { predictCoco } from "./predictCoco";
+//import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoCategories } from "./constructCocoCategories";
 
@@ -101,15 +101,15 @@ export class CocoSSD extends Segmenter {
       );
     }
 
-    const graphModel = this._model as GraphModel;
+    // const graphModel = this._model as GraphModel;
 
-    // TODO - segmenter: is this 4D or 3D???
-    const infT = await this._inferenceDataset.toArray();
+    // // TODO - segmenter: is this 4D or 3D???
+    // const infT = await this._inferenceDataset.toArray();
     // imTensor disposed in `predictCoco`
-    const annotationsPromises = infT.map((imTensor) =>
-      predictCoco(graphModel, imTensor, this._inferenceCategories!)
-    );
-    const annotations = await Promise.all(annotationsPromises);
+    // const annotationsPromises = infT.map((imTensor) =>
+    //   predictCoco(graphModel, imTensor, this._inferenceCategories!)
+    // );
+    //const annotations = await Promise.all(annotationsPromises);
     console.log("done?");
   }
 
