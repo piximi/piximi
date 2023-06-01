@@ -52,6 +52,7 @@ const initialState: ImageViewerStore = {
     toActualSize: false,
     toFit: false,
   },
+  imageIsLoading: false,
 };
 
 export const imageViewerSlice = createSlice({
@@ -362,6 +363,9 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ options: ZoomToolOptionsType }>
     ) {
       state.zoomOptions = action.payload.options;
+    },
+    setImageIsLoading(state, action: PayloadAction<{ isLoading: boolean }>) {
+      state.imageIsLoading = action.payload.isLoading;
     },
   },
 });

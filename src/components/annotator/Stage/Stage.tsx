@@ -27,6 +27,7 @@ import {
   setImageOrigin,
   activeImageRenderedSrcsSelector,
   imageViewerSlice,
+  selectImageIsloading,
 } from "store/imageViewer";
 import {
   selectAnnotationState,
@@ -60,7 +61,7 @@ export const Stage = ({
   const stagePosition = useSelector(stagePositionSelector);
   const imageWidth = useSelector(selectActiveImageWidth);
   const imageHeight = useSelector(selectActiveImageHeight);
-
+  const imageIsLoading = useSelector(selectImageIsloading);
   const annotationState = useSelector(selectAnnotationState);
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
 
@@ -130,7 +131,13 @@ export const Stage = ({
         return imgElem;
       })
     );
-  }, [renderedSrcs]);
+    stageRef?.current?.scale({ x: 1, y: 1 });
+    dispatch(
+      imageViewerSlice.actions.setStagePosition({
+        stagePosition: { x: 0, y: 0 },
+      })
+    );
+  }, [renderedSrcs, stageRef, dispatch]);
 
   useHotkeys(
     "alt",
@@ -175,13 +182,15 @@ export const Stage = ({
                     fill={"black"}
                     fontSize={(30 * stageWidth) / normalizeFont} //scale font depending on window width
                   />
-                ) : (
+                ) : !imageIsLoading ? (
                   <Image
                     ref={imageRef}
                     images={htmlImages}
                     stageHeight={stageHeight}
                     stageWidth={stageWidth}
                   />
+                ) : (
+                  <></>
                 )}
                 {(annotationState === AnnotationStateType.Annotating ||
                   toolType === ToolType.QuickAnnotation) && ( //TODO: remind myself why quick annotation special
@@ -195,7 +204,9 @@ export const Stage = ({
                   draggable={draggable}
                   toolType={toolType}
                 />
-                <Annotations annotationTool={annotationTool} />
+                {!imageIsLoading && (
+                  <Annotations annotationTool={annotationTool} />
+                )}
               </Layer>
             </DndProvider>
           </StageContext.Provider>
