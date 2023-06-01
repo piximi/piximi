@@ -56,10 +56,6 @@ export const ImageMenu = ({
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     if (!selectedImage) return;
-    console.log("~* HandleDeleteImage *~");
-    console.log("--- selectedImageId: ", selectedImage.id);
-    console.log("--- previousImageId: ", previousImageId);
-    console.log(" ");
 
     batch(() => {
       dispatch(
