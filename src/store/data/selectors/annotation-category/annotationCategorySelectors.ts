@@ -7,14 +7,19 @@ import { RootState } from "store/reducer/reducer";
 import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
-export const annotationCategorySelectors = annotationCategoriesAdapter.getSelectors(
-  (state: RootState) => state.data.annotationCategories
-);
+export const annotationCategorySelectors =
+  annotationCategoriesAdapter.getSelectors(
+    (state: RootState) => state.data.annotationCategories
+  );
 
-export const selectAnnotationCategoryIds = annotationCategorySelectors.selectIds;
-export const selectAnnotationCategoryEntities = annotationCategorySelectors.selectEntities;
-export const selectAllAnnotationCategories = annotationCategorySelectors.selectAll;
-export const selectAnnotationCategoryById = annotationCategorySelectors.selectById;
+export const selectAnnotationCategoryIds =
+  annotationCategorySelectors.selectIds;
+export const selectAnnotationCategoryEntities =
+  annotationCategorySelectors.selectEntities;
+export const selectAllAnnotationCategories =
+  annotationCategorySelectors.selectAll;
+export const selectAnnotationCategoryById =
+  annotationCategorySelectors.selectById;
 
 export const selectCreatedAnnotationCategories = createSelector(
   selectAllAnnotationCategories,

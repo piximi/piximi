@@ -7,7 +7,9 @@ import { selectAnnotationsByImageDict } from "../annotation/annotationSelectors"
 
 import { DataStoreSlice, Partition } from "types";
 
-const imageSelectors = imagesAdapter.getSelectors((state: RootState) => state.data.images);
+const imageSelectors = imagesAdapter.getSelectors(
+  (state: RootState) => state.data.images
+);
 
 export const selectImageIds = imageSelectors.selectIds;
 export const selectImageEntities = imageSelectors.selectEntities;
@@ -18,7 +20,11 @@ export const selectImageCount = createSelector(selectAllImages, (images) => {
   return images.length;
 });
 
-export const selectImagesByCategoryDict = ({ data }: { data: DataStoreSlice }) => {
+export const selectImagesByCategoryDict = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
   return data.imagesByCategory;
 };
 

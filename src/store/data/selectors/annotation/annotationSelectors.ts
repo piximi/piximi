@@ -15,11 +15,19 @@ export const selectAllAnnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationById = annotationSelectors.selectEntities;
 export const selectTotalAnnotationCount = annotationSelectors.selectTotal;
 
-export const selectAnnotationsByImageDict = ({ data }: { data: DataStoreSlice }) => {
+export const selectAnnotationsByImageDict = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
   return data.annotationsByImage;
 };
 
-export const selectAnnotationsByCategoryDict = ({ data }: { data: DataStoreSlice }) => {
+export const selectAnnotationsByCategoryDict = ({
+  data,
+}: {
+  data: DataStoreSlice;
+}) => {
   return data.annotationsByCategory;
 };
 
@@ -31,7 +39,11 @@ export const selectAnnotationIdsByImage = createSelector(
 );
 
 export const selectTotalAnnotationCountByImage = createSelector(
-  [selectAnnotationsByImageDict, selectAllAnnotationIds, (state, imageId) => imageId],
+  [
+    selectAnnotationsByImageDict,
+    selectAllAnnotationIds,
+    (state, imageId) => imageId,
+  ],
   (annotationsByImage, annotationIds, imageId) => {
     let count = 0;
 
@@ -47,7 +59,11 @@ export const selectTotalAnnotationCountByImage = createSelector(
 
 export const selectAnnotationCountByCategory = () =>
   createSelector(
-    [selectAllAnnotationIds, selectAnnotationsByCategoryDict, (state, categoryId) => categoryId],
+    [
+      selectAllAnnotationIds,
+      selectAnnotationsByCategoryDict,
+      (state, categoryId) => categoryId,
+    ],
     (annotationIds, annotationsByCategory, categoryId) => {
       if (!Object.keys(annotationsByCategory).includes(categoryId)) return;
 
