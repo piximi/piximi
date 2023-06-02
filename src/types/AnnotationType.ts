@@ -2,7 +2,7 @@ import { Tensor4D } from "@tensorflow/tfjs";
 import { DataArray } from "utils/common/image";
 
 export type AnnotationType = {
-  // x1, y1, W, H
+  // x1, y1, x_2, y_2
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;
@@ -14,7 +14,7 @@ export type AnnotationType = {
   src?: string;
 };
 export type DecodedAnnotationType = {
-  // x1, y1, W, H
+  // x1, y1, x_2, y_2
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;

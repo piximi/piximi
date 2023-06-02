@@ -11,7 +11,7 @@ export class StardistVHE extends Segmenter {
       name: "StardistVHE",
       task: ModelTask.Segmentation,
       graph: true,
-      pretrained: false,
+      pretrained: true,
       trainable: false,
     });
   }
@@ -30,6 +30,8 @@ export class StardistVHE extends Segmenter {
     return this._history!;
   }
 
-  predict() {}
+  predict() {
+    return [[]];
+  }
   evaluate() {}
 }

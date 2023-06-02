@@ -9,8 +9,6 @@ import {
   selectAllAnnotationCategories,
 } from "store/data";
 import {
-  segmenterInputShapeSelector,
-  segmenterPreprocessOptionsSelector,
   segmenterFitOptionsSelector,
   segmenterSlice,
   segmenterModelSelector,
@@ -22,8 +20,8 @@ import {
   FitOptions,
   ImageType,
   Partition,
-  PreprocessOptions,
-  Shape,
+  // PreprocessOptions,
+  // Shape,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   DecodedAnnotationType,
 } from "types";
@@ -62,8 +60,7 @@ export function* predictSegmenterSaga({
     return;
   }
 
-  // assign each of the inference images to the validation partition
-  // TODO - segmenter: they should go in the inference partition
+  // TODO - segmenter: make sure this doesn't clash with classifier inference set
   yield put(
     dataSlice.actions.updateSegmentationImagesPartition({
       imageIdsByPartition: {
@@ -84,86 +81,93 @@ export function* predictSegmenterSaga({
     segmenterModelSelector
   );
 
-  let possibleClasses: {
-    [key: string]: { name: string; id: number; displayName: string };
-  } = {};
+  // const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
+  //   yield select(segmenterInputShapeSelector);
 
-  if (model instanceof CocoSSD) {
-    possibleClasses = COCO_CLASSES;
-  }
-
-  const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
-    yield select(segmenterInputShapeSelector);
-
-  // preprocessOption: {shuffle: true, rescaleOptions:{rescale:true, center: true}}
-  const preprocessOptions: ReturnType<
-    typeof segmenterPreprocessOptionsSelector
-  > = yield select(segmenterPreprocessOptionsSelector);
+  // const preprocessOptions: ReturnType<
+  //   typeof segmenterPreprocessOptionsSelector
+  // > = yield select(segmenterPreprocessOptionsSelector);
 
   // fitOptions: {epochs: 10, batchSize:32, initialEpoch: 0}
   const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
     yield select(segmenterFitOptionsSelector);
 
-  yield runSegmentationPrediction(
+  yield runPrediction(
     model,
     inferenceImages,
-    annotationCategories,
     createdCategories,
-    inputShape,
-    preprocessOptions,
-    fitOptions,
-    possibleClasses
+    // inputShape,
+    //preprocessOptions,
+    fitOptions
   );
 
   yield put(
     segmenterSlice.actions.updateModelStatus({
-      modelStatus: ModelStatus.Suggesting,
+      modelStatus: ModelStatus.Trained,
       execSaga: false,
     })
   );
 }
 
-function* runSegmentationPrediction(
+function* runPrediction(
   model: Segmenter,
   inferenceImages: Array<ImageType>,
-  categories: Array<Category>,
-  createdCategories: Array<Category>,
-  inputShape: Shape,
-  preprocessOptions: PreprocessOptions,
-  fitOptions: FitOptions,
-  possibleClasses: {
-    [key: string]: { name: string; id: number; displayName: string };
-  }
+  currentCategories: Array<Category>,
+  // inputShape: Shape,
+  //preprocessOptions: PreprocessOptions,
+  fitOptions: FitOptions
 ) {
-  let predictedAnnotations: Array<{
-    imageId: string;
-    annotations: DecodedAnnotationType[];
-  }> = model.predict("options", "callbacks");
+  // TODO - segmenter: generalize to model.trainable?, or maybe model.cannotTrainButCanUseCustomLabelsSomehow?
+  const generateCategories = model instanceof CocoSSD ? true : false;
 
-  const foundCategories: Category[] = [];
-  let index = 0;
-  while (index < foundCategories.length) {
-    const foundCat = foundCategories[index];
+  try {
+    model.loadInference(inferenceImages, {
+      categories: generateCategories ? undefined : currentCategories,
+      fitOptions,
+    });
+  } catch (error) {
+    yield handleError(
+      error as Error,
+      "Error in preprocessing the inference data"
+    );
+    return;
+  }
+
+  let predictedAnnotations: Awaited<ReturnType<typeof model.predict>> =
+    yield model.predict();
+
+  if (generateCategories) {
+    const uniquePredictedIds = [
+      ...new Set(
+        predictedAnnotations.flatMap((imAnns) =>
+          imAnns.map((ann) => ann.categoryId)
+        )
+      ),
+    ];
+    // TODO - segmenter: generalize inferenceCategoriesById, same way as above
+    const generatedCategories = (model as CocoSSD).inferenceCategoriesById([
+      // keep categories that we currently have, as long as they are also model categories
+      ...currentCategories.map((cat) => cat.id),
+      // add or keep categories that the model says exist
+      ...uniquePredictedIds,
+    ]);
+
     yield put(
-      dataSlice.actions.createAnnotationCategory({
-        name: foundCat.name,
-        color: foundCat.color,
-        id: foundCat.id,
+      dataSlice.actions.setImageCategories({
+        categories: generatedCategories,
       })
     );
-    index++;
   }
 
-  index = 0;
-  while (index < predictedAnnotations.length) {
+  for (const [i, annotations] of predictedAnnotations.entries()) {
+    const imageId = inferenceImages[i].id;
+
     yield put(
       dataSlice.actions.updateImageAnnotations({
-        imageId: predictedAnnotations[index].imageId,
-        annotations: predictedAnnotations[index].annotations,
+        imageId: imageId,
+        annotations: predictedAnnotations[i],
       })
     );
-
-    index++;
   }
 }
 

@@ -1,3 +1,4 @@
+import { decodedAnnotationType } from "types";
 import { Model, TrainingCallbacks } from "../Model";
 import {
   GraphModel,
@@ -24,6 +25,10 @@ export abstract class Segmenter extends Model {
   _history?: History;
   //protected _history?: History;
   private _cachedOutputShape?: number[];
+
+  abstract predict():
+    | decodedAnnotationType[][]
+    | Promise<decodedAnnotationType[][]>;
 
   dispose() {
     if (!this._model) {
