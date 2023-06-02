@@ -27,6 +27,13 @@ export const predictCoco = async (
   const height = imTensor.shape[1];
   const width = imTensor.shape[2];
 
+  // model returns two tensors:
+  // 1. box classification score with shape of [1, 1917, 90]
+  // 2. box location with shape of [1, 1917, 1, 4]
+  // where 1917 is the number of box detectors, 90 is the number of classes.
+  // and 4 is the four coordinates of the box.
+  // NOTE: there's actually only 80 classes to actually choose from
+  // 10/90 of them are dummys and in theory should never be chosen as max prob
   const results = (await model.executeAsync(imTensor)) as [
     Tensor<Rank.R3>,
     Tensor<Rank.R4>
@@ -58,12 +65,9 @@ export const predictCoco = async (
     setBackend("cpu");
   }
 
-  // TODO - segmenter: type annotate with rank
-  // I'm guessing 1-d tensor, of length == number of boxes selected by NMS
+  // Rank1 Tensor, with length == number of boxes selected by NMS
   // values being equal to the index in `boxes` of chosen boxes
   const indexTensor = tidy(() => {
-    // TODO - segmenter: figure out why we can take a 4d tensor and convert it
-    // to a 2d tensor directly
     const boxesT = tensor2d(boxes, [results[1].shape[1], results[1].shape[3]]);
 
     return tfimage.nonMaxSuppressionWithScore(
@@ -73,11 +77,24 @@ export const predictCoco = async (
       overlapThreshold,
       minScore,
       1
-    ).selectedIndices;
+    ).selectedIndices as Tensor<Rank.R1>;
+
+    // return tfimage.nonMaxSuppression(
+    //   boxesT,
+    //   maxScores,
+    //   maxNumBoxes,
+    //   overlapThreshold,
+    //   minScore
+    // ) as Tensor<Rank.R1>;
   });
 
   const indexes = indexTensor.dataSync() as Float32Array;
   indexTensor.dispose();
+
+  const x: number[] = [];
+  for (const idx of indexes) {
+    x.push(maxScores[idx]);
+  }
 
   if (prevBackend !== getBackend()) {
     setBackend(prevBackend);
@@ -140,14 +157,19 @@ const buildDetectedObjects = (
     const maxX = Math.round(bbox[3] * width);
 
     // x_1, y_1, x_2, y_2
-    //const annotationBbox = [minX, minY, maxX, maxY];
-    // x_1, y_1, W, H
-    const annotationBbox = [minX, minY, maxX - minX, maxY - minY] as [
+    const annotationBbox = [minX, minY, maxX, maxY] as [
       number,
       number,
       number,
       number
     ];
+    // x_1, y_1, W, H
+    // const annotationBbox = [minX, minY, maxX - minX, maxY - minY] as [
+    //   number,
+    //   number,
+    //   number,
+    //   number
+    // ];
 
     const maskData = new Uint8Array((maxX - minX) * (maxY - minY)).fill(255);
 

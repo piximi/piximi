@@ -9,14 +9,14 @@ type LoadModelArgs = {
 };
 
 // TODO - segmenter: change name to Fulyl Convolutional
-export class FullyCOnnectedSegmenter extends Segmenter {
+export class FullyConnectedSegmenter extends Segmenter {
   constructor() {
     super({
       name: "Fully Convolutional Network",
       task: ModelTask.Segmentation,
-      graph: true,
+      graph: false,
       pretrained: false,
-      trainable: false,
+      trainable: true,
     });
   }
 
@@ -30,6 +30,8 @@ export class FullyCOnnectedSegmenter extends Segmenter {
     return this._history!;
   }
 
-  predict() {}
+  predict() {
+    return [[]];
+  }
   evaluate() {}
 }

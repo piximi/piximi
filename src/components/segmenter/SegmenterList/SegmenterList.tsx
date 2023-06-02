@@ -25,7 +25,6 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelTask } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
-import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 
 export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
@@ -49,8 +48,7 @@ export const SegmenterList = () => {
 
   const importSegmentationModel = async (model: Model, inputShape: Shape) => {
     if (model instanceof Segmenter) {
-      // TODO - segmenter: generalize this to something like if model.requiredCategories
-      if (model instanceof CocoSSD) {
+      if (model.pretrained) {
         await model.loadModel();
 
         const cocoCategories = model.constructCategories();
@@ -65,7 +63,7 @@ export const SegmenterList = () => {
       dispatch(
         segmenterSlice.actions.uploadUserSelectedModel({
           inputShape,
-          model,
+          model: model as Segmenter,
         })
       );
     } else if (process.env.NODE_ENV !== "production") {

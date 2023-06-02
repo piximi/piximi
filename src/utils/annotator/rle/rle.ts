@@ -106,6 +106,7 @@ export const encodeAnnotation = (
   return encodedAnnotation;
 };
 
+// TODO: why is this returning a Promise???
 export const encodeAnnotations = (
   decodedAnnotations: Array<DecodedAnnotationType>
 ): Promise<Array<AnnotationType>> => {

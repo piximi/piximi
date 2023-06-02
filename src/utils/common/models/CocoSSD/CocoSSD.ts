@@ -14,7 +14,8 @@ import { constructCocoCategories } from "./constructCocoCategories";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
-  categories: Array<Category>;
+  // if cat undefined, created from default classes
+  categories?: Array<Category>;
 };
 
 /*
@@ -48,9 +49,10 @@ export class CocoSSD extends Segmenter {
       name: "COCO-SSD",
       task: ModelTask.Segmentation,
       graph: true,
-      pretrained: false,
+      pretrained: true,
       trainable: false,
       src: "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1",
+      requiredChannels: 3,
     });
   }
 
@@ -71,14 +73,17 @@ export class CocoSSD extends Segmenter {
       preprocessingArgs.fitOptions
     );
 
-    this._inferenceCategories = preprocessingArgs.categories;
-  }
-
-  constructCategories() {
-    return constructCocoCategories();
+    if (preprocessingArgs.categories) {
+      this._inferenceCategories = preprocessingArgs.categories;
+    } else if (!this._inferenceCategories) {
+      this._inferenceCategories = constructCocoCategories();
+    }
   }
 
   async train(options: any, callbacks: any): Promise<History> {
+    if (!this.trainable) {
+      throw Error("Training not supported for COCO SSD");
+    }
     return this._history!;
   }
 
@@ -92,13 +97,11 @@ export class CocoSSD extends Segmenter {
     }
 
     if (!this._inferenceDataset) {
-      throw Error(`"${this.name}" Model's inferences data not loaded`);
+      throw Error(`"${this.name}" Model's inference data not loaded`);
     }
 
     if (!this._inferenceCategories) {
-      throw Error(
-        `"${this.name}" Model's inferences categegories are not loaded`
-      );
+      throw Error(`"${this.name}" Model's inference categories are not loaded`);
     }
 
     // const graphModel = this._model as GraphModel;

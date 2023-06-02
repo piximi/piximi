@@ -15,6 +15,39 @@
  * =============================================================================
  */
 
+/*
+ * NOTE:
+ *
+ * The tfjs coco ssd v2 has 80 labels, here:
+ * https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts
+ *
+ * but was converted from the TensorFlow Object Detection API, here:
+ * https://github.com/tensorflow/models/blob/master/research/object_detection/README.md
+ * having the same label map, here:
+ * https://github.com/tensorflow/models/blob/master/research/object_detection/data/mscoco_label_map.pbtxt
+ *
+ * However COCO SSD, actually has a 90 class vector in its output, so 10 are missing from the label map
+ * i.e. labels 12, 26, 29, 30, 45, 66, 68, 69, 71, 83
+ *
+ * The full label map can be found here:
+ * https://github.com/tensorflow/models/blob/master/research/object_detection/data/mscoco_complete_label_map.pbtxt
+ *
+ * The full map is just the slimmer label map, but the 10 missing labels are put back in as dummies, having their
+ * own index as their display name.
+ *
+ * The 80/90 discrepency is described in the original COCO paper, here:
+ * https://arxiv.org/pdf/1405.0312.pdf
+ *
+ * "Our dataset contains 91 [90 + 1 background] object categories (the 2014 release contains segmentation
+ *  masks for 80 of these categories)"
+ *
+ * More here:
+ * https://stackoverflow.com/questions/50665110/tensorflow-models-uses-coco-90-class-ids-although-coco-has-only-80-categories
+ *
+ * I'm using the full map because it makes some logic in the CocoSSD Model Class a tiny bit easier to work with
+ * but they can be disabled if we wish in the future (with corresponding changes in the code to account for it)
+ */
+
 const COCO_CLASSES: {
   [key: string]: { name: string; id: number; displayName: string };
 } = {
@@ -73,6 +106,7 @@ const COCO_CLASSES: {
     id: 11,
     displayName: "fire hydrant",
   },
+  12: { name: "12", id: 12, displayName: "12" },
   13: {
     name: "/m/02pv19",
     id: 13,
@@ -138,6 +172,7 @@ const COCO_CLASSES: {
     id: 25,
     displayName: "giraffe",
   },
+  26: { name: "26", id: 26, displayName: "26" },
   27: {
     name: "/m/01940j",
     id: 27,
@@ -148,6 +183,8 @@ const COCO_CLASSES: {
     id: 28,
     displayName: "umbrella",
   },
+  29: { name: "29", id: 29, displayName: "29" },
+  30: { name: "30", id: 30, displayName: "30" },
   31: {
     name: "/m/080hkjn",
     id: 31,
@@ -218,6 +255,7 @@ const COCO_CLASSES: {
     id: 44,
     displayName: "bottle",
   },
+  45: { name: "45", id: 45, displayName: "45" },
   46: {
     name: "/m/09tvcd",
     id: 46,
@@ -318,16 +356,20 @@ const COCO_CLASSES: {
     id: 65,
     displayName: "bed",
   },
+  66: { name: "66", id: 66, displayName: "66" },
   67: {
     name: "/m/04bcr3",
     id: 67,
     displayName: "dining table",
   },
+  68: { name: "68", id: 68, displayName: "68" },
+  69: { name: "69", id: 69, displayName: "69" },
   70: {
     name: "/m/09g1w",
     id: 70,
     displayName: "toilet",
   },
+  71: { name: "71", id: 71, displayName: "71" },
   72: {
     name: "/m/07c52",
     id: 72,
@@ -383,6 +425,7 @@ const COCO_CLASSES: {
     id: 82,
     displayName: "refrigerator",
   },
+  83: { name: "83", id: 83, displayName: "83" },
   84: {
     name: "/m/0bt_c3",
     id: 84,
