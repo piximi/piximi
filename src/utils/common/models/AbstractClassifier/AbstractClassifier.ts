@@ -86,7 +86,7 @@ export abstract class SequentialClassifier extends Model {
       throw Error(`"${this.name}" Model's validation data not loaded`);
     }
 
-    if (!this.trainable) {
+    if (this.trainable) {
       throw Error(`"${this.name}" Model is not trainable`);
     }
 
