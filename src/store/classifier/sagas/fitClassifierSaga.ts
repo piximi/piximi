@@ -192,11 +192,13 @@ export function* fitClassifierSaga({
   const trainingPercentage: ReturnType<
     typeof classifierTrainingPercentageSelector
   > = yield select(classifierTrainingPercentageSelector);
+  console.log("trainingPercentage", trainingPercentage); //LOG:
 
   const categorizedImages: ReturnType<typeof selectImagesByPartition> =
     yield select((state) =>
       selectImagesByPartition(state, Partition.Inference)
     );
+  console.log("cat img", categorizedImages); //LOG:
 
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);
