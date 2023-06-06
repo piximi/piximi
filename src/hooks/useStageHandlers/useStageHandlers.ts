@@ -37,6 +37,7 @@ import {
   getOverlappingAnnotations,
 } from "utils/annotator";
 import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools";
+import { setWorkingAnnotation } from "store/imageViewer/imageViewerSlice";
 
 const delta = 10;
 const transformerClassName = "Transformer";
@@ -184,6 +185,13 @@ export const useStageHandlers = (
                 })
               );
               dispatch(
+                setWorkingAnnotation({
+                  annotation: activeAnnotations.filter(
+                    (annotation) => annotation.id === annotationsInBox[0].id
+                  )[0],
+                })
+              );
+              dispatch(
                 setSelectedCategoryId({
                   selectedCategoryId: annotationsInBox[0].categoryId,
                   execSaga: false,
@@ -204,6 +212,13 @@ export const useStageHandlers = (
                   ...additionalAnnotations.map((an) => an.id),
                 ],
                 workingAnnotationId: annotationsInBox[0].id,
+              })
+            );
+            dispatch(
+              setWorkingAnnotation({
+                annotation: activeAnnotations.filter(
+                  (annotation) => annotation.id === annotationsInBox[0].id
+                )[0],
               })
             );
           }
@@ -308,6 +323,11 @@ export const useStageHandlers = (
         setSelectedAnnotationIds({
           annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
           workingAnnotationId: currentAnnotation.id,
+        })
+      );
+      dispatch(
+        setWorkingAnnotation({
+          annotation: currentAnnotation,
         })
       );
     }
