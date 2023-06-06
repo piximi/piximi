@@ -285,7 +285,7 @@ export abstract class SequentialClassifier extends Model {
   }
 
   get numClasses() {
-    return this.defaultOutputShape[1];
+    return this.defaultOutputShape[0];
   }
 
   get defaultInputShape() {

@@ -6,19 +6,32 @@ import Stardist2DBrightfieldWeights1 from "data/model-data/stardist/group1-shard
 //@ts-ignore
 import Stardist2DBrightfieldWeights2 from "data/model-data//stardist/group1-shard2of2.bin";
 
+/*
+ * model.json contains 'modelTopology' and 'weightsManifest
+ *
+ * 'modelTopology': A JSON object that can be either of:
+ *   1) a model architecture JSON consistent with the format of the return value of keras.Model.to_json()
+ *   2) a full model JSON in the format of keras.models.save_model().
+ *
+ * 'weightsManifest': A TensorFlow.js weights manifest.
+ *   See the Python converter function save_model() for more details.
+ *   It is also assumed that model weights (.bin files) can be accessed
+ *   from relative paths described by the paths fields in weights manifest.
+ */
+
 export async function loadStardist() {
-  let modelTopology: File;
+  let modelDescription: File;
   let modelWeights1: File;
   let modelWeights2: File;
 
   try {
-    const model_topology_blob = new Blob(
+    const model_desc_blob = new Blob(
       [JSON.stringify(Stardist2DBrightfieldModel)],
       {
         type: "application/json",
       }
     );
-    modelTopology = new File([model_topology_blob], "model.json", {
+    modelDescription = new File([model_desc_blob], "model.json", {
       type: "application/json",
     });
 
@@ -43,7 +56,7 @@ export async function loadStardist() {
 
   try {
     const model = await loadGraphModel(
-      io.browserFiles([modelTopology, modelWeights1, modelWeights2])
+      io.browserFiles([modelDescription, modelWeights1, modelWeights2])
     );
 
     return model;
