@@ -201,15 +201,15 @@ export const colorOverlayROI = (
 ): HTMLImageElement | undefined => {
   if (!maskData) return undefined;
 
-  // const endX = Math.min(imageWidth, boundingBox[2]);
-  // const endY = Math.min(imageHeight, boundingBox[3]);
+  const endX = Math.min(imageWidth, boundingBox[2]);
+  const endY = Math.min(imageHeight, boundingBox[3]);
 
-  // //extract bounding box params
-  // const boxWidth = endX - boundingBox[0];
-  // const boxHeight = endY - boundingBox[1];
+  //extract bounding box params
+  const boxWidth = endX - boundingBox[0];
+  const boxHeight = endY - boundingBox[1];
 
-  const boxWidth = boundingBox[2] - boundingBox[0];
-  const boxHeight = boundingBox[3] - boundingBox[1];
+  // const boxWidth = boundingBox[2] - boundingBox[0];
+  // const boxHeight = boundingBox[3] - boundingBox[1];
 
   if (!boxWidth || !boxHeight) return undefined;
   let croppedImage = new ImageJS.Image(

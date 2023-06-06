@@ -29,6 +29,21 @@ import { connectPoints } from "utils/annotator";
 
 export const predictStardist = async (
   model: GraphModel,
+  imTensor: Tensor4D,
+  catId: string // foreground (nucleus category)
+) => {
+  // [batchSize, H, W, 33]
+  const res = model.execute(imTensor) as Tensor4D;
+  const preds = await res.array();
+
+  dispose(imTensor);
+  dispose(res);
+  return [] as decodedAnnotationType[];
+};
+
+// TODO - segmenter: remove
+export const oldPredictStardist = async (
+  model: GraphModel,
   inferenceImages: ImageType[],
   createdCategories: Category[]
 ): Promise<{

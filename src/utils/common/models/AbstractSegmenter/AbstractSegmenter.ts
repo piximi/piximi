@@ -58,6 +58,10 @@ export abstract class Segmenter extends Model {
     } else if (this._cachedOutputShape) {
       return this._cachedOutputShape;
     } else {
+      // TODO - segmenter: may or may not be necessary, at least Stardist graph has
+      // signature.outputs.output.tensorShape.dim which is not undefined even though
+      // outpus[0].shape is undefined
+
       // sometimes models don't list their output shape (often graph models)
       // in this case run inference on dummy data, and get shape of output
       // we cache it to avoid expensive recalculation
