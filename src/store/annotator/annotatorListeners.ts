@@ -37,7 +37,12 @@ startAppListening({
     const selectedCategory = getCompleteEntity(
       data.annotationCategories.entities[selectedAnnotationCategoryId]
     )!;
-    if (selectionMode === AnnotationModeType.New) {
+    const workingAnnotation = imageViewer.workingAnnotation;
+
+    if (
+      selectionMode === AnnotationModeType.New &&
+      annotationTool.annotationState === AnnotationStateType.Annotated
+    ) {
       annotationTool.annotate(
         selectedCategory,
         activeImagePlane,
@@ -49,35 +54,15 @@ startAppListening({
         annotationTool.annotation as DecodedAnnotationType
       );
 
-      // listenerAPI.dispatch(
-      //   dataSlice.actions.addAnnotation({ annotation: annotation! })
-      // );
       listenerAPI.dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({
           annotation: annotation!,
         })
       );
-      // listenerAPI.dispatch(
-      //   imageViewerSlice.actions.addActiveAnnotationId({
-      //     annotationId: annotation!.id,
-      //   })
-      // );
-      // listenerAPI.dispatch(
-      //   imageViewerSlice.actions.setSelectedAnnotationIds({
-      //     annotationIds: [annotation!.id],
-      //     workingAnnotationId: annotation!.id,
-      //   })
-      // );
     } else {
       const toolType = annotator.toolType;
 
       if (toolType === ToolType.Zoom) return;
-
-      const workingAnnotationId = imageViewer.workingAnnotationId;
-      if (!workingAnnotationId) return;
-      const workingAnnotation = getCompleteEntity(
-        data.annotations.entities[workingAnnotationId]
-      );
 
       if (
         !workingAnnotation ||

@@ -98,9 +98,9 @@ export const encodeAnnotation = (
   decodedAnnotation: DecodedAnnotationType | undefined
 ): AnnotationType | undefined => {
   if (!decodedAnnotation) return undefined;
-  const { maskData, ...encodedAnnotation } = {
-    mask: encode(decodedAnnotation.maskData),
+  const encodedAnnotation = {
     ...decodedAnnotation,
+    mask: encode(decodedAnnotation.maskData),
   };
 
   return encodedAnnotation;
