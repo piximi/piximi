@@ -15,7 +15,6 @@ export { usePreferredMuiTheme, usePreferredNivoTheme } from "./useTheme";
 export { useTransformer } from "./useTransformer";
 export { useTranslation } from "./useTranslation";
 export { useUpload } from "./useUpload";
-export { useWindowFocusHandler } from "./useWindowFocusHandler";
 export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";

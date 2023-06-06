@@ -45,22 +45,8 @@ export const AnnotationMode = () => {
       setDisabledAnnotationEdit(false);
     } else {
       setDisabledAnnotationEdit(true);
-      if (annotationMode !== AnnotationModeType.New) {
-        dispatch(
-          annotatorSlice.actions.setSelectionMode({
-            selectionMode: AnnotationModeType.New,
-          })
-        );
-      }
     }
-  }, [workingAnnotation, annotationMode, annotationState, dispatch]);
-
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const payload = {
-      selectionMode: parseInt((event.target as HTMLInputElement).value),
-    };
-    dispatch(annotatorSlice.actions.setSelectionMode(payload));
-  };
+  }, [workingAnnotation, annotationState, dispatch]);
 
   const onClickLabel = (event: any, mode: AnnotationModeType) => {
     const payload = {
@@ -75,7 +61,6 @@ export const AnnotationMode = () => {
     <RadioGroup
       aria-label="annotation mode"
       name="annotation-mode"
-      onChange={onChange}
       value={annotationMode}
     >
       <List

@@ -1,6 +1,6 @@
 export enum AnnotatorSelectionMode {
-  Addition,
-  Intersection,
   New,
+  Addition,
   Subtraction,
+  Intersection,
 }

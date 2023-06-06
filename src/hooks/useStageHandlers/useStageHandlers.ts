@@ -103,7 +103,13 @@ export const useStageHandlers = (
         workingAnnotationId: undefined,
       })
     );
-  }, [dispatch]);
+    dispatch(
+      annotatorSlice.actions.setAnnotationState({
+        annotationState: AnnotationStateType.Blank,
+        annotationTool,
+      })
+    );
+  }, [dispatch, annotationTool]);
 
   useHotkeys(
     "shift",

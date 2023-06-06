@@ -213,12 +213,6 @@ export abstract class AnnotationTool extends Tool {
     const existingMaskData = this._maskData;
     const existingBoundingBox = this._boundingBox;
 
-    console.log("newEncodedMaskData", newEncodedMaskData); //LOG:
-    console.log("newBoundingBox", newBoundingBox); //LOG
-    console.log("newMaskData", newMaskData); //LOG:
-    console.log("existingMaskData", existingMaskData); //LOG:
-    console.log("existingBoundingBox", existingBoundingBox); //LOG:
-
     const combinedBoundingBox = [
       existingBoundingBox[0] < newBoundingBox[0]
         ? existingBoundingBox[0]

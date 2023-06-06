@@ -10,7 +10,6 @@ import {
   useAnnotationTool,
   useHotkeys,
   useStageHandlers,
-  useWindowFocusHandler,
   usePointerLocation,
 } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
@@ -65,7 +64,6 @@ export const Stage = ({
   const annotationState = useSelector(selectAnnotationState);
   const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
 
-  useWindowFocusHandler();
   const { annotationTool } = useAnnotationTool();
   useAnnotationState(annotationTool);
 
