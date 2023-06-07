@@ -1,5 +1,5 @@
 import {
-  //GraphModel,
+  GraphModel,
   History,
   LayersModel,
   loadGraphModel,
@@ -8,7 +8,7 @@ import {
 import { ModelTask } from "types/ModelType";
 import { Category, FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
-//import { predictCoco } from "./predictCoco";
+import { predictCoco } from "./predictCoco";
 import { preprocessInference } from "../AbstractSegmenter/preprocess";
 import { constructCocoCategories } from "./constructCocoCategories";
 
@@ -21,7 +21,6 @@ type LoadInferenceDataArgs = {
 /*
   SSD with MobileNet (v2) backbone, initialized with Imagenet classification checkpoint,
   and trained on COCO 2017 dataset.
-
   Ther are several variants on TFHub
   - v1: https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v1/1/default/1
     - model json
@@ -35,7 +34,6 @@ type LoadInferenceDataArgs = {
     - model json
       - TF Hub: https://tfhub.dev/tensorflow/tfjs-model/ssdlite_mobilenet_v2/1/default/1
       - mirror: https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json
-
   Also published package on NPM here: https://www.npmjs.com/package/@tensorflow-models/coco-ssd
   Github here: https://github.com/tensorflow/tfjs-models/tree/master/coco-ssd
   with the 80 outputclasses listed here:
@@ -104,16 +102,24 @@ export class CocoSSD extends Segmenter {
       throw Error(`"${this.name}" Model's inference categories are not loaded`);
     }
 
-    // const graphModel = this._model as GraphModel;
+    const graphModel = this._model as GraphModel;
 
-    // // TODO - segmenter: is this 4D or 3D???
-    // const infT = await this._inferenceDataset.toArray();
+    const infT = await this._inferenceDataset.toArray();
     // imTensor disposed in `predictCoco`
-    // const annotationsPromises = infT.map((imTensor) =>
-    //   predictCoco(graphModel, imTensor, this._inferenceCategories!)
-    // );
-    //const annotations = await Promise.all(annotationsPromises);
-    console.log("done?");
+    const annotationsPromises = infT.map((imTensor) => {
+      return predictCoco(graphModel, imTensor, this._inferenceCategories!);
+    });
+    const annotations = await Promise.all(annotationsPromises);
+
+    return annotations;
+  }
+
+  inferenceCategoriesById(catIds: Array<string>) {
+    if (!this._inferenceCategories) {
+      throw Error(`"${this.name}" Model has no inference categories loaded`);
+    }
+
+    return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
   }
 
   evaluate() {}
