@@ -12,7 +12,7 @@ import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedMode
 import { CategoriesList } from "components/categories/CategoriesList";
 import { SegmenterExecListItem } from "../SegmenterExecListItem";
 
-import { dataSlice, selectCreatedAnnotationCategories } from "store/data";
+import { selectCreatedAnnotationCategories } from "store/data";
 
 import {
   segmenterModelSelector,
@@ -27,10 +27,9 @@ import { Model } from "utils/common/models/Model";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export const SegmenterList = () => {
-  const categories = useSelector(selectCreatedAnnotationCategories);
-
   const dispatch = useDispatch();
 
+  const categories = useSelector(selectCreatedAnnotationCategories);
   const selectedModel = useSelector(segmenterModelSelector);
   const modelStatus = useSelector(segmenterModelStatusSelector);
 
@@ -50,14 +49,6 @@ export const SegmenterList = () => {
     if (model instanceof Segmenter) {
       if (model.pretrained) {
         await model.loadModel();
-
-        const cocoCategories = model.constructCategories();
-        dispatch(
-          dataSlice.actions.setAnnotationCategories({
-            annotationCategories: cocoCategories,
-            isPermanent: true,
-          })
-        );
       }
 
       dispatch(

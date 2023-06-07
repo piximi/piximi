@@ -14,19 +14,15 @@ import {
   segmenterModelSelector,
 } from "store/segmenter";
 import {
-  //AlertStateType,
+  AlertStateType,
   AlertType,
   Category,
   FitOptions,
   ImageType,
   Partition,
-  // PreprocessOptions,
-  // Shape,
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  DecodedAnnotationType,
 } from "types";
-//import { getStackTraceFromError } from "utils";
-import COCO_CLASSES from "data/model-data/cocossd-classes";
+import { getStackTraceFromError } from "utils";
 import { ModelStatus } from "types/ModelType";
 import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
@@ -82,25 +78,10 @@ export function* predictSegmenterSaga({
     segmenterModelSelector
   );
 
-  // const inputShape: ReturnType<typeof segmenterInputShapeSelector> =
-  //   yield select(segmenterInputShapeSelector);
-
-  // const preprocessOptions: ReturnType<
-  //   typeof segmenterPreprocessOptionsSelector
-  // > = yield select(segmenterPreprocessOptionsSelector);
-
-  // fitOptions: {epochs: 10, batchSize:32, initialEpoch: 0}
   const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
     yield select(segmenterFitOptionsSelector);
 
-  yield runPrediction(
-    model,
-    inferenceImages,
-    createdCategories,
-    // inputShape,
-    //preprocessOptions,
-    fitOptions
-  );
+  yield runPrediction(model, inferenceImages, createdCategories, fitOptions);
 
   yield put(
     segmenterSlice.actions.updateModelStatus({
@@ -114,8 +95,6 @@ function* runPrediction(
   model: Segmenter,
   inferenceImages: Array<ImageType>,
   currentCategories: Array<Category>,
-  // inputShape: Shape,
-  //preprocessOptions: PreprocessOptions,
   fitOptions: FitOptions
 ) {
   // TODO - segmenter: generalize to model.trainable?, or maybe model.cannotTrainButCanUseCustomLabelsSomehow?
@@ -167,28 +146,27 @@ function* runPrediction(
     const imageId = inferenceImages[i].id;
 
     yield put(
-      dataSlice.actions.updateImageAnnotations({
-        imageId: imageId,
-        annotations: predictedAnnotations[i],
+      dataSlice.actions.setAnnotations({
+        annotations: annotations.map((ann) => ({ ...ann, imageId })),
       })
     );
   }
 }
 
-// function* handleError(error: Error, name: string) {
-//   const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
-//     yield getStackTraceFromError(error);
+function* handleError(error: Error, name: string) {
+  const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
+    yield getStackTraceFromError(error);
 
-//   const alertState: AlertStateType = {
-//     alertType: AlertType.Error,
-//     name: name,
-//     description: `${error.name}:\n${error.message}`,
-//     stackTrace: stackTrace,
-//   };
+  const alertState: AlertStateType = {
+    alertType: AlertType.Error,
+    name: name,
+    description: `${error.name}:\n${error.message}`,
+    stackTrace: stackTrace,
+  };
 
-//   yield put(
-//     applicationSlice.actions.updateAlertState({
-//       alertState: alertState,
-//     })
-//   );
-// }
+  yield put(
+    applicationSlice.actions.updateAlertState({
+      alertState: alertState,
+    })
+  );
+}
