@@ -31,7 +31,7 @@ const initialState: ImageViewerStore = {
   imageOrigin: { x: 0, y: 0 },
   hiddenCategoryIds: [],
   workingAnnotationId: undefined,
-  workingAnnotation: undefined,
+  workingAnnotation: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
@@ -188,14 +188,14 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{ annotation: AnnotationType | undefined }>
     ) {
-      state.workingAnnotation = action.payload.annotation;
+      state.workingAnnotation.saved = action.payload.annotation;
+      state.workingAnnotation.changes = {};
     },
     updateWorkingAnnotation(
       state,
       action: PayloadAction<{ changes: Partial<AnnotationType> }>
     ) {
-      if (!state.workingAnnotation) return;
-      Object.assign(state.workingAnnotation, action.payload.changes);
+      state.workingAnnotation.changes = action.payload.changes;
     },
     hideCategory(
       state,

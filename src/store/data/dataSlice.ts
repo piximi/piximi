@@ -820,6 +820,7 @@ export const dataSlice = createSlice({
       }>
     ) {
       const annotation = action.payload.annotation;
+      if (state.annotations.ids.includes(annotation.id)) return;
       if (!state.annotationCategories.ids.includes(annotation.categoryId)) {
         annotation.categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
         state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
