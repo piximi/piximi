@@ -25,7 +25,7 @@ export const decodeAnnotation = (
   encodedAnnotation: AnnotationType | undefined
 ): DecodedAnnotationType | undefined => {
   if (!encodedAnnotation) return undefined;
-  const { mask, ...decodedAnnotation } = {
+  const decodedAnnotation = {
     maskData: Uint8Array.from(decode(encodedAnnotation.mask!)),
     ...encodedAnnotation,
   };

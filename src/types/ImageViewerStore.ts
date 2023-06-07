@@ -13,7 +13,10 @@ export type ImageViewerStore = {
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
-  workingAnnotation: AnnotationType | undefined;
+  workingAnnotation: {
+    saved: AnnotationType | undefined;
+    changes: Partial<AnnotationType>;
+  };
   selectedAnnotationIds: Array<string>;
   selectedCategoryId: string;
   stageHeight: number;

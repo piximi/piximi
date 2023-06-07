@@ -19,7 +19,7 @@ import {
   selectAnnotationState,
   selectAnnotationSelectionMode,
 } from "store/annotator/selectors";
-import { selectWorkingAnnotation } from "store/data";
+import { selectWorkingAnnotation } from "store/imageViewer";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
 
@@ -39,7 +39,7 @@ export const AnnotationMode = () => {
 
   React.useEffect(() => {
     if (
-      workingAnnotation ||
+      workingAnnotation.saved ||
       annotationState === AnnotationStateType.Annotated
     ) {
       setDisabledAnnotationEdit(false);

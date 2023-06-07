@@ -37,7 +37,6 @@ startAppListening({
     const selectedCategory = getCompleteEntity(
       data.annotationCategories.entities[selectedAnnotationCategoryId]
     )!;
-    const workingAnnotation = imageViewer.workingAnnotation;
 
     if (
       selectionMode === AnnotationModeType.New &&
@@ -63,13 +62,17 @@ startAppListening({
       const toolType = annotator.toolType;
 
       if (toolType === ToolType.Zoom) return;
-
+      const savedWorkingAnnotation = imageViewer.workingAnnotation.saved;
+      const workingAnnotationChanges = imageViewer.workingAnnotation.changes;
       if (
-        !workingAnnotation ||
+        !savedWorkingAnnotation ||
         annotationTool.annotationState !== AnnotationStateType.Annotated
       )
         return;
-
+      const workingAnnotation = {
+        ...savedWorkingAnnotation,
+        ...workingAnnotationChanges,
+      };
       let combinedMask, combinedBoundingBox;
 
       if (selectionMode === AnnotationModeType.Add) {
@@ -106,24 +109,9 @@ startAppListening({
 
       const annotation = encodeAnnotation(combinedSelectedAnnotation);
 
-      // listenerAPI.dispatch(
-      //   dataSlice.actions.addAnnotation({ annotation: annotation! })
-      // );
-      // listenerAPI.dispatch(
-      //   imageViewerSlice.actions.addActiveAnnotationId({
-      //     annotationId: annotation!.id,
-      //   })
-      // );
-
-      // listenerAPI.dispatch(
-      //   imageViewerSlice.actions.setSelectedAnnotationIds({
-      //     annotationIds: [annotation!.id],
-      //     workingAnnotationId: annotation!.id,
-      //   })
-      // );
       listenerAPI.dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({
-          annotation: annotation!,
+        imageViewerSlice.actions.updateWorkingAnnotation({
+          changes: annotation!,
         })
       );
 

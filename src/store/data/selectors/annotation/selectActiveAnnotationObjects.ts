@@ -8,7 +8,7 @@ import { selectActiveImageShape } from "../image/selectActiveImageAttributes";
 import { selectAnnotationCategoryEntities } from "../annotation-category/annotationCategorySelectors";
 import { selectAnnotationEntities } from "./annotationSelectors";
 
-import { DecodedAnnotationType, Shape } from "types";
+import { AnnotationType, DecodedAnnotationType, Shape } from "types";
 import { decodeAnnotation } from "utils/annotator";
 
 // Note: re-selects on activeImageId, image.entities, annotationsByImage, annotations.entities, annotationCategories.entities
@@ -42,7 +42,7 @@ export const selectActiveAnnotationObjects = createSelector(
     for (const annotationId of activeAnnotationIds) {
       if (
         !annotationEntities[annotationId] ||
-        annotationId === workingAnnotation?.id
+        annotationId === workingAnnotation.saved?.id
       )
         continue;
       const annotation = decodeAnnotation(annotationEntities[annotationId])!;
@@ -64,8 +64,12 @@ export const selectWorkingAnnotationObject = createSelector(
     selectActiveImageShape,
     selectAnnotationCategoryEntities,
   ],
-  (workingAnnotation, activeImageShape, categoryEntities) => {
-    if (!workingAnnotation || !activeImageShape) return;
+  (workingAnnotationEntity, activeImageShape, categoryEntities) => {
+    if (!workingAnnotationEntity.saved || !activeImageShape) return;
+    const workingAnnotation = {
+      ...workingAnnotationEntity.saved,
+      ...workingAnnotationEntity.changes,
+    } as AnnotationType;
     const annotation = !workingAnnotation.maskData
       ? decodeAnnotation(workingAnnotation)!
       : workingAnnotation;

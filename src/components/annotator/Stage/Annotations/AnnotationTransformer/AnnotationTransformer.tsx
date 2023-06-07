@@ -118,13 +118,27 @@ export const AnnotationTransformer = ({
     trRef.current!.getLayer()?.batchDraw();
 
     if (activeAnnotationIds.includes(annotationId)) {
-      dispatch(
-        dataSlice.actions.deleteAnnotation({ annotationId: annotationId })
-      );
+      if (Object.keys(workingAnnotation.changes).length === 0) {
+        dispatch(
+          dataSlice.actions.deleteAnnotation({ annotationId: annotationId })
+        );
+      } else {
+        dispatch(
+          dataSlice.actions.updateAnnotation({
+            annotationId: annotationId,
+            updates: workingAnnotation.changes,
+          })
+        );
+      }
       if (soundEnabled) playDeleteAnnotationSoundEffect();
     } else {
       dispatch(
-        dataSlice.actions.addAnnotation({ annotation: workingAnnotation! })
+        dataSlice.actions.addAnnotation({
+          annotation: {
+            ...workingAnnotation.saved!,
+            ...workingAnnotation.changes,
+          },
+        })
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
     }
@@ -149,17 +163,21 @@ export const AnnotationTransformer = ({
   };
 
   useEffect(() => {
-    if (workingAnnotation) {
+    if (workingAnnotation.saved) {
+      const fullWorkingAnnotation = {
+        ...workingAnnotation.saved,
+        ...workingAnnotation.changes,
+      };
       const newX =
         Math.max(
-          workingAnnotation.boundingBox[0],
-          workingAnnotation.boundingBox[2]
+          fullWorkingAnnotation.boundingBox[0],
+          fullWorkingAnnotation.boundingBox[2]
         ) + imageOrigin.x;
       setXPos(newX);
 
       const yMax = Math.max(
-        workingAnnotation.boundingBox[1],
-        workingAnnotation.boundingBox[3]
+        fullWorkingAnnotation.boundingBox[1],
+        fullWorkingAnnotation.boundingBox[3]
       );
       const newY =
         yMax + 56 > imageHeight!
@@ -239,7 +257,8 @@ export const AnnotationTransformer = ({
                   fontSize={14}
                   padding={6}
                   text={
-                    activeAnnotationIds.includes(annotationId)
+                    activeAnnotationIds.includes(annotationId) &&
+                    Object.keys(workingAnnotation.changes).length === 0
                       ? "Delete"
                       : "Confirm"
                   }

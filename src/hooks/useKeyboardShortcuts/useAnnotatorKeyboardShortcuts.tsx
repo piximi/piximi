@@ -20,6 +20,7 @@ import { selectSoundEnabled } from "store/application";
 import {
   AnnotationModeType,
   AnnotationStateType,
+  AnnotationType,
   DecodedAnnotationType,
   HotkeyView,
   ToolType,
@@ -35,7 +36,10 @@ type useAnnotatorHotkeysProps = {
   deselectAllAnnotations: () => void;
   deselectAnnotation: () => void;
   resetZoomSelection: () => void;
-  workingAnnotation: DecodedAnnotationType | undefined;
+  workingAnnotationEntity: {
+    saved: AnnotationType | undefined;
+    changes: Partial<AnnotationType>;
+  };
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
   toolType: ToolType;
@@ -47,7 +51,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   deselectAllAnnotations,
   deselectAnnotation,
   resetZoomSelection,
-  workingAnnotation,
+  workingAnnotationEntity,
   selectedAnnotationsIds,
   selectionMode,
   toolType,
@@ -62,7 +66,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
   const confirmAnnotations = () => {
     if (
-      !workingAnnotation ||
+      !workingAnnotationEntity.saved ||
       !annotationTool ||
       annotationTool.annotationState === AnnotationStateType.Annotating ||
       !activeImageId

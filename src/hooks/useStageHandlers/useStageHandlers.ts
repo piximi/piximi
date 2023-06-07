@@ -13,6 +13,7 @@ import {
   setSelectedCategoryId,
   selectSelectedAnnotationIds,
   activeImageIdSelector,
+  selectWorkingAnnotation,
 } from "store/imageViewer";
 
 import {
@@ -20,7 +21,7 @@ import {
   selectToolType,
 } from "store/annotator/selectors";
 
-import { selectActiveAnnotations, selectWorkingAnnotation } from "store/data";
+import { selectActiveAnnotations } from "store/data";
 import { annotatorSlice } from "store/annotator";
 
 import {
@@ -60,7 +61,7 @@ export const useStageHandlers = (
   const [selecting, setSelecting] = useState<boolean>(false);
   const [shift, setShift] = useState<boolean>(false);
   const selectionMode = useSelector(selectAnnotationSelectionMode);
-  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
@@ -529,7 +530,7 @@ export const useStageHandlers = (
     deselectAllAnnotations,
     deselectAnnotation,
     resetZoomSelection,
-    workingAnnotation,
+    workingAnnotationEntity,
     selectedAnnotationsIds,
     selectionMode,
     toolType,
