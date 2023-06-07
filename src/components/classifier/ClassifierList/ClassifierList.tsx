@@ -115,7 +115,6 @@ export const ClassifierList = () => {
         dispatchFunction={importClassifierModel}
       />
       <SaveFittedModelDialog
-        // TODO - segmenter: pass in the model class instead, with save method
         model={selectedModel}
         modelStatus={modelStatus}
         onClose={onSaveClassifierDialogClose}

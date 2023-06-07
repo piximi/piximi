@@ -29,8 +29,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  // TOOD: why copy?
-  const modelOptions = availableClassifierModels.slice();
+  const modelOptions = availableClassifierModels.filter((m) => m.trainable);
 
   useEffect(() => {
     if (selectedModel.requiredChannels) {
