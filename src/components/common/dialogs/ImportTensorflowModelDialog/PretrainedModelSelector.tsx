@@ -10,8 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
-import { availableSegmenterModels } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { range } from "lodash";
 
@@ -19,7 +17,7 @@ export const PretrainedModelSelector = ({
   values,
   setModel,
 }: {
-  values: Array<SequentialClassifier | (typeof availableSegmenterModels)[0]>;
+  values: Array<Model>;
   setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
 }) => {
   // const [errMessage, setErrMessage] = useState<string>("");

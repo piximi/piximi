@@ -11,65 +11,27 @@ import {
   TextField,
 } from "@mui/material";
 
-<<<<<<< HEAD:src/components/file-io/dialogs/SaveFittedModelDialog/SaveFittedModelDialog.tsx
 import { HotkeyView } from "types";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { ModelStatus } from "types/ModelType";
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
-import { SegmenterModelProps, ClassifierModelProps, HotkeyView } from "types";
-=======
-import { HotkeyView } from "types";
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
 
 // TODO - segmenter: All of this
 type SaveFittedModelDialogProps = {
-<<<<<<< HEAD:src/components/file-io/dialogs/SaveFittedModelDialog/SaveFittedModelDialog.tsx
   // TODO - segmenter: change to Model
   model: SequentialClassifier | Segmenter;
   modelStatus: ModelStatus;
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
-  modelProps: ClassifierModelProps | SegmenterModelProps;
-  fittedModel: LayersModel | undefined;
-  modelKind: string;
-=======
-  modelName: string;
-  fittedModel: LayersModel | undefined;
-  modelKind: string;
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
   onClose: () => void;
   open: boolean;
 };
 
 export const SaveFittedModelDialog = ({
-<<<<<<< HEAD:src/components/file-io/dialogs/SaveFittedModelDialog/SaveFittedModelDialog.tsx
   model,
   modelStatus,
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
-  modelProps,
-  fittedModel,
-  modelKind,
-=======
-  modelName,
-  fittedModel,
-  modelKind,
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
   onClose,
   open,
 }: SaveFittedModelDialogProps) => {
-<<<<<<< HEAD:src/components/file-io/dialogs/SaveFittedModelDialog/SaveFittedModelDialog.tsx
   const [name, setName] = useState<string>(model.name);
-||||||| parent of e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
-  const [classifierName, setClassifierName] = useState<string>(
-    modelProps.modelName
-  );
-
-  const noFittedModel = fittedModel ? false : true;
-=======
-  const [classifierName, setClassifierName] = useState<string>(modelName);
-
-  const noFittedModel = fittedModel ? false : true;
->>>>>>> e3786db1 ([wip, mod, opt] Get SimpleCNN back up and running):src/components/file-io/SaveFittedModelDialog/SaveFittedModelDialog.tsx
 
   const onSaveClassifierClick = async () => {
     // TODO - segmenter

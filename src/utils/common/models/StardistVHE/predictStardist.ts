@@ -11,7 +11,7 @@ import {
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { DecodedAnnotationType, Point } from "types";
+import { AnnotationType, DecodedAnnotationType, Point } from "types";
 
 import { scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
@@ -141,7 +141,7 @@ export function generateAnnotations(
 
         const { maskData, bbox } = polygon;
 
-        const annotation: DecodedAnnotationType = {
+        const annotation = {
           maskData: maskData,
           boundingBox: bbox,
           categoryId: categoryId,
@@ -211,7 +211,7 @@ export const predictStardist = async (
   const indices = (await indexTensor.data()) as Float32Array;
   dispose(indexTensor);
 
-  const selectedAnnotations: Array<DecodedAnnotationType> = [];
+  const selectedAnnotations: Array<AnnotationType> = [];
 
   indices.forEach((index) => {
     selectedAnnotations.push(generatedAnnotations[index]);
