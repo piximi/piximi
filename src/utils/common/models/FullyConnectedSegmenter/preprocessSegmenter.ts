@@ -54,48 +54,6 @@ export const drawSegmentationMask = async (
   });
 };
 
-// TODO - segmenter: delete as much here as possible
-// or move to imageHelper, or model/utils
-export const decodeFromImgSrc = async (
-  channels: number,
-  rescaleOptions: RescaleOptions,
-  item: {
-    srcs: string; // dataURL
-    annotations: DecodedAnnotationType[];
-    id: string;
-    shape: Shape;
-  }
-): Promise<{
-  xs: Tensor3D;
-  annotations: DecodedAnnotationType[];
-  id: string;
-  shape: Shape;
-}> => {
-  const fetched = await tfutil.fetch(item.srcs);
-
-  const buffer: ArrayBuffer = await fetched.arrayBuffer();
-
-  let data: ImageJS.Image = await ImageJS.Image.load(buffer, {
-    ignorePalette: true,
-  });
-
-  const canvas: HTMLCanvasElement = data.getCanvas();
-
-  let x: Tensor3D = browser.fromPixels(canvas, channels);
-
-  if (rescaleOptions.rescale) {
-    const rescaleFactor = scalar(255); //Because xs is string, values are encoded by uint8array by default
-    const unscaledx = x;
-    x = unscaledx.div(rescaleFactor);
-    unscaledx.dispose();
-    rescaleFactor.dispose();
-  }
-
-  return new Promise((resolve) => {
-    return resolve({ ...item, xs: x });
-  });
-};
-
 export const decodeFromOriginalSrc = async (
   rescaleOptions: RescaleOptions,
   item: {

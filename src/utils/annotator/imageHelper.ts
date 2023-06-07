@@ -227,13 +227,15 @@ export const colorOverlayROI = (
       alpha: 0,
     }).resize({ factor: scalingFactor });
   } catch (err) {
-    console.log(`boundingbox: ${boundingBox}`);
-    console.log(`boxWidth: ${boxWidth}`);
-    console.log(`boxHeight: ${boxHeight}`);
-    console.log(`bwxbh: ${boxHeight * boxWidth}`);
-    console.log(`maskData length: ${maskData.length}`);
-    console.log(`diff: ${boxHeight * boxWidth - maskData.length}`);
-    console.log(err);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`boundingbox: ${boundingBox}`);
+      console.log(`boxWidth: ${boxWidth}`);
+      console.log(`boxHeight: ${boxHeight}`);
+      console.log(`bwxbh: ${boxHeight * boxWidth}`);
+      console.log(`maskData length: ${maskData.length}`);
+      console.log(`diff: ${boxHeight * boxWidth - maskData.length}`);
+      console.log(err);
+    }
   }
 
   const colorROIImage = new ImageJS.Image(boxWidth, boxHeight, {

@@ -28,6 +28,6 @@ export const preprocessInference = (
       .generator(inferenceGenerator(images))
       // TODO - segmenter: probably have to dispose on converting to int32
       .map((im) => denormalizeTensor(im.data, im.bitDepth).asType("int32"))
-      .batch(fitOptions.batchSize) as tfdata.Dataset<Tensor4D>
+      .batch(1) as tfdata.Dataset<Tensor4D>
   );
 };

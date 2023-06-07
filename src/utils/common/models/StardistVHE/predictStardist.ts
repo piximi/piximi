@@ -1,291 +1,225 @@
 import {
-  Tensor,
   Tensor4D,
-  Rank,
   GraphModel,
-  image as TFImage,
-  expandDims,
-  tidy,
   dispose,
-  tensor,
+  tidy,
+  image as TFImage,
   tensor2d,
-  getBackend,
+  tensor1d,
   setBackend,
+  getBackend,
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { decodeFromImgSrc } from "../FullyConnectedSegmenter/preprocessSegmenter";
+import { DecodedAnnotationType, Point } from "types";
 
-import {
-  Category,
-  RescaleOptions,
-  DecodedAnnotationType,
-  Point,
-  ImageType,
-} from "types";
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
-
-export const predictStardist = async (
-  model: GraphModel,
-  imTensor: Tensor4D,
-  catId: string // foreground (nucleus category)
-) => {
-  // [batchSize, H, W, 33]
-  const res = model.execute(imTensor) as Tensor4D;
-  const preds = await res.array();
-
-  dispose(imTensor);
-  dispose(res);
-  return [] as decodedAnnotationType[];
-};
-
-// TODO - segmenter: remove
-export const oldPredictStardist = async (
-  model: GraphModel,
-  inferenceImages: ImageType[],
-  createdCategories: Category[]
-): Promise<{
-  annotations: Array<{
-    imageId: string;
-    annotations: Array<DecodedAnnotationType>;
-  }>;
-  categories: Array<Category>;
-}> => {
-  const predictedAnnotations: Array<{
-    imageId: string;
-    annotations: Array<DecodedAnnotationType>;
-  }> = [];
-
-  const foundCategories: Array<Category> = [];
-
-  for await (const image of inferenceImages) {
-    const channels = image.shape.channels;
-    const rescaleOptions: RescaleOptions = { rescale: false, center: false };
-    const item = {
-      srcs: image.src,
-      annotations: [],
-      id: image.id,
-      shape: image.shape,
-    };
-    const decodedImage = await decodeFromImgSrc(channels, rescaleOptions, item);
-    const expandedImage = expandDims(decodedImage.xs);
-
-    const padX =
-      image.shape.width % 16 === 0 ? 0 : 16 - (image.shape.width % 16);
-    const padY =
-      image.shape.height % 16 === 0 ? 0 : 16 - (image.shape.height % 16);
-    const imageTensor = tidy(() => {
-      if (!(padX === 0 && padY === 0)) {
-        return expandedImage
-          .mirrorPad(
-            [
-              [0, 0],
-              [
-                padY % 2 === 0 ? padY / 2 : Math.floor(padY / 2),
-                padY % 2 === 0 ? padY / 2 : Math.ceil(padY / 2),
-              ],
-              [
-                padX % 2 === 0 ? padX / 2 : Math.floor(padX / 2),
-                padX % 2 === 0 ? padX / 2 : Math.ceil(padX / 2),
-              ],
-              [0, 0],
-            ],
-            "reflect"
-          )
-          .asType("float32")
-          .div(255) as Tensor4D;
-      } else {
-        return expandedImage.asType("float32").div(255) as Tensor4D;
-      }
-    });
-
-    const results = model.execute(imageTensor) as Tensor<Rank.R4>;
-    const annotationCategory = generateNewCategory(
-      "Necleus",
-      createdCategories
-    );
-    foundCategories.push(annotationCategory);
-    const preds = results.arraySync()[0];
-
-    dispose(decodedImage.xs);
-    dispose(expandedImage);
-    dispose(imageTensor);
-    dispose(results);
-
-    const { generatedAnnotations, scores, generartedBBoxes } =
-      generateAnnotations(
-        preds,
-        annotationCategory.id,
-        padX,
-        padY,
-        image.shape.width,
-        image.shape.height
-      );
-
-    const minScore = 0.5;
-    const overlapThreshold = 0.1;
-    const prevBackend = getBackend();
-
-    const indexTensor = tidy(() => {
-      const bboxTensor = tensor2d(generartedBBoxes);
-      const scoresTensor = tensor(scores) as Tensor<Rank.R1>;
-      if (getBackend() === "webgl") {
-        setBackend("cpu");
-      }
-      return TFImage.nonMaxSuppressionWithScore(
-        bboxTensor,
-        scoresTensor,
-        500,
-        overlapThreshold,
-        minScore
-      ).selectedIndices;
-    });
-    const indices = indexTensor.dataSync() as Float32Array;
-    indexTensor.dispose();
-    if (prevBackend !== getBackend()) {
-      setBackend(prevBackend);
-    }
-
-    const selectedAnnotations: Array<DecodedAnnotationType> = [];
-    indices.forEach((index) => {
-      selectedAnnotations.push(generatedAnnotations[index]);
-    });
-
-    predictedAnnotations.push({
-      imageId: image.id,
-      annotations: selectedAnnotations,
-    });
-  }
-  return { annotations: predictedAnnotations, categories: foundCategories };
-};
 
 export const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
   coordinates: Array<Point>,
-  imgWidth: number,
-  imgHeight: number
+  imH: number,
+  imW: number
 ) => {
-  const connectedPoints = connectPoints(coordinates!); // get coordinates of connected points and draw boundaries of mask
-
+  // get coordinates of connected points and draw boundaries of mask
+  const connectedPoints = connectPoints(coordinates);
   const simplifiedPoints = simplifyPolygon(connectedPoints);
-
-  const maskImage = scanline(simplifiedPoints, imgWidth, imgHeight);
-
+  const maskImage = scanline(simplifiedPoints, imW, imH);
   // @ts-ignore: getChannel API is not exposed
   const greyScaleMask = maskImage.getChannel(0); // as ImageJS.Image;
   const cropped = greyScaleMask.crop(cropDims);
+
   return cropped;
 };
+
 export function buildPolygon(
-  lengths: Array<number>,
-  i: number,
-  j: number,
-  padX: number,
-  padY: number,
-  imgWidth: number,
-  imgHeight: number
+  distances: Array<number>,
+  row: number,
+  col: number,
+  imH: number,
+  imW: number,
+  inputImDims: {
+    width: number;
+    height: number;
+    padX: number;
+    padY: number;
+  }
 ) {
+  const THETA = (2 / distances.length) * Math.PI; // 0.19635, for 32 distances
   const points: Array<Point> = [];
   var xMin = Infinity;
   var yMin = Infinity;
   var xMax = 0;
   var yMax = 0;
-  lengths.forEach((length, idx) => {
-    const x = Math.max(
-      0,
-      Math.min(imgWidth, Math.round(j + length * Math.cos(idx * 0.19625)))
-    );
-    xMin = x < xMin ? x : xMin;
-    xMax = x > xMax ? x : xMax;
+
+  distances.forEach((length, idx) => {
     const y = Math.max(
       0,
-      Math.min(imgHeight, Math.round(i + length * Math.sin(idx * 0.19625)))
+      Math.min(
+        imH - 1,
+        Math.round(
+          row +
+            length * Math.sin(idx * THETA) -
+            Math.floor(inputImDims.padY / 2)
+        )
+      )
     );
+
+    const x = Math.max(
+      0,
+      Math.min(
+        imW - 1,
+        Math.round(
+          col +
+            length * Math.cos(idx * THETA) -
+            Math.floor(inputImDims.padX / 2)
+        )
+      )
+    );
+
     yMin = y < yMin ? y : yMin;
     yMax = y > yMax ? y : yMax;
 
-    points.push({
-      x: x,
-      y: y,
-    });
-  });
-  let bbox: [number, number, number, number] = [xMin, yMin, xMax, yMax];
-  const width = bbox[2] - bbox[0];
-  const height = bbox[3] - bbox[1];
-  let cropDims = { x: bbox[0], y: bbox[1], width: width, height: height };
+    xMin = x < xMin ? x : xMin;
+    xMax = x > xMax ? x : xMax;
 
-  const poly = computeAnnotationMaskFromPoints(
-    cropDims,
-    points,
-    imgWidth,
-    imgHeight
-  );
-  return { maskData: poly!.data, bbox: bbox };
+    points.push({ x, y });
+  });
+
+  let bbox: [number, number, number, number] = [
+    Math.max(0, xMin),
+    Math.max(0, yMin),
+    Math.min(inputImDims.width, xMax),
+    Math.min(inputImDims.height, yMax),
+  ];
+
+  const boxH = bbox[3] - bbox[1];
+  const boxW = bbox[2] - bbox[0];
+
+  if (boxW <= 0 || boxH <= 0) return;
+
+  let cropDims = { x: bbox[0], y: bbox[1], width: boxW, height: boxH };
+
+  const poly = computeAnnotationMaskFromPoints(cropDims, points, imH, imW);
+
+  return { maskData: poly.data, bbox: bbox };
 }
 
 export function generateAnnotations(
   preds: number[][][],
   categoryId: string,
-  padX: number,
-  padY: number,
+  height: number,
   width: number,
-  height: number
+  inputImDims: {
+    width: number;
+    height: number;
+    padX: number;
+    padY: number;
+  },
+  scoreThresh: number
 ) {
   const generatedAnnotations: Array<DecodedAnnotationType> = [];
-  const generartedBBoxes: Array<[number, number, number, number]> = [];
   const scores: Array<number> = [];
-  var i = 0;
+  const generatedBboxes: Array<[number, number, number, number]> = [];
 
-  preds.forEach((row: Array<Array<number>>) => {
-    var j = 0;
-    row.forEach((output: Array<number>) => {
-      if (output[0] > 0.3) {
-        const { maskData, bbox } = buildPolygon(
-          output.slice(1),
+  preds.forEach((row: Array<Array<number>>, i) => {
+    row.forEach((output: Array<number>, j) => {
+      if (output[0] >= scoreThresh) {
+        const polygon = buildPolygon(
+          output.slice(1), // radial distances
           i,
           j,
-          padX,
-          padY,
+          height,
           width,
-          height
+          inputImDims
         );
+
+        if (!polygon) return;
+
+        scores.push(output[0]);
+
+        const { maskData, bbox } = polygon;
+
         const annotation: DecodedAnnotationType = {
           maskData: maskData,
           boundingBox: bbox,
           categoryId: categoryId,
           id: uuid4(),
-          plane: 1,
+          plane: 0,
         };
+
         generatedAnnotations.push(annotation);
-        scores.push(output[0]);
-        generartedBBoxes.push(bbox);
+        generatedBboxes.push(bbox);
       }
-      j++;
     });
-    i++;
   });
-  return { generatedAnnotations, scores, generartedBBoxes };
+  return { generatedAnnotations, generatedBboxes, scores };
 }
 
-const generateNewCategory = (
-  name: string,
-  annotationCategories: Array<Category>
+export const predictStardist = async (
+  model: GraphModel,
+  imTensor: Tensor4D, // expects 1 for batchSize dim (axis 0)
+  catId: string, // foreground (nucleus category)
+  inputImDims: {
+    width: number;
+    height: number;
+    padX: number;
+    padY: number;
+  },
+  NMS_IoUThresh: number = 0.1,
+  NMS_scoreThresh: number = 0.3,
+  NMS_maxOutputSize: number = 500,
+  NMS_softNmsSigma: number = 0.0
 ) => {
-  const usedColors = annotationCategories.map((category: Category) => {
-    return category.color;
-  });
-  const availableColos = Object.values(CATEGORY_COLORS).filter(
-    (color: string) => !usedColors.includes(color)
+  // [batchSize, H, W, 33]
+  const res = model.execute(imTensor) as Tensor4D;
+  const preds = (await res.array())[0];
+
+  dispose(imTensor);
+  dispose(res);
+
+  const prevBackend = getBackend();
+
+  if (prevBackend === "webgl") {
+    setBackend("cpu");
+  }
+
+  const { generatedAnnotations, generatedBboxes, scores } = generateAnnotations(
+    preds,
+    catId,
+    res.shape[1], // H
+    res.shape[2], // W
+    inputImDims,
+    NMS_scoreThresh
   );
-  const catColor =
-    availableColos[Math.floor(Math.random() * availableColos.length)];
-  const catID = uuid4();
-  return {
-    name: name,
-    color: catColor,
-    id: catID,
-    visible: true,
-  };
+
+  const indexTensor = tidy(() => {
+    const bboxTensor = tensor2d(generatedBboxes);
+    const scoresTensor = tensor1d(scores);
+
+    return TFImage.nonMaxSuppressionWithScore(
+      bboxTensor,
+      scoresTensor,
+      NMS_maxOutputSize,
+      NMS_IoUThresh,
+      NMS_scoreThresh,
+      NMS_softNmsSigma
+    ).selectedIndices;
+  });
+
+  const indices = (await indexTensor.data()) as Float32Array;
+  dispose(indexTensor);
+
+  const selectedAnnotations: Array<DecodedAnnotationType> = [];
+
+  indices.forEach((index) => {
+    selectedAnnotations.push(generatedAnnotations[index]);
+  });
+
+  if (prevBackend !== getBackend()) {
+    setBackend(prevBackend);
+  }
+
+  return selectedAnnotations;
 };

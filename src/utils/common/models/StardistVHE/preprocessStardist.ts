@@ -1,10 +1,13 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
-import { FitOptions, ImageType } from "types";
-import { denormalizeTensor, getImageSlice } from "utils/common/image";
+import { ImageType } from "types";
+import { getImageSlice } from "utils/common/image";
 
 // TODO - segmenter COCO and others uses this same generator
 // refactor to a general util
-const sampleGenerator = (images: Array<ImageType>) => {
+const sampleGenerator = (
+  images: Array<ImageType>,
+  padVals: Array<{ padX: number; padY: number }>
+) => {
   const count = images.length;
 
   return function* () {
@@ -14,7 +17,12 @@ const sampleGenerator = (images: Array<ImageType>) => {
       const image = images[index];
       const dataPlane = getImageSlice(image.data, image.activePlane);
 
-      yield { data: dataPlane, bitDepth: image.bitDepth };
+      yield {
+        data: dataPlane,
+        bitDepth: image.bitDepth,
+        padX: padVals[index].padX,
+        padY: padVals[index].padY,
+      };
 
       index++;
     }
@@ -29,24 +37,20 @@ const sampleGenerator = (images: Array<ImageType>) => {
 const padImage = (image: {
   data: Tensor3D;
   bitDepth: ImageType["bitDepth"];
+  padX: number;
+  padY: number;
 }) => {
-  const height = image.data.shape[0];
-  const width = image.data.shape[1];
-
-  const padX = width % 16 === 0 ? 0 : 16 - (width % 16);
-  const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
-
   const imageTensor = tidy(() => {
-    if (!(padX === 0 && padY === 0)) {
+    if (!(image.padX === 0 && image.padY === 0)) {
       const padded = image.data.mirrorPad(
         [
           [
-            padY % 2 === 0 ? padY / 2 : Math.floor(padY / 2),
-            padY % 2 === 0 ? padY / 2 : Math.ceil(padY / 2),
+            image.padY % 2 === 0 ? image.padY / 2 : Math.floor(image.padY / 2),
+            image.padY % 2 === 0 ? image.padY / 2 : Math.ceil(image.padY / 2),
           ],
           [
-            padX % 2 === 0 ? padX / 2 : Math.floor(padX / 2),
-            padX % 2 === 0 ? padX / 2 : Math.ceil(padX / 2),
+            image.padX % 2 === 0 ? image.padX / 2 : Math.floor(image.padX / 2),
+            image.padX % 2 === 0 ? image.padX / 2 : Math.ceil(image.padX / 2),
           ],
           [0, 0],
         ],
@@ -66,10 +70,11 @@ const padImage = (image: {
 
 export const preprocessStardist = (
   images: Array<ImageType>,
-  fitOptions: FitOptions
+  batchSize: number,
+  dataDims: Array<{ padX: number; padY: number }>
 ) => {
   return tfdata
-    .generator(sampleGenerator(images))
+    .generator(sampleGenerator(images, dataDims))
     .map((im) => padImage(im))
-    .batch(fitOptions.batchSize) as tfdata.Dataset<Tensor4D>;
+    .batch(batchSize) as tfdata.Dataset<Tensor4D>;
 };
