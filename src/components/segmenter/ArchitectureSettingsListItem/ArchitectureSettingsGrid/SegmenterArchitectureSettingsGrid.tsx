@@ -29,7 +29,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  const modelOptions = availableSegmenterModels.slice();
+  const modelOptions = availableSegmenterModels.filter((m) => m.trainable);
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,

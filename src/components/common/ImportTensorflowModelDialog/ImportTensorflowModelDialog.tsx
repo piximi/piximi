@@ -14,7 +14,6 @@ import {
   availableClassifierModels,
   availableSegmenterModels,
 } from "types/ModelType";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { Model } from "utils/common/models/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 
@@ -40,10 +39,7 @@ export const ImportTensorflowModelDialog = ({
   });
   const [isGraph, setIsGraph] = useState(false);
 
-  // TODO - segmenter: replace typeof with actual known type
-  const [pretrainedModels, setPretrainedModels] = useState<
-    Array<SequentialClassifier | (typeof availableSegmenterModels)[0]>
-  >([]);
+  const [pretrainedModels, setPretrainedModels] = useState<Array<Model>>([]);
 
   const dispatchModelToStore = () => {
     if (!selectedModel) {
@@ -70,13 +66,16 @@ export const ImportTensorflowModelDialog = ({
   );
 
   useEffect(() => {
-    // TODO - segmenter: map over and only include pretrained === true
-    const models =
+    const allModels =
       modelTask === ModelTask.Classification
         ? availableClassifierModels
         : availableSegmenterModels;
 
-    setPretrainedModels(models);
+    const _pretrainedModels = (allModels as Model[]).filter(
+      (m) => m.pretrained
+    );
+
+    setPretrainedModels(_pretrainedModels);
   }, [modelTask]);
 
   return (

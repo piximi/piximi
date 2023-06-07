@@ -39,7 +39,7 @@ export const availableClassifierModels: Array<SequentialClassifier> = [
 ];
 
 export const availableSegmenterModels: Array<Segmenter> = [
-  new CocoSSD(),
   new FullyConnectedSegmenter(),
+  new CocoSSD(),
   new StardistVHE(),
 ];
