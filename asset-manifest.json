@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.js": "/static/js/main.d486afa8.js",
+    "main.js": "/static/js/main.d36c2b9f.js",
+    "static/js/845.d9f7556a.chunk.js": "/static/js/845.d9f7556a.chunk.js",
     "static/js/314.fb79b1cc.chunk.js": "/static/js/314.fb79b1cc.chunk.js",
     "static/js/450.acea0832.chunk.js": "/static/js/450.acea0832.chunk.js",
     "static/js/994.d7b4df34.chunk.js": "/static/js/994.d7b4df34.chunk.js",
     "static/js/247.787de740.chunk.js": "/static/js/247.787de740.chunk.js",
     "static/js/888.c52fbe7f.chunk.js": "/static/js/888.c52fbe7f.chunk.js",
-    "static/js/845.02a9151d.chunk.js": "/static/js/845.02a9151d.chunk.js",
+    "static/media/group1-shard1of2.bin": "/static/media/group1-shard1of2.33895c8f25a993d537ff.bin",
     "static/media/malaria.png": "/static/media/malaria.5b73ad7591d4eef598db.png",
+    "static/media/group1-shard2of2.bin": "/static/media/group1-shard2of2.09065811a29ecbc30998.bin",
     "static/media/cElegansExampleProjectIcon.png": "/static/media/cElegansExampleProjectIcon.ec038762b8385f2d59fd.png",
     "static/media/humanU2OSCellsExampleProjectIcon.png": "/static/media/humanU2OSCellsExampleProjectIcon.59ecbfc81d965b81358b.png",
     "static/media/cell-painting.png": "/static/media/cell-painting.f118ef087853056f08e6.png",
@@ -42,10 +44,10 @@
     "static/media/BBBC013ExampleProject.h5": "/static/media/BBBC013ExampleProject.70e1cd31613d8e7ce6a4.h5",
     "static/media/PLP1ExampleProject.h5": "/static/media/PLP1ExampleProject.62a63e8e2c6b8be20f0e.h5",
     "static/media/mnistExampleProject.h5": "/static/media/mnistExampleProject.0120cf6d8ee9ac7102f4.h5",
-    "main.d486afa8.js.map": "/static/js/main.d486afa8.js.map",
-    "845.02a9151d.chunk.js.map": "/static/js/845.02a9151d.chunk.js.map"
+    "main.d36c2b9f.js.map": "/static/js/main.d36c2b9f.js.map",
+    "845.d9f7556a.chunk.js.map": "/static/js/845.d9f7556a.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.d486afa8.js"
+    "static/js/main.d36c2b9f.js"
   ]
 }
