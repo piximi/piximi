@@ -149,6 +149,7 @@ function* runPrediction(
     yield put(
       dataSlice.actions.setAnnotations({
         annotations: annotations.map((ann) => ({ ...ann, imageId })),
+        isPermanent: true,
       })
     );
   }
