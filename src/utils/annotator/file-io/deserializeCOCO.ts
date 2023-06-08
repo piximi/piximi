@@ -245,7 +245,7 @@ export const deserializeCOCOFile = (
 
     const newAnnotation = {
       id: uuidv4(),
-      mask: encodedMask,
+      encodedMask: encodedMask,
       plane: parentIm.activePlane,
       boundingBox: bbox,
       categoryId: cocoAnn.category_id,

@@ -103,7 +103,7 @@ export const Annotation = ({
 
     const tempUpdated = {
       ...updatedAnnotation,
-      mask: encode(resizedMaskROI.data),
+      encodedMask: encode(resizedMaskROI.data),
     };
 
     dispatch(
