@@ -29,7 +29,6 @@ export const decodeAnnotation = (
   encodedAnnotation: EncodedAnnotationType | undefined
 ): AnnotationType | undefined => {
   if (!encodedAnnotation) return undefined;
-  console.log(encodedAnnotation);
   const decodedAnnotation = {
     ...encodedAnnotation,
     decodedMask: Uint8Array.from(decode(encodedAnnotation.encodedMask)),
@@ -105,7 +104,7 @@ export const encodeAnnotation = (
   if (!decodedAnnotation) return undefined;
   const encodedAnnotation = {
     ...decodedAnnotation,
-    mask: encode(decodedAnnotation.decodedMask),
+    encodedMask: encode(decodedAnnotation.decodedMask),
   };
 
   return encodedAnnotation;
@@ -118,8 +117,8 @@ export const encodeAnnotations = (
   return new Promise((resolve) => {
     const encodedAnnotations = decodedAnnotations.map((annotation) => {
       const decdodedAnnotation = {
-        mask: encode(annotation.decodedMask),
         ...annotation,
+        encodedMask: encode(annotation.decodedMask),
       };
       return decdodedAnnotation;
     });

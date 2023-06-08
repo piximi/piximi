@@ -8,12 +8,15 @@ export const selectActiveAnnotations = createSelector(
   [selectActiveAnnotationIds, selectAnnotationEntities],
   (annotationIds, annotationEntities): Array<AnnotationType> => {
     if (!annotationIds.length) return [];
-    return annotationIds.map(
-      (annotationId) =>
-        decodeAnnotation(
-          annotationEntities[annotationId]! as EncodedAnnotationType
-        )!
-    );
+
+    return annotationIds.map((annotationId) => {
+      const decodedAnnotation = !annotationEntities[annotationId].decodedMask
+        ? decodeAnnotation(
+            annotationEntities[annotationId] as EncodedAnnotationType
+          )!
+        : (annotationEntities[annotationId] as AnnotationType);
+      return decodedAnnotation;
+    });
   }
 );
 

@@ -45,6 +45,7 @@ export const selectActiveAnnotationObjects = createSelector(
         annotationId === workingAnnotation.saved?.id
       )
         continue;
+
       const annotation = !annotationEntities[annotationId].decodedMask
         ? decodeAnnotation(
             annotationEntities[annotationId] as EncodedAnnotationType
