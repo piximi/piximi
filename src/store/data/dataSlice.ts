@@ -878,6 +878,36 @@ export const dataSlice = createSlice({
         );
       }
     },
+    setAnnotationsByImage(
+      state,
+      action: PayloadAction<{
+        annotations: Array<AnnotationType>;
+        imageId: string;
+        isPermanent?: boolean;
+      }>
+    ) {
+      const withInvalidImageId = [];
+      dataSlice.caseReducers.deleteAllAnnotationsByImage(state, {
+        type: "deleteAllAnnotationsByImage",
+        payload: { imageId: action.payload.imageId },
+      });
+
+      for (const annotation of action.payload.annotations) {
+        if (!state.images.ids.includes(annotation.imageId!)) {
+          withInvalidImageId.push(annotation.id);
+          continue;
+        }
+        dataSlice.caseReducers.addAnnotation(state, {
+          type: "addAnnotation",
+          payload: { annotation, isPermanent: action.payload.isPermanent },
+        });
+      }
+      if (withInvalidImageId.length) {
+        console.log(
+          `${withInvalidImageId.length} annotations contained an invalid image id: Skipped`
+        );
+      }
+    },
     updateAnnotation(
       state,
       action: PayloadAction<{
@@ -907,7 +937,10 @@ export const dataSlice = createSlice({
         });
       }
     },
-    deleteAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
+    deleteAnnotation(
+      state,
+      action: PayloadAction<{ annotationId: string; isPermanent?: boolean }>
+    ) {
       const annotationId = action.payload.annotationId;
       if (state.annotations.ids.includes(annotationId)) {
         const imageId = getDeferredProperty(
@@ -926,46 +959,58 @@ export const dataSlice = createSlice({
           state.annotationsByImage[imageId!],
           (_annotationId) => _annotationId !== annotationId
         );
-        annotationsAdapter.removeOne(state.annotations, annotationId);
+        if (action.payload.isPermanent) {
+          delete state.annotations.entities[annotationId];
+          state.annotations.ids = Object.keys(state.annotations.entities);
+        } else {
+          annotationsAdapter.removeOne(state.annotations, annotationId);
+        }
       }
     },
     deleteAnnotations(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+        isPermanent?: boolean;
+      }>
     ) {
       const annotationIds = [...action.payload.annotationIds];
 
       for (const annotationId of annotationIds) {
         dataSlice.caseReducers.deleteAnnotation(state, {
           type: "deleteAnnotation",
-          payload: { annotationId },
+          payload: { annotationId, isPermanent: action.payload.isPermanent },
         });
       }
     },
     deleteAllAnnotationsByImage(
       state,
-      action: PayloadAction<{ imageId: string }>
+      action: PayloadAction<{ imageId: string; isPermanent?: boolean }>
     ) {
       const annotationIds = state.annotationsByImage[action.payload.imageId];
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds },
+        payload: { annotationIds, isPermanent: action.payload.isPermanent },
       });
     },
     deleteAllAnnotationsByCategory(
       state,
-      action: PayloadAction<{ categoryId: string }>
+      action: PayloadAction<{ categoryId: string; isPermanent?: boolean }>
     ) {
       const annotationIds =
         state.annotationsByCategory[action.payload.categoryId];
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds },
+        payload: { annotationIds, isPermanent: action.payload.isPermanent },
       });
     },
     deleteImageAnnotationsByCategory(
       state,
-      action: PayloadAction<{ imageId: string; categoryId: string }>
+      action: PayloadAction<{
+        imageId: string;
+        categoryId: string;
+        isPermanent?: boolean;
+      }>
     ) {
       const { imageId, categoryId } = action.payload;
       const annotationIds = state.annotationsByCategory[categoryId].filter(
@@ -981,14 +1026,17 @@ export const dataSlice = createSlice({
 
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotation",
-        payload: { annotationIds },
+        payload: { annotationIds, isPermanent: action.payload.isPermanent },
       });
     },
-    deleteAllAnnotations(state, action: PayloadAction<{}>) {
+    deleteAllAnnotations(
+      state,
+      action: PayloadAction<{ isPermanent?: boolean }>
+    ) {
       const annotationIds = [...state.annotations.ids] as Array<string>;
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds },
+        payload: { annotationIds, isPermanent: action.payload.isPermanent },
       });
     },
     reconcile(
