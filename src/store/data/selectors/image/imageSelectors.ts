@@ -43,9 +43,9 @@ export const selectImageCountByCategory = () =>
   );
 
 export const selectImagesByPartition = createSelector(
-  [selectAllImages, (_, partition: Partition) => partition],
-  (images, partition) => {
-    return images.filter((image) => image.partition === partition);
+  [selectAllImages],
+  (images) => (partitions: Partition[]) => {
+    return images.filter((image) => partitions.includes(image.partition));
   }
 );
 
