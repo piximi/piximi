@@ -59,16 +59,13 @@ export const selectTotalAnnotationCountByImage = createSelector(
 
 export const selectAnnotationCountByCategory = () =>
   createSelector(
-    [
-      selectAllAnnotationIds,
-      selectAnnotationsByCategoryDict,
-      (state, categoryId) => categoryId,
-    ],
-    (annotationIds, annotationsByCategory, categoryId) => {
-      if (!Object.keys(annotationsByCategory).includes(categoryId)) return;
+    [selectAllAnnotationIds, selectAnnotationsByCategoryDict],
+    (annotationIds, annotationsByCategory) =>
+      (categoryId: string): number => {
+        if (!Object.keys(annotationsByCategory).includes(categoryId)) return 0;
 
-      return annotationsByCategory[categoryId].length;
-    }
+        return annotationsByCategory[categoryId].length;
+      }
   );
 
 export const selectAnnotationsByImage = createSelector(
