@@ -150,7 +150,9 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="tabbed-view">
           <Tab label="Images" {...a11yProps(0)} />
-          <Tab label="Objects" {...a11yProps(1)} />
+          {process.env.NODE_ENV !== "production" && (
+            <Tab label="Objects" {...a11yProps(1)} />
+          )}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -207,60 +209,62 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
           </Container>
         </Box>
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Box
-          component="main"
-          ref={dropTarget}
-          sx={(theme) => ({
-            transition: theme.transitions.create("margin", {
-              duration: theme.transitions.duration.enteringScreen,
-              easing: theme.transitions.easing.easeOut,
-            }),
-          })}
-          style={{
-            border: isOver ? "5px solid blue" : "",
-          }}
-        >
-          <Container
+      {process.env.NODE_ENV !== "production" && (
+        <TabPanel value={value} index={1}>
+          <Box
+            component="main"
+            ref={dropTarget}
             sx={(theme) => ({
-              paddingBottom: theme.spacing(8),
-              height: "100%",
+              transition: theme.transitions.create("margin", {
+                duration: theme.transitions.duration.enteringScreen,
+                easing: theme.transitions.easing.easeOut,
+              }),
             })}
-            maxWidth={false}
+            style={{
+              border: isOver ? "5px solid blue" : "",
+            }}
           >
-            <div onContextMenu={handleContextMenu}>
-              <Grid
-                container
-                gap={2}
-                sx={{ transform: "translateZ(0)", height: "100%" }}
-              >
-                {[].map((image: ImageType) => (
-                  <MainImageGridItem
-                    image={image}
-                    selected={selectedImages.includes(image.id)}
-                    selectionColor={imageSelectionColor}
-                    selectedImageBorderWidth={selectedImageBorderWidth}
-                    key={image.id}
-                  />
-                ))}
-              </Grid>
+            <Container
+              sx={(theme) => ({
+                paddingBottom: theme.spacing(8),
+                height: "100%",
+              })}
+              maxWidth={false}
+            >
+              <div onContextMenu={handleContextMenu}>
+                <Grid
+                  container
+                  gap={2}
+                  sx={{ transform: "translateZ(0)", height: "100%" }}
+                >
+                  {[].map((image: ImageType) => (
+                    <MainImageGridItem
+                      image={image}
+                      selected={selectedImages.includes(image.id)}
+                      selectionColor={imageSelectionColor}
+                      selectedImageBorderWidth={selectedImageBorderWidth}
+                      key={image.id}
+                    />
+                  ))}
+                </Grid>
 
-              <ImageCategoryMenu
-                open={contextMenu !== null}
-                onClose={closeContextMenu}
-                anchorReference="anchorPosition"
-                imageIds={selectedImages}
-                anchorPosition={
-                  contextMenu !== null
-                    ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-                    : undefined
-                }
-              />
-            </div>
-            <MainImageGridAppBar />
-          </Container>
-        </Box>
-      </TabPanel>
+                <ImageCategoryMenu
+                  open={contextMenu !== null}
+                  onClose={closeContextMenu}
+                  anchorReference="anchorPosition"
+                  imageIds={selectedImages}
+                  anchorPosition={
+                    contextMenu !== null
+                      ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                      : undefined
+                  }
+                />
+              </div>
+              <MainImageGridAppBar />
+            </Container>
+          </Box>
+        </TabPanel>
+      )}
     </Box>
   );
 };
