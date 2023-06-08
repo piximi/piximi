@@ -136,7 +136,7 @@ function* runPrediction(
     ]);
 
     yield put(
-      dataSlice.actions.setAnnotationCategories({
+      dataSlice.actions.addAnnotationCategories({
         annotationCategories: generatedCategories,
         isPermanent: true,
       })
@@ -147,7 +147,8 @@ function* runPrediction(
     const imageId = inferenceImages[i].id;
 
     yield put(
-      dataSlice.actions.setAnnotations({
+      dataSlice.actions.setAnnotationsByImage({
+        imageId,
         annotations: annotations.map((ann) => ({ ...ann, imageId })),
         isPermanent: true,
       })
