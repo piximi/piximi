@@ -138,7 +138,10 @@ startAppListening({
         });
       } else {
         listenerAPI.dispatch(
-          dataSlice.actions.addImages({ images: imagesToUpload })
+          dataSlice.actions.addImages({
+            images: imagesToUpload,
+            isPermanent: true,
+          })
         );
       }
     }
