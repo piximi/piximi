@@ -136,8 +136,9 @@ function* runPrediction(
     ]);
 
     yield put(
-      dataSlice.actions.setImageCategories({
-        categories: generatedCategories,
+      dataSlice.actions.setAnnotationCategories({
+        annotationCategories: generatedCategories,
+        isPermanent: true,
       })
     );
   }
