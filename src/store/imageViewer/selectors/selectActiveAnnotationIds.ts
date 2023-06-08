@@ -1,14 +1,14 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { activeImageIdSelector } from "./activeImageIdSelector";
+import { selectAnnotationsByImageDict } from "store/data/selectors/annotation/annotationSelectors";
 
-import { ImageViewerStore } from "types";
-
-export const selectActiveAnnotationIds = ({
-  imageViewer,
-}: {
-  imageViewer: ImageViewerStore;
-}) => {
-  return imageViewer.activeAnnotationIds;
-};
+export const selectActiveAnnotationIds = createSelector(
+  [activeImageIdSelector, selectAnnotationsByImageDict],
+  (imageId, annotationsByImage) => {
+    if (!imageId) return [];
+    return annotationsByImage[imageId];
+  }
+);
 
 export const selectActiveAnnotationIdsCount = createSelector(
   selectActiveAnnotationIds,
