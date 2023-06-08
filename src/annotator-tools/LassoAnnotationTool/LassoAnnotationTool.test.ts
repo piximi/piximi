@@ -83,7 +83,7 @@ test("onMouseUp", async () => {
     { x: 0, y: 0 },
   ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 5, 5]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 
   expect(operator.buffer).toStrictEqual([]);
 });
@@ -120,7 +120,7 @@ test("select", async () => {
   });
 
   expect(operator.boundingBox).toStrictEqual([0, 0, 5, 5]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 
   expect(operator.anchor).toBe(undefined);
   expect(operator.buffer).toStrictEqual([]);
@@ -164,7 +164,7 @@ test("deselect", async () => {
   expect(operator.annotation).toBe(undefined);
 
   expect(operator.boundingBox).toStrictEqual([0, 0, 5, 5]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 
   expect(operator.anchor).toBe(undefined);
   expect(operator.buffer).toStrictEqual([]);

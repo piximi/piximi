@@ -234,14 +234,14 @@ export const deserializeCOCOFile = (
       Math.round(cocoAnn.bbox[1] + cocoAnn.bbox[3]),
     ] as [number, number, number, number];
 
-    const maskData = maskFromPoints(
+    const decodedMask = maskFromPoints(
       points,
       { width: parentIm.shape.width, height: parentIm.shape.height },
       bbox,
       true
     );
 
-    const encodedMask = encode(maskData);
+    const encodedMask = encode(decodedMask);
 
     const newAnnotation = {
       id: uuidv4(),

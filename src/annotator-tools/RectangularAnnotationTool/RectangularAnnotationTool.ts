@@ -43,10 +43,10 @@ export class RectangularAnnotationTool extends AnnotationTool {
     this.points = drawRectangle(this.origin, this.width, this.height);
     this._boundingBox = this.computeBoundingBox();
 
-    const maskData = this.convertToMask();
-    if (!maskData) return;
+    const decodedMask = this.convertToMask();
+    if (!decodedMask) return;
 
-    this._maskData = maskData;
+    this._decodedMask = decodedMask;
     this.setAnnotated();
   }
 

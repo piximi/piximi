@@ -70,7 +70,7 @@ export class PolygonalAnnotationTool extends AnnotationTool {
 
       this.setAnnotationMaskFromPoints();
 
-      if (!this.maskData) return;
+      if (!this.decodedMask) return;
 
       this.buffer = [];
       this.newAnchor = undefined;

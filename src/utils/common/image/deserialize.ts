@@ -102,7 +102,7 @@ const deserializeAnnotationsGroup = (
         number,
         number
       ],
-      mask: Array.from(masks.slice(maskIdx, maskIdx + maskLengths[i])),
+      encodedMask: Array.from(masks.slice(maskIdx, maskIdx + maskLengths[i])),
     });
 
     bboxIdx += 4;

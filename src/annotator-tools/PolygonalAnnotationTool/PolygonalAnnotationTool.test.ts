@@ -108,7 +108,7 @@ test("onMouseUp (connected)", async () => {
     { x: 100, y: 0 },
   ]);
 
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
   expect(operator.buffer).toStrictEqual([]);
   expect(operator.origin).toBe(undefined);
   expect(operator.anchor).toBe(undefined);

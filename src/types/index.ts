@@ -10,7 +10,12 @@ export { AnnotationStateType } from "./AnnotationStateType";
 export { AnnotationExportType } from "./AnnotationExportType";
 export type { AnnotationsEntityType } from "./AnnotationsEntityType";
 export type { TypedAppStartListening } from "./TypedAppStartListening";
-export type { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
+export type {
+  AnnotationType,
+  DecodedAnnotationType,
+  EncodedAnnotationType,
+  SerializedAnnotationType,
+} from "./AnnotationType";
 
 export type { Category } from "./Category";
 export {
@@ -100,8 +105,6 @@ export type { PointerSelectionType } from "./PointerSelectionType";
 export type { RescaleOptions } from "./RescaleOptions";
 
 export type { SegmenterStoreType } from "./SegmenterStoreType";
-
-export type { SerializedAnnotationType } from "./SerializedAnnotationType";
 
 export type { SerializedFileType } from "./SerializedFileType";
 

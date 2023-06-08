@@ -39,7 +39,7 @@ export class EllipticalAnnotationTool extends AnnotationTool {
 
     this.setAnnotationMaskFromPoints();
 
-    if (!this.maskData) return;
+    if (!this.decodedMask) return;
 
     this.setAnnotated();
   }

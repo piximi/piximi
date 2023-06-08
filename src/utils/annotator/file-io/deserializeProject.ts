@@ -17,7 +17,7 @@ export const deserializeAnnotations = (
   for (const annotation of serializedAnnotations) {
     annotations.push({
       id: uuidv4(),
-      mask: annotation.mask.split(" ").map((e) => Number(e)),
+      encodedMask: annotation.mask.split(" ").map((e) => Number(e)),
       plane: annotation.plane,
       boundingBox: annotation.boundingBox as [number, number, number, number],
       categoryId: annotation.categoryId,

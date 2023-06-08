@@ -8,7 +8,7 @@ import { selectActiveImageShape } from "../image/selectActiveImageAttributes";
 import { selectAnnotationCategoryEntities } from "../annotation-category/annotationCategorySelectors";
 import { selectAnnotationEntities } from "./annotationSelectors";
 
-import { AnnotationType, DecodedAnnotationType, Shape } from "types";
+import { AnnotationType, EncodedAnnotationType, Shape } from "types";
 import { decodeAnnotation } from "utils/annotator";
 
 // Note: re-selects on activeImageId, image.entities, annotationsByImage, annotations.entities, annotationCategories.entities
@@ -27,14 +27,14 @@ export const selectActiveAnnotationObjects = createSelector(
     categoryEntities,
     workingAnnotation
   ): Array<{
-    annotation: DecodedAnnotationType;
+    annotation: AnnotationType;
     fillColor: string;
     imageShape: Shape;
   }> => {
     if (!activeImageShape) return [];
 
     const annotationObjects: Array<{
-      annotation: DecodedAnnotationType;
+      annotation: AnnotationType;
       fillColor: string;
       imageShape: Shape;
     }> = [];
@@ -45,7 +45,11 @@ export const selectActiveAnnotationObjects = createSelector(
         annotationId === workingAnnotation.saved?.id
       )
         continue;
-      const annotation = decodeAnnotation(annotationEntities[annotationId])!;
+      const annotation = !annotationEntities[annotationId].decodedMask
+        ? decodeAnnotation(
+            annotationEntities[annotationId] as EncodedAnnotationType
+          )!
+        : (annotationEntities[annotationId] as AnnotationType);
 
       const fillColor = categoryEntities[annotation.categoryId].color;
       annotationObjects.push({
@@ -70,8 +74,8 @@ export const selectWorkingAnnotationObject = createSelector(
       ...workingAnnotationEntity.saved,
       ...workingAnnotationEntity.changes,
     } as AnnotationType;
-    const annotation = !workingAnnotation.maskData
-      ? decodeAnnotation(workingAnnotation)!
+    const annotation = !workingAnnotation.decodedMask
+      ? decodeAnnotation(workingAnnotation as EncodedAnnotationType)!
       : workingAnnotation;
     const fillColor = categoryEntities[workingAnnotation.categoryId].color;
     const imageShape = activeImageShape;

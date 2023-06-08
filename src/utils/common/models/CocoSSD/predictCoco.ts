@@ -171,7 +171,7 @@ const buildDetectedObjects = (
     //   number
     // ];
 
-    const maskData = new Uint8Array((maxX - minX) * (maxY - minY)).fill(255);
+    const decodedMask = new Uint8Array((maxX - minX) * (maxY - minY)).fill(255);
 
     const category = categories[classes[indices[i]]];
 
@@ -179,7 +179,7 @@ const buildDetectedObjects = (
       boundingBox: annotationBbox,
       categoryId: category.id,
       id: uuid4(),
-      maskData,
+      decodedMask,
       plane: 0,
     });
   }

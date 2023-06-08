@@ -78,7 +78,7 @@ const preloadedImages: Array<{
         boundingBox: [86, 149, 217, 240],
         categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
         id: "59b919c0-f052-4df6-b947-bb8f3c9359a7",
-        mask: [0, 11921],
+        encodedMask: [0, 11921],
         plane: 0,
       },
     ],

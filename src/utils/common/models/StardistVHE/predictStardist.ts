@@ -103,7 +103,7 @@ export function buildPolygon(
 
   const poly = computeAnnotationMaskFromPoints(cropDims, points, imH, imW);
 
-  return { maskData: poly.data, bbox: bbox };
+  return { decodedMask: poly.data, bbox: bbox };
 }
 
 export function generateAnnotations(
@@ -139,10 +139,10 @@ export function generateAnnotations(
 
         scores.push(output[0]);
 
-        const { maskData, bbox } = polygon;
+        const { decodedMask, bbox } = polygon;
 
         const annotation = {
-          maskData: maskData,
+          decodedMask: decodedMask,
           boundingBox: bbox,
           categoryId: categoryId,
           id: uuid4(),

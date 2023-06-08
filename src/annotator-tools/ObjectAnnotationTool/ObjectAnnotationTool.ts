@@ -139,7 +139,7 @@ export class ObjectAnnotationTool extends RectangularAnnotationTool {
       const thresholded = greyMask.data.map((i: number) => (i > 1 ? 255 : 0)); //threshold necessary because output of NN is not binary
 
       // @ts-ignore
-      this.maskData = thresholded;
+      this.decodedMask = thresholded;
 
       this.width = undefined;
     }

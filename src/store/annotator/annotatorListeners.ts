@@ -77,31 +77,31 @@ startAppListening({
 
       if (selectionMode === AnnotationModeType.Add) {
         [combinedMask, combinedBoundingBox] = annotationTool.add(
-          workingAnnotation.maskData!,
+          workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox
         );
       } else if (selectionMode === AnnotationModeType.Subtract) {
         [combinedMask, combinedBoundingBox] = annotationTool.subtract(
-          workingAnnotation.maskData!,
+          workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox
         );
       } else if (selectionMode === AnnotationModeType.Intersect) {
         [combinedMask, combinedBoundingBox] = annotationTool.intersect(
-          workingAnnotation.maskData!,
+          workingAnnotation.decodedMask!,
           workingAnnotation.boundingBox
         );
       } else {
         return;
       }
 
-      annotationTool.maskData = combinedMask;
+      annotationTool.decodedMask = combinedMask;
       annotationTool.boundingBox = combinedBoundingBox;
 
-      const combinedSelectedAnnotation = annotationTool.maskData.length
+      const combinedSelectedAnnotation = annotationTool.decodedMask.length
         ? {
             ...workingAnnotation,
             boundingBox: annotationTool.boundingBox,
-            maskData: annotationTool.maskData,
+            decodedMask: annotationTool.decodedMask,
           }
         : undefined;
 
@@ -115,7 +115,7 @@ startAppListening({
         })
       );
 
-      if (annotationTool.maskData.length) {
+      if (annotationTool.decodedMask.length) {
         annotationTool.annotate(
           selectedCategory,
           activeImagePlane!,

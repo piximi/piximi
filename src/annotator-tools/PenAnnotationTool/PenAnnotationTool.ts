@@ -44,7 +44,7 @@ export class PenAnnotationTool extends AnnotationTool {
       return;
     }
 
-    this.maskData = circlesData;
+    this.decodedMask = circlesData;
 
     this.setAnnotated();
   }

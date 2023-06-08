@@ -21,7 +21,6 @@ import {
   AnnotationModeType,
   AnnotationStateType,
   AnnotationType,
-  DecodedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
@@ -31,7 +30,7 @@ type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool | undefined;
   deleteAnnotations: (
     annotationIds: Array<string>,
-    stagedAnnotations: Array<DecodedAnnotationType>
+    stagedAnnotations: Array<AnnotationType>
   ) => void;
   deselectAllAnnotations: () => void;
   deselectAnnotation: () => void;
