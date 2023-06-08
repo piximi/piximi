@@ -50,8 +50,8 @@ const enhancers: StoreEnhancer[] = [];
 let loggingMiddleware: Middleware[] =
   process.env.NODE_ENV !== "production" &&
   process.env.REACT_APP_LOG_LEVEL === "2"
-    ? [dataMiddleware.middleware, logger, saga]
-    : [dataMiddleware.middleware, saga];
+    ? [logger, saga]
+    : [saga];
 
 let listenerMiddlewares: Middleware[] = [
   dataMiddleware.middleware,
