@@ -61,7 +61,7 @@ test("onMouseUp-NoMove", async () => {
 
   expect(operator.boundingBox).toStrictEqual([0, 0, 8, 8]);
 
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("onMouseUp-Move", async () => {
@@ -83,7 +83,7 @@ test("onMouseUp-Move", async () => {
   ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 107, 107]);
 
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("select", async () => {

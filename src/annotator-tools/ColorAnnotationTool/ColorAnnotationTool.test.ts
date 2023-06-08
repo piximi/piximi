@@ -99,7 +99,7 @@ test("onMouseUp", async () => {
   expect(operator.roiManager).toBeDefined();
   expect(operator.roiMask).toBeDefined();
   expect(operator.boundingBox).toStrictEqual([0, 0, 107, 52]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("select", async () => {

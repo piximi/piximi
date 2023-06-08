@@ -1,4 +1,8 @@
-import { DecodedAnnotationType, AnnotationType } from "types";
+import {
+  DecodedAnnotationType,
+  AnnotationType,
+  EncodedAnnotationType,
+} from "types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -22,25 +26,26 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: AnnotationType | undefined
-): DecodedAnnotationType | undefined => {
+  encodedAnnotation: EncodedAnnotationType | undefined
+): AnnotationType | undefined => {
   if (!encodedAnnotation) return undefined;
+  console.log(encodedAnnotation);
   const decodedAnnotation = {
-    maskData: Uint8Array.from(decode(encodedAnnotation.mask!)),
     ...encodedAnnotation,
+    decodedMask: Uint8Array.from(decode(encodedAnnotation.encodedMask)),
   };
 
   return decodedAnnotation;
 };
 
 export const decodeAnnotations = async (
-  encodedAnnotations: Array<AnnotationType>
-): Promise<Array<DecodedAnnotationType>> => {
+  encodedAnnotations: Array<EncodedAnnotationType>
+): Promise<Array<AnnotationType>> => {
   return new Promise((resolve, reject) => {
     const decodedAnnotations = encodedAnnotations.map((annotation) => {
-      const { mask, ...decdodedAnnotation } = {
-        maskData: Uint8Array.from(decode(annotation.mask!)),
+      const decdodedAnnotation = {
         ...annotation,
+        decodedMask: Uint8Array.from(decode(annotation.encodedMask)),
       };
       return decdodedAnnotation;
     });
@@ -100,7 +105,7 @@ export const encodeAnnotation = (
   if (!decodedAnnotation) return undefined;
   const encodedAnnotation = {
     ...decodedAnnotation,
-    mask: encode(decodedAnnotation.maskData),
+    mask: encode(decodedAnnotation.decodedMask),
   };
 
   return encodedAnnotation;
@@ -112,8 +117,8 @@ export const encodeAnnotations = (
 ): Promise<Array<AnnotationType>> => {
   return new Promise((resolve) => {
     const encodedAnnotations = decodedAnnotations.map((annotation) => {
-      const { maskData, ...decdodedAnnotation } = {
-        mask: encode(annotation.maskData),
+      const decdodedAnnotation = {
+        mask: encode(annotation.decodedMask),
         ...annotation,
       };
       return decdodedAnnotation;

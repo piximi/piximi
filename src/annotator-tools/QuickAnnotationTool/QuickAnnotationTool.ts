@@ -159,7 +159,7 @@ export class QuickAnnotationTool extends AnnotationTool {
       i > 1 ? 255 : 0
     );
 
-    this.maskData = Uint8Array.from(thresholdMask);
+    this.decodedMask = Uint8Array.from(thresholdMask);
     this.setAnnotated();
   }
 }

@@ -9,7 +9,7 @@ import { DataArray, convertToDataArray } from "utils/common/image";
 
 import {
   computeBoundingBoxFromContours as _computeBoundingBoxFromContours,
-  maskFromPoints as _maskFromPoints,
+  maskFromPoints,
 } from "utils/annotator";
 
 export abstract class AnnotationTool extends Tool {
@@ -28,13 +28,13 @@ export abstract class AnnotationTool extends Tool {
    */
   protected _boundingBox?: [number, number, number, number];
   /**
-   * One-hot encoded mask of the annotation.
+   * One-hot encoded encodedMask of the annotation.
    */
-  protected _mask?: Array<number>;
+  protected _encodedMask?: Array<number>;
   /**
    * Raw msk data
    */
-  protected _maskData?: DataArray;
+  protected _decodedMask?: DataArray;
   /**
    * State of the annotation: Blank (not yet annotating), Annotating or Annotated
    */
@@ -84,31 +84,31 @@ export abstract class AnnotationTool extends Tool {
     this.boundingBox = _computeBoundingBoxFromContours(contour);
   }
 
-  get mask(): Array<number> | undefined {
-    return this._mask;
+  get encodedMask(): Array<number> | undefined {
+    return this._encodedMask;
   }
 
-  set mask(updatedMask: Array<number> | undefined) {
-    this._mask = updatedMask;
+  set encodedMask(updatedMask: Array<number> | undefined) {
+    this._encodedMask = updatedMask;
   }
 
-  get maskData(): DataArray | undefined {
-    return this._maskData;
+  get decodedMask(): DataArray | undefined {
+    return this._decodedMask;
   }
 
-  set maskData(updatedMask: DataArray | undefined) {
-    this._maskData = updatedMask;
+  set decodedMask(updatedMask: DataArray | undefined) {
+    this._decodedMask = updatedMask;
   }
 
   /**
-   * Compute the mask image of the annotation polygon from the bounding box and the polygon points.
+   * Compute the encodedMask image of the annotation polygon from the bounding box and the polygon points.
    */
   setAnnotationMaskFromPoints() {
     if (!this.boundingBox || !this.points) {
       return;
     }
 
-    this.maskData = _maskFromPoints(
+    this.decodedMask = maskFromPoints(
       this.points,
       { width: this.image.width, height: this.image.height },
       this.boundingBox
@@ -160,22 +160,22 @@ export abstract class AnnotationTool extends Tool {
    * @returns
    */
   annotate(category: Category, plane: number, imageId: string): void {
-    if (!this.boundingBox || !this.maskData) return;
+    if (!this.boundingBox || !this.decodedMask) return;
 
     this.annotation = {
       boundingBox: this.boundingBox,
       categoryId: category.id,
       id: this.annotation ? this.annotation.id : uuidv4(),
       imageId,
-      maskData: this.maskData,
+      decodedMask: this.decodedMask,
       plane: plane,
     };
   }
 
   updateAnnotationMask(): void {
-    if (!this.boundingBox || !this.maskData || !this.annotation) return;
+    if (!this.boundingBox || !this.decodedMask || !this.annotation) return;
 
-    this.annotation = { ...this.annotation, maskData: this.maskData };
+    this.annotation = { ...this.annotation, decodedMask: this.decodedMask };
   }
 
   /**
@@ -198,19 +198,19 @@ export abstract class AnnotationTool extends Tool {
 
   /**
    * Add the areas selected by the current AnnotationTool from the selected annotation.
-   * @param newEncodedMaskData Encoded mask data of new annotation to be added
+   * @param newEncodedMaskData Encoded encodedMask data of new annotation to be added
    * @param newBoundingBox Bounding box of new annotation to be added
-   * @returns Bounding box and mask of the combined annotation areas
+   * @returns Bounding box and encodedMask of the combined annotation areas
    */
   add(
     newEncodedMaskData: DataArray,
     newBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
-    if (!this._maskData || !this._boundingBox)
+    if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
     const newMaskData = newEncodedMaskData;
-    const existingMaskData = this._maskData;
+    const existingMaskData = this._decodedMask;
     const existingBoundingBox = this._boundingBox;
 
     const combinedBoundingBox = [
@@ -270,17 +270,16 @@ export abstract class AnnotationTool extends Tool {
    * Intersect the areas selected by the current AnnotationTool and the selected annotation.
    * @param decodedMask1
    * @param boundingBox1
-   * @returns Bounding box and mask of the intersected annotation areas.
+   * @returns Bounding box and encodedMask of the intersected annotation areas.
    */
   intersect(
     decodedMask1: DataArray,
     boundingBox1: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
-    if (!this._maskData || !this._boundingBox)
+    if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
-    const maskData1 = decodedMask1;
-    const maskData2 = this._maskData;
+    const decodedMask2 = this._decodedMask;
 
     const boundingBox2 = this._boundingBox;
 
@@ -323,9 +322,9 @@ export abstract class AnnotationTool extends Tool {
       const b2i = b2x + b2y * (boundingBox2[2] - boundingBox2[0]);
       if (
         this.isInBoundingBox(b1x, b1y, boundingBox1) &&
-        maskData1[b1i] === 255 &&
+        decodedMask1[b1i] === 255 &&
         this.isInBoundingBox(b2x, b2y, boundingBox2) &&
-        maskData2[b2i] === 255
+        decodedMask2[b2i] === 255
       ) {
         newMaskData.push(255);
       } else {
@@ -346,18 +345,18 @@ export abstract class AnnotationTool extends Tool {
    * Invert the selected annotation area
    * @param selectedMask
    * @param selectedBoundingBox
-   * @returns Bounding box and mask of the inverted annotation area
+   * @returns Bounding box and encodedMask of the inverted annotation area
    */
   invert(
     selectedMask: DataArray,
     selectedBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
-    const mask = selectedMask;
+    const encodedMask = selectedMask;
 
     const imageWidth = this.image.width;
     const imageHeight = this.image.height;
 
-    // Find min and max boundary points when computing the mask.
+    // Find min and max boundary points when computing the encodedMask.
     const invertedBoundingBox: [number, number, number, number] = [
       imageWidth,
       imageHeight,
@@ -371,15 +370,20 @@ export abstract class AnnotationTool extends Tool {
     });
     for (let x = 0; x < imageWidth; x++) {
       for (let y = 0; y < imageHeight; y++) {
-        const x_mask = x - selectedBoundingBox[0];
-        const y_mask = y - selectedBoundingBox[1];
+        const x_encodedMask = x - selectedBoundingBox[0];
+        const y_encodedMask = y - selectedBoundingBox[1];
         const value =
-          mask[
-            x_mask + y_mask * (selectedBoundingBox[2] - selectedBoundingBox[0])
+          encodedMask[
+            x_encodedMask +
+              y_encodedMask * (selectedBoundingBox[2] - selectedBoundingBox[0])
           ];
         if (
           value > 0 &&
-          this.isInBoundingBox(x_mask, y_mask, selectedBoundingBox)
+          this.isInBoundingBox(
+            x_encodedMask,
+            y_encodedMask,
+            selectedBoundingBox
+          )
         ) {
           invertedMask.setPixelXY(x, y, [0]);
         } else {
@@ -398,7 +402,7 @@ export abstract class AnnotationTool extends Tool {
       }
     }
 
-    // Crop the mask using the new bounding box.
+    // Crop the encodedMask using the new bounding box.
     const croppedInvertedMask = invertedMask.crop({
       x: invertedBoundingBox[0],
       y: invertedBoundingBox[1],
@@ -417,19 +421,19 @@ export abstract class AnnotationTool extends Tool {
    * [Difference = Minuend - Subtrahend]
    * @param encodedMinuendData
    * @param minuendBoundingBox
-   * @returns Bounding box and mask of the difference of the annotation areas.
+   * @returns Bounding box and encodedMask of the difference of the annotation areas.
    */
   subtract(
     encodedMinuendData: DataArray,
     minuendBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
-    if (!this._maskData || !this._boundingBox)
+    if (!this._decodedMask || !this._boundingBox)
       return [convertToDataArray(8, []) as Uint8Array, [0, 0, 0, 0]];
 
     // decode the selected annotation data
     const minuendData = encodedMinuendData;
     // decode the the subtrahend data
-    const subtrahendData = this._maskData;
+    const subtrahendData = this._decodedMask;
 
     const subtrahendBoundingBox = this._boundingBox;
 

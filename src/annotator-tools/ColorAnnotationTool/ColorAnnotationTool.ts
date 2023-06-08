@@ -129,7 +129,7 @@ export class ColorAnnotationTool extends AnnotationTool {
       }
     }
 
-    this.maskData = imgMask.data as Uint8Array;
+    this.decodedMask = imgMask.data as Uint8Array;
 
     this.setAnnotated();
   }

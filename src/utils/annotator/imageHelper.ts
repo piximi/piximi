@@ -151,7 +151,7 @@ export const getOverlappingAnnotations = (
           const maskROI = new ImageJS.Image(
             boundingBox[2] - boundingBox[0],
             boundingBox[3] - boundingBox[1],
-            annotation.maskData,
+            annotation.decodedMask,
             { components: 1, alpha: 0 }
           );
           if (
@@ -192,14 +192,14 @@ export const getAnnotationsInBox = (
  *          when creating an image from mask, the original width/height should be scaled by the same scale factor
  */
 export const colorOverlayROI = (
-  maskData: DataArray,
+  decodedMask: DataArray,
   boundingBox: [number, number, number, number],
   imageWidth: number,
   imageHeight: number,
   color: Array<number>,
   scalingFactor: number
 ): HTMLImageElement | undefined => {
-  if (!maskData) return undefined;
+  if (!decodedMask) return undefined;
 
   const endX = Math.min(imageWidth, boundingBox[2]);
   const endY = Math.min(imageHeight, boundingBox[3]);
@@ -222,7 +222,7 @@ export const colorOverlayROI = (
     }
   ).resize({ factor: scalingFactor });
   try {
-    croppedImage = new ImageJS.Image(boxWidth, boxHeight, maskData, {
+    croppedImage = new ImageJS.Image(boxWidth, boxHeight, decodedMask, {
       components: 1,
       alpha: 0,
     }).resize({ factor: scalingFactor });
@@ -232,8 +232,8 @@ export const colorOverlayROI = (
       console.log(`boxWidth: ${boxWidth}`);
       console.log(`boxHeight: ${boxHeight}`);
       console.log(`bwxbh: ${boxHeight * boxWidth}`);
-      console.log(`maskData length: ${maskData.length}`);
-      console.log(`diff: ${boxHeight * boxWidth - maskData.length}`);
+      console.log(`decodedMask length: ${decodedMask.length}`);
+      console.log(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
       console.log(err);
     }
   }
@@ -320,7 +320,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
           alpha: 0,
         }
       );
-      const decoded = decode(annotation.mask!);
+      const decoded = decode(annotation.encodedMask!);
       const boundingBox = annotation.boundingBox;
       const endX = Math.min(width, boundingBox[2]);
       const endY = Math.min(height, boundingBox[3]);
@@ -395,7 +395,7 @@ export const saveAnnotationsAsLabeledSemanticSegmentationMasks = (
 
       for (let annotation of current.annotations) {
         if (annotation.categoryId !== category.id) continue;
-        const decoded = decode(annotation.mask!);
+        const decoded = decode(annotation.encodedMask!);
         const boundingBox = annotation.boundingBox;
         const endX = Math.min(width, boundingBox[2]);
         const endY = Math.min(height, boundingBox[3]);
@@ -473,7 +473,7 @@ export const saveAnnotationsAsLabelMatrix = (
               g = g + 1;
             }
             if (annotation.categoryId !== category.id) continue;
-            const decoded = decode(annotation.mask!);
+            const decoded = decode(annotation.encodedMask!);
             const boundingBox = annotation.boundingBox;
             const endX = Math.min(width, boundingBox[2]);
             const endY = Math.min(height, boundingBox[3]);

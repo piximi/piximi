@@ -29,7 +29,7 @@ const serializeImageAnnotations = (
   const ids = annotations.map((an) => an.id);
   const maskLengths = new Uint8Array(annotations.length);
   const masks = new Uint8Array(
-    annotations.reduce((prev, curr) => prev + curr.mask!.length, 0)
+    annotations.reduce((prev, curr) => prev + curr.encodedMask!.length, 0)
   );
   const planes = Uint8Array.from(annotations.map((an) => an.plane));
 
@@ -37,9 +37,9 @@ const serializeImageAnnotations = (
   for (let i = 0; i < annotations.length; i++) {
     let annotation = annotations[i];
     bboxes.set(annotation.boundingBox, i * 4);
-    maskLengths[i] = annotation.mask!.length;
-    masks.set(annotation.mask!, maskStartIdx);
-    maskStartIdx += annotation.mask!.length;
+    maskLengths[i] = annotation.encodedMask!.length;
+    masks.set(annotation.encodedMask!, maskStartIdx);
+    maskStartIdx += annotation.encodedMask!.length;
   }
 
   annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");

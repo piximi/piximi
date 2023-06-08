@@ -29,19 +29,19 @@ export const InvertAnnotation = () => {
       ...workingAnnotationEntity.saved,
       ...workingAnnotationEntity.changes,
     };
-    if (!workingAnnotation.maskData) return;
+    if (!workingAnnotation.decodedMask) return;
 
     const [invertedMask, invertedBoundingBox] = annotationTool.invert(
-      workingAnnotation.maskData,
+      workingAnnotation.decodedMask,
       workingAnnotation.boundingBox
     );
 
-    const mask = encode(invertedMask);
+    const encodedMask = encode(invertedMask);
 
     dispatch(
       dataSlice.actions.updateAnnotation({
         annotationId: workingAnnotation.id,
-        updates: { mask, boundingBox: invertedBoundingBox },
+        updates: { encodedMask, boundingBox: invertedBoundingBox },
       })
     );
 

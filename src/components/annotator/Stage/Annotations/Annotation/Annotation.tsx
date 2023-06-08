@@ -34,12 +34,12 @@ export const Annotation = ({
   useEffect(() => {
     const boxWidth = annotation.boundingBox[2] - annotation.boundingBox[0];
     const boxHeight = annotation.boundingBox[3] - annotation.boundingBox[1];
-    if (!boxWidth || !boxHeight || !annotation.maskData) return;
+    if (!boxWidth || !boxHeight || !annotation.decodedMask) return;
     if (Math.round(boxWidth) <= 0 || Math.round(boxHeight) <= 0) return;
     const color = hexToRGBA(fillColor, 0);
     setImageMask(
       colorOverlayROI(
-        annotation.maskData,
+        annotation.decodedMask,
         annotation.boundingBox,
         imageWidth,
         imageHeight,
@@ -48,7 +48,7 @@ export const Annotation = ({
       )
     );
   }, [
-    annotation.maskData,
+    annotation.decodedMask,
     fillColor,
     annotation.boundingBox,
     imageWidth,
@@ -57,7 +57,7 @@ export const Annotation = ({
 
   //TODO: Remove Transformations on annotations
   const onTransformEnd = () => {
-    if (!selected || !imageWidth || !imageHeight || !annotation.maskData)
+    if (!selected || !imageWidth || !imageHeight || !annotation.decodedMask)
       return;
 
     const node = annotatorRef.current;
@@ -69,7 +69,7 @@ export const Annotation = ({
     node.scaleY(1);
     if (!scaleX || !scaleY) return;
 
-    const maskData = annotation.maskData;
+    const decodedMask = annotation.decodedMask;
     const boundingBox = annotation.boundingBox;
 
     const roiWidth = boundingBox[2] - boundingBox[0];
@@ -77,7 +77,7 @@ export const Annotation = ({
 
     if (!roiWidth || !roiHeight) return;
 
-    const roi = new Image(roiWidth, roiHeight, maskData, {
+    const roi = new Image(roiWidth, roiHeight, decodedMask, {
       components: 1,
       alpha: 0,
     });
@@ -98,7 +98,7 @@ export const Annotation = ({
         stageScaledX + resizedMaskROI.width,
         stageScaleY + resizedMaskROI.height,
       ] as [number, number, number, number],
-      maskData: Uint8Array.from(resizedMaskROI.data),
+      decodedMask: Uint8Array.from(resizedMaskROI.data),
     };
 
     const tempUpdated = {

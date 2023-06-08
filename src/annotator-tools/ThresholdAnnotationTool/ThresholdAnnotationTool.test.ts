@@ -66,7 +66,7 @@ test("onMouseUp", async () => {
     { x: 100, y: 100 },
   ]);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("onMouseUp-NoDrag", async () => {
@@ -88,7 +88,7 @@ test("onMouseUp-NoDrag", async () => {
   expect(operator.height).toBe(undefined);
   expect(operator.points).toStrictEqual([]);
   expect(operator.boundingBox).toBe(undefined);
-  expect(operator.maskData).toBe(undefined);
+  expect(operator.decodedMask).toBe(undefined);
 });
 
 test("onMouseMove-NoDrag", async () => {
@@ -108,7 +108,7 @@ test("onMouseMove-NoDrag", async () => {
 
   expect(operator.points).toStrictEqual([]);
   expect(operator.boundingBox).toBe(undefined);
-  expect(operator.maskData).toBe(undefined);
+  expect(operator.decodedMask).toBe(undefined);
 });
 
 test("select", async () => {
@@ -131,7 +131,7 @@ test("select", async () => {
 
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
   expect(operator.boundingBox).toStrictEqual([0, 0, 100, 100]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
   expect(operator.annotation).toMatchObject({
     boundingBox: [0, 0, 100, 100],
     categoryId: "5ed3511d-1223-4bba-a0c2-2b3897232d98",

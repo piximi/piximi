@@ -9,7 +9,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
 
   updateMask(threshold: number) {
     this.threshold = Math.round(threshold);
-    if (this.maskData) {
+    if (this.decodedMask) {
       if (!this._boundingBox) return;
 
       const maskImg = this.applyThreshold(this._boundingBox);
@@ -19,7 +19,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
         return;
       }
 
-      this.maskData = maskImg;
+      this.decodedMask = maskImg;
 
       this.setAnnotated();
     }
@@ -76,7 +76,7 @@ export class ThresholdAnnotationTool extends AnnotationTool {
       return;
     }
 
-    this.maskData = thresholdMask;
+    this.decodedMask = thresholdMask;
   }
 
   private applyThreshold(boundingBox: [number, number, number, number]) {

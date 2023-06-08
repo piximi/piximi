@@ -58,7 +58,7 @@ export class LassoAnnotationTool extends AnnotationTool {
 
       this.setAnnotationMaskFromPoints();
 
-      if (!this.maskData) {
+      if (!this.decodedMask) {
         return;
       }
 

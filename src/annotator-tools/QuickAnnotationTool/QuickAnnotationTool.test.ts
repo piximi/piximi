@@ -58,7 +58,7 @@ test("onMouseUp", async () => {
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
 
   expect(operator.boundingBox).toStrictEqual([182, 175, 218, 212]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("onMouseUp (Adding)", async () => {
@@ -82,7 +82,7 @@ test("onMouseUp (Adding)", async () => {
   expect(operator.annotationState).toBe(AnnotationStateType.Annotated);
 
   expect(operator.boundingBox).toStrictEqual([182, 175, 218, 212]);
-  expect(operator.maskData).toBeDefined();
+  expect(operator.decodedMask).toBeDefined();
 });
 
 test("select", async () => {

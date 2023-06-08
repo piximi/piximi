@@ -24,7 +24,7 @@ export const encodeAnnotationToSegmentationMask = (
     const annotationIndex =
       createdCategoriesIDs.findIndex((id) => id === annotation.categoryId) + 1;
     // Get the binary annotation mask from the run-length encoded annotation.
-    const decodedAnnotation = decode(annotation.mask!);
+    const decodedAnnotation = decode(annotation.encodedMask!);
 
     const x1 = annotation.boundingBox[0];
     const y1 = annotation.boundingBox[1];
@@ -111,7 +111,7 @@ export const decodeSegmentationMaskToAnnotations = (
         boundingBox: [x1, y1, x2, y2],
         categoryId: category.id,
         id: uuidv4(),
-        maskData: flattenedMask,
+        decodedMask: flattenedMask,
         plane: 0,
       });
     }

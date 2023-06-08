@@ -31,6 +31,7 @@ import {
   ToolType,
   AnnotationStateType,
   AnnotationModeType,
+  AnnotationType,
 } from "types";
 
 import {
@@ -94,7 +95,7 @@ export const useStageHandlers = (
 
   const deleteAnnotations = (
     annotationIds: Array<string>,
-    stagedAnnotations: Array<DecodedAnnotationType>
+    stagedAnnotations: Array<AnnotationType>
   ) => {};
 
   const deselectAllAnnotations = useCallback(() => {
@@ -179,7 +180,7 @@ export const useStageHandlers = (
         const annotationsInBox = getAnnotationsInBox(
           scaledMinimum,
           scaledMaximum,
-          activeAnnotations
+          activeAnnotations as DecodedAnnotationType[]
         );
 
         if (annotationsInBox.length) {
@@ -259,7 +260,7 @@ export const useStageHandlers = (
       return;
     const overlappingAnnotationIds = getOverlappingAnnotations(
       absolutePosition,
-      activeAnnotations
+      activeAnnotations as DecodedAnnotationType[]
     );
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
@@ -269,7 +270,7 @@ export const useStageHandlers = (
       return;
     }
 
-    let currentAnnotation: DecodedAnnotationType | undefined;
+    let currentAnnotation: AnnotationType | undefined;
 
     if (overlappingAnnotationIds.length > 1) {
       dispatch(
@@ -283,13 +284,13 @@ export const useStageHandlers = (
       const nextAnnotationId = overlappingAnnotationIds[currentIndex];
 
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationType) => {
+        (annotation: AnnotationType) => {
           return annotation.id === nextAnnotationId;
         }
       );
     } else {
       currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationType) => {
+        (annotation: AnnotationType) => {
           return annotation.id === overlappingAnnotationIds[0];
         }
       );
