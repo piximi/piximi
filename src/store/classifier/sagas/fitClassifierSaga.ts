@@ -15,7 +15,7 @@ import {
 import {
   dataSlice,
   selectCreatedImageCategories,
-  selectImagesByPartition,
+  selectImagesByPartitions,
   selectCreatedImageCategoryCount,
 } from "store/data";
 import { applicationSlice } from "store/application";
@@ -34,7 +34,7 @@ function* assignDataPartitions({
   trainingPercentage,
 }: {
   preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
-  categorizedImages: ReturnType<typeof selectImagesByPartition>;
+  categorizedImages: ReturnType<ReturnType<typeof selectImagesByPartitions>>;
   trainingPercentage: number;
 }) {
   //first assign train and val partition to all categorized images
@@ -109,12 +109,11 @@ function* loadClassifier({
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
-  const trainImages: ReturnType<typeof selectImagesByPartition> = yield select(
-    (state) => selectImagesByPartition(state, Partition.Training)
-  );
-  const valImages: ReturnType<typeof selectImagesByPartition> = yield select(
-    (state) => selectImagesByPartition(state, Partition.Validation)
-  );
+
+  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
+    yield select(selectImagesByPartitions);
+  const trainImages = partitionSelector([Partition.Training]);
+  const valImages = partitionSelector([Partition.Validation]);
 
   try {
     const loadDataArgs = {
@@ -193,10 +192,12 @@ export function* fitClassifierSaga({
     typeof classifierTrainingPercentageSelector
   > = yield select(classifierTrainingPercentageSelector);
 
-  const categorizedImages: ReturnType<typeof selectImagesByPartition> =
-    yield select((state) =>
-      selectImagesByPartition(state, Partition.Inference)
-    );
+  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
+    yield select(selectImagesByPartitions);
+  const categorizedImages = partitionSelector([
+    Partition.Training,
+    Partition.Validation,
+  ]);
 
   const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
     yield select(classifierFitOptionsSelector);

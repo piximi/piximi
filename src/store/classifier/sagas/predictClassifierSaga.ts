@@ -12,7 +12,7 @@ import { applicationSlice } from "store/application";
 import {
   dataSlice,
   selectCreatedImageCategories,
-  selectImagesByPartition,
+  selectImagesByPartitions,
 } from "store/data";
 
 import {
@@ -35,9 +35,9 @@ export function* predictClassifierSaga({
 }: PayloadAction<{ modelStatus: ModelStatus; execSaga: boolean }>) {
   if (modelStatus !== ModelStatus.Predicting || !execSaga) return;
 
-  const testImages: ReturnType<typeof selectImagesByPartition> = yield select(
-    (state) => selectImagesByPartition(state, Partition.Inference)
-  );
+  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
+    yield select(selectImagesByPartitions);
+  const testImages = partitionSelector([Partition.Inference]);
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);

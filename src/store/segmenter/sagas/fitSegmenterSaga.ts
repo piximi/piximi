@@ -7,7 +7,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 //   dataSlice,
 //   selectAnnotatedImages,
 //   selectAllAnnotationCategories,
-//   selectImagesByPartition,
+//   selectImagesByPartitions,
 // } from "store/data";
 // import {
 //   segmenterTrainingPercentageSelector,
@@ -57,12 +57,9 @@ export function* fitSegmenterSaga({
   //   yield select(segmenterCompileOptionsSelector);
   // const categories: ReturnType<typeof selectAllAnnotationCategories> =
   //   yield select(selectAllAnnotationCategories);
-  // const trainImages: ReturnType<typeof selectImagesByPartition> = yield select((state)=>
-  //   selectImagesByPartition(state, Partition.Training)
-  // );
-  // const valImages: ReturnType<typeof selectImagesByPartition> = yield select(
-  //   (state) => selectImagesByPartition(state, Partition.Validation)
-  // );
+  // const partitionSelector: ReturnType<typeof selectImagesByPartitions> = yield select(selectImagesByPartitions)
+  // const trainImages = partitionSelector([Partition.Training])
+  // const valImages = partitionSelector([Partition.Validation])
 }
 
 // function* handleError(error: Error, errorName: string) {
