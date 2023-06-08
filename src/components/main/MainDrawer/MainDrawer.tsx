@@ -35,7 +35,7 @@ export const MainDrawer = () => {
 
       <Divider />
 
-      {process.env.NODE_ENV === "development" && <SegmenterList />}
+      <SegmenterList />
       <Divider />
 
       <ApplicationOptionsList />
