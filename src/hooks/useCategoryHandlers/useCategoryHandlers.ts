@@ -13,6 +13,7 @@ import {
 } from "store/data";
 
 import {
+  activeImageIdSelector,
   imageViewerSlice,
   selectHiddenAnnotationCategoryIds,
 } from "store/imageViewer";
@@ -52,6 +53,7 @@ export const useCategoryHandlers = (
   const activeAnnotationCountsByCategory = useSelector(
     selectActiveAnnotationCountsByCategory
   );
+  const activeImageId = useSelector(activeImageIdSelector);
 
   const handleSelectCategory = useCallback(
     (category: Category) => {
@@ -171,9 +173,14 @@ export const useCategoryHandlers = (
   );
   const annotationCountByCategory = useCallback(
     (categoryId: string): number => {
+      if (!activeImageId) {
+        return annotationsByCategory[categoryId]
+          ? annotationsByCategory[categoryId].length
+          : 0;
+      }
       return activeAnnotationCountsByCategory[categoryId] ?? 0;
     },
-    [activeAnnotationCountsByCategory]
+    [activeAnnotationCountsByCategory, annotationsByCategory, activeImageId]
   );
 
   const dispatchDeleteCategories = useCallback(
