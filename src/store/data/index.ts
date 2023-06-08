@@ -12,7 +12,7 @@ export {
   selectImageEntities,
   selectImagesByCategory,
   selectImagesByCategoryDict,
-  selectImagesByPartition,
+  selectImagesByPartitions,
   selectUnannotatedImages,
   selectImageIds,
   selectActiveImageBitDepth,

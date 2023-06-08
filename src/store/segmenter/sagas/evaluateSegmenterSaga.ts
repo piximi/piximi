@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
 import { applicationSlice } from "store/application";
-import { selectImagesByPartition } from "store/data";
+import { selectImagesByPartitions } from "store/data";
 
 import {
   segmenterSlice,
@@ -22,10 +22,9 @@ export function* evaluateSegmenterSaga({
   //   segmenterModelSelector
   //);
 
-  const validationImages: ReturnType<typeof selectImagesByPartition> =
-    yield select((state) =>
-      selectImagesByPartition(state, Partition.Validation)
-    );
+  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
+    yield select(selectImagesByPartitions);
+  const validationImages = partitionSelector([Partition.Validation]);
 
   yield put(applicationSlice.actions.hideAlertState({}));
 

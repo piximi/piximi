@@ -22,7 +22,7 @@ export {
   selectImageEntities,
   selectImagesByCategory,
   selectImagesByCategoryDict,
-  selectImagesByPartition,
+  selectImagesByPartitions,
   selectUnannotatedImages,
   selectImageIds,
 } from "./imageSelectors";

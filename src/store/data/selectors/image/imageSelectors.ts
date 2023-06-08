@@ -42,7 +42,7 @@ export const selectImageCountByCategory = () =>
     }
   );
 
-export const selectImagesByPartition = createSelector(
+export const selectImagesByPartitions = createSelector(
   [selectAllImages],
   (images) => (partitions: Partition[]) => {
     return images.filter((image) => partitions.includes(image.partition));
