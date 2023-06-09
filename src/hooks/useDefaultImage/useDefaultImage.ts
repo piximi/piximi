@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { applicationSlice, selectInitSettings } from "store/application";
 import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
-import { loadExampleImage } from "utils/common/image";
+import { loadExampleImage, loadImjoyImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
-import { SerializedFileType } from "types";
+import { ImageType, SerializedFileType } from "types";
 import { dataSlice, selectImageCount } from "store/data";
 
 export enum DispatchLocation {
@@ -18,29 +18,12 @@ const dispatchToProject = async (
   dispatch: ReturnType<typeof useDispatch>
 ) => {
   if (location !== DispatchLocation.Project) return;
-  const { image, annotationCategories, annotations } = await loadExampleImage(
-    colorImage,
-    cellPaintingAnnotations as SerializedFileType,
-    // imageFile.name points to
-    // "/static/media/cell-painting.f118ef087853056f08e6.png"
-    "cell-painting.png"
-  );
-
-  batch(() => {
+  await loadImjoyImage((image: ImageType) => {
     dispatch(
-      dataSlice.actions.setImages({
+      dataSlice.actions.addImages({
         images: [image],
         isPermanent: true,
       })
-    );
-    dispatch(
-      dataSlice.actions.setAnnotationCategories({
-        categories: annotationCategories,
-        isPermanent: true,
-      })
-    );
-    dispatch(
-      dataSlice.actions.setAnnotations({ annotations, isPermanent: true })
     );
   });
 };

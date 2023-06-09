@@ -1,4 +1,5 @@
 export { loadExampleImage } from "./loadExampleImage";
+export { loadImjoyImage } from "./loadImjoyImage";
 
 export {
   fileFromPath,
