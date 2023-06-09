@@ -159,6 +159,19 @@ startAppListening({
     }
   },
 });
+startAppListening({
+  actionCreator: dataSlice.actions.addAnnotation,
+  effect: (action, listenerAPI) => {
+    const imageId = action.payload.annotation.imageId;
+    if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.addActiveAnnotationId({
+          annotationId: action.payload.annotation.id,
+        })
+      );
+    }
+  },
+});
 
 startAppListening({
   actionCreator: dataSlice.actions.updateImage,
