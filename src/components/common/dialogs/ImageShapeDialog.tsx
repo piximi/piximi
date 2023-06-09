@@ -75,7 +75,6 @@ export const ImageShapeDialog = ({
         slices: slices,
         referenceShape: referenceImageShape,
         isUploadedFromAnnotator: isUploadedFromAnnotator,
-        execSaga: true,
       })
     );
 

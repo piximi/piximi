@@ -27,7 +27,6 @@ export const useUpload = (
             slices: 1,
             referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
-            execSaga: true,
           })
         );
       } else if (imageShapeInfo.shape === ImageShapeEnum.DicomImage) {
@@ -38,7 +37,6 @@ export const useUpload = (
             slices: 1,
             referenceShape: imageShapeInfo,
             isUploadedFromAnnotator: isUploadedFromAnnotator,
-            execSaga: true,
           })
         );
       } else if (imageShapeInfo.shape === ImageShapeEnum.HyperStackImage) {
