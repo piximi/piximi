@@ -74,6 +74,7 @@ export type {
 } from "./ImageType";
 
 export type { Colors, ColorsRaw } from "./tensorflow";
+
 export type { ImageViewerStore } from "./ImageViewerStore";
 
 export type { AnnotatorImage } from "./AnnotatorImage";
