@@ -30,7 +30,66 @@ export const dataMiddleware = createListenerMiddleware();
 export const startAppListening =
   dataMiddleware.startListening as TypedAppStartListening;
 
-//TODO - Change OldImageType
+async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
+  let imageStack: ImageJS.Stack;
+  if (imageTypeEnum === ImageShapeEnum.DicomImage) {
+    const imgArrayBuffer = await imageFile.arrayBuffer();
+
+    const imgArray = new Uint8Array(imgArrayBuffer);
+
+    var dicomImgData = DicomParser.parseDicom(imgArray);
+    var pixelDataElement = dicomImgData.elements.x7fe00010;
+
+    const samplesPerPixel = dicomImgData.int16("x00280002");
+    const rows = dicomImgData.int16("x00280010");
+    const columns = dicomImgData.int16("x00280011");
+    const bitsAllocated = dicomImgData.int16("x00280100");
+
+    if (!samplesPerPixel || !rows || !columns || !bitsAllocated) {
+      throw Error("Failed to parse dicom image tags");
+    }
+
+    var pixelData = new Uint16Array(
+      dicomImgData.byteArray.buffer,
+      pixelDataElement.dataOffset,
+      pixelDataElement.length / 2
+    );
+
+    const img = new ImageJS.Image(rows, columns, pixelData, {
+      components: samplesPerPixel,
+      bitDepth: bitsAllocated,
+      alpha: 0,
+    });
+
+    const channels: ImageJS.Image[] = [];
+    for (let i = 0; i < samplesPerPixel; i++) {
+      channels.push(img.getChannel(i));
+    }
+    imageStack = new ImageJS.Stack(channels);
+  } else {
+    imageStack = await loadImageFileAsStack(imageFile);
+  }
+
+  return {
+    imageStack,
+    fileName: imageFile.name,
+  } as ImageFileType;
+}
+
+function checkImageShape(
+  imageStack: Array<ImageJS.Image>,
+  channels: number,
+  slices: number,
+  imageShape: ImageShapeEnum
+) {
+  if (imageShape === ImageShapeEnum.GreyScale) {
+    return channels === 1 && imageStack.length === 1;
+  } else if (imageShape === ImageShapeEnum.SingleRGBImage) {
+    return channels === 3 && imageStack.length === 3;
+  } else {
+    return channels * slices === imageStack.length;
+  }
+}
 
 startAppListening({
   actionCreator: uploadImages,
@@ -159,6 +218,19 @@ startAppListening({
     }
   },
 });
+startAppListening({
+  actionCreator: dataSlice.actions.addAnnotation,
+  effect: (action, listenerAPI) => {
+    const imageId = action.payload.annotation.imageId;
+    if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.addActiveAnnotationId({
+          annotationId: action.payload.annotation.id,
+        })
+      );
+    }
+  },
+});
 
 startAppListening({
   actionCreator: dataSlice.actions.updateImage,
@@ -195,63 +267,20 @@ startAppListening({
   },
 });
 
-async function decodeImageFile(imageFile: File, imageTypeEnum: ImageShapeEnum) {
-  let imageStack: ImageJS.Stack;
-  if (imageTypeEnum === ImageShapeEnum.DicomImage) {
-    const imgArrayBuffer = await imageFile.arrayBuffer();
-
-    const imgArray = new Uint8Array(imgArrayBuffer);
-
-    var dicomImgData = DicomParser.parseDicom(imgArray);
-    var pixelDataElement = dicomImgData.elements.x7fe00010;
-
-    const samplesPerPixel = dicomImgData.int16("x00280002");
-    const rows = dicomImgData.int16("x00280010");
-    const columns = dicomImgData.int16("x00280011");
-    const bitsAllocated = dicomImgData.int16("x00280100");
-
-    if (!samplesPerPixel || !rows || !columns || !bitsAllocated) {
-      throw Error("Failed to parse dicom image tags");
+startAppListening({
+  actionCreator: dataSlice.actions.reconcile,
+  effect: (action, listenerAPI) => {
+    const newState = listenerAPI.getState();
+    const selectedImages = newState.project.selectedImageIds;
+    const currentImages = newState.data.images.ids;
+    const imagesToRemove = [];
+    for (const imageId of selectedImages) {
+      if (!currentImages.includes(imageId)) {
+        imagesToRemove.push(imageId);
+      }
     }
-
-    var pixelData = new Uint16Array(
-      dicomImgData.byteArray.buffer,
-      pixelDataElement.dataOffset,
-      pixelDataElement.length / 2
+    listenerAPI.dispatch(
+      projectSlice.actions.deselectImages({ ids: imagesToRemove })
     );
-
-    const img = new ImageJS.Image(rows, columns, pixelData, {
-      components: samplesPerPixel,
-      bitDepth: bitsAllocated,
-      alpha: 0,
-    });
-
-    const channels: ImageJS.Image[] = [];
-    for (let i = 0; i < samplesPerPixel; i++) {
-      channels.push(img.getChannel(i));
-    }
-    imageStack = new ImageJS.Stack(channels);
-  } else {
-    imageStack = await loadImageFileAsStack(imageFile);
-  }
-
-  return {
-    imageStack,
-    fileName: imageFile.name,
-  } as ImageFileType;
-}
-
-function checkImageShape(
-  imageStack: Array<ImageJS.Image>,
-  channels: number,
-  slices: number,
-  imageShape: ImageShapeEnum
-) {
-  if (imageShape === ImageShapeEnum.GreyScale) {
-    return channels === 1 && imageStack.length === 1;
-  } else if (imageShape === ImageShapeEnum.SingleRGBImage) {
-    return channels === 3 && imageStack.length === 3;
-  } else {
-    return channels * slices === imageStack.length;
-  }
-}
+  },
+});
