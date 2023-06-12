@@ -12,14 +12,11 @@ import {
 } from "@mui/material";
 
 import { HotkeyView } from "types";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { ModelStatus } from "types/ModelType";
+import { Model } from "utils/common/models/Model";
 
-// TODO - segmenter: All of this
 type SaveFittedModelDialogProps = {
-  // TODO - segmenter: change to Model
-  model: SequentialClassifier | Segmenter;
+  model: Model;
   modelStatus: ModelStatus;
   onClose: () => void;
   open: boolean;
@@ -34,8 +31,7 @@ export const SaveFittedModelDialog = ({
   const [name, setName] = useState<string>(model.name);
 
   const onSaveClassifierClick = async () => {
-    // TODO - segmenter
-    await model._model!.save(`downloads://${name}`);
+    await model.saveModel();
 
     onClose();
   };

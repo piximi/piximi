@@ -1,9 +1,7 @@
 import { AnnotationType } from "types";
 import { Model, TrainingCallbacks } from "../Model";
 import {
-  GraphModel,
   History,
-  LayersModel,
   Tensor,
   Tensor2D,
   Tensor4D,
@@ -14,8 +12,6 @@ import {
 
 export abstract class Segmenter extends Model {
   // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _model?: LayersModel | GraphModel;
-  //protected _model?: LayersModel;
   _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -33,6 +29,14 @@ export abstract class Segmenter extends Model {
       throw Error(`"${this.name}" Model not loaded`);
     }
     this._model.dispose();
+  }
+
+  evaluate() {
+    throw Error(`"${this.name}" Model evaluation not supported`);
+  }
+
+  stopTraining() {
+    throw Error(`"${this.name}" Model early stopping not supported`);
   }
 
   get modelLoaded() {
@@ -92,4 +96,10 @@ export abstract class Segmenter extends Model {
   }
 
   onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
+
+  get modelSummary() {
+    if (this.graph) throw Error("Not implemented for graph models");
+    // TODO - segmenter: implement graph model summary
+    return [];
+  }
 }

@@ -23,7 +23,6 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";
-import { LayersModel } from "@tensorflow/tfjs";
 
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;
@@ -47,8 +46,7 @@ export const FitSegmenterDialogAppBar = ({
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training) return;
-    // TODO - segmenter: move into model class
-    (selectedModel._model! as LayersModel).stopTraining = true;
+    selectedModel.stopTraining();
     // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
     dispatch(
       segmenterSlice.actions.updateModelStatus({
