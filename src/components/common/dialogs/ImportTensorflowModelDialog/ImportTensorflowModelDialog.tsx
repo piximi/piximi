@@ -39,7 +39,6 @@ export const ImportTensorflowModelDialog = ({
   });
   const [isGraph, setIsGraph] = useState(false);
 
-  // TODO - segmenter: replace typeof with actual known type
   const [pretrainedModels, setPretrainedModels] = useState<Array<Model>>([]);
 
   const dispatchModelToStore = () => {

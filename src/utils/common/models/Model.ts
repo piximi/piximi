@@ -1,8 +1,9 @@
-import { History } from "@tensorflow/tfjs";
+import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
 import { CallbackList } from "@tensorflow/tfjs-layers";
 
 import { ImageType } from "types";
 import { ModelTask } from "types/ModelType";
+import { ModelLayerData } from "./utils/getModelSummary";
 
 type ModelArgs = {
   name: string;
@@ -26,6 +27,9 @@ export abstract class Model {
   readonly trainable: boolean;
   readonly src?: string;
   readonly requiredChannels?: number;
+
+  // TODO - segmenter: use protected once all the other _model accessors are refactored
+  _model?: LayersModel | GraphModel;
 
   constructor({
     name,
@@ -56,6 +60,13 @@ export abstract class Model {
 
   abstract dispose(): void;
 
+  abstract stopTraining(): void;
+
+  async saveModel() {
+    if (!this._model) throw Error(`Model ${this.name} not loaded`);
+    await this._model.save(`downloads://${this.name}`);
+  }
+
   abstract get modelLoaded(): boolean;
   abstract get trainingLoaded(): boolean;
   abstract get validationLoaded(): boolean;
@@ -63,6 +74,8 @@ export abstract class Model {
 
   abstract get defaultInputShape(): number[];
   abstract get defaultOutputShape(): number[];
+
+  abstract get modelSummary(): Array<ModelLayerData>;
 
   //abstract onEpochEnd: TrainingCallbacks["onEpochEnd"];
 

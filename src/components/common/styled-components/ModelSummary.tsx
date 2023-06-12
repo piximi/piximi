@@ -1,5 +1,3 @@
-import { LayersModel } from "@tensorflow/tfjs";
-
 import {
   Container,
   Table,
@@ -10,36 +8,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-
-interface ModelLayerData {
-  layerName: string;
-  outputShape: string;
-  parameters: number;
-  trainable: string;
-}
-
-const getModelSummary = (model: LayersModel): ModelLayerData[] => {
-  const modelSummary: ModelLayerData[] = [];
-
-  for (let i = 0; i < model.layers.length; i++) {
-    const layer = model.layers[i];
-
-    const outputShape = layer.outputShape;
-    const parameters = layer.countParams();
-    const layerName = layer.name;
-    const trainable = layer.trainable;
-
-    const layerSummary: ModelLayerData = {
-      layerName,
-      outputShape: String(outputShape).slice(1),
-      parameters: parameters,
-      trainable: String(trainable),
-    };
-
-    modelSummary.push(layerSummary);
-  }
-  return modelSummary;
-};
+import { Model } from "utils/common/models/Model";
 
 interface Column {
   id: "layerName" | "outputShape" | "parameters" | "trainable";
@@ -63,13 +32,11 @@ const columns: readonly Column[] = [
 ];
 
 type ModelSummaryTableProps = {
-  loadedModel: LayersModel;
+  model: Model;
 };
 
 export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
-  const { loadedModel } = props;
-
-  const modelSummary = getModelSummary(loadedModel);
+  const { model } = props;
 
   return (
     <Container sx={{ maxHeight: 400, width: 900 }}>
@@ -91,7 +58,7 @@ export const ModelSummaryTable = (props: ModelSummaryTableProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {modelSummary.map((row, idx) => {
+            {model.modelSummary.map((row, idx) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
                   {columns.map((column) => {

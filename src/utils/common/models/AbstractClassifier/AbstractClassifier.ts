@@ -11,7 +11,6 @@ import {
   oneHot,
   math,
   metrics,
-  GraphModel,
   zeros,
 } from "@tensorflow/tfjs";
 
@@ -27,6 +26,7 @@ import {
   PreprocessOptions,
   Shape,
 } from "types";
+import { getLayersModelSummary } from "../utils/getModelSummary";
 
 type LoadDataArgs = {
   categories: Array<Category>;
@@ -37,8 +37,6 @@ type LoadDataArgs = {
 
 export abstract class SequentialClassifier extends Model {
   // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _model?: LayersModel | GraphModel;
-  //protected _model?: LayersModel;
   _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -273,6 +271,18 @@ export abstract class SequentialClassifier extends Model {
     };
   }
 
+  stopTraining(): void {
+    if (!this._model) {
+      throw Error("Model not loaded");
+    }
+
+    if (this.graph) {
+      throw Error("Early stop not implemented for graph model");
+    }
+
+    (this._model as LayersModel).stopTraining = true;
+  }
+
   dispose() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
@@ -331,6 +341,13 @@ export abstract class SequentialClassifier extends Model {
 
   get inferenceLoaded() {
     return this._inferenceDataset !== undefined;
+  }
+
+  get modelSummary() {
+    if (this.graph) {
+      throw Error("Graph model summaries unavailale");
+    }
+    return getLayersModelSummary(this._model as LayersModel);
   }
 
   onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
