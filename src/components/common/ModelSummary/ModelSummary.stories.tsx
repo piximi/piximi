@@ -9,7 +9,6 @@ import {
   Metric,
   OptimizationAlgorithm,
 } from "types";
-import { LayersModel } from "@tensorflow/tfjs";
 
 export default {
   title: "Model summary table",
@@ -42,5 +41,4 @@ const Template: ComponentStory<typeof ModelSummaryTable> = (args) => (
 );
 
 export const Primary = Template.bind({});
-// TODO - segmenter: replace with Model
-Primary.args = { loadedModel: simpleCNN._model! as LayersModel };
+Primary.args = { model: simpleCNN };

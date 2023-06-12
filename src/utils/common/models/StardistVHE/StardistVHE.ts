@@ -140,8 +140,6 @@ export class StardistVHE extends Segmenter {
     return annotations;
   }
 
-  evaluate() {}
-
   inferenceCategoriesById(catIds: Array<string>) {
     if (!this._fgCategory) {
       throw Error(`"${this.name}" Model has no foreground category loaded`);

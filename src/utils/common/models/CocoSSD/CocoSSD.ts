@@ -121,6 +121,4 @@ export class CocoSSD extends Segmenter {
 
     return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
   }
-
-  evaluate() {}
 }

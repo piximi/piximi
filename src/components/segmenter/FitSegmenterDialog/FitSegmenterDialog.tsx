@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LayersModel } from "@tensorflow/tfjs";
 
 import { Dialog, DialogContent, List } from "@mui/material";
 
@@ -66,7 +65,6 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   >([]);
 
   const annotatedImages = useSelector(selectAnnotatedImages);
-  //const compiledModel = useSelector(segmenterCompiledModelSelector);
   const selectedModel = useSelector(segmenterModelSelector);
   const modelStatus = useSelector(segmenterModelStatusSelector);
 
@@ -321,12 +319,10 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
           </div>
         )}
 
-        {modelStatus > ModelStatus.Training && (
+        {modelStatus > ModelStatus.Training && !selectedModel.graph && (
           <div>
-            {/*  TODO - segmenter: pass in actual model class */}
-            <ModelSummaryTable
-              loadedModel={selectedModel._model! as LayersModel}
-            />
+            {/*  TODO - segmenter: implement model summary for graph */}
+            <ModelSummaryTable model={selectedModel} />
           </div>
         )}
       </DialogContent>
