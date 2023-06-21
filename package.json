@@ -103,7 +103,7 @@
     "eject": "react-scripts eject",
     "start": "BROWSER='none' react-scripts start",
     "start-logger": "BROWSER='none' REACT_APP_LOG_LEVEL='1' react-scripts start",
-    "test": "react-scripts test --env=./src/store/classifier/coroutines/custom-test-env.js",
+    "test": "react-scripts test --env=./src/utils/common/models/utils/custom-test-env.js",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
     "prepare": "husky install",
