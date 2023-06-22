@@ -1,6 +1,5 @@
 // TODO: fix
-export const foo = "foo";
-// // import { test } from "@jest/globals";
+// import { test } from "@jest/globals";
 // import { v4 as uuidv4 } from "uuid";
 
 // // import { projectSlice } from "store/project";
@@ -56,11 +55,18 @@ export const foo = "foo";
 //   id: uuidv4(),
 //   color: CATEGORY_COLORS.darkcyan,
 // };
+export const foo = "foo";
+
+describe("A passing test", () => {
+  it("should pass the test", () => {
+    expect(true).toEqual(true);
+  });
+});
 
 // // annotations exist T1 and T2
 // const im1AnnotationsT1: Array<AnnotationType> = [
 //   {
-//     // 1clockTower.jpg -> Unknown (backpack)
+//     1clockTower.jpg -> Unknown (backpack)
 //     ...expectedState.annotator.images[0].annotations[0],
 //     id: uuidv4(),
 //     categoryId: T1T2UnmodifiedCat.id,
@@ -154,130 +160,130 @@ export const foo = "foo";
 // const imagesT2 = [im1T2, im3T2];
 // const imagesT3Expected = [im1T2, im3T2]; // same as T2, no images created/destroyed
 
-// // const annotationsT1 = [...im1T1.annotations, ...im2T1.annotations];
-// // const annotationsT2 = [...im1T2.annotations, ...im3T2.annotations];
-// // const annotationsT3Expected = [
-// //   ...im1T2.annotations, // im1 annotations present during deserialization
-// //   ...im1T1.annotations, // im1 annotations that were serialized, recreated
-// //   ...im3T2.annotations, // im3 annotations present during deserialization
-// //   // im2T1 annotations serialized, but not re-created because no im2 present
-// // ];
+// const annotationsT1 = [...im1T1.annotations, ...im2T1.annotations];
+// const annotationsT2 = [...im1T2.annotations, ...im3T2.annotations];
+// const annotationsT3Expected = [
+//   ...im1T2.annotations, // im1 annotations present during deserialization
+//   ...im1T1.annotations, // im1 annotations that were serialized, recreated
+//   ...im3T2.annotations, // im3 annotations present during deserialization
+//   // im2T1 annotations serialized, but not re-created because no im2 present
+// ];
 
-// //#endregion setup
+//#endregion setup
 
-// // test("serialize COCO", () => {
-// //   // piximi initial state
+// test("serialize COCO", () => {
+//   // piximi initial state
 
-// //   let projectState = projectSlice.reducer(undefined, { type: undefined });
-// //   let annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
+//   let projectState = projectSlice.reducer(undefined, { type: undefined });
+//   let annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
 
-// //   // T1 - pre-serialization
+//   // T1 - pre-serialization
 
-// //   projectState = projectSlice.reducer(
-// //     projectState,
-// //     setAnnotationCategories({ categories: categoriesT1 })
-// //   );
-// //   annotatorState = imageViewerSlice.reducer(
-// //     annotatorState,
-// //     addImages({ newImages: imagesT1 })
-// //   );
+//   projectState = projectSlice.reducer(
+//     projectState,
+//     setAnnotationCategories({ categories: categoriesT1 })
+//   );
+//   annotatorState = imageViewerSlice.reducer(
+//     annotatorState,
+//     addImages({ newImages: imagesT1 })
+//   );
 
-// //   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
+//   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
-// //   const serializedProject = serializeCOCOFile(imagesT1, categoriesT1);
+//   const serializedProject = serializeCOCOFile(imagesT1, categoriesT1);
 
-// //   // T1 -> T2, piximi closed and new project started
+//   // T1 -> T2, piximi closed and new project started
 
-// //   projectState = projectSlice.reducer(undefined, { type: undefined });
-// //   annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
+//   projectState = projectSlice.reducer(undefined, { type: undefined });
+//   annotatorState = imageViewerSlice.reducer(undefined, { type: undefined });
 
-// //   // T2 - pre-deserialization
+//   // T2 - pre-deserialization
 
-// //   projectState = projectSlice.reducer(
-// //     projectState,
-// //     setAnnotationCategories({ categories: categoriesT2 })
-// //   );
-// //   annotatorState = imageViewerSlice.reducer(
-// //     annotatorState,
-// //     addImages({ newImages: imagesT2 })
-// //   );
+//   projectState = projectSlice.reducer(
+//     projectState,
+//     setAnnotationCategories({ categories: categoriesT2 })
+//   );
+//   annotatorState = imageViewerSlice.reducer(
+//     annotatorState,
+//     addImages({ newImages: imagesT2 })
+//   );
 
-// //   const { newCategories, imsToAnnotate } = deserializeCOCOFile(
-// //     serializedProject,
-// //     imagesT2,
-// //     categoriesT2
-// //   );
+//   const { newCategories, imsToAnnotate } = deserializeCOCOFile(
+//     serializedProject,
+//     imagesT2,
+//     categoriesT2
+//   );
 
-// //   // T2 -> T3 dispatch deserialized project
+//   // T2 -> T3 dispatch deserialized project
 
-// //   projectState = projectSlice.reducer(
-// //     projectState,
-// //     addAnnotationCategories({ categories: newCategories })
-// //   );
-// //   annotatorState = imageViewerSlice.reducer(
-// //     annotatorState,
-// //     setInstances({ instances: imsToAnnotate })
-// //   );
+//   projectState = projectSlice.reducer(
+//     projectState,
+//     addAnnotationCategories({ categories: newCategories })
+//   );
+//   annotatorState = imageViewerSlice.reducer(
+//     annotatorState,
+//     setInstances({ instances: imsToAnnotate })
+//   );
 
-// //   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
+//   // imageViewerSlice.actions.setActiveImageId({ imageId: "", prevImageId: "", execSaga: true })
 
-// //   // T3 - after deserialization
+//   // T3 - after deserialization
 
-// //   const categoriesT3Actual = selectAllAnnotationCategories({
-// //
-// //   });
-// //   const imagesT3Actual = annotatorFullImagesSelector({
-// //     annotator: annotatorState,
-// //     project: projectState,
-// //   });
+//   const categoriesT3Actual = selectAllAnnotationCategories({
+//
+//   });
+//   const imagesT3Actual = annotatorFullImagesSelector({
+//     annotator: annotatorState,
+//     project: projectState,
+//   });
 
-// //   // const annotationsT3Actual = imagesT3Actual.reduce(
-// //   //   (annotations, im) => [...annotations, ...im.annotations],
-// //   //   [] as Array<AnnotationType>
-// //   // );
+//   // const annotationsT3Actual = imagesT3Actual.reduce(
+//   //   (annotations, im) => [...annotations, ...im.annotations],
+//   //   [] as Array<AnnotationType>
+//   // );
 
-// //   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);
-// //   expect(imagesT3Actual.length).toBe(imagesT3Expected.length);
+//   expect(categoriesT3Actual.length).toBe(categoriesT3Expected.length);
+//   expect(imagesT3Actual.length).toBe(imagesT3Expected.length);
 
-// //   expect(categoriesT3Actual.map((c) => c.name)).toEqual(
-// //     categoriesT3Expected.map((c) => c.name)
-// //   );
-// //   expect(imagesT3Actual.map((im) => im.name)).toEqual(
-// //     imagesT3Expected.map((im) => im.name)
-// //   );
+//   expect(categoriesT3Actual.map((c) => c.name)).toEqual(
+//     categoriesT3Expected.map((c) => c.name)
+//   );
+//   expect(imagesT3Actual.map((im) => im.name)).toEqual(
+//     imagesT3Expected.map((im) => im.name)
+//   );
 
-// /*
-//     Below tests are not performed because the annotations will
-//     differ slightly after going from polygon -> mask -> polygon,
-//     as in this test, and in a hard to predict manner.
+/*
+    Below tests are not performed because the annotations will
+    differ slightly after going from polygon -> mask -> polygon,
+    as in this test, and in a hard to predict manner.
 
-//     The number, location, and opening/closing point of points will
-//     differ from original polygon to polygons from contour finding.
+    The number, location, and opening/closing point of points will
+    differ from original polygon to polygons from contour finding.
 
-//     I'm sure there's some clever approximately equal way to compare
-//     them, but the findContours already has a tests, so we assume
-//     it's doing enough to test mask -> polygon conversions.
+    I'm sure there's some clever approximately equal way to compare
+    them, but the findContours already has a tests, so we assume
+    it's doing enough to test mask -> polygon conversions.
 
-//     The easier test is: open a coco file in piximi to get
-//     polygon -> mask annotations, look and see if they make sense,
-//     save them in coco format to get mask -> polygon, and then
-//     open up the saved file to see if it looks more or less the
-//     same as the original.
-//    */
+    The easier test is: open a coco file in piximi to get
+    polygon -> mask annotations, look and see if they make sense,
+    save them in coco format to get mask -> polygon, and then
+    open up the saved file to see if it looks more or less the
+    same as the original.
+   */
 
-// // expect ids to be different, because they're uuid generated
-// // jest ignores undefined property keys
-// // expect(
-// //   annotationsT3Actual.map((ann) => ({
-// //     ...ann,
-// //     id: undefined,
-// //     categoryId: undefined,
-// //   }))
-// // ).toEqual(
-// //   annotationsT3Expected.map((ann) => ({
-// //     ...ann,
-// //     id: undefined,
-// //     categoryId: undefined,
-// //   }))
-// // );
-// //});
+// expect ids to be different, because they're uuid generated
+// jest ignores undefined property keys
+// expect(
+//   annotationsT3Actual.map((ann) => ({
+//     ...ann,
+//     id: undefined,
+//     categoryId: undefined,
+//   }))
+// ).toEqual(
+//   annotationsT3Expected.map((ann) => ({
+//     ...ann,
+//     id: undefined,
+//     categoryId: undefined,
+//   }))
+// );
+//});

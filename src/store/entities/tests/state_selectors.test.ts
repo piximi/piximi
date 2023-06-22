@@ -62,8 +62,6 @@ describe("Entity State Selectors", () => {
     it("should create a selector for selecting the list of models", () => {
       const models = selectors.selectAll(state);
 
-      console.log(models);
-
       expect(models).toEqual([AClockworkOrange, AnimalFarm, TheGreatGatsby]);
     });
 
