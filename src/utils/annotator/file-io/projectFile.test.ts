@@ -1,5 +1,10 @@
 // TODO: fix
 export const foo = "foo";
+describe("A passing test", () => {
+  it("should pass the test", () => {
+    expect(true).toEqual(true);
+  });
+});
 // import { test } from "@jest/globals";
 // import { v4 as uuidv4 } from "uuid";
 

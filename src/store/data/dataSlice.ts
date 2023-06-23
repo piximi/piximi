@@ -1049,22 +1049,18 @@ export const dataSlice = createSlice({
         type: "_reconcileAnnotations",
         payload: { keepChanges },
       });
-      console.log("fine -- a"); //LOG:
       dataSlice.caseReducers._reconcileAnnotationCategories(state, {
         type: "_reconcileAnnotationCategories",
         payload: { keepChanges },
       });
-      console.log("fine -- ac"); //LOG:
       dataSlice.caseReducers._reconcileImages(state, {
         type: "_reconcileImages",
         payload: { keepChanges },
       });
-      console.log("fine -- i"); //LOG:
       dataSlice.caseReducers._reconcileImageCategories(state, {
         type: "_reconcileImageCategories",
         payload: { keepChanges },
       });
-      console.log("fine -- ic"); //LOG:
 
       state.imagesByCategory = { [UNKNOWN_IMAGE_CATEGORY_ID]: [] };
       state.annotationsByCategory = { [UNKNOWN_ANNOTATION_CATEGORY_ID]: [] };

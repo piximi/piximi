@@ -22,6 +22,9 @@ startAppListening({
           renderedSrcs: [],
         })
       );
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setActiveAnnotationIds({ annotationIds: [] })
+      );
       return;
     }
     const savedActiveImage = newState.data.images.entities[newActiveId].saved;
