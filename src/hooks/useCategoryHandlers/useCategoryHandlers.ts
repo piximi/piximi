@@ -231,7 +231,12 @@ export const useCategoryHandlers = (
   const dispatchDeleteAnnotationsOfCategory = useCallback(
     (categoryId: string) => {
       const annotationIds = annotationsByCategory[categoryId];
-      dispatch(dataSlice.actions.deleteAnnotations({ annotationIds }));
+      batch(() => {
+        dispatch(
+          imageViewerSlice.actions.removeActiveAnnotationIds({ annotationIds })
+        );
+        dispatch(dataSlice.actions.deleteAnnotations({ annotationIds }));
+      });
     },
     [annotationsByCategory, dispatch]
   );
