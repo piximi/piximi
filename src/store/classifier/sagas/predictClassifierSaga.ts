@@ -37,7 +37,7 @@ export function* predictClassifierSaga({
 
   const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
     yield select(selectImagesByPartitions);
-  const testImages = partitionSelector([Partition.Inference]);
+  const inferenceImages = partitionSelector([Partition.Inference]);
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
@@ -58,7 +58,7 @@ export function* predictClassifierSaga({
 
   let finalModelStatus = ModelStatus.Trained;
 
-  if (!testImages.length) {
+  if (!inferenceImages.length) {
     yield put(
       applicationSlice.actions.updateAlertState({
         alertState: {
@@ -85,7 +85,7 @@ export function* predictClassifierSaga({
     );
   } else {
     yield runPrediction(
-      testImages,
+      inferenceImages,
       categories,
       inputShape,
       preprocessOptions,
@@ -104,7 +104,7 @@ export function* predictClassifierSaga({
 }
 
 function* runPrediction(
-  testImages: Array<ImageType>,
+  inferenceImages: Array<ImageType>,
   categories: Array<Category>,
   inputShape: Shape,
   preprocessOptions: PreprocessOptions,
@@ -112,7 +112,7 @@ function* runPrediction(
   model: SequentialClassifier
 ) {
   try {
-    model.loadInference(testImages, {
+    model.loadInference(inferenceImages, {
       categories,
       inputShape,
       preprocessOptions,
@@ -126,7 +126,7 @@ function* runPrediction(
     return;
   }
 
-  const imageIds = testImages.map((img) => img.id);
+  const imageIds = inferenceImages.map((img) => img.id);
   const categoryIds: Awaited<ReturnType<typeof model.predict>> =
     yield model.predict(categories);
 

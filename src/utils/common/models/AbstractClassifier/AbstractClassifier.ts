@@ -36,15 +36,10 @@ type LoadDataArgs = {
 };
 
 export abstract class SequentialClassifier extends Model {
-  // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  //protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  //protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  _history?: History;
-  //protected _history?: History;
+  protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _history?: History;
   private _cachedOutputShape?: number[];
 
   loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {

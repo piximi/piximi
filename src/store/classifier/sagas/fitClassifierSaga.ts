@@ -96,7 +96,7 @@ function* loadClassifier({
         useCustomTopLayer: true,
       });
     } else {
-      // TODO - segmenter: do a block for UserUPloadedModel
+      // TODO - segmenter: do a block for UserUploadedModel
       process.env.NODE_ENV !== "production" &&
         process.env.REACT_APP_LOG_LEVEL === "1" &&
         console.warn("Unhandled architecture", model.name);

@@ -40,7 +40,7 @@ type LoadInferenceDataArgs = {
   https://github.com/tensorflow/tfjs-models/blob/master/coco-ssd/src/classes.ts
  */
 export class CocoSSD extends Segmenter {
-  _inferenceCategories?: Array<Category>;
+  protected _inferenceCategories?: Array<Category>;
 
   constructor() {
     super({

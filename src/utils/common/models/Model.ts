@@ -28,8 +28,7 @@ export abstract class Model {
   readonly src?: string;
   readonly requiredChannels?: number;
 
-  // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _model?: LayersModel | GraphModel;
+  protected _model?: LayersModel | GraphModel;
 
   constructor({
     name,
