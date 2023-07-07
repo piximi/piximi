@@ -1,7 +1,7 @@
 import { History } from "@tensorflow/tfjs";
 
 import { ModelTask } from "types/ModelType";
-import { ImageType } from "types";
+import { Category, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 
 type LoadModelArgs = {
@@ -33,5 +33,10 @@ export class FullyConnectedSegmenter extends Segmenter {
   predict() {
     return [[]];
   }
+
+  inferenceCategoriesById(catIds: string[]): Category[] {
+    return [];
+  }
+
   evaluate() {}
 }

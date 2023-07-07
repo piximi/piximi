@@ -1,7 +1,5 @@
-// TODO - segmenter: Remove this, now in SimpleCNN concrete model class
 import {
-  loadLayersModel,
-  io as tfio,
+  io as tfio, //eslint-disable-line @typescript-eslint/no-unused-vars
   memory as tfmemory, //eslint-disable-line @typescript-eslint/no-unused-vars
   time as tftime, //eslint-disable-line @typescript-eslint/no-unused-vars
   profile as tfprofile,
@@ -21,7 +19,8 @@ import {
 } from "types";
 
 import { loadDataUrlAsStack, convertToImage } from "utils/common/image";
-import { SimpleCNN } from "./SimpleCNN";
+import { UploadedClassifier } from "../UploadedClassifier/UploadedClassifier";
+import { ModelTask } from "types/ModelType";
 
 jest.setTimeout(100000);
 
@@ -177,12 +176,17 @@ it("evaluateClassifier", async () => {
     "mnist_classifier.weights.bin"
   );
 
-  const loaded_model = await loadLayersModel(
-    tfio.browserFiles([jsonFile, weightsFile])
-  );
+  const model = new UploadedClassifier({
+    TFHub: false,
+    descFile: jsonFile,
+    weightsFiles: [weightsFile],
+    name: "SimpleCNN",
+    task: ModelTask.Classification,
+    graph: false,
+    pretrained: true,
+    trainable: true,
+  });
 
-  const model = new SimpleCNN();
-  model._model = loaded_model;
   model.loadValidation(validationImages, {
     categories,
     inputShape,
