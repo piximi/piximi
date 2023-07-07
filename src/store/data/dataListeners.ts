@@ -94,9 +94,6 @@ function checkImageShape(
 startAppListening({
   actionCreator: uploadImages,
   effect: async (action, listenerAPI) => {
-    process.env.NODE_ENV !== "production" &&
-      console.log("...heard dataSlice.uploadImages");
-
     const invalidImageFiles: Array<ImageFileError> = [];
     const imageFiles: Array<ImageFileType> = [];
     const imagesToUpload: Array<OldImageType> = [];

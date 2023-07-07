@@ -72,7 +72,7 @@ export abstract class Model {
   abstract get inferenceLoaded(): boolean;
 
   abstract get defaultInputShape(): number[];
-  abstract get defaultOutputShape(): number[];
+  abstract get defaultOutputShape(): number[] | undefined;
 
   abstract get modelSummary(): Array<ModelLayerData>;
 
