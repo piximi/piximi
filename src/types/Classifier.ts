@@ -1,4 +1,4 @@
-import { History, Tensor } from "@tensorflow/tfjs";
+import { History } from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
@@ -25,8 +25,6 @@ export type Classifier = {
   history?: History;
   // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
-  // post-prediction results
-  predictions?: Tensor; // TODO - segmenter
   // status flags
   modelStatus: ModelStatus;
 };

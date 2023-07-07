@@ -1,4 +1,4 @@
-import { AnnotationType } from "types";
+import { AnnotationType, Category } from "types";
 import { Model, TrainingCallbacks } from "../Model";
 import {
   History,
@@ -11,18 +11,25 @@ import {
 } from "@tensorflow/tfjs";
 
 export abstract class Segmenter extends Model {
-  // TODO - segmenter: use protected once all the other _model accessors are refactored
-  _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  //protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  //protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  _inferenceDataset?: tfdata.Dataset<Tensor4D>;
-  // protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
-  _history?: History;
-  //protected _history?: History;
+  protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
+  protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
+  protected _history?: History;
   private _cachedOutputShape?: number[];
 
   abstract predict(): AnnotationType[][] | Promise<AnnotationType[][]>;
+
+  /*
+   * Concrete classes must keep track of their inference categories somehow,
+   * either taken in as an argument in `preprocessingArgs` of `loadInference`
+   * or default categroies (if pretrained)
+   * or both (eg take an optional arg otherwise fallback to default)
+   *
+   * `inferenceCategoriesById` takes a list of category ids (usually the ones
+   * associated with categoryIds in the annotations returned by `predict`), and
+   * returns the corresponding `Category` objects.
+   */
+  abstract inferenceCategoriesById(catIds: Array<string>): Category[];
 
   dispose() {
     if (!this._model) {

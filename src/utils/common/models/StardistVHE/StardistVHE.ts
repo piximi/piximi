@@ -25,8 +25,8 @@ type LoadInferenceDataArgs = {
  * This pretrained model: meant to segment individual cell nuclei from brightfield images with H&E staining
  */
 export class StardistVHE extends Segmenter {
-  _fgCategory?: Category;
-  _inferenceDataDims?: Array<{
+  protected _fgCategory?: Category;
+  protected _inferenceDataDims?: Array<{
     width: number;
     height: number;
     padX: number;
@@ -56,7 +56,7 @@ export class StardistVHE extends Segmenter {
 
   loadValidation(images: ImageType[], preprocessingArgs: any): void {}
 
-  _getPaddings(height: number, width: number) {
+  protected _getPaddings(height: number, width: number) {
     const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
     const padX = width % 16 === 0 ? 0 : 16 - (width % 16);
 

@@ -24,9 +24,7 @@ import {
 } from "types";
 import { getStackTraceFromError } from "utils";
 import { ModelStatus } from "types/ModelType";
-import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
-import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
 
 export function* predictSegmenterSaga({
   payload: { execSaga, modelStatus },
@@ -57,7 +55,6 @@ export function* predictSegmenterSaga({
     return;
   }
 
-  // TODO - segmenter: make sure this doesn't clash with classifier inference set
   yield put(
     dataSlice.actions.updateSegmentationImagesPartition({
       imageIdsByPartition: {
@@ -97,9 +94,10 @@ function* runPrediction(
   currentCategories: Array<Category>,
   fitOptions: FitOptions
 ) {
-  // TODO - segmenter: generalize to model.trainable?, or maybe model.cannotTrainButCanUseCustomLabelsSomehow?
-  const generateCategories =
-    model instanceof CocoSSD || model instanceof StardistVHE ? true : false;
+  // if it's not trainable, it must not have been previously trained with custom categories
+  // will need to be extend to account for trainable but has not been trained
+  // and user uploaded with/without labels
+  const generateCategories = !model.trainable;
 
   try {
     model.loadInference(inferenceImages, {
@@ -125,10 +123,8 @@ function* runPrediction(
         )
       ),
     ];
-    // TODO - segmenter: generalize inferenceCategoriesById, same way as above
-    const generatedCategories = (
-      model as CocoSSD | StardistVHE
-    ).inferenceCategoriesById([
+
+    const generatedCategories = model.inferenceCategoriesById([
       // keep categories that we currently have, as long as they are also model categories
       ...currentCategories.map((cat) => cat.id),
       // add or keep categories that the model says exist
