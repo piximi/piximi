@@ -26,7 +26,7 @@ export const preprocessInference = (
   return (
     tfdata
       .generator(inferenceGenerator(images))
-      // TODO - segmenter: probably have to dispose on converting to int32
+      // pre type converted tensor disposed internally by tf
       .map((im) => denormalizeTensor(im.data, im.bitDepth).asType("int32"))
       .batch(1) as tfdata.Dataset<Tensor4D>
   );
