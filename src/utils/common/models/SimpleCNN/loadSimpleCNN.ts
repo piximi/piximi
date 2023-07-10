@@ -1,5 +1,3 @@
-// TODO - segmenter: REmove this file when done, should now be in `loadSimpleCNN.ts`
-
 import { sequential, layers, initializers } from "@tensorflow/tfjs";
 
 import { Shape } from "types/Shape";
