@@ -1,8 +1,37 @@
-import { loadLayersModel, sequential, layers } from "@tensorflow/tfjs";
+import {
+  loadLayersModel,
+  sequential,
+  layers,
+  initializers,
+  LayersModel,
+  Sequential,
+  serialization,
+} from "@tensorflow/tfjs";
 import _ from "lodash";
 
 import { Shape } from "types/Shape";
-import { changeInputShape } from "../utils/changeInputShape";
+
+export const copyLayer = (
+  fromModel: LayersModel,
+  toModel: Sequential,
+  layerIdx: number
+) => {
+  const sourceLayer = fromModel.layers[layerIdx];
+  const classMap = serialization.SerializationMap.getMap().classNameMap;
+  const className: string = sourceLayer.getClassName();
+  const [cls, fromConfig] = classMap[className];
+  const cfg = sourceLayer.getConfig();
+
+  const newLayer = fromConfig(cls, cfg) as typeof sourceLayer;
+
+  // new weights initialized on add
+  toModel.add(newLayer);
+
+  // replace newly initialized weights, with weights of the layer we're
+  // copying over; no need to dispose the newly initialized weights,
+  // they are disposed internally by tf
+  newLayer.setWeights(sourceLayer.getWeights());
+};
 
 /**
  *
@@ -32,27 +61,56 @@ export const createMobileNet = async ({
   defaultInputShape: [number, number, number];
   lastLayerName: string;
 }) => {
+  if (numClasses <= 0) {
+    throw new Error("Must have at least one labeled class");
+  }
+
   const input_shape: [number, number, number] = [
     inputShape.width,
     inputShape.height,
     inputShape.channels,
   ];
 
-  // TODO - segmenter: lots of dispose() needed to be done throughout here, I think
-
   const mobilenet = await loadLayersModel(resource);
 
-  const backbone = sequential();
-  for (const l of mobilenet.layers) {
-    backbone.add(l);
-    if (l.name === lastLayerName) {
-      break;
+  const model = sequential();
+
+  // if we need to change the input shape
+  if (!_.isEqual(input_shape, defaultInputShape)) {
+    mobilenet.layers[0].dispose();
+
+    model.add(layers.inputLayer({ inputShape: input_shape }));
+
+    if (input_shape[2] !== defaultInputShape[2]) {
+      model.add(
+        layers.conv2d({
+          inputShape: input_shape,
+          kernelSize: 3,
+          filters: defaultInputShape[2],
+          strides: 2,
+          activation: "linear",
+          kernelInitializer: initializers.varianceScaling({
+            distribution: "uniform",
+            mode: "fanAvg",
+            scale: 1,
+            seed: undefined,
+          }),
+          dilationRate: [1, 1],
+          useBias: false,
+          biasInitializer: "zeros",
+        })
+      );
     }
+  } else {
+    copyLayer(mobilenet, model, 0);
   }
 
-  let model = backbone;
-  if (!_.isEqual(input_shape, defaultInputShape)) {
-    model = changeInputShape(model, input_shape, defaultInputShape);
+  for (let i = 1; i < mobilenet.layers.length; i++) {
+    copyLayer(mobilenet, model, i);
+
+    if (mobilenet.layers[i].name === lastLayerName) {
+      break;
+    }
   }
 
   if (freeze) {
@@ -92,5 +150,8 @@ export const createMobileNet = async ({
       })
     );
   }
+
+  mobilenet.dispose();
+
   return model;
 };

@@ -8,8 +8,7 @@ type LoadModelArgs = {
   simple: boolean;
 };
 
-// TODO - segmenter: change name to Fulyl Convolutional
-export class FullyConnectedSegmenter extends Segmenter {
+export class FullyConvolutionalSegmenter extends Segmenter {
   constructor() {
     super({
       name: "Fully Convolutional Network",

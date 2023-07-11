@@ -100,11 +100,11 @@ function* loadClassifier({
       process.env.NODE_ENV !== "production" &&
         process.env.REACT_APP_LOG_LEVEL === "1" &&
         console.warn("Unhandled architecture", model.name);
-      return;
+      return false;
     }
   } catch (error) {
     yield handleError(error as Error, "Failed to create tensorflow model");
-    return;
+    return false;
   }
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
@@ -125,10 +125,11 @@ function* loadClassifier({
     model.loadTraining(trainImages, loadDataArgs);
     model.loadValidation(valImages, loadDataArgs);
   } catch (error) {
-    process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in preprocessing");
-    return;
+    return false;
   }
+
+  return true;
 }
 
 function* fitClassifier({
@@ -148,7 +149,6 @@ function* fitClassifier({
       onEpochEnd: onEpochEnd!,
     });
   } catch (error) {
-    process.env.NODE_ENV !== "production" && console.error(error);
     yield handleError(error as Error, "Error in training the model");
     return;
   }
@@ -217,7 +217,7 @@ export function* fitClassifierSaga({
   const compileOptions: ReturnType<typeof classifierCompileOptionsSelector> =
     yield select(classifierCompileOptionsSelector);
 
-  // if Unititialized -> InitFit, then load first, else skip straight to traing
+  // if Unititialized -> InitFit, then load first, else skip straight to training
   if (modelStatus === ModelStatus.InitFit) {
     yield put(
       classifierSlice.actions.updateModelStatus({
@@ -232,7 +232,7 @@ export function* fitClassifierSaga({
       trainingPercentage,
     });
 
-    yield loadClassifier({
+    const loaded: boolean = yield loadClassifier({
       model: selectedModel,
       inputShape,
       preprocessOptions,
@@ -240,6 +240,8 @@ export function* fitClassifierSaga({
       fitOptions,
       numClasses,
     });
+
+    if (!loaded) return;
 
     yield put(
       classifierSlice.actions.updateModelStatus({
@@ -262,6 +264,16 @@ function* handleError(error: Error, errorName: string) {
     description: `${error.name}:\n${error.message}`,
     stackTrace: stackTrace,
   } as AlertStateType;
+
+  if (process.env.NODE_ENV !== "production") {
+    console.error(
+      alertState.name,
+      "\n",
+      alertState.description,
+      "\n",
+      alertState.stackTrace
+    );
+  }
 
   yield put(
     applicationSlice.actions.updateAlertState({

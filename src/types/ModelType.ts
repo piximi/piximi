@@ -3,7 +3,7 @@ import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegment
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
-import { FullyConnectedSegmenter } from "utils/common/models/FullyConnectedSegmenter/FullyConnectedSegmenter";
+import { FullyConvolutionalSegmenter } from "utils/common/models/FullyConvolutionalSegmenter/FullyConvolutionalSegmenter";
 import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 
 export enum ModelArchitecture {
@@ -39,7 +39,7 @@ export const availableClassifierModels: Array<SequentialClassifier> = [
 ];
 
 export const availableSegmenterModels: Array<Segmenter> = [
-  new FullyConnectedSegmenter(),
+  new FullyConvolutionalSegmenter(),
   new CocoSSD(),
   new StardistVHE(),
 ];
