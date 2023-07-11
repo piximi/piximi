@@ -98,8 +98,8 @@ export abstract class Segmenter extends Model {
   onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
 
   get modelSummary() {
+    // TODO: implement graph model summary
     if (this.graph) throw Error("Not implemented for graph models");
-    // TODO - segmenter: implement graph model summary
     return [];
   }
 

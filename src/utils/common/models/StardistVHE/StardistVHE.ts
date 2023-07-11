@@ -40,7 +40,7 @@ export class StardistVHE extends Segmenter {
       graph: true,
       pretrained: true,
       trainable: false,
-      requiredChannels: 3, // TODO - segmenter, correct?
+      requiredChannels: 3,
     });
   }
 
@@ -56,6 +56,12 @@ export class StardistVHE extends Segmenter {
 
   loadValidation(images: ImageType[], preprocessingArgs: any): void {}
 
+  // This Stardist model requires image dimensions to be a multiple of 16
+  // (for VHE in particular), see:
+  // https://github.com/stardist/stardist/blob/468c60552c8c93403969078e51bddc9c2c702035/stardist/models/model2d.py#L543
+  // https://github.com/stardist/stardist/blob/master/stardist/models/model2d.py#L201C30-L201C30
+  // and config here (under source -> grid): https://bioimage.io/#/?tags=stardist&id=10.5281%2Fzenodo.6338614
+  // basically, in the case of VHE: 2^3 * 2 = 16
   protected _getPaddings(height: number, width: number) {
     const padY = height % 16 === 0 ? 0 : 16 - (height % 16);
     const padX = width % 16 === 0 ? 0 : 16 - (width % 16);
@@ -96,7 +102,10 @@ export class StardistVHE extends Segmenter {
   }
 
   async train(options: any, callbacks: any): Promise<History> {
-    // TODO - segmenter: remove this placeholder
+    if (!this.trainable) {
+      throw Error("Training not supported for COCO SSD");
+    }
+
     return this._history!;
   }
 

@@ -3,7 +3,9 @@ import { random } from "lodash";
 
 export const padToMatch = (
   sample: Tensor3D,
-  targetDims: { width: number; height: number }
+  targetDims: { width: number; height: number },
+  padMode: "constant" | "reflect" | "symmetric",
+  constantValue?: number
 ): Tensor3D => {
   const sampleHeight = sample.shape[0];
   const sampleWidth = sample.shape[1];
@@ -23,7 +25,15 @@ export const padToMatch = (
     padX[1] = Math.ceil(dWidth / 2);
   }
 
-  const padded: Tensor3D = sample.pad([padY, padX, [0, 0]]);
+  let padded: Tensor3D;
+
+  if (padMode === "constant") {
+    padded = sample.pad([padY, padX, [0, 0]], constantValue);
+  } else if (padMode === "reflect" || padMode === "symmetric") {
+    padded = sample.mirrorPad([padY, padX, [0, 0]], padMode);
+  } else {
+    throw new Error(`Unrecognized pad mode: ${padMode}`);
+  }
 
   sample.dispose();
   return padded;
