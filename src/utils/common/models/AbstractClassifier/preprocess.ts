@@ -135,7 +135,11 @@ export const cropResize = (
 
     const xs =
       preprocessOptions.cropOptions.cropSchema === CropSchema.Match
-        ? padToMatch(item.xs, { width: cropSize[1], height: cropSize[0] })
+        ? padToMatch(
+            item.xs,
+            { width: cropSize[1], height: cropSize[0] },
+            "constant"
+          )
         : item.xs;
 
     const batchedXs = xs.expandDims(0) as Tensor4D;

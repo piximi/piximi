@@ -1,9 +1,8 @@
 import { Tensor3D, Tensor4D, data as tfdata, tidy } from "@tensorflow/tfjs";
 import { ImageType } from "types";
 import { getImageSlice } from "utils/common/image";
+import { padToMatch } from "../utils/crop";
 
-// TODO - segmenter COCO and others uses this same generator
-// refactor to a general util
 const sampleGenerator = (
   images: Array<ImageType>,
   padVals: Array<{ padX: number; padY: number }>
@@ -29,11 +28,6 @@ const sampleGenerator = (
   };
 };
 
-// TODO - segmenter: there's also a pad function in classifier preporcessor
-// is it compatible with this one? can we generalize so it is?
-// This Stardist model requires image dimensions to be a multiple of 16
-// TODO - segmenter: if you have the patience, link to the line on github
-// that shows this
 const padImage = (image: {
   data: Tensor3D;
   bitDepth: ImageType["bitDepth"];
@@ -41,30 +35,24 @@ const padImage = (image: {
   padY: number;
 }) => {
   const imageTensor = tidy(() => {
-    if (!(image.padX === 0 && image.padY === 0)) {
-      const padded = image.data.mirrorPad(
-        [
-          [
-            image.padY % 2 === 0 ? image.padY / 2 : Math.floor(image.padY / 2),
-            image.padY % 2 === 0 ? image.padY / 2 : Math.ceil(image.padY / 2),
-          ],
-          [
-            image.padX % 2 === 0 ? image.padX / 2 : Math.floor(image.padX / 2),
-            image.padX % 2 === 0 ? image.padX / 2 : Math.ceil(image.padX / 2),
-          ],
-          [0, 0],
-        ],
+    if (image.padX !== 0 || image.padY !== 0) {
+      const padded = padToMatch(
+        image.data,
+        {
+          height: image.data.shape[0] + image.padY,
+          width: image.data.shape[1] + image.padX,
+        },
         "reflect"
       );
-      // TODO - segmenter: is it not disposed automatically by tidy?
-      image.data.dispose();
+
+      // image.data disposed by padToMatch, and would be disposed by tf anyway
       return padded;
     } else {
       return image.data;
     }
   });
 
-  // TODO - segmenter: does Stardist expect float32, or should we cast it?
+  // no casting, stardistVHE input should be float32
   return imageTensor as Tensor3D;
 };
 
