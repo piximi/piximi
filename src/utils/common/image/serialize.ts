@@ -13,6 +13,7 @@ import {
 import { Colors } from "types/tensorflow";
 import { sortTypeByKey } from "types/ImageSortType";
 import { Model } from "../models/Model";
+import { availableClassifierModels } from "types/ModelType";
 
 /* 
    =====================
@@ -292,7 +293,10 @@ const serializeClassifier = (
   classifierGroup.create_dataset("metrics", classifier.metrics);
 
   const selectedModelGroup = classifierGroup.create_group("selected_model");
-  serializeModelProps(selectedModelGroup, classifier.selectedModel);
+  serializeModelProps(
+    selectedModelGroup,
+    availableClassifierModels[classifier.selectedModelIdx]
+  );
 };
 
 /*

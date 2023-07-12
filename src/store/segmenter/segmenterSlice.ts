@@ -8,11 +8,10 @@ import { availableSegmenterModels, ModelStatus } from "types/ModelType";
 import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
 import { CropSchema } from "types/CropOptions";
 import { SegmenterStoreType } from "types/SegmenterStoreType";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { TrainingCallbacks } from "utils/common/models/Model";
 
 export const initialState: SegmenterStoreType = {
-  selectedModel: availableSegmenterModels[0],
+  selectedModelIdx: 0,
   inputShape: {
     height: 256,
     width: 256,
@@ -70,12 +69,15 @@ export const segmenterSlice = createSlice({
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        model: Segmenter;
+        model: (typeof availableSegmenterModels)[number];
       }>
     ) {
       const { model, inputShape } = action.payload;
+
+      availableSegmenterModels.push(model);
+      state.selectedModelIdx = availableSegmenterModels.length - 1;
+
       state.inputShape = inputShape;
-      state.selectedModel = model;
 
       if (model.pretrained) {
         state.modelStatus = ModelStatus.Trained;
@@ -131,8 +133,8 @@ export const segmenterSlice = createSlice({
     ) {
       state.compileOptions.metrics = action.payload.metrics;
     },
-    updateSelectedModel(state, action: PayloadAction<{ model: Segmenter }>) {
-      state.selectedModel = action.payload.model;
+    updateSelectedModelIdx(state, action: PayloadAction<{ modelIdx: number }>) {
+      state.selectedModelIdx = action.payload.modelIdx;
     },
     updateSegmentationOptimizationAlgorithm(
       state,

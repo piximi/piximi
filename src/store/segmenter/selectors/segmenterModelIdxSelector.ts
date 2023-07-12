@@ -1,10 +1,13 @@
 import { SegmenterStoreType } from "types";
 import { availableSegmenterModels } from "types/ModelType";
 
-export const segmenterModelSelector = ({
+export const segmenterModelIdxSelector = ({
   segmenter,
 }: {
   segmenter: SegmenterStoreType;
 }) => {
-  return availableSegmenterModels[segmenter.selectedModelIdx];
+  return {
+    idx: segmenter.selectedModelIdx,
+    model: availableSegmenterModels[segmenter.selectedModelIdx],
+  };
 };

@@ -6,12 +6,11 @@ import { FitOptions } from "./FitOptions";
 import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
 import { ClassifierEvaluationResultType } from "./EvaluationResultType";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { ModelStatus } from "./ModelType";
 
 export type Classifier = {
   // pre-fit state
-  selectedModel: SequentialClassifier;
+  selectedModelIdx: number;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;

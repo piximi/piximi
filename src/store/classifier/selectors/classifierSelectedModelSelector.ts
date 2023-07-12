@@ -1,10 +1,10 @@
 import { Classifier } from "types";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import { availableClassifierModels } from "types/ModelType";
 
 export const classifierSelectedModelSelector = ({
   classifier,
 }: {
   classifier: Classifier;
-}): SequentialClassifier => {
-  return classifier.selectedModel;
+}) => {
+  return availableClassifierModels[classifier.selectedModelIdx];
 };
