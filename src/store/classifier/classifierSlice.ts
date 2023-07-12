@@ -10,7 +10,6 @@ import { availableClassifierModels, ModelStatus } from "../../types/ModelType";
 import { ClassifierEvaluationResultType } from "types/EvaluationResultType";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { TrainingCallbacks } from "utils/common/models/Model";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 export const initialState: Classifier = {
   modelStatus: ModelStatus.Uninitialized,
@@ -27,7 +26,7 @@ export const initialState: Classifier = {
   },
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,
-  selectedModel: availableClassifierModels[0],
+  selectedModelIdx: 0,
   metrics: [Metric.CategoricalAccuracy],
   optimizationAlgorithm: OptimizationAlgorithm.Adam,
   preprocessOptions: {
@@ -120,22 +119,22 @@ export const classifierSlice = createSlice({
 
       state.metrics = metrics;
     },
-    updateSelectedModel(
-      state,
-      action: PayloadAction<{ model: SequentialClassifier }>
-    ) {
-      state.selectedModel = action.payload.model;
+    updateSelectedModelIdx(state, action: PayloadAction<{ modelIdx: number }>) {
+      state.selectedModelIdx = action.payload.modelIdx;
     },
     uploadUserSelectedModel(
       state,
       action: PayloadAction<{
         inputShape: Shape;
-        model: SequentialClassifier;
+        model: (typeof availableClassifierModels)[number];
       }>
     ) {
-      const { model, inputShape } = action.payload;
+      const { inputShape, model } = action.payload;
+
+      availableClassifierModels.push(model);
+      state.selectedModelIdx = availableClassifierModels.length - 1;
+
       state.inputShape = inputShape;
-      state.selectedModel = model;
 
       if (model.pretrained) {
         state.modelStatus = ModelStatus.Trained;

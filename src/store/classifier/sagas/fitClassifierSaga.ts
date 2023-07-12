@@ -27,6 +27,7 @@ import { TrainingCallbacks } from "utils/common/models/Model";
 import { getStackTraceFromError } from "utils";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
+import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 function* assignDataPartitions({
   preprocessOptions,
@@ -71,7 +72,7 @@ function* loadClassifier({
   fitOptions,
   numClasses,
 }: {
-  model: ReturnType<typeof classifierSelectedModelSelector>;
+  model: SequentialClassifier;
   inputShape: ReturnType<typeof classifierInputShapeSelector>;
   preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
   compileOptions: ReturnType<typeof classifierCompileOptionsSelector>;
@@ -137,7 +138,7 @@ function* fitClassifier({
   onEpochEnd,
   fitOptions,
 }: {
-  model: ReturnType<typeof classifierSelectedModelSelector>;
+  model: SequentialClassifier;
   onEpochEnd?: TrainingCallbacks["onEpochEnd"];
   fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
 }) {
