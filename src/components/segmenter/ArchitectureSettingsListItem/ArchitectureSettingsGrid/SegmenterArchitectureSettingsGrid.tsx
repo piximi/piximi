@@ -9,18 +9,17 @@ import {
 } from "components/common/styled-components";
 
 import {
-  segmenterModelSelector,
+  segmenterModelIdxSelector,
   segmenterInputShapeSelector,
   segmenterSlice,
 } from "store/segmenter";
 
 import { availableSegmenterModels } from "types/ModelType";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
 export const SegmenterArchitectureSettingsGrid = () => {
   const dispatch = useDispatch();
 
-  const selectedModel = useSelector(segmenterModelSelector);
+  const selectedModel = useSelector(segmenterModelIdxSelector);
   const inputShape = useSelector(segmenterInputShapeSelector);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
@@ -29,25 +28,34 @@ export const SegmenterArchitectureSettingsGrid = () => {
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  const modelOptions = availableSegmenterModels.filter((m) => m.trainable);
+  const modelOptions = availableSegmenterModels
+    .map((m, i) => ({
+      name: m.name,
+      requiredChannels: m.requiredChannels,
+      trainable: m.trainable,
+      idx: i,
+    }))
+    .filter((m) => m.trainable);
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
-    value: Segmenter | null
+    modelOption: (typeof modelOptions)[number] | null
   ) => {
-    const _selectedModel = value as Segmenter;
+    if (!modelOption) return;
 
     dispatch(
-      segmenterSlice.actions.updateSelectedModel({ model: _selectedModel })
+      segmenterSlice.actions.updateSelectedModelIdx({
+        modelIdx: modelOption.idx,
+      })
     );
 
     // if the selected model requires a specific number of input channels, dispatch that number to the store
-    if (_selectedModel.requiredChannels) {
+    if (modelOption.requiredChannels) {
       dispatch(
         segmenterSlice.actions.updateSegmentationInputShape({
           inputShape: {
             ...inputShape,
-            channels: _selectedModel.requiredChannels,
+            channels: modelOption.requiredChannels,
           },
         })
       );
@@ -80,10 +88,10 @@ export const SegmenterArchitectureSettingsGrid = () => {
   };
 
   useEffect(() => {
-    if (selectedModel.requiredChannels) {
+    if (selectedModel.model.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
-        `${selectedModel.name} requires ${selectedModel.requiredChannels} channels!`
+        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`
       );
     } else {
       setFixedNumberOfChannels(false);
@@ -99,7 +107,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
             disableClearable={true}
             options={modelOptions}
             onChange={onSelectedModelChange}
-            getOptionLabel={(option: Segmenter) => option.name}
+            getOptionLabel={(option) => option.name}
             sx={{ width: 300 }}
             renderInput={(params) => (
               <TextField
@@ -108,7 +116,12 @@ export const SegmenterArchitectureSettingsGrid = () => {
                 label="Model architecture"
               />
             )}
-            value={selectedModel}
+            value={{
+              name: selectedModel.model.name,
+              requiredChannels: selectedModel.model.requiredChannels,
+              trainable: selectedModel.model.trainable,
+              idx: selectedModel.idx,
+            }}
             isOptionEqualToValue={(option, value) => value.name === option.name}
           />
         </Grid>
@@ -121,7 +134,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
             value={inputShape.height}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={!selectedModel.trainable}
+            disabled={!selectedModel.model.trainable}
           />
         </Grid>
         <Grid item xs={2}>
@@ -131,7 +144,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
             value={inputShape.width}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={!selectedModel.trainable}
+            disabled={!selectedModel.model.trainable}
           />
         </Grid>
         <Grid item xs={2}>
@@ -141,7 +154,7 @@ export const SegmenterArchitectureSettingsGrid = () => {
             value={inputShape.channels}
             dispatchCallBack={dispatchShape}
             min={1}
-            disabled={fixedNumberOfChannels || !selectedModel.trainable}
+            disabled={fixedNumberOfChannels || !selectedModel.model.trainable}
           />
         </Grid>
       </Grid>

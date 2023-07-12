@@ -10,18 +10,17 @@ import {
 
 import {
   classifierInputShapeSelector,
-  classifierSelectedModelSelector,
+  classifierSelectedModelIdxSelector,
   classifierSlice,
 } from "store/classifier";
 
 import { availableClassifierModels } from "types/ModelType";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
 export const ClassifierArchitectureSettingsGrid = () => {
   const dispatch = useDispatch();
 
   const inputShape = useSelector(classifierInputShapeSelector);
-  const selectedModel = useSelector(classifierSelectedModelSelector);
+  const selectedModel = useSelector(classifierSelectedModelIdxSelector);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     useState<boolean>(false);
@@ -29,13 +28,20 @@ export const ClassifierArchitectureSettingsGrid = () => {
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  const modelOptions = availableClassifierModels.filter((m) => m.trainable);
+  const modelOptions = availableClassifierModels
+    .map((m, i) => ({
+      name: m.name,
+      requiredChannels: m.requiredChannels,
+      trainable: m.trainable,
+      idx: i,
+    }))
+    .filter((m) => m.trainable);
 
   useEffect(() => {
-    if (selectedModel.requiredChannels) {
+    if (selectedModel.model.requiredChannels) {
       setFixedNumberOfChannels(true);
       setFixedNumberOfChannelsHelperText(
-        `${selectedModel.name} requires ${selectedModel.requiredChannels} channels!`
+        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`
       );
     } else {
       setFixedNumberOfChannels(false);
@@ -45,22 +51,23 @@ export const ClassifierArchitectureSettingsGrid = () => {
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
-    value: SequentialClassifier | null
+    modelOption: (typeof modelOptions)[number] | null
   ) => {
-    const _selectedModel = value as SequentialClassifier;
-
+    if (!modelOption) return;
     // TODO - segmenter: probably towrad the end, resolve problem with select -> train -> select new ...
     dispatch(
-      classifierSlice.actions.updateSelectedModel({ model: _selectedModel })
+      classifierSlice.actions.updateSelectedModelIdx({
+        modelIdx: modelOption.idx,
+      })
     );
 
     // if the selected model requires a specific number of input channels, dispatch that number to the store
-    if (_selectedModel.requiredChannels) {
+    if (modelOption.requiredChannels) {
       dispatch(
         classifierSlice.actions.updateInputShape({
           inputShape: {
             ...inputShape,
-            channels: _selectedModel.requiredChannels,
+            channels: modelOption.requiredChannels,
           },
         })
       );
@@ -99,7 +106,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
             disableClearable={true}
             options={modelOptions}
             onChange={onSelectedModelChange}
-            getOptionLabel={(option: SequentialClassifier) => option.name}
+            getOptionLabel={(option) => option.name}
             sx={{ width: 300 }}
             renderInput={(params) => (
               <TextField
@@ -108,8 +115,13 @@ export const ClassifierArchitectureSettingsGrid = () => {
                 label="Model architecture"
               />
             )}
-            value={selectedModel}
-            isOptionEqualToValue={(option, value) => value.name === option.name}
+            value={{
+              name: selectedModel.model.name,
+              requiredChannels: selectedModel.model.requiredChannels,
+              trainable: selectedModel.model.trainable,
+              idx: selectedModel.idx,
+            }}
+            isOptionEqualToValue={(option, value) => option.name === value.name}
           />
         </Grid>
       </Grid>
@@ -121,7 +133,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
             value={inputShape.height}
             dispatchCallBack={dispatchRows}
             min={1}
-            disabled={!selectedModel.trainable}
+            disabled={!selectedModel.model.trainable}
           />
         </Grid>
         <Grid item xs={1}>
@@ -131,7 +143,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
             value={inputShape.width}
             dispatchCallBack={dispatchCols}
             min={1}
-            disabled={!selectedModel.trainable}
+            disabled={!selectedModel.model.trainable}
           />
         </Grid>
         <Grid item xs={1}>
@@ -141,7 +153,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
             value={inputShape.channels}
             dispatchCallBack={dispatchChannels}
             min={1}
-            disabled={fixedNumberOfChannels || !selectedModel.trainable}
+            disabled={fixedNumberOfChannels || !selectedModel.model.trainable}
           />
         </Grid>
       </Grid>

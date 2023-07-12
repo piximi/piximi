@@ -4,12 +4,11 @@ import { Shape } from "./Shape";
 import { PreprocessOptions } from "./PreprocessOptions";
 import { SegmenterEvaluationResultType } from "./EvaluationResultType";
 import { CompileOptions } from "./CompileOptions";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 import { ModelStatus } from "./ModelType";
 
 export type SegmenterStoreType = {
   // pre-fit state
-  selectedModel: Segmenter;
+  selectedModelIdx: number;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;
   fitOptions: FitOptions;

@@ -28,7 +28,6 @@ import { initialState as initialProjectState } from "store/project/projectSlice"
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
 import { Model } from "../models/Model";
 import { ModelTask } from "types/ModelType";
-import { SimpleCNN } from "../models/SimpleCNN/SimpleCNN";
 
 /*
   =====================
@@ -398,11 +397,11 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
   );
 
   // const selectedModelGroup = getGroup(classifierGroup, "selected_model");
-  // TODO - segmenter: remove typecast, should be generic Model
+  // TODO - segmenter: 0 is SimpleCNN right now, should be generic Model
   // const selectedModel = deserializeSelectedModelGroup(
   //   selectedModelGroup
   // ) as SequentialClassifier;
-  const selectedModel = new SimpleCNN();
+  const selectedModelIdx = 0;
 
   return {
     ...initialClassifierState,
@@ -415,7 +414,7 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
     },
     metrics,
     preprocessOptions,
-    selectedModel,
+    selectedModelIdx,
     learningRate,
     lossFunction,
     optimizationAlgorithm,

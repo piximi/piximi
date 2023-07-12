@@ -25,6 +25,7 @@ export { classifierPreprocessOptionsSelector } from "./selectors/classifierPrepr
 export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
 export { classifierShuffleOptionsSelector } from "./selectors/classifierShuffleOptionsSelector";
 export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
+export { classifierSelectedModelIdxSelector } from "./selectors/classifierSelectedModelIdxSelector";
 export { classifierTrainingPercentageSelector } from "./selectors/classifierTrainingPercentageSelector";
 export { classifierModelStatusSelector } from "./selectors/classifierModelStatusSelector";
 
