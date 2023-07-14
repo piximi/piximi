@@ -1,4 +1,3 @@
-import { History } from "@tensorflow/tfjs";
 import { LossFunction } from "./LossFunction";
 import { Metric } from "./Metric";
 import { OptimizationAlgorithm } from "./OptimizationAlgorithm";
@@ -21,7 +20,6 @@ export type Classifier = {
   metrics: Array<Metric>;
 
   trainingPercentage: number;
-  history?: History;
   // post-evaluation results
   evaluationResult: ClassifierEvaluationResultType;
   // status flags

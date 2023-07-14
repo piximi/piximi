@@ -92,6 +92,7 @@ export { LossFunction } from "./LossFunction";
 export { Metric } from "./Metric";
 
 export { ModelArchitecture } from "./ModelType";
+
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
 export { Partition } from "./Partition";
@@ -141,3 +142,5 @@ export type {
 export type { DataStoreSlice } from "./DataStoreType";
 export type { ImagesEntityType } from "./ImagesEntityType";
 export type { PartialBy } from "./utility/PartialBy";
+
+export type { ModelHistory } from "./ModelHistory";

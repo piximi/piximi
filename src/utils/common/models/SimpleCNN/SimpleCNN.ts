@@ -23,7 +23,11 @@ export class SimpleCNN extends SequentialClassifier {
     });
   }
 
-  loadModel({
+  public override dispose() {
+    super.dispose();
+  }
+
+  public loadModel({
     inputShape,
     numClasses,
     randomizeWeights,

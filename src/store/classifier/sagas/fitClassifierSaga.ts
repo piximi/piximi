@@ -143,21 +143,26 @@ function* fitClassifier({
   fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
 }) {
   try {
-    if (!onEpochEnd && process.env.NODE_ENV !== "production") {
-      console.warn("Epoch end callback not provided");
+    if (!onEpochEnd) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Epoch end callback not provided");
+      }
+      onEpochEnd = async (epoch: number, logs: any) => {
+        console.log(`Epcoch: ${epoch}`);
+        console.log(logs);
+      };
     }
     var history: History = yield model.train(fitOptions, {
-      onEpochEnd: onEpochEnd!,
+      onEpochEnd: onEpochEnd,
     });
+
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log(history);
   } catch (error) {
     yield handleError(error as Error, "Error in training the model");
     return;
   }
-
-  yield put(
-    // end model training: Training -> Trained
-    classifierSlice.actions.updateFitted({ history })
-  );
 
   yield put(
     classifierSlice.actions.updateModelStatus({

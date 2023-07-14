@@ -69,7 +69,7 @@ export class UploadedClassifier extends SequentialClassifier {
     }
   }
 
-  async upload(): Promise<void> {
+  public async upload(): Promise<void> {
     if (this.src && this.TFHub && !Model.verifyTFHubUrl(this.src)) {
       throw new Error(`Expected TFHub Url: ${this.src}`);
     }
@@ -93,7 +93,7 @@ export class UploadedClassifier extends SequentialClassifier {
     this._loadState = LoadState.Uploaded;
   }
 
-  async loadModel({
+  public async loadModel({
     inputShape,
     numClasses,
     compileOptions,
