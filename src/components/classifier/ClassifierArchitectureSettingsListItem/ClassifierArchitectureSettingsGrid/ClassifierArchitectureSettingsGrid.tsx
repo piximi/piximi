@@ -16,7 +16,13 @@ import {
 
 import { availableClassifierModels } from "types/ModelType";
 
-export const ClassifierArchitectureSettingsGrid = () => {
+type ArchitectureSettingsProps = {
+  onModelSelect: (modelIdx: number) => void;
+};
+
+export const ClassifierArchitectureSettingsGrid = ({
+  onModelSelect,
+}: ArchitectureSettingsProps) => {
   const dispatch = useDispatch();
 
   const inputShape = useSelector(classifierInputShapeSelector);
@@ -31,7 +37,6 @@ export const ClassifierArchitectureSettingsGrid = () => {
   const modelOptions = availableClassifierModels
     .map((m, i) => ({
       name: m.name,
-      requiredChannels: m.requiredChannels,
       trainable: m.trainable,
       idx: i,
     }))
@@ -54,24 +59,7 @@ export const ClassifierArchitectureSettingsGrid = () => {
     modelOption: (typeof modelOptions)[number] | null
   ) => {
     if (!modelOption) return;
-    // TODO - segmenter: probably towrad the end, resolve problem with select -> train -> select new ...
-    dispatch(
-      classifierSlice.actions.updateSelectedModelIdx({
-        modelIdx: modelOption.idx,
-      })
-    );
-
-    // if the selected model requires a specific number of input channels, dispatch that number to the store
-    if (modelOption.requiredChannels) {
-      dispatch(
-        classifierSlice.actions.updateInputShape({
-          inputShape: {
-            ...inputShape,
-            channels: modelOption.requiredChannels,
-          },
-        })
-      );
-    }
+    onModelSelect(modelOption.idx);
   };
 
   const dispatchRows = (height: number) => {
@@ -117,7 +105,6 @@ export const ClassifierArchitectureSettingsGrid = () => {
             )}
             value={{
               name: selectedModel.model.name,
-              requiredChannels: selectedModel.model.requiredChannels,
               trainable: selectedModel.model.trainable,
               idx: selectedModel.idx,
             }}

@@ -39,31 +39,38 @@ export abstract class SequentialClassifier extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _inferenceDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
-  protected _history?: History;
   private _cachedOutputShape?: number[];
 
-  loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public override dispose() {
+    this._trainingDataset = undefined;
+    this._validationDataset = undefined;
+    this._inferenceDataset = undefined;
+    this._cachedOutputShape = undefined;
+    super.dispose();
+  }
+
+  public loadTraining(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._trainingDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  loadValidation(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadValidation(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._validationDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs) {
     this._inferenceDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,
     });
   }
 
-  async train(
+  public async train(
     options: FitOptions,
     callbacks: TrainingCallbacks
   ): Promise<History> {
@@ -95,13 +102,15 @@ export abstract class SequentialClassifier extends Model {
         args
       );
 
+      this.appendHistory(history);
+
       return history;
     } else {
       throw Error(`"${this.name}" Graph Model training not implemented`);
     }
   }
 
-  async predict(categories: Array<Category>): Promise<string[]> {
+  public async predict(categories: Array<Category>): Promise<string[]> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -148,7 +157,7 @@ export abstract class SequentialClassifier extends Model {
     return categoryIds;
   }
 
-  async evaluate(): Promise<ClassifierEvaluationResultType> {
+  public async evaluate(): Promise<ClassifierEvaluationResultType> {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -266,7 +275,7 @@ export abstract class SequentialClassifier extends Model {
     };
   }
 
-  stopTraining(): void {
+  public stopTraining(): void {
     if (!this._model) {
       throw Error("Model not loaded");
     }
@@ -278,26 +287,19 @@ export abstract class SequentialClassifier extends Model {
     (this._model as LayersModel).stopTraining = true;
   }
 
-  dispose() {
-    if (!this._model) {
-      throw Error(`"${this.name}" Model not loaded`);
-    }
-    this._model.dispose();
-  }
-
-  get modelLoaded() {
+  public get modelLoaded() {
     return this._model !== undefined;
   }
 
-  get numClasses() {
+  public get numClasses() {
     return this.defaultOutputShape[0];
   }
 
-  get defaultInputShape() {
+  public get defaultInputShape() {
     return this._model?.inputs[0].shape!.slice(1) as number[];
   }
 
-  get defaultOutputShape() {
+  public get defaultOutputShape() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -326,24 +328,33 @@ export abstract class SequentialClassifier extends Model {
     }
   }
 
-  get trainingLoaded() {
+  public get trainingLoaded() {
     return this._trainingDataset !== undefined;
   }
 
-  get validationLoaded() {
+  public get validationLoaded() {
     return this._validationDataset !== undefined;
   }
 
-  get inferenceLoaded() {
+  public get inferenceLoaded() {
     return this._inferenceDataset !== undefined;
   }
 
-  get modelSummary() {
+  public get modelSummary() {
+    // TODO: implent summary for graph models
     if (this.graph) {
       throw Error("Graph model summaries unavailale");
     }
+
+    if (!this._model) {
+      throw Error(`Model ${this.name}not loaded`);
+    }
+
     return getLayersModelSummary(this._model as LayersModel);
   }
 
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
+  public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
+    epochs,
+    logs
+  ) => {};
 }

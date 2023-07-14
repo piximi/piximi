@@ -20,6 +20,7 @@ export const OptimizerSettingsListItem = ({
       primary="Optimizer Settings"
       disablePadding={false}
       paddingLeft={true}
+      closed={true}
     >
       <OptimizerSettingsGrid
         compileOptions={compileOptions}

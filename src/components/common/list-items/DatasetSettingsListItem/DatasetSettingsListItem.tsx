@@ -28,6 +28,7 @@ export const DatasetSettingsListItem = ({
       primary="Dataset Settings"
       disablePadding={false}
       paddingLeft={true}
+      closed={true}
     >
       <StyledFormControl>
         <Typography id="range-slider" gutterBottom>

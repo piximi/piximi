@@ -2,7 +2,6 @@ import { AnnotationType, Category } from "types";
 import { Model, TrainingCallbacks } from "../Model";
 import {
   GraphModel,
-  History,
   Tensor,
   Tensor2D,
   Tensor4D,
@@ -15,9 +14,15 @@ export abstract class Segmenter extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _inferenceDataset?: tfdata.Dataset<Tensor4D>;
-  protected _history?: History;
 
-  abstract predict(): AnnotationType[][] | Promise<AnnotationType[][]>;
+  public override dispose() {
+    this._trainingDataset = undefined;
+    this._validationDataset = undefined;
+    this._inferenceDataset = undefined;
+    super.dispose();
+  }
+
+  public abstract predict(): AnnotationType[][] | Promise<AnnotationType[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,
@@ -29,32 +34,25 @@ export abstract class Segmenter extends Model {
    * associated with categoryIds in the annotations returned by `predict`), and
    * returns the corresponding `Category` objects.
    */
-  abstract inferenceCategoriesById(catIds: Array<string>): Category[];
+  public abstract inferenceCategoriesById(catIds: Array<string>): Category[];
 
-  dispose() {
-    if (!this._model) {
-      throw Error(`"${this.name}" Model not loaded`);
-    }
-    this._model.dispose();
-  }
-
-  evaluate() {
+  public evaluate() {
     throw Error(`"${this.name}" Model evaluation not supported`);
   }
 
-  stopTraining() {
+  public stopTraining() {
     throw Error(`"${this.name}" Model early stopping not supported`);
   }
 
-  get modelLoaded() {
+  public get modelLoaded() {
     return this._model !== undefined;
   }
 
-  get defaultInputShape() {
+  public get defaultInputShape() {
     return this._model?.inputs[0].shape!.slice(1) as number[];
   }
 
-  get expectedType() {
+  public get expectedType() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -62,7 +60,7 @@ export abstract class Segmenter extends Model {
     return this._model.inputs[0].dtype;
   }
 
-  get defaultOutputShape() {
+  public get defaultOutputShape() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -83,21 +81,24 @@ export abstract class Segmenter extends Model {
     return outputShape ? (outputShape as number[]).slice(1) : undefined;
   }
 
-  get trainingLoaded() {
+  public get trainingLoaded() {
     return this._trainingDataset !== undefined;
   }
 
-  get validationLoaded() {
+  public get validationLoaded() {
     return this._validationDataset !== undefined;
   }
 
-  get inferenceLoaded() {
+  public get inferenceLoaded() {
     return this._inferenceDataset !== undefined;
   }
 
-  onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (epochs, logs) => {};
+  public onEpochEnd: TrainingCallbacks["onEpochEnd"] = async (
+    epochs,
+    logs
+  ) => {};
 
-  get modelSummary() {
+  public get modelSummary() {
     // TODO: implement graph model summary
     if (this.graph) throw Error("Not implemented for graph models");
     return [];
@@ -108,7 +109,7 @@ export abstract class Segmenter extends Model {
    * impossible to generalize completely, so shouldn't be used in code to
    * deduce exact output shape
    */
-  async predictPrintOutputShape() {
+  public async predictPrintOutputShape() {
     // some models may not expose output shape at all,
     // in this case run inference on dummy data, and get shape of output
     // we cache it to avoid expensive recalculation

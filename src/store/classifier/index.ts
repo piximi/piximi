@@ -3,7 +3,6 @@
 export { classifierSlice } from "./classifierSlice";
 export { updateBatchSize } from "./classifierSlice";
 export { updateEpochs } from "./classifierSlice";
-export { updateFitted } from "./classifierSlice";
 export { updateLearningRate } from "./classifierSlice";
 export { updateLossFunction } from "./classifierSlice";
 export { updateMetrics } from "./classifierSlice";
@@ -25,6 +24,7 @@ export { classifierPreprocessOptionsSelector } from "./selectors/classifierPrepr
 export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
 export { classifierShuffleOptionsSelector } from "./selectors/classifierShuffleOptionsSelector";
 export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
+export { classifierHistorySelector } from "./selectors/classifierSelectedModelSelector";
 export { classifierSelectedModelIdxSelector } from "./selectors/classifierSelectedModelIdxSelector";
 export { classifierTrainingPercentageSelector } from "./selectors/classifierTrainingPercentageSelector";
 export { classifierModelStatusSelector } from "./selectors/classifierModelStatusSelector";
