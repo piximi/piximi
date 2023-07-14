@@ -33,6 +33,7 @@ export class SimpleCNN extends SequentialClassifier {
     randomizeWeights,
     compileOptions,
   }: LoadModelArgs) {
+    if (this._model) return;
     this._model = createSimpleCNN(inputShape, numClasses, randomizeWeights);
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);

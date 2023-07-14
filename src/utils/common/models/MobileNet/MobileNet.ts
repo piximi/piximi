@@ -31,6 +31,8 @@ export class MobileNet extends SequentialClassifier {
     freeze = false,
     useCustomTopLayer = true,
   }: LoadModelArgs) {
+    if (this._model) return;
+
     this._model = await createMobileNet({
       inputShape,
       numClasses,
