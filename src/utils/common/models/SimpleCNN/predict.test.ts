@@ -196,6 +196,7 @@ it("predict", async () => {
     trainable: true,
   });
 
+  await model.loadModel();
   model.loadInference(inferrenceImages, {
     categories,
     inputShape,

@@ -1,15 +1,6 @@
-import { CompileOptions, Shape } from "types";
 import { SequentialClassifier } from "../AbstractClassifier/AbstractClassifier";
 import { Model } from "../Model";
 import { io, loadGraphModel, loadLayersModel } from "@tensorflow/tfjs";
-
-type LoadModelArgs = {
-  inputShape: Shape;
-  numClasses: number;
-  compileOptions: CompileOptions;
-  randomizeWeights: boolean;
-  uploadOnly?: boolean;
-};
 
 enum LoadState {
   Unloaded,
@@ -93,12 +84,7 @@ export class UploadedClassifier extends SequentialClassifier {
     this._loadState = LoadState.Uploaded;
   }
 
-  public async loadModel({
-    inputShape,
-    numClasses,
-    compileOptions,
-    randomizeWeights,
-  }: LoadModelArgs) {
+  public async loadModel() {
     if (this._loadState === LoadState.Unloaded) {
       await this.upload();
     }
