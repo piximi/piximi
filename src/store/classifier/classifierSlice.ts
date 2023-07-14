@@ -3,7 +3,6 @@ import { Classifier } from "../../types/Classifier";
 import { LossFunction } from "../../types/LossFunction";
 import { Metric } from "../../types/Metric";
 import { OptimizationAlgorithm } from "../../types/OptimizationAlgorithm";
-import { History } from "@tensorflow/tfjs";
 import { Shape } from "../../types/Shape";
 import { RescaleOptions } from "../../types/RescaleOptions";
 import { availableClassifierModels, ModelStatus } from "../../types/ModelType";
@@ -93,11 +92,6 @@ export const classifierSlice = createSlice({
 
       state.fitOptions.epochs = epochs;
     },
-    updateFitted(state, action: PayloadAction<{ history: History }>) {
-      state.modelStatus = ModelStatus.Trained;
-
-      state.history = action.payload.history;
-    },
     updateInputShape(state, action: PayloadAction<{ inputShape: Shape }>) {
       state.inputShape = action.payload.inputShape;
     },
@@ -119,8 +113,24 @@ export const classifierSlice = createSlice({
 
       state.metrics = metrics;
     },
-    updateSelectedModelIdx(state, action: PayloadAction<{ modelIdx: number }>) {
-      state.selectedModelIdx = action.payload.modelIdx;
+    updateSelectedModelIdx(
+      state,
+      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>
+    ) {
+      const { modelIdx, disposePrevious } = action.payload;
+
+      if (disposePrevious) {
+        availableClassifierModels[state.selectedModelIdx].dispose();
+      }
+
+      const newHistory = availableClassifierModels[modelIdx].history;
+      state.selectedModelIdx = modelIdx;
+
+      if (newHistory.epochs.length > 0) {
+        state.modelStatus = ModelStatus.Trained;
+      } else {
+        state.modelStatus = ModelStatus.Uninitialized;
+      }
     },
     uploadUserSelectedModel(
       state,
@@ -136,8 +146,10 @@ export const classifierSlice = createSlice({
 
       state.inputShape = inputShape;
 
-      if (model.pretrained) {
+      if (model.pretrained || model.history.epochs.length > 0) {
         state.modelStatus = ModelStatus.Trained;
+      } else {
+        state.modelStatus = ModelStatus.Uninitialized;
       }
     },
     updateOptimizationAlgorithm(
@@ -187,7 +199,6 @@ export const classifierSlice = createSlice({
 export const {
   updateBatchSize,
   updateEpochs,
-  updateFitted,
   updateLearningRate,
   updateLossFunction,
   updateMetrics,

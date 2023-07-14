@@ -6,7 +6,7 @@ import { Dialog, DialogContent, List } from "@mui/material";
 import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
 import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
-import { DialogTransition, AlertDialog } from "components/common/dialogs";
+import { DialogTransitionSlide, AlertDialog } from "components/common/dialogs";
 import { FitSegmenterDialogAppBar } from "../FitSegmenterDialogAppBar";
 import { SegmenterArchitectureSettingsListItem } from "../ArchitectureSettingsListItem";
 import { ModelSummaryTable } from "components/common/styled-components";
@@ -256,7 +256,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       maxWidth="md"
       onClose={closeDialog}
       open={openedDialog}
-      TransitionComponent={DialogTransition}
+      TransitionComponent={DialogTransitionSlide}
       style={{ zIndex: 1203, height: "100%" }}
     >
       <FitSegmenterDialogAppBar

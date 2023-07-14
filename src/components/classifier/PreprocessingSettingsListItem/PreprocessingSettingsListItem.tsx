@@ -10,6 +10,7 @@ export const PreprocessingSettingsListItem = () => {
       primary="Preprocessing"
       disablePadding={false}
       paddingLeft={true}
+      closed={true}
     >
       <RescalingForm />
       <CroppingForm />

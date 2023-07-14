@@ -44,7 +44,7 @@ export class StardistVHE extends Segmenter {
     });
   }
 
-  async loadModel() {
+  public async loadModel() {
     // inputs: [ {name: 'input', shape: [-1,-1,-1,3], dtype: 'float32'} ]
     // outputs: [ {name: 'concatenate_4/concat', shape: [-1, -1, -1, 33], dtype: 'float32'} ]
     // where each -1 matches on input and output of corresponding dim/axis
@@ -52,9 +52,9 @@ export class StardistVHE extends Segmenter {
     this._model = await loadStardist();
   }
 
-  loadTraining(images: ImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
 
-  loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
 
   // This Stardist model requires image dimensions to be a multiple of 16
   // (for VHE in particular), see:
@@ -69,7 +69,7 @@ export class StardistVHE extends Segmenter {
     return { padY, padX };
   }
 
-  loadInference(
+  public loadInference(
     images: ImageType[],
     preprocessingArgs: LoadInferenceDataArgs
   ): void {
@@ -101,15 +101,15 @@ export class StardistVHE extends Segmenter {
     }
   }
 
-  async train(options: any, callbacks: any): Promise<History> {
+  public async train(options: any, callbacks: any): Promise<History> {
     if (!this.trainable) {
-      throw Error("Training not supported for COCO SSD");
+      throw new Error(`Training not supported for Model ${this.name}`);
+    } else {
+      throw new Error(`Training not yet implemented for Model ${this.name}`);
     }
-
-    return this._history!;
   }
 
-  async predict() {
+  public async predict() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -149,11 +149,15 @@ export class StardistVHE extends Segmenter {
     return annotations;
   }
 
-  inferenceCategoriesById(catIds: Array<string>) {
+  public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._fgCategory) {
       throw Error(`"${this.name}" Model has no foreground category loaded`);
     }
 
     return catIds.includes(this._fgCategory.id) ? [this._fgCategory] : [];
+  }
+
+  public override dispose() {
+    super.dispose();
   }
 }

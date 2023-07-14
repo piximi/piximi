@@ -19,23 +19,31 @@ export class FullyConvolutionalSegmenter extends Segmenter {
     });
   }
 
-  loadModel({ simple }: LoadModelArgs) {}
+  public loadModel({ simple }: LoadModelArgs) {}
 
-  loadTraining(images: ImageType[], preprocessingArgs: any): void {}
-  loadValidation(images: ImageType[], preprocessingArgs: any): void {}
-  loadInference(images: ImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+  public loadInference(images: ImageType[], preprocessingArgs: any): void {}
 
-  async train(options: any, callbacks: any): Promise<History> {
-    return this._history!;
+  public async train(options: any, callbacks: any): Promise<History> {
+    if (!this.trainable) {
+      throw new Error(`Training not supported for Model ${this.name}`);
+    } else {
+      throw new Error(`Training not yet implemented for Model ${this.name}`);
+    }
   }
 
-  predict() {
+  public predict() {
     return [[]];
   }
 
-  inferenceCategoriesById(catIds: string[]): Category[] {
+  public inferenceCategoriesById(catIds: string[]): Category[] {
     return [];
   }
 
-  evaluate() {}
+  public evaluate() {}
+
+  public override dispose() {
+    super.dispose();
+  }
 }

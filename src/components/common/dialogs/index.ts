@@ -1,7 +1,7 @@
 export { AlertDialog } from "./AlertDialog";
 export { CustomDialog } from "./CustomDialog";
 export { DialogWithAction } from "./DialogWithAction";
-export { DialogTransition } from "./DialogTransition";
+export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { FallBackDialog } from "./FallBackDialog";
 export { ImageShapeDialog } from "./ImageShapeDialog";
 export { ImportTensorflowModelDialog } from "./ImportTensorflowModelDialog/ImportTensorflowModelDialog";

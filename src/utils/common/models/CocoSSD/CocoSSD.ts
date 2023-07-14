@@ -54,7 +54,7 @@ export class CocoSSD extends Segmenter {
     });
   }
 
-  async loadModel() {
+  public async loadModel() {
     if (!this.src) return;
 
     const isTFHub = CocoSSD.verifyTFHubUrl(this.src);
@@ -62,10 +62,13 @@ export class CocoSSD extends Segmenter {
     this._model = await loadGraphModel(this.src, { fromTFHub: isTFHub });
   }
 
-  loadTraining(images: ImageType[], preprocessingArgs: any): void {}
-  loadValidation(images: ImageType[], preprocessingArgs: any): void {}
+  public loadTraining(images: ImageType[], preprocessingArgs: any): void {}
+  public loadValidation(images: ImageType[], preprocessingArgs: any): void {}
 
-  loadInference(images: ImageType[], preprocessingArgs: LoadInferenceDataArgs) {
+  public loadInference(
+    images: ImageType[],
+    preprocessingArgs: LoadInferenceDataArgs
+  ) {
     this._inferenceDataset = preprocessInference(
       images,
       preprocessingArgs.fitOptions
@@ -78,14 +81,15 @@ export class CocoSSD extends Segmenter {
     }
   }
 
-  async train(options: any, callbacks: any): Promise<History> {
+  public async train(options: any, callbacks: any): Promise<History> {
     if (!this.trainable) {
-      throw Error("Training not supported for COCO SSD");
+      throw new Error(`Training not supported for Model ${this.name}`);
+    } else {
+      throw new Error(`Training not yet implemented for Model ${this.name}`);
     }
-    return this._history!;
   }
 
-  async predict() {
+  public async predict() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -114,11 +118,15 @@ export class CocoSSD extends Segmenter {
     return annotations;
   }
 
-  inferenceCategoriesById(catIds: Array<string>) {
+  public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._inferenceCategories) {
       throw Error(`"${this.name}" Model has no inference categories loaded`);
     }
 
     return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
+  }
+
+  public override dispose() {
+    super.dispose();
   }
 }

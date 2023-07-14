@@ -24,7 +24,7 @@ export class MobileNet extends SequentialClassifier {
     });
   }
 
-  async loadModel({
+  public async loadModel({
     inputShape,
     numClasses,
     compileOptions,
@@ -42,5 +42,9 @@ export class MobileNet extends SequentialClassifier {
     });
     const compileArgs = createCompileArgs(compileOptions);
     this._model.compile(compileArgs);
+  }
+
+  public override dispose() {
+    super.dispose();
   }
 }
