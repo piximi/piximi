@@ -56,6 +56,7 @@ export class CocoSSD extends Segmenter {
 
   public async loadModel() {
     if (!this.src) return;
+    if (this._model) return;
 
     const isTFHub = CocoSSD.verifyTFHubUrl(this.src);
 

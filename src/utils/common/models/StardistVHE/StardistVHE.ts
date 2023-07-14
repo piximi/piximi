@@ -45,6 +45,7 @@ export class StardistVHE extends Segmenter {
   }
 
   public async loadModel() {
+    if (this._model) return;
     // inputs: [ {name: 'input', shape: [-1,-1,-1,3], dtype: 'float32'} ]
     // outputs: [ {name: 'concatenate_4/concat', shape: [-1, -1, -1, 33], dtype: 'float32'} ]
     // where each -1 matches on input and output of corresponding dim/axis
