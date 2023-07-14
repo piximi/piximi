@@ -91,7 +91,7 @@ export { LossFunction } from "./LossFunction";
 
 export { Metric } from "./Metric";
 
-export { ModelArchitecture } from "./ModelType";
+export { ModelArchitecture } from "./ModelArchitecture";
 
 export { OptimizationAlgorithm } from "./OptimizationAlgorithm";
 
