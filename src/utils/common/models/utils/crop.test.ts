@@ -18,8 +18,7 @@ it("padToMatch", async () => {
   ]);
 
   const profile = await tf.profile(() =>
-    // @ts-ignore
-    padToMatch(sample, { width: 5, height: 5 })
+    padToMatch(sample, { width: 5, height: 5 }, "constant")
   );
   const result = profile.result as tf.Tensor3D;
   const padded = result.arraySync();
@@ -65,8 +64,11 @@ it("padToMatch", async () => {
     ],
   ];
 
-  // @ts-ignore
-  const paddedAgain = padToMatch(result, { width: 5, height: 5 }).arraySync();
+  const paddedAgain = padToMatch(
+    result,
+    { width: 5, height: 5 },
+    "constant"
+  ).arraySync();
 
   expect(padded).toStrictEqual(expected);
   expect(paddedAgain).toStrictEqual(expected);
