@@ -187,6 +187,8 @@ it("evaluateClassifier", async () => {
     trainable: true,
   });
 
+  await model.loadModel();
+
   model.loadValidation(validationImages, {
     categories,
     inputShape,
