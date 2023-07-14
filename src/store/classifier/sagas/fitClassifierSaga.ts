@@ -88,7 +88,6 @@ function* loadClassifier({
         compileOptions,
       });
     } else if (model instanceof MobileNet) {
-      // TODO - segmenter: useCustomTopLayer or not?
       yield (model as MobileNet).loadModel({
         inputShape,
         numClasses,
