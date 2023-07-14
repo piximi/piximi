@@ -6,17 +6,6 @@ import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
 import { FullyConvolutionalSegmenter } from "utils/common/models/FullyConvolutionalSegmenter/FullyConvolutionalSegmenter";
 import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 
-export enum ModelArchitecture {
-  None,
-  SimpleCNN,
-  MobileNet,
-  SimpleFCNSegmenter,
-  FCNSegmenter,
-  UserUploaded,
-  CocoSSD,
-  StardistVHE,
-}
-
 export enum ModelTask {
   Classification,
   Segmentation,
