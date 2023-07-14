@@ -46,8 +46,9 @@ export const FitSegmenterDialogAppBar = ({
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training) return;
+
     selectedModel.stopTraining();
-    // TODO - segmenter: Trained or back to Loaded, or some halfway thing?
+
     dispatch(
       segmenterSlice.actions.updateModelStatus({
         execSaga: true,
