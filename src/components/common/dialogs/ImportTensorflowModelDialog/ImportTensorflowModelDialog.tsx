@@ -1,6 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  IconButton,
+} from "@mui/material";
+
+import CloseIcon from "@mui/icons-material/Close";
 
 import { useHotkeys } from "hooks";
 
@@ -16,6 +26,7 @@ import {
 } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
+import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -41,6 +52,18 @@ export const ImportTensorflowModelDialog = ({
 
   const [pretrainedModels, setPretrainedModels] = useState<Array<Model>>([]);
 
+  const [cloudWarning, setCloudWarning] = useState(false);
+
+  const onModelChange = useCallback((model: Model | undefined) => {
+    setSelectedModel(model);
+    // TODO - segmenter: generalize to model.cloud
+    if (model instanceof Cellpose) {
+      setCloudWarning(true);
+    } else {
+      setCloudWarning(false);
+    }
+  }, []);
+
   const dispatchModelToStore = () => {
     if (!selectedModel) {
       process.env.NODE_ENV !== "production" &&
@@ -54,6 +77,7 @@ export const ImportTensorflowModelDialog = ({
   };
 
   const closeDialog = () => {
+    setCloudWarning(false);
     onClose();
   };
 
@@ -80,6 +104,26 @@ export const ImportTensorflowModelDialog = ({
 
   return (
     <Dialog fullWidth maxWidth="xs" onClose={closeDialog} open={open}>
+      <Collapse in={cloudWarning}>
+        <Alert
+          severity="warning"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setCloudWarning(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          This model performs inference in the cloud ☁️
+        </Alert>
+      </Collapse>
       <DialogTitle>
         Import{" "}
         {modelTask === ModelTask.Classification
@@ -93,19 +137,19 @@ export const ImportTensorflowModelDialog = ({
       <LocalFileUpload
         modelTask={modelTask}
         isGraph={isGraph}
-        setModel={setSelectedModel}
+        setModel={onModelChange}
         setInputShape={setInputShape}
       />
 
       <PretrainedModelSelector
         values={pretrainedModels}
-        setModel={setSelectedModel}
+        setModel={onModelChange}
       />
 
       <CloudUpload
         modelTask={modelTask}
         isGraph={isGraph}
-        setModel={setSelectedModel}
+        setModel={onModelChange}
         setInputShape={setInputShape}
       />
 

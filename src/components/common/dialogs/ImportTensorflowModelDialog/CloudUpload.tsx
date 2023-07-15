@@ -27,7 +27,7 @@ export const CloudUpload = ({
 }: {
   modelTask: ModelTask;
   isGraph: boolean;
-  setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
+  setModel: (model: Model) => void;
   setInputShape: React.Dispatch<React.SetStateAction<Shape>>;
 }) => {
   const [errMessage, setErrMessage] = useState("");

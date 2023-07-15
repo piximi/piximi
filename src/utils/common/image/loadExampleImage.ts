@@ -1,14 +1,15 @@
-import {
-  fileFromPath,
-  loadImageFileAsStack,
-  convertToImage,
-} from "./imageHelper";
 import * as tf from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
 
 import { deserializeAnnotations } from "utils/annotator";
 
 import { Category, AnnotationType, SerializedFileType } from "types";
+
+import {
+  fileFromPath,
+  loadImageFileAsStack,
+  convertToImage,
+} from "./imageHelper";
 
 export const loadExampleImage = async (
   imagePath: string,
