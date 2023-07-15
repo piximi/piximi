@@ -51,6 +51,7 @@ export class Cellpose extends Segmenter {
 
   public async loadModel() {
     if (this._model) return;
+    // A bit silly, but Model expects a dispose method
     this._model = { dispose: () => {} } as GraphModel;
   }
 
@@ -148,6 +149,7 @@ export class Cellpose extends Segmenter {
   }
 
   public override dispose() {
+    this._fgCategory = undefined;
     super.dispose();
   }
 }
