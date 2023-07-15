@@ -18,7 +18,7 @@ export const PretrainedModelSelector = ({
   setModel,
 }: {
   values: Array<Model>;
-  setModel: React.Dispatch<React.SetStateAction<Model | undefined>>;
+  setModel: (model: Model | undefined) => void;
 }) => {
   // const [errMessage, setErrMessage] = useState<string>("");
   const [modelIdxs, setModelIdxs] = useState<number[]>(

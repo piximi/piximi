@@ -159,6 +159,8 @@ export class StardistVHE extends Segmenter {
   }
 
   public override dispose() {
+    this._inferenceDataDims = undefined;
+    this._fgCategory = undefined;
     super.dispose();
   }
 }
