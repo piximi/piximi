@@ -1,5 +1,6 @@
 // TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
+import { v4 as uuid } from "uuid";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
 import {
   convertToImage,
@@ -8,7 +9,7 @@ import {
 } from "utils/common/image";
 import { fileFromPath } from "utils/common/image/nodeImageHelper";
 import { Category } from "types/Category";
-import { OldImageType } from "types/ImageType";
+import { ImageType } from "types/ImageType";
 import { Partition } from "types/Partition";
 import { Shape } from "types/Shape";
 import { RescaleOptions } from "types/RescaleOptions";
@@ -64,26 +65,27 @@ const annotationCategories: Array<Category> = [
 ];
 
 const preloadedImages: Array<{
+  id: string;
   src: string;
   name: string;
   mimetype: MIMEType;
   annotations: Array<AnnotationType>;
-}> = [
-  {
-    src: "/static/media/cell-painting.f118ef087853056f08e6.png",
-    name: "cell-painting.png",
-    mimetype: "image/png",
-    annotations: [
-      {
-        boundingBox: [86, 149, 217, 240],
-        categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
-        id: "59b919c0-f052-4df6-b947-bb8f3c9359a7",
-        encodedMask: [0, 11921],
-        plane: 0,
-      },
-    ],
-  },
-];
+}> = [uuid()].map((imId) => ({
+  id: imId,
+  src: "/static/media/cell-painting.f118ef087853056f08e6.png",
+  name: "cell-painting.png",
+  mimetype: "image/png",
+  annotations: [
+    {
+      boundingBox: [86, 149, 217, 240],
+      categoryId: "1dca6ba0-c53b-435d-a43f-d4a2bb4042a5",
+      id: "59b919c0-f052-4df6-b947-bb8f3c9359a7",
+      encodedMask: [0, 11921],
+      plane: 0,
+      imageId: imId,
+    },
+  ],
+}));
 
 const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
   const file = await fileFromPath(src, mimetype, false, name);
@@ -92,7 +94,7 @@ const urlToStack = async (src: string, name: string, mimetype: MIMEType) => {
 };
 
 it.skip("preprocessSegmenter", async () => {
-  const images: Array<OldImageType> = [];
+  const images: Array<ImageType> = [];
 
   for (const preIm of preloadedImages) {
     const imStack = await urlToStack(preIm.src, preIm.name, preIm.mimetype);
@@ -106,7 +108,6 @@ it.skip("preprocessSegmenter", async () => {
 
     images.push({
       ...im,
-      annotations: preIm.annotations,
       partition: Partition.Training,
     });
   }

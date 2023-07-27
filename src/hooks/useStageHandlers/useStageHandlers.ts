@@ -31,7 +31,6 @@ import {
   ToolType,
   AnnotationStateType,
   AnnotationModeType,
-  AnnotationType,
 } from "types";
 
 import {
@@ -95,7 +94,7 @@ export const useStageHandlers = (
 
   const deleteAnnotations = (
     annotationIds: Array<string>,
-    stagedAnnotations: Array<AnnotationType>
+    stagedAnnotations: Array<DecodedAnnotationType>
   ) => {};
 
   const deselectAllAnnotations = useCallback(() => {
@@ -270,7 +269,7 @@ export const useStageHandlers = (
       return;
     }
 
-    let currentAnnotation: AnnotationType | undefined;
+    let currentAnnotation: DecodedAnnotationType | undefined;
 
     if (overlappingAnnotationIds.length > 1) {
       dispatch(
@@ -284,13 +283,13 @@ export const useStageHandlers = (
       const nextAnnotationId = overlappingAnnotationIds[currentIndex];
 
       currentAnnotation = activeAnnotations.find(
-        (annotation: AnnotationType) => {
+        (annotation: DecodedAnnotationType) => {
           return annotation.id === nextAnnotationId;
         }
       );
     } else {
       currentAnnotation = activeAnnotations.find(
-        (annotation: AnnotationType) => {
+        (annotation: DecodedAnnotationType) => {
           return annotation.id === overlappingAnnotationIds[0];
         }
       );

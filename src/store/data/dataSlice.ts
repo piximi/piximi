@@ -22,6 +22,7 @@ import {
 import { ImageShapeInfo, replaceDuplicateName } from "utils/common/image";
 import { mutatingFilter } from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
+import { encode } from "utils/annotator";
 
 export const imageCategoriesAdapter = createDeferredEntityAdapter<Category>();
 export const annotationCategoriesAdapter =
@@ -541,21 +542,6 @@ export const dataSlice = createSlice({
       });
     },
 
-    //TODO: this should be annotation
-    setImageInstances(
-      state,
-      action: PayloadAction<{
-        instances: Record<string, Array<AnnotationType>>;
-      }>
-    ) {
-      Object.entries(action.payload.instances).forEach(
-        ([imageId, annotations]) => {
-          state.annotationsByImage[imageId] = annotations.map(
-            (annotation) => annotation.id
-          );
-        }
-      );
-    },
     setImageActivePlane(
       state,
       action: PayloadAction<{
@@ -814,12 +800,21 @@ export const dataSlice = createSlice({
     addAnnotation(
       state,
       action: PayloadAction<{
-        annotation: AnnotationType;
+        annotation: AnnotationType | DecodedAnnotationType;
         isPermanent?: boolean;
       }>
     ) {
-      const annotation = action.payload.annotation;
+      let annotation = action.payload.annotation;
+
       if (state.annotations.ids.includes(annotation.id)) return;
+
+      if (annotation.decodedMask) {
+        (annotation as AnnotationType).encodedMask = encode(
+          annotation.decodedMask
+        );
+        delete annotation.decodedMask;
+      }
+
       if (!state.annotationCategories.ids.includes(annotation.categoryId)) {
         annotation.categoryId = UNKNOWN_ANNOTATION_CATEGORY_ID;
         state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
@@ -829,7 +824,10 @@ export const dataSlice = createSlice({
         state.annotationsByCategory[annotation.categoryId].push(annotation.id);
       }
       state.annotationsByImage[annotation.imageId!].push(annotation.id);
-      annotationsAdapter.addOne(state.annotations, action.payload.annotation);
+      annotationsAdapter.addOne(
+        state.annotations,
+        annotation as AnnotationType
+      );
       if (action.payload.isPermanent) {
         state.annotations.entities[annotation.id].changes = {};
       }

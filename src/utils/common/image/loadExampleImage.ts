@@ -29,12 +29,13 @@ export const loadExampleImage = async (
   );
 
   const deserializedAnnotations = deserializeAnnotations(
-    serializedAnnotations.annotations
+    serializedAnnotations.annotations,
+    image.id
   );
   const annotations: Array<AnnotationType> = [];
 
   const normImageData = image.data.mul(255);
-  const imDataArray = (await normImageData.arraySync()) as number[][][];
+  const imDataArray = normImageData.arraySync() as number[][][];
   normImageData.dispose();
   const flatImageData = imDataArray.flat(3);
   const renderedIm = new ImageJS({
@@ -68,8 +69,6 @@ export const loadExampleImage = async (
       boundingBox: bbox,
     });
   });
-
-  image.annotations.push(...annotations);
 
   const annotationCategories = serializedAnnotations.categories as Category[];
 

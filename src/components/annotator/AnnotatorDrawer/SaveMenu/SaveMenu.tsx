@@ -19,11 +19,12 @@ import {
   selectAllImageCategories,
   selectAllAnnotationCategories,
   selectSelectedImages,
+  selectAllAnnotations,
 } from "store/data";
 
 import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
 
-import { AnnotationExportType, HotkeyView, ShadowImageType } from "types";
+import { AnnotationExportType, HotkeyView } from "types";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;
@@ -64,10 +65,8 @@ const exportOptions = [
 ];
 
 export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
-  const images = useSelector(selectSelectedImages).map((image) => {
-    return { ...image, annotations: [] } as ShadowImageType;
-  });
-
+  const images = useSelector(selectSelectedImages);
+  const annotations = useSelector(selectAllAnnotations);
   const annotationCategories = useSelector(selectAllAnnotationCategories);
   const categories = useSelector(selectAllImageCategories);
   const projectName = useSelector(projectNameSelector);
@@ -111,6 +110,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
           case AnnotationExportType.PIXIMI:
             const piximiSerializedProject = serializeProject(
               images,
+              annotations,
               categories
             );
 
@@ -123,7 +123,11 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
             break;
 
           case AnnotationExportType.COCO:
-            const cocoSerializedProject = serializeCOCOFile(images, categories);
+            const cocoSerializedProject = serializeCOCOFile(
+              images,
+              annotations,
+              categories
+            );
 
             const blob = new Blob([JSON.stringify(cocoSerializedProject)], {
               type: "application/json;charset=utf-8",
@@ -134,18 +138,23 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
             break;
 
           case AnnotationExportType.Matrix:
-            Promise.all(
-              saveAnnotationsAsLabelMatrix(images, annotationCategories, zip)
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
                 saveAs(blob, `${userProjectName}.zip`);
               });
             });
+
             break;
 
           case AnnotationExportType.BinaryInstances:
             saveAnnotationsAsBinaryInstanceSegmentationMasks(
               images,
+              annotations,
               annotationCategories,
               zip,
               userProjectName
@@ -154,13 +163,12 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
             break;
 
           case AnnotationExportType.LabeledInstances:
-            Promise.all(
-              saveAnnotationsAsLabelMatrix(
-                images,
-                annotationCategories,
-                zip,
-                true
-              )
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              true
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
                 saveAs(blob, `${userProjectName}.zip`);
@@ -169,14 +177,13 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
             break;
 
           case AnnotationExportType.BinarySemanticMasks:
-            Promise.all(
-              saveAnnotationsAsLabelMatrix(
-                images,
-                annotationCategories,
-                zip,
-                false,
-                true
-              )
+            saveAnnotationsAsLabelMatrix(
+              images,
+              annotations,
+              annotationCategories,
+              zip,
+              false,
+              true
             ).then(() => {
               zip.generateAsync({ type: "blob" }).then((blob) => {
                 saveAs(blob, `${userProjectName}.zip`);
@@ -187,6 +194,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
           case AnnotationExportType.LabeledSemanticMasks:
             saveAnnotationsAsLabeledSemanticSegmentationMasks(
               images,
+              annotations,
               annotationCategories,
               zip,
               userProjectName
@@ -205,6 +213,7 @@ export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
       annotationCategories,
       categories,
       images,
+      annotations,
     ]
   );
 

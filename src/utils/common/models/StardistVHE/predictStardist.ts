@@ -11,10 +11,11 @@ import {
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { AnnotationType, DecodedAnnotationType, Point } from "types";
+import { Point } from "types";
 
-import { scanline, simplifyPolygon } from "utils/annotator";
+import { encode, scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
+import { OrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
 
 export const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
@@ -119,7 +120,7 @@ export function generateAnnotations(
   },
   scoreThresh: number
 ) {
-  const generatedAnnotations: Array<DecodedAnnotationType> = [];
+  const generatedAnnotations: Array<OrphanedAnnotationType> = [];
   const scores: Array<number> = [];
   const generatedBboxes: Array<[number, number, number, number]> = [];
 
@@ -142,7 +143,7 @@ export function generateAnnotations(
         const { decodedMask, bbox } = polygon;
 
         const annotation = {
-          decodedMask: decodedMask,
+          encodedMask: encode(decodedMask),
           boundingBox: bbox,
           categoryId: categoryId,
           id: uuid4(),
@@ -211,7 +212,7 @@ export const predictStardist = async (
   const indices = (await indexTensor.data()) as Float32Array;
   dispose(indexTensor);
 
-  const selectedAnnotations: Array<AnnotationType> = [];
+  const selectedAnnotations: Array<OrphanedAnnotationType> = [];
 
   indices.forEach((index) => {
     selectedAnnotations.push(generatedAnnotations[index]);

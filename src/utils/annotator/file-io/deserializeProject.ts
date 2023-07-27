@@ -5,12 +5,13 @@ import {
   Category,
   SerializedAnnotationType,
   SerializedFileType,
-  ShadowImageType,
   SerializedAnnotatorImageType,
+  ImageType,
 } from "types";
 
 export const deserializeAnnotations = (
-  serializedAnnotations: Array<SerializedAnnotationType>
+  serializedAnnotations: Array<SerializedAnnotationType>,
+  imageId: string
 ) => {
   const annotations: Array<AnnotationType> = [];
 
@@ -21,6 +22,7 @@ export const deserializeAnnotations = (
       plane: annotation.plane,
       boundingBox: annotation.boundingBox as [number, number, number, number],
       categoryId: annotation.categoryId,
+      imageId,
     });
   }
 
@@ -87,7 +89,7 @@ change the incoming annotations to refer to the updated incoming image id.
 If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
 */
 const reconcileImages = (
-  existingImages: Array<ShadowImageType>,
+  existingImages: Array<ImageType>,
   serializedImages: Array<SerializedAnnotatorImageType>,
   serializedAnnotations: Array<SerializedAnnotationType>
 ) => {
@@ -145,7 +147,7 @@ const reconcileImages = (
 
 export const deserializeProjectFile = (
   serializedProject: SerializedFileType,
-  existingImages: Array<ShadowImageType>,
+  existingImages: Array<ImageType>,
   existingCategories: Array<Category>
 ) => {
   // this must come first
@@ -171,19 +173,12 @@ export const deserializeProjectFile = (
     return idMap;
   }, {} as { [imageId: string]: Array<SerializedAnnotationType> });
 
-  const deserializedImages = matchedIms.reduce(
-    (idMap, im) => {
-      const annotations = deserializeAnnotations(annMap[im.id]);
-      idMap[im.id] = annotations;
-      return idMap;
-    },
-    {} as {
-      [imageId: string]: Array<AnnotationType>;
-    }
-  );
+  const encodedAnnotations = matchedIms.flatMap((im) => {
+    return deserializeAnnotations(annMap[im.id], im.id);
+  });
 
   return {
-    imsToAnnotate: deserializedImages, // nonexisting ims excluded
+    annotations: encodedAnnotations, // nonexisting ims excluded
     newCategories: newCats, // existing cats excluded
   };
 };

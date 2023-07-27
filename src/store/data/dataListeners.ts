@@ -13,7 +13,7 @@ import {
   TypedAppStartListening,
   ImageFileError,
   ImageFileType,
-  OldImageType,
+  ImageType,
 } from "types";
 
 import { getStackTraceFromError } from "utils";
@@ -96,7 +96,7 @@ startAppListening({
   effect: async (action, listenerAPI) => {
     const invalidImageFiles: Array<ImageFileError> = [];
     const imageFiles: Array<ImageFileType> = [];
-    const imagesToUpload: Array<OldImageType> = [];
+    const imagesToUpload: Array<ImageType> = [];
 
     const { files, channels, slices, referenceShape, isUploadedFromAnnotator } =
       action.payload;

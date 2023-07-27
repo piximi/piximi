@@ -1,4 +1,4 @@
-import { AnnotationType } from "./AnnotationType";
+import { DecodedAnnotationType } from "./AnnotationType";
 import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
 import { ZoomToolOptionsType } from "./ZoomToolOptionsType";
 
@@ -14,8 +14,8 @@ export type ImageViewerStore = {
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;
   workingAnnotation: {
-    saved: AnnotationType | undefined;
-    changes: Partial<AnnotationType>;
+    saved: DecodedAnnotationType | undefined;
+    changes: Partial<DecodedAnnotationType>;
   };
   selectedAnnotationIds: Array<string>;
   selectedCategoryId: string;

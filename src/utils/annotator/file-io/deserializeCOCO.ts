@@ -9,8 +9,8 @@ import {
   SerializedCOCOCategoryType,
   SerializedCOCOImageType,
   Point,
-  ShadowImageType,
   AnnotationType,
+  ImageType,
 } from "types";
 
 /*
@@ -90,7 +90,7 @@ change the incoming annotations to refer to the updated incoming image id.
 If the image doesn't exist, then there's nothing to assign the annotation to, and it is discarded.
 */
 const reconcileImages = (
-  existingImages: Array<ShadowImageType>,
+  existingImages: Array<ImageType>,
   serializedImages: Array<SerializedCOCOImageType>,
   // reconcileCOCOCategories changes 'category_id' type
   serializedAnnotations: Array<
@@ -158,7 +158,7 @@ const reconcileImages = (
 
 export const deserializeCOCOFile = (
   cocoFile: SerializedCOCOFileType,
-  existingImages: Array<ShadowImageType>,
+  existingImages: Array<ImageType>,
   existingCategories: Array<Category>,
   availableColors: Array<string> = []
 ) => {
@@ -181,9 +181,7 @@ export const deserializeCOCOFile = (
   const multipart: Array<number> = [];
   const malformed: Array<number> = [];
 
-  const imsToAnnotate: {
-    [imageId: string]: Array<AnnotationType>;
-  } = {};
+  const encodedAnnotations: Array<AnnotationType> = [];
 
   for (const cocoAnn of imModdedAnnotations) {
     const parentIm = matchedIms.find((im) => im.id === cocoAnn.image_id);
@@ -249,13 +247,10 @@ export const deserializeCOCOFile = (
       plane: parentIm.activePlane,
       boundingBox: bbox,
       categoryId: cocoAnn.category_id,
+      imageId: parentIm.id,
     };
 
-    if (imsToAnnotate.hasOwnProperty(parentIm.id)) {
-      imsToAnnotate[parentIm.id].push(newAnnotation);
-    } else {
-      imsToAnnotate[parentIm.id] = [newAnnotation];
-    }
+    encodedAnnotations.push(newAnnotation);
   }
 
   if (
@@ -282,7 +277,7 @@ export const deserializeCOCOFile = (
   }
 
   return {
-    imsToAnnotate,
+    annotations: encodedAnnotations,
     newCategories: newCats,
   };
 };

@@ -20,7 +20,7 @@ import { selectSoundEnabled } from "store/application";
 import {
   AnnotationModeType,
   AnnotationStateType,
-  AnnotationType,
+  DecodedAnnotationType,
   HotkeyView,
   ToolType,
 } from "types";
@@ -30,14 +30,14 @@ type useAnnotatorHotkeysProps = {
   annotationTool: AnnotationTool | undefined;
   deleteAnnotations: (
     annotationIds: Array<string>,
-    stagedAnnotations: Array<AnnotationType>
+    activeAnnotations: Array<DecodedAnnotationType>
   ) => void;
   deselectAllAnnotations: () => void;
   deselectAnnotation: () => void;
   resetZoomSelection: () => void;
   workingAnnotationEntity: {
-    saved: AnnotationType | undefined;
-    changes: Partial<AnnotationType>;
+    saved: DecodedAnnotationType | undefined;
+    changes: Partial<DecodedAnnotationType>;
   };
   selectedAnnotationsIds: string[];
   selectionMode: AnnotationModeType;
@@ -61,7 +61,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   const images = useSelector(selectSelectedImages);
   const activeImageId = useSelector(activeImageIdSelector);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
-  const stagedAnnotations = useSelector(selectActiveAnnotations);
+  const activeAnnotations = useSelector(selectActiveAnnotations);
 
   const confirmAnnotations = () => {
     if (
@@ -297,7 +297,7 @@ export const useAnnotatorKeyboardShortcuts = ({
       annotationTool,
       annotationTool?.annotationState,
       selectedAnnotations,
-      stagedAnnotations,
+      activeAnnotations,
       selectionMode,
       selectedAnnotationsIds,
       soundEnabled,
@@ -324,7 +324,7 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "backspace, delete",
     () => {
-      deleteAnnotations(selectedAnnotationsIds, stagedAnnotations);
+      deleteAnnotations(selectedAnnotationsIds, activeAnnotations);
       deselectAllAnnotations();
 
       deselectAnnotation();

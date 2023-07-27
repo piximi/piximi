@@ -8,17 +8,20 @@ export type AnnotationType = {
   boundingBox: [number, number, number, number];
   categoryId: string;
   id: string;
-  encodedMask?: Array<number>;
+  encodedMask: Array<number>;
   decodedMask?: DataArray;
   plane: number;
+  imageId: string;
+  // TODO serialize: these should not be undefineable
   data?: Tensor4D;
-  imageId?: string;
   src?: string;
 };
-export type DecodedAnnotationType = AnnotationType & { decodedMask: DataArray };
-export type EncodedAnnotationType = AnnotationType & {
-  encodedMask: Array<number>;
-};
+export type DecodedAnnotationType = Omit<
+  AnnotationType & {
+    decodedMask: DataArray;
+  },
+  "encodedMask"
+>;
 
 export type SerializedAnnotationType = T.TypeOf<
   typeof SerializedAnnotationRType
