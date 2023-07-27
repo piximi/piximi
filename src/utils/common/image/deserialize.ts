@@ -1,11 +1,10 @@
 import { tensor2d, tensor4d } from "@tensorflow/tfjs";
 import { Dataset, File, Group, ready } from "h5wasm";
+import semver from "semver";
 
 import { getFile } from "../fileHandlers";
 import { createRenderedTensor, BitDepth } from "./imageHelper";
 import {
-  SerializedImageType,
-  OldImageType,
   Project,
   Classifier,
   AnnotationType,
@@ -22,51 +21,9 @@ import {
   ImageType,
 } from "types";
 import { Colors } from "types/tensorflow";
-import { sortKeyByName } from "types/ImageSortType";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import { Model } from "../models/Model";
-import { ModelTask } from "types/ModelType";
-
-/*
-  =====================
-  Image Deserialization
-  =====================
-*/
-
-export const deserializeImage = async (
-  serializedImage: SerializedImageType
-) => {
-  const imageData = tensor4d(serializedImage.data);
-  const imageColors = {
-    ...serializedImage.colors,
-    color: tensor2d(serializedImage.colors.color),
-  };
-
-  return {
-    name: serializedImage.name,
-    id: serializedImage.id,
-    shape: {
-      planes: serializedImage.planes,
-      height: serializedImage.height,
-      width: serializedImage.width,
-      channels: serializedImage.channels,
-    },
-    data: imageData,
-    bitDepth: serializedImage.bitDepth,
-    colors: imageColors,
-    partition: serializedImage.partition,
-    categoryId: serializedImage.categoryId,
-    annotations: serializedImage.annotations,
-
-    visible: true,
-    activePlane: 0,
-    src:
-      serializedImage.src ??
-      createRenderedTensor(imageData, imageColors, serializedImage.bitDepth, 0),
-  } as OldImageType;
-};
 
 /*
   ====================
@@ -77,6 +34,7 @@ export const deserializeImage = async (
 const deserializeAnnotationsGroup = (
   annotationsGroup: Group
 ): Array<AnnotationType> => {
+  const imageIds = getDataset(annotationsGroup, "image_id").value as string[];
   const bboxes = getDataset(annotationsGroup, "bounding_box")
     .value as Uint8Array;
   const categories = getDataset(annotationsGroup, "annotation_category_id")
@@ -102,6 +60,7 @@ const deserializeAnnotationsGroup = (
         number
       ],
       encodedMask: Array.from(masks.slice(maskIdx, maskIdx + maskLengths[i])),
+      imageId: imageIds[i],
     });
 
     bboxIdx += 4;
@@ -146,7 +105,7 @@ const deserializeColorsGroup = (colorsGroup: Group): Colors => {
 const deserializeImageGroup = async (
   name: string,
   imageGroup: Group
-): Promise<OldImageType> => {
+): Promise<ImageType> => {
   const id = getAttr(imageGroup, "image_id") as string;
   const activePlane = getAttr(imageGroup, "active_plane") as number;
   const categoryId = getAttr(imageGroup, "class_category_id") as string;
@@ -154,10 +113,7 @@ const deserializeImageGroup = async (
     imageGroup,
     "classifier_partition"
   ) as Partition;
-  const visible = Boolean(getAttr(imageGroup, "visible_B"));
 
-  const annotationsGroup = getGroup(imageGroup, "annotations");
-  const annotations = deserializeAnnotationsGroup(annotationsGroup);
   const colorsGroup = getGroup(imageGroup, "colors");
   const colors = deserializeColorsGroup(colorsGroup);
   const imageDataset = getDataset(imageGroup, name);
@@ -183,8 +139,6 @@ const deserializeImageGroup = async (
     activePlane,
     categoryId,
     partition: classifierPartition,
-    visible,
-    annotations,
     colors,
     data: imageTensor,
     bitDepth,
@@ -195,13 +149,18 @@ const deserializeImageGroup = async (
       channels,
     },
     src,
+    visible: true,
   };
 };
 
 const deserializeImagesGroup = async (imagesGroup: Group) => {
   const imageNames = imagesGroup.keys();
-  const images: Array<OldImageType> = [];
-  for (const name of imageNames) {
+  const images: Array<ImageType> = [];
+
+  for (const [i, name] of Object.entries(imageNames)) {
+    process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log(`processing image ${i}/${imageNames.length}`);
+
     let imageGroup = getGroup(imagesGroup, name);
     let image = await deserializeImageGroup(name, imageGroup);
     images.push(image);
@@ -214,15 +173,8 @@ const deserializeCategoriesGroup = (categoriesGroup: Group) => {
   const ids = getDataset(categoriesGroup, "category_id").value as string[];
   const colors = getDataset(categoriesGroup, "color").value as string[];
   const names = getDataset(categoriesGroup, "name").value as string[];
-  const visibilities = Array.from(
-    getDataset(categoriesGroup, "visible_B").value as Uint8Array
-  ).map(Boolean);
 
-  if (
-    ids.length !== colors.length ||
-    ids.length !== names.length ||
-    ids.length !== visibilities.length
-  ) {
+  if (ids.length !== colors.length || ids.length !== names.length) {
     throw Error(
       `Expected categories group "${categoriesGroup.path}" to have "${ids.length}" number of ids, colors, names, and visibilities`
     );
@@ -234,7 +186,7 @@ const deserializeCategoriesGroup = (categoriesGroup: Group) => {
       id: ids[i],
       color: colors[i],
       name: names[i],
-      visible: visibilities[i],
+      visible: true,
     });
   }
 
@@ -255,15 +207,10 @@ const deserializeProjectGroup = async (
   const name = getAttr(projectGroup, "name") as string;
 
   const imagesGroup = getGroup(projectGroup, "images");
-  const sortKeyName = getAttr(imagesGroup, "sort_key") as string;
-  const imageSortKey = sortKeyByName(sortKeyName).imageSortKey;
-  const oldImages = await deserializeImagesGroup(imagesGroup);
-  const annotations: Array<AnnotationType> = [];
-  const images: Array<ImageType> = oldImages.map((image) => {
-    const { annotations, ...newImage } = image;
-    annotations.push(...annotations);
-    return newImage;
-  });
+  const images = await deserializeImagesGroup(imagesGroup);
+
+  const annotationsGroup = getGroup(projectGroup, "annotations");
+  const annotations = deserializeAnnotationsGroup(annotationsGroup);
 
   const categoriesGroup = getGroup(projectGroup, "categories");
   const categories = deserializeCategoriesGroup(categoriesGroup);
@@ -280,10 +227,17 @@ const deserializeProjectGroup = async (
     project: {
       ...initialProjectState,
       name,
-      imageSortKey: imageSortKey,
     },
     data: { images, annotations, categories, annotationCategories },
   };
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const deserializeModelPropsGroup = (modelPropsGroup: Group) => {
+  const classifierName = getAttr(modelPropsGroup, "classifier_name") as string;
+  const segmenterName = getAttr(modelPropsGroup, "segmenter_name") as string;
+
+  return { classifierName, segmenterName };
 };
 
 const deserializeFitOptionsGroup = (fitOptionsGroup: Group): FitOptions => {
@@ -336,36 +290,12 @@ const deserializePreprocessOptionsGroup = (
   return { cropOptions, rescaleOptions, shuffle };
 };
 
-// TODO - Segmenter: temp unused
-// eslint-disable-next-line
-const deserializeSelectedModelGroup = (selectedModelGroup: Group): Model => {
-  const name = getAttr(selectedModelGroup, "model_name") as string;
-  const task = getAttr(selectedModelGroup, "model_task") as number as ModelTask;
-
-  const graph = Boolean(getAttr(selectedModelGroup, "model_graph_B"));
-
-  const pretrained = Boolean(getAttr(selectedModelGroup, "model_pretrained_B"));
-
-  const requiredChannelsAttr = selectedModelGroup.attrs["required_channels"];
-  const requiredChannels = requiredChannelsAttr
-    ? (requiredChannelsAttr.value as number)
-    : undefined;
-
-  const src = getAttr(selectedModelGroup, "src") as string;
-
-  // TODO - segmenter: actually convert this to a model
-  return {
-    name,
-    task,
-    graph,
-    pretrained,
-    requiredChannels,
-    src,
-  } as unknown as Model;
-};
-
 const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
-  const learningRate = getAttr(classifierGroup, "learning_rate") as number;
+  // round to account for serialization error
+  // convert to number
+  const learningRate = +(
+    getAttr(classifierGroup, "learning_rate") as number
+  ).toFixed(4);
   const lossFunction = getAttr(
     classifierGroup,
     "loss_function"
@@ -374,10 +304,11 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
     classifierGroup,
     "optimization_algorithm"
   ) as string as OptimizationAlgorithm;
-  const trainingPercentage = getAttr(
-    classifierGroup,
-    "training_percent"
-  ) as number;
+  // round to account for serialization error
+  // convert to number
+  const trainingPercentage = +(
+    getAttr(classifierGroup, "training_percent") as number
+  ).toFixed(2);
 
   const fitOptionsGroup = getGroup(classifierGroup, "fit_options");
   const fitOptions = deserializeFitOptionsGroup(fitOptionsGroup);
@@ -396,13 +327,6 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
     preprocessOptionsGroup
   );
 
-  // const selectedModelGroup = getGroup(classifierGroup, "selected_model");
-  // TODO - segmenter: 0 is SimpleCNN right now, should be generic Model
-  // const selectedModel = deserializeSelectedModelGroup(
-  //   selectedModelGroup
-  // ) as SequentialClassifier;
-  const selectedModelIdx = 0;
-
   return {
     ...initialClassifierState,
     fitOptions,
@@ -414,7 +338,6 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
     },
     metrics,
     preprocessOptions,
-    selectedModelIdx,
     learningRate,
     lossFunction,
     optimizationAlgorithm,
@@ -425,14 +348,27 @@ const deserializeClassifierGroup = (classifierGroup: Group): Classifier => {
 export const deserialize = async (filename: string) => {
   const { FS } = await ready;
 
+  process.env.REACT_APP_LOG_LEVEL === "1" &&
+    console.log(`starting deserialization of ${filename}`);
+
   let f = await getFile(filename, "r");
 
   if (!(f.type === "Group")) {
     throw Error("Expected group at top level");
   }
 
+  const piximiVersion = semver.clean(getAttr(f, "version") as string);
+
+  if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
+    throw Error(`File version ${piximiVersion} is unsupported.`);
+  }
+
   const projectGroup = getGroup(f, "project");
   const { project, data } = await deserializeProjectGroup(projectGroup);
+
+  // exists, but we do nothing with them, only for the user to inspect
+  // const modelPropsGroup = getGroup(f, "model_props");
+  // const { classifierName, segmenterName } = deserializeModelPropsGroup(modelPropsGroup);
 
   const classifierGroup = getGroup(f, "classifier");
   const classifier = deserializeClassifierGroup(classifierGroup);

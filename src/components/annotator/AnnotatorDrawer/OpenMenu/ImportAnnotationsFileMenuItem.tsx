@@ -14,11 +14,7 @@ import {
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 
 import { validateFileType, ProjectFileType } from "types/runtime";
-import {
-  SerializedCOCOFileType,
-  SerializedFileType,
-  ShadowImageType,
-} from "types";
+import { SerializedCOCOFileType, SerializedFileType } from "types";
 
 type ImportAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
@@ -35,10 +31,7 @@ export const ImportAnnotationsFileMenuItem = ({
 
   const existingAnnotationCategories = useSelector(selectAllImageCategories);
 
-  const existingImages = useSelector(selectSelectedImages).map((image) => {
-    return { ...image, annotations: [] } as ShadowImageType;
-  });
-
+  const existingImages = useSelector(selectSelectedImages);
   const availableColors = useSelector(selectUnusedImageCategoryColors);
 
   const onImportProjectFile = useCallback(
@@ -58,7 +51,7 @@ export const ImportAnnotationsFileMenuItem = ({
           const serializedProject: SerializedCOCOFileType | SerializedFileType =
             validateFileType(event.target.result as string, projectType);
 
-          const { imsToAnnotate, newCategories } =
+          const { annotations, newCategories } =
             projectType === ProjectFileType.PIXIMI
               ? deserializeProjectFile(
                   serializedProject as SerializedFileType,
@@ -78,11 +71,7 @@ export const ImportAnnotationsFileMenuItem = ({
                 annotationCategories: newCategories,
               })
             );
-            dispatch(
-              dataSlice.actions.setImageInstances({
-                instances: imsToAnnotate,
-              })
-            );
+            dispatch(dataSlice.actions.addAnnotations({ annotations }));
           });
 
           // when a deserialized annotation is associated with the active image

@@ -7,8 +7,6 @@ import { createRenderedTensor } from "utils/common/image";
 
 import { selectActiveImageColor, selectSelectedImages } from "store/data";
 
-import { OldImageType } from "types";
-
 export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(selectActiveImageColor);
   const images = useSelector(selectSelectedImages);
@@ -32,7 +30,7 @@ export const ApplyColorsButton = () => {
             color: newColor.clone(),
           };
 
-          // TOO: COCO - necessary?
+          // TODO: COCO - necessary?
           const imageData = image.data.clone();
 
           const updatedSrc = await createRenderedTensor(
@@ -47,7 +45,7 @@ export const ApplyColorsButton = () => {
             data: imageData,
             colors: imageColors,
             src: updatedSrc,
-          } as OldImageType;
+          };
         })
       );
     };

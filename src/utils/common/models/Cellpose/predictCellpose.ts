@@ -11,7 +11,8 @@ import { ColorModel, Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
 import { v4 as uuid } from "uuid";
 
-import { AnnotationType } from "types";
+import { encode } from "utils/annotator";
+import { OrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,
@@ -19,7 +20,7 @@ const labelToAnnotation = async (
   maskH: number,
   maskW: number,
   categoryId: string
-): Promise<AnnotationType> => {
+): Promise<OrphanedAnnotationType> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
   // bool
@@ -82,7 +83,7 @@ const labelToAnnotation = async (
   return {
     categoryId,
     boundingBox: bbox as [number, number, number, number],
-    decodedMask: annotationData,
+    encodedMask: encode(annotationData),
     plane: 0,
     id: uuid(),
   };
@@ -101,7 +102,7 @@ const labelMaskToAnnotation = async (
   indices.dispose();
   values.dispose();
 
-  const annotations: Array<AnnotationType> = [];
+  const annotations: Array<OrphanedAnnotationType> = [];
 
   for (const label of labels) {
     if (label !== 0) {

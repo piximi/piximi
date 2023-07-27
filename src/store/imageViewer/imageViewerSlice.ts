@@ -4,9 +4,9 @@ import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   ImageViewerStore,
   ColorAdjustmentOptionsType,
-  AnnotationType,
   ZoomModeType,
   ZoomToolOptionsType,
+  DecodedAnnotationType,
 } from "types";
 
 import { mutatingFilter } from "utils/common/helpers";
@@ -186,14 +186,14 @@ export const imageViewerSlice = createSlice({
     },
     setWorkingAnnotation(
       state,
-      action: PayloadAction<{ annotation: AnnotationType | undefined }>
+      action: PayloadAction<{ annotation: DecodedAnnotationType | undefined }>
     ) {
       state.workingAnnotation.saved = action.payload.annotation;
       state.workingAnnotation.changes = {};
     },
     updateWorkingAnnotation(
       state,
-      action: PayloadAction<{ changes: Partial<AnnotationType> }>
+      action: PayloadAction<{ changes: Partial<DecodedAnnotationType> }>
     ) {
       state.workingAnnotation.changes = action.payload.changes;
     },

@@ -1,20 +1,18 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectActiveAnnotationIds } from "store/imageViewer";
 import { selectAnnotationEntities } from "./annotationSelectors";
-import { AnnotationType, EncodedAnnotationType } from "types";
+import { DecodedAnnotationType } from "types";
 import { decodeAnnotation } from "utils/annotator";
 
 export const selectActiveAnnotations = createSelector(
   [selectActiveAnnotationIds, selectAnnotationEntities],
-  (annotationIds, annotationEntities): Array<AnnotationType> => {
+  (annotationIds, annotationEntities): Array<DecodedAnnotationType> => {
     if (!annotationIds.length) return [];
 
     return annotationIds.map((annotationId) => {
       const decodedAnnotation = !annotationEntities[annotationId].decodedMask
-        ? decodeAnnotation(
-            annotationEntities[annotationId] as EncodedAnnotationType
-          )!
-        : (annotationEntities[annotationId] as AnnotationType);
+        ? decodeAnnotation(annotationEntities[annotationId])
+        : (annotationEntities[annotationId] as DecodedAnnotationType);
       return decodedAnnotation;
     });
   }

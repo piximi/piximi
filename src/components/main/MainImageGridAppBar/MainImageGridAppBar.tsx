@@ -38,14 +38,16 @@ import { projectSlice, selectedImagesIdSelector } from "store/project";
 import { dataSlice, selectVisibleImages } from "store/data";
 import { setActiveImageId } from "store/imageViewer";
 
-import { HotkeyView, ImageType, ShadowImageType } from "types";
+import { HotkeyView } from "types";
 
 export const MainImageGridAppBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const images = useSelector(selectVisibleImages);
-  const selectedImages: Array<string> = useSelector(selectedImagesIdSelector);
+  const selectedImagesIds: Array<string> = useSelector(
+    selectedImagesIdSelector
+  );
   const currentHotkeyView = useSelector(hotkeyViewSelector);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -64,7 +66,7 @@ export const MainImageGridAppBar = () => {
   const handleAndDispatchDeleteImages = () => {
     dispatch(
       dataSlice.actions.deleteImages({
-        imageIds: selectedImages,
+        imageIds: selectedImagesIds,
         disposeColorTensors: true,
       })
     );
@@ -81,45 +83,11 @@ export const MainImageGridAppBar = () => {
   };
 
   const onOpenAnnotator = () => {
-    const selected = selectedImages.map((id: string, idx: number) => {
-      const projectImage = images.find((image: ImageType) => {
-        return image.id === id;
-      });
-
-      if (!projectImage) {
-        throw Error(
-          `Selected image with id ${id} not found among visible images.`
-        );
-      }
-
-      const annotatorImageColors = {
-        ...projectImage.colors,
-        color: projectImage.colors.color.clone(),
-      };
-
-      const annotatorImage: ShadowImageType = {
-        id: projectImage.id,
-        name: projectImage.name,
-        annotations: [],
-        src: projectImage.src,
-        activePlane: projectImage.activePlane,
-        shape: projectImage.shape,
-        // clone so that if it's mutated or disposed in annotator
-        // it won't apply those changes to the tensor in the main view
-        // unless changes are saved
-        colors: annotatorImageColors,
-        bitDepth: projectImage.bitDepth,
-      };
-
-      return annotatorImage;
-    });
-
-    if (!selected) return;
-
     batch(() => {
       dispatch(
         setActiveImageId({
-          imageId: selected.length > 0 ? selected[0].id : undefined,
+          imageId:
+            selectedImagesIds.length > 0 ? selectedImagesIds[0] : undefined,
           prevImageId: undefined,
           execSaga: true,
         })
@@ -166,16 +134,16 @@ export const MainImageGridAppBar = () => {
   }, [showImageGridAppBar, currentHotkeyView, dispatch]);
 
   React.useEffect(() => {
-    if (selectedImages.length > 0) {
+    if (selectedImagesIds.length > 0) {
       setShowImageGridAppBar(true);
     } else {
       setShowImageGridAppBar(false);
     }
 
-    images.length === selectedImages.length
+    images.length === selectedImagesIds.length
       ? setShowSelectAllButton(false)
       : setShowSelectAllButton(true);
-  }, [selectedImages, images]);
+  }, [selectedImagesIds, images]);
 
   return (
     <>
@@ -197,7 +165,7 @@ export const MainImageGridAppBar = () => {
             </Tooltip>
 
             <Typography sx={{ flexGrow: 1 }}>
-              {selectedImages.length} selected images
+              {selectedImagesIds.length} selected images
             </Typography>
 
             <Box sx={{ flexGrow: 1 }} />
@@ -250,14 +218,14 @@ export const MainImageGridAppBar = () => {
 
       <ImageCategoryMenu
         anchorEl={categoryMenuAnchorEl as HTMLElement}
-        imageIds={selectedImages}
+        imageIds={selectedImagesIds}
         onClose={onCloseCategoryMenu}
         open={Boolean(categoryMenuAnchorEl as HTMLElement)}
       />
 
       <DialogWithAction
-        title={`Delete ${selectedImages.length} image${
-          selectedImages.length > 1 ? "s" : ""
+        title={`Delete ${selectedImagesIds.length} image${
+          selectedImagesIds.length > 1 ? "s" : ""
         }?`}
         content="Images will be deleted from the project."
         handleConfirmCallback={handleAndDispatchDeleteImages}

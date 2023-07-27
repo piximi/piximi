@@ -4,7 +4,6 @@ import {
   AnnotationModeType,
   AnnotationStateType,
   TypedAppStartListening,
-  DecodedAnnotationType,
   ToolType,
 } from "types";
 import { annotatorSlice } from "./annotatorSlice";
@@ -49,13 +48,9 @@ startAppListening({
       );
       if (!annotationTool.annotation) return;
 
-      const annotation = encodeAnnotation(
-        annotationTool.annotation as DecodedAnnotationType
-      );
-
       listenerAPI.dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({
-          annotation: annotation!,
+          annotation: annotationTool.annotation,
         })
       );
     } else {

@@ -21,6 +21,7 @@ import { HotkeyView } from "types";
 import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
 import { downloader } from "utils/common/fileHandlers";
+import { segmenterSelector } from "store/segmenter";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -32,6 +33,7 @@ export const SaveProjectDialog = ({
   open,
 }: SaveProjectDialogProps) => {
   const classifier = useSelector(classifierSelector);
+  const segmenter = useSelector(segmenterSelector);
 
   const project = useSelector(projectSelector);
   const data = useSelector(dataProjectSelector);
@@ -39,7 +41,7 @@ export const SaveProjectDialog = ({
   const [projectName, setProjectName] = useState<string>(project.name);
 
   const onSaveProjectClick = async () => {
-    serialize(projectName, project, data, classifier)
+    serialize(projectName, project, data, classifier, segmenter)
       .then((f) => {
         downloader(f, `${projectName}.h5`);
       })

@@ -3,7 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Tool } from "../Tool";
 
-import { AnnotationStateType, Category, Point, AnnotationType } from "types";
+import {
+  AnnotationStateType,
+  Category,
+  Point,
+  DecodedAnnotationType,
+} from "types";
 
 import { DataArray, convertToDataArray } from "utils/common/image";
 
@@ -42,7 +47,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: AnnotationType;
+  annotation?: DecodedAnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];

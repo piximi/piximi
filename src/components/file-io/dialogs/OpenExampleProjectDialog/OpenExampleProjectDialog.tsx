@@ -40,7 +40,7 @@ const exampleProjects = [
     projectDescription:
       "C. elegans infection marker: " +
       "Images show transgenic C. elegans expressing the promoter of gene clec-60 fused to GFP.\n" +
-      "Channel 1: brightfield; Channel 2: GFP; Channel 3: mCherry",
+      "Channel 1: GFP; Channel 2: mCherry",
     exampleProjectEnum: ExampleProject.CElegans,
     projectIcon: cElegansExampleProjectIcon,
     projectSource: {
