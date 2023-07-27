@@ -87,15 +87,12 @@ export const ImageMenu = ({
     let zip = new JSZip();
 
     if (!selectedImage.id) return;
-    console.log(annotations.length);
-
-    Promise.all(
-      saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage!, annotations }],
-        annotationCategories,
-        zip,
-        true
-      )
+    saveAnnotationsAsLabelMatrix(
+      [selectedImage],
+      annotations,
+      annotationCategories,
+      zip,
+      true
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labeled_instances.zip");
@@ -114,7 +111,8 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     saveAnnotationsAsBinaryInstanceSegmentationMasks(
-      [{ ...selectedImage, annotations }],
+      [selectedImage],
+      annotations,
       annotationCategories,
       zip,
       "binary_instances"
@@ -131,12 +129,11 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    Promise.all(
-      saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage, annotations }],
-        annotationCategories,
-        zip
-      )
+    saveAnnotationsAsLabelMatrix(
+      [selectedImage],
+      annotations,
+      annotationCategories,
+      zip
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "labels.zip");
@@ -155,7 +152,8 @@ export const ImageMenu = ({
     if (!selectedImage) return;
 
     saveAnnotationsAsLabeledSemanticSegmentationMasks(
-      [{ ...selectedImage, annotations }],
+      [selectedImage],
+      annotations,
       annotationCategories,
       zip,
       "labeled_semantic"
@@ -172,14 +170,13 @@ export const ImageMenu = ({
 
     if (!selectedImage) return;
 
-    Promise.all(
-      saveAnnotationsAsLabelMatrix(
-        [{ ...selectedImage, annotations }],
-        annotationCategories,
-        zip,
-        false,
-        true
-      )
+    saveAnnotationsAsLabelMatrix(
+      [selectedImage],
+      annotations,
+      annotationCategories,
+      zip,
+      false,
+      true
     ).then(() => {
       zip.generateAsync({ type: "blob" }).then((blob) => {
         saveAs(blob, "binary_semantic.zip");

@@ -10,6 +10,8 @@ import {
   zeros,
 } from "@tensorflow/tfjs";
 
+export type OrphanedAnnotationType = Omit<AnnotationType, "imageId">;
+
 export abstract class Segmenter extends Model {
   protected _trainingDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
   protected _validationDataset?: tfdata.Dataset<{ xs: Tensor4D; ys: Tensor2D }>;
@@ -22,7 +24,9 @@ export abstract class Segmenter extends Model {
     super.dispose();
   }
 
-  public abstract predict(): AnnotationType[][] | Promise<AnnotationType[][]>;
+  public abstract predict():
+    | OrphanedAnnotationType[][]
+    | Promise<OrphanedAnnotationType[][]>;
 
   /*
    * Concrete classes must keep track of their inference categories somehow,

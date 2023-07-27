@@ -13,7 +13,6 @@ export type { TypedAppStartListening } from "./TypedAppStartListening";
 export type {
   AnnotationType,
   DecodedAnnotationType,
-  EncodedAnnotationType,
   SerializedAnnotationType,
 } from "./AnnotationType";
 
@@ -65,13 +64,7 @@ export {
   defaultImageSortKey,
 } from "./ImageSortType";
 
-export type {
-  OldImageType,
-  ShadowImageType,
-  ImageType,
-  stagedImageType,
-  ImageAttributeType,
-} from "./ImageType";
+export type { ImageType, ImageAttributeType } from "./ImageType";
 
 export type { Colors, ColorsRaw } from "./tensorflow";
 
@@ -110,10 +103,7 @@ export type { SegmenterStoreType } from "./SegmenterStoreType";
 
 export type { SerializedFileType } from "./SerializedFileType";
 
-export type {
-  SerializedImageType,
-  SerializedAnnotatorImageType,
-} from "./SerializedImageType";
+export type { SerializedAnnotatorImageType } from "./SerializedImageType";
 
 export type { Settings } from "./Settings";
 export { HotkeyView } from "./Settings";

@@ -14,7 +14,9 @@ import {
 } from "@tensorflow/tfjs";
 import { v4 as uuid4 } from "uuid";
 
-import { Category, DecodedAnnotationType } from "types";
+import { Category } from "types";
+import { encode } from "utils/annotator";
+import { OrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
 
 export const predictCoco = async (
   model: GraphModel,
@@ -142,7 +144,7 @@ const buildDetectedObjects = (
   classes: Array<number>,
   categories: Array<Category>
 ) => {
-  const annotations: Array<DecodedAnnotationType> = [];
+  const annotations: Array<OrphanedAnnotationType> = [];
   const count = indices.length;
 
   for (let i = 0; i < count; i++) {
@@ -179,7 +181,7 @@ const buildDetectedObjects = (
       boundingBox: annotationBbox,
       categoryId: category.id,
       id: uuid4(),
-      decodedMask,
+      encodedMask: encode(decodedMask),
       plane: 0,
     });
   }

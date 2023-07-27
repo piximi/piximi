@@ -6,13 +6,13 @@ import Image from "image-js";
 
 import { imageOriginSelector } from "store/imageViewer";
 
-import { AnnotationType, Shape } from "types";
+import { DecodedAnnotationType, Shape } from "types";
 
 import { hexToRGBA, colorOverlayROI, encode } from "utils/annotator";
 import { dataSlice } from "store/data";
 
 type AnnotationProps = {
-  annotation: AnnotationType;
+  annotation: DecodedAnnotationType;
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;

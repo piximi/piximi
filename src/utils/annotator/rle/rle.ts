@@ -1,8 +1,4 @@
-import {
-  DecodedAnnotationType,
-  AnnotationType,
-  EncodedAnnotationType,
-} from "types";
+import { AnnotationType, DecodedAnnotationType } from "types";
 
 /**
  * Decode a Run-length encoded input array.
@@ -26,12 +22,11 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 };
 
 export const decodeAnnotation = (
-  encodedAnnotation: EncodedAnnotationType | undefined
-): AnnotationType | undefined => {
-  if (!encodedAnnotation) return undefined;
-
-  if (!encodedAnnotation.encodedMask && encodedAnnotation.decodedMask)
-    return encodedAnnotation;
+  encodedAnnotation: AnnotationType
+): DecodedAnnotationType => {
+  // TODO - serializtion: temporary measure, remove when done
+  if (!encodedAnnotation.encodedMask)
+    throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
 
   const decodedAnnotation = {
     ...encodedAnnotation,
@@ -42,8 +37,8 @@ export const decodeAnnotation = (
 };
 
 export const decodeAnnotations = async (
-  encodedAnnotations: Array<EncodedAnnotationType>
-): Promise<Array<AnnotationType>> => {
+  encodedAnnotations: Array<AnnotationType>
+): Promise<Array<DecodedAnnotationType>> => {
   return new Promise((resolve, reject) => {
     const decodedAnnotations = encodedAnnotations.map((annotation) => {
       const decdodedAnnotation = {
@@ -103,9 +98,12 @@ export const encode = (
 };
 
 export const encodeAnnotation = (
-  decodedAnnotation: DecodedAnnotationType | undefined
-): AnnotationType | undefined => {
-  if (!decodedAnnotation) return undefined;
+  decodedAnnotation: DecodedAnnotationType
+): AnnotationType => {
+  // TODO - serializtion: temporary measure, remove when done
+  if (!decodedAnnotation.decodedMask)
+    throw Error(`Annotation ${decodedAnnotation.id} has no decoded mask`);
+
   const encodedAnnotation = {
     ...decodedAnnotation,
     encodedMask: encode(decodedAnnotation.decodedMask),

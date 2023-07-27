@@ -5,15 +5,17 @@ import {
   AnnotationType,
   Classifier,
   FitOptions,
-  OldImageType,
   PreprocessOptions,
   Project,
   Category,
+  ImageType,
+  SegmenterStoreType,
 } from "types";
 import { Colors } from "types/tensorflow";
-import { sortTypeByKey } from "types/ImageSortType";
-import { Model } from "../models/Model";
-import { availableClassifierModels } from "types/ModelType";
+import {
+  availableClassifierModels,
+  availableSegmenterModels,
+} from "types/ModelType";
 
 /* 
    =====================
@@ -25,12 +27,13 @@ const serializeImageAnnotations = (
   annotationsGroup: Group,
   annotations: Array<AnnotationType>
 ) => {
+  const imageIds = annotations.map((an) => an.imageId);
   const bboxes = new Uint8Array(annotations.length * 4);
   const categories = annotations.map((an) => an.categoryId);
   const ids = annotations.map((an) => an.id);
   const maskLengths = new Uint8Array(annotations.length);
   const masks = new Uint8Array(
-    annotations.reduce((prev, curr) => prev + curr.encodedMask!.length, 0)
+    annotations.reduce((prev, curr) => prev + curr.encodedMask.length, 0)
   );
   const planes = Uint8Array.from(annotations.map((an) => an.plane));
 
@@ -38,11 +41,12 @@ const serializeImageAnnotations = (
   for (let i = 0; i < annotations.length; i++) {
     let annotation = annotations[i];
     bboxes.set(annotation.boundingBox, i * 4);
-    maskLengths[i] = annotation.encodedMask!.length;
-    masks.set(annotation.encodedMask!, maskStartIdx);
-    maskStartIdx += annotation.encodedMask!.length;
+    maskLengths[i] = annotation.encodedMask.length;
+    masks.set(annotation.encodedMask, maskStartIdx);
+    maskStartIdx += annotation.encodedMask.length;
   }
 
+  annotationsGroup.create_dataset("image_id", imageIds);
   annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");
   annotationsGroup.create_dataset("annotation_category_id", categories);
   annotationsGroup.create_dataset("annotation_id", ids);
@@ -75,7 +79,7 @@ const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
   );
 };
 
-const serializeImages = (imagesGroup: Group, images: Array<OldImageType>) => {
+const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
   for (let i = 0; i < images.length; i++) {
     let im = images[i];
     let imGroup = imagesGroup.create_group(im.name);
@@ -91,15 +95,11 @@ const serializeImages = (imagesGroup: Group, images: Array<OldImageType>) => {
     imGroup.create_attribute("image_id", im.id);
     imGroup.create_attribute("active_plane", im.activePlane, undefined, "<B");
     imGroup.create_attribute("class_category_id", im.categoryId);
-    imGroup.create_attribute("visible_B", Number(im.visible), undefined, "<B");
     imGroup.create_attribute("classifier_partition", im.partition);
     // imGroup.create_attribute("segmenter_partition", im.segmentationPartition)
 
     let colorGroup = imGroup.create_group("colors");
     serializeImageColors(colorGroup, im.colors);
-
-    let annotationsGroup = imGroup.create_group("annotations");
-    serializeImageAnnotations(annotationsGroup, im.annotations);
   }
 };
 
@@ -116,19 +116,14 @@ const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
     "name",
     categories.map((cat) => cat.name)
   );
-  categoryGroup.create_dataset(
-    "visible_B",
-    Uint8Array.from(categories.map((cat) => Number(cat.visible))),
-    undefined,
-    "<B"
-  );
 };
 
 const serializeProject = (
   projectGroup: Group,
   project: Project,
   data: {
-    images: Array<OldImageType>;
+    images: Array<ImageType>;
+    annotations: Array<AnnotationType>;
     categories: Array<Category>;
     annotationCategories: Array<Category>;
   }
@@ -136,9 +131,10 @@ const serializeProject = (
   projectGroup.create_attribute("name", project.name);
 
   const imagesGroup = projectGroup.create_group("images");
-  const imageSortKeyName = sortTypeByKey(project.imageSortKey).imageSortKeyName;
-  imagesGroup.create_attribute("sort_key", imageSortKeyName);
   serializeImages(imagesGroup, data.images);
+
+  let annotationsGroup = projectGroup.create_group("annotations");
+  serializeImageAnnotations(annotationsGroup, data.annotations);
 
   const categoriesGroup = projectGroup.create_group("categories");
   serializeCategories(categoriesGroup, data.categories);
@@ -217,34 +213,13 @@ const serializePreprocessOptions = (
   );
 };
 
-const serializeModelProps = (modelPropsGroup: Group, model: Model) => {
-  modelPropsGroup.create_attribute("model_name", model.name);
-
-  modelPropsGroup.create_attribute("model_tak", model.task);
-
-  model.src && modelPropsGroup.create_attribute("src", model.src);
-
-  modelPropsGroup.create_attribute(
-    "model_graph_B",
-    Number(model.graph),
-    undefined,
-    "<B"
-  );
-
-  modelPropsGroup.create_attribute(
-    "model_pretrained_B",
-    Number(model.pretrained),
-    undefined,
-    "<B"
-  );
-
-  model.requiredChannels &&
-    modelPropsGroup.create_attribute(
-      "required_channels",
-      model.requiredChannels,
-      undefined,
-      "<B"
-    );
+const serializeModelProps = (
+  modelPropsGroup: Group,
+  classifierName: string,
+  segmenterName: string
+) => {
+  modelPropsGroup.create_attribute("classifier_name", classifierName);
+  modelPropsGroup.create_attribute("segmenter_name", segmenterName);
 };
 
 const serializeClassifier = (
@@ -291,12 +266,6 @@ const serializeClassifier = (
   );
 
   classifierGroup.create_dataset("metrics", classifier.metrics);
-
-  const selectedModelGroup = classifierGroup.create_group("selected_model");
-  serializeModelProps(
-    selectedModelGroup,
-    availableClassifierModels[classifier.selectedModelIdx]
-  );
 };
 
 /*
@@ -309,20 +278,40 @@ export const serialize = async (
   name: string,
   projectSlice: Project,
   data: {
-    images: Array<OldImageType>;
+    images: Array<ImageType>;
+    annotations: Array<AnnotationType>;
     categories: Array<Category>;
     annotationCategories: Array<Category>;
   },
-  classifierSlice: Classifier
+  classifierSlice: Classifier,
+  segmenterSlice: SegmenterStoreType
 ) => {
   const { FS } = await ready;
 
   const f = await getFile(name, "w");
 
-  f.create_attribute("version", "0.1.0");
+  // yarn/npm start/build must be run with REACT_APP_VERSION=$npm_package_version
+  const piximiVersion = process.env.REACT_APP_VERSION;
+
+  if (!piximiVersion) {
+    throw Error("Missing Piximi version");
+  }
+
+  f.create_attribute("version", piximiVersion);
 
   const projectGroup = f.create_group("project");
   serializeProject(projectGroup, projectSlice, data);
+
+  const modelPropsGroup = f.create_group("model_props");
+  const classifierModel =
+    availableClassifierModels[classifierSlice.selectedModelIdx];
+  const segmenterModel =
+    availableSegmenterModels[segmenterSlice.selectedModelIdx];
+  serializeModelProps(
+    modelPropsGroup,
+    classifierModel.name,
+    segmenterModel.name
+  );
 
   const classifierGroup = f.create_group("classifier");
   serializeClassifier(classifierGroup, classifierSlice);

@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   DEFAULT_COLORS,
-  OldImageType,
+  ImageType,
   Partition,
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
@@ -807,7 +807,7 @@ export const convertToImage = async (
   currentColors: Colors | undefined,
   numSlices: number,
   numChannels: number
-) => {
+): Promise<ImageType> => {
   if (!imageStack.length) {
     throw Error("Expected image stack");
   }
@@ -834,7 +834,6 @@ export const convertToImage = async (
 
   return {
     activePlane: activePlane,
-    annotations: [],
     colors: colors,
     bitDepth,
     categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
@@ -845,7 +844,7 @@ export const convertToImage = async (
     partition: Partition.Inference,
     src: coloredSliceURL,
     visible: true,
-  } as OldImageType;
+  } as ImageType;
 };
 
 /*
