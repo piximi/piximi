@@ -367,12 +367,12 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      for (const category in state.annotationsByCategory) {
-        if (category !== UNKNOWN_ANNOTATION_CATEGORY_ID) {
+      for (const categoryId in state.annotationsByCategory) {
+        if (categoryId !== UNKNOWN_ANNOTATION_CATEGORY_ID) {
           state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
-            ...state.annotationsByCategory[category]
+            ...state.annotationsByCategory[categoryId]
           );
-          delete state.annotationsByCategory[category];
+          delete state.annotationsByCategory[categoryId];
         }
       }
       for (const annotationId of state.annotations.ids) {
@@ -1305,4 +1305,5 @@ export const {
   updateAnnotation,
   updateAnnotations,
   deleteImageAnnotationsByCategory,
+  setAnnotations,
 } = dataSlice.actions;
