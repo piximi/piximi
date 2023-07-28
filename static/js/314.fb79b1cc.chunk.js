@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkpiximi=self.webpackChunkpiximi||[]).push([[314],{51314:function(e,i,c){e.exports=c.p+"static/media/mnistExampleProject.0120cf6d8ee9ac7102f4.h5"}}]);

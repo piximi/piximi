@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpiximi=self.webpackChunkpiximi||[]).push([[247],{31247:function(e,i,c){e.exports=c.p+"static/media/BBBC013ExampleProject.7d7ac33f0c8d9e2f06c2.h5"}}]);
