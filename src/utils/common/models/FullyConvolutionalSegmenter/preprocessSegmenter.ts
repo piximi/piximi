@@ -24,7 +24,7 @@ import { FitOptions } from "types/FitOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { RescaleOptions } from "types/RescaleOptions";
 import { DecodedAnnotationType } from "types/AnnotationType";
-import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
+//import { encodeAnnotationToSegmentationMask } from "./segmentationMasks";
 
 export const drawSegmentationMask = async (
   createdCategoriesIDs: Array<string>,
