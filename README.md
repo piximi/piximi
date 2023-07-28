@@ -29,7 +29,7 @@ Builds the app for production to the `build` folder.<br />
 
 Runs the tests. Note that for tests using tensorflow you need to specify the custom environment:
 
-`yarn test --env=./src/store/coroutines/classifier/custom-test-env.js`<br />
+`yarn test --env=./src/utils/common/models/utils/custom-test-env.js`<br />
 
 ## Docker
 

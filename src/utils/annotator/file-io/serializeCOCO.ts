@@ -92,8 +92,8 @@ export const serializeCOCOFile = (
 
   const info = {
     year: new Date().getFullYear(),
-    // TODO: COCO - get this from package.json
-    version: "0.1.0",
+    // provided in package.json scripts
+    version: process.env.REACT_APP_VERSION as string,
     description: "",
     contributor: "",
     url: "",

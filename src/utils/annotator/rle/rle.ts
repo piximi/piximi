@@ -112,21 +112,18 @@ export const encodeAnnotation = (
   return encodedAnnotation;
 };
 
-// TODO: why is this returning a Promise???
 export const encodeAnnotations = (
   decodedAnnotations: Array<DecodedAnnotationType>
-): Promise<Array<AnnotationType>> => {
-  return new Promise((resolve) => {
-    const encodedAnnotations = decodedAnnotations.map((annotation) => {
-      const decdodedAnnotation = {
-        ...annotation,
-        encodedMask: encode(annotation.decodedMask),
-      };
-      return decdodedAnnotation;
-    });
-
-    resolve(encodedAnnotations);
+): Array<AnnotationType> => {
+  const encodedAnnotations = decodedAnnotations.map((annotation) => {
+    const decdodedAnnotation = {
+      ...annotation,
+      encodedMask: encode(annotation.decodedMask),
+    };
+    return decdodedAnnotation;
   });
+
+  return encodedAnnotations;
 };
 
 export const fromString = (s: Array<number>) => {
