@@ -46,7 +46,6 @@ const preprocessingOptions: PreprocessOptions = {
 const fitOptions: FitOptions = {
   epochs: 10,
   batchSize: 32,
-  initialEpoch: 0,
 };
 
 const annotationCategories: Array<Category> = [

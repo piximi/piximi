@@ -8,7 +8,7 @@
       "planes": 1,
       "frames": 1
     },
-    "fitOptions": { "epochs": 10, "batchSize": 32, "initialEpoch": 0 },
+    "fitOptions": { "epochs": 10, "batchSize": 32 },
     "fitting": false,
     "learningRate": 0.01,
     "lossFunction": "Categorical (softmax) cross entropy",
@@ -47,7 +47,7 @@
       "metrics": ["Categorical accuracy"],
       "optimizationAlgorithm": "Adam"
     },
-    "fitOptions": { "epochs": 10, "batchSize": 32, "initialEpoch": 0 },
+    "fitOptions": { "epochs": 10, "batchSize": 32 },
     "inputShape": {
       "height": 256,
       "width": 256,

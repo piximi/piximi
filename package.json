@@ -73,7 +73,8 @@
     "use-image": "^1.0.7",
     "use-sound": "^4.0.1",
     "uuid": "^8.3.2",
-    "web-vitals": "^2.1.2"
+    "web-vitals": "^2.1.2",
+    "zarr": "^0.6.1"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",

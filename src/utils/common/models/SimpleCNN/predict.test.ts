@@ -117,7 +117,6 @@ const preprocessOptions: PreprocessOptions = {
 const fitOptions: FitOptions = {
   epochs: 1,
   batchSize: 3,
-  initialEpoch: 0,
 };
 
 const inferrenceImagesUnloaded = [

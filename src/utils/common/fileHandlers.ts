@@ -1,3 +1,4 @@
+// TODO - zarr: throw away?
 // source: https://cdn.jsdelivr.net/npm/h5wasm@latest/dist/esm/file_handlers.js
 // license: https://github.com/usnistgov/h5wasm/blob/main/LICENSE.txt
 

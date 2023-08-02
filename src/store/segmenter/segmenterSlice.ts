@@ -33,7 +33,6 @@ export const initialState: SegmenterStoreType = {
   fitOptions: {
     epochs: 10,
     batchSize: 32,
-    initialEpoch: 0,
   },
   compileOptions: {
     learningRate: 0.01,

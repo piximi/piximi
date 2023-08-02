@@ -14,7 +14,7 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserialize } from "utils/common/image/deserialize";
+import { deserialize } from "utils/common/image/legacyDeserialize";
 import { uploader } from "utils/common/fileHandlers";
 import { dataSlice } from "store/data";
 
