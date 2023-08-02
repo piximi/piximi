@@ -119,7 +119,6 @@ const preprocessOptions: PreprocessOptions = {
 const fitOptions: FitOptions = {
   epochs: 2,
   batchSize: 3,
-  initialEpoch: 0,
 };
 
 const validationImagesUnloaded = [

@@ -8,12 +8,12 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
 
-import { uploader } from "utils/common/fileHandlers";
 import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
+import { FileStore } from "utils/annotator/file-io/zarr";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -33,13 +33,12 @@ export const OpenProjectMenuItem = ({
 
     if (!event.currentTarget.files) return;
 
-    const file = event.currentTarget.files[0];
-
-    await uploader(file);
+    const zarrFiles = event.currentTarget.files;
+    const zarrStore = FileStore.fListToStore(zarrFiles);
 
     event.target.value = "";
 
-    deserialize(file.name)
+    deserialize(zarrStore)
       .then((res) => {
         batch(() => {
           dispatch(classifierSlice.actions.resetClassifier());
@@ -111,6 +110,10 @@ export const OpenProjectMenuItem = ({
           onOpenProjectFile(event);
         }}
         type="file"
+        // @ts-ignore
+        webkitdirectory=""
+        directory=""
+        multiple
       />
     </MenuItem>
   );

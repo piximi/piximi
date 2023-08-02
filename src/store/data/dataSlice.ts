@@ -466,15 +466,25 @@ export const dataSlice = createSlice({
     ) {
       const image = action.payload.image;
 
-      const initialName = image.name.split(".")[0]; //get name before file extension
-      const imageNames = Object.values(state.images.entities).map(
-        (image) => getDeferredProperty(image, "name") as string
+      const nameParts = image.name.split(".");
+      const namePrefix = nameParts[0]; //get name before file extension
+      const nameSuffix = nameParts.slice(1).join("."); //get file extension
+
+      const existingPrefixes = Object.values(state.images.entities).map(
+        (im) => (getDeferredProperty(im, "name") as string).split(".")[0]
       );
-      //add filename extension to updatedName
+
+      const updatedNamePrefix = replaceDuplicateName(
+        namePrefix,
+        existingPrefixes
+      );
+
+      // add original extension, if it ever existed
       const updatedName =
-        replaceDuplicateName(initialName, imageNames) +
-        "." +
-        image.name.split(".").slice(1);
+        nameSuffix === ""
+          ? updatedNamePrefix
+          : updatedNamePrefix + "." + nameSuffix;
+
       image.name = updatedName;
 
       if (state.imageCategories.ids.includes(image.categoryId)) {

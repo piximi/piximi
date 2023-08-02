@@ -21,7 +21,6 @@ export const initialState: Classifier = {
   fitOptions: {
     epochs: 10,
     batchSize: 32,
-    initialEpoch: 0,
   },
   learningRate: 0.01,
   lossFunction: LossFunction.CategoricalCrossEntropy,

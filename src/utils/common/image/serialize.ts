@@ -4,7 +4,6 @@ import { getFile, to_blob } from "../fileHandlers";
 import {
   AnnotationType,
   Classifier,
-  FitOptions,
   PreprocessOptions,
   Project,
   Category,
@@ -46,10 +45,11 @@ const serializeImageAnnotations = (
     maskStartIdx += annotation.encodedMask.length;
   }
 
-  annotationsGroup.create_dataset("image_id", imageIds);
+  annotationsGroup.create_attribute("image_id", imageIds);
+  annotationsGroup.create_attribute("annotation_category_id", categories);
+  annotationsGroup.create_attribute("annotation_id", ids);
+
   annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");
-  annotationsGroup.create_dataset("annotation_category_id", categories);
-  annotationsGroup.create_dataset("annotation_id", ids);
   annotationsGroup.create_dataset("mask_length", maskLengths, undefined, "<B");
   annotationsGroup.create_dataset("mask", masks, undefined, "<B");
   annotationsGroup.create_dataset("plane", planes, undefined, "<B");
@@ -80,12 +80,18 @@ const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
 };
 
 const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
+  // TODO - zarr: split is temporary, replace with just im.name when done
+  const imageNames = images.map((image) => image.name.split(".")[0]);
+  // zarr decoder needs to know the name of each subgroup, so put it as attr
+  // TODO - zarr: this freaks out the hdf5 encoder
+  // imagesGroup.create_attribute("image_name", imageNames);
+
   for (let i = 0; i < images.length; i++) {
     let im = images[i];
-    let imGroup = imagesGroup.create_group(im.name);
+    let imGroup = imagesGroup.create_group(imageNames[i]);
 
     let im_data = imGroup.create_dataset(
-      im.name,
+      imageNames[i],
       im.data.dataSync(),
       [im.shape.planes, im.shape.height, im.shape.width, im.shape.channels],
       "<f4"
@@ -104,15 +110,15 @@ const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
 };
 
 const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
-  categoryGroup.create_dataset(
+  categoryGroup.create_attribute(
     "category_id",
     categories.map((cat) => cat.id)
   );
-  categoryGroup.create_dataset(
+  categoryGroup.create_attribute(
     "color",
     categories.map((cat) => cat.color)
   );
-  categoryGroup.create_dataset(
+  categoryGroup.create_attribute(
     "name",
     categories.map((cat) => cat.name)
   );
@@ -149,30 +155,6 @@ const serializeProject = (
   Classifier Serialization
   ========================
  */
-
-const serializeFitOptions = (
-  fitOptionsGroup: Group,
-  fitOptions: FitOptions
-) => {
-  fitOptionsGroup.create_attribute(
-    "epochs",
-    fitOptions.epochs,
-    undefined,
-    "<B"
-  );
-  fitOptionsGroup.create_attribute(
-    "batch_size",
-    fitOptions.batchSize,
-    undefined,
-    "<B"
-  );
-  fitOptionsGroup.create_attribute(
-    "initial_epoch",
-    fitOptions.initialEpoch,
-    undefined,
-    "<B"
-  );
-};
 
 const serializePreprocessOptions = (
   preprocessOptionsGroup: Group,
@@ -213,21 +195,14 @@ const serializePreprocessOptions = (
   );
 };
 
-const serializeModelProps = (
-  modelPropsGroup: Group,
-  classifierName: string,
-  segmenterName: string
-) => {
-  modelPropsGroup.create_attribute("classifier_name", classifierName);
-  modelPropsGroup.create_attribute("segmenter_name", segmenterName);
-};
-
 const serializeClassifier = (
   classifierGroup: Group,
   classifier: Classifier
 ) => {
-  const fitOptionsGroup = classifierGroup.create_group("fit_options");
-  serializeFitOptions(fitOptionsGroup, classifier.fitOptions);
+  const classifierModel =
+    availableClassifierModels[classifier.selectedModelIdx];
+
+  classifierGroup.create_attribute("name", classifierModel.name);
 
   const { planes, height, width, channels } = classifier.inputShape;
   classifierGroup.create_dataset(
@@ -238,25 +213,43 @@ const serializeClassifier = (
   );
 
   classifierGroup.create_attribute(
+    "training_percent",
+    classifier.trainingPercentage,
+    undefined,
+    "<f"
+  );
+
+  classifierGroup.create_attribute("metrics", classifier.metrics);
+
+  const optSettingsGroup = classifierGroup.create_group("optimizer_settings");
+
+  optSettingsGroup.create_attribute(
+    "epochs",
+    classifier.fitOptions.epochs,
+    undefined,
+    "<B"
+  );
+
+  optSettingsGroup.create_attribute(
+    "batch_size",
+    classifier.fitOptions.batchSize,
+    undefined,
+    "<B"
+  );
+
+  optSettingsGroup.create_attribute(
+    "optimization_algorithm",
+    classifier.optimizationAlgorithm
+  );
+
+  optSettingsGroup.create_attribute(
     "learning_rate",
     classifier.learningRate,
     undefined,
     "<f"
   );
 
-  classifierGroup.create_attribute("loss_function", classifier.lossFunction);
-
-  classifierGroup.create_attribute(
-    "optimization_algorithm",
-    classifier.optimizationAlgorithm
-  );
-
-  classifierGroup.create_attribute(
-    "training_percent",
-    classifier.trainingPercentage,
-    undefined,
-    "<f"
-  );
+  optSettingsGroup.create_attribute("loss_function", classifier.lossFunction);
 
   const preprocessOptionsGroup =
     classifierGroup.create_group("preprocess_options");
@@ -264,8 +257,15 @@ const serializeClassifier = (
     preprocessOptionsGroup,
     classifier.preprocessOptions
   );
+};
 
-  classifierGroup.create_dataset("metrics", classifier.metrics);
+const serializeSegmenter = (
+  segmenterGroup: Group,
+  segmenter: SegmenterStoreType
+) => {
+  const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
+
+  segmenterGroup.create_attribute("name", segmenterModel.name);
 };
 
 /*
@@ -302,19 +302,11 @@ export const serialize = async (
   const projectGroup = f.create_group("project");
   serializeProject(projectGroup, projectSlice, data);
 
-  const modelPropsGroup = f.create_group("model_props");
-  const classifierModel =
-    availableClassifierModels[classifierSlice.selectedModelIdx];
-  const segmenterModel =
-    availableSegmenterModels[segmenterSlice.selectedModelIdx];
-  serializeModelProps(
-    modelPropsGroup,
-    classifierModel.name,
-    segmenterModel.name
-  );
-
   const classifierGroup = f.create_group("classifier");
   serializeClassifier(classifierGroup, classifierSlice);
+
+  const segmenterGroup = f.create_group("segmenter");
+  serializeSegmenter(segmenterGroup, segmenterSlice);
 
   const fBlob = await to_blob(f);
 
