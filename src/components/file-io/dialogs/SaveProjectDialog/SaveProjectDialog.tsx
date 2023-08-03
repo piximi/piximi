@@ -20,8 +20,10 @@ import { dataProjectSelector } from "store/data";
 import { HotkeyView } from "types";
 import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
-import { downloader } from "utils/common/fileHandlers";
+// TODO - zarr: no more
+//import { downloader } from "utils/common/fileHandlers";
 import { segmenterSelector } from "store/segmenter";
+import { saveAs } from "file-saver";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -42,8 +44,22 @@ export const SaveProjectDialog = ({
 
   const onSaveProjectClick = async () => {
     serialize(projectName, project, data, classifier, segmenter)
-      .then((f) => {
-        downloader(f, `${projectName}.h5`);
+      .then((zip) => {
+        return zip.generateAsync(
+          {
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: { level: 4 },
+          },
+          // onUpdate callback
+          (meta: { percent: number }) => {
+            process.env.REACT_APP_LOG_LEVEL === "1" &&
+              console.log(`zipping %${Math.floor(meta.percent)}`);
+          }
+        );
+      })
+      .then((blob) => {
+        saveAs(blob, `${projectName}.zip`);
       })
       .catch((err) => {
         process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);

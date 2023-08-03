@@ -184,7 +184,7 @@ const deserializeImagesGroup = async (imagesGroup: Group) => {
 
   for (const [i, name] of Object.entries(imageNames)) {
     process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log(`processing image ${+i + 1}/${imageNames.length}`);
+      console.log(`deserializing image ${+i + 1}/${imageNames.length}`);
 
     const imageGroup = await getGroup(imagesGroup, name);
     const image = await deserializeImageGroup(name, imageGroup);
