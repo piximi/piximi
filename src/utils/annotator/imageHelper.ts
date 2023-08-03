@@ -229,13 +229,14 @@ export const colorOverlayROI = (
     }).resize({ factor: scalingFactor });
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
+      console.error("could not create crop");
       console.log(`boundingbox: ${boundingBox}`);
       console.log(`boxWidth: ${boxWidth}`);
       console.log(`boxHeight: ${boxHeight}`);
       console.log(`bwxbh: ${boxHeight * boxWidth}`);
       console.log(`decodedMask length: ${decodedMask.length}`);
       console.log(`diff: ${boxHeight * boxWidth - decodedMask.length}`);
-      console.log(err);
+      console.error(err);
     }
   }
 
@@ -332,7 +333,7 @@ export const saveAnnotationsAsBinaryInstanceSegmentationMasks = (
           alpha: 0,
         }
       );
-      const decoded = decode(ann.encodedMask!);
+      const decoded = decode(ann.encodedMask);
       const boundingBox = ann.boundingBox;
       const endX = Math.min(width, boundingBox[2]);
       const endY = Math.min(height, boundingBox[3]);
