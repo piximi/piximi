@@ -1,5 +1,6 @@
+import JSZip from "jszip";
 import { KeyError } from "zarr";
-import { AsyncStore } from "zarr/types/storage/types";
+import { AsyncStore, ValidStoreType } from "zarr/types/storage/types";
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -88,4 +89,71 @@ export class FileStore
     const path = this._key(key);
     return this._map.has(path);
   }
+}
+
+export class ZipStore implements AsyncStore<ValidStoreType> {
+  private _name: string;
+  private _zip: ReturnType<JSZip>;
+
+  private createGroup() {
+    return JSON.stringify({ zarr_format: 2 });
+  }
+
+  constructor(name: string) {
+    this._name = `${name}.zarr`;
+    this._zip = new JSZip();
+    this._zip.folder(this._name);
+  }
+
+  async keys(): Promise<string[]> {
+    // TODO -zarr: not sure if this is correct
+    // currently all files with full path
+    return Object.values(this._zip.files)
+      .filter((f) => !f.dir)
+      .map((f) => f.name);
+  }
+
+  // TODO - zarr
+  async getItem(key: string): Promise<ValidStoreType> {
+    if (key === `${this._name}/.zgroup`) {
+      const initialGroup = this.createGroup();
+      this._zip.file(key, initialGroup);
+      return initialGroup;
+    }
+    const item = this._zip.file(key);
+
+    if (!item) {
+      throw new Error(`No item with key ${key}`);
+    }
+
+    return item.async("arraybuffer");
+  }
+
+  async containsItem(key: string) {
+    return this._zip.file(`${this._name}/${key}`) !== null;
+  }
+
+  async setItem(item: string, value: ValidStoreType) {
+    this._zip.file(item, value);
+    return true;
+  }
+
+  async deleteItem(item: string) {
+    this._zip.remove(item);
+    return true;
+  }
+
+  get zip() {
+    return this._zip;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  // listDir?: (path?: string) => Promise<string[]>;
+  //  rmDir?: (path?: string) => Promise<boolean>;
+
+  //  getSize?: (path?: string) => Promise<number>;
+  //  rename?: (path?: string) => Promise<void>;
 }

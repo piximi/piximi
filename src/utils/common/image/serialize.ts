@@ -1,6 +1,8 @@
-import { Group, ready } from "h5wasm";
+import { Group, NestedArray, group } from "zarr";
+//import { Blosc } from "numcodecs";
 
-import { getFile, to_blob } from "../fileHandlers";
+// TODO - zarr: no more
+//import { to_blob } from "../fileHandlers";
 import {
   AnnotationType,
   Classifier,
@@ -15,6 +17,8 @@ import {
   availableClassifierModels,
   availableSegmenterModels,
 } from "types/ModelType";
+import { ZipStore } from "utils/annotator/file-io/zarr";
+import { Tensor } from "@tensorflow/tfjs";
 
 /* 
    =====================
@@ -22,7 +26,7 @@ import {
    =====================
  */
 
-const serializeImageAnnotations = (
+const serializeImageAnnotations = async (
   annotationsGroup: Group,
   annotations: Array<AnnotationType>
 ) => {
@@ -45,17 +49,17 @@ const serializeImageAnnotations = (
     maskStartIdx += annotation.encodedMask.length;
   }
 
-  annotationsGroup.create_attribute("image_id", imageIds);
-  annotationsGroup.create_attribute("annotation_category_id", categories);
-  annotationsGroup.create_attribute("annotation_id", ids);
+  await annotationsGroup.attrs.setItem("image_id", imageIds);
+  await annotationsGroup.attrs.setItem("annotation_category_id", categories);
+  await annotationsGroup.attrs.setItem("annotation_id", ids);
 
-  annotationsGroup.create_dataset("bounding_box", bboxes, undefined, "<B");
-  annotationsGroup.create_dataset("mask_length", maskLengths, undefined, "<B");
-  annotationsGroup.create_dataset("mask", masks, undefined, "<B");
-  annotationsGroup.create_dataset("plane", planes, undefined, "<B");
+  await writeArray(annotationsGroup, "bounding_box", bboxes);
+  await writeArray(annotationsGroup, "mask_length", maskLengths);
+  await writeArray(annotationsGroup, "mask", masks);
+  await writeArray(annotationsGroup, "plane", planes);
 };
 
-const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
+const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
   const numChannels = colors.color.shape[0];
   const rangeMins = new Float32Array(numChannels);
   const rangeMaxs = new Float32Array(numChannels);
@@ -67,64 +71,72 @@ const serializeImageColors = (colorsGroup: Group, colors: Colors) => {
     visibilities[i] = Number(colors.visible[i]);
   }
 
-  colorsGroup.create_dataset("range_min", rangeMins, undefined, "<f4");
-  colorsGroup.create_dataset("range_max", rangeMaxs, undefined, "<f4");
-  colorsGroup.create_dataset("visible_B", visibilities, undefined, "<B");
+  await writeArray(colorsGroup, "range_min", rangeMins);
+  await writeArray(colorsGroup, "range_max", rangeMaxs);
+  await writeArray(colorsGroup, "visible_B", visibilities);
 
-  colorsGroup.create_dataset(
-    "color",
-    colors.color.dataSync(),
-    [colors.color.shape[0], colors.color.shape[1]],
-    "<f4"
-  );
+  await writeTensor(colorsGroup, "color", colors.color, [
+    colors.color.shape[0],
+    colors.color.shape[1],
+  ]);
 };
 
-const serializeImages = (imagesGroup: Group, images: Array<ImageType>) => {
+const serializeImages = async (
+  imagesGroup: Group,
+  images: Array<ImageType>
+) => {
   // TODO - zarr: split is temporary, replace with just im.name when done
-  const imageNames = images.map((image) => image.name.split(".")[0]);
+  // const imageNames = images.map((image) => image.name.split(".")[0]);
+  const imageNames = images.map((image) => image.name);
   // zarr decoder needs to know the name of each subgroup, so put it as attr
-  // TODO - zarr: this freaks out the hdf5 encoder
-  // imagesGroup.create_attribute("image_name", imageNames);
+  imagesGroup.attrs.setItem("image_names", imageNames);
 
   for (let i = 0; i < images.length; i++) {
+    process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log(`serializing image ${+i + 1}/${imageNames.length}`);
+
     let im = images[i];
-    let imGroup = imagesGroup.create_group(imageNames[i]);
+    let imGroup = await imagesGroup.createGroup(imageNames[i]);
 
-    let im_data = imGroup.create_dataset(
-      imageNames[i],
-      im.data.dataSync(),
-      [im.shape.planes, im.shape.height, im.shape.width, im.shape.channels],
-      "<f4"
-    );
-    im_data.create_attribute("bit_depth", im.bitDepth, undefined, "<B");
+    let im_data = await writeTensor(imGroup, imageNames[i], im.data, [
+      im.shape.planes,
+      im.shape.height,
+      im.shape.width,
+      im.shape.channels,
+    ]);
 
-    imGroup.create_attribute("image_id", im.id);
-    imGroup.create_attribute("active_plane", im.activePlane, undefined, "<B");
-    imGroup.create_attribute("class_category_id", im.categoryId);
-    imGroup.create_attribute("classifier_partition", im.partition);
-    // imGroup.create_attribute("segmenter_partition", im.segmentationPartition)
+    await im_data.attrs.setItem("bit_depth", im.bitDepth);
 
-    let colorGroup = imGroup.create_group("colors");
-    serializeImageColors(colorGroup, im.colors);
+    await imGroup.attrs.setItem("image_id", im.id);
+    await imGroup.attrs.setItem("active_plane", im.activePlane);
+    await imGroup.attrs.setItem("class_category_id", im.categoryId);
+    await imGroup.attrs.setItem("classifier_partition", im.partition);
+    // imGroup.attrs.setItem("segmenter_partition", im.segmentationPartition)
+
+    let colorGroup = await imGroup.createGroup("colors");
+    await serializeImageColors(colorGroup, im.colors);
   }
 };
 
-const serializeCategories = (categoryGroup: Group, categories: Category[]) => {
-  categoryGroup.create_attribute(
+const serializeCategories = async (
+  categoryGroup: Group,
+  categories: Category[]
+) => {
+  await categoryGroup.attrs.setItem(
     "category_id",
     categories.map((cat) => cat.id)
   );
-  categoryGroup.create_attribute(
+  await categoryGroup.attrs.setItem(
     "color",
     categories.map((cat) => cat.color)
   );
-  categoryGroup.create_attribute(
+  await categoryGroup.attrs.setItem(
     "name",
     categories.map((cat) => cat.name)
   );
 };
 
-const serializeProject = (
+const serializeProject = async (
   projectGroup: Group,
   project: Project,
   data: {
@@ -134,20 +146,24 @@ const serializeProject = (
     annotationCategories: Array<Category>;
   }
 ) => {
-  projectGroup.create_attribute("name", project.name);
+  await projectGroup.attrs.setItem("name", project.name);
 
-  const imagesGroup = projectGroup.create_group("images");
-  serializeImages(imagesGroup, data.images);
+  const imagesGroup = await projectGroup.createGroup("images");
 
-  let annotationsGroup = projectGroup.create_group("annotations");
-  serializeImageAnnotations(annotationsGroup, data.annotations);
+  await serializeImages(imagesGroup, data.images);
 
-  const categoriesGroup = projectGroup.create_group("categories");
-  serializeCategories(categoriesGroup, data.categories);
-  const annotationCategoriesGroup = projectGroup.create_group(
+  let annotationsGroup = await projectGroup.createGroup("annotations");
+  await serializeImageAnnotations(annotationsGroup, data.annotations);
+
+  const categoriesGroup = await projectGroup.createGroup("categories");
+  await serializeCategories(categoriesGroup, data.categories);
+  const annotationCategoriesGroup = await projectGroup.createGroup(
     "annotationCategories"
   );
-  serializeCategories(annotationCategoriesGroup, data.annotationCategories);
+  await serializeCategories(
+    annotationCategoriesGroup,
+    data.annotationCategories
+  );
 };
 
 /*
@@ -156,116 +172,107 @@ const serializeProject = (
   ========================
  */
 
-const serializePreprocessOptions = (
+const serializePreprocessOptions = async (
   preprocessOptionsGroup: Group,
   preprocessOptions: PreprocessOptions
 ) => {
-  preprocessOptionsGroup.create_attribute(
+  await preprocessOptionsGroup.attrs.setItem(
     "shuffle_B",
-    Number(preprocessOptions.shuffle),
-    undefined,
-    "<B"
+    Number(preprocessOptions.shuffle)
   );
 
-  const rescaleOptionsGroup =
-    preprocessOptionsGroup.create_group("rescale_options");
-  rescaleOptionsGroup.create_attribute(
+  const rescaleOptionsGroup = await preprocessOptionsGroup.createGroup(
+    "rescale_options"
+  );
+
+  await rescaleOptionsGroup.attrs.setItem(
     "rescale_B",
-    Number(preprocessOptions.rescaleOptions.rescale),
-    undefined,
-    "<B"
-  );
-  rescaleOptionsGroup.create_attribute(
-    "center_B",
-    Number(preprocessOptions.rescaleOptions.center),
-    undefined,
-    "<B"
+    Number(preprocessOptions.rescaleOptions.rescale)
   );
 
-  const cropOptionsGroup = preprocessOptionsGroup.create_group("crop_options");
-  cropOptionsGroup.create_attribute(
-    "num_crops",
-    preprocessOptions.cropOptions.numCrops,
-    undefined,
-    "<B"
+  await rescaleOptionsGroup.attrs.setItem(
+    "center_B",
+    Number(preprocessOptions.rescaleOptions.center)
   );
-  cropOptionsGroup.create_attribute(
+
+  const cropOptionsGroup = await preprocessOptionsGroup.createGroup(
+    "crop_options"
+  );
+  await cropOptionsGroup.attrs.setItem(
+    "num_crops",
+    preprocessOptions.cropOptions.numCrops
+  );
+  await cropOptionsGroup.attrs.setItem(
     "crop_schema",
     preprocessOptions.cropOptions.cropSchema
   );
 };
 
-const serializeClassifier = (
+const serializeClassifier = async (
   classifierGroup: Group,
   classifier: Classifier
 ) => {
   const classifierModel =
     availableClassifierModels[classifier.selectedModelIdx];
 
-  classifierGroup.create_attribute("name", classifierModel.name);
+  await classifierGroup.attrs.setItem("name", classifierModel.name);
 
   const { planes, height, width, channels } = classifier.inputShape;
-  classifierGroup.create_dataset(
+  await writeArray(
+    classifierGroup,
     "input_shape",
-    new Uint8Array([planes, height, width, channels]),
-    undefined,
-    "<B"
+    new Uint8Array([planes, height, width, channels])
   );
 
-  classifierGroup.create_attribute(
+  await classifierGroup.attrs.setItem(
     "training_percent",
-    classifier.trainingPercentage,
-    undefined,
-    "<f"
+    classifier.trainingPercentage
   );
 
-  classifierGroup.create_attribute("metrics", classifier.metrics);
+  await classifierGroup.attrs.setItem("metrics", classifier.metrics);
 
-  const optSettingsGroup = classifierGroup.create_group("optimizer_settings");
-
-  optSettingsGroup.create_attribute(
-    "epochs",
-    classifier.fitOptions.epochs,
-    undefined,
-    "<B"
+  const optSettingsGroup = await classifierGroup.createGroup(
+    "optimizer_settings"
   );
 
-  optSettingsGroup.create_attribute(
+  await optSettingsGroup.attrs.setItem("epochs", classifier.fitOptions.epochs);
+
+  await optSettingsGroup.attrs.setItem(
     "batch_size",
-    classifier.fitOptions.batchSize,
-    undefined,
-    "<B"
+    classifier.fitOptions.batchSize
   );
 
-  optSettingsGroup.create_attribute(
+  await optSettingsGroup.attrs.setItem(
     "optimization_algorithm",
     classifier.optimizationAlgorithm
   );
 
-  optSettingsGroup.create_attribute(
+  await optSettingsGroup.attrs.setItem(
     "learning_rate",
-    classifier.learningRate,
-    undefined,
-    "<f"
+    classifier.learningRate
   );
 
-  optSettingsGroup.create_attribute("loss_function", classifier.lossFunction);
+  await optSettingsGroup.attrs.setItem(
+    "loss_function",
+    classifier.lossFunction
+  );
 
-  const preprocessOptionsGroup =
-    classifierGroup.create_group("preprocess_options");
-  serializePreprocessOptions(
+  const preprocessOptionsGroup = await classifierGroup.createGroup(
+    "preprocess_options"
+  );
+  await serializePreprocessOptions(
     preprocessOptionsGroup,
     classifier.preprocessOptions
   );
 };
 
-const serializeSegmenter = (
+const serializeSegmenter = async (
   segmenterGroup: Group,
   segmenter: SegmenterStoreType
 ) => {
   const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
 
-  segmenterGroup.create_attribute("name", segmenterModel.name);
+  await segmenterGroup.attrs.setItem("name", segmenterModel.name);
 };
 
 /*
@@ -286,9 +293,8 @@ export const serialize = async (
   classifierSlice: Classifier,
   segmenterSlice: SegmenterStoreType
 ) => {
-  const { FS } = await ready;
-
-  const f = await getFile(name, "w");
+  const zipStore = new ZipStore(name);
+  const root = await group(zipStore, zipStore.name);
 
   // yarn/npm start/build must be run with REACT_APP_VERSION=$npm_package_version
   const piximiVersion = process.env.REACT_APP_VERSION;
@@ -297,25 +303,82 @@ export const serialize = async (
     throw Error("Missing Piximi version");
   }
 
-  f.create_attribute("version", piximiVersion);
+  root.attrs.setItem("version", piximiVersion);
 
-  const projectGroup = f.create_group("project");
-  serializeProject(projectGroup, projectSlice, data);
+  const projectGroup = await root.createGroup("project");
+  await serializeProject(projectGroup, projectSlice, data);
 
-  const classifierGroup = f.create_group("classifier");
-  serializeClassifier(classifierGroup, classifierSlice);
+  const classifierGroup = await root.createGroup("classifier");
+  await serializeClassifier(classifierGroup, classifierSlice);
 
-  const segmenterGroup = f.create_group("segmenter");
-  serializeSegmenter(segmenterGroup, segmenterSlice);
+  const segmenterGroup = await root.createGroup("segmenter");
+  await serializeSegmenter(segmenterGroup, segmenterSlice);
 
-  const fBlob = await to_blob(f);
+  // TODO - zarr: no
+  // const fBlob = await to_blob(f);
 
-  const closeStatus = f.close();
+  // const closeStatus = f.close();
 
-  process.env.REACT_APP_LOG_LEVEL === "1" &&
-    console.log(`closed ${name} with status ${closeStatus}`);
+  // process.env.REACT_APP_LOG_LEVEL === "1" &&
+  //   console.log(`closed ${name} with status ${closeStatus}`);
 
-  FS.unlink(`${f.path}${f.filename}`);
+  // FS.unlink(`${f.path}${f.filename}`);
 
-  return fBlob;
+  // return fBlob;
+  return zipStore.zip;
+};
+
+/*
+  ==========================
+  File Serialization Helpers
+  ==========================
+ */
+
+/*
+ * tensor.dataSync() returns either a Float32Array, Uint8Array
+ * or Int32Array. The reason for recasting it is because the returned
+ * data's buffer (rawData.buffer) sometimes has extra padding bytes.
+ * recasting it as its own TypedArray sets a new underlying buffer
+ * of the appropriate byteLength
+ */
+const cleanBuffer = (tensor: Tensor) => {
+  const rawData = tensor.dataSync();
+
+  if (rawData instanceof Float32Array) {
+    return Float32Array.from(rawData);
+  } else if (rawData instanceof Int32Array) {
+    return Int32Array.from(rawData);
+  } else if (rawData instanceof Uint8Array) {
+    return Uint8Array.from(rawData);
+  } else {
+    return rawData;
+  }
+};
+
+const writeArray = async (
+  group: Group,
+  name: string,
+  value: Float32Array | Uint8Array | Int32Array,
+  shape?: number[]
+) => {
+  const nested = new NestedArray(value, shape);
+  return group.createDataset(name, undefined, nested, {
+    chunks: false,
+    fillValue: 0.0,
+    //compressor: { id: Blosc.codecId },
+  });
+};
+
+const writeTensor = async (
+  group: Group,
+  name: string,
+  tensor: Tensor,
+  shape?: number[]
+) => {
+  return writeArray(
+    group,
+    name,
+    cleanBuffer(tensor),
+    shape ? shape : tensor.shape
+  );
 };
