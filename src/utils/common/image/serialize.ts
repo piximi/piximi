@@ -31,14 +31,22 @@ const serializeImageAnnotations = async (
   annotations: Array<AnnotationType>
 ) => {
   const imageIds = annotations.map((an) => an.imageId);
-  const bboxes = new Uint8Array(annotations.length * 4);
+  // Uint16 means images with a width and/or height > 65536 would cause trouble
+  const bboxes = new Uint16Array(annotations.length * 4);
   const categories = annotations.map((an) => an.categoryId);
   const ids = annotations.map((an) => an.id);
-  const maskLengths = new Uint8Array(annotations.length);
-  const masks = new Uint8Array(
+  // might be able to scale down to Uint16 but better safe in this case
+  const maskLengths = new Uint32Array(annotations.length);
+  // needs to be Uint32, Uint16Array would potentially start causing
+  // trouble on image sizes > 256 x 256 since we're counting pixels
+  // and sqrt(2^16) = 256, wheras sqrt(2^32) = 65536 gives us support
+  // for decently large images
+  const masks = new Uint32Array(
     annotations.reduce((prev, curr) => prev + curr.encodedMask.length, 0)
   );
-  const planes = Uint8Array.from(annotations.map((an) => an.plane));
+  // Uint16 because they may have more than 256 planes but more than
+  // 65536 is crazy
+  const planes = Uint16Array.from(annotations.map((an) => an.plane));
 
   let maskStartIdx = 0;
   for (let i = 0; i < annotations.length; i++) {
@@ -358,7 +366,7 @@ const cleanBuffer = (tensor: Tensor) => {
 const writeArray = async (
   group: Group,
   name: string,
-  value: Float32Array | Uint8Array | Int32Array,
+  value: Float32Array | Uint8Array | Int32Array | Uint16Array | Uint32Array,
   shape?: number[]
 ) => {
   const nested = new NestedArray(value, shape);
