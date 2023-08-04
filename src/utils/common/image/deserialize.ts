@@ -23,7 +23,7 @@ import { Colors } from "types/tensorflow";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import { FileStore } from "utils/annotator/file-io/zarr";
+import { CustomStore } from "utils/annotator/file-io/zarr";
 import { RawArray } from "zarr/types/rawArray";
 
 /*
@@ -427,26 +427,26 @@ const deserializeSegmenterGroup = async (segmenterGroup: Group) => {
   return initialSegmenterState;
 };
 
-export const deserialize = async (fileStore: FileStore) => {
+export const deserialize = async (fileStore: CustomStore) => {
   process.env.REACT_APP_LOG_LEVEL === "1" &&
     console.log(`starting deserialization of ${fileStore.rootName}`);
 
-  const f = await openGroup(fileStore, fileStore.rootName, "r");
+  const rootGroup = await openGroup(fileStore, fileStore.rootName, "r");
 
-  const piximiVersionRaw = (await getAttr(f, "version")) as string;
+  const piximiVersionRaw = (await getAttr(rootGroup, "version")) as string;
   const piximiVersion = semver.clean(piximiVersionRaw);
 
   if (!semver.valid(piximiVersion) || semver.lt(piximiVersion!, "0.1.0")) {
     throw Error(`File version ${piximiVersion} is unsupported.`);
   }
 
-  const projectGroup = await getGroup(f, "project");
+  const projectGroup = await getGroup(rootGroup, "project");
   const { project, data } = await deserializeProjectGroup(projectGroup);
 
-  const classifierGroup = await getGroup(f, "classifier");
+  const classifierGroup = await getGroup(rootGroup, "classifier");
   const classifier = await deserializeClassifierGroup(classifierGroup);
 
-  const segmenterGroup = await getGroup(f, "segmenter");
+  const segmenterGroup = await getGroup(rootGroup, "segmenter");
   const segmenter = await deserializeSegmenterGroup(segmenterGroup);
 
   process.env.REACT_APP_LOG_LEVEL === "1" &&

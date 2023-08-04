@@ -302,7 +302,7 @@ export const serialize = async (
   segmenterSlice: SegmenterStoreType
 ) => {
   const zipStore = new ZipStore(name);
-  const root = await group(zipStore, zipStore.name);
+  const root = await group(zipStore, zipStore.rootName);
 
   // yarn/npm start/build must be run with REACT_APP_VERSION=$npm_package_version
   const piximiVersion = process.env.REACT_APP_VERSION;

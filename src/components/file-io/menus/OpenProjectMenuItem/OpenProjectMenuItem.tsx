@@ -13,7 +13,7 @@ import { deserialize } from "utils/common/image/deserialize";
 import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { FileStore } from "utils/annotator/file-io/zarr";
+import { fListToStore } from "utils/annotator/file-io/zarr";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -26,17 +26,17 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onOpenProjectFile = async (
-    event: React.ChangeEvent<HTMLInputElement>
+  const onOpenProject = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    zip: boolean
   ) => {
     event.persist();
 
     if (!event.currentTarget.files) return;
 
-    const zarrFiles = event.currentTarget.files;
-    const zarrStore = FileStore.fListToStore(zarrFiles);
+    const files = event.currentTarget.files;
 
-    event.target.value = "";
+    const zarrStore = await fListToStore(files, zip);
 
     deserialize(zarrStore)
       .then((res) => {
@@ -87,6 +87,9 @@ export const OpenProjectMenuItem = ({
       })
       .catch((err) => {
         const error: Error = err as Error;
+        process.env.NODE_ENV !== "production" &&
+          process.env.REACT_APP_LOG_LEVEL === "1" &&
+          console.error(err);
         const warning: AlertStateType = {
           alertType: AlertType.Warning,
           name: "Could not parse project file",
@@ -96,25 +99,40 @@ export const OpenProjectMenuItem = ({
           applicationSlice.actions.updateAlertState({ alertState: warning })
         );
       });
+
+    event.target.value = "";
   };
 
   return (
-    <MenuItem component="label">
-      <ListItemText primary="Open project" />
-      <input
-        accept="application/x-hdf5"
-        hidden
-        id="open-project-file"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          onMenuClose();
-          onOpenProjectFile(event);
-        }}
-        type="file"
-        // @ts-ignore
-        webkitdirectory=""
-        directory=""
-        multiple
-      />
-    </MenuItem>
+    <>
+      <MenuItem component="label">
+        <ListItemText primary="Open project zarr" />
+        <input
+          accept=".zarr"
+          hidden
+          id="open-project-zarr"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onMenuClose();
+            onOpenProject(event, false);
+          }}
+          type="file"
+          // @ts-ignore
+          webkitdirectory=""
+        />
+      </MenuItem>
+      <MenuItem component="label">
+        <ListItemText primary="Open project zip" />
+        <input
+          accept="application/zip"
+          hidden
+          id="open-project-zip"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onMenuClose();
+            onOpenProject(event, true);
+          }}
+          type="file"
+        />
+      </MenuItem>
+    </>
   );
 };

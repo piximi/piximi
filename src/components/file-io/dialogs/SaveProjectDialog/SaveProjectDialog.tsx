@@ -20,8 +20,6 @@ import { dataProjectSelector } from "store/data";
 import { HotkeyView } from "types";
 import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
-// TODO - zarr: no more
-//import { downloader } from "utils/common/fileHandlers";
 import { segmenterSelector } from "store/segmenter";
 import { saveAs } from "file-saver";
 
