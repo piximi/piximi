@@ -1,8 +1,6 @@
 import { Group, NestedArray, group } from "zarr";
 //import { Blosc } from "numcodecs";
 
-// TODO - zarr: no more
-//import { to_blob } from "../fileHandlers";
 import {
   AnnotationType,
   Classifier,
@@ -17,7 +15,7 @@ import {
   availableClassifierModels,
   availableSegmenterModels,
 } from "types/ModelType";
-import { ZipStore } from "utils/annotator/file-io/zarr";
+import { ZipStore } from "utils";
 import { Tensor } from "@tensorflow/tfjs";
 
 /* 
@@ -93,8 +91,6 @@ const serializeImages = async (
   imagesGroup: Group,
   images: Array<ImageType>
 ) => {
-  // TODO - zarr: split is temporary, replace with just im.name when done
-  // const imageNames = images.map((image) => image.name.split(".")[0]);
   const imageNames = images.map((image) => image.name);
   // zarr decoder needs to know the name of each subgroup, so put it as attr
   imagesGroup.attrs.setItem("image_names", imageNames);
@@ -322,17 +318,6 @@ export const serialize = async (
   const segmenterGroup = await root.createGroup("segmenter");
   await serializeSegmenter(segmenterGroup, segmenterSlice);
 
-  // TODO - zarr: no
-  // const fBlob = await to_blob(f);
-
-  // const closeStatus = f.close();
-
-  // process.env.REACT_APP_LOG_LEVEL === "1" &&
-  //   console.log(`closed ${name} with status ${closeStatus}`);
-
-  // FS.unlink(`${f.path}${f.filename}`);
-
-  // return fBlob;
   return zipStore.zip;
 };
 

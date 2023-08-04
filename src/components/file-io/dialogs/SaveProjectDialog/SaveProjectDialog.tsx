@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Button,
@@ -17,11 +17,12 @@ import { dataProjectSelector } from "store/data";
 // TODO: implement segmenter serialization
 // import { segmenterSelector } from "store/segmenter";
 
-import { HotkeyView } from "types";
+import { AlertStateType, AlertType, HotkeyView } from "types";
 import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
 import { segmenterSelector } from "store/segmenter";
 import { saveAs } from "file-saver";
+import { applicationSlice } from "store/application";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -32,6 +33,8 @@ export const SaveProjectDialog = ({
   onClose,
   open,
 }: SaveProjectDialogProps) => {
+  const dispatch = useDispatch();
+
   const classifier = useSelector(classifierSelector);
   const segmenter = useSelector(segmenterSelector);
 
@@ -59,8 +62,21 @@ export const SaveProjectDialog = ({
       .then((blob) => {
         saveAs(blob, `${projectName}.zip`);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);
+
+        process.env.NODE_ENV !== "production" &&
+          process.env.REACT_APP_LOG_LEVEL === "1" &&
+          console.error(err);
+        const warning: AlertStateType = {
+          alertType: AlertType.Warning,
+          name: "Could not parse project file",
+          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
+        };
+
+        dispatch(
+          applicationSlice.actions.updateAlertState({ alertState: warning })
+        );
       });
 
     onClose();

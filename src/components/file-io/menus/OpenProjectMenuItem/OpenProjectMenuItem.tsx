@@ -13,7 +13,7 @@ import { deserialize } from "utils/common/image/deserialize";
 import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
-import { fListToStore } from "utils/annotator/file-io/zarr";
+import { fListToStore } from "utils";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -85,16 +85,17 @@ export const OpenProjectMenuItem = ({
           });
         }
       })
-      .catch((err) => {
-        const error: Error = err as Error;
+      .catch((err: Error) => {
         process.env.NODE_ENV !== "production" &&
           process.env.REACT_APP_LOG_LEVEL === "1" &&
           console.error(err);
+
         const warning: AlertStateType = {
           alertType: AlertType.Warning,
           name: "Could not parse project file",
-          description: `Error while parsing the project file: ${error.name}\n${error.message}`,
+          description: `Error while parsing the project file: ${err.name}\n${err.message}`,
         };
+
         dispatch(
           applicationSlice.actions.updateAlertState({ alertState: warning })
         );

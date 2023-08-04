@@ -20,3 +20,4 @@ package-lock.json
 stories
 git-sim_media
 .husky/pre-commit
+src/data/exampleProjects/*.zip
