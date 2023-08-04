@@ -39,28 +39,6 @@ export class FileStore
   private _rootPrefix: string;
   private _rootName: string;
 
-  public static fListToStore(files: FileList) {
-    const rootName = files[0].webkitRelativePath.split("/")[0];
-
-    /*
-     * You can't randomly access files from a directory by path name
-     * without the Native File System API, so we need to get objects for _all_
-     * the files right away for Zarr. This is unfortunate because we need to iterate
-     * over all File objects and create an in-memory index.
-     *
-     * fMap is simple key-value mapping from 'some/file/path' -> File
-     */
-    const fMap: Map<string, File> = new Map();
-
-    for (const file of files) {
-      if (file.name === ".DS_Store") continue;
-      // TODO: check browser compat with webkitRelativePath vs path
-      fMap.set(file.webkitRelativePath, file);
-    }
-
-    return new FileStore(fMap, rootName);
-  }
-
   constructor(fileMap: Map<string, File>, rootName: string, rootPrefix = "") {
     super();
     this._map = fileMap;
@@ -92,17 +70,20 @@ export class FileStore
 }
 
 export class ZipStore implements AsyncStore<ValidStoreType> {
-  private _name: string;
+  private _rootName: string;
   private _zip: ReturnType<JSZip>;
+  private _needsInitialGroup: boolean;
 
   private createGroup() {
     return JSON.stringify({ zarr_format: 2 });
   }
 
-  constructor(name: string) {
-    this._name = `${name}.zarr`;
-    this._zip = new JSZip();
-    this._zip.folder(this._name);
+  constructor(name: string, zip?: JSZip) {
+    this._rootName = name;
+    this._rootName = `${name}.zarr`;
+    this._zip = zip ? zip : new JSZip();
+    this._zip.folder(this._rootName);
+    this._needsInitialGroup = zip ? false : true;
   }
 
   async keys(): Promise<string[]> {
@@ -115,7 +96,10 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
 
   // TODO - zarr
   async getItem(key: string): Promise<ValidStoreType> {
-    if (key === `${this._name}/.zgroup`) {
+    // This is to cover the case where we're using the store to write
+    // and zarr.js expects .zgroup to be present at the root group
+    // before attempting to write it
+    if (key === `${this._rootName}/.zgroup` && this._needsInitialGroup) {
       const initialGroup = this.createGroup();
       this._zip.file(key, initialGroup);
       return initialGroup;
@@ -130,7 +114,7 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
   }
 
   async containsItem(key: string) {
-    return this._zip.file(`${this._name}/${key}`) !== null;
+    return this._zip.file(key) !== null;
   }
 
   async setItem(item: string, value: ValidStoreType) {
@@ -147,8 +131,8 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
     return this._zip;
   }
 
-  get name() {
-    return this._name;
+  get rootName() {
+    return this._rootName;
   }
 
   // listDir?: (path?: string) => Promise<string[]>;
@@ -157,3 +141,46 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
   //  getSize?: (path?: string) => Promise<number>;
   //  rename?: (path?: string) => Promise<void>;
 }
+
+export type CustomStore = FileStore | ZipStore;
+
+export const fListToStore = async (
+  files: FileList,
+  zipFile: boolean
+): Promise<CustomStore> => {
+  if (zipFile) {
+    const file = files[0];
+    const zip = await new JSZip().loadAsync(file);
+    // find folder of pattern "projectName.zarr/"
+    const rootFile = zip.folder(/.*\.zarr\/$/);
+
+    if (rootFile.length !== 1) {
+      throw new Error("Could not determine zarr root");
+    }
+
+    // "projectName.zarr/" -> "projectName"
+    const fileName = rootFile[0].name.split(".")[0];
+
+    return new ZipStore(fileName, zip);
+  } else {
+    const rootName = files[0].webkitRelativePath.split("/")[0];
+
+    /*
+     * You can't randomly access files from a directory by path name
+     * without the Native File System API, so we need to get objects for _all_
+     * the files right away for Zarr. This is unfortunate because we need to iterate
+     * over all File objects and create an in-memory index.
+     *
+     * fMap is simple key-value mapping from 'some/file/path' -> File
+     */
+    const fMap: Map<string, File> = new Map();
+
+    for (const file of files) {
+      if (file.name === ".DS_Store") continue;
+      // TODO: check browser compat with webkitRelativePath vs path
+      fMap.set(file.webkitRelativePath, file);
+    }
+
+    return new FileStore(fMap, rootName);
+  }
+};
