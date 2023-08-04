@@ -23,7 +23,7 @@ import { Colors } from "types/tensorflow";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
 import { initialState as initialProjectState } from "store/project/projectSlice";
 import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
-import { CustomStore } from "utils/annotator/file-io/zarr";
+import { CustomStore } from "utils/common/zarrStores";
 import { RawArray } from "zarr/types/rawArray";
 
 /*

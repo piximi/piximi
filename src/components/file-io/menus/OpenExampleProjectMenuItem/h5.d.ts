@@ -1,1 +1,0 @@
-declare module "*.h5";

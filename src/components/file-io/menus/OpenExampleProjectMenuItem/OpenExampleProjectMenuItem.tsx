@@ -14,9 +14,11 @@ import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
-import { deserialize } from "utils/common/image/legacyDeserialize";
-import { uploader } from "utils/common/fileHandlers";
+import { deserialize } from "utils/common/image/deserialize";
 import { dataSlice } from "store/data";
+import { PseudoFileList, fListToStore } from "utils";
+import { AlertStateType, AlertType } from "types";
+import { applicationSlice } from "store/application";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -61,14 +63,14 @@ export const OpenExampleProjectMenuItem = ({
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
             ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/mnistExampleProject.h5"
-            : (await import("data/exampleProjects/mnistExampleProject.h5"))
+            : (await import("data/exampleProjects/mnistExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.CElegans:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
             ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/cElegansExampleProject.h5"
-            : (await import("data/exampleProjects/cElegansExampleProject.h5"))
+            : (await import("data/exampleProjects/cElegansExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.HumanU2OSCells:
@@ -77,7 +79,7 @@ export const OpenExampleProjectMenuItem = ({
             ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/HumanU2OSCellsExampleProject.h5"
             : (
                 await import(
-                  "data/exampleProjects/HumanU2OSCellsExampleProject.h5"
+                  "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
                 )
               ).default;
         break;
@@ -85,52 +87,74 @@ export const OpenExampleProjectMenuItem = ({
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
             ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/BBBC013ExampleProject.h5"
-            : (await import("data/exampleProjects/BBBC013ExampleProject.h5"))
+            : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.PLP1:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
             ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/PLP1ExampleProject.h5"
-            : (await import("data/exampleProjects/PLP1ExampleProject.h5"))
+            : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
                 .default;
         break;
       default:
         return;
     }
 
-    const exampleProjectFile = await fetch(exampleProjectFilePath)
+    const exampleProjectFileList = await fetch(exampleProjectFilePath)
       .then((res) => res.blob())
-      .then((blob) => new File([blob], exampleProject.projectName, blob));
-
-    await uploader(exampleProjectFile);
-
-    const deserializedProject = await deserialize(exampleProjectFile.name);
-
-    const project = deserializedProject.project;
-    const data = deserializedProject.data;
-    const classifier = deserializedProject.classifier;
-    //TODO: keeps images, fix that
-    batch(() => {
-      dispatch(dataSlice.actions.resetData());
-      dispatch(
-        dataSlice.actions.initData({
-          images: data.images,
-          annotations: data.annotations,
-          categories: data.categories,
-          annotationCategories: data.annotationCategories,
-        })
-      );
-      dispatch(projectSlice.actions.setProject({ project }));
-
-      dispatch(
-        classifierSlice.actions.setClassifier({
-          classifier,
-        })
+      .then(
+        (blob) =>
+          new PseudoFileList([
+            new File([blob], exampleProject.projectName, blob),
+          ])
       );
 
-      dispatch(classifierSlice.actions.setDefaults({}));
-    });
+    const fileStore = await fListToStore(exampleProjectFileList, true);
+
+    try {
+      const deserializedProject = await deserialize(fileStore);
+      const project = deserializedProject.project;
+      const data = deserializedProject.data;
+      const classifier = deserializedProject.classifier;
+      //TODO: keeps images, fix that
+      batch(() => {
+        dispatch(dataSlice.actions.resetData());
+        dispatch(
+          dataSlice.actions.initData({
+            images: data.images,
+            annotations: data.annotations,
+            categories: data.categories,
+            annotationCategories: data.annotationCategories,
+          })
+        );
+        dispatch(projectSlice.actions.setProject({ project }));
+
+        dispatch(
+          classifierSlice.actions.setClassifier({
+            classifier,
+          })
+        );
+
+        dispatch(classifierSlice.actions.setDefaults({}));
+      });
+    } catch (err) {
+      const error: Error = err as Error;
+
+      process.env.NODE_ENV !== "production" &&
+        process.env.REACT_APP_LOG_LEVEL === "1" &&
+        console.error(err);
+
+      const warning: AlertStateType = {
+        alertType: AlertType.Warning,
+        name: "Could not parse project file",
+        description: `Error while parsing the project file: ${error.name}\n${error.message}`,
+      };
+
+      dispatch(
+        applicationSlice.actions.updateAlertState({ alertState: warning })
+      );
+    }
 
     onClose();
   };

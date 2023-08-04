@@ -94,7 +94,6 @@ export class ZipStore implements AsyncStore<ValidStoreType> {
       .map((f) => f.name);
   }
 
-  // TODO - zarr
   async getItem(key: string): Promise<ValidStoreType> {
     // This is to cover the case where we're using the store to write
     // and zarr.js expects .zgroup to be present at the root group
