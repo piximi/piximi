@@ -12,7 +12,7 @@ Piximi's target users are computational or non-computational scientists interest
 
 In the project directory, you can run:
 
-### `yarn install`
+### `yarn install && yarn prepare`
 
 Install all project dependencies.
 

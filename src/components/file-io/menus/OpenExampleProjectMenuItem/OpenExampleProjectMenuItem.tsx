@@ -56,27 +56,33 @@ export const OpenExampleProjectMenuItem = ({
     }, 20);
   };
 
+  // CloudFront distribution domain
+  const domain = "https://dw9hr7pc3ofrm.cloudfront.net";
+  // S3 bucket path
+  const rootPath = "exampleProjects";
+  const ext = "zip";
+
   const openExampleProject = async () => {
     var exampleProjectFilePath: string;
     switch (exampleProject.exampleProjectEnum) {
       case ExampleProject.Mnist:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
-            ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/mnistExampleProject.h5"
+            ? `${domain}/${rootPath}/mnistExampleProject.${ext}`
             : (await import("data/exampleProjects/mnistExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.CElegans:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
-            ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/cElegansExampleProject.h5"
+            ? `${domain}/${rootPath}/cElegansExampleProject.${ext}`
             : (await import("data/exampleProjects/cElegansExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
-            ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/HumanU2OSCellsExampleProject.h5"
+            ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
             : (
                 await import(
                   "data/exampleProjects/HumanU2OSCellsExampleProject.zip"
@@ -86,14 +92,14 @@ export const OpenExampleProjectMenuItem = ({
       case ExampleProject.BBBC013:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
-            ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/BBBC013ExampleProject.h5"
+            ? `${domain}/${rootPath}/BBBC013ExampleProject.${ext}`
             : (await import("data/exampleProjects/BBBC013ExampleProject.zip"))
                 .default;
         break;
       case ExampleProject.PLP1:
         exampleProjectFilePath =
           process.env.NODE_ENV === "production"
-            ? "https://media.githubusercontent.com/media/piximi/piximi/master/src/data/exampleProjects/PLP1ExampleProject.h5"
+            ? `${domain}/${rootPath}/PLP1ExampleProject.${ext}`
             : (await import("data/exampleProjects/PLP1ExampleProject.zip"))
                 .default;
         break;
@@ -108,8 +114,15 @@ export const OpenExampleProjectMenuItem = ({
           new PseudoFileList([
             new File([blob], exampleProject.projectName, blob),
           ])
-      );
+      )
+      .catch((err: any) => {
+        process.env.NODE_ENV === "production" &&
+          process.env.REACT_APP_LOG_LEVEL === "1" &&
+          console.error(err);
+        throw err;
+      });
 
+    //@ts-ignore
     const fileStore = await fListToStore(exampleProjectFileList, true);
 
     try {
