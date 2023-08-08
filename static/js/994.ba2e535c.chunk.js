@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkpiximi=self.webpackChunkpiximi||[]).push([[994],{12994:function(e,i,p){e.exports=p.p+"static/media/HumanU2OSCellsExampleProject.7149bb3adf4c209ff957.h5"}}]);

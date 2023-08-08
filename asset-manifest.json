@@ -1,12 +1,17 @@
 {
   "files": {
-    "main.js": "/static/js/main.a872b7ce.js",
+    "main.js": "/static/js/main.7421861d.js",
     "static/js/845.d9f7556a.chunk.js": "/static/js/845.d9f7556a.chunk.js",
-    "static/js/314.57a8b515.chunk.js": "/static/js/314.57a8b515.chunk.js",
-    "static/js/450.4505da4b.chunk.js": "/static/js/450.4505da4b.chunk.js",
-    "static/js/994.ba2e535c.chunk.js": "/static/js/994.ba2e535c.chunk.js",
-    "static/js/247.55360a36.chunk.js": "/static/js/247.55360a36.chunk.js",
-    "static/js/888.f77853e6.chunk.js": "/static/js/888.f77853e6.chunk.js",
+    "static/js/12.a52bd582.chunk.js": "/static/js/12.a52bd582.chunk.js",
+    "static/js/361.5ef997bf.chunk.js": "/static/js/361.5ef997bf.chunk.js",
+    "static/js/692.b4c3db41.chunk.js": "/static/js/692.b4c3db41.chunk.js",
+    "static/js/861.54d36503.chunk.js": "/static/js/861.54d36503.chunk.js",
+    "static/js/364.5732e363.chunk.js": "/static/js/364.5732e363.chunk.js",
+    "static/media/cElegansExampleProject.zip": "/static/media/cElegansExampleProject.7e05429d7a52fe7f9b6e.zip",
+    "static/media/HumanU2OSCellsExampleProject.zip": "/static/media/HumanU2OSCellsExampleProject.34df019255756d984fbb.zip",
+    "static/media/PLP1ExampleProject.zip": "/static/media/PLP1ExampleProject.524ebdb87fdeb9796319.zip",
+    "static/media/BBBC013ExampleProject.zip": "/static/media/BBBC013ExampleProject.9b6398c28ccd215154d2.zip",
+    "static/media/mnistExampleProject.zip": "/static/media/mnistExampleProject.c85f7210615b265f16a7.zip",
     "static/media/group1-shard1of2.bin": "/static/media/group1-shard1of2.33895c8f25a993d537ff.bin",
     "static/media/malaria.png": "/static/media/malaria.5b73ad7591d4eef598db.png",
     "static/media/group1-shard2of2.bin": "/static/media/group1-shard2of2.09065811a29ecbc30998.bin",
@@ -39,15 +44,10 @@
     "static/media/VolumeOff.svg": "/static/media/VolumeOff.1149786552b52a25580655f2ce3391c1.svg",
     "static/media/VolumeUp.svg": "/static/media/VolumeUp.30de055e122b96e2aa207a710b1bd74a.svg",
     "static/media/Moon.svg": "/static/media/Moon.593035e92f1f02f04668bb75454d1fb3.svg",
-    "static/media/HumanU2OSCellsExampleProject.h5": "/static/media/HumanU2OSCellsExampleProject.7149bb3adf4c209ff957.h5",
-    "static/media/cElegansExampleProject.h5": "/static/media/cElegansExampleProject.7fada34b2d5e21b37580.h5",
-    "static/media/BBBC013ExampleProject.h5": "/static/media/BBBC013ExampleProject.7d7ac33f0c8d9e2f06c2.h5",
-    "static/media/PLP1ExampleProject.h5": "/static/media/PLP1ExampleProject.38ad95281c20bf098761.h5",
-    "static/media/mnistExampleProject.h5": "/static/media/mnistExampleProject.e06ab02a982204518a33.h5",
-    "main.a872b7ce.js.map": "/static/js/main.a872b7ce.js.map",
+    "main.7421861d.js.map": "/static/js/main.7421861d.js.map",
     "845.d9f7556a.chunk.js.map": "/static/js/845.d9f7556a.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.a872b7ce.js"
+    "static/js/main.7421861d.js"
   ]
 }

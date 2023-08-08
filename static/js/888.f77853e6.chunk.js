@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkpiximi=self.webpackChunkpiximi||[]).push([[888],{73888:function(i,e,p){i.exports=p.p+"static/media/PLP1ExampleProject.38ad95281c20bf098761.h5"}}]);
