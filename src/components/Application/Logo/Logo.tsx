@@ -1,5 +1,30 @@
 import React from "react";
 
+const speed = "3s";
+const repeatCount = "indefinite";
+const styles = {
+  flood: "#02aec5",
+  fill: "#ffffff",
+  stroke: "none",
+};
+
+let startAt: "left" | "right" | "top" | "bottom" = "bottom";
+// @ts-ignore
+const isHoriz = startAt === "top" || startAt === "bottom";
+// @ts-ignore
+const from = startAt === "left" || startAt === "top" ? 0 : 1;
+const to = from === 1 ? 0 : 1;
+const attName = isHoriz ? "dy" : "dx";
+// @ts-ignore
+const fill = styles.fill
+  ? styles.fill
+  : // @ts-ignore
+  startAt === "left" || startAt === "top"
+  ? "#fff"
+  : "#000";
+const flood = styles.flood ? styles.flood : fill === "#fff" ? "#000" : "#fff";
+const stroke = styles.stroke ? styles.stroke : "none";
+
 export const Logo = ({ width, height }: { width: number; height: number }) => {
   return (
     <svg
@@ -12,68 +37,97 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
       <defs>
         {/* Cyto */}
         <clipPath id="clipPath24744" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucleus white bg */}
         <clipPath id="clipPath24756" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus lower right blue dot */}
         <clipPath id="clipPath24768" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus upper right blue dot */}
         <clipPath id="clipPath24780" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus all circles, border blue dots */}
         <clipPath id="clipPath24792" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus center blue dot */}
         <clipPath id="clipPath24804" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus lower left blue dot */}
         <clipPath id="clipPath24816" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* Nucelus upper left blue dot */}
         <clipPath id="clipPath24828" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* P */}
         <clipPath id="clipPath24840" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* I 1 */}
         <clipPath id="clipPath24852" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* X */}
         <clipPath id="clipPath24862" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* I 2 */}
         <clipPath id="clipPath24874" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* M 1 */}
         <clipPath id="clipPath24894" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* I 3 */}
         <clipPath id="clipPath24884" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* T */}
         <clipPath id="clipPath24906" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
         {/* M 2 */}
         <clipPath id="clipPath24918" clipPathUnits="userSpaceOnUse">
-          <path d="M0 1765.44h1000V0H0z"></path>
+          <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
+
+        <filter
+          id="fullFill"
+          primitiveUnits="objectBoundingBox"
+          x="0%"
+          y="0%"
+          width="100%"
+          height="100%"
+        >
+          <feFlood
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            floodColor={flood}
+          />
+
+          <feOffset>
+            <animate
+              attributeName={attName}
+              from={from}
+              to={to}
+              dur={speed}
+              repeatCount={repeatCount}
+            />
+          </feOffset>
+          <feComposite operator="in" in2="SourceGraphic" />
+          <feComposite operator="over" in2="SourceGraphic" />
+        </filter>
       </defs>
       <g transform="translate(-.39 -157.665)">
         <g transform="matrix(.35278 0 0 -.35278 -6.07 355.35)">
@@ -91,10 +145,11 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
             <g clipPath="url(#clipPath24744)">
               <g transform="translate(271.99 1361.056)">
                 <path
-                  fill="#02aec5"
+                  fill={fill}
+                  filter={`url(#fullFill)`}
+                  stroke={stroke}
                   fillOpacity="1"
                   fillRule="nonzero"
-                  stroke="none"
                   d="M 0 0
                      h -37.512
                      c -17.004 0 -30.789 13.785 -30.789 30.789
