@@ -1,6 +1,39 @@
 import React from "react";
 
-export const Logo = ({ width, height }: { width: number; height: number }) => {
+const speed = "3s";
+const repeatCount = "indefinite";
+const styles = {
+  flood: "#02aec5",
+  fill: "#ffffff",
+  stroke: "none",
+};
+
+let startAt: "left" | "right" | "top" | "bottom" = "bottom";
+// @ts-ignore
+const isHoriz = startAt === "top" || startAt === "bottom";
+// @ts-ignore
+const from = startAt === "left" || startAt === "top" ? 0 : 1;
+const to = from === 1 ? 0 : 1;
+const attName = isHoriz ? "dy" : "dx";
+// @ts-ignore
+const fill = styles.fill
+  ? styles.fill
+  : // @ts-ignore
+  startAt === "left" || startAt === "top"
+  ? "#fff"
+  : "#000";
+const flood = styles.flood ? styles.flood : fill === "#fff" ? "#000" : "#fff";
+const stroke = styles.stroke ? styles.stroke : "none";
+
+export const Logo = ({
+  width,
+  height,
+  loadPercent,
+}: {
+  width: number;
+  height: number;
+  loadPercent: number;
+}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -74,6 +107,35 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
         <clipPath id="clipPath24918" clipPathUnits="userSpaceOnUse">
           <path d="M 0 1765.44 h 1000 V 0 H 0 z"></path>
         </clipPath>
+
+        <filter
+          id="fullFill"
+          primitiveUnits="objectBoundingBox"
+          x="0%"
+          y="0%"
+          width="100%"
+          height="100%"
+        >
+          <feFlood
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            floodColor={flood}
+          />
+
+          <feOffset>
+            <animate
+              attributeName={attName}
+              from={from}
+              to={to}
+              dur={speed}
+              repeatCount={repeatCount}
+            />
+          </feOffset>
+          <feComposite operator="in" in2="SourceGraphic" />
+          <feComposite operator="over" in2="SourceGraphic" />
+        </filter>
       </defs>
       <g transform="translate(-.39 -157.665)">
         <g transform="matrix(.35278 0 0 -.35278 -6.07 355.35)">
@@ -85,16 +147,17 @@ export const Logo = ({ width, height }: { width: number; height: number }) => {
             Elliptical Arc Curve: A, a
             ClosePath: Z, z
           */}
-          ''
+
           {/* Cyto */}
           <g transform="translate(-185.381 -899.778)">
             <g clipPath="url(#clipPath24744)">
               <g transform="translate(271.99 1361.056)">
                 <path
-                  fill="#02aec5"
+                  fill={loadPercent < 0 ? fill : "#02aec5"}
+                  filter={loadPercent < 0 ? `url(#fullFill)` : undefined}
+                  stroke={stroke}
                   fillOpacity="1"
                   fillRule="nonzero"
-                  stroke="none"
                   d="M 0 0
                      h -37.512
                      c -17.004 0 -30.789 13.785 -30.789 30.789
