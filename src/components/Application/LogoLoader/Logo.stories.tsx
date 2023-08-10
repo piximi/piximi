@@ -1,21 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Logo } from "./Logo";
 import { Button } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  classifierModelStatusSelector,
+  classifierSlice,
+} from "store/classifier";
+import { ModelStatus } from "types/ModelType";
 
 const Controller = ({ width, height }: { width: number; height: number }) => {
-  const [loadPercent, setLoadPercent] = useState(1);
+  const dispatch = useDispatch();
+  const modelStatus = useSelector(classifierModelStatusSelector);
 
-  const flipLoad = () => {
-    setLoadPercent((prev) => (prev > 0 ? -1 : 1));
+  const flipLoad = (newStatus: ModelStatus) => {
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: newStatus,
+        execSaga: false,
+      })
+    );
   };
 
   return (
     <>
-      <Logo width={width} height={height} loadPercent={loadPercent} />
+      <Logo
+        width={width}
+        height={height}
+        loadPercent={modelStatus === ModelStatus.Predicting ? -1 : 1}
+      />
       <div style={{ width: "100%" }}>
-        <Button onClick={flipLoad}>Flip Load</Button>
+        <Button
+          onClick={() =>
+            flipLoad(
+              modelStatus === ModelStatus.Predicting
+                ? ModelStatus.Trained
+                : ModelStatus.Predicting
+            )
+          }
+        >
+          Flip Load
+        </Button>
       </div>
     </>
   );
