@@ -1,28 +1,5 @@
 import React from "react";
 
-const speed = "3s";
-const repeatCount = "indefinite";
-const styles = {
-  flood: "#02aec5",
-  fill: "#ffffff",
-};
-
-let startAt: "left" | "right" | "top" | "bottom" = "bottom";
-// @ts-ignore
-const isHoriz = startAt === "top" || startAt === "bottom";
-// @ts-ignore
-const from = startAt === "left" || startAt === "top" ? 0 : 1;
-const to = from === 1 ? 0 : 1;
-const attName = isHoriz ? "dy" : "dx";
-// @ts-ignore
-const fill = styles.fill
-  ? styles.fill
-  : // @ts-ignore
-  startAt === "left" || startAt === "top"
-  ? "#fff"
-  : "#000";
-const flood = styles.flood ? styles.flood : fill === "#fff" ? "#000" : "#fff";
-
 export const Logo = ({
   width,
   height,
@@ -41,7 +18,7 @@ export const Logo = ({
     >
       <defs>
         <filter
-          id="fullFill"
+          id="indefinite-fill"
           primitiveUnits="objectBoundingBox"
           x="0%"
           y="0%"
@@ -53,36 +30,47 @@ export const Logo = ({
             y="0%"
             width="100%"
             height="100%"
-            floodColor={flood}
+            floodColor={"#02aec5"}
           />
 
           <feOffset>
             <animate
-              attributeName={attName}
-              from={from}
-              to={to}
-              dur={speed}
-              repeatCount={repeatCount}
+              attributeName={"dy"}
+              from={1}
+              to={0}
+              dur={"3s"}
+              repeatCount={"indefinite"}
             />
           </feOffset>
           <feComposite operator="in" in2="SourceGraphic" />
           <feComposite operator="over" in2="SourceGraphic" />
         </filter>
+
+        <linearGradient y2="0%" x2="100%" y1="0%" x1="0%" id="percent-fill">
+          <stop
+            stopColor="#02aec5"
+            offset={`${
+              (loadPercent < 0 ? 1 : loadPercent > 1 ? 1 : loadPercent) * 100
+            }%`}
+            id="F1gst1"
+          />
+          <stop stopColor="#ffffff" offset="0%" id="F1gst2" />
+        </linearGradient>
       </defs>
 
       {/*
--            MoveTo: M, m
--            LineTo: L, l, H, h, V, v
--            Cubic Bézier Curve: C, c, S, s
--            Quadratic Bézier Curve: Q, q, T, t
--            Elliptical Arc Curve: A, a
--            ClosePath: Z, z
--          */}
+          MoveTo: M, m
+          LineTo: L, l, H, h, V, v
+          Cubic Bézier Curve: C, c, S, s
+          Quadratic Bézier Curve: Q, q, T, t
+          Elliptical Arc Curve: A, a
+          ClosePath: Z, z
+        */}
 
       {/* cyto */}
       <path
-        fill={loadPercent < 0 ? fill : "#02aec5"}
-        filter={loadPercent < 0 ? `url(#fullFill)` : undefined}
+        fill={loadPercent < 0 ? "#ffffff" : "#02aec5"}
+        filter={loadPercent < 0 ? `url(#indefinite-fill)` : undefined}
         d="M 24.094 34.955
            H 10.86
            C 4.862 34.955 0 30.092 0 24.094
@@ -211,7 +199,7 @@ export const Logo = ({
       />
       {/* Piximi TM */}
       <path
-        fill="#02aec5"
+        fill={"url(#percent-fill"}
         d="M 50.859 15.825
            h 1.706
            c 1.407 0 2.525 -.394 3.355 -1.185.83 -.79 1.244 -1.88 1.244 -3.271 0 -2.339 -1.296 -3.508 -3.887 -3.508
