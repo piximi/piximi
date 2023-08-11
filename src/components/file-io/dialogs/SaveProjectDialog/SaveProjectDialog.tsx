@@ -12,13 +12,13 @@ import {
 } from "@mui/material";
 
 import { classifierSelector } from "store/classifier";
-import { projectSelector } from "store/project";
+import { projectSelector, projectSlice } from "store/project";
 import { dataProjectSelector } from "store/data";
 // TODO: implement segmenter serialization
 // import { segmenterSelector } from "store/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
-import { useHotkeys } from "hooks";
+import { useDebounce, useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
 import { segmenterSelector } from "store/segmenter";
 import { saveAs } from "file-saver";
@@ -43,8 +43,12 @@ export const SaveProjectDialog = ({
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
+  const onLoadProgress = useDebounce((loadPercent: number) => {
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
+  }, 10);
+
   const onSaveProjectClick = async () => {
-    serialize(projectName, project, data, classifier, segmenter)
+    serialize(projectName, project, data, classifier, segmenter, onLoadProgress)
       .then((zip) => {
         return zip.generateAsync(
           {
@@ -54,13 +58,16 @@ export const SaveProjectDialog = ({
           },
           // onUpdate callback
           (meta: { percent: number }) => {
+            onLoadProgress(meta.percent / 100);
             process.env.REACT_APP_LOG_LEVEL === "1" &&
               console.log(`zipping %${Math.floor(meta.percent)}`);
           }
         );
       })
       .then((blob) => {
+        onLoadProgress(-1);
         saveAs(blob, `${projectName}.zip`);
+        onLoadProgress(1);
       })
       .catch((err: Error) => {
         process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);

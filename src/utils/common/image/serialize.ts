@@ -9,6 +9,7 @@ import {
   Category,
   ImageType,
   SegmenterStoreType,
+  LoadCB,
 } from "types";
 import { Colors } from "types/tensorflow";
 import {
@@ -89,12 +90,14 @@ const serializeImageColors = async (colorsGroup: Group, colors: Colors) => {
 
 const serializeImages = async (
   imagesGroup: Group,
-  images: Array<ImageType>
+  images: Array<ImageType>,
+  loadCb: LoadCB
 ) => {
   const imageNames = images.map((image) => image.name);
   // zarr decoder needs to know the name of each subgroup, so put it as attr
   imagesGroup.attrs.setItem("image_names", imageNames);
 
+  loadCb(0);
   for (let i = 0; i < images.length; i++) {
     process.env.REACT_APP_LOG_LEVEL === "1" &&
       console.log(`serializing image ${+i + 1}/${imageNames.length}`);
@@ -119,7 +122,11 @@ const serializeImages = async (
 
     let colorGroup = await imGroup.createGroup("colors");
     await serializeImageColors(colorGroup, im.colors);
+
+    loadCb((i + 1) / imageNames.length);
   }
+  // set back to indeterminate for remaining serialization
+  loadCb(-1);
 };
 
 const serializeCategories = async (
@@ -148,13 +155,14 @@ const serializeProject = async (
     annotations: Array<AnnotationType>;
     categories: Array<Category>;
     annotationCategories: Array<Category>;
-  }
+  },
+  loadCb: LoadCB
 ) => {
   await projectGroup.attrs.setItem("name", project.name);
 
   const imagesGroup = await projectGroup.createGroup("images");
 
-  await serializeImages(imagesGroup, data.images);
+  await serializeImages(imagesGroup, data.images, loadCb);
 
   let annotationsGroup = await projectGroup.createGroup("annotations");
   await serializeImageAnnotations(annotationsGroup, data.annotations);
@@ -295,7 +303,8 @@ export const serialize = async (
     annotationCategories: Array<Category>;
   },
   classifierSlice: Classifier,
-  segmenterSlice: SegmenterStoreType
+  segmenterSlice: SegmenterStoreType,
+  loadCb: LoadCB
 ) => {
   const zipStore = new ZipStore(name);
   const root = await group(zipStore, zipStore.rootName);
@@ -310,7 +319,7 @@ export const serialize = async (
   root.attrs.setItem("version", piximiVersion);
 
   const projectGroup = await root.createGroup("project");
-  await serializeProject(projectGroup, projectSlice, data);
+  await serializeProject(projectGroup, projectSlice, data, loadCb);
 
   const classifierGroup = await root.createGroup("classifier");
   await serializeClassifier(classifierGroup, classifierSlice);
