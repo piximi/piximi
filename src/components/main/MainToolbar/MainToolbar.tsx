@@ -1,5 +1,5 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Slider, Toolbar, Box, Button } from "@mui/material";
 import {
@@ -10,13 +10,15 @@ import {
 import { ImageSortSelection } from "../ImageSortSelection";
 
 import { UploadButton } from "../UploadButton";
-import { Logo } from "components/Application/Logo";
+import { Logo } from "components/Application/LogoLoader";
 
 import { applicationSlice } from "store/application";
+import { loadPercentSelector } from "store/project";
 
 export const MainToolbar = () => {
   const dispatch = useDispatch();
-  const [value, setValue] = React.useState<number>(1);
+  const loadPercent = useSelector(loadPercentSelector);
+  const [value, setValue] = useState<number>(1);
   const minZoom = 0.6;
   const maxZoom = 4;
 
@@ -51,7 +53,7 @@ export const MainToolbar = () => {
 
   return (
     <Toolbar>
-      <Logo width={250} height={50} />
+      <Logo width={250} height={50} loadPercent={loadPercent} />
 
       <Box sx={{ flexGrow: 1 }} />
 

@@ -14,6 +14,7 @@ import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { fListToStore } from "utils";
+import { useDebounce } from "hooks";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -26,6 +27,10 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
+  const onLoadProgress = useDebounce((loadPercent: number) => {
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
+  }, 10);
+
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,
     zip: boolean
@@ -34,13 +39,18 @@ export const OpenProjectMenuItem = ({
 
     if (!event.currentTarget.files) return;
 
+    // set indefinite loading
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
+
     const files = event.currentTarget.files;
 
     const zarrStore = await fListToStore(files, zip);
 
-    deserialize(zarrStore)
+    deserialize(zarrStore, onLoadProgress)
       .then((res) => {
         batch(() => {
+          // indefinite load until dispatches complete
+          dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
           dispatch(classifierSlice.actions.resetClassifier());
           dispatch(segmenterSlice.actions.resetSegmenter());
           dispatch(imageViewerSlice.actions.resetImageViewer());
@@ -84,6 +94,8 @@ export const OpenProjectMenuItem = ({
             );
           });
         }
+
+        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
       })
       .catch((err: Error) => {
         process.env.NODE_ENV !== "production" &&

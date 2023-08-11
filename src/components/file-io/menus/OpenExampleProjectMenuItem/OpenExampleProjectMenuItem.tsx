@@ -3,7 +3,6 @@ import { useDispatch, batch } from "react-redux";
 
 import {
   Avatar,
-  CircularProgress,
   ListItem,
   ListItemAvatar,
   ListItemText,
@@ -19,6 +18,7 @@ import { dataSlice } from "store/data";
 import { PseudoFileList, fListToStore } from "utils";
 import { AlertStateType, AlertType } from "types";
 import { applicationSlice } from "store/application";
+import { useDebounce } from "hooks/useDebounce";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -46,15 +46,9 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const [exampleClassifierIsLoading, setExampleClassifierIsLoading] =
-    React.useState(false);
-
-  const onClickExampleProject = () => {
-    setExampleClassifierIsLoading(true);
-    setTimeout(() => {
-      openExampleProject();
-    }, 20);
-  };
+  const onLoadProgress = useDebounce((loadPercent: number) => {
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
+  }, 10);
 
   // CloudFront distribution domain
   const domain = "https://dw9hr7pc3ofrm.cloudfront.net";
@@ -63,6 +57,10 @@ export const OpenExampleProjectMenuItem = ({
   const ext = "zip";
 
   const openExampleProject = async () => {
+    onClose();
+
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
+
     var exampleProjectFilePath: string;
     switch (exampleProject.exampleProjectEnum) {
       case ExampleProject.Mnist:
@@ -81,7 +79,7 @@ export const OpenExampleProjectMenuItem = ({
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectFilePath =
-          process.env.NODE_ENV === "production"
+          process.env.NODE_ENV !== "production"
             ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
             : (
                 await import(
@@ -107,6 +105,10 @@ export const OpenExampleProjectMenuItem = ({
         return;
     }
 
+    process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      console.log("downloading file...");
+
     const exampleProjectFileList = await fetch(exampleProjectFilePath)
       .then((res) => res.blob())
       .then(
@@ -122,16 +124,16 @@ export const OpenExampleProjectMenuItem = ({
         throw err;
       });
 
-    //@ts-ignore
     const fileStore = await fListToStore(exampleProjectFileList, true);
 
     try {
-      const deserializedProject = await deserialize(fileStore);
+      const deserializedProject = await deserialize(fileStore, onLoadProgress);
       const project = deserializedProject.project;
       const data = deserializedProject.data;
       const classifier = deserializedProject.classifier;
       //TODO: keeps images, fix that
       batch(() => {
+        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
         dispatch(dataSlice.actions.resetData());
         dispatch(
           dataSlice.actions.initData({
@@ -169,17 +171,13 @@ export const OpenExampleProjectMenuItem = ({
       );
     }
 
-    onClose();
+    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
   };
 
   return (
-    <ListItem button onClick={onClickExampleProject}>
+    <ListItem button onClick={openExampleProject}>
       <ListItemAvatar>
-        {exampleClassifierIsLoading ? (
-          <CircularProgress disableShrink />
-        ) : (
-          <Avatar src={exampleProject.projectIcon}></Avatar>
-        )}
+        <Avatar src={exampleProject.projectIcon}></Avatar>
       </ListItemAvatar>
 
       <ListItemText

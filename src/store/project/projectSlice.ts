@@ -10,6 +10,7 @@ export const initialState: Project = {
   imageSortKey: defaultImageSortKey.imageSortKey,
   highlightedCategory: null,
   hiddenImageCategoryIds: [],
+  loadPercent: 1,
 };
 
 export const projectSlice = createSlice({
@@ -159,6 +160,19 @@ export const projectSlice = createSlice({
       //   state.highlightedCategory = null;
       // }
     },
+    setLoadPercent(state, action: PayloadAction<{ loadPercent?: number }>) {
+      const loadPercent = action.payload.loadPercent;
+
+      if (!loadPercent) {
+        state.loadPercent = 1; // not / done loading
+      } else if (loadPercent < 0) {
+        state.loadPercent = -1; // indefinite loading
+      } else if (loadPercent > 1) {
+        state.loadPercent = 1; // default to not loading if invalid
+      } else {
+        state.loadPercent = loadPercent; // loading [0, 1]
+      }
+    },
   },
 });
 
@@ -171,4 +185,5 @@ export const {
   deselectImage,
   deselectImages,
   updateHighlightedCategory,
+  setLoadPercent,
 } = projectSlice.actions;

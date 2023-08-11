@@ -6,4 +6,5 @@ export type Project = {
   imageSortKey: ImageSortKey;
   highlightedCategory: string | null;
   hiddenImageCategoryIds: string[];
+  loadPercent: number;
 };

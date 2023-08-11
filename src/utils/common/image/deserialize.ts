@@ -18,6 +18,7 @@ import {
   LossFunction,
   OptimizationAlgorithm,
   ImageType,
+  LoadCB,
 } from "types";
 import { Colors } from "types/tensorflow";
 import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
@@ -177,7 +178,7 @@ const deserializeImageGroup = async (
   };
 };
 
-const deserializeImagesGroup = async (imagesGroup: Group) => {
+const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const imageNames = (await getAttr(imagesGroup, "image_names")) as string[];
 
   const images: Array<ImageType> = [];
@@ -186,10 +187,15 @@ const deserializeImagesGroup = async (imagesGroup: Group) => {
     process.env.REACT_APP_LOG_LEVEL === "1" &&
       console.log(`deserializing image ${+i + 1}/${imageNames.length}`);
 
+    loadCb(+i / (imageNames.length - 1));
+
     const imageGroup = await getGroup(imagesGroup, name);
     const image = await deserializeImageGroup(name, imageGroup);
     images.push(image);
   }
+
+  // final image complete
+  loadCb(1);
 
   return images;
 };
@@ -221,7 +227,8 @@ const deserializeCategoriesGroup = async (
 };
 
 const deserializeProjectGroup = async (
-  projectGroup: Group
+  projectGroup: Group,
+  loadCb: LoadCB
 ): Promise<{
   project: Project;
   data: {
@@ -234,7 +241,7 @@ const deserializeProjectGroup = async (
   const name = (await getAttr(projectGroup, "name")) as string;
 
   const imagesGroup = await getGroup(projectGroup, "images");
-  const images = await deserializeImagesGroup(imagesGroup);
+  const images = await deserializeImagesGroup(imagesGroup, loadCb);
 
   const annotationsGroup = await getGroup(projectGroup, "annotations");
   const annotations = await deserializeAnnotationsGroup(annotationsGroup);
@@ -427,7 +434,7 @@ const deserializeSegmenterGroup = async (segmenterGroup: Group) => {
   return initialSegmenterState;
 };
 
-export const deserialize = async (fileStore: CustomStore) => {
+export const deserialize = async (fileStore: CustomStore, loadCb: LoadCB) => {
   process.env.REACT_APP_LOG_LEVEL === "1" &&
     console.log(`starting deserialization of ${fileStore.rootName}`);
 
@@ -441,7 +448,7 @@ export const deserialize = async (fileStore: CustomStore) => {
   }
 
   const projectGroup = await getGroup(rootGroup, "project");
-  const { project, data } = await deserializeProjectGroup(projectGroup);
+  const { project, data } = await deserializeProjectGroup(projectGroup, loadCb);
 
   const classifierGroup = await getGroup(rootGroup, "classifier");
   const classifier = await deserializeClassifierGroup(classifierGroup);
