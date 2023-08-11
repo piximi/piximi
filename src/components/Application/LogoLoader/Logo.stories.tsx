@@ -10,7 +10,15 @@ import {
 } from "store/classifier";
 import { ModelStatus } from "types/ModelType";
 
-const Controller = ({ width, height }: { width: number; height: number }) => {
+const Controller = ({
+  width,
+  height,
+  fullLogo,
+}: {
+  width: number;
+  height: number;
+  fullLogo: boolean;
+}) => {
   const dispatch = useDispatch();
   const modelStatus = useSelector(classifierModelStatusSelector);
   const [sliderVal, setSliderVal] = useState(100);
@@ -36,6 +44,7 @@ const Controller = ({ width, height }: { width: number; height: number }) => {
         loadPercent={
           modelStatus === ModelStatus.Predicting ? -1 : sliderVal / 100
         }
+        fullLogo={fullLogo}
       />
       <div>{sliderVal < 100 ? `Task ${sliderVal} / 100` : ""}</div>
       <Box sx={{ width: 200 }}>
@@ -72,5 +81,6 @@ export const Playground: Story = {
   args: {
     width: 1000,
     height: 200,
+    fullLogo: true,
   },
 };
