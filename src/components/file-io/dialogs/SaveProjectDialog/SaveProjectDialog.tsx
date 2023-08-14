@@ -18,7 +18,7 @@ import { dataProjectSelector } from "store/data";
 // import { segmenterSelector } from "store/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
-import { useDebounce, useHotkeys } from "hooks";
+import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
 import { segmenterSelector } from "store/segmenter";
 import { saveAs } from "file-saver";
@@ -43,9 +43,9 @@ export const SaveProjectDialog = ({
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onLoadProgress = useDebounce((loadPercent: number) => {
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
-  }, 10);
+  const onLoadProgress = (loadPercent: number) => {
+    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  };
 
   const onSaveProjectClick = async () => {
     serialize(projectName, project, data, classifier, segmenter, onLoadProgress)
