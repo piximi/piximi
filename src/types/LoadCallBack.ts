@@ -1,1 +1,1 @@
-export type LoadCB = (laodPercent: number) => void;
+export type LoadCB = (laodPercent: number, loadMessage: string) => void;

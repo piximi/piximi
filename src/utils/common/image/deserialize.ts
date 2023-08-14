@@ -184,10 +184,13 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   const images: Array<ImageType> = [];
 
   for (const [i, name] of Object.entries(imageNames)) {
-    process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log(`deserializing image ${+i + 1}/${imageNames.length}`);
+    // process.env.REACT_APP_LOG_LEVEL === "1" &&
+    //   console.log(`deserializing image ${+i + 1}/${imageNames.length}`);
 
-    loadCb(+i / (imageNames.length - 1));
+    loadCb(
+      +i / (imageNames.length - 1),
+      `deserializing image ${+i + 1}/${imageNames.length}`
+    );
 
     const imageGroup = await getGroup(imagesGroup, name);
     const image = await deserializeImageGroup(name, imageGroup);
@@ -195,7 +198,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
   }
 
   // final image complete
-  loadCb(1);
+  loadCb(1, "");
 
   return images;
 };

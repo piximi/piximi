@@ -29,6 +29,7 @@ startAppListening({
     listenerApi.dispatch(
       projectSlice.actions.setLoadPercent({
         loadPercent: action.payload.loadPercent,
+        loadMessage: action.payload.loadMessage,
       })
     );
 

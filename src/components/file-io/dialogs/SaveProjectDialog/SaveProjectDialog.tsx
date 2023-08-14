@@ -43,8 +43,10 @@ export const SaveProjectDialog = ({
 
   const [projectName, setProjectName] = useState<string>(project.name);
 
-  const onLoadProgress = (loadPercent: number) => {
-    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+    dispatch(
+      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+    );
   };
 
   const onSaveProjectClick = async () => {
@@ -58,14 +60,17 @@ export const SaveProjectDialog = ({
           },
           // onUpdate callback
           (meta: { percent: number }) => {
-            onLoadProgress(meta.percent / 100);
-            process.env.REACT_APP_LOG_LEVEL === "1" &&
-              console.log(`zipping %${Math.floor(meta.percent)}`);
+            onLoadProgress(
+              meta.percent / 100,
+              `compressing ${meta.percent.toFixed(2)}%`
+            );
+            // process.env.REACT_APP_LOG_LEVEL === "1" &&
+            //   console.log(`zipping %${Math.floor(meta.percent)}`);
           }
         );
       })
       .then((blob) => {
-        onLoadProgress(-1);
+        onLoadProgress(-1, "saving project...");
         saveAs(blob, `${projectName}.zip`);
         // don't use onLoadProgress here, it may be sleeping
         // and ignoring updates; this *must* go through

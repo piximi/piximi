@@ -9,15 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 
+import { applicationSlice } from "store/application";
 import { classifierSlice } from "store/classifier";
+import { dataSlice } from "store/data";
 import { projectSlice } from "store/project";
 
 import { ExampleProject } from "data/exampleProjects/exampleProjectsEnum";
 import { deserialize } from "utils/common/image/deserialize";
-import { dataSlice } from "store/data";
 import { PseudoFileList, fListToStore } from "utils";
 import { AlertStateType, AlertType } from "types";
-import { applicationSlice } from "store/application";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -45,8 +45,10 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onLoadProgress = (loadPercent: number) => {
-    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+    dispatch(
+      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+    );
   };
 
   // CloudFront distribution domain
@@ -58,7 +60,12 @@ export const OpenExampleProjectMenuItem = ({
   const openExampleProject = async () => {
     onClose();
 
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
+    dispatch(
+      projectSlice.actions.setLoadPercent({
+        loadPercent: -1,
+        loadMessage: "loading example project...",
+      })
+    );
 
     var exampleProjectFilePath: string;
     switch (exampleProject.exampleProjectEnum) {
@@ -103,10 +110,6 @@ export const OpenExampleProjectMenuItem = ({
       default:
         return;
     }
-
-    process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log("downloading file...");
 
     const exampleProjectFileList = await fetch(exampleProjectFilePath)
       .then((res) => res.blob())

@@ -26,8 +26,10 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onLoadProgress = (loadPercent: number) => {
-    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  const onLoadProgress = (loadPercent: number, loadMessage: string) => {
+    dispatch(
+      projectSlice.actions.sendLoadPercent({ loadPercent, loadMessage })
+    );
   };
 
   const onOpenProject = async (
@@ -39,7 +41,12 @@ export const OpenProjectMenuItem = ({
     if (!event.currentTarget.files) return;
 
     // set indefinite loading
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
+    dispatch(
+      projectSlice.actions.setLoadPercent({
+        loadPercent: -1,
+        loadMessage: "deserializing proejct...",
+      })
+    );
 
     const files = event.currentTarget.files;
 

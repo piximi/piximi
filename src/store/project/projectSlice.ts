@@ -11,6 +11,7 @@ export const initialState: Project = {
   highlightedCategory: null,
   hiddenImageCategoryIds: [],
   loadPercent: 1,
+  loadMessage: "",
 };
 
 export const projectSlice = createSlice({
@@ -160,20 +161,30 @@ export const projectSlice = createSlice({
       //   state.highlightedCategory = null;
       // }
     },
-    setLoadPercent(state, action: PayloadAction<{ loadPercent?: number }>) {
-      const loadPercent = action.payload.loadPercent;
+    setLoadPercent(
+      state,
+      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+    ) {
+      const { loadPercent, loadMessage } = action.payload;
 
       if (!loadPercent) {
         state.loadPercent = 1; // not / done loading
+        state.loadMessage = "";
       } else if (loadPercent < 0) {
         state.loadPercent = -1; // indefinite loading
-      } else if (loadPercent > 1) {
+        state.loadMessage = loadMessage ?? "";
+      } else if (loadPercent >= 1) {
         state.loadPercent = 1; // default to not loading if invalid
+        state.loadMessage = "";
       } else {
         state.loadPercent = loadPercent; // loading [0, 1]
+        state.loadMessage = loadMessage ?? "";
       }
     },
-    sendLoadPercent(state, action: PayloadAction<{ loadPercent?: number }>) {},
+    sendLoadPercent(
+      state,
+      action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
+    ) {},
   },
 });
 
