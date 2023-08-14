@@ -25,16 +25,20 @@ startAppListening({
 startAppListening({
   actionCreator: projectSlice.actions.sendLoadPercent,
   effect: async (action, listenerApi) => {
-    // Cancel any in-progress instances of this listener
-    listenerApi.cancelActiveListeners();
-
-    // Delay before starting actual work
-    await listenerApi.delay(100);
-
+    // do work
     listenerApi.dispatch(
       projectSlice.actions.setLoadPercent({
         loadPercent: action.payload.loadPercent,
       })
     );
+
+    // prevent others from doing work
+    listenerApi.unsubscribe();
+
+    // for the next 100ms
+    await listenerApi.delay(100);
+
+    // then continue letting others do work
+    listenerApi.subscribe();
   },
 });

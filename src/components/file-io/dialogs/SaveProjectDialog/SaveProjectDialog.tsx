@@ -67,7 +67,9 @@ export const SaveProjectDialog = ({
       .then((blob) => {
         onLoadProgress(-1);
         saveAs(blob, `${projectName}.zip`);
-        onLoadProgress(1);
+        // don't use onLoadProgress here, it may be sleeping
+        // and ignoring updates; this *must* go through
+        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
       })
       .catch((err: Error) => {
         process.env.REACT_APP_LOG_LEVEL === "1" && console.error(err);
