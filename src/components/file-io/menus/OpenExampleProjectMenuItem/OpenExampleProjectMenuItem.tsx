@@ -132,7 +132,6 @@ export const OpenExampleProjectMenuItem = ({
       const classifier = deserializedProject.classifier;
       //TODO: keeps images, fix that
       batch(() => {
-        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: -1 }));
         dispatch(dataSlice.actions.resetData());
         dispatch(
           dataSlice.actions.initData({
@@ -142,6 +141,7 @@ export const OpenExampleProjectMenuItem = ({
             annotationCategories: data.annotationCategories,
           })
         );
+        // loadPercent will be set to 1 here
         dispatch(projectSlice.actions.setProject({ project }));
 
         dispatch(

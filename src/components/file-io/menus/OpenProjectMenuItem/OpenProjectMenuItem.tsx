@@ -63,6 +63,7 @@ export const OpenProjectMenuItem = ({
               annotationCategories: res.data.annotationCategories,
             })
           );
+          // loadPerecnt set to 1 here
           dispatch(
             projectSlice.actions.setProject({
               project: res.project,
@@ -93,8 +94,6 @@ export const OpenProjectMenuItem = ({
             );
           });
         }
-
-        dispatch(projectSlice.actions.setLoadPercent({ loadPercent: 1 }));
       })
       .catch((err: Error) => {
         process.env.NODE_ENV !== "production" &&
