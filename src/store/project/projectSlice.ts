@@ -173,6 +173,7 @@ export const projectSlice = createSlice({
         state.loadPercent = loadPercent; // loading [0, 1]
       }
     },
+    sendLoadPercent(state, action: PayloadAction<{ loadPercent?: number }>) {},
   },
 });
 

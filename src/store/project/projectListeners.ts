@@ -21,3 +21,20 @@ startAppListening({
     listenerAPI.dispatch(imageViewerSlice.actions.resetImageViewer());
   },
 });
+
+startAppListening({
+  actionCreator: projectSlice.actions.sendLoadPercent,
+  effect: async (action, listenerApi) => {
+    // Cancel any in-progress instances of this listener
+    listenerApi.cancelActiveListeners();
+
+    // Delay before starting actual work
+    await listenerApi.delay(100);
+
+    listenerApi.dispatch(
+      projectSlice.actions.setLoadPercent({
+        loadPercent: action.payload.loadPercent,
+      })
+    );
+  },
+});

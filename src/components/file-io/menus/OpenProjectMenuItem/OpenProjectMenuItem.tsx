@@ -14,7 +14,6 @@ import { AlertStateType, AlertType } from "types";
 import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { fListToStore } from "utils";
-import { useDebounce } from "hooks";
 
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
@@ -27,9 +26,9 @@ export const OpenProjectMenuItem = ({
 }: OpenProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onLoadProgress = useDebounce((loadPercent: number) => {
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
-  }, 10);
+  const onLoadProgress = (loadPercent: number) => {
+    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  };
 
   const onOpenProject = async (
     event: React.ChangeEvent<HTMLInputElement>,

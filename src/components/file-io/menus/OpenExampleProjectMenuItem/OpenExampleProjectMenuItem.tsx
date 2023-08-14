@@ -18,7 +18,6 @@ import { dataSlice } from "store/data";
 import { PseudoFileList, fListToStore } from "utils";
 import { AlertStateType, AlertType } from "types";
 import { applicationSlice } from "store/application";
-import { useDebounce } from "hooks/useDebounce";
 
 type ExampleProjectProps = {
   projectName: string;
@@ -46,9 +45,9 @@ export const OpenExampleProjectMenuItem = ({
 }: OpenExampleProjectMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const onLoadProgress = useDebounce((loadPercent: number) => {
-    dispatch(projectSlice.actions.setLoadPercent({ loadPercent }));
-  }, 10);
+  const onLoadProgress = (loadPercent: number) => {
+    dispatch(projectSlice.actions.sendLoadPercent({ loadPercent }));
+  };
 
   // CloudFront distribution domain
   const domain = "https://dw9hr7pc3ofrm.cloudfront.net";
