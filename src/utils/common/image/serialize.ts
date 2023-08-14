@@ -97,10 +97,10 @@ const serializeImages = async (
   // zarr decoder needs to know the name of each subgroup, so put it as attr
   imagesGroup.attrs.setItem("image_names", imageNames);
 
-  loadCb(0);
+  loadCb(0, `serializing ${images.length} images`);
   for (let i = 0; i < images.length; i++) {
-    process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log(`serializing image ${+i + 1}/${imageNames.length}`);
+    // process.env.REACT_APP_LOG_LEVEL === "1" &&
+    //   console.log(`serializing image ${+i + 1}/${imageNames.length}`);
 
     let im = images[i];
     let imGroup = await imagesGroup.createGroup(imageNames[i]);
@@ -123,10 +123,13 @@ const serializeImages = async (
     let colorGroup = await imGroup.createGroup("colors");
     await serializeImageColors(colorGroup, im.colors);
 
-    loadCb((i + 1) / imageNames.length);
+    loadCb(
+      (i + 1) / imageNames.length,
+      `serialized image ${i + 1}/${imageNames.length}`
+    );
   }
   // set back to indeterminate for remaining serialization
-  loadCb(-1);
+  loadCb(-1, "finishing serialization...");
 };
 
 const serializeCategories = async (

@@ -7,4 +7,5 @@ export type Project = {
   highlightedCategory: string | null;
   hiddenImageCategoryIds: string[];
   loadPercent: number;
+  loadMessage: string;
 };
