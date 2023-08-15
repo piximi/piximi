@@ -112,43 +112,48 @@ function* runPrediction(
     return;
   }
 
-  let predictedAnnotations: Awaited<ReturnType<typeof model.predict>> =
-    yield model.predict();
+  try {
+    let predictedAnnotations: Awaited<ReturnType<typeof model.predict>> =
+      yield model.predict();
 
-  if (generateCategories) {
-    const uniquePredictedIds = [
-      ...new Set(
-        predictedAnnotations.flatMap((imAnns) =>
-          imAnns.map((ann) => ann.categoryId)
-        )
-      ),
-    ];
+    if (generateCategories) {
+      const uniquePredictedIds = [
+        ...new Set(
+          predictedAnnotations.flatMap((imAnns) =>
+            imAnns.map((ann) => ann.categoryId)
+          )
+        ),
+      ];
 
-    const generatedCategories = model.inferenceCategoriesById([
-      // keep categories that we currently have, as long as they are also model categories
-      ...currentCategories.map((cat) => cat.id),
-      // add or keep categories that the model says exist
-      ...uniquePredictedIds,
-    ]);
+      const generatedCategories = model.inferenceCategoriesById([
+        // keep categories that we currently have, as long as they are also model categories
+        ...currentCategories.map((cat) => cat.id),
+        // add or keep categories that the model says exist
+        ...uniquePredictedIds,
+      ]);
 
-    yield put(
-      dataSlice.actions.addAnnotationCategories({
-        annotationCategories: generatedCategories,
-        isPermanent: true,
-      })
-    );
-  }
+      yield put(
+        dataSlice.actions.addAnnotationCategories({
+          annotationCategories: generatedCategories,
+          isPermanent: true,
+        })
+      );
+    }
 
-  for (const [i, annotations] of predictedAnnotations.entries()) {
-    const imageId = inferenceImages[i].id;
+    for (const [i, annotations] of predictedAnnotations.entries()) {
+      const imageId = inferenceImages[i].id;
 
-    yield put(
-      dataSlice.actions.setAnnotationsByImage({
-        imageId,
-        annotations: annotations.map((ann) => ({ ...ann, imageId })),
-        isPermanent: true,
-      })
-    );
+      yield put(
+        dataSlice.actions.setAnnotationsByImage({
+          imageId,
+          annotations: annotations.map((ann) => ({ ...ann, imageId })),
+          isPermanent: true,
+        })
+      );
+    }
+  } catch (error) {
+    yield handleError(error as Error, "Error in running prediction");
+    return;
   }
 }
 
