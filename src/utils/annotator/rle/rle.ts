@@ -55,17 +55,28 @@ export const decodeAnnotations = async (
 /**
  * Compute the Run-length encoding of the input array.
  * @param decoded (decoded) input array
+ * @param expectBinary true if decoded mask is binary array (only consists of the values 0 or 1)
+                       false if the two values are 0 and 26^bitDepth-1
  * @returns Encoded array
  */
 export const encode = (
-  decoded: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
+  decoded: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array,
+  expectBinary: boolean = false
 ): Array<number> => {
-  const bitDepth =
-    decoded.constructor === Uint16Array
-      ? 16
-      : decoded.constructor === Float32Array
-      ? 32
-      : 8; // Uint8[Clamped]Array
+  let highVal: number;
+
+  if (expectBinary) {
+    highVal = 1;
+  } else {
+    const bitDepth =
+      decoded.constructor === Uint16Array
+        ? 16
+        : decoded.constructor === Float32Array
+        ? 32
+        : 8; // Uint8[Clamped]Array
+
+    highVal = 2 ** bitDepth - 1;
+  }
 
   let lastElement = decoded[0];
 
@@ -76,7 +87,7 @@ export const encode = (
   // Float32Array data usually holds normalized data between 0 and 1,
   // in which case it must be denormalized before calling this func
   // such that 0 -> 0 and 1 -> 2*16-1
-  if (decoded[0] === 2 ** bitDepth - 1) {
+  if (decoded[0] === highVal) {
     encoded.push(0);
   }
 
