@@ -83,7 +83,7 @@ const labelToAnnotation = async (
   return {
     categoryId,
     boundingBox: bbox as [number, number, number, number],
-    encodedMask: encode(annotationData),
+    encodedMask: encode(annotationData, true),
     plane: 0,
     id: uuid(),
   };
