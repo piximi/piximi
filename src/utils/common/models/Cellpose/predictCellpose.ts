@@ -161,41 +161,35 @@ export const predictCellpose = async (
 
   /*
    * The problem here is that _rvalue is returned as a Uint8Array
-   * with H*W*2 bytes, however it needs to be a Uint16Array
-   * (as specified by res.info)
-   * of length H*W
-   * We can't just do `new Uint16Array(res.mask._rvalue)` because
-   * that creates a Uint16Array of length H*W*2
-   * so instead we manualy contruct it by creating a blank
-   * Uint16Array of empty values, create a dataview over the
-   * Uint8Array buffer, taking into account the underlying byteOffset
-   * from the reserved bytes of the buffer, march through the
-   * Uint8Array 2 bytes at a time, and put them in the
-   * constructored Uint16Array, taking into account that it's little
-   * endian.
+   * of length H*W*2 bytes, however it needs to be a Uint16Array
+   * (as specified by res.info) of length H*W
+   * Moreover, the underlying buffer is actually
+   * H*W*2 + some number of reserved bytes at the beginning and end
    */
-  const uint16Data = new Uint16Array(res.mask._rvalue.length / 2);
-  const dv = new DataView(
-    res.mask._rvalue.buffer,
-    res.mask._rvalue.byteOffset,
-    res.mask._rvalue.byteLength
-  );
-
-  for (let i = 0; i < res.mask._rvalue.length; i += 2) {
-    const littleEndian = true;
-    uint16Data[i / 2] = dv.getUint16(i, littleEndian);
-  }
-
+  let labelMask: Uint8Array | Uint16Array | Float32Array = res.mask
+    ._rvalue as Uint8Array;
   /*
-   * TensorflowJS doesn't allow for Uint16Array, so instead
-   * if we know that all values are bellow 255, we can just
-   * clamp it and cast to Uin8Array, which it does support,
-   * or if we know some values are above 255, we can try
-   * Float32Array
+   * It's already of type Uint8Array, but
+   * recasting drops the reserved bytes so that now the
+   * underlying array buffer really is just H*W*2 bytes
    */
+  labelMask = new Uint8Array(labelMask);
+  /*
+   * This gives the correct type view over the buffer
+   * uin16 values of length H*W (little endian)
+   */
+  labelMask = new Uint16Array(labelMask.buffer);
+  /*
+   * Although the label mask returned from bio-engine
+   * really are uint16 values, and we certainly don't expect any
+   * label values above 2**16-1 = 65,535, tensorflow.js doesn't
+   * support uint16 (as of writing). So, we cast to Float32, which
+   * keeps the values preserved, but converts them to 4 byte floats.
+   * Now, H*W === length === byteLength / 4
+   */
+  labelMask = new Float32Array(labelMask);
 
-  const massagedData = Uint8Array.from(Uint8ClampedArray.from(uint16Data));
-  const maskTensor = tensor1d(massagedData);
+  const maskTensor = tensor1d(labelMask);
 
   const annotations = await labelMaskToAnnotation(
     maskTensor,
