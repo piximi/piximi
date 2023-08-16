@@ -104,7 +104,7 @@ export const CloudUpload = ({
   return (
     <>
       <DialogContent>
-        <Typography>{"Or upload a model from the internet."}</Typography>
+        <Typography>{"Upload a model from the internet."}</Typography>
       </DialogContent>
       <MenuItem>
         <FormControl sx={{ width: "75%", ml: 2, pr: 1 }}>

@@ -64,7 +64,7 @@ export const segmenterSlice = createSlice({
       // state = action.payload.segmenter;
       return action.payload.segmenter;
     },
-    uploadUserSelectedModel(
+    loadUserSelectedModel(
       state,
       action: PayloadAction<{
         inputShape: Shape;
@@ -73,13 +73,17 @@ export const segmenterSlice = createSlice({
     ) {
       const { model, inputShape } = action.payload;
 
-      availableSegmenterModels.push(model);
-      state.selectedModelIdx = availableSegmenterModels.length - 1;
-
       state.inputShape = inputShape;
 
       if (model.pretrained) {
         state.modelStatus = ModelStatus.Trained;
+        const selectedModelIdx = availableSegmenterModels.findIndex(
+          (m) => m.constructor.name === model.constructor.name
+        );
+        state.selectedModelIdx = selectedModelIdx >= 0 ? selectedModelIdx : 0;
+      } else {
+        availableSegmenterModels.push(model);
+        state.selectedModelIdx = availableSegmenterModels.length - 1;
       }
     },
 

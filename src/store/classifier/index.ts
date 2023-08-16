@@ -8,7 +8,7 @@ export { updateLossFunction } from "./classifierSlice";
 export { updateMetrics } from "./classifierSlice";
 export { updateOptimizationAlgorithm } from "./classifierSlice";
 export { updateTrainingPercentage } from "./classifierSlice";
-export { uploadUserSelectedModel } from "./classifierSlice";
+export { loadUserSelectedModel } from "./classifierSlice";
 export { updateModelStatus } from "./classifierSlice";
 
 // Selectors

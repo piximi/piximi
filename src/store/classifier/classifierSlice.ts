@@ -131,7 +131,7 @@ export const classifierSlice = createSlice({
         state.modelStatus = ModelStatus.Uninitialized;
       }
     },
-    uploadUserSelectedModel(
+    loadUserSelectedModel(
       state,
       action: PayloadAction<{
         inputShape: Shape;
@@ -203,6 +203,6 @@ export const {
   updateMetrics,
   updateOptimizationAlgorithm,
   updateTrainingPercentage,
-  uploadUserSelectedModel,
+  loadUserSelectedModel,
   updateModelStatus,
 } = classifierSlice.actions;

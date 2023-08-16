@@ -2,12 +2,15 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   Dialog,
   DialogActions,
   DialogTitle,
   IconButton,
+  Tab,
+  Tabs,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -54,6 +57,8 @@ export const ImportTensorflowModelDialog = ({
 
   const [cloudWarning, setCloudWarning] = useState(false);
 
+  const [tabVal, setTabVal] = useState("1");
+
   const onModelChange = useCallback((model: Model | undefined) => {
     setSelectedModel(model);
     // TODO - segmenter: generalize to model.cloud
@@ -79,6 +84,10 @@ export const ImportTensorflowModelDialog = ({
   const closeDialog = () => {
     setCloudWarning(false);
     onClose();
+  };
+
+  const onTabSelect = (event: React.SyntheticEvent, newValue: string) => {
+    setTabVal(newValue);
   };
 
   useHotkeys(
@@ -125,33 +134,55 @@ export const ImportTensorflowModelDialog = ({
         </Alert>
       </Collapse>
       <DialogTitle>
-        Import{" "}
+        Load{" "}
         {modelTask === ModelTask.Classification
           ? "Classification"
           : "Segmentation"}{" "}
         model
       </DialogTitle>
 
-      <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+      <Tabs value={tabVal} onChange={onTabSelect}>
+        <Tab label="Load Pretrained" value="1" />
+        <Tab
+          label="Upload Local"
+          value="2"
+          disabled={modelTask === ModelTask.Segmentation}
+        />
+        <Tab
+          label="Fetch Remote"
+          value="3"
+          disabled={modelTask === ModelTask.Segmentation}
+        />
+      </Tabs>
 
-      <LocalFileUpload
-        modelTask={modelTask}
-        isGraph={isGraph}
-        setModel={onModelChange}
-        setInputShape={setInputShape}
-      />
+      <Box hidden={tabVal !== "1"}>
+        <PretrainedModelSelector
+          values={pretrainedModels}
+          setModel={onModelChange}
+        />
+      </Box>
 
-      <PretrainedModelSelector
-        values={pretrainedModels}
-        setModel={onModelChange}
-      />
+      <Box hidden={tabVal !== "2" && tabVal !== "3"}>
+        <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+      </Box>
 
-      <CloudUpload
-        modelTask={modelTask}
-        isGraph={isGraph}
-        setModel={onModelChange}
-        setInputShape={setInputShape}
-      />
+      <Box hidden={tabVal !== "2"}>
+        <LocalFileUpload
+          modelTask={modelTask}
+          isGraph={isGraph}
+          setModel={onModelChange}
+          setInputShape={setInputShape}
+        />
+      </Box>
+
+      <Box hidden={tabVal !== "3"}>
+        <CloudUpload
+          modelTask={modelTask}
+          isGraph={isGraph}
+          setModel={onModelChange}
+          setInputShape={setInputShape}
+        />
+      </Box>
 
       <DialogActions>
         <Button onClick={closeDialog} color="primary">

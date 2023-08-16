@@ -52,7 +52,7 @@ export const SegmenterList = () => {
       }
 
       dispatch(
-        segmenterSlice.actions.uploadUserSelectedModel({
+        segmenterSlice.actions.loadUserSelectedModel({
           inputShape,
           model: model as Segmenter,
         })

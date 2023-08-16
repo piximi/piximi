@@ -15,7 +15,7 @@ import { CategoriesList } from "components/categories/CategoriesList";
 import {
   classifierModelStatusSelector,
   classifierSelectedModelSelector,
-  uploadUserSelectedModel,
+  loadUserSelectedModel,
 } from "store/classifier";
 
 import { selectCreatedImageCategories } from "store/data";
@@ -48,7 +48,7 @@ export const ClassifierList = () => {
   const importClassifierModel = (model: Model, inputShape: Shape) => {
     if (model instanceof SequentialClassifier) {
       dispatch(
-        uploadUserSelectedModel({
+        loadUserSelectedModel({
           inputShape: inputShape,
           model,
         })
