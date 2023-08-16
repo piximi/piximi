@@ -60,6 +60,8 @@ export function interpolateX(yScan: number, edge: Edge) {
 export function computeBoundingBoxFromContours(
   contour: Array<Point>
 ): [number, number, number, number] {
+  if (contour.length === 0) return [0, 0, 0, 0];
+
   const xValues = contour.map((point) => point.x);
   const yValues = contour.map((point) => point.y);
   return [

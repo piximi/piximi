@@ -73,7 +73,7 @@ export const Stage = ({
     setCurrentMousePosition,
     positionByStage,
     pixelColor,
-  } = usePointerLocation(imageRef, stageRef!, annotationTool?.image);
+  } = usePointerLocation(imageRef, stageRef!, annotationTool.image);
 
   const {
     handleMouseUp,

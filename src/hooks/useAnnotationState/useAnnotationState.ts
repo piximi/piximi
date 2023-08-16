@@ -47,7 +47,7 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
         })
       );
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool?.annotate(
+      annotationTool.annotate(
         selectedCategory!,
         activeImagePlane!,
         activeImageId!
@@ -75,7 +75,6 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
     return func;
   }, [annotationTool, dispatch]);
   useEffect(() => {
-    if (!annotationTool) return;
     annotationTool.registerOnAnnotatedHandler(onAnnotated);
     annotationTool.registerOnAnnotatingHandler(onAnnotating);
     annotationTool.registerOnDeselectHandler(onDeselect);

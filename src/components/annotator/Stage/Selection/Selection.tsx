@@ -27,13 +27,11 @@ import {
 } from "annotator-tools";
 
 type SelectionProps = {
-  tool?: Tool;
-  toolType?: ToolType;
+  tool: Tool;
+  toolType: ToolType;
 };
 
 export const Selection = ({ tool, toolType }: SelectionProps) => {
-  if (!toolType || !tool) return <></>;
-
   switch (toolType) {
     case ToolType.ColorAnnotation:
       return <ColorSelection operator={tool as ColorAnnotationTool} />;

@@ -79,18 +79,8 @@ export const useStageHandlers = (
   } = useZoom(stageRef?.current);
 
   const deselectAnnotation = useCallback(() => {
-    if (!annotationTool) {
-      console.log("deselect me");
-      dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Blank,
-          annotationTool,
-        })
-      );
-      return;
-    }
     annotationTool.deselect();
-  }, [annotationTool, dispatch]);
+  }, [annotationTool]);
 
   const deleteAnnotations = (
     annotationIds: Array<string>,
@@ -397,7 +387,7 @@ export const useStageHandlers = (
           return;
         }
       }
-      if (!annotationTool || outOfBounds) return;
+      if (outOfBounds) return;
       annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);
@@ -434,7 +424,6 @@ export const useStageHandlers = (
       } else if (toolType === ToolType.Pointer) {
         handlePointerMouseMove(absolutePosition!);
       } else {
-        if (!annotationTool) return;
         annotationTool.onMouseMove(absolutePosition!);
       }
     };
@@ -487,7 +476,6 @@ export const useStageHandlers = (
       } else if (toolType === ToolType.Pointer) {
         handlePointerMouseUp(absolutePosition);
       } else {
-        if (!annotationTool) return;
         if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
             absolutePosition

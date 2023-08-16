@@ -11,6 +11,7 @@ import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { encodeAnnotation } from "utils/annotator";
 //import { dataSlice } from "store/data";
 import { imageViewerSlice } from "store/imageViewer";
+import { BlankAnnotationTool } from "annotator-tools/BlankAnnotationTool";
 
 export const annotatorMiddleware = createListenerMiddleware();
 
@@ -23,7 +24,10 @@ startAppListening({
     const { imageViewer, data, annotator } = listenerAPI.getState();
     const { annotationState, annotationTool } = action.payload;
 
-    if (!annotationTool || annotationState !== AnnotationStateType.Annotated)
+    if (
+      annotationTool instanceof BlankAnnotationTool ||
+      annotationState !== AnnotationStateType.Annotated
+    )
       return;
     const selectionMode = annotator.selectionMode;
     const activeImageId = imageViewer.activeImageId;
