@@ -24,7 +24,7 @@ export const InvertAnnotation = () => {
   const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
 
   const onInvertClick = () => {
-    if (!annotationTool || !workingAnnotationEntity.saved) return;
+    if (!workingAnnotationEntity.saved) return;
     const workingAnnotation = {
       ...workingAnnotationEntity.saved,
       ...workingAnnotationEntity.changes,

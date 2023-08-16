@@ -25,10 +25,13 @@ import {
   RectangularAnnotationTool,
   ThresholdAnnotationTool,
 } from "annotator-tools";
+import { BlankAnnotationTool } from "annotator-tools/BlankAnnotationTool";
 
 export const useAnnotationTool = () => {
-  const [operator, setOperator] = useState<AnnotationTool>();
   const [image, setImage] = useState<ImageJS.Image>();
+  const [operator, setOperator] = useState<AnnotationTool>(
+    new BlankAnnotationTool()
+  );
 
   const src = useSelector(selectActiveImageSrc);
   const operation = useSelector(selectToolType);
@@ -94,6 +97,10 @@ export const useAnnotationTool = () => {
         setOperator(new RectangularAnnotationTool(image));
 
         return;
+      default:
+        setOperator(new BlankAnnotationTool(image));
+
+        return;
     }
   }, [operation, image]);
 
@@ -115,7 +122,7 @@ export const useAnnotationTool = () => {
   }, [operator, quickSelectionRegionSize, penSelectionBrushSize, stageScale]);
 
   return {
-    annotationTool: operator!,
+    annotationTool: operator,
     ToolSelecton: {
       /*!(
                 annotationState !== AnnotationStateType.Annotating &&

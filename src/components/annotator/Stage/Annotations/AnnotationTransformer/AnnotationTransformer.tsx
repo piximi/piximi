@@ -25,7 +25,7 @@ import {
 
 import useSound from "use-sound";
 
-import { AnnotationModeType, AnnotationStateType } from "types";
+import { AnnotationModeType } from "types";
 
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
@@ -42,7 +42,7 @@ const labelPosition = {
 
 type AnnotationTransformerProps = {
   annotationId: string;
-  annotationTool?: AnnotationTool;
+  annotationTool: AnnotationTool;
 };
 
 export const AnnotationTransformer = ({
@@ -78,16 +78,7 @@ export const AnnotationTransformer = ({
   );
 
   const clearAnnotation = () => {
-    if (annotationTool) {
-      annotationTool.deselect();
-    } else {
-      dispatch(
-        annotatorSlice.actions.setAnnotationState({
-          annotationState: AnnotationStateType.Blank,
-          annotationTool: annotationTool,
-        })
-      );
-    }
+    annotationTool.deselect();
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })

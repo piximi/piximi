@@ -6,7 +6,7 @@ import { Point } from "types";
 export const usePointerLocation = (
   imageRef: React.MutableRefObject<Konva.Image | null>,
   stageRef: React.RefObject<Konva.Stage | null>,
-  originalImage: ImageJS.Image | undefined
+  originalImage: ImageJS.Image
 ) => {
   const [absolutePosition, setAbsolutePosition] = useState<Point>();
   const [positionByStage, setPositionByStage] = useState<Point>();
@@ -15,7 +15,7 @@ export const usePointerLocation = (
 
   const getPositionFromImage = useCallback(
     (position: Point): Point | undefined => {
-      if (!imageRef || !imageRef.current || !originalImage) return;
+      if (!imageRef || !imageRef.current) return;
 
       const transform = imageRef.current.getAbsoluteTransform().copy();
 
@@ -24,7 +24,7 @@ export const usePointerLocation = (
       const imageOffset = transform.point(position);
 
       return {
-        x: (imageOffset.x / imageRef.current.width()) * originalImage?.width,
+        x: (imageOffset.x / imageRef.current.width()) * originalImage.width,
         y: (imageOffset.y / imageRef.current.height()) * originalImage.height,
       };
     },
@@ -42,7 +42,7 @@ export const usePointerLocation = (
     []
   );
   const setCurrentMousePosition = useCallback(() => {
-    if (!stageRef.current || !originalImage) return;
+    if (!stageRef.current) return;
     const position = stageRef.current.getPointerPosition();
 
     if (!position) return;
@@ -84,7 +84,7 @@ export const usePointerLocation = (
     setAbsolutePosition(absolute);
   }, [stageRef, getRelativePosition, originalImage, imageRef]);
   useEffect(() => {
-    if (!absolutePosition?.x || outOfBounds || !originalImage) return;
+    if (!absolutePosition?.x || outOfBounds) return;
 
     let y: number;
     /* For some reason the full range of x values work, but only y < height  work

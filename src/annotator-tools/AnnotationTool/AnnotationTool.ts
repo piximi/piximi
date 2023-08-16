@@ -19,14 +19,9 @@ import {
 
 export abstract class AnnotationTool extends Tool {
   /**
-   * RoiManager of the annotated image.
-   * https://image-js.github.io/image-js/#roi
-   */
-  manager: ImageJS.RoiManager;
-  /**
    * Polygon that defines the annotation area, array of (x, y) coordinates.
    */
-  points?: Array<Point> = [];
+  points: Array<Point> = [];
   /**
    * Coordinates of the annotation bounding box: [x1, y1, x2, y2].
    * Specifies the top left and bottom right points.
@@ -56,11 +51,6 @@ export abstract class AnnotationTool extends Tool {
   onAnnotated?: () => void;
   onDeselect?: () => void;
 
-  constructor(image: ImageJS.Image) {
-    super(image);
-    this.manager = image.getRoiManager();
-  }
-
   get boundingBox(): [number, number, number, number] | undefined {
     return this._boundingBox;
   }
@@ -75,8 +65,8 @@ export abstract class AnnotationTool extends Tool {
    * Compute the bounding box of the polygon that defined the annotation.
    * @returns bounding box [number, number, number, number] or undefined
    */
-  computeBoundingBox(): [number, number, number, number] | undefined {
-    if (!this.points || !this.points.length) return undefined;
+  protected computeBoundingBox(): [number, number, number, number] | undefined {
+    if (this.points.length === 0) return undefined;
     return [
       this.points[0].x,
       this.points[0].y,
@@ -85,7 +75,7 @@ export abstract class AnnotationTool extends Tool {
     ];
   }
 
-  setBoundingBoxFromContours(contour: Array<Point>) {
+  protected setBoundingBoxFromContours(contour: Array<Point>) {
     this.boundingBox = _computeBoundingBoxFromContours(contour);
   }
 
@@ -108,8 +98,8 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Compute the encodedMask image of the annotation polygon from the bounding box and the polygon points.
    */
-  setAnnotationMaskFromPoints() {
-    if (!this.boundingBox || !this.points) {
+  protected setAnnotationMaskFromPoints() {
+    if (!this.boundingBox || this.points.length === 0) {
       return;
     }
 
@@ -120,43 +110,43 @@ export abstract class AnnotationTool extends Tool {
     );
   }
 
-  setAnnotating() {
+  protected setAnnotating() {
     this.annotationState = AnnotationStateType.Annotating;
     if (this.onAnnotating) {
       this.onAnnotating();
     }
   }
-  registerOnAnnotatingHandler(handler: () => void): void {
+  public registerOnAnnotatingHandler(handler: () => void): void {
     this.onAnnotating = handler;
   }
 
-  setAnnotated() {
+  protected setAnnotated() {
     this.annotationState = AnnotationStateType.Annotated;
     if (this.onAnnotated) {
       this.onAnnotated();
     }
   }
-  registerOnAnnotatedHandler(handler: () => void): void {
+  public registerOnAnnotatedHandler(handler: () => void): void {
     this.onAnnotated = handler;
   }
 
-  setBlank() {
+  protected setBlank() {
     this.annotationState = AnnotationStateType.Blank;
     if (this.onDeselect) {
       this.onDeselect();
     }
   }
-  registerOnDeselectHandler(handler: () => void): void {
+  public registerOnDeselectHandler(handler: () => void): void {
     this.onDeselect = handler;
   }
 
-  abstract deselect(): void;
+  public abstract deselect(): void;
 
-  abstract onMouseDown(position: { x: number; y: number }): void;
+  public abstract onMouseDown(position: { x: number; y: number }): void;
 
-  abstract onMouseMove(position: { x: number; y: number }): void;
+  public abstract onMouseMove(position: { x: number; y: number }): void;
 
-  abstract onMouseUp(position: { x: number; y: number }): void;
+  public abstract onMouseUp(position: { x: number; y: number }): void;
 
   /**
    * Creates and sets the annotation object.
@@ -164,7 +154,7 @@ export abstract class AnnotationTool extends Tool {
    * @param plane Index of the image plane that corresponds to the annotation.
    * @returns
    */
-  annotate(category: Category, plane: number, imageId: string): void {
+  public annotate(category: Category, plane: number, imageId: string): void {
     if (!this.boundingBox || !this.decodedMask) return;
 
     this.annotation = {
@@ -177,12 +167,6 @@ export abstract class AnnotationTool extends Tool {
     };
   }
 
-  updateAnnotationMask(): void {
-    if (!this.boundingBox || !this.decodedMask || !this.annotation) return;
-
-    this.annotation = { ...this.annotation, decodedMask: this.decodedMask };
-  }
-
   /**
    * Checks if a point lies within an annotation bounding box
    * @param x x-coord of point
@@ -190,7 +174,7 @@ export abstract class AnnotationTool extends Tool {
    * @param boundingBox Bounding box of annotation
    * @returns true if point lies within the bounding box, false otherwise
    */
-  isInBoundingBox(
+  private isInBoundingBox(
     x: number,
     y: number,
     boundingBox: [number, number, number, number]
@@ -207,7 +191,7 @@ export abstract class AnnotationTool extends Tool {
    * @param newBoundingBox Bounding box of new annotation to be added
    * @returns Bounding box and encodedMask of the combined annotation areas
    */
-  add(
+  public add(
     newEncodedMaskData: DataArray,
     newBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
@@ -277,7 +261,7 @@ export abstract class AnnotationTool extends Tool {
    * @param boundingBox1
    * @returns Bounding box and encodedMask of the intersected annotation areas.
    */
-  intersect(
+  public intersect(
     decodedMask1: DataArray,
     boundingBox1: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
@@ -352,7 +336,7 @@ export abstract class AnnotationTool extends Tool {
    * @param selectedBoundingBox
    * @returns Bounding box and encodedMask of the inverted annotation area
    */
-  invert(
+  public invert(
     selectedMask: DataArray,
     selectedBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {
@@ -428,7 +412,7 @@ export abstract class AnnotationTool extends Tool {
    * @param minuendBoundingBox
    * @returns Bounding box and encodedMask of the difference of the annotation areas.
    */
-  subtract(
+  public subtract(
     encodedMinuendData: DataArray,
     minuendBoundingBox: [number, number, number, number]
   ): [Uint8Array, [number, number, number, number]] {

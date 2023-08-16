@@ -27,7 +27,7 @@ import {
 import { AnnotationTool } from "annotator-tools";
 
 type useAnnotatorHotkeysProps = {
-  annotationTool: AnnotationTool | undefined;
+  annotationTool: AnnotationTool;
   deleteAnnotations: (
     annotationIds: Array<string>,
     activeAnnotations: Array<DecodedAnnotationType>
@@ -66,7 +66,6 @@ export const useAnnotatorKeyboardShortcuts = ({
   const confirmAnnotations = () => {
     if (
       !workingAnnotationEntity.saved ||
-      !annotationTool ||
       annotationTool.annotationState === AnnotationStateType.Annotating ||
       !activeImageId
     )
@@ -295,7 +294,7 @@ export const useAnnotatorKeyboardShortcuts = ({
     [
       activeImageId,
       annotationTool,
-      annotationTool?.annotationState,
+      annotationTool.annotationState,
       selectedAnnotations,
       activeAnnotations,
       selectionMode,
@@ -308,8 +307,6 @@ export const useAnnotatorKeyboardShortcuts = ({
   useHotkeys(
     "escape",
     () => {
-      if (!annotationTool) return;
-
       deselectAllAnnotations();
 
       deselectAnnotation();
