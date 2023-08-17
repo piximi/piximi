@@ -185,6 +185,8 @@ export const predictCellpose = async (
    * label values above 2**16-1 = 65,535, tensorflow.js doesn't
    * support uint16 (as of writing). So, we cast to Float32, which
    * keeps the values preserved, but converts them to 4 byte floats.
+   * It should be noted Float32 usually holds normalized values between
+   * 0 and 1, but in this case they are all whole numbers 0-65535.
    * Now, H*W === length === byteLength / 4
    */
   labelMask = new Float32Array(labelMask);
