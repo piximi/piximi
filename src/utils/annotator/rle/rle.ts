@@ -87,6 +87,7 @@ export const encode = (
   // Float32Array data usually holds normalized data between 0 and 1,
   // in which case it must be denormalized before calling this func
   // such that 0 -> 0 and 1 -> 2*16-1
+  // or expectBinary should be set true
   if (decoded[0] === highVal) {
     encoded.push(0);
   }
