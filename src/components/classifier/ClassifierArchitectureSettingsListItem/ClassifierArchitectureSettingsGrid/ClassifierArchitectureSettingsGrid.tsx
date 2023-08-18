@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
@@ -34,14 +34,18 @@ export const ClassifierArchitectureSettingsGrid = ({
   const [fixedNumberOfChannelsHelperText, setFixedNumberOfChannelsHelperText] =
     useState<string>("");
 
-  const modelOptions = availableClassifierModels
-    .map((m, i) => ({
-      name: m.name,
-      trainable: m.trainable,
-      loaded: m.modelLoaded,
-      idx: i,
-    }))
-    .filter((m) => m.trainable || m.loaded);
+  const modelOptions = useMemo(
+    () =>
+      availableClassifierModels
+        .map((m, i) => ({
+          name: m.name,
+          trainable: m.trainable,
+          loaded: m.modelLoaded,
+          idx: i,
+        }))
+        .filter((m) => m.trainable || m.loaded),
+    []
+  );
 
   useEffect(() => {
     if (selectedModel.model.requiredChannels) {
