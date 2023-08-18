@@ -38,9 +38,10 @@ export const ClassifierArchitectureSettingsGrid = ({
     .map((m, i) => ({
       name: m.name,
       trainable: m.trainable,
+      loaded: m.modelLoaded,
       idx: i,
     }))
-    .filter((m) => m.trainable);
+    .filter((m) => m.trainable || m.loaded);
 
   useEffect(() => {
     if (selectedModel.model.requiredChannels) {
@@ -106,6 +107,7 @@ export const ClassifierArchitectureSettingsGrid = ({
             value={{
               name: selectedModel.model.name,
               trainable: selectedModel.model.trainable,
+              loaded: selectedModel.model.modelLoaded,
               idx: selectedModel.idx,
             }}
             isOptionEqualToValue={(option, value) => option.name === value.name}

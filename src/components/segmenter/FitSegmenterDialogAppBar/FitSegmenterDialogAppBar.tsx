@@ -27,7 +27,8 @@ import { ModelStatus } from "types/ModelType";
 type FitSegmenterDialogAppBarProps = {
   closeDialog: any;
   fit: any;
-  disableFitting: boolean;
+  noLabels: boolean;
+  noTrain: boolean;
   epochs: number;
   currentEpoch: number;
 };
@@ -35,7 +36,8 @@ type FitSegmenterDialogAppBarProps = {
 export const FitSegmenterDialogAppBar = ({
   closeDialog,
   fit,
-  disableFitting,
+  noLabels,
+  noTrain,
   epochs,
   currentEpoch,
 }: FitSegmenterDialogAppBarProps) => {
@@ -94,8 +96,10 @@ export const FitSegmenterDialogAppBar = ({
           modelStatus >= ModelStatus.Trained) && (
           <Tooltip
             title={
-              disableFitting
+              noLabels
                 ? "Please annotate images before fitting a model."
+                : noTrain
+                ? "Model not trainable"
                 : "Fit the model"
             }
             placement="bottom"
@@ -104,7 +108,7 @@ export const FitSegmenterDialogAppBar = ({
               <Button
                 variant="outlined"
                 onClick={fit}
-                disabled={disableFitting}
+                disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
               >
                 Fit Segmenter
