@@ -119,12 +119,7 @@ export const AnnotationTransformer = ({
 
     if (activeAnnotationIds.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        batch(() => {
-          dispatch(
-            imageViewerSlice.actions.removeActiveAnnotationId({ annotationId })
-          );
-          dispatch(dataSlice.actions.deleteAnnotation({ annotationId }));
-        });
+        dispatch(dataSlice.actions.deleteAnnotation({ annotationId }));
       } else {
         dispatch(
           dataSlice.actions.updateAnnotation({
