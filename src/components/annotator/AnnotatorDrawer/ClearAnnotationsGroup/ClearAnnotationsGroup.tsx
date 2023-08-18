@@ -46,11 +46,6 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({
-            annotationIds: activeAnnotationsIds,
-          })
-        );
-        dispatch(
           dataSlice.actions.deleteAnnotations({
             annotationIds: activeAnnotationsIds,
           })
@@ -58,11 +53,6 @@ export const ClearAnnotationsGroup = () => {
       } else {
         dispatch(
           imageViewerSlice.actions.removeSelectedAnnotationIds({
-            annotationIds: selectedAnnotationsIds,
-          })
-        );
-        dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({
             annotationIds: selectedAnnotationsIds,
           })
         );
