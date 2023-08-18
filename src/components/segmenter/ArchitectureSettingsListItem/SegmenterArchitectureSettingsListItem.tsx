@@ -3,7 +3,13 @@ import { styled } from "@mui/material";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { SegmenterArchitectureSettingsGrid } from "./ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
 
-export const SegmenterArchitectureSettingsListItem = () => {
+type ArchitectureSettingsProps = {
+  onModelSelect: (modelIdx: number) => void;
+};
+
+export const SegmenterArchitectureSettingsListItem = ({
+  onModelSelect,
+}: ArchitectureSettingsProps) => {
   const StyledForm = styled("form")({
     // width: '100%',
     display: "flex",
@@ -18,7 +24,7 @@ export const SegmenterArchitectureSettingsListItem = () => {
       paddingLeft={true}
     >
       <StyledForm noValidate autoComplete="off">
-        <SegmenterArchitectureSettingsGrid />
+        <SegmenterArchitectureSettingsGrid onModelSelect={onModelSelect} />
       </StyledForm>
     </CollapsibleList>
   );

@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Dialog, DialogContent, List } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Fade,
+  List,
+} from "@mui/material";
 
 import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
@@ -20,6 +28,8 @@ import {
   segmenterSlice,
   segmenterModelSelector,
   segmenterModelStatusSelector,
+  segmenterInputShapeSelector,
+  segmenterHistorySelector,
 } from "store/segmenter";
 
 import {
@@ -29,7 +39,8 @@ import {
   OptimizationAlgorithm,
 } from "types";
 import { TrainingCallbacks } from "utils/common/models/Model";
-import { ModelStatus } from "types/ModelType";
+import { ModelStatus, availableSegmenterModels } from "types/ModelType";
+import { useDialog } from "hooks";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -41,8 +52,13 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const { closeDialog, openedDialog } = props;
 
+  const {
+    onClose: onCloseClearDialog,
+    open: openClearDialog,
+    onOpen: onOpenClearDialog,
+  } = useDialog();
+
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-  const [totalEpochs, setTotalEpochs] = useState<number>(0);
 
   const [showWarning, setShowWarning] = useState<boolean>(true);
   const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
@@ -64,15 +80,31 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
+  const [nextModelIdx, setNextModelIdx] = useState(0);
+
+  const [clearModel, setClearModel] = useState(false);
+
   const annotatedImages = useSelector(selectAnnotatedImages);
   const selectedModel = useSelector(segmenterModelSelector);
+  const inputShape = useSelector(segmenterInputShapeSelector);
   const modelStatus = useSelector(segmenterModelStatusSelector);
-
   const alertState = useSelector(alertStateSelector);
 
   const fitOptions = useSelector(segmenterFitOptionsSelector);
   const compileOptions = useSelector(segmenterCompileOptionsSelector);
   const trainingPercentage = useSelector(segmenterTrainingPercentageSelector);
+
+  const items = useRef([
+    "loss",
+    "val_loss",
+    "categoricalAccuracy",
+    "val_categoricalAccuracy",
+    "epochs",
+  ]);
+
+  const modelHistory = useSelector((state) =>
+    segmenterHistorySelector(state, items.current)
+  );
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
     dispatch(
@@ -124,8 +156,8 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
-    name: "No labeled images",
-    description: "Please label images to train a model.",
+    name: "No annotated images",
+    description: "Please annotate images to train a model.",
   };
 
   useEffect(() => {
@@ -178,10 +210,9 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     epoch,
     logs
   ) => {
-    const nextEpoch = totalEpochs + epoch + 1;
+    const nextEpoch = selectedModel.numEpochs + epoch + 1;
     const trainingEpochIndicator = nextEpoch - 0.5;
 
-    setTotalEpochs(nextEpoch);
     setCurrentEpoch((currentEpoch) => currentEpoch + 1);
 
     if (!logs) return;
@@ -207,7 +238,6 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
         prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
       );
     }
-
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
         prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
@@ -217,21 +247,29 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     setShowPlots(true);
   };
 
-  const cleanUpStates = () => {
-    setTrainingAccuracy([]);
-    setValidationAccuracy([]);
-    setTrainingLoss([]);
-    setValidationLoss([]);
-    setShowPlots(false);
+  useEffect(() => {
+    setTrainingAccuracy(
+      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
+    );
+    setValidationAccuracy(
+      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y }))
+    );
+    setTrainingLoss(modelHistory.loss.map((y, i) => ({ x: i + 0.5, y })));
+    setValidationLoss(modelHistory.val_loss.map((y, i) => ({ x: i + 1, y })));
+
+    // modelHistory.epochs.length same as numEpochs
+    // the rest should be same length as well
+    // don't use modelHistory.numEpochs because then it will need to be
+    // a useEffect dependency, and we don't want to react to model object
+    // state changes directly, only through useSelector returned values
+    setShowPlots(modelHistory.epochs.length > 0);
 
     setCurrentEpoch(0);
-  };
+  }, [modelHistory]);
 
   const onFit = async () => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
-      cleanUpStates();
-
       dispatch(
         segmenterSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.InitFit,
@@ -250,82 +288,145 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     }
   };
 
+  const dispatchModel = (_clearModel: boolean, _nextModelIdx: number) => {
+    dispatch(
+      segmenterSlice.actions.updateSelectedModelIdx({
+        modelIdx: _nextModelIdx,
+        disposePrevious: _clearModel,
+      })
+    );
+
+    const nextModel = availableSegmenterModels[_nextModelIdx];
+
+    // if the selected model requires a specific number of input channels,
+    // dispatch that number to the store
+    if (nextModel.requiredChannels) {
+      dispatch(
+        segmenterSlice.actions.updateSegmentationInputShape({
+          inputShape: {
+            ...inputShape,
+            channels: nextModel.requiredChannels,
+          },
+        })
+      );
+    }
+  };
+
+  const dispatchModelOnExit = () => {
+    dispatchModel(clearModel, nextModelIdx);
+  };
+
+  const onClearSelect = (_clearModel: boolean) => {
+    onCloseClearDialog();
+    // don't call dispatchModel directly here
+    // it needs to be triggered on dialog exit
+    setClearModel(_clearModel);
+  };
+
+  const onModelSelect = (modelIdx: number) => {
+    setNextModelIdx(modelIdx);
+    if (selectedModel.modelLoaded) {
+      onOpenClearDialog();
+    } else {
+      // if not loaded skip the clear dialog
+      dispatchModel(false, modelIdx);
+    }
+  };
+
   return (
-    <Dialog
-      fullWidth
-      maxWidth="md"
-      onClose={closeDialog}
-      open={openedDialog}
-      TransitionComponent={DialogTransitionSlide}
-      style={{ zIndex: 1203, height: "100%" }}
-    >
-      <FitSegmenterDialogAppBar
-        closeDialog={closeDialog}
-        fit={onFit}
-        disableFitting={noLabeledImages || !selectedModel.trainable}
-        epochs={fitOptions.epochs}
-        currentEpoch={currentEpoch}
-      />
-
-      {showWarning && noLabeledImages && selectedModel.trainable && (
-        <AlertDialog
-          setShowAlertDialog={setShowWarning}
-          alertState={noLabeledImageAlert}
+    <>
+      <Dialog
+        onClose={onCloseClearDialog}
+        open={openClearDialog}
+        TransitionComponent={Fade}
+        TransitionProps={{ onExited: dispatchModelOnExit }}
+      >
+        <DialogTitle> Clear {selectedModel.name}?</DialogTitle>
+        <DialogActions>
+          <Button onClick={onCloseClearDialog}>Cancel</Button>
+          <Button onClick={() => onClearSelect(false)}>No</Button>
+          <Button onClick={() => onClearSelect(true)}>Yes</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        onClose={closeDialog}
+        open={openedDialog}
+        TransitionComponent={DialogTransitionSlide}
+        style={{ zIndex: 1203, height: "100%" }}
+      >
+        <FitSegmenterDialogAppBar
+          closeDialog={closeDialog}
+          fit={onFit}
+          noLabels={noLabeledImages}
+          noTrain={!selectedModel.trainable}
+          epochs={fitOptions.epochs}
+          currentEpoch={currentEpoch}
         />
-      )}
 
-      {alertState.visible && <AlertDialog alertState={alertState} />}
-
-      <DialogContent>
-        <List dense>
-          <SegmenterArchitectureSettingsListItem />
-
-          <OptimizerSettingsListItem
-            compileOptions={compileOptions}
-            dispatchLossFunctionCallback={dispatchLossFunctionCallback}
-            dispatchOptimizationAlgorithmCallback={
-              dispatchOptimizationAlgorithmCallback
-            }
-            dispatchEpochsCallback={dispatchEpochsCallback}
-            fitOptions={fitOptions}
-            dispatchBatchSizeCallback={dispatchBatchSizeCallback}
-            dispatchLearningRateCallback={dispatchLearningRateCallback}
-            isModelTrainable={selectedModel.trainable}
+        {showWarning && noLabeledImages && selectedModel.trainable && (
+          <AlertDialog
+            setShowAlertDialog={setShowWarning}
+            alertState={noLabeledImageAlert}
           />
-
-          <DatasetSettingsListItem
-            trainingPercentage={trainingPercentage}
-            dispatchTrainingPercentageCallback={
-              dispatchTrainingPercentageCallback
-            }
-            isModelTrainable={selectedModel.trainable}
-          />
-        </List>
-
-        {showPlots && (
-          <div>
-            <TrainingHistoryPlot
-              metric={"accuracy"}
-              trainingValues={trainingAccuracy}
-              validationValues={validationAccuracy}
-            />
-
-            <TrainingHistoryPlot
-              metric={"loss"}
-              trainingValues={trainingLoss}
-              validationValues={validationLoss}
-              dynamicYRange={true}
-            />
-          </div>
         )}
 
-        {modelStatus > ModelStatus.Training && !selectedModel.graph && (
-          <div>
-            {/*  TODO - segmenter: implement model summary for graph */}
-            <ModelSummaryTable model={selectedModel} />
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        {alertState.visible && <AlertDialog alertState={alertState} />}
+
+        <DialogContent>
+          <List dense>
+            <SegmenterArchitectureSettingsListItem
+              onModelSelect={onModelSelect}
+            />
+
+            <OptimizerSettingsListItem
+              compileOptions={compileOptions}
+              dispatchLossFunctionCallback={dispatchLossFunctionCallback}
+              dispatchOptimizationAlgorithmCallback={
+                dispatchOptimizationAlgorithmCallback
+              }
+              dispatchEpochsCallback={dispatchEpochsCallback}
+              fitOptions={fitOptions}
+              dispatchBatchSizeCallback={dispatchBatchSizeCallback}
+              dispatchLearningRateCallback={dispatchLearningRateCallback}
+              isModelTrainable={selectedModel.trainable}
+            />
+
+            <DatasetSettingsListItem
+              trainingPercentage={trainingPercentage}
+              dispatchTrainingPercentageCallback={
+                dispatchTrainingPercentageCallback
+              }
+              isModelTrainable={selectedModel.trainable}
+            />
+          </List>
+
+          {showPlots && (
+            <div>
+              <TrainingHistoryPlot
+                metric={"accuracy"}
+                trainingValues={trainingAccuracy}
+                validationValues={validationAccuracy}
+              />
+
+              <TrainingHistoryPlot
+                metric={"loss"}
+                trainingValues={trainingLoss}
+                validationValues={validationLoss}
+                dynamicYRange={true}
+              />
+            </div>
+          )}
+
+          {modelStatus > ModelStatus.Training && !selectedModel.graph && (
+            <div>
+              {/*  TODO: implement model summary for graph models */}
+              <ModelSummaryTable model={selectedModel} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

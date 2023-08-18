@@ -136,8 +136,24 @@ export const segmenterSlice = createSlice({
     ) {
       state.compileOptions.metrics = action.payload.metrics;
     },
-    updateSelectedModelIdx(state, action: PayloadAction<{ modelIdx: number }>) {
-      state.selectedModelIdx = action.payload.modelIdx;
+    updateSelectedModelIdx(
+      state,
+      action: PayloadAction<{ modelIdx: number; disposePrevious: boolean }>
+    ) {
+      const { modelIdx, disposePrevious } = action.payload;
+
+      if (disposePrevious) {
+        availableSegmenterModels[state.selectedModelIdx].dispose();
+      }
+
+      const newHistory = availableSegmenterModels[modelIdx].history;
+      state.selectedModelIdx = modelIdx;
+
+      if (newHistory.epochs.length > 0) {
+        state.modelStatus = ModelStatus.Trained;
+      } else {
+        state.modelStatus = ModelStatus.Uninitialized;
+      }
     },
     updateSegmentationOptimizationAlgorithm(
       state,

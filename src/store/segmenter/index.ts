@@ -10,7 +10,10 @@ export { segmenterCompileOptionsSelector } from "./selectors/segmenterCompileOpt
 export { segmenterPreprocessOptionsSelector } from "./selectors/segmenterPreprocessOptionsSelector";
 export { segmenterInputShapeSelector } from "./selectors/segmenterInputShapeSelector";
 export { segmenterSelector } from "./selectors/segmenterSelector";
-export { segmenterModelSelector } from "./selectors/segmenterModelSelector";
+export {
+  segmenterModelSelector,
+  segmenterHistorySelector,
+} from "./selectors/segmenterModelSelector";
 export { segmenterModelIdxSelector } from "./selectors/segmenterModelIdxSelector";
 export { segmenterModelStatusSelector } from "./selectors/segmenterModelStatusSelector";
 

@@ -25,7 +25,8 @@ import { ModelStatus } from "types/ModelType";
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
   fit: any;
-  disableFitting: boolean;
+  noLabels: boolean;
+  noTrain: boolean;
   epochs: number;
   currentEpoch: number;
 };
@@ -33,7 +34,8 @@ type FitClassifierDialogAppBarProps = {
 export const FitClassifierDialogAppBar = ({
   closeDialog,
   fit,
-  disableFitting,
+  noLabels,
+  noTrain,
   epochs,
   currentEpoch,
 }: FitClassifierDialogAppBarProps) => {
@@ -92,8 +94,10 @@ export const FitClassifierDialogAppBar = ({
           modelStatus >= ModelStatus.Trained) && (
           <Tooltip
             title={
-              disableFitting
+              noLabels
                 ? "Please label images before fitting a model."
+                : noTrain
+                ? "Model not trainable"
                 : "Fit the model"
             }
             placement="bottom"
@@ -102,7 +106,7 @@ export const FitClassifierDialogAppBar = ({
               <Button
                 variant="outlined"
                 onClick={fit}
-                disabled={disableFitting}
+                disabled={noLabels || noTrain}
                 startIcon={<PlayCircleOutline />}
               >
                 Fit Classifier

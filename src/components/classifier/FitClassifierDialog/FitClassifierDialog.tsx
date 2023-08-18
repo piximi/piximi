@@ -86,7 +86,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const [nextModelIdx, setNextModelIdx] = useState<number>(0);
+  const [nextModelIdx, setNextModelIdx] = useState(0);
 
   const [clearModel, setClearModel] = useState(false);
 
@@ -240,7 +240,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         prevState.concat({ x: trainingEpochIndicator, y: logs.loss as number })
       );
     }
-
     if (logs.val_loss) {
       setValidationLoss((prevState) =>
         prevState.concat({ x: nextEpoch, y: logs.val_loss as number })
@@ -361,7 +360,8 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         <FitClassifierDialogAppBar
           closeDialog={closeDialog}
           fit={onFit}
-          disableFitting={noCategorizedImages || !selectedModel.trainable}
+          noLabels={noCategorizedImages}
+          noTrain={!selectedModel.trainable}
           epochs={fitOptions.epochs}
           currentEpoch={currentEpoch}
         />
@@ -420,7 +420,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
               />
             </div>
           )}
-          {/* TODO - segmenter: implement model summary for graph models */}
+          {/* TODO: implement model summary for graph models */}
           {modelStatus > ModelStatus.Training && !selectedModel.graph && (
             <div>
               <ModelSummaryTable model={selectedModel} />

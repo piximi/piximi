@@ -16,7 +16,13 @@ import {
 
 import { availableSegmenterModels } from "types/ModelType";
 
-export const SegmenterArchitectureSettingsGrid = () => {
+type ArchitectureSettingsProps = {
+  onModelSelect: (modelIdx: number) => void;
+};
+
+export const SegmenterArchitectureSettingsGrid = ({
+  onModelSelect,
+}: ArchitectureSettingsProps) => {
   const dispatch = useDispatch();
 
   const selectedModel = useSelector(segmenterModelIdxSelector);
@@ -31,35 +37,30 @@ export const SegmenterArchitectureSettingsGrid = () => {
   const modelOptions = availableSegmenterModels
     .map((m, i) => ({
       name: m.name,
-      requiredChannels: m.requiredChannels,
       trainable: m.trainable,
+      loaded: m.modelLoaded,
       idx: i,
     }))
-    .filter((m) => m.trainable);
+    .filter((m) => m.trainable || m.loaded);
+
+  useEffect(() => {
+    if (selectedModel.model.requiredChannels) {
+      setFixedNumberOfChannels(true);
+      setFixedNumberOfChannelsHelperText(
+        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`
+      );
+    } else {
+      setFixedNumberOfChannels(false);
+      setFixedNumberOfChannelsHelperText("");
+    }
+  }, [selectedModel]);
 
   const onSelectedModelChange = (
     event: React.SyntheticEvent<Element, Event>,
     modelOption: (typeof modelOptions)[number] | null
   ) => {
     if (!modelOption) return;
-
-    dispatch(
-      segmenterSlice.actions.updateSelectedModelIdx({
-        modelIdx: modelOption.idx,
-      })
-    );
-
-    // if the selected model requires a specific number of input channels, dispatch that number to the store
-    if (modelOption.requiredChannels) {
-      dispatch(
-        segmenterSlice.actions.updateSegmentationInputShape({
-          inputShape: {
-            ...inputShape,
-            channels: modelOption.requiredChannels,
-          },
-        })
-      );
-    }
+    onModelSelect(modelOption.idx);
   };
 
   const dispatchShape = (value: number, inputID: string) => {
@@ -87,18 +88,6 @@ export const SegmenterArchitectureSettingsGrid = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedModel.model.requiredChannels) {
-      setFixedNumberOfChannels(true);
-      setFixedNumberOfChannelsHelperText(
-        `${selectedModel.model.name} requires ${selectedModel.model.requiredChannels} channels!`
-      );
-    } else {
-      setFixedNumberOfChannels(false);
-      setFixedNumberOfChannelsHelperText("");
-    }
-  }, [selectedModel]);
-
   return (
     <StyledFormControl>
       <Grid container spacing={2}>
@@ -118,8 +107,8 @@ export const SegmenterArchitectureSettingsGrid = () => {
             )}
             value={{
               name: selectedModel.model.name,
-              requiredChannels: selectedModel.model.requiredChannels,
               trainable: selectedModel.model.trainable,
+              loaded: selectedModel.model.modelLoaded,
               idx: selectedModel.idx,
             }}
             isOptionEqualToValue={(option, value) => value.name === option.name}
