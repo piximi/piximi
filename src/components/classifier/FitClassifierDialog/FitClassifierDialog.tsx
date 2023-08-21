@@ -47,6 +47,12 @@ import { ModelStatus, availableClassifierModels } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
 import { useDialog } from "hooks";
 
+enum ClearOptions {
+  cancel,
+  no,
+  yes,
+}
+
 type FitClassifierDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
@@ -88,7 +94,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [nextModelIdx, setNextModelIdx] = useState(0);
 
-  const [clearModel, setClearModel] = useState(false);
+  const [clearModel, setClearModel] = useState(ClearOptions.no);
 
   //TODO: need full inference images here, or just count?
   const categorizedImages = useSelector(selectImagesByPartitions)([
@@ -290,11 +296,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
   };
 
-  const dispatchModel = (_clearModel: boolean, _nextModelIdx: number) => {
+  const dispatchModel = (disposePrevious: boolean, _nextModelIdx: number) => {
     dispatch(
       classifierSlice.actions.updateSelectedModelIdx({
         modelIdx: _nextModelIdx,
-        disposePrevious: _clearModel,
+        disposePrevious,
       })
     );
 
@@ -315,10 +321,12 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   };
 
   const dispatchModelOnExit = () => {
-    dispatchModel(clearModel, nextModelIdx);
+    if (clearModel !== ClearOptions.cancel) {
+      dispatchModel(clearModel === ClearOptions.yes, nextModelIdx);
+    }
   };
 
-  const onClearSelect = (_clearModel: boolean) => {
+  const onClearSelect = (_clearModel: ClearOptions) => {
     onCloseClearDialog();
     // don't call dispatchModel directly here
     // it needs to be triggered on dialog exit
@@ -345,9 +353,11 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       >
         <DialogTitle>Clear {selectedModel.name}?</DialogTitle>
         <DialogActions>
-          <Button onClick={onCloseClearDialog}>Cancel</Button>
-          <Button onClick={() => onClearSelect(false)}>No</Button>
-          <Button onClick={() => onClearSelect(true)}>Yes</Button>
+          <Button onClick={() => onClearSelect(ClearOptions.cancel)}>
+            Cancel
+          </Button>
+          <Button onClick={() => onClearSelect(ClearOptions.no)}>No</Button>
+          <Button onClick={() => onClearSelect(ClearOptions.yes)}>Yes</Button>
         </DialogActions>
       </Dialog>
       <Dialog

@@ -42,6 +42,12 @@ import { TrainingCallbacks } from "utils/common/models/Model";
 import { ModelStatus, availableSegmenterModels } from "types/ModelType";
 import { useDialog } from "hooks";
 
+enum ClearOptions {
+  cancel,
+  no,
+  yes,
+}
+
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
@@ -82,7 +88,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
 
   const [nextModelIdx, setNextModelIdx] = useState(0);
 
-  const [clearModel, setClearModel] = useState(false);
+  const [clearModel, setClearModel] = useState(ClearOptions.no);
 
   const annotatedImages = useSelector(selectAnnotatedImages);
   const selectedModel = useSelector(segmenterModelSelector);
@@ -288,11 +294,11 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     }
   };
 
-  const dispatchModel = (_clearModel: boolean, _nextModelIdx: number) => {
+  const dispatchModel = (disposePrevious: boolean, _nextModelIdx: number) => {
     dispatch(
       segmenterSlice.actions.updateSelectedModelIdx({
         modelIdx: _nextModelIdx,
-        disposePrevious: _clearModel,
+        disposePrevious,
       })
     );
 
@@ -313,10 +319,12 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   };
 
   const dispatchModelOnExit = () => {
-    dispatchModel(clearModel, nextModelIdx);
+    if (clearModel !== ClearOptions.cancel) {
+      dispatchModel(clearModel === ClearOptions.yes, nextModelIdx);
+    }
   };
 
-  const onClearSelect = (_clearModel: boolean) => {
+  const onClearSelect = (_clearModel: ClearOptions) => {
     onCloseClearDialog();
     // don't call dispatchModel directly here
     // it needs to be triggered on dialog exit
@@ -343,9 +351,11 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
       >
         <DialogTitle> Clear {selectedModel.name}?</DialogTitle>
         <DialogActions>
-          <Button onClick={onCloseClearDialog}>Cancel</Button>
-          <Button onClick={() => onClearSelect(false)}>No</Button>
-          <Button onClick={() => onClearSelect(true)}>Yes</Button>
+          <Button onClick={() => onClearSelect(ClearOptions.cancel)}>
+            Cancel
+          </Button>
+          <Button onClick={() => onClearSelect(ClearOptions.no)}>No</Button>
+          <Button onClick={() => onClearSelect(ClearOptions.yes)}>Yes</Button>
         </DialogActions>
       </Dialog>
       <Dialog
