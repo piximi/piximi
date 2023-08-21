@@ -54,7 +54,6 @@ export const useStageHandlers = (
   outOfBounds: boolean,
   setCurrentMousePosition: () => void
 ) => {
-  const [firstMouseDown, setFirstMouseDown] = useState(false);
   const [dragging, setDragging] = useState<boolean>(false);
   const [minimum, setMinimum] = useState<Point | undefined>();
   const [maximum, setMaximum] = useState<Point | undefined>();
@@ -360,9 +359,6 @@ export const useStageHandlers = (
   };
   const memoizedOnMouseDown = useMemo(() => {
     const func = (event: KonvaEventObject<MouseEvent>) => {
-      if (!firstMouseDown) {
-        setFirstMouseDown(true);
-      }
       if (
         !stageRef ||
         !stageRef.current ||
@@ -402,7 +398,6 @@ export const useStageHandlers = (
     annotationTool,
     deselectAllAnnotations,
     deselectAnnotation,
-    firstMouseDown,
     selectionMode,
     toolType,
     outOfBounds,
