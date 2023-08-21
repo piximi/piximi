@@ -10,7 +10,10 @@ import {
   DialogTitle,
   IconButton,
   Tab,
+  TabProps,
   Tabs,
+  Tooltip,
+  TooltipProps,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -30,6 +33,42 @@ import {
 import { Model } from "utils/common/models/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
+
+const ToolTipTab = (
+  props: TabProps & {
+    disabledMessage: string;
+    placement: TooltipProps["placement"];
+  }
+) => {
+  const {
+    label,
+    disabled,
+    onChange,
+    value,
+    placement,
+    disabledMessage,
+    ...rest
+  } = props;
+
+  return (
+    <Tab
+      style={{ pointerEvents: "auto" }}
+      value={value}
+      label={
+        <Tooltip
+          title={disabled ? disabledMessage : ""}
+          arrow
+          placement={placement}
+        >
+          <span>{label}</span>
+        </Tooltip>
+      }
+      disabled={disabled}
+      onChange={onChange}
+      {...rest}
+    />
+  );
+};
 
 type ImportTensorflowModelDialogProps = {
   onClose: () => void;
@@ -109,6 +148,10 @@ export const ImportTensorflowModelDialog = ({
     );
 
     setPretrainedModels(_pretrainedModels);
+    // if no pretrained models, make sure not on tab 1
+    setTabVal((curr) =>
+      _pretrainedModels.length === 0 && curr === "1" ? "2" : curr
+    );
   }, [modelTask]);
 
   return (
@@ -142,15 +185,27 @@ export const ImportTensorflowModelDialog = ({
       </DialogTitle>
 
       <Tabs value={tabVal} onChange={onTabSelect}>
-        <Tab label="Load Pretrained" value="1" />
-        <Tab
+        <ToolTipTab
+          label="Load Pretrained"
+          value="1"
+          disabledMessage="None Available"
+          placement="top"
+          disabled={pretrainedModels.length === 0}
+        />
+
+        <ToolTipTab
           label="Upload Local"
           value="2"
+          disabledMessage="Not Yet Supported"
+          placement="top"
           disabled={modelTask === ModelTask.Segmentation}
         />
-        <Tab
+
+        <ToolTipTab
           label="Fetch Remote"
           value="3"
+          disabledMessage="Not Yet Supported"
+          placement="top"
           disabled={modelTask === ModelTask.Segmentation}
         />
       </Tabs>
