@@ -24,8 +24,9 @@ import {
   QuickAnnotationTool,
   RectangularAnnotationTool,
   ThresholdAnnotationTool,
+  SelectionTool,
+  BlankAnnotationTool,
 } from "annotator-tools";
-import { BlankAnnotationTool } from "annotator-tools/BlankAnnotationTool";
 
 export const useAnnotationTool = () => {
   const [image, setImage] = useState<ImageJS.Image>();
@@ -95,6 +96,10 @@ export const useAnnotationTool = () => {
         return;
       case ToolType.RectangularAnnotation:
         setOperator(new RectangularAnnotationTool(image));
+
+        return;
+      case ToolType.Pointer:
+        setOperator(new SelectionTool(image));
 
         return;
       default:

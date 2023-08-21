@@ -150,8 +150,8 @@ export const getOverlappingAnnotations = (
         if (boundingBoxHeight && boundingBoxWidth) {
           //return annotation if clicked on actual selected data
           const maskROI = new ImageJS.Image(
-            boundingBox[2] - boundingBox[0],
-            boundingBox[3] - boundingBox[1],
+            boundingBoxWidth,
+            boundingBoxHeight,
             annotation.decodedMask,
             { components: 1, alpha: 0 }
           );

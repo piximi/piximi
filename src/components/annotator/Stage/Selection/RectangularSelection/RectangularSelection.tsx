@@ -6,10 +6,10 @@ import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import { imageOriginSelector } from "store/imageViewer";
-import { RectangularAnnotationTool } from "annotator-tools";
+import { RectangularAnnotationTool, SelectionTool } from "annotator-tools";
 
 type RectangularSelectionProps = {
-  operator: RectangularAnnotationTool;
+  operator: RectangularAnnotationTool | SelectionTool;
 };
 
 export const RectangularSelection = ({

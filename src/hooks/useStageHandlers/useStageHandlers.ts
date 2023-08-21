@@ -250,6 +250,7 @@ export const useStageHandlers = (
       absolutePosition,
       activeAnnotations as DecodedAnnotationType[]
     );
+
     if (overlappingAnnotationIds.length === 0) {
       deselectAllAnnotations();
       dispatch(
@@ -368,12 +369,13 @@ export const useStageHandlers = (
         toolType === ToolType.ColorAdjustment
       )
         return;
+      console.log("mousedown");
 
       if (toolType === ToolType.Pointer) {
         onPointerMouseDown(absolutePosition!);
-        return;
+        //return;
       } else if (toolType === ToolType.Zoom) {
-        handleZoomMouseDown(positionByStage!, event);
+        handleZoomMouseDown(positionByStage, event);
         return;
       }
       if (annotationState === AnnotationStateType.Annotated) {
@@ -418,6 +420,7 @@ export const useStageHandlers = (
         handleZoomMouseMove(positionByStage, event);
       } else if (toolType === ToolType.Pointer) {
         handlePointerMouseMove(absolutePosition!);
+        annotationTool.onMouseMove(absolutePosition!);
       } else {
         annotationTool.onMouseMove(absolutePosition!);
       }
@@ -462,6 +465,7 @@ export const useStageHandlers = (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
       if (!positionByStage || !absolutePosition || draggable) return;
+      console.log("mouseup");
       if (toolType === ToolType.Zoom) {
         handleZoomMouseUp(
           positionByStage,
@@ -470,6 +474,7 @@ export const useStageHandlers = (
         setCurrentMousePosition();
       } else if (toolType === ToolType.Pointer) {
         handlePointerMouseUp(absolutePosition);
+        annotationTool.onMouseUp(absolutePosition);
       } else {
         if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
