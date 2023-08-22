@@ -1,3 +1,4 @@
+import { AnnotationStateType } from "types/AnnotationStateType";
 import { AnnotationTool } from "../AnnotationTool";
 import { drawRectangle } from "utils/annotator";
 
@@ -16,6 +17,7 @@ export class SelectionTool extends AnnotationTool {
   }
 
   onMouseDown(position: { x: number; y: number }) {
+    if (this.annotationState === AnnotationStateType.Annotated) return;
     if (!this.width) {
       this.origin = position;
       this.setAnnotating();
@@ -23,16 +25,17 @@ export class SelectionTool extends AnnotationTool {
   }
 
   onMouseMove(position: { x: number; y: number }) {
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
     this.resize(position);
   }
 
   onMouseUp(position: { x: number; y: number }) {
-    if (!(this.width && this.height)) {
-      this.deselect();
-      return;
-    }
+    if (this.annotationState !== AnnotationStateType.Annotating) return;
 
-    if (Math.abs(this.width * this.height) < 10) {
+    if (
+      !(this.width && this.height) ||
+      Math.abs(this.width * this.height) < 10
+    ) {
       this.deselect();
       return;
     }
