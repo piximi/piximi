@@ -1,18 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import { throttle } from "lodash";
 
-import { useHotkeys, useZoom, useAnnotatorKeyboardShortcuts } from "hooks";
+import { useZoom, useAnnotatorKeyboardShortcuts } from "hooks";
 
 import {
-  imageViewerSlice,
-  currentIndexSelector,
   setSelectedAnnotationIds,
-  setSelectedCategoryId,
   selectSelectedAnnotationIds,
-  activeImageIdSelector,
   selectWorkingAnnotation,
 } from "store/imageViewer";
 
@@ -21,26 +17,19 @@ import {
   selectToolType,
 } from "store/annotator/selectors";
 
-import { selectActiveAnnotations } from "store/data";
 import { annotatorSlice } from "store/annotator";
 
 import {
   DecodedAnnotationType,
-  HotkeyView,
   Point,
   ToolType,
   AnnotationStateType,
   AnnotationModeType,
 } from "types";
 
-import {
-  getAnnotationsInBox,
-  getOverlappingAnnotations,
-} from "utils/annotator";
 import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools";
-import { setWorkingAnnotation } from "store/imageViewer/imageViewerSlice";
+import { usePointerTool } from "hooks/usePointerTool/usePointerTool";
 
-const delta = 10;
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
 
@@ -54,19 +43,11 @@ export const useStageHandlers = (
   outOfBounds: boolean,
   setCurrentMousePosition: () => void
 ) => {
-  const [dragging, setDragging] = useState<boolean>(false);
-  const [minimum, setMinimum] = useState<Point | undefined>();
-  const [maximum, setMaximum] = useState<Point | undefined>();
-  const [selecting, setSelecting] = useState<boolean>(false);
-  const [shift, setShift] = useState<boolean>(false);
   const selectionMode = useSelector(selectAnnotationSelectionMode);
   const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
-  const activeAnnotations = useSelector(selectActiveAnnotations);
-  const activeImageId = useSelector(activeImageIdSelector);
-  const currentIndex = useSelector(currentIndexSelector);
 
   const {
     handleZoomDblClick,
@@ -100,249 +81,20 @@ export const useStageHandlers = (
       })
     );
   }, [dispatch, annotationTool]);
-
-  useHotkeys(
-    "shift",
-    (event) => {
-      if (event.type === "keydown") {
-        setShift(true);
-      } else {
-        setShift(false);
-      }
-    },
-    HotkeyView.Annotator,
-    { keyup: true, keydown: true }
-  );
-
-  /*
-   * * HANDLE POINTER FUNCTIONS * *
-   */
-
-  const onPointerMouseDown = useCallback(
-    (position: { x: number; y: number }) => {
-      setDragging(false);
-      setMinimum(position);
-      setSelecting(true);
-    },
-    []
-  );
-
-  const handlePointerMouseMove = useCallback(
-    (position: { x: number; y: number }) => {
-      if (!position || !selecting || !minimum) return;
-
-      setDragging(Math.abs(position.x - minimum.x) >= delta);
-      setMaximum(position);
-    },
-    [minimum, selecting]
-  );
-
-  const handlePointerMouseUp = useCallback(
-    (position: { x: number; y: number }) => {
-      if (!position || !selecting || !minimum) return;
-      if (dragging) {
-        // correct minimum or maximum in the case where user may have selected rectangle from right to left
-        const maximumNew: { x: number; y: number } = {
-          x: minimum.x > position.x ? minimum.x : position.x,
-          y: minimum.y > position.y ? minimum.y : position.y,
-        };
-        const minimumNew: { x: number; y: number } = {
-          x: minimum.x > position.x ? position.x : minimum.x,
-          y: minimum.y > position.y ? position.y : minimum.y,
-        };
-
-        if (!minimumNew || !activeAnnotations.length) {
-          setSelecting(false);
-          return;
-        }
-
-        const scaledMinimum = {
-          x: minimumNew.x,
-          y: minimumNew.y,
-        };
-        const scaledMaximum = {
-          x: maximumNew.x,
-          y: maximumNew.y,
-        };
-
-        const annotationsInBox = getAnnotationsInBox(
-          scaledMinimum,
-          scaledMaximum,
-          activeAnnotations as DecodedAnnotationType[]
-        );
-
-        if (annotationsInBox.length) {
-          if (!shift) {
-            batch(() => {
-              dispatch(
-                setSelectedAnnotationIds({
-                  annotationIds: annotationsInBox.map((an) => an.id),
-                  workingAnnotationId: annotationsInBox[0].id,
-                })
-              );
-              dispatch(
-                setWorkingAnnotation({
-                  annotation: activeAnnotations.filter(
-                    (annotation) => annotation.id === annotationsInBox[0].id
-                  )[0],
-                })
-              );
-              dispatch(
-                setSelectedCategoryId({
-                  selectedCategoryId: annotationsInBox[0].categoryId,
-                  execSaga: false,
-                })
-              );
-            });
-          } else {
-            //only include if not already selected
-            const additionalAnnotations = annotationsInBox.filter(
-              (annotation: DecodedAnnotationType) => {
-                return !selectedAnnotationsIds.includes(annotation.id);
-              }
-            );
-            dispatch(
-              setSelectedAnnotationIds({
-                annotationIds: [
-                  ...selectedAnnotationsIds,
-                  ...additionalAnnotations.map((an) => an.id),
-                ],
-                workingAnnotationId: annotationsInBox[0].id,
-              })
-            );
-            dispatch(
-              setWorkingAnnotation({
-                annotation: activeAnnotations.filter(
-                  (annotation) => annotation.id === annotationsInBox[0].id
-                )[0],
-              })
-            );
-          }
-        }
-      }
-
-      setSelecting(false);
-    },
-    [
-      activeAnnotations,
-      dispatch,
-      dragging,
-      minimum,
-      selectedAnnotationsIds,
-      selecting,
-      shift,
-    ]
-  );
-
-  /*
-   * * HANDLE CLICK * *
-   */
-
-  const handleClick = useCallback(() => {
-    if (
-      toolType !== ToolType.Pointer ||
-      !absolutePosition ||
-      !activeAnnotations.length ||
-      !activeImageId
-    )
-      return;
-    const overlappingAnnotationIds = getOverlappingAnnotations(
-      absolutePosition,
-      activeAnnotations as DecodedAnnotationType[]
-    );
-
-    if (overlappingAnnotationIds.length === 0) {
-      deselectAllAnnotations();
-      dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
-      );
-      return;
-    }
-
-    let currentAnnotation: DecodedAnnotationType | undefined;
-
-    if (overlappingAnnotationIds.length > 1) {
-      dispatch(
-        imageViewerSlice.actions.setCurrentIndex({
-          currentIndex:
-            currentIndex + 1 === overlappingAnnotationIds.length
-              ? 0
-              : currentIndex + 1,
-        })
-      );
-      const nextAnnotationId = overlappingAnnotationIds[currentIndex];
-
-      currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationType) => {
-          return annotation.id === nextAnnotationId;
-        }
-      );
-    } else {
-      currentAnnotation = activeAnnotations.find(
-        (annotation: DecodedAnnotationType) => {
-          return annotation.id === overlappingAnnotationIds[0];
-        }
-      );
-      dispatch(
-        imageViewerSlice.actions.setCurrentIndex({
-          currentIndex: 0,
-        })
-      );
-    }
-
-    if (!currentAnnotation) return;
-
-    if (!shift) {
-      batch(() => {
-        dispatch(
-          setSelectedAnnotationIds({
-            annotationIds: [currentAnnotation!.id],
-            workingAnnotationId: currentAnnotation?.id,
-          })
-        );
-        dispatch(
-          imageViewerSlice.actions.setWorkingAnnotation({
-            annotation: currentAnnotation!,
-          })
-        );
-        dispatch(
-          setSelectedCategoryId({
-            selectedCategoryId: currentAnnotation!.categoryId,
-            execSaga: false,
-          })
-        );
-      });
-    }
-
-    if (shift && !selectedAnnotationsIds.includes(currentAnnotation.id)) {
-      //include newly selected annotation if not already selected
-      dispatch(
-        setSelectedAnnotationIds({
-          annotationIds: [...selectedAnnotationsIds, currentAnnotation.id],
-          workingAnnotationId: currentAnnotation.id,
-        })
-      );
-      dispatch(
-        setWorkingAnnotation({
-          annotation: currentAnnotation,
-        })
-      );
-    }
-  }, [
-    activeAnnotations,
-    currentIndex,
-    dispatch,
-    activeImageId,
-    selectedAnnotationsIds,
-    shift,
-    toolType,
-    deselectAllAnnotations,
+  const {
+    onPointerMouseDown,
+    handlePointerMouseMove,
+    handlePointerMouseUp,
+    dragging,
+    minimum,
+    maximum,
+    selecting,
+  } = usePointerTool(
     absolutePosition,
-  ]);
-
-  /*
-   * * HANDLE MOUSE DOWN * *
-   */
+    deselectAllAnnotations,
+    selectedAnnotationsIds,
+    toolType
+  );
 
   const handleMouseDown = (
     event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
@@ -369,24 +121,24 @@ export const useStageHandlers = (
         toolType === ToolType.ColorAdjustment
       )
         return;
-      console.log("mousedown");
 
-      if (toolType === ToolType.Pointer) {
-        onPointerMouseDown(absolutePosition!);
-        //return;
-      } else if (toolType === ToolType.Zoom) {
+      if (toolType === ToolType.Zoom) {
         handleZoomMouseDown(positionByStage, event);
         return;
-      }
-      if (annotationState === AnnotationStateType.Annotated) {
-        deselectAnnotation();
-        if (selectionMode === AnnotationModeType.New) {
-          deselectAllAnnotations();
-          return;
+      } else {
+        if (toolType === ToolType.Pointer) {
+          onPointerMouseDown(absolutePosition!);
         }
+        if (annotationState === AnnotationStateType.Annotated) {
+          deselectAnnotation();
+          if (selectionMode === AnnotationModeType.New) {
+            deselectAllAnnotations();
+            return;
+          }
+        }
+        if (outOfBounds) return;
+        annotationTool.onMouseDown(absolutePosition);
       }
-      if (outOfBounds) return;
-      annotationTool.onMouseDown(absolutePosition);
     };
     const throttled = throttle(func, 5);
     return (event: KonvaEventObject<MouseEvent>) => throttled(event);
@@ -418,10 +170,10 @@ export const useStageHandlers = (
       if (toolType === ToolType.ColorAdjustment) return;
       if (toolType === ToolType.Zoom) {
         handleZoomMouseMove(positionByStage, event);
-      } else if (toolType === ToolType.Pointer) {
-        handlePointerMouseMove(absolutePosition!);
-        annotationTool.onMouseMove(absolutePosition!);
       } else {
+        if (toolType === ToolType.Pointer) {
+          handlePointerMouseMove(absolutePosition!);
+        }
         annotationTool.onMouseMove(absolutePosition!);
       }
     };
@@ -465,18 +217,16 @@ export const useStageHandlers = (
       event: KonvaEventObject<MouseEvent> | KonvaEventObject<TouchEvent>
     ) => {
       if (!positionByStage || !absolutePosition || draggable) return;
-      console.log("mouseup");
       if (toolType === ToolType.Zoom) {
         handleZoomMouseUp(
           positionByStage,
           event as KonvaEventObject<MouseEvent>
         );
         setCurrentMousePosition();
-      } else if (toolType === ToolType.Pointer) {
-        handlePointerMouseUp(absolutePosition);
-        annotationTool.onMouseUp(absolutePosition);
       } else {
-        if (toolType === ToolType.ObjectAnnotation) {
+        if (toolType === ToolType.Pointer) {
+          handlePointerMouseUp(absolutePosition);
+        } else if (toolType === ToolType.ObjectAnnotation) {
           await (annotationTool as ObjectAnnotationTool).onMouseUp(
             absolutePosition
           );
@@ -529,7 +279,6 @@ export const useStageHandlers = (
     handleMouseUp,
     handleMouseMove,
     handleTouchMove,
-    handleClick,
     handleZoomWheel,
     handleDblClickToZoom,
     dragging,

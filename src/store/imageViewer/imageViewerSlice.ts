@@ -23,7 +23,6 @@ const initialState: ImageViewerStore = {
     shadows: 0,
     vibrance: 0,
   },
-  currentIndex: 0,
   cursor: "default",
   activeImageId: undefined,
   activeAnnotationIds: [],
@@ -304,9 +303,6 @@ export const imageViewerSlice = createSlice({
     ) {
       Object.assign(state.colorAdjustment, action.payload.changes);
     },
-    setCurrentIndex(state, action: PayloadAction<{ currentIndex: number }>) {
-      state.currentIndex = action.payload.currentIndex;
-    },
     setCursor(
       state,
       action: PayloadAction<{
@@ -373,7 +369,6 @@ export const imageViewerSlice = createSlice({
 export const {
   setActiveImageId,
   setActiveImageRenderedSrcs,
-  setCurrentIndex,
   setCursor,
   setImageOrigin,
   setSelectedAnnotationIds,
