@@ -228,6 +228,30 @@ startAppListening({
     }
   },
 });
+startAppListening({
+  actionCreator: dataSlice.actions.deleteAnnotation,
+  effect: (action, listenerAPI) => {
+    const { annotationId, isPermanent } = action.payload;
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.removeActiveAnnotationId({ annotationId })
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions._deleteAnnotation({ annotationId, isPermanent })
+    );
+  },
+});
+startAppListening({
+  actionCreator: dataSlice.actions.deleteAnnotations,
+  effect: (action, listenerAPI) => {
+    const { annotationIds, isPermanent } = action.payload;
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.removeActiveAnnotationIds({ annotationIds })
+    );
+    listenerAPI.dispatch(
+      dataSlice.actions._deleteAnnotations({ annotationIds, isPermanent })
+    );
+  },
+});
 
 startAppListening({
   actionCreator: dataSlice.actions.updateImage,

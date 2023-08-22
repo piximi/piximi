@@ -944,7 +944,9 @@ export const dataSlice = createSlice({
         });
       }
     },
-    deleteAnnotation(
+    // do not dispatch directly from component, use deleteAnnotation
+    // which will call this from a listener
+    _deleteAnnotation(
       state,
       action: PayloadAction<{ annotationId: string; isPermanent?: boolean }>
     ) {
@@ -963,7 +965,7 @@ export const dataSlice = createSlice({
           (_annotationId) => _annotationId !== annotationId
         );
         mutatingFilter(
-          state.annotationsByImage[imageId!],
+          state.annotationsByImage[imageId],
           (_annotationId) => _annotationId !== annotationId
         );
         if (action.payload.isPermanent) {
@@ -974,7 +976,15 @@ export const dataSlice = createSlice({
         }
       }
     },
-    deleteAnnotations(
+    deleteAnnotation(
+      state,
+      action: PayloadAction<{ annotationId: string; isPermanent?: boolean }>
+    ) {
+      // data listener fires first
+    },
+    // do not dispatch directly from component, use deleteAnnotations
+    // which will call this from a listener
+    _deleteAnnotations(
       state,
       action: PayloadAction<{
         annotationIds: Array<string>;
@@ -989,6 +999,15 @@ export const dataSlice = createSlice({
           payload: { annotationId, isPermanent: action.payload.isPermanent },
         });
       }
+    },
+    deleteAnnotations(
+      state,
+      action: PayloadAction<{
+        annotationIds: Array<string>;
+        isPermanent?: boolean;
+      }>
+    ) {
+      // data listener fires first
     },
     deleteAllAnnotationsByImage(
       state,

@@ -110,9 +110,7 @@ export const AnnotationTransformer = ({
 
     if (activeAnnotationIds.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        dispatch(
-          dataSlice.actions.deleteAnnotation({ annotationId: annotationId })
-        );
+        dispatch(dataSlice.actions.deleteAnnotation({ annotationId }));
       } else {
         dispatch(
           dataSlice.actions.updateAnnotation({
