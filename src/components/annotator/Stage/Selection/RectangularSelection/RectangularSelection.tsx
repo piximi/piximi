@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
@@ -6,10 +6,10 @@ import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
 import { imageOriginSelector } from "store/imageViewer";
-import { RectangularAnnotationTool } from "annotator-tools";
+import { RectangularAnnotationTool, SelectionTool } from "annotator-tools";
 
 type RectangularSelectionProps = {
-  operator: RectangularAnnotationTool;
+  operator: RectangularAnnotationTool | SelectionTool;
 };
 
 export const RectangularSelection = ({
@@ -19,12 +19,25 @@ export const RectangularSelection = ({
 
   const imageOrigin = useSelector(imageOriginSelector);
   const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
-  if (!operator.origin || !operator.width || !operator.height) return null;
+  const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
 
-  const x = operator.origin.x + imageOrigin.x;
-  const y = operator.origin.y + imageOrigin.y;
+  useEffect(() => {
+    if (!operator.origin || !operator.width || !operator.height) return;
+    setX(operator.origin.x + imageOrigin.x);
+    setY(operator.origin.y + imageOrigin.y);
+  }, [
+    operator.origin,
+    imageOrigin.x,
+    imageOrigin.y,
+    operator.width,
+    operator.height,
+  ]);
 
-  return (
+  return !operator.origin ||
+    !operator.width ||
+    !operator.height ||
+    x === 0 ? null : (
     <>
       <ReactKonva.Group>
         <ReactKonva.Rect

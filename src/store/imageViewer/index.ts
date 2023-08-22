@@ -9,7 +9,6 @@ export {
   setStageScale,
   setStageWidth,
   setZoomSelection,
-  setCurrentIndex,
   setCursor,
   setStageHeight,
   setStagePosition,
@@ -25,7 +24,6 @@ export {
 export { selectedAnnotationCategoryIdSelector } from "./selectors/selectedAnnotationCategoryIdSelector";
 export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
 export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
-export { currentIndexSelector } from "./selectors/currentIndexSelector";
 export { cursorSelector } from "./selectors/cursorSelector";
 export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
 export { stageHeightSelector } from "./selectors/stageHeightSelector";

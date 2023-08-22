@@ -82,7 +82,6 @@ export const Stage = ({
     handleTouchMove,
     handleDblClickToZoom,
     handleZoomWheel,
-    handleClick,
   } = useStageHandlers(
     stageRef,
     annotationTool,
@@ -151,7 +150,6 @@ export const Stage = ({
       <ReactKonva.Stage
         draggable={draggable}
         height={stageHeight}
-        onClick={() => handleClick()}
         onMouseDown={(evt) => handleMouseDown(evt)}
         onTouchStart={(evt) => handleMouseDown(evt)}
         onMouseMove={(evt) => handleMouseMove(evt)}

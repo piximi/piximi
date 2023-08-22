@@ -24,6 +24,7 @@ import {
   PolygonalAnnotationTool,
   QuickAnnotationTool,
   RectangularAnnotationTool,
+  SelectionTool,
 } from "annotator-tools";
 
 type SelectionProps = {
@@ -53,6 +54,8 @@ export const Selection = ({ tool, toolType }: SelectionProps) => {
       return (
         <RectangularSelection operator={tool as RectangularAnnotationTool} />
       );
+    case ToolType.Pointer:
+      return <RectangularSelection operator={tool as SelectionTool} />;
     case ToolType.ThresholdAnnotation:
       return (
         <RectangularSelection operator={tool as RectangularAnnotationTool} />

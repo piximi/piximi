@@ -4,7 +4,6 @@ import { ZoomToolOptionsType } from "./ZoomToolOptionsType";
 
 export type ImageViewerStore = {
   colorAdjustment: ColorAdjustmentOptionsType;
-  currentIndex: number;
   cursor: string;
   activeImageId?: string;
   activeAnnotationIds: Array<string>;

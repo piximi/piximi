@@ -25,6 +25,15 @@ export const generatePoints = (buffer: Array<number> | undefined) => {
   return pointArray;
 };
 
+const pointInBox = (point: Point, box: [number, number, number, number]) => {
+  return (
+    point.x >= box[0] &&
+    point.x <= box[2] &&
+    point.y >= box[1] &&
+    point.y <= box[3]
+  );
+};
+
 export const connectPoints = (coordinates: Array<Point>) => {
   let connectedPoints: Array<Point> = [];
 
@@ -139,19 +148,14 @@ export const getOverlappingAnnotations = (
   const overlappingAnnotations = annotations.filter(
     (annotation: DecodedAnnotationType) => {
       const boundingBox = annotation.boundingBox;
-      if (
-        position.x >= boundingBox[0] &&
-        position.x <= boundingBox[2] &&
-        position.y >= boundingBox[1] &&
-        position.y <= boundingBox[3]
-      ) {
+      if (pointInBox(position, boundingBox)) {
         const boundingBoxWidth = boundingBox[2] - boundingBox[0];
         const boundingBoxHeight = boundingBox[3] - boundingBox[1];
         if (boundingBoxHeight && boundingBoxWidth) {
           //return annotation if clicked on actual selected data
           const maskROI = new ImageJS.Image(
-            boundingBox[2] - boundingBox[0],
-            boundingBox[3] - boundingBox[1],
+            boundingBoxWidth,
+            boundingBoxHeight,
             annotation.decodedMask,
             { components: 1, alpha: 0 }
           );
