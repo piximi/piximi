@@ -1,10 +1,10 @@
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
-import { OpenMenu } from "../../file-io/menus/OpenMenu";
+import { OpenProjectMenu } from "components/menus";
 import { useMenu } from "hooks";
 
-export const OpenListItem = () => {
+export const OpenProjectListItem = () => {
   const { anchorEl, onClose, open, onOpen } = useMenu();
 
   return (
@@ -17,7 +17,7 @@ export const OpenListItem = () => {
         <ListItemText primary="Open" />
       </ListItem>
 
-      <OpenMenu anchorEl={anchorEl} onClose={onClose} open={open} />
+      <OpenProjectMenu anchorEl={anchorEl} onClose={onClose} open={open} />
     </>
   );
 };

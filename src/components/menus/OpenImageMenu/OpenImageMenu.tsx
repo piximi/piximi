@@ -9,13 +9,17 @@ import { ProjectFileType } from "types/runtime";
 import { useMenu } from "hooks";
 // import { OpenProjectMenuItem } from "components/file-io/OpenProjectMenuItem";
 
-type OpenMenuProps = {
+type OpenImageMenuProps = {
   anchorEl: HTMLElement | null;
   onCloseMenu: () => void;
   open: boolean;
 };
 
-export const OpenMenu = ({ anchorEl, onCloseMenu, open }: OpenMenuProps) => {
+export const OpenImageMenu = ({
+  anchorEl,
+  onCloseMenu,
+  open,
+}: OpenImageMenuProps) => {
   const {
     anchorEl: subMenuAnchorEl,
     onClose: onSubMenuClose,

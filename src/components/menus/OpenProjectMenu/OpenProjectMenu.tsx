@@ -9,13 +9,17 @@ import { OpenExampleProjectDialog } from "components/dialogs";
 
 import { HotkeyView } from "types";
 
-type OpenMenuProps = {
+type OpenProjectMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
 };
 
-export const OpenMenu = ({ anchorEl, onClose, open }: OpenMenuProps) => {
+export const OpenProjectMenu = ({
+  anchorEl,
+  onClose,
+  open,
+}: OpenProjectMenuProps) => {
   const {
     onClose: onCloseExampleProjectDialog,
     onOpen: onOpenExampleProjectDialog,

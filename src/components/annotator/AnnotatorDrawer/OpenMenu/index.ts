@@ -1,1 +1,0 @@
-export { OpenMenu } from "./OpenMenu";

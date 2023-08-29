@@ -8,7 +8,7 @@ import { AppBarOffset } from "components/common/styled-components";
 import { ApplicationOptionsList } from "components/common/styled-components/ApplicationOptionsList";
 
 import { ImageList } from "./ImageList";
-import { OpenListItem, SaveListItem } from "components/list-items";
+import { OpenImageListItem, SaveImageListItem } from "components/list-items";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
@@ -44,8 +44,8 @@ export const AnnotatorDrawer = () => {
       <Divider />
 
       <List dense>
-        <OpenListItem />
-        <SaveListItem />
+        <OpenImageListItem />
+        <SaveImageListItem />
       </List>
 
       <Divider />

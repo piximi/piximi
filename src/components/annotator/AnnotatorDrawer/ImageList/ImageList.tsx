@@ -19,7 +19,7 @@ import { useTranslation } from "hooks";
 
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 
-import { ImageMenu } from "../ImageMenu";
+import { ImageMenu } from "components/menus";
 
 import { activeImageIdSelector, setActiveImageId } from "store/imageViewer";
 import { selectTotalAnnotationCountByImage } from "store/data";
