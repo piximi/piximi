@@ -13,7 +13,7 @@ import {
 import {
   CustomNumberTextField,
   StyledFormControl,
-} from "components/common/styled-components";
+} from "components/styled-components";
 
 import {
   classifierCropOptionsSelector,

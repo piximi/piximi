@@ -6,8 +6,8 @@ import { Container, Box, Tabs, Tab, Grid } from "@mui/material";
 import { useDndFileDrop, useContextMenu, useHotkeys } from "hooks";
 
 import { MainImageGridItem } from "../MainImageGridItem";
-import { ImageCategoryMenu } from "../../menus/ImageMenu/ImageCategoryMenu";
-import { MainImageGridAppBar } from "../MainImageGridAppBar";
+import { ImageCategoryMenu } from "components/menus";
+import { MainImageGridAppBar } from "components/app-bars";
 
 import {
   updateHighlightedCategory,

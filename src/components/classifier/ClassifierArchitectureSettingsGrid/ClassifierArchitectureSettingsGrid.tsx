@@ -6,7 +6,7 @@ import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
 import {
   CustomNumberTextField,
   StyledFormControl,
-} from "components/common/styled-components";
+} from "components/styled-components";
 
 import {
   classifierInputShapeSelector,

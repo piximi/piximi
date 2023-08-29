@@ -7,9 +7,9 @@ import {
   ZoomIn as ZoomInIcon,
 } from "@mui/icons-material";
 
-import { ImageSortSelection } from "../ImageSortSelection";
+import { ImageSortSelection } from "components/styled-components";
 
-import { UploadButton } from "../UploadButton";
+import { UploadButton } from "../../main/UploadButton";
 import { Logo } from "components/Application/LogoLoader";
 
 import { applicationSlice } from "store/application";

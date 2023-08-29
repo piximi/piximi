@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 
-import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/styled-components/CollapsibleList";
 import { ClassifierArchitectureSettingsGrid } from "../../classifier/ClassifierArchitectureSettingsGrid/ClassifierArchitectureSettingsGrid";
 
 type ArchitectureSettingsProps = {

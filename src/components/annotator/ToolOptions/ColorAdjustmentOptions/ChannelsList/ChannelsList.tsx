@@ -14,7 +14,7 @@ import {
 
 import { useLocalGlobalState } from "hooks";
 
-import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/styled-components/CollapsibleList";
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 import { Palette } from "../Palette";
 

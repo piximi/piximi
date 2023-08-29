@@ -11,7 +11,7 @@ import { ImageShapeDialog, FallBackDialog } from "components/dialogs";
 
 import { MainDrawer } from "components/drawers";
 import { MainImageGrid } from "../MainImageGrid";
-import { MainAppBar } from "../MainAppBar";
+import { MainAppBar } from "../../app-bars/MainAppBar";
 
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";

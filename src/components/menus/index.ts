@@ -6,3 +6,4 @@ export { ImageMenu } from "./ImageMenu";
 export { SaveImageMenu } from "./SaveImageMenu";
 export { CategoryItemMenu } from "./CategoryItemMenu";
 export { UploadMenu } from "./UploadMenu";
+export { ImageCategoryMenu } from "./ImageCategoryMenu";

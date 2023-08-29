@@ -13,7 +13,7 @@ import {
   usePointerLocation,
 } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
-import { Cursor } from "components/common/styled-components/Cursor";
+import { Cursor } from "components/styled-components/Cursor";
 import { StageContext } from "../AnnotatorView/AnnotatorView";
 
 import { Image } from "./Image";

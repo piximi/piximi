@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Drawer } from "@mui/material";
 
 import { useTranslation } from "hooks";
-import { AppBarOffset } from "components/common/styled-components";
+import { AppBarOffset } from "components/styled-components";
 
 import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
 import { QuickAnnotationOptions } from "./QuickAnnotationOptions";

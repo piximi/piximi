@@ -11,12 +11,12 @@ import {
   List,
 } from "@mui/material";
 
-import { FitClassifierDialogAppBar } from "../../classifier/FitClassifierDialogAppBar";
+import { FitClassifierDialogAppBar } from "components/app-bars";
 
 import {
   ModelSummaryTable,
   TrainingHistoryPlot,
-} from "components/common/styled-components";
+} from "components/styled-components";
 import {
   OptimizerSettingsListItem,
   DatasetSettingsListItem,

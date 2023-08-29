@@ -5,7 +5,7 @@ import {
   CollapsibleList,
   CustomNumberTextField,
   StyledFormControl,
-} from "../../common/styled-components";
+} from "../../styled-components";
 
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;
