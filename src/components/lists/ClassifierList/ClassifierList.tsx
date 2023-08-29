@@ -8,7 +8,7 @@ import { useDialog, useDialogHotkey } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/dialogs";
 import { SaveFittedModelDialog } from "components/dialogs";
-import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/styled-components/CollapsibleList";
 import { ClassifierExecListItem } from "components/list-items";
 import { CategoriesList } from "components/lists/CategoriesList";
 

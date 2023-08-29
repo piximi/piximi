@@ -6,7 +6,7 @@ import { FileList, ClassifierList } from "components/lists";
 import {
   AppBarOffset,
   ApplicationOptionsList,
-} from "components/common/styled-components";
+} from "components/styled-components";
 import { SegmenterList } from "components/lists";
 
 export const MainDrawer = () => {

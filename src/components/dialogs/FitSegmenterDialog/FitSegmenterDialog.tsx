@@ -16,10 +16,10 @@ import {
   DatasetSettingsListItem,
   SegmenterArchitectureSettingsListItem,
 } from "components/list-items";
-import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
+import { TrainingHistoryPlot } from "components/styled-components/TrainingHistoryPlot";
 import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
-import { FitSegmenterDialogAppBar } from "../../segmenter/FitSegmenterDialogAppBar";
-import { ModelSummaryTable } from "components/common/styled-components";
+import { FitSegmenterDialogAppBar } from "components/app-bars";
+import { ModelSummaryTable } from "components/styled-components";
 
 import { alertStateSelector } from "store/application";
 import { selectAnnotatedImages } from "store/data";

@@ -13,7 +13,7 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/styled-components/CollapsibleList";
 
 import { imageViewerSlice } from "store/imageViewer";
 import { selectAllAnnotationCategories } from "store/data";

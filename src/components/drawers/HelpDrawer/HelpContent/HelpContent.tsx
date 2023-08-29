@@ -1,7 +1,7 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
-import { ToolHotkeyTitle } from "../../../common/tooltips/ToolHotkeyTitle";
+import { ToolHotkeyTitle } from "../../../tooltips/ToolHotkeyTitle";
 
-import { CollapsibleList } from "../../../common/styled-components/CollapsibleList";
+import { CollapsibleList } from "../../../styled-components/CollapsibleList";
 
 type Subtopic = {
   subtitle: string;

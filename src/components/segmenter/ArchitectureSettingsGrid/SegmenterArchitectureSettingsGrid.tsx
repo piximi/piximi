@@ -6,7 +6,7 @@ import { Grid, TextField, Alert, Autocomplete } from "@mui/material";
 import {
   CustomNumberTextField,
   StyledFormControl,
-} from "components/common/styled-components";
+} from "components/styled-components";
 
 import {
   segmenterModelIdxSelector,

@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-import { CustomNumberTextField } from "../common/styled-components/CustomNumberTextField";
+import { CustomNumberTextField } from "../styled-components/CustomNumberTextField";
 
 import { dataSlice } from "store/data";
 

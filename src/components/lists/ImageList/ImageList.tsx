@@ -17,7 +17,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { useTranslation } from "hooks";
 
-import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/styled-components/CollapsibleList";
 
 import { ImageMenu } from "components/menus";
 

@@ -5,7 +5,7 @@ import { sample } from "lodash";
 import { Button, TextField, Box } from "@mui/material";
 import { useHotkeys } from "hooks";
 
-import { ColorIcon } from "components/common/controls/ColorIcon";
+import { ColorIcon } from "components/controls/ColorIcon";
 import { CustomDialog } from "./CustomDialog";
 
 import { Category, HotkeyView, PartialBy } from "types";
