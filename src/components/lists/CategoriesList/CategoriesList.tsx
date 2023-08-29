@@ -20,9 +20,11 @@ import { useDialogHotkey, useCategoryHandlers } from "hooks";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
 
-import { CategoryItem } from "../CategoryItem";
-import { CategoryItemMenu } from "../CategoryItemMenu";
-import { PredictionVisibility } from "../PredictionsVisibility/";
+import {
+  CategoryItem,
+  CategoryPredictionListItem,
+} from "components/list-items";
+import { CategoryItemMenu } from "components/menus";
 
 import { Category, CategoryType, HotkeyView } from "types";
 
@@ -138,7 +140,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
       })}
 
       {
-        predicted && <PredictionVisibility /> //TODO - UI: Should dissapear or be disabled?
+        predicted && <CategoryPredictionListItem /> //TODO - UI: Should dissapear or be disabled?
       }
       <ListItemButton onClick={handleOpenCreateCategoryDialog}>
         <ListItemIcon>
