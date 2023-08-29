@@ -20,8 +20,7 @@ import {
 
 import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";
-import { ToolDrawer } from "../ToolDrawer";
-import { AnnotatorDrawer } from "../AnnotatorDrawer/AnnotatorDrawer";
+import { AnnotatorDrawer, ToolDrawer } from "components/drawers";
 
 import {
   alertStateSelector,
