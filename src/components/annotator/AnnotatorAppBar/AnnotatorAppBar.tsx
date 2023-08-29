@@ -12,7 +12,7 @@ import {
 
 import { useDialog } from "hooks";
 
-import { ExitAnnotatorDialog } from "../AnnotatorDrawer/ExitAnnotatorDialog";
+import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { Logo } from "components/Application/LogoLoader";
 

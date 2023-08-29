@@ -11,40 +11,35 @@ import {
   List,
 } from "@mui/material";
 
-import { FitClassifierDialogAppBar } from "../FitClassifierDialogAppBar";
-import { ClassifierArchitectureSettingsListItem } from "../ClassifierArchitectureSettingsListItem";
-import { PreprocessingSettingsListItem } from "../PreprocessingSettingsListItem/PreprocessingSettingsListItem";
-
-import {
-  ModelSummaryTable,
-  TrainingHistoryPlot,
-} from "components/common/styled-components";
-import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem/OptimizerSettingsListItem";
+import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
 import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
-import { AlertDialog, DialogTransitionSlide } from "components/common/dialogs/";
+import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
+import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
+import { FitSegmenterDialogAppBar } from "../../segmenter/FitSegmenterDialogAppBar";
+import { SegmenterArchitectureSettingsListItem } from "../../segmenter/ArchitectureSettingsListItem";
+import { ModelSummaryTable } from "components/common/styled-components";
 
 import { alertStateSelector } from "store/application";
+import { selectAnnotatedImages } from "store/data";
 import {
-  classifierSelectedModelSelector,
-  classifierHistorySelector,
-  classifierModelStatusSelector,
-  classifierCompileOptionsSelector,
-  classifierFitOptionsSelector,
-  classifierTrainingPercentageSelector,
-  classifierSlice,
-  classifierInputShapeSelector,
-} from "store/classifier";
-import { selectImagesByPartitions } from "store/data";
+  segmenterFitOptionsSelector,
+  segmenterCompileOptionsSelector,
+  segmenterTrainingPercentageSelector,
+  segmenterSlice,
+  segmenterModelSelector,
+  segmenterModelStatusSelector,
+  segmenterInputShapeSelector,
+  segmenterHistorySelector,
+} from "store/segmenter";
 
 import {
   AlertStateType,
   AlertType,
-  OptimizationAlgorithm,
   LossFunction,
-  Partition,
+  OptimizationAlgorithm,
 } from "types";
-import { ModelStatus, availableClassifierModels } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
+import { ModelStatus, availableSegmenterModels } from "types/ModelType";
 import { useDialog } from "hooks";
 
 enum ClearOptions {
@@ -53,12 +48,12 @@ enum ClearOptions {
   yes,
 }
 
-type FitClassifierDialogProps = {
+type FitSegmenterDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
 };
 
-export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
+export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const dispatch = useDispatch();
 
   const { closeDialog, openedDialog } = props;
@@ -72,8 +67,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
   const [showWarning, setShowWarning] = useState<boolean>(true);
-  const [noCategorizedImages, setNoCategorizedImages] =
-    useState<boolean>(false);
+  const [noLabeledImages, setNoLabeledImages] = useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
 
   const [trainingAccuracy, setTrainingAccuracy] = useState<
@@ -96,19 +90,15 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const [clearModel, setClearModel] = useState(ClearOptions.no);
 
-  //TODO: need full inference images here, or just count?
-  const categorizedImages = useSelector(selectImagesByPartitions)([
-    Partition.Inference,
-  ]);
-
-  const selectedModel = useSelector(classifierSelectedModelSelector);
-  const inputShape = useSelector(classifierInputShapeSelector);
-  const modelStatus = useSelector(classifierModelStatusSelector);
+  const annotatedImages = useSelector(selectAnnotatedImages);
+  const selectedModel = useSelector(segmenterModelSelector);
+  const inputShape = useSelector(segmenterInputShapeSelector);
+  const modelStatus = useSelector(segmenterModelStatusSelector);
   const alertState = useSelector(alertStateSelector);
 
-  const fitOptions = useSelector(classifierFitOptionsSelector);
-  const compileOptions = useSelector(classifierCompileOptionsSelector);
-  const trainingPercentage = useSelector(classifierTrainingPercentageSelector);
+  const fitOptions = useSelector(segmenterFitOptionsSelector);
+  const compileOptions = useSelector(segmenterCompileOptionsSelector);
+  const trainingPercentage = useSelector(segmenterTrainingPercentageSelector);
 
   const items = useRef([
     "loss",
@@ -119,28 +109,36 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ]);
 
   const modelHistory = useSelector((state) =>
-    classifierHistorySelector(state, items.current)
+    segmenterHistorySelector(state, items.current)
   );
 
   const dispatchBatchSizeCallback = (batchSize: number) => {
-    dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
+    dispatch(
+      segmenterSlice.actions.updateSegmentationBatchSize({
+        batchSize: batchSize,
+      })
+    );
   };
 
   const dispatchLearningRateCallback = (learningRate: number) => {
     dispatch(
-      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
+      segmenterSlice.actions.updateSegmentationLearningRate({
+        learningRate: learningRate,
+      })
     );
   };
 
   const dispatchEpochsCallback = (epochs: number) => {
-    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
+    dispatch(
+      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs })
+    );
   };
 
   const dispatchOptimizationAlgorithmCallback = (
     optimizationAlgorithm: OptimizationAlgorithm
   ) => {
     dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
+      segmenterSlice.actions.updateSegmentationOptimizationAlgorithm({
         optimizationAlgorithm: optimizationAlgorithm,
       })
     );
@@ -148,7 +146,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
     dispatch(
-      classifierSlice.actions.updateLossFunction({
+      segmenterSlice.actions.updateSegmentationLossFunction({
         lossFunction: lossFunction,
       })
     );
@@ -156,7 +154,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
     dispatch(
-      classifierSlice.actions.updateTrainingPercentage({
+      segmenterSlice.actions.updateSegmentationTrainingPercentage({
         trainingPercentage: trainPercentage,
       })
     );
@@ -164,35 +162,35 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
-    name: "No labeled images",
-    description: "Please label images to train a model.",
+    name: "No annotated images",
+    description: "Please annotate images to train a model.",
   };
 
   useEffect(() => {
-    if (categorizedImages.length === 0) {
-      setNoCategorizedImages(true);
-      if (!noCategorizedImages && selectedModel.trainable) {
+    if (annotatedImages.length === 0) {
+      setNoLabeledImages(true);
+      if (!noLabeledImages && selectedModel.trainable) {
         setShowWarning(true);
       }
     } else {
-      setNoCategorizedImages(false);
+      setNoLabeledImages(false);
     }
-  }, [categorizedImages, noCategorizedImages, selectedModel]);
+  }, [annotatedImages, noLabeledImages, selectedModel]);
 
   useEffect(() => {
     if (
       process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "1" &&
-      categorizedImages.length > 0
+      annotatedImages.length > 0
     ) {
       const trainingSize = Math.round(
-        categorizedImages.length * trainingPercentage
+        annotatedImages.length * trainingPercentage
       );
-      const validationSize = categorizedImages.length - trainingSize;
+      const validationSize = annotatedImages.length - trainingSize;
 
       console.log(
-        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
-        `; val size to ${categorizedImages.length} - ${trainingSize} = ${validationSize}`
+        `Set training size to Round[${annotatedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
+        `; val size to ${annotatedImages.length} - ${trainingSize} = ${validationSize}`
       );
 
       console.log(
@@ -212,7 +210,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         `; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
-  }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
+  }, [fitOptions.batchSize, trainingPercentage, annotatedImages.length]);
 
   const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
     epoch,
@@ -279,7 +277,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
       dispatch(
-        classifierSlice.actions.updateModelStatus({
+        segmenterSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
           execSaga: true,
@@ -287,7 +285,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
       );
     } else {
       dispatch(
-        classifierSlice.actions.updateModelStatus({
+        segmenterSlice.actions.updateModelStatus({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
           execSaga: true,
@@ -298,19 +296,19 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
   const dispatchModel = (disposePrevious: boolean, _nextModelIdx: number) => {
     dispatch(
-      classifierSlice.actions.updateSelectedModelIdx({
+      segmenterSlice.actions.updateSelectedModelIdx({
         modelIdx: _nextModelIdx,
         disposePrevious,
       })
     );
 
-    const nextModel = availableClassifierModels[_nextModelIdx];
+    const nextModel = availableSegmenterModels[_nextModelIdx];
 
     // if the selected model requires a specific number of input channels,
     // dispatch that number to the store
     if (nextModel.requiredChannels) {
       dispatch(
-        classifierSlice.actions.updateInputShape({
+        segmenterSlice.actions.updateSegmentationInputShape({
           inputShape: {
             ...inputShape,
             channels: nextModel.requiredChannels,
@@ -351,7 +349,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         TransitionComponent={Fade}
         TransitionProps={{ onExited: dispatchModelOnExit }}
       >
-        <DialogTitle>Clear {selectedModel.name}?</DialogTitle>
+        <DialogTitle> Clear {selectedModel.name}?</DialogTitle>
         <DialogActions>
           <Button onClick={() => onClearSelect(ClearOptions.cancel)}>
             Cancel
@@ -361,22 +359,23 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         </DialogActions>
       </Dialog>
       <Dialog
-        fullScreen
+        fullWidth
+        maxWidth="md"
         onClose={closeDialog}
         open={openedDialog}
         TransitionComponent={DialogTransitionSlide}
-        style={{ zIndex: 1203 }}
+        style={{ zIndex: 1203, height: "100%" }}
       >
-        <FitClassifierDialogAppBar
+        <FitSegmenterDialogAppBar
           closeDialog={closeDialog}
           fit={onFit}
-          noLabels={noCategorizedImages}
+          noLabels={noLabeledImages}
           noTrain={!selectedModel.trainable}
           epochs={fitOptions.epochs}
           currentEpoch={currentEpoch}
         />
 
-        {showWarning && noCategorizedImages && selectedModel.trainable && (
+        {showWarning && noLabeledImages && selectedModel.trainable && (
           <AlertDialog
             setShowAlertDialog={setShowWarning}
             alertState={noLabeledImageAlert}
@@ -387,9 +386,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
 
         <DialogContent>
           <List dense>
-            <PreprocessingSettingsListItem />
-
-            <ClassifierArchitectureSettingsListItem
+            <SegmenterArchitectureSettingsListItem
               onModelSelect={onModelSelect}
             />
 
@@ -414,6 +411,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
               isModelTrainable={selectedModel.trainable}
             />
           </List>
+
           {showPlots && (
             <div>
               <TrainingHistoryPlot
@@ -430,9 +428,10 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
               />
             </div>
           )}
-          {/* TODO: implement model summary for graph models */}
+
           {modelStatus > ModelStatus.Training && !selectedModel.graph && (
             <div>
+              {/*  TODO: implement model summary for graph models */}
               <ModelSummaryTable model={selectedModel} />
             </div>
           )}

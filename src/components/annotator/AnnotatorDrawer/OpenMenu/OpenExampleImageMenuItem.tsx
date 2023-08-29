@@ -4,7 +4,7 @@ import { MenuItem, ListItemText } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { ExampleImageDialog } from "../ExampleImageDialog";
+import { ExampleImageDialog } from "components/dialogs";
 
 type OpenExampleImageMenuItemProps = {
   onCloseMenu: () => void;

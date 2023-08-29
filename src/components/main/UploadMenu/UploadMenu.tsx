@@ -11,7 +11,7 @@ import ComputerIcon from "@mui/icons-material/Computer";
 
 import { useUpload } from "hooks";
 
-import { ImageShapeDialog } from "components/common/dialogs";
+import { ImageShapeDialog } from "components/dialogs";
 import { StyledMenuItem } from "./StyledMenuItem";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";

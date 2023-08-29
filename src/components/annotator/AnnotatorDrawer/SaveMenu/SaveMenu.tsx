@@ -22,7 +22,7 @@ import {
   selectAllAnnotations,
 } from "store/data";
 
-import { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";
+import { ExportAnnotationsDialog } from "components/dialogs";
 
 import { AnnotationExportType, HotkeyView } from "types";
 

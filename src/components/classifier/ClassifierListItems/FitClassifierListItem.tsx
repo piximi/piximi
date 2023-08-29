@@ -10,7 +10,7 @@ import { ScatterPlot as ScatterPlotIcon } from "@mui/icons-material";
 
 import { useDialogHotkey } from "hooks";
 
-import { FitClassifierDialog } from "../FitClassifierDialog/FitClassifierDialog";
+import { FitClassifierDialog } from "components/dialogs";
 import { HotkeyView } from "types";
 
 export const FitClassifierListItem = () => {
