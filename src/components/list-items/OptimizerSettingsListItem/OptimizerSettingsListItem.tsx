@@ -2,7 +2,7 @@ import {
   OptimizerSettingsGrid,
   OptimizerSettingsGridProps,
 } from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
-import { CollapsibleList } from "../../styled-components/CollapsibleList";
+import { CollapsibleList } from "../../common/styled-components/CollapsibleList";
 
 export const OptimizerSettingsListItem = ({
   compileOptions,

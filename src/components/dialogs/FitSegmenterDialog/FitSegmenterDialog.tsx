@@ -11,12 +11,14 @@ import {
   List,
 } from "@mui/material";
 
-import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
+import {
+  OptimizerSettingsListItem,
+  DatasetSettingsListItem,
+  SegmenterArchitectureSettingsListItem,
+} from "components/list-items";
 import { TrainingHistoryPlot } from "components/common/styled-components/TrainingHistoryPlot";
 import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
 import { FitSegmenterDialogAppBar } from "../../segmenter/FitSegmenterDialogAppBar";
-import { SegmenterArchitectureSettingsListItem } from "../../segmenter/ArchitectureSettingsListItem";
 import { ModelSummaryTable } from "components/common/styled-components";
 
 import { alertStateSelector } from "store/application";

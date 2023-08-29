@@ -10,7 +10,7 @@ import { ImportTensorflowModelDialog } from "components/dialogs";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { CategoriesList } from "components/categories/CategoriesList";
-import { SegmenterExecListItem } from "../SegmenterExecListItem";
+import { SegmenterExecListItem } from "components/list-items";
 
 import { selectCreatedAnnotationCategories } from "store/data";
 

@@ -4,7 +4,7 @@ import {
   CustomNumberTextField,
   CustomFormSelectField,
   StyledFormControl,
-} from "../../../styled-components";
+} from "../../../common/styled-components";
 
 import {
   CompileOptions,

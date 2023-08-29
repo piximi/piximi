@@ -8,40 +8,36 @@ import {
   ListItemText,
   Stack,
 } from "@mui/material";
-
-import { LabelImportant as LabelImportantIcon } from "@mui/icons-material";
+import LabelImportantIcon from "@mui/icons-material/LabelImportant";
 
 import { useTranslation } from "hooks";
 
-import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton/DisabledListItemButton";
+import { DisabledListItemButton } from "components/list-items/DisabledListItemButton";
 
-import {
-  classifierSlice,
-  classifierModelStatusSelector,
-} from "store/classifier";
+import { segmenterSlice, segmenterModelStatusSelector } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";
 
-type PredictClassifierListItemProps = {
+type PredictSegmenterListItemProps = {
   disabled: boolean;
   helperText: string;
 };
 
-export const PredictClassifierListItem = (
-  props: PredictClassifierListItemProps
+export const PredictSegmenterListItem = (
+  props: PredictSegmenterListItemProps
 ) => {
   const t = useTranslation();
   const dispatch = useDispatch();
 
-  const modelStatus = useSelector(classifierModelStatusSelector);
-
   const onPredict = () => {
     dispatch(
-      classifierSlice.actions.updateModelStatus({
+      segmenterSlice.actions.updateModelStatus({
         modelStatus: ModelStatus.Predicting,
         execSaga: true,
       })
     );
   };
+
+  const modelStatus = useSelector(segmenterModelStatusSelector);
 
   return (
     <Grid item xs={4}>

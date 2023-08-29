@@ -8,8 +8,7 @@ import { AppBarOffset } from "components/common/styled-components";
 import { ApplicationOptionsList } from "components/common/styled-components/ApplicationOptionsList";
 
 import { ImageList } from "./ImageList";
-import { OpenListItem } from "./OpenListItem";
-import { SaveListItem } from "./SaveListItem";
+import { OpenListItem, SaveListItem } from "components/list-items";
 import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
 

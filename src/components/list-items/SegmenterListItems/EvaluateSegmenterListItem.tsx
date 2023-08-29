@@ -12,7 +12,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import { useTranslation } from "hooks";
 
-import { DisabledListItemButton } from "components/common/list-items/DisabledListItemButton";
+import { DisabledListItemButton } from "components/list-items/DisabledListItemButton";
 
 import { segmenterModelStatusSelector, segmenterSlice } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";

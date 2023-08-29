@@ -1,13 +1,13 @@
 import { styled } from "@mui/material";
 
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
-import { ClassifierArchitectureSettingsGrid } from "./ClassifierArchitectureSettingsGrid/ClassifierArchitectureSettingsGrid";
+import { SegmenterArchitectureSettingsGrid } from "components/segmenter/ArchitectureSettingsGrid/SegmenterArchitectureSettingsGrid";
 
 type ArchitectureSettingsProps = {
   onModelSelect: (modelIdx: number) => void;
 };
 
-export const ClassifierArchitectureSettingsListItem = ({
+export const SegmenterArchitectureSettingsListItem = ({
   onModelSelect,
 }: ArchitectureSettingsProps) => {
   const StyledForm = styled("form")({
@@ -22,10 +22,9 @@ export const ClassifierArchitectureSettingsListItem = ({
       primary="Architecture Settings"
       disablePadding={false}
       paddingLeft={true}
-      closed={false}
     >
       <StyledForm noValidate autoComplete="off">
-        <ClassifierArchitectureSettingsGrid onModelSelect={onModelSelect} />
+        <SegmenterArchitectureSettingsGrid onModelSelect={onModelSelect} />
       </StyledForm>
     </CollapsibleList>
   );
