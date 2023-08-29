@@ -1,26 +1,27 @@
 import React from "react";
 
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
+
+import FeedbackIcon from "@mui/icons-material/Feedback";
 
 import { useDialog } from "hooks";
 
-import { SettingsDialog } from "../../../dialogs";
+import { SendFeedbackDialog } from "../../dialogs";
 
-export const SettingsListItem = () => {
+export const SendFeedbackListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
     <>
       <ListItem button onClick={onOpen}>
         <ListItemIcon>
-          <SettingsIcon />
+          <FeedbackIcon />
         </ListItemIcon>
 
-        <ListItemText primary="Settings" />
+        <ListItemText primary="Send feedback" />
       </ListItem>
 
-      <SettingsDialog onClose={onClose} open={open} />
+      <SendFeedbackDialog onClose={onClose} open={open} />
     </>
   );
 };

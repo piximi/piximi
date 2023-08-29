@@ -2,9 +2,11 @@ import React from "react";
 
 import { List } from "@mui/material";
 
-import { NewProjectListItem } from "../list-items/NewProjectListItem";
-import { OpenListItem } from "../list-items/OpenListItem";
-import { SaveListItem } from "../list-items/SaveListItem";
+import {
+  NewProjectListItem,
+  OpenListItem,
+  SaveListItem,
+} from "components/list-items";
 
 export const FileList = () => {
   return (

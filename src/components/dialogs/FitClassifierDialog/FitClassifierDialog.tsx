@@ -12,15 +12,17 @@ import {
 } from "@mui/material";
 
 import { FitClassifierDialogAppBar } from "../../classifier/FitClassifierDialogAppBar";
-import { ClassifierArchitectureSettingsListItem } from "../../classifier/ClassifierArchitectureSettingsListItem";
-import { PreprocessingSettingsListItem } from "../../classifier/PreprocessingSettingsListItem/PreprocessingSettingsListItem";
 
 import {
   ModelSummaryTable,
   TrainingHistoryPlot,
 } from "components/common/styled-components";
-import { OptimizerSettingsListItem } from "components/common/list-items/OptimizerSettingsListItem/OptimizerSettingsListItem";
-import { DatasetSettingsListItem } from "components/common/list-items/DatasetSettingsListItem/DatasetSettingsListItem";
+import {
+  OptimizerSettingsListItem,
+  DatasetSettingsListItem,
+  ClassifierArchitectureSettingsListItem,
+  PreprocessingSettingsListItem,
+} from "components/list-items";
 import { AlertDialog, DialogTransitionSlide } from "components/dialogs";
 
 import { alertStateSelector } from "store/application";
