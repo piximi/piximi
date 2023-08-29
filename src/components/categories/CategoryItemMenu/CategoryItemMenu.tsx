@@ -3,10 +3,7 @@ import React from "react";
 import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
-import {
-  DialogWithAction,
-  UpsertCategoriesDialog,
-} from "components/common/dialogs";
+import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
 
 import { Category, UNKNOWN_CATEGORY_NAME, PartialBy, HotkeyView } from "types";
 

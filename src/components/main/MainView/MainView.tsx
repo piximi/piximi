@@ -7,7 +7,7 @@ import { Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
-import { ImageShapeDialog, FallBackDialog } from "components/common/dialogs";
+import { ImageShapeDialog, FallBackDialog } from "components/dialogs";
 
 import { MainDrawer } from "../MainDrawer";
 import { MainImageGrid } from "../MainImageGrid";

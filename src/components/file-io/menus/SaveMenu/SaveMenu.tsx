@@ -2,7 +2,7 @@ import { Menu, MenuItem } from "@mui/material";
 
 import { useDialog } from "hooks";
 
-import { SaveProjectDialog } from "../../dialogs/SaveProjectDialog/SaveProjectDialog";
+import { SaveProjectDialog } from "components/dialogs";
 
 type SaveMenuProps = {
   anchorEl: HTMLElement | null;

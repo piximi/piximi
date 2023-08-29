@@ -18,10 +18,7 @@ import {
 import { useDialogHotkey, useCategoryHandlers } from "hooks";
 
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
-import {
-  DialogWithAction,
-  UpsertCategoriesDialog,
-} from "components/common/dialogs";
+import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
 
 import { CategoryItem } from "../CategoryItem";
 import { CategoryItemMenu } from "../CategoryItemMenu";

@@ -5,7 +5,7 @@ import { Menu, MenuItem, MenuList } from "@mui/material";
 import { useDialogHotkey } from "hooks";
 
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenExampleProjectDialog } from "../../dialogs/OpenExampleProjectDialog/OpenExampleProjectDialog";
+import { OpenExampleProjectDialog } from "components/dialogs";
 
 import { HotkeyView } from "types";
 

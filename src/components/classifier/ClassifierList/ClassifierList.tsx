@@ -6,8 +6,8 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import { ImportTensorflowModelDialog } from "components/common/dialogs";
-import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedModelDialog";
+import { ImportTensorflowModelDialog } from "components/dialogs";
+import { SaveFittedModelDialog } from "components/dialogs";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { ClassifierExecListItem } from "../ClassifierExecListItem";
 import { CategoriesList } from "components/categories/CategoriesList";

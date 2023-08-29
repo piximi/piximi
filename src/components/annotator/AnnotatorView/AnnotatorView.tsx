@@ -16,7 +16,7 @@ import {
   FallBackDialog,
   ImageShapeDialog,
   AlertDialog,
-} from "components/common/dialogs";
+} from "components/dialogs";
 
 import { StageWrapper } from "../StageWrapper";
 import { ToolOptions } from "../ToolOptions";

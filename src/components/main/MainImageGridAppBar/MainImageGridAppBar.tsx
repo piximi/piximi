@@ -25,7 +25,7 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { DialogWithAction } from "components/common/dialogs";
+import { DialogWithAction } from "components/dialogs";
 import { ImageCategoryMenu } from "../ImageCategoryMenu";
 import { TooltipTitle } from "components/common/tooltips";
 

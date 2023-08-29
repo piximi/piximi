@@ -20,7 +20,7 @@ import {
   Palette as PaletteIcon,
 } from "@mui/icons-material";
 
-import { MaterialUISwitch } from "../controls/MaterialUISwitch";
+import { MaterialUISwitch } from "../common/controls/MaterialUISwitch";
 import {
   selectedImageBorderWidthSelector,
   imageSelectionColorSelector,

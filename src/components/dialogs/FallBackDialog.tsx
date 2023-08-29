@@ -25,8 +25,7 @@ import {
 
 import { useDialogHotkey } from "hooks";
 
-import { SaveFittedModelDialog } from "components/file-io/dialogs/SaveFittedModelDialog";
-import { SaveProjectDialog } from "components/file-io/dialogs/SaveProjectDialog/SaveProjectDialog";
+import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
 import {
   classifierSelectedModelSelector,

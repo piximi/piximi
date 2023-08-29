@@ -11,7 +11,7 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialog, useTranslation } from "hooks";
 
-import { DialogWithAction } from "components/common/dialogs";
+import { DialogWithAction } from "components/dialogs";
 import {
   imageViewerSlice,
   selectActiveAnnotationIds,
