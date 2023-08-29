@@ -26,7 +26,7 @@ import { ExportAnnotationsDialog } from "components/dialogs";
 
 import { AnnotationExportType, HotkeyView } from "types";
 
-type SaveMenuProps = {
+type SaveImageMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
@@ -64,7 +64,11 @@ const exportOptions = [
   },
 ];
 
-export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
+export const SaveImageMenu = ({
+  anchorEl,
+  onClose,
+  open,
+}: SaveImageMenuProps) => {
   const images = useSelector(selectSelectedImages);
   const annotations = useSelector(selectAllAnnotations);
   const annotationCategories = useSelector(selectAllAnnotationCategories);

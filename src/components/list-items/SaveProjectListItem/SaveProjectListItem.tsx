@@ -4,10 +4,10 @@ import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { SaveMenu } from "../../file-io/menus/SaveMenu";
+import { SaveProjectMenu } from "components/menus";
 import { useMenu } from "hooks";
 
-export const SaveListItem = () => {
+export const SaveProjectListItem = () => {
   const { anchorEl, onClose, onOpen, open } = useMenu();
 
   return (
@@ -20,7 +20,7 @@ export const SaveListItem = () => {
         <ListItemText primary="Save" />
       </ListItem>
 
-      <SaveMenu anchorEl={anchorEl} onClose={onClose} open={open} />
+      <SaveProjectMenu anchorEl={anchorEl} onClose={onClose} open={open} />
     </>
   );
 };

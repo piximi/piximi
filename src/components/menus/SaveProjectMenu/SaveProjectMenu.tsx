@@ -4,13 +4,17 @@ import { useDialog } from "hooks";
 
 import { SaveProjectDialog } from "components/dialogs";
 
-type SaveMenuProps = {
+type SaveProjectMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   open: boolean;
 };
 
-export const SaveMenu = ({ anchorEl, onClose, open }: SaveMenuProps) => {
+export const SaveProjectMenu = ({
+  anchorEl,
+  onClose,
+  open,
+}: SaveProjectMenuProps) => {
   const {
     onClose: onSaveProjectDialogClose,
     onOpen: onSaveProjectDialogOpen,

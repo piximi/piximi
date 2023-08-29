@@ -4,8 +4,8 @@ import { List } from "@mui/material";
 
 import {
   NewProjectListItem,
-  OpenListItem,
-  SaveListItem,
+  OpenProjectListItem,
+  SaveProjectListItem,
 } from "components/list-items";
 
 export const FileList = () => {
@@ -13,9 +13,9 @@ export const FileList = () => {
     <List dense>
       <NewProjectListItem />
 
-      <OpenListItem />
+      <OpenProjectListItem />
 
-      <SaveListItem />
+      <SaveProjectListItem />
     </List>
   );
 };
