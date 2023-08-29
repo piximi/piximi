@@ -12,7 +12,7 @@ import { AppBarOffset } from "components/common/styled-components";
 import { ApplicationOptionsList } from "components/common/styled-components/ApplicationOptionsList";
 
 import { OpenImageListItem, SaveImageListItem } from "components/list-items";
-import { AnnotatorAppBar } from "../AnnotatorAppBar";
+import { AnnotatorAppBar } from "../../annotator/AnnotatorAppBar";
 
 import {
   selectCreatedAnnotationCategories,

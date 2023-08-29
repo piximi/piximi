@@ -9,7 +9,7 @@ import { useUpload } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 import { ImageShapeDialog, FallBackDialog } from "components/dialogs";
 
-import { MainDrawer } from "../MainDrawer";
+import { MainDrawer } from "components/drawers";
 import { MainImageGrid } from "../MainImageGrid";
 import { MainAppBar } from "../MainAppBar";
 

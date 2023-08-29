@@ -1,4 +1,4 @@
-export { HelpDrawer } from "../../help/HelpDrawer/HelpDrawer";
+export { HelpDrawer } from "../../drawers/HelpDrawer/HelpDrawer";
 export { AppBarOffset } from "./AppBarOffset";
 export { ApplicationOptionsList } from "./ApplicationOptionsList";
 export { CollapsibleList } from "./CollapsibleList";
