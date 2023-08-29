@@ -3,13 +3,15 @@ import { useSelector } from "react-redux";
 
 import { Divider, Drawer, List } from "@mui/material";
 
-import { CategoriesList } from "components/categories/CategoriesList";
+import {
+  CategoriesList,
+  ImageList,
+  ClearAnnotationsGroup,
+} from "components/lists";
 import { AppBarOffset } from "components/common/styled-components";
 import { ApplicationOptionsList } from "components/common/styled-components/ApplicationOptionsList";
 
-import { ImageList } from "./ImageList";
 import { OpenImageListItem, SaveImageListItem } from "components/list-items";
-import { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 import { AnnotatorAppBar } from "../AnnotatorAppBar";
 
 import {

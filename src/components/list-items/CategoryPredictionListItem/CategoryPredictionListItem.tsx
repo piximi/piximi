@@ -17,7 +17,7 @@ import { Partition } from "types";
 
 import { ModelStatus } from "types/ModelType";
 
-export const PredictionVisibility = () => {
+export const CategoryPredictionListItem = () => {
   const dispatch = useDispatch();
 
   const [showLabeledImages, setShowLabeledImages] = React.useState(true);

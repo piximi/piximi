@@ -10,7 +10,7 @@ import { ImportTensorflowModelDialog } from "components/dialogs";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { CollapsibleList } from "components/common/styled-components/CollapsibleList";
 import { ClassifierExecListItem } from "components/list-items";
-import { CategoriesList } from "components/categories/CategoriesList";
+import { CategoriesList } from "components/lists/CategoriesList";
 
 import {
   classifierModelStatusSelector,
