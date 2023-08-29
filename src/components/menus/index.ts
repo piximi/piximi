@@ -5,3 +5,4 @@ export { OpenExampleProjectMenuItem } from "./OpenExampleProjectMenuItem";
 export { ImageMenu } from "./ImageMenu";
 export { SaveImageMenu } from "./SaveImageMenu";
 export { CategoryItemMenu } from "./CategoryItemMenu";
+export { UploadMenu } from "./UploadMenu";

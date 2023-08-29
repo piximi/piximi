@@ -5,7 +5,7 @@ import { AddPhotoAlternate as AddPhotoAltIcon } from "@mui/icons-material";
 
 import { useMenu } from "hooks";
 
-import { UploadMenu } from "../UploadMenu";
+import { UploadMenu } from "components/menus";
 
 export const UploadButton = () => {
   const { anchorEl, onClose, onOpen, open } = useMenu();
