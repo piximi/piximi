@@ -32,7 +32,7 @@ export const ColorIcon = ({
     onColorChange(color);
     onCloseColorPicker();
   };
-
+  //TODO: should be dialog and button
   return (
     <React.Fragment>
       <IconButton onClick={onOpenColorPicker}>

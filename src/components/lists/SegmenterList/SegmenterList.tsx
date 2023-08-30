@@ -7,7 +7,7 @@ import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 import { useDialog, useDialogHotkey } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/dialogs";
-import { CollapsibleList } from "components/styled-components/CollapsibleList";
+import { CollapsibleList } from "components/lists";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { CategoriesList } from "components/lists/CategoriesList";
 import { SegmenterExecListItem } from "components/list-items";

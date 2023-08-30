@@ -1,11 +1,11 @@
 import { Grid, Typography } from "@mui/material";
 
 import { ShuffleForm } from "./ShuffleForm";
+import { CollapsibleList } from "components/lists";
 import {
-  CollapsibleList,
   CustomNumberTextField,
   StyledFormControl,
-} from "../../styled-components";
+} from "components/styled-components";
 
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;

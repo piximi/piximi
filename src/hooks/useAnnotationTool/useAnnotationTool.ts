@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import * as ImageJS from "image-js";
 import { useSelector } from "react-redux";
 
-import { StageContext } from "components/annotator/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/AnnotatorView/AnnotatorView";
 import {
   selectPenSelectionBrushSize,
   selectQuickSelectionRegionSize,

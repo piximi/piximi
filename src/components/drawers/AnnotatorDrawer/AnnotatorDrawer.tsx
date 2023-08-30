@@ -9,7 +9,7 @@ import {
   ClearAnnotationsGroup,
 } from "components/lists";
 import { AppBarOffset } from "components/styled-components";
-import { ApplicationOptionsList } from "components/styled-components/ApplicationOptionsList";
+import { ApplicationOptionsList } from "components/lists/ApplicationOptionsList";
 
 import { OpenImageListItem, SaveImageListItem } from "components/list-items";
 import { AnnotatorAppBar } from "components/app-bars";

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
-import { AppBarOffset } from "../../styled-components/AppBarOffset";
+import { AppBarOffset } from "../../styled-components/AppBarOffset/AppBarOffset";
 import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
 import { applicationSlice } from "store/application";

@@ -16,7 +16,7 @@ import {
 
 import { useHotkeys, useTranslation } from "hooks";
 
-import { Tool } from "../../annotator/Tool";
+import { Tool } from "../../stage/Tool";
 
 import { annotatorSlice } from "store/annotator";
 import { selectToolType } from "store/annotator/selectors";
@@ -36,7 +36,7 @@ import {
   Selection,
   Zoom,
 } from "icons";
-import { CustomToolTip } from "../../annotator/Tool/CustomToolTip";
+import { CustomToolTip } from "../../stage/Tool/CustomToolTip";
 
 const toolMap: Record<
   string,

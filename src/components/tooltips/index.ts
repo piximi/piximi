@@ -1,3 +1,3 @@
 export { ToolHotkeyTitle } from "./ToolHotkeyTitle";
-export { TooltipCard } from "./ToolTipCard";
+export { TooltipCard } from "./TooltipCard";
 export { TooltipTitle } from "./TooltipTitle";
