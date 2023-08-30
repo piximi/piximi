@@ -122,10 +122,10 @@ export const classifierSlice = createSlice({
         availableClassifierModels[state.selectedModelIdx].dispose();
       }
 
-      const newHistory = availableClassifierModels[modelIdx].history;
       state.selectedModelIdx = modelIdx;
+      const selectedModel = availableClassifierModels[modelIdx];
 
-      if (newHistory.epochs.length > 0) {
+      if (selectedModel.history.epochs.length > 0 || selectedModel.pretrained) {
         state.modelStatus = ModelStatus.Trained;
       } else {
         state.modelStatus = ModelStatus.Uninitialized;

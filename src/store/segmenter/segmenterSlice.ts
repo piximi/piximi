@@ -146,10 +146,10 @@ export const segmenterSlice = createSlice({
         availableSegmenterModels[state.selectedModelIdx].dispose();
       }
 
-      const newHistory = availableSegmenterModels[modelIdx].history;
       state.selectedModelIdx = modelIdx;
+      const selectedModel = availableSegmenterModels[modelIdx];
 
-      if (newHistory.epochs.length > 0) {
+      if (selectedModel.history.epochs.length > 0 || selectedModel.pretrained) {
         state.modelStatus = ModelStatus.Trained;
       } else {
         state.modelStatus = ModelStatus.Uninitialized;
