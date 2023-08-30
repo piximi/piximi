@@ -6,7 +6,7 @@ import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import { usePreferredMuiTheme } from "hooks";
 
 import { ImageViewer } from "../ImageViewer";
-import { MainView } from "views/_MainView";
+import { ProjectViewer } from "../ProjectViewer";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -16,7 +16,7 @@ export const Application = () => {
       <ThemeProvider theme={theme}>
         <BrowserRouter basename={"/"}>
           <Routes>
-            <Route path="/" element={<MainView />} />
+            <Route path="/" element={<ProjectViewer />} />
             <Route path="annotator" element={<ImageViewer />} />
           </Routes>
         </BrowserRouter>

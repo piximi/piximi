@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { Logo } from "./Logo";
+import { LogoLoader } from "./LogoLoader";
 import { Box, Button, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -38,7 +38,7 @@ const Controller = ({
 
   return (
     <>
-      <Logo
+      <LogoLoader
         width={width}
         height={height}
         loadPercent={
@@ -68,7 +68,7 @@ const Controller = ({
 };
 
 const meta: Meta<typeof Controller> = {
-  title: "Example/Logo",
+  title: "Example/LogoLoader",
   component: Controller,
   tags: ["autodocs"],
 };

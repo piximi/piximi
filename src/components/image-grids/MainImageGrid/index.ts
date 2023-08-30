@@ -1,1 +1,0 @@
-export { MainImageGrid } from "./MainImageGrid";

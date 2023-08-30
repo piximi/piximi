@@ -14,7 +14,7 @@ import { useDialog } from "hooks";
 
 import { ExitAnnotatorDialog } from "components/dialogs";
 
-import { Logo } from "views/Application/LogoLoader";
+import { LogoLoader } from "components/styled-components";
 
 export const ImageViewerAppBar = () => {
   const {
@@ -51,7 +51,7 @@ export const ImageViewerAppBar = () => {
               <ArrowBack />
             </IconButton>
           </Tooltip>
-          <Logo width={30} height={30} loadPercent={1} fullLogo={false} />
+          <LogoLoader width={30} height={30} loadPercent={1} fullLogo={false} />
           <Typography variant="h5" color={"#02aec5"}>
             Annotator
           </Typography>

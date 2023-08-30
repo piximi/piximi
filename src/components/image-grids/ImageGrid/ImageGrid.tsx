@@ -5,9 +5,9 @@ import { Container, Box, Tabs, Tab, Grid } from "@mui/material";
 
 import { useDndFileDrop, useContextMenu, useHotkeys } from "hooks";
 
-import { MainImageGridItem } from "../MainImageGridItem";
+import { ImageGridItem } from "../ImageGridItem";
 import { ImageCategoryMenu } from "components/menus";
-import { MainImageGridAppBar } from "components/app-bars";
+import { ImageGridAppBar } from "components/app-bars";
 
 import {
   updateHighlightedCategory,
@@ -56,11 +56,11 @@ function a11yProps(index: number) {
   };
 }
 
-type MainImageGridProps = {
+type ImageGridProps = {
   onDrop: (files: FileList) => void;
 };
 
-export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
+export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const images = useSelector(selectVisibleImages);
   const imageSelectionColor = useSelector(imageSelectionColorSelector);
   const selectedImageBorderWidth = useSelector(
@@ -183,7 +183,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 sx={{ transform: "translateZ(0)", height: "100%" }}
               >
                 {images.slice(0, max_images).map((image: ImageType) => (
-                  <MainImageGridItem
+                  <ImageGridItem
                     image={image}
                     selected={selectedImages.includes(image.id)}
                     selectionColor={imageSelectionColor}
@@ -205,7 +205,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                 }
               />
             </div>
-            <MainImageGridAppBar />
+            <ImageGridAppBar />
           </Container>
         </Box>
       </TabPanel>
@@ -238,7 +238,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                   sx={{ transform: "translateZ(0)", height: "100%" }}
                 >
                   {[].map((image: ImageType) => (
-                    <MainImageGridItem
+                    <ImageGridItem
                       image={image}
                       selected={selectedImages.includes(image.id)}
                       selectionColor={imageSelectionColor}
@@ -260,7 +260,7 @@ export const MainImageGrid = ({ onDrop }: MainImageGridProps) => {
                   }
                 />
               </div>
-              <MainImageGridAppBar />
+              <ImageGridAppBar />
             </Container>
           </Box>
         </TabPanel>

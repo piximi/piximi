@@ -10,12 +10,12 @@ import {
 import { ImageSortSelection } from "components/styled-components";
 
 import { UploadButton } from "components/controls";
-import { Logo } from "views/Application/LogoLoader";
+import { LogoLoader } from "components/styled-components";
 
 import { applicationSlice } from "store/application";
 import { loadMessageSelector, loadPercentSelector } from "store/project";
 
-export const MainToolbar = () => {
+export const ProjectToolbar = () => {
   const dispatch = useDispatch();
   const loadPercent = useSelector(loadPercentSelector);
   const loadMessage = useSelector(loadMessageSelector);
@@ -54,7 +54,7 @@ export const MainToolbar = () => {
 
   return (
     <Toolbar>
-      <Logo width={250} height={50} loadPercent={loadPercent} />
+      <LogoLoader width={250} height={50} loadPercent={loadPercent} />
 
       <Typography ml={5} sx={{ flexGrow: 1 }}>
         {loadMessage}

@@ -9,3 +9,4 @@ export { SegmenterArchitectureSettingsGrid } from "./SegmenterArchitectureSettin
 export { ClassifierArchitectureSettingsGrid } from "./ClassifierArchitectureSettingsGrid";
 export { Cursor } from "./Cursor";
 export { KeyboardKey } from "./KeyboardKey";
+export { LogoLoader } from "./LogoLoader";
