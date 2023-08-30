@@ -78,7 +78,7 @@ export const segmenterSlice = createSlice({
       if (model.pretrained) {
         state.modelStatus = ModelStatus.Trained;
         const selectedModelIdx = availableSegmenterModels.findIndex(
-          (m) => m.constructor.name === model.constructor.name
+          (m) => m.name === model.name
         );
         state.selectedModelIdx = selectedModelIdx >= 0 ? selectedModelIdx : 0;
       } else {
