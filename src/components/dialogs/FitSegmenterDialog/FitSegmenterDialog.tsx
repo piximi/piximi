@@ -16,7 +16,7 @@ import {
   DatasetSettingsListItem,
   SegmenterArchitectureSettingsListItem,
 } from "components/list-items";
-import { TrainingHistoryPlot } from "components/styled-components/TrainingHistoryPlot";
+import { TrainingHistoryPlot } from "components/styled-components/TrainingHistoryPlot/TrainingHistoryPlot";
 import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
 import { FitSegmenterDialogAppBar } from "components/app-bars";
 import { ModelSummaryTable } from "components/styled-components";

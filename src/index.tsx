@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Application } from "./components/Application";
+import { Application } from "views/Application";
 import { productionStore } from "./store";
 
 ReactDOM.render(

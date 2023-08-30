@@ -1,0 +1,1 @@
+export { ImageShapeDialog } from "./ImageShapeDialog";

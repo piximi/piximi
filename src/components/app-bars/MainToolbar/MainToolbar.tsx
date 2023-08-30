@@ -9,8 +9,8 @@ import {
 
 import { ImageSortSelection } from "components/styled-components";
 
-import { UploadButton } from "../../main/UploadButton";
-import { Logo } from "components/Application/LogoLoader";
+import { UploadButton } from "components/controls";
+import { Logo } from "views/Application/LogoLoader";
 
 import { applicationSlice } from "store/application";
 import { loadMessageSelector, loadPercentSelector } from "store/project";

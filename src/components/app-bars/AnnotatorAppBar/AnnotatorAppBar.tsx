@@ -14,7 +14,7 @@ import { useDialog } from "hooks";
 
 import { ExitAnnotatorDialog } from "components/dialogs";
 
-import { Logo } from "components/Application/LogoLoader";
+import { Logo } from "views/Application/LogoLoader";
 
 export const AnnotatorAppBar = () => {
   const {

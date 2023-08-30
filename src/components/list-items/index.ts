@@ -12,6 +12,6 @@ export { OpenProjectListItem } from "./OpenProjectListItem";
 export { SaveImageListItem } from "./SaveImageListItem";
 export { SaveProjectListItem } from "./SaveProjectListItem";
 export { SegmenterExecListItem } from "./SegmenterExecListItem";
-export { SegmenterArchitectureSettingsListItem } from "./ArchitectureSettingsListItem";
+export { SegmenterArchitectureSettingsListItem } from "./SegmenterArchitectureSettingsListItem";
 export { CategoryItem } from "./CategoryItem";
 export { CategoryPredictionListItem } from "./CategoryPredictionListItem";

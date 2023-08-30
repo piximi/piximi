@@ -1,0 +1,1 @@
+export { ToolHotkeyTitle } from "./ToolHotkeyTitle";
