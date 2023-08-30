@@ -994,8 +994,8 @@ export const dataSlice = createSlice({
       const annotationIds = [...action.payload.annotationIds];
 
       for (const annotationId of annotationIds) {
-        dataSlice.caseReducers.deleteAnnotation(state, {
-          type: "deleteAnnotation",
+        dataSlice.caseReducers._deleteAnnotation(state, {
+          type: "_deleteAnnotation",
           payload: { annotationId, isPermanent: action.payload.isPermanent },
         });
       }
