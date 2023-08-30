@@ -3,14 +3,14 @@ import { useSelector } from "react-redux";
 
 import { AppBar, Box } from "@mui/material";
 
-import { MainToolbar } from "../MainToolbar";
+import { ProjectToolbar } from "../ProjectToolbar";
 
 import { AlertDialog } from "components/dialogs";
 
 import { alertStateSelector } from "store/application";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
-export const MainAppBar = () => {
+export const ProjectAppBar = () => {
   const alertState = useSelector(alertStateSelector);
 
   return (
@@ -23,7 +23,7 @@ export const MainAppBar = () => {
         color="inherit"
         position="fixed"
       >
-        <MainToolbar />
+        <ProjectToolbar />
 
         {alertState.visible && <AlertDialog alertState={alertState} />}
       </AppBar>

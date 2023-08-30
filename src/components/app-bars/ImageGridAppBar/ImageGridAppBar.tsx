@@ -40,7 +40,7 @@ import { setActiveImageId } from "store/imageViewer";
 
 import { HotkeyView } from "types";
 
-export const MainImageGridAppBar = () => {
+export const ImageGridAppBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

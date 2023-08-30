@@ -10,7 +10,7 @@ import {
 } from "components/lists";
 import { AppBarOffset } from "components/styled-components";
 
-export const MainDrawer = () => {
+export const ProjectDrawer = () => {
   return (
     <Drawer
       anchor="left"

@@ -9,9 +9,9 @@ import { useUpload } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 import { ImageShapeDialog, FallBackDialog } from "components/dialogs";
 
-import { MainDrawer } from "components/drawers";
-import { MainImageGrid } from "components/image-grids/MainImageGrid";
-import { MainAppBar } from "components/app-bars/MainAppBar";
+import { ProjectDrawer } from "components/drawers";
+import { ImageGrid } from "components/image-grids/ImageGrid";
+import { ProjectAppBar } from "components/app-bars/ProjectAppBar";
 
 import { applicationSlice } from "store/application";
 import { projectSlice } from "store/project";
@@ -22,7 +22,7 @@ import { AlertType, HotkeyView } from "types";
 import { getStackTraceFromError } from "utils";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
-export const MainView = () => {
+export const ProjectViewer = () => {
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
@@ -127,11 +127,11 @@ export const MainView = () => {
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
 
-            <MainAppBar />
+            <ProjectAppBar />
 
-            <MainDrawer />
+            <ProjectDrawer />
 
-            <MainImageGrid onDrop={handleDrop} />
+            <ImageGrid onDrop={handleDrop} />
 
             {files?.length && (
               <ImageShapeDialog

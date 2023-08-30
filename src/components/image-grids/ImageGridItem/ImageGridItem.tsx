@@ -3,26 +3,26 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Grid } from "@mui/material";
 
-import { ImageIconLabel } from "../MainImageGrid/ImageIconLabel";
+import { ImageIconLabel } from "../ImageGrid/ImageIconLabel";
 
 import { tileSizeSelector } from "store/application";
 import { projectSlice } from "store/project";
 import { ImageType } from "types";
 
-type MainImageGridItemProps = {
+type ImageGridItemProps = {
   image: ImageType;
   selected: boolean;
   selectionColor: string;
   selectedImageBorderWidth: number;
 };
 
-export const MainImageGridItem = memo(
+export const ImageGridItem = memo(
   ({
     image,
     selected,
     selectionColor,
     selectedImageBorderWidth,
-  }: MainImageGridItemProps) => {
+  }: ImageGridItemProps) => {
     const dispatch = useDispatch();
     const scaleFactor = useSelector(tileSizeSelector);
 

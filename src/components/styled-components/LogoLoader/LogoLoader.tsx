@@ -95,7 +95,7 @@ const PiximiText = ({ loadPercent }: { loadPercent: number }) => {
   );
 };
 
-export const Logo = ({
+export const LogoLoader = ({
   width,
   height,
   loadPercent,
