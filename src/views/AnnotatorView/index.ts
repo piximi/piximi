@@ -1,1 +1,0 @@
-export { AnnotatorView } from "./AnnotatorView";

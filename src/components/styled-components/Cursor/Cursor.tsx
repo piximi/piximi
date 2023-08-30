@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 import { PenAnnotationToolTip } from "components/stage/Stage/PenAnnotationToolTip";
 
 import { cursorSelector } from "store/imageViewer";

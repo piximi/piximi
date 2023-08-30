@@ -16,7 +16,7 @@ import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { Logo } from "views/Application/LogoLoader";
 
-export const AnnotatorAppBar = () => {
+export const ImageViewerAppBar = () => {
   const {
     onClose: onCloseExitAnnotatorDialog,
     onOpen: onOpenExitAnnotatorDialog,

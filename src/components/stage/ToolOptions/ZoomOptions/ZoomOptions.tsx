@@ -22,7 +22,7 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 import {
   setStagePosition,
   stageHeightSelector,
