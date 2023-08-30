@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 import { selectSoundEnabled } from "store/application";
 import {
   activeImageIdSelector,

@@ -3,7 +3,7 @@ import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 import { ObjectAnnotationTool } from "annotator-tools";
 
 type ObjectSelectionProps = {

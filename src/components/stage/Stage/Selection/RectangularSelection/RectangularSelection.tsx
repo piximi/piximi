@@ -4,7 +4,7 @@ import * as ReactKonva from "react-konva";
 
 import { useMarchingAnts } from "hooks";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 import { imageOriginSelector } from "store/imageViewer";
 import { RectangularAnnotationTool, SelectionTool } from "annotator-tools";
 

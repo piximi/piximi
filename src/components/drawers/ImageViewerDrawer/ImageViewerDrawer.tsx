@@ -12,7 +12,7 @@ import { AppBarOffset } from "components/styled-components";
 import { ApplicationOptionsList } from "components/lists/ApplicationOptionsList";
 
 import { OpenImageListItem, SaveImageListItem } from "components/list-items";
-import { AnnotatorAppBar } from "components/app-bars";
+import { ImageViewerAppBar } from "components/app-bars";
 
 import {
   selectCreatedAnnotationCategories,
@@ -21,7 +21,7 @@ import {
 
 import { CategoryType } from "types/Category";
 
-export const AnnotatorDrawer = () => {
+export const ImageViewerDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotationCategories);
 
   const annotatorImages = useSelector(selectSelectedImages);
@@ -39,7 +39,7 @@ export const AnnotatorDrawer = () => {
       open
       variant="persistent"
     >
-      <AnnotatorAppBar />
+      <ImageViewerAppBar />
 
       <AppBarOffset />
 

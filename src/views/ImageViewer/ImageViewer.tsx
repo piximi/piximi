@@ -20,7 +20,7 @@ import {
 
 import { StageWrapper } from "../../components/stage/StageWrapper";
 import { ToolOptions } from "../../components/stage/ToolOptions";
-import { AnnotatorDrawer, ToolDrawer } from "components/drawers";
+import { ImageViewerDrawer, ToolDrawer } from "components/drawers";
 
 import {
   alertStateSelector,
@@ -39,7 +39,7 @@ export const StageContext = createContext<React.RefObject<Konva.Stage> | null>(
   null
 );
 
-export const AnnotatorView = () => {
+export const ImageViewer = () => {
   const dispatch = useDispatch();
   const stageRef = useRef<Konva.Stage>(null);
   const [files, setFiles] = useState<FileList>();
@@ -150,7 +150,7 @@ export const AnnotatorView = () => {
 
           <CssBaseline />
 
-          <AnnotatorDrawer />
+          <ImageViewerDrawer />
 
           <StageWrapper
             onDrop={onDrop}

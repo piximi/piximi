@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { StageContext } from "views/AnnotatorView/AnnotatorView";
+import { StageContext } from "views/ImageViewer/ImageViewer";
 
 import {
   selectPenSelectionBrushSize,
