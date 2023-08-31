@@ -10,16 +10,16 @@ export {
 
 // Selectors
 
-export { highlightedCategoriesSelector } from "./selectors/highlightedCategorySelector";
+export { selectHighlightedCategory } from "./selectors/selectHighlightedCategory";
 export {
-  imageSortKeySelector,
+  selectImageSortKey,
   selectImageSortType,
-} from "./selectors/imageSortKeySelector";
-export { projectSelector } from "./selectors/projectSelector";
-export { projectNameSelector } from "./selectors/projectNameSelector";
-export { loadPercentSelector } from "./selectors/loadPercentSelector";
-export { loadMessageSelector } from "./selectors/loadMessageSelector";
-export { selectedImagesIdSelector } from "./selectors/selectedImagesIdSelector";
+} from "./selectors/selectImageSortKey";
+export { selectProject } from "./selectors/selectProject";
+export { selectProjectName } from "./selectors/selectProjectName";
+export { selectLoadPercent } from "./selectors/selectLoadPercent";
+export { selectLoadMessage } from "./selectors/selectLoadMessage";
+export { selectSelectedImagesId } from "./selectors/selectSelectedImagesId";
 export { selectHiddenImageCategoryIds } from "./selectors/selectHiddenImageCategoryIds";
 
 // Sagas

@@ -6,10 +6,10 @@ import * as ReactKonva from "react-konva";
 import { StageContext } from "views/ImageViewer/ImageViewer";
 import { selectSoundEnabled } from "store/application";
 import {
-  activeImageIdSelector,
-  cursorSelector,
+  selectActiveImageId,
+  selectCursor,
   setSelectedAnnotationIds,
-  imageOriginSelector,
+  selectImageOrigin,
   selectActiveAnnotationIds,
   selectWorkingAnnotation,
   imageViewerSlice,
@@ -57,11 +57,11 @@ export const AnnotationTransformer = ({
   const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
   const workingAnnotation = useSelector(selectWorkingAnnotation);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
-  const activeImageId = useSelector(activeImageIdSelector);
-  const cursor = useSelector(cursorSelector);
+  const activeImageId = useSelector(selectActiveImageId);
+  const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
   const imageHeight = useSelector(selectActiveImageHeight);
-  const imageOrigin = useSelector(imageOriginSelector);
+  const imageOrigin = useSelector(selectImageOrigin);
 
   const trRef = useRef<Konva.Transformer | null>(null);
   const saveLabelRef = useRef<Konva.Label>();

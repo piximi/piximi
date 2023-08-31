@@ -10,10 +10,10 @@ import { PayloadAction } from "@reduxjs/toolkit";
 //   selectImagesByPartitions,
 // } from "store/data";
 // import {
-//   segmenterTrainingPercentageSelector,
-//   segmenterFitOptionsSelector,
-//   segmenterPreprocessOptionsSelector,
-//   segmenterCompileOptionsSelector,
+//   selectSegmenterTrainingPercentage,
+//   selectSegmenterFitOptions,
+//   selectSegmenterPreprocessOptions,
+//   selectSegmenterCompileOptions,
 //   segmenterSlice,
 // } from "store/segmenter";
 // import { compile } from "store/coroutines";
@@ -42,19 +42,19 @@ export function* fitSegmenterSaga({
   // )
   //   return;
   // const trainingPercentage: ReturnType<
-  //   typeof segmenterTrainingPercentageSelector
-  // > = yield select(segmenterTrainingPercentageSelector);
+  //   typeof selectSegmenterTrainingPercentage
+  // > = yield select(selectSegmenterTrainingPercentage);
   // const annotatedImages: ReturnType<typeof selectAnnotatedImages> =
   //   yield select(selectAnnotatedImages);
-  // const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
-  //   yield select(segmenterFitOptionsSelector);
+  // const fitOptions: ReturnType<typeof selectSegmenterFitOptions> =
+  //   yield select(selectSegmenterFitOptions);
   // const preprocessingOptions: ReturnType<
-  //   typeof segmenterPreprocessOptionsSelector
-  // > = yield select(segmenterPreprocessOptionsSelector);
+  //   typeof selectSegmenterPreprocessOptions
+  // > = yield select(selectSegmenterPreprocessOptions);
   // const annotationCategories: ReturnType<typeof selectAllAnnotationCategories> =
   //   yield select(selectAllAnnotationCategories);
-  // const compileOptions: ReturnType<typeof segmenterCompileOptionsSelector> =
-  //   yield select(segmenterCompileOptionsSelector);
+  // const compileOptions: ReturnType<typeof selectSegmenterCompileOptions> =
+  //   yield select(selectSegmenterCompileOptions);
   // const categories: ReturnType<typeof selectAllAnnotationCategories> =
   //   yield select(selectAllAnnotationCategories);
   // const partitionSelector: ReturnType<typeof selectImagesByPartitions> = yield select(selectImagesByPartitions)

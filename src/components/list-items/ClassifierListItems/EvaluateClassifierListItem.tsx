@@ -16,8 +16,8 @@ import { EvaluateClassifierDialog } from "components/dialogs";
 import { DisabledListItemButton } from "components/list-items/DisabledListItemButton/DisabledListItemButton";
 
 import {
-  classifierEvaluationResultSelector,
-  classifierModelStatusSelector,
+  selectClassifierEvaluationResult,
+  selectClassifierModelStatus,
   classifierSlice,
 } from "store/classifier";
 import { selectCreatedImageCategories } from "store/data";
@@ -38,8 +38,8 @@ export const EvaluateClassifierListItem = (
   const t = useTranslation();
 
   const categories: Category[] = useSelector(selectCreatedImageCategories);
-  const modelStatus = useSelector(classifierModelStatusSelector);
-  const evaluationResult = useSelector(classifierEvaluationResultSelector);
+  const modelStatus = useSelector(selectClassifierModelStatus);
+  const evaluationResult = useSelector(selectClassifierEvaluationResult);
 
   const [waitingForResults, setWaitingForResults] = useState(false);
 

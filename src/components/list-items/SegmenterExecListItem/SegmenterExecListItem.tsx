@@ -9,7 +9,7 @@ import {
   EvaluateSegmenterListItem,
 } from "../SegmenterListItems";
 
-import { segmenterModelStatusSelector } from "store/segmenter";
+import { selectSegmenterModelStatus } from "store/segmenter";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
@@ -19,7 +19,7 @@ export const SegmenterExecListItem = () => {
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const modelStatus = useSelector(segmenterModelStatusSelector);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained) {

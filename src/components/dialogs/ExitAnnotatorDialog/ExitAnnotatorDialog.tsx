@@ -8,7 +8,7 @@ import {
   Stack,
 } from "@mui/material";
 
-import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 import { dataSlice } from "store/data";
 
 type ExitAnnotatorDialogProps = {
@@ -24,7 +24,7 @@ export const ExitAnnotatorDialog = ({
 }: ExitAnnotatorDialogProps) => {
   const dispatch = useDispatch();
 
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const onSaveChanges = () => {
     batch(() => {

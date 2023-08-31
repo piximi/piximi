@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 import { RectangularAnnotationTool, SelectionTool } from "annotator-tools";
 
 type RectangularSelectionProps = {
@@ -17,7 +17,7 @@ export const RectangularSelection = ({
 }: RectangularSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
-  const imageOrigin = useSelector(imageOriginSelector);
+  const imageOrigin = useSelector(selectImageOrigin);
   const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);

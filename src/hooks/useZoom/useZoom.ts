@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { KonvaEventObject } from "konva/lib/Node";
 
 import {
-  zoomSelectionSelector,
+  selectZoomSelection,
   setZoomSelection,
-  stageWidthSelector,
-  activeImageIdSelector,
+  selectStageWidth,
+  selectActiveImageId,
 } from "store/imageViewer";
 
 import { selectToolType } from "store/annotator/selectors";
-import { zoomToolOptionsSelector } from "store/imageViewer";
+import { selectZoomToolOptions } from "store/imageViewer";
 
 import { Point, ToolType, ZoomModeType } from "types";
 
@@ -20,11 +20,11 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   const [selectStart, setSelectStart] = useState<{ x: number; y: number }>();
 
   const dispatch = useDispatch();
-  const stageWidth = useSelector(stageWidthSelector);
+  const stageWidth = useSelector(selectStageWidth);
   const toolType = useSelector(selectToolType);
-  const { automaticCentering, mode } = useSelector(zoomToolOptionsSelector);
-  const zoomSelection = useSelector(zoomSelectionSelector);
-  const activeImageId = useSelector(activeImageIdSelector);
+  const { automaticCentering, mode } = useSelector(selectZoomToolOptions);
+  const zoomSelection = useSelector(selectZoomSelection);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
     if (!center || !stage) return;

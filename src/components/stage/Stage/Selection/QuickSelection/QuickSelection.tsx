@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { QuickAnnotationTool } from "annotator-tools";
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 
 type QuickSelectionProps = {
   operator: QuickAnnotationTool;
@@ -11,7 +11,7 @@ type QuickSelectionProps = {
 
 export const QuickSelection = ({ operator }: QuickSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
-  const imageOrigin = useSelector(imageOriginSelector);
+  const imageOrigin = useSelector(selectImageOrigin);
 
   useLayoutEffect(() => {
     let timerId: number;

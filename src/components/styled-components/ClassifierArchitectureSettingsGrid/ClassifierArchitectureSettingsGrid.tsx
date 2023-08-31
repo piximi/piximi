@@ -9,8 +9,8 @@ import {
 } from "components/styled-components";
 
 import {
-  classifierInputShapeSelector,
-  classifierSelectedModelIdxSelector,
+  selectClassifierInputShape,
+  selectClassifierSelectedModelIdx,
   classifierSlice,
 } from "store/classifier";
 
@@ -25,8 +25,8 @@ export const ClassifierArchitectureSettingsGrid = ({
 }: ArchitectureSettingsProps) => {
   const dispatch = useDispatch();
 
-  const inputShape = useSelector(classifierInputShapeSelector);
-  const selectedModel = useSelector(classifierSelectedModelIdxSelector);
+  const inputShape = useSelector(selectClassifierInputShape);
+  const selectedModel = useSelector(selectClassifierSelectedModelIdx);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     useState<boolean>(false);

@@ -11,16 +11,16 @@ import {
   TextField,
 } from "@mui/material";
 
-import { classifierSelector } from "store/classifier";
-import { projectSelector, projectSlice } from "store/project";
-import { dataProjectSelector } from "store/data";
+import { selectClassifier } from "store/classifier";
+import { selectProject, projectSlice } from "store/project";
+import { selectDataProject } from "store/data";
 // TODO: implement segmenter serialization
-// import { segmenterSelector } from "store/segmenter";
+// import { selectSegmenter } from "store/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
 import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
-import { segmenterSelector } from "store/segmenter";
+import { selectSegmenter } from "store/segmenter";
 import { saveAs } from "file-saver";
 import { applicationSlice } from "store/application";
 
@@ -35,11 +35,11 @@ export const SaveProjectDialog = ({
 }: SaveProjectDialogProps) => {
   const dispatch = useDispatch();
 
-  const classifier = useSelector(classifierSelector);
-  const segmenter = useSelector(segmenterSelector);
+  const classifier = useSelector(selectClassifier);
+  const segmenter = useSelector(selectSegmenter);
 
-  const project = useSelector(projectSelector);
-  const data = useSelector(dataProjectSelector);
+  const project = useSelector(selectProject);
+  const data = useSelector(selectDataProject);
 
   const [projectName, setProjectName] = useState<string>(project.name);
 

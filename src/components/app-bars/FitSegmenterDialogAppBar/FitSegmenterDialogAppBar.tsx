@@ -18,8 +18,8 @@ import { FitSegmenterProgressBar } from "./FitSegmenterProgressBar";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import {
-  segmenterModelSelector,
-  segmenterModelStatusSelector,
+  selectSegmenterModel,
+  selectSegmenterModelStatus,
   segmenterSlice,
 } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";
@@ -43,8 +43,8 @@ export const FitSegmenterDialogAppBar = ({
 }: FitSegmenterDialogAppBarProps) => {
   const dispatch = useDispatch();
 
-  const selectedModel = useSelector(segmenterModelSelector);
-  const modelStatus = useSelector(segmenterModelStatusSelector);
+  const selectedModel = useSelector(selectSegmenterModel);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
 
   const onStopFitting = () => {
     if (modelStatus !== ModelStatus.Training) return;

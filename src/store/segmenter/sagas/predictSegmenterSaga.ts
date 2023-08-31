@@ -9,9 +9,9 @@ import {
   selectAllAnnotationCategories,
 } from "store/data";
 import {
-  segmenterFitOptionsSelector,
+  selectSegmenterFitOptions,
   segmenterSlice,
-  segmenterModelSelector,
+  selectSegmenterModel,
 } from "store/segmenter";
 import {
   AlertStateType,
@@ -71,12 +71,13 @@ export function* predictSegmenterSaga({
     return category.id !== UNKNOWN_ANNOTATION_CATEGORY_ID;
   });
 
-  const model: ReturnType<typeof segmenterModelSelector> = yield select(
-    segmenterModelSelector
+  const model: ReturnType<typeof selectSegmenterModel> = yield select(
+    selectSegmenterModel
   );
 
-  const fitOptions: ReturnType<typeof segmenterFitOptionsSelector> =
-    yield select(segmenterFitOptionsSelector);
+  const fitOptions: ReturnType<typeof selectSegmenterFitOptions> = yield select(
+    selectSegmenterFitOptions
+  );
 
   yield runPrediction(model, inferenceImages, createdCategories, fitOptions);
 

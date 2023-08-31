@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { ListItem, ListItemText, Typography } from "@mui/material";
 
 import { dataSlice } from "store/data";
-import { activeImageIdSelector, imageViewerSlice } from "store/imageViewer";
+import { selectActiveImageId, imageViewerSlice } from "store/imageViewer";
 import { projectSlice } from "store/project";
 
 import { SerializedFileType } from "types";
@@ -37,7 +37,7 @@ export const OpenExampleImageMenuItem = ({
 }: OpenExampleImageMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const openExampleImage = async () => {
     onClose();

@@ -13,21 +13,21 @@ export { updateModelStatus } from "./classifierSlice";
 
 // Selectors
 
-export { classifierSelector } from "./selectors/classifierSelector";
-export { classifierCompileOptionsSelector } from "./selectors/classifierCompileOptionsSelector";
-export { classifierCropOptionsSelector } from "./selectors/classifierCropOptionsSelector";
-export { classifierEpochsSelector } from "./selectors/classifierEpochsSelector";
-export { classifierEvaluationResultSelector } from "./selectors/classifierEvaluationResultSelector";
-export { classifierFitOptionsSelector } from "./selectors/classifierFitOptionsSelector";
-export { classifierInputShapeSelector } from "./selectors/classifierInputShapeSelector";
-export { classifierPreprocessOptionsSelector } from "./selectors/classifierPreprocessOptionsSelector";
-export { classifierRescaleOptionsSelector } from "./selectors/classifierRescaleOptionsSelector";
-export { classifierShuffleOptionsSelector } from "./selectors/classifierShuffleOptionsSelector";
-export { classifierSelectedModelSelector } from "./selectors/classifierSelectedModelSelector";
-export { classifierHistorySelector } from "./selectors/classifierSelectedModelSelector";
-export { classifierSelectedModelIdxSelector } from "./selectors/classifierSelectedModelIdxSelector";
-export { classifierTrainingPercentageSelector } from "./selectors/classifierTrainingPercentageSelector";
-export { classifierModelStatusSelector } from "./selectors/classifierModelStatusSelector";
+export { selectClassifier } from "./selectors/selectClassifier";
+export { selectClassifierCompileOptions } from "./selectors/selectClassifierCompileOptions";
+export { selectClassifierCropOptions } from "./selectors/selectClassifierCropOptions";
+export { selectClassifierEpochs } from "./selectors/selectClassifierEpochs";
+export { selectClassifierEvaluationResult } from "./selectors/selectClassifierEvaluationResult";
+export { selectClassifierFitOptions } from "./selectors/selectClassifierFitOptions";
+export { selectClassifierInputShape } from "./selectors/selectClassifierInputShape";
+export { selectClassifierPreprocessOptions } from "./selectors/selectClassifierPreprocessOptions";
+export { selectClassifierRescaleOptions } from "./selectors/selectClassifierRescaleOptions";
+export { selectClassifierShuffleOptions } from "./selectors/selectClassifierShuffleOptions";
+export { selectClassifierSelectedModel } from "./selectors/selectClassifierSelectedModel";
+export { selectClassifierHistory } from "./selectors/selectClassifierSelectedModel";
+export { selectClassifierSelectedModelIdx } from "./selectors/selectClassifierSelectedModelIdx";
+export { selectClassifierTrainingPercentage } from "./selectors/selectClassifierTrainingPercentage";
+export { selectClassifierModelStatus } from "./selectors/selectClassifierModelStatus";
 
 // Sagas
 

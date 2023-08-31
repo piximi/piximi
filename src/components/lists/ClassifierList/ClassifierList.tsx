@@ -13,8 +13,8 @@ import { ClassifierExecListItem } from "components/list-items";
 import { CategoriesList } from "components/lists/CategoriesList";
 
 import {
-  classifierModelStatusSelector,
-  classifierSelectedModelSelector,
+  selectClassifierModelStatus,
+  selectClassifierSelectedModel,
   loadUserSelectedModel,
 } from "store/classifier";
 
@@ -29,8 +29,8 @@ import { Model } from "utils/common/models/Model";
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
 
-  const modelStatus = useSelector(classifierModelStatusSelector);
-  const selectedModel = useSelector(classifierSelectedModelSelector);
+  const modelStatus = useSelector(selectClassifierModelStatus);
+  const selectedModel = useSelector(selectClassifierSelectedModel);
 
   const dispatch = useDispatch();
 

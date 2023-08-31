@@ -15,17 +15,14 @@ import {
   StyledFormControl,
 } from "components/styled-components";
 
-import {
-  classifierCropOptionsSelector,
-  classifierSlice,
-} from "store/classifier";
+import { selectClassifierCropOptions, classifierSlice } from "store/classifier";
 
 import { CropSchema } from "types";
 
 import { enumKeys } from "utils";
 
 export const CroppingForm = () => {
-  const cropOptions = useSelector(classifierCropOptionsSelector);
+  const cropOptions = useSelector(selectClassifierCropOptions);
 
   const dispatch = useDispatch();
 

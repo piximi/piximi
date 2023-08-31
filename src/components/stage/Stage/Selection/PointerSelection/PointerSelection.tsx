@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 
 type PointerSelectionProps = {
   dragging: boolean;
@@ -27,7 +27,7 @@ export const PointerSelection = ({
   maximum,
   selecting,
 }: PointerSelectionProps) => {
-  const imagePosition = useSelector(imageOriginSelector);
+  const imagePosition = useSelector(selectImageOrigin);
 
   if (!minimum || !maximum || !selecting || !dragging) return <></>;
 

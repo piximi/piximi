@@ -21,7 +21,7 @@ import { CollapsibleList } from "components/lists";
 
 import { ImageMenu } from "components/menus";
 
-import { activeImageIdSelector, setActiveImageId } from "store/imageViewer";
+import { selectActiveImageId, setActiveImageId } from "store/imageViewer";
 import { selectTotalAnnotationCountByImage } from "store/data";
 
 import { ImageType } from "types";
@@ -50,7 +50,7 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const handleImageItemClick = React.useCallback(
     (image: ImageType) => {

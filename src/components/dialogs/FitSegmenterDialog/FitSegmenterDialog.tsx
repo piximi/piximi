@@ -21,17 +21,17 @@ import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
 import { FitSegmenterDialogAppBar } from "components/app-bars";
 import { ModelSummaryTable } from "components/styled-components";
 
-import { alertStateSelector } from "store/application";
+import { selectAlertState } from "store/application";
 import { selectAnnotatedImages } from "store/data";
 import {
-  segmenterFitOptionsSelector,
-  segmenterCompileOptionsSelector,
-  segmenterTrainingPercentageSelector,
+  selectSegmenterFitOptions,
+  selectSegmenterCompileOptions,
+  selectSegmenterTrainingPercentage,
   segmenterSlice,
-  segmenterModelSelector,
-  segmenterModelStatusSelector,
-  segmenterInputShapeSelector,
-  segmenterHistorySelector,
+  selectSegmenterModel,
+  selectSegmenterModelStatus,
+  selectSegmenterInputShape,
+  selectSegmenterHistory,
 } from "store/segmenter";
 
 import {
@@ -93,14 +93,14 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const [clearModel, setClearModel] = useState(ClearOptions.no);
 
   const annotatedImages = useSelector(selectAnnotatedImages);
-  const selectedModel = useSelector(segmenterModelSelector);
-  const inputShape = useSelector(segmenterInputShapeSelector);
-  const modelStatus = useSelector(segmenterModelStatusSelector);
-  const alertState = useSelector(alertStateSelector);
+  const selectedModel = useSelector(selectSegmenterModel);
+  const inputShape = useSelector(selectSegmenterInputShape);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
+  const alertState = useSelector(selectAlertState);
 
-  const fitOptions = useSelector(segmenterFitOptionsSelector);
-  const compileOptions = useSelector(segmenterCompileOptionsSelector);
-  const trainingPercentage = useSelector(segmenterTrainingPercentageSelector);
+  const fitOptions = useSelector(selectSegmenterFitOptions);
+  const compileOptions = useSelector(selectSegmenterCompileOptions);
+  const trainingPercentage = useSelector(selectSegmenterTrainingPercentage);
 
   const items = useRef([
     "loss",
@@ -111,7 +111,7 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   ]);
 
   const modelHistory = useSelector((state) =>
-    segmenterHistorySelector(state, items.current)
+    selectSegmenterHistory(state, items.current)
   );
 
   const dispatchBatchSizeCallback = (batchSize: number) => {

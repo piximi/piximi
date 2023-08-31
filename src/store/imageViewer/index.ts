@@ -16,27 +16,27 @@ export {
 } from "./imageViewerSlice";
 
 // Selectors
-export { workingAnnotationIdSelector } from "./selectors/workingAnnotationIdSelector";
+export { selectWorkingAnnotationId } from "./selectors/selectWorkingAnnotationId";
 export {
   selectActiveAnnotationIds,
   selectActiveAnnotationIdsCount,
 } from "./selectors/selectActiveAnnotationIds";
-export { selectedAnnotationCategoryIdSelector } from "./selectors/selectedAnnotationCategoryIdSelector";
-export { activeImageIdSelector } from "./selectors/activeImageIdSelector";
-export { activeImageRenderedSrcsSelector } from "./selectors/activeImageRenderedSrcsSelector";
-export { cursorSelector } from "./selectors/cursorSelector";
-export { zoomSelectionSelector } from "./selectors/zoomSelectionSelector";
-export { stageHeightSelector } from "./selectors/stageHeightSelector";
-export { stagePositionSelector } from "./selectors/stagePositionSelector";
-export { stageScaleSelector } from "./selectors/stageScaleSelector";
-export { stageWidthSelector } from "./selectors/stageWidthSelector";
-export { imageOriginSelector } from "./selectors/imageOriginSelector";
+export { selectSelectedAnnotationCategoryId } from "./selectors/selectSelectedAnnotationCategoryId";
+export { selectActiveImageId } from "./selectors/selectActiveImageId";
+export { selectActiveImageRenderedSrcs } from "./selectors/selectActiveImageRenderedSrcs";
+export { selectCursor } from "./selectors/selectCursor";
+export { selectZoomSelection } from "./selectors/selectZoomSelection";
+export { selectStageHeight } from "./selectors/selectStageHeight";
+export { selectStagePosition } from "./selectors/selectStagePosition";
+export { selectStageScale } from "./selectors/selectStageScale";
+export { selectStageWidth } from "./selectors/selectStageWidth";
+export { selectImageOrigin } from "./selectors/selectImageOrigin";
 export { selectHiddenAnnotationCategoryIds } from "./selectors/selectHiddenAnnotationCategoryIds";
 export {
   selectSelectedAnnotationIds,
   selectSelectedAnnotationIdsCount,
 } from "./selectors/selectSelectedAnnotationIds";
 export { selectColorAdjustments } from "./selectors/selectColorAdjustments";
-export { zoomToolOptionsSelector } from "./selectors/zoomToolOptionsSelector";
+export { selectZoomToolOptions } from "./selectors/selectZoomToolOptions";
 export { selectWorkingAnnotation } from "./selectors/selectWorkingAnnotation";
 export { selectImageIsloading } from "./selectors/selectImageIsLoading";

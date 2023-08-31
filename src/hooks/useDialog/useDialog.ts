@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-  alertStateSelector,
+  selectAlertState,
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
@@ -11,7 +11,7 @@ import { AlertType, HotkeyView } from "types";
 export const useDialog = (closeOnError: boolean = true) => {
   const [open, setOpen] = useState(false);
 
-  const alertState = useSelector(alertStateSelector);
+  const alertState = useSelector(selectAlertState);
 
   React.useEffect(() => {
     if (

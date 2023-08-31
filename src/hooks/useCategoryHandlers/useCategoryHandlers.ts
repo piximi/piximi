@@ -13,7 +13,7 @@ import {
 } from "store/data";
 
 import {
-  activeImageIdSelector,
+  selectActiveImageId,
   imageViewerSlice,
   selectHiddenAnnotationCategoryIds,
 } from "store/imageViewer";
@@ -53,7 +53,7 @@ export const useCategoryHandlers = (
   const activeAnnotationCountsByCategory = useSelector(
     selectActiveAnnotationCountsByCategory
   );
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const handleSelectCategory = useCallback(
     (category: Category) => {

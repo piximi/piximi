@@ -4,7 +4,7 @@ import { put, select } from "redux-saga/effects";
 import { applicationSlice } from "store/application";
 import {
   classifierSlice,
-  classifierSelectedModelSelector,
+  selectClassifierSelectedModel,
 } from "store/classifier";
 import { selectCreatedImageCategories } from "store/data";
 import { AlertStateType, AlertType } from "types";
@@ -25,8 +25,9 @@ export function* evaluateClassifierSaga({
     yield select(selectCreatedImageCategories);
   yield put(applicationSlice.actions.hideAlertState({}));
 
-  const model: ReturnType<typeof classifierSelectedModelSelector> =
-    yield select(classifierSelectedModelSelector);
+  const model: ReturnType<typeof selectClassifierSelectedModel> = yield select(
+    selectClassifierSelectedModel
+  );
 
   if (!model.validationLoaded) {
     yield put(

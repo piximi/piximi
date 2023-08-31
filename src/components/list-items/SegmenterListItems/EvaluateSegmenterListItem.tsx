@@ -14,7 +14,7 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/list-items/DisabledListItemButton";
 
-import { segmenterModelStatusSelector, segmenterSlice } from "store/segmenter";
+import { selectSegmenterModelStatus, segmenterSlice } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";
 
 type EvaluateSegmenterListItemProps = {
@@ -28,7 +28,7 @@ export const EvaluateSegmenterListItem = (
   const dispatch = useDispatch();
   const t = useTranslation();
 
-  const modelStatus = useSelector(segmenterModelStatusSelector);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
 
   const [waitingForResults, setWaitingForResults] = React.useState(false);
 

@@ -7,11 +7,11 @@ import { ProjectToolbar } from "../ProjectToolbar";
 
 import { AlertDialog } from "components/dialogs";
 
-import { alertStateSelector } from "store/application";
+import { selectAlertState } from "store/application";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const ProjectAppBar = () => {
-  const alertState = useSelector(alertStateSelector);
+  const alertState = useSelector(selectAlertState);
 
   return (
     <Box>

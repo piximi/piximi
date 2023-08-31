@@ -18,7 +18,7 @@ import { CollapsibleList } from "components/lists";
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 import { Palette } from "../Palette";
 
-import { activeImageIdSelector } from "store/imageViewer";
+import { selectActiveImageId } from "store/imageViewer";
 
 import {
   dataSlice,
@@ -33,7 +33,7 @@ export const ChannelsList = () => {
   const dispatch = useDispatch();
 
   const imageData = useSelector(selectActiveImageData);
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const imageBitDepth = useSelector(selectActiveImageBitDepth);
 

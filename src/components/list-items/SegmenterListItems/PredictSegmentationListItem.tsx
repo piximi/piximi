@@ -14,7 +14,7 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/list-items/DisabledListItemButton";
 
-import { segmenterSlice, segmenterModelStatusSelector } from "store/segmenter";
+import { segmenterSlice, selectSegmenterModelStatus } from "store/segmenter";
 import { ModelStatus } from "types/ModelType";
 
 type PredictSegmenterListItemProps = {
@@ -37,7 +37,7 @@ export const PredictSegmenterListItem = (
     );
   };
 
-  const modelStatus = useSelector(segmenterModelStatusSelector);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
 
   return (
     <Grid item xs={4}>

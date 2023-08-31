@@ -22,9 +22,9 @@ import { Selection } from "./Selection";
 import { Annotations } from "./Annotations";
 
 import {
-  stagePositionSelector,
+  selectStagePosition,
   setImageOrigin,
-  activeImageRenderedSrcsSelector,
+  selectActiveImageRenderedSrcs,
   imageViewerSlice,
   selectImageIsloading,
 } from "store/imageViewer";
@@ -57,12 +57,12 @@ export const Stage = ({
 
   // useSelector
   const toolType = useSelector(selectToolType);
-  const stagePosition = useSelector(stagePositionSelector);
+  const stagePosition = useSelector(selectStagePosition);
   const imageWidth = useSelector(selectActiveImageWidth);
   const imageHeight = useSelector(selectActiveImageHeight);
   const imageIsLoading = useSelector(selectImageIsloading);
   const annotationState = useSelector(selectAnnotationState);
-  const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
+  const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
 
   const { annotationTool } = useAnnotationTool();
   useAnnotationState(annotationTool);

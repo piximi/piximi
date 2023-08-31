@@ -3,10 +3,10 @@ import { put, select } from "redux-saga/effects";
 
 import {
   classifierSlice,
-  classifierFitOptionsSelector,
-  classifierPreprocessOptionsSelector,
-  classifierSelectedModelSelector,
-  classifierInputShapeSelector,
+  selectClassifierFitOptions,
+  selectClassifierPreprocessOptions,
+  selectClassifierSelectedModel,
+  selectClassifierInputShape,
 } from "store/classifier";
 import { applicationSlice } from "store/application";
 import {
@@ -43,17 +43,17 @@ export function* predictClassifierSaga({
     yield select(selectCreatedImageCategories);
 
   const preprocessOptions: ReturnType<
-    typeof classifierPreprocessOptionsSelector
-  > = yield select(classifierPreprocessOptionsSelector);
+    typeof selectClassifierPreprocessOptions
+  > = yield select(selectClassifierPreprocessOptions);
 
-  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
-    yield select(classifierFitOptionsSelector);
+  const fitOptions: ReturnType<typeof selectClassifierFitOptions> =
+    yield select(selectClassifierFitOptions);
 
-  const inputShape: ReturnType<typeof classifierInputShapeSelector> =
-    yield select(classifierInputShapeSelector);
+  const inputShape: ReturnType<typeof selectClassifierInputShape> =
+    yield select(selectClassifierInputShape);
 
-  let model: ReturnType<typeof classifierSelectedModelSelector> = yield select(
-    classifierSelectedModelSelector
+  let model: ReturnType<typeof selectClassifierSelectedModel> = yield select(
+    selectClassifierSelectedModel
   );
 
   let finalModelStatus = ModelStatus.Trained;

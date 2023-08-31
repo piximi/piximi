@@ -9,7 +9,7 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { activeImageIdSelector } from "store/imageViewer";
+import { selectActiveImageId } from "store/imageViewer";
 import {
   dataSlice,
   selectActiveImageData,
@@ -27,7 +27,7 @@ export const ColorAdjustmentOptions = () => {
 
   const imageData = useSelector(selectActiveImageData);
 
-  const imageId = useSelector(activeImageIdSelector);
+  const imageId = useSelector(selectActiveImageId);
 
   const onResetChannelsClick = async () => {
     if (!imageShape || !imageData) return;

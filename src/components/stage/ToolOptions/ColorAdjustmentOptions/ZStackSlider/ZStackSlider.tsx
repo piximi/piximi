@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { activeImageRenderedSrcsSelector } from "store/imageViewer";
+import { selectActiveImageRenderedSrcs } from "store/imageViewer";
 import {
   dataSlice,
   selectActiveImage,
@@ -14,7 +14,7 @@ export const ZStackSlider = () => {
   const dispatch = useDispatch();
   const activeImage = useSelector(selectActiveImage);
   const activePlane = useSelector(selectActiveImageActivePlane);
-  const renderedSrcs = useSelector(activeImageRenderedSrcsSelector);
+  const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
 
   if (!activeImage || activeImage!.shape.planes === 1)
     return <React.Fragment />;

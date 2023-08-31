@@ -11,14 +11,14 @@ import { ImageGridAppBar } from "components/app-bars";
 
 import {
   updateHighlightedCategory,
-  highlightedCategoriesSelector,
-  selectedImagesIdSelector,
+  selectHighlightedCategory,
+  selectSelectedImagesId,
 } from "store/project";
 
 import {
-  imageSelectionColorSelector,
+  selectImageSelectionColor,
   registerHotkeyView,
-  selectedImageBorderWidthSelector,
+  selectSelectedImageBorderWidth,
   unregisterHotkeyView,
 } from "store/application";
 
@@ -62,12 +62,10 @@ type ImageGridProps = {
 
 export const ImageGrid = ({ onDrop }: ImageGridProps) => {
   const images = useSelector(selectVisibleImages);
-  const imageSelectionColor = useSelector(imageSelectionColorSelector);
-  const selectedImageBorderWidth = useSelector(
-    selectedImageBorderWidthSelector
-  );
-  const highlightedCategory = useSelector(highlightedCategoriesSelector);
-  const selectedImages = useSelector(selectedImagesIdSelector);
+  const imageSelectionColor = useSelector(selectImageSelectionColor);
+  const selectedImageBorderWidth = useSelector(selectSelectedImageBorderWidth);
+  const highlightedCategory = useSelector(selectHighlightedCategory);
+  const selectedImages = useSelector(selectSelectedImagesId);
   const max_images = 1000; //number of images from the project that we'll show
   const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
   const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();

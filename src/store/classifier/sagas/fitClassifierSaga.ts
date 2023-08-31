@@ -5,12 +5,12 @@ import { put, select } from "redux-saga/effects";
 
 import {
   classifierSlice,
-  classifierCompileOptionsSelector,
-  classifierFitOptionsSelector,
-  classifierPreprocessOptionsSelector,
-  classifierTrainingPercentageSelector,
-  classifierSelectedModelSelector,
-  classifierInputShapeSelector,
+  selectClassifierCompileOptions,
+  selectClassifierFitOptions,
+  selectClassifierPreprocessOptions,
+  selectClassifierTrainingPercentage,
+  selectClassifierSelectedModel,
+  selectClassifierInputShape,
 } from "store/classifier";
 import {
   dataSlice,
@@ -34,7 +34,7 @@ function* assignDataPartitions({
   categorizedImages,
   trainingPercentage,
 }: {
-  preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
+  preprocessOptions: ReturnType<typeof selectClassifierPreprocessOptions>;
   categorizedImages: ReturnType<ReturnType<typeof selectImagesByPartitions>>;
   trainingPercentage: number;
 }) {
@@ -73,10 +73,10 @@ function* loadClassifier({
   numClasses,
 }: {
   model: SequentialClassifier;
-  inputShape: ReturnType<typeof classifierInputShapeSelector>;
-  preprocessOptions: ReturnType<typeof classifierPreprocessOptionsSelector>;
-  compileOptions: ReturnType<typeof classifierCompileOptionsSelector>;
-  fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
+  inputShape: ReturnType<typeof selectClassifierInputShape>;
+  preprocessOptions: ReturnType<typeof selectClassifierPreprocessOptions>;
+  compileOptions: ReturnType<typeof selectClassifierCompileOptions>;
+  fitOptions: ReturnType<typeof selectClassifierFitOptions>;
   numClasses: number;
 }) {
   try {
@@ -139,7 +139,7 @@ function* fitClassifier({
 }: {
   model: SequentialClassifier;
   onEpochEnd?: TrainingCallbacks["onEpochEnd"];
-  fitOptions: ReturnType<typeof classifierFitOptionsSelector>;
+  fitOptions: ReturnType<typeof selectClassifierFitOptions>;
 }) {
   try {
     if (!onEpochEnd) {
@@ -194,8 +194,8 @@ export function* fitClassifierSaga({
     console.log("tensorflow flags:", ENV.features);
 
   const trainingPercentage: ReturnType<
-    typeof classifierTrainingPercentageSelector
-  > = yield select(classifierTrainingPercentageSelector);
+    typeof selectClassifierTrainingPercentage
+  > = yield select(selectClassifierTrainingPercentage);
 
   const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
     yield select(selectImagesByPartitions);
@@ -204,23 +204,23 @@ export function* fitClassifierSaga({
     Partition.Validation,
   ]);
 
-  const fitOptions: ReturnType<typeof classifierFitOptionsSelector> =
-    yield select(classifierFitOptionsSelector);
+  const fitOptions: ReturnType<typeof selectClassifierFitOptions> =
+    yield select(selectClassifierFitOptions);
 
   const preprocessOptions: ReturnType<
-    typeof classifierPreprocessOptionsSelector
-  > = yield select(classifierPreprocessOptionsSelector);
+    typeof selectClassifierPreprocessOptions
+  > = yield select(selectClassifierPreprocessOptions);
 
-  const inputShape: ReturnType<typeof classifierInputShapeSelector> =
-    yield select(classifierInputShapeSelector);
+  const inputShape: ReturnType<typeof selectClassifierInputShape> =
+    yield select(selectClassifierInputShape);
 
   const numClasses: number = yield select(selectCreatedImageCategoryCount);
 
-  const selectedModel: ReturnType<typeof classifierSelectedModelSelector> =
-    yield select(classifierSelectedModelSelector);
+  const selectedModel: ReturnType<typeof selectClassifierSelectedModel> =
+    yield select(selectClassifierSelectedModel);
 
-  const compileOptions: ReturnType<typeof classifierCompileOptionsSelector> =
-    yield select(classifierCompileOptionsSelector);
+  const compileOptions: ReturnType<typeof selectClassifierCompileOptions> =
+    yield select(selectClassifierCompileOptions);
 
   // if Unititialized -> InitFit, then load first, else skip straight to training
   if (modelStatus === ModelStatus.InitFit) {

@@ -15,10 +15,7 @@ import { useTranslation } from "hooks";
 
 import { DisabledListItemButton } from "components/list-items/DisabledListItemButton/DisabledListItemButton";
 
-import {
-  classifierSlice,
-  classifierModelStatusSelector,
-} from "store/classifier";
+import { classifierSlice, selectClassifierModelStatus } from "store/classifier";
 import { ModelStatus } from "types/ModelType";
 
 type PredictClassifierListItemProps = {
@@ -32,7 +29,7 @@ export const PredictClassifierListItem = (
   const t = useTranslation();
   const dispatch = useDispatch();
 
-  const modelStatus = useSelector(classifierModelStatusSelector);
+  const modelStatus = useSelector(selectClassifierModelStatus);
 
   const onPredict = () => {
     dispatch(

@@ -9,8 +9,8 @@ import {
 } from "components/styled-components";
 
 import {
-  segmenterModelIdxSelector,
-  segmenterInputShapeSelector,
+  selectSegmenterModelIdx,
+  selectSegmenterInputShape,
   segmenterSlice,
 } from "store/segmenter";
 
@@ -25,8 +25,8 @@ export const SegmenterArchitectureSettingsGrid = ({
 }: ArchitectureSettingsProps) => {
   const dispatch = useDispatch();
 
-  const selectedModel = useSelector(segmenterModelIdxSelector);
-  const inputShape = useSelector(segmenterInputShapeSelector);
+  const selectedModel = useSelector(selectSegmenterModelIdx);
+  const inputShape = useSelector(selectSegmenterInputShape);
 
   const [fixedNumberOfChannels, setFixedNumberOfChannels] =
     useState<boolean>(false);

@@ -10,12 +10,12 @@ import {
 } from "@mui/material";
 
 import {
-  classifierRescaleOptionsSelector,
+  selectClassifierRescaleOptions,
   classifierSlice,
 } from "store/classifier";
 
 export const RescalingForm = () => {
-  const rescaleOptions = useSelector(classifierRescaleOptionsSelector);
+  const rescaleOptions = useSelector(selectClassifierRescaleOptions);
 
   const dispatch = useDispatch();
 
