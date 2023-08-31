@@ -1,6 +1,6 @@
 export { dataSlice } from "./dataSlice";
 
-export { dataProjectSelector } from "./selectors/dataProjectSelector";
+export { selectDataProject } from "./selectors/selectDataProject";
 export {
   selectAllImages,
   selectSelectedImages,

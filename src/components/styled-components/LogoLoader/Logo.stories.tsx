@@ -4,10 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { LogoLoader } from "./LogoLoader";
 import { Box, Button, Slider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  classifierModelStatusSelector,
-  classifierSlice,
-} from "store/classifier";
+import { selectClassifierModelStatus, classifierSlice } from "store/classifier";
 import { ModelStatus } from "types/ModelType";
 
 const Controller = ({
@@ -20,7 +17,7 @@ const Controller = ({
   fullLogo: boolean;
 }) => {
   const dispatch = useDispatch();
-  const modelStatus = useSelector(classifierModelStatusSelector);
+  const modelStatus = useSelector(selectClassifierModelStatus);
   const [sliderVal, setSliderVal] = useState(100);
 
   const flipLoad = (newStatus: ModelStatus) => {

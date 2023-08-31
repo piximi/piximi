@@ -5,7 +5,7 @@ import { selectAllAnnotationCategories } from "store/data";
 import {
   imageViewerSlice,
   setSelectedCategoryId,
-  activeImageIdSelector,
+  selectActiveImageId,
 } from "store/imageViewer";
 
 import { annotatorSlice } from "store/annotator";
@@ -59,7 +59,7 @@ export const useAnnotatorKeyboardShortcuts = ({
 
   const annotationCategories = useSelector(selectAllAnnotationCategories);
   const images = useSelector(selectSelectedImages);
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeAnnotations = useSelector(selectActiveAnnotations);
 

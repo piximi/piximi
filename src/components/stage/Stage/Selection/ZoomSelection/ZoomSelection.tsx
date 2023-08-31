@@ -3,12 +3,11 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { zoomSelectionSelector } from "store/imageViewer";
+import { selectZoomSelection } from "store/imageViewer";
 
 export const ZoomSelection = () => {
-  const { dragging, minimum, maximum, selecting } = useSelector(
-    zoomSelectionSelector
-  );
+  const { dragging, minimum, maximum, selecting } =
+    useSelector(selectZoomSelection);
   const stageRef = useContext(StageContext);
 
   if (!minimum || !maximum || !selecting || !dragging) return <></>;

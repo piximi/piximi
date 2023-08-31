@@ -30,11 +30,11 @@ import { ImageCategoryMenu } from "../../menus/ImageCategoryMenu";
 import { TooltipTitle } from "components/tooltips";
 
 import {
-  hotkeyViewSelector,
+  selectHotkeyView,
   registerHotkeyView,
   unregisterHotkeyView,
 } from "store/application";
-import { projectSlice, selectedImagesIdSelector } from "store/project";
+import { projectSlice, selectSelectedImagesId } from "store/project";
 import { dataSlice, selectVisibleImages } from "store/data";
 import { setActiveImageId } from "store/imageViewer";
 
@@ -45,10 +45,8 @@ export const ImageGridAppBar = () => {
   const navigate = useNavigate();
 
   const images = useSelector(selectVisibleImages);
-  const selectedImagesIds: Array<string> = useSelector(
-    selectedImagesIdSelector
-  );
-  const currentHotkeyView = useSelector(hotkeyViewSelector);
+  const selectedImagesIds: Array<string> = useSelector(selectSelectedImagesId);
+  const currentHotkeyView = useSelector(selectHotkeyView);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);

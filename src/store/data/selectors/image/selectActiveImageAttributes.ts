@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { activeImageIdSelector } from "store/imageViewer/selectors/activeImageIdSelector";
+import { selectActiveImageId } from "store/imageViewer/selectors/selectActiveImageId";
 import { selectImageEntities } from "./imageSelectors";
 
 import { ImageAttributeType, ImageType, Colors, ColorsRaw } from "types";
@@ -9,7 +9,7 @@ import { getProperty } from "store/entities/utils";
 import { generateBlankColors } from "utils/common/image";
 
 export const selectActiveImage = createSelector(
-  [activeImageIdSelector, selectImageEntities],
+  [selectActiveImageId, selectImageEntities],
   (activeImageId, imageEntities): ImageType | undefined => {
     if (!activeImageId) return;
     return imageEntities[activeImageId];

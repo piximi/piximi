@@ -13,12 +13,12 @@ import { UploadButton } from "components/controls";
 import { LogoLoader } from "components/styled-components";
 
 import { applicationSlice } from "store/application";
-import { loadMessageSelector, loadPercentSelector } from "store/project";
+import { selectLoadMessage, selectLoadPercent } from "store/project";
 
 export const ProjectToolbar = () => {
   const dispatch = useDispatch();
-  const loadPercent = useSelector(loadPercentSelector);
-  const loadMessage = useSelector(loadMessageSelector);
+  const loadPercent = useSelector(selectLoadPercent);
+  const loadMessage = useSelector(selectLoadMessage);
   const [value, setValue] = useState<number>(1);
   const minZoom = 0.6;
   const maxZoom = 4;

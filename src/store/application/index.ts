@@ -7,13 +7,13 @@ export {
 
 // Selectors
 
-export { initSelector } from "./selectors/initSelector";
-export { alertStateSelector } from "./selectors/alertStateSelector";
-export { hotkeyViewSelector } from "./selectors/hotkeyViewSelector";
-export { imageSelectionColorSelector } from "./selectors/imageSelectionColorSelector";
-export { selectedImageBorderWidthSelector } from "./selectors/selectedImageBorderWidthSelector";
-export { themeModeSelector } from "./selectors/themeModeSelector";
-export { tileSizeSelector } from "./selectors/tileSizeSelector";
+export { selectInitSettings } from "./selectors/selectInitSettings";
+export { selectAlertState } from "./selectors/selectAlertState";
+export { selectHotkeyView } from "./selectors/selectHotkeyView";
+export { selectImageSelectionColor } from "./selectors/selectImageSelectionColor";
+export { selectSelectedImageBorderWidth } from "./selectors/selectSelectedImageBorderWidth";
+export { selectThemeMode } from "./selectors/selectThemeMode";
+export { selectTileSize } from "./selectors/selectTileSize";
 export { selectLanguageType } from "./selectors/selectLanguageType";
 export { selectSoundEnabled } from "./selectors/selectSoundEnabled";
 

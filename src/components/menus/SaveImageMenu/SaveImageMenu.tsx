@@ -14,7 +14,7 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import { projectNameSelector } from "store/project";
+import { selectProjectName } from "store/project";
 import {
   selectAllImageCategories,
   selectAllAnnotationCategories,
@@ -73,7 +73,7 @@ export const SaveImageMenu = ({
   const annotations = useSelector(selectAllAnnotations);
   const annotationCategories = useSelector(selectAllAnnotationCategories);
   const categories = useSelector(selectAllImageCategories);
-  const projectName = useSelector(projectNameSelector);
+  const projectName = useSelector(selectProjectName);
 
   const {
     anchorEl: subMenuAnchorEl,

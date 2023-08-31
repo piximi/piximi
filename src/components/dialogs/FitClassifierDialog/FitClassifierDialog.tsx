@@ -25,16 +25,16 @@ import {
 } from "components/list-items";
 import { AlertDialog, DialogTransitionSlide } from "components/dialogs";
 
-import { alertStateSelector } from "store/application";
+import { selectAlertState } from "store/application";
 import {
-  classifierSelectedModelSelector,
-  classifierHistorySelector,
-  classifierModelStatusSelector,
-  classifierCompileOptionsSelector,
-  classifierFitOptionsSelector,
-  classifierTrainingPercentageSelector,
+  selectClassifierSelectedModel,
+  selectClassifierHistory,
+  selectClassifierModelStatus,
+  selectClassifierCompileOptions,
+  selectClassifierFitOptions,
+  selectClassifierTrainingPercentage,
   classifierSlice,
-  classifierInputShapeSelector,
+  selectClassifierInputShape,
 } from "store/classifier";
 import { selectImagesByPartitions } from "store/data";
 
@@ -103,14 +103,14 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     Partition.Inference,
   ]);
 
-  const selectedModel = useSelector(classifierSelectedModelSelector);
-  const inputShape = useSelector(classifierInputShapeSelector);
-  const modelStatus = useSelector(classifierModelStatusSelector);
-  const alertState = useSelector(alertStateSelector);
+  const selectedModel = useSelector(selectClassifierSelectedModel);
+  const inputShape = useSelector(selectClassifierInputShape);
+  const modelStatus = useSelector(selectClassifierModelStatus);
+  const alertState = useSelector(selectAlertState);
 
-  const fitOptions = useSelector(classifierFitOptionsSelector);
-  const compileOptions = useSelector(classifierCompileOptionsSelector);
-  const trainingPercentage = useSelector(classifierTrainingPercentageSelector);
+  const fitOptions = useSelector(selectClassifierFitOptions);
+  const compileOptions = useSelector(selectClassifierCompileOptions);
+  const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
 
   const items = useRef([
     "loss",
@@ -121,7 +121,7 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
   ]);
 
   const modelHistory = useSelector((state) =>
-    classifierHistorySelector(state, items.current)
+    selectClassifierHistory(state, items.current)
   );
 
   const dispatchBatchSizeCallback = (batchSize: number) => {

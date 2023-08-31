@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 
 import {
-  classifierShuffleOptionsSelector,
+  selectClassifierShuffleOptions,
   classifierSlice,
 } from "store/classifier";
 
@@ -19,7 +19,7 @@ export const ShuffleForm = ({
 }: {
   isModelTrainable?: boolean;
 }) => {
-  const shuffle = useSelector(classifierShuffleOptionsSelector);
+  const shuffle = useSelector(selectClassifierShuffleOptions);
 
   const dispatch = useDispatch();
 

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { StageContext } from "views/ImageViewer/ImageViewer";
 import { PenAnnotationToolTip } from "components/stage/Stage/PenAnnotationToolTip";
 
-import { cursorSelector } from "store/imageViewer";
+import { selectCursor } from "store/imageViewer";
 
 import { AnnotationStateType, Point, ToolType } from "types";
 
@@ -26,7 +26,7 @@ export const Cursor = ({
   toolType,
 }: CursorProps) => {
   const stageRef = useContext(StageContext);
-  const cursor = useSelector(cursorSelector);
+  const cursor = useSelector(selectCursor);
   useEffect(() => {
     if (!stageRef || !stageRef.current) return;
 

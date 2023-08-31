@@ -15,8 +15,8 @@ import { SegmenterExecListItem } from "components/list-items";
 import { selectCreatedAnnotationCategories } from "store/data";
 
 import {
-  segmenterModelSelector,
-  segmenterModelStatusSelector,
+  selectSegmenterModel,
+  selectSegmenterModelStatus,
   segmenterSlice,
 } from "store/segmenter";
 
@@ -30,8 +30,8 @@ export const SegmenterList = () => {
   const dispatch = useDispatch();
 
   const categories = useSelector(selectCreatedAnnotationCategories);
-  const selectedModel = useSelector(segmenterModelSelector);
-  const modelStatus = useSelector(segmenterModelStatusSelector);
+  const selectedModel = useSelector(selectSegmenterModel);
+  const modelStatus = useSelector(selectSegmenterModelStatus);
 
   const {
     onClose: onCloseImportSegmenterDialog,

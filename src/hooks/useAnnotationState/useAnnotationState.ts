@@ -8,8 +8,8 @@ import {
   selectAnnotationCategoryById,
 } from "store/data";
 import {
-  activeImageIdSelector,
-  selectedAnnotationCategoryIdSelector,
+  selectActiveImageId,
+  selectSelectedAnnotationCategoryId,
 } from "store/imageViewer";
 import { RootState } from "store/reducer/reducer";
 import { AnnotationModeType, AnnotationStateType } from "types";
@@ -18,9 +18,9 @@ export const useAnnotationState = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
   const selectionMode = useSelector(selectAnnotationSelectionMode);
   const activeImagePlane = useSelector(selectActiveImageActivePlane);
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
   const selectedAnnotationCategoryId = useSelector(
-    selectedAnnotationCategoryIdSelector
+    selectSelectedAnnotationCategoryId
   );
   const selectedCategory = useSelector((state: RootState) =>
     selectAnnotationCategoryById(state, selectedAnnotationCategoryId!)

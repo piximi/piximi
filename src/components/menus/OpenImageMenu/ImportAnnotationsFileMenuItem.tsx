@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 import {
   dataSlice,
   selectAllImageCategories,
@@ -27,7 +27,7 @@ export const ImportAnnotationsFileMenuItem = ({
 }: ImportAnnotationsMenuItemProps) => {
   const dispatch = useDispatch();
 
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const existingAnnotationCategories = useSelector(selectAllImageCategories);
 

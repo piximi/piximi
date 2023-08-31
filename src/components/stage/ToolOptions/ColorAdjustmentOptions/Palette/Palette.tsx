@@ -8,7 +8,7 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { activeImageIdSelector } from "store/imageViewer";
+import { selectActiveImageId } from "store/imageViewer";
 import { dataSlice, selectActiveImageRawColor } from "store/data";
 
 import { DEFAULT_COLORS } from "types";
@@ -25,7 +25,7 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
   const open = Boolean(anchorEl);
 
   const colors = useSelector(selectActiveImageRawColor);
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const dispatch = useDispatch();
 

@@ -6,7 +6,7 @@ import { selectImagesByPartitions } from "store/data";
 
 import {
   segmenterSlice,
-  //segmenterModelSelector,
+  //selectSegmenterModel,
 } from "store/segmenter";
 
 import { AlertType, /*AlertStateType,*/ Partition } from "types";
@@ -18,8 +18,8 @@ export function* evaluateSegmenterSaga({
 }: PayloadAction<{ execSaga: boolean; modelStatus: ModelStatus }>) {
   if (!execSaga || modelStatus !== ModelStatus.Evaluating) return;
 
-  // const model: ReturnType<typeof segmenterModelSelector> = yield select(
-  //   segmenterModelSelector
+  // const model: ReturnType<typeof selectSegmenterModel> = yield select(
+  //   selectSegmenterModel
   //);
 
   const partitionSelector: ReturnType<typeof selectImagesByPartitions> =

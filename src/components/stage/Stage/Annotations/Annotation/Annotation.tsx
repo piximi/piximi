@@ -4,7 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 import Image from "image-js";
 
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 
 import { DecodedAnnotationType, Shape } from "types";
 
@@ -28,7 +28,7 @@ export const Annotation = ({
   const [imageWidth] = useState<number>(imageShape.width);
   const [imageHeight] = useState<number>(imageShape.height);
   const [imageMask, setImageMask] = useState<HTMLImageElement>();
-  const imagePosition = useSelector(imageOriginSelector);
+  const imagePosition = useSelector(selectImageOrigin);
   const dispatch = useDispatch();
 
   useEffect(() => {

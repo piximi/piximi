@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
 import { ColorAnnotationTool } from "annotator-tools";
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;
@@ -13,7 +13,7 @@ type ColorSelectionProps = {
 
 export const ColorSelection = ({ operator }: ColorSelectionProps) => {
   const [image, setImage] = useState<HTMLImageElement>();
-  const imagePosition = useSelector(imageOriginSelector);
+  const imagePosition = useSelector(selectImageOrigin);
 
   useLayoutEffect(() => {
     let timerId: number;

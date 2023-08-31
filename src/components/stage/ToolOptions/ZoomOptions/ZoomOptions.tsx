@@ -25,10 +25,10 @@ import { useTranslation, useZoom } from "hooks";
 import { StageContext } from "views/ImageViewer/ImageViewer";
 import {
   setStagePosition,
-  stageHeightSelector,
-  stageWidthSelector,
-  zoomSelectionSelector,
-  zoomToolOptionsSelector,
+  selectStageHeight,
+  selectStageWidth,
+  selectZoomSelection,
+  selectZoomToolOptions,
   setZoomToolOptions,
 } from "store/imageViewer";
 import { selectActiveImage } from "store/data";
@@ -45,12 +45,12 @@ import {
 export const ZoomOptions = () => {
   const dispatch = useDispatch();
 
-  const options = useSelector(zoomToolOptionsSelector);
-  const stageWidth = useSelector(stageWidthSelector);
-  const stageHeight = useSelector(stageHeightSelector);
+  const options = useSelector(selectZoomToolOptions);
+  const stageWidth = useSelector(selectStageWidth);
+  const stageHeight = useSelector(selectStageHeight);
   const stageRef = useContext(StageContext);
   const image = useSelector(selectActiveImage);
-  const { centerPoint } = useSelector(zoomSelectionSelector);
+  const { centerPoint } = useSelector(selectZoomSelection);
 
   const t = useTranslation();
 

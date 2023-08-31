@@ -9,7 +9,7 @@ import {
   EvaluateClassifierListItem,
 } from "../ClassifierListItems";
 
-import { classifierModelStatusSelector } from "store/classifier";
+import { selectClassifierModelStatus } from "store/classifier";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
@@ -19,7 +19,7 @@ export const ClassifierExecListItem = () => {
   const [helperText, setHelperText] =
     React.useState<string>("No trained model");
 
-  const modelStatus = useSelector(classifierModelStatusSelector);
+  const modelStatus = useSelector(selectClassifierModelStatus);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained) {

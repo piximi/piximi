@@ -5,7 +5,7 @@ import { Box, Grid } from "@mui/material";
 
 import { ImageIconLabel } from "../ImageGrid/ImageIconLabel";
 
-import { tileSizeSelector } from "store/application";
+import { selectTileSize } from "store/application";
 import { projectSlice } from "store/project";
 import { ImageType } from "types";
 
@@ -24,7 +24,7 @@ export const ImageGridItem = memo(
     selectedImageBorderWidth,
   }: ImageGridItemProps) => {
     const dispatch = useDispatch();
-    const scaleFactor = useSelector(tileSizeSelector);
+    const scaleFactor = useSelector(selectTileSize);
 
     const getSize = (scaleFactor: number) => {
       const sideLength = (220 * scaleFactor).toString() + "px";

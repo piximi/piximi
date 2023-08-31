@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 import { PolygonalAnnotationTool } from "annotator-tools";
 
 type PolygonalSelectionProps = {
@@ -16,7 +16,7 @@ export const PolygonalSelection = ({ operator }: PolygonalSelectionProps) => {
   const dashOffset = useMarchingAnts();
 
   const stageScale = useContext(StageContext)?.current?.scaleX() ?? 1;
-  const imageOrigin = useSelector(imageOriginSelector);
+  const imageOrigin = useSelector(selectImageOrigin);
 
   if (!operator.origin) return <></>;
 

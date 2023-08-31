@@ -23,7 +23,7 @@ import { ToolOptions } from "../../components/stage/ToolOptions";
 import { ImageViewerDrawer, ToolDrawer } from "components/drawers";
 
 import {
-  alertStateSelector,
+  selectAlertState,
   applicationSlice,
   registerHotkeyView,
   unregisterHotkeyView,
@@ -52,7 +52,7 @@ export const ImageViewer = () => {
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
-  const alertState = useSelector(alertStateSelector);
+  const alertState = useSelector(selectAlertState);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);

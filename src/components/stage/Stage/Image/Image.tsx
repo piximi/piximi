@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 import Konva from "konva";
 
-import { imageOriginSelector } from "store/imageViewer";
+import { selectImageOrigin } from "store/imageViewer";
 import {
   selectActiveImageActivePlane,
   selectActiveImageWidth,
@@ -47,7 +47,7 @@ export const Image = forwardRef<
   const width = useSelector(selectActiveImageWidth);
   const height = useSelector(selectActiveImageHeight);
   const [filters] = useState<Array<any>>();
-  const imagePosition = useSelector(imageOriginSelector);
+  const imagePosition = useSelector(selectImageOrigin);
   return (
     <>
       {images.map((image, idx) => (

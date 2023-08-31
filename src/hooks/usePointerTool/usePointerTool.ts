@@ -3,7 +3,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { selectActiveAnnotations } from "store/data";
 import { useHotkeys } from "hooks/useHotkeys";
 import {
-  activeImageIdSelector,
+  selectActiveImageId,
   imageViewerSlice,
   setSelectedAnnotationIds,
   setSelectedCategoryId,
@@ -24,7 +24,7 @@ export const usePointerTool = (
   toolType: any
 ) => {
   const dispatch = useDispatch();
-  const activeImageId = useSelector(activeImageIdSelector);
+  const activeImageId = useSelector(selectActiveImageId);
   const activeAnnotations = useSelector(selectActiveAnnotations);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shift, setShift] = useState<boolean>(false);

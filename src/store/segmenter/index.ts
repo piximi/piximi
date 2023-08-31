@@ -4,18 +4,18 @@ export { segmenterSlice } from "./segmenterSlice";
 
 // Selectors
 
-export { segmenterTrainingPercentageSelector } from "./selectors/segmenterTrainingPercentageSelector";
-export { segmenterFitOptionsSelector } from "./selectors/segmenterFitOptionsSelector";
-export { segmenterCompileOptionsSelector } from "./selectors/segmenterCompileOptionsSelector";
-export { segmenterPreprocessOptionsSelector } from "./selectors/segmenterPreprocessOptionsSelector";
-export { segmenterInputShapeSelector } from "./selectors/segmenterInputShapeSelector";
-export { segmenterSelector } from "./selectors/segmenterSelector";
+export { selectSegmenterTrainingPercentage } from "./selectors/selectSegmenterTrainingPercentage";
+export { selectSegmenterFitOptions } from "./selectors/selectSegmenterFitOptions";
+export { selectSegmenterCompileOptions } from "./selectors/selectSegmenterCompileOptions";
+export { selectSegmenterPreprocessOptions } from "./selectors/selectSegmenterPreprocessOptions";
+export { selectSegmenterInputShape } from "./selectors/selectSegmenterInputShape";
+export { selectSegmenter } from "./selectors/selectSegmenter";
 export {
-  segmenterModelSelector,
-  segmenterHistorySelector,
-} from "./selectors/segmenterModelSelector";
-export { segmenterModelIdxSelector } from "./selectors/segmenterModelIdxSelector";
-export { segmenterModelStatusSelector } from "./selectors/segmenterModelStatusSelector";
+  selectSegmenterModel,
+  selectSegmenterHistory,
+} from "./selectors/selectSegmenterModel";
+export { selectSegmenterModelIdx } from "./selectors/selectSegmenterModelIdx";
+export { selectSegmenterModelStatus } from "./selectors/selectSegmenterModelStatus";
 
 // Sagas
 

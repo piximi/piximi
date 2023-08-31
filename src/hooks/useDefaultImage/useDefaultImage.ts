@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { applicationSlice, initSelector } from "store/application";
-import { imageViewerSlice, activeImageIdSelector } from "store/imageViewer";
+import { applicationSlice, selectInitSettings } from "store/application";
+import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
@@ -93,9 +93,9 @@ const dispatchToImageViewer = async (
 export const useDefaultImage = (location: DispatchLocation) => {
   const dispatch = useDispatch();
 
-  const init = useSelector(initSelector);
+  const init = useSelector(selectInitSettings);
   const numProjectImages = useSelector(selectImageCount);
-  const activeAnnotatorImageId = useSelector(activeImageIdSelector);
+  const activeAnnotatorImageId = useSelector(selectActiveImageId);
 
   useEffect(() => {
     if (init) return;

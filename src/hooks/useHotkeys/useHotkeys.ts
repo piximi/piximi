@@ -2,7 +2,7 @@
 import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { hotkeyViewSelector } from "store/application";
+import { selectHotkeyView } from "store/application";
 import {
   AvailableTags,
   HotkeysEvent,
@@ -70,7 +70,7 @@ export function useHotkeys(
     enabled = true,
     enableOnContentEditable = false,
   } = (options as Options) || {};
-  const currentHotkeyView = useSelector(hotkeyViewSelector);
+  const currentHotkeyView = useSelector(selectHotkeyView);
   // The return value of this callback determines if the browsers default behavior is prevented.
 
   const memoisedCallback = useCallback(

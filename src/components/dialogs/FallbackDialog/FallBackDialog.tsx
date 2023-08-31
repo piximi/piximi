@@ -28,12 +28,12 @@ import { useDialogHotkey } from "hooks";
 import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 
 import {
-  classifierSelectedModelSelector,
-  classifierModelStatusSelector,
+  selectClassifierSelectedModel,
+  selectClassifierModelStatus,
 } from "store/classifier";
 import {
-  segmenterModelSelector,
-  segmenterModelStatusSelector,
+  selectSegmenterModel,
+  selectSegmenterModelStatus,
 } from "store/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
@@ -90,11 +90,11 @@ export const FallBackDialog = (props: any) => {
     open: openSaveSegmenterDialog,
   } = useDialogHotkey(HotkeyView.SaveFittedModelDialog);
 
-  const selectedClassifierModel = useSelector(classifierSelectedModelSelector);
-  const classifierModelStatus = useSelector(classifierModelStatusSelector);
+  const selectedClassifierModel = useSelector(selectClassifierSelectedModel);
+  const classifierModelStatus = useSelector(selectClassifierModelStatus);
 
-  const selectedSegmenterModel = useSelector(segmenterModelSelector);
-  const segmenterModelStatus = useSelector(segmenterModelStatusSelector);
+  const selectedSegmenterModel = useSelector(selectSegmenterModel);
+  const segmenterModelStatus = useSelector(selectSegmenterModelStatus);
 
   const errorState: AlertStateType = {
     alertType: AlertType.Error,

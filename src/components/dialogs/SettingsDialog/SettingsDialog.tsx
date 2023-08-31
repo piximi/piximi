@@ -22,10 +22,10 @@ import {
 
 import { MaterialUISwitch } from "components/controls";
 import {
-  selectedImageBorderWidthSelector,
-  imageSelectionColorSelector,
+  selectSelectedImageBorderWidth,
+  selectImageSelectionColor,
   applicationSlice,
-  themeModeSelector,
+  selectThemeMode,
   setThemeMode,
   selectSoundEnabled,
 } from "store/application";
@@ -67,16 +67,16 @@ type SettingsDialogProps = {
 export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const dispatch = useDispatch();
 
-  const themeMode = useSelector(themeModeSelector);
+  const themeMode = useSelector(selectThemeMode);
 
   const initialSelectedImageBorderWidth = useSelector(
-    selectedImageBorderWidthSelector
+    selectSelectedImageBorderWidth
   );
   const [selectionSize, setSelectionSize] = useState<number>(
     initialSelectedImageBorderWidth
   );
 
-  const initialSelectionColor = useSelector(imageSelectionColorSelector);
+  const initialSelectionColor = useSelector(selectImageSelectionColor);
   const [selectionColor, setSelectionColor] = useState<string>(
     initialSelectionColor
   );
