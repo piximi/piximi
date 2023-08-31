@@ -3,10 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Alert, Autocomplete, Grid, TextField } from "@mui/material";
 
-import {
-  CustomNumberTextField,
-  StyledFormControl,
-} from "components/styled-components";
+import { CustomNumberTextField, StyledFormControl } from "../";
 
 import {
   selectClassifierInputShape,
