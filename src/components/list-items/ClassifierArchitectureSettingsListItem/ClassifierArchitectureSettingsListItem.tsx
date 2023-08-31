@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 
 import { CollapsibleList } from "components/lists";
-import { ClassifierArchitectureSettingsGrid } from "components/styled-components";
+import { ClassifierArchitectureSettingsGrid } from "components/forms";
 
 type ArchitectureSettingsProps = {
   onModelSelect: (modelIdx: number) => void;
