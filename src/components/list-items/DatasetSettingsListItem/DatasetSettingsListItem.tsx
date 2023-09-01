@@ -1,8 +1,8 @@
 import { Grid, Typography } from "@mui/material";
 
-import { ShuffleForm } from "./ShuffleForm";
-import { CollapsibleList } from "components/lists";
+import { ShuffleForm } from "components/forms/ShuffleForm";
 import { CustomNumberTextField, StyledFormControl } from "components/forms";
+import { CollapsibleListItem } from "../CollapsibleListItem";
 
 type DatasetSettingsListItemProps = {
   trainingPercentage: number;
@@ -20,12 +20,10 @@ export const DatasetSettingsListItem = ({
   };
 
   return (
-    <CollapsibleList
-      dense={false}
-      primary="Dataset Settings"
-      disablePadding={false}
-      paddingLeft={true}
-      closed={true}
+    <CollapsibleListItem
+      primaryText="Dataset Settings"
+      carotPosition="start"
+      divider={true}
     >
       <StyledFormControl>
         <Typography id="range-slider" gutterBottom>
@@ -48,6 +46,6 @@ export const DatasetSettingsListItem = ({
         </Grid>
       </StyledFormControl>
       <ShuffleForm isModelTrainable={isModelTrainable} />
-    </CollapsibleList>
+    </CollapsibleListItem>
   );
 };

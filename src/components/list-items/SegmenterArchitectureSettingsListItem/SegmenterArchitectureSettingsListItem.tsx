@@ -1,7 +1,9 @@
 import { styled } from "@mui/material";
 
-import { CollapsibleList } from "components/lists";
 import { SegmenterArchitectureSettingsGrid } from "components/forms";
+import { CollapsibleListItem } from "../CollapsibleListItem";
+
+//TODO: revisit forms
 
 type ArchitectureSettingsProps = {
   onModelSelect: (modelIdx: number) => void;
@@ -17,15 +19,14 @@ export const SegmenterArchitectureSettingsListItem = ({
   });
 
   return (
-    <CollapsibleList
-      dense={false}
-      primary="Architecture Settings"
-      disablePadding={false}
-      paddingLeft={true}
+    <CollapsibleListItem
+      primaryText="Architecture Settings"
+      carotPosition="start"
+      divider={true}
     >
       <StyledForm noValidate autoComplete="off">
         <SegmenterArchitectureSettingsGrid onModelSelect={onModelSelect} />
       </StyledForm>
-    </CollapsibleList>
+    </CollapsibleListItem>
   );
 };

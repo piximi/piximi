@@ -10,6 +10,8 @@ type ToolProps = {
   onClick: () => void;
 };
 
+//TODO: tool buttons
+
 export const Tool = ({ children, name, onClick }: ToolProps) => {
   let toolName = name;
 

@@ -16,6 +16,8 @@ import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 import { validateFileType, ProjectFileType } from "types/runtime";
 import { SerializedCOCOFileType, SerializedFileType } from "types";
 
+//TODO: MenuItem??
+
 type ImportAnnotationsMenuItemProps = {
   onCloseMenu: () => void;
   projectType: ProjectFileType;

@@ -3,7 +3,7 @@ export { SaveProjectMenu } from "./SaveProjectMenu";
 export { OpenProjectMenu } from "./OpenProjectMenu";
 export { OpenExampleProjectMenuItem } from "./OpenExampleProjectMenuItem";
 export { ImageMenu } from "./ImageMenu";
-export { SaveImageMenu } from "./SaveImageMenu";
+export { ExportAnnotationsMenu } from "./ExportAnnotationsMenu";
 export { CategoryItemMenu } from "./CategoryItemMenu";
 export { UploadMenu } from "./UploadMenu";
 export { ImageCategoryMenu } from "./ImageCategoryMenu";

@@ -11,7 +11,10 @@ import {
 import { AppBarOffset } from "components/styled-components";
 import { ApplicationOptionsList } from "components/lists/ApplicationOptionsList";
 
-import { OpenImageListItem, SaveImageListItem } from "components/list-items";
+import {
+  ImportAnnotationListItem,
+  ExportAnnotationsListItem,
+} from "components/list-items";
 import { ImageViewerAppBar } from "components/app-bars";
 
 import {
@@ -46,8 +49,8 @@ export const ImageViewerDrawer = () => {
       <Divider />
 
       <List dense>
-        <OpenImageListItem />
-        <SaveImageListItem />
+        <ImportAnnotationListItem />
+        <ExportAnnotationsListItem />
       </List>
 
       <Divider />

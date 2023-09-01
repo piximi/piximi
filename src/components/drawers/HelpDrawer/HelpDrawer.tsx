@@ -3,13 +3,7 @@ import { useDispatch } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { useLocation } from "react-router-dom";
 
-import {
-  Drawer,
-  IconButton,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Drawer, IconButton } from "@mui/material";
 import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 
 import { AppBarOffset } from "../../styled-components/AppBarOffset/AppBarOffset";
@@ -18,6 +12,8 @@ import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 import { applicationSlice } from "store/application";
 
 import { AlertType } from "types";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItem } from "components/list-items/CustomListItem";
 
 export const HelpDrawer = () => {
   const dispatch = useDispatch();
@@ -65,13 +61,11 @@ export const HelpDrawer = () => {
   return (
     <ErrorBoundary onError={handleError} FallbackComponent={FallBackHelpDrawer}>
       <div key={"left"}>
-        <ListItem button onClick={toggleDrawer("left", true)}>
-          <ListItemIcon>
-            <HelpIcon />
-          </ListItemIcon>
-
-          <ListItemText primary="Help" />
-        </ListItem>
+        <CustomListItemButton
+          primaryText="Help"
+          onClick={toggleDrawer("left", true)}
+          icon={<HelpIcon />}
+        />
 
         <Drawer
           variant={"persistent"}
@@ -105,13 +99,5 @@ export const HelpDrawer = () => {
 };
 
 export const FallBackHelpDrawer = () => {
-  return (
-    <ListItem disabled>
-      <ListItemIcon>
-        <HelpIcon />
-      </ListItemIcon>
-
-      <ListItemText primary="Help" />
-    </ListItem>
-  );
+  return <CustomListItem primaryText="Help" icon={<HelpIcon />} />;
 };

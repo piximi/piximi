@@ -1,18 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Radio,
-  RadioGroup,
-  Tooltip,
-} from "@mui/material";
+import { List, ListSubheader, Radio, RadioGroup } from "@mui/material";
 
 import { useTranslation } from "hooks";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 import { annotatorSlice } from "store/annotator";
 import {
@@ -69,108 +61,81 @@ export const AnnotationMode = () => {
           <ListSubheader component="div">{t("Annotation mode")}</ListSubheader>
         }
       >
-        <Tooltip
-          title="Create a new annotation."
-          placement="bottom"
-          disableInteractive
-        >
-          <ListItemButton
-            dense
-            onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
-          >
-            <ListItemIcon>
-              <Radio
-                disableRipple
-                edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
-                tabIndex={-1}
-                value={AnnotationModeType.New}
-              />
-            </ListItemIcon>
+        <CustomListItemButton
+          primaryText={t("New")}
+          icon={
+            <Radio
+              disableRipple
+              edge="start"
+              icon={<RadioUncheckedIcon />}
+              checkedIcon={<RadioCheckedIcon />}
+              tabIndex={-1}
+              value={AnnotationModeType.New}
+              sx={{ py: 0 }}
+            />
+          }
+          onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
+          tooltipText={"Create a new annotation."}
+          disabled={disableAnnotationEdits}
+          dense
+        />
 
-            <ListItemText primary={t("New annotation")} />
-          </ListItemButton>
-        </Tooltip>
+        <CustomListItemButton
+          primaryText={t("Add")}
+          icon={
+            <Radio
+              disableRipple
+              edge="start"
+              icon={<RadioUncheckedIcon />}
+              checkedIcon={<RadioCheckedIcon />}
+              tabIndex={-1}
+              value={AnnotationModeType.Add}
+              sx={{ py: 0 }}
+            />
+          }
+          onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
+          tooltipText="Adding to an annotation adds any new areas you annotate to an existing annotation."
+          disabled={disableAnnotationEdits}
+          dense
+        />
 
-        <Tooltip
-          title="Adding to an annotation adds any new areas you annotate to an existing annotation."
-          placement="bottom"
-          disableInteractive
-        >
-          <ListItemButton
-            dense
-            onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
-            disabled={disableAnnotationEdits}
-          >
-            <ListItemIcon>
-              <Radio
-                disableRipple
-                edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
-                tabIndex={-1}
-                value={AnnotationModeType.Add}
-              />
-            </ListItemIcon>
+        <CustomListItemButton
+          primaryText={t("Subtract")}
+          icon={
+            <Radio
+              disableRipple
+              edge="start"
+              icon={<RadioUncheckedIcon />}
+              checkedIcon={<RadioCheckedIcon />}
+              tabIndex={-1}
+              value={AnnotationModeType.Subtract}
+              sx={{ py: 0 }}
+            />
+          }
+          onClick={(event) => onClickLabel(event, AnnotationModeType.Subtract)}
+          tooltipText="Remove the area you label from an existing annotation."
+          disabled={disableAnnotationEdits}
+          dense
+        />
 
-            <ListItemText primary={t("Add area")} />
-          </ListItemButton>
-        </Tooltip>
-
-        <Tooltip
-          title="Remove the area you label from an existing annotation."
-          placement="bottom"
-          disableInteractive
-        >
-          <ListItemButton
-            dense
-            onClick={(event) =>
-              onClickLabel(event, AnnotationModeType.Subtract)
-            }
-            disabled={disableAnnotationEdits}
-          >
-            <ListItemIcon>
-              <Radio
-                disableRipple
-                edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
-                tabIndex={-1}
-                value={AnnotationModeType.Subtract}
-              />
-            </ListItemIcon>
-
-            <ListItemText primary={t("Subtract area")} />
-          </ListItemButton>
-        </Tooltip>
-
-        <Tooltip
-          title="Constrain the boundary of the new annotation to the selected annotation."
-          placement="bottom"
-          disableInteractive
-        >
-          <ListItemButton
-            dense
-            onClick={(event) =>
-              onClickLabel(event, AnnotationModeType.Intersect)
-            }
-            disabled={disableAnnotationEdits}
-          >
-            <ListItemIcon>
-              <Radio
-                disableRipple
-                edge="start"
-                icon={<RadioUncheckedIcon />}
-                checkedIcon={<RadioCheckedIcon />}
-                tabIndex={-1}
-                value={AnnotationModeType.Intersect}
-              />
-            </ListItemIcon>
-
-            <ListItemText primary={t("Intersection")} />
-          </ListItemButton>
-        </Tooltip>
+        <CustomListItemButton
+          primaryText={t("Intersection")}
+          icon={
+            <Radio
+              disableRipple
+              edge="start"
+              icon={<RadioUncheckedIcon />}
+              checkedIcon={<RadioCheckedIcon />}
+              tabIndex={-1}
+              value={AnnotationModeType.Intersect}
+              sx={{ py: 0 }}
+            />
+          }
+          onClick={(event) => onClickLabel(event, AnnotationModeType.Intersect)}
+          tooltipText="Constrain the boundary of the new annotation to the selected annotation."
+          disabled={disableAnnotationEdits}
+          dense
+        />
       </List>
     </RadioGroup>
   );

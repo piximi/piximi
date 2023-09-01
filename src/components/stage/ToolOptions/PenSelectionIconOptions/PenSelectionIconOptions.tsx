@@ -8,6 +8,8 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import { annotatorSlice } from "store/annotator";
 import { selectPenSelectionBrushSize } from "store/annotator/selectors";
 
+//TODO: Slider
+
 export const PenSelectionIconOptions = () => {
   const dispatch = useDispatch();
 

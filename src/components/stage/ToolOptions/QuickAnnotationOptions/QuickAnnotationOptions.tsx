@@ -9,6 +9,8 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import { annotatorSlice } from "store/annotator";
 import { selectQuickSelectionRegionSize } from "store/annotator/selectors";
 
+//TODO: Slider
+
 export const QuickAnnotationOptions = () => {
   const quickSelectionRegionSize = useSelector(selectQuickSelectionRegionSize);
 
