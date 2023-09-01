@@ -15,6 +15,8 @@ import { imageViewerSlice } from "store/imageViewer";
 import { dataSlice } from "store/data";
 import { fListToStore } from "utils";
 
+//TODO: MenuItem??
+
 type OpenProjectMenuItemProps = {
   onMenuClose: () => void;
   fromAnnotator?: boolean;

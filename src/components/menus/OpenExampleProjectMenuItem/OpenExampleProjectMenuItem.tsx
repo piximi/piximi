@@ -19,6 +19,8 @@ import { deserialize } from "utils/common/image/deserialize";
 import { PseudoFileList, fListToStore } from "utils";
 import { AlertStateType, AlertType } from "types";
 
+//TODO: Replace with cards
+
 type ExampleProjectProps = {
   projectName: string;
   projectDescription: string;

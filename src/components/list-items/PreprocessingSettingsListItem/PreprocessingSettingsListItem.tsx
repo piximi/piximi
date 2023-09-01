@@ -1,19 +1,17 @@
-import { RescalingForm } from "./RescalingForm";
-import { CroppingForm } from "./CroppingForm";
+import { CroppingForm, RescalingForm } from "components/forms";
 
-import { CollapsibleList } from "components/lists";
+import { CollapsibleListItem } from "../CollapsibleListItem";
 
 export const PreprocessingSettingsListItem = () => {
   return (
-    <CollapsibleList
+    <CollapsibleListItem
       dense={false}
-      primary="Preprocessing"
-      disablePadding={false}
-      paddingLeft={true}
-      closed={true}
+      primaryText="Preprocessing"
+      carotPosition="start"
+      divider={true}
     >
       <RescalingForm />
       <CroppingForm />
-    </CollapsibleList>
+    </CollapsibleListItem>
   );
 };

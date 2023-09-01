@@ -1,8 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-
 import {
   Clear as ClearIcon,
   Visibility as VisibilityIcon,
@@ -16,6 +14,7 @@ import { dataSlice, selectImagesByPartitions } from "store/data";
 import { Partition } from "types";
 
 import { ModelStatus } from "types/ModelType";
+import { CustomListItemButton } from "../CustomListItemButton";
 
 export const CategoryPredictionListItem = () => {
   const dispatch = useDispatch();
@@ -64,21 +63,16 @@ export const CategoryPredictionListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={clearPredictions}>
-        <ListItemText primary={t("Clear predictions")} />
-        <ListItemIcon>
-          <ClearIcon />
-        </ListItemIcon>
-      </ListItem>
-
-      <ListItem button onClick={toggleShowLabeledImages}>
-        <ListItemText
-          primary={t(`${showLabeledImages ? "Hide" : "Show"} labeled images`)}
-        />
-        <ListItemIcon>
-          {showLabeledImages ? <VisibilityOffIcon /> : <VisibilityIcon />}
-        </ListItemIcon>
-      </ListItem>
+      <CustomListItemButton
+        primaryText={t("Clear predictions")}
+        onClick={clearPredictions}
+        icon={<ClearIcon />}
+      />
+      <CustomListItemButton
+        primaryText={t(`${showLabeledImages ? "Hide" : "Show"} labeled images`)}
+        onClick={toggleShowLabeledImages}
+        icon={showLabeledImages ? <VisibilityOffIcon /> : <VisibilityIcon />}
+      />
     </>
   );
 };

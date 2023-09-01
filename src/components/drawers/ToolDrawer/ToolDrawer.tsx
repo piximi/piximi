@@ -91,6 +91,8 @@ const toolMap: Record<
     icon: (color) => <RectangleAnnotation color={color} />,
   },
 };
+
+//TODO: Icon button
 export const ToolDrawer = ({
   optionsVisibility,
   setOptionsVisibility,

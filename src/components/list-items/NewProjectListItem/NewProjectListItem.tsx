@@ -1,13 +1,12 @@
 import React from "react";
 
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-
 import AddIcon from "@mui/icons-material/Add";
 
 import { useDialogHotkey } from "hooks";
 
 import { NewProjectDialog } from "components/dialogs";
 import { HotkeyView } from "types";
+import { CustomListItemButton } from "../CustomListItemButton";
 
 export const NewProjectListItem = () => {
   const { onClose, onOpen, open } = useDialogHotkey(
@@ -16,13 +15,11 @@ export const NewProjectListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-
-        <ListItemText primary="New project" />
-      </ListItem>
+      <CustomListItemButton
+        primaryText="New Project"
+        onClick={onOpen}
+        icon={<AddIcon />}
+      />
 
       <NewProjectDialog onClose={onClose} open={open} />
     </>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, List, ListItem, ListItemText } from "@mui/material";
+import { Divider, List } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
@@ -17,6 +17,9 @@ import {
 } from "store/data";
 
 import { generateDefaultColors } from "utils/common/image";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+
+//TODO: Check
 
 export const ColorAdjustmentOptions = () => {
   const t = useTranslation();
@@ -29,7 +32,7 @@ export const ColorAdjustmentOptions = () => {
 
   const imageId = useSelector(selectActiveImageId);
 
-  const onResetChannelsClick = async () => {
+  const handleResetChannelsClick = async () => {
     if (!imageShape || !imageData) return;
 
     const defaultColors = await generateDefaultColors(imageData);
@@ -56,9 +59,10 @@ export const ColorAdjustmentOptions = () => {
       <Divider />
 
       <List dense>
-        <ListItem button onClick={onResetChannelsClick}>
-          <ListItemText>{t("Reset colors")}</ListItemText>
-        </ListItem>
+        <CustomListItemButton
+          primaryText={t("Reset colors")}
+          onClick={handleResetChannelsClick}
+        />
         <ApplyColorsButton />
       </List>
     </>

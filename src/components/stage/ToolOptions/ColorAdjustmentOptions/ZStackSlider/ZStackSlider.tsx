@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { List, ListItem, ListItemText, Slider } from "@mui/material";
+import { List, ListItem, Slider } from "@mui/material";
 
 import { selectActiveImageRenderedSrcs } from "store/imageViewer";
 import {
@@ -9,6 +9,9 @@ import {
   selectActiveImage,
   selectActiveImageActivePlane,
 } from "store/data";
+import { CustomListItem } from "components/list-items/CustomListItem";
+
+//TODO: change slider style
 
 export const ZStackSlider = () => {
   const dispatch = useDispatch();
@@ -16,14 +19,11 @@ export const ZStackSlider = () => {
   const activePlane = useSelector(selectActiveImageActivePlane);
   const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
 
-  if (!activeImage || activeImage!.shape.planes === 1)
-    return <React.Fragment />;
-
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
         dataSlice.actions.setImageActivePlane({
-          imageId: activeImage.id,
+          imageId: activeImage!.id,
           activePlane: newValue,
           renderedSrc: renderedSrcs[newValue],
         })
@@ -31,26 +31,24 @@ export const ZStackSlider = () => {
     }
   };
 
-  return (
-    <React.Fragment>
-      <List dense>
-        <ListItem>
-          <ListItemText>Z plane: {activePlane}</ListItemText>
-        </ListItem>
+  return !activeImage || activeImage!.shape.planes === 1 ? (
+    <React.Fragment />
+  ) : (
+    <List dense>
+      <CustomListItem primaryText={`Z-plane: ${activePlane}`} />
 
-        <ListItem>
-          <Slider
-            aria-label="z-plane"
-            onChange={handleChange}
-            value={activePlane}
-            valueLabelDisplay="auto"
-            step={1}
-            marks
-            min={0}
-            max={activeImage!.shape.planes - 1}
-          />
-        </ListItem>
-      </List>
-    </React.Fragment>
+      <ListItem>
+        <Slider
+          aria-label="z-plane"
+          onChange={handleChange}
+          value={activePlane}
+          valueLabelDisplay="auto"
+          step={1}
+          marks
+          min={0}
+          max={activeImage!.shape.planes - 1}
+        />
+      </ListItem>
+    </List>
   );
 };

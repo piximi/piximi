@@ -1,5 +1,5 @@
 export { ClassifierArchitectureSettingsListItem } from "./ClassifierArchitectureSettingsListItem";
-export { DatasetSettingsListItem } from "./DatasetSettingsListItem/DatasetSettingsListItem";
+export { DatasetSettingsListItem } from "./DatasetSettingsListItem";
 export { DisabledListItemButton } from "./DisabledListItemButton";
 export { OptimizerSettingsListItem } from "./OptimizerSettingsListItem";
 export { SendFeedbackListItem } from "./SendFeedbackListItem";
@@ -7,9 +7,9 @@ export { SettingsListItem } from "./SettingsListItem";
 export { ClassifierExecListItem } from "./ClassifierExecListItem";
 export { PreprocessingSettingsListItem } from "./PreprocessingSettingsListItem";
 export { NewProjectListItem } from "./NewProjectListItem";
-export { OpenImageListItem } from "./OpenImageListItem";
+export { ImportAnnotationListItem } from "./ImportAnnotationsListItem";
 export { OpenProjectListItem } from "./OpenProjectListItem";
-export { SaveImageListItem } from "./SaveImageListItem";
+export { ExportAnnotationsListItem } from "./ExportAnnotationsListItem";
 export { SaveProjectListItem } from "./SaveProjectListItem";
 export { SegmenterExecListItem } from "./SegmenterExecListItem";
 export { SegmenterArchitectureSettingsListItem } from "./SegmenterArchitectureSettingsListItem";

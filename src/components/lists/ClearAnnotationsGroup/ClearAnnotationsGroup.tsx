@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
-import {
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { List } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 import { useDialog, useTranslation } from "hooks";
@@ -18,6 +13,7 @@ import {
   selectSelectedAnnotationIds,
 } from "store/imageViewer";
 import { dataSlice } from "store/data";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
@@ -73,15 +69,12 @@ export const ClearAnnotationsGroup = () => {
   return (
     <>
       <List dense>
-        <ListItemButton
+        <CustomListItemButton
+          primaryText={t("Clear all annotations")}
           onClick={() => handleOpenAndTrack("ALL")}
           disabled={activeAnnotationsIds.length === 0}
-        >
-          <ListItemIcon>
-            <DeleteIcon color="disabled" />
-          </ListItemIcon>
-          <ListItemText primary={t("Clear all annotations")} />
-        </ListItemButton>
+          icon={<DeleteIcon color="disabled" />}
+        />
 
         <DialogWithAction
           title={`Delete ${deleteOp}  annotations`}
@@ -95,15 +88,12 @@ export const ClearAnnotationsGroup = () => {
           open={isDeleteAnnotationsDialogOpen}
         />
 
-        <ListItemButton
+        <CustomListItemButton
+          primaryText={t("Clear selected annotations")}
           onClick={() => handleOpenAndTrack("SELECTED")}
           disabled={selectedAnnotationsIds.length === 0}
-        >
-          <ListItemIcon>
-            <DeleteIcon color="disabled" />
-          </ListItemIcon>
-          <ListItemText primary={t("Clear selected annotations")} />
-        </ListItemButton>
+          icon={<DeleteIcon color="disabled" />}
+        />
       </List>
     </>
   );

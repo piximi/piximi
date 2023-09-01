@@ -6,6 +6,8 @@ import ComputerIcon from "@mui/icons-material/Computer";
 
 import { StyledMenuItem } from "./StyledMenuItem";
 
+//TODO: MenuItem??
+
 type DropboxMenuItemProps = {
   onClose: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 };

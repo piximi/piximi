@@ -1,8 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { ListItem, ListItemText } from "@mui/material";
-
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { createRenderedTensor } from "utils/common/image";
 
 import { selectActiveImageColor, selectSelectedImages } from "store/data";
@@ -11,7 +10,7 @@ export const ApplyColorsButton = () => {
   const activeImageColors = useSelector(selectActiveImageColor);
   const images = useSelector(selectSelectedImages);
 
-  const onApplyColorsClick = async () => {
+  const handleApplyColorsClick = async () => {
     const newColor = activeImageColors.color.clone();
 
     const getUpdatedImages = async () => {
@@ -56,8 +55,9 @@ export const ApplyColorsButton = () => {
   };
 
   return (
-    <ListItem button onClick={onApplyColorsClick}>
-      <ListItemText>{"Apply to all images open in annotator"}</ListItemText>
-    </ListItem>
+    <CustomListItemButton
+      primaryText="Apply to all images open in annotator"
+      onClick={handleApplyColorsClick}
+    />
   );
 };

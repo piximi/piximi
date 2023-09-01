@@ -10,6 +10,8 @@ import { SerializedFileType } from "types";
 
 import { loadExampleImage } from "utils/common/image";
 
+//TODO: MenuItem?
+
 type ExampleImageProject = {
   exampleImageTitle: string;
   exampleImageName?: string;

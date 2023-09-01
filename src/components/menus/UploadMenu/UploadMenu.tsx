@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 
-import {
-  Fade,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Menu,
-} from "@mui/material";
+import { Fade, ListItemIcon, ListItemText, Menu } from "@mui/material";
 import ComputerIcon from "@mui/icons-material/Computer";
 
 import { useUpload } from "hooks";
@@ -15,6 +9,8 @@ import { ImageShapeDialog } from "components/dialogs";
 import { StyledMenuItem } from "./StyledMenuItem";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
+
+//TODO: MenuItem??
 
 type UploadMenuProps = {
   anchorEl: HTMLElement | null;
@@ -27,15 +23,14 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
   });
+  const [files, setFiles] = useState<FileList>();
+
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
 
   const handleClose = () => {
     setOpenDimensionsDialogBox(false);
   };
-
-  const [files, setFiles] = useState<FileList>();
-
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
-  const onUploadFromComputerChange = async (
+  const handleUploadFromComputerChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!event.currentTarget.files) return;
@@ -55,32 +50,16 @@ export const UploadMenu = ({ anchorEl, onClose, open }: UploadMenuProps) => {
         type="file"
         multiple
         id="upload-images"
-        onChange={onUploadFromComputerChange}
+        onChange={handleUploadFromComputerChange}
       />
       <Menu
-        PaperProps={{ style: { width: 320 } }}
         TransitionComponent={Fade}
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         onClose={onClose}
         open={open}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <ListSubheader
-          sx={{
-            color: "#80868b",
-            margin: "16px",
-            letterSpacing: ".07272727em",
-            fontSize: ".6875rem",
-            fontWeight: 500,
-            lineHeight: "1rem",
-            textTransform: "uppercase",
-            maxWidth: 320,
-          }}
-        >
-          Upload from
-        </ListSubheader>
-
         <label htmlFor="upload-images">
           <StyledMenuItem component="span" dense onClick={onClose}>
             <ListItemIcon>
