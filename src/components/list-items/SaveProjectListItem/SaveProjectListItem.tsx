@@ -1,26 +1,30 @@
 import React from "react";
 
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
-
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { SaveProjectMenu } from "components/menus";
-import { useMenu } from "hooks";
+import { useDialog } from "hooks";
+import { CustomListItemButton } from "../CustomListItemButton";
+import { SaveProjectDialog } from "components/dialogs";
 
 export const SaveProjectListItem = () => {
-  const { anchorEl, onClose, onOpen, open } = useMenu();
+  const {
+    onClose: onSaveProjectDialogClose,
+    onOpen: onSaveProjectDialogOpen,
+    open: openSaveProjectDialog,
+  } = useDialog();
 
   return (
     <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <DownloadIcon />
-        </ListItemIcon>
+      <CustomListItemButton
+        primaryText="Save Project"
+        onClick={onSaveProjectDialogOpen}
+        icon={<DownloadIcon />}
+      />
 
-        <ListItemText primary="Save" />
-      </ListItem>
-
-      <SaveProjectMenu anchorEl={anchorEl} onClose={onClose} open={open} />
+      <SaveProjectDialog
+        onClose={onSaveProjectDialogClose}
+        open={openSaveProjectDialog}
+      />
     </>
   );
 };

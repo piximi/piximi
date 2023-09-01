@@ -1,17 +1,7 @@
 import React, { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Avatar,
-  Chip,
-  IconButton,
-  ListItemButton,
-  ListItemAvatar,
-  ListItemText,
-  LinearProgress,
-  Box,
-  ListItem,
-} from "@mui/material";
+import { Avatar, Chip, LinearProgress, Box } from "@mui/material";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
@@ -25,6 +15,7 @@ import { selectActiveImageId, setActiveImageId } from "store/imageViewer";
 import { selectTotalAnnotationCountByImage } from "store/data";
 
 import { ImageType } from "types";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 const NUM_BUFFERED_IMS = 20;
 const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 2);
@@ -189,53 +180,35 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
   );
 };
 
-export const ImageListItem = memo(
+const ImageListItem = memo(
   ({ image, isActive, onItemClick, onSecondaryClick }: ImageListItemProps) => {
     const annotationCount = useSelector((state) =>
       selectTotalAnnotationCountByImage(state, image.id)
     );
     return (
-      <ListItem
+      <CustomListItemButton
         key={image.id}
-        id={image.id}
         selected={isActive}
-        sx={{
-          pl: 0,
-          "&:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.04)",
-          },
-        }}
-        secondaryAction={
-          <IconButton
-            edge="end"
-            onClick={(event) => onSecondaryClick(event.currentTarget)}
-          >
-            <MoreHorizIcon />
-          </IconButton>
-        }
-      >
-        <ListItemButton
-          key={image.id}
-          id={image.id}
-          sx={{
-            "&.MuiListItemButton-root": { pr: 0 },
-            "&:hover": { backgroundColor: "transparent" },
-          }}
-          onClick={() => onItemClick(image)}
-        >
-          <ListItemAvatar>
-            <Avatar alt={image.name} src={image.src} variant={"square"} />
-          </ListItemAvatar>
-          <ListItemText
-            id={image.id}
-            primary={image.name}
-            primaryTypographyProps={{ noWrap: true }}
+        onClick={() => onItemClick(image)}
+        icon={
+          <Avatar
+            alt={image.name}
+            src={image.src}
+            variant={"square"}
+            sx={{ mr: ".5rem" }}
           />
-          {annotationCount !== 0 && (
+        }
+        secondaryIcon={<MoreHorizIcon />}
+        onSecondary={(event) => onSecondaryClick(event.currentTarget)}
+        primaryText={image.name}
+        tooltipText={image.name}
+        additionalComponent={
+          annotationCount !== 0 ? (
             <Chip label={annotationCount} size="small" />
-          )}
-        </ListItemButton>
-      </ListItem>
+          ) : undefined
+        }
+        primaryTypographyProps={{ noWrap: true }}
+      />
     );
   }
 );

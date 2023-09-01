@@ -1,8 +1,7 @@
-import {
-  OptimizerSettingsGrid,
-  OptimizerSettingsGridProps,
-} from "./OptimizerSettingsGrid/OptimizerSettingsGrid";
-import { CollapsibleList } from "components/lists";
+import { OptimizerSettingsGrid } from "components/forms";
+import { OptimizerSettingsGridProps } from "components/forms/OptimizerSettingsGrid";
+
+import { CollapsibleListItem } from "../CollapsibleListItem";
 
 export const OptimizerSettingsListItem = ({
   compileOptions,
@@ -15,12 +14,10 @@ export const OptimizerSettingsListItem = ({
   isModelTrainable,
 }: OptimizerSettingsGridProps) => {
   return (
-    <CollapsibleList
-      dense={false}
-      primary="Optimizer Settings"
-      disablePadding={false}
-      paddingLeft={true}
-      closed={true}
+    <CollapsibleListItem
+      primaryText="Optimizer Settings"
+      carotPosition="start"
+      divider={true}
     >
       <OptimizerSettingsGrid
         compileOptions={compileOptions}
@@ -34,6 +31,6 @@ export const OptimizerSettingsListItem = ({
         dispatchLearningRateCallback={dispatchLearningRateCallback}
         isModelTrainable={isModelTrainable}
       />
-    </CollapsibleList>
+    </CollapsibleListItem>
   );
 };

@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 
-import { CollapsibleList } from "components/lists";
 import { ClassifierArchitectureSettingsGrid } from "components/forms";
+import { CollapsibleListItem } from "../CollapsibleListItem";
 
 type ArchitectureSettingsProps = {
   onModelSelect: (modelIdx: number) => void;
@@ -17,16 +17,14 @@ export const ClassifierArchitectureSettingsListItem = ({
   });
 
   return (
-    <CollapsibleList
-      dense={false}
-      primary="Architecture Settings"
-      disablePadding={false}
-      paddingLeft={true}
-      closed={false}
+    <CollapsibleListItem
+      primaryText="Architecture Settings"
+      carotPosition="start"
+      divider={true}
     >
       <StyledForm noValidate autoComplete="off">
         <ClassifierArchitectureSettingsGrid onModelSelect={onModelSelect} />
       </StyledForm>
-    </CollapsibleList>
+    </CollapsibleListItem>
   );
 };

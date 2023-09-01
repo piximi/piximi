@@ -1,24 +1,22 @@
 import React from "react";
 
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDialog } from "hooks";
 
-import { SettingsDialog } from "../../dialogs";
+import { SettingsDialog } from "components/dialogs";
+import { CustomListItemButton } from "../CustomListItemButton";
 
 export const SettingsListItem = () => {
   const { onClose, onOpen, open } = useDialog();
 
   return (
     <>
-      <ListItem button onClick={onOpen}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-
-        <ListItemText primary="Settings" />
-      </ListItem>
+      <CustomListItemButton
+        primaryText="Settings"
+        onClick={onOpen}
+        icon={<SettingsIcon />}
+      />
 
       <SettingsDialog onClose={onClose} open={open} />
     </>

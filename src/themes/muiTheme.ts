@@ -14,6 +14,13 @@ export const lightTheme = createTheme({
 
 export const darkTheme = createTheme({
   components: {
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: "none",
+        },
+      },
+    },
     MuiDrawer: {
       styleOverrides: {
         paperAnchorDockedLeft: {

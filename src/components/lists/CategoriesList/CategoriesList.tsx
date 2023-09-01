@@ -1,12 +1,6 @@
 import React, { useEffect } from "react";
 
-import {
-  Checkbox,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-} from "@mui/material";
+import { Checkbox, ListItemIcon, Tooltip } from "@mui/material";
 
 import {
   Label as LabelIcon,
@@ -19,6 +13,7 @@ import { useDialogHotkey, useCategoryHandlers } from "hooks";
 
 import { CollapsibleList } from "components/lists";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 import {
   CategoryItem,
@@ -142,23 +137,19 @@ export const CategoriesList = (props: CategoriesListProps) => {
       {
         predicted && <CategoryPredictionListItem /> //TODO - UI: Should dissapear or be disabled?
       }
-      <ListItemButton onClick={handleOpenCreateCategoryDialog}>
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-
-        <ListItemText primary="Create category" />
-      </ListItemButton>
+      <CustomListItemButton
+        primaryText="Create Category"
+        onClick={handleOpenCreateCategoryDialog}
+        icon={<AddIcon />}
+      />
 
       {
         categories.length > 0 && (
-          <ListItemButton onClick={handleOpenDeleteCategoryDialog}>
-            <ListItemIcon>
-              <DeleteIcon color="disabled" />
-            </ListItemIcon>
-
-            <ListItemText primary={"Delete all categories"} />
-          </ListItemButton>
+          <CustomListItemButton
+            primaryText="Delete All Categories"
+            onClick={handleOpenDeleteCategoryDialog}
+            icon={<DeleteIcon color="disabled" />}
+          />
         ) //TODO - UI: Should dissapear or be disabled?
       }
       <CategoryItemMenu

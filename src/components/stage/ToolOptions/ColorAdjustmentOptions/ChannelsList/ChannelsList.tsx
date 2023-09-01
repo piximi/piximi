@@ -29,6 +29,8 @@ import {
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 
+//TODO: Slider Components
+
 export const ChannelsList = () => {
   const dispatch = useDispatch();
 

@@ -7,8 +7,6 @@ import {
   Grid,
   List,
   ListItem,
-  ListItemIcon,
-  ListItemText,
   ListSubheader,
   Radio,
   RadioGroup,
@@ -41,6 +39,10 @@ import {
   RadioCheckedIcon,
   RadioUncheckedIcon,
 } from "icons";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItem } from "components/list-items/CustomListItem";
+
+//TODO: Slider
 
 export const ZoomOptions = () => {
   const dispatch = useDispatch();
@@ -199,12 +201,9 @@ export const ZoomOptions = () => {
               <ListSubheader component="div">{t("Zoom mode")}</ListSubheader>
             }
           >
-            <ListItem
-              button
-              dense
-              onClick={(event) => onModeClick(event, ZoomModeType.In)}
-            >
-              <ListItemIcon>
+            <CustomListItem
+              primaryText={t("Zoom in")}
+              icon={
                 <Radio
                   disableRipple
                   edge="start"
@@ -212,18 +211,13 @@ export const ZoomOptions = () => {
                   checkedIcon={<RadioCheckedIcon />}
                   tabIndex={-1}
                   value={ZoomModeType.In}
+                  onClick={(event) => onModeClick(event, ZoomModeType.In)}
                 />
-              </ListItemIcon>
-
-              <ListItemText primary={t("Zoom in")} />
-            </ListItem>
-
-            <ListItem
-              button
-              dense
-              onClick={(event) => onModeClick(event, ZoomModeType.Out)}
-            >
-              <ListItemIcon>
+              }
+            />
+            <CustomListItem
+              primaryText={t("Zoom out")}
+              icon={
                 <Radio
                   disableRipple
                   edge="start"
@@ -231,19 +225,19 @@ export const ZoomOptions = () => {
                   checkedIcon={<RadioCheckedIcon />}
                   tabIndex={-1}
                   value={ZoomModeType.Out}
+                  onClick={(event) => onModeClick(event, ZoomModeType.Out)}
                 />
-              </ListItemIcon>
-
-              <ListItemText primary={t("Zoom out")} />
-            </ListItem>
+              }
+            />
           </List>
         </RadioGroup>
       </List>
 
       <Divider />
 
-      <ListItem button dense onClick={onAutomaticCenteringChange}>
-        <ListItemIcon>
+      <CustomListItem
+        primaryText={t("Automatically zoom towards the center")}
+        icon={
           <Checkbox
             checked={options.automaticCentering}
             disableRipple
@@ -251,39 +245,38 @@ export const ZoomOptions = () => {
             icon={<CheckboxUncheckedIcon />}
             checkedIcon={<CheckboxCheckedIcon />}
             tabIndex={-1}
+            onClick={onAutomaticCenteringChange}
           />
-        </ListItemIcon>
-
-        <ListItemText primary={t("Automatically zoom towards the center")} />
-      </ListItem>
+        }
+      />
 
       <Divider />
 
       <List dense>
-        <ListItem button onClick={onToActualSizeClick}>
-          <ListItemText>{t("Actual size")}</ListItemText>
-        </ListItem>
+        <CustomListItemButton
+          primaryText={t("Actual size")}
+          onClick={onToActualSizeClick}
+        />
 
-        <ListItem button onClick={onToFitClick}>
-          <ListItemText>{t("Fit to canvas")}</ListItemText>
-        </ListItem>
+        <CustomListItemButton
+          primaryText={t("Fit to canvas")}
+          onClick={onToFitClick}
+        />
 
-        <ListItem button onClick={onResetClick}>
-          <ListItemText>{t("Reset position")}</ListItemText>
-        </ListItem>
+        <CustomListItemButton
+          primaryText={t("Reset position")}
+          onClick={onResetClick}
+        />
       </List>
       <List sx={{ mt: "auto" }}>
-        <ListItem>
-          <ListItemText
-            primaryTypographyProps={{
-              color: "gray",
-              fontSize: "0.875rem",
-              textAlign: "center",
-            }}
-          >
-            {t("Alt+Click to drage stage")}
-          </ListItemText>
-        </ListItem>
+        <CustomListItem
+          primaryText={t("Alt+Click to drage stage")}
+          primaryTypographyProps={{
+            color: "gray",
+            fontSize: "0.875rem",
+            textAlign: "center",
+          }}
+        />
       </List>
     </>
   );

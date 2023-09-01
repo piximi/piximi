@@ -9,6 +9,8 @@ import { InvertAnnotation } from "../InvertAnnotation";
 import { annotatorSlice } from "store/annotator";
 import { selectThresholdAnnotationValue } from "store/annotator/selectors";
 
+//TODO: Slider
+
 export const ThresholdAnnotationOptions = () => {
   const thresholdValue = useSelector(selectThresholdAnnotationValue);
 
