@@ -5,6 +5,7 @@ import { LanguageType } from "./LanguageType";
 export enum HotkeyView {
   Annotator,
   Classifier,
+  Segmenter,
   CreateCategoryDialog,
   DeleteAnnotationCategoryDialog,
   DeleteAllCategoriesDialog,
