@@ -1,1 +1,0 @@
-export { OpenExampleProjectMenuItem } from "./OpenExampleProjectMenuItem";

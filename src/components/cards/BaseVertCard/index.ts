@@ -1,0 +1,1 @@
+export { BaseVertCard } from "./BaseVertCard";

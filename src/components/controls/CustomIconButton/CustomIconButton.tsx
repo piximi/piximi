@@ -4,7 +4,7 @@ import {
   Tooltip,
   TooltipProps,
 } from "@mui/material";
-import { ElementType, useEffect, useState } from "react";
+import { ElementType, useState } from "react";
 
 type IconButtonType = Omit<IconButtonProps, "children">;
 type TooltipType = Omit<TooltipProps, "children" | "title">;
@@ -33,9 +33,6 @@ export const CustomIconButton = ({
     arrow: true,
     ...tooltipProps,
   });
-  useEffect(() => {
-    console.log(_tooltipProps);
-  }, [_tooltipProps]);
   return (
     <Tooltip
       // can't use "sx" prop directly to access tooltip

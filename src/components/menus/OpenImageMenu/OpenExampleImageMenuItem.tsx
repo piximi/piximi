@@ -18,8 +18,8 @@ export const OpenExampleImageMenuItem = ({
   const { onClose, onOpen, open } = useDialog();
 
   return (
-    <MenuItem onClick={onOpen}>
-      <ListItemText primary="Open example image" />
+    <MenuItem onClick={onOpen} dense>
+      <ListItemText primary="Example Image" />
       <ExampleImageDialog
         onClose={() => {
           onClose();

@@ -83,9 +83,9 @@ export const ClearAnnotationsGroup = () => {
               ? activeAnnotationsIds.length
               : selectActiveAnnotationIds.length
           } annotations will be deleted`}
-          handleConfirmCallback={handleDeleteAnnotations}
+          onConfirm={handleDeleteAnnotations}
           onClose={handleCloseDeleteAnnotationsDialog}
-          open={isDeleteAnnotationsDialogOpen}
+          isOpen={isDeleteAnnotationsDialogOpen}
         />
 
         <CustomListItemButton

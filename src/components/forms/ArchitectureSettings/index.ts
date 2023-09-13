@@ -1,0 +1,1 @@
+export { ArchitectureSettings } from "./ArchitectureSettings";

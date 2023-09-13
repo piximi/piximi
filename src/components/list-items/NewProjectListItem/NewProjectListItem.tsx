@@ -16,9 +16,10 @@ export const NewProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
-        primaryText="New Project"
+        primaryText="New"
         onClick={onOpen}
         icon={<AddIcon />}
+        tooltipText="New Project"
       />
 
       <NewProjectDialog onClose={onClose} open={open} />

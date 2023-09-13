@@ -174,6 +174,9 @@ export const segmenterSlice = createSlice({
     ) {
       state.evaluationResult = action.payload.evaluationResult;
     },
+    updateShuffleOptions(state, action: PayloadAction<{ shuffle: boolean }>) {
+      state.preprocessOptions.shuffle = action.payload.shuffle;
+    },
   },
 });
 

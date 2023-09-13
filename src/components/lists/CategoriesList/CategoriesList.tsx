@@ -176,9 +176,9 @@ export const CategoriesList = (props: CategoriesListProps) => {
       <DialogWithAction
         title="Delete All Categories"
         content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
-        handleConfirmCallback={handleDeleteAllCategories}
+        onConfirm={handleDeleteAllCategories}
         onClose={handleCloseDeleteCategoryDialog}
-        open={isDeleteCategoryDialogOpen}
+        isOpen={isDeleteCategoryDialogOpen}
       />
     </CollapsibleList>
   );

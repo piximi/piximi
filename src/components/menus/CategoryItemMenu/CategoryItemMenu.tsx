@@ -1,9 +1,10 @@
 import React from "react";
 
-import { Divider, Menu, MenuItem, MenuList, Typography } from "@mui/material";
+import { Menu, MenuItem, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
+import { StyledDivider } from "components/styled-components/";
 
 import { Category, UNKNOWN_CATEGORY_NAME, PartialBy, HotkeyView } from "types";
 
@@ -65,48 +66,52 @@ export const CategoryItemMenu = ({
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
-      anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+      anchorOrigin={{ horizontal: "center", vertical: "top" }}
       onClose={handleCloseCategoryMenu}
       open={openCategoryMenu}
-      transformOrigin={{ horizontal: "center", vertical: "top" }}
+      transformOrigin={{ horizontal: "center", vertical: "bottom" }}
+      sx={(theme) => ({
+        "& .MuiMenu-list": {
+          px: theme.spacing(1),
+          display: "flex",
+          flexDirection: "row",
+        },
+      })}
     >
-      <MenuList dense variant="menu">
-        <MenuItem
-          onClick={() => {
-            handleHideOtherCategories(category);
-          }}
-        >
-          <Typography variant="inherit">Hide Other Categories</Typography>
-        </MenuItem>
+      <CategoryMenuItem
+        onClick={() => {
+          handleHideCategory(category);
+        }}
+        label={categoryHidden ? "Show" : "Hide"}
+      />
+      <MenuItemDivider />
+      <CategoryMenuItem
+        onClick={() => {
+          handleHideOtherCategories(category);
+        }}
+        label="Hide Other"
+      />
 
-        <MenuItem
-          onClick={() => {
-            handleHideCategory(category);
-          }}
-        >
-          <Typography variant="inherit">
-            {categoryHidden ? "Show" : "Hide"} Category
-          </Typography>
-        </MenuItem>
+      {category.name !== UNKNOWN_CATEGORY_NAME && (
+        <>
+          <MenuItemDivider />
 
-        {category.name !== UNKNOWN_CATEGORY_NAME && (
-          <div>
-            <Divider />
-
-            <MenuItem onClick={handleOpenDeleteCategoryDialog}>
-              <Typography variant="inherit">Delete Category</Typography>
-            </MenuItem>
-
-            <MenuItem onClick={handleOpenEditCategoryDialog}>
-              <Typography variant="inherit">Edit Category</Typography>
-            </MenuItem>
-
-            <MenuItem onClick={handleOpenDialogWithAction}>
-              <Typography variant="inherit">Clear Annotations</Typography>
-            </MenuItem>
-          </div>
-        )}
-      </MenuList>
+          <CategoryMenuItem
+            onClick={handleOpenDeleteCategoryDialog}
+            label="Delete"
+          />
+          <MenuItemDivider />
+          <CategoryMenuItem
+            onClick={handleOpenEditCategoryDialog}
+            label="Edit"
+          />
+          <MenuItemDivider />
+          <CategoryMenuItem
+            onClick={handleOpenDialogWithAction}
+            label="Clear Annotations"
+          />
+        </>
+      )}
       <UpsertCategoriesDialog
         category={category}
         usedCategoryInfo={usedCategoryInfo}
@@ -118,17 +123,45 @@ export const CategoryItemMenu = ({
         title={`Delete "${category.name}" Category`}
         content={`Objects categorized as "${category.name}" will NOT be deleted, and instead will be labeled as
         "Unknown".`}
-        handleConfirmCallback={handleDeleteCategory}
+        onConfirm={handleDeleteCategory}
         onClose={() => handleMenuCloseWith(handleCloseDeleteCategoryDialog)}
-        open={isDeleteCategoryDialogOpen}
+        isOpen={isDeleteCategoryDialogOpen}
       />
       <DialogWithAction
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted.`}
-        handleConfirmCallback={handleDeleteObjects}
+        onConfirm={handleDeleteObjects}
         onClose={() => handleMenuCloseWith(handleCloseDialogWithAction)}
-        open={isDialogWithActionOpen}
+        isOpen={isDialogWithActionOpen}
       />
     </Menu>
+  );
+};
+
+const CategoryMenuItem = ({
+  label,
+  onClick: handleClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) => {
+  return (
+    <MenuItem
+      onClick={handleClick}
+      dense
+      sx={(theme) => ({ px: theme.spacing(0.5) })}
+    >
+      <Typography variant="inherit">{label}</Typography>
+    </MenuItem>
+  );
+};
+
+const MenuItemDivider = () => {
+  return (
+    <StyledDivider
+      orientation="vertical"
+      flexItem
+      sx={(theme) => ({ mx: theme.spacing(0.5) })}
+    />
   );
 };
