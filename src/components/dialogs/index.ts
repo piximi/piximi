@@ -1,6 +1,6 @@
-export { AlertDialog } from "./AlertDialog";
 export { CustomDialog } from "./CustomDialog";
 export { DialogWithAction } from "./DialogWithAction";
+export { DialogWithActionSHK } from "./DialogWithAction";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";
 export { FallBackDialog } from "./FallbackDialog/FallBackDialog";
 export { ImageShapeDialog } from "./ImageShapeDialog/ImageShapeDialog";
@@ -14,7 +14,7 @@ export { ExitAnnotatorDialog } from "./ExitAnnotatorDialog";
 export { FitClassifierDialog } from "./FitClassifierDialog";
 export { FitSegmenterDialog } from "./FitSegmenterDialog";
 export { NewProjectDialog } from "./NewProjectDialog";
-export { OpenExampleProjectDialog } from "./OpenExampleProjectDialog";
+export { ExampleProjectDialog } from "./ExampleProjectDialog";
 export { SaveFittedModelDialog } from "./SaveFittedModelDialog";
 export { SaveProjectDialog } from "./SaveProjectDialog";
 export { ExportAnnotationsDialog } from "./ExportAnnotationsDialog";

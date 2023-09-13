@@ -1,6 +1,6 @@
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 
-import { OpenProjectMenu } from "components/menus";
+import { OpenMenu } from "components/menus";
 import { useMenu } from "hooks";
 import { CustomListItemButton } from "../CustomListItemButton";
 
@@ -10,12 +10,13 @@ export const OpenProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
-        primaryText="Open Project"
+        primaryText="Open"
         onClick={onOpen}
         icon={<FolderOpenIcon />}
+        tooltipText="Open Project/Image"
       />
 
-      <OpenProjectMenu anchorEl={anchorEl} onClose={onClose} open={open} />
+      <OpenMenu anchorEl={anchorEl} onClose={onClose} open={open} />
     </>
   );
 };

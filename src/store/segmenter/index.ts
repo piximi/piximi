@@ -16,6 +16,7 @@ export {
 } from "./selectors/selectSegmenterModel";
 export { selectSegmenterModelIdx } from "./selectors/selectSegmenterModelIdx";
 export { selectSegmenterModelStatus } from "./selectors/selectSegmenterModelStatus";
+export { selectSegmenterShuffleOptions } from "./selectors/selectSegmenterShuffleOptions";
 
 // Sagas
 

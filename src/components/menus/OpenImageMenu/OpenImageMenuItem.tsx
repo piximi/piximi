@@ -38,8 +38,8 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
 
   return (
     <React.Fragment>
-      <MenuItem component="label">
-        <ListItemText primary="Open new image" />
+      <MenuItem component="label" dense>
+        <ListItemText primary="New Image" />
         <input
           accept="image/*,.dcm"
           hidden

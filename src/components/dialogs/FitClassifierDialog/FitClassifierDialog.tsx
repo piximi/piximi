@@ -1,79 +1,56 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fade,
-  List,
-} from "@mui/material";
+import { Dialog, DialogContent, List } from "@mui/material";
 
-import { FitClassifierDialogAppBar } from "components/app-bars";
+import { AlertBar, FitClassifierDialogAppBar } from "components/app-bars";
 
+import { ModelSummaryTable, TwoDataPlot } from "components/data-viz";
 import {
-  ModelSummaryTable,
-  TrainingHistoryPlot,
-} from "components/styled-components";
-import {
-  OptimizerSettingsListItem,
-  DatasetSettingsListItem,
-  ClassifierArchitectureSettingsListItem,
-  PreprocessingSettingsListItem,
+  ClassifierArchitectureListItem,
+  ClassifierOptimizerListItem,
+  ClassifierPreprocessingListItem,
+  ClassifierDatasetListItem,
 } from "components/list-items";
-import { AlertDialog, DialogTransitionSlide } from "components/dialogs";
+import { DialogTransitionSlide } from "components/dialogs";
 
 import { selectAlertState } from "store/application";
 import {
   selectClassifierSelectedModel,
   selectClassifierHistory,
   selectClassifierModelStatus,
-  selectClassifierCompileOptions,
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
   classifierSlice,
-  selectClassifierInputShape,
 } from "store/classifier";
 import { selectImagesByPartitions } from "store/data";
 
-import {
-  AlertStateType,
-  AlertType,
-  OptimizationAlgorithm,
-  LossFunction,
-  Partition,
-} from "types";
-import { ModelStatus, availableClassifierModels } from "types/ModelType";
+import { AlertStateType, AlertType, Partition } from "types";
+import { ModelStatus } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
-import { useDialog } from "hooks";
-
-enum ClearOptions {
-  cancel,
-  no,
-  yes,
-}
 
 type FitClassifierDialogProps = {
   closeDialog: () => void;
   openedDialog: boolean;
 };
 
-export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
+const historyItems = [
+  "loss",
+  "val_loss",
+  "categoricalAccuracy",
+  "val_categoricalAccuracy",
+  "epochs",
+];
+
+export const FitClassifierDialog = ({
+  closeDialog,
+  openedDialog,
+}: FitClassifierDialogProps) => {
   const dispatch = useDispatch();
 
-  const { closeDialog, openedDialog } = props;
-
-  const {
-    onClose: onCloseClearDialog,
-    open: openClearDialog,
-    onOpen: onOpenClearDialog,
-  } = useDialog();
-
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-
   const [showWarning, setShowWarning] = useState<boolean>(true);
+
   const [noCategorizedImages, setNoCategorizedImages] =
     useState<boolean>(false);
   const [showPlots, setShowPlots] = useState<boolean>(false);
@@ -94,127 +71,24 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const [nextModelIdx, setNextModelIdx] = useState(0);
-
-  const [clearModel, setClearModel] = useState(ClearOptions.no);
-
   //TODO: need full inference images here, or just count?
   const categorizedImages = useSelector(selectImagesByPartitions)([
-    Partition.Inference,
+    Partition.Training,
+    Partition.Validation,
   ]);
-
   const selectedModel = useSelector(selectClassifierSelectedModel);
-  const inputShape = useSelector(selectClassifierInputShape);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
-
   const fitOptions = useSelector(selectClassifierFitOptions);
-  const compileOptions = useSelector(selectClassifierCompileOptions);
   const trainingPercentage = useSelector(selectClassifierTrainingPercentage);
-
-  const items = useRef([
-    "loss",
-    "val_loss",
-    "categoricalAccuracy",
-    "val_categoricalAccuracy",
-    "epochs",
-  ]);
-
   const modelHistory = useSelector((state) =>
-    selectClassifierHistory(state, items.current)
+    selectClassifierHistory(state, historyItems)
   );
-
-  const dispatchBatchSizeCallback = (batchSize: number) => {
-    dispatch(classifierSlice.actions.updateBatchSize({ batchSize: batchSize }));
-  };
-
-  const dispatchLearningRateCallback = (learningRate: number) => {
-    dispatch(
-      classifierSlice.actions.updateLearningRate({ learningRate: learningRate })
-    );
-  };
-
-  const dispatchEpochsCallback = (epochs: number) => {
-    dispatch(classifierSlice.actions.updateEpochs({ epochs: epochs }));
-  };
-
-  const dispatchOptimizationAlgorithmCallback = (
-    optimizationAlgorithm: OptimizationAlgorithm
-  ) => {
-    dispatch(
-      classifierSlice.actions.updateOptimizationAlgorithm({
-        optimizationAlgorithm: optimizationAlgorithm,
-      })
-    );
-  };
-
-  const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
-    dispatch(
-      classifierSlice.actions.updateLossFunction({
-        lossFunction: lossFunction,
-      })
-    );
-  };
-
-  const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
-    dispatch(
-      classifierSlice.actions.updateTrainingPercentage({
-        trainingPercentage: trainPercentage,
-      })
-    );
-  };
-
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
     name: "No labeled images",
     description: "Please label images to train a model.",
   };
-
-  useEffect(() => {
-    if (categorizedImages.length === 0) {
-      setNoCategorizedImages(true);
-      if (!noCategorizedImages && selectedModel.trainable) {
-        setShowWarning(true);
-      }
-    } else {
-      setNoCategorizedImages(false);
-    }
-  }, [categorizedImages, noCategorizedImages, selectedModel]);
-
-  useEffect(() => {
-    if (
-      process.env.NODE_ENV !== "production" &&
-      process.env.REACT_APP_LOG_LEVEL === "1" &&
-      categorizedImages.length > 0
-    ) {
-      const trainingSize = Math.round(
-        categorizedImages.length * trainingPercentage
-      );
-      const validationSize = categorizedImages.length - trainingSize;
-
-      console.log(
-        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
-        `; val size to ${categorizedImages.length} - ${trainingSize} = ${validationSize}`
-      );
-
-      console.log(
-        `Set training batches per epoch to RoundUp[${trainingSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
-      );
-
-      console.log(
-        `Set validation batches per epoch to RoundUp[${validationSize} / ${
-          fitOptions.batchSize
-        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
-      );
-
-      console.log(
-        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
-        `; validation is ${validationSize % fitOptions.batchSize}`
-      );
-    }
-  }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
 
   const trainingHistoryCallback: TrainingCallbacks["onEpochEnd"] = async (
     epoch,
@@ -257,26 +131,6 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     setShowPlots(true);
   };
 
-  useEffect(() => {
-    setTrainingAccuracy(
-      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
-    );
-    setValidationAccuracy(
-      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y }))
-    );
-    setTrainingLoss(modelHistory.loss.map((y, i) => ({ x: i + 0.5, y })));
-    setValidationLoss(modelHistory.val_loss.map((y, i) => ({ x: i + 1, y })));
-
-    // modelHistory.epochs.length same as numEpochs
-    // the rest should be same length as well
-    // don't use modelHistory.numEpochs because then it will need to be
-    // a useEffect dependency, and we don't want to react to model object
-    // state changes directly, only through useSelector returned values
-    setShowPlots(modelHistory.epochs.length > 0);
-
-    setCurrentEpoch(0);
-  }, [modelHistory]);
-
   const onFit = async () => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
@@ -298,76 +152,81 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
     }
   };
 
-  const dispatchModel = (disposePrevious: boolean, _nextModelIdx: number) => {
-    dispatch(
-      classifierSlice.actions.updateSelectedModelIdx({
-        modelIdx: _nextModelIdx,
-        disposePrevious,
-      })
-    );
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REACT_APP_LOG_LEVEL === "1" &&
+      categorizedImages.length > 0
+    ) {
+      const trainingSize = Math.round(
+        categorizedImages.length * trainingPercentage
+      );
+      const validationSize = categorizedImages.length - trainingSize;
 
-    const nextModel = availableClassifierModels[_nextModelIdx];
+      console.log(
+        `Set training size to Round[${categorizedImages.length} * ${trainingPercentage}] = ${trainingSize}`,
+        `; val size to ${categorizedImages.length} - ${trainingSize} = ${validationSize}`
+      );
 
-    // if the selected model requires a specific number of input channels,
-    // dispatch that number to the store
-    if (nextModel.requiredChannels) {
-      dispatch(
-        classifierSlice.actions.updateInputShape({
-          inputShape: {
-            ...inputShape,
-            channels: nextModel.requiredChannels,
-          },
-        })
+      console.log(
+        `Set training batches per epoch to RoundUp[${trainingSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(trainingSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Set validation batches per epoch to RoundUp[${validationSize} / ${
+          fitOptions.batchSize
+        }] = ${Math.ceil(validationSize / fitOptions.batchSize)}`
+      );
+
+      console.log(
+        `Training last batch size is ${trainingSize % fitOptions.batchSize}`,
+        `; validation is ${validationSize % fitOptions.batchSize}`
       );
     }
-  };
+  }, [fitOptions.batchSize, trainingPercentage, categorizedImages.length]);
 
-  const dispatchModelOnExit = () => {
-    if (clearModel !== ClearOptions.cancel) {
-      dispatchModel(clearModel === ClearOptions.yes, nextModelIdx);
-    }
-  };
-
-  const onClearSelect = (_clearModel: ClearOptions) => {
-    onCloseClearDialog();
-    // don't call dispatchModel directly here
-    // it needs to be triggered on dialog exit
-    setClearModel(_clearModel);
-  };
-
-  const onModelSelect = (modelIdx: number) => {
-    setNextModelIdx(modelIdx);
-    if (selectedModel.modelLoaded) {
-      onOpenClearDialog();
+  useEffect(() => {
+    if (categorizedImages.length === 0) {
+      setNoCategorizedImages(true);
+      if (!noCategorizedImages && selectedModel.trainable) {
+        setShowWarning(true);
+      }
     } else {
-      // if not loaded skip the clear dialog
-      dispatchModel(false, modelIdx);
+      setNoCategorizedImages(false);
     }
-  };
+  }, [categorizedImages, noCategorizedImages, selectedModel]);
+
+  useEffect(() => {
+    setTrainingAccuracy(
+      modelHistory.categoricalAccuracy.map((y, i) => ({ x: i + 0.5, y }))
+    );
+    setValidationAccuracy(
+      modelHistory.val_categoricalAccuracy.map((y, i) => ({ x: i + 1, y }))
+    );
+    setTrainingLoss(modelHistory.loss.map((y, i) => ({ x: i + 0.5, y })));
+    setValidationLoss(modelHistory.val_loss.map((y, i) => ({ x: i + 1, y })));
+
+    // modelHistory.epochs.length same as numEpochs
+    // the rest should be same length as well
+    // don't use modelHistory.numEpochs because then it will need to be
+    // a useEffect dependency, and we don't want to react to model object
+    // state changes directly, only through useSelector returned values
+    setShowPlots(modelHistory.epochs.length > 0);
+
+    setCurrentEpoch(0);
+  }, [modelHistory]);
 
   return (
     <>
       <Dialog
-        onClose={onCloseClearDialog}
-        open={openClearDialog}
-        TransitionComponent={Fade}
-        TransitionProps={{ onExited: dispatchModelOnExit }}
-      >
-        <DialogTitle>Clear {selectedModel.name}?</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => onClearSelect(ClearOptions.cancel)}>
-            Cancel
-          </Button>
-          <Button onClick={() => onClearSelect(ClearOptions.no)}>No</Button>
-          <Button onClick={() => onClearSelect(ClearOptions.yes)}>Yes</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        fullScreen
+        fullWidth
+        maxWidth="md"
         onClose={closeDialog}
         open={openedDialog}
         TransitionComponent={DialogTransitionSlide}
-        style={{ zIndex: 1203 }}
+        style={{ zIndex: 1203, height: "100%" }}
       >
         <FitClassifierDialogAppBar
           closeDialog={closeDialog}
@@ -379,55 +238,50 @@ export const FitClassifierDialog = (props: FitClassifierDialogProps) => {
         />
 
         {showWarning && noCategorizedImages && selectedModel.trainable && (
-          <AlertDialog
-            setShowAlertDialog={setShowWarning}
+          <AlertBar
+            setShowAlertBar={setShowWarning}
             alertState={noLabeledImageAlert}
           />
         )}
 
-        {alertState.visible && <AlertDialog alertState={alertState} />}
+        {alertState.visible && <AlertBar alertState={alertState} />}
 
         <DialogContent>
           <List dense>
-            <PreprocessingSettingsListItem />
+            <ClassifierPreprocessingListItem />
 
-            <ClassifierArchitectureSettingsListItem
-              onModelSelect={onModelSelect}
-            />
+            <ClassifierArchitectureListItem />
 
-            <OptimizerSettingsListItem
-              compileOptions={compileOptions}
-              dispatchLossFunctionCallback={dispatchLossFunctionCallback}
-              dispatchOptimizationAlgorithmCallback={
-                dispatchOptimizationAlgorithmCallback
-              }
-              dispatchEpochsCallback={dispatchEpochsCallback}
+            <ClassifierOptimizerListItem
               fitOptions={fitOptions}
-              dispatchBatchSizeCallback={dispatchBatchSizeCallback}
-              dispatchLearningRateCallback={dispatchLearningRateCallback}
-              isModelTrainable={selectedModel.trainable}
+              trainable={selectedModel.trainable}
             />
 
-            <DatasetSettingsListItem
+            <ClassifierDatasetListItem
               trainingPercentage={trainingPercentage}
-              dispatchTrainingPercentageCallback={
-                dispatchTrainingPercentageCallback
-              }
-              isModelTrainable={selectedModel.trainable}
+              trainable={selectedModel.trainable}
             />
           </List>
           {showPlots && (
             <div>
-              <TrainingHistoryPlot
-                metric={"accuracy"}
-                trainingValues={trainingAccuracy}
-                validationValues={validationAccuracy}
+              <TwoDataPlot
+                title="Training History - Accuracy per Epoch"
+                yLabel="Accuracy"
+                xLabel="Epoch"
+                yData1={trainingAccuracy}
+                id1="Accuracy"
+                yData2={validationAccuracy}
+                id2="Validation Accuracy"
               />
 
-              <TrainingHistoryPlot
-                metric={"loss"}
-                trainingValues={trainingLoss}
-                validationValues={validationLoss}
+              <TwoDataPlot
+                title="Training History - Loss per Epoch"
+                yLabel="Loss"
+                xLabel="Epoch"
+                yData1={trainingLoss}
+                id1="Loss"
+                yData2={validationLoss}
+                id2="Validation Loss"
                 dynamicYRange={true}
               />
             </div>

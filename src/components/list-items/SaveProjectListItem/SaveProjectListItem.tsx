@@ -16,9 +16,10 @@ export const SaveProjectListItem = () => {
   return (
     <>
       <CustomListItemButton
-        primaryText="Save Project"
+        primaryText="Save"
         onClick={onSaveProjectDialogOpen}
         icon={<DownloadIcon />}
+        tooltipText="Save Project"
       />
 
       <SaveProjectDialog

@@ -226,8 +226,8 @@ export const ImageGridAppBar = () => {
           selectedImagesIds.length > 1 ? "s" : ""
         }?`}
         content="Images will be deleted from the project."
-        handleConfirmCallback={handleAndDispatchDeleteImages}
-        open={deleteImagesDialogisOpen}
+        onConfirm={handleAndDispatchDeleteImages}
+        isOpen={deleteImagesDialogisOpen}
         onClose={handleCloseDeleteImagesDialog}
       />
     </>

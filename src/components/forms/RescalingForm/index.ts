@@ -1,1 +1,0 @@
-export { RescalingForm } from "./RescalingForm";

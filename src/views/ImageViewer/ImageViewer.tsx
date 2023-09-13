@@ -12,15 +12,12 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 
 import { useUpload } from "hooks";
 
-import {
-  FallBackDialog,
-  ImageShapeDialog,
-  AlertDialog,
-} from "components/dialogs";
-
-import { StageWrapper } from "../../components/stage/StageWrapper";
-import { ToolOptions } from "../../components/stage/ToolOptions";
+import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
 import { ImageViewerDrawer, ToolDrawer } from "components/drawers";
+import { AlertBar } from "components/app-bars";
+
+import { StageWrapper } from "components/stage/StageWrapper";
+import { ToolOptions } from "components/stage/ToolOptions";
 
 import {
   selectAlertState,
@@ -144,7 +141,7 @@ export const ImageViewer = () => {
               color="inherit"
               position="fixed"
             >
-              <AlertDialog alertState={alertState} />
+              <AlertBar alertState={alertState} />
             </AppBar>
           )}
 
