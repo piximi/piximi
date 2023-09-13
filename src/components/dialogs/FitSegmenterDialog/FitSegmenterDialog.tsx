@@ -1,54 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fade,
-  List,
-} from "@mui/material";
+import { Dialog, DialogContent, List } from "@mui/material";
 
 import {
-  OptimizerSettingsListItem,
-  DatasetSettingsListItem,
-  SegmenterArchitectureSettingsListItem,
+  SegmenterOptimizerListItem,
+  SegmenterDatasetListItem,
+  SegmenterArchitectureListItem,
 } from "components/list-items";
-import { TrainingHistoryPlot } from "components/styled-components/TrainingHistoryPlot/TrainingHistoryPlot";
-import { DialogTransitionSlide, AlertDialog } from "components/dialogs";
-import { FitSegmenterDialogAppBar } from "components/app-bars";
-import { ModelSummaryTable } from "components/styled-components";
+import { TwoDataPlot, ModelSummaryTable } from "components/data-viz";
+import { DialogTransitionSlide } from "components/dialogs";
+import { FitSegmenterDialogAppBar, AlertBar } from "components/app-bars";
 
 import { selectAlertState } from "store/application";
 import { selectAnnotatedImages } from "store/data";
 import {
   selectSegmenterFitOptions,
-  selectSegmenterCompileOptions,
   selectSegmenterTrainingPercentage,
   segmenterSlice,
   selectSegmenterModel,
   selectSegmenterModelStatus,
-  selectSegmenterInputShape,
   selectSegmenterHistory,
 } from "store/segmenter";
 
-import {
-  AlertStateType,
-  AlertType,
-  LossFunction,
-  OptimizationAlgorithm,
-} from "types";
+import { AlertStateType, AlertType } from "types";
 import { TrainingCallbacks } from "utils/common/models/Model";
-import { ModelStatus, availableSegmenterModels } from "types/ModelType";
-import { useDialog } from "hooks";
-
-enum ClearOptions {
-  cancel,
-  no,
-  yes,
-}
+import { ModelStatus } from "types/ModelType";
 
 type FitSegmenterDialogProps = {
   closeDialog: () => void;
@@ -59,12 +36,6 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const dispatch = useDispatch();
 
   const { closeDialog, openedDialog } = props;
-
-  const {
-    onClose: onCloseClearDialog,
-    open: openClearDialog,
-    onOpen: onOpenClearDialog,
-  } = useDialog();
 
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
 
@@ -88,18 +59,13 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     { x: number; y: number }[]
   >([]);
 
-  const [nextModelIdx, setNextModelIdx] = useState(0);
-
-  const [clearModel, setClearModel] = useState(ClearOptions.no);
-
   const annotatedImages = useSelector(selectAnnotatedImages);
   const selectedModel = useSelector(selectSegmenterModel);
-  const inputShape = useSelector(selectSegmenterInputShape);
   const modelStatus = useSelector(selectSegmenterModelStatus);
   const alertState = useSelector(selectAlertState);
 
   const fitOptions = useSelector(selectSegmenterFitOptions);
-  const compileOptions = useSelector(selectSegmenterCompileOptions);
+
   const trainingPercentage = useSelector(selectSegmenterTrainingPercentage);
 
   const items = useRef([
@@ -113,54 +79,6 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
   const modelHistory = useSelector((state) =>
     selectSegmenterHistory(state, items.current)
   );
-
-  const dispatchBatchSizeCallback = (batchSize: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationBatchSize({
-        batchSize: batchSize,
-      })
-    );
-  };
-
-  const dispatchLearningRateCallback = (learningRate: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationLearningRate({
-        learningRate: learningRate,
-      })
-    );
-  };
-
-  const dispatchEpochsCallback = (epochs: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationEpochs({ epochs: epochs })
-    );
-  };
-
-  const dispatchOptimizationAlgorithmCallback = (
-    optimizationAlgorithm: OptimizationAlgorithm
-  ) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationOptimizationAlgorithm({
-        optimizationAlgorithm: optimizationAlgorithm,
-      })
-    );
-  };
-
-  const dispatchLossFunctionCallback = (lossFunction: LossFunction) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationLossFunction({
-        lossFunction: lossFunction,
-      })
-    );
-  };
-
-  const dispatchTrainingPercentageCallback = (trainPercentage: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSegmentationTrainingPercentage({
-        trainingPercentage: trainPercentage,
-      })
-    );
-  };
 
   const noLabeledImageAlert: AlertStateType = {
     alertType: AlertType.Info,
@@ -296,70 +214,8 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
     }
   };
 
-  const dispatchModel = (disposePrevious: boolean, _nextModelIdx: number) => {
-    dispatch(
-      segmenterSlice.actions.updateSelectedModelIdx({
-        modelIdx: _nextModelIdx,
-        disposePrevious,
-      })
-    );
-
-    const nextModel = availableSegmenterModels[_nextModelIdx];
-
-    // if the selected model requires a specific number of input channels,
-    // dispatch that number to the store
-    if (nextModel.requiredChannels) {
-      dispatch(
-        segmenterSlice.actions.updateSegmentationInputShape({
-          inputShape: {
-            ...inputShape,
-            channels: nextModel.requiredChannels,
-          },
-        })
-      );
-    }
-  };
-
-  const dispatchModelOnExit = () => {
-    if (clearModel !== ClearOptions.cancel) {
-      dispatchModel(clearModel === ClearOptions.yes, nextModelIdx);
-    }
-  };
-
-  const onClearSelect = (_clearModel: ClearOptions) => {
-    onCloseClearDialog();
-    // don't call dispatchModel directly here
-    // it needs to be triggered on dialog exit
-    setClearModel(_clearModel);
-  };
-
-  const onModelSelect = (modelIdx: number) => {
-    setNextModelIdx(modelIdx);
-    if (selectedModel.modelLoaded) {
-      onOpenClearDialog();
-    } else {
-      // if not loaded skip the clear dialog
-      dispatchModel(false, modelIdx);
-    }
-  };
-
   return (
     <>
-      <Dialog
-        onClose={onCloseClearDialog}
-        open={openClearDialog}
-        TransitionComponent={Fade}
-        TransitionProps={{ onExited: dispatchModelOnExit }}
-      >
-        <DialogTitle> Clear {selectedModel.name}?</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => onClearSelect(ClearOptions.cancel)}>
-            Cancel
-          </Button>
-          <Button onClick={() => onClearSelect(ClearOptions.no)}>No</Button>
-          <Button onClick={() => onClearSelect(ClearOptions.yes)}>Yes</Button>
-        </DialogActions>
-      </Dialog>
       <Dialog
         fullWidth
         maxWidth="md"
@@ -378,54 +234,49 @@ export const FitSegmenterDialog = (props: FitSegmenterDialogProps) => {
         />
 
         {showWarning && noLabeledImages && selectedModel.trainable && (
-          <AlertDialog
-            setShowAlertDialog={setShowWarning}
+          <AlertBar
+            setShowAlertBar={setShowWarning}
             alertState={noLabeledImageAlert}
           />
         )}
 
-        {alertState.visible && <AlertDialog alertState={alertState} />}
+        {alertState.visible && <AlertBar alertState={alertState} />}
 
         <DialogContent>
           <List dense>
-            <SegmenterArchitectureSettingsListItem
-              onModelSelect={onModelSelect}
-            />
+            <SegmenterArchitectureListItem />
 
-            <OptimizerSettingsListItem
-              compileOptions={compileOptions}
-              dispatchLossFunctionCallback={dispatchLossFunctionCallback}
-              dispatchOptimizationAlgorithmCallback={
-                dispatchOptimizationAlgorithmCallback
-              }
-              dispatchEpochsCallback={dispatchEpochsCallback}
+            <SegmenterOptimizerListItem
               fitOptions={fitOptions}
-              dispatchBatchSizeCallback={dispatchBatchSizeCallback}
-              dispatchLearningRateCallback={dispatchLearningRateCallback}
-              isModelTrainable={selectedModel.trainable}
+              trainable={selectedModel.trainable}
             />
 
-            <DatasetSettingsListItem
+            <SegmenterDatasetListItem
               trainingPercentage={trainingPercentage}
-              dispatchTrainingPercentageCallback={
-                dispatchTrainingPercentageCallback
-              }
-              isModelTrainable={selectedModel.trainable}
+              trainable={selectedModel.trainable}
             />
           </List>
 
           {showPlots && (
             <div>
-              <TrainingHistoryPlot
-                metric={"accuracy"}
-                trainingValues={trainingAccuracy}
-                validationValues={validationAccuracy}
+              <TwoDataPlot
+                title="Training History - Accuracy per Epoch"
+                yLabel="Accuracy"
+                xLabel="Epoch"
+                yData1={trainingAccuracy}
+                id1="Accuracy"
+                yData2={validationAccuracy}
+                id2="Validation Accuracy"
               />
 
-              <TrainingHistoryPlot
-                metric={"loss"}
-                trainingValues={trainingLoss}
-                validationValues={validationLoss}
+              <TwoDataPlot
+                title="Training History - Loss per Epoch"
+                yLabel="Loss"
+                xLabel="Epoch"
+                yData1={trainingLoss}
+                id1="Loss"
+                yData2={validationLoss}
+                id2="Validation Loss"
                 dynamicYRange={true}
               />
             </div>

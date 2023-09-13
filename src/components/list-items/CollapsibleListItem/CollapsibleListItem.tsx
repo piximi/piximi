@@ -39,7 +39,7 @@ export const CollapsibleListItem = ({
   dense,
   secondary,
   carotPosition = "end",
-  beginCollapsed,
+  beginCollapsed = true,
   disabled,
   enforceHeight,
   indentSpacing = 4,

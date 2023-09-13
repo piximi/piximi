@@ -5,7 +5,7 @@ import { AppBar, Box } from "@mui/material";
 
 import { ProjectToolbar } from "../ProjectToolbar";
 
-import { AlertDialog } from "components/dialogs";
+import { AlertBar } from "components/app-bars";
 
 import { selectAlertState } from "store/application";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
@@ -25,7 +25,7 @@ export const ProjectAppBar = () => {
       >
         <ProjectToolbar />
 
-        {alertState.visible && <AlertDialog alertState={alertState} />}
+        {alertState.visible && <AlertBar alertState={alertState} />}
       </AppBar>
     </Box>
   );

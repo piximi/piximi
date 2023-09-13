@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { TextField } from "@mui/material";
+import { FormControl, TextField } from "@mui/material";
 
 const intRegExpr = new RegExp("^[0-9]+(.0*)?$");
 const floatRegExpr = new RegExp("-*^[0-9]*(.[0-9]*)?$");
@@ -14,19 +14,10 @@ type CustomNumberTextFieldProps = {
   max?: number;
   enableFloat?: boolean;
   disabled?: boolean;
+  size?: "small" | "medium";
+  width?: string;
 };
 
-/**
- * @param {string} id
- * @param {string} label
- * @param {number} value
- * @param {(arg: number) => void} dispatchCallBack callback to dispatch the selected value to the store
- * @param {number} [min=Number.MIN_SAFE_INTEGER]
- * @param {number} [max=Number.MIN_SAFE_INTEGER]
- * @param {boolean} [enableFloat=false] allow floating point values
- * @param {boolean} [disabled=false] disable the input field
- * @returns
- */
 export const CustomNumberTextField = ({
   id,
   label,
@@ -36,6 +27,8 @@ export const CustomNumberTextField = ({
   max = Number.MAX_SAFE_INTEGER,
   enableFloat = false,
   disabled = false,
+  size = "small",
+  width,
 }: CustomNumberTextFieldProps) => {
   const [valueString, setValueString] = React.useState<string>(
     value.toString()
@@ -95,24 +88,22 @@ export const CustomNumberTextField = ({
   };
 
   return (
-    <TextField
-      id={id}
-      onBlur={dispatchValue}
-      label={label}
-      sx={(theme) => ({
-        marginRight: theme.spacing(1),
-        flexBasis: 300,
-        marginTop: theme.spacing(2.75),
-        width: "100%",
-      })}
-      error={inputError}
-      helperText={inputError ? errorHelpText : ""}
-      value={valueString}
-      onChange={onInputChange}
-      type="text"
-      margin="normal"
-      autoComplete="off"
-      disabled={disabled}
-    />
+    <FormControl size={size}>
+      <TextField
+        id={id}
+        onBlur={dispatchValue}
+        label={label}
+        error={inputError}
+        helperText={inputError ? errorHelpText : ""}
+        value={valueString}
+        onChange={onInputChange}
+        type="text"
+        margin="normal"
+        autoComplete="off"
+        disabled={disabled}
+        size={size}
+        sx={{ width: width ? width : "inherit" }}
+      />
+    </FormControl>
   );
 };

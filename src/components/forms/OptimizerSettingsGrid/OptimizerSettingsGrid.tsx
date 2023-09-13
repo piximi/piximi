@@ -1,10 +1,6 @@
-import { FormHelperText, Grid, SelectChangeEvent } from "@mui/material";
+import { Grid, SelectChangeEvent } from "@mui/material";
 
-import {
-  CustomNumberTextField,
-  CustomFormSelectField,
-  StyledFormControl,
-} from "components/forms";
+import { CustomNumberTextField, CustomFormSelectField } from "components/forms";
 
 import {
   CompileOptions,
@@ -13,7 +9,7 @@ import {
   OptimizationAlgorithm,
 } from "types";
 
-export type OptimizerSettingsGridProps = {
+type OptimizerSettingsGridProps = {
   compileOptions: CompileOptions;
   dispatchLossFunctionCallback: (lossFunction: LossFunction) => void;
   dispatchOptimizationAlgorithmCallback: (
@@ -52,68 +48,64 @@ export const OptimizerSettingsGrid = ({
 
   return (
     <>
-      <StyledFormControl>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <FormHelperText>Optimization Algorithm</FormHelperText>
-            <CustomFormSelectField
-              keySource={OptimizationAlgorithm}
-              value={compileOptions.optimizationAlgorithm as string}
-              onChange={onOptimizationAlgorithmChange}
-              disabled={!isModelTrainable}
-            />
-          </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <CustomFormSelectField
+            keySource={OptimizationAlgorithm}
+            value={compileOptions.optimizationAlgorithm as string}
+            onChange={onOptimizationAlgorithmChange}
+            disabled={!isModelTrainable}
+            helperText="OptimizationAlgorithm"
+          />
         </Grid>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <CustomNumberTextField
-              id="learning-rate"
-              label="Learning rate"
-              value={compileOptions.learningRate}
-              dispatchCallBack={dispatchLearningRateCallback}
-              min={0}
-              enableFloat={true}
-              disabled={!isModelTrainable}
-            />
-          </Grid>
+      </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <CustomNumberTextField
+            id="learning-rate"
+            label="Learning rate"
+            value={compileOptions.learningRate}
+            dispatchCallBack={dispatchLearningRateCallback}
+            min={0}
+            enableFloat={true}
+            disabled={!isModelTrainable}
+          />
         </Grid>
-      </StyledFormControl>
-      <StyledFormControl>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <FormHelperText>Loss Function</FormHelperText>
-            <CustomFormSelectField
-              keySource={LossFunction}
-              value={compileOptions.lossFunction as string}
-              onChange={onLossFunctionChange}
-              disabled={!isModelTrainable}
-            />
-          </Grid>
+      </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <CustomFormSelectField
+            keySource={LossFunction}
+            value={compileOptions.lossFunction as string}
+            onChange={onLossFunctionChange}
+            disabled={!isModelTrainable}
+            helperText="Loss Function"
+          />
         </Grid>
-        <Grid container direction={"row"} spacing={2}>
-          <Grid item xs={2}>
-            <CustomNumberTextField
-              id="batch-size"
-              label="Batch size"
-              value={fitOptions.batchSize}
-              dispatchCallBack={dispatchBatchSizeCallback}
-              min={1}
-              disabled={!isModelTrainable}
-            />
-          </Grid>
+      </Grid>
+      <Grid container direction={"row"} spacing={2}>
+        <Grid item xs={2}>
+          <CustomNumberTextField
+            id="batch-size"
+            label="Batch size"
+            value={fitOptions.batchSize}
+            dispatchCallBack={dispatchBatchSizeCallback}
+            min={1}
+            disabled={!isModelTrainable}
+          />
+        </Grid>
 
-          <Grid item xs={2}>
-            <CustomNumberTextField
-              id="epochs"
-              label="Epochs"
-              value={fitOptions.epochs}
-              dispatchCallBack={dispatchEpochsCallback}
-              min={1}
-              disabled={!isModelTrainable}
-            />
-          </Grid>
+        <Grid item xs={2}>
+          <CustomNumberTextField
+            id="epochs"
+            label="Epochs"
+            value={fitOptions.epochs}
+            dispatchCallBack={dispatchEpochsCallback}
+            min={1}
+            disabled={!isModelTrainable}
+          />
         </Grid>
-      </StyledFormControl>
+      </Grid>
     </>
   );
 };

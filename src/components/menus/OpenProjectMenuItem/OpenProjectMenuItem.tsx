@@ -125,8 +125,8 @@ export const OpenProjectMenuItem = ({
 
   return (
     <>
-      <MenuItem component="label">
-        <ListItemText primary="Open project zarr" />
+      <MenuItem component="label" dense>
+        <ListItemText primary="Project from Zarr" />
         <input
           accept=".zarr"
           hidden
@@ -140,8 +140,8 @@ export const OpenProjectMenuItem = ({
           webkitdirectory=""
         />
       </MenuItem>
-      <MenuItem component="label">
-        <ListItemText primary="Open project zip" />
+      <MenuItem component="label" dense>
+        <ListItemText primary="Project from Zip" />
         <input
           accept="application/zip"
           hidden

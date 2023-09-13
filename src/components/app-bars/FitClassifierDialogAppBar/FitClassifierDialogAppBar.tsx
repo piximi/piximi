@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { ArrowBack, PlayCircleOutline, Stop } from "@mui/icons-material";
+import { Close, PlayCircleOutline, Stop } from "@mui/icons-material";
 
 import { FitClassifierProgressBar } from "./FitClassifierProgressBar";
 
@@ -21,6 +21,7 @@ import {
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
+import { useEffect } from "react";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -57,6 +58,11 @@ export const FitClassifierDialogAppBar = ({
     );
   };
 
+  useEffect(() => {
+    console.log("noLabel: ", noLabels); //LOG:
+    console.log("noTrain", noTrain); //LOG
+  }, [noLabels, noTrain]);
+
   return (
     <AppBar
       sx={{
@@ -75,7 +81,7 @@ export const FitClassifierDialogAppBar = ({
             aria-label="Close"
             href={""}
           >
-            <ArrowBack />
+            <Close />
           </IconButton>
         </Tooltip>
 

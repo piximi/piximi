@@ -30,6 +30,11 @@ export const getNivoTheme = (themeMode: ThemeMode) => {
         fill: theme.palette.text.primary,
       },
     },
+    grid: {
+      line: {
+        stroke: theme.palette.grey[100],
+      },
+    },
   };
 
   return nivoTheme;

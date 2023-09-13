@@ -1,11 +1,11 @@
 import React from "react";
 
-import { Menu, MenuItem, MenuList } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 
 import { OpenProjectMenuItem } from "../OpenProjectMenuItem";
-import { OpenExampleProjectDialog } from "components/dialogs";
+import { ExampleProjectDialog } from "components/dialogs";
 
 import { HotkeyView } from "types";
 
@@ -22,7 +22,7 @@ export const OpenProjectMenu = ({
 }: OpenProjectMenuProps) => {
   const {
     onClose: onCloseExampleProjectDialog,
-    onOpen: onOpenExampleProjectDialog,
+    onOpen: onExampleProjectDialog,
     open: openExampleProject,
   } = useDialogHotkey(HotkeyView.ExampleClassifierDialog);
 
@@ -34,15 +34,25 @@ export const OpenProjectMenu = ({
   };
 
   return (
-    <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-      <MenuList dense variant="menu">
-        <OpenProjectMenuItem onMenuClose={onClose} />
-        <MenuItem onClick={onOpenExampleProjectDialog}>
-          Open example project
-        </MenuItem>
-      </MenuList>
+    <Menu
+      anchorEl={anchorEl}
+      open={open}
+      onClose={onClose}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "left",
+      }}
+    >
+      <OpenProjectMenuItem onMenuClose={onClose} />
+      <MenuItem onClick={onExampleProjectDialog} dense>
+        Example Project
+      </MenuItem>
 
-      <OpenExampleProjectDialog
+      <ExampleProjectDialog
         onClose={onMenuDialogClose(onCloseExampleProjectDialog)}
         open={openExampleProject}
       />
