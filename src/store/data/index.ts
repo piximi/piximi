@@ -61,6 +61,7 @@ export {
   selectImageCategoryNames,
   selectUsedImageCategoryColors,
   selectImageCategoryIds,
+  selectImageCategoryProperty,
 } from "./selectors/image-category/imageCategorySelectors";
 
 export {
@@ -75,4 +76,5 @@ export {
   selectCreatedAnnotationCategoryCount,
   selectUnusedAnnotationCategoryColors,
   selectUsedAnnotationCategoryColors,
+  selectAnnotationCategoryProperty,
 } from "./selectors/annotation-category";

@@ -5,16 +5,16 @@ import { sample } from "lodash";
 import { Button, TextField, Box } from "@mui/material";
 import { useHotkeys } from "hooks";
 
-import { ColorIcon } from "components/controls";
-import { CustomDialog } from "../CustomDialog";
-
 import { Category, HotkeyView, PartialBy } from "types";
+import { CustomDialog } from "../CustomDialog";
+import { ColorIcon } from "components/controls";
 
 type UpsertCategoriesDialogProps = {
   category?: Category;
   onClose: () => void;
   open: boolean;
-  usedCategoryInfo: { names: string[]; colors: string[] };
+  usedCategoryNames: string[];
+  usedCategoryColors: string[];
   dispatchUpsertCategory: (
     category: PartialBy<Category, "id" | "visible">
   ) => void;
@@ -24,10 +24,11 @@ export const UpsertCategoriesDialog = ({
   onClose,
   category,
   open,
-  usedCategoryInfo,
+  usedCategoryNames,
+  usedCategoryColors,
   dispatchUpsertCategory,
 }: UpsertCategoriesDialogProps) => {
-  const [color, setColor] = useState<string>(sample(usedCategoryInfo.colors)!);
+  const [color, setColor] = useState<string>(sample(usedCategoryColors)!);
   const [name, setName] = useState<string>("");
   const [errorHelperText, setErrorHelperText] = useState<string>("");
   const [invalidName, setInvalidName] = useState<boolean>(false);
@@ -36,7 +37,7 @@ export const UpsertCategoriesDialog = ({
     setErrorHelperText("");
     setName("");
     setInvalidName(false);
-    setColor(sample(usedCategoryInfo.colors)!);
+    setColor(sample(usedCategoryColors)!);
 
     onClose();
   };
@@ -72,7 +73,7 @@ export const UpsertCategoriesDialog = ({
       validInput = false;
     } else if (
       categoryName !== category?.name &&
-      usedCategoryInfo.names.includes(categoryName)
+      usedCategoryNames.includes(categoryName)
     ) {
       helperText =
         "Category names must be unique. A category with this name already exits.";
@@ -94,8 +95,8 @@ export const UpsertCategoriesDialog = ({
   );
 
   useEffect(() => {
-    setColor(sample(usedCategoryInfo.colors)!);
-  }, [usedCategoryInfo.colors]);
+    setColor(sample(usedCategoryColors)!);
+  }, [usedCategoryColors]);
   useEffect(() => {
     if (category) {
       setColor(category.color);
@@ -118,7 +119,7 @@ export const UpsertCategoriesDialog = ({
         >
           <ColorIcon
             color={color}
-            unusedColors={usedCategoryInfo.colors}
+            unusedColors={usedCategoryColors}
             onColorChange={onColorChange}
           />
 

@@ -1,13 +1,11 @@
 import React from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 
 import { dataSlice } from "store/data";
-import { projectSlice } from "store/project";
 import { SerializedFileType } from "types";
 
 import { BaseHorizCard } from "../BaseHorizCard";
 import { loadExampleImage } from "utils/common/image";
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 
 type ExampleImageType = {
   name: string;
@@ -35,8 +33,6 @@ export const ExampleImageCard = ({
 }: ExampleImageCardProps) => {
   const dispatch = useDispatch();
 
-  const activeImageId = useSelector(selectActiveImageId);
-
   const openExampleImage = async () => {
     onClose();
 
@@ -55,15 +51,6 @@ export const ExampleImageCard = ({
           categories: [],
         })
       );
-
-      dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId: image.id,
-          prevImageId: activeImageId,
-          execSaga: true,
-        })
-      );
-      dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
     });
   };
   return (

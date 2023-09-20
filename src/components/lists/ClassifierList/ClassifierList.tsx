@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, IconButton, Tooltip } from "@mui/material";
+import { List } from "@mui/material";
 import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
-import { useDialog, useDialogHotkey } from "hooks";
+import { useDialog, useDialogHotkey, useTranslation } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/dialogs";
 import { SaveFittedModelDialog } from "components/dialogs";
-import { CollapsibleList } from "components/lists";
+import { ImageCategoryList } from "components/lists";
 import { ClassifierExecListItem } from "components/list-items";
-import { CategoriesList } from "components/lists/CategoriesList";
 
 import {
   selectClassifierModelStatus,
@@ -21,10 +20,11 @@ import {
 import { selectCreatedImageCategories } from "store/data";
 
 import { CategoryType, HotkeyView, Shape } from "types";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus, ModelTask } from "types/ModelType";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { Model } from "utils/common/models/Model";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { DividerHeader, TabContext } from "components/styled-components";
 
 export const ClassifierList = () => {
   const categories = useSelector(selectCreatedImageCategories);
@@ -33,6 +33,9 @@ export const ClassifierList = () => {
   const selectedModel = useSelector(selectClassifierSelectedModel);
 
   const dispatch = useDispatch();
+
+  const tabIndex = useContext(TabContext);
+  const t = useTranslation();
 
   const {
     onClose: onCloseImportClassifierDialog,
@@ -62,52 +65,34 @@ export const ClassifierList = () => {
     }
   };
 
-  const ClassifierIOButtons = (
-    <>
-      <Tooltip title="Import Model">
-        <IconButton
-          size="small"
-          edge="end"
-          aria-label="import classification model"
-          onClick={onOpenImportClassifierDialog}
-        >
-          <AddIcon />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Save Model">
-        <IconButton
-          size="small"
-          edge="end"
-          aria-label="save classification model"
-          onClick={onSaveClassifierDialogOpen}
-        >
-          <SaveIcon />
-        </IconButton>
-      </Tooltip>
-    </>
-  );
-
   return (
-    <>
-      <CollapsibleList
+    <List>
+      <CustomListItemButton
+        primaryText={t("Load Model")}
+        onClick={onOpenImportClassifierDialog}
+        icon={<AddIcon />}
+        tooltipText={t("Load a classification model")}
         dense
-        backgroundColor={APPLICATION_COLORS.classifierList}
-        primary="Classifier"
-        closed={true}
-        secondary={ClassifierIOButtons}
-      >
-        <>
-          <CategoriesList
-            createdCategories={categories}
-            categoryType={CategoryType.ImageCategory}
-            predicted={modelStatus === ModelStatus.Suggesting}
-          />
+      />
+      <CustomListItemButton
+        primaryText={t("Save Model")}
+        onClick={onSaveClassifierDialogOpen}
+        icon={<SaveIcon />}
+        tooltipText={t("Save the classification model")}
+        dense
+      />
+      <ClassifierExecListItem />
 
-          <Divider />
+      <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
+        Categories
+      </DividerHeader>
+      <ImageCategoryList
+        createdCategories={categories}
+        categoryType={CategoryType.ImageCategory}
+        hasPredicted={modelStatus === ModelStatus.Suggesting}
+        hotkeysActive={tabIndex === 0}
+      />
 
-          <ClassifierExecListItem />
-        </>
-      </CollapsibleList>
       <ImportTensorflowModelDialog
         onClose={onCloseImportClassifierDialog}
         open={openImportClassifierDialog}
@@ -120,6 +105,6 @@ export const ClassifierList = () => {
         onClose={onSaveClassifierDialogClose}
         open={openSaveClassifierDialog}
       />
-    </>
+    </List>
   );
 };

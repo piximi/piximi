@@ -1,15 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, IconButton, Tooltip } from "@mui/material";
+import { List } from "@mui/material";
 import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
 
-import { useDialog, useDialogHotkey } from "hooks";
+import { useDialog, useDialogHotkey, useTranslation } from "hooks";
 
 import { ImportTensorflowModelDialog } from "components/dialogs";
-import { CollapsibleList } from "components/lists";
+import { AnnotationCategoryList } from "components/lists";
 import { SaveFittedModelDialog } from "components/dialogs";
-import { CategoriesList } from "components/lists/CategoriesList";
 import { SegmenterExecListItem } from "components/list-items";
 
 import { selectCreatedAnnotationCategories } from "store/data";
@@ -21,10 +20,11 @@ import {
 } from "store/segmenter";
 
 import { CategoryType, HotkeyView, Shape } from "types";
-import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelTask } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { DividerHeader, TabContext } from "components/styled-components";
 
 export const SegmenterList = () => {
   const dispatch = useDispatch();
@@ -32,6 +32,8 @@ export const SegmenterList = () => {
   const categories = useSelector(selectCreatedAnnotationCategories);
   const selectedModel = useSelector(selectSegmenterModel);
   const modelStatus = useSelector(selectSegmenterModelStatus);
+  const tabIndex = useContext(TabContext);
+  const t = useTranslation();
 
   const {
     onClose: onCloseImportSegmenterDialog,
@@ -66,52 +68,35 @@ export const SegmenterList = () => {
     }
   };
 
-  const SegmenterIOButtons = (
-    <>
-      <Tooltip title="Import Model">
-        <IconButton
-          size="small"
-          edge="end"
-          aria-label="import segmentation model"
-          onClick={onOpenImportSegmenterDialog}
-        >
-          <AddIcon />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Save Model">
-        <IconButton
-          size="small"
-          edge="end"
-          aria-label="save segmentation model"
-          onClick={onSaveSegmenterDialogOpen}
-        >
-          <SaveIcon />
-        </IconButton>
-      </Tooltip>
-    </>
-  );
-
   return (
-    <>
-      <CollapsibleList
+    <List>
+      <CustomListItemButton
+        primaryText={t("Load Model")}
+        onClick={onOpenImportSegmenterDialog}
+        icon={<AddIcon />}
+        tooltipText={t("Load a segmentation model")}
         dense
-        backgroundColor={APPLICATION_COLORS.segmenterList}
-        primary="Segmenter"
-        secondary={SegmenterIOButtons}
-        closed={true}
-      >
-        <>
-          <CategoriesList
-            createdCategories={categories}
-            predicted={false}
-            categoryType={CategoryType.AnnotationCategory}
-          />
+      />
+      <CustomListItemButton
+        primaryText={t("Save Model")}
+        onClick={onSaveSegmenterDialogOpen}
+        icon={<SaveIcon />}
+        tooltipText={t("Save the segmentation model")}
+        dense
+      />
+      <SegmenterExecListItem />
 
-          <Divider />
+      <DividerHeader sx={{ my: 1 }} textAlign="left" typographyVariant="body2">
+        Categories
+      </DividerHeader>
 
-          <SegmenterExecListItem />
-        </>
-      </CollapsibleList>
+      <AnnotationCategoryList
+        createdCategories={categories}
+        hasPredicted={false}
+        categoryType={CategoryType.AnnotationCategory}
+        hotkeysActive={tabIndex === 1}
+      />
+
       <ImportTensorflowModelDialog
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
@@ -124,6 +109,6 @@ export const SegmenterList = () => {
         onClose={onSaveSegmenterDialogClose}
         open={openSaveSegmenterDialog}
       />
-    </>
+    </List>
   );
 };

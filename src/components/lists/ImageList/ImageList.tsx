@@ -1,13 +1,21 @@
-import React, { memo } from "react";
+import React, { memo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Avatar, Chip, LinearProgress, Box } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Chip,
+  IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
-import { useTranslation } from "hooks";
-
-import { CollapsibleList } from "components/lists";
 
 import { ImageMenu } from "components/menus";
 
@@ -15,10 +23,9 @@ import { selectActiveImageId, setActiveImageId } from "store/imageViewer";
 import { selectTotalAnnotationCountByImage } from "store/data";
 
 import { ImageType } from "types";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 const NUM_BUFFERED_IMS = 20;
-const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 2);
+const NUM_VIEW_IMS = Math.floor(NUM_BUFFERED_IMS / 4);
 
 interface ImageListItemProps {
   image: ImageType;
@@ -29,7 +36,6 @@ interface ImageListItemProps {
 
 export const ImageList = ({ images }: { images: Array<ImageType> }) => {
   const dispatch = useDispatch();
-  const t = useTranslation();
 
   const [imageAnchorEl, setImageAnchorEl] = React.useState<null | HTMLElement>(
     null
@@ -117,17 +123,18 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
         gridTemplateRows="1fr"
       >
         <Box gridColumn="1 / 13" gridRow="1 / 2">
-          <CollapsibleList
-            closed={!images.length}
+          <List
             dense
-            primary={t("Images")}
-            sx={{
+            disablePadding
+            component="div"
+            sx={(theme) => ({
               maxHeight: `${3 * NUM_VIEW_IMS + 0.5}rem`,
               overflowY: "scroll",
               "::-webkit-scrollbar": { display: "none" },
-            }}
+              width: "calc(100% - 5px)",
+              backgroundColor: theme.palette.background.paper,
+            })}
             onScroll={handleScroll}
-            disabled={images.length === 0}
           >
             {images
               .slice(bufferRange.start, bufferRange.end)
@@ -144,16 +151,15 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
                   />
                 );
               })}
-          </CollapsibleList>
+          </List>
         </Box>
-
         <Box gridColumn="12 / 13" gridRow=" 1 / 2" justifyItems="flex-end">
           {images.length > NUM_BUFFERED_IMS && (
             <LinearProgress
               sx={{
                 width: 4,
                 height: `${3 * NUM_VIEW_IMS}rem`,
-                marginTop: "3em",
+
                 marginLeft: "auto",
                 "& span.MuiLinearProgress-bar": {
                   transform: `translateY(-${100 - scrollProgress}%) !important`, //has to have !important
@@ -165,6 +171,7 @@ export const ImageList = ({ images }: { images: Array<ImageType> }) => {
           )}
         </Box>
       </Box>
+
       <ImageMenu
         anchorElImageMenu={imageAnchorEl}
         selectedImage={images[selectedImageIndex]}
@@ -185,30 +192,77 @@ const ImageListItem = memo(
     const annotationCount = useSelector((state) =>
       selectTotalAnnotationCountByImage(state, image.id)
     );
+    const listItemRef = useRef<HTMLLIElement | null>(null);
     return (
-      <CustomListItemButton
-        key={image.id}
-        selected={isActive}
-        onClick={() => onItemClick(image)}
-        icon={
-          <Avatar
-            alt={image.name}
-            src={image.src}
-            variant={"square"}
-            sx={{ mr: ".5rem" }}
-          />
-        }
-        secondaryIcon={<MoreHorizIcon />}
-        onSecondary={(event) => onSecondaryClick(event.currentTarget)}
-        primaryText={image.name}
-        tooltipText={image.name}
-        additionalComponent={
-          annotationCount !== 0 ? (
-            <Chip label={annotationCount} size="small" />
-          ) : undefined
-        }
-        primaryTypographyProps={{ noWrap: true }}
-      />
+      <Tooltip
+        title={image.name}
+        placement="bottom"
+        disableInteractive={true}
+        enterDelay={500}
+        enterNextDelay={500}
+        arrow={true}
+        componentsProps={{
+          tooltip: {
+            sx: {
+              backgroundColor: "#565656",
+              fontSize: "0.85rem",
+            },
+          },
+          arrow: {
+            sx: { color: "#565656" },
+          },
+        }}
+      >
+        <span>
+          <ListItem
+            secondaryAction={
+              <IconButton
+                edge="end"
+                onClick={(event) => onSecondaryClick(event.currentTarget)}
+                size={
+                  listItemRef.current?.classList.contains("MuiListItem-dense")
+                    ? "small"
+                    : "medium"
+                }
+                sx={{
+                  mr: listItemRef.current?.classList.contains(
+                    "MuiListItem-dense"
+                  )
+                    ? "-15px"
+                    : "",
+                }}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+            }
+            disablePadding
+          >
+            <ListItemButton
+              onClick={() => onItemClick(image)}
+              selected={isActive}
+            >
+              <ListItemIcon>
+                {
+                  <Avatar
+                    alt={image.name}
+                    src={image.src}
+                    variant={"square"}
+                    sx={{ mr: ".5rem" }}
+                  />
+                }
+              </ListItemIcon>
+
+              <ListItemText
+                primary={image.name}
+                primaryTypographyProps={{ noWrap: true }}
+              />
+              {annotationCount !== 0 ? (
+                <Chip label={annotationCount} size="small" />
+              ) : undefined}
+            </ListItemButton>
+          </ListItem>
+        </span>
+      </Tooltip>
     );
   }
 );

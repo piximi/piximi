@@ -9,6 +9,7 @@ export {
   selectCreatedAnnotationCategoryCount,
   selectUnusedAnnotationCategoryColors,
   selectUsedAnnotationCategoryColors,
+  selectAnnotationCategoryProperty,
 } from "./annotationCategorySelectors";
 
 export { selectSelectedAnnotationCategory } from "./selectSelectedAnnotationCategory";

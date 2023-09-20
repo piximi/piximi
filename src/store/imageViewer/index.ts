@@ -13,6 +13,7 @@ export {
   setStageHeight,
   setStagePosition,
   setZoomToolOptions,
+  updateHighlightedAnnotationCategory,
 } from "./imageViewerSlice";
 
 // Selectors
@@ -40,3 +41,4 @@ export { selectColorAdjustments } from "./selectors/selectColorAdjustments";
 export { selectZoomToolOptions } from "./selectors/selectZoomToolOptions";
 export { selectWorkingAnnotation } from "./selectors/selectWorkingAnnotation";
 export { selectImageIsloading } from "./selectors/selectImageIsLoading";
+export { selectHighligtedAnnotationCatogory } from "./selectors/selectHighlightedAnnotationCategory";

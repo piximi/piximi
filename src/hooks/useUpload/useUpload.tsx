@@ -7,7 +7,7 @@ import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
 
 export const useUpload = (
   setOpenDimensionsDialogBox: (flag: boolean) => void,
-  isUploadedFromAnnotator: boolean
+  isUploadedFromAnnotator?: boolean
 ) => {
   const dispatch = useDispatch();
 

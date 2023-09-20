@@ -16,3 +16,4 @@ export { CategoryPredictionListItem } from "./CategoryPredictionListItem";
 export { ClassifierOptimizerListItem } from "./ClassifierOptimizerListItem";
 export { ClassifierPreprocessingListItem } from "./ClassifierPreprocessingListItem";
 export { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
+export { ShowPredictionItems } from "./ShowPredictionItems";

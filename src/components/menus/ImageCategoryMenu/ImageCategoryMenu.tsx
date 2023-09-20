@@ -5,13 +5,18 @@ import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
 import { applicationSlice } from "store/application";
-import { dataSlice, selectAllImageCategories } from "store/data";
+import {
+  dataSlice,
+  selectAllAnnotationCategories,
+  selectAllImageCategories,
+} from "store/data";
 
 import { Category } from "types";
+import { projectSlice, selectImageGridTab } from "store/project";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;
-  imageIds: Array<string>;
+  selectedIds: Array<string>;
   onClose: () => void;
   anchorReference?: PopoverReference;
   anchorPosition?: { top: number; left: number };
@@ -21,14 +26,16 @@ type ImageCategoryMenuProps = {
 
 export const ImageCategoryMenu = ({
   anchorEl,
-  imageIds,
+  selectedIds,
   onClose,
   anchorReference,
   anchorPosition,
   open,
   container,
 }: ImageCategoryMenuProps) => {
-  const categories = useSelector(selectAllImageCategories);
+  const imageCategories = useSelector(selectAllImageCategories);
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
+  const imageGridTab = useSelector(selectImageGridTab);
 
   const dispatch = useDispatch();
 
@@ -38,13 +45,25 @@ export const ImageCategoryMenu = ({
   ) => {
     onClose();
 
-    dispatch(
-      dataSlice.actions.updateImageCategories({
-        imageIds: imageIds,
-        categoryId: categoryId,
-      })
-    );
-    dispatch(applicationSlice.actions.clearSelectedImages());
+    if (imageGridTab === "Images") {
+      dispatch(
+        dataSlice.actions.updateImageCategories({
+          imageIds: selectedIds,
+          categoryId: categoryId,
+        })
+      );
+      dispatch(applicationSlice.actions.clearSelectedImages());
+    } else {
+      dispatch(
+        dataSlice.actions.updateAnnotationCategories({
+          annotationIds: selectedIds,
+          categoryId: categoryId,
+        })
+      );
+      dispatch(
+        projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
+      );
+    }
   };
 
   return (
@@ -65,7 +84,10 @@ export const ImageCategoryMenu = ({
       container={container}
     >
       <MenuList dense variant="menu">
-        {categories.map((category: Category) => (
+        {(imageGridTab === "Images"
+          ? imageCategories
+          : annotationCategories
+        ).map((category: Category) => (
           <MenuItem
             key={category.id}
             onClick={(event: any) => onClick(event, category.id)}

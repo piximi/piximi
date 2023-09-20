@@ -12,6 +12,8 @@ import {
 import { mutatingFilter } from "utils/common/helpers";
 
 const initialState: ImageViewerStore = {
+  imageStack: [],
+
   colorAdjustment: {
     blackPoint: 0,
     brightness: 0,
@@ -52,6 +54,7 @@ const initialState: ImageViewerStore = {
     toFit: false,
   },
   imageIsLoading: false,
+  highlightedCategory: undefined,
 };
 
 export const imageViewerSlice = createSlice({
@@ -59,6 +62,9 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetImageViewer: () => initialState,
+    setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
+      state.imageStack = action.payload.imageIds;
+    },
     addActiveAnnotationId(
       state,
       action: PayloadAction<{ annotationId: string }>
@@ -356,12 +362,18 @@ export const imageViewerSlice = createSlice({
     },
     setZoomToolOptions(
       state,
-      action: PayloadAction<{ options: ZoomToolOptionsType }>
+      action: PayloadAction<{ options: Partial<ZoomToolOptionsType> }>
     ) {
-      state.zoomOptions = action.payload.options;
+      state.zoomOptions = { ...state.zoomOptions, ...action.payload.options };
     },
     setImageIsLoading(state, action: PayloadAction<{ isLoading: boolean }>) {
       state.imageIsLoading = action.payload.isLoading;
+    },
+    updateHighlightedAnnotationCategory(
+      state,
+      action: PayloadAction<{ categoryId: string | undefined }>
+    ) {
+      state.highlightedCategory = action.payload.categoryId;
     },
   },
 });
@@ -380,4 +392,5 @@ export const {
   setZoomSelection,
   setZoomToolOptions,
   setWorkingAnnotation,
+  updateHighlightedAnnotationCategory,
 } = imageViewerSlice.actions;

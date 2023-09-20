@@ -1,0 +1,1 @@
+export { DividerHeader } from "./DividerHeader";

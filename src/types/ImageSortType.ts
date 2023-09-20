@@ -1,22 +1,28 @@
-import { ImageType } from "./ImageType";
+import { ImageGridTab } from "./ImageGridTab";
 
 export enum ImageSortKey {
   None,
   FileName,
   Category,
   Random,
+  Image,
 }
 
 export type ImageSortKeyType = {
   imageSortKeyName: string;
   imageSortKey: ImageSortKey;
-  comparerFunction: (a: ImageType, b: ImageType) => number;
+  comparerFunction: (
+    a: { name: string; category: string },
+    b: { name: string; category: string }
+  ) => number;
+  objectType: ImageGridTab | "All";
 };
 
 export const defaultImageSortKey: ImageSortKeyType = {
   imageSortKeyName: "None",
   imageSortKey: ImageSortKey.None,
   comparerFunction: (a, b) => 0,
+  objectType: "All",
 };
 
 export const availableImageSortKeys: ImageSortKeyType[] = [
@@ -24,16 +30,25 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
     imageSortKeyName: "File name",
     imageSortKey: ImageSortKey.FileName,
     comparerFunction: (a, b) => a.name.localeCompare(b.name),
+    objectType: "Images",
   },
   {
-    imageSortKeyName: "Image category",
+    imageSortKeyName: "Category",
     imageSortKey: ImageSortKey.Category,
-    comparerFunction: (a, b) => a.categoryId.localeCompare(b.categoryId),
+    comparerFunction: (a, b) => a.category.localeCompare(b.category),
+    objectType: "All",
   },
   {
     imageSortKeyName: "Random",
     imageSortKey: ImageSortKey.Random,
     comparerFunction: (a, b) => (Math.round(Math.random() * 10) >= 5 ? 1 : -1),
+    objectType: "All",
+  },
+  {
+    imageSortKeyName: "Image",
+    imageSortKey: ImageSortKey.Image,
+    comparerFunction: (a, b) => a.name.localeCompare(b.name),
+    objectType: "Annotations",
   },
 ];
 

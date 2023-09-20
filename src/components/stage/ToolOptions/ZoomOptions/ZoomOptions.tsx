@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import {
@@ -7,7 +7,6 @@ import {
   Grid,
   List,
   ListItem,
-  ListSubheader,
   Radio,
   RadioGroup,
   Slider,
@@ -28,6 +27,7 @@ import {
   selectZoomSelection,
   selectZoomToolOptions,
   setZoomToolOptions,
+  selectStageScale,
 } from "store/imageViewer";
 import { selectActiveImage } from "store/data";
 
@@ -41,6 +41,7 @@ import {
 } from "icons";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CustomListItem } from "components/list-items/CustomListItem";
+import { DividerHeader } from "components/styled-components";
 
 //TODO: Slider
 
@@ -53,6 +54,10 @@ export const ZoomOptions = () => {
   const stageRef = useContext(StageContext);
   const image = useSelector(selectActiveImage);
   const { centerPoint } = useSelector(selectZoomSelection);
+  const stageScale = useSelector(selectStageScale);
+  const [sliderValue, setSliderValue] = useState<number>(
+    stageRef?.current?.scaleX() ?? 1
+  );
 
   const t = useTranslation();
 
@@ -128,11 +133,8 @@ export const ZoomOptions = () => {
   };
 
   const onSliderChange = (value: number) => {
-    if (options.automaticCentering) {
-      zoomAndOffset(value, centerPoint!);
-    } else {
-      zoomAndOffset(value, { x: stageWidth / 2, y: stageHeight / 2 });
-    }
+    setSliderValue(value);
+    zoomAndOffset(value, centerPoint!);
   };
   const onResetClick = () => {
     stageRef?.current?.position({
@@ -149,17 +151,13 @@ export const ZoomOptions = () => {
     );
   };
 
-  // @ts-ignore
+  useEffect(() => {
+    setSliderValue(stageScale);
+  }, [stageScale]);
+
   return (
     <>
-      <Divider />
-
-      <List
-        component="nav"
-        subheader={
-          <ListSubheader component="div">{t("Zoom scale")}</ListSubheader>
-        }
-      >
+      <List>
         <ListItem>
           <Grid container spacing={2}>
             <Grid item>
@@ -171,8 +169,7 @@ export const ZoomOptions = () => {
                 onChange={(event: any, value: number | number[]) =>
                   onSliderChange(value as number)
                 }
-                valueLabelDisplay="auto"
-                value={stageRef?.current?.scaleX()!}
+                value={sliderValue}
                 min={0.25}
                 max={5}
                 step={0.01}
@@ -183,72 +180,70 @@ export const ZoomOptions = () => {
             </Grid>
           </Grid>
         </ListItem>
+        <CustomListItem
+          primaryText={t("Automatically zoom towards the center")}
+          icon={
+            <Checkbox
+              checked={options.automaticCentering}
+              disableRipple
+              edge="start"
+              icon={<CheckboxUncheckedIcon />}
+              checkedIcon={<CheckboxCheckedIcon />}
+              tabIndex={-1}
+              onClick={onAutomaticCenteringChange}
+            />
+          }
+          dense
+          primaryTypographyProps={{
+            fontSize: "0.875rem",
+            textAlign: "center",
+          }}
+        />
       </List>
 
-      <Divider />
+      <DividerHeader textAlign="left" typographyVariant="body2">
+        Zoom Mode
+      </DividerHeader>
 
-      <List dense>
-        <RadioGroup
-          defaultValue={ZoomModeType.In}
-          aria-label="annotation mode"
-          name="annotation-mode"
-          onChange={onModeChange}
-          value={options.mode}
-        >
-          <List
-            component="nav"
-            subheader={
-              <ListSubheader component="div">{t("Zoom mode")}</ListSubheader>
+      <RadioGroup
+        defaultValue={ZoomModeType.In}
+        aria-label="annotation mode"
+        name="annotation-mode"
+        onChange={onModeChange}
+        value={options.mode}
+      >
+        <List dense>
+          <CustomListItem
+            primaryText={t("Zoom in")}
+            icon={
+              <Radio
+                disableRipple
+                edge="start"
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
+                tabIndex={-1}
+                value={ZoomModeType.In}
+                onClick={(event) => onModeClick(event, ZoomModeType.In)}
+              />
             }
-          >
-            <CustomListItem
-              primaryText={t("Zoom in")}
-              icon={
-                <Radio
-                  disableRipple
-                  edge="start"
-                  icon={<RadioUncheckedIcon />}
-                  checkedIcon={<RadioCheckedIcon />}
-                  tabIndex={-1}
-                  value={ZoomModeType.In}
-                  onClick={(event) => onModeClick(event, ZoomModeType.In)}
-                />
-              }
-            />
-            <CustomListItem
-              primaryText={t("Zoom out")}
-              icon={
-                <Radio
-                  disableRipple
-                  edge="start"
-                  icon={<RadioUncheckedIcon />}
-                  checkedIcon={<RadioCheckedIcon />}
-                  tabIndex={-1}
-                  value={ZoomModeType.Out}
-                  onClick={(event) => onModeClick(event, ZoomModeType.Out)}
-                />
-              }
-            />
-          </List>
-        </RadioGroup>
-      </List>
-
-      <Divider />
-
-      <CustomListItem
-        primaryText={t("Automatically zoom towards the center")}
-        icon={
-          <Checkbox
-            checked={options.automaticCentering}
-            disableRipple
-            edge="start"
-            icon={<CheckboxUncheckedIcon />}
-            checkedIcon={<CheckboxCheckedIcon />}
-            tabIndex={-1}
-            onClick={onAutomaticCenteringChange}
           />
-        }
-      />
+
+          <CustomListItem
+            primaryText={t("Zoom out")}
+            icon={
+              <Radio
+                disableRipple
+                edge="start"
+                icon={<RadioUncheckedIcon />}
+                checkedIcon={<RadioCheckedIcon />}
+                tabIndex={-1}
+                value={ZoomModeType.Out}
+                onClick={(event) => onModeClick(event, ZoomModeType.Out)}
+              />
+            }
+          />
+        </List>
+      </RadioGroup>
 
       <Divider />
 
@@ -268,11 +263,10 @@ export const ZoomOptions = () => {
           onClick={onResetClick}
         />
       </List>
-      <List sx={{ mt: "auto" }}>
+      <List sx={{ mt: "auto" }} dense>
         <CustomListItem
-          primaryText={t("Alt+Click to drage stage")}
+          primaryText={t("Alt+Click to drag stage")}
           primaryTypographyProps={{
-            color: "gray",
             fontSize: "0.875rem",
             textAlign: "center",
           }}

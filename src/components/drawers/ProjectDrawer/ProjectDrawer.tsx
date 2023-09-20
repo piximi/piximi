@@ -1,44 +1,28 @@
 import React from "react";
 
-import { Divider, Drawer } from "@mui/material";
+import { Divider } from "@mui/material";
 
-import {
-  FileList,
-  ClassifierList,
-  SegmenterList,
-  ApplicationOptionsList,
-} from "components/lists";
-import { AppBarOffset } from "components/styled-components";
+import { FileList, ClassifierList, SegmenterList } from "components/lists";
+import { AppBarOffset, CustomTabSwitcher } from "components/styled-components";
+import { BaseAppDrawer } from "../BaseAppDrawer";
 
 export const ProjectDrawer = () => {
   return (
-    <Drawer
-      anchor="left"
-      sx={{
-        flexShrink: 0,
-        width: (theme) => theme.spacing(32),
-        "& > 	.MuiDrawer-paper": {
-          zIndex: 0,
-          width: (theme) => theme.spacing(32),
-        },
-      }}
-      open
-      variant="persistent"
-    >
+    <BaseAppDrawer>
       <AppBarOffset />
 
       <FileList />
 
       <Divider />
+      <CustomTabSwitcher
+        childClassName="drawer-tab"
+        label1="Classifier"
+        label2="Segmenter"
+      >
+        <ClassifierList />
 
-      <ClassifierList />
-
-      <Divider />
-
-      <SegmenterList />
-      <Divider />
-
-      <ApplicationOptionsList />
-    </Drawer>
+        <SegmenterList />
+      </CustomTabSwitcher>
+    </BaseAppDrawer>
   );
 };
