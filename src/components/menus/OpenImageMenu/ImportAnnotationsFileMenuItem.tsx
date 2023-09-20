@@ -70,7 +70,7 @@ export const ImportAnnotationsFileMenuItem = ({
           batch(() => {
             dispatch(
               dataSlice.actions.addAnnotationCategories({
-                annotationCategories: newCategories,
+                categories: newCategories,
               })
             );
             dispatch(dataSlice.actions.addAnnotations({ annotations }));

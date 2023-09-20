@@ -95,6 +95,7 @@ export const SegmenterList = () => {
         hasPredicted={false}
         categoryType={CategoryType.AnnotationCategory}
         hotkeysActive={tabIndex === 1}
+        changesPermanent={true}
       />
 
       <ImportTensorflowModelDialog

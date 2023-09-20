@@ -21,6 +21,7 @@ import { imageViewerSlice } from "store/imageViewer";
 import { TabContext } from "components/styled-components";
 import { GridItemActionBar } from "components/app-bars";
 import { DialogWithAction, ImageShapeDialog } from "components/dialogs";
+import { applicationSlice } from "store/application";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -75,6 +76,7 @@ export const ImageGrid = () => {
       dataSlice.actions.deleteImages({
         imageIds: selectedImageIds,
         disposeColorTensors: true,
+        isPermanent: true,
       })
     );
     dispatch(projectSlice.actions.setSelectedImages({ imageIds: [] }));
@@ -111,6 +113,17 @@ export const ImageGrid = () => {
     },
     [dispatch]
   );
+
+  const handleUpdateCategories = (categoryId: string) => {
+    dispatch(
+      dataSlice.actions.updateImageCategories({
+        imageIds: selectedImageIds,
+        categoryId: categoryId,
+        isPermanent: true,
+      })
+    );
+    dispatch(applicationSlice.actions.clearSelectedImages());
+  };
 
   useHotkeys("esc", () => deselectAllImages(), HotkeyView.ProjectView, {
     enabled: tabIndex === 0,
@@ -204,6 +217,7 @@ export const ImageGrid = () => {
           handleDeleteObjects={handleDeleteImages}
           handleOpenDeleteDialog={onOpenDeleteImagesDialog}
           onOpenImageViewer={handleOpenImageViewer}
+          onUpdateCategories={handleUpdateCategories}
         />
       )}
 

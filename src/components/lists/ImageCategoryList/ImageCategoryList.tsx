@@ -124,6 +124,7 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
       dispatch(
         dataSlice.actions.deleteImageCategories({
           categoryIds: categories.map((category) => category.id),
+          isPermanent: true,
         })
       );
     },
@@ -134,7 +135,11 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     (categoryId: string) => {
       const imageIds = imagesByCategories[categoryId];
       dispatch(
-        dataSlice.actions.deleteImages({ imageIds, disposeColorTensors: false })
+        dataSlice.actions.deleteImages({
+          imageIds,
+          disposeColorTensors: false,
+          isPermanent: true,
+        })
       );
     },
     [imagesByCategories, dispatch]
@@ -142,7 +147,9 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
 
   const dispatchUpsertCategory = useCallback(
     (category: PartialBy<Category, "id" | "visible">) => {
-      dispatch(dataSlice.actions.upsertImageCategory({ category }));
+      dispatch(
+        dataSlice.actions.upsertImageCategory({ category, isPermanent: true })
+      );
     },
     [dispatch]
   );
@@ -185,6 +192,7 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
               id: imageId,
               categoryId: highlightedCategory,
             })),
+            isPermanent: true,
           })
         );
       }

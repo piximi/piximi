@@ -1,18 +1,9 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 
 import { Menu, MenuItem, MenuList, PopoverReference } from "@mui/material";
 import LabelIcon from "@mui/icons-material/Label";
 
-import { applicationSlice } from "store/application";
-import {
-  dataSlice,
-  selectAllAnnotationCategories,
-  selectAllImageCategories,
-} from "store/data";
-
 import { Category } from "types";
-import { projectSlice, selectImageGridTab } from "store/project";
 
 type ImageCategoryMenuProps = {
   anchorEl?: HTMLElement;
@@ -22,48 +13,24 @@ type ImageCategoryMenuProps = {
   anchorPosition?: { top: number; left: number };
   open: boolean;
   container?: Element | null;
+  categories: Category[];
+  onUpdateCategories: (categoryId: string) => void;
 };
 
 export const ImageCategoryMenu = ({
   anchorEl,
-  selectedIds,
   onClose,
   anchorReference,
   anchorPosition,
   open,
   container,
+  categories,
+  onUpdateCategories: handleUpdateCategories,
 }: ImageCategoryMenuProps) => {
-  const imageCategories = useSelector(selectAllImageCategories);
-  const annotationCategories = useSelector(selectAllAnnotationCategories);
-  const imageGridTab = useSelector(selectImageGridTab);
-
-  const dispatch = useDispatch();
-
-  const onClick = (
-    event: React.MouseEvent<HTMLLIElement>,
-    categoryId: string
-  ) => {
+  const handleUpdateCategoriesAndClose = (categoryId: string) => {
     onClose();
 
-    if (imageGridTab === "Images") {
-      dispatch(
-        dataSlice.actions.updateImageCategories({
-          imageIds: selectedIds,
-          categoryId: categoryId,
-        })
-      );
-      dispatch(applicationSlice.actions.clearSelectedImages());
-    } else {
-      dispatch(
-        dataSlice.actions.updateAnnotationCategories({
-          annotationIds: selectedIds,
-          categoryId: categoryId,
-        })
-      );
-      dispatch(
-        projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
-      );
-    }
+    handleUpdateCategories(categoryId);
   };
 
   return (
@@ -84,13 +51,10 @@ export const ImageCategoryMenu = ({
       container={container}
     >
       <MenuList dense variant="menu">
-        {(imageGridTab === "Images"
-          ? imageCategories
-          : annotationCategories
-        ).map((category: Category) => (
+        {categories.map((category: Category) => (
           <MenuItem
             key={category.id}
-            onClick={(event: any) => onClick(event, category.id)}
+            onClick={() => handleUpdateCategoriesAndClose(category.id)}
           >
             <LabelIcon style={{ color: category.color, paddingRight: "8px" }} />
             {category.name}

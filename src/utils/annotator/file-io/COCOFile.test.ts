@@ -188,7 +188,7 @@ test("serialize COCO", () => {
 
   productionStore.dispatch(
     dataSlice.actions.setAnnotationCategories({
-      annotationCategories: categoriesT1,
+      categories: categoriesT1,
       isPermanent: true,
     })
   );
@@ -218,7 +218,7 @@ test("serialize COCO", () => {
 
   productionStore.dispatch(
     dataSlice.actions.setAnnotationCategories({
-      annotationCategories: categoriesT2,
+      categories: categoriesT2,
       isPermanent: true,
     })
   );
@@ -239,7 +239,7 @@ test("serialize COCO", () => {
 
   productionStore.dispatch(
     dataSlice.actions.addAnnotationCategories({
-      annotationCategories: newCategories,
+      categories: newCategories,
       isPermanent: true,
     })
   );
