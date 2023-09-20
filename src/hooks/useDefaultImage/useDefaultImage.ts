@@ -31,13 +31,12 @@ const dispatchToProject = async (
     dispatch(
       dataSlice.actions.setImages({
         images: [image],
-        disposeColorTensors: true,
         isPermanent: true,
       })
     );
     dispatch(
       dataSlice.actions.setAnnotationCategories({
-        annotationCategories,
+        categories: annotationCategories,
         isPermanent: true,
       })
     );
@@ -65,13 +64,12 @@ const dispatchToImageViewer = async (
     dispatch(
       dataSlice.actions.setImages({
         images: [image],
-        disposeColorTensors: true,
         isPermanent: true,
       })
     );
     dispatch(
       dataSlice.actions.setAnnotationCategories({
-        annotationCategories,
+        categories: annotationCategories,
         isPermanent: true,
       })
     );

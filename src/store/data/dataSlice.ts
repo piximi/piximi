@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
-import { Changes, Deferred, EntityId } from "store/entities/models";
+import { Deferred, EntityId } from "store/entities/models";
 import { getDeferredProperty } from "store/entities/utils";
 
 import {
@@ -89,7 +89,7 @@ export const dataSlice = createSlice({
       dataSlice.caseReducers.addAnnotationCategories(state, {
         type: "setAnnotationCategories",
         payload: {
-          annotationCategories: newAnnotationCategories,
+          categories: newAnnotationCategories,
           isPermanent: true,
         },
       });
@@ -111,11 +111,11 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      const category = action.payload.category;
+      const { category, isPermanent } = action.payload;
       if (state.imageCategories.ids.includes(category.id)) return;
       state.imagesByCategory[category.id] = [];
       imageCategoriesAdapter.addOne(state.imageCategories, category);
-      if (action.payload.isPermanent) {
+      if (isPermanent) {
         state.imageCategories.entities[category.id].changes = {};
       }
     },
@@ -126,17 +126,23 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      for (const category of action.payload.categories) {
+      const { categories, isPermanent } = action.payload;
+      for (const category of categories) {
         dataSlice.caseReducers.addImageCategory(state, {
           type: "addImageCategory",
-          payload: { category, isPermanent: action.payload.isPermanent },
+          payload: { category, isPermanent: isPermanent },
         });
       }
     },
     createImageCategory(
       state,
-      action: PayloadAction<{ name: string; color: string }>
+      action: PayloadAction<{
+        name: string;
+        color: string;
+        isPermanent?: boolean;
+      }>
     ) {
+      const { name, color, isPermanent } = action.payload;
       let id = uuidv4();
       let idIsUnique = !state.imageCategories.ids.includes(id);
 
@@ -149,18 +155,30 @@ export const dataSlice = createSlice({
 
       imageCategoriesAdapter.addOne(state.imageCategories, {
         id: id,
-        name: action.payload.name,
-        color: action.payload.color,
+        name: name,
+        color: color,
         visible: true,
       } as Category);
+      if (isPermanent) {
+        state.imageCategories.entities[id].changes = {};
+      }
     },
     updateImageCategory(
       state,
       action: PayloadAction<{
         updates: PartialBy<Category, "color" | "name" | "visible">;
+        isPermanent?: boolean;
       }>
     ) {
-      const { id, ...updates } = action.payload.updates;
+      const { updates, isPermanent } = action.payload;
+      const id = updates.id;
+
+      if (isPermanent) {
+        state.imageCategories.entities[id] = {
+          ...state.imageCategories.entities[id],
+          ...updates,
+        };
+      }
       imageCategoriesAdapter.updateOne(state.imageCategories, {
         id: id,
         changes: updates,
@@ -170,15 +188,16 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ id?: string }>
     ) {
-      const idsToUpdate = state.imageCategories.ids.filter((id) => {
+      const { id } = action.payload;
+      const idsToUpdate = state.imageCategories.ids.filter((_id) => {
         return (
-          id !== action.payload.id &&
-          state.imageCategories.entities[id].saved.visible !== false &&
-          state.imageCategories.entities[id].changes?.visible !== false
+          _id !== id &&
+          state.imageCategories.entities[_id].saved.visible !== false &&
+          state.imageCategories.entities[_id].changes?.visible !== false
         );
       });
-      const changes = idsToUpdate.map((id) => {
-        return { id: id, changes: { visible: false } };
+      const changes = idsToUpdate.map((_id) => {
+        return { id: _id, changes: { visible: false } };
       });
       imageCategoriesAdapter.updateMany(state.imageCategories, changes);
     },
@@ -186,9 +205,10 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ categoryId: string; visible: boolean }>
     ) {
+      const { categoryId, visible } = action.payload;
       imageCategoriesAdapter.updateOne(state.imageCategories, {
-        id: action.payload.categoryId,
-        changes: { visible: action.payload.visible },
+        id: categoryId,
+        changes: { visible: visible },
       });
     },
     setImageCategories(
@@ -198,6 +218,7 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
+      const { categories, isPermanent } = action.payload;
       dataSlice.caseReducers.deleteAllImageCategories(state, {
         type: "deleteAllImageCategories",
         payload: {},
@@ -205,8 +226,8 @@ export const dataSlice = createSlice({
       dataSlice.caseReducers.addImageCategories(state, {
         type: "addImageCategories",
         payload: {
-          categories: action.payload.categories,
-          isPermanent: action.payload.isPermanent,
+          categories: categories,
+          isPermanent: isPermanent,
         },
       });
     },
@@ -214,14 +235,19 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         category: PartialBy<Category, "id" | "visible">;
+        isPermanent?: boolean;
       }>
     ) {
-      const { category } = action.payload;
+      const { category, isPermanent } = action.payload;
 
       if (!category.id) {
         dataSlice.caseReducers.createImageCategory(state, {
           type: "createImageCategory",
-          payload: { name: category.name!, color: category.color! },
+          payload: {
+            name: category.name!,
+            color: category.color!,
+            isPermanent: isPermanent,
+          },
         });
       } else {
         dataSlice.caseReducers.updateImageCategory(state, {
@@ -231,57 +257,84 @@ export const dataSlice = createSlice({
               Category,
               "color" | "name" | "visible"
             >,
+            isPermanent: isPermanent,
           },
         });
       }
     },
-    deleteImageCategory(state, action: PayloadAction<{ categoryId: string }>) {
-      const categoryId = action.payload.categoryId;
+    deleteImageCategory(
+      state,
+      action: PayloadAction<{ categoryId: string; isPermanent?: boolean }>
+    ) {
+      const { categoryId, isPermanent } = action.payload;
 
       // ---- Look Up Reference
-      const imageChanges = state.imagesByCategory[categoryId].map((imageId) => {
-        return {
-          id: imageId,
-          changes: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
-        };
-      });
+      const imageIds = state.imagesByCategory[categoryId];
       state.imagesByCategory[UNKNOWN_IMAGE_CATEGORY_ID].push(
         ...state.imagesByCategory[categoryId]
       );
       delete state.imagesByCategory[categoryId];
       // ----
 
-      imagesAdapter.updateMany(state.images, imageChanges);
-      imageCategoriesAdapter.removeOne(
-        state.imageCategories,
-        action.payload.categoryId
-      );
+      for (const imageId of imageIds) {
+        dataSlice.caseReducers.updateImage(state, {
+          type: "updateImage",
+          payload: {
+            imageId,
+            updates: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
+            isPermanent: isPermanent,
+          },
+        });
+      }
+      if (isPermanent) {
+        delete state.imageCategories.entities[categoryId];
+        mutatingFilter(
+          state.imageCategories.ids,
+          (catId) => catId !== categoryId
+        );
+      } else {
+        imageCategoriesAdapter.removeOne(state.imageCategories, categoryId);
+      }
     },
     deleteImageCategories(
       state,
-      action: PayloadAction<{ categoryIds: string[] }>
+      action: PayloadAction<{ categoryIds: string[]; isPermanent?: boolean }>
     ) {
-      for (const categoryId of action.payload.categoryIds) {
+      const { categoryIds, isPermanent } = action.payload;
+      for (const categoryId of categoryIds) {
         dataSlice.caseReducers.deleteImageCategory(state, {
           type: "deleteImageCategory",
-          payload: { categoryId },
+          payload: { categoryId, isPermanent: isPermanent },
         });
       }
     },
-    deleteAllImageCategories(state, action: PayloadAction<{}>) {
+    deleteAllImageCategories(
+      state,
+      action: PayloadAction<{ isPermanent?: boolean }>
+    ) {
+      const { isPermanent } = action.payload;
       // Must create new ids array, otherwise the array will change as deletions occur
       const categories = [...state.imageCategories.ids];
       categories.forEach((categoryId) => {
         dataSlice.caseReducers.deleteImageCategory(state, {
           type: "deleteImageCategory",
-          payload: { categoryId: categoryId as string },
+          payload: {
+            categoryId: categoryId as string,
+            isPermanent: isPermanent,
+          },
         });
       });
     },
     createAnnotationCategory(
       state,
-      action: PayloadAction<{ name: string; color: string; id?: string }>
+      action: PayloadAction<{
+        name: string;
+        color: string;
+        id?: string;
+        isPermanent?: boolean;
+      }>
     ) {
+      const { name, color, isPermanent } = action.payload;
       let id = uuidv4();
       let idIsUnique = !state.annotationCategories.ids.includes(id);
 
@@ -289,46 +342,51 @@ export const dataSlice = createSlice({
         id = uuidv4();
         idIsUnique = !state.annotationCategories.ids.includes(id);
       }
+      state.annotationsByCategory[id] = [];
 
       const newCategory = {
         id: id,
-        name: action.payload.name,
-        color: action.payload.color,
+        name: name,
+        color: color,
         visible: true,
       } as Category;
       annotationCategoriesAdapter.addOne(
         state.annotationCategories,
         newCategory
       );
-      state.annotationsByCategory[id] = [];
+
+      if (isPermanent) {
+        state.annotationCategories.entities[id].changes = {};
+      }
     },
     addAnnotationCategory(
       state,
       action: PayloadAction<{
-        annotationCategory: Category;
+        category: Category;
         isPermanent?: boolean;
       }>
     ) {
-      const category = action.payload.annotationCategory;
+      const { category, isPermanent } = action.payload;
       state.annotationsByCategory[category.id] = [];
       annotationCategoriesAdapter.addOne(state.annotationCategories, category);
-      if (action.payload.isPermanent) {
+      if (isPermanent) {
         state.annotationCategories.entities[category.id].changes = {};
       }
     },
     addAnnotationCategories(
       state,
       action: PayloadAction<{
-        annotationCategories: Array<Category>;
+        categories: Array<Category>;
         isPermanent?: boolean;
       }>
     ) {
-      for (const annotationCategory of action.payload.annotationCategories) {
+      const { categories, isPermanent } = action.payload;
+      for (const category of categories) {
         dataSlice.caseReducers.addAnnotationCategory(state, {
           type: "addAnnotationCategory",
           payload: {
-            annotationCategory,
-            isPermanent: action.payload.isPermanent,
+            category,
+            isPermanent: isPermanent,
           },
         });
       }
@@ -337,36 +395,42 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         updates: PartialBy<Category, "color" | "name" | "visible">;
+        isPermanent?: boolean;
       }>
     ) {
-      const { id, ...updates } = action.payload.updates;
-      annotationCategoriesAdapter.updateOne(state.annotationCategories, {
-        id: id,
-        changes: updates,
-      });
+      const { updates, isPermanent } = action.payload;
+      const id = updates.id;
+      if (isPermanent) {
+        state.annotationCategories.entities[id].saved = {
+          ...state.annotationCategories.entities[id].saved,
+          ...updates,
+        };
+      } else {
+        annotationCategoriesAdapter.updateOne(state.annotationCategories, {
+          id: id,
+          changes: updates,
+        });
+      }
     },
     setAnnotationCategory(
       state,
       action: PayloadAction<{ category: Category; isPermanent?: boolean }>
     ) {
-      state.annotationsByCategory[action.payload.category.id] = [];
-      annotationCategoriesAdapter.setOne(
-        state.annotationCategories,
-        action.payload.category
-      );
-      if (action.payload.isPermanent) {
-        state.annotationCategories.entities[
-          action.payload.category.id
-        ].changes.added = false;
+      const { category, isPermanent } = action.payload;
+      state.annotationsByCategory[category.id] = [];
+      annotationCategoriesAdapter.setOne(state.annotationCategories, category);
+      if (isPermanent) {
+        state.annotationCategories.entities[category.id].changes.added = false;
       }
     },
     setAnnotationCategories(
       state,
       action: PayloadAction<{
-        annotationCategories: Array<Category>;
+        categories: Array<Category>;
         isPermanent?: boolean;
       }>
     ) {
+      const { categories, isPermanent } = action.payload;
       for (const categoryId in state.annotationsByCategory) {
         if (categoryId !== UNKNOWN_ANNOTATION_CATEGORY_ID) {
           state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
@@ -381,10 +445,10 @@ export const dataSlice = createSlice({
           changes: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
         });
       }
-      for (const category of action.payload.annotationCategories) {
+      for (const category of categories) {
         dataSlice.caseReducers.setAnnotationCategory(state, {
           type: "setAnnotationCategory",
-          payload: { category, isPermanent: action.payload.isPermanent },
+          payload: { category, isPermanent: isPermanent },
         });
       }
     },
@@ -392,14 +456,19 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         category: PartialBy<Category, "id" | "visible">;
+        isPermanent?: boolean;
       }>
     ) {
-      const { category } = action.payload;
+      const { category, isPermanent } = action.payload;
 
       if (!category.id) {
         dataSlice.caseReducers.createAnnotationCategory(state, {
           type: "createAnnotationCategory",
-          payload: { name: category.name!, color: category.color! },
+          payload: {
+            name: category.name!,
+            color: category.color!,
+            isPermanent: isPermanent,
+          },
         });
       } else {
         dataSlice.caseReducers.updateAnnotationCategory(state, {
@@ -409,25 +478,21 @@ export const dataSlice = createSlice({
               Category,
               "color" | "name" | "visible"
             >,
+            isPermanent: isPermanent,
           },
         });
       }
     },
     deleteAnnotationCategory(
       state,
-      action: PayloadAction<{ categoryId: EntityId }>
+      action: PayloadAction<{ categoryId: EntityId; isPermanent?: boolean }>
     ) {
+      const { categoryId, isPermanent } = action.payload;
       state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
-        ...state.annotationsByCategory[action.payload.categoryId]
+        ...state.annotationsByCategory[categoryId]
       );
-      const categoryAnnotationIds =
-        state.annotationsByCategory[action.payload.categoryId];
-      delete state.annotationsByCategory[action.payload.categoryId];
-
-      annotationCategoriesAdapter.removeOne(
-        state.annotationCategories,
-        action.payload.categoryId
-      );
+      const categoryAnnotationIds = state.annotationsByCategory[categoryId];
+      delete state.annotationsByCategory[categoryId];
 
       for (const annotationId of categoryAnnotationIds) {
         dataSlice.caseReducers.updateAnnotation(state, {
@@ -435,36 +500,57 @@ export const dataSlice = createSlice({
           payload: {
             annotationId,
             updates: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
+            isPermanent: isPermanent,
           },
         });
+      }
+      if (isPermanent) {
+        delete state.annotationCategories.entities[categoryId];
+        mutatingFilter(
+          state.annotationCategories.ids,
+          (catId) => catId !== categoryId
+        );
+      } else {
+        annotationCategoriesAdapter.removeOne(
+          state.annotationCategories,
+          categoryId
+        );
       }
     },
     deleteAnnotationCategories(
       state,
-      action: PayloadAction<{ categoryIds: string[] }>
+      action: PayloadAction<{ categoryIds: string[]; isPermanent?: boolean }>
     ) {
-      for (const categoryId of action.payload.categoryIds) {
+      const { categoryIds, isPermanent } = action.payload;
+      for (const categoryId of categoryIds) {
         dataSlice.caseReducers.deleteAnnotationCategory(state, {
           type: "deleteAnnotationCategory",
-          payload: { categoryId },
+          payload: { categoryId, isPermanent: isPermanent },
         });
       }
     },
-    deleteAllAnnotationCategories(state, action: PayloadAction<{}>) {
+    deleteAllAnnotationCategories(
+      state,
+      action: PayloadAction<{ isPermanent?: boolean }>
+    ) {
+      const { isPermanent } = action.payload;
       const idsToDelete = state.annotationCategories.ids.filter(
         (id) => id !== UNKNOWN_ANNOTATION_CATEGORY_ID
       );
 
       dataSlice.caseReducers.deleteAnnotationCategories(state, {
         type: "deleteAnnotationCategories",
-        payload: { categoryIds: idsToDelete as string[] },
+        payload: {
+          categoryIds: idsToDelete as string[],
+          isPermanent: isPermanent,
+        },
       });
     },
     addImage(
       state,
       action: PayloadAction<{ image: ImageType; isPermanent?: boolean }>
     ) {
-      const image = action.payload.image;
+      const { image, isPermanent } = action.payload;
 
       const nameParts = image.name.split(".");
       const namePrefix = nameParts[0]; //get name before file extension
@@ -496,7 +582,7 @@ export const dataSlice = createSlice({
 
       state.annotationsByImage[image.id] = [];
       imagesAdapter.addOne(state.images, image);
-      if (action.payload.isPermanent) {
+      if (isPermanent) {
         state.images.entities[image.id].changes = {};
       }
     },
@@ -504,10 +590,11 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ images: Array<ImageType>; isPermanent?: boolean }>
     ) {
-      for (const image of action.payload.images) {
+      const { images, isPermanent } = action.payload;
+      for (const image of images) {
         dataSlice.caseReducers.addImage(state, {
           type: "addImage",
-          payload: { image, isPermanent: action.payload.isPermanent },
+          payload: { image, isPermanent: isPermanent },
         });
       }
     },
@@ -527,11 +614,10 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         images: Array<ImageType>;
-        disposeColorTensors?: boolean;
         isPermanent?: boolean;
       }>
     ) {
-      const images = action.payload.images;
+      const { images, isPermanent } = action.payload;
 
       dataSlice.caseReducers.deleteAllImages(state, {
         type: "deleteAllImages",
@@ -540,15 +626,27 @@ export const dataSlice = createSlice({
 
       dataSlice.caseReducers.addImages(state, {
         type: "AddImages",
-        payload: { images, isPermanent: action.payload.isPermanent },
+        payload: { images, isPermanent: isPermanent },
       });
 
-      //imagesAdapter.setAll(state.images, images, action.payload.isPermanent);
+      //imagesAdapter.setAll(state.images, images, isPermanent);
     },
-    setImageSrc(state, action: PayloadAction<{ imgId: string; src: string }>) {
-      imagesAdapter.updateOne(state.images, {
-        id: action.payload.imgId,
-        changes: { src: action.payload.src },
+    setImageSrc(
+      state,
+      action: PayloadAction<{
+        imageId: string;
+        src: string;
+        isPermanent?: boolean;
+      }>
+    ) {
+      const { imageId, src, isPermanent } = action.payload;
+      dataSlice.caseReducers.updateImage(state, {
+        type: "updateImage",
+        payload: {
+          imageId: imageId,
+          updates: { src: src },
+          isPermanent: isPermanent,
+        },
       });
     },
 
@@ -558,13 +656,19 @@ export const dataSlice = createSlice({
         imageId: string;
         activePlane: number;
         renderedSrc: string;
+        isPermanent?: boolean;
       }>
     ) {
-      imagesAdapter.updateOne(state.images, {
-        id: action.payload.imageId,
-        changes: {
-          src: action.payload.renderedSrc,
-          activePlane: action.payload.activePlane,
+      const { imageId, activePlane, renderedSrc, isPermanent } = action.payload;
+      dataSlice.caseReducers.updateImage(state, {
+        type: "updateImage",
+        payload: {
+          imageId: imageId,
+          updates: {
+            src: renderedSrc,
+            activePlane: activePlane,
+          },
+          isPermanent: isPermanent,
         },
       });
     },
@@ -574,11 +678,17 @@ export const dataSlice = createSlice({
         imageId: string;
         colors: Colors;
         execSaga: boolean;
+        isPermanent?: boolean;
       }>
     ) {
-      imagesAdapter.updateOne(state.images, {
-        id: action.payload.imageId,
-        changes: { colors: action.payload.colors },
+      const { imageId, colors, isPermanent } = action.payload;
+      dataSlice.caseReducers.updateImage(state, {
+        type: "updateImage",
+        payload: {
+          imageId: imageId,
+          updates: { colors: colors },
+          isPermanent: isPermanent,
+        },
       });
     },
 
@@ -587,9 +697,11 @@ export const dataSlice = createSlice({
       action: PayloadAction<{
         annotations: Array<DecodedAnnotationType>;
         imageId: string;
+        isPermanent?: boolean;
       }>
     ) {},
-    clearPredictions(state, action: PayloadAction<{}>) {
+    clearPredictions(state, action: PayloadAction<{ isPermanent?: boolean }>) {
+      const { isPermanent } = action.payload;
       state.images.ids.forEach((imageId) => {
         if (
           state.images.entities[imageId].saved.partition ===
@@ -602,9 +714,13 @@ export const dataSlice = createSlice({
             state.images.entities[imageId],
             "categoryId"
           ) as string;
-          imagesAdapter.updateOne(state.images, {
-            id: imageId,
-            changes: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
+          dataSlice.caseReducers.updateImage(state, {
+            type: "updateImage",
+            payload: {
+              imageId: imageId as string,
+              updates: { categoryId: UNKNOWN_IMAGE_CATEGORY_ID },
+              isPermanent: isPermanent,
+            },
           });
           mutatingFilter(
             state.imagesByCategory[predictedCategory],
@@ -617,6 +733,53 @@ export const dataSlice = createSlice({
         }
       });
     },
+    updateImage(
+      state,
+      action: PayloadAction<{
+        imageId: string;
+        updates: Partial<ImageType>;
+        execSaga?: boolean;
+        isPermanent?: boolean;
+      }>
+    ) {
+      const { imageId, updates, isPermanent } = action.payload;
+
+      if (state.images.ids.includes(imageId)) {
+        if (isPermanent) {
+          state.images.entities[imageId].saved = {
+            ...state.images.entities[imageId].saved,
+            ...updates,
+          };
+        } else {
+          const changes = {
+            id: imageId,
+            changes: updates as Deferred<ImageType>,
+          };
+
+          imagesAdapter.updateOne(state.images, changes);
+        }
+      }
+    },
+    updateImages(
+      state,
+      action: PayloadAction<{
+        updates: Array<{ id: string } & Partial<ImageType>>;
+        isPermanent?: boolean;
+      }>
+    ) {
+      const { updates, isPermanent } = action.payload;
+      for (const update of updates) {
+        const { id, ...changes } = update;
+        dataSlice.caseReducers.updateImage(state, {
+          type: "updateImage",
+          payload: {
+            imageId: id as string,
+            updates: changes as Partial<ImageType>,
+            isPermanent: isPermanent,
+          },
+        });
+      }
+    },
     updateImageCategories(
       state,
       action: PayloadAction<{
@@ -625,10 +788,14 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      const newCategoryId = action.payload.categoryId;
+      const {
+        imageIds,
+        categoryId: newCategoryId,
+        isPermanent,
+      } = action.payload;
       if (!newCategoryId) return;
-      const changes: Array<Changes<ImageType>> = [];
-      for (const imageId of action.payload.imageIds) {
+      const changes: Array<{ id: string } & Partial<ImageType>> = [];
+      for (const imageId of imageIds) {
         const categoryId = getDeferredProperty(
           state.images.entities[imageId],
           "categoryId"
@@ -638,28 +805,32 @@ export const dataSlice = createSlice({
         ].filter((currentImageId) => currentImageId !== imageId);
         state.imagesByCategory[newCategoryId].push(imageId);
 
-        if (action.payload.isPermanent) {
-          state.images.entities[imageId].saved.categoryId = newCategoryId;
-        } else {
-          changes.push({
-            id: imageId,
-            changes: { categoryId: action.payload.categoryId },
-          });
-        }
+        changes.push({
+          id: imageId,
+          categoryId: categoryId,
+        });
       }
-      imagesAdapter.updateMany(state.images, changes);
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: changes,
+          isPermanent: isPermanent,
+        },
+      });
     },
     updateCategoriesOfImages(
       state,
       action: PayloadAction<{
         imageIds: Array<string>;
         categoryIds: Array<string>;
+        isPermanent?: boolean;
       }>
     ) {
-      const { imageIds, categoryIds } = action.payload;
+      const { imageIds, categoryIds, isPermanent } = action.payload;
       if (imageIds.length !== categoryIds.length) {
         return;
       }
+      const changes: Array<{ id: string } & Partial<ImageType>> = [];
 
       imageIds.forEach((imageId, idx) => {
         const categoryId = categoryIds[idx];
@@ -672,33 +843,43 @@ export const dataSlice = createSlice({
           state.imagesByCategory[previousCategoryId],
           (previousImageId) => previousImageId !== imageId
         );
+        changes.push({
+          id: imageId,
+          categoryId: categoryIds[idx],
+        });
       });
-      const changes = action.payload.imageIds.map((id, idx) => {
-        return {
-          id,
-          changes: { categoryId: action.payload.categoryIds[idx] },
-        } as Changes<ImageType>;
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: changes,
+          isPermanent: isPermanent,
+        },
       });
-      imagesAdapter.updateMany(state.images, changes);
     },
     updateImagesPartition(
       state,
       action: PayloadAction<{
         imageIdsByPartition: Record<string, Array<string>>;
+        isPermanent?: boolean;
       }>
     ) {
-      const changes: Changes<ImageType>[] = [];
-      Object.entries(action.payload.imageIdsByPartition).forEach(
-        ([partition, imageIds]) => {
-          for (const imageId of imageIds) {
-            changes.push({
-              id: imageId,
-              changes: { partition: partition as Partition },
-            });
-          }
+      const { imageIdsByPartition, isPermanent } = action.payload;
+      const changes: Array<{ id: string } & Partial<ImageType>> = [];
+      Object.entries(imageIdsByPartition).forEach(([partition, imageIds]) => {
+        for (const imageId of imageIds) {
+          changes.push({
+            id: imageId,
+            partition: partition as Partition,
+          });
         }
-      );
-      imagesAdapter.updateMany(state.images, changes);
+      });
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: changes,
+          isPermanent: isPermanent,
+        },
+      });
     },
 
     updateLabeledImagesVisibility(
@@ -707,7 +888,7 @@ export const dataSlice = createSlice({
     ) {
       // state.images.forEach((image) => {
       //   if (image.partition !== Partition.Inference) {
-      //     image.visible = action.payload.visibility;
+      //     image.visible = visibility;
       //   }
       // });
     },
@@ -716,36 +897,47 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{
         imageIdsByPartition: Record<string, Array<string>>;
+        isPermanent?: boolean;
       }>
     ) {
-      const changes: Changes<ImageType>[] = [];
-      Object.entries(action.payload.imageIdsByPartition).forEach(
-        ([partition, imageIds]) => {
-          for (const imageId of imageIds) {
-            changes.push({
-              id: imageId,
-              changes: { partition: partition as Partition },
-            });
-          }
+      const { imageIdsByPartition, isPermanent } = action.payload;
+      const changes: Array<{ id: string } & Partial<ImageType>> = [];
+      Object.entries(imageIdsByPartition).forEach(([partition, imageIds]) => {
+        for (const imageId of imageIds) {
+          changes.push({
+            id: imageId,
+            partition: partition as Partition,
+          });
         }
-      );
-      imagesAdapter.updateMany(state.images, changes);
+      });
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: changes,
+          isPermanent: isPermanent,
+        },
+      });
     },
     setVisibilityOfImages(
       state,
       action: PayloadAction<{ visible: boolean; imageIds: Array<string> }>
     ) {
-      const changes = action.payload.imageIds.map((id) => {
-        return { id, changes: { visible: action.payload.visible } };
+      const { imageIds, visible } = action.payload;
+      const changes = imageIds.map((id) => {
+        return { id, changes: { visible: visible } };
       });
       imagesAdapter.updateMany(state.images, changes);
     },
 
     deleteImage(
       state,
-      action: PayloadAction<{ imageId: string; disposeColorTensor?: boolean }>
+      action: PayloadAction<{
+        imageId: string;
+        disposeColorTensor?: boolean;
+        isPermanent?: boolean;
+      }>
     ) {
-      const { imageId } = action.payload;
+      const { imageId, disposeColorTensor, isPermanent } = action.payload;
       const imageCategoryId = getDeferredProperty(
         state.images.entities[imageId],
         "categoryId"
@@ -754,12 +946,22 @@ export const dataSlice = createSlice({
         state.imagesByCategory[imageCategoryId],
         (id) => id !== imageId
       );
-      imagesAdapter.removeOne(state.images, action.payload.imageId);
+
+      delete state.annotationsByImage[imageId];
+      if (isPermanent) {
+        if (disposeColorTensor) {
+          dispose(state.images.entities[imageId].saved.data as TensorContainer);
+          dispose(state.images.entities[imageId].changes as TensorContainer);
+        }
+        delete state.images.entities[imageId];
+        mutatingFilter(state.images.ids, (_imageId) => _imageId !== imageId);
+      } else {
+        imagesAdapter.removeOne(state.images, imageId);
+      }
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds: state.annotationsByImage[imageId] },
+        payload: { annotationIds: state.annotationsByImage[imageId] }, //TODO: return here
       });
-      delete state.annotationsByImage[imageId];
     },
 
     deleteImages(
@@ -767,69 +969,42 @@ export const dataSlice = createSlice({
       action: PayloadAction<{
         imageIds: Array<string>;
         disposeColorTensors: boolean;
+        isPermanent?: boolean;
       }>
     ) {
-      const disposeColorTensor = action.payload.disposeColorTensors;
-      for (const imageId of action.payload.imageIds) {
+      const { imageIds, disposeColorTensors, isPermanent } = action.payload;
+      const disposeColorTensor = disposeColorTensors;
+      for (const imageId of imageIds) {
         dataSlice.caseReducers.deleteImage(state, {
           type: "deleteImage",
-          payload: { imageId, disposeColorTensor },
+          payload: {
+            imageId,
+            disposeColorTensor,
+            isPermanent: isPermanent,
+          },
         });
       }
     },
 
     deleteAllImages(
       state,
-      action: PayloadAction<{ disposeColorTensors: boolean }>
+      action: PayloadAction<{
+        disposeColorTensors: boolean;
+        isPermanent?: boolean;
+      }>
     ) {
-      const disposeColorTensors = action.payload.disposeColorTensors;
+      const { disposeColorTensors, isPermanent } = action.payload;
       const imageIds = [...state.images.ids] as string[];
       dataSlice.caseReducers.deleteImages(state, {
         type: "deleteImages",
-        payload: { imageIds, disposeColorTensors },
+        payload: {
+          imageIds,
+          disposeColorTensors,
+          isPermanent: isPermanent,
+        },
       });
     },
 
-    updateImage(
-      state,
-      action: PayloadAction<{
-        imageId: string;
-        updates: Partial<ImageType>;
-        execSaga?: boolean;
-        isPermanent?: boolean;
-      }>
-    ) {
-      const { imageId, updates } = action.payload;
-
-      if (state.images.ids.includes(imageId)) {
-        const changes = {
-          id: imageId,
-          changes: updates as Deferred<ImageType>,
-        };
-
-        imagesAdapter.updateOne(state.images, changes);
-        return;
-      }
-    },
-    updateImages(
-      state,
-      action: PayloadAction<{
-        updates: Array<{ id: string } & Partial<ImageType>>;
-        isPermanent?: boolean;
-      }>
-    ) {
-      for (const update of action.payload.updates) {
-        const { id, ...changes } = update;
-        dataSlice.caseReducers.updateImage(state, {
-          type: "updateImage",
-          payload: {
-            imageId: id,
-            updates: changes,
-            isPermanent: action.payload.isPermanent,
-          },
-        });
-      }
-    },
     addAnnotation(
       state,
       action: PayloadAction<{
@@ -837,7 +1012,7 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      let annotation = action.payload.annotation;
+      const { annotation, isPermanent } = action.payload;
 
       if (state.annotations.ids.includes(annotation.id)) return;
 
@@ -861,7 +1036,7 @@ export const dataSlice = createSlice({
         state.annotations,
         annotation as AnnotationType
       );
-      if (action.payload.isPermanent) {
+      if (isPermanent) {
         state.annotations.entities[annotation.id].changes = {};
       }
     },
@@ -872,10 +1047,11 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      for (const annotation of action.payload.annotations) {
+      const { annotations, isPermanent } = action.payload;
+      for (const annotation of annotations) {
         dataSlice.caseReducers.addAnnotation(state, {
           type: "addAnnotation",
-          payload: { annotation, isPermanent: action.payload.isPermanent },
+          payload: { annotation, isPermanent: isPermanent },
         });
       }
     },
@@ -886,20 +1062,21 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
+      const { annotations, isPermanent } = action.payload;
       const withInvalidImageId = [];
       dataSlice.caseReducers.deleteAllAnnotations(state, {
         type: "deleteAllAnnotations",
         payload: {},
       });
 
-      for (const annotation of action.payload.annotations) {
+      for (const annotation of annotations) {
         if (!state.images.ids.includes(annotation.imageId!)) {
           withInvalidImageId.push(annotation.id);
           continue;
         }
         dataSlice.caseReducers.addAnnotation(state, {
           type: "addAnnotation",
-          payload: { annotation, isPermanent: action.payload.isPermanent },
+          payload: { annotation, isPermanent: isPermanent },
         });
       }
       if (withInvalidImageId.length) {
@@ -916,20 +1093,21 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
+      const { annotations, imageId, isPermanent } = action.payload;
       const withInvalidImageId = [];
       dataSlice.caseReducers.deleteAllAnnotationsByImage(state, {
         type: "deleteAllAnnotationsByImage",
-        payload: { imageId: action.payload.imageId },
+        payload: { imageId: imageId },
       });
 
-      for (const annotation of action.payload.annotations) {
+      for (const annotation of annotations) {
         if (!state.images.ids.includes(annotation.imageId!)) {
           withInvalidImageId.push(annotation.id);
           continue;
         }
         dataSlice.caseReducers.addAnnotation(state, {
           type: "addAnnotation",
-          payload: { annotation, isPermanent: action.payload.isPermanent },
+          payload: { annotation, isPermanent: isPermanent },
         });
       }
       if (withInvalidImageId.length) {
@@ -965,14 +1143,15 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      for (const update of action.payload.updates) {
+      const { updates, isPermanent } = action.payload;
+      for (const update of updates) {
         const { id, ...changes } = update;
         dataSlice.caseReducers.updateAnnotation(state, {
           type: "updateAnnotation",
           payload: {
-            annotationId: id,
-            updates: changes,
-            isPermanent: action.payload.isPermanent,
+            annotationId: id as string,
+            updates: changes as Partial<AnnotationType>,
+            isPermanent: isPermanent,
           },
         });
       }
@@ -985,10 +1164,14 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      const newCategoryId = action.payload.categoryId;
+      const {
+        annotationIds,
+        categoryId: newCategoryId,
+        isPermanent,
+      } = action.payload;
       if (!newCategoryId) return;
-      const changes: Array<Changes<ImageType>> = [];
-      for (const annotationId of action.payload.annotationIds) {
+      const changes: Array<{ id: string } & Partial<AnnotationType>> = [];
+      for (const annotationId of annotationIds) {
         const categoryId = getDeferredProperty(
           state.annotations.entities[annotationId],
           "categoryId"
@@ -998,17 +1181,18 @@ export const dataSlice = createSlice({
         ].filter((currentAnnotationId) => currentAnnotationId !== annotationId);
         state.annotationsByCategory[newCategoryId].push(annotationId);
 
-        if (action.payload.isPermanent) {
-          state.annotations.entities[annotationId].saved.categoryId =
-            newCategoryId;
-        } else {
-          changes.push({
-            id: annotationId,
-            changes: { categoryId: action.payload.categoryId },
-          });
-        }
+        changes.push({
+          id: annotationId,
+          categoryId: categoryId,
+        });
       }
-      annotationsAdapter.updateMany(state.annotations, changes);
+      dataSlice.caseReducers.updateAnnotations(state, {
+        type: "updateAnnotations",
+        payload: {
+          updates: changes,
+          isPermanent: isPermanent,
+        },
+      });
     },
     // do not dispatch directly from component, use deleteAnnotation
     // which will call this from a listener
@@ -1016,7 +1200,7 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ annotationId: string; isPermanent?: boolean }>
     ) {
-      const annotationId = action.payload.annotationId;
+      const { annotationId, isPermanent } = action.payload;
       if (state.annotations.ids.includes(annotationId)) {
         const imageId = getDeferredProperty(
           state.annotations.entities[annotationId],
@@ -1034,7 +1218,7 @@ export const dataSlice = createSlice({
           state.annotationsByImage[imageId],
           (_annotationId) => _annotationId !== annotationId
         );
-        if (action.payload.isPermanent) {
+        if (isPermanent) {
           delete state.annotations.entities[annotationId];
           state.annotations.ids = Object.keys(state.annotations.entities);
         } else {
@@ -1057,12 +1241,13 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      const annotationIds = [...action.payload.annotationIds];
+      const { annotationIds, isPermanent } = action.payload;
+      const _annotationIds = [...annotationIds];
 
-      for (const annotationId of annotationIds) {
+      for (const annotationId of _annotationIds) {
         dataSlice.caseReducers._deleteAnnotation(state, {
           type: "_deleteAnnotation",
-          payload: { annotationId, isPermanent: action.payload.isPermanent },
+          payload: { annotationId, isPermanent: isPermanent },
         });
       }
     },
@@ -1079,21 +1264,22 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ imageId: string; isPermanent?: boolean }>
     ) {
-      const annotationIds = state.annotationsByImage[action.payload.imageId];
+      const { imageId, isPermanent } = action.payload;
+      const annotationIds = state.annotationsByImage[imageId];
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds, isPermanent: action.payload.isPermanent },
+        payload: { annotationIds, isPermanent: isPermanent },
       });
     },
     deleteAllAnnotationsByCategory(
       state,
       action: PayloadAction<{ categoryId: string; isPermanent?: boolean }>
     ) {
-      const annotationIds =
-        state.annotationsByCategory[action.payload.categoryId];
+      const { categoryId, isPermanent } = action.payload;
+      const annotationIds = state.annotationsByCategory[categoryId];
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds, isPermanent: action.payload.isPermanent },
+        payload: { annotationIds, isPermanent: isPermanent },
       });
     },
     deleteImageAnnotationsByCategory(
@@ -1104,7 +1290,7 @@ export const dataSlice = createSlice({
         isPermanent?: boolean;
       }>
     ) {
-      const { imageId, categoryId } = action.payload;
+      const { imageId, categoryId, isPermanent } = action.payload;
       const annotationIds = state.annotationsByCategory[categoryId].filter(
         (annotationId) => {
           return (
@@ -1118,17 +1304,18 @@ export const dataSlice = createSlice({
 
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotation",
-        payload: { annotationIds, isPermanent: action.payload.isPermanent },
+        payload: { annotationIds, isPermanent: isPermanent },
       });
     },
     deleteAllAnnotations(
       state,
       action: PayloadAction<{ isPermanent?: boolean }>
     ) {
+      const { isPermanent } = action.payload;
       const annotationIds = [...state.annotations.ids] as Array<string>;
       dataSlice.caseReducers.deleteAnnotations(state, {
         type: "deleteAnnotations",
-        payload: { annotationIds, isPermanent: action.payload.isPermanent },
+        payload: { annotationIds, isPermanent: isPermanent },
       });
     },
     reconcile(
