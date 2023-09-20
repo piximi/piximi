@@ -4,7 +4,7 @@ import { sortBy } from "lodash";
 import { imageCategoriesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 
-import { UNKNOWN_IMAGE_CATEGORY_ID } from "types";
+import { Category, UNKNOWN_IMAGE_CATEGORY_ID } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 const imageCategorySelectors = imageCategoriesAdapter.getSelectors(
@@ -73,4 +73,14 @@ export const selectImageCategoryNames = createSelector(
   (categories) => {
     return categories.map((category) => category.name);
   }
+);
+
+export const selectImageCategoryProperty = createSelector(
+  selectImageCategoryEntities,
+  (entities) =>
+    <S extends keyof Category>(id: string, property: S) => {
+      const category = entities[id];
+      if (!category) return;
+      return category[property];
+    }
 );

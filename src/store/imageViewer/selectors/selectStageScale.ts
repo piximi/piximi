@@ -4,5 +4,5 @@ export const selectStageScale = ({
 }: {
   imageViewer: ImageViewerStore;
 }): number => {
-  return imageViewer.stageScale;
+  return imageViewer.zoomOptions.scale;
 };

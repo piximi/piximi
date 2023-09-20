@@ -23,7 +23,7 @@ import {
   convertToImage,
   createRenderedTensor,
 } from "utils/common/image";
-import { getCompleteEntity } from "store/entities/utils";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 
 export const dataMiddleware = createListenerMiddleware();
 
@@ -290,8 +290,9 @@ startAppListening({
 
 startAppListening({
   actionCreator: dataSlice.actions.reconcile,
-  effect: (action, listenerAPI) => {
+  effect: async (action, listenerAPI) => {
     const newState = listenerAPI.getState();
+    const previousState = listenerAPI.getOriginalState();
     const selectedImages = newState.project.selectedImageIds;
     const currentImages = newState.data.images.ids;
     const imagesToRemove = [];
@@ -302,6 +303,38 @@ startAppListening({
     }
     listenerAPI.dispatch(
       projectSlice.actions.deselectImages({ ids: imagesToRemove })
+    );
+    if (!action.payload.keepChanges) return;
+    const srcUpdates: Array<{ id: string; src: string }> = [];
+    for (const entity of Object.values(
+      previousState.data.annotations.entities
+    )) {
+      if (
+        (!entity.saved.src ||
+          entity.changes.boundingBox ||
+          entity.changes.decodedMask) &&
+        !entity.changes.deleted
+      ) {
+        const imageId = getDeferredProperty(entity, "imageId");
+        if (!imageId) continue;
+        const bbox = getDeferredProperty(entity, "boundingBox");
+        const imageSrc = newState.data.images.entities[imageId].saved.src;
+        const image = await ImageJS.Image.load(imageSrc);
+        const object = image.crop({
+          x: bbox[0],
+          y: bbox[1],
+          width: bbox[2] - bbox[0],
+          height: bbox[3] - bbox[1],
+        });
+        const src = object.getCanvas().toDataURL();
+        srcUpdates.push({ id: entity.saved.id, src });
+      }
+    }
+    listenerAPI.dispatch(
+      dataSlice.actions.updateAnnotations({
+        updates: srcUpdates,
+        isPermanent: true,
+      })
     );
   },
 });

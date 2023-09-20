@@ -67,34 +67,32 @@ export const ClearAnnotationsGroup = () => {
   const t = useTranslation();
 
   return (
-    <>
-      <List dense>
-        <CustomListItemButton
-          primaryText={t("Clear all annotations")}
-          onClick={() => handleOpenAndTrack("ALL")}
-          disabled={activeAnnotationsIds.length === 0}
-          icon={<DeleteIcon color="disabled" />}
-        />
+    <List dense>
+      <CustomListItemButton
+        primaryText={t("Clear all annotations")}
+        onClick={() => handleOpenAndTrack("ALL")}
+        disabled={activeAnnotationsIds.length === 0}
+        icon={<DeleteIcon color="disabled" />}
+      />
 
-        <DialogWithAction
-          title={`Delete ${deleteOp}  annotations`}
-          content={`${
-            deleteOp === "ALL"
-              ? activeAnnotationsIds.length
-              : selectActiveAnnotationIds.length
-          } annotations will be deleted`}
-          onConfirm={handleDeleteAnnotations}
-          onClose={handleCloseDeleteAnnotationsDialog}
-          isOpen={isDeleteAnnotationsDialogOpen}
-        />
+      <DialogWithAction
+        title={`Delete ${deleteOp}  annotations`}
+        content={`${
+          deleteOp === "ALL"
+            ? activeAnnotationsIds.length
+            : selectActiveAnnotationIds.length
+        } annotations will be deleted`}
+        onConfirm={handleDeleteAnnotations}
+        onClose={handleCloseDeleteAnnotationsDialog}
+        isOpen={isDeleteAnnotationsDialogOpen}
+      />
 
-        <CustomListItemButton
-          primaryText={t("Clear selected annotations")}
-          onClick={() => handleOpenAndTrack("SELECTED")}
-          disabled={selectedAnnotationsIds.length === 0}
-          icon={<DeleteIcon color="disabled" />}
-        />
-      </List>
-    </>
+      <CustomListItemButton
+        primaryText={t("Clear selected annotations")}
+        onClick={() => handleOpenAndTrack("SELECTED")}
+        disabled={selectedAnnotationsIds.length === 0}
+        icon={<DeleteIcon color="disabled" />}
+      />
+    </List>
   );
 };

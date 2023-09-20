@@ -1,15 +1,14 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { Divider, Drawer, List } from "@mui/material";
+import { Divider, List } from "@mui/material";
 
 import {
-  CategoriesList,
   ImageList,
   ClearAnnotationsGroup,
+  AnnotationCategoryList,
 } from "components/lists";
-import { AppBarOffset } from "components/styled-components";
-import { ApplicationOptionsList } from "components/lists/ApplicationOptionsList";
+import { AppBarOffset, DividerHeader } from "components/styled-components";
 
 import {
   ImportAnnotationListItem,
@@ -23,6 +22,7 @@ import {
 } from "store/data";
 
 import { CategoryType } from "types/Category";
+import { BaseAppDrawer } from "../BaseAppDrawer";
 
 export const ImageViewerDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotationCategories);
@@ -30,18 +30,7 @@ export const ImageViewerDrawer = () => {
   const annotatorImages = useSelector(selectSelectedImages);
 
   return (
-    <Drawer
-      anchor="left"
-      sx={{
-        flexShrink: 0,
-        width: (theme) => theme.spacing(32),
-        "& > .MuiDrawer-paper": {
-          width: (theme) => theme.spacing(32),
-        },
-      }}
-      open
-      variant="persistent"
-    >
+    <BaseAppDrawer>
       <ImageViewerAppBar />
 
       <AppBarOffset />
@@ -53,24 +42,25 @@ export const ImageViewerDrawer = () => {
         <ExportAnnotationsListItem />
       </List>
 
-      <Divider />
+      <DividerHeader textAlign="left" typographyVariant="body2" sx={{ my: 2 }}>
+        Images
+      </DividerHeader>
 
       <ImageList images={annotatorImages} />
 
-      <Divider />
+      <DividerHeader textAlign="left" typographyVariant="body2" sx={{ my: 2 }}>
+        Categories
+      </DividerHeader>
 
-      <CategoriesList
+      <AnnotationCategoryList
         createdCategories={createdCategories}
         categoryType={CategoryType.AnnotationCategory}
+        hotkeysActive={true}
       />
 
-      <Divider />
+      <Divider sx={{ mt: 1 }} />
 
       <ClearAnnotationsGroup />
-
-      <Divider />
-
-      <ApplicationOptionsList />
-    </Drawer>
+    </BaseAppDrawer>
   );
 };

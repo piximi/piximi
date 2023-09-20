@@ -1,6 +1,6 @@
 import { Project } from "types";
 
-export const selectHighlightedCategory = ({
+export const selectHighlightedImageCategory = ({
   project,
 }: {
   project: Project;

@@ -6,3 +6,5 @@ export { ClearAnnotationsGroup } from "./ClearAnnotationsGroup";
 export { SegmenterList } from "./SegmenterList";
 export { ApplicationOptionsList } from "./ApplicationOptionsList";
 export { CollapsibleList } from "./CollapsibleList";
+export { AnnotationCategoryList } from "./AnnotationCategoryList";
+export { ImageCategoryList } from "./ImageCategoryList";

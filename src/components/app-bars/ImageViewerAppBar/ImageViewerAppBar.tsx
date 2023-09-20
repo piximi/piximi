@@ -35,7 +35,6 @@ export const ImageViewerAppBar = () => {
       <AppBar
         color="default"
         sx={{
-          backgroundColor: "rgba(0, 0, 0, 0)",
           boxShadow: "none",
           position: "absolute",
         }}

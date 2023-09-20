@@ -3,6 +3,7 @@ import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
 import { ZoomToolOptionsType } from "./ZoomToolOptionsType";
 
 export type ImageViewerStore = {
+  imageStack: string[];
   colorAdjustment: ColorAdjustmentOptionsType;
   cursor: string;
   activeImageId?: string;
@@ -31,4 +32,5 @@ export type ImageViewerStore = {
   };
   zoomOptions: ZoomToolOptionsType;
   imageIsLoading: boolean;
+  highlightedCategory?: string;
 };

@@ -1,4 +1,4 @@
-import React, { ReactElement, useRef } from "react";
+import React, { ReactElement, useRef, useState } from "react";
 
 import {
   ListItem,
@@ -9,9 +9,12 @@ import {
   ListItemButtonProps,
   ListItemTextProps,
   IconButton,
+  TooltipProps,
 } from "@mui/material";
 
-type CustomLiteItemButtonProps = Pick<
+type TooltipType = Omit<TooltipProps, "children" | "title">;
+
+type CustomListItemButtonProps = Pick<
   ListItemButtonProps,
   | "alignItems"
   | "disabled"
@@ -29,6 +32,7 @@ type CustomLiteItemButtonProps = Pick<
     onSecondary?: React.MouseEventHandler<HTMLButtonElement> | undefined;
     additionalComponent?: ReactElement;
     tooltipText?: string;
+    tooltipProps?: TooltipType;
   };
 
 export const CustomListItemButton = ({
@@ -40,27 +44,33 @@ export const CustomListItemButton = ({
   tooltipText,
   additionalComponent,
   primaryTypographyProps,
+  tooltipProps,
   ...rest
-}: CustomLiteItemButtonProps) => {
+}: CustomListItemButtonProps) => {
   const listItemRef = useRef<HTMLLIElement | null>(null);
+  const [_tooltipProps] = useState<TooltipType>({
+    placement: "bottom" as "bottom",
+    disableInteractive: true,
+    enterDelay: 500,
+    enterNextDelay: 500,
+    arrow: true,
+    componentsProps: {
+      tooltip: {
+        sx: {
+          backgroundColor: "#565656",
+          fontSize: "0.85rem",
+          ...tooltipProps?.componentsProps?.tooltip?.sx,
+        },
+      },
+      arrow: {
+        sx: { color: "#565656", ...tooltipProps?.componentsProps?.arrow?.sx },
+      },
+    },
+    ...tooltipProps,
+  });
 
   return (
-    <Tooltip
-      // can't use "sx" prop directly to access tooltip
-      // see: https://github.com/mui-org/material-ui/issues/28679
-      componentsProps={{
-        tooltip: {
-          sx: { backgroundColor: "#565656", fontSize: "0.85rem" },
-        },
-        arrow: { sx: { color: "#565656" } },
-      }}
-      title={tooltipText}
-      placement="bottom"
-      disableInteractive
-      enterDelay={500}
-      enterNextDelay={500}
-      arrow
-    >
+    <Tooltip title={tooltipText} {..._tooltipProps}>
       <span>
         <ListItem
           ref={listItemRef}
@@ -69,17 +79,9 @@ export const CustomListItemButton = ({
               <IconButton
                 edge="end"
                 onClick={handleSecondary}
-                size={
-                  listItemRef.current?.classList.contains("MuiListItem-dense")
-                    ? "small"
-                    : "medium"
-                }
+                size="small"
                 sx={{
-                  mr: listItemRef.current?.classList.contains(
-                    "MuiListItem-dense"
-                  )
-                    ? "-15px"
-                    : "",
+                  mr: "-15px",
                 }}
               >
                 {secondaryIcon}
@@ -87,6 +89,7 @@ export const CustomListItemButton = ({
             ) : undefined
           }
           disablePadding
+          {...rest}
         >
           <ListItemButton onClick={handleClick} {...rest}>
             {icon && <ListItemIcon>{icon}</ListItemIcon>}

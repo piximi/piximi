@@ -28,6 +28,7 @@ export const ExitAnnotatorDialog = ({
         })
       );
       dispatch(dataSlice.actions.reconcile({ keepChanges: true }));
+      dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [] }));
     });
 
     onReturnToProject();

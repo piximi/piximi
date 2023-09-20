@@ -31,7 +31,7 @@ export const selectHiddenImageCategoryIds = ({
 }) => {
   return project.hiddenImageCategoryIds;
 };
-export const selectSelectedImagesIds = ({
+export const selectSelectedImageIds = ({
   project,
 }: {
   project: Project;

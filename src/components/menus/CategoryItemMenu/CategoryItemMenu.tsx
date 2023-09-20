@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
@@ -16,7 +16,8 @@ type CategoryItemMenuProps = {
   handleHideOtherCategories: (category: Category) => void;
   handleHideCategory: (category: Category) => void;
   openCategoryMenu: boolean;
-  usedCategoryInfo: { names: string[]; colors: string[] };
+  usedCategoryColors: string[];
+  usedCategoryNames: string[];
   dispatchDeleteObjectsOfCategory: (categoryId: string) => void;
   dispatchDeleteCategories: (categories: Category | Category[]) => void;
   dispatchUpsertCategory: (
@@ -32,7 +33,8 @@ export const CategoryItemMenu = ({
   handleHideOtherCategories,
   handleHideCategory,
   openCategoryMenu,
-  usedCategoryInfo,
+  usedCategoryColors,
+  usedCategoryNames,
   dispatchDeleteObjectsOfCategory,
   dispatchDeleteCategories,
   dispatchUpsertCategory,
@@ -66,55 +68,51 @@ export const CategoryItemMenu = ({
   return (
     <Menu
       anchorEl={anchorElCategoryMenu}
-      anchorOrigin={{ horizontal: "center", vertical: "top" }}
+      anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
       onClose={handleCloseCategoryMenu}
       open={openCategoryMenu}
-      transformOrigin={{ horizontal: "center", vertical: "bottom" }}
-      sx={(theme) => ({
-        "& .MuiMenu-list": {
-          px: theme.spacing(1),
-          display: "flex",
-          flexDirection: "row",
-        },
-      })}
+      transformOrigin={{ horizontal: "left", vertical: "top" }}
+      MenuListProps={{ sx: { py: 0 } }}
     >
-      <CategoryMenuItem
-        onClick={() => {
-          handleHideCategory(category);
-        }}
-        label={categoryHidden ? "Show" : "Hide"}
-      />
-      <MenuItemDivider />
-      <CategoryMenuItem
-        onClick={() => {
-          handleHideOtherCategories(category);
-        }}
-        label="Hide Other"
-      />
+      <MenuList dense variant="menu" sx={{ py: 0 }}>
+        <CategoryMenuItem
+          onClick={() => {
+            handleHideCategory(category);
+          }}
+          label={categoryHidden ? "Show" : "Hide"}
+        />
 
-      {category.name !== UNKNOWN_CATEGORY_NAME && (
-        <>
-          <MenuItemDivider />
+        <CategoryMenuItem
+          onClick={() => {
+            handleHideOtherCategories(category);
+          }}
+          label="Hide Other"
+        />
+        <StyledDivider sx={{ mx: 1, my: 1 }} />
 
-          <CategoryMenuItem
-            onClick={handleOpenDeleteCategoryDialog}
-            label="Delete"
-          />
-          <MenuItemDivider />
-          <CategoryMenuItem
-            onClick={handleOpenEditCategoryDialog}
-            label="Edit"
-          />
-          <MenuItemDivider />
-          <CategoryMenuItem
-            onClick={handleOpenDialogWithAction}
-            label="Clear Annotations"
-          />
-        </>
-      )}
+        {category.name !== UNKNOWN_CATEGORY_NAME && (
+          <Box>
+            <CategoryMenuItem
+              onClick={handleOpenDeleteCategoryDialog}
+              label="Delete"
+            />
+
+            <CategoryMenuItem
+              onClick={handleOpenEditCategoryDialog}
+              label="Edit"
+            />
+
+            <CategoryMenuItem
+              onClick={handleOpenDialogWithAction}
+              label="Clear Annotations"
+            />
+          </Box>
+        )}
+      </MenuList>
       <UpsertCategoriesDialog
         category={category}
-        usedCategoryInfo={usedCategoryInfo}
+        usedCategoryColors={usedCategoryColors}
+        usedCategoryNames={usedCategoryNames}
         dispatchUpsertCategory={dispatchUpsertCategory}
         onClose={() => handleMenuCloseWith(hendleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
@@ -146,22 +144,8 @@ const CategoryMenuItem = ({
   onClick: () => void;
 }) => {
   return (
-    <MenuItem
-      onClick={handleClick}
-      dense
-      sx={(theme) => ({ px: theme.spacing(0.5) })}
-    >
+    <MenuItem onClick={handleClick} dense>
       <Typography variant="inherit">{label}</Typography>
     </MenuItem>
-  );
-};
-
-const MenuItemDivider = () => {
-  return (
-    <StyledDivider
-      orientation="vertical"
-      flexItem
-      sx={(theme) => ({ mx: theme.spacing(0.5) })}
-    />
   );
 };

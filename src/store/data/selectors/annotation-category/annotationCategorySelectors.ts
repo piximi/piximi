@@ -4,7 +4,7 @@ import { sortBy } from "lodash";
 import { annotationCategoriesAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 
-import { UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
+import { Category, UNKNOWN_ANNOTATION_CATEGORY_ID } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 export const annotationCategorySelectors =
@@ -68,4 +68,14 @@ export const selectAnnotationCategoryNames = createSelector(
   (categories) => {
     return categories.map((category) => category.name);
   }
+);
+
+export const selectAnnotationCategoryProperty = createSelector(
+  selectAnnotationCategoryEntities,
+  (entities) =>
+    <S extends keyof Category>(id: string, property: S) => {
+      const category = entities[id];
+      if (!category) return;
+      return category[property];
+    }
 );

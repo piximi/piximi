@@ -23,7 +23,7 @@ type ImageShapeDialogProps = {
   files: FileList;
   open: boolean;
   onClose: () => void;
-  isUploadedFromAnnotator: boolean;
+  isUploadedFromAnnotator?: boolean;
   referenceImageShape: ImageShapeInfo;
 };
 
