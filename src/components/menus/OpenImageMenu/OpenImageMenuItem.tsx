@@ -22,7 +22,7 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
 
   const [files, setFiles] = React.useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
+  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);
@@ -57,7 +57,6 @@ export const OpenImageMenuItem = ({ onCloseMenu }: OpenImageMenuItemProps) => {
             setOpenDimensionsDialogBox(false);
             onCloseMenu();
           }}
-          isUploadedFromAnnotator={true}
           referenceImageShape={imageShape}
         />
       )}

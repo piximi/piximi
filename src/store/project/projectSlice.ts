@@ -3,13 +3,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Project } from "types/Project";
 import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
 import { mutatingFilter } from "utils/common/helpers";
+import { ImageGridTab } from "types";
 
 export const initialState: Project = {
   selectedImageIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
-  highlightedCategory: null,
+  highlightedCategory: undefined,
   hiddenImageCategoryIds: [],
+  selectedAnnotationIds: [],
+  imageGridTab: "Images",
   loadPercent: 1,
   loadMessage: "",
 };
@@ -28,6 +31,9 @@ export const projectSlice = createSlice({
       // WARNING, don't do below (overwrites draft object)
       // state = action.payload.project;
       return action.payload.project;
+    },
+    setImageGridTab(state, action: PayloadAction<{ view: ImageGridTab }>) {
+      state.imageGridTab = action.payload.view;
     },
     clearSelectedImages(state) {
       state.selectedImageIds = [];
@@ -58,7 +64,7 @@ export const projectSlice = createSlice({
         });
       }
     },
-    setselectedImages(
+    setSelectedImages(
       state,
       action: PayloadAction<{ imageIds: Array<string> }>
     ) {
@@ -68,6 +74,44 @@ export const projectSlice = createSlice({
         type: "selectImages",
         payload: { imageIds: action.payload.imageIds },
       });
+    },
+    selectAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
+      state.selectedAnnotationIds.push(action.payload.annotationId);
+    },
+    selectAnnotations(
+      state,
+      action: PayloadAction<{ annotationIds: Array<string> }>
+    ) {
+      for (const annotationId of action.payload.annotationIds) {
+        projectSlice.caseReducers.selectAnnotation(state, {
+          type: "selectAnnotation",
+          payload: { annotationId },
+        });
+      }
+    },
+    setSelectedAnnotations(
+      state,
+      action: PayloadAction<{ annotationIds: Array<string> }>
+    ) {
+      state.selectedAnnotationIds = [];
+
+      projectSlice.caseReducers.selectAnnotations(state, {
+        type: "selectAnnotations",
+        payload: { annotationIds: action.payload.annotationIds },
+      });
+    },
+    deselectAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
+      state.selectedAnnotationIds = state.selectedAnnotationIds.filter(
+        (id: string) => id !== action.payload.annotationId
+      );
+    },
+    deselectAnnotations(
+      state,
+      action: PayloadAction<{ annotationIds: Array<string> }>
+    ) {
+      state.selectedAnnotationIds = state.selectedAnnotationIds.filter(
+        (id: string) => !action.payload.annotationIds.includes(id)
+      );
     },
     hideCategory(
       state,
@@ -149,18 +193,6 @@ export const projectSlice = createSlice({
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;
     },
-    updateHighlightedCategory(
-      state,
-      action: PayloadAction<{ categoryIndex: number }>
-    ) {
-      // const index = action.payload.categoryIndex;
-      // if (!isNaN(index) && index < state.categories.length) {
-      //   const categoryId = state.categories[action.payload.categoryIndex].id;
-      //   state.highlightedCategory = categoryId;
-      // } else {
-      //   state.highlightedCategory = null;
-      // }
-    },
     setLoadPercent(
       state,
       action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
@@ -172,7 +204,7 @@ export const projectSlice = createSlice({
         state.loadMessage = "";
       } else if (loadPercent < 0) {
         state.loadPercent = -1; // indefinite loading
-        state.loadMessage = loadMessage ?? "";
+        state.loadMessage = loadMessage ?? "Loading...";
       } else if (loadPercent >= 1) {
         state.loadPercent = 1; // default to not loading if invalid
         state.loadMessage = "";
@@ -185,6 +217,12 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
     ) {},
+    updateHighlightedImageCategory(
+      state,
+      action: PayloadAction<{ categoryId: string | undefined }>
+    ) {
+      state.highlightedCategory = action.payload.categoryId;
+    },
   },
 });
 
@@ -193,9 +231,9 @@ export const {
   selectImage,
   selectImages,
   selectAllImages,
-  setselectedImages,
+  setSelectedImages,
   deselectImage,
   deselectImages,
-  updateHighlightedCategory,
+  updateHighlightedImageCategory,
   setLoadPercent,
 } = projectSlice.actions;

@@ -1,124 +1,45 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHotkeys } from "hooks";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { Box, CssBaseline } from "@mui/material";
 
-import { useUpload } from "hooks";
+import { useErrorHandler, useUnloadConfirmation } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
-import { ImageShapeDialog, FallBackDialog } from "components/dialogs";
 
-import { ProjectDrawer } from "components/drawers";
-import { ImageGrid } from "components/image-grids/ImageGrid";
-import { ProjectAppBar } from "components/app-bars/ProjectAppBar";
-
-import { applicationSlice } from "store/application";
+import { registerHotkeyView, unregisterHotkeyView } from "store/application";
 import { projectSlice } from "store/project";
-import { selectVisibleImages } from "store/data";
 
-import { AlertType, HotkeyView } from "types";
+import { HotkeyView, ImageGridTab } from "types";
+import { ProjectDrawer } from "components/drawers";
+import { ProjectAppBar } from "components/app-bars";
+import { CustomTabSwitcher } from "components/styled-components";
+import { AnnotationImageGrid, ImageGrid } from "components/image-grids";
+import { FallBackDialog } from "components/dialogs";
+import { selectTotalAnnotationCount } from "store/data";
 
-import { getStackTraceFromError } from "utils";
-import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
+const tabs: Array<ImageGridTab> = ["Images", "Annotations"];
 
 export const ProjectViewer = () => {
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
-    shape: ImageShapeEnum.InvalidImage,
-  });
-  const [files, setFiles] = useState<FileList>();
-
   const dispatch = useDispatch();
-  const images = useSelector(selectVisibleImages);
+
+  const annotationCount = useSelector(selectTotalAnnotationCount);
+
   useDefaultImage(DispatchLocation.Project);
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
+  useErrorHandler();
+  useUnloadConfirmation();
 
-  useHotkeys(
-    "control+a",
-    () => selectAllImages(),
-    [HotkeyView.MainImageGrid, HotkeyView.MainImageGridAppBar],
-    [images]
-  );
-
-  const handleClose = () => {
-    setOpenDimensionsDialogBox(false);
+  const handleTabChange = (newValue: number) => {
+    dispatch(projectSlice.actions.setImageGridTab({ view: tabs[newValue] }));
+    //TODO: should maybe also change ctegories tab
   };
-
-  const handleDrop = async (files: FileList) => {
-    const imageShapeInfo = await uploadFiles(files);
-    setImageShape(imageShapeInfo);
-    setFiles(files);
-  };
-
-  const selectAllImages = useCallback(() => {
-    dispatch(
-      projectSlice.actions.selectAllImages({
-        ids: images.map((image) => image.id),
-      })
-    );
-  }, [images, dispatch]);
-
-  const handleUnload = (e: any) => {
-    if (process.env.NODE_ENV === "development") {
-      return;
-    } else {
-      e.preventDefault();
-      return (e.returnValue = "Are you sure you want to exit?");
-    }
-  };
-
-  const handleError = useCallback(
-    async (e: any) => {
-      e.preventDefault();
-      var error = e.error as Error;
-      const stackTrace = await getStackTraceFromError(error);
-      dispatch(
-        applicationSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: error.name,
-            description: error.message,
-            stackTrace: stackTrace,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
-
-  const handleUncaughtRejection = useCallback(
-    async (e: any) => {
-      e.preventDefault();
-      dispatch(
-        applicationSlice.actions.updateAlertState({
-          alertState: {
-            alertType: AlertType.Error,
-            name: "Uncaught promise rejection",
-            description: String(e.reason.message),
-            stackTrace: String(e.reason.stack),
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
 
   useEffect(() => {
-    window.addEventListener("error", handleError);
-    window.addEventListener("unhandledrejection", handleUncaughtRejection);
+    dispatch(registerHotkeyView({ hotkeyView: HotkeyView.ProjectView }));
     return () => {
-      window.removeEventListener("error", handleError);
-      window.removeEventListener("unhandledrejection", handleUncaughtRejection);
+      dispatch(unregisterHotkeyView({ hotkeyView: HotkeyView.ProjectView }));
     };
-  }, [handleError, handleUncaughtRejection]);
-
-  useEffect(() => {
-    window.addEventListener("beforeunload", handleUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-    };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>
@@ -126,22 +47,31 @@ export const ProjectViewer = () => {
         <div tabIndex={-1}>
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
-
             <ProjectAppBar />
 
             <ProjectDrawer />
 
-            <ImageGrid onDrop={handleDrop} />
-
-            {files?.length && (
-              <ImageShapeDialog
-                files={files}
-                open={openDimensionsDialogBox}
-                onClose={handleClose}
-                isUploadedFromAnnotator={false}
-                referenceImageShape={imageShape}
-              />
-            )}
+            <Box
+              sx={(theme) => ({
+                maxWidth: "calc(100% - 256px)", // magic number draw width
+                overflow: "hidden",
+                flexGrow: 1,
+                height: "100%",
+                paddingTop: theme.spacing(8),
+                marginLeft: theme.spacing(32),
+              })}
+            >
+              <CustomTabSwitcher
+                childClassName="grid-tabs"
+                label1="Images"
+                label2="Annotations"
+                disabledTabs={annotationCount === 0 ? [1] : undefined}
+                secondaryEffect={handleTabChange}
+              >
+                <ImageGrid />
+                {annotationCount === 0 ? <></> : <AnnotationImageGrid />}
+              </CustomTabSwitcher>
+            </Box>
           </Box>
         </div>
       </ErrorBoundary>

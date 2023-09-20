@@ -78,3 +78,11 @@ export const selectAnnotationsByImage = createSelector(
       return annotations;
     }
 );
+
+export const selectImageIdByAnnotation = createSelector(
+  [selectAnnotationEntities],
+  (entities): ((annotationId: string) => string) =>
+    (annotationId: string) => {
+      return entities[annotationId].imageId!;
+    }
+);

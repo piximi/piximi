@@ -7,7 +7,7 @@ import { SendFeedbackListItem } from "../../list-items/SendFeedbackListItem";
 
 export const ApplicationOptionsList = () => {
   return (
-    <List dense>
+    <List dense sx={{ mt: "auto" }}>
       <SettingsListItem />
 
       <SendFeedbackListItem />

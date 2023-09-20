@@ -12,18 +12,20 @@ type ToolProps = {
 
 //TODO: tool buttons
 
-export const Tool = ({ children, name, onClick }: ToolProps) => {
+export const Tool = ({ children, name, onClick: handleClick }: ToolProps) => {
   let toolName = name;
 
   const description = <ToolHotkeyTitle toolName={toolName} />;
 
   return (
-    <TooltipCard description={description}>
-      <ListItem button onClick={onClick}>
-        <ListItemIcon>
-          <SvgIcon fontSize="small">{children}</SvgIcon>
-        </ListItemIcon>
-      </ListItem>
-    </TooltipCard>
+    <>
+      <TooltipCard description={description}>
+        <ListItem button onClick={handleClick}>
+          <ListItemIcon>
+            <SvgIcon fontSize="small">{children}</SvgIcon>
+          </ListItemIcon>
+        </ListItem>
+      </TooltipCard>
+    </>
   );
 };

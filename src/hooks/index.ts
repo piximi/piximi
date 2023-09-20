@@ -13,8 +13,9 @@ export { useUpload } from "./useUpload";
 export { useZoom } from "./useZoom";
 export { useLocalGlobalState } from "./useLocalGlobalState";
 export { useHotkeys } from "./useHotkeys";
-export { useCategoryHandlers } from "./useCategoryHandlers";
 export { usePointerLocation } from "./usePointerLocation/usePointerLocation";
+export { useErrorHandler } from "./useErrorHandler";
+export { useUnloadConfirmation } from "./useUnloadConfirmation";
 
 // useDefaultImage not included to encourage use of
 // import {useDefaultImage, DispatchLocation} from "hooks/useDefaultImage"

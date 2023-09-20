@@ -136,3 +136,4 @@ export type { PartialBy } from "./utility/PartialBy";
 export type { ModelHistory } from "./ModelHistory";
 
 export type { LoadCB } from "./LoadCallBack";
+export type { ImageGridTab } from "./ImageGridTab";

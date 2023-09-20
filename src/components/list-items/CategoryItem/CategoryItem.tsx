@@ -15,8 +15,9 @@ import { CustomListItemButton } from "../CustomListItemButton";
 type CategoryItemProps = {
   category: Category;
   id: string;
-  selectedCategory: Category;
   categoryisVisible: boolean;
+  isSelected: boolean;
+  isHighlighted: boolean;
   handleToggleCategoryVisibility: (category: Category) => void;
   handleSelectCategory: (category: Category) => void;
   handleOpenCategoryMenu: (
@@ -28,8 +29,9 @@ type CategoryItemProps = {
 
 export const CategoryItem = ({
   category,
+  isSelected,
+  isHighlighted,
   id,
-  selectedCategory,
   categoryisVisible,
   handleToggleCategoryVisibility,
   handleSelectCategory,
@@ -45,7 +47,7 @@ export const CategoryItem = ({
 
   return (
     <CustomListItemButton
-      selected={category.id === selectedCategory.id}
+      selected={isSelected}
       primaryText={category.name}
       icon={
         <Checkbox
@@ -65,13 +67,10 @@ export const CategoryItem = ({
         />
       }
       sx={{
-        backgroundColor:
-          category.id === selectedCategory.id
-            ? APPLICATION_COLORS.highlightColor
-            : "none",
+        backgroundColor: isHighlighted ? category.color + "33" : "inherit",
       }}
       onClick={handleSelect}
-      secondaryIcon={<MoreHorizIcon />}
+      secondaryIcon={<MoreHorizIcon />} //TODO: Fix Display -- on load buttons offset, then move after interaction
       onSecondary={handleOpenMenu}
       additionalComponent={
         <Chip
@@ -89,6 +88,7 @@ export const CategoryItem = ({
           }}
         />
       }
+      dense
     />
   );
 };

@@ -8,12 +8,14 @@ import {
   setZoomSelection,
   selectStageWidth,
   selectActiveImageId,
+  setZoomToolOptions,
 } from "store/imageViewer";
 
 import { selectToolType } from "store/annotator/selectors";
 import { selectZoomToolOptions } from "store/imageViewer";
 
 import { Point, ToolType, ZoomModeType } from "types";
+import { useDebounce } from "hooks/useDebounce";
 
 export const useZoom = (stage?: Konva.Stage | null) => {
   const delta = 10;
@@ -25,6 +27,9 @@ export const useZoom = (stage?: Konva.Stage | null) => {
   const { automaticCentering, mode } = useSelector(selectZoomToolOptions);
   const zoomSelection = useSelector(selectZoomSelection);
   const activeImageId = useSelector(selectActiveImageId);
+  const updateZoomScale = useDebounce((scale: number) => {
+    dispatch(setZoomToolOptions({ options: { scale } }));
+  }, 300);
 
   const zoomAndOffset = (newScale: number, center: Point) => {
     if (!center || !stage) return;
@@ -181,6 +186,8 @@ export const useZoom = (stage?: Konva.Stage | null) => {
     }
     if (!center) return;
     zoomAndOffset(newScale, center);
+
+    updateZoomScale(newScale);
 
     const labelGroup = stage.find(`#label-group`)[0];
     if (!labelGroup) return;

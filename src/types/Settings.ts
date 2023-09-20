@@ -21,6 +21,8 @@ export enum HotkeyView {
   ExportAnnotationsDialog,
   SaveFittedModelDialog,
   SaveProjectDialog,
+  ProjectView,
+  SimpleCancelConfirmDialog,
 }
 
 export type Settings = {

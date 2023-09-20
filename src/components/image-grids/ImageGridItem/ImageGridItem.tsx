@@ -1,106 +1,135 @@
-import { memo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { memo, useMemo } from "react";
+import { useSelector } from "react-redux";
 
-import { Box, Grid } from "@mui/material";
-
-import { ImageIconLabel } from "../ImageGrid/ImageIconLabel";
+import { List, ListItem, ListItemText } from "@mui/material";
 
 import { selectTileSize } from "store/application";
-import { projectSlice } from "store/project";
-import { ImageType } from "types";
+import { selectImageCategoryProperty } from "store/data";
+
+import { ImageType, Partition, UNKNOWN_IMAGE_CATEGORY_ID } from "types";
+import { ProjectGridItem } from "../ProjectGridItem";
+import { contrastingText } from "utils/common/colorPalette";
 
 type ImageGridItemProps = {
-  image: ImageType;
   selected: boolean;
-  selectionColor: string;
-  selectedImageBorderWidth: number;
+  handleClick: (id: string, selected: boolean) => void;
+  image: ImageType;
 };
 
 export const ImageGridItem = memo(
-  ({
-    image,
-    selected,
-    selectionColor,
-    selectedImageBorderWidth,
-  }: ImageGridItemProps) => {
-    const dispatch = useDispatch();
+  ({ selected, handleClick, image }: ImageGridItemProps) => {
     const scaleFactor = useSelector(selectTileSize);
 
-    const getSize = (scaleFactor: number) => {
-      const sideLength = (220 * scaleFactor).toString() + "px";
+    const getImageCategoryProperty = useSelector(selectImageCategoryProperty);
 
+    const categoryDetails = useMemo(() => {
+      const categoryName = getImageCategoryProperty(image.categoryId, "name")!;
+      const categoryColor = getImageCategoryProperty(
+        image.categoryId,
+        "color"
+      )!;
       return {
-        width: sideLength,
-        height: sideLength,
-        margin: "2px",
+        name: categoryName,
+        color: categoryColor,
+        fontColor: contrastingText(categoryColor),
       };
-    };
+    }, [image, getImageCategoryProperty]);
+    const imageDetailComponent = useMemo(() => {
+      return (
+        <List dense>
+          <ListItem>
+            <ListItemText
+              primary={`Image name: ${image.name}`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={`Width: ${image.shape.width} px`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={`Height: ${image.shape.height} px`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={`Channels: ${image.shape.channels}`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={`Planes: ${image.shape.planes}`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={`Partition: ${image.partition}`}
+              primaryTypographyProps={{
+                sx: { color: categoryDetails.fontColor },
+              }}
+            />
+          </ListItem>
+        </List>
+      );
+    }, [image, categoryDetails.fontColor]);
 
-    const getIconPlacement = (image: ImageType, scaleFactor: number) => {
-      const imageWidth = image.shape.width;
-      const imageHeight = image.shape.height;
+    const itemSize = useMemo(() => {
+      return (220 * scaleFactor).toString() + "px";
+    }, [scaleFactor]);
+
+    const iconPosition = useMemo(() => {
       const containerSize = 220 * scaleFactor;
-      const scaleBy = imageWidth > imageHeight ? imageWidth : imageHeight;
+      const scaleBy =
+        image.shape.width > image.shape.height
+          ? image.shape.width
+          : image.shape.height;
       const dimScaleFactor = containerSize / scaleBy;
-      const scaledWidth = dimScaleFactor * imageWidth;
-      const scaledHeight = dimScaleFactor * imageHeight;
+      const scaledWidth = dimScaleFactor * image.shape.width;
+      const scaledHeight = dimScaleFactor * image.shape.height;
 
       const offsetY = Math.ceil((containerSize - scaledHeight) / 2);
       const offsetX = Math.ceil((containerSize - scaledWidth) / 2);
 
-      return { top: `${offsetY}px`, left: `${offsetX}px` };
-    };
+      return { top: offsetY, left: offsetX };
+    }, [image, scaleFactor]);
 
-    const getSelectionStatus = () => {
-      // TODO: Change to always have border so image size doesnt change
-      return selected
-        ? {
-            border: `solid ${selectedImageBorderWidth}px ${selectionColor}`,
-            borderRadius: `${selectedImageBorderWidth}px`,
-          }
-        : { border: "none" };
-    };
-
-    const onSelectImage = (image: ImageType) => {
-      if (selected) {
-        dispatch(projectSlice.actions.deselectImage({ id: image.id }));
-      } else {
-        dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
-      }
-    };
-
-    const onContextSelectImage = (image: ImageType) => {
-      if (!selected) {
-        dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
-      }
+    const handleSelect = (
+      evt: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
+      evt.stopPropagation();
+      handleClick(image.id, selected);
     };
 
     return (
-      <Grid
-        item
-        position="relative" // must be a position element for absolutely positioned ImageIconLabel
-        onClick={() => onSelectImage(image)}
-        sx={{ ...getSize(scaleFactor), ...getSelectionStatus() }}
-        onContextMenu={() => onContextSelectImage(image)}
-      >
-        <Box
-          component="img"
-          alt=""
-          src={image.src}
-          sx={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            top: 0,
-            transform: "none",
-          }}
-        />
-
-        <ImageIconLabel
-          image={image}
-          placement={getIconPlacement(image, scaleFactor)}
-        />
-      </Grid>
+      <ProjectGridItem
+        handleClick={handleSelect}
+        categoryDetails={categoryDetails}
+        imageDetail={imageDetailComponent}
+        iconPosition={iconPosition}
+        imageSize={itemSize}
+        src={image.src}
+        selected={selected}
+        isPredicted={
+          image.partition === Partition.Inference &&
+          image.categoryId !== UNKNOWN_IMAGE_CATEGORY_ID
+        }
+      />
     );
   }
 );

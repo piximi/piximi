@@ -9,6 +9,7 @@ export {
   selectTotalAnnotationCount,
   selectTotalAnnotationCountByImage,
   selectAnnotationCountByCategory,
+  selectImageIdByAnnotation,
 } from "./annotationSelectors";
 
 export {

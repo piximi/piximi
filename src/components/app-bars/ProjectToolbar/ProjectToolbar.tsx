@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Slider, Toolbar, Box, Button, Typography } from "@mui/material";
+import {
+  Slider,
+  Toolbar,
+  Box,
+  Button,
+  Typography,
+  TextField,
+  FormControl,
+} from "@mui/material";
 import {
   ZoomOut as ZoomOutIcon,
   ZoomIn as ZoomInIcon,
@@ -9,19 +17,27 @@ import {
 
 import { ImageSortSelection } from "components/styled-components";
 
-import { UploadButton } from "components/controls";
 import { LogoLoader } from "components/styled-components";
 
 import { applicationSlice } from "store/application";
-import { selectLoadMessage, selectLoadPercent } from "store/project";
+import {
+  selectLoadMessage,
+  selectLoadPercent,
+  selectProjectName,
+  projectSlice,
+} from "store/project";
+
+const minZoom = 0.6;
+const maxZoom = 4;
 
 export const ProjectToolbar = () => {
   const dispatch = useDispatch();
   const loadPercent = useSelector(selectLoadPercent);
   const loadMessage = useSelector(selectLoadMessage);
+  const projectName = useSelector(selectProjectName);
   const [value, setValue] = useState<number>(1);
-  const minZoom = 0.6;
-  const maxZoom = 4;
+  const [newProjectName, setNewProjectName] = useState<string>(projectName);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
@@ -52,13 +68,47 @@ export const ProjectToolbar = () => {
     );
   };
 
+  const handleTextFieldBlur = () => {
+    if (projectName === newProjectName) return;
+    dispatch(projectSlice.actions.setProjectName({ name: newProjectName }));
+    setNewProjectName("");
+  };
+
+  const handleTextFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewProjectName(event.target.value);
+  };
+
+  const handleTextFieldEnter = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Enter") {
+      inputRef.current?.blur();
+    }
+  };
+
   return (
     <Toolbar>
       <LogoLoader width={250} height={50} loadPercent={loadPercent} />
 
-      <Typography ml={5} sx={{ flexGrow: 1 }}>
-        {loadMessage}
-      </Typography>
+      {loadMessage ? (
+        <Typography ml={5} sx={{ flexGrow: 1 }}>
+          {loadMessage}
+        </Typography>
+      ) : (
+        <FormControl>
+          <TextField
+            onChange={handleTextFieldChange}
+            onBlur={handleTextFieldBlur}
+            onKeyDown={handleTextFieldEnter}
+            defaultValue={projectName}
+            inputRef={inputRef}
+            size="small"
+            sx={{ ml: 5 }}
+          />
+        </FormControl>
+      )}
 
       <Box sx={{ flexGrow: 1 }} />
 
@@ -67,7 +117,6 @@ export const ProjectToolbar = () => {
         <ZoomOutIcon
           sx={(theme) => ({
             marginLeft: theme.spacing(1),
-            marginRight: theme.spacing(1),
           })}
         />
       </Button>
@@ -83,13 +132,10 @@ export const ProjectToolbar = () => {
       <Button onClick={onZoomIn}>
         <ZoomInIcon
           sx={(theme) => ({
-            marginLeft: theme.spacing(1),
             marginRight: theme.spacing(1),
           })}
         />
       </Button>
-
-      <UploadButton />
     </Toolbar>
   );
 };
