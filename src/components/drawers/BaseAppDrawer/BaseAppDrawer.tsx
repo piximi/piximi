@@ -20,7 +20,7 @@ export const BaseAppDrawer = ({ children }: { children: React.ReactNode }) => {
       open
       variant="persistent"
     >
-      <Box sx={{ overflowY: "scroll" }}>{children}</Box>
+      <Box sx={{ overflowY: "scroll", overflowX: "hidden" }}>{children}</Box>
       <Divider />
       <ApplicationOptionsList />
     </Drawer>
