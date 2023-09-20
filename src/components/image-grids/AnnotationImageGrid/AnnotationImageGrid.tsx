@@ -125,6 +125,19 @@ export const AnnotationImageGrid = () => {
     }
   };
 
+  const handleUpdateCategories = (categoryId: string) => {
+    dispatch(
+      dataSlice.actions.updateAnnotationCategories({
+        annotationIds: selectedAnnotations,
+        categoryId: categoryId,
+        isPermanent: true,
+      })
+    );
+    dispatch(
+      projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
+    );
+  };
+
   useHotkeys("esc", () => deselectAllAnnotations(), HotkeyView.ProjectView, {
     enabled: currentTab === "Annotations",
   });
@@ -215,6 +228,7 @@ export const AnnotationImageGrid = () => {
           handleDeleteObjects={handleDeleteAnnotations}
           handleOpenDeleteDialog={onOpenDeleteAnnotationsDialog}
           onOpenImageViewer={handleOpenImageViewer}
+          onUpdateCategories={handleUpdateCategories}
         />
       )}
 

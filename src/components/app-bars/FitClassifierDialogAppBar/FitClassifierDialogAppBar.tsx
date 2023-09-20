@@ -21,7 +21,6 @@ import {
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
-import { useEffect } from "react";
 
 type FitClassifierDialogAppBarProps = {
   closeDialog: any;
@@ -57,11 +56,6 @@ export const FitClassifierDialogAppBar = ({
       })
     );
   };
-
-  useEffect(() => {
-    console.log("noLabel: ", noLabels); //LOG:
-    console.log("noTrain", noTrain); //LOG
-  }, [noLabels, noTrain]);
 
   return (
     <AppBar

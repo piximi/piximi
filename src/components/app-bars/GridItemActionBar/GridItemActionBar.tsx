@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -27,16 +27,21 @@ import { TooltipTitle } from "components/tooltips";
 
 import { unregisterHotkeyView } from "store/application";
 
-import { HotkeyView } from "types";
+import { HotkeyView, ImageGridTab } from "types";
+import {
+  selectAllAnnotationCategories,
+  selectAllImageCategories,
+} from "store/data";
 
 type GridItemActionBarProps = {
-  currentTab: string;
+  currentTab: ImageGridTab;
   showAppBar: boolean;
   selectedObjects: any;
   selectAllObjects: any;
   deselectAllObjects: any;
   handleDeleteObjects: any;
   handleOpenDeleteDialog: any;
+  onUpdateCategories: (categoryId: string) => void;
   onOpenImageViewer: any;
 };
 
@@ -47,6 +52,7 @@ export const GridItemActionBar = ({
   selectAllObjects,
   deselectAllObjects,
   handleDeleteObjects,
+  onUpdateCategories: handleUpdateCategories,
   handleOpenDeleteDialog,
   onOpenImageViewer: handleOpenImageViewer,
 }: GridItemActionBarProps) => {
@@ -57,6 +63,9 @@ export const GridItemActionBar = ({
     React.useState<null | HTMLElement>(null);
   const [showSelectAllButton, setShowSelectAllButton] =
     React.useState<boolean>(true);
+
+  const imageCategories = useSelector(selectAllImageCategories);
+  const annotationCategories = useSelector(selectAllAnnotationCategories);
 
   const handleSelectAllObjects = () => {
     setShowSelectAllButton(false);
@@ -166,6 +175,10 @@ export const GridItemActionBar = ({
         selectedIds={selectedObjects}
         onClose={onCloseCategoryMenu}
         open={Boolean(categoryMenuAnchorEl as HTMLElement)}
+        onUpdateCategories={handleUpdateCategories}
+        categories={
+          currentTab === "Images" ? imageCategories : annotationCategories
+        }
       />
     </>
   );

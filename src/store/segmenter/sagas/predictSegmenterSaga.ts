@@ -25,6 +25,7 @@ import {
 import { getStackTraceFromError } from "utils";
 import { ModelStatus } from "types/ModelType";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import Image from "image-js";
 
 export function* predictSegmenterSaga({
   payload: { execSaga, modelStatus },
@@ -135,7 +136,7 @@ function* runPrediction(
 
       yield put(
         dataSlice.actions.addAnnotationCategories({
-          annotationCategories: generatedCategories,
+          categories: generatedCategories,
           isPermanent: true,
         })
       );
@@ -143,6 +144,24 @@ function* runPrediction(
 
     for (const [i, annotations] of predictedAnnotations.entries()) {
       const imageId = inferenceImages[i].id;
+
+      const imageSrc = inferenceImages[i].src;
+      const loadedImg: Awaited<Image> = yield Image.load(imageSrc);
+
+      for (let j = 0; j < annotations.length; j++) {
+        const ann = annotations[j];
+        const bbox = ann.boundingBox;
+
+        const annObj = loadedImg.crop({
+          x: bbox[0],
+          y: bbox[1],
+          width: bbox[2] - bbox[0],
+          height: bbox[3] - bbox[1],
+        });
+        const src = annObj.getCanvas().toDataURL();
+
+        annotations[j].src = src;
+      }
 
       yield put(
         dataSlice.actions.setAnnotationsByImage({

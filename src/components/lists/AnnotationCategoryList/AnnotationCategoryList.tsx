@@ -32,10 +32,16 @@ type AnnotationCategoryListProps = {
   categoryType: CategoryType;
   hasPredicted?: boolean;
   hotkeysActive?: boolean;
+  changesPermanent?: boolean;
 };
 
 export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
-  const { createdCategories: categories, hasPredicted, hotkeysActive } = props;
+  const {
+    createdCategories: categories,
+    hasPredicted,
+    hotkeysActive,
+    changesPermanent,
+  } = props;
   const dispatch = useDispatch();
   const [selectedCategory, setSelectedCategory] = useState<Category>();
   const selectedAnnotations = useSelector(selectSelectedAnnotationIds);
@@ -149,11 +155,12 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
             categoryIds: (categories as Category[]).map(
               (category) => category.id
             ),
+            isPermanent: changesPermanent,
           })
         );
       });
     },
-    [dispatch]
+    [dispatch, changesPermanent]
   );
 
   const dispatchDeleteAnnotationsOfCategory = useCallback(
@@ -163,17 +170,27 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
         dispatch(
           imageViewerSlice.actions.removeActiveAnnotationIds({ annotationIds })
         );
-        dispatch(dataSlice.actions.deleteAnnotations({ annotationIds }));
+        dispatch(
+          dataSlice.actions.deleteAnnotations({
+            annotationIds,
+            isPermanent: changesPermanent,
+          })
+        );
       });
     },
-    [annotationsByCategory, dispatch]
+    [annotationsByCategory, dispatch, changesPermanent]
   );
 
   const dispatchUpsertCategory = useCallback(
     (category: PartialBy<Category, "id" | "visible">) => {
-      dispatch(dataSlice.actions.upsertAnnotationCategory({ category }));
+      dispatch(
+        dataSlice.actions.upsertAnnotationCategory({
+          category,
+          isPermanent: changesPermanent,
+        })
+      );
     },
-    [dispatch]
+    [dispatch, changesPermanent]
   );
 
   useHotkeys(
@@ -187,6 +204,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
               id: annotationId,
               categoryId: highlightedCategory,
             })),
+            isPermanent: changesPermanent,
           })
         );
       }
@@ -195,7 +213,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     },
     [HotkeyView.Annotator],
     { keyup: true },
-    [dispatch, selectedAnnotations]
+    [dispatch, selectedAnnotations, changesPermanent]
   );
   useHotkeys(
     "shift",
@@ -208,6 +226,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
               id: annotationId,
               categoryId: highlightedCategory,
             })),
+            isPermanent: changesPermanent,
           })
         );
       }
@@ -216,7 +235,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     },
     [HotkeyView.ProjectView],
     { keyup: true, enabled: hotkeysActive },
-    [dispatch, selectedAnnotations]
+    [dispatch, selectedAnnotations, changesPermanent]
   );
 
   useEffect(() => {
