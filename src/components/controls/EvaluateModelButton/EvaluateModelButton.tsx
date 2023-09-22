@@ -19,7 +19,7 @@ export const EvaluateModelButton = ({
   return (
     <ModelExecButton
       onClick={handleClick}
-      buttonLabel="Predict Model"
+      buttonLabel="Evaluate Model"
       icon={AssessmentIcon}
       disabled={disabled}
       loading={modelStatus === ModelStatus.Evaluating}
