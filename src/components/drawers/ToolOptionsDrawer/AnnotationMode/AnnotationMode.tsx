@@ -77,6 +77,11 @@ export const AnnotationMode = () => {
           onClick={(event) => onClickLabel(event, AnnotationModeType.New)}
           tooltipText={"Create a new annotation."}
           disabled={disableAnnotationEdits}
+          sx={{
+            "&.Mui-disabled": {
+              opacity: 0.8,
+            },
+          }}
           dense
         />
 
@@ -94,7 +99,7 @@ export const AnnotationMode = () => {
             />
           }
           onClick={(event) => onClickLabel(event, AnnotationModeType.Add)}
-          tooltipText="Adding to an annotation adds any new areas you annotate to an existing annotation."
+          tooltipText="Adds new areas to an existing annotation."
           disabled={disableAnnotationEdits}
           dense
         />
@@ -113,7 +118,7 @@ export const AnnotationMode = () => {
             />
           }
           onClick={(event) => onClickLabel(event, AnnotationModeType.Subtract)}
-          tooltipText="Remove the area you label from an existing annotation."
+          tooltipText="Remove area from an existing annotation."
           disabled={disableAnnotationEdits}
           dense
         />
