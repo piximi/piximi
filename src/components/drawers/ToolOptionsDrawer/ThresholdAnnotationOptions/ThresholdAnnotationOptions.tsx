@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
-
-import { AnnotationMode } from "../AnnotationMode";
-import { InvertAnnotation } from "../InvertAnnotation";
+import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { annotatorSlice } from "store/annotator";
 import { selectThresholdAnnotationValue } from "store/annotator/selectors";
+import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider
 
@@ -28,13 +26,7 @@ export const ThresholdAnnotationOptions = () => {
   }, [dispatch, threshold]);
 
   return (
-    <>
-      <Divider />
-
-      <AnnotationMode />
-
-      <Divider />
-
+    <BaseOptions>
       <List>
         <ListItem dense>
           <ListItemText
@@ -52,10 +44,6 @@ export const ThresholdAnnotationOptions = () => {
           />
         </ListItem>
       </List>
-
-      <Divider />
-
-      <InvertAnnotation />
-    </>
+    </BaseOptions>
   );
 };

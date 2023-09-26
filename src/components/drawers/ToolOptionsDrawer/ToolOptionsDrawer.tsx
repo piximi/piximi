@@ -13,7 +13,7 @@ import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { PointerSelectionOptions } from "./PointerSelectionOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { InformationBox } from "./InformationBox";
-import { DefaultOptions } from "./DefaultOptions";
+import { BaseOptions } from "./BaseOptions";
 
 import { selectToolType } from "store/annotator/selectors";
 
@@ -56,7 +56,7 @@ const operations: Array<OperationType> = [
     method: ToolType.RectangularAnnotation,
     name: "Rectangle Tool",
     description: "Click and drag to create a rectangular annotation.",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "R",
   },
   {
@@ -64,7 +64,7 @@ const operations: Array<OperationType> = [
     method: ToolType.EllipticalAnnotation,
     name: "Ellipse Tool",
     description: "Click and drag to create an elliptical annotation.",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "E",
   },
   {
@@ -80,7 +80,7 @@ const operations: Array<OperationType> = [
     method: ToolType.LassoAnnotation,
     name: "Lasso Tool",
     description: "-",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "L",
   },
   {
@@ -88,7 +88,7 @@ const operations: Array<OperationType> = [
     method: ToolType.PolygonalAnnotation,
     name: "Polygon Tool",
     description: "-",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "P",
   },
   {
@@ -96,7 +96,7 @@ const operations: Array<OperationType> = [
     method: ToolType.MagneticAnnotation,
     name: "Magnetic Tool",
     description: "-",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "M",
   },
   {
@@ -104,7 +104,7 @@ const operations: Array<OperationType> = [
     method: ToolType.ColorAnnotation,
     name: "Color Tool",
     description: "-",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "C",
   },
   {
@@ -128,7 +128,7 @@ const operations: Array<OperationType> = [
     method: ToolType.ObjectAnnotation,
     name: "Object selection",
     description: "-",
-    options: <DefaultOptions />,
+    options: <BaseOptions />,
     hotkey: "O",
   },
   {
@@ -148,7 +148,7 @@ const operations: Array<OperationType> = [
     hotkey: "S",
   },
 ];
-export const ToolOptions = ({
+export const ToolOptionsDrawer = ({
   optionsVisibility,
 }: {
   optionsVisibility: boolean;

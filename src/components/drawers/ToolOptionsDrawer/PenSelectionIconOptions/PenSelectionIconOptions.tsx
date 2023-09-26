@@ -1,12 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
-
-import { AnnotationMode } from "../AnnotationMode";
-import { InvertAnnotation } from "../InvertAnnotation";
+import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { annotatorSlice } from "store/annotator";
 import { selectPenSelectionBrushSize } from "store/annotator/selectors";
+import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider
 
@@ -24,13 +22,7 @@ export const PenSelectionIconOptions = () => {
   };
 
   return (
-    <>
-      <Divider />
-
-      <AnnotationMode />
-
-      <Divider />
-
+    <BaseOptions>
       <List>
         <ListItem dense>
           <ListItemText
@@ -48,10 +40,6 @@ export const PenSelectionIconOptions = () => {
           />
         </ListItem>
       </List>
-
-      <Divider />
-
-      <InvertAnnotation />
-    </>
+    </BaseOptions>
   );
 };

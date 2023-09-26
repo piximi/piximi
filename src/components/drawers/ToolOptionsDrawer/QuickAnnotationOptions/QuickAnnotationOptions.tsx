@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Divider, List, ListItem, ListItemText, Slider } from "@mui/material";
-
-import { AnnotationMode } from "../AnnotationMode";
-import { InvertAnnotation } from "../InvertAnnotation";
+import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
 import { annotatorSlice } from "store/annotator";
 import { selectQuickSelectionRegionSize } from "store/annotator/selectors";
+import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider
 
@@ -30,13 +28,7 @@ export const QuickAnnotationOptions = () => {
   };
 
   return (
-    <>
-      <Divider />
-
-      <AnnotationMode />
-
-      <Divider />
-
+    <BaseOptions>
       <List>
         <ListItem dense>
           <ListItemText
@@ -53,14 +45,6 @@ export const QuickAnnotationOptions = () => {
           />
         </ListItem>
       </List>
-
-      <Divider />
-
-      <InvertAnnotation />
-
-      {/*<Divider />*/}
-
-      {/*<SampleList />*/}
-    </>
+    </BaseOptions>
   );
 };
