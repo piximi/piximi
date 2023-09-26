@@ -7,7 +7,6 @@ import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
 import { dataSlice, selectImageCount } from "store/data";
-import { projectSlice } from "store/project";
 
 export enum DispatchLocation {
   Project,
@@ -77,7 +76,7 @@ const dispatchToImageViewer = async (
       dataSlice.actions.setAnnotations({ annotations, isPermanent: true })
     );
 
-    dispatch(projectSlice.actions.selectImage({ imageId: image.id }));
+    dispatch(imageViewerSlice.actions.setImageStack({ imageIds: [image.id] }));
     dispatch(
       imageViewerSlice.actions.setActiveImageId({
         imageId: image.id,

@@ -15,8 +15,12 @@ import { useDialog } from "hooks";
 import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { LogoLoader } from "components/styled-components";
+import { batch, useDispatch } from "react-redux";
+import { annotatorSlice } from "store/annotator";
+import { imageViewerSlice } from "store/imageViewer";
 
 export const ImageViewerAppBar = () => {
+  const dispatch = useDispatch();
   const {
     onClose: onCloseExitAnnotatorDialog,
     onOpen: onOpenExitAnnotatorDialog,
@@ -28,6 +32,10 @@ export const ImageViewerAppBar = () => {
   const onReturnToMainProject = () => {
     onCloseExitAnnotatorDialog();
     navigate("/");
+    batch(() => {
+      dispatch(annotatorSlice.actions.resetAnnotator());
+      dispatch(imageViewerSlice.actions.resetImageViewer());
+    });
   };
 
   return (

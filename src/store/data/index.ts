@@ -28,6 +28,7 @@ export {
   selectActiveImageSrc,
   selectActiveImageAttributes,
   selectActiveImage,
+  selectImageStackImages,
 } from "./selectors/image";
 export {
   selectAllAnnotations,

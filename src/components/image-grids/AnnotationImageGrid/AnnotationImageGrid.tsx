@@ -19,9 +19,10 @@ import {
 import { selectSelectedImageIds } from "store/project/selectors";
 import { AnnotationGridItem } from "../AnnotationGridItem/AnnotationGridItem";
 import { useDialogHotkey, useHotkeys } from "hooks";
-import { HotkeyView, Partition } from "types";
+import { HotkeyView, Partition, ToolType } from "types";
 import { DialogWithAction } from "components/dialogs";
 import { GridItemActionBar } from "components/app-bars";
+import { annotatorSlice } from "store/annotator";
 
 // type AnnotationObjectGridProps = {
 //   onDrop: (files: FileList) => void;
@@ -88,18 +89,30 @@ export const AnnotationImageGrid = () => {
   };
 
   const handleOpenImageViewer = () => {
-    const imageIds: string[] = [];
+    const annotationImageIds: string[] = [];
     for (const annotationId of selectedAnnotations) {
       const imageId = imageIdByAnnotation(annotationId);
-      if (!selectedImageIds.includes(imageId) && !imageIds.includes(imageId)) {
-        imageIds.push(imageId);
+      if (
+        !selectedImageIds.includes(imageId) &&
+        !annotationImageIds.includes(imageId)
+      ) {
+        annotationImageIds.push(imageId);
       }
     }
-    const imageViewerImages = [...selectedImageIds, ...imageIds];
+    const imageViewerImages = [...selectedImageIds, ...annotationImageIds];
 
     batch(() => {
       dispatch(
         imageViewerSlice.actions.setImageStack({ imageIds: imageViewerImages })
+      );
+
+      dispatch(
+        imageViewerSlice.actions.setActiveImageId({
+          imageId:
+            imageViewerImages.length > 0 ? imageViewerImages[0] : undefined,
+          prevImageId: undefined,
+          execSaga: true,
+        })
       );
       dispatch(
         imageViewerSlice.actions.setSelectedAnnotationIds({
@@ -107,11 +120,13 @@ export const AnnotationImageGrid = () => {
         })
       );
       dispatch(
-        imageViewerSlice.actions.setActiveImageId({
-          imageId:
-            imageViewerImages.length > 0 ? imageViewerImages[0] : undefined,
-          prevImageId: undefined,
-          execSaga: true,
+        imageViewerSlice.actions.setWorkingAnnotation({
+          annotation: selectedAnnotations[0],
+        })
+      );
+      dispatch(
+        annotatorSlice.actions.setToolType({
+          operation: ToolType.Pointer,
         })
       );
     });
