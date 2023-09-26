@@ -25,6 +25,10 @@ export const StageWrapper = ({
   const [height, setHeight] = useState<number>(
     window.innerHeight - dimensions.stageInfoHeight
   );
+
+  const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
+
+  useDefaultImage(DispatchLocation.ImageViewer);
   useLayoutEffect(() => {
     const resizeHandler = () => {
       setWidth(
@@ -39,10 +43,6 @@ export const StageWrapper = ({
       window.removeEventListener("resize", resizeHandler);
     };
   });
-
-  const [{ isOver }, dropTarget] = useDndFileDrop(onDrop);
-
-  useDefaultImage(DispatchLocation.ImageViewer);
 
   return (
     <Box

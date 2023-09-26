@@ -18,7 +18,7 @@ import { ImageViewerAppBar } from "components/app-bars";
 
 import {
   selectCreatedAnnotationCategories,
-  selectSelectedImages,
+  selectImageStackImages,
 } from "store/data";
 
 import { CategoryType } from "types/Category";
@@ -27,7 +27,7 @@ import { BaseAppDrawer } from "../BaseAppDrawer";
 export const ImageViewerDrawer = () => {
   const createdCategories = useSelector(selectCreatedAnnotationCategories);
 
-  const annotatorImages = useSelector(selectSelectedImages);
+  const annotatorImages = useSelector(selectImageStackImages);
 
   return (
     <BaseAppDrawer>

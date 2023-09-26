@@ -42,3 +42,4 @@ export { selectZoomToolOptions } from "./selectors/selectZoomToolOptions";
 export { selectWorkingAnnotation } from "./selectors/selectWorkingAnnotation";
 export { selectImageIsloading } from "./selectors/selectImageIsLoading";
 export { selectHighligtedAnnotationCatogory } from "./selectors/selectHighlightedAnnotationCategory";
+export { selectImageStackImageIds } from "./selectors/selectImageStackImageIds";

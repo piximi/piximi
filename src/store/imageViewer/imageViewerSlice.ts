@@ -191,10 +191,20 @@ export const imageViewerSlice = createSlice({
     },
     setWorkingAnnotation(
       state,
-      action: PayloadAction<{ annotation: DecodedAnnotationType | undefined }>
+      action: PayloadAction<{
+        annotation: DecodedAnnotationType | string | undefined;
+      }>
     ) {
-      state.workingAnnotation.saved = action.payload.annotation;
-      state.workingAnnotation.changes = {};
+      const { annotation } = action.payload;
+      if (typeof annotation === "string") {
+        //managed in listener
+        return;
+      } else {
+        state.workingAnnotation.saved = action.payload.annotation as
+          | DecodedAnnotationType
+          | undefined;
+        state.workingAnnotation.changes = {};
+      }
     },
     updateWorkingAnnotation(
       state,

@@ -180,7 +180,7 @@ startAppListening({
             dataSlice.actions.addImages({ images: imagesToUpload })
           );
           listenerAPI.dispatch(
-            projectSlice.actions.selectImages({
+            imageViewerSlice.actions.setImageStack({
               imageIds: imagesToUpload.map((image) => image.id),
             })
           );
