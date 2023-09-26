@@ -13,11 +13,14 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
-import { ImageViewerDrawer, ToolDrawer } from "components/drawers";
+import {
+  ImageViewerDrawer,
+  ToolDrawer,
+  ToolOptionsDrawer,
+} from "components/drawers";
 import { AlertBar } from "components/app-bars";
 
 import { StageWrapper } from "components/stage/StageWrapper";
-import { ToolOptions } from "components/stage/ToolOptions";
 
 import {
   selectAlertState,
@@ -165,7 +168,7 @@ export const ImageViewer = () => {
             />
           )}
 
-          <ToolOptions optionsVisibility={optionsVisible} />
+          <ToolOptionsDrawer optionsVisibility={optionsVisible} />
 
           <ToolDrawer
             optionsVisibility={optionsVisible}

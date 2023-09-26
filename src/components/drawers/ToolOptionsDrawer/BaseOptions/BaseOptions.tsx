@@ -5,7 +5,7 @@ import { Divider } from "@mui/material";
 import { AnnotationMode } from "../AnnotationMode";
 import { InvertAnnotation } from "../InvertAnnotation";
 
-export const DefaultOptions = () => {
+export const BaseOptions = ({ children }: { children?: React.ReactNode }) => {
   return (
     <>
       <Divider />
@@ -15,10 +15,6 @@ export const DefaultOptions = () => {
       <Divider />
 
       <InvertAnnotation />
-
-      {/*<Divider />*/}
-
-      {/*<SampleList />*/}
     </>
   );
 };
