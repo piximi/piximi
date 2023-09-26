@@ -1,8 +1,13 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { ImageType, TypedAppStartListening } from "types";
+import {
+  DecodedAnnotationType,
+  ImageType,
+  TypedAppStartListening,
+} from "types";
 import { imageViewerSlice } from "./imageViewerSlice";
 import { getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/image";
+import { decodeAnnotation } from "utils/annotator";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -110,5 +115,28 @@ startAppListening({
         annotationIds: activeAnnotationIds,
       })
     );
+  },
+});
+
+startAppListening({
+  actionCreator: imageViewerSlice.actions.setWorkingAnnotation,
+  effect: async (action, listenerAPI) => {
+    const data = listenerAPI.getState().data;
+    const annotationValue = action.payload.annotation;
+    if (typeof annotationValue === "string") {
+      const deferredAnnotation = data.annotations.entities[annotationValue];
+      const annotation = {
+        ...deferredAnnotation.saved,
+        ...deferredAnnotation.changes,
+      };
+      const decodedAnnotation = !annotation.decodedMask
+        ? decodeAnnotation(annotation)
+        : (annotation as DecodedAnnotationType);
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setWorkingAnnotation({
+          annotation: decodedAnnotation,
+        })
+      );
+    }
   },
 });

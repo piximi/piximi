@@ -28,3 +28,4 @@ export {
 } from "./imageSelectors";
 export { selectVisibleImages } from "./selectVisibleImages";
 export { selectSelectedImages } from "./selectSelectedImages";
+export { selectImageStackImages } from "./selectImageStackImages";

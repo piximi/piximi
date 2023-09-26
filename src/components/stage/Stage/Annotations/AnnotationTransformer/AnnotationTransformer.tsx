@@ -1,4 +1,10 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
@@ -151,7 +157,7 @@ export const AnnotationTransformer = ({
     container.style.cursor = cursor;
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (workingAnnotation.saved) {
       const fullWorkingAnnotation = {
         ...workingAnnotation.saved,
@@ -173,10 +179,19 @@ export const AnnotationTransformer = ({
           ? imageHeight! - 65 + imageOrigin.y
           : yMax + imageOrigin.y;
       setYPos(newY);
-    }
-  }, [workingAnnotation, selectedAnnotations.length, imageHeight, imageOrigin]);
 
-  useEffect(() => {
+      console.log(newX, newY); //LOG:
+      console.log("here also");
+    }
+  }, [
+    workingAnnotation,
+    selectedAnnotations.length,
+    imageHeight,
+    imageOrigin,
+    stageRef,
+  ]);
+
+  useLayoutEffect(() => {
     if (!stageRef || !stageRef.current) return;
     const transformerId = "tr-".concat(annotationId);
     const transformer: Konva.Transformer | undefined = stageRef.current.findOne(
@@ -202,6 +217,10 @@ export const AnnotationTransformer = ({
       transformer.getLayer()?.batchDraw();
     };
   }, [annotationId, stageRef]);
+
+  useEffect(() => {
+    console.log("fired"); //LOG:
+  }, [stageRef]);
 
   return (
     <>

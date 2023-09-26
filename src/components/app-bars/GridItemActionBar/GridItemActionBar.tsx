@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -32,6 +32,7 @@ import {
   selectAllAnnotationCategories,
   selectAllImageCategories,
 } from "store/data";
+import { projectSlice } from "store/project";
 
 type GridItemActionBarProps = {
   currentTab: ImageGridTab;
@@ -90,6 +91,10 @@ export const GridItemActionBar = ({
     dispatch(
       unregisterHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
     );
+    batch(() => {
+      dispatch(projectSlice.actions.clearSelectedImages());
+      dispatch(projectSlice.actions.clearSelectedAnnotations());
+    });
     navigate("/annotator");
   };
 
