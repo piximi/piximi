@@ -142,9 +142,8 @@ export const AnnotationImageGrid = () => {
 
   const handleUpdateCategories = (categoryId: string) => {
     dispatch(
-      dataSlice.actions.updateAnnotationCategories({
-        annotationIds: selectedAnnotations,
-        categoryId: categoryId,
+      dataSlice.actions.updateAnnotations({
+        updates: selectedAnnotations.map((id) => ({ id, categoryId })),
         isPermanent: true,
       })
     );

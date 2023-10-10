@@ -22,10 +22,14 @@ export const ZStackSlider = () => {
   const handleChange = async (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       dispatch(
-        dataSlice.actions.setImageActivePlane({
-          imageId: activeImage!.id,
-          activePlane: newValue,
-          renderedSrc: renderedSrcs[newValue],
+        dataSlice.actions.updateImages({
+          updates: [
+            {
+              id: activeImage!.id,
+              activePlane: newValue,
+              src: renderedSrcs[newValue],
+            },
+          ],
         })
       );
     }
