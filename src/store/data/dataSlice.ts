@@ -83,13 +83,14 @@ export const dataSlice = createSlice({
         categories: newCategories,
         annotationCategories: newAnnotationCategories,
       } = action.payload;
+      console.log(newCategories);
       dataSlice.caseReducers.addImageCategories(state, {
-        type: "setImageCategories",
+        type: "addImageCategories",
         payload: { categories: newCategories, isPermanent: true },
       });
 
       dataSlice.caseReducers.addAnnotationCategories(state, {
-        type: "setAnnotationCategories",
+        type: "addAnnotationCategories",
         payload: {
           categories: newAnnotationCategories,
           isPermanent: true,
@@ -97,12 +98,12 @@ export const dataSlice = createSlice({
       });
 
       dataSlice.caseReducers.addImages(state, {
-        type: "setImages",
+        type: "addImages",
         payload: { images: newImages, isPermanent: true },
       });
 
       dataSlice.caseReducers.addAnnotations(state, {
-        type: "setAnnotations",
+        type: "addAnnotations",
         payload: { annotations: newAnnotations, isPermanent: true },
       });
     },
@@ -114,9 +115,12 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { categories, isPermanent } = action.payload;
+      console.log(categories);
       for (const category of categories) {
-        if (state.imageCategories.ids.includes(category.id)) return;
+        console.log(category);
+        if (state.imageCategories.ids.includes(category.id)) continue;
         state.imagesByCategory[category.id] = [];
+
         imageCategoriesAdapter.addOne(state.imageCategories, category);
         if (isPermanent) {
           state.imageCategories.entities[category.id].changes = {};
@@ -720,7 +724,7 @@ export const dataSlice = createSlice({
     ) {
       const { annotations, isPermanent } = action.payload;
       for (const annotation of annotations) {
-        if (state.annotations.ids.includes(annotation.id)) return;
+        if (state.annotations.ids.includes(annotation.id)) continue;
 
         if (annotation.decodedMask) {
           (annotation as AnnotationType).encodedMask = encode(
