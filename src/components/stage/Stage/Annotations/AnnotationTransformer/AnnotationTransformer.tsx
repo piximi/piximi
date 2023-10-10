@@ -116,23 +116,31 @@ export const AnnotationTransformer = ({
 
     if (activeAnnotationIds.includes(annotationId)) {
       if (Object.keys(workingAnnotation.changes).length === 0) {
-        dispatch(dataSlice.actions.deleteAnnotation({ annotationId }));
+        dispatch(
+          imageViewerSlice.actions.removeActiveAnnotationIds({
+            annotationIds: [annotationId],
+          })
+        );
+        dispatch(
+          dataSlice.actions.deleteAnnotations({ annotationIds: [annotationId] })
+        );
       } else {
         dispatch(
-          dataSlice.actions.updateAnnotation({
-            annotationId: annotationId,
-            updates: workingAnnotation.changes,
+          dataSlice.actions.updateAnnotations({
+            updates: [{ id: annotationId, ...workingAnnotation.changes }],
           })
         );
       }
       if (soundEnabled) playDeleteAnnotationSoundEffect();
     } else {
       dispatch(
-        dataSlice.actions.addAnnotation({
-          annotation: {
-            ...workingAnnotation.saved!,
-            ...workingAnnotation.changes,
-          },
+        dataSlice.actions.addAnnotations({
+          annotations: [
+            {
+              ...workingAnnotation.saved!,
+              ...workingAnnotation.changes,
+            },
+          ],
         })
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();

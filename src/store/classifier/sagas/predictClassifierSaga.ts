@@ -130,12 +130,16 @@ function* runPrediction(
   const categoryIds: Awaited<ReturnType<typeof model.predict>> =
     yield model.predict(categories);
 
-  yield put(
-    dataSlice.actions.updateCategoriesOfImages({
-      imageIds: imageIds,
-      categoryIds: categoryIds,
-    })
-  );
+  if (imageIds.length === categoryIds.length) {
+    yield put(
+      dataSlice.actions.updateImages({
+        updates: imageIds.map((imageId, idx) => ({
+          id: imageId,
+          categoryId: categoryIds[idx],
+        })),
+      })
+    );
+  }
 }
 
 function* handleError(error: Error, name: string) {

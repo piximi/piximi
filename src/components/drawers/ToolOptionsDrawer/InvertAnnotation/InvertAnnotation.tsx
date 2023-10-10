@@ -36,9 +36,14 @@ export const InvertAnnotation = () => {
     const encodedMask = encode(invertedMask);
 
     dispatch(
-      dataSlice.actions.updateAnnotation({
-        annotationId: workingAnnotation.id,
-        updates: { encodedMask, boundingBox: invertedBoundingBox },
+      dataSlice.actions.updateAnnotations({
+        updates: [
+          {
+            id: workingAnnotation.id,
+            encodedMask,
+            boundingBox: invertedBoundingBox,
+          },
+        ],
       })
     );
 

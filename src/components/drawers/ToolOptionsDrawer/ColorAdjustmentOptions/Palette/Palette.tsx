@@ -48,10 +48,13 @@ export const Palette = ({ channelIdx }: PaletteProps) => {
     });
 
     dispatch(
-      dataSlice.actions.updateImage({
-        imageId: activeImageId!,
-        updates: { colors: { ...colors, color: tensor2d(updatedColors) } },
-        execSaga: true,
+      dataSlice.actions.updateImages({
+        updates: [
+          {
+            id: activeImageId!,
+            colors: { ...colors, color: tensor2d(updatedColors) },
+          },
+        ],
       })
     );
 

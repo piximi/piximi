@@ -32,10 +32,13 @@ export const ShowPredictionItems = () => {
     const updatedShowLabeledImages = !showLabeledImages;
 
     setShowLabeledImages(updatedShowLabeledImages);
+
     dispatch(
-      dataSlice.actions.setVisibilityOfImages({
-        visible: updatedShowLabeledImages,
-        imageIds: inferenceImages.map((image) => image.id),
+      dataSlice.actions.updateImages({
+        updates: inferenceImages.map((image) => ({
+          id: image.id,
+          visible: updatedShowLabeledImages,
+        })),
       })
     );
   };
@@ -45,10 +48,13 @@ export const ShowPredictionItems = () => {
 
     if (!showLabeledImages) {
       setShowLabeledImages(true);
+
       dispatch(
-        dataSlice.actions.setVisibilityOfImages({
-          visible: true,
-          imageIds: inferenceImages.map((image) => image.id),
+        dataSlice.actions.updateImages({
+          updates: inferenceImages.map((image) => ({
+            id: image.id,
+            visible: true,
+          })),
         })
       );
     }

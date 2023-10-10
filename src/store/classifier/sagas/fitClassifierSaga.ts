@@ -55,11 +55,11 @@ function* assignDataPartitions({
   const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
   yield put(
-    dataSlice.actions.updateImagesPartition({
-      imageIdsByPartition: {
-        [Partition.Training]: trainDataIds,
-        [Partition.Validation]: valDataIds,
-      },
+    dataSlice.actions.updateImages({
+      updates: [
+        ...trainDataIds.map((id) => ({ id, partition: Partition.Training })),
+        ...valDataIds.map((id) => ({ id, partition: Partition.Validation })),
+      ],
     })
   );
 }
