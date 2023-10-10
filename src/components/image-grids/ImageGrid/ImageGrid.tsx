@@ -21,7 +21,6 @@ import { imageViewerSlice } from "store/imageViewer";
 import { TabContext } from "components/styled-components";
 import { GridItemActionBar } from "components/app-bars";
 import { DialogWithAction, ImageShapeDialog } from "components/dialogs";
-import { applicationSlice } from "store/application";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -115,14 +114,17 @@ export const ImageGrid = () => {
   );
 
   const handleUpdateCategories = (categoryId: string) => {
+    const updates = selectedImageIds.map((imageId) => ({
+      id: imageId,
+      categoryId: categoryId,
+    }));
     dispatch(
-      dataSlice.actions.updateImageCategories({
-        imageIds: selectedImageIds,
-        categoryId: categoryId,
+      dataSlice.actions.updateImages({
+        updates,
         isPermanent: true,
       })
     );
-    dispatch(applicationSlice.actions.clearSelectedImages());
+    dispatch(projectSlice.actions.clearSelectedImages());
   };
 
   useHotkeys("esc", () => deselectAllImages(), HotkeyView.ProjectView, {

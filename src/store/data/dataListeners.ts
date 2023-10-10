@@ -216,75 +216,68 @@ startAppListening({
   },
 });
 startAppListening({
-  actionCreator: dataSlice.actions.addAnnotation,
+  actionCreator: dataSlice.actions.addAnnotations,
   effect: (action, listenerAPI) => {
-    const imageId = action.payload.annotation.imageId;
-    if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+    action.payload.annotations.forEach((annotation) => {
+      const imageId = annotation.imageId;
+      if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+        listenerAPI.dispatch(
+          imageViewerSlice.actions.addActiveAnnotationId({
+            annotationId: annotation.id,
+          })
+        );
+      }
+    });
+  },
+});
+
+startAppListening({
+  actionCreator: dataSlice.actions.updateImages,
+  effect: async (action, listenerAPI) => {
+    const { updates } = action.payload;
+
+    const currentState = listenerAPI.getState();
+    const srcUpdates: Array<{ id: string } & Partial<ImageType>> = [];
+    let renderedSrcs: string[] = [];
+    for await (const update of updates) {
+      const { id: imageId, ...changes } = update;
+      if (
+        changes.colors &&
+        imageId === currentState.imageViewer.activeImageId
+      ) {
+        const colors = changes.colors;
+        const image = getCompleteEntity(
+          currentState.data.images.entities[imageId]
+        )!;
+
+        const colorsEditable = {
+          range: { ...colors.range },
+          visible: { ...colors.visible },
+          color: colors.color,
+        };
+        renderedSrcs = await createRenderedTensor(
+          image.data,
+          colorsEditable,
+          image.bitDepth,
+          undefined
+        );
+
+        srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
+      }
+    }
+
+    if (srcUpdates.length !== 0) {
+      listenerAPI.unsubscribe();
       listenerAPI.dispatch(
-        imageViewerSlice.actions.addActiveAnnotationId({
-          annotationId: action.payload.annotation.id,
+        dataSlice.actions.updateImages({
+          updates: srcUpdates,
         })
       );
+      listenerAPI.subscribe();
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+      );
     }
-  },
-});
-startAppListening({
-  actionCreator: dataSlice.actions.deleteAnnotation,
-  effect: (action, listenerAPI) => {
-    const { annotationId, isPermanent } = action.payload;
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.removeActiveAnnotationId({ annotationId })
-    );
-    listenerAPI.dispatch(
-      dataSlice.actions._deleteAnnotation({ annotationId, isPermanent })
-    );
-  },
-});
-startAppListening({
-  actionCreator: dataSlice.actions.deleteAnnotations,
-  effect: (action, listenerAPI) => {
-    const { annotationIds, isPermanent } = action.payload;
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.removeActiveAnnotationIds({ annotationIds })
-    );
-    listenerAPI.dispatch(
-      dataSlice.actions._deleteAnnotations({ annotationIds, isPermanent })
-    );
-  },
-});
-
-startAppListening({
-  actionCreator: dataSlice.actions.updateImage,
-  effect: async (action, listenerAPI) => {
-    const { imageId, updates } = action.payload;
-    const colors = updates.colors;
-    const currentState = listenerAPI.getState();
-    if (!colors || imageId !== currentState.imageViewer.activeImageId) return;
-
-    const image = getCompleteEntity(
-      currentState.data.images.entities[imageId]
-    )!;
-
-    const colorsEditable = {
-      range: { ...colors.range },
-      visible: { ...colors.visible },
-      color: colors.color,
-    };
-    const renderedSrcs = await createRenderedTensor(
-      image.data,
-      colorsEditable,
-      image.bitDepth,
-      undefined
-    );
-    listenerAPI.dispatch(
-      dataSlice.actions.updateImage({
-        imageId: imageId,
-        updates: { src: renderedSrcs[image.activePlane] },
-      })
-    );
-    listenerAPI.dispatch(
-      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
-    );
   },
 });
 

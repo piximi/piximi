@@ -18,7 +18,7 @@ import { CustomListItemButton } from "components/list-items/CustomListItemButton
 type DeleteType = "ALL" | "SELECTED";
 export const ClearAnnotationsGroup = () => {
   const dispatch = useDispatch();
-  const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);
+  const selectedAnnotationIds = useSelector(selectSelectedAnnotationIds);
   const activeAnnotationsIds = useSelector(selectActiveAnnotationIds);
   const [deleteOp, setDeleteOp] = useState<DeleteType>();
 
@@ -42,19 +42,29 @@ export const ClearAnnotationsGroup = () => {
           })
         );
         dispatch(
+          imageViewerSlice.actions.removeActiveAnnotationIds({
+            annotationIds: activeAnnotationsIds,
+          })
+        );
+        dispatch(
           dataSlice.actions.deleteAnnotations({
             annotationIds: activeAnnotationsIds,
           })
         );
       } else {
         dispatch(
+          imageViewerSlice.actions.removeActiveAnnotationIds({
+            annotationIds: selectedAnnotationIds,
+          })
+        );
+        dispatch(
           imageViewerSlice.actions.removeSelectedAnnotationIds({
-            annotationIds: selectedAnnotationsIds,
+            annotationIds: selectedAnnotationIds,
           })
         );
         dispatch(
           dataSlice.actions.deleteAnnotations({
-            annotationIds: selectedAnnotationsIds,
+            annotationIds: selectedAnnotationIds,
           })
         );
       }
@@ -90,7 +100,7 @@ export const ClearAnnotationsGroup = () => {
       <CustomListItemButton
         primaryText={t("Clear selected annotations")}
         onClick={() => handleOpenAndTrack("SELECTED")}
-        disabled={selectedAnnotationsIds.length === 0}
+        disabled={selectedAnnotationIds.length === 0}
         icon={<DeleteIcon color="disabled" />}
       />
     </List>

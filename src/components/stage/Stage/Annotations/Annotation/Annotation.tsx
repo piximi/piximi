@@ -107,9 +107,8 @@ export const Annotation = ({
     };
 
     dispatch(
-      dataSlice.actions.updateAnnotation({
-        annotationId: updatedAnnotation.id,
-        updates: tempUpdated,
+      dataSlice.actions.updateAnnotations({
+        updates: [tempUpdated],
       })
     );
   };

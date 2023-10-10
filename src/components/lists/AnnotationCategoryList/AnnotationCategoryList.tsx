@@ -197,28 +197,6 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     "shift",
     () => {
       //TODO : in Image Viewer, change only takes place when confirm button clicked
-      if (selectedAnnotations.length > 0) {
-        dispatch(
-          dataSlice.actions.updateAnnotations({
-            updates: selectedAnnotations.map((annotationId) => ({
-              id: annotationId,
-              categoryId: highlightedCategory,
-            })),
-            isPermanent: changesPermanent,
-          })
-        );
-      }
-
-      setCategoryIndex("");
-    },
-    [HotkeyView.Annotator],
-    { keyup: true },
-    [dispatch, selectedAnnotations, changesPermanent]
-  );
-  useHotkeys(
-    "shift",
-    () => {
-      //TODO : in Image Viewer, change only takes place when confirm button clicked
       if (selectedAnnotationObjects.length > 0) {
         dispatch(
           dataSlice.actions.updateAnnotations({

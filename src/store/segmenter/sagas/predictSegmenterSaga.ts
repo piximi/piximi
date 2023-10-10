@@ -57,10 +57,11 @@ export function* predictSegmenterSaga({
   }
 
   yield put(
-    dataSlice.actions.updateSegmentationImagesPartition({
-      imageIdsByPartition: {
-        [Partition.Validation]: inferenceImages.map((image) => image.id),
-      },
+    dataSlice.actions.updateImages({
+      updates: inferenceImages.map((image) => ({
+        id: image.id,
+        partition: Partition.Inference,
+      })),
     })
   );
 
