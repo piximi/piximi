@@ -27,6 +27,7 @@ import {
   selectActiveImageRenderedSrcs,
   imageViewerSlice,
   selectImageIsloading,
+  selectActiveImageId,
 } from "store/imageViewer";
 import {
   selectAnnotationState,
@@ -63,6 +64,7 @@ export const Stage = ({
   const imageIsLoading = useSelector(selectImageIsloading);
   const annotationState = useSelector(selectAnnotationState);
   const renderedSrcs = useSelector(selectActiveImageRenderedSrcs);
+  const activeImageId = useSelector(selectActiveImageId);
 
   const { annotationTool } = useAnnotationTool();
   useAnnotationState(annotationTool);
@@ -128,13 +130,16 @@ export const Stage = ({
         return imgElem;
       })
     );
+  }, [renderedSrcs, stageRef, dispatch]);
+
+  useEffect(() => {
     stageRef?.current?.scale({ x: 1, y: 1 });
     dispatch(
       imageViewerSlice.actions.setStagePosition({
         stagePosition: { x: 0, y: 0 },
       })
     );
-  }, [renderedSrcs, stageRef, dispatch]);
+  }, [activeImageId, stageRef, dispatch]);
 
   useHotkeys(
     "alt",
