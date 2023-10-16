@@ -52,7 +52,7 @@ export const ExitAnnotatorDialog = ({
   return (
     <DialogWithAction
       title="Save Changes?"
-      content="Would you like to save these annotations and return to the project page?"
+      content="Would you like to save the changes to these annotations and return to the project page?"
       onConfirm={onSaveChanges}
       confirmText="SAVE"
       onReject={onDiscardChanges}
