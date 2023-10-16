@@ -239,12 +239,11 @@ startAppListening({
     const currentState = listenerAPI.getState();
     const srcUpdates: Array<{ id: string } & Partial<ImageType>> = [];
     let renderedSrcs: string[] = [];
+    const numImages = updates.length;
+    let imageNumber = 1;
     for await (const update of updates) {
       const { id: imageId, ...changes } = update;
-      if (
-        changes.colors &&
-        imageId === currentState.imageViewer.activeImageId
-      ) {
+      if (changes.colors) {
         const colors = changes.colors;
         const image = getCompleteEntity(
           currentState.data.images.entities[imageId]
@@ -263,6 +262,19 @@ startAppListening({
         );
 
         srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
+        if (imageId === currentState.imageViewer.activeImageId) {
+          listenerAPI.dispatch(
+            imageViewerSlice.actions.setActiveImageRenderedSrcs({
+              renderedSrcs,
+            })
+          );
+        }
+        listenerAPI.dispatch(
+          projectSlice.actions.setLoadMessage({
+            message: `Updating image ${imageNumber} of ${numImages}`,
+          })
+        );
+        imageNumber++;
       }
     }
 
@@ -274,10 +286,12 @@ startAppListening({
         })
       );
       listenerAPI.subscribe();
-      listenerAPI.dispatch(
-        imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
-      );
     }
+    listenerAPI.dispatch(
+      projectSlice.actions.setLoadMessage({
+        message: "",
+      })
+    );
   },
 });
 

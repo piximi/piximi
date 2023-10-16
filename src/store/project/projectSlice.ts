@@ -223,6 +223,9 @@ export const projectSlice = createSlice({
       state,
       action: PayloadAction<{ loadPercent?: number; loadMessage?: string }>
     ) {},
+    setLoadMessage(state, action: PayloadAction<{ message: string }>) {
+      state.loadMessage = action.payload.message;
+    },
     updateHighlightedImageCategory(
       state,
       action: PayloadAction<{ categoryId: string | undefined }>
