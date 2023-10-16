@@ -73,8 +73,28 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
           execSaga: true,
         })
       );
+      if (selectedAnnotations.length > 0) {
+        dispatch(
+          dataSlice.actions.updateAnnotations({
+            updates: selectedAnnotations.map((id) => ({
+              id,
+              categoryId: category.id,
+            })),
+          })
+        );
+      } else if (selectedAnnotationObjects.length > 0) {
+        dispatch(
+          dataSlice.actions.updateAnnotations({
+            updates: selectedAnnotationObjects.map((id) => ({
+              id,
+              categoryId: category.id,
+            })),
+            isPermanent: true,
+          })
+        );
+      }
     },
-    [dispatch]
+    [dispatch, selectedAnnotations, selectedAnnotationObjects]
   );
 
   const handleToggleCategoryVisibility = useCallback(

@@ -1,10 +1,4 @@
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import Konva from "konva";
 import * as ReactKonva from "react-konva";
@@ -187,9 +181,6 @@ export const AnnotationTransformer = ({
           ? imageHeight! - 65 + imageOrigin.y
           : yMax + imageOrigin.y;
       setYPos(newY);
-
-      console.log(newX, newY); //LOG:
-      console.log("here also");
     }
   }, [
     workingAnnotation,
@@ -225,10 +216,6 @@ export const AnnotationTransformer = ({
       transformer.getLayer()?.batchDraw();
     };
   }, [annotationId, stageRef]);
-
-  useEffect(() => {
-    console.log("fired"); //LOG:
-  }, [stageRef]);
 
   return (
     <>
