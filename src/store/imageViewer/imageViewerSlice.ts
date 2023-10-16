@@ -47,7 +47,7 @@ const initialState: ImageViewerStore = {
     centerPoint: undefined,
   },
   zoomOptions: {
-    automaticCentering: false,
+    automaticCentering: true,
     mode: ZoomModeType.In,
     scale: 1.0,
     toActualSize: false,
