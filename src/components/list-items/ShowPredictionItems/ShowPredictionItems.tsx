@@ -24,6 +24,7 @@ export const ShowPredictionItems = () => {
   // Yes, this is supposed to select on training partition
   const inferenceImages = useSelector(selectImagesByPartitions)([
     Partition.Training,
+    Partition.Validation,
   ]);
 
   const t = useTranslation();

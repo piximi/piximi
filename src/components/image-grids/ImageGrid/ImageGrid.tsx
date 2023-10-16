@@ -185,6 +185,7 @@ export const ImageGrid = () => {
               {images
                 .slice(0, max_images)
                 .sort(sortFunction.comparerFunction)
+
                 .map((image: ImageType) => (
                   <ImageGridItem
                     key={image.id}
