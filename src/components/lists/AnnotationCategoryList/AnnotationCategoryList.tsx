@@ -15,6 +15,7 @@ import {
   selectSelectedAnnotationIds,
   updateHighlightedAnnotationCategory,
   selectHighligtedAnnotationCatogory,
+  selectWorkingAnnotation,
 } from "store/imageViewer";
 import {
   dataSlice,
@@ -52,6 +53,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     selectHiddenAnnotationCategoryIds
   );
   const annotationsByCategory = useSelector(selectAnnotationsByCategoryDict);
+  const workingAnnotation = useSelector(selectWorkingAnnotation);
   const usedAnnotationCategoryNames = useSelector(
     selectAnnotationCategoryNames
   );
@@ -73,6 +75,7 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
           execSaga: true,
         })
       );
+
       if (selectedAnnotations.length > 0) {
         dispatch(
           dataSlice.actions.updateAnnotations({
@@ -92,9 +95,20 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
             isPermanent: true,
           })
         );
+      } else if (workingAnnotation) {
+        dispatch(
+          imageViewerSlice.actions.updateWorkingAnnotation({
+            changes: { categoryId: category.id },
+          })
+        );
       }
     },
-    [dispatch, selectedAnnotations, selectedAnnotationObjects]
+    [
+      dispatch,
+      selectedAnnotations,
+      selectedAnnotationObjects,
+      workingAnnotation,
+    ]
   );
 
   const handleToggleCategoryVisibility = useCallback(
