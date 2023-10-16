@@ -127,8 +127,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
                 id={category.id}
                 key={category.id}
                 isSelected={
-                  (selectedCategory && selectedCategory.id === category.id) ||
-                  unknownCategory.id === category.id
+                  selectedCategory ? selectedCategory.id === category.id : false
                 }
                 isHighlighted={highlightedCategory === category.id}
                 objectCount={objectCountByCategory(category.id)}
