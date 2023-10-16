@@ -18,6 +18,8 @@ import {
 
 import { generateDefaultColors } from "utils/common/image";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { CustomListItem } from "components/list-items/CustomListItem";
+import { selectLoadMessage } from "store/project";
 
 //TODO: Check
 
@@ -31,6 +33,7 @@ export const ColorAdjustmentOptions = () => {
   const imageData = useSelector(selectActiveImageData);
 
   const imageId = useSelector(selectActiveImageId);
+  const progressMessage = useSelector(selectLoadMessage);
 
   const handleResetChannelsClick = async () => {
     if (!imageShape || !imageData) return;
@@ -62,6 +65,7 @@ export const ColorAdjustmentOptions = () => {
           onClick={handleResetChannelsClick}
         />
         <ApplyColorsButton />
+        {progressMessage && <CustomListItem primaryText={progressMessage} />}
       </List>
     </>
   );
