@@ -444,11 +444,7 @@ export const dataSlice = createSlice({
     ) {
       const { categoryIds, isPermanent } = action.payload;
       for (const categoryId of categoryIds) {
-        state.annotationsByCategory[UNKNOWN_ANNOTATION_CATEGORY_ID].push(
-          ...state.annotationsByCategory[categoryId]
-        );
         const categoryAnnotationIds = state.annotationsByCategory[categoryId];
-        delete state.annotationsByCategory[categoryId];
 
         dataSlice.caseReducers.updateAnnotations(state, {
           type: "updateAnnotations",
@@ -460,6 +456,7 @@ export const dataSlice = createSlice({
             isPermanent: isPermanent,
           },
         });
+        delete state.annotationsByCategory[categoryId];
 
         if (isPermanent) {
           delete state.annotationCategories.entities[categoryId];
