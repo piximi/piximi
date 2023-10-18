@@ -15,6 +15,7 @@ export const BaseOptions = ({ children }: { children?: React.ReactNode }) => {
       <Divider />
 
       <InvertAnnotation />
+      {children}
     </>
   );
 };
