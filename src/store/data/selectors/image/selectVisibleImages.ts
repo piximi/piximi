@@ -15,7 +15,6 @@ export const selectVisibleImages = createSelector(
     selectImageCategoryEntities,
   ],
   (hiddenCategories, imagesByCategory, imageEntities, imageCategories) => {
-    console.log("I ran"); //LOG:
     const visibleImages: Array<ImageType & { category: string }> = [];
     for (const categoryId of Object.keys(imagesByCategory)) {
       if (!hiddenCategories.includes(categoryId)) {
