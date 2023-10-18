@@ -118,9 +118,10 @@ export const GridItemActionBar = ({
             </Tooltip>
 
             <Typography sx={{ flexGrow: 1 }}>
-              {`${selectedObjects.length} selected ${currentTab}${
-                selectedObjects.length === 1 ? "" : "s"
-              }`}
+              {`${selectedObjects.length} selected ${currentTab.slice(
+                0,
+                currentTab.length - 1
+              )}${selectedObjects.length === 1 ? "" : "s"}`}
             </Typography>
 
             <Box sx={{ flexGrow: 1 }} />
