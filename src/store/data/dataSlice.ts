@@ -645,6 +645,8 @@ export const dataSlice = createSlice({
     ) {
       const { imageId, oldCategoryId, newCategoryId } = action.payload;
 
+      if (state.imagesByCategory[newCategoryId].includes(imageId)) return;
+
       mutatingFilter(
         state.imagesByCategory[oldCategoryId],
         (scopedImageId) => scopedImageId !== imageId
@@ -859,6 +861,9 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { annotationId, oldCategoryId, newCategoryId } = action.payload;
+
+      if (state.annotationsByCategory[newCategoryId].includes(annotationId))
+        return;
 
       mutatingFilter(
         state.annotationsByCategory[oldCategoryId],
