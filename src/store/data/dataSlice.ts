@@ -674,8 +674,7 @@ export const dataSlice = createSlice({
           state.imagesByCategory[imageCategoryId],
           (id) => id !== imageId
         );
-
-        delete state.annotationsByImage[imageId];
+        const annotationsToDelete = state.annotationsByImage[imageId];
         if (isPermanent) {
           if (disposeColorTensor) {
             dispose(
@@ -690,7 +689,7 @@ export const dataSlice = createSlice({
         }
         dataSlice.caseReducers.deleteAnnotations(state, {
           type: "deleteAnnotations",
-          payload: { annotationIds: state.annotationsByImage[imageId] },
+          payload: { annotationIds: annotationsToDelete },
         });
       }
     },
