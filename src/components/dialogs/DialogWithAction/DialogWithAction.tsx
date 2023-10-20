@@ -11,16 +11,21 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useHotkeys } from "hooks";
 import { HotkeyView } from "types";
+import { ReactElement } from "react";
 
-type DialogWithActionProps = Omit<DialogProps, "children" | "open"> & {
+type DialogWithActionProps = Omit<
+  DialogProps,
+  "children" | "open" | "content"
+> & {
   title: string;
-  content?: any;
+  content?: ReactElement | string;
   onConfirm: () => void;
   onClose: () => void;
   isOpen: boolean;
   onReject?: () => void;
   confirmText?: string;
   rejectText?: string;
+  confirmDisabled?: boolean;
 };
 
 export const DialogWithAction = ({
@@ -32,6 +37,7 @@ export const DialogWithAction = ({
   confirmText = "Confirm",
   rejectText = "Reject",
   isOpen,
+  confirmDisabled,
   ...rest
 }: DialogWithActionProps) => {
   const handleConfirm = () => {
@@ -45,15 +51,28 @@ export const DialogWithAction = ({
     () => {
       handleConfirm();
     },
-    HotkeyView.DeleteCategoryDialog,
-    { enableOnTags: ["INPUT"] },
+    HotkeyView.DialogWithAction,
+    { enableOnTags: ["INPUT"], enabled: isOpen },
     [handleConfirm]
   );
+
   return (
     <Dialog fullWidth onClose={handleClose} open={isOpen} {...rest}>
-      <Box display="flex" justifyContent="space-between" px={1} py={1.5}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={1}
+        pb={1.5}
+        pt={1}
+      >
         <DialogTitle sx={{ p: 1 }}>{title}</DialogTitle>
-        <IconButton onClick={handleClose}>
+        <IconButton
+          onClick={handleClose}
+          sx={(theme) => ({
+            maxHeight: "40px",
+          })}
+        >
           <CloseIcon />
         </IconButton>
       </Box>
@@ -61,7 +80,11 @@ export const DialogWithAction = ({
       {content && <DialogContent>{content}</DialogContent>}
 
       <DialogActions>
-        <Button onClick={handleConfirm} color="primary">
+        <Button
+          onClick={handleConfirm}
+          color="primary"
+          disabled={confirmDisabled}
+        >
           {confirmText}
         </Button>
         {handleReject ? (

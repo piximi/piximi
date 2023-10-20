@@ -2,14 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import {
-  Alert,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-} from "@mui/material";
+import { Alert, Box } from "@mui/material";
 
 import { CustomNumberTextField } from "components/forms/CustomNumberTextField";
 
@@ -18,6 +11,7 @@ import { dataSlice } from "store/data";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 
 import { HotkeyView } from "types";
+import { DialogWithAction } from "../DialogWithAction";
 
 type ImageShapeDialogProps = {
   files: FileList;
@@ -98,30 +92,31 @@ export const ImageShapeDialog = ({
   );
 
   return (
-    <Dialog onClose={closeDialog} open={open}>
-      <DialogTitle sx={{ pb: 0 }}>Tell us about your image: </DialogTitle>
-      <Box sx={{ pl: 3, pt: 0, pb: 0, width: "28ch" }}>
-        <CustomNumberTextField
-          id="channels-c"
-          label="Channels (c)"
-          value={channels}
-          dispatchCallBack={handleChannelsChange}
-          min={1}
-        />
-        {invalidImageShape && (
-          <Alert
-            sx={{ width: "28ch" }}
-            severity="warning"
-          >{`Invalid image shape: Cannot create a ${channels} (c) x ${(
-            frames / channels
-          ).toFixed(2)} (z) image from file.`}</Alert>
-        )}
-      </Box>
-      <DialogActions>
-        <Button onClick={uploadImages} autoFocus>
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <DialogWithAction
+      title="Tell us about your image"
+      isOpen={open}
+      onClose={closeDialog}
+      content={
+        <Box sx={{ pl: 3, pt: 0, pb: 0, width: "28ch" }}>
+          <CustomNumberTextField
+            id="channels-c"
+            label="Channels (c)"
+            value={channels}
+            dispatchCallBack={handleChannelsChange}
+            min={1}
+          />
+          {invalidImageShape && (
+            <Alert
+              sx={{ width: "28ch" }}
+              severity="warning"
+            >{`Invalid image shape: Cannot create a ${channels} (c) x ${(
+              frames / channels
+            ).toFixed(2)} (z) image from file.`}</Alert>
+          )}
+        </Box>
+      }
+      onConfirm={uploadImages}
+      confirmText="OK"
+    />
   );
 };

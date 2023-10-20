@@ -1,15 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-} from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import { selectClassifier } from "store/classifier";
 import { selectProject, projectSlice } from "store/project";
@@ -23,6 +15,7 @@ import { serialize } from "utils/common/image/serialize";
 import { selectSegmenter } from "store/segmenter";
 import { saveAs } from "file-saver";
 import { applicationSlice } from "store/application";
+import { DialogWithAction } from "../DialogWithAction";
 
 type SaveProjectDialogProps = {
   onClose: () => void;
@@ -115,10 +108,11 @@ export const SaveProjectDialog = ({
   );
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save Project</DialogTitle>
-
-      <DialogContent>
+    <DialogWithAction
+      isOpen={open}
+      onClose={onCancel}
+      title="Save Project"
+      content={
         <Grid container spacing={1}>
           <Grid item xs={10}>
             <TextField
@@ -132,17 +126,9 @@ export const SaveProjectDialog = ({
             />
           </Grid>
         </Grid>
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onCancel} color="primary">
-          Cancel
-        </Button>
-
-        <Button onClick={onSaveProjectClick} color="primary">
-          Save Project
-        </Button>
-      </DialogActions>
-    </Dialog>
+      }
+      onConfirm={onSaveProjectClick}
+      confirmText="Save Project"
+    />
   );
 };

@@ -70,13 +70,13 @@ export const CategoriesList = (props: CategoriesListProps) => {
     onClose: handleCloseCreateCategoryDialog,
     onOpen: handleOpenCreateCategoryDialog,
     open: isCreateCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.CreateCategoryDialog);
+  } = useDialogHotkey(HotkeyView.DialogWithAction);
 
   const {
     onClose: handleCloseDeleteCategoryDialog,
     onOpen: handleOpenDeleteCategoryDialog,
     open: isDeleteCategoryDialogOpen,
-  } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
+  } = useDialogHotkey(HotkeyView.DialogWithAction);
 
   const onOpenCategoryMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
