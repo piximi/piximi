@@ -2,19 +2,13 @@ import React, { ChangeEvent } from "react";
 import { useDispatch } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
+import { TextField } from "@mui/material";
 
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { HotkeyView } from "types";
 import { dataSlice } from "store/data";
+import { DialogWithAction } from "../DialogWithAction";
 
 type NewProjectDialogProps = {
   onClose: () => void;
@@ -81,10 +75,11 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
   );
 
   return (
-    <Dialog fullWidth maxWidth={"xs"} onClose={closeDialog} open={open}>
-      <DialogTitle>New project</DialogTitle>
-
-      <DialogContent>
+    <DialogWithAction
+      onClose={closeDialog}
+      isOpen={open}
+      title="New Project"
+      content={
         <TextField
           autoFocus
           fullWidth
@@ -96,16 +91,9 @@ export const NewProjectDialog = ({ onClose, open }: NewProjectDialogProps) => {
           error={invalidProjectName}
           helperText={invalidProjectName ? "Provide a project name" : ""}
         />
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={closeDialog} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={onCreateNewProject} color="primary">
-          Create
-        </Button>
-      </DialogActions>
-    </Dialog>
+      }
+      onConfirm={onCreateNewProject}
+      confirmText="Create"
+    />
   );
 };

@@ -58,7 +58,7 @@ export const AnnotationImageGrid = () => {
     onClose: handleCloseDeleteAnnotationssDialog,
     onOpen: handleOpenDeleteAnnotationsDialog,
     open: deleteAnnotationsDialogisOpen,
-  } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
+  } = useDialogHotkey(HotkeyView.DialogWithAction);
 
   const handleSelectAll = () => {
     const allAnnotationIds = visibleAnnotations.map(

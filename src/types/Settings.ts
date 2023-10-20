@@ -22,7 +22,7 @@ export enum HotkeyView {
   SaveFittedModelDialog,
   SaveProjectDialog,
   ProjectView,
-  SimpleCancelConfirmDialog,
+  DialogWithAction,
 }
 
 export type Settings = {

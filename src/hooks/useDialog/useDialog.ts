@@ -35,7 +35,7 @@ export const useDialog = (closeOnError: boolean = true) => {
 };
 
 export const useDialogHotkey = (
-  view: HotkeyView,
+  view?: HotkeyView,
   closeOnError: boolean = true
 ) => {
   const dispatch = useDispatch();
@@ -46,12 +46,13 @@ export const useDialogHotkey = (
   } = useDialog(closeOnError);
 
   const onOpen = () => {
-    dispatch(registerHotkeyView({ hotkeyView: view }));
+    view && dispatch(registerHotkeyView({ hotkeyView: view }));
     onDialogOpen();
   };
 
   const onClose = () => {
-    dispatch(unregisterHotkeyView({}));
+    view && dispatch(unregisterHotkeyView({}));
+    console.log("I'm called");
     onDialogClose();
   };
 

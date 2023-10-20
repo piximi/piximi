@@ -1,18 +1,11 @@
 import React, { ChangeEvent, useState } from "react";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-} from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import { useHotkeys } from "hooks";
 
 import { HotkeyView } from "types";
+import { DialogWithAction } from "../DialogWithAction";
 
 type ExportAnnotationsDialogProps = {
   onClose: () => void;
@@ -50,10 +43,9 @@ export const ExportAnnotationsDialog = ({
   );
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Export Annotations</DialogTitle>
-
-      <DialogContent>
+    <DialogWithAction
+      title="Export Annotations"
+      content={
         <Grid container spacing={1}>
           <Grid item xs={10}>
             <TextField
@@ -62,21 +54,16 @@ export const ExportAnnotationsDialog = ({
               id="name"
               label="Project file name"
               margin="dense"
+              defaultValue={projectName}
               onChange={onNameChange}
             />
           </Grid>
         </Grid>
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onCancel} color="primary">
-          Cancel
-        </Button>
-
-        <Button onClick={() => handleSave(projectName)} color="primary">
-          Export Annotations
-        </Button>
-      </DialogActions>
-    </Dialog>
+      }
+      onClose={onCancel}
+      onConfirm={() => handleSave(projectName)}
+      confirmText="Export Annotations"
+      isOpen={open}
+    />
   );
 };

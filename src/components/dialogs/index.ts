@@ -1,4 +1,3 @@
-export { CustomDialog } from "./CustomDialog";
 export { DialogWithAction } from "./DialogWithAction";
 export { DialogWithActionSHK } from "./DialogWithAction";
 export { DialogTransitionSlide } from "./DialogTransitionSlide";

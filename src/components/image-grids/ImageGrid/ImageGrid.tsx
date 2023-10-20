@@ -44,7 +44,7 @@ export const ImageGrid = () => {
     onClose: handleCloseDeleteImagesDialog,
     onOpen: onOpenDeleteImagesDialog,
     open: deleteImagesDialogisOpen,
-  } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
+  } = useDialogHotkey(HotkeyView.DialogWithAction);
 
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
 

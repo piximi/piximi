@@ -1,19 +1,12 @@
 import { ChangeEvent, useState } from "react";
 import { useHotkeys } from "hooks";
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-} from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import { HotkeyView } from "types";
 import { ModelStatus } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
+import { DialogWithAction } from "../DialogWithAction";
 
 type SaveFittedModelDialogProps = {
   model: Model;
@@ -51,17 +44,20 @@ export const SaveFittedModelDialog = ({
   );
 
   return (
-    <Dialog fullWidth maxWidth="xs" onClose={onClose} open={open}>
-      <DialogTitle>Save {model.name}</DialogTitle>
-
-      <DialogContent>
+    <DialogWithAction
+      isOpen={open}
+      onClose={onClose}
+      title={`Save ${model.name}`}
+      content={
         <Grid container spacing={1}>
           <Grid item xs={10}>
             <TextField
               autoFocus
               fullWidth
               id="name"
-              label={model.name}
+              label="Model Name"
+              value={name}
+              defaultValue={model.name}
               margin="dense"
               onChange={onNameChange}
               helperText={
@@ -73,21 +69,10 @@ export const SaveFittedModelDialog = ({
             />
           </Grid>
         </Grid>
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-
-        <Button
-          onClick={onSaveClassifierClick}
-          color="primary"
-          disabled={modelStatus !== ModelStatus.Trained}
-        >
-          Save {name}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      }
+      onConfirm={onSaveClassifierClick}
+      confirmText="Save"
+      confirmDisabled={modelStatus !== ModelStatus.Trained}
+    />
   );
 };
