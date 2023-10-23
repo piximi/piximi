@@ -48,6 +48,7 @@ export {
   selectTotalAnnotationCount,
   selectActiveAnnotationObjects,
   selectWorkingAnnotationObject,
+  selectVisibleAnnotations,
 } from "./selectors/annotation";
 
 export {

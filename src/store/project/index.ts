@@ -2,7 +2,6 @@
 
 export {
   projectSlice,
-  deselectImage,
   deselectImages,
   updateHighlightedImageCategory,
   setLoadPercent,

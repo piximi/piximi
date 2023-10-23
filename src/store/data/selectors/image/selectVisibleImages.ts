@@ -4,7 +4,7 @@ import {
   selectImageEntities,
   selectImagesByCategoryDict,
 } from "./imageSelectors";
-import { ImageType } from "types";
+import { Category, ImageType } from "types";
 import { selectImageCategoryEntities } from "../image-category/imageCategorySelectors";
 
 export const selectVisibleImages = createSelector(
@@ -15,14 +15,14 @@ export const selectVisibleImages = createSelector(
     selectImageCategoryEntities,
   ],
   (hiddenCategories, imagesByCategory, imageEntities, imageCategories) => {
-    const visibleImages: Array<ImageType & { category: string }> = [];
+    const visibleImages: Array<ImageType & { category: Category }> = [];
     for (const categoryId of Object.keys(imagesByCategory)) {
       if (!hiddenCategories.includes(categoryId)) {
         for (const imageId of imagesByCategory[categoryId]) {
           if (imageEntities[imageId].visible) {
             visibleImages.push({
               ...imageEntities[imageId],
-              category: imageCategories[categoryId].name,
+              category: imageCategories[categoryId],
             });
           }
         }

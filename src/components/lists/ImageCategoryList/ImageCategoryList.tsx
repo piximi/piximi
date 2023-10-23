@@ -52,7 +52,6 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     (category: Category) => {
       setSelectedCategory(category);
 
-      console.log(category);
       dispatch(
         projectSlice.actions.updateHighlightedImageCategory({
           categoryId: category.id,

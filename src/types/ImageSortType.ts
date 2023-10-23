@@ -1,3 +1,4 @@
+import { Category } from "./Category";
 import { ImageGridTab } from "./ImageGridTab";
 
 export enum ImageSortKey {
@@ -12,8 +13,8 @@ export type ImageSortKeyType = {
   imageSortKeyName: string;
   imageSortKey: ImageSortKey;
   comparerFunction: (
-    a: { name: string; category: string },
-    b: { name: string; category: string }
+    a: { name: string; category: Category },
+    b: { name: string; category: Category }
   ) => number;
   objectType: ImageGridTab | "All";
 };
@@ -35,7 +36,7 @@ export const availableImageSortKeys: ImageSortKeyType[] = [
   {
     imageSortKeyName: "Category",
     imageSortKey: ImageSortKey.Category,
-    comparerFunction: (a, b) => a.category.localeCompare(b.category),
+    comparerFunction: (a, b) => a.category.name.localeCompare(b.category.name),
     objectType: "All",
   },
   {

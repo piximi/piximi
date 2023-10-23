@@ -24,3 +24,4 @@ export {
 } from "./selectActiveAnnotations";
 
 export { selectSelectedAnnotations } from "./selectSelectedAnnotations";
+export { selectVisibleAnnotations } from "./selectVisibleAnnotations";
