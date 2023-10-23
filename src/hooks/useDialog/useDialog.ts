@@ -52,7 +52,6 @@ export const useDialogHotkey = (
 
   const onClose = () => {
     view && dispatch(unregisterHotkeyView({}));
-    console.log("I'm called");
     onDialogClose();
   };
 
