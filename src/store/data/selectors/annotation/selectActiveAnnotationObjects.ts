@@ -76,8 +76,6 @@ export const selectWorkingAnnotationObject = createSelector(
     const annotation = !workingAnnotation.decodedMask
       ? decodeAnnotation(workingAnnotation)
       : (workingAnnotation as DecodedAnnotationType);
-    console.log(annotation.categoryId); //LOG:
-    console.log(categoryEntities); //LOG:
     const fillColor = categoryEntities[workingAnnotation.categoryId].color;
     const imageShape = activeImageShape;
     return {
