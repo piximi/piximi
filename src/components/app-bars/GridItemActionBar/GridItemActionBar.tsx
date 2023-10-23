@@ -40,7 +40,6 @@ type GridItemActionBarProps = {
   selectedObjects: any;
   selectAllObjects: any;
   deselectAllObjects: any;
-  handleDeleteObjects: any;
   handleOpenDeleteDialog: any;
   onUpdateCategories: (categoryId: string) => void;
   onOpenImageViewer: any;
@@ -52,7 +51,6 @@ export const GridItemActionBar = ({
   selectedObjects,
   selectAllObjects,
   deselectAllObjects,
-  handleDeleteObjects,
   onUpdateCategories: handleUpdateCategories,
   handleOpenDeleteDialog,
   onOpenImageViewer: handleOpenImageViewer,
@@ -92,8 +90,8 @@ export const GridItemActionBar = ({
       unregisterHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
     );
     batch(() => {
-      dispatch(projectSlice.actions.clearSelectedImages());
-      dispatch(projectSlice.actions.clearSelectedAnnotations());
+      dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
+      dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
     });
     navigate("/annotator");
   };

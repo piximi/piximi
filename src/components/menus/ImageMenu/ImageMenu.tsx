@@ -66,7 +66,9 @@ export const ImageMenu = ({
           execSaga: true,
         })
       );
-      dispatch(projectSlice.actions.deselectImage({ id: selectedImage.id }));
+      dispatch(
+        projectSlice.actions.deselectImages({ ids: [selectedImage.id] })
+      );
       dispatch(
         dataSlice.actions.deleteImages({
           imageIds: [selectedImage.id],

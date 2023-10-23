@@ -32,6 +32,12 @@ export const ImageGrid = () => {
   const images = useSelector(selectVisibleImages);
   const selectedImageIds = useSelector(selectSelectedImageIds);
 
+  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
+  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
+    shape: ImageShapeEnum.InvalidImage,
+  });
+  const [files, setFiles] = useState<FileList>();
+
   //const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
 
   const {
@@ -40,14 +46,8 @@ export const ImageGrid = () => {
     open: deleteImagesDialogisOpen,
   } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
 
-  // ************ File IO ***************
-
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
-    shape: ImageShapeEnum.InvalidImage,
-  });
-  const [files, setFiles] = useState<FileList>();
   const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
+
   const handleDrop = useCallback(
     async (files: FileList) => {
       const imageShapeInfo = await uploadFiles(files);
@@ -57,20 +57,24 @@ export const ImageGrid = () => {
     [uploadFiles]
   );
   const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
-  const handleClose = () => {
+
+  const handleCloseDimensionsDialog = () => {
     setOpenDimensionsDialogBox(false);
   };
 
-  // ************ File IO ***************
-
-  const selectAllImages = useCallback(() => {
+  const handleSelectAll = useCallback(() => {
     dispatch(
       projectSlice.actions.setSelectedImages({
-        imageIds: images.map((image) => image.id),
+        ids: images.map((image) => image.id),
       })
     );
   }, [images, dispatch]);
-  const deleteImages = () => {
+
+  const handleDeselectAll = () => {
+    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
+  };
+
+  const handleDelete = () => {
     dispatch(
       dataSlice.actions.deleteImages({
         imageIds: selectedImageIds,
@@ -78,15 +82,32 @@ export const ImageGrid = () => {
         isPermanent: true,
       })
     );
-    dispatch(projectSlice.actions.setSelectedImages({ imageIds: [] }));
+    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
   };
 
-  const deselectAllImages = () => {
-    dispatch(projectSlice.actions.setSelectedImages({ imageIds: [] }));
-  };
-  const handleDeleteImages = () => {
-    handleCloseDeleteImagesDialog();
-    deleteImages();
+  const handleClick = useCallback(
+    (id: string, selected: boolean) => {
+      if (selected) {
+        dispatch(projectSlice.actions.deselectImages({ ids: id }));
+      } else {
+        dispatch(projectSlice.actions.selectImages({ ids: id }));
+      }
+    },
+    [dispatch]
+  );
+
+  const handleUpdate = (categoryId: string) => {
+    const updates = selectedImageIds.map((imageId) => ({
+      id: imageId,
+      categoryId: categoryId,
+    }));
+    dispatch(
+      dataSlice.actions.updateImages({
+        updates,
+        isPermanent: true,
+      })
+    );
+    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
   };
 
   const handleOpenImageViewer = () => {
@@ -102,32 +123,7 @@ export const ImageGrid = () => {
     );
   };
 
-  const handleImageClick = useCallback(
-    (id: string, selected: boolean) => {
-      if (selected) {
-        dispatch(projectSlice.actions.deselectImage({ id: id }));
-      } else {
-        dispatch(projectSlice.actions.selectImage({ imageId: id }));
-      }
-    },
-    [dispatch]
-  );
-
-  const handleUpdateCategories = (categoryId: string) => {
-    const updates = selectedImageIds.map((imageId) => ({
-      id: imageId,
-      categoryId: categoryId,
-    }));
-    dispatch(
-      dataSlice.actions.updateImages({
-        updates,
-        isPermanent: true,
-      })
-    );
-    dispatch(projectSlice.actions.clearSelectedImages());
-  };
-
-  useHotkeys("esc", () => deselectAllImages(), HotkeyView.ProjectView, {
+  useHotkeys("esc", () => handleDeselectAll(), HotkeyView.ProjectView, {
     enabled: tabIndex === 0,
   });
   useHotkeys(
@@ -138,7 +134,7 @@ export const ImageGrid = () => {
   );
   useHotkeys(
     "control+a",
-    () => selectAllImages(),
+    () => handleSelectAll(),
     HotkeyView.ProjectView,
     { enabled: tabIndex === 0 },
     [images]
@@ -168,9 +164,7 @@ export const ImageGrid = () => {
         >
           <div
             onClick={() => {
-              dispatch(
-                projectSlice.actions.setSelectedImages({ imageIds: [] })
-              );
+              dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
             }}
           >
             <Grid
@@ -190,7 +184,7 @@ export const ImageGrid = () => {
                   <ImageGridItem
                     key={image.id}
                     image={image}
-                    handleClick={handleImageClick}
+                    handleClick={handleClick}
                     selected={selectedImageIds.includes(image.id)}
                   />
                 ))}
@@ -215,12 +209,11 @@ export const ImageGrid = () => {
           currentTab={currentTab}
           showAppBar={selectedImageIds.length > 0}
           selectedObjects={selectedImageIds}
-          selectAllObjects={selectAllImages}
-          deselectAllObjects={deselectAllImages}
-          handleDeleteObjects={handleDeleteImages}
+          selectAllObjects={handleSelectAll}
+          deselectAllObjects={handleDeselectAll}
           handleOpenDeleteDialog={onOpenDeleteImagesDialog}
           onOpenImageViewer={handleOpenImageViewer}
-          onUpdateCategories={handleUpdateCategories}
+          onUpdateCategories={handleUpdate}
         />
       )}
 
@@ -229,7 +222,7 @@ export const ImageGrid = () => {
           selectedImageIds.length > 1 ? "s" : ""
         }?`}
         content="Images will be deleted from the project."
-        onConfirm={handleDeleteImages}
+        onConfirm={handleDelete}
         isOpen={deleteImagesDialogisOpen}
         onClose={handleCloseDeleteImagesDialog}
       />
@@ -237,7 +230,7 @@ export const ImageGrid = () => {
         <ImageShapeDialog
           files={files}
           open={openDimensionsDialogBox}
-          onClose={handleClose}
+          onClose={handleCloseDimensionsDialog}
           isUploadedFromAnnotator={false}
           referenceImageShape={imageShape}
         />

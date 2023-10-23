@@ -210,7 +210,9 @@ export const imageViewerSlice = createSlice({
       state,
       action: PayloadAction<{ changes: Partial<DecodedAnnotationType> }>
     ) {
-      state.workingAnnotation.changes = action.payload.changes;
+      if (state.workingAnnotation.saved) {
+        state.workingAnnotation.changes = action.payload.changes;
+      }
     },
     hideCategory(
       state,

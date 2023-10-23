@@ -35,89 +35,73 @@ export const projectSlice = createSlice({
     setImageGridTab(state, action: PayloadAction<{ view: ImageGridTab }>) {
       state.imageGridTab = action.payload.view;
     },
-
-    selectAllImages(state, action: PayloadAction<{ ids: Array<string> }>) {
-      state.selectedImageIds = [];
-
-      state.selectedImageIds = action.payload.ids;
-    },
-    selectImage(state, action: PayloadAction<{ imageId: string }>) {
-      state.selectedImageIds.push(action.payload.imageId);
-    },
-    selectImages(state, action: PayloadAction<{ imageIds: Array<string> }>) {
-      for (const imageId of action.payload.imageIds) {
-        projectSlice.caseReducers.selectImage(state, {
-          type: "selectImage",
-          payload: { imageId },
-        });
+    selectImages(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      for (const imageId of ids) {
+        state.selectedImageIds.push(imageId);
       }
     },
-
-    deselectImage(state, action: PayloadAction<{ id: string }>) {
+    deselectImages(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
       state.selectedImageIds = state.selectedImageIds.filter(
-        (id: string) => id !== action.payload.id
+        (id: string) => !ids.includes(id)
       );
-    },
-    deselectImages(state, action: PayloadAction<{ ids: Array<string> }>) {
-      state.selectedImageIds = state.selectedImageIds.filter(
-        (id: string) => !action.payload.ids.includes(id)
-      );
-    },
-    clearSelectedImages(state) {
-      state.selectedImageIds = [];
     },
     setSelectedImages(
       state,
-      action: PayloadAction<{ imageIds: Array<string> }>
+      action: PayloadAction<{ ids: Array<string> | string }>
     ) {
-      state.selectedImageIds = [];
-
-      projectSlice.caseReducers.selectImages(state, {
-        type: "selectImages",
-        payload: { imageIds: action.payload.imageIds },
-      });
-    },
-    selectAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
-      state.selectedAnnotationIds.push(action.payload.annotationId);
+      state.selectedImageIds =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
     },
     selectAnnotations(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{ ids: Array<string> | string }>
     ) {
-      for (const annotationId of action.payload.annotationIds) {
-        projectSlice.caseReducers.selectAnnotation(state, {
-          type: "selectAnnotation",
-          payload: { annotationId },
-        });
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      for (const annotationId of ids) {
+        if (!state.selectedAnnotationIds.includes(annotationId)) {
+          state.selectedAnnotationIds.push(annotationId);
+        }
       }
-    },
-
-    deselectAnnotation(state, action: PayloadAction<{ annotationId: string }>) {
-      state.selectedAnnotationIds = state.selectedAnnotationIds.filter(
-        (id: string) => id !== action.payload.annotationId
-      );
     },
     deselectAnnotations(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{ ids: Array<string> | string }>
     ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
       state.selectedAnnotationIds = state.selectedAnnotationIds.filter(
-        (id: string) => !action.payload.annotationIds.includes(id)
+        (id: string) => !ids.includes(id)
       );
-    },
-    clearSelectedAnnotations(state) {
-      state.selectedAnnotationIds = [];
     },
     setSelectedAnnotations(
       state,
-      action: PayloadAction<{ annotationIds: Array<string> }>
+      action: PayloadAction<{ ids: Array<string> | string }>
     ) {
-      state.selectedAnnotationIds = [];
-
-      projectSlice.caseReducers.selectAnnotations(state, {
-        type: "selectAnnotations",
-        payload: { annotationIds: action.payload.annotationIds },
-      });
+      state.selectedAnnotationIds =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
     },
     hideCategory(
       state,
@@ -237,11 +221,8 @@ export const projectSlice = createSlice({
 
 export const {
   createNewProject,
-  selectImage,
   selectImages,
-  selectAllImages,
   setSelectedImages,
-  deselectImage,
   deselectImages,
   updateHighlightedImageCategory,
   setLoadPercent,

@@ -1,51 +1,37 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText } from "@mui/material";
 
 import { selectTileSize } from "store/application";
-import { selectAnnotationCategoryProperty } from "store/data";
 
 import { contrastingText } from "utils/common/colorPalette";
 import { ProjectGridItem } from "../ProjectGridItem";
 import { AnnotationItemDetails } from "../AnnotationImageGrid";
+import { Category } from "types";
 
 type ImageGridItemProps = {
   selected: boolean;
-  handleClick: (id: string) => void;
+  handleClick: (id: string, selected: boolean) => void;
   details: AnnotationItemDetails;
+  category: Category;
 };
 
 export const AnnotationGridItem = memo(
-  ({ selected, handleClick, details }: ImageGridItemProps) => {
+  ({ selected, handleClick, details, category }: ImageGridItemProps) => {
     const scaleFactor = useSelector(selectTileSize);
-
-    const getAnnotationCategoryProperty = useSelector(
-      selectAnnotationCategoryProperty
-    );
-
-    const categoryDetails = useMemo(() => {
-      const categoryName = getAnnotationCategoryProperty(
-        details.category,
-        "name"
-      )!;
-      const categoryColor = getAnnotationCategoryProperty(
-        details.category,
-        "color"
-      )!;
-      return {
-        name: categoryName,
-        color: categoryColor,
-        fontColor: contrastingText(categoryColor),
-      };
-    }, [details, getAnnotationCategoryProperty]);
+    const [categoryDetails, setCategoryDetails] = useState({
+      name: category.name,
+      color: category.color,
+      fontColor: contrastingText(category.color),
+    });
 
     const imageDetailComponent = useMemo(() => {
       return (
         <List dense>
           <ListItem>
             <ListItemText
-              primary={`Image name: ${details.name}`}
+              primary={`Image name: ${categoryDetails.name}`}
               primaryTypographyProps={{
                 sx: { color: categoryDetails.fontColor },
               }}
@@ -77,7 +63,7 @@ export const AnnotationGridItem = memo(
           </ListItem>
         </List>
       );
-    }, [details, categoryDetails.fontColor]);
+    }, [details, categoryDetails]);
 
     const itemSize = useMemo(() => {
       return (220 * scaleFactor).toString() + "px";
@@ -101,8 +87,16 @@ export const AnnotationGridItem = memo(
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>
     ) => {
       evt.stopPropagation();
-      handleClick(details.id);
+      handleClick(details.id, selected);
     };
+
+    useEffect(() => {
+      setCategoryDetails({
+        name: category.name,
+        color: category.color,
+        fontColor: contrastingText(category.color),
+      });
+    }, [category]);
 
     return (
       <ProjectGridItem

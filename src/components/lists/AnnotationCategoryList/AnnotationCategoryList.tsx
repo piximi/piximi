@@ -5,6 +5,7 @@ import {
   HotkeyView,
   PartialBy,
   UNKNOWN_ANNOTATION_CATEGORY,
+  UNKNOWN_ANNOTATION_CATEGORY_ID,
 } from "types";
 import { CategoriesList } from "../CategoriesList/CategoriesList";
 import { batch, useDispatch, useSelector } from "react-redux";
@@ -182,7 +183,11 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
             execSaga: true,
           })
         );
-
+        dispatch(
+          imageViewerSlice.actions.updateWorkingAnnotation({
+            changes: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
+          })
+        );
         dispatch(
           dataSlice.actions.deleteAnnotationCategories({
             // need to recast catagories as an array because inside batch

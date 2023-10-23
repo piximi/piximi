@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 
 import { Container, Grid } from "@mui/material";
 
-import { dataSlice, selectImageById } from "store/data";
-
 import {
-  selectAllAnnotations,
-  selectImageIdByAnnotation,
-} from "store/data/selectors/annotation/annotationSelectors";
+  dataSlice,
+  selectImageById,
+  selectVisibleAnnotations,
+} from "store/data";
+
+import { selectImageIdByAnnotation } from "store/data/selectors/annotation/annotationSelectors";
 import { imageViewerSlice } from "store/imageViewer";
 import {
   projectSlice,
@@ -19,7 +20,7 @@ import {
 import { selectSelectedImageIds } from "store/project/selectors";
 import { AnnotationGridItem } from "../AnnotationGridItem/AnnotationGridItem";
 import { useDialogHotkey, useHotkeys } from "hooks";
-import { HotkeyView, Partition, ToolType } from "types";
+import { Category, HotkeyView, Partition, ToolType } from "types";
 import { DialogWithAction } from "components/dialogs";
 import { GridItemActionBar } from "components/app-bars";
 import { annotatorSlice } from "store/annotator";
@@ -34,58 +35,75 @@ export type AnnotationItemDetails = {
   src: string;
   width: number;
   height: number;
-  category: string;
+  category: Category;
   area: number | undefined;
   partition?: Partition;
 };
 
 export const AnnotationImageGrid = () => {
+  const dispatch = useDispatch();
   const currentTab = useSelector(selectImageGridTab);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const imageIdByAnnotation = useSelector(selectImageIdByAnnotation);
   const selectedImageIds = useSelector(selectSelectedImageIds);
   const sortFunction = useSelector(selectImageSortType);
   const imageById = useSelector(selectImageById);
+  const visibleAnnotations = useSelector(selectVisibleAnnotations);
+
   const [annotationDetails, setAnnotationDetails] = useState<
     AnnotationItemDetails[]
   >([]);
-  const allAnnotations = useSelector(selectAllAnnotations);
-  const dispatch = useDispatch();
 
-  const deleteAnnotations = () => {
+  const {
+    onClose: handleCloseDeleteAnnotationssDialog,
+    onOpen: handleOpenDeleteAnnotationsDialog,
+    open: deleteAnnotationsDialogisOpen,
+  } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
+
+  const handleSelectAll = () => {
+    const allAnnotationIds = visibleAnnotations.map(
+      (annotation) => annotation.id
+    );
+    dispatch(
+      projectSlice.actions.setSelectedAnnotations({
+        ids: allAnnotationIds,
+      })
+    );
+  };
+
+  const handleDeselectAll = () => {
+    dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
+  };
+
+  const handleDelete = () => {
     dispatch(
       dataSlice.actions.deleteAnnotations({
         annotationIds: selectedAnnotations,
         isPermanent: true,
       })
     );
-    dispatch(
-      projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
-    );
+    dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
   };
-  const _selectAllAnnotations = () => {
-    const allAnnotationIds = allAnnotations.map((annotation) => annotation.id);
+
+  const handleClick = useCallback(
+    (id: string, selected: boolean) => {
+      if (selected) {
+        dispatch(projectSlice.actions.deselectAnnotations({ ids: id }));
+      } else {
+        dispatch(projectSlice.actions.selectAnnotations({ ids: id }));
+      }
+    },
+    [dispatch]
+  );
+
+  const handleUpdate = (categoryId: string) => {
     dispatch(
-      projectSlice.actions.setSelectedAnnotations({
-        annotationIds: allAnnotationIds,
+      dataSlice.actions.updateAnnotations({
+        updates: selectedAnnotations.map((id) => ({ id, categoryId })),
+        isPermanent: true,
       })
     );
-  };
-  const deselectAllAnnotations = () => {
-    dispatch(
-      projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
-    );
-  };
-
-  const {
-    onClose: handleCloseDeleteAnnotationssDialog,
-    onOpen: onOpenDeleteAnnotationsDialog,
-    open: deleteAnnotationsDialogisOpen,
-  } = useDialogHotkey(HotkeyView.SimpleCancelConfirmDialog);
-
-  const handleDeleteAnnotations = () => {
-    handleCloseDeleteAnnotationssDialog();
-    deleteAnnotations();
+    dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
   };
 
   const handleOpenImageViewer = () => {
@@ -132,47 +150,27 @@ export const AnnotationImageGrid = () => {
     });
   };
 
-  const handleAnnotationObjectClick = (id: string) => {
-    if (selectedAnnotations.includes(id)) {
-      dispatch(projectSlice.actions.deselectAnnotation({ annotationId: id }));
-    } else {
-      dispatch(projectSlice.actions.selectAnnotation({ annotationId: id }));
-    }
-  };
-
-  const handleUpdateCategories = (categoryId: string) => {
-    dispatch(
-      dataSlice.actions.updateAnnotations({
-        updates: selectedAnnotations.map((id) => ({ id, categoryId })),
-        isPermanent: true,
-      })
-    );
-    dispatch(
-      projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
-    );
-  };
-
-  useHotkeys("esc", () => deselectAllAnnotations(), HotkeyView.ProjectView, {
+  useHotkeys("esc", () => handleDeselectAll(), HotkeyView.ProjectView, {
     enabled: currentTab === "Annotations",
   });
   useHotkeys(
     "backspace, delete",
-    () => onOpenDeleteAnnotationsDialog(),
+    () => handleOpenDeleteAnnotationsDialog(),
     HotkeyView.ProjectView,
     { enabled: currentTab === "Annotations" }
   );
   useHotkeys(
     "control+a",
-    () => _selectAllAnnotations(),
+    () => handleSelectAll(),
     HotkeyView.ProjectView,
     { enabled: currentTab === "Annotations" },
-    [allAnnotations]
+    [visibleAnnotations]
   );
 
   useEffect(() => {
     const details: AnnotationItemDetails[] = [];
 
-    for (const annotation of allAnnotations) {
+    for (const annotation of visibleAnnotations) {
       let area = 0;
       for (let i = 0; i < annotation.encodedMask.length; i++) {
         if (i % 1 === 0) {
@@ -184,13 +182,13 @@ export const AnnotationImageGrid = () => {
         id: annotation.id,
         width: annotation.boundingBox[2] - annotation.boundingBox[0],
         height: annotation.boundingBox[3] - annotation.boundingBox[1],
-        category: annotation.categoryId,
+        category: annotation.category,
         src: annotation.src!,
         area: area,
       });
     }
     setAnnotationDetails(details);
-  }, [allAnnotations, imageById]);
+  }, [visibleAnnotations, imageById]);
 
   return (
     <>
@@ -204,9 +202,7 @@ export const AnnotationImageGrid = () => {
       >
         <div
           onClick={() => {
-            dispatch(
-              projectSlice.actions.setSelectedAnnotations({ annotationIds: [] })
-            );
+            dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
           }}
         >
           <Grid
@@ -224,9 +220,10 @@ export const AnnotationImageGrid = () => {
                 .map((details) => (
                   <AnnotationGridItem
                     selected={selectedAnnotations.includes(details.id)}
-                    handleClick={handleAnnotationObjectClick}
+                    handleClick={handleClick}
                     details={details}
                     key={details.id}
+                    category={details.category}
                   />
                 ))}
           </Grid>
@@ -237,21 +234,22 @@ export const AnnotationImageGrid = () => {
           currentTab={currentTab}
           showAppBar={selectedAnnotations.length > 0}
           selectedObjects={selectedAnnotations}
-          selectAllObjects={_selectAllAnnotations}
-          deselectAllObjects={deselectAllAnnotations}
-          handleDeleteObjects={handleDeleteAnnotations}
-          handleOpenDeleteDialog={onOpenDeleteAnnotationsDialog}
+          selectAllObjects={handleSelectAll}
+          deselectAllObjects={handleDeselectAll}
+          handleOpenDeleteDialog={handleOpenDeleteAnnotationsDialog}
           onOpenImageViewer={handleOpenImageViewer}
-          onUpdateCategories={handleUpdateCategories}
+          onUpdateCategories={handleUpdate}
         />
       )}
 
       <DialogWithAction
-        title={`Delete ${selectedAnnotations.length} image${
+        title={`Delete ${selectedAnnotations.length} annotation${
           selectedAnnotations.length > 1 ? "s" : ""
         }?`}
-        content="Annotationss will be deleted from the project."
-        onConfirm={handleDeleteAnnotations}
+        content={`The annotation${
+          selectedAnnotations.length > 1 ? "s" : ""
+        } will be permanently deleted from the project.`}
+        onConfirm={handleDelete}
         isOpen={deleteAnnotationsDialogisOpen}
         onClose={handleCloseDeleteAnnotationssDialog}
       />
