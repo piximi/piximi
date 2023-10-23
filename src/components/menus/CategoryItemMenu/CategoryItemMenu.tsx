@@ -4,7 +4,6 @@ import { Box, Menu, MenuItem, MenuList, Typography } from "@mui/material";
 
 import { useDialogHotkey } from "hooks";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
-import { StyledDivider } from "components/styled-components/";
 
 import { Category, UNKNOWN_CATEGORY_NAME, PartialBy, HotkeyView } from "types";
 
@@ -88,7 +87,6 @@ export const CategoryItemMenu = ({
           }}
           label="Hide Other"
         />
-        <StyledDivider sx={{ mx: 1, my: 1 }} />
 
         {category.name !== UNKNOWN_CATEGORY_NAME && (
           <Box>
