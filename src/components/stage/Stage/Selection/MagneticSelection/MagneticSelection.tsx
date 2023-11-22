@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/slices/imageViewer";
 import { MagneticAnnotationTool } from "annotator-tools";
 
 type MagneticSelectionProps = {

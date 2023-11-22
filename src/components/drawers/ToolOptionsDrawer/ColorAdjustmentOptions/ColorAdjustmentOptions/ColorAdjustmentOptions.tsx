@@ -9,17 +9,17 @@ import { ZStackSlider } from "../ZStackSlider";
 import { ApplyColorsButton } from "../ApplyColorsButton";
 import { ChannelsList } from "../ChannelsList";
 
-import { selectActiveImageId } from "store/imageViewer";
+import { selectActiveImageId } from "store/slices/imageViewer";
 import {
   dataSlice,
   selectActiveImageData,
   selectActiveImageShape,
-} from "store/data";
+} from "store/slices/data";
 
 import { generateDefaultColors } from "utils/common/image";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CustomListItem } from "components/list-items/CustomListItem";
-import { selectLoadMessage } from "store/project";
+import { selectLoadMessage } from "store/slices/project";
 
 //TODO: Check
 

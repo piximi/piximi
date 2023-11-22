@@ -28,12 +28,15 @@ import {
   imageViewerSlice,
   selectImageIsloading,
   selectActiveImageId,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 import {
   selectAnnotationState,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImageWidth, selectActiveImageHeight } from "store/data";
+} from "store/slices/annotator/selectors";
+import {
+  selectActiveImageWidth,
+  selectActiveImageHeight,
+} from "store/slices/data";
 
 import { AnnotationStateType, HotkeyView, ToolType } from "types";
 import { dimensions } from "utils/common";

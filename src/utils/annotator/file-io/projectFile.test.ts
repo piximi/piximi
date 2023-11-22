@@ -8,7 +8,7 @@ import {
   selectAllAnnotationCategories,
   selectAllAnnotations,
   selectAllImages,
-} from "store/data";
+} from "store/slices/data";
 import { AnnotationType, ImageType, UNKNOWN_ANNOTATION_CATEGORY } from "types";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 

@@ -4,7 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { selectSoundEnabled } from "store/applicationSettings";
+import { selectSoundEnabled } from "store/slices/applicationSettings";
 import {
   selectActiveImageId,
   selectCursor,
@@ -13,15 +13,15 @@ import {
   selectActiveAnnotationIds,
   selectWorkingAnnotation,
   imageViewerSlice,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "store/slices/annotator";
 
 import {
   dataSlice,
   selectActiveImageHeight,
   selectSelectedAnnotations,
-} from "store/data";
+} from "store/slices/data";
 
 import useSound from "use-sound";
 

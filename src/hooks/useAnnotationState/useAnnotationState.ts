@@ -1,17 +1,17 @@
 import { AnnotationTool } from "annotator-tools";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { annotatorSlice } from "store/annotator";
-import { selectAnnotationSelectionMode } from "store/annotator/selectors";
+import { annotatorSlice } from "store/slices/annotator";
+import { selectAnnotationSelectionMode } from "store/slices/annotator/selectors";
 import {
   selectActiveImageActivePlane,
   selectAnnotationCategoryById,
-} from "store/data";
+} from "store/slices/data";
 import {
   selectActiveImageId,
   selectSelectedAnnotationCategoryId,
-} from "store/imageViewer";
-import { RootState } from "store/reducer/reducer";
+} from "store/slices/imageViewer";
+import { RootState } from "store/rootReducer";
 import { AnnotationModeType, AnnotationStateType } from "types";
 
 export const useAnnotationState = (annotationTool: AnnotationTool) => {

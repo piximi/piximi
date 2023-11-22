@@ -15,7 +15,7 @@ import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { InformationBox } from "./InformationBox";
 import { BaseOptions } from "./BaseOptions";
 
-import { selectToolType } from "store/annotator/selectors";
+import { selectToolType } from "store/slices/annotator/selectors";
 
 import { ToolType } from "types";
 

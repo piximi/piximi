@@ -4,7 +4,7 @@ import {
   classifierSlice,
   selectClassifierCropOptions,
   selectClassifierRescaleOptions,
-} from "store/classifier";
+} from "store/slices/classifier";
 import { CollapsibleListItem } from "../CollapsibleListItem";
 import { PreprocessingSettings } from "components/forms";
 import { CropOptions, RescaleOptions } from "types";

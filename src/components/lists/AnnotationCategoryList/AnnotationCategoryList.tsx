@@ -14,20 +14,20 @@ import {
   selectFilteredAnnotationCategoryIds as selectImageViewerFilteredAnnotationCategoryIds,
   selectSelectedAnnotationIds,
   selectWorkingAnnotation,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 import {
   dataSlice,
   selectActiveAnnotationCountsByCategory,
   selectAnnotationCategoryNames,
   selectAnnotationsByCategoryDict,
   selectUnusedAnnotationCategoryColors,
-} from "store/data";
+} from "store/slices/data";
 
 import {
   projectSlice,
   selectSelectedAnnotations,
   selectFilteredAnnotationCategoryIds as selectProjectFilteredAnnotationCategoryIds,
-} from "store/project";
+} from "store/slices/project";
 import { useHotkeys } from "hooks";
 import { CategoryContext } from "contexts";
 

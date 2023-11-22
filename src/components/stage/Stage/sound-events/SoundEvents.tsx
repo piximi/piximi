@@ -3,7 +3,7 @@ import { memo } from "react";
 import useSound from "use-sound";
 import { useHotkeys } from "hooks";
 
-import { selectSoundEnabled } from "store/applicationSettings";
+import { selectSoundEnabled } from "store/slices/applicationSettings";
 
 import { HotkeyView } from "types";
 

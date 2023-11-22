@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
-import { dataSlice, selectActiveImageRawColor } from "store/data";
-import { selectImageStackImageIds } from "store/imageViewer";
+import { dataSlice, selectActiveImageRawColor } from "store/slices/data";
+import { selectImageStackImageIds } from "store/slices/imageViewer";
 import { tensor2d } from "@tensorflow/tfjs";
 
 export const ApplyColorsButton = () => {

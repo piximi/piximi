@@ -4,10 +4,10 @@ import { useHotkeys } from "hooks";
 
 import { TextField } from "@mui/material";
 
-import { classifierSlice } from "store/classifier";
-import { projectSlice } from "store/project";
+import { classifierSlice } from "store/slices/classifier";
+import { projectSlice } from "store/slices/project";
 import { HotkeyView } from "types";
-import { dataSlice } from "store/data";
+import { dataSlice } from "store/slices/data";
 import { DialogWithAction } from "../DialogWithAction";
 
 type NewProjectDialogProps = {

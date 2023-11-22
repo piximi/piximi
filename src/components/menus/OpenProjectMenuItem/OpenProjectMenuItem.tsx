@@ -3,16 +3,16 @@ import { batch, useDispatch } from "react-redux";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { classifierSlice } from "store/classifier";
-import { projectSlice } from "store/project";
-import { segmenterSlice } from "store/segmenter";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { classifierSlice } from "store/slices/classifier";
+import { projectSlice } from "store/slices/project";
+import { segmenterSlice } from "store/slices/segmenter";
 
 import { deserialize } from "utils/common/image/deserialize";
 
 import { AlertStateType, AlertType } from "types";
-import { imageViewerSlice } from "store/imageViewer";
-import { dataSlice } from "store/data";
+import { imageViewerSlice } from "store/slices/imageViewer";
+import { dataSlice } from "store/slices/data";
 import { fListToStore } from "utils";
 
 //TODO: MenuItem??

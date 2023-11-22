@@ -14,7 +14,7 @@ import {
 } from "components/list-items";
 import { DialogTransitionSlide } from "components/dialogs";
 
-import { selectAlertState } from "store/applicationSettings";
+import { selectAlertState } from "store/slices/applicationSettings";
 import {
   selectClassifierSelectedModel,
   selectClassifierHistory,
@@ -22,8 +22,8 @@ import {
   selectClassifierFitOptions,
   selectClassifierTrainingPercentage,
   classifierSlice,
-} from "store/classifier";
-import { selectImagesByPartitions } from "store/data";
+} from "store/slices/classifier";
+import { selectImagesByPartitions } from "store/slices/data";
 
 import { AlertStateType, AlertType, Partition } from "types";
 import { ModelStatus } from "types/ModelType";

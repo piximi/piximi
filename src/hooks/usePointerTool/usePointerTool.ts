@@ -1,14 +1,14 @@
 import { useCallback, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { selectActiveAnnotations } from "store/data";
+import { selectActiveAnnotations } from "store/slices/data";
 import { useHotkeys } from "hooks/useHotkeys";
 import {
   selectActiveImageId,
   imageViewerSlice,
   setSelectedAnnotationIds,
   setSelectedCategoryId,
-} from "store/imageViewer";
-import { setWorkingAnnotation } from "store/imageViewer/imageViewerSlice";
+} from "store/slices/imageViewer";
+import { setWorkingAnnotation } from "store/slices/imageViewer/imageViewerSlice";
 import { DecodedAnnotationType, HotkeyView, Point, ToolType } from "types";
 import {
   getAnnotationsInBox,

@@ -8,7 +8,7 @@ import {
   LabelImportant as LabelImportantIcon,
 } from "@mui/icons-material";
 
-import { selectAllImageCategories } from "store/data";
+import { selectAllImageCategories } from "store/slices/data";
 
 import {
   Category,

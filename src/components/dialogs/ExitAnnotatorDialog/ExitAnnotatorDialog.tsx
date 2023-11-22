@@ -1,7 +1,10 @@
 import { batch, useDispatch, useSelector } from "react-redux";
 import { DialogWithAction } from "../DialogWithAction";
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
-import { dataSlice } from "store/data";
+import {
+  imageViewerSlice,
+  selectActiveImageId,
+} from "store/slices/imageViewer";
+import { dataSlice } from "store/slices/data";
 
 type ExitAnnotatorDialogProps = {
   onReturnToProject: () => void;

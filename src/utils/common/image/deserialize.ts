@@ -21,9 +21,9 @@ import {
   LoadCB,
 } from "types";
 import { Colors } from "types/tensorflow";
-import { initialState as initialClassifierState } from "store/classifier/classifierSlice";
-import { initialState as initialProjectState } from "store/project/projectSlice";
-import { initialState as initialSegmenterState } from "store/segmenter/segmenterSlice";
+import { initialState as initialClassifierState } from "store/slices/classifier/classifierSlice";
+import { initialState as initialProjectState } from "store/slices/project/projectSlice";
+import { initialState as initialSegmenterState } from "store/slices/segmenter/segmenterSlice";
 import { CustomStore } from "utils/common/zarrStores";
 import { RawArray } from "zarr/types/rawArray";
 

@@ -7,7 +7,7 @@ import { ProjectToolbar } from "../ProjectToolbar";
 
 import { AlertBar } from "components/app-bars";
 
-import { selectAlertState } from "store/applicationSettings";
+import { selectAlertState } from "store/slices/applicationSettings";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 
 export const ProjectAppBar = () => {

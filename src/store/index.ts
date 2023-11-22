@@ -1,3 +1,3 @@
-export { reducer } from "./reducer";
-export { rootSaga } from "./sagas/rootSaga";
-export { productionStore } from "./stores";
+export { rootReducer } from "./rootReducer";
+export { rootSaga } from "./rootSaga";
+export { productionStore } from "./productionStore";

@@ -14,13 +14,13 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
 } from "utils/annotator/imageHelper";
 
-import { selectProjectName } from "store/project";
+import { selectProjectName } from "store/slices/project";
 import {
   selectAllImageCategories,
   selectAllAnnotationCategories,
   selectSelectedImages,
   selectAllAnnotations,
-} from "store/data";
+} from "store/slices/data";
 
 import { ExportAnnotationsDialog } from "components/dialogs";
 

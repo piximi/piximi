@@ -7,23 +7,23 @@ import {
   dataSlice,
   selectImageById,
   selectVisibleAnnotations,
-} from "store/data";
+} from "store/slices/data";
 
-import { selectImageIdByAnnotation } from "store/data/selectors/annotation/annotationSelectors";
-import { imageViewerSlice } from "store/imageViewer";
+import { selectImageIdByAnnotation } from "store/slices/data/selectors/annotation/annotationSelectors";
+import { imageViewerSlice } from "store/slices/imageViewer";
 import {
   projectSlice,
   selectImageSortType,
   selectSelectedAnnotations,
   selectImageGridTab,
-} from "store/project";
-import { selectSelectedImageIds } from "store/project/selectors";
+} from "store/slices/project";
+import { selectSelectedImageIds } from "store/slices/project/selectors";
 import { AnnotationGridItem } from "../AnnotationGridItem/AnnotationGridItem";
 import { useDialogHotkey, useHotkeys } from "hooks";
 import { Category, HotkeyView, Partition, ToolType } from "types";
 import { DialogWithAction } from "components/dialogs";
 import { GridItemActionBar } from "components/app-bars";
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "store/slices/annotator";
 
 // type AnnotationObjectGridProps = {
 //   onDrop: (files: FileList) => void;

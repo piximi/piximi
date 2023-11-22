@@ -3,13 +3,16 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import {
   applicationSettingsSlice,
   selectInitSettings,
-} from "store/applicationSettings";
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+} from "store/slices/applicationSettings";
+import {
+  imageViewerSlice,
+  selectActiveImageId,
+} from "store/slices/imageViewer";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import { SerializedFileType } from "types";
-import { dataSlice, selectImageCount } from "store/data";
+import { dataSlice, selectImageCount } from "store/slices/data";
 
 export enum DispatchLocation {
   Project,

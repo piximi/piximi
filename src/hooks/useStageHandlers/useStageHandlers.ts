@@ -10,14 +10,14 @@ import {
   setSelectedAnnotationIds,
   selectSelectedAnnotationIds,
   selectWorkingAnnotation,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 
 import {
   selectAnnotationSelectionMode,
   selectToolType,
-} from "store/annotator/selectors";
+} from "store/slices/annotator/selectors";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "store/slices/annotator";
 
 import {
   DecodedAnnotationType,

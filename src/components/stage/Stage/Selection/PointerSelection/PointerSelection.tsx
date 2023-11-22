@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/slices/imageViewer";
 
 type PointerSelectionProps = {
   dragging: boolean;

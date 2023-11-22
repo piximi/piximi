@@ -10,8 +10,8 @@ import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 import {
   registerHotkeyView,
   unregisterHotkeyView,
-} from "store/applicationSettings";
-import { projectSlice } from "store/project";
+} from "store/slices/applicationSettings";
+import { projectSlice } from "store/slices/project";
 
 import { HotkeyView, ImageGridTab } from "types";
 import { ProjectDrawer } from "components/drawers";
@@ -19,7 +19,7 @@ import { ProjectAppBar } from "components/app-bars";
 import { CustomTabSwitcher } from "components/styled-components";
 import { AnnotationImageGrid, ImageGrid } from "components/image-grids";
 import { FallBackDialog } from "components/dialogs";
-import { selectTotalAnnotationCount } from "store/data";
+import { selectTotalAnnotationCount } from "store/slices/data";
 
 const tabs: Array<ImageGridTab> = ["Images", "Annotations"];
 

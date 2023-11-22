@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   classifierSlice,
   selectClassifierCompileOptions,
-} from "store/classifier";
+} from "store/slices/classifier";
 import { FitOptions, LossFunction, OptimizationAlgorithm } from "types";
 
 export const ClassifierOptimizerListItem = ({

@@ -5,8 +5,11 @@ import { List, SvgIcon } from "@mui/material";
 
 import { useAnnotationTool, useTranslation } from "hooks";
 
-import { imageViewerSlice, selectWorkingAnnotation } from "store/imageViewer";
-import { dataSlice } from "store/data";
+import {
+  imageViewerSlice,
+  selectWorkingAnnotation,
+} from "store/slices/imageViewer";
+import { dataSlice } from "store/slices/data";
 
 import { ReactComponent as InvertSelectionIcon } from "icons/InvertAnnotation.svg";
 import { encode } from "utils/annotator";

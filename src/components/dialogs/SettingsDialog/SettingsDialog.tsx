@@ -28,8 +28,8 @@ import {
   selectThemeMode,
   setThemeMode,
   selectSoundEnabled,
-} from "store/applicationSettings";
-import { selectUnusedImageCategoryColors } from "store/data";
+} from "store/slices/applicationSettings";
+import { selectUnusedImageCategoryColors } from "store/slices/data";
 
 import { ThemeMode } from "types";
 

@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { ColorAnnotationToolTip } from "../../ColorAnnotationToolTip";
 
 import { ColorAnnotationTool } from "annotator-tools";
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/slices/imageViewer";
 
 type ColorSelectionProps = {
   operator: ColorAnnotationTool;

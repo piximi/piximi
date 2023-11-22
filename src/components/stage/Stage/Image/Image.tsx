@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import * as ReactKonva from "react-konva";
 import Konva from "konva";
 
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/slices/imageViewer";
 import {
   selectActiveImageActivePlane,
   selectActiveImageWidth,
   selectActiveImageHeight,
-} from "store/data";
+} from "store/slices/data";
 
 import { Point } from "types";
 

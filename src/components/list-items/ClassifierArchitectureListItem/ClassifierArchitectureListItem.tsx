@@ -6,7 +6,7 @@ import {
   classifierSlice,
   selectClassifierInputShape,
   selectClassifierSelectedModelIdx,
-} from "store/classifier";
+} from "store/slices/classifier";
 
 const modelOptions = availableClassifierModels
   .map((m, i) => ({

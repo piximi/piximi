@@ -17,7 +17,7 @@ import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   classifierSlice,
-} from "store/classifier";
+} from "store/slices/classifier";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";

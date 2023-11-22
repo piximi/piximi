@@ -6,12 +6,12 @@ import { List, ListSubheader, Radio, RadioGroup } from "@mui/material";
 import { useTranslation } from "hooks";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "store/slices/annotator";
 import {
   selectAnnotationState,
   selectAnnotationSelectionMode,
-} from "store/annotator/selectors";
-import { selectWorkingAnnotation } from "store/imageViewer";
+} from "store/slices/annotator/selectors";
+import { selectWorkingAnnotation } from "store/slices/imageViewer";
 
 import { AnnotationModeType, AnnotationStateType } from "types";
 

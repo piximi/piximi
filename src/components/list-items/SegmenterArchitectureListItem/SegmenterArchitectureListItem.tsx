@@ -5,7 +5,7 @@ import {
   segmenterSlice,
   selectSegmenterInputShape,
   selectSegmenterModelIdx,
-} from "store/segmenter";
+} from "store/slices/segmenter";
 import { availableSegmenterModels } from "types/ModelType";
 
 const modelOptions = availableSegmenterModels

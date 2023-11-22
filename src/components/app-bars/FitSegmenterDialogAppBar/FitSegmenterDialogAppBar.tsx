@@ -21,7 +21,7 @@ import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
   segmenterSlice,
-} from "store/segmenter";
+} from "store/slices/segmenter";
 import { ModelStatus } from "types/ModelType";
 
 type FitSegmenterDialogAppBarProps = {

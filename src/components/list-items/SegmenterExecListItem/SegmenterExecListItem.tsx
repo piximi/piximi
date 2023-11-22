@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/material";
 
-import { segmenterSlice, selectSegmenterModelStatus } from "store/segmenter";
+import {
+  segmenterSlice,
+  selectSegmenterModelStatus,
+} from "store/slices/segmenter";
 
 import { ModelStatus } from "types/ModelType";
 import { useDialogHotkey } from "hooks";
