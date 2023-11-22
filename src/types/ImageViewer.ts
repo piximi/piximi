@@ -1,15 +1,16 @@
-import { DecodedAnnotationType } from "./AnnotationType";
+import { AnnotationType, DecodedAnnotationType } from "./AnnotationType";
 import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
 import { ZoomToolOptionsType } from "./ZoomToolOptionsType";
+import { FilterType } from "./utility/FilterType";
 
-export type ImageViewerStore = {
+export type ImageViewer = {
   imageStack: string[];
   colorAdjustment: ColorAdjustmentOptionsType;
   cursor: string;
   activeImageId?: string;
   activeAnnotationIds: Array<string>;
   previousImageId?: string;
-  hiddenCategoryIds: string[];
+  annotationFilters: Required<Pick<FilterType<AnnotationType>, "categoryId">>;
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;

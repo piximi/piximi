@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { HotkeyView, Settings } from "../../types/Settings";
+import {
+  HotkeyView,
+  ApplicationSettings,
+} from "../../types/ApplicationSettings";
 import { ThemeMode } from "types/ThemeMode";
 import { AlertStateType, defaultAlert } from "types/AlertStateType";
 import { LanguageType } from "types";
 
-const initialState: Settings = {
+const initialState: ApplicationSettings = {
   init: false,
-  selectedImages: [],
   tileSize: 1,
   themeMode: ThemeMode.Light,
   language: LanguageType.English,
@@ -17,31 +19,15 @@ const initialState: Settings = {
   hotkeyStack: [],
 };
 
-export const applicationSlice = createSlice({
-  name: "settings",
+export const applicationSettingsSlice = createSlice({
+  name: "application",
   initialState: initialState,
   reducers: {
-    initialized(state: Settings) {
+    initialized(state: ApplicationSettings) {
       state.init = true;
     },
-    resetApplicationSetings(state: Settings) {
+    resetApplicationSettingsSetings(state: ApplicationSettings) {
       return initialState;
-    },
-    clearSelectedImages(state: Settings) {
-      state.selectedImages = [];
-    },
-    deselectImage(state: Settings, action: PayloadAction<{ id: string }>) {
-      state.selectedImages = state.selectedImages.filter(
-        (id: string) => id !== action.payload.id
-      );
-    },
-    deselectImages(
-      state: Settings,
-      action: PayloadAction<{ ids: Array<string> }>
-    ) {
-      state.selectedImages = state.selectedImages.filter(
-        (id: string) => !action.payload.ids.includes(id)
-      );
     },
 
     hideAlertState(state, action: PayloadAction<{}>) {
@@ -57,18 +43,21 @@ export const applicationSlice = createSlice({
       state.language = action.payload.language;
     },
     setImageSelectionColor(
-      state: Settings,
+      state: ApplicationSettings,
       action: PayloadAction<{ selectionColor: string }>
     ) {
       state.imageSelectionColor = action.payload.selectionColor;
     },
     setSelectedImageBorderWidth(
-      state: Settings,
+      state: ApplicationSettings,
       action: PayloadAction<{ selectionSize: number }>
     ) {
       state.selectedImageBorderWidth = action.payload.selectionSize;
     },
-    setThemeMode(state: Settings, action: PayloadAction<{ mode: ThemeMode }>) {
+    setThemeMode(
+      state: ApplicationSettings,
+      action: PayloadAction<{ mode: ThemeMode }>
+    ) {
       state.themeMode = action.payload.mode;
     },
     setSoundEnabled(state, action: PayloadAction<{ soundEnabled: boolean }>) {
@@ -85,7 +74,7 @@ export const applicationSlice = createSlice({
       state.alertState.visible = true;
     },
     updateTileSize(
-      state: Settings,
+      state: ApplicationSettings,
       action: PayloadAction<{ newValue: number }>
     ) {
       state.tileSize = action.payload.newValue!;
@@ -100,4 +89,4 @@ export const {
   setThemeMode,
   unregisterHotkeyView,
   updateAlertState,
-} = applicationSlice.actions;
+} = applicationSettingsSlice.actions;

@@ -2,7 +2,7 @@ import { ToolType } from "./ToolType";
 import { AnnotationModeType } from "./AnnotationModeType";
 import { AnnotationStateType } from "./AnnotationStateType";
 
-export type AnnotatorStore = {
+export type Annotator = {
   annotationState: AnnotationStateType;
   penSelectionBrushSize: number;
   quickSelectionRegionSize: number;

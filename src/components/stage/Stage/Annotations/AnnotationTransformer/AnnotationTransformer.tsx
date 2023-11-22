@@ -4,7 +4,7 @@ import Konva from "konva";
 import * as ReactKonva from "react-konva";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { selectSoundEnabled } from "store/application";
+import { selectSoundEnabled } from "store/applicationSettings";
 import {
   selectActiveImageId,
   selectCursor,

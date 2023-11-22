@@ -1,9 +1,9 @@
-import { ImageViewerStore, ZoomToolOptionsType } from "types";
+import { ImageViewer, ZoomToolOptionsType } from "types";
 
 export const selectZoomToolOptions = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewerStore;
+  imageViewer: ImageViewer;
 }): ZoomToolOptionsType => {
   return imageViewer.zoomOptions;
 };

@@ -19,7 +19,7 @@ import {
 
 import { selectCreatedImageCategories } from "store/data";
 
-import { CategoryType, HotkeyView, Shape } from "types";
+import { HotkeyView, Shape } from "types";
 import { ModelStatus, ModelTask } from "types/ModelType";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 import { Model } from "utils/common/models/Model";
@@ -88,7 +88,6 @@ export const ClassifierList = () => {
       </DividerHeader>
       <ImageCategoryList
         createdCategories={categories}
-        categoryType={CategoryType.ImageCategory}
         hasPredicted={modelStatus === ModelStatus.Suggesting}
         hotkeysActive={tabIndex === 0}
       />

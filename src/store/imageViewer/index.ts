@@ -32,7 +32,7 @@ export { selectStagePosition } from "./selectors/selectStagePosition";
 export { selectStageScale } from "./selectors/selectStageScale";
 export { selectStageWidth } from "./selectors/selectStageWidth";
 export { selectImageOrigin } from "./selectors/selectImageOrigin";
-export { selectHiddenAnnotationCategoryIds } from "./selectors/selectHiddenAnnotationCategoryIds";
+export { selectFilteredAnnotationCategoryIds } from "./selectors/selectFilteredAnnotationCategoryIds";
 export {
   selectSelectedAnnotationIds,
   selectSelectedAnnotationIdsCount,

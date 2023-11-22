@@ -9,7 +9,7 @@ import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AppBarOffset } from "../../styled-components/AppBarOffset/AppBarOffset";
 import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertType } from "types";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
@@ -31,7 +31,7 @@ export const HelpDrawer = () => {
 
   const handleError = (error: Error, info: { componentStack: string }) => {
     dispatch(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Error,
           name: helpContent.error,

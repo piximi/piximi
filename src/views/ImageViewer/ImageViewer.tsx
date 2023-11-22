@@ -24,10 +24,10 @@ import { StageWrapper } from "components/stage/StageWrapper";
 
 import {
   selectAlertState,
-  applicationSlice,
+  applicationSettingsSlice,
   registerHotkeyView,
   unregisterHotkeyView,
-} from "store/application";
+} from "store/applicationSettings";
 
 import { getStackTraceFromError } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
@@ -78,7 +78,7 @@ export const ImageViewer = () => {
       var error = e.error as Error;
       const stackTrace = await getStackTraceFromError(error);
       dispatch(
-        applicationSlice.actions.updateAlertState({
+        applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
             name: error.name,
@@ -95,7 +95,7 @@ export const ImageViewer = () => {
     async (e: any) => {
       e.preventDefault();
       dispatch(
-        applicationSlice.actions.updateAlertState({
+        applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
             name: "Uncaught promise rejection",

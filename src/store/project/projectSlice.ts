@@ -2,19 +2,20 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Project } from "types/Project";
 import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
-import { mutatingFilter } from "utils/common/helpers";
-import { ImageGridTab } from "types";
+import { distinctFilter, mutatingFilter } from "utils/common/helpers";
+import { ImageGridTab, Partition } from "types";
 
 export const initialState: Project = {
   selectedImageIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
   highlightedCategory: undefined,
-  hiddenImageCategoryIds: [],
   selectedAnnotationIds: [],
   imageGridTab: "Images",
   loadPercent: 1,
   loadMessage: "",
+  imageFilters: { categoryId: [], partition: [] },
+  annotationFilters: { categoryId: [] },
 };
 
 export const projectSlice = createSlice({
@@ -103,73 +104,6 @@ export const projectSlice = createSlice({
           ? [action.payload.ids]
           : action.payload.ids;
     },
-    hideCategory(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      !state.hiddenImageCategoryIds.includes(action.payload.categoryId) &&
-        state.hiddenImageCategoryIds.push(action.payload.categoryId);
-    },
-    hideCategories(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[];
-      }>
-    ) {
-      for (const categoryId of action.payload.categoryIds) {
-        projectSlice.caseReducers.hideCategory(state, {
-          type: "hideCategory",
-          payload: { categoryId },
-        });
-      }
-    },
-    showCategory(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      mutatingFilter(
-        state.hiddenImageCategoryIds,
-        (categoryId) => categoryId !== action.payload.categoryId
-      );
-    },
-    showCategories(
-      state,
-      action: PayloadAction<{
-        categoryIds?: string[];
-      }>
-    ) {
-      if (!action.payload.categoryIds) {
-        state.hiddenImageCategoryIds = [];
-        return;
-      }
-      for (const categoryId of action.payload.categoryIds) {
-        projectSlice.caseReducers.showCategory(state, {
-          type: "showCategory",
-          payload: { categoryId },
-        });
-      }
-    },
-    toggleCategoryVisibility(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      const { categoryId } = action.payload;
-
-      if (state.hiddenImageCategoryIds.includes(categoryId)) {
-        mutatingFilter(
-          state.hiddenImageCategoryIds,
-          (id) => id !== action.payload.categoryId
-        );
-      } else {
-        state.hiddenImageCategoryIds.push(categoryId);
-      }
-    },
 
     sortImagesBySelectedKey(
       state,
@@ -215,6 +149,96 @@ export const projectSlice = createSlice({
       action: PayloadAction<{ categoryId: string | undefined }>
     ) {
       state.highlightedCategory = action.payload.categoryId;
+    },
+    addImageCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.imageFilters["categoryId"],
+        ...action.payload.categoryIds,
+      ].filter(distinctFilter);
+      state.imageFilters["categoryId"] = newFilters;
+    },
+    removeImageCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.imageFilters["categoryId"] = [];
+        return;
+      }
+      if (action.payload.categoryIds) {
+        mutatingFilter(
+          state.imageFilters["categoryId"],
+          (id) => !action.payload.categoryIds!.includes(id)
+        );
+      }
+    },
+    addImagePartitionFilters(
+      state,
+      action: PayloadAction<{
+        partitions: Partition[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.imageFilters["partition"],
+        ...action.payload.partitions,
+      ].filter(distinctFilter);
+      state.imageFilters["partition"] = newFilters;
+    },
+    removeImagePartitionFilters(
+      state,
+      action: PayloadAction<{
+        partitions?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.imageFilters["partition"] = [];
+        return;
+      }
+      if (action.payload.partitions) {
+        mutatingFilter(
+          state.imageFilters["partition"],
+          (partition) => !action.payload.partitions!.includes(partition)
+        );
+      }
+    },
+    addAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.annotationFilters["categoryId"],
+        ...action.payload.categoryIds,
+      ].filter(distinctFilter);
+      state.annotationFilters["categoryId"] = newFilters;
+    },
+    removeAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.annotationFilters["categoryId"] = [];
+        return;
+      }
+      if (action.payload.categoryIds) {
+        mutatingFilter(
+          state.annotationFilters["categoryId"],
+          (id) => !action.payload.categoryIds!.includes(id)
+        );
+      }
     },
   },
 });

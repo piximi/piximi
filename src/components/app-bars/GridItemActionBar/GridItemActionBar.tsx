@@ -25,7 +25,7 @@ import {
 import { ImageCategoryMenu } from "../../menus/ImageCategoryMenu";
 import { TooltipTitle } from "components/tooltips";
 
-import { unregisterHotkeyView } from "store/application";
+import { unregisterHotkeyView } from "store/applicationSettings";
 
 import { HotkeyView, ImageGridTab } from "types";
 import {

@@ -1,12 +1,9 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { SegmenterStoreType } from "types";
+import { Segmenter } from "types";
 import { availableSegmenterModels } from "types/ModelType";
 
-const selectedIdxSelector = ({
-  segmenter,
-}: {
-  segmenter: SegmenterStoreType;
-}) => segmenter.selectedModelIdx;
+const selectedIdxSelector = ({ segmenter }: { segmenter: Segmenter }) =>
+  segmenter.selectedModelIdx;
 
 export const selectSegmenterModelIdx = createSelector(
   selectedIdxSelector,

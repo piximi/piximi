@@ -2,16 +2,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
-  ImageViewerStore,
+  ImageViewer,
   ColorAdjustmentOptionsType,
   ZoomModeType,
   ZoomToolOptionsType,
   DecodedAnnotationType,
 } from "types";
 
-import { mutatingFilter } from "utils/common/helpers";
+import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
-const initialState: ImageViewerStore = {
+const initialState: ImageViewer = {
   imageStack: [],
 
   colorAdjustment: {
@@ -30,7 +30,7 @@ const initialState: ImageViewerStore = {
   activeAnnotationIds: [],
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
-  hiddenCategoryIds: [],
+  annotationFilters: { categoryId: [] },
   workingAnnotationId: undefined,
   workingAnnotation: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
@@ -214,72 +214,6 @@ export const imageViewerSlice = createSlice({
         state.workingAnnotation.changes = action.payload.changes;
       }
     },
-    hideCategory(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      !state.hiddenCategoryIds.includes(action.payload.categoryId) &&
-        state.hiddenCategoryIds.push(action.payload.categoryId);
-    },
-    hideCategories(
-      state,
-      action: PayloadAction<{
-        categoryIds: string[];
-      }>
-    ) {
-      for (const categoryId of action.payload.categoryIds) {
-        imageViewerSlice.caseReducers.hideCategory(state, {
-          type: "hideCategory",
-          payload: { categoryId },
-        });
-      }
-    },
-    showCategory(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      mutatingFilter(
-        state.hiddenCategoryIds,
-        (categoryId) => categoryId !== action.payload.categoryId
-      );
-    },
-    showCategories(
-      state,
-      action: PayloadAction<{
-        categoryIds?: string[];
-      }>
-    ) {
-      if (!action.payload.categoryIds) {
-        state.hiddenCategoryIds = [];
-        return;
-      }
-      for (const categoryId of action.payload.categoryIds) {
-        imageViewerSlice.caseReducers.showCategory(state, {
-          type: "showCategory",
-          payload: { categoryId },
-        });
-      }
-    },
-    toggleCategoryVisibility(
-      state,
-      action: PayloadAction<{
-        categoryId: string;
-      }>
-    ) {
-      const { categoryId } = action.payload;
-      if (state.hiddenCategoryIds.includes(categoryId)) {
-        mutatingFilter(
-          state.hiddenCategoryIds,
-          (id) => id !== action.payload.categoryId
-        );
-      } else {
-        state.hiddenCategoryIds.push(categoryId);
-      }
-    },
     setSelectedCategoryId(
       state,
       action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
@@ -386,6 +320,36 @@ export const imageViewerSlice = createSlice({
       action: PayloadAction<{ categoryId: string | undefined }>
     ) {
       state.highlightedCategory = action.payload.categoryId;
+    },
+    addAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.annotationFilters["categoryId"],
+        ...action.payload.categoryIds,
+      ].filter(distinctFilter);
+      state.annotationFilters["categoryId"] = newFilters;
+    },
+    removeAnnotationCategoryFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.annotationFilters["categoryId"] = [];
+        return;
+      }
+      if (action.payload.categoryIds) {
+        mutatingFilter(
+          state.annotationFilters["categoryId"],
+          (id) => !action.payload.categoryIds!.includes(id)
+        );
+      }
     },
   },
 });

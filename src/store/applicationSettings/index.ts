@@ -1,9 +1,9 @@
 export {
-  applicationSlice,
+  applicationSettingsSlice,
   setThemeMode,
   registerHotkeyView,
   unregisterHotkeyView,
-} from "./applicationSlice";
+} from "./applicationSettingsSlice";
 
 // Selectors
 

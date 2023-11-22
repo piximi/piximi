@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Category,
-  CategoryType,
   HotkeyView,
   PartialBy,
   UNKNOWN_ANNOTATION_CATEGORY,
@@ -12,10 +11,8 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import {
   selectActiveImageId,
   imageViewerSlice,
-  selectHiddenAnnotationCategoryIds,
+  selectFilteredAnnotationCategoryIds as selectImageViewerFilteredAnnotationCategoryIds,
   selectSelectedAnnotationIds,
-  updateHighlightedAnnotationCategory,
-  selectHighligtedAnnotationCatogory,
   selectWorkingAnnotation,
 } from "store/imageViewer";
 import {
@@ -26,15 +23,20 @@ import {
   selectUnusedAnnotationCategoryColors,
 } from "store/data";
 
-import { selectSelectedAnnotations } from "store/project";
+import {
+  projectSlice,
+  selectSelectedAnnotations,
+  selectFilteredAnnotationCategoryIds as selectProjectFilteredAnnotationCategoryIds,
+} from "store/project";
 import { useHotkeys } from "hooks";
+import { CategoryContext } from "contexts";
 
 type AnnotationCategoryListProps = {
   createdCategories: Array<Category>;
-  categoryType: CategoryType;
   hasPredicted?: boolean;
   hotkeysActive?: boolean;
   changesPermanent?: boolean;
+  view: "Project" | "ImageViewer";
 };
 
 export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
@@ -43,65 +45,68 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     hasPredicted,
     hotkeysActive,
     changesPermanent,
+    view,
   } = props;
   const dispatch = useDispatch();
   const [selectedCategory, setSelectedCategory] = useState<Category>();
+  const [highlightedCategory, setHighlightedCategory] = useState<string>();
   const selectedAnnotations = useSelector(selectSelectedAnnotationIds);
   const selectedAnnotationObjects = useSelector(selectSelectedAnnotations);
   const [categoryIndex, setCategoryIndex] = useState("");
-  const highlightedCategory = useSelector(selectHighligtedAnnotationCatogory);
-  const hiddenAnnotationCategories = useSelector(
-    selectHiddenAnnotationCategoryIds
+  const imageViewerFilteredAnnotationCategories = useSelector(
+    selectImageViewerFilteredAnnotationCategoryIds
+  );
+  const projectFilteredAnnotationCategories = useSelector(
+    selectProjectFilteredAnnotationCategoryIds
   );
   const annotationsByCategory = useSelector(selectAnnotationsByCategoryDict);
   const workingAnnotation = useSelector(selectWorkingAnnotation);
-  const usedAnnotationCategoryNames = useSelector(
-    selectAnnotationCategoryNames
-  );
-  const unusedAnnotationCategoryColors = useSelector(
-    selectUnusedAnnotationCategoryColors
-  );
+  const unavailableNames = useSelector(selectAnnotationCategoryNames);
+  const availableColors = useSelector(selectUnusedAnnotationCategoryColors);
   const activeAnnotationCountsByCategory = useSelector(
     selectActiveAnnotationCountsByCategory
   );
   const activeImageId = useSelector(selectActiveImageId);
 
-  const handleSelectCategory = useCallback(
+  const selectCategory = useCallback(
     (category: Category) => {
       setSelectedCategory(category);
+      setHighlightedCategory(category.id);
 
-      dispatch(
-        imageViewerSlice.actions.setSelectedCategoryId({
-          selectedCategoryId: category.id,
-          execSaga: true,
-        })
-      );
+      if (view === "ImageViewer") {
+        dispatch(
+          imageViewerSlice.actions.setSelectedCategoryId({
+            selectedCategoryId: category.id,
+            execSaga: true,
+          })
+        );
 
-      if (selectedAnnotations.length > 0) {
-        dispatch(
-          dataSlice.actions.updateAnnotations({
-            updates: selectedAnnotations.map((id) => ({
-              id,
-              categoryId: category.id,
-            })),
-          })
-        );
-      } else if (selectedAnnotationObjects.length > 0) {
-        dispatch(
-          dataSlice.actions.updateAnnotations({
-            updates: selectedAnnotationObjects.map((id) => ({
-              id,
-              categoryId: category.id,
-            })),
-            isPermanent: true,
-          })
-        );
-      } else if (workingAnnotation) {
-        dispatch(
-          imageViewerSlice.actions.updateWorkingAnnotation({
-            changes: { categoryId: category.id },
-          })
-        );
+        if (selectedAnnotations.length > 0) {
+          dispatch(
+            dataSlice.actions.updateAnnotations({
+              updates: selectedAnnotations.map((id) => ({
+                id,
+                categoryId: category.id,
+              })),
+            })
+          );
+        } else if (selectedAnnotationObjects.length > 0) {
+          dispatch(
+            dataSlice.actions.updateAnnotations({
+              updates: selectedAnnotationObjects.map((id) => ({
+                id,
+                categoryId: category.id,
+              })),
+              isPermanent: true,
+            })
+          );
+        } else if (workingAnnotation) {
+          dispatch(
+            imageViewerSlice.actions.updateWorkingAnnotation({
+              changes: { categoryId: category.id },
+            })
+          );
+        }
       }
     },
     [
@@ -109,21 +114,52 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
       selectedAnnotations,
       selectedAnnotationObjects,
       workingAnnotation,
+      view,
     ]
   );
 
-  const handleToggleCategoryVisibility = useCallback(
+  const toggleCategoryFilter = useCallback(
     (category: Category) => {
-      dispatch(
-        imageViewerSlice.actions.toggleCategoryVisibility({
-          categoryId: category.id,
-        })
-      );
+      console.log(view);
+      if (view === "ImageViewer") {
+        if (imageViewerFilteredAnnotationCategories.includes(category.id)) {
+          dispatch(
+            imageViewerSlice.actions.removeAnnotationCategoryFilters({
+              categoryIds: [category.id],
+            })
+          );
+        } else {
+          dispatch(
+            imageViewerSlice.actions.addAnnotationCategoryFilters({
+              categoryIds: [category.id],
+            })
+          );
+        }
+      } else {
+        if (projectFilteredAnnotationCategories.includes(category.id)) {
+          dispatch(
+            projectSlice.actions.removeAnnotationCategoryFilters({
+              categoryIds: [category.id],
+            })
+          );
+        } else {
+          dispatch(
+            projectSlice.actions.addAnnotationCategoryFilters({
+              categoryIds: [category.id],
+            })
+          );
+        }
+      }
     },
-    [dispatch]
+    [
+      dispatch,
+      imageViewerFilteredAnnotationCategories,
+      projectFilteredAnnotationCategories,
+      view,
+    ]
   );
 
-  const handleHideOtherCategories = useCallback(
+  const filterOthers = useCallback(
     (category?: Category) => {
       let otherCategories: string[] = [
         ...categories,
@@ -134,29 +170,61 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
         }
         return otherIds;
       }, []);
+      if (view === "ImageViewer") {
+        dispatch(
+          imageViewerSlice.actions.addAnnotationCategoryFilters({
+            categoryIds: otherCategories,
+          })
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.addAnnotationCategoryFilters({
+            categoryIds: otherCategories,
+          })
+        );
+      }
+    },
+    [categories, dispatch, view]
+  );
+
+  const unfilterCategories = useCallback(() => {
+    if (view === "ImageViewer") {
       dispatch(
-        imageViewerSlice.actions.hideCategories({
-          categoryIds: otherCategories,
-        })
+        imageViewerSlice.actions.removeAnnotationCategoryFilters({ all: true })
       );
-    },
-    [categories, dispatch]
-  );
+    } else {
+      dispatch(
+        projectSlice.actions.removeAnnotationCategoryFilters({ all: true })
+      );
+    }
+  }, [dispatch, view]);
 
-  const handleShowAllCategories = useCallback(() => {
-    dispatch(imageViewerSlice.actions.showCategories({}));
-  }, [dispatch]);
-
-  const annotationCategoryIsVisible = useCallback(
+  const isCategoryFiltered = useCallback(
     (categoryId: string) => {
-      return !hiddenAnnotationCategories.includes(categoryId);
+      if (view === "ImageViewer") {
+        return !imageViewerFilteredAnnotationCategories.includes(categoryId);
+      } else {
+        return !projectFilteredAnnotationCategories.includes(categoryId);
+      }
     },
-    [hiddenAnnotationCategories]
+    [
+      imageViewerFilteredAnnotationCategories,
+      projectFilteredAnnotationCategories,
+      view,
+    ]
   );
 
-  const hasHiddenAnnotationCategories = useMemo(() => {
-    return hiddenAnnotationCategories.length > 0;
-  }, [hiddenAnnotationCategories]);
+  const anyFiltered = useMemo(() => {
+    if (view === "ImageViewer") {
+      return imageViewerFilteredAnnotationCategories.length > 0;
+    } else {
+      return projectFilteredAnnotationCategories.length > 0;
+    }
+  }, [
+    imageViewerFilteredAnnotationCategories,
+    projectFilteredAnnotationCategories,
+    view,
+  ]);
 
   const annotationCountByCategory = useCallback(
     (categoryId: string): number => {
@@ -170,24 +238,26 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
     [activeAnnotationCountsByCategory, annotationsByCategory, activeImageId]
   );
 
-  const dispatchDeleteCategories = useCallback(
+  const deleteCategories = useCallback(
     (categories: Category | Category[]) => {
       if (!Array.isArray(categories)) {
         categories = [categories];
       }
 
       batch(() => {
-        dispatch(
-          imageViewerSlice.actions.setSelectedCategoryId({
-            selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
-            execSaga: true,
-          })
-        );
-        dispatch(
-          imageViewerSlice.actions.updateWorkingAnnotation({
-            changes: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
-          })
-        );
+        if (view === "ImageViewer") {
+          dispatch(
+            imageViewerSlice.actions.setSelectedCategoryId({
+              selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY.id,
+              execSaga: true,
+            })
+          );
+          dispatch(
+            imageViewerSlice.actions.updateWorkingAnnotation({
+              changes: { categoryId: UNKNOWN_ANNOTATION_CATEGORY_ID },
+            })
+          );
+        }
         dispatch(
           dataSlice.actions.deleteAnnotationCategories({
             // need to recast catagories as an array because inside batch
@@ -199,16 +269,20 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
         );
       });
     },
-    [dispatch, changesPermanent]
+    [dispatch, changesPermanent, view]
   );
 
-  const dispatchDeleteAnnotationsOfCategory = useCallback(
+  const deleteObjectsOfCategory = useCallback(
     (categoryId: string) => {
       const annotationIds = annotationsByCategory[categoryId];
       batch(() => {
-        dispatch(
-          imageViewerSlice.actions.removeActiveAnnotationIds({ annotationIds })
-        );
+        if (view === "ImageViewer") {
+          dispatch(
+            imageViewerSlice.actions.removeActiveAnnotationIds({
+              annotationIds,
+            })
+          );
+        }
         dispatch(
           dataSlice.actions.deleteAnnotations({
             annotationIds,
@@ -217,10 +291,10 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
         );
       });
     },
-    [annotationsByCategory, dispatch, changesPermanent]
+    [annotationsByCategory, dispatch, changesPermanent, view]
   );
 
-  const dispatchUpsertCategory = useCallback(
+  const upsertCategory = useCallback(
     (category: PartialBy<Category, "id" | "visible">) => {
       dispatch(
         dataSlice.actions.upsertAnnotationCategory({
@@ -258,39 +332,35 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
   useEffect(() => {
     const allCategories = [UNKNOWN_ANNOTATION_CATEGORY, ...categories];
     if (categoryIndex.length === 0) {
-      dispatch(
-        updateHighlightedAnnotationCategory({
-          categoryId: undefined,
-        })
-      );
+      setHighlightedCategory(undefined);
     } else if (!Number.isNaN(+categoryIndex) && allCategories[+categoryIndex]) {
-      dispatch(
-        updateHighlightedAnnotationCategory({
-          categoryId: allCategories[+categoryIndex].id,
-        })
-      );
+      setHighlightedCategory(allCategories[+categoryIndex].id);
     }
   }, [dispatch, categoryIndex, categories]);
 
   return (
-    <CategoriesList
-      createdCategories={categories}
-      predicted={hasPredicted}
-      categoryIsVisible={annotationCategoryIsVisible}
-      selectedCategory={selectedCategory}
-      highlightedCategory={highlightedCategory}
-      unknownCategory={UNKNOWN_ANNOTATION_CATEGORY}
-      hasHidden={hasHiddenAnnotationCategories}
-      usedCategoryNames={usedAnnotationCategoryNames}
-      usedCategoryColors={unusedAnnotationCategoryColors}
-      objectCountByCategory={annotationCountByCategory}
-      handleSelectCategory={handleSelectCategory}
-      handleToggleCategoryVisibility={handleToggleCategoryVisibility}
-      handleHideOtherCategories={handleHideOtherCategories}
-      handleShowAllCategories={handleShowAllCategories}
-      dispatchDeleteObjectsOfCategory={dispatchDeleteAnnotationsOfCategory}
-      dispatchDeleteCategories={dispatchDeleteCategories}
-      dispatchUpsertCategory={dispatchUpsertCategory}
-    />
+    <CategoryContext.Provider
+      value={{
+        isCategoryFiltered,
+        selectedCategory,
+        highlightedCategory,
+        anyFiltered,
+        unavailableNames,
+        availableColors,
+        selectCategory,
+        toggleCategoryFilter,
+        filterOthers,
+        unfilterCategories,
+        deleteObjectsOfCategory,
+        deleteCategories,
+        upsertCategory,
+        createdCategories: categories,
+        hasPredictions: !!hasPredicted,
+        unknownCategory: UNKNOWN_ANNOTATION_CATEGORY,
+        getObjectCountPerCategory: annotationCountByCategory,
+      }}
+    >
+      <CategoriesList />
+    </CategoryContext.Provider>
   );
 };

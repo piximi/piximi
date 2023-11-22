@@ -12,7 +12,7 @@ import { TwoDataPlot, ModelSummaryTable } from "components/data-viz";
 import { DialogTransitionSlide } from "components/dialogs";
 import { FitSegmenterDialogAppBar, AlertBar } from "components/app-bars";
 
-import { selectAlertState } from "store/application";
+import { selectAlertState } from "store/applicationSettings";
 import { selectAnnotatedImages } from "store/data";
 import {
   selectSegmenterFitOptions,

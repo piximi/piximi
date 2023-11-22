@@ -14,7 +14,7 @@ import {
 } from "components/list-items";
 import { DialogTransitionSlide } from "components/dialogs";
 
-import { selectAlertState } from "store/application";
+import { selectAlertState } from "store/applicationSettings";
 import {
   selectClassifierSelectedModel,
   selectClassifierHistory,

@@ -1,10 +1,10 @@
 import { FitOptions } from "types/FitOptions";
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 
 export const selectSegmenterFitOptions = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
+  segmenter: Segmenter;
 }): FitOptions => {
   return segmenter.fitOptions;
 };

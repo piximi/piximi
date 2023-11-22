@@ -2,7 +2,7 @@
 import hotkeys from "./hotkeys"; //{ HotkeysEvent, KeyHandler }
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { selectHotkeyView } from "store/application";
+import { selectHotkeyView } from "store/applicationSettings";
 import {
   AvailableTags,
   HotkeysEvent,

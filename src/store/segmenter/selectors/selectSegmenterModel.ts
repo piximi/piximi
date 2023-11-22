@@ -1,11 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { SegmenterStoreType } from "types";
+import { Segmenter } from "types";
 import { availableSegmenterModels } from "types/ModelType";
 
 export const selectSegmenterModel = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
+  segmenter: Segmenter;
 }) => {
   return availableSegmenterModels[segmenter.selectedModelIdx];
 };

@@ -24,11 +24,11 @@ import { MaterialUISwitch } from "components/controls";
 import {
   selectSelectedImageBorderWidth,
   selectImageSelectionColor,
-  applicationSlice,
+  applicationSettingsSlice,
   selectThemeMode,
   setThemeMode,
   selectSoundEnabled,
-} from "store/application";
+} from "store/applicationSettings";
 import { selectUnusedImageCategoryColors } from "store/data";
 
 import { ThemeMode } from "types";
@@ -90,10 +90,12 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
   const preClose = () => {
     batch(() => {
       dispatch(
-        applicationSlice.actions.setSelectedImageBorderWidth({ selectionSize })
+        applicationSettingsSlice.actions.setSelectedImageBorderWidth({
+          selectionSize,
+        })
       );
       dispatch(
-        applicationSlice.actions.setImageSelectionColor({
+        applicationSettingsSlice.actions.setImageSelectionColor({
           selectionColor,
         })
       );
@@ -125,7 +127,7 @@ export const SettingsDialog = ({ onClose, open }: SettingsDialogProps) => {
 
   const toggleSoundEnabled = () => {
     dispatch(
-      applicationSlice.actions.setSoundEnabled({
+      applicationSettingsSlice.actions.setSoundEnabled({
         soundEnabled: !soundEnabled,
       })
     );

@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { applicationSlice, selectInitSettings } from "store/application";
+import {
+  applicationSettingsSlice,
+  selectInitSettings,
+} from "store/applicationSettings";
 import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
 import { loadExampleImage } from "utils/common/image";
 import colorImage from "images/cell-painting.png";
@@ -104,6 +107,6 @@ export const useDefaultImage = (location: DispatchLocation) => {
       activeAnnotatorImageId === undefined &&
       dispatchToImageViewer(location, dispatch);
 
-    dispatch(applicationSlice.actions.initialized());
+    dispatch(applicationSettingsSlice.actions.initialized());
   }, [dispatch, location, numProjectImages, activeAnnotatorImageId, init]);
 };

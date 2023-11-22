@@ -1,9 +1,9 @@
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 
 export const selectSegmenter = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
-}): SegmenterStoreType => {
+  segmenter: Segmenter;
+}): Segmenter => {
   return segmenter;
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { dataSlice } from "store/data";
 import { projectSlice } from "store/project";
@@ -160,7 +160,9 @@ export const ExampleProjectCard = ({
       };
 
       dispatch(
-        applicationSlice.actions.updateAlertState({ alertState: warning })
+        applicationSettingsSlice.actions.updateAlertState({
+          alertState: warning,
+        })
       );
     }
 

@@ -22,6 +22,7 @@ type CustomListItemButtonProps = Pick<
   | "disableGutters"
   | "dense"
   | "selected"
+  | "disableRipple"
   | "sx"
 > &
   Pick<ListItemTextProps, "primaryTypographyProps"> & {

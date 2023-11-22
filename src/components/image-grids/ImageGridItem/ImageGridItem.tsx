@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { selectTileSize } from "store/application";
+import { selectTileSize } from "store/applicationSettings";
 import { selectImageCategoryProperty } from "store/data";
 
 import { ImageType, Partition, UNKNOWN_IMAGE_CATEGORY_ID } from "types";

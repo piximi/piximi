@@ -6,7 +6,7 @@ type CatID = string;
 type ImageID = string;
 type AnnotationID = string;
 type AnnotationCatID = string;
-export type DataStoreSlice = {
+export type Data = {
   annotationCategories: DeferredEntityState<Category>;
   imageCategories: DeferredEntityState<Category>;
   images: DeferredEntityState<ImageType>;

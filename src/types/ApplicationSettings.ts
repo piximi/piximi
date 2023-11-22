@@ -25,13 +25,12 @@ export enum HotkeyView {
   DialogWithAction,
 }
 
-export type Settings = {
+export type ApplicationSettings = {
   // async work for setting initial states,
   // for all store slices,
   // should be completed before this flag is set to true
   init: boolean;
   tileSize: number;
-  selectedImages: Array<string>;
   themeMode: ThemeMode;
   imageSelectionColor: string;
   selectedImageBorderWidth: number;

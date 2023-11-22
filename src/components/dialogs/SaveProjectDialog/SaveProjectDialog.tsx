@@ -14,7 +14,7 @@ import { useHotkeys } from "hooks";
 import { serialize } from "utils/common/image/serialize";
 import { selectSegmenter } from "store/segmenter";
 import { saveAs } from "file-saver";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { DialogWithAction } from "../DialogWithAction";
 
 type SaveProjectDialogProps = {
@@ -82,7 +82,9 @@ export const SaveProjectDialog = ({
         };
 
         dispatch(
-          applicationSlice.actions.updateAlertState({ alertState: warning })
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          })
         );
       });
 

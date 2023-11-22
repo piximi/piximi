@@ -1,8 +1,8 @@
-import { ImageViewerStore } from "types";
+import { ImageViewer } from "types";
 export const selectImageOrigin = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewerStore;
+  imageViewer: ImageViewer;
 }) => {
   return imageViewer.imageOrigin;
 };

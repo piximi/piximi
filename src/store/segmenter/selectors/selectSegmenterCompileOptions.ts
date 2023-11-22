@@ -1,10 +1,10 @@
 import { CompileOptions } from "types/CompileOptions";
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 
 export const selectSegmenterCompileOptions = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
+  segmenter: Segmenter;
 }): CompileOptions => {
   return segmenter.compileOptions;
 };

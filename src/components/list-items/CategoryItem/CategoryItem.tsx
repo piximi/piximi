@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useMemo } from "react";
 
 import { Checkbox, Chip } from "@mui/material";
 import {
@@ -11,47 +11,48 @@ import { Category } from "types";
 
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { CustomListItemButton } from "../CustomListItemButton";
+import { CategoryContext } from "contexts";
 
 type CategoryItemProps = {
   category: Category;
-  id: string;
-  categoryisVisible: boolean;
+  isFiltered: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
-  handleToggleCategoryVisibility: (category: Category) => void;
-  handleSelectCategory: (category: Category) => void;
   handleOpenCategoryMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category
   ) => void;
-  objectCount: number;
 };
 
 export const CategoryItem = ({
   category,
   isSelected,
   isHighlighted,
-  id,
-  categoryisVisible,
-  handleToggleCategoryVisibility,
-  handleSelectCategory,
+  isFiltered,
   handleOpenCategoryMenu,
-  objectCount,
 }: CategoryItemProps) => {
+  const { getObjectCountPerCategory, toggleCategoryFilter, selectCategory } =
+    useContext(CategoryContext);
+
+  const numObjects = useMemo(
+    () => getObjectCountPerCategory(category.id),
+    [category, getObjectCountPerCategory]
+  );
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     handleOpenCategoryMenu(event, category);
   };
   const handleSelect = () => {
-    handleSelectCategory(category);
+    selectCategory(category);
   };
 
   return (
     <CustomListItemButton
       selected={isSelected}
+      disableRipple={true}
       primaryText={category.name}
       icon={
         <Checkbox
-          checked={categoryisVisible}
+          checked={isFiltered}
           checkedIcon={<LabelIcon />}
           disableRipple
           edge="start"
@@ -62,7 +63,7 @@ export const CategoryItem = ({
           }}
           icon={<LabelOutlinedIcon />}
           tabIndex={-1}
-          onChange={() => handleToggleCategoryVisibility(category)}
+          onChange={() => toggleCategoryFilter(category)}
           size="small"
         />
       }
@@ -74,7 +75,7 @@ export const CategoryItem = ({
       onSecondary={handleOpenMenu}
       additionalComponent={
         <Chip
-          label={objectCount}
+          label={numObjects}
           size="small"
           sx={(theme) => {
             return {

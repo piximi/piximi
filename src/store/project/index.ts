@@ -20,8 +20,9 @@ export { selectLoadPercent } from "./selectors/selectLoadPercent";
 export { selectLoadMessage } from "./selectors/selectLoadMessage";
 export { selectSelectedImagesId } from "./selectors/selectSelectedImagesId";
 export { selectSelectedImageIds } from "./selectors";
-export { selectHiddenImageCategoryIds } from "./selectors/selectHiddenImageCategoryIds";
+export { selectFilteredImageCategoryIds as selectHiddenImageCategoryIds } from "./selectors/selectFilteredImageCategoryIds";
 export { selectSelectedAnnotations } from "./selectors/selectSelectedAnnotations";
 export { selectImageGridTab } from "./selectors/selectImageGridTab";
+export { selectFilteredAnnotationCategoryIds } from "./selectors/selectFilteredAnnotationCategoryIds";
 
 // Sagas

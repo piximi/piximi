@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { Checkbox, List } from "@mui/material";
 
@@ -13,55 +13,33 @@ import { useDialogHotkey } from "hooks";
 
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
 
-import { Category, HotkeyView, PartialBy } from "types";
+import { Category, HotkeyView } from "types";
 import { CategoryItem, ShowPredictionItems } from "components/list-items";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CategoryItemMenu } from "components/menus";
-
-type CategoriesListProps = {
-  createdCategories: Array<Category>;
-  predicted?: boolean;
-  selectedCategory?: Category;
-  highlightedCategory?: string;
-  dispatchDeleteCategories: (categories: Category | Category[]) => void;
-  dispatchUpsertCategory: (
-    category: PartialBy<Category, "id" | "visible">
-  ) => void;
-  handleSelectCategory: (category: Category) => void;
-  handleToggleCategoryVisibility: (category: Category) => void;
-  handleHideOtherCategories: (category?: Category | undefined) => void;
-  handleShowAllCategories: () => void;
-  categoryIsVisible: (categoryId: string) => boolean;
-  hasHidden: boolean;
-  objectCountByCategory: (categoryId: string) => number;
-  dispatchDeleteObjectsOfCategory: (categoryId: string) => void;
-  usedCategoryNames: string[];
-  usedCategoryColors: string[];
-  hotkeysActive?: boolean;
-  unknownCategory: Category;
-};
+import { CategoryContext } from "contexts";
 
 // TODO: Make background different color (or find another way to differentiate list from section)
-export const CategoriesList = (props: CategoriesListProps) => {
+export const CategoriesList = () => {
   const {
     createdCategories: categories,
-    predicted,
-    selectedCategory,
+    hasPredictions,
+    isCategoryFiltered,
+    selectCategory,
     highlightedCategory,
-    dispatchDeleteCategories,
-    dispatchDeleteObjectsOfCategory,
-    dispatchUpsertCategory,
-    handleHideOtherCategories,
-    handleSelectCategory,
-    handleShowAllCategories,
-    handleToggleCategoryVisibility,
-    hasHidden,
-    usedCategoryColors,
-    usedCategoryNames,
     unknownCategory,
-    categoryIsVisible,
-    objectCountByCategory,
-  } = props;
+    unavailableNames,
+    availableColors,
+    anyFiltered,
+    getObjectCountPerCategory,
+    selectedCategory,
+    toggleCategoryFilter,
+    filterOthers,
+    unfilterCategories,
+    deleteCategories,
+    deleteObjectsOfCategory,
+    upsertCategory,
+  } = useContext(CategoryContext);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -82,7 +60,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
     event: React.MouseEvent<HTMLButtonElement>,
     category: Category
   ) => {
-    handleSelectCategory(category);
+    selectCategory(category);
     setCategoryMenuAnchorEl(event.currentTarget);
   };
 
@@ -90,31 +68,31 @@ export const CategoriesList = (props: CategoriesListProps) => {
     setCategoryMenuAnchorEl(null);
   };
   const handleHideOtherCategoriesAndClose = (category: Category) => {
-    handleHideOtherCategories(category);
+    filterOthers(category);
     onCloseCategoryMenu();
   };
 
   const handleToggleCategoryVisibilityAndClose = (category: Category) => {
-    handleToggleCategoryVisibility(category);
+    toggleCategoryFilter(category);
 
     onCloseCategoryMenu();
   };
   const handleDeleteAllCategories = () => {
-    dispatchDeleteCategories(categories);
+    deleteCategories(categories);
   };
 
   const handleAllHidden = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    if (!hasHidden) {
-      handleHideOtherCategories();
+    if (!anyFiltered) {
+      filterOthers();
     } else {
-      handleShowAllCategories();
+      unfilterCategories();
     }
   };
 
   useEffect(() => {
-    objectCountByCategory(unknownCategory.id);
-  }, [objectCountByCategory, unknownCategory]);
+    getObjectCountPerCategory(unknownCategory.id);
+  }, [getObjectCountPerCategory, unknownCategory]);
 
   return (
     <>
@@ -124,7 +102,6 @@ export const CategoriesList = (props: CategoriesListProps) => {
             return (
               <CategoryItem
                 category={category}
-                id={category.id}
                 key={category.id}
                 isSelected={
                   selectedCategory
@@ -132,10 +109,7 @@ export const CategoriesList = (props: CategoriesListProps) => {
                     : unknownCategory.id === category.id
                 }
                 isHighlighted={highlightedCategory === category.id}
-                objectCount={objectCountByCategory(category.id)}
-                categoryisVisible={categoryIsVisible(category.id)}
-                handleToggleCategoryVisibility={handleToggleCategoryVisibility}
-                handleSelectCategory={handleSelectCategory}
+                isFiltered={isCategoryFiltered(category.id)}
                 handleOpenCategoryMenu={onOpenCategoryMenu}
               />
             );
@@ -143,13 +117,13 @@ export const CategoriesList = (props: CategoriesListProps) => {
         </List>
 
         {
-          predicted && <ShowPredictionItems /> //TODO - UI: Should dissapear or be disabled?
+          hasPredictions && <ShowPredictionItems /> //TODO - UI: Should dissapear or be disabled?
         }
         <CustomListItemButton
-          primaryText={`${hasHidden ? "Show" : "Hide"} All`}
+          primaryText={`${anyFiltered ? "Show" : "Hide"} All`}
           icon={
             <Checkbox
-              checked={!hasHidden}
+              checked={!anyFiltered}
               checkedIcon={<LabelIcon />}
               disableRipple
               icon={<LabelOutlinedIcon />}
@@ -192,22 +166,22 @@ export const CategoriesList = (props: CategoriesListProps) => {
         anchorElCategoryMenu={categoryMenuAnchorEl}
         category={selectedCategory ?? unknownCategory}
         categoryHidden={
-          !categoryIsVisible(selectedCategory?.id ?? unknownCategory.id)
+          !isCategoryFiltered(selectedCategory?.id ?? unknownCategory.id)
         }
         handleCloseCategoryMenu={onCloseCategoryMenu}
-        usedCategoryColors={usedCategoryColors}
-        usedCategoryNames={usedCategoryNames}
-        dispatchDeleteObjectsOfCategory={dispatchDeleteObjectsOfCategory}
+        usedCategoryColors={availableColors}
+        usedCategoryNames={unavailableNames}
+        dispatchDeleteObjectsOfCategory={deleteObjectsOfCategory}
         handleHideCategory={handleToggleCategoryVisibilityAndClose}
         handleHideOtherCategories={handleHideOtherCategoriesAndClose}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
-        dispatchUpsertCategory={dispatchUpsertCategory}
-        dispatchDeleteCategories={dispatchDeleteCategories}
+        dispatchUpsertCategory={upsertCategory}
+        dispatchDeleteCategories={deleteCategories}
       />
       <UpsertCategoriesDialog
-        usedCategoryColors={usedCategoryColors}
-        usedCategoryNames={usedCategoryNames}
-        dispatchUpsertCategory={dispatchUpsertCategory}
+        usedCategoryColors={availableColors}
+        usedCategoryNames={unavailableNames}
+        dispatchUpsertCategory={upsertCategory}
         onClose={handleCloseCreateCategoryDialog}
         open={isCreateCategoryDialogOpen}
       />

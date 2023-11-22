@@ -21,7 +21,6 @@ import {
   selectImageStackImages,
 } from "store/data";
 
-import { CategoryType } from "types/Category";
 import { BaseAppDrawer } from "../BaseAppDrawer";
 
 export const ImageViewerDrawer = () => {
@@ -54,8 +53,8 @@ export const ImageViewerDrawer = () => {
 
       <AnnotationCategoryList
         createdCategories={createdCategories}
-        categoryType={CategoryType.AnnotationCategory}
         hotkeysActive={true}
+        view="ImageViewer"
       />
 
       <Divider sx={{ mt: 1 }} />
