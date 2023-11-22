@@ -27,7 +27,7 @@ import {
   applicationSettingsSlice,
   registerHotkeyView,
   unregisterHotkeyView,
-} from "store/applicationSettings";
+} from "store/slices/applicationSettings";
 
 import { getStackTraceFromError } from "utils";
 import { APPLICATION_COLORS } from "utils/common/colorPalette";

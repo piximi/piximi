@@ -7,8 +7,11 @@ import { StageContext } from "views/ImageViewer/ImageViewer";
 import {
   selectPenSelectionBrushSize,
   selectToolType,
-} from "store/annotator/selectors";
-import { selectActiveImageHeight, selectActiveImageWidth } from "store/data";
+} from "store/slices/annotator/selectors";
+import {
+  selectActiveImageHeight,
+  selectActiveImageWidth,
+} from "store/slices/data";
 
 import { ToolType } from "types";
 

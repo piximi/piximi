@@ -11,8 +11,8 @@ import {
   imageViewerSlice,
   selectActiveAnnotationIds,
   selectSelectedAnnotationIds,
-} from "store/imageViewer";
-import { dataSlice } from "store/data";
+} from "store/slices/imageViewer";
+import { dataSlice } from "store/slices/data";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 
 type DeleteType = "ALL" | "SELECTED";

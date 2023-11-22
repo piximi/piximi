@@ -1,9 +1,9 @@
 import React from "react";
 import { batch, useDispatch } from "react-redux";
-import { applicationSettingsSlice } from "store/applicationSettings";
-import { classifierSlice } from "store/classifier";
-import { dataSlice } from "store/data";
-import { projectSlice } from "store/project";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
+import { classifierSlice } from "store/slices/classifier";
+import { dataSlice } from "store/slices/data";
+import { projectSlice } from "store/slices/project";
 import { AlertStateType, AlertType } from "types";
 import { PseudoFileList, fListToStore } from "utils";
 import { deserialize } from "utils/common/image/deserialize";

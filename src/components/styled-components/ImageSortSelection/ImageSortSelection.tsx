@@ -7,7 +7,7 @@ import {
   projectSlice,
   selectImageGridTab,
   selectImageSortType,
-} from "store/project";
+} from "store/slices/project";
 
 import { availableImageSortKeys, ImageSortKeyType, ImageSortKey } from "types";
 

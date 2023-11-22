@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 import { Annotation } from "./Annotation";
 import { AnnotationTransformer } from "./AnnotationTransformer";
 
-import { selectSelectedAnnotationIds } from "store/imageViewer";
+import { selectSelectedAnnotationIds } from "store/slices/imageViewer";
 import {
   selectActiveAnnotationObjects,
   selectWorkingAnnotationObject,
-} from "store/data";
+} from "store/slices/data";
 
 import { AnnotationTool } from "annotator-tools";
 

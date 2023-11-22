@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useMarchingAnts } from "hooks";
 
 import { StageContext } from "views/ImageViewer/ImageViewer";
-import { selectImageOrigin } from "store/imageViewer";
+import { selectImageOrigin } from "store/slices/imageViewer";
 import { PolygonalAnnotationTool } from "annotator-tools";
 
 type PolygonalSelectionProps = {

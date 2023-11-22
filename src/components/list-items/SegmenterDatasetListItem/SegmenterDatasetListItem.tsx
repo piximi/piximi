@@ -2,7 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { CollapsibleListItem } from "../CollapsibleListItem";
 import { DatasetSettings } from "components/forms/DatasetSettings";
-import { segmenterSlice, selectSegmenterShuffleOptions } from "store/segmenter";
+import {
+  segmenterSlice,
+  selectSegmenterShuffleOptions,
+} from "store/slices/segmenter";
 
 export const SegmenterDatasetListItem = ({
   trainingPercentage,

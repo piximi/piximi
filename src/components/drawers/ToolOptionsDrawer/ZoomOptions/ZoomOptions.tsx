@@ -28,8 +28,8 @@ import {
   selectZoomToolOptions,
   setZoomToolOptions,
   selectStageScale,
-} from "store/imageViewer";
-import { selectActiveImage } from "store/data";
+} from "store/slices/imageViewer";
+import { selectActiveImage } from "store/slices/data";
 
 import { ZoomModeType } from "types";
 

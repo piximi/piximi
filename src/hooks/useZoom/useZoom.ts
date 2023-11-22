@@ -9,10 +9,10 @@ import {
   selectStageWidth,
   selectActiveImageId,
   setZoomToolOptions,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 
-import { selectToolType } from "store/annotator/selectors";
-import { selectZoomToolOptions } from "store/imageViewer";
+import { selectToolType } from "store/slices/annotator/selectors";
+import { selectZoomToolOptions } from "store/slices/imageViewer";
 
 import { Point, ToolType, ZoomModeType } from "types";
 import { useDebounce } from "hooks/useDebounce";

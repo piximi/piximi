@@ -1,21 +1,21 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useHotkeys } from "hooks";
 
-import { selectAllAnnotationCategories } from "store/data";
+import { selectAllAnnotationCategories } from "store/slices/data";
 import {
   imageViewerSlice,
   setSelectedCategoryId,
   selectActiveImageId,
-} from "store/imageViewer";
+} from "store/slices/imageViewer";
 
-import { annotatorSlice } from "store/annotator";
+import { annotatorSlice } from "store/slices/annotator";
 
 import {
   selectSelectedImages,
   selectSelectedAnnotations,
   selectActiveAnnotations,
-} from "store/data";
-import { selectSoundEnabled } from "store/applicationSettings";
+} from "store/slices/data";
+import { selectSoundEnabled } from "store/slices/applicationSettings";
 
 import {
   AnnotationModeType,

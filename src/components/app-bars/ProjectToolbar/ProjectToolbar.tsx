@@ -19,13 +19,13 @@ import { ImageSortSelection } from "components/styled-components";
 
 import { LogoLoader } from "components/styled-components";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
 import {
   selectLoadMessage,
   selectLoadPercent,
   selectProjectName,
   projectSlice,
-} from "store/project";
+} from "store/slices/project";
 
 const minZoom = 0.6;
 const maxZoom = 4;

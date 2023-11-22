@@ -8,8 +8,8 @@ import {
   selectQuickSelectionRegionSize,
   selectToolType,
   selectThresholdAnnotationValue,
-} from "store/annotator/selectors";
-import { selectActiveImageSrc } from "store/data";
+} from "store/slices/annotator/selectors";
+import { selectActiveImageSrc } from "store/slices/data";
 
 import { ToolType } from "types";
 import {

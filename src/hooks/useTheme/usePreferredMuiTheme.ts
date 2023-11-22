@@ -3,7 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import { setThemeMode, selectThemeMode } from "store/applicationSettings";
+import {
+  setThemeMode,
+  selectThemeMode,
+} from "store/slices/applicationSettings";
 
 import { ThemeMode } from "types";
 

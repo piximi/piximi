@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectLanguageType } from "store/applicationSettings";
+import { selectLanguageType } from "store/slices/applicationSettings";
 import { de, en, fas, fi, fr, gr, hi, hu } from "translations";
 import { LanguageType } from "types";
 

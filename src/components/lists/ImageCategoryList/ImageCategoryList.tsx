@@ -6,19 +6,19 @@ import {
   selectImageCategoryNames,
   selectImagesByCategoryDict,
   selectUnusedImageCategoryColors,
-} from "store/data";
+} from "store/slices/data";
 
 import {
   projectSlice,
   selectHiddenImageCategoryIds,
   updateHighlightedImageCategory,
   selectHighlightedImageCategory,
-} from "store/project";
+} from "store/slices/project";
 
 import { Category, HotkeyView, PartialBy, UNKNOWN_IMAGE_CATEGORY } from "types";
 import { CategoriesList } from "../CategoriesList";
 import { useHotkeys } from "hooks";
-import { selectSelectedImageIds } from "store/project/selectors";
+import { selectSelectedImageIds } from "store/slices/project/selectors";
 import { CategoryContext } from "contexts";
 
 type ImageCategoryListProps = {

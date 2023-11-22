@@ -4,7 +4,7 @@ import { CollapsibleListItem } from "../CollapsibleListItem";
 import {
   classifierSlice,
   selectClassifierShuffleOptions,
-} from "store/classifier";
+} from "store/slices/classifier";
 import { DatasetSettings } from "components/forms/DatasetSettings";
 
 export const ClassifierDatasetListItem = ({

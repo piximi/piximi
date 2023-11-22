@@ -6,7 +6,7 @@ import { Alert, Box } from "@mui/material";
 
 import { CustomNumberTextField } from "components/forms/CustomNumberTextField";
 
-import { dataSlice } from "store/data";
+import { dataSlice } from "store/slices/data";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 

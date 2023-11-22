@@ -10,14 +10,14 @@ import {
   projectSlice,
   selectImageGridTab,
   selectImageSortType,
-} from "store/project";
+} from "store/slices/project";
 
-import { dataSlice, selectVisibleImages } from "store/data";
+import { dataSlice, selectVisibleImages } from "store/slices/data";
 
 import { HotkeyView, ImageType } from "types";
 import { ImageGridItem } from "../ImageGridItem/ImageGridItem";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
-import { imageViewerSlice } from "store/imageViewer";
+import { imageViewerSlice } from "store/slices/imageViewer";
 import { TabContext } from "components/styled-components";
 import { GridItemActionBar } from "components/app-bars";
 import { DialogWithAction, ImageShapeDialog } from "components/dialogs";

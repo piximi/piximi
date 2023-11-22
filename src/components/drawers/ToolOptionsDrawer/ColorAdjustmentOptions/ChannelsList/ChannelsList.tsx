@@ -18,14 +18,14 @@ import { CollapsibleList } from "components/lists";
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 import { Palette } from "../Palette";
 
-import { selectActiveImageId } from "store/imageViewer";
+import { selectActiveImageId } from "store/slices/imageViewer";
 
 import {
   dataSlice,
   selectActiveImageBitDepth,
   selectActiveImageData,
   selectActiveImageRawColor,
-} from "store/data";
+} from "store/slices/data";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
 

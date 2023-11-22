@@ -14,7 +14,7 @@ import {
   selectAllAnnotationCategories,
   selectAllAnnotations,
   selectAllImages,
-} from "store/data";
+} from "store/slices/data";
 import { productionStore } from "store";
 
 // Time 1 (T1) is pre-serialization state of piximi

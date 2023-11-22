@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText, Slider } from "@mui/material";
 
-import { annotatorSlice } from "store/annotator";
-import { selectQuickSelectionRegionSize } from "store/annotator/selectors";
+import { annotatorSlice } from "store/slices/annotator";
+import { selectQuickSelectionRegionSize } from "store/slices/annotator/selectors";
 import { BaseOptions } from "../BaseOptions";
 
 //TODO: Slider

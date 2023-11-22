@@ -7,8 +7,8 @@ import { Divider, Menu, MenuList, MenuItem, Typography } from "@mui/material";
 
 import { useTranslation } from "hooks";
 
-import { dataSlice, selectAllAnnotationCategories } from "store/data";
-import { imageViewerSlice } from "store/imageViewer";
+import { dataSlice, selectAllAnnotationCategories } from "store/slices/data";
+import { imageViewerSlice } from "store/slices/imageViewer";
 
 import { ImageType } from "types";
 
@@ -17,8 +17,8 @@ import {
   saveAnnotationsAsLabeledSemanticSegmentationMasks,
   saveAnnotationsAsBinaryInstanceSegmentationMasks,
 } from "utils/annotator/imageHelper";
-import { projectSlice } from "store/project";
-import { selectAnnotationsByImage } from "store/data/selectors/annotation/annotationSelectors";
+import { projectSlice } from "store/slices/project";
+import { selectAnnotationsByImage } from "store/slices/data/selectors/annotation/annotationSelectors";
 
 type ImageMenuProps = {
   anchorElImageMenu: any;

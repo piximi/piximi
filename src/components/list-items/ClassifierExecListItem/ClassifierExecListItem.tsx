@@ -20,11 +20,11 @@ import {
   classifierSlice,
   selectClassifierEvaluationResult,
   selectClassifierModelStatus,
-} from "store/classifier";
+} from "store/slices/classifier";
 
 import { ModelStatus } from "types/ModelType";
 import { Category, HotkeyView } from "types";
-import { selectCreatedImageCategories } from "store/data";
+import { selectCreatedImageCategories } from "store/slices/data";
 
 export const ClassifierExecListItem = () => {
   const [disabled, setDisabled] = React.useState<boolean>(true);

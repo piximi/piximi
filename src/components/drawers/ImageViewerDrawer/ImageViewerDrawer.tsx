@@ -19,7 +19,7 @@ import { ImageViewerAppBar } from "components/app-bars";
 import {
   selectCreatedAnnotationCategories,
   selectImageStackImages,
-} from "store/data";
+} from "store/slices/data";
 
 import { BaseAppDrawer } from "../BaseAppDrawer";
 

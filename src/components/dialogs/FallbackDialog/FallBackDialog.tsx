@@ -30,11 +30,11 @@ import { SaveFittedModelDialog, SaveProjectDialog } from "components/dialogs";
 import {
   selectClassifierSelectedModel,
   selectClassifierModelStatus,
-} from "store/classifier";
+} from "store/slices/classifier";
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
-} from "store/segmenter";
+} from "store/slices/segmenter";
 
 import { AlertStateType, AlertType, HotkeyView } from "types";
 

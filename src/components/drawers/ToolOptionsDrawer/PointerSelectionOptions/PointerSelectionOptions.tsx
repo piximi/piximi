@@ -6,9 +6,9 @@ import { Label as LabelIcon } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
 
-import { imageViewerSlice } from "store/imageViewer";
-import { selectAllAnnotationCategories } from "store/data";
-import { selectActiveAnnotations } from "store/data/selectors/annotation/";
+import { imageViewerSlice } from "store/slices/imageViewer";
+import { selectAllAnnotationCategories } from "store/slices/data";
+import { selectActiveAnnotations } from "store/slices/data/selectors/annotation";
 
 import { Category } from "types";
 

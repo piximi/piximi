@@ -11,13 +11,13 @@ import { AnnotationCategoryList } from "components/lists";
 import { SaveFittedModelDialog } from "components/dialogs";
 import { SegmenterExecListItem } from "components/list-items";
 
-import { selectCreatedAnnotationCategories } from "store/data";
+import { selectCreatedAnnotationCategories } from "store/slices/data";
 
 import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
   segmenterSlice,
-} from "store/segmenter";
+} from "store/slices/segmenter";
 
 import { HotkeyView, Shape } from "types";
 import { ModelTask } from "types/ModelType";

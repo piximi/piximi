@@ -23,7 +23,7 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
 import { AlertStateType, AlertType } from "types";
 

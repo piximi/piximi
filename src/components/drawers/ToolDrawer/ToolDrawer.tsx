@@ -18,8 +18,8 @@ import { useHotkeys, useTranslation } from "hooks";
 
 import { Tool } from "../../stage/Tool";
 
-import { annotatorSlice } from "store/annotator";
-import { selectToolType } from "store/annotator/selectors";
+import { annotatorSlice } from "store/slices/annotator";
+import { selectToolType } from "store/slices/annotator/selectors";
 
 import { HotkeyView, ToolType as OperationType } from "types";
 

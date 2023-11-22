@@ -12,8 +12,8 @@ import { TwoDataPlot, ModelSummaryTable } from "components/data-viz";
 import { DialogTransitionSlide } from "components/dialogs";
 import { FitSegmenterDialogAppBar, AlertBar } from "components/app-bars";
 
-import { selectAlertState } from "store/applicationSettings";
-import { selectAnnotatedImages } from "store/data";
+import { selectAlertState } from "store/slices/applicationSettings";
+import { selectAnnotatedImages } from "store/slices/data";
 import {
   selectSegmenterFitOptions,
   selectSegmenterTrainingPercentage,
@@ -21,7 +21,7 @@ import {
   selectSegmenterModel,
   selectSegmenterModelStatus,
   selectSegmenterHistory,
-} from "store/segmenter";
+} from "store/slices/segmenter";
 
 import { AlertStateType, AlertType } from "types";
 import { TrainingCallbacks } from "utils/common/models/Model";

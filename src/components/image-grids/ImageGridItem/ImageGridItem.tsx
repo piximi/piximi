@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText } from "@mui/material";
 
-import { selectTileSize } from "store/applicationSettings";
-import { selectImageCategoryProperty } from "store/data";
+import { selectTileSize } from "store/slices/applicationSettings";
+import { selectImageCategoryProperty } from "store/slices/data";
 
 import { ImageType, Partition, UNKNOWN_IMAGE_CATEGORY_ID } from "types";
 import { ProjectGridItem } from "../ProjectGridItem";

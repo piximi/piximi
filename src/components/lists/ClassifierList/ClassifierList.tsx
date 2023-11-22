@@ -15,9 +15,9 @@ import {
   selectClassifierModelStatus,
   selectClassifierSelectedModel,
   loadUserSelectedModel,
-} from "store/classifier";
+} from "store/slices/classifier";
 
-import { selectCreatedImageCategories } from "store/data";
+import { selectCreatedImageCategories } from "store/slices/data";
 
 import { HotkeyView, Shape } from "types";
 import { ModelStatus, ModelTask } from "types/ModelType";

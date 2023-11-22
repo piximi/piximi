@@ -16,8 +16,8 @@ import { ExitAnnotatorDialog } from "components/dialogs";
 
 import { LogoLoader } from "components/styled-components";
 import { batch, useDispatch } from "react-redux";
-import { annotatorSlice } from "store/annotator";
-import { imageViewerSlice } from "store/imageViewer";
+import { annotatorSlice } from "store/slices/annotator";
+import { imageViewerSlice } from "store/slices/imageViewer";
 
 export const ImageViewerAppBar = () => {
   const dispatch = useDispatch();

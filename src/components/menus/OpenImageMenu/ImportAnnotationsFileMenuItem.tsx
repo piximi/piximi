@@ -3,13 +3,16 @@ import { batch, useDispatch, useSelector } from "react-redux";
 
 import { MenuItem, ListItemText } from "@mui/material";
 
-import { imageViewerSlice, selectActiveImageId } from "store/imageViewer";
+import {
+  imageViewerSlice,
+  selectActiveImageId,
+} from "store/slices/imageViewer";
 import {
   dataSlice,
   selectAllImageCategories,
   selectUnusedImageCategoryColors,
   selectSelectedImages,
-} from "store/data";
+} from "store/slices/data";
 
 import { deserializeCOCOFile, deserializeProjectFile } from "utils/annotator";
 

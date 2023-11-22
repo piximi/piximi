@@ -19,8 +19,11 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 import { ImageMenu } from "components/menus";
 
-import { selectActiveImageId, setActiveImageId } from "store/imageViewer";
-import { selectTotalAnnotationCountByImage } from "store/data";
+import {
+  selectActiveImageId,
+  setActiveImageId,
+} from "store/slices/imageViewer";
+import { selectTotalAnnotationCountByImage } from "store/slices/data";
 
 import { ImageType } from "types";
 

@@ -9,8 +9,8 @@ import {
 
 import { useTranslation } from "hooks";
 
-import { classifierSlice } from "store/classifier";
-import { dataSlice, selectImagesByPartitions } from "store/data";
+import { classifierSlice } from "store/slices/classifier";
+import { dataSlice, selectImagesByPartitions } from "store/slices/data";
 import { Partition } from "types";
 
 import { ModelStatus } from "types/ModelType";

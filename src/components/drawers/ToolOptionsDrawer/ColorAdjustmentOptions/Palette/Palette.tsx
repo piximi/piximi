@@ -8,8 +8,8 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { selectActiveImageId } from "store/imageViewer";
-import { dataSlice, selectActiveImageRawColor } from "store/data";
+import { selectActiveImageId } from "store/slices/imageViewer";
+import { dataSlice, selectActiveImageRawColor } from "store/slices/data";
 
 import { DEFAULT_COLORS } from "types";
 

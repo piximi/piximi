@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { StageContext } from "views/ImageViewer/ImageViewer";
 import { PenAnnotationToolTip } from "components/stage/Stage/PenAnnotationToolTip";
 
-import { selectCursor } from "store/imageViewer";
+import { selectCursor } from "store/slices/imageViewer";
 
 import { AnnotationStateType, Point, ToolType } from "types";
 

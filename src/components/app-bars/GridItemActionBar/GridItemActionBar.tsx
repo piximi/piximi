@@ -25,14 +25,14 @@ import {
 import { ImageCategoryMenu } from "../../menus/ImageCategoryMenu";
 import { TooltipTitle } from "components/tooltips";
 
-import { unregisterHotkeyView } from "store/applicationSettings";
+import { unregisterHotkeyView } from "store/slices/applicationSettings";
 
 import { HotkeyView, ImageGridTab } from "types";
 import {
   selectAllAnnotationCategories,
   selectAllImageCategories,
-} from "store/data";
-import { projectSlice } from "store/project";
+} from "store/slices/data";
+import { projectSlice } from "store/slices/project";
 
 type GridItemActionBarProps = {
   currentTab: ImageGridTab;

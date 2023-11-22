@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 
-import { dataSlice } from "store/data";
+import { dataSlice } from "store/slices/data";
 
 import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
 

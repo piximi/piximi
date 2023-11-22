@@ -9,7 +9,7 @@ import { Help as HelpIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AppBarOffset } from "../../styled-components/AppBarOffset/AppBarOffset";
 import { HelpContent, HelpContentType } from "./HelpContent/HelpContent";
 
-import { applicationSettingsSlice } from "store/applicationSettings";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
 import { AlertType } from "types";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
