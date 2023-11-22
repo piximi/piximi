@@ -7,7 +7,10 @@ import { Box, CssBaseline } from "@mui/material";
 import { useErrorHandler, useUnloadConfirmation } from "hooks";
 import { useDefaultImage, DispatchLocation } from "hooks/useDefaultImage";
 
-import { registerHotkeyView, unregisterHotkeyView } from "store/application";
+import {
+  registerHotkeyView,
+  unregisterHotkeyView,
+} from "store/applicationSettings";
 import { projectSlice } from "store/project";
 
 import { HotkeyView, ImageGridTab } from "types";

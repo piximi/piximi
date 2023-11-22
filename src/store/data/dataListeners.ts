@@ -5,7 +5,7 @@ import * as DicomParser from "dicom-parser";
 
 import { dataSlice, uploadImages } from "./dataSlice";
 import { imageViewerSlice } from "store/imageViewer";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { projectSlice } from "store/project";
 import {
   AlertStateType,
@@ -153,7 +153,9 @@ startAppListening({
           stackTrace: stackTrace,
         };
         listenerAPI.dispatch(
-          applicationSlice.actions.updateAlertState({ alertState: warning })
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          })
         );
       }
     }
@@ -169,7 +171,9 @@ startAppListening({
         )}`,
       };
       listenerAPI.dispatch(
-        applicationSlice.actions.updateAlertState({ alertState: warning })
+        applicationSettingsSlice.actions.updateAlertState({
+          alertState: warning,
+        })
       );
       return;
     }

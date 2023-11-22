@@ -1,9 +1,9 @@
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 
 export const selectSegmenterTrainingPercentage = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
+  segmenter: Segmenter;
 }): number => {
   return segmenter.trainingPercentage;
 };

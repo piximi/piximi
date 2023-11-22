@@ -19,7 +19,7 @@ import { ImageSortSelection } from "components/styled-components";
 
 import { LogoLoader } from "components/styled-components";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   selectLoadMessage,
   selectLoadPercent,
@@ -42,7 +42,7 @@ export const ProjectToolbar = () => {
   const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
     dispatch(
-      applicationSlice.actions.updateTileSize({
+      applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
       })
     );
@@ -52,7 +52,7 @@ export const ProjectToolbar = () => {
     const newValue = value - 0.1 >= minZoom ? value - 0.1 : minZoom;
     setValue(newValue as number);
     dispatch(
-      applicationSlice.actions.updateTileSize({
+      applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
       })
     );
@@ -62,7 +62,7 @@ export const ProjectToolbar = () => {
     const newValue = value + 0.1 <= maxZoom ? value + 0.1 : maxZoom;
     setValue(newValue as number);
     dispatch(
-      applicationSlice.actions.updateTileSize({
+      applicationSettingsSlice.actions.updateTileSize({
         newValue: newValue as number,
       })
     );

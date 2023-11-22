@@ -5,7 +5,7 @@ import {
   selectAlertState,
   registerHotkeyView,
   unregisterHotkeyView,
-} from "store/application";
+} from "store/applicationSettings";
 import { AlertType, HotkeyView } from "types";
 
 export const useDialog = (closeOnError: boolean = true) => {

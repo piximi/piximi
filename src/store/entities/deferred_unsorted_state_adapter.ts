@@ -98,7 +98,9 @@ export function createUnsortedDeferredStateAdapter<T>(
   function removeManyMutably(keys: readonly EntityId[], state: R): void {
     keys.forEach((key) => {
       if (key in state.entities) {
+        const added = state.entities[key].changes.added ? { added: true } : {};
         state.entities[key].changes = {
+          ...added,
           deleted: true,
         } as Deferred<T>;
       }
@@ -107,7 +109,8 @@ export function createUnsortedDeferredStateAdapter<T>(
 
   function removeAllMutably(state: R): void {
     for (const key of state.ids) {
-      state.entities[key].changes = { deleted: true } as Deferred<T>;
+      const added = state.entities[key].changes.added ? { added: true } : {};
+      state.entities[key].changes = { ...added, deleted: true } as Deferred<T>;
     }
   }
 

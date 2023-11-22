@@ -19,7 +19,7 @@ import {
   segmenterSlice,
 } from "store/segmenter";
 
-import { CategoryType, HotkeyView, Shape } from "types";
+import { HotkeyView, Shape } from "types";
 import { ModelTask } from "types/ModelType";
 import { Model } from "utils/common/models/Model";
 import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
@@ -93,9 +93,9 @@ export const SegmenterList = () => {
       <AnnotationCategoryList
         createdCategories={categories}
         hasPredicted={false}
-        categoryType={CategoryType.AnnotationCategory}
         hotkeysActive={tabIndex === 1}
         changesPermanent={true}
+        view="Project"
       />
 
       <ImportTensorflowModelDialog

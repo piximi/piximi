@@ -10,7 +10,7 @@ import {
   Partition,
   DecodedAnnotationType,
   AnnotationType,
-  DataStoreSlice,
+  Data,
   PartialBy,
   Category,
   UNKNOWN_ANNOTATION_CATEGORY,
@@ -30,7 +30,7 @@ export const annotationCategoriesAdapter =
 export const imagesAdapter = createDeferredEntityAdapter<ImageType>();
 export const annotationsAdapter = createDeferredEntityAdapter<AnnotationType>();
 
-export const initialState = (): DataStoreSlice => {
+export const initialState = (): Data => {
   return {
     imageCategories: imageCategoriesAdapter.getInitialState({
       ids: [UNKNOWN_IMAGE_CATEGORY_ID],

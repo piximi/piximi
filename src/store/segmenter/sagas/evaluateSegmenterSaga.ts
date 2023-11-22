@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, put } from "redux-saga/effects";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { selectImagesByPartitions } from "store/data";
 
 import {
@@ -26,11 +26,11 @@ export function* evaluateSegmenterSaga({
     yield select(selectImagesByPartitions);
   const validationImages = partitionSelector([Partition.Validation]);
 
-  yield put(applicationSlice.actions.hideAlertState({}));
+  yield put(applicationSettingsSlice.actions.hideAlertState({}));
 
   if (validationImages.length === 0) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Info,
           name: "Validation set is empty",
@@ -60,7 +60,7 @@ export function* evaluateSegmenterSaga({
 //   };
 
 //   yield put(
-//     applicationSlice.actions.updateAlertState({
+//     applicationSettingsSlice.actions.updateAlertState({
 //       alertState: alertState,
 //     })
 //   );

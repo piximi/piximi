@@ -8,7 +8,7 @@ import {
   Project,
   Category,
   ImageType,
-  SegmenterStoreType,
+  Segmenter,
   LoadCB,
 } from "types";
 import { Colors } from "types/tensorflow";
@@ -283,7 +283,7 @@ const serializeClassifier = async (
 
 const serializeSegmenter = async (
   segmenterGroup: Group,
-  segmenter: SegmenterStoreType
+  segmenter: Segmenter
 ) => {
   const segmenterModel = availableSegmenterModels[segmenter.selectedModelIdx];
 
@@ -306,7 +306,7 @@ export const serialize = async (
     annotationCategories: Array<Category>;
   },
   classifierSlice: Classifier,
-  segmenterSlice: SegmenterStoreType,
+  segmenterSlice: Segmenter,
   loadCb: LoadCB
 ) => {
   const zipStore = new ZipStore(name);

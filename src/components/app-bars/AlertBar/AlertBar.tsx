@@ -23,7 +23,7 @@ import {
   GitHub as GitHubIcon,
 } from "@mui/icons-material";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertStateType, AlertType } from "types";
 
@@ -90,7 +90,7 @@ export const AlertBar = ({
     if (setShowAlertBar) {
       setShowAlertBar(false);
     } else {
-      dispatch(applicationSlice.actions.hideAlertState({}));
+      dispatch(applicationSettingsSlice.actions.hideAlertState({}));
     }
   };
 

@@ -4,12 +4,12 @@ import {
   ToolType,
   AnnotationModeType,
   AnnotationStateType,
-  AnnotatorStore,
+  Annotator,
 } from "types";
 
 import { AnnotationTool } from "annotator-tools";
 
-const initialState: AnnotatorStore = {
+const initialState: Annotator = {
   annotationState: AnnotationStateType.Blank,
   penSelectionBrushSize: 10,
   quickSelectionRegionSize: 40,

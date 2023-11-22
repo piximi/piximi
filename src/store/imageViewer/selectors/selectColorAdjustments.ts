@@ -1,9 +1,9 @@
-import { ColorAdjustmentOptionsType, ImageViewerStore } from "types";
+import { ColorAdjustmentOptionsType, ImageViewer } from "types";
 
 export const selectColorAdjustments = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewerStore;
+  imageViewer: ImageViewer;
 }): ColorAdjustmentOptionsType => {
   return imageViewer.colorAdjustment;
 };

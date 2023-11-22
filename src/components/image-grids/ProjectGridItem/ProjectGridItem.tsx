@@ -11,7 +11,7 @@ import {
 import {
   selectImageSelectionColor,
   selectSelectedImageBorderWidth,
-} from "store/application";
+} from "store/applicationSettings";
 import { ItemDetailTooltip } from "./ItemDetailTooltip";
 
 type ProjectGridItemProps = {

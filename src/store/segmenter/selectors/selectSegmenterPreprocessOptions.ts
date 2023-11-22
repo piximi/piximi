@@ -1,10 +1,10 @@
 import { PreprocessOptions } from "types/PreprocessOptions";
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 
 export const selectSegmenterPreprocessOptions = ({
   segmenter,
 }: {
-  segmenter: SegmenterStoreType;
+  segmenter: Segmenter;
 }): PreprocessOptions => {
   return segmenter.preprocessOptions;
 };

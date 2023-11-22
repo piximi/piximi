@@ -24,13 +24,7 @@ export const selectHighlightedCategories = ({
 }) => {
   return project.highlightedCategory;
 };
-export const selectHiddenImageCategoryIds = ({
-  project,
-}: {
-  project: Project;
-}) => {
-  return project.hiddenImageCategoryIds;
-};
+
 export const selectSelectedImageIds = ({
   project,
 }: {

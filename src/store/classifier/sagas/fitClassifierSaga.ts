@@ -18,7 +18,7 @@ import {
   selectImagesByPartitions,
   selectCreatedImageCategoryCount,
 } from "store/data";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import { AlertStateType, AlertType, ImageType, Partition } from "types";
 import { ModelStatus } from "types/ModelType";
@@ -281,7 +281,7 @@ function* handleError(error: Error, errorName: string) {
   }
 
   yield put(
-    applicationSlice.actions.updateAlertState({
+    applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
     })
   );

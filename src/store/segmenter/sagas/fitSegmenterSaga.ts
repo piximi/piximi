@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 // import shuffle from "lodash/shuffle";
 // import { select, put } from "redux-saga/effects";
 
-// import { applicationSlice } from "store/application";
+// import { applicationSettingsSlice } from "store/applicationSettings";
 // import {
 //   dataSlice,
 //   selectAnnotatedImages,
@@ -74,7 +74,7 @@ export function* fitSegmenterSaga({
 //   };
 
 //   yield put(
-//     applicationSlice.actions.updateAlertState({
+//     applicationSettingsSlice.actions.updateAlertState({
 //       alertState: alertState,
 //     })
 //   );

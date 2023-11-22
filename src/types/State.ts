@@ -1,13 +1,13 @@
 import { Classifier } from "./Classifier";
 import { Project } from "./Project";
-import { Settings } from "./Settings";
-import { ImageViewerStore } from "./ImageViewerStore";
+import { ApplicationSettings } from "./ApplicationSettings";
+import { ImageViewer } from "./ImageViewer";
 import { ToolOptionsStateType } from "./ToolOptionsStateType";
 
 export type State = {
   classifier: Classifier;
-  annotator: ImageViewerStore;
+  annotator: ImageViewer;
   project: Project;
-  settings: Settings;
+  applicationSettings: ApplicationSettings;
   toolOptions: ToolOptionsStateType;
 };

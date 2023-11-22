@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   classifierSlice,
   selectClassifierSelectedModel,
@@ -19,11 +19,11 @@ export function* evaluateClassifierSaga({
 }>) {
   if (modelStatus !== ModelStatus.Evaluating || !execSaga) return;
 
-  yield put(applicationSlice.actions.hideAlertState({}));
+  yield put(applicationSettingsSlice.actions.hideAlertState({}));
 
   const categories: ReturnType<typeof selectCreatedImageCategories> =
     yield select(selectCreatedImageCategories);
-  yield put(applicationSlice.actions.hideAlertState({}));
+  yield put(applicationSettingsSlice.actions.hideAlertState({}));
 
   const model: ReturnType<typeof selectClassifierSelectedModel> = yield select(
     selectClassifierSelectedModel
@@ -31,7 +31,7 @@ export function* evaluateClassifierSaga({
 
   if (!model.validationLoaded) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Info,
           name: "Validation set is empty",
@@ -41,7 +41,7 @@ export function* evaluateClassifierSaga({
     );
   } else if (model.numClasses !== categories.length) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Warning,
           name: "The output shape of your model does not correspond to the number of categories!",
@@ -89,7 +89,7 @@ function* handleError(error: Error, name: string) {
   };
 
   yield put(
-    applicationSlice.actions.updateAlertState({
+    applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
     })
   );

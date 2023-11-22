@@ -1,10 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { ImageViewerStore } from "types";
+import { ImageViewer } from "types";
 
 export const selectActiveAnnotationIds = ({
   imageViewer,
 }: {
-  imageViewer: ImageViewerStore;
+  imageViewer: ImageViewer;
 }) => {
   return imageViewer.activeAnnotationIds;
 };

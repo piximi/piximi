@@ -49,7 +49,8 @@ startAppListening({
       const annotationIsDeleted =
         newState.data.annotations.entities[id].changes.deleted;
 
-      const hiddenCategoryIds = newState.imageViewer.hiddenCategoryIds;
+      const hiddenCategoryIds =
+        newState.imageViewer.annotationFilters.categoryId;
 
       if (
         !annotationIsDeleted &&
@@ -83,8 +84,8 @@ startAppListening({
 startAppListening({
   predicate: (action, currentState, previousState) => {
     return (
-      currentState.imageViewer.hiddenCategoryIds !==
-      previousState.imageViewer.hiddenCategoryIds
+      currentState.imageViewer.annotationFilters.categoryId !==
+      previousState.imageViewer.annotationFilters.categoryId
     );
   },
   effect: async (action, listenerAPI) => {
@@ -100,7 +101,8 @@ startAppListening({
       const annotationIsDeleted =
         currentState.data.annotations.entities[id].changes.deleted;
 
-      const hiddenCategoryIds = currentState.imageViewer.hiddenCategoryIds;
+      const hiddenCategoryIds =
+        currentState.imageViewer.annotationFilters.categoryId;
 
       if (
         !annotationIsDeleted &&

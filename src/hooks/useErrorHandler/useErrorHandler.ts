@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { AlertType } from "types";
 import { getStackTraceFromError } from "utils";
 
@@ -12,7 +12,7 @@ export const useErrorHandler = () => {
       var error = e.error as Error;
       const stackTrace = await getStackTraceFromError(error);
       dispatch(
-        applicationSlice.actions.updateAlertState({
+        applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
             name: error.name,
@@ -29,7 +29,7 @@ export const useErrorHandler = () => {
     async (e: any) => {
       e.preventDefault();
       dispatch(
-        applicationSlice.actions.updateAlertState({
+        applicationSettingsSlice.actions.updateAlertState({
           alertState: {
             alertType: AlertType.Error,
             name: "Uncaught promise rejection",

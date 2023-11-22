@@ -15,7 +15,7 @@ import {
   selectSelectedAnnotations,
   selectActiveAnnotations,
 } from "store/data";
-import { selectSoundEnabled } from "store/application";
+import { selectSoundEnabled } from "store/applicationSettings";
 
 import {
   AnnotationModeType,

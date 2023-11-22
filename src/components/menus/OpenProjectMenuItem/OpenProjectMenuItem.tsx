@@ -3,7 +3,7 @@ import { batch, useDispatch } from "react-redux";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { projectSlice } from "store/project";
 import { segmenterSlice } from "store/segmenter";
@@ -116,7 +116,9 @@ export const OpenProjectMenuItem = ({
         };
 
         dispatch(
-          applicationSlice.actions.updateAlertState({ alertState: warning })
+          applicationSettingsSlice.actions.updateAlertState({
+            alertState: warning,
+          })
         );
       });
 

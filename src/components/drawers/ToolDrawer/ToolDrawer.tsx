@@ -184,7 +184,7 @@ export const ToolDrawer = ({
       {/* <Tool
         name={t("Object annotation")}
        onClick={() => {
-          dispatch(applicationSlice.actions.setOperation({ operation: OperationType.ObjectAnnotation, }) );
+          dispatch(applicationSettingsSlice.actions.setOperation({ operation: OperationType.ObjectAnnotation, }) );
       }}
         selected={activeOperation === OperationType.ObjectAnnotation}
       >

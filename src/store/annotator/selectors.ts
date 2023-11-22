@@ -1,14 +1,14 @@
 import {
   AnnotationModeType,
   AnnotationStateType,
-  AnnotatorStore,
+  Annotator,
   ToolType,
 } from "types";
 
 export const selectAnnotationState = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }): AnnotationStateType => {
   return annotator.annotationState;
 };
@@ -16,14 +16,14 @@ export const selectAnnotationState = ({
 export const selectAnnotationSelectionMode = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }): AnnotationModeType => {
   return annotator.selectionMode;
 };
 export const selectPenSelectionBrushSize = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }) => {
   return annotator.penSelectionBrushSize;
 };
@@ -31,7 +31,7 @@ export const selectPenSelectionBrushSize = ({
 export const selectQuickSelectionRegionSize = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }) => {
   return annotator.quickSelectionRegionSize;
 };
@@ -39,7 +39,7 @@ export const selectQuickSelectionRegionSize = ({
 export const selectThresholdAnnotationValue = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }) => {
   return annotator.thresholdAnnotationValue;
 };
@@ -47,7 +47,7 @@ export const selectThresholdAnnotationValue = ({
 export const selectToolType = ({
   annotator,
 }: {
-  annotator: AnnotatorStore;
+  annotator: Annotator;
 }): ToolType => {
   return annotator.toolType;
 };

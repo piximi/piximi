@@ -15,20 +15,14 @@ import {
   selectHighlightedImageCategory,
 } from "store/project";
 
-import {
-  Category,
-  CategoryType,
-  HotkeyView,
-  PartialBy,
-  UNKNOWN_IMAGE_CATEGORY,
-} from "types";
+import { Category, HotkeyView, PartialBy, UNKNOWN_IMAGE_CATEGORY } from "types";
 import { CategoriesList } from "../CategoriesList";
 import { useHotkeys } from "hooks";
 import { selectSelectedImageIds } from "store/project/selectors";
+import { CategoryContext } from "contexts";
 
 type ImageCategoryListProps = {
   createdCategories: Array<Category>;
-  categoryType: CategoryType;
   hasPredicted?: boolean;
   hotkeysActive?: boolean;
 };
@@ -40,15 +34,12 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
   const selectedImageIds = useSelector(selectSelectedImageIds);
   const [selectedCategory, setSelectedCategory] = useState<Category>();
   const [categoryIndex, setCategoryIndex] = useState("");
-  const hiddenImageCategories = useSelector(selectHiddenImageCategoryIds);
-  const imagesByCategories = useSelector(selectImagesByCategoryDict);
-  const usedImageCategoryNames = useSelector(selectImageCategoryNames);
+  const filteredImageCategories = useSelector(selectHiddenImageCategoryIds);
+  const imagesByCategory = useSelector(selectImagesByCategoryDict);
+  const unavailableNames = useSelector(selectImageCategoryNames);
+  const availableColors = useSelector(selectUnusedImageCategoryColors);
 
-  const unusedImageCategoryColors = useSelector(
-    selectUnusedImageCategoryColors
-  );
-
-  const handleSelectCategory = useCallback(
+  const selectCategory = useCallback(
     (category: Category) => {
       setSelectedCategory(category);
 
@@ -61,18 +52,26 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     [dispatch]
   );
 
-  const handleToggleCategoryVisibility = useCallback(
+  const toggleCategoryFilter = useCallback(
     (category: Category) => {
-      dispatch(
-        projectSlice.actions.toggleCategoryVisibility({
-          categoryId: category.id,
-        })
-      );
+      if (filteredImageCategories.includes(category.id)) {
+        dispatch(
+          projectSlice.actions.removeImageCategoryFilters({
+            categoryIds: [category.id],
+          })
+        );
+      } else {
+        dispatch(
+          projectSlice.actions.addImageCategoryFilters({
+            categoryIds: [category.id],
+          })
+        );
+      }
     },
-    [dispatch]
+    [dispatch, filteredImageCategories]
   );
 
-  const handleHideOtherCategories = useCallback(
+  const filterOthers = useCallback(
     (category?: Category) => {
       let otherCategories: string[] = [
         ...categories,
@@ -83,8 +82,9 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
         }
         return otherIds;
       }, []);
+
       dispatch(
-        projectSlice.actions.hideCategories({
+        projectSlice.actions.addImageCategoryFilters({
           categoryIds: otherCategories,
         })
       );
@@ -92,29 +92,29 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     [categories, dispatch]
   );
 
-  const handleShowAllCategories = useCallback(() => {
-    dispatch(projectSlice.actions.showCategories({}));
+  const unfilterCategories = useCallback(() => {
+    dispatch(projectSlice.actions.removeImageCategoryFilters({ all: true }));
   }, [dispatch]);
 
-  const imageCategoryIsVisible = useCallback(
+  const isCategoryFiltered = useCallback(
     (categoryId: string) => {
-      return !hiddenImageCategories.includes(categoryId);
+      return !filteredImageCategories.includes(categoryId);
     },
-    [hiddenImageCategories]
+    [filteredImageCategories]
   );
 
-  const hasHiddenImageCategories = useMemo(() => {
-    return hiddenImageCategories.length > 0;
-  }, [hiddenImageCategories]);
+  const anyFiltered = useMemo(() => {
+    return filteredImageCategories.length > 0;
+  }, [filteredImageCategories]);
 
-  const ImageCountByCategory = useCallback(
+  const imageCountByCategory = useCallback(
     (categoryId: string): number => {
-      return imagesByCategories[categoryId].length ?? 0;
+      return imagesByCategory[categoryId].length ?? 0;
     },
-    [imagesByCategories]
+    [imagesByCategory]
   );
 
-  const dispatchDeleteCategories = useCallback(
+  const deleteCategories = useCallback(
     (categories: Category | Category[]) => {
       if (!Array.isArray(categories)) {
         categories = [categories];
@@ -130,9 +130,9 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     [dispatch]
   );
 
-  const dispatchDeleteImagesOfCategory = useCallback(
+  const deleteImagesOfCategory = useCallback(
     (categoryId: string) => {
-      const imageIds = imagesByCategories[categoryId];
+      const imageIds = imagesByCategory[categoryId];
       dispatch(
         dataSlice.actions.deleteImages({
           imageIds,
@@ -141,10 +141,10 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
         })
       );
     },
-    [imagesByCategories, dispatch]
+    [imagesByCategory, dispatch]
   );
 
-  const dispatchUpsertCategory = useCallback(
+  const upsertCategory = useCallback(
     (category: PartialBy<Category, "id" | "visible">) => {
       dispatch(
         dataSlice.actions.upsertImageCategory({ category, isPermanent: true })
@@ -220,24 +220,28 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
     }
   }, [dispatch, categoryIndex, categories]);
   return (
-    <CategoriesList
-      createdCategories={categories}
-      predicted={hasPredicted}
-      categoryIsVisible={imageCategoryIsVisible}
-      selectedCategory={selectedCategory}
-      highlightedCategory={highlightedCategory}
-      unknownCategory={UNKNOWN_IMAGE_CATEGORY}
-      hasHidden={hasHiddenImageCategories}
-      objectCountByCategory={ImageCountByCategory}
-      usedCategoryNames={usedImageCategoryNames}
-      usedCategoryColors={unusedImageCategoryColors}
-      handleSelectCategory={handleSelectCategory}
-      handleToggleCategoryVisibility={handleToggleCategoryVisibility}
-      handleHideOtherCategories={handleHideOtherCategories}
-      handleShowAllCategories={handleShowAllCategories}
-      dispatchDeleteObjectsOfCategory={dispatchDeleteImagesOfCategory}
-      dispatchDeleteCategories={dispatchDeleteCategories}
-      dispatchUpsertCategory={dispatchUpsertCategory}
-    />
+    <CategoryContext.Provider
+      value={{
+        isCategoryFiltered,
+        selectedCategory,
+        highlightedCategory,
+        anyFiltered,
+        unavailableNames,
+        availableColors,
+        selectCategory,
+        toggleCategoryFilter,
+        filterOthers,
+        unfilterCategories,
+        deleteCategories,
+        upsertCategory,
+        createdCategories: categories,
+        hasPredictions: !!hasPredicted,
+        unknownCategory: UNKNOWN_IMAGE_CATEGORY,
+        getObjectCountPerCategory: imageCountByCategory,
+        deleteObjectsOfCategory: deleteImagesOfCategory,
+      }}
+    >
+      <CategoriesList />
+    </CategoryContext.Provider>
   );
 };

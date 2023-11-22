@@ -3,7 +3,7 @@ export { AlertType, defaultAlert } from "./AlertStateType";
 
 export { AnnotationModeType } from "./AnnotationModeType";
 
-export type { AnnotatorStore } from "./AnnotatorStore";
+export type { Annotator } from "./Annotator";
 
 export { AnnotationStateType } from "./AnnotationStateType";
 
@@ -68,7 +68,7 @@ export type { ImageType, ImageAttributeType } from "./ImageType";
 
 export type { Colors, ColorsRaw } from "./tensorflow";
 
-export type { ImageViewerStore } from "./ImageViewerStore";
+export type { ImageViewer } from "./ImageViewer";
 
 export type { AnnotatorImage } from "./AnnotatorImage";
 
@@ -99,14 +99,14 @@ export type { PointerSelectionType } from "./PointerSelectionType";
 
 export type { RescaleOptions } from "./RescaleOptions";
 
-export type { SegmenterStoreType } from "./SegmenterStoreType";
+export type { Segmenter } from "./Segmenter";
 
 export type { SerializedFileType } from "./SerializedFileType";
 
 export type { SerializedAnnotatorImageType } from "./SerializedImageType";
 
-export type { Settings } from "./Settings";
-export { HotkeyView } from "./Settings";
+export type { ApplicationSettings } from "./ApplicationSettings";
+export { HotkeyView } from "./ApplicationSettings";
 
 export type { Shape } from "./Shape";
 
@@ -129,7 +129,7 @@ export type {
   SerializedCOCOCategoryType,
 } from "./COCOTypes";
 
-export type { DataStoreSlice } from "./DataStoreType";
+export type { Data } from "./Data";
 export type { ImagesEntityType } from "./ImagesEntityType";
 export type { PartialBy } from "./utility/PartialBy";
 
@@ -137,3 +137,4 @@ export type { ModelHistory } from "./ModelHistory";
 
 export type { LoadCB } from "./LoadCallBack";
 export type { ImageGridTab } from "./ImageGridTab";
+export type { FilterType } from "./utility/FilterType";

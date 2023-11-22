@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import { classifierSlice } from "store/classifier";
 import { imageViewerSlice } from "store/imageViewer";
 import { projectSlice } from "store/project";
@@ -12,7 +12,7 @@ const reducers = {
   segmenter: segmenterSlice.reducer,
   imageViewer: imageViewerSlice.reducer,
   project: projectSlice.reducer,
-  settings: applicationSlice.reducer,
+  applicationSettings: applicationSettingsSlice.reducer,
   data: dataSlice.reducer,
   annotator: annotatorSlice.reducer,
 };

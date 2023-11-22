@@ -7,10 +7,10 @@ import { Shape } from "types/Shape";
 import { availableSegmenterModels, ModelStatus } from "types/ModelType";
 import { SegmenterEvaluationResultType } from "types/EvaluationResultType";
 import { CropSchema } from "types/CropOptions";
-import { SegmenterStoreType } from "types/SegmenterStoreType";
+import { Segmenter } from "types/Segmenter";
 import { TrainingCallbacks } from "utils/common/models/Model";
 
-export const initialState: SegmenterStoreType = {
+export const initialState: Segmenter = {
   selectedModelIdx: 0,
   inputShape: {
     height: 256,
@@ -57,7 +57,7 @@ export const segmenterSlice = createSlice({
     setSegmenter(
       state,
       action: PayloadAction<{
-        segmenter: SegmenterStoreType;
+        segmenter: Segmenter;
       }>
     ) {
       // WARNING, don't do below (overwrites draft object)

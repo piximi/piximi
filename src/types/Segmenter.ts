@@ -6,7 +6,7 @@ import { SegmenterEvaluationResultType } from "./EvaluationResultType";
 import { CompileOptions } from "./CompileOptions";
 import { ModelStatus } from "./ModelType";
 
-export type SegmenterStoreType = {
+export type Segmenter = {
   // pre-fit state
   selectedModelIdx: number;
   inputShape: Shape;

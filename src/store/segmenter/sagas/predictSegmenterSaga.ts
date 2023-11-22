@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { put, select } from "redux-saga/effects";
 
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 
 import {
   dataSlice,
@@ -37,7 +37,7 @@ export function* predictSegmenterSaga({
 
   if (!inferenceImages.length) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Info,
           name: "Inference set is empty",
@@ -190,7 +190,7 @@ function* handleError(error: Error, name: string) {
   };
 
   yield put(
-    applicationSlice.actions.updateAlertState({
+    applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
     })
   );

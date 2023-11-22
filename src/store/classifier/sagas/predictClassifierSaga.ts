@@ -8,7 +8,7 @@ import {
   selectClassifierSelectedModel,
   selectClassifierInputShape,
 } from "store/classifier";
-import { applicationSlice } from "store/application";
+import { applicationSettingsSlice } from "store/applicationSettings";
 import {
   dataSlice,
   selectCreatedImageCategories,
@@ -60,7 +60,7 @@ export function* predictClassifierSaga({
 
   if (!inferenceImages.length) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Info,
           name: "Inference set is empty",
@@ -70,7 +70,7 @@ export function* predictClassifierSaga({
     );
   } else if (model.numClasses !== categories.length) {
     yield put(
-      applicationSlice.actions.updateAlertState({
+      applicationSettingsSlice.actions.updateAlertState({
         alertState: {
           alertType: AlertType.Warning,
           name: "The output shape of your model does not correspond to the number of categories!",
@@ -154,7 +154,7 @@ function* handleError(error: Error, name: string) {
   };
 
   yield put(
-    applicationSlice.actions.updateAlertState({
+    applicationSettingsSlice.actions.updateAlertState({
       alertState: alertState,
     })
   );

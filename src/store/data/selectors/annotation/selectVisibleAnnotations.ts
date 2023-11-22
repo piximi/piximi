@@ -5,17 +5,17 @@ import {
 } from "./annotationSelectors";
 import { AnnotationType, Category } from "types";
 import { selectAnnotationCategoryEntities } from "../annotation-category/annotationCategorySelectors";
-import { selectHiddenAnnotationCategoryIds } from "store/imageViewer";
+import { selectFilteredAnnotationCategoryIds } from "store/project";
 
 export const selectVisibleAnnotations = createSelector(
   [
-    selectHiddenAnnotationCategoryIds,
+    selectFilteredAnnotationCategoryIds,
     selectAnnotationsByCategoryDict,
     selectAnnotationEntities,
     selectAnnotationCategoryEntities,
   ],
   (
-    hiddenCategories,
+    filteredCategories,
     annotationsByCategory,
     annotationEntities,
     annotationCategories
@@ -23,7 +23,7 @@ export const selectVisibleAnnotations = createSelector(
     const visibleAnnotations: Array<AnnotationType & { category: Category }> =
       [];
     for (const categoryId of Object.keys(annotationsByCategory)) {
-      if (!hiddenCategories.includes(categoryId)) {
+      if (!filteredCategories.includes(categoryId)) {
         for (const annotationId of annotationsByCategory[categoryId]) {
           visibleAnnotations.push({
             ...annotationEntities[annotationId],

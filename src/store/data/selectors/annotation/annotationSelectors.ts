@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { annotationsAdapter } from "../../dataSlice";
 import { RootState } from "store/reducer/reducer";
 
-import { DataStoreSlice, AnnotationType } from "types";
+import { Data, AnnotationType } from "types";
 
 const annotationSelectors = annotationsAdapter.getSelectors(
   (state: RootState) => state.data.annotations
@@ -15,19 +15,11 @@ export const selectAllAnnotationIds = annotationSelectors.selectIds;
 export const selectAnnotationById = annotationSelectors.selectEntities;
 export const selectTotalAnnotationCount = annotationSelectors.selectTotal;
 
-export const selectAnnotationsByImageDict = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
+export const selectAnnotationsByImageDict = ({ data }: { data: Data }) => {
   return data.annotationsByImage;
 };
 
-export const selectAnnotationsByCategoryDict = ({
-  data,
-}: {
-  data: DataStoreSlice;
-}) => {
+export const selectAnnotationsByCategoryDict = ({ data }: { data: Data }) => {
   return data.annotationsByCategory;
 };
 
