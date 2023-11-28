@@ -2,6 +2,11 @@ import { createTheme } from "@mui/material/styles";
 
 export const lightTheme = createTheme({
   components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },
     MuiListItemIcon: {
       styleOverrides: {
         root: {
@@ -14,6 +19,11 @@ export const lightTheme = createTheme({
 
 export const darkTheme = createTheme({
   components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },
     MuiDialog: {
       styleOverrides: {
         paper: {

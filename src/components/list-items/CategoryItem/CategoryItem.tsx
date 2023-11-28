@@ -48,7 +48,6 @@ export const CategoryItem = ({
   return (
     <CustomListItemButton
       selected={isSelected}
-      disableRipple={true}
       primaryText={category.name}
       icon={
         <Checkbox
