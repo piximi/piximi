@@ -14,12 +14,13 @@ import {
 import { projectSlice } from "store/slices/project";
 
 import { HotkeyView, ImageGridTab } from "types";
-import { ProjectDrawer } from "components/drawers";
+import { ProjectDrawer, ImageToolDrawer } from "components/drawers";
 import { ProjectAppBar } from "components/app-bars";
 import { CustomTabSwitcher } from "components/styled-components";
 import { AnnotationImageGrid, ImageGrid } from "components/image-grids";
 import { FallBackDialog } from "components/dialogs";
 import { selectTotalAnnotationCount } from "store/slices/data";
+import { dimensions } from "utils/common";
 
 const tabs: Array<ImageGridTab> = ["Images", "Annotations"];
 
@@ -56,7 +57,7 @@ export const ProjectViewer = () => {
 
             <Box
               sx={(theme) => ({
-                maxWidth: "calc(100% - 256px)", // magic number draw width
+                maxWidth: `calc(100% - ${dimensions.leftDrawerWidth}px - ${dimensions.toolDrawerWidth}px)`, // magic number draw width
                 overflow: "hidden",
                 flexGrow: 1,
                 height: "100%",
@@ -75,6 +76,7 @@ export const ProjectViewer = () => {
                 {annotationCount === 0 ? <></> : <AnnotationImageGrid />}
               </CustomTabSwitcher>
             </Box>
+            <ImageToolDrawer />
           </Box>
         </div>
       </ErrorBoundary>
