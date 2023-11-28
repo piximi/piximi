@@ -23,7 +23,7 @@ export const filterObjects = <T extends object>(
       }
 
       // If the key is not present in the record, include the item
-      return false;
+      return true;
     });
   });
 };

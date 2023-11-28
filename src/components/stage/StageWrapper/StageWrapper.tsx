@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import { Box } from "@mui/material";
 import { useDndFileDrop } from "hooks";
@@ -18,9 +18,7 @@ export const StageWrapper = ({
   persistOptions,
 }: StageWrapperProps) => {
   const [width, setWidth] = useState<number>(
-    window.innerWidth -
-      dimensions.annotatorDrawerWidth -
-      dimensions.annotatorToolDrawerWidth
+    window.innerWidth - dimensions.leftDrawerWidth - dimensions.toolDrawerWidth
   );
   const [height, setHeight] = useState<number>(
     window.innerHeight - dimensions.stageInfoHeight
@@ -33,8 +31,8 @@ export const StageWrapper = ({
     const resizeHandler = () => {
       setWidth(
         window.innerWidth -
-          dimensions.annotatorDrawerWidth -
-          dimensions.annotatorToolDrawerWidth
+          dimensions.leftDrawerWidth -
+          dimensions.toolDrawerWidth
       );
       setHeight(window.innerHeight - dimensions.stageInfoHeight);
     };
@@ -42,6 +40,10 @@ export const StageWrapper = ({
     return () => {
       window.removeEventListener("resize", resizeHandler);
     };
+  });
+
+  useEffect(() => {
+    console.log(width); //LOG:
   });
 
   return (

@@ -120,7 +120,6 @@ export const AnnotationCategoryList = (props: AnnotationCategoryListProps) => {
 
   const toggleCategoryFilter = useCallback(
     (category: Category) => {
-      console.log(view);
       if (view === "ImageViewer") {
         if (imageViewerFilteredAnnotationCategories.includes(category.id)) {
           dispatch(

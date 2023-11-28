@@ -37,6 +37,15 @@ import {
   Zoom,
 } from "icons";
 import { CustomToolTip } from "../../stage/Tool/CustomToolTip";
+import { dimensions } from "utils/common";
+import { ToolOptionsDrawer } from "./ToolOptionsDrawer";
+
+type AnnotatorToolDrawerProps = {
+  optionsVisibility: boolean;
+  setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  persistOptions: boolean;
+  setPersistOptions: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const toolMap: Record<
   string,
@@ -91,19 +100,12 @@ const toolMap: Record<
     icon: (color) => <RectangleAnnotation color={color} />,
   },
 };
-
-//TODO: Icon button
-export const ToolDrawer = ({
+export const AnnotatorToolDrawer = ({
   optionsVisibility,
   setOptionsVisibility,
   persistOptions,
   setPersistOptions,
-}: {
-  optionsVisibility: boolean;
-  setOptionsVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  persistOptions: boolean;
-  setPersistOptions: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+}: AnnotatorToolDrawerProps) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const activeOperation = useSelector(selectToolType);
@@ -120,68 +122,69 @@ export const ToolDrawer = ({
     HotkeyView.Annotator
   );
   const t = useTranslation();
-
   return (
-    <Drawer
-      anchor="right"
-      sx={{
-        flexShrink: 0,
-        whiteSpace: "nowrap",
-        width: 56,
-        "& > .MuiDrawer-paper": {
-          width: 56,
-        },
-      }}
-      variant="permanent"
-      onMouseEnter={() => {
-        !persistOptions && setOptionsVisibility(true);
-      }}
-    >
-      <CustomToolTip
-        name={`${persistOptions ? "Unlock" : "Lock"} Options`}
-        letter="O"
+    <>
+      <ToolOptionsDrawer optionsVisibility={optionsVisibility} />
+      <Drawer
+        anchor="right"
+        sx={{
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+          width: dimensions.toolDrawerWidth,
+          "& > .MuiDrawer-paper": {
+            width: 56,
+          },
+        }}
+        variant="permanent"
+        onMouseEnter={() => {
+          !persistOptions && setOptionsVisibility(true);
+        }}
       >
-        <ListItem button onClick={togglePersistHandler}>
-          <ListItemIcon sx={{ pt: "1rem" }}>
-            <SvgIcon fontSize="small">
-              {persistOptions ? <LockIcon /> : <LockOpenIcon />}
-            </SvgIcon>
-          </ListItemIcon>
-        </ListItem>
-      </CustomToolTip>
+        <CustomToolTip
+          name={`${persistOptions ? "Unlock" : "Lock"} Options`}
+          letter="O"
+        >
+          <ListItem button onClick={togglePersistHandler}>
+            <ListItemIcon sx={{ pt: "1rem" }}>
+              <SvgIcon fontSize="small">
+                {persistOptions ? <LockIcon /> : <LockOpenIcon />}
+              </SvgIcon>
+            </ListItemIcon>
+          </ListItem>
+        </CustomToolTip>
 
-      <br />
-      {Object.keys(toolMap).map((name, idx) => {
-        return (
-          <React.Fragment key={`${name}_${idx}`}>
-            <Tool
-              name={t(name)}
-              onClick={() => {
-                dispatch(
-                  annotatorSlice.actions.setToolType({
-                    operation: toolMap[name].operation,
-                  })
-                );
-              }}
-            >
-              {toolMap[name].icon(
-                activeOperation === toolMap[name].operation
-                  ? theme.palette.primary.dark
-                  : theme.palette.grey[400]
-              )}
-            </Tool>
-            {[
-              "Color Adjustment",
-              "Pointer",
-              "Polygonal annotation",
-              "Freehand annotation",
-              "Magnetic annotation",
-            ].includes(name) && <Divider sx={{ margin: "0.5rem 0" }} />}
-          </React.Fragment>
-        );
-      })}
+        <br />
+        {Object.keys(toolMap).map((name, idx) => {
+          return (
+            <React.Fragment key={`${name}_${idx}`}>
+              <Tool
+                name={t(name)}
+                onClick={() => {
+                  dispatch(
+                    annotatorSlice.actions.setToolType({
+                      operation: toolMap[name].operation,
+                    })
+                  );
+                }}
+              >
+                {toolMap[name].icon(
+                  activeOperation === toolMap[name].operation
+                    ? theme.palette.primary.dark
+                    : theme.palette.grey[400]
+                )}
+              </Tool>
+              {[
+                "Color Adjustment",
+                "Pointer",
+                "Polygonal annotation",
+                "Freehand annotation",
+                "Magnetic annotation",
+              ].includes(name) && <Divider sx={{ margin: "0.5rem 0" }} />}
+            </React.Fragment>
+          );
+        })}
 
-      {/* <Tool
+        {/* <Tool
         name={t("Object annotation")}
        onClick={() => {
           dispatch(applicationSettingsSlice.actions.setOperation({ operation: OperationType.ObjectAnnotation, }) );
@@ -190,7 +193,8 @@ export const ToolDrawer = ({
       >
         <ObjectSelectionIcon />
       </Tool> */}
-      <br />
-    </Drawer>
+        <br />
+      </Drawer>
+    </>
   );
 };

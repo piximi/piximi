@@ -19,7 +19,12 @@ export { selectProjectName } from "./selectors/selectProjectName";
 export { selectLoadPercent } from "./selectors/selectLoadPercent";
 export { selectLoadMessage } from "./selectors/selectLoadMessage";
 export { selectSelectedImagesId } from "./selectors/selectSelectedImagesId";
-export { selectSelectedImageIds } from "./selectors";
+export {
+  selectSelectedImageIds,
+  selectImageFilters,
+  selectAnnotationFilters,
+  selectFilteredState,
+} from "./selectors";
 export { selectFilteredImageCategoryIds as selectHiddenImageCategoryIds } from "./selectors/selectFilteredImageCategoryIds";
 export { selectSelectedAnnotations } from "./selectors/selectSelectedAnnotations";
 export { selectImageGridTab } from "./selectors/selectImageGridTab";
