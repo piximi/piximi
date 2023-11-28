@@ -1,6 +1,6 @@
 export const dimensions = {
-  annotatorDrawerWidth: 256,
-  annotatorToolDrawerWidth: 56,
+  leftDrawerWidth: 256,
+  toolDrawerWidth: 56,
   annotatorToolOptionsWidth: 200,
   stagePaddingX: 50,
   stageInfoHeight: 21,
