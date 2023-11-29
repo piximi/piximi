@@ -1,4 +1,4 @@
-import { Box, List, useTheme } from "@mui/material";
+import { Box, Collapse, List, useTheme } from "@mui/material";
 import { DividerHeader } from "components/styled-components";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { PartitionChipsWrapper } from "./PartitionChipsWrapper";
@@ -21,12 +21,13 @@ export const PartitionFilterList = ({
       <DividerHeader typographyVariant="caption" textAlign="left">
         {header}
       </DividerHeader>
-      {filteredPartitions.length > 0 && (
+      <Collapse in={filteredPartitions.length > 0} timeout="auto">
         <PartitionChipsWrapper
           filteredPartitions={filteredPartitions}
           removeFilter={removeFilter}
         />
-      )}
+      </Collapse>
+
       <List>
         {Object.entries(Partition).map((partition) => {
           return (
