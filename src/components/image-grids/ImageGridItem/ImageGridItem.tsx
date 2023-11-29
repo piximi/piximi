@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 import { List, ListItem, ListItemText } from "@mui/material";
@@ -14,6 +14,23 @@ type ImageGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   image: ImageType;
+};
+
+const getIconPosition = (scale: number, height: number, width: number) => {
+  const containerSize = 220 * scale;
+  const scaleBy = width > height ? width : height;
+  const dimScaleFactor = containerSize / scaleBy;
+  const scaledWidth = dimScaleFactor * width;
+  const scaledHeight = dimScaleFactor * height;
+
+  const offsetY = Math.ceil((containerSize - scaledHeight) / 2);
+  const offsetX = Math.ceil((containerSize - scaledWidth) / 2);
+
+  return { top: offsetY, left: offsetX };
+};
+
+const printSize = (scale: number) => {
+  return (220 * scale).toString() + "px";
 };
 
 export const ImageGridItem = memo(
@@ -89,26 +106,6 @@ export const ImageGridItem = memo(
       );
     }, [image, categoryDetails.fontColor]);
 
-    const itemSize = useMemo(() => {
-      return (220 * scaleFactor).toString() + "px";
-    }, [scaleFactor]);
-
-    const iconPosition = useMemo(() => {
-      const containerSize = 220 * scaleFactor;
-      const scaleBy =
-        image.shape.width > image.shape.height
-          ? image.shape.width
-          : image.shape.height;
-      const dimScaleFactor = containerSize / scaleBy;
-      const scaledWidth = dimScaleFactor * image.shape.width;
-      const scaledHeight = dimScaleFactor * image.shape.height;
-
-      const offsetY = Math.ceil((containerSize - scaledHeight) / 2);
-      const offsetX = Math.ceil((containerSize - scaledWidth) / 2);
-
-      return { top: offsetY, left: offsetX };
-    }, [image, scaleFactor]);
-
     const handleSelect = (
       evt: React.MouseEvent<HTMLDivElement, MouseEvent>
     ) => {
@@ -116,13 +113,21 @@ export const ImageGridItem = memo(
       handleClick(image.id, selected);
     };
 
+    useEffect(() => {
+      //console.log("id: ", image.id, ", cat details: ", categoryDetails); //LOG:
+    }, [categoryDetails, image.id]);
+
     return (
       <ProjectGridItem
         handleClick={handleSelect}
         categoryDetails={categoryDetails}
         imageDetail={imageDetailComponent}
-        iconPosition={iconPosition}
-        imageSize={itemSize}
+        iconPosition={getIconPosition(
+          scaleFactor,
+          image.shape.height,
+          image.shape.width
+        )}
+        imageSize={printSize(scaleFactor)}
         src={image.src}
         selected={selected}
         isPredicted={

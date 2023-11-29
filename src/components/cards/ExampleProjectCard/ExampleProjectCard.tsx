@@ -123,7 +123,8 @@ export const ExampleProjectCard = ({
       const data = deserializedProject.data;
       const classifier = deserializedProject.classifier;
 
-      console.log(data);
+      console.log(data.images);
+
       //TODO: keeps images, fix that
       batch(() => {
         dispatch(dataSlice.actions.resetData());

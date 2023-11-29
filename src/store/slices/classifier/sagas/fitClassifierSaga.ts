@@ -17,10 +17,17 @@ import {
   selectCreatedImageCategories,
   selectImagesByPartitions,
   selectCreatedImageCategoryCount,
+  selectAllImages,
 } from "store/slices/data";
 import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
-import { AlertStateType, AlertType, ImageType, Partition } from "types";
+import {
+  AlertStateType,
+  AlertType,
+  ImageType,
+  Partition,
+  UNKNOWN_IMAGE_CATEGORY_ID,
+} from "types";
 import { ModelStatus } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
 
@@ -32,10 +39,12 @@ import { SequentialClassifier } from "utils/common/models/AbstractClassifier/Abs
 function* assignDataPartitions({
   preprocessOptions,
   categorizedImages,
+  uncategorizedImages,
   trainingPercentage,
 }: {
   preprocessOptions: ReturnType<typeof selectClassifierPreprocessOptions>;
-  categorizedImages: ReturnType<ReturnType<typeof selectImagesByPartitions>>;
+  categorizedImages: Array<ImageType>;
+  uncategorizedImages: Array<ImageType>;
   trainingPercentage: number;
 }) {
   //first assign train and val partition to all categorized images
@@ -54,12 +63,19 @@ function* assignDataPartitions({
   const trainDataIds = take(categorizedImagesIds, trainDataLength);
   const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
+  console.log("assignPartition: ", uncategorizedImages); //LOG:
+
   yield put(
     dataSlice.actions.updateImages({
       updates: [
         ...trainDataIds.map((id) => ({ id, partition: Partition.Training })),
         ...valDataIds.map((id) => ({ id, partition: Partition.Validation })),
+        ...uncategorizedImages.map((image) => ({
+          id: image.id,
+          partition: Partition.Inference,
+        })),
       ],
+      isPermanent: true,
     })
   );
 }
@@ -197,12 +213,37 @@ export function* fitClassifierSaga({
     typeof selectClassifierTrainingPercentage
   > = yield select(selectClassifierTrainingPercentage);
 
-  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
-    yield select(selectImagesByPartitions);
-  const categorizedImages = partitionSelector([
-    Partition.Training,
-    Partition.Validation,
-  ]);
+  // const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
+  //   yield select(selectImagesByPartitions);
+  // const categorizedImages = partitionSelector([
+  //   Partition.Training,
+  //   Partition.Validation,
+  // ]);
+
+  const images: ReturnType<typeof selectAllImages> = yield select(
+    selectAllImages
+  );
+
+  const { categorizedImages, uncategorizedImages } = images.reduce(
+    (
+      sortedImages: {
+        categorizedImages: ImageType[];
+        uncategorizedImages: ImageType[];
+      },
+      image: ImageType
+    ) => {
+      if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
+        sortedImages.uncategorizedImages.push(image);
+      } else if (image.partition === Partition.Unassigned) {
+        sortedImages.categorizedImages.push(image);
+      }
+      return sortedImages;
+    },
+    { categorizedImages: [], uncategorizedImages: [] }
+  );
+
+  console.log(categorizedImages);
+  console.log(uncategorizedImages);
 
   const fitOptions: ReturnType<typeof selectClassifierFitOptions> =
     yield select(selectClassifierFitOptions);
@@ -223,38 +264,38 @@ export function* fitClassifierSaga({
     yield select(selectClassifierCompileOptions);
 
   // if Unititialized -> InitFit, then load first, else skip straight to training
-  if (modelStatus === ModelStatus.InitFit) {
-    yield put(
-      classifierSlice.actions.updateModelStatus({
-        execSaga: false,
-        modelStatus: ModelStatus.Loading,
-      })
-    );
 
-    yield assignDataPartitions({
-      preprocessOptions,
-      categorizedImages,
-      trainingPercentage,
-    });
+  yield put(
+    classifierSlice.actions.updateModelStatus({
+      execSaga: false,
+      modelStatus: ModelStatus.Loading,
+    })
+  );
 
-    const loaded: boolean = yield loadClassifier({
-      model: selectedModel,
-      inputShape,
-      preprocessOptions,
-      compileOptions,
-      fitOptions,
-      numClasses,
-    });
+  yield assignDataPartitions({
+    preprocessOptions,
+    categorizedImages,
+    uncategorizedImages,
+    trainingPercentage,
+  });
 
-    if (!loaded) return;
+  const loaded: boolean = yield loadClassifier({
+    model: selectedModel,
+    inputShape,
+    preprocessOptions,
+    compileOptions,
+    fitOptions,
+    numClasses,
+  });
 
-    yield put(
-      classifierSlice.actions.updateModelStatus({
-        execSaga: false,
-        modelStatus: ModelStatus.Training,
-      })
-    );
-  }
+  if (!loaded) return;
+
+  yield put(
+    classifierSlice.actions.updateModelStatus({
+      execSaga: false,
+      modelStatus: ModelStatus.Training,
+    })
+  );
 
   yield fitClassifier({ model: selectedModel, onEpochEnd, fitOptions });
 }

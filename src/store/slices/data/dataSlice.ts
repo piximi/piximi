@@ -83,7 +83,6 @@ export const dataSlice = createSlice({
         categories: newCategories,
         annotationCategories: newAnnotationCategories,
       } = action.payload;
-      console.log(newCategories);
       dataSlice.caseReducers.addImageCategories(state, {
         type: "addImageCategories",
         payload: { categories: newCategories, isPermanent: true },
@@ -115,9 +114,7 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { categories, isPermanent } = action.payload;
-      console.log(categories);
       for (const category of categories) {
-        console.log(category);
         if (state.imageCategories.ids.includes(category.id)) continue;
         state.imagesByCategory[category.id] = [];
 
@@ -565,39 +562,30 @@ export const dataSlice = createSlice({
     },
     clearPredictions(state, action: PayloadAction<{ isPermanent?: boolean }>) {
       const { isPermanent } = action.payload;
-      state.images.ids.forEach((imageId) => {
-        if (
-          state.images.entities[imageId].saved.partition ===
-            Partition.Inference ||
-          (state.images.entities[imageId].changes.partition &&
-            state.images.entities[imageId].changes.partition ===
-              Partition.Inference)
-        ) {
-          const predictedCategory = getDeferredProperty(
-            state.images.entities[imageId],
-            "categoryId"
-          ) as string;
-          dataSlice.caseReducers.updateImages(state, {
-            type: "updateImages",
-            payload: {
-              updates: [
-                {
-                  id: imageId as string,
-                  categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
-                },
-              ],
-              isPermanent: isPermanent,
-            },
-          });
-          mutatingFilter(
-            state.imagesByCategory[predictedCategory],
-            (_imageId) => _imageId !== imageId
-          );
 
-          state.imagesByCategory[UNKNOWN_IMAGE_CATEGORY_ID].push(
-            imageId as string
-          );
+      const updates: Array<{ id: string } & Partial<ImageType>> = [];
+
+      state.images.ids.forEach((id) => {
+        if (
+          (state.images.entities[id].changes &&
+            state.images.entities[id].changes.partition ===
+              Partition.Inference) ||
+          state.images.entities[id].saved.partition === Partition.Inference
+        ) {
+          updates.push({
+            id: id as string,
+            categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
+            partition: Partition.Unassigned,
+          });
         }
+      });
+
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: updates,
+          isPermanent: isPermanent,
+        },
       });
     },
     updateImages(
@@ -608,6 +596,8 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { updates, isPermanent } = action.payload;
+
+      console.log("update reducer: ", updates); //LOG:
 
       for (const update of updates) {
         const { id, ...changes } = update;

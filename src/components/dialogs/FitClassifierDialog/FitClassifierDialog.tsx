@@ -23,9 +23,9 @@ import {
   selectClassifierTrainingPercentage,
   classifierSlice,
 } from "store/slices/classifier";
-import { selectImagesByPartitions } from "store/slices/data";
+import { selectCategorizedImages } from "store/slices/data";
 
-import { AlertStateType, AlertType, Partition } from "types";
+import { AlertStateType, AlertType } from "types";
 import { ModelStatus } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
 
@@ -72,10 +72,7 @@ export const FitClassifierDialog = ({
   >([]);
 
   //TODO: need full inference images here, or just count?
-  const categorizedImages = useSelector(selectImagesByPartitions)([
-    Partition.Training,
-    Partition.Validation,
-  ]);
+  const categorizedImages = useSelector(selectCategorizedImages);
   const selectedModel = useSelector(selectClassifierSelectedModel);
   const modelStatus = useSelector(selectClassifierModelStatus);
   const alertState = useSelector(selectAlertState);
@@ -189,6 +186,7 @@ export const FitClassifierDialog = ({
 
   useEffect(() => {
     if (categorizedImages.length === 0) {
+      console.log("fitClassifierDialog: ", categorizedImages); //LOG:
       setNoCategorizedImages(true);
       if (!noCategorizedImages && selectedModel.trainable) {
         setShowWarning(true);
