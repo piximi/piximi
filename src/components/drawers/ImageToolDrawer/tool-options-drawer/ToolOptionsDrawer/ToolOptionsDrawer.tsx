@@ -11,7 +11,7 @@ export const ToolOptionsDrawer = ({
   toolType,
 }: {
   optionsVisibility: boolean;
-  toolType: OperationType;
+  toolType: OperationType | undefined;
 }) => {
   const t = useTranslation();
 
@@ -31,26 +31,30 @@ export const ToolOptionsDrawer = ({
       open={optionsVisibility}
     >
       <AppBarOffset />
-      <Box
-        width={"100%"}
-        sx={(theme) => ({
-          borderBottom: "1px solid " + theme.palette.text.primary,
-          mb: theme.spacing(1),
-        })}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            textTransform: "capitalize",
-            marginInline: "auto",
-            maxWidth: "fit-content",
-          }}
-          gutterBottom
-        >
-          {t(toolType.name)}
-        </Typography>
-      </Box>
-      {toolType!.options}
+      {toolType && (
+        <>
+          <Box
+            width={"100%"}
+            sx={(theme) => ({
+              borderBottom: "1px solid " + theme.palette.text.primary,
+              mb: theme.spacing(1),
+            })}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                textTransform: "capitalize",
+                marginInline: "auto",
+                maxWidth: "fit-content",
+              }}
+              gutterBottom
+            >
+              {t(toolType?.name)}
+            </Typography>
+          </Box>
+          {toolType!.options}
+        </>
+      )}
     </Drawer>
   );
 };

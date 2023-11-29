@@ -45,7 +45,7 @@ export const ShowPredictionItems = () => {
   };
 
   const clearPredictions = () => {
-    dispatch(dataSlice.actions.clearPredictions({}));
+    dispatch(dataSlice.actions.clearPredictions({ isPermanent: true }));
 
     if (!showLabeledImages) {
       setShowLabeledImages(true);

@@ -5,7 +5,7 @@ import { RootState } from "store/rootReducer";
 import { imagesAdapter } from "../../dataSlice";
 import { selectAnnotationsByImageDict } from "../annotation/annotationSelectors";
 
-import { Data, ImageType, Partition } from "types";
+import { Data, ImageType, Partition, UNKNOWN_IMAGE_CATEGORY_ID } from "types";
 
 const imageSelectors = imagesAdapter.getSelectors(
   (state: RootState) => state.data.images
@@ -74,5 +74,14 @@ export const selectAnnotatedImages = createSelector(
     }
 
     return images;
+  }
+);
+
+export const selectCategorizedImages = createSelector(
+  selectAllImages,
+  (images) => {
+    return images.filter(
+      (image) => image.categoryId !== UNKNOWN_IMAGE_CATEGORY_ID
+    );
   }
 );

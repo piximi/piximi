@@ -15,7 +15,13 @@ import {
   selectHighlightedImageCategory,
 } from "store/slices/project";
 
-import { Category, HotkeyView, PartialBy, UNKNOWN_IMAGE_CATEGORY } from "types";
+import {
+  Category,
+  HotkeyView,
+  PartialBy,
+  UNKNOWN_IMAGE_CATEGORY,
+  Partition,
+} from "types";
 import { CategoriesList } from "../CategoriesList";
 import { useHotkeys } from "hooks";
 import { selectSelectedImageIds } from "store/slices/project/selectors";
@@ -190,6 +196,7 @@ export const ImageCategoryList = (props: ImageCategoryListProps) => {
             updates: selectedImageIds.map((imageId) => ({
               id: imageId,
               categoryId: highlightedCategory,
+              partition: Partition.Unassigned,
             })),
             isPermanent: true,
           })

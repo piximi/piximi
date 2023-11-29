@@ -14,7 +14,7 @@ import {
 
 import { dataSlice, selectVisibleImages } from "store/slices/data";
 
-import { HotkeyView, ImageType } from "types";
+import { HotkeyView, ImageType, Partition } from "types";
 import { ImageGridItem } from "../ImageGridItem/ImageGridItem";
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 import { imageViewerSlice } from "store/slices/imageViewer";
@@ -100,6 +100,7 @@ export const ImageGrid = () => {
     const updates = selectedImageIds.map((imageId) => ({
       id: imageId,
       categoryId: categoryId,
+      partition: Partition.Unassigned,
     }));
     dispatch(
       dataSlice.actions.updateImages({

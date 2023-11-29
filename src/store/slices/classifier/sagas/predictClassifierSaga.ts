@@ -137,6 +137,7 @@ function* runPrediction(
           id: imageId,
           categoryId: categoryIds[idx],
         })),
+        isPermanent: true,
       })
     );
   }

@@ -133,10 +133,10 @@ const deserializeImageGroup = async (
   const id = (await getAttr(imageGroup, "image_id")) as string;
   const activePlane = (await getAttr(imageGroup, "active_plane")) as number;
   const categoryId = (await getAttr(imageGroup, "class_category_id")) as string;
-  const classifierPartition = (await getAttr(
-    imageGroup,
-    "classifier_partition"
-  )) as Partition;
+  // const classifierPartition = (await getAttr(
+  //   imageGroup,
+  //   "classifier_partition"
+  // )) as Partition;
 
   const colorsGroup = await getGroup(imageGroup, "colors");
   const colors = await deserializeColorsGroup(colorsGroup);
@@ -163,7 +163,7 @@ const deserializeImageGroup = async (
     name,
     activePlane,
     categoryId,
-    partition: classifierPartition,
+    partition: Partition.Unassigned,
     colors,
     data: imageTensor,
     bitDepth,
@@ -194,6 +194,7 @@ const deserializeImagesGroup = async (imagesGroup: Group, loadCb: LoadCB) => {
 
     const imageGroup = await getGroup(imagesGroup, name);
     const image = await deserializeImageGroup(name, imageGroup);
+
     images.push(image);
   }
 

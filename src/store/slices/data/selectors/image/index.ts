@@ -25,6 +25,7 @@ export {
   selectImagesByPartitions,
   selectUnannotatedImages,
   selectImageIds,
+  selectCategorizedImages,
 } from "./imageSelectors";
 export { selectVisibleImages } from "./selectVisibleImages";
 export { selectSelectedImages } from "./selectSelectedImages";
