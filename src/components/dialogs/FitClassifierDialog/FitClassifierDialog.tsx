@@ -186,7 +186,6 @@ export const FitClassifierDialog = ({
 
   useEffect(() => {
     if (categorizedImages.length === 0) {
-      console.log("fitClassifierDialog: ", categorizedImages); //LOG:
       setNoCategorizedImages(true);
       if (!noCategorizedImages && selectedModel.trainable) {
         setShowWarning(true);

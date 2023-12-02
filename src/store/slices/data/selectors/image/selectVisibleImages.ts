@@ -50,8 +50,8 @@ export const selectVisibleImages = createSelector(
         }
       }
     }
-    //const t1 = performance.now();
-    //console.log("Duration: ", t1 - t0);
+    // const t1 = performance.now();
+    // console.log("Duration: ", t1 - t0);
     return visibleImages;
   }
 );

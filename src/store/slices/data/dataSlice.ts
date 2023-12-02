@@ -597,8 +597,6 @@ export const dataSlice = createSlice({
     ) {
       const { updates, isPermanent } = action.payload;
 
-      console.log("update reducer: ", updates); //LOG:
-
       for (const update of updates) {
         const { id, ...changes } = update;
 

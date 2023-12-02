@@ -63,8 +63,6 @@ function* assignDataPartitions({
   const trainDataIds = take(categorizedImagesIds, trainDataLength);
   const valDataIds = takeRight(categorizedImagesIds, valDataLength);
 
-  console.log("assignPartition: ", uncategorizedImages); //LOG:
-
   yield put(
     dataSlice.actions.updateImages({
       updates: [
