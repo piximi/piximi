@@ -23,7 +23,25 @@ export const FilterOptions = () => {
 
   const toggleImageCategoryFilter = useCallback(
     (categoryId: string) => {
-      if (imageFilters.categoryId.includes(categoryId)) {
+      if (imageFilters.categoryId.length === 0) {
+        dispatch(
+          projectSlice.actions.addImageCategoryFilters({
+            categoryIds: Object.keys(imageCategories).filter(
+              (id) => id !== categoryId
+            ),
+          })
+        );
+      } else if (
+        imageFilters.categoryId.length ===
+          Object.keys(imageCategories).length - 1 &&
+        !imageFilters.categoryId.includes(categoryId)
+      ) {
+        dispatch(
+          projectSlice.actions.removeImageCategoryFilters({
+            all: true,
+          })
+        );
+      } else if (imageFilters.categoryId.includes(categoryId)) {
         dispatch(
           projectSlice.actions.removeImageCategoryFilters({
             categoryIds: [categoryId],
@@ -37,12 +55,27 @@ export const FilterOptions = () => {
         );
       }
     },
-    [dispatch, imageFilters.categoryId]
+    [dispatch, imageFilters.categoryId, imageCategories]
   );
 
   const toggleImagePartition = useCallback(
     (partition: Partition) => {
-      if (imageFilters.partition.includes(partition)) {
+      if (imageFilters.partition.length === 0) {
+        dispatch(
+          projectSlice.actions.addImagePartitionFilters({
+            partitions: Object.values(Partition).filter(
+              (_partition) => _partition !== partition
+            ),
+          })
+        );
+      } else if (
+        imageFilters.partition.length === Object.values(Partition).length - 1 &&
+        !imageFilters.partition.includes(partition)
+      ) {
+        dispatch(
+          projectSlice.actions.removeImagePartitionFilters({ all: true })
+        );
+      } else if (imageFilters.partition.includes(partition)) {
         dispatch(
           projectSlice.actions.removeImagePartitionFilters({
             partitions: [partition],
@@ -61,7 +94,25 @@ export const FilterOptions = () => {
 
   const toggleAnnotationCategoryFilter = useCallback(
     (categoryId: string) => {
-      if (annotationFilters.categoryId.includes(categoryId)) {
+      if (annotationFilters.categoryId.length === 0) {
+        dispatch(
+          projectSlice.actions.addAnnotationCategoryFilters({
+            categoryIds: Object.keys(annotationCategories).filter(
+              (id) => id !== categoryId
+            ),
+          })
+        );
+      } else if (
+        annotationFilters.categoryId.length ===
+          Object.keys(annotationCategories).length - 1 &&
+        !annotationFilters.categoryId.includes(categoryId)
+      ) {
+        dispatch(
+          projectSlice.actions.removeAnnotationCategoryFilters({
+            all: true,
+          })
+        );
+      } else if (annotationFilters.categoryId.includes(categoryId)) {
         dispatch(
           projectSlice.actions.removeAnnotationCategoryFilters({
             categoryIds: [categoryId],
@@ -75,28 +126,29 @@ export const FilterOptions = () => {
         );
       }
     },
-    [dispatch, annotationFilters.categoryId]
+    [dispatch, annotationFilters.categoryId, annotationCategories]
   );
 
-  const handleRemoveImageCategoryFilter = (categoryId: string) => {
+  const handleAddImageCategoryFilter = (categoryId: string) => {
     dispatch(
-      projectSlice.actions.removeImageCategoryFilters({
+      projectSlice.actions.addImageCategoryFilters({
         categoryIds: [categoryId],
       })
     );
   };
 
-  const handleRemoveImagePartitionFilter = (partition: Partition) => {
+  const handleAddImagePartitionFilter = (partition: Partition) => {
     dispatch(
-      projectSlice.actions.removeImagePartitionFilters({
+      projectSlice.actions.addImagePartitionFilters({
         partitions: [partition],
       })
     );
   };
 
-  const handleRemoveAnnotationCategoryFilter = (categoryId: string) => {
+  const handleAddAnnotationCategoryFilter = (categoryId: string) => {
+    console.log("add");
     dispatch(
-      projectSlice.actions.removeAnnotationCategoryFilters({
+      projectSlice.actions.addAnnotationCategoryFilters({
         categoryIds: [categoryId],
       })
     );
@@ -109,20 +161,20 @@ export const FilterOptions = () => {
         allCategories={imageCategories}
         filteredCategories={imageFilters.categoryId}
         toggleFilter={toggleImageCategoryFilter}
-        removeFilter={handleRemoveImageCategoryFilter}
+        addFilter={handleAddImageCategoryFilter}
       />
       <PartitionFilterList
         header="Image Partitions"
         filteredPartitions={imageFilters.partition}
         toggleFilter={toggleImagePartition}
-        removeFilter={handleRemoveImagePartitionFilter}
+        addFilter={handleAddImagePartitionFilter}
       />
       <FilterCategoriesList
         header="Annotation Categories"
         allCategories={annotationCategories}
         filteredCategories={annotationFilters.categoryId}
         toggleFilter={toggleAnnotationCategoryFilter}
-        removeFilter={handleRemoveAnnotationCategoryFilter}
+        addFilter={handleAddAnnotationCategoryFilter}
       />
     </Stack>
   );

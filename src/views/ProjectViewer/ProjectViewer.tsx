@@ -76,7 +76,7 @@ export const ProjectViewer = () => {
                 {annotationCount === 0 ? <></> : <AnnotationImageGrid />}
               </CustomTabSwitcher>
             </Box>
-            <ImageToolDrawer />
+            {process.env.NODE_ENV === "development" && <ImageToolDrawer />}
           </Box>
         </div>
       </ErrorBoundary>
