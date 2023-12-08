@@ -4,7 +4,10 @@ import {
   selectActiveAnnotationIds,
   selectWorkingAnnotation,
 } from "store/slices/imageViewer";
-import { selectActiveImageShape } from "../image/selectActiveImageAttributes";
+import {
+  selectActiveImageActivePlane,
+  selectActiveImageShape,
+} from "../image/selectActiveImageAttributes";
 import { selectAnnotationCategoryEntities } from "../annotation-category/annotationCategorySelectors";
 import { selectAnnotationEntities } from "./annotationSelectors";
 
@@ -19,13 +22,15 @@ export const selectActiveAnnotationObjects = createSelector(
     selectAnnotationEntities,
     selectAnnotationCategoryEntities,
     selectWorkingAnnotation,
+    selectActiveImageActivePlane,
   ],
   (
     activeImageShape,
     activeAnnotationIds,
     annotationEntities,
     categoryEntities,
-    workingAnnotation
+    workingAnnotation,
+    activePlane
   ): Array<{
     annotation: DecodedAnnotationType;
     fillColor: string;
@@ -50,12 +55,14 @@ export const selectActiveAnnotationObjects = createSelector(
         ? decodeAnnotation(annotationEntities[annotationId])
         : (annotationEntities[annotationId] as DecodedAnnotationType);
 
-      const fillColor = categoryEntities[annotation.categoryId].color;
-      annotationObjects.push({
-        annotation,
-        fillColor,
-        imageShape: activeImageShape,
-      });
+      if (annotation.plane === activePlane) {
+        const fillColor = categoryEntities[annotation.categoryId].color;
+        annotationObjects.push({
+          annotation,
+          fillColor,
+          imageShape: activeImageShape,
+        });
+      }
     }
     return annotationObjects;
   }
