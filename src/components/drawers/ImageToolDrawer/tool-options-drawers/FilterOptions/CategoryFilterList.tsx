@@ -11,13 +11,11 @@ export const FilterCategoriesList = ({
   allCategories,
   filteredCategories,
   toggleFilter,
-  addFilter,
 }: {
   header: string;
   allCategories: Record<string, Category>;
   filteredCategories: string[];
   toggleFilter: (categoryId: string) => void;
-  addFilter: (categoryId: string) => void;
 }) => {
   const theme = useTheme();
   const [unfilteredCategories, setUnfilteredCategories] = useState<string[]>(
@@ -38,7 +36,7 @@ export const FilterCategoriesList = ({
         <CategoryChipsWrapper
           allCategories={allCategories}
           filteredCategories={unfilteredCategories}
-          removeFilter={addFilter}
+          removeFilter={toggleFilter}
         />
       </Collapse>
 

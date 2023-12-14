@@ -1,0 +1,1 @@
+export { ImageInformationTable } from "./ImageInformationTable";

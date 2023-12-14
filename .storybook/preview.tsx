@@ -7,7 +7,7 @@ import { withThemeFromJSXProvider } from "@storybook/addon-styling";
 
 /* TODO: update import for your custom Material UI themes */
 import { lightTheme, darkTheme } from "../src/themes/muiTheme";
-import { productionStore } from "../src/store/stores";
+import { productionStore } from "../src/store";
 
 // Import your fontface CSS files here
 // Don't have any? We recommend installing and using @fontsource/roboto

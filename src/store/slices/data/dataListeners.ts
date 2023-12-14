@@ -290,12 +290,12 @@ startAppListening({
         })
       );
       listenerAPI.subscribe();
+      listenerAPI.dispatch(
+        projectSlice.actions.setLoadMessage({
+          message: "",
+        })
+      );
     }
-    listenerAPI.dispatch(
-      projectSlice.actions.setLoadMessage({
-        message: "",
-      })
-    );
   },
 });
 

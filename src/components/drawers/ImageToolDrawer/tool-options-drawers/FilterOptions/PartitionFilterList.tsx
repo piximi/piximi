@@ -9,12 +9,10 @@ export const PartitionFilterList = ({
   header,
   filteredPartitions,
   toggleFilter,
-  addFilter,
 }: {
   header: string;
   filteredPartitions: Partition[];
   toggleFilter: (partition: Partition) => void;
-  addFilter: (partition: Partition) => void;
 }) => {
   const theme = useTheme();
   const [unfilteredPartitions, setUnfilteredPartitions] = useState<Partition[]>(
@@ -41,7 +39,7 @@ export const PartitionFilterList = ({
       <Collapse in={unfilteredPartitions.length > 0} timeout="auto">
         <PartitionChipsWrapper
           filteredPartitions={unfilteredPartitions}
-          removeFilter={addFilter}
+          removeFilter={toggleFilter}
         />
       </Collapse>
 

@@ -129,31 +129,6 @@ export const FilterOptions = () => {
     [dispatch, annotationFilters.categoryId, annotationCategories]
   );
 
-  const handleAddImageCategoryFilter = (categoryId: string) => {
-    dispatch(
-      projectSlice.actions.addImageCategoryFilters({
-        categoryIds: [categoryId],
-      })
-    );
-  };
-
-  const handleAddImagePartitionFilter = (partition: Partition) => {
-    dispatch(
-      projectSlice.actions.addImagePartitionFilters({
-        partitions: [partition],
-      })
-    );
-  };
-
-  const handleAddAnnotationCategoryFilter = (categoryId: string) => {
-    console.log("add");
-    dispatch(
-      projectSlice.actions.addAnnotationCategoryFilters({
-        categoryIds: [categoryId],
-      })
-    );
-  };
-
   return (
     <Stack maxWidth="100%">
       <FilterCategoriesList
@@ -161,20 +136,17 @@ export const FilterOptions = () => {
         allCategories={imageCategories}
         filteredCategories={imageFilters.categoryId}
         toggleFilter={toggleImageCategoryFilter}
-        addFilter={handleAddImageCategoryFilter}
       />
       <PartitionFilterList
         header="Image Partitions"
         filteredPartitions={imageFilters.partition}
         toggleFilter={toggleImagePartition}
-        addFilter={handleAddImagePartitionFilter}
       />
       <FilterCategoriesList
         header="Annotation Categories"
         allCategories={annotationCategories}
         filteredCategories={annotationFilters.categoryId}
         toggleFilter={toggleAnnotationCategoryFilter}
-        addFilter={handleAddAnnotationCategoryFilter}
       />
     </Stack>
   );

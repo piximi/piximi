@@ -2,10 +2,14 @@ import React, { ReactElement, useState } from "react";
 
 import { Badge, Drawer, ListItem, ListItemIcon, useTheme } from "@mui/material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { FilterOptions } from "./tool-options-drawer/FilterOptions";
+import {
+  FilterOptions,
+  InformationOptions,
+  ToolOptionsDrawer,
+} from "./tool-options-drawers";
 import { useTranslation } from "hooks";
-import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
 import { AppBarOffset } from "components/styled-components";
 import { dimensions } from "utils/common";
 import { useSelector } from "react-redux";
@@ -27,6 +31,13 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <FilterOptions />,
     hotkey: "F",
+  },
+  "image information": {
+    icon: (color) => <InfoOutlinedIcon sx={{ color: color }} />,
+    name: "image information",
+    description: "-",
+    options: <InformationOptions />,
+    hotkey: "I",
   },
 };
 
@@ -76,36 +87,48 @@ export const ImageToolDrawer = () => {
         open={isOpen}
       >
         <AppBarOffset />
-        <TooltipCard description={<ToolHotkeyTitle toolName={t("Filters")} />}>
-          <ListItem
-            button
-            onClick={() => {
-              handleSelectTool("filters");
-            }}
-          >
-            <ListItemIcon>
-              <Badge
-                color="primary"
-                variant="dot"
-                invisible={
-                  !(
-                    filteredState.hasAnnotationFilters ||
-                    filteredState.hasImageFilters
-                  )
-                }
+        {Object.values(imageTools).map((tool) => {
+          return (
+            <TooltipCard
+              key={`tool-drawer-${tool.name}`}
+              description={<ToolHotkeyTitle toolName={t(tool.name)} />}
+            >
+              <ListItem
+                button
+                onClick={() => {
+                  handleSelectTool(tool.name);
+                }}
               >
-                <FilterAltOutlinedIcon
-                  sx={{
-                    color:
-                      activeTool === "filters"
+                <ListItemIcon>
+                  {tool.name === "filters" ? (
+                    <Badge
+                      color="primary"
+                      variant="dot"
+                      invisible={
+                        !(
+                          filteredState.hasAnnotationFilters ||
+                          filteredState.hasImageFilters
+                        )
+                      }
+                    >
+                      {tool.icon(
+                        activeTool === tool.name
+                          ? theme.palette.primary.dark
+                          : theme.palette.grey[400]
+                      )}
+                    </Badge>
+                  ) : (
+                    tool.icon(
+                      activeTool === tool.name
                         ? theme.palette.primary.dark
-                        : theme.palette.grey[400],
-                  }}
-                />
-              </Badge>
-            </ListItemIcon>
-          </ListItem>
-        </TooltipCard>
+                        : theme.palette.grey[400]
+                    )
+                  )}
+                </ListItemIcon>
+              </ListItem>
+            </TooltipCard>
+          );
+        })}
       </Drawer>
     </>
   );
