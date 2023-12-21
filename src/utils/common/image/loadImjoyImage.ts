@@ -3,7 +3,7 @@ import { generateDefaultColors } from "./imageHelper";
 import * as tf from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
 
-import { OldImageType, UNKNOWN_IMAGE_CATEGORY, Partition } from "types";
+import { ImageType, UNKNOWN_IMAGE_CATEGORY, Partition } from "types";
 
 import { imjoyRPC } from "imjoy-rpc";
 
@@ -31,9 +31,8 @@ const loadImage = async (image: any, cb: any) => {
 
   const colors = await generateDefaultColors(imTensor);
 
-  const decodedImage: OldImageType = {
+  const decodedImage: ImageType = {
     id: uuid(),
-    annotations: [],
     activePlane: 0,
     bitDepth: 8,
     categoryId: UNKNOWN_IMAGE_CATEGORY.id,
@@ -51,7 +50,7 @@ const loadImage = async (image: any, cb: any) => {
   cb(decodedImage);
 };
 
-export const loadImjoyImage = async (cb: (image: OldImageType) => any) => {
+export const loadImjoyImage = async (cb: (image: ImageType) => any) => {
   const setupPromise = imjoyRPC.setupRPC({
     name: "Piximi",
     version: "0.1.0",
