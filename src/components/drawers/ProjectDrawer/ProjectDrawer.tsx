@@ -16,8 +16,7 @@ export const ProjectDrawer = () => {
       <Divider />
       <CustomTabSwitcher
         childClassName="drawer-tab"
-        label1="Classifier"
-        label2="Segmenter"
+        labels={["Classifier", "Segmenter"]}
       >
         <ClassifierList />
 

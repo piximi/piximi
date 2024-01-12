@@ -67,13 +67,12 @@ export const ProjectViewer = () => {
             >
               <CustomTabSwitcher
                 childClassName="grid-tabs"
-                label1="Images"
-                label2="Annotations"
+                labels={["Images", "Annotations"]}
                 disabledTabs={annotationCount === 0 ? [1] : undefined}
                 secondaryEffect={handleTabChange}
               >
                 <ImageGrid />
-                {annotationCount === 0 ? <></> : <AnnotationImageGrid />}
+                <AnnotationImageGrid />
               </CustomTabSwitcher>
             </Box>
             {process.env.NODE_ENV === "development" && <ImageToolDrawer />}

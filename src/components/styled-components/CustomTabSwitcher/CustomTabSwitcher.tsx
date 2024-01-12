@@ -31,15 +31,13 @@ function TabPanel(props: TabPanelProps) {
 export const CustomTabSwitcher = ({
   children,
   childClassName,
-  label1,
-  label2,
+  labels,
   disabledTabs,
   secondaryEffect,
 }: {
   children: JSX.Element[];
   childClassName: string;
-  label1: string;
-  label2: string;
+  labels: string[] | ReactElement[];
   disabledTabs?: number[];
   secondaryEffect?: (index: number) => void;
 }) => {
@@ -61,7 +59,8 @@ export const CustomTabSwitcher = ({
           })}
         </div>
       );
-    });
+    }).filter((child, idx) => !disabledTabs?.includes(idx));
+
     return <>{StyledChildren}</>;
   };
 
@@ -80,14 +79,17 @@ export const CustomTabSwitcher = ({
             aria-label="tabbed-view"
             variant="fullWidth"
           >
-            <Tab
-              label={label1}
-              disabled={disabledTabs && disabledTabs.includes(0)}
-            />
-            <Tab
-              label={label2}
-              disabled={disabledTabs && disabledTabs.includes(1)}
-            />
+            {labels?.map((label, idx) => {
+              return typeof label === "string" ? (
+                <Tab
+                  key={`Tab-${childClassName}-tab-${idx}`}
+                  label={label}
+                  disabled={disabledTabs && disabledTabs.includes(idx)}
+                />
+              ) : (
+                label
+              );
+            })}
           </Tabs>
         </Box>
         <TabPanel value={tabIndex} index={0}>
