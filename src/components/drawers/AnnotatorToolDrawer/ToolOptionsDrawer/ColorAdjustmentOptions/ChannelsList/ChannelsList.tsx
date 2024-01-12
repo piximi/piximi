@@ -15,7 +15,6 @@ import {
 
 import { useLocalGlobalState } from "hooks";
 
-import { CollapsibleList } from "components/lists";
 import { rgbToHex, scaleUpRange, scaleDownRange } from "utils/common/image";
 import { Palette } from "../Palette";
 
@@ -29,6 +28,7 @@ import {
 } from "store/slices/data";
 
 import { CheckboxCheckedIcon, CheckboxUncheckedIcon } from "icons";
+import { CollapsibleListItem } from "components/list-items/CollapsibleListItem";
 
 //TODO: Slider Components
 
@@ -151,14 +151,16 @@ export const ChannelsList = () => {
   };
 
   return (
-    <CollapsibleList closed dense disableNestIndent={true} primary="Channels">
-      <List component="div" dense>
-        {Array(localActiveImageColors.color.length)
-          .fill(0)
-          .map((_, i) => {
-            return colorAdjustmentSlider(i, `Ch. ${i}`);
-          })}
-      </List>
-    </CollapsibleList>
+    <List dense>
+      <CollapsibleListItem dense primaryText="Channels" indentSpacing={0}>
+        <List component="div" dense>
+          {Array(localActiveImageColors.color.length)
+            .fill(0)
+            .map((_, i) => {
+              return colorAdjustmentSlider(i, `Ch. ${i}`);
+            })}
+        </List>
+      </CollapsibleListItem>
+    </List>
   );
 };
