@@ -1,20 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Slider,
-  Toolbar,
-  Box,
-  Button,
-  Typography,
-  TextField,
-  FormControl,
-} from "@mui/material";
+import { Slider, Toolbar, Box, Button, Typography } from "@mui/material";
 import {
   ZoomOut as ZoomOutIcon,
   ZoomIn as ZoomInIcon,
 } from "@mui/icons-material";
 
+import { BlurActionTextField } from "components/styled-components/inputs";
 import { ImageSortSelection } from "components/styled-components";
 
 import { LogoLoader } from "components/styled-components";
@@ -36,8 +29,6 @@ export const ProjectToolbar = () => {
   const loadMessage = useSelector(selectLoadMessage);
   const projectName = useSelector(selectProjectName);
   const [value, setValue] = useState<number>(1);
-  const [newProjectName, setNewProjectName] = useState<string>(projectName);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSizeChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number);
@@ -68,26 +59,6 @@ export const ProjectToolbar = () => {
     );
   };
 
-  const handleTextFieldBlur = () => {
-    if (projectName === newProjectName) return;
-    dispatch(projectSlice.actions.setProjectName({ name: newProjectName }));
-    setNewProjectName("");
-  };
-
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setNewProjectName(event.target.value);
-  };
-
-  const handleTextFieldEnter = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      inputRef.current?.blur();
-    }
-  };
-
   return (
     <Toolbar>
       <LogoLoader width={250} height={50} loadPercent={loadPercent} />
@@ -97,17 +68,15 @@ export const ProjectToolbar = () => {
           {loadMessage}
         </Typography>
       ) : (
-        <FormControl>
-          <TextField
-            onChange={handleTextFieldChange}
-            onBlur={handleTextFieldBlur}
-            onKeyDown={handleTextFieldEnter}
-            defaultValue={projectName}
-            inputRef={inputRef}
-            size="small"
-            sx={{ ml: 5 }}
-          />
-        </FormControl>
+        <BlurActionTextField
+          id="toolbar-project-name-input"
+          currentText={projectName}
+          callback={(name) =>
+            dispatch(projectSlice.actions.setProjectName({ name }))
+          }
+          size="small"
+          sx={{ ml: 5 }}
+        />
       )}
 
       <Box sx={{ flexGrow: 1 }} />

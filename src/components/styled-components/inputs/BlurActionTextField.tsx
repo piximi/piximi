@@ -16,14 +16,11 @@ export const BlurActionTextField = ({
     setNewText(event.target.value);
   };
   const handleBlur = () => {
-    console.log("Im blur"); //LOG:
     if (currentText === newText) return;
-    console.log("I made it past the blur check"); //LOG:
     callback(newText);
   };
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      console.log("Im enter"); //LOG:
       inputRef.current?.blur();
     }
   };
@@ -36,6 +33,10 @@ export const BlurActionTextField = ({
       onChange={handleChange}
       onBlur={handleBlur}
       onKeyDown={handleEnter}
+      onFocus={(event) => {
+        console.log("Text Field Focused");
+        console.log(event); //LOG:
+      }}
     />
   );
 };
