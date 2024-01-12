@@ -87,7 +87,7 @@ export const PointerSelectionOptions = () => {
         <CollapsibleListItem
           beginCollapsed
           primaryText={t("Select by Category")}
-          carotPosition="start"
+          caretPosition="start"
           dense
         >
           <List>

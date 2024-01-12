@@ -73,7 +73,7 @@ export const SegmenterArchitectureListItem = () => {
   return (
     <CollapsibleListItem
       primaryText="Architecture Settings"
-      carotPosition="start"
+      caretPosition="start"
       divider={true}
     >
       <ArchitectureSettings

@@ -35,7 +35,7 @@ export const ClassifierPreprocessingListItem = () => {
     <CollapsibleListItem
       dense={false}
       primaryText="Preprocessing Settings"
-      carotPosition="start"
+      caretPosition="start"
       divider={true}
     >
       <PreprocessingSettings

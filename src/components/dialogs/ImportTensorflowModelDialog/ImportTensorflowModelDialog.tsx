@@ -33,6 +33,7 @@ import {
 import { Model } from "utils/common/models/Model";
 import { ModelFormatSelection } from "./ModelFormatSelection";
 import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
+import { CustomTabSwitcher } from "components/styled-components";
 
 const ToolTipTab = (
   props: TabProps & {
@@ -184,6 +185,55 @@ export const ImportTensorflowModelDialog = ({
         model
       </DialogTitle>
 
+      <CustomTabSwitcher
+        childClassName="import-tf-model-tabs"
+        labels={[
+          <ToolTipTab
+            label="Load Pretrained"
+            value="1"
+            disabledMessage="None Available"
+            placement="top"
+            disabled={pretrainedModels.length === 0}
+          />,
+          <ToolTipTab
+            label="Upload Local"
+            value="2"
+            disabledMessage="Not Yet Supported"
+            placement="top"
+            disabled={modelTask === ModelTask.Segmentation}
+          />,
+          <ToolTipTab
+            label="Fetch Remote"
+            value="3"
+            disabledMessage="Not Yet Supported"
+            placement="top"
+            disabled={modelTask === ModelTask.Segmentation}
+          />,
+        ]}
+      >
+        <PretrainedModelSelector
+          values={pretrainedModels}
+          setModel={onModelChange}
+        />
+        <>
+          <LocalFileUpload
+            modelTask={modelTask}
+            isGraph={isGraph}
+            setModel={onModelChange}
+            setInputShape={setInputShape}
+          />
+          <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+        </>
+        <>
+          <CloudUpload
+            modelTask={modelTask}
+            isGraph={isGraph}
+            setModel={onModelChange}
+            setInputShape={setInputShape}
+          />
+          <ModelFormatSelection isGraph={isGraph} setIsGraph={setIsGraph} />
+        </>
+      </CustomTabSwitcher>
       <Tabs value={tabVal} onChange={onTabSelect}>
         <ToolTipTab
           label="Load Pretrained"

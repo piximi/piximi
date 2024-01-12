@@ -20,7 +20,7 @@ type CollapsibleListProps = {
   closed?: boolean;
   backgroundColor?: string;
   disablePadding?: boolean;
-  paddingLeft?: boolean;
+  disableNestIndent?: boolean;
   sx?: SxProps;
   onScroll?: (evt: React.UIEvent<HTMLDivElement, UIEvent>) => void;
   secondary?: JSX.Element;
@@ -34,7 +34,7 @@ export const CollapsibleList = ({
   backgroundColor,
   primary,
   disablePadding,
-  paddingLeft,
+  disableNestIndent,
   sx,
   onScroll,
   secondary,
@@ -51,22 +51,22 @@ export const CollapsibleList = ({
       sx={{ backgroundColor: backgroundColor ? backgroundColor : "" }}
       dense={dense}
     >
-      <ListItem secondaryAction={secondary}>
+      <ListItem secondaryAction={secondary} disablePadding>
         <ListItemButton
           role={undefined}
           onClick={handleClick}
           disableGutters
           disabled={disabled}
+          sx={{ py: 0.5, px: 2 }}
         >
-          <ListItemIcon>
+          <ListItemText primary={primary} />
+          <ListItemIcon sx={{ minWidth: 0 }}>
             {!collapsed ? (
               <KeyboardArrowDownIcon />
             ) : (
               <KeyboardArrowRightIcon />
             )}
           </ListItemIcon>
-
-          <ListItemText primary={primary} />
         </ListItemButton>
       </ListItem>
 
@@ -74,17 +74,9 @@ export const CollapsibleList = ({
         in={!collapsed}
         timeout="auto"
         unmountOnExit
-        sx={{ paddingLeft: paddingLeft ? "2rem" : "auto" }}
+        sx={{ paddingLeft: disableNestIndent ? "auto" : "2rem" }}
       >
-        <List
-          component="div"
-          dense={dense}
-          disablePadding={disablePadding}
-          sx={sx}
-          onScroll={onScroll}
-        >
-          {children}
-        </List>
+        {children}
       </Collapse>
     </List>
   );

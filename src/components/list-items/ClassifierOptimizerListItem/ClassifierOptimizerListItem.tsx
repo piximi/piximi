@@ -54,7 +54,7 @@ export const ClassifierOptimizerListItem = ({
   return (
     <CollapsibleListItem
       primaryText="Optimizer Settings"
-      carotPosition="start"
+      caretPosition="start"
       divider={true}
     >
       <OptimizerSettingsGrid

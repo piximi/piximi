@@ -35,7 +35,7 @@ export const ClassifierDatasetListItem = ({
   return (
     <CollapsibleListItem
       primaryText="Dataset Settings"
-      carotPosition="start"
+      caretPosition="start"
       divider={true}
     >
       <DatasetSettings

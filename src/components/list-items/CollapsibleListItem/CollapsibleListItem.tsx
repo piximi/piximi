@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import {
   ListItemIcon,
   ListItemText,
@@ -6,10 +6,8 @@ import {
   ListItemButton,
   Divider,
 } from "@mui/material";
-import {
-  KeyboardArrowRight as KeyboardArrowRightIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-} from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const heights = {
   sm: "1.5rem",
@@ -25,7 +23,7 @@ type GenericCollapsibleListItemProps = {
   divider?: boolean;
   dense?: boolean;
   secondary?: JSX.Element;
-  carotPosition?: "start" | "end";
+  caretPosition?: "start" | "end";
   beginCollapsed?: boolean;
   disabled?: boolean;
   enforceHeight?: "sm" | "md" | "lg";
@@ -38,7 +36,7 @@ export const CollapsibleListItem = ({
   divider,
   dense,
   secondary,
-  carotPosition = "end",
+  caretPosition = "end",
   beginCollapsed = true,
   disabled,
   enforceHeight,
@@ -50,38 +48,47 @@ export const CollapsibleListItem = ({
     setCollapsed(!collapsed);
   };
 
+  const caret = useMemo(() => {
+    return collapsed ? (
+      <ChevronRightIcon fontSize={dense ? "small" : "medium"} />
+    ) : (
+      <ExpandMoreIcon fontSize={dense ? "small" : "medium"} />
+    );
+  }, [dense, collapsed]);
+
+  const ListItemContents = () => {
+    if (caretPosition === "start") {
+      return (
+        <>
+          <ListItemIcon sx={{ minWidth: 0 }}>{caret}</ListItemIcon>
+
+          <ListItemText primary={primaryText} sx={{ px: 0.5 }} />
+          {secondary && secondary}
+        </>
+      );
+    } else {
+      return (
+        <>
+          {secondary && secondary}
+          <ListItemText primary={primaryText} sx={{ px: 0.5 }} />
+          <ListItemIcon sx={{ minWidth: 0 }}>{caret}</ListItemIcon>
+        </>
+      );
+    }
+  };
+
   return (
     <>
       <ListItemButton
         onClick={handleCollapse}
         disabled={disabled}
-        sx={{ height: enforceHeight ? heights[enforceHeight] : undefined }}
+        sx={{
+          height: enforceHeight ? heights[enforceHeight] : undefined,
+          px: 0.5,
+        }}
         dense={dense}
       >
-        {carotPosition === "start" ? (
-          <ListItemIcon>
-            {!collapsed ? (
-              <KeyboardArrowDownIcon />
-            ) : (
-              <KeyboardArrowRightIcon />
-            )}
-          </ListItemIcon>
-        ) : (
-          secondary && secondary
-        )}
-
-        <ListItemText primary={primaryText} />
-        {carotPosition === "end" ? (
-          <ListItemIcon>
-            {!collapsed ? (
-              <KeyboardArrowDownIcon />
-            ) : (
-              <KeyboardArrowRightIcon />
-            )}
-          </ListItemIcon>
-        ) : (
-          secondary && secondary
-        )}
+        {ListItemContents()}
       </ListItemButton>
       {divider && (
         <Divider

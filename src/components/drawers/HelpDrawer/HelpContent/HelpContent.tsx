@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Typography } from "@mui/material";
+import { Box, Divider, List, Typography } from "@mui/material";
 import { ToolHotkeyTitle } from "components/tooltips/ToolHotkeyTitle/ToolHotkeyTitle";
 
 import { CollapsibleList } from "components/lists";
@@ -40,7 +40,7 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
             closed={true}
             dense={true}
           >
-            <Container>
+            <List component="div" dense>
               {helpContent.subtopics.map(
                 (subTopic: Subtopic, subtopicIndex: number) => {
                   return (
@@ -74,7 +74,7 @@ export const HelpContent = (helpContent: Array<HelpTopic>) => {
                   );
                 }
               )}
-            </Container>
+            </List>
           </CollapsibleList>
         );
       })}
