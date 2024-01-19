@@ -165,7 +165,7 @@ describe("Unsorted State Adapter", () => {
       entities: {
         [TheGreatGatsby.id]: {
           saved: TheGreatGatsby,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
       },
     });
@@ -188,11 +188,11 @@ describe("Unsorted State Adapter", () => {
       entities: {
         [TheGreatGatsby.id]: {
           saved: TheGreatGatsby,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
         [AClockworkOrange.id]: {
           saved: AClockworkOrange,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
         [AnimalFarm.id]: {
           saved: AnimalFarm,
@@ -216,15 +216,15 @@ describe("Unsorted State Adapter", () => {
       entities: {
         [TheGreatGatsby.id]: {
           saved: TheGreatGatsby,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
         [AClockworkOrange.id]: {
           saved: AClockworkOrange,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
         [AnimalFarm.id]: {
           saved: AnimalFarm,
-          changes: { deleted: true },
+          changes: { added: true, deleted: true },
         },
       },
     });
@@ -566,21 +566,8 @@ describe("Unsorted State Adapter", () => {
     const withReconcileSave = adapter.reconcile(withRemove, false);
 
     expect(withReconcileSave).toEqual({
-      ids: [TheGreatGatsby.id, AClockworkOrange.id, AnimalFarm.id],
-      entities: {
-        [TheGreatGatsby.id]: {
-          saved: TheGreatGatsby,
-          changes: {},
-        },
-        [AClockworkOrange.id]: {
-          saved: AClockworkOrange,
-          changes: {},
-        },
-        [AnimalFarm.id]: {
-          saved: AnimalFarm,
-          changes: {},
-        },
-      },
+      ids: [],
+      entities: {},
     });
   });
 

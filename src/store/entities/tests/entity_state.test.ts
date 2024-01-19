@@ -73,6 +73,7 @@ describe("Entity State", () => {
 
     const afterRemoveOne = reducer(afterAddOne, removeOne(book1.id));
     expect(afterRemoveOne.entities[book1.id].changes).toEqual({
+      added: true,
       deleted: true,
     });
     expect(selectors.selectTotal(afterRemoveOne)).toBe(0);
