@@ -146,7 +146,6 @@ export const FilterOptions = () => {
   };
 
   const handleAddAnnotationCategoryFilter = (categoryId: string) => {
-    console.log("add");
     dispatch(
       projectSlice.actions.addAnnotationCategoryFilters({
         categoryIds: [categoryId],

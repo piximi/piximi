@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 
 import { Box } from "@mui/material";
 import { useDndFileDrop } from "hooks";
@@ -40,10 +40,6 @@ export const StageWrapper = ({
     return () => {
       window.removeEventListener("resize", resizeHandler);
     };
-  });
-
-  useEffect(() => {
-    console.log(width); //LOG:
   });
 
   return (
