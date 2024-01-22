@@ -129,7 +129,9 @@ export const ArchitectureSettings = ({
                 id="shape-rows"
                 label="Input rows"
                 value={inputShape.height}
-                dispatchCallBack={dispatchShape}
+                dispatchCallBack={(number) =>
+                  dispatchShape(number, "shape-rows")
+                }
                 min={1}
                 disabled={!selectedModel.model.trainable}
               />
@@ -139,7 +141,9 @@ export const ArchitectureSettings = ({
                 id="shape-cols"
                 label="Input cols"
                 value={inputShape.width}
-                dispatchCallBack={dispatchShape}
+                dispatchCallBack={(number) =>
+                  dispatchShape(number, "shape-cols")
+                }
                 min={1}
                 disabled={!selectedModel.model.trainable}
               />
@@ -149,7 +153,9 @@ export const ArchitectureSettings = ({
                 id="shape-channels"
                 label="Input channels"
                 value={inputShape.channels}
-                dispatchCallBack={dispatchShape}
+                dispatchCallBack={(number) =>
+                  dispatchShape(number, "shape-channels")
+                }
                 min={1}
                 disabled={
                   fixedNumberOfChannels || !selectedModel.model.trainable
