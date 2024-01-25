@@ -27,6 +27,7 @@ import { Colors } from "types/tensorflow";
  ======================================
  */
 
+//QUESTION: Is there a reason why these are in this file and not in types?
 export enum ImageShapeEnum {
   DicomImage,
   GreyScale,
@@ -833,6 +834,7 @@ export const convertToImage = async (
   const [planes, height, width, channels] = imageTensor.shape;
 
   return {
+    kind: "Image",
     activePlane: activePlane,
     colors: colors,
     bitDepth,
@@ -978,6 +980,26 @@ export const replaceDuplicateName = (
     i += 1;
   }
   return currentName;
+};
+
+//HACK: new
+export const newReplaceDuplicateName = (
+  newName: string,
+  existingNames: Array<string>
+) => {
+  let currentName = newName;
+  let count = 0;
+  // eslint-disable-next-line
+  const nameRe = new RegExp(`${newName}(_\d+)?`, "g");
+  existingNames.forEach((name) => {
+    if (!!nameRe.exec(name)) {
+      const suffix = +name.split("_")[1];
+      if (suffix > count) {
+        count = suffix;
+      }
+    }
+  });
+  return !count ? currentName : `${currentName}_${count + 1}`;
 };
 
 export const scaleUpRange = (

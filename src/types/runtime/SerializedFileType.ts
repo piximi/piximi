@@ -80,6 +80,13 @@ export const SerializedImageRType = T.type({
   name: T.string,
 });
 
+export const NewSerializedImageRType = T.type({
+  id: T.string,
+  name: T.string,
+  kind: T.string,
+  containing: T.array(T.string),
+});
+
 export const SerializedAnnotationRType = T.type({
   categoryId: T.string, // category id, matching id of a SerializedCategory
   imageId: T.string, // image id, matching id of SerializedImage
