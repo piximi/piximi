@@ -178,7 +178,6 @@ const deserializeImageGroup = async (
       channels,
     },
     src,
-    visible: true,
   };
 };
 
