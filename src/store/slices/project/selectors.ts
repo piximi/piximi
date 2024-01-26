@@ -75,3 +75,6 @@ export const selectFilteredState = createSelector(
     return { hasImageFilters, hasAnnotationFilters };
   }
 );
+
+export const selectActiveKind = ({ project }: { project: Project }) =>
+  project.activeKind;

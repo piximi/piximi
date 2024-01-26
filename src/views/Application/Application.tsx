@@ -7,6 +7,7 @@ import { usePreferredMuiTheme } from "hooks";
 
 import { ImageViewer } from "../ImageViewer";
 import { ProjectViewer } from "../ProjectViewer";
+import { NewProjectViewer } from "views/ProjectViewer/NewProjectViewer";
 
 export const Application = () => {
   const theme = usePreferredMuiTheme();
@@ -18,6 +19,7 @@ export const Application = () => {
           <Routes>
             <Route path="/" element={<ProjectViewer />} />
             <Route path="annotator" element={<ImageViewer />} />
+            <Route path="newUI" element={<NewProjectViewer />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
