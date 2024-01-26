@@ -16,6 +16,7 @@ export const initialState: Project = {
   loadMessage: "",
   imageFilters: { categoryId: [], partition: [] },
   annotationFilters: { categoryId: [] },
+  activeKind: "Image",
 };
 
 export const projectSlice = createSlice({
@@ -35,6 +36,9 @@ export const projectSlice = createSlice({
     },
     setImageGridTab(state, action: PayloadAction<{ view: ImageGridTab }>) {
       state.imageGridTab = action.payload.view;
+    },
+    setActiveKind(state, action: PayloadAction<{ kind: string }>) {
+      state.activeKind = action.payload.kind;
     },
     selectImages(
       state,

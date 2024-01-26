@@ -6,6 +6,7 @@ import { projectSlice } from "store/slices/project";
 import { segmenterSlice } from "store/slices/segmenter";
 import { dataSlice } from "store/slices/data";
 import { annotatorSlice } from "store/slices/annotator";
+import { newDataSlice } from "./slices/newData/newDataSlice";
 
 const reducers = {
   classifier: classifierSlice.reducer,
@@ -15,6 +16,7 @@ const reducers = {
   applicationSettings: applicationSettingsSlice.reducer,
   data: dataSlice.reducer,
   annotator: annotatorSlice.reducer,
+  newData: newDataSlice.reducer,
 };
 
 export const rootReducer = combineReducers(reducers);

@@ -1,7 +1,10 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
 import { dataSlice } from "store/slices/data";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { uploadImages } from "utils/common/image/upload";
 
 import { getImageFileInformation, ImageShapeEnum } from "utils/common/image";
 
@@ -20,6 +23,30 @@ export const useUpload = (
           imageShapeInfo.shape
         )
       ) {
+        const channels =
+          imageShapeInfo.shape === ImageShapeEnum.GreyScale ? 1 : 3;
+        const res = await uploadImages(files, channels, 1, imageShapeInfo);
+        //HACK: Future plans to re-work error messages
+        if (res.warning) {
+          dispatch(
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: res.warning,
+            })
+          );
+        } else if (res.errors.length) {
+          dispatch(
+            applicationSettingsSlice.actions.updateAlertState({
+              alertState: res.errors[0],
+            })
+          );
+        } else {
+          dispatch(
+            newDataSlice.actions.addThings({
+              things: res.imagesToUpload,
+              isPermanent: true,
+            })
+          );
+        }
         dispatch(
           dataSlice.actions.uploadImages({
             files: files,
