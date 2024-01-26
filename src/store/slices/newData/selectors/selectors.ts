@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit";
 import {
   kindsAdapter,
   categoriesAdapter,
@@ -28,3 +29,11 @@ export const selectCategoriesDictionary = categorySelectors.selectEntities; // r
 export const selectAllCategories = categorySelectors.selectAll; // returns an array
 export const selectAllCategoryIds = categorySelectors.selectIds;
 export const selectTotalCategoryCount = categorySelectors.selectTotal;
+
+export const selectThingsOfKind = createSelector(
+  [selectKindDictionary, selectThingsDictionary],
+  (kindDict, thingDict) => (kind: string) => {
+    const thingsOfKind = kindDict[kind].containing;
+    return thingsOfKind.map((thingId) => thingDict[thingId]);
+  }
+);

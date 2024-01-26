@@ -15,6 +15,7 @@ export type Project = {
   highlightedCategory: string | undefined;
   selectedAnnotationIds: string[];
   imageGridTab: ImageGridTab;
+  activeKind: string;
   loadPercent: number;
   loadMessage: string;
 };
