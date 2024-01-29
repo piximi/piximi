@@ -76,7 +76,7 @@ export const ExampleProjectCard = ({
         break;
       case ExampleProject.HumanU2OSCells:
         exampleProjectFilePath =
-          process.env.NODE_ENV !== "production"
+          process.env.NODE_ENV === "production"
             ? `${domain}/${rootPath}/HumanU2OSCellsExampleProject.${ext}`
             : (
                 await import(
