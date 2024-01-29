@@ -12,15 +12,16 @@ import { newDataSlice } from "./slices/newData/newDataSlice";
 import { projectSlice } from "./slices/project";
 import { segmenterSlice } from "./slices/segmenter";
 import { loadExampleImage } from "utils/common/image";
-import { SerializedFileType } from "types";
+import { Partition, SerializedFileType, Shape } from "types";
 import {
+  Category,
   Kind,
   NEW_UNKNOWN_CATEGORY,
   NEW_UNKNOWN_CATEGORY_ID,
   NewCategory,
 } from "types/Category";
 import { NewAnnotationType } from "types/AnnotationType";
-import { NewImageType } from "types/ImageType";
+import { ImageType, NewImageType } from "types/ImageType";
 import { DeferredEntityState } from "./entities";
 import { initStore } from "./productionStore";
 import { Provider } from "react-redux";
@@ -37,13 +38,17 @@ const loadState = async () => {
     segmenter: segmenterSlice.getInitialState(),
   };
 
-  const { image, annotationCategories, annotations } = await loadExampleImage(
+  const { image, annotationCategories, annotations } = (await loadExampleImage(
     colorImage,
     cellPaintingAnnotations as SerializedFileType,
     // imageFile.name points to
     // "/static/media/cell-painting.f118ef087853056f08e6.png"
     "cell-painting.png"
-  );
+  )) as {
+    image: ImageType;
+    annotationCategories: Category[];
+    annotations: NewAnnotationType[];
+  };
 
   const categories: DeferredEntityState<NewCategory> = {
     ids: [],
@@ -67,6 +72,7 @@ const loadState = async () => {
   };
 
   image.kind = "Image";
+  image.categoryId = NEW_UNKNOWN_CATEGORY_ID;
   image.containing = annotations.map((annotation) => annotation.id);
 
   things.ids.push(image.id);
@@ -95,11 +101,46 @@ const loadState = async () => {
     };
     anCat2KindNAme[anCat.id] = anCat.name;
   }
+
+  const numAnnotationsOfKindPerImage: Record<string, number> = {};
+
   for (const annotation of annotations) {
     annotation.kind = anCat2KindNAme[annotation.categoryId];
-    annotation.name = `${annotation.imageId}-${annotation.kind}`;
+
+    let annotationName: string = `${image.name}-${annotation.kind}`;
+    if (annotationName in numAnnotationsOfKindPerImage) {
+      annotationName += `_${numAnnotationsOfKindPerImage[annotationName]++}`;
+    } else {
+      numAnnotationsOfKindPerImage[annotationName] = 1;
+      annotationName += "_0";
+    }
+    annotation.name = annotationName;
     annotation.categoryId = NEW_UNKNOWN_CATEGORY_ID;
+    annotation.shape = annotation.data.shape.reduce(
+      (shape: Shape, value: number, idx) => {
+        switch (idx) {
+          case 0:
+            shape.planes = value;
+            break;
+          case 1:
+            shape.height = value;
+            break;
+          case 2:
+            shape.width = value;
+            break;
+          case 3:
+            shape.channels = value;
+            break;
+          default:
+            break;
+        }
+        return shape;
+      },
+      { planes: 0, height: 0, width: 0, channels: 0 }
+    );
+    annotation.partition = Partition.Unassigned;
     things.ids.push(annotation.id);
+
     things.entities[annotation.id] = {
       saved: annotation as NewAnnotationType,
       changes: {},

@@ -5,6 +5,7 @@ import {
   thingsAdapter,
 } from "../newDataSlice";
 import { RootState } from "store/rootReducer";
+import { NewCategory } from "types/Category";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.newData.kinds
@@ -36,4 +37,14 @@ export const selectThingsOfKind = createSelector(
     const thingsOfKind = kindDict[kind].containing;
     return thingsOfKind.map((thingId) => thingDict[thingId]);
   }
+);
+
+export const selectCategoryProperty = createSelector(
+  selectCategoriesDictionary,
+  (entities) =>
+    <S extends keyof NewCategory>(id: string, property: S) => {
+      const category = entities[id];
+      if (!category) return;
+      return category[property];
+    }
 );

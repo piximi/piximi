@@ -44,7 +44,7 @@ export const UNKNOWN_ANNOTATION_CATEGORY: Category = {
   visible: true,
 };
 export const NEW_UNKNOWN_CATEGORY: NewCategory = {
-  color: UNKNOWN_ANNOTATION_CATEGORY_COLOR,
+  color: UNKNOWN_IMAGE_CATEGORY_COLOR,
   id: NEW_UNKNOWN_CATEGORY_ID,
   name: "Unknown",
   containing: [],

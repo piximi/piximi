@@ -5,13 +5,12 @@ import { BitDepth } from "image-js";
 
 export type ThingType = {
   id: string;
-  name?: string;
+  name: string;
   src: string;
   partition: Partition;
-  kind?: string;
+  kind: string;
   data: Tensor4D;
   shape: Shape;
   bitDepth: BitDepth;
   categoryId: string;
-  containing?: string[];
 };
