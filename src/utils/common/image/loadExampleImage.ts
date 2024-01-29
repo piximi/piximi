@@ -46,13 +46,6 @@ export const loadExampleImage = async (
     alpha: 0,
   });
 
-  //TODO: Remove Later
-  const catDict = serializedAnnotations.categories.reduce(
-    (map: Record<string, string>, cat: Category) => {
-      return { ...map, [cat.id]: cat.name };
-    },
-    {}
-  );
   deserializedAnnotations.forEach((annotation) => {
     let bbox = annotation.boundingBox;
 
@@ -69,8 +62,6 @@ export const loadExampleImage = async (
       objectImage.width,
       3,
     ]);
-    //TODO: Remove Later
-    const category = catDict[annotation.categoryId];
     annotations.push({
       ...annotation,
 
@@ -78,7 +69,6 @@ export const loadExampleImage = async (
       src: objSrc,
       imageId: image.id,
       boundingBox: bbox,
-      kind: category,
     });
   });
 
