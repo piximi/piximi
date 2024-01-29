@@ -1,7 +1,6 @@
 import { BitDepth } from "image-js";
 import { Colors } from "./tensorflow";
 import { ThingType } from "./ThingType";
-import { RequireField } from "./utility/PartialBy";
 import { Shape } from "types";
 import { Tensor4D } from "@tensorflow/tfjs";
 import { Partition } from "./Partition";
@@ -20,13 +19,12 @@ export type ImageType = {
   kind?: string;
   containing?: string[]; // The URI to be displayed on the canvas
 };
-export type EhImageType = RequireField<ThingType, "name"> & {
+
+export type NewImageType = ThingType & {
   activePlane: number;
   colors: Colors;
-  annotatons?: string[];
+  containing: string[];
 };
-
-export type NewImageType = RequireField<EhImageType, "kind" | "containing">;
 
 export type ImageAttributeType = keyof ImageType;
 

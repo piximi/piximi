@@ -2,15 +2,15 @@ import { DataArray } from "utils/common/image";
 import * as T from "io-ts";
 import { SerializedAnnotationRType } from "./runtime";
 import { ThingType } from "./ThingType";
-import { PartialBy, RequireField } from "./utility/PartialBy";
 import { NewSerializedAnnotationRType } from "./runtime/SerializedFileType";
+import { Tensor4D } from "@tensorflow/tfjs";
 
-export type AnnotationType = PartialBy<
-  ThingType,
-  "data" | "src" | "bitDepth" | "partition" | "shape"
-> & {
-  // x1, y1, x_2, y_2
-  boundingBox: [number, number, number, number];
+export type AnnotationType = {
+  id: string;
+  src?: string;
+  data?: Tensor4D;
+  categoryId: string;
+  boundingBox: [number, number, number, number]; // x1, y1, x_2, y_2
   encodedMask: Array<number>;
   decodedMask?: DataArray;
   plane: number;
@@ -18,10 +18,13 @@ export type AnnotationType = PartialBy<
   // TODO serialize: these should not be undefineable
 };
 
-export type NewAnnotationType = RequireField<
-  AnnotationType,
-  "kind" | "containing"
->;
+export type NewAnnotationType = ThingType & {
+  boundingBox: [number, number, number, number];
+  encodedMask: Array<number>;
+  decodedMask?: DataArray;
+  plane: number;
+  imageId: string;
+};
 
 export type DecodedAnnotationType = Omit<
   AnnotationType & {

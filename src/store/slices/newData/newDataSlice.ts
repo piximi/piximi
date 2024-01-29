@@ -573,10 +573,11 @@ export const newDataSlice = createSlice({
     ) {
       const { changes, isPermanent } = action.payload;
       for (const { thingId, contents, updateType } of changes) {
-        const previousContents = getDeferredProperty(
-          state.things.entities[thingId],
-          "containing"
-        );
+        const thing = state.things.entities[
+          thingId
+        ] as DeferredEntity<NewImageType>;
+        if (!("containing" in state.things.entities[thingId].saved)) continue;
+        const previousContents = getDeferredProperty(thing, "containing");
 
         if (!state.things.entities[thingId]) continue;
 
@@ -586,9 +587,9 @@ export const newDataSlice = createSlice({
           updateType
         );
         if (isPermanent) {
-          state.things.entities[thingId].saved.containing = newContents;
+          thing.saved.containing = newContents;
           //TODO: Change so entire changes object isnt removed
-          state.things.entities[thingId].changes = {};
+          thing.changes = {};
         } else {
           thingsAdapter.updateOne(state.things, {
             id: thingId,

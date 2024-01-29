@@ -31,7 +31,6 @@ export const NewProjectViewer = () => {
 
   const handleTabChange = (tab: string) => {
     dispatch(projectSlice.actions.setActiveKind({ kind: tab }));
-    //TODO: should maybe also change ctegories tab
   };
 
   useEffect(() => {
