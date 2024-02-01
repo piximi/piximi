@@ -23,7 +23,7 @@ import { DialogWithAction, ImageShapeDialog } from "components/dialogs";
 import { selectThingsOfKind } from "store/slices/newData/";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
-import { NewProjectGridItem } from "../ProjectGridItem/NewProjectGridItem";
+import { ProjectGridItemNew } from "../ProjectGridItem/ProjectGridItemNew";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -185,7 +185,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
                 //.sort(sortFunction.comparerFunction) // wait until sorting fuctions updated
 
                 .map((thing: NewImageType | NewAnnotationType) => (
-                  <NewProjectGridItem
+                  <ProjectGridItemNew
                     key={thing.id}
                     thing={thing}
                     handleClick={handleClick}

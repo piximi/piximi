@@ -6,6 +6,7 @@ import {
 } from "../newDataSlice";
 import { RootState } from "store/rootReducer";
 import { NewCategory } from "types/Category";
+import { selectActiveKind } from "store/slices/project/selectors";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.newData.kinds
@@ -33,7 +34,17 @@ export const selectTotalCategoryCount = categorySelectors.selectTotal;
 
 export const selectThingsOfKind = createSelector(
   [selectKindDictionary, selectThingsDictionary],
-  (kindDict, thingDict) => (kind: string) => {
+  (kindDict, thingDict) => {
+    return (kind: string) => {
+      const thingsOfKind = kindDict[kind].containing;
+      return thingsOfKind.map((thingId) => thingDict[thingId]);
+    };
+  }
+);
+
+export const selectThingsInView = createSelector(
+  [selectKindDictionary, selectThingsDictionary, selectActiveKind],
+  (kindDict, thingDict, kind) => {
     const thingsOfKind = kindDict[kind].containing;
     return thingsOfKind.map((thingId) => thingDict[thingId]);
   }

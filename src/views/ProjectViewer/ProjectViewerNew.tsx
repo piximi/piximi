@@ -13,15 +13,16 @@ import {
 import { projectSlice } from "store/slices/project";
 
 import { HotkeyView } from "types";
-import { ProjectDrawer, ImageToolDrawer } from "components/drawers";
+import { ImageToolDrawer } from "components/drawers";
 import { ProjectAppBar } from "components/app-bars";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common";
 import { NewCustomTabSwitcher } from "components/styled-components/CustomTabSwitcher/NewCustomTabSwitcher";
 import { selectAllKindIds } from "store/slices/newData/selectors/selectors";
 import { ImageGridNew } from "components/image-grids/ImageGrid/ImageGridNew";
+import { ProjectDrawerNew } from "components/drawers/ProjectDrawer/ProjectDrawerNew";
 
-export const NewProjectViewer = () => {
+export const ProjectViewerNew = () => {
   const dispatch = useDispatch();
 
   const kinds = useSelector(selectAllKindIds) as string[];
@@ -48,7 +49,7 @@ export const NewProjectViewer = () => {
             <CssBaseline />
             <ProjectAppBar />
 
-            <ProjectDrawer />
+            <ProjectDrawerNew />
 
             <Box
               sx={(theme) => ({

@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import { useSelector } from "react-redux";
 
 import { Box, Grid } from "@mui/material";
@@ -42,7 +42,7 @@ const printSize = (scale: number) => {
   return (220 * scale).toString() + "px";
 };
 
-export const NewProjectGridItem = memo(
+export const ProjectGridItemNew = memo(
   ({ selected, handleClick, thing }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
@@ -60,10 +60,6 @@ export const NewProjectGridItem = memo(
       evt.stopPropagation();
       handleClick(thing.id, selected);
     };
-
-    useEffect(() => {
-      console.log("I fired"); //LOG:
-    }, [categoryName]);
 
     return (
       <Grid
