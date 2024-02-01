@@ -10,6 +10,7 @@ import {
   Tensor4D,
   tidy,
   fill,
+  dispose,
 } from "@tensorflow/tfjs";
 import { v4 as uuidv4 } from "uuid";
 
@@ -589,9 +590,12 @@ const getImageTensorData = async (
   bitDepth: BitDepth,
   opts: { disposeImageTensor: boolean } = { disposeImageTensor: true }
 ) => {
-  const imageData = await denormalizeTensor(imageTensor, bitDepth, {
+  //NOTE: Split the following into two steps. Previously created a tensor and called data() in one step, but the tensor was never disposed of
+  const denormalizedImageTensor = denormalizeTensor(imageTensor, bitDepth, {
     disposeNormalTensor: opts.disposeImageTensor,
-  }).data();
+  });
+  const imageData = await denormalizedImageTensor.data();
+  denormalizedImageTensor.dispose();
 
   // DO NOT USE "imageData instanceof Float32Array" here
   // tensorflow sublcasses typed arrays, so it will always return false
@@ -770,36 +774,46 @@ export async function createRenderedTensor(
   bitDepth: BitDepth,
   plane: number | undefined
 ) {
-  let operandTensor: Tensor4D | Tensor3D;
-  let disposeOperandTensor: boolean;
+  const compositeImage = tidy(() => {
+    let operandTensor: Tensor4D | Tensor3D;
+    let disposeOperandTensor: boolean;
 
-  if (plane === undefined) {
-    operandTensor = imageTensor;
-    disposeOperandTensor = false;
-  } else {
-    // image slice := get z idx 0 of image with dims: [H, W, C]
-    operandTensor = getImageSlice(imageTensor, plane);
-    disposeOperandTensor = true;
-  }
+    if (plane === undefined) {
+      operandTensor = imageTensor;
+      disposeOperandTensor = false;
+    } else {
+      // image slice := get z idx 0 of image with dims: [H, W, C]
+      operandTensor = getImageSlice(imageTensor, plane);
+      disposeOperandTensor = true;
+    }
 
-  // scale each channel by its range
-  const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
-    disposeImageTensor: disposeOperandTensor,
+    // scale each channel by its range
+    const scaledImageSlice = scaleImageTensor(operandTensor, colors, {
+      disposeImageTensor: disposeOperandTensor,
+    });
+
+    // get indices of visible channels, VC
+    const visibleChannels = filterVisibleChannels(colors);
+
+    // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
+    const filteredSlice = sliceVisibleChannels(
+      scaledImageSlice,
+      visibleChannels
+    );
+
+    // color matrix filtered by visible channels: [VC, 3]
+    const filteredColors = sliceVisibleColors(colors, visibleChannels);
+
+    // composite image slice: [H, W, 3] or [Z, H, W, 3]
+    const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
+
+    return compositeImage;
   });
+  const src = await renderTensor(compositeImage, bitDepth);
 
-  // get indices of visible channels, VC
-  const visibleChannels = filterVisibleChannels(colors);
+  dispose(compositeImage);
 
-  // image slice filtered by visible channels: [H, W, VC] or [Z, H, W, VC]
-  const filteredSlice = sliceVisibleChannels(scaledImageSlice, visibleChannels);
-
-  // color matrix filtered by visible channels: [VC, 3]
-  const filteredColors = sliceVisibleColors(colors, visibleChannels);
-
-  // composite image slice: [H, W, 3] or [Z, H, W, 3]
-  const compositeImage = generateColoredTensor(filteredSlice, filteredColors);
-
-  return await renderTensor(compositeImage, bitDepth);
+  return src;
 }
 
 export const convertToImage = async (
