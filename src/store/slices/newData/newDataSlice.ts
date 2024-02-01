@@ -16,7 +16,7 @@ import {
 import { mutatingFilter } from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { NewData } from "types/NewData";
-import { DeferredEntity } from "store/entities/models";
+import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 import { NewCategory, Kind } from "types/Category";
 import { NewImageType } from "types/ImageType";
 import { NewAnnotationType } from "types/AnnotationType";
@@ -69,6 +69,24 @@ export const newDataSlice = createSlice({
   initialState: initialState,
   reducers: {
     resetData: (state) => initialState(),
+    initializeState(
+      state,
+      action: PayloadAction<{
+        data: {
+          kinds: DeferredEntityState<Kind>;
+          categories: DeferredEntityState<NewCategory>;
+          things: DeferredEntityState<NewAnnotationType | NewImageType>;
+        };
+      }>
+    ) {
+      Object.values(state.things.entities).forEach((entity) => {
+        dispose(entity as unknown as TensorContainer);
+      });
+
+      state.kinds = action.payload.data.kinds;
+      state.categories = action.payload.data.categories;
+      state.things = action.payload.data.things;
+    },
     addKinds(
       state,
       action: PayloadAction<{
