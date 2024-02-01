@@ -841,7 +841,7 @@ export const convertToImage = async (
     name: filename,
     shape: { planes, height, width, channels },
     data: imageTensor,
-    partition: Partition.Unassigned,
+    partition: Partition.Inference,
     src: coloredSliceURL,
     visible: true,
   } as ImageType;
