@@ -566,12 +566,11 @@ export const dataSlice = createSlice({
       const updates: Array<{ id: string } & Partial<ImageType>> = [];
 
       state.images.ids.forEach((id) => {
-        if (
-          (state.images.entities[id].changes &&
-            state.images.entities[id].changes.partition ===
-              Partition.Inference) ||
-          state.images.entities[id].saved.partition === Partition.Inference
-        ) {
+        const imagePartition = getDeferredProperty(
+          state.images.entities[id],
+          "partition"
+        );
+        if (imagePartition === Partition.Inference) {
           updates.push({
             id: id as string,
             categoryId: UNKNOWN_IMAGE_CATEGORY_ID,

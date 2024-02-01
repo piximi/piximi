@@ -240,9 +240,6 @@ export function* fitClassifierSaga({
     { categorizedImages: [], uncategorizedImages: [] }
   );
 
-  console.log(categorizedImages);
-  console.log(uncategorizedImages);
-
   const fitOptions: ReturnType<typeof selectClassifierFitOptions> =
     yield select(selectClassifierFitOptions);
 
