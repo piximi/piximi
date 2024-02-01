@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import {
   Clear as ClearIcon,
@@ -10,52 +10,50 @@ import {
 import { useTranslation } from "hooks";
 
 import { classifierSlice } from "store/slices/classifier";
-import { dataSlice, selectImagesByPartitions } from "store/slices/data";
+import { dataSlice } from "store/slices/data";
 import { Partition } from "types";
 
 import { ModelStatus } from "types/ModelType";
 import { CustomListItemButton } from "../CustomListItemButton";
+import { projectSlice } from "store/slices/project";
 
 export const ShowPredictionItems = () => {
   const dispatch = useDispatch();
 
-  const [showLabeledImages, setShowLabeledImages] = React.useState(true);
-
-  // Yes, this is supposed to select on training partition
-  const inferenceImages = useSelector(selectImagesByPartitions)([
-    Partition.Training,
-    Partition.Validation,
-  ]);
+  const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
 
   const t = useTranslation();
 
   const toggleShowLabeledImages = () => {
-    const updatedShowLabeledImages = !showLabeledImages;
-
-    setShowLabeledImages(updatedShowLabeledImages);
-
-    dispatch(
-      dataSlice.actions.updateImages({
-        updates: inferenceImages.map((image) => ({
-          id: image.id,
-          visible: updatedShowLabeledImages,
-        })),
-      })
-    );
+    if (labeledImagesVisible) {
+      dispatch(
+        projectSlice.actions.setImagePartitionFilters({
+          partitions: [
+            Partition.Training,
+            Partition.Validation,
+            Partition.Unassigned,
+          ],
+        })
+      );
+    } else {
+      dispatch(
+        projectSlice.actions.setImagePartitionFilters({
+          partitions: [],
+        })
+      );
+    }
+    setLabeledImagesVisible((isShown) => !isShown);
   };
 
   const clearPredictions = () => {
     dispatch(dataSlice.actions.clearPredictions({ isPermanent: true }));
 
-    if (!showLabeledImages) {
-      setShowLabeledImages(true);
+    if (!labeledImagesVisible) {
+      setLabeledImagesVisible(true);
 
       dispatch(
-        dataSlice.actions.updateImages({
-          updates: inferenceImages.map((image) => ({
-            id: image.id,
-            visible: true,
-          })),
+        projectSlice.actions.setImagePartitionFilters({
+          partitions: [],
         })
       );
     }
@@ -76,9 +74,11 @@ export const ShowPredictionItems = () => {
         icon={<ClearIcon />}
       />
       <CustomListItemButton
-        primaryText={t(`${showLabeledImages ? "Hide" : "Show"} labeled images`)}
+        primaryText={t(
+          `${labeledImagesVisible ? "Hide" : "Show"} labeled images`
+        )}
         onClick={toggleShowLabeledImages}
-        icon={showLabeledImages ? <VisibilityOffIcon /> : <VisibilityIcon />}
+        icon={labeledImagesVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
       />
     </>
   );
