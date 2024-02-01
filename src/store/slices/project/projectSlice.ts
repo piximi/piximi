@@ -180,6 +180,14 @@ export const projectSlice = createSlice({
         );
       }
     },
+    setImagePartitionFilters(
+      state,
+      action: PayloadAction<{
+        partitions: Partition[];
+      }>
+    ) {
+      state.imageFilters["partition"] = action.payload.partitions;
+    },
     addImagePartitionFilters(
       state,
       action: PayloadAction<{
