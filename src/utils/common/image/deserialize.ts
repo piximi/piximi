@@ -19,6 +19,7 @@ import {
   OptimizationAlgorithm,
   ImageType,
   LoadCB,
+  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
 import { initialState as initialClassifierState } from "store/slices/classifier/classifierSlice";
@@ -163,7 +164,10 @@ const deserializeImageGroup = async (
     name,
     activePlane,
     categoryId,
-    partition: Partition.Unassigned,
+    partition:
+      categoryId === UNKNOWN_IMAGE_CATEGORY_ID
+        ? Partition.Inference
+        : Partition.Unassigned,
     colors,
     data: imageTensor,
     bitDepth,

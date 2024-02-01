@@ -575,7 +575,6 @@ export const dataSlice = createSlice({
           updates.push({
             id: id as string,
             categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
-            partition: Partition.Unassigned,
           });
         }
       });
