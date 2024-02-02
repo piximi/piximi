@@ -1,1 +1,0 @@
-export { ShowPredictionItems } from "./ShowPredictionItems";

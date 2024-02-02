@@ -14,7 +14,7 @@ import { useDialogHotkey } from "hooks";
 import { DialogWithAction, UpsertCategoriesDialog } from "components/dialogs";
 
 import { Category, HotkeyView } from "types";
-import { CategoryItem, ShowPredictionItems } from "components/list-items";
+import { CategoryItem, PredictionListItems } from "components/list-items";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CategoryItemMenu } from "components/menus";
 import { CategoryContext } from "contexts";
@@ -117,7 +117,7 @@ export const CategoriesList = () => {
         </List>
 
         {
-          hasPredictions && <ShowPredictionItems /> //TODO - UI: Should dissapear or be disabled?
+          hasPredictions && <PredictionListItems /> //TODO - UI: Should dissapear or be disabled?
         }
         <CustomListItemButton
           primaryText={`${anyFiltered ? "Show" : "Hide"} All`}
