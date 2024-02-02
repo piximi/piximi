@@ -17,7 +17,7 @@ import { ModelStatus } from "types/ModelType";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { projectSlice } from "store/slices/project";
 
-export const ShowPredictionItems = () => {
+export const PredictionListItems = () => {
   const dispatch = useDispatch();
 
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
