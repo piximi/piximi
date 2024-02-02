@@ -17,3 +17,4 @@ export { ClassifierOptimizerListItem } from "./ClassifierOptimizerListItem";
 export { ClassifierPreprocessingListItem } from "./ClassifierPreprocessingListItem";
 export { ClassifierDatasetListItem } from "./ClassifierDatasetListItem";
 export { PredictionListItems } from "./PredictionListItems";
+export { ListItemHoldButton } from "./ListItemHoldButton";
