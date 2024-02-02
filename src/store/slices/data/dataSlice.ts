@@ -586,6 +586,39 @@ export const dataSlice = createSlice({
         },
       });
     },
+    acceptPredictions(state, action: PayloadAction<{ isPermanent?: boolean }>) {
+      const { isPermanent } = action.payload;
+
+      const updates: Array<{ id: string } & Partial<ImageType>> = [];
+
+      state.images.ids.forEach((id) => {
+        const imagePartition = getDeferredProperty(
+          state.images.entities[id],
+          "partition"
+        );
+        const categoryId = getDeferredProperty(
+          state.images.entities[id],
+          "categoryId"
+        );
+        if (
+          imagePartition === Partition.Inference &&
+          categoryId !== UNKNOWN_IMAGE_CATEGORY_ID
+        ) {
+          updates.push({
+            id: id as string,
+            partition: Partition.Unassigned,
+          });
+        }
+      });
+
+      dataSlice.caseReducers.updateImages(state, {
+        type: "updateImages",
+        payload: {
+          updates: updates,
+          isPermanent: isPermanent,
+        },
+      });
+    },
     updateImages(
       state,
       action: PayloadAction<{

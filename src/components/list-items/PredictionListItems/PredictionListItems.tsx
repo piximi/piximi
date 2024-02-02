@@ -5,6 +5,7 @@ import {
   Clear as ClearIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  Check as CheckIcon,
 } from "@mui/icons-material";
 
 import { useTranslation } from "hooks";
@@ -16,6 +17,7 @@ import { Partition } from "types";
 import { ModelStatus } from "types/ModelType";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { projectSlice } from "store/slices/project";
+import { ListItemHoldButton } from "../ListItemHoldButton";
 
 export const PredictionListItems = () => {
   const dispatch = useDispatch();
@@ -65,20 +67,35 @@ export const PredictionListItems = () => {
       })
     );
   };
+  const acceptPredictions = () => {
+    dispatch(dataSlice.actions.acceptPredictions({ isPermanent: true }));
+    dispatch(
+      classifierSlice.actions.updateModelStatus({
+        modelStatus: ModelStatus.Trained,
+        execSaga: false,
+      })
+    );
+  };
 
   return (
     <>
-      <CustomListItemButton
-        primaryText={t("Clear predictions")}
-        onClick={clearPredictions}
-        icon={<ClearIcon />}
-      />
       <CustomListItemButton
         primaryText={t(
           `${labeledImagesVisible ? "Hide" : "Show"} labeled images`
         )}
         onClick={toggleShowLabeledImages}
         icon={labeledImagesVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+      />
+      <CustomListItemButton
+        primaryText={t("Clear predictions")}
+        onClick={clearPredictions}
+        icon={<ClearIcon />}
+      />
+      <ListItemHoldButton
+        onHoldComplete={acceptPredictions}
+        primaryText="Accept Predictions (Hold)"
+        icon={<CheckIcon />}
+        holdDuration={100}
       />
     </>
   );
