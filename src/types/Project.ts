@@ -1,6 +1,6 @@
 import { AnnotationType } from "./AnnotationType";
 import { ImageGridTab } from "./ImageGridTab";
-import { ImageSortKey } from "./ImageSortType";
+import { ImageSortKey, ThingSortKey_new } from "./ImageSortType";
 import { ImageType } from "./ImageType";
 import { FilterType } from "./utility/FilterType";
 
@@ -8,6 +8,7 @@ export type Project = {
   name: string;
   selectedImageIds: Array<string>;
   imageSortKey: ImageSortKey;
+  sortType_new: ThingSortKey_new;
   imageFilters: Required<
     Pick<FilterType<ImageType>, "categoryId" | "partition">
   >;

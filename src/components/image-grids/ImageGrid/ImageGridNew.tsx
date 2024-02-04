@@ -9,7 +9,6 @@ import {
   selectSelectedImageIds,
   projectSlice,
   selectImageGridTab,
-  //selectImageSortType, // Comented out until the sorting functions are updated
 } from "store/slices/project";
 
 import { dataSlice } from "store/slices/data";
@@ -24,16 +23,17 @@ import { selectThingsOfKind } from "store/slices/newData/";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
 import { ProjectGridItemNew } from "../ProjectGridItem/ProjectGridItemNew";
+import { useSortFunctionNew } from "hooks/useSortFunctionNew/useSortFunctionNew";
 
 const max_images = 1000; //number of images from the project that we'll show
 
 export const ImageGridNew = ({ kind }: { kind: string }) => {
   const dispatch = useDispatch();
   const tabIndex = useContext(TabContext);
-  // const sortFunction = useSelector(selectImageSortType); // wait intil sorting functions are updated
   const currentTab = useSelector(selectImageGridTab);
   const things = useSelector(selectThingsOfKind)(kind);
   const selectedImageIds = useSelector(selectSelectedImageIds);
+  const sortFunction = useSortFunctionNew();
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
@@ -182,7 +182,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
             >
               {things
                 .slice(0, max_images)
-                //.sort(sortFunction.comparerFunction) // wait until sorting fuctions updated
+                .sort(sortFunction) // wait until sorting fuctions updated
 
                 .map((thing: NewImageType | NewAnnotationType) => (
                   <ProjectGridItemNew
