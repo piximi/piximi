@@ -2,13 +2,14 @@ import React from "react";
 
 import { List } from "@mui/material";
 
-import { NewProjectListItem, SaveProjectListItem } from "components/list-items";
+import { SaveProjectListItem } from "components/list-items";
 import { OpenProjectListItemNew } from "components/list-items/OpenProjectListItem/OpenProjectListItemNew";
+import { NewProjectListItemNew } from "components/list-items/NewProjectListItem/NewProjectListItemNew";
 
 export const FileListNew = () => {
   return (
     <List dense>
-      <NewProjectListItem />
+      <NewProjectListItemNew />
 
       <OpenProjectListItemNew />
 
