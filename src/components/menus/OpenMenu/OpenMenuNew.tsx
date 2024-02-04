@@ -5,9 +5,9 @@ import { KeyboardArrowRight as KeyboardArrowRightIcon } from "@mui/icons-materia
 
 import { useMenu } from "hooks";
 
-import { OpenImageMenu } from "../OpenImageMenu";
 import { BaseMenu } from "../BaseMenu";
 import { OpenProjectMenuNew } from "../OpenProjectMenu/OpenProjectMenuNew";
+import { OpenImageMenuNew } from "../OpenImageMenu/OpenImageMenuNew";
 
 type OpenMenuProps = {
   anchorEl: HTMLElement | null;
@@ -86,7 +86,7 @@ export const OpenMenuNew = ({ anchorEl, onClose, open }: OpenMenuProps) => {
         onClose={handleCloseAndDeselectProjectMenu}
         open={projectMenuOpen}
       />
-      <OpenImageMenu
+      <OpenImageMenuNew
         anchorEl={imageMenuAnchorEl}
         onCloseMenu={handleCloseAndDeselectImageMenu}
         open={imageMenuOpen}
