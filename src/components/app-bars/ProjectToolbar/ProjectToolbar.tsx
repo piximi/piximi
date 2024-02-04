@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -98,6 +98,11 @@ export const ProjectToolbar = () => {
     }
   };
 
+  useEffect(() => {
+    console.log(projectName);
+    setNewProjectName(projectName);
+  }, [projectName]);
+
   return (
     <Toolbar>
       <LogoLoader width={250} height={50} loadPercent={loadPercent} />
@@ -110,9 +115,9 @@ export const ProjectToolbar = () => {
         <FormControl>
           <TextField
             onChange={handleTextFieldChange}
+            value={newProjectName}
             onBlur={handleTextFieldBlur}
             onKeyDown={handleTextFieldEnter}
-            defaultValue={projectName}
             inputRef={inputRef}
             size="small"
             sx={{ ml: 5 }}
