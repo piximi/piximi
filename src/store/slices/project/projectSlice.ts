@@ -1,7 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Project } from "types/Project";
-import { defaultImageSortKey, ImageSortKey } from "types/ImageSortType";
+import {
+  defaultImageSortKey,
+  ImageSortKey,
+  ThingSortKey_new,
+} from "types/ImageSortType";
 import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 import { ImageGridTab, Partition } from "types";
 
@@ -9,6 +13,7 @@ export const initialState: Project = {
   selectedImageIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
+  sortType_new: ThingSortKey_new.None,
   highlightedCategory: undefined,
   selectedAnnotationIds: [],
   imageGridTab: "Images",
@@ -117,6 +122,13 @@ export const projectSlice = createSlice({
       state.imageSortKey = selectedSortKey;
 
       //(state.images as OldImageType[]).sort(selectedSortKey.comparerFunction);
+    },
+    setSortType_new(
+      state,
+      action: PayloadAction<{ sortType: ThingSortKey_new }>
+    ) {
+      console.log(action.payload.sortType);
+      state.sortType_new = action.payload.sortType;
     },
     setProjectName(state, action: PayloadAction<{ name: string }>) {
       state.name = action.payload.name;

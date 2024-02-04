@@ -1,7 +1,11 @@
 import { Project } from "types";
 
 import { createSelector } from "@reduxjs/toolkit";
-import { ImageSortKey, sortTypeByKey } from "types/ImageSortType";
+import {
+  ImageSortKey,
+  ThingSortKey_new,
+  sortTypeByKey,
+} from "types/ImageSortType";
 
 export const selectImageSortKey = ({
   project,
@@ -9,6 +13,14 @@ export const selectImageSortKey = ({
   project: Project;
 }): ImageSortKey => {
   return project.imageSortKey;
+};
+
+export const selectSortTypeNew = ({
+  project,
+}: {
+  project: Project;
+}): ThingSortKey_new => {
+  return project.sortType_new;
 };
 
 export const selectImageSortType = createSelector(

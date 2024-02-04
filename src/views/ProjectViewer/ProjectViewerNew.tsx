@@ -14,13 +14,13 @@ import { projectSlice } from "store/slices/project";
 
 import { HotkeyView } from "types";
 import { ImageToolDrawer } from "components/drawers";
-import { ProjectAppBar } from "components/app-bars";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common";
 import { NewCustomTabSwitcher } from "components/styled-components/CustomTabSwitcher/NewCustomTabSwitcher";
 import { selectAllKindIds } from "store/slices/newData/selectors/selectors";
 import { ImageGridNew } from "components/image-grids/ImageGrid/ImageGridNew";
 import { ProjectDrawerNew } from "components/drawers/ProjectDrawer/ProjectDrawerNew";
+import { ProjectAppBarNew } from "components/app-bars/ProjectAppBar/ProjectAppBarNew";
 
 export const ProjectViewerNew = () => {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ export const ProjectViewerNew = () => {
         <div tabIndex={-1}>
           <Box sx={{ height: "100vh" }}>
             <CssBaseline />
-            <ProjectAppBar />
+            <ProjectAppBarNew />
 
             <ProjectDrawerNew />
 
