@@ -304,8 +304,6 @@ export const newDataSlice = createSlice({
     ) {
       const { changes, isPermanent } = action.payload;
       for (const { categoryId, contents, updateType } of changes) {
-        console.log(state.categories.entities[categoryId]);
-
         const previousContents = getDeferredProperty(
           state.categories.entities[categoryId],
           "containing"
@@ -430,9 +428,7 @@ export const newDataSlice = createSlice({
             },
           });
         }
-        console.log("before imageId: ", thing);
         if ("imageId" in thing) {
-          console.log("imageId: ", thing);
           newDataSlice.caseReducers.updateThingContents(state, {
             type: "updateThingContents",
             payload: {
