@@ -99,10 +99,10 @@ export const initStore = (loadedData: RootState | undefined) => {
     preloadedState: loadedData ?? {},
     reducer: rootReducer,
   };
+  const store = configureStore(options) as EnhancedStore;
+  saga.run(rootSaga);
 
-  return configureStore(options) as EnhancedStore;
+  return store;
 };
 
 export type AppDispatch = Dispatch<AnyAction>;
-
-saga.run(rootSaga);
