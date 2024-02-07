@@ -54,8 +54,6 @@ export const selectCategoriesOfKind = createSelector(
 export const selectCategoriesInView = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKind],
   (kindDict, categoriesDict, kind) => {
-    console.log(kindDict);
-    console.log(kind);
     const categoriesOfKind = kindDict[kind].categories;
     return categoriesOfKind.map((catId) => categoriesDict[catId]);
   }

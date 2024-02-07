@@ -15,6 +15,8 @@ type CategoryDialogProps = {
   open: boolean;
 };
 
+//TODO: If category exists in other kind, dont show error, update list of categories in kind
+//TODO: Same for updating. If editing a category which exists in other kinds, create new category instead.
 export const CategoryDialog = ({
   onClose,
   onConfirm,

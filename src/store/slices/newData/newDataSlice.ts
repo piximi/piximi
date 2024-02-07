@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 
 import { getDeferredProperty } from "store/entities/utils";
-import { union } from "lodash";
+import { intersection, union } from "lodash";
 
 import {
   Partition,
@@ -374,6 +374,79 @@ export const newDataSlice = createSlice({
         } else {
           categoriesAdapter.removeOne(state.categories, categoryId);
         }
+      }
+    },
+    removeCategoriesFromKind(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[] | "all";
+        kind: string;
+        isPermanent?: boolean;
+      }>
+    ) {
+      //HACK: Should check for empty category. if category empty, delete completely
+      let { categoryIds, kind, isPermanent } = action.payload;
+      if (categoryIds === "all") {
+        categoryIds = state.categories.ids as string[];
+      }
+
+      for (const categoryId of categoryIds) {
+        if (categoryId === NEW_UNKNOWN_CATEGORY_ID) continue;
+
+        newDataSlice.caseReducers.updateKindCategories(state, {
+          type: "updateKindCategories",
+          payload: {
+            changes: [
+              { kindId: kind, updateType: "remove", categories: [categoryId] },
+            ],
+            isPermanent,
+          },
+        });
+        const thingsOfKind = getDeferredProperty(
+          state.kinds.entities[kind],
+          "containing"
+        );
+        const thingsOfCategory = getDeferredProperty(
+          state.categories.entities[categoryId],
+          "containing"
+        );
+        const thingsToRemove = intersection(thingsOfKind, thingsOfCategory);
+
+        newDataSlice.caseReducers.updateCategoryContents(state, {
+          type: "updateCategoryContents",
+          payload: {
+            changes: [
+              {
+                categoryId: categoryId,
+                updateType: "remove",
+                contents: thingsToRemove,
+              },
+            ],
+            isPermanent,
+          },
+        });
+        newDataSlice.caseReducers.updateCategoryContents(state, {
+          type: "updateCategoryContents",
+          payload: {
+            changes: [
+              {
+                categoryId: NEW_UNKNOWN_CATEGORY_ID,
+                updateType: "add",
+                contents: thingsToRemove,
+              },
+            ],
+            isPermanent,
+          },
+        });
+        const thingUpdates = thingsToRemove.map((thing) => ({
+          id: thing,
+          categoryId: NEW_UNKNOWN_CATEGORY_ID,
+        }));
+
+        newDataSlice.caseReducers.updateThings(state, {
+          type: "updateThings",
+          payload: { updates: thingUpdates, isPermanent },
+        });
       }
     },
 
