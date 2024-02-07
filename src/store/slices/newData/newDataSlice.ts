@@ -21,6 +21,7 @@ import { NewCategory, Kind } from "types/Category";
 import { NewImageType } from "types/ImageType";
 import { NewAnnotationType } from "types/AnnotationType";
 import { newReplaceDuplicateName } from "utils/common/image/imageHelper";
+import { RequireOnly } from "types/utility/PartialBy";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<NewCategory>();
@@ -273,11 +274,12 @@ export const newDataSlice = createSlice({
     updateCategory(
       state,
       action: PayloadAction<{
-        updates: PartialBy<NewCategory, "color" | "name" | "visible">;
+        updates: RequireOnly<NewCategory, "id">;
         isPermanent?: boolean;
       }>
     ) {
-      const { updates, isPermanent } = action.payload;
+      let { updates, isPermanent } = action.payload;
+
       const id = updates.id;
 
       if (isPermanent) {
