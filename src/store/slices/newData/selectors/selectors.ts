@@ -7,6 +7,7 @@ import {
 import { RootState } from "store/rootReducer";
 import { NewCategory } from "types/Category";
 import { selectActiveKind } from "store/slices/project/selectors";
+import { intersection } from "lodash";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.newData.kinds
@@ -41,6 +42,24 @@ export const selectThingsOfKind = createSelector(
     };
   }
 );
+export const selectCategoriesOfKind = createSelector(
+  [selectKindDictionary, selectCategoriesDictionary],
+  (kindDict, categoriesDict) => {
+    return (kind: string) => {
+      const categoriesOfKind = kindDict[kind].categories;
+      return categoriesOfKind.map((catId) => categoriesDict[catId]);
+    };
+  }
+);
+export const selectCategoriesInView = createSelector(
+  [selectKindDictionary, selectCategoriesDictionary, selectActiveKind],
+  (kindDict, categoriesDict, kind) => {
+    console.log(kindDict);
+    console.log(kind);
+    const categoriesOfKind = kindDict[kind].categories;
+    return categoriesOfKind.map((catId) => categoriesDict[catId]);
+  }
+);
 
 export const selectThingsInView = createSelector(
   [selectKindDictionary, selectThingsDictionary, selectActiveKind],
@@ -58,4 +77,14 @@ export const selectCategoryProperty = createSelector(
       if (!category) return;
       return category[property];
     }
+);
+export const selectNumThingsOfCatAndKind = createSelector(
+  selectKindDictionary,
+  selectCategoriesDictionary,
+  (kindDict, catDict) => (catId: string, kind: string) => {
+    const thingsOfKind = kindDict[kind].containing;
+    const thingsOfCat = catDict[catId].containing;
+
+    return intersection(thingsOfCat, thingsOfKind).length;
+  }
 );
