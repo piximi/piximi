@@ -8,7 +8,7 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { DialogWithAction } from "components/dialogs";
 
-import { Category, HotkeyView, NEW_UNKNOWN_CATEGORY, Partition } from "types";
+import { HotkeyView, NEW_UNKNOWN_CATEGORY, Partition } from "types";
 import { NewCategory } from "types/Category";
 import { ShowPredictionItems } from "components/list-items";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
@@ -31,6 +31,7 @@ import { selectActiveKind } from "store/slices/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { selectClassifierModelStatus } from "store/slices/classifier";
 import { ModelStatus } from "types/ModelType";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 // TODO: Make background different color (or find another way to differentiate list from section)
 export const CategoriesListNew = () => {
@@ -78,21 +79,6 @@ export const CategoriesListNew = () => {
     [dispatch]
   );
 
-  const deleteCategories = useCallback(
-    (categories: Category | Category[]) => {
-      if (!Array.isArray(categories)) {
-        categories = [categories];
-      }
-
-      dispatch(
-        dataSlice.actions.deleteImageCategories({
-          categoryIds: categories.map((category) => category.id),
-          isPermanent: true,
-        })
-      );
-    },
-    [dispatch]
-  );
   const deleteObjectsOfCategory = useCallback(
     (categoryId: string) => {
       const imageIds = imagesByCategory[categoryId];
@@ -118,7 +104,15 @@ export const CategoriesListNew = () => {
   const onCloseCategoryMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
-  const handleDeleteAllCategories = () => {};
+  const handleRemoveAllCategories = () => {
+    dispatch(
+      newDataSlice.actions.removeCategoriesFromKind({
+        categoryIds: "all",
+        kind: activeKind,
+        isPermanent: true,
+      })
+    );
+  };
 
   useHotkeys(
     "shift+1,shift+2,shift+3,shift+4,shift+5,shift+6,shift+7,shift+8,shift+9,shift+0",
@@ -188,7 +182,7 @@ export const CategoriesListNew = () => {
     }
   }, [dispatch, categoryIndex, categories]);
   useEffect(() => {
-    console.log(categories);
+    console.log("Categories Rendered: ", categories);
   });
 
   return (
@@ -196,7 +190,6 @@ export const CategoriesListNew = () => {
       <List dense>
         <List dense sx={{ maxHeight: "20rem", overflowY: "scroll" }}>
           {categories.map((category: NewCategory) => {
-            console.log(category);
             return (
               <CategoryItemNew
                 category={category}
@@ -247,7 +240,6 @@ export const CategoriesListNew = () => {
         usedCategoryNames={unavailableNames}
         dispatchDeleteObjectsOfCategory={deleteObjectsOfCategory}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
-        dispatchDeleteCategories={deleteCategories}
       />
       <CreateCategoryDialogNew
         kind={activeKind}
@@ -258,7 +250,7 @@ export const CategoriesListNew = () => {
       <DialogWithAction
         title="Delete All Categories"
         content={`Affected objects will NOT be deleted, and instead be labelled as "Unknown"`}
-        onConfirm={handleDeleteAllCategories}
+        onConfirm={handleRemoveAllCategories}
         onClose={handleCloseDeleteCategoryDialog}
         isOpen={isDeleteCategoryDialogOpen}
       />
