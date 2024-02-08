@@ -23,6 +23,10 @@ export const selectSortTypeNew = ({
   return project.sortType_new;
 };
 
+export const selectActiveKind = ({ project }: { project: Project }) => {
+  return project.activeKind;
+};
+
 export const selectImageSortType = createSelector(
   selectImageSortKey,
   (sortKey) => {
@@ -44,6 +48,15 @@ export const selectSelectedImageIds = ({
 }): Array<string> => {
   return project.selectedImageIds;
 };
+
+export const selectSelectedThingIds = ({
+  project,
+}: {
+  project: Project;
+}): Array<string> => {
+  return project.selectedImageIds;
+};
+
 export const selectProject = ({ project }: { project: Project }): Project => {
   return project;
 };
@@ -87,6 +100,3 @@ export const selectFilteredState = createSelector(
     return { hasImageFilters, hasAnnotationFilters };
   }
 );
-
-export const selectActiveKind = ({ project }: { project: Project }) =>
-  project.activeKind;

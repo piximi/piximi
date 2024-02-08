@@ -1,45 +1,35 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Container, Box, Grid } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 
-import { useDialogHotkey, useDndFileDrop, useUpload } from "hooks";
+import { useDialogHotkey } from "hooks";
 
-import {
-  selectSelectedImageIds,
-  projectSlice,
-  selectImageGridTab,
-} from "store/slices/project";
+import { projectSlice } from "store/slices/project";
 
 import { dataSlice } from "store/slices/data";
 
 import { HotkeyView, Partition } from "types";
-import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 import { imageViewerSlice } from "store/slices/imageViewer";
-import { TabContext } from "components/styled-components";
-import { GridItemActionBar } from "components/app-bars";
-import { DialogWithAction, ImageShapeDialog } from "components/dialogs";
+import { DialogWithAction } from "components/dialogs";
 import { selectThingsOfKind } from "store/slices/newData/";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
 import { ProjectGridItemNew } from "../ProjectGridItem/ProjectGridItemNew";
 import { useSortFunctionNew } from "hooks/useSortFunctionNew/useSortFunctionNew";
+import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/GridItemActionBarNew";
+import { selectActiveSelectedThings } from "store/slices/project/selectors/selectActiveSelectedThings";
+import { DropBox } from "components/styled-components/DropBox/DropBox";
+import { selectActiveKind } from "store/slices/project/selectors";
 
 const max_images = 1000; //number of images from the project that we'll show
 
 export const ImageGridNew = ({ kind }: { kind: string }) => {
   const dispatch = useDispatch();
-  const tabIndex = useContext(TabContext);
-  const currentTab = useSelector(selectImageGridTab);
+  const activeKind = useSelector(selectActiveKind);
   const things = useSelector(selectThingsOfKind)(kind);
-  const selectedImageIds = useSelector(selectSelectedImageIds);
+  const selectedThingIds = useSelector(selectActiveSelectedThings);
   const sortFunction = useSortFunctionNew();
-
-  const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-  const [imageShape, setImageShape] = useState<ImageShapeInfo>({
-    shape: ImageShapeEnum.InvalidImage,
-  });
-  const [files, setFiles] = useState<FileList>();
 
   //const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
 
@@ -49,58 +39,46 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
     open: deleteImagesDialogisOpen,
   } = useDialogHotkey(HotkeyView.DialogWithAction);
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, false);
-
-  const handleDrop = useCallback(
-    async (files: FileList) => {
-      const imageShapeInfo = await uploadFiles(files);
-      setImageShape(imageShapeInfo);
-      setFiles(files);
-    },
-    [uploadFiles]
-  );
-  const [{ isOver }, dropTarget] = useDndFileDrop(handleDrop);
-
-  const handleCloseDimensionsDialog = () => {
-    setOpenDimensionsDialogBox(false);
-  };
-
   const handleSelectAll = useCallback(() => {
     dispatch(
-      projectSlice.actions.setSelectedImages({
+      projectSlice.actions.selectThings({
         ids: things.map((thing) => thing.id),
       })
     );
   }, [things, dispatch]);
 
   const handleDeselectAll = () => {
-    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
+    dispatch(
+      projectSlice.actions.deselectThings({
+        ids: things.map((thing) => thing.id),
+      })
+    );
   };
 
   const handleDelete = () => {
     dispatch(
       dataSlice.actions.deleteImages({
-        imageIds: selectedImageIds,
+        imageIds: selectedThingIds,
         disposeColorTensors: true,
         isPermanent: true,
       })
     );
-    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
+    dispatch(projectSlice.actions.deselectThings({ ids: selectedThingIds }));
   };
 
-  const handleClick = useCallback(
+  const handleSelectThing = useCallback(
     (id: string, selected: boolean) => {
       if (selected) {
-        dispatch(projectSlice.actions.deselectImages({ ids: id }));
+        dispatch(projectSlice.actions.deselectThings({ ids: id }));
       } else {
-        dispatch(projectSlice.actions.selectImages({ ids: id }));
+        dispatch(projectSlice.actions.selectThings({ ids: id }));
       }
     },
     [dispatch]
   );
 
-  const handleUpdate = (categoryId: string) => {
-    const updates = selectedImageIds.map((imageId) => ({
+  const handleUpdateThingCategory = (categoryId: string) => {
+    const updates = selectedThingIds.map((imageId) => ({
       id: imageId,
       categoryId: categoryId,
       partition: Partition.Unassigned,
@@ -111,16 +89,15 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
         isPermanent: true,
       })
     );
-    dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
   };
 
   const handleOpenImageViewer = () => {
     dispatch(
-      imageViewerSlice.actions.setImageStack({ imageIds: selectedImageIds })
+      imageViewerSlice.actions.setImageStack({ imageIds: selectedThingIds })
     );
     dispatch(
       imageViewerSlice.actions.setActiveImageId({
-        imageId: selectedImageIds.length > 0 ? selectedImageIds[0] : undefined,
+        imageId: selectedThingIds.length > 0 ? selectedThingIds[0] : undefined,
         prevImageId: undefined,
         execSaga: true,
       })
@@ -145,19 +122,8 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
   //   );
 
   return (
-    <>
-      <Box
-        component="main"
-        ref={dropTarget}
-        sx={(theme) => ({
-          transition: theme.transitions.create("margin", {
-            duration: theme.transitions.duration.enteringScreen,
-            easing: theme.transitions.easing.easeOut,
-          }),
-          border: isOver ? "5px solid blue" : "",
-          height: "calc(100vh - 64px - 49px)",
-        })}
-      >
+    <DropBox>
+      <>
         <Container
           sx={(theme) => ({
             paddingBottom: theme.spacing(8),
@@ -168,7 +134,9 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
         >
           <div
             onClick={() => {
-              dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
+              dispatch(
+                projectSlice.actions.deselectImages({ ids: selectedThingIds })
+              );
             }}
           >
             <Grid
@@ -182,14 +150,14 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
             >
               {things
                 .slice(0, max_images)
-                .sort(sortFunction) // wait until sorting fuctions updated
+                .sort(sortFunction)
 
                 .map((thing: NewImageType | NewAnnotationType) => (
                   <ProjectGridItemNew
                     key={thing.id}
                     thing={thing}
-                    handleClick={handleClick}
-                    selected={selectedImageIds.includes(thing.id)}
+                    handleClick={handleSelectThing}
+                    selected={selectedThingIds.includes(thing.id)}
                   />
                 ))}
             </Grid>
@@ -207,38 +175,29 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
           />*/}
           </div>
         </Container>
-      </Box>
-      {tabIndex === 0 && (
-        <GridItemActionBar
-          currentTab={currentTab}
-          showAppBar={selectedImageIds.length > 0}
-          selectedObjects={selectedImageIds}
-          selectAllObjects={handleSelectAll}
-          deselectAllObjects={handleDeselectAll}
-          handleOpenDeleteDialog={onOpenDeleteImagesDialog}
-          onOpenImageViewer={handleOpenImageViewer}
-          onUpdateCategories={handleUpdate}
-        />
-      )}
+        {kind === activeKind && (
+          <GridItemActionBarNew
+            showAppBar={selectedThingIds.length > 0}
+            allSelected={selectedThingIds.length === things.length}
+            selectedThings={selectedThingIds}
+            selectAllThings={handleSelectAll}
+            deselectAllThings={handleDeselectAll}
+            handleOpenDeleteDialog={onOpenDeleteImagesDialog}
+            onOpenImageViewer={handleOpenImageViewer}
+            onUpdateCategories={handleUpdateThingCategory}
+          />
+        )}
 
-      <DialogWithAction
-        title={`Delete ${selectedImageIds.length} image${
-          selectedImageIds.length > 1 ? "s" : ""
-        }?`}
-        content="Images will be deleted from the project."
-        onConfirm={handleDelete}
-        isOpen={deleteImagesDialogisOpen}
-        onClose={handleCloseDeleteImagesDialog}
-      />
-      {files?.length && (
-        <ImageShapeDialog
-          files={files}
-          open={openDimensionsDialogBox}
-          onClose={handleCloseDimensionsDialog}
-          isUploadedFromAnnotator={false}
-          referenceImageShape={imageShape}
+        <DialogWithAction
+          title={`Delete ${selectedThingIds.length} image${
+            selectedThingIds.length > 1 ? "s" : ""
+          }?`}
+          content="Images will be deleted from the project."
+          onConfirm={handleDelete}
+          isOpen={deleteImagesDialogisOpen}
+          onClose={handleCloseDeleteImagesDialog}
         />
-      )}
-    </>
+      </>
+    </DropBox>
   );
 };
