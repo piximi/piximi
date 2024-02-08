@@ -181,9 +181,6 @@ export const CategoriesListNew = () => {
       );
     }
   }, [dispatch, categoryIndex, categories]);
-  useEffect(() => {
-    console.log("Categories Rendered: ", categories);
-  });
 
   return (
     <>
