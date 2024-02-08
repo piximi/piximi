@@ -53,9 +53,36 @@ export const projectSlice = createSlice({
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
+
       for (const imageId of ids) {
         state.selectedImageIds.push(imageId);
       }
+    },
+    selectThings(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      const allSelectedThings = [
+        ...new Set([...state.selectedImageIds, ...ids]),
+      ];
+
+      state.selectedImageIds = allSelectedThings;
+    },
+    deselectThings(
+      state,
+      action: PayloadAction<{ ids: Array<string> | string }>
+    ) {
+      const ids =
+        typeof action.payload.ids === "string"
+          ? [action.payload.ids]
+          : action.payload.ids;
+      state.selectedImageIds = state.selectedImageIds.filter(
+        (id: string) => !ids.includes(id)
+      );
     },
     deselectImages(
       state,
