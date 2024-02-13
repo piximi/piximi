@@ -75,6 +75,11 @@ export const PredictionListItems = () => {
         execSaga: false,
       })
     );
+    dispatch(
+      projectSlice.actions.setImagePartitionFilters({
+        partitions: [],
+      })
+    );
   };
 
   return (
