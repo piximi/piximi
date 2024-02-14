@@ -3,9 +3,9 @@ import { sample } from "lodash";
 import { ColorResult } from "react-color";
 import { useSelector } from "react-redux";
 import {
-  selectImageCategoryNames,
-  selectUnusedImageCategoryColors,
-} from "store/slices/data";
+  selectActiveCategoryColors,
+  selectActiveCategoryNames,
+} from "store/slices/newData/selectors/selectors";
 
 export function useCategoryValidation({
   initName,
@@ -16,10 +16,10 @@ export function useCategoryValidation({
   initColor?: string;
   kind: string;
 }) {
-  const unavailableNames = useSelector(selectImageCategoryNames);
-  const availableColors = useSelector(selectUnusedImageCategoryColors);
+  const unavailableNames = useSelector(selectActiveCategoryNames);
+  const availableColors = useSelector(selectActiveCategoryColors);
   const [color, setColor] = useState<string>(
-    initColor ?? sample(availableColors)!
+    initColor ?? "" //sample(availableColors)!
   );
   const [name, setName] = useState<string>(initName ?? "");
   const [errorHelperText, setErrorHelperText] = useState<string>(" ");
@@ -38,6 +38,7 @@ export function useCategoryValidation({
     (categoryName: string) => {
       let validInput = true;
       let helperText = " ";
+      //console.log(unavailableNames);
 
       if (categoryName === "") {
         helperText = "Please type a category name.";
@@ -61,6 +62,10 @@ export function useCategoryValidation({
     validateInput(name);
   }, [name, validateInput]);
 
+  useEffect(() => {
+    if (!initColor) setColor(sample(availableColors)!);
+  }, [availableColors, initColor]);
+
   return {
     name,
     color,
@@ -69,5 +74,6 @@ export function useCategoryValidation({
     isInvalidName,
     errorHelperText,
     availableColors,
+    setName,
   };
 }
