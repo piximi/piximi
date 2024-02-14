@@ -33,7 +33,6 @@ import { selectClassifierModelStatus } from "store/slices/classifier";
 import { ModelStatus } from "types/ModelType";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 
-// TODO: Make background different color (or find another way to differentiate list from section)
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectCategoriesInView);
@@ -204,9 +203,7 @@ export const CategoriesListNew = () => {
           })}
         </List>
 
-        {
-          hasPredictions && <ShowPredictionItems /> //TODO - UI: Should dissapear or be disabled?
-        }
+        {hasPredictions && <ShowPredictionItems />}
         <CustomListItemButton
           icon={<AddIcon />}
           primaryText="Create Category"
