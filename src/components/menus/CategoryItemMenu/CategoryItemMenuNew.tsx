@@ -42,6 +42,12 @@ export const CategoryItemMenuNew = ({
     open: isDeleteCategoryDialogOpen,
   } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
 
+  const {
+    onClose: handleCloseDeleteObjectsDialog,
+    onOpen: handleOpenDeleteObjectsDialog,
+    open: isDeleteObjectsDialogOpen,
+  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
+
   const handleRemoveCategory = () => {
     dispatch(
       newDataSlice.actions.removeCategoriesFromKind({
@@ -51,11 +57,6 @@ export const CategoryItemMenuNew = ({
       })
     );
   };
-  const {
-    onClose: handleCloseDialogWithAction,
-    onOpen: handleOpenDialogWithAction,
-    open: isDialogWithActionOpen,
-  } = useDialogHotkey(HotkeyView.DeleteCategoryDialog);
   const handleDeleteObjects = () => {
     dispatchDeleteObjectsOfCategory(category.id);
   };
@@ -74,24 +75,25 @@ export const CategoryItemMenuNew = ({
       MenuListProps={{ sx: { py: 0 } }}
     >
       <MenuList dense variant="menu" sx={{ py: 0 }}>
-        {category.name !== UNKNOWN_CATEGORY_NAME && (
-          <Box>
-            <CategoryMenuItem
-              onClick={handleOpenDeleteCategoryDialog}
-              label="Delete"
-            />
+        <Box>
+          {category.name !== UNKNOWN_CATEGORY_NAME && (
+            <>
+              <CategoryMenuItem
+                onClick={handleOpenDeleteCategoryDialog}
+                label="Delete"
+              />
 
-            <CategoryMenuItem
-              onClick={handleOpenEditCategoryDialog}
-              label="Edit"
-            />
-
-            <CategoryMenuItem
-              onClick={handleOpenDialogWithAction}
-              label="Clear Annotations"
-            />
-          </Box>
-        )}
+              <CategoryMenuItem
+                onClick={handleOpenEditCategoryDialog}
+                label="Edit"
+              />
+            </>
+          )}
+          <CategoryMenuItem
+            onClick={handleOpenDeleteObjectsDialog}
+            label="Clear Objects"
+          />
+        </Box>
       </MenuList>
       <UpdateCategoryDialogNew
         category={category}
@@ -111,8 +113,8 @@ export const CategoryItemMenuNew = ({
         title={`Delete All "${category.name}" Objects`}
         content={`Objects categorized as "${category.name}" will be deleted.`}
         onConfirm={handleDeleteObjects}
-        onClose={() => handleMenuCloseWith(handleCloseDialogWithAction)}
-        isOpen={isDialogWithActionOpen}
+        onClose={() => handleMenuCloseWith(handleCloseDeleteObjectsDialog)}
+        isOpen={isDeleteObjectsDialogOpen}
       />
     </Menu>
   );
