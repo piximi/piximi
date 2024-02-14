@@ -21,6 +21,7 @@ import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/Grid
 import { selectActiveSelectedThings } from "store/slices/project/selectors/selectActiveSelectedThings";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import { selectActiveKind } from "store/slices/project/selectors";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -78,13 +79,13 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
   );
 
   const handleUpdateThingCategory = (categoryId: string) => {
-    const updates = selectedThingIds.map((imageId) => ({
-      id: imageId,
+    const updates = selectedThingIds.map((thingId) => ({
+      id: thingId,
       categoryId: categoryId,
       partition: Partition.Unassigned,
     }));
     dispatch(
-      dataSlice.actions.updateImages({
+      newDataSlice.actions.updateThings({
         updates,
         isPermanent: true,
       })
