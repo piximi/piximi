@@ -7,7 +7,8 @@ import {
 import { RootState } from "store/rootReducer";
 import { NewCategory } from "types/Category";
 import { selectActiveKind } from "store/slices/project/selectors";
-import { intersection } from "lodash";
+import { difference, intersection } from "lodash";
+import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 const kindsSelectors = kindsAdapter.getSelectors(
   (state: RootState) => state.newData.kinds
@@ -55,6 +56,7 @@ export const selectCategoriesInView = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKind],
   (kindDict, categoriesDict, kind) => {
     const categoriesOfKind = kindDict[kind].categories;
+
     return categoriesOfKind.map((catId) => categoriesDict[catId]);
   }
 );
@@ -84,5 +86,24 @@ export const selectNumThingsOfCatAndKind = createSelector(
     const thingsOfCat = catDict[catId].containing;
 
     return intersection(thingsOfCat, thingsOfKind).length;
+  }
+);
+
+export const selectActiveCategoryNames = createSelector(
+  selectCategoriesInView,
+  (activeCategories) => {
+    return activeCategories.map((cat) => cat.name);
+  }
+);
+
+export const selectActiveCategoryColors = createSelector(
+  selectCategoriesInView,
+  (activeCategories) => {
+    const activeColors = activeCategories.map((cat) => cat.color.toUpperCase());
+    const allCategoryColors = Object.values(CATEGORY_COLORS).map((color) =>
+      color.toUpperCase()
+    );
+    const availableColors = difference(allCategoryColors, activeColors);
+    return availableColors;
   }
 );

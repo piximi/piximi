@@ -23,9 +23,10 @@ export const UpdateCategoryDialogNew = ({
       newDataSlice.actions.updateCategory({
         updates: {
           id: category.id,
-          name,
-          color,
-          kind: kind,
+          changes: {
+            name,
+            color,
+          },
         },
         isPermanent: true,
       })

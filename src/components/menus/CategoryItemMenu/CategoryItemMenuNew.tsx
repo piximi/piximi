@@ -97,7 +97,7 @@ export const CategoryItemMenuNew = ({
         category={category}
         onClose={() => handleMenuCloseWith(handleCloseEditCategoryDialog)}
         open={isEditCategoryDialogOpen}
-        kind={category.kind}
+        kind={activeKind}
       />
       <DialogWithAction
         title={`Delete "${category.name}" Category`}
