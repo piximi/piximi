@@ -11,7 +11,6 @@ import {
   PartialBy,
   NEW_UNKNOWN_CATEGORY,
   NEW_UNKNOWN_CATEGORY_ID,
-  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { mutatingFilter } from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
@@ -21,7 +20,6 @@ import { NewCategory, Kind } from "types/Category";
 import { NewImageType } from "types/ImageType";
 import { NewAnnotationType } from "types/AnnotationType";
 import { newReplaceDuplicateName } from "utils/common/image/imageHelper";
-import { RequireOnly } from "types/utility/PartialBy";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<NewCategory>();
@@ -195,7 +193,7 @@ export const newDataSlice = createSlice({
         if (category.kind === "all") {
           kindsToUpdate = state.kinds.ids;
         } else {
-          kindsToUpdate.push(category.kind);
+          kindsToUpdate.push(...category.kind);
         }
         kindsToUpdate.forEach((kind) =>
           newDataSlice.caseReducers.updateKindCategories(state, {
@@ -228,13 +226,6 @@ export const newDataSlice = createSlice({
       }>
     ) {
       const { name, color, isPermanent, kind } = action.payload;
-      let id = uuidv4();
-      let idIsUnique = !state.categories.ids.includes(id);
-
-      while (!idIsUnique) {
-        id = uuidv4();
-        idIsUnique = !state.categories.ids.includes(id);
-      }
 
       let kindsToUpdate = [];
 
@@ -243,6 +234,37 @@ export const newDataSlice = createSlice({
       } else {
         kindsToUpdate.push(kind);
       }
+
+      let id = uuidv4();
+      let idIsUnique = !state.categories.ids.includes(id);
+
+      while (!idIsUnique) {
+        id = uuidv4();
+        idIsUnique = !state.categories.ids.includes(id);
+      }
+      if (isPermanent) {
+        state.categories.entities[id] = {
+          saved: {
+            id: id,
+            name: name,
+            color: color,
+            visible: true,
+            containing: [],
+            kind: kind,
+          } as NewCategory,
+          changes: {},
+        };
+      } else {
+        categoriesAdapter.addOne(state.categories, {
+          id: id,
+          name: name,
+          color: color,
+          visible: true,
+          containing: [],
+          kind: kind,
+        } as NewCategory);
+      }
+
       kindsToUpdate.forEach((kind) =>
         newDataSlice.caseReducers.updateKindCategories(state, {
           type: "updateKindCategories",
@@ -258,23 +280,11 @@ export const newDataSlice = createSlice({
           },
         })
       );
-
-      categoriesAdapter.addOne(state.categories, {
-        id: id,
-        name: name,
-        color: color,
-        visible: true,
-        containing: [],
-        kind,
-      } as NewCategory);
-      if (isPermanent) {
-        state.categories.entities[id].changes = {};
-      }
     },
     updateCategory(
       state,
       action: PayloadAction<{
-        updates: RequireOnly<NewCategory, "id">;
+        updates: { id: string; changes: { name?: string; color?: string } };
         isPermanent?: boolean;
       }>
     ) {
@@ -283,9 +293,9 @@ export const newDataSlice = createSlice({
       const id = updates.id;
 
       if (isPermanent) {
-        state.categories.entities[id] = {
-          ...state.categories.entities[id],
-          ...updates,
+        state.categories.entities[id].saved = {
+          ...state.categories.entities[id].saved,
+          ...updates.changes,
         };
       }
       categoriesAdapter.updateOne(state.categories, {
@@ -306,12 +316,11 @@ export const newDataSlice = createSlice({
     ) {
       const { changes, isPermanent } = action.payload;
       for (const { categoryId, contents, updateType } of changes) {
+        if (!state.categories.entities[categoryId]) continue;
         const previousContents = getDeferredProperty(
           state.categories.entities[categoryId],
           "containing"
         );
-
-        if (!state.kinds.entities[categoryId]) continue;
 
         const newContents = updateContents(
           previousContents,
@@ -329,6 +338,7 @@ export const newDataSlice = createSlice({
         }
       }
     },
+
     setCategories(
       state,
       action: PayloadAction<{
@@ -539,60 +549,6 @@ export const newDataSlice = createSlice({
         }
       }
     },
-    setImages(
-      state,
-      action: PayloadAction<{
-        images: Array<NewImageType>;
-        isPermanent?: boolean;
-      }>
-    ) {
-      const { images, isPermanent } = action.payload;
-
-      newDataSlice.caseReducers.deleteImages(state, {
-        type: "deleteImages",
-        payload: { imageIds: "all", disposeColorTensors: true, isPermanent },
-      });
-
-      newDataSlice.caseReducers.addThings(state, {
-        type: "addThings",
-        payload: {
-          things: images.map((image) => {
-            if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
-              image.categoryId = NEW_UNKNOWN_CATEGORY_ID;
-            }
-            return image;
-          }),
-          isPermanent: isPermanent,
-        },
-      });
-
-      //imagesAdapter.setAll(state.images, images, isPermanent);
-    },
-    setAnnotations(
-      state,
-      action: PayloadAction<{
-        annotations: Array<NewAnnotationType>;
-        isPermanent?: boolean;
-      }>
-    ) {
-      const { annotations, isPermanent } = action.payload;
-
-      newDataSlice.caseReducers.deleteThings(state, {
-        type: "deleteThings",
-        payload: {
-          thingIds: "annotations",
-          disposeColorTensors: true,
-          isPermanent,
-        },
-      });
-
-      newDataSlice.caseReducers.addThings(state, {
-        type: "addThings",
-        payload: { things: annotations, isPermanent: isPermanent },
-      });
-
-      //imagesAdapter.setAll(state.images, images, isPermanent);
-    },
     clearPredictions(
       state,
       action: PayloadAction<{ kind: string; isPermanent?: boolean }>
@@ -626,6 +582,7 @@ export const newDataSlice = createSlice({
         },
       });
     },
+
     updateThings(
       state,
       action: PayloadAction<{
@@ -641,6 +598,39 @@ export const newDataSlice = createSlice({
         const { id, ...changes } = update;
 
         if (!state.things.ids.includes(id)) continue;
+
+        if ("categoryId" in changes) {
+          const oldCategory = getDeferredProperty(
+            state.things.entities[id],
+            "categoryId"
+          );
+          newDataSlice.caseReducers.updateCategoryContents(state, {
+            type: "updateCategoryContents",
+            payload: {
+              changes: [
+                {
+                  categoryId: oldCategory,
+                  updateType: "remove",
+                  contents: [id],
+                },
+              ],
+              isPermanent,
+            },
+          });
+          newDataSlice.caseReducers.updateCategoryContents(state, {
+            type: "updateCategoryContents",
+            payload: {
+              changes: [
+                {
+                  categoryId: changes.categoryId!,
+                  updateType: "add",
+                  contents: [id],
+                },
+              ],
+              isPermanent,
+            },
+          });
+        }
 
         if (isPermanent) {
           Object.assign(state.things.entities[id].saved, changes);
@@ -782,5 +772,3 @@ export const newDataSlice = createSlice({
     ) {},
   },
 });
-
-export const { updateThings, setImages } = newDataSlice.actions;
