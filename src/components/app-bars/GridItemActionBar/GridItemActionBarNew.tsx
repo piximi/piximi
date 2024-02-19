@@ -27,28 +27,25 @@ import { TooltipTitle } from "components/tooltips";
 
 import { unregisterHotkeyView } from "store/slices/applicationSettings";
 
-import { HotkeyView } from "types";
+import { HotkeyView, Partition } from "types";
 import { projectSlice } from "store/slices/project";
 import { selectCategoriesInView } from "store/slices/newData/selectors/selectors";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 type GridItemActionBarProps = {
-  showAppBar: boolean;
   allSelected: boolean;
-  selectedThings: any;
+  selectedThings: string[];
   selectAllThings: any;
   deselectAllThings: any;
   handleOpenDeleteDialog: any;
-  onUpdateCategories: (categoryId: string) => void;
   onOpenImageViewer: any;
 };
 
 export const GridItemActionBarNew = ({
-  showAppBar,
   allSelected,
   selectedThings,
   selectAllThings,
   deselectAllThings,
-  onUpdateCategories: handleUpdateCategories,
   handleOpenDeleteDialog,
   onOpenImageViewer: handleOpenImageViewer,
 }: GridItemActionBarProps) => {
@@ -75,6 +72,19 @@ export const GridItemActionBarNew = ({
   const onCloseCategoryMenu = () => {
     setCategoryMenuAnchorEl(null);
   };
+  const handleUpdateCategories = (categoryId: string) => {
+    const updates = selectedThings.map((thingId) => ({
+      id: thingId,
+      categoryId: categoryId,
+      partition: Partition.Unassigned,
+    }));
+    dispatch(
+      newDataSlice.actions.updateThings({
+        updates,
+        isPermanent: true,
+      })
+    );
+  };
 
   const handleNavigateImageViewer = () => {
     handleOpenImageViewer();
@@ -90,7 +100,7 @@ export const GridItemActionBarNew = ({
 
   return (
     <>
-      <Slide appear={false} direction="down" in={showAppBar}>
+      <Slide appear={false} direction="down" in={selectedThings.length > 0}>
         <AppBar color="inherit" position="fixed">
           <Toolbar>
             <Tooltip

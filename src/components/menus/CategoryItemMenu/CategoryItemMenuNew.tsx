@@ -17,9 +17,6 @@ type CategoryItemMenuProps = {
   category: NewCategory;
   handleCloseCategoryMenu: () => void;
   openCategoryMenu: boolean;
-  usedCategoryColors: string[];
-  usedCategoryNames: string[];
-  dispatchDeleteObjectsOfCategory: (categoryId: string) => void;
 };
 
 export const CategoryItemMenuNew = ({
@@ -27,7 +24,6 @@ export const CategoryItemMenuNew = ({
   category,
   handleCloseCategoryMenu,
   openCategoryMenu,
-  dispatchDeleteObjectsOfCategory,
 }: CategoryItemMenuProps) => {
   const activeKind = useSelector(selectActiveKind);
   const dispatch = useDispatch();
@@ -57,9 +53,7 @@ export const CategoryItemMenuNew = ({
       })
     );
   };
-  const handleDeleteObjects = () => {
-    dispatchDeleteObjectsOfCategory(category.id);
-  };
+  const handleDeleteObjects = () => {};
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
     dialogClose();

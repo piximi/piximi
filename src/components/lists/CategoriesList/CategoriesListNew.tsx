@@ -21,12 +21,7 @@ import {
   selectHighlightedImageCategory,
   selectSelectedImageIds,
 } from "store/slices/project";
-import {
-  dataSlice,
-  selectImageCategoryNames,
-  selectImagesByCategoryDict,
-  selectUnusedImageCategoryColors,
-} from "store/slices/data";
+import { dataSlice } from "store/slices/data";
 import { selectActiveKind } from "store/slices/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { selectClassifierModelStatus } from "store/slices/classifier";
@@ -39,15 +34,9 @@ export const CategoriesListNew = () => {
   const activeKind = useSelector(selectActiveKind);
   const [selectedCategory, setSelectedCategory] = useState<NewCategory>();
   const [categoryIndex, setCategoryIndex] = useState("");
-  const imagesByCategory = useSelector(selectImagesByCategoryDict);
 
   const highlightedCategory = useSelector(selectHighlightedImageCategory);
-  const unknownCategory = NEW_UNKNOWN_CATEGORY;
-  const unavailableNames = useSelector(selectImageCategoryNames);
-  const availableColors = useSelector(selectUnusedImageCategoryColors);
-  const hasPredictions =
-    useSelector(selectClassifierModelStatus) === ModelStatus.Suggesting;
-  const hotkeysActive = true;
+  const modelStatus = useSelector(selectClassifierModelStatus);
   const selectedImageIds = useSelector(selectSelectedImageIds);
 
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
@@ -76,20 +65,6 @@ export const CategoriesListNew = () => {
       );
     },
     [dispatch]
-  );
-
-  const deleteObjectsOfCategory = useCallback(
-    (categoryId: string) => {
-      const imageIds = imagesByCategory[categoryId];
-      dispatch(
-        dataSlice.actions.deleteImages({
-          imageIds,
-          disposeColorTensors: false,
-          isPermanent: true,
-        })
-      );
-    },
-    [imagesByCategory, dispatch]
   );
 
   const onOpenCategoryMenu = (
@@ -123,7 +98,7 @@ export const CategoriesListNew = () => {
       }
     },
     [HotkeyView.Annotator, HotkeyView.ProjectView],
-    { enabled: hotkeysActive },
+
     []
   );
 
@@ -137,7 +112,6 @@ export const CategoriesListNew = () => {
       }
     },
     [HotkeyView.ProjectView],
-    { enabled: hotkeysActive },
     []
   );
 
@@ -160,7 +134,7 @@ export const CategoriesListNew = () => {
       setCategoryIndex("");
     },
     [HotkeyView.Annotator, HotkeyView.ProjectView],
-    { keyup: true, enabled: hotkeysActive },
+    { keyup: true, enabled: true },
     [dispatch, selectedImageIds]
   );
 
@@ -193,7 +167,7 @@ export const CategoriesListNew = () => {
                 isSelected={
                   selectedCategory
                     ? selectedCategory.id === category.id
-                    : unknownCategory.id === category.id
+                    : NEW_UNKNOWN_CATEGORY.id === category.id
                 }
                 selectCategory={selectCategory}
                 isHighlighted={highlightedCategory === category.id}
@@ -203,7 +177,7 @@ export const CategoriesListNew = () => {
           })}
         </List>
 
-        {hasPredictions && <ShowPredictionItems />}
+        {modelStatus === ModelStatus.Suggesting && <ShowPredictionItems />}
         <CustomListItemButton
           icon={<AddIcon />}
           primaryText="Create Category"
@@ -228,11 +202,8 @@ export const CategoriesListNew = () => {
 
       <CategoryItemMenuNew
         anchorElCategoryMenu={categoryMenuAnchorEl}
-        category={selectedCategory ?? unknownCategory}
+        category={selectedCategory ?? NEW_UNKNOWN_CATEGORY}
         handleCloseCategoryMenu={onCloseCategoryMenu}
-        usedCategoryColors={availableColors}
-        usedCategoryNames={unavailableNames}
-        dispatchDeleteObjectsOfCategory={deleteObjectsOfCategory}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
       />
       <CreateCategoryDialogNew

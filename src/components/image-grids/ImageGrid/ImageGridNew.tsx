@@ -7,9 +7,7 @@ import { useDialogHotkey } from "hooks";
 
 import { projectSlice } from "store/slices/project";
 
-import { dataSlice } from "store/slices/data";
-
-import { HotkeyView, Partition } from "types";
+import { HotkeyView } from "types";
 import { imageViewerSlice } from "store/slices/imageViewer";
 import { DialogWithAction } from "components/dialogs";
 import { selectThingsOfKind } from "store/slices/newData/";
@@ -21,7 +19,6 @@ import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/Grid
 import { selectActiveSelectedThings } from "store/slices/project/selectors/selectActiveSelectedThings";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import { selectActiveKind } from "store/slices/project/selectors";
-import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -57,13 +54,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
   };
 
   const handleDelete = () => {
-    dispatch(
-      dataSlice.actions.deleteImages({
-        imageIds: selectedThingIds,
-        disposeColorTensors: true,
-        isPermanent: true,
-      })
-    );
+    console.log("update me"); //HACK:  implement after discussion
     dispatch(projectSlice.actions.deselectThings({ ids: selectedThingIds }));
   };
 
@@ -77,20 +68,6 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
     },
     [dispatch]
   );
-
-  const handleUpdateThingCategory = (categoryId: string) => {
-    const updates = selectedThingIds.map((thingId) => ({
-      id: thingId,
-      categoryId: categoryId,
-      partition: Partition.Unassigned,
-    }));
-    dispatch(
-      newDataSlice.actions.updateThings({
-        updates,
-        isPermanent: true,
-      })
-    );
-  };
 
   const handleOpenImageViewer = () => {
     dispatch(
@@ -178,14 +155,12 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
         </Container>
         {kind === activeKind && (
           <GridItemActionBarNew
-            showAppBar={selectedThingIds.length > 0}
             allSelected={selectedThingIds.length === things.length}
             selectedThings={selectedThingIds}
             selectAllThings={handleSelectAll}
             deselectAllThings={handleDeselectAll}
             handleOpenDeleteDialog={onOpenDeleteImagesDialog}
             onOpenImageViewer={handleOpenImageViewer}
-            onUpdateCategories={handleUpdateThingCategory}
           />
         )}
 
