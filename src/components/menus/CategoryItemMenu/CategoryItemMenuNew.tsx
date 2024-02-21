@@ -53,7 +53,16 @@ export const CategoryItemMenuNew = ({
       })
     );
   };
-  const handleDeleteObjects = () => {};
+  const handleDeleteObjects = () => {
+    dispatch(
+      newDataSlice.actions.deleteThings({
+        ofCategories: [category.id],
+        activeKind: activeKind,
+        isPermanent: true,
+        disposeColorTensors: true,
+      })
+    );
+  };
 
   const handleMenuCloseWith = (dialogClose: () => void) => {
     dialogClose();
@@ -105,7 +114,11 @@ export const CategoryItemMenuNew = ({
       />
       <DialogWithAction
         title={`Delete All "${category.name}" Objects`}
-        content={`Objects categorized as "${category.name}" will be deleted.`}
+        content={`Objects categorized as "${category.name}" will be deleted. ${
+          activeKind === "Image"
+            ? "Associated annotations will also be removed."
+            : ""
+        } `}
         onConfirm={handleDeleteObjects}
         onClose={() => handleMenuCloseWith(handleCloseDeleteObjectsDialog)}
         isOpen={isDeleteObjectsDialogOpen}

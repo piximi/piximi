@@ -11,6 +11,7 @@ import { ImageGridTab, Partition } from "types";
 
 export const initialState: Project = {
   selectedImageIds: [],
+  selectedThingIds: [],
   name: "Untitled project",
   imageSortKey: defaultImageSortKey.imageSortKey,
   sortType_new: ThingSortKey_new.None,
@@ -68,10 +69,10 @@ export const projectSlice = createSlice({
           ? [action.payload.ids]
           : action.payload.ids;
       const allSelectedThings = [
-        ...new Set([...state.selectedImageIds, ...ids]),
+        ...new Set([...state.selectedThingIds, ...ids]),
       ];
 
-      state.selectedImageIds = allSelectedThings;
+      state.selectedThingIds = allSelectedThings;
     },
     deselectThings(
       state,
@@ -81,7 +82,7 @@ export const projectSlice = createSlice({
         typeof action.payload.ids === "string"
           ? [action.payload.ids]
           : action.payload.ids;
-      state.selectedImageIds = state.selectedImageIds.filter(
+      state.selectedThingIds = state.selectedThingIds.filter(
         (id: string) => !ids.includes(id)
       );
     },
