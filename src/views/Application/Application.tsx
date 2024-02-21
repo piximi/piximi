@@ -19,7 +19,7 @@ export const Application = () => {
           <Routes>
             <Route path="/" element={<ProjectViewer />} />
             <Route path="annotator" element={<ImageViewer />} />
-            <Route path="newUI" element={<ProjectViewerNew />} />
+            <Route path="beta" element={<ProjectViewerNew />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
