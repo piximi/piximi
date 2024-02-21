@@ -23,6 +23,7 @@ import {
   selectThingFilters,
 } from "store/slices/project/selectors";
 import { isFiltered } from "utils/common/helpers";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -62,8 +63,13 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
   };
 
   const handleDelete = () => {
-    console.log("update me"); //HACK:  implement after discussion
-    dispatch(projectSlice.actions.deselectThings({ ids: selectedThingIds }));
+    dispatch(
+      newDataSlice.actions.deleteThings({
+        thingIds: selectedThingIds,
+        disposeColorTensors: true,
+        isPermanent: true,
+      })
+    );
   };
 
   const handleSelectThing = useCallback(
@@ -173,10 +179,14 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
         )}
 
         <DialogWithAction
-          title={`Delete ${selectedThingIds.length} image${
+          title={`Delete ${selectedThingIds.length} Object${
             selectedThingIds.length > 1 ? "s" : ""
           }?`}
-          content="Images will be deleted from the project."
+          content={`Objects will be deleted from the project. ${
+            kind === "Image"
+              ? "Associated annotations will also be removed."
+              : ""
+          } `}
           onConfirm={handleDelete}
           isOpen={deleteImagesDialogisOpen}
           onClose={handleCloseDeleteImagesDialog}

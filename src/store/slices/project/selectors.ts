@@ -54,7 +54,7 @@ export const selectSelectedThingIds = ({
 }: {
   project: Project;
 }): Array<string> => {
-  return project.selectedImageIds;
+  return project.selectedThingIds;
 };
 
 export const selectProject = ({ project }: { project: Project }): Project => {

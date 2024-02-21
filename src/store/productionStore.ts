@@ -16,6 +16,7 @@ import { dataMiddleware } from "store/slices/data/dataListeners";
 import { annotatorMiddleware } from "store/slices/annotator/annotatorListeners";
 import { imageViewerMiddleware } from "./slices/imageViewer/imageViewerListeners";
 import { projectMiddleware } from "./slices/project/projectListeners";
+import { newDataMiddleware } from "./slices/newData/dataListenersNew";
 import { classifierSlice } from "./slices/classifier";
 import { annotatorSlice } from "./slices/annotator";
 import { applicationSettingsSlice } from "./slices/applicationSettings";
@@ -68,6 +69,7 @@ let listenerMiddlewares: Middleware[] = [
   annotatorMiddleware.middleware,
   imageViewerMiddleware.middleware,
   projectMiddleware.middleware,
+  newDataMiddleware.middleware,
 ];
 
 const preloadedState: RootState = {
