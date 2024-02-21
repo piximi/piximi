@@ -677,88 +677,147 @@ export const newDataSlice = createSlice({
         }
       }
     },
-
-    deleteImages(
-      state,
-      action: PayloadAction<{
-        imageIds: Array<string> | "all";
-        disposeColorTensors: boolean;
-        isPermanent?: boolean;
-      }>
-    ) {
-      const { disposeColorTensors, isPermanent } = action.payload;
-      const imageIds =
-        action.payload.imageIds === "all" ? [] : action.payload.imageIds;
-      const disposeColorTensor = disposeColorTensors;
-      for (const imageId of imageIds) {
-        if (isPermanent) {
-          if (disposeColorTensor) {
-            dispose(
-              state.things.entities[imageId].saved.data as TensorContainer
-            );
-            dispose(state.things.entities[imageId].changes as TensorContainer);
-          }
-          delete state.things.entities[imageId];
-          mutatingFilter(state.things.ids, (_imageId) => _imageId !== imageId);
-        } else {
-          thingsAdapter.removeOne(state.things, imageId);
-        }
-      }
-    },
     deleteThings(
       state,
-      action:
-        | PayloadAction<{
+      action: PayloadAction<
+        | {
             thingIds: Array<string> | "all" | "annotations";
+            activeKind?: string;
             disposeColorTensors: boolean;
             isPermanent?: boolean;
-          }>
-        | PayloadAction<{
+            preparedByListener?: boolean;
+          }
+        | {
             ofKinds: Array<string>;
+            activeKind?: string;
             disposeColorTensors: boolean;
             isPermanent?: boolean;
-          }>
+            preparedByListener?: boolean;
+          }
+        | {
+            ofCategories: Array<string>;
+            activeKind: string;
+            disposeColorTensors: boolean;
+            isPermanent?: boolean;
+            preparedByListener?: boolean;
+          }
+      >
     ) {
-      const { disposeColorTensors, isPermanent } = action.payload;
-      let thingIds: string[] = [];
-      if ("thingIds" in action.payload) {
-        if (action.payload.thingIds === "all") {
-          thingIds = state.things.ids as string[];
-        } else if (action.payload.thingIds === "annotations") {
-          thingIds = state.kinds.ids.reduce((tIds: string[], kindId) => {
-            if (kindId !== "Image") {
-              tIds.push(
-                ...getDeferredProperty(
-                  state.kinds.entities[kindId],
-                  "containing"
-                )
+      if (!action.payload.preparedByListener) return;
+      if (!("thingIds" in action.payload)) return;
+      const { thingIds, disposeColorTensors, isPermanent } = action.payload;
+
+      console.log("Delete things action fired with thing ids: ", thingIds);
+
+      for (const thingId of thingIds) {
+        const thing = state.things.entities[thingId];
+        if (!thing) continue;
+
+        if (getDeferredProperty(thing, "kind") === "Image") {
+          const thingContents = getDeferredProperty(
+            thing as DeferredEntity<NewImageType>,
+            "containing"
+          );
+          if (thingContents) {
+            for (const containedThingId of thingContents) {
+              const containedThing = state.things.entities[containedThingId];
+              if (!containedThing) continue;
+
+              const thingKind = getDeferredProperty(containedThing, "kind");
+              const thingCategoryId = getDeferredProperty(
+                containedThing,
+                "categoryId"
               );
+              const kind = state.kinds.entities[thingKind];
+              const category = state.categories.entities[thingCategoryId];
+              if (isPermanent) {
+                if (disposeColorTensors) {
+                  dispose(containedThing.saved.data as TensorContainer);
+                  dispose(containedThing.changes as TensorContainer);
+                }
+
+                mutatingFilter(
+                  kind.saved.containing,
+                  (containedId) => containedId !== containedThingId
+                );
+                if (kind.changes.containing) {
+                  mutatingFilter(
+                    kind.changes.containing,
+                    (containedId) => containedId !== containedThingId
+                  );
+                }
+                mutatingFilter(
+                  category.saved.containing,
+                  (thingId) => thingId !== containedThingId
+                );
+                if (category.changes.containing) {
+                  mutatingFilter(
+                    category.changes.containing,
+                    (thingId) => thingId !== containedThingId
+                  );
+                }
+                delete state.things.entities[containedThingId];
+                mutatingFilter(
+                  state.things.ids,
+                  (thingId) => thingId !== containedThingId
+                );
+              } else {
+                kind.changes.containing = getDeferredProperty(
+                  kind,
+                  "containing"
+                ).filter((thingId) => thingId !== containedThingId);
+                category.changes.containing = getDeferredProperty(
+                  category,
+                  "containing"
+                ).filter((thingId) => thingId !== containedThingId);
+
+                thingsAdapter.removeOne(state.things, containedThingId);
+              }
             }
-            return tIds;
-          }, []);
+          }
         }
-      } else {
-        action.payload.ofKinds.forEach((kindId) => {
-          if (kindId in state.kinds.entities) {
-            thingIds.push(
-              ...getDeferredProperty(state.kinds.entities[kindId], "containing")
+        const thingKind = getDeferredProperty(thing, "kind");
+        const thingCategoryId = getDeferredProperty(thing, "categoryId");
+        const kind = state.kinds.entities[thingKind];
+        const category = state.categories.entities[thingCategoryId];
+        if (isPermanent) {
+          if (disposeColorTensors) {
+            dispose(thing.saved.data as TensorContainer);
+            dispose(thing.changes as TensorContainer);
+          }
+
+          mutatingFilter(
+            kind.saved.containing,
+            (containedId) => containedId !== thingId
+          );
+          if (kind.changes.containing) {
+            mutatingFilter(
+              kind.changes.containing,
+              (containedId) => containedId !== thingId
             );
           }
-        });
-      }
-
-      const disposeColorTensor = disposeColorTensors;
-      for (const thingId of thingIds) {
-        if (isPermanent) {
-          if (disposeColorTensor) {
-            dispose(
-              state.things.entities[thingId].saved.data as TensorContainer
+          mutatingFilter(
+            category.saved.containing,
+            (_thingId) => _thingId !== thingId
+          );
+          if (category.changes.containing) {
+            mutatingFilter(
+              category.changes.containing,
+              (_thingId) => _thingId !== thingId
             );
-            dispose(state.things.entities[thingId].changes as TensorContainer);
           }
           delete state.things.entities[thingId];
           mutatingFilter(state.things.ids, (_thingId) => _thingId !== thingId);
         } else {
+          kind.changes.containing = getDeferredProperty(
+            kind,
+            "containing"
+          ).filter((_thingId) => _thingId !== thingId);
+          category.changes.containing = getDeferredProperty(
+            category,
+            "containing"
+          ).filter((_thingId) => _thingId !== thingId);
+
           thingsAdapter.removeOne(state.things, thingId);
         }
       }

@@ -7,6 +7,7 @@ import { FilterType } from "./utility/FilterType";
 export type Project = {
   name: string;
   selectedImageIds: Array<string>;
+  selectedThingIds: Array<string>;
   imageSortKey: ImageSortKey;
   sortType_new: ThingSortKey_new;
   imageFilters: Required<
