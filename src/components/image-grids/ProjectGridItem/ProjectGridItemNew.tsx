@@ -18,6 +18,7 @@ type ProjectGridItemProps = {
   selected: boolean;
   handleClick: (id: string, selected: boolean) => void;
   thing: NewImageType | NewAnnotationType;
+  filtered: boolean;
 };
 
 const getIconPosition = (
@@ -43,7 +44,7 @@ const printSize = (scale: number) => {
 };
 
 export const ProjectGridItemNew = memo(
-  ({ selected, handleClick, thing }: ProjectGridItemProps) => {
+  ({ selected, handleClick, thing, filtered }: ProjectGridItemProps) => {
     const imageSelectionColor = useSelector(selectImageSelectionColor);
     const selectedImageBorderWidth = useSelector(
       selectSelectedImageBorderWidth
@@ -61,7 +62,9 @@ export const ProjectGridItemNew = memo(
       handleClick(thing.id, selected);
     };
 
-    return (
+    return filtered ? (
+      <></>
+    ) : (
       <Grid
         item
         position="relative" // must be a position element for absolutely positioned ImageIconLabel

@@ -18,14 +18,22 @@ import { useSortFunctionNew } from "hooks/useSortFunctionNew/useSortFunctionNew"
 import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/GridItemActionBarNew";
 import { selectActiveSelectedThings } from "store/slices/project/selectors/selectActiveSelectedThings";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
-import { selectActiveKind } from "store/slices/project/selectors";
+import {
+  selectActiveKind,
+  selectThingFilters,
+} from "store/slices/project/selectors";
+import { isFiltered } from "utils/common/helpers";
 
 const max_images = 1000; //number of images from the project that we'll show
+
+//NOTE: kind is passed as a prop and used internally instead of the kind returned
+// by the active kind selector to keep from rerendering the grid items when switching tabs
 
 export const ImageGridNew = ({ kind }: { kind: string }) => {
   const dispatch = useDispatch();
   const activeKind = useSelector(selectActiveKind);
   const things = useSelector(selectThingsOfKind)(kind);
+  const thingFilters = useSelector(selectThingFilters)[kind];
   const selectedThingIds = useSelector(selectActiveSelectedThings);
   const sortFunction = useSortFunctionNew();
 
@@ -129,13 +137,13 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
               {things
                 .slice(0, max_images)
                 .sort(sortFunction)
-
                 .map((thing: NewImageType | NewAnnotationType) => (
                   <ProjectGridItemNew
                     key={thing.id}
                     thing={thing}
                     handleClick={handleSelectThing}
                     selected={selectedThingIds.includes(thing.id)}
+                    filtered={isFiltered(thing, thingFilters ?? {})}
                   />
                 ))}
             </Grid>

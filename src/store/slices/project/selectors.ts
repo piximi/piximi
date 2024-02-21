@@ -72,6 +72,21 @@ export const selectAnnotationFilters = ({ project }: { project: Project }) => {
   return project.annotationFilters;
 };
 
+export const selectActiveFilteredStateHasFilters = ({
+  project,
+}: {
+  project: Project;
+}) => {
+  const activeKind = project.activeKind;
+  const thingFilters = project.thingFilters[activeKind];
+  if (!thingFilters) return false;
+  const hasFilters = Object.values(thingFilters).some((filters) => {
+    return filters.length > 0;
+  });
+
+  return hasFilters;
+};
+
 export const selectImageFilteredState = createSelector(
   selectImageFilters,
   (imageFilters) => {
@@ -100,3 +115,12 @@ export const selectFilteredState = createSelector(
     return { hasImageFilters, hasAnnotationFilters };
   }
 );
+
+export const selectThingFilters = ({ project }: { project: Project }) => {
+  return project.thingFilters;
+};
+
+export const selectActiveThingFilters = ({ project }: { project: Project }) => {
+  const activeKind = project.activeKind;
+  return project.thingFilters[activeKind] ?? {};
+};

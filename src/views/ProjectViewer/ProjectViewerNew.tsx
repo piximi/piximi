@@ -13,7 +13,7 @@ import {
 import { projectSlice } from "store/slices/project";
 
 import { HotkeyView } from "types";
-import { ImageToolDrawer } from "components/drawers";
+import { ImageToolDrawerNew } from "components/drawers/ImageToolDrawer/ImageToolDrawerNew";
 import { FallBackDialog } from "components/dialogs";
 import { dimensions } from "utils/common";
 import { NewCustomTabSwitcher } from "components/styled-components/CustomTabSwitcher/NewCustomTabSwitcher";
@@ -71,7 +71,7 @@ export const ProjectViewerNew = () => {
                 ))}
               </NewCustomTabSwitcher>
             </Box>
-            {process.env.NODE_ENV === "development" && <ImageToolDrawer />}
+            {process.env.NODE_ENV === "development" && <ImageToolDrawerNew />}
           </Box>
         </div>
       </ErrorBoundary>
