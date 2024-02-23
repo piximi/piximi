@@ -1,34 +1,39 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from "react";
 
-import { List } from "@mui/material";
-import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
+import { Box } from "@mui/material";
 
-import { useDialog, useDialogHotkey, useTranslation } from "hooks";
-
-import { ImportTensorflowModelDialog } from "components/dialogs";
-import { SaveFittedModelDialog } from "components/dialogs";
-import { ClassifierExecListItem } from "components/list-items";
+import { useDialog, useDialogHotkey } from "hooks";
 
 import {
-  selectClassifierModelStatus,
-  selectClassifierSelectedModel,
-  loadUserSelectedModel,
-} from "store/slices/classifier";
+  FitClassifierDialog,
+  ImportTensorflowModelDialog,
+} from "components/dialogs";
+import { SaveFittedModelDialog } from "components/dialogs";
 
-import { HotkeyView, Shape } from "types";
-import { ModelTask } from "types/ModelType";
-import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
-import { Model } from "utils/common/models/Model";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { ModelStatus, ModelTask } from "types/ModelType";
+import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroupNew";
+
+import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
+import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
+import { EvaluateClassifierDialogNew } from "components/dialogs/EvaluateClassifierDialog/EvaluationClassifierDialogNew";
+import { HotkeyView } from "types";
 
 export const ClassifierListNew = () => {
-  const modelStatus = useSelector(selectClassifierModelStatus);
-  const selectedModel = useSelector(selectClassifierSelectedModel);
-
-  const dispatch = useDispatch();
-
-  const t = useTranslation();
+  const {
+    modelStatus,
+    selectedModel,
+    handlePredict,
+    handleEvaluate,
+    helperText,
+    waitingForResults,
+    setWaitingForResults,
+    handleImportModel,
+  } = useClassificationModel();
+  const {
+    onClose: handleCloseEval,
+    onOpen: handleOpenEval,
+    open: evalOpen,
+  } = useDialog();
 
   const {
     onClose: onCloseImportClassifierDialog,
@@ -36,58 +41,59 @@ export const ClassifierListNew = () => {
     open: openImportClassifierDialog,
   } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
   const {
-    onClose: onSaveClassifierDialogClose,
-    onOpen: onSaveClassifierDialogOpen,
+    onClose: onCloseSaveClassifierDialog,
+    onOpen: onOpenSaveClassifierDialog,
     open: openSaveClassifierDialog,
   } = useDialog();
+  const {
+    onClose: handleCloseFitModelDialog,
+    onOpen: handleOpenFitModelDialog,
+    open: fittingOpen,
+  } = useDialogHotkey(HotkeyView.Classifier, false);
 
-  const importClassifierModel = (model: Model, inputShape: Shape) => {
-    if (model instanceof SequentialClassifier) {
-      dispatch(
-        loadUserSelectedModel({
-          inputShape: inputShape,
-          model,
-        })
-      );
-    } else if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `Attempting to dispatch a model with task ${
-          ModelTask[model.task]
-        }, should be ${ModelTask[ModelTask.Classification]}`
-      );
+  useEffect(() => {
+    if (modelStatus === ModelStatus.Trained && waitingForResults) {
+      setWaitingForResults(false);
+      handleOpenEval();
     }
-  };
+  }, [modelStatus, waitingForResults, handleOpenEval, setWaitingForResults]);
 
   return (
-    <List>
-      <CustomListItemButton
-        primaryText={t("Load Model")}
-        onClick={onOpenImportClassifierDialog}
-        icon={<AddIcon />}
-        tooltipText={t("Load a classification model")}
-        dense
-      />
-      <CustomListItemButton
-        primaryText={t("Save Model")}
-        onClick={onSaveClassifierDialogOpen}
-        icon={<SaveIcon />}
-        tooltipText={t("Save the classification model")}
-        dense
-      />
-      <ClassifierExecListItem />
+    <>
+      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+        <ModelIOButtonGroup
+          handleImportModel={onOpenImportClassifierDialog}
+          handleSaveModel={onOpenSaveClassifierDialog}
+        />
 
+        <ModelExecButtonGroupNew
+          modelStatus={modelStatus}
+          handleEvaluate={handleEvaluate}
+          handleFit={handleOpenFitModelDialog}
+          handlePredict={handlePredict}
+          helperText={helperText}
+        />
+      </Box>
       <ImportTensorflowModelDialog
         onClose={onCloseImportClassifierDialog}
         open={openImportClassifierDialog}
         modelTask={ModelTask.Classification}
-        dispatchFunction={importClassifierModel}
+        dispatchFunction={handleImportModel}
       />
       <SaveFittedModelDialog
         model={selectedModel}
         modelStatus={modelStatus}
-        onClose={onSaveClassifierDialogClose}
+        onClose={onCloseSaveClassifierDialog}
         open={openSaveClassifierDialog}
       />
-    </List>
+      <FitClassifierDialog
+        openedDialog={fittingOpen}
+        closeDialog={handleCloseFitModelDialog}
+      />
+      <EvaluateClassifierDialogNew
+        openedDialog={evalOpen}
+        closeDialog={handleCloseEval}
+      />
+    </>
   );
 };
