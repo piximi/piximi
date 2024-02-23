@@ -1,33 +1,32 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from "react";
 
-import { List } from "@mui/material";
-import { SaveAlt as SaveIcon, Add as AddIcon } from "@mui/icons-material";
+import { Box } from "@mui/material";
 
-import { useDialog, useDialogHotkey, useTranslation } from "hooks";
-
-import { ImportTensorflowModelDialog } from "components/dialogs";
-import { SaveFittedModelDialog } from "components/dialogs";
-import { SegmenterExecListItem } from "components/list-items";
+import { useDialog, useDialogHotkey } from "hooks";
 
 import {
-  selectSegmenterModel,
-  selectSegmenterModelStatus,
-  segmenterSlice,
-} from "store/slices/segmenter";
+  FitSegmenterDialog,
+  ImportTensorflowModelDialog,
+  SaveFittedModelDialog,
+} from "components/dialogs";
 
-import { HotkeyView, Shape } from "types";
-import { ModelTask } from "types/ModelType";
-import { Model } from "utils/common/models/Model";
-import { Segmenter } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
-import { CustomListItemButton } from "components/list-items/CustomListItemButton";
+import { HotkeyView } from "types";
+import { ModelStatus, ModelTask } from "types/ModelType";
+import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
+import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroupNew";
+import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
 
 export const SegmenterListNew = () => {
-  const dispatch = useDispatch();
-
-  const selectedModel = useSelector(selectSegmenterModel);
-  const modelStatus = useSelector(selectSegmenterModelStatus);
-  const t = useTranslation();
+  const {
+    modelStatus,
+    selectedModel,
+    handlePredict,
+    handleEvaluate,
+    helperText,
+    waitingForResults,
+    setWaitingForResults,
+    handleImportModel,
+  } = useSegmentationModel();
 
   const {
     onClose: onCloseImportSegmenterDialog,
@@ -36,62 +35,54 @@ export const SegmenterListNew = () => {
   } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
 
   const {
-    onClose: onSaveSegmenterDialogClose,
-    onOpen: onSaveSegmenterDialogOpen,
+    onClose: onCloseSaveSegmenterDialog,
+    onOpen: onOpenSaveSegmenterDialog,
     open: openSaveSegmenterDialog,
   } = useDialog();
-
-  const importSegmentationModel = async (model: Model, inputShape: Shape) => {
-    if (model instanceof Segmenter) {
-      if (model.pretrained) {
-        await model.loadModel();
-      }
-
-      dispatch(
-        segmenterSlice.actions.loadUserSelectedModel({
-          inputShape,
-          model: model as Segmenter,
-        })
-      );
-    } else if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `Attempting to dispatch a model with task ${
-          ModelTask[model.task]
-        }, should be ${ModelTask[ModelTask.Segmentation]}`
-      );
+  const {
+    onClose: handleCloseFitModelDialog,
+    onOpen: handleOpenFitModelDialog,
+    open: fittingOpen,
+  } = useDialogHotkey(HotkeyView.Segmenter, false);
+  useEffect(() => {
+    if (modelStatus === ModelStatus.Trained && waitingForResults) {
+      setWaitingForResults(false);
     }
-  };
+  }, [modelStatus, waitingForResults, setWaitingForResults]);
 
   return (
-    <List>
-      <CustomListItemButton
-        primaryText={t("Load Model")}
-        onClick={onOpenImportSegmenterDialog}
-        icon={<AddIcon />}
-        tooltipText={t("Load a segmentation model")}
-        dense
-      />
-      <CustomListItemButton
-        primaryText={t("Save Model")}
-        onClick={onSaveSegmenterDialogOpen}
-        icon={<SaveIcon />}
-        tooltipText={t("Save the segmentation model")}
-        dense
-      />
-      <SegmenterExecListItem />
+    <>
+      <Box>
+        <ModelIOButtonGroup
+          handleImportModel={onOpenImportSegmenterDialog}
+          handleSaveModel={onOpenSaveSegmenterDialog}
+        />
+
+        <ModelExecButtonGroupNew
+          modelStatus={modelStatus}
+          handleEvaluate={handleEvaluate}
+          handleFit={handleOpenFitModelDialog}
+          handlePredict={handlePredict}
+          helperText={helperText}
+        />
+      </Box>
 
       <ImportTensorflowModelDialog
         onClose={onCloseImportSegmenterDialog}
         open={openImportSegmenterDialog}
         modelTask={ModelTask.Segmentation}
-        dispatchFunction={importSegmentationModel}
+        dispatchFunction={handleImportModel}
       />
       <SaveFittedModelDialog
         model={selectedModel}
         modelStatus={modelStatus}
-        onClose={onSaveSegmenterDialogClose}
+        onClose={onCloseSaveSegmenterDialog}
         open={openSaveSegmenterDialog}
       />
-    </List>
+      <FitSegmenterDialog
+        openedDialog={fittingOpen}
+        closeDialog={handleCloseFitModelDialog}
+      />
+    </>
   );
 };
