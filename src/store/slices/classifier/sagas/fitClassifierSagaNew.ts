@@ -12,21 +12,13 @@ import {
   selectClassifierSelectedModel,
   selectClassifierInputShape,
 } from "store/slices/classifier";
-import {
-  dataSlice,
-  selectCreatedImageCategories,
-  selectImagesByPartitions,
-  selectCreatedImageCategoryCount,
-  selectAllImages,
-} from "store/slices/data";
 import { applicationSettingsSlice } from "store/slices/applicationSettings";
 
 import {
   AlertStateType,
   AlertType,
-  ImageType,
+  NEW_UNKNOWN_CATEGORY_ID,
   Partition,
-  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { ModelStatus } from "types/ModelType";
 import { TrainingCallbacks } from "utils/common/models/Model";
@@ -35,40 +27,50 @@ import { getStackTraceFromError } from "utils";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
+import {
+  selectActiveCategories,
+  selectActiveKnownCategoryCount,
+  selectActiveLabeledThings,
+  selectActiveThingsByPartition,
+  selectActiveUnlabeledThings,
+} from "store/slices/newData/selectors/reselectors";
+import { NewImageType } from "types/ImageType";
+import { NewAnnotationType } from "types/AnnotationType";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
 
-function* assignDataPartitions({
+function* assignDataPartitionsNew({
   preprocessOptions,
-  categorizedImages,
-  uncategorizedImages,
+  labeledThings,
+  unlabeledThings,
   trainingPercentage,
 }: {
   preprocessOptions: ReturnType<typeof selectClassifierPreprocessOptions>;
-  categorizedImages: Array<ImageType>;
-  uncategorizedImages: Array<ImageType>;
+  labeledThings: Array<NewImageType | NewAnnotationType>;
+  unlabeledThings: Array<NewImageType | NewAnnotationType>;
   trainingPercentage: number;
 }) {
   //first assign train and val partition to all categorized images
-  const categorizedImagesIds = (
-    preprocessOptions.shuffle ? shuffle(categorizedImages) : categorizedImages
-  ).map((image: ImageType) => {
-    return image.id;
+  const labeledThingIds = (
+    preprocessOptions.shuffle ? shuffle(labeledThings) : labeledThings
+  ).map((thing: NewImageType | NewAnnotationType) => {
+    return thing.id;
   });
 
   //separate ids into train and val datasets
   const trainDataLength = Math.round(
-    trainingPercentage * categorizedImagesIds.length
+    trainingPercentage * labeledThingIds.length
   );
-  const valDataLength = categorizedImagesIds.length - trainDataLength;
+  const valDataLength = labeledThingIds.length - trainDataLength;
 
-  const trainDataIds = take(categorizedImagesIds, trainDataLength);
-  const valDataIds = takeRight(categorizedImagesIds, valDataLength);
+  const trainDataIds = take(labeledThingIds, trainDataLength);
+  const valDataIds = takeRight(labeledThingIds, valDataLength);
 
   yield put(
-    dataSlice.actions.updateImages({
+    newDataSlice.actions.updateThings({
       updates: [
         ...trainDataIds.map((id) => ({ id, partition: Partition.Training })),
         ...valDataIds.map((id) => ({ id, partition: Partition.Validation })),
-        ...uncategorizedImages.map((image) => ({
+        ...unlabeledThings.map((image) => ({
           id: image.id,
           partition: Partition.Inference,
         })),
@@ -78,7 +80,7 @@ function* assignDataPartitions({
   );
 }
 
-function* loadClassifier({
+function* loadClassifierNew({
   model,
   inputShape,
   preprocessOptions,
@@ -117,17 +119,22 @@ function* loadClassifier({
       return false;
     }
   } catch (error) {
-    yield handleError(error as Error, "Failed to create tensorflow model");
+    yield handleErrorNew(error as Error, "Failed to create tensorflow model");
     return false;
   }
 
-  const categories: ReturnType<typeof selectCreatedImageCategories> =
-    yield select(selectCreatedImageCategories);
+  const allCategories: ReturnType<typeof selectActiveCategories> = yield select(
+    selectActiveCategories
+  );
+  const categories = allCategories.filter(
+    (category) => category.id !== NEW_UNKNOWN_CATEGORY_ID
+  );
 
-  const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
-    yield select(selectImagesByPartitions);
-  const trainImages = partitionSelector([Partition.Training]);
-  const valImages = partitionSelector([Partition.Validation]);
+  const partitionedThings: ReturnType<typeof selectActiveThingsByPartition> =
+    yield select(selectActiveThingsByPartition);
+
+  const trainingThings = partitionedThings[Partition.Training];
+  const validationThings = partitionedThings[Partition.Validation];
 
   try {
     const loadDataArgs = {
@@ -136,17 +143,17 @@ function* loadClassifier({
       preprocessOptions,
       fitOptions,
     };
-    model.loadTraining(trainImages, loadDataArgs);
-    model.loadValidation(valImages, loadDataArgs);
+    model.loadTraining(trainingThings, loadDataArgs);
+    model.loadValidation(validationThings, loadDataArgs);
   } catch (error) {
-    yield handleError(error as Error, "Error in preprocessing");
+    yield handleErrorNew(error as Error, "Error in preprocessing");
     return false;
   }
 
   return true;
 }
 
-function* fitClassifier({
+function* fitClassifierNew({
   model,
   onEpochEnd,
   fitOptions,
@@ -173,19 +180,19 @@ function* fitClassifier({
       process.env.REACT_APP_LOG_LEVEL === "1" &&
       console.log(history);
   } catch (error) {
-    yield handleError(error as Error, "Error in training the model");
+    yield handleErrorNew(error as Error, "Error in training the model");
     return;
   }
 
   yield put(
-    classifierSlice.actions.updateModelStatus({
+    classifierSlice.actions.updateModelStatusNew({
       execSaga: false,
       modelStatus: ModelStatus.Trained,
     })
   );
 }
 
-export function* fitClassifierSaga({
+export function* fitClassifierSagaNew({
   payload: { modelStatus, onEpochEnd, execSaga },
 }: PayloadAction<{
   onEpochEnd?: TrainingCallbacks["onEpochEnd"];
@@ -211,34 +218,10 @@ export function* fitClassifierSaga({
     typeof selectClassifierTrainingPercentage
   > = yield select(selectClassifierTrainingPercentage);
 
-  // const partitionSelector: ReturnType<typeof selectImagesByPartitions> =
-  //   yield select(selectImagesByPartitions);
-  // const categorizedImages = partitionSelector([
-  //   Partition.Training,
-  //   Partition.Validation,
-  // ]);
-
-  const images: ReturnType<typeof selectAllImages> = yield select(
-    selectAllImages
-  );
-
-  const { categorizedImages, uncategorizedImages } = images.reduce(
-    (
-      sortedImages: {
-        categorizedImages: ImageType[];
-        uncategorizedImages: ImageType[];
-      },
-      image: ImageType
-    ) => {
-      if (image.categoryId === UNKNOWN_IMAGE_CATEGORY_ID) {
-        sortedImages.uncategorizedImages.push(image);
-      } else if (image.partition === Partition.Unassigned) {
-        sortedImages.categorizedImages.push(image);
-      }
-      return sortedImages;
-    },
-    { categorizedImages: [], uncategorizedImages: [] }
-  );
+  const labeledThings: ReturnType<typeof selectActiveLabeledThings> =
+    yield select(selectActiveLabeledThings);
+  const unlabeledThings: ReturnType<typeof selectActiveUnlabeledThings> =
+    yield select(selectActiveUnlabeledThings);
 
   const fitOptions: ReturnType<typeof selectClassifierFitOptions> =
     yield select(selectClassifierFitOptions);
@@ -250,7 +233,8 @@ export function* fitClassifierSaga({
   const inputShape: ReturnType<typeof selectClassifierInputShape> =
     yield select(selectClassifierInputShape);
 
-  const numClasses: number = yield select(selectCreatedImageCategoryCount);
+  const numClasses: ReturnType<typeof selectActiveKnownCategoryCount> =
+    yield select(selectActiveKnownCategoryCount);
 
   const selectedModel: ReturnType<typeof selectClassifierSelectedModel> =
     yield select(selectClassifierSelectedModel);
@@ -267,35 +251,38 @@ export function* fitClassifierSaga({
     })
   );
 
-  yield assignDataPartitions({
+  yield assignDataPartitionsNew({
     preprocessOptions,
-    categorizedImages,
-    uncategorizedImages,
+    labeledThings,
+    unlabeledThings,
     trainingPercentage,
   });
 
-  const loaded: boolean = yield loadClassifier({
+  const loaded: boolean = yield loadClassifierNew({
     model: selectedModel,
     inputShape,
     preprocessOptions,
     compileOptions,
     fitOptions,
-    numClasses,
+    numClasses: numClasses,
   });
-
+  console.log(
+    "made it to FitClassifierSaga - FitClassifier - has loaded with return: ",
+    loaded
+  );
   if (!loaded) return;
 
   yield put(
-    classifierSlice.actions.updateModelStatus({
+    classifierSlice.actions.updateModelStatusNew({
       execSaga: false,
       modelStatus: ModelStatus.Training,
     })
   );
 
-  yield fitClassifier({ model: selectedModel, onEpochEnd, fitOptions });
+  yield fitClassifierNew({ model: selectedModel, onEpochEnd, fitOptions });
 }
 
-function* handleError(error: Error, errorName: string) {
+function* handleErrorNew(error: Error, errorName: string) {
   const stackTrace: Awaited<ReturnType<typeof getStackTraceFromError>> =
     yield getStackTraceFromError(error);
 
@@ -323,7 +310,7 @@ function* handleError(error: Error, errorName: string) {
   );
 
   yield put(
-    classifierSlice.actions.updateModelStatus({
+    classifierSlice.actions.updateModelStatusNew({
       execSaga: false,
       modelStatus: ModelStatus.Uninitialized,
     })

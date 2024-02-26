@@ -1,11 +1,11 @@
 import { takeLeading } from "redux-saga/effects";
-import { fitClassifierSaga } from "./fitClassifierSaga";
+import { fitClassifierSagaNew } from "./fitClassifierSagaNew";
 
 import { classifierSlice } from "store/slices/classifier";
 
-export function* watchFitClassifierSaga() {
+export function* watchFitClassifierSagaNew() {
   yield takeLeading(
-    classifierSlice.actions.updateModelStatus.type,
-    fitClassifierSaga
+    classifierSlice.actions.updateModelStatusNew.type,
+    fitClassifierSagaNew
   );
 }
