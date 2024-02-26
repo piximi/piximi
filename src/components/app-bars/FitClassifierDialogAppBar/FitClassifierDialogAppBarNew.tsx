@@ -22,7 +22,7 @@ import {
 import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { ModelStatus } from "types/ModelType";
 
-type FitClassifierDialogAppBarProps = {
+type FitClassifierDialogAppBarNewProps = {
   closeDialog: any;
   fit: any;
   noLabels: boolean;
@@ -31,14 +31,14 @@ type FitClassifierDialogAppBarProps = {
   currentEpoch: number;
 };
 
-export const FitClassifierDialogAppBar = ({
+export const FitClassifierDialogAppBarNew = ({
   closeDialog,
   fit,
   noLabels,
   noTrain,
   epochs,
   currentEpoch,
-}: FitClassifierDialogAppBarProps) => {
+}: FitClassifierDialogAppBarNewProps) => {
   const dispatch = useDispatch();
 
   const selectedModel = useSelector(selectClassifierSelectedModel);

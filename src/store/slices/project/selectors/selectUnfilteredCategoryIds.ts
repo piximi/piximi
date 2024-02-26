@@ -1,11 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectActiveThingFilters } from "../selectors";
-import { selectCategoriesInView } from "store/slices/newData/selectors/selectors";
+import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
 import { difference } from "lodash";
 
 export const selectUnfilteredActiveCategoryIds = createSelector(
   selectActiveThingFilters,
-  selectCategoriesInView,
+  selectActiveCategories,
   (thingFilters, activeCategories) => {
     const filteredCategories = thingFilters.categoryId;
     const unfilteredCategories = difference(

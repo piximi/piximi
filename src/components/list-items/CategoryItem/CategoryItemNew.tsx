@@ -10,7 +10,7 @@ import { APPLICATION_COLORS } from "utils/common/colorPalette";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { NewCategory } from "types/Category";
 import { useSelector } from "react-redux";
-import { selectNumThingsOfCatAndKind } from "store/slices/newData/selectors/selectors";
+import { selectNumThingsByCatAndKind } from "store/slices/newData/selectors/reselectors";
 import { selectActiveKind } from "store/slices/project/selectors";
 
 type CategoryItemProps = {
@@ -31,7 +31,7 @@ export const CategoryItemNew = ({
   handleOpenCategoryMenu,
   selectCategory,
 }: CategoryItemProps) => {
-  const numThings = useSelector(selectNumThingsOfCatAndKind);
+  const numThings = useSelector(selectNumThingsByCatAndKind);
   const activeKind = useSelector(selectActiveKind);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
