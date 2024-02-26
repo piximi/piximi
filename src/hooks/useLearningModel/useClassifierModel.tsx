@@ -22,7 +22,7 @@ export const useClassificationModel = () => {
 
   const handlePredict = () => {
     dispatch(
-      classifierSlice.actions.updateModelStatus({
+      classifierSlice.actions.updateModelStatusNew({
         modelStatus: ModelStatus.Predicting,
         execSaga: true,
       })

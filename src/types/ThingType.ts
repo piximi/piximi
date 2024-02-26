@@ -13,4 +13,5 @@ export type ThingType = {
   shape: Shape;
   bitDepth: BitDepth;
   categoryId: string;
+  activePlane: number;
 };

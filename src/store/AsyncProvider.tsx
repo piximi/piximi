@@ -106,7 +106,7 @@ const loadState = async () => {
 
   for (const annotation of annotations) {
     annotation.kind = anCat2KindNAme[annotation.categoryId];
-
+    annotation.activePlane = annotation.plane ?? 0;
     let annotationName: string = `${image.name}-${annotation.kind}`;
     if (annotationName in numAnnotationsOfKindPerImage) {
       annotationName += `_${numAnnotationsOfKindPerImage[annotationName]++}`;
