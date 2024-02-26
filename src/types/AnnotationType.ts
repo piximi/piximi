@@ -22,7 +22,7 @@ export type NewAnnotationType = ThingType & {
   boundingBox: [number, number, number, number];
   encodedMask: Array<number>;
   decodedMask?: DataArray;
-  plane: number;
+  plane?: number;
   imageId: string;
 };
 

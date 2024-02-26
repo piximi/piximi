@@ -21,7 +21,6 @@ export type ImageType = {
 };
 
 export type NewImageType = ThingType & {
-  activePlane: number;
   colors: Colors;
   containing: string[];
 };

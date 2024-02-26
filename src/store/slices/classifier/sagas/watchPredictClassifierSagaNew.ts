@@ -1,12 +1,12 @@
 import { takeLeading } from "redux-saga/effects";
 
-import { predictClassifierSaga } from "./predictClassifierSaga";
+import { predictClassifierSagaNew } from "./predictClassifierSagaNew";
 
 import { classifierSlice } from "store/slices/classifier";
 
-export function* watchPredictClassifierSaga() {
+export function* watchPredictClassifierSagaNew() {
   yield takeLeading(
-    classifierSlice.actions.updateModelStatus.type,
-    predictClassifierSaga
+    classifierSlice.actions.updateModelStatusNew.type,
+    predictClassifierSagaNew
   );
 }

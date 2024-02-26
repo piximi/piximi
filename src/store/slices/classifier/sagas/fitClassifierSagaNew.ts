@@ -266,10 +266,7 @@ export function* fitClassifierSagaNew({
     fitOptions,
     numClasses: numClasses,
   });
-  console.log(
-    "made it to FitClassifierSaga - FitClassifier - has loaded with return: ",
-    loaded
-  );
+
   if (!loaded) return;
 
   yield put(

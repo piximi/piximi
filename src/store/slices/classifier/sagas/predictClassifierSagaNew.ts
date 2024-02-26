@@ -30,7 +30,7 @@ import { ModelStatus } from "types/ModelType";
 import { getStackTraceFromError } from "utils";
 import { SequentialClassifier } from "utils/common/models/AbstractClassifier/AbstractClassifier";
 
-export function* predictClassifierSaga({
+export function* predictClassifierSagaNew({
   payload: { modelStatus, execSaga },
 }: PayloadAction<{ modelStatus: ModelStatus; execSaga: boolean }>) {
   if (modelStatus !== ModelStatus.Predicting || !execSaga) return;
