@@ -14,7 +14,7 @@ import {
 } from "types";
 import { mutatingFilter } from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
-import { NewData } from "types/NewData";
+import { NewDataState } from "types/NewData";
 import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 import { NewCategory, Kind } from "types/Category";
 import { NewImageType } from "types/ImageType";
@@ -27,7 +27,7 @@ export const thingsAdapter = createDeferredEntityAdapter<
   NewImageType | NewAnnotationType
 >();
 
-export const initialState = (): NewData => {
+export const initialState = (): NewDataState => {
   return {
     kinds: kindsAdapter.getInitialState(),
     categories: categoriesAdapter.getInitialState({

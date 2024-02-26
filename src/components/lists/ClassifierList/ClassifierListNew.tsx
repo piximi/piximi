@@ -4,10 +4,7 @@ import { Box } from "@mui/material";
 
 import { useDialog, useDialogHotkey } from "hooks";
 
-import {
-  FitClassifierDialog,
-  ImportTensorflowModelDialog,
-} from "components/dialogs";
+import { ImportTensorflowModelDialog } from "components/dialogs";
 import { SaveFittedModelDialog } from "components/dialogs";
 
 import { ModelStatus, ModelTask } from "types/ModelType";
@@ -17,6 +14,7 @@ import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/Mod
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
 import { EvaluateClassifierDialogNew } from "components/dialogs/EvaluateClassifierDialog/EvaluationClassifierDialogNew";
 import { HotkeyView } from "types";
+import { FitClassifierDialogNew } from "components/dialogs/FitClassifierDialog/FitClassifierDialogNew";
 
 export const ClassifierListNew = () => {
   const {
@@ -71,6 +69,7 @@ export const ClassifierListNew = () => {
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitModelDialog}
           handlePredict={handlePredict}
+          modelTrainable={selectedModel.trainable}
           helperText={helperText}
         />
       </Box>
@@ -86,7 +85,7 @@ export const ClassifierListNew = () => {
         onClose={onCloseSaveClassifierDialog}
         open={openSaveClassifierDialog}
       />
-      <FitClassifierDialog
+      <FitClassifierDialogNew
         openedDialog={fittingOpen}
         closeDialog={handleCloseFitModelDialog}
       />

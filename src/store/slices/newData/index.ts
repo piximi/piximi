@@ -1,1 +1,1 @@
-export { selectThingsOfKind } from "./selectors/selectors";
+export { selectThingsByKind as selectThingsOfKind } from "./selectors/reselectors";

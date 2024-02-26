@@ -13,7 +13,7 @@ import { NewCategory } from "types/Category";
 import { PredictionListItems } from "components/list-items";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCategoriesInView } from "store/slices/newData/selectors/selectors";
+import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
 import { CategoryItemNew } from "components/list-items/CategoryItem/CategoryItemNew";
 import { CategoryItemMenuNew } from "components/menus/CategoryItemMenu/CategoryItemMenuNew";
 import {
@@ -30,7 +30,7 @@ import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
-  const categories = useSelector(selectCategoriesInView);
+  const categories = useSelector(selectActiveCategories);
   const activeKind = useSelector(selectActiveKind);
   const [selectedCategory, setSelectedCategory] = useState<NewCategory>();
   const [categoryIndex, setCategoryIndex] = useState("");
