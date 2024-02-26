@@ -10,6 +10,7 @@ import { difference, intersection } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
+import { Partition } from "types";
 
 export const selectThingsByKind = createSelector(
   [selectKindDictionary, selectThingsDictionary],
@@ -67,6 +68,19 @@ export const selectActiveCategories = createSelector(
   }
 );
 
+export const selectActiveCategoryCount = createSelector(
+  selectActiveCategories,
+  (activeCategories) => {
+    return activeCategories.length;
+  }
+);
+export const selectActiveKnownCategoryCount = createSelector(
+  selectActiveCategories,
+  (activeCategories) => {
+    return activeCategories.length - 1;
+  }
+);
+
 export const selectActiveCategoryNames = createSelector(
   selectActiveCategories,
   (activeCategories) => {
@@ -97,6 +111,17 @@ export const selectActiveLabeledThingsIds = createSelector(
     return difference(thingsInKind, unknownThings);
   }
 );
+export const selectActiveUnlabeledThingsIds = createSelector(
+  selectKindDictionary,
+  selectCategoriesDictionary,
+  selectActiveKind,
+  (kindDict, catDict, activeKind) => {
+    if (!kindDict[activeKind]) return [];
+    const thingsInKind = kindDict[activeKind].containing;
+    const unknownThings = catDict[NEW_UNKNOWN_CATEGORY_ID].containing;
+    return intersection(thingsInKind, unknownThings);
+  }
+);
 
 export const selectActiveLabeledThings = createSelector(
   selectActiveLabeledThingsIds,
@@ -111,6 +136,19 @@ export const selectActiveLabeledThings = createSelector(
     return activeLabeledThings;
   }
 );
+export const selectActiveUnlabeledThings = createSelector(
+  selectActiveUnlabeledThingsIds,
+  selectThingsDictionary,
+  (activeUnlabeledThingIds, thingDict) => {
+    const activeLabeledThings: Array<NewAnnotationType | NewImageType> = [];
+    for (const thingId of activeUnlabeledThingIds) {
+      const thing = thingDict[thingId];
+      thing && activeLabeledThings.push(thing);
+    }
+
+    return activeLabeledThings;
+  }
+);
 
 export const selectActiveLabeledThingsCount = createSelector(
   selectActiveLabeledThingsIds,
@@ -118,3 +156,45 @@ export const selectActiveLabeledThingsCount = createSelector(
     return activeLabeledThings.length;
   }
 );
+
+export const selectActiveThingsByPartition = createSelector(
+  selectActiveThings,
+  (activeThings) => {
+    const thingsByPartition = activeThings.reduce(
+      (
+        byPartition: Record<string, Array<NewImageType | NewImageType>>,
+        thing
+      ) => {
+        switch (thing.partition) {
+          case Partition.Inference:
+            updateRecord(byPartition, Partition.Inference, thing);
+            break;
+          case Partition.Training:
+            updateRecord(byPartition, Partition.Training, thing);
+            break;
+          case Partition.Unassigned:
+            updateRecord(byPartition, Partition.Unassigned, thing);
+            break;
+          case Partition.Validation:
+            updateRecord(byPartition, Partition.Validation, thing);
+            break;
+        }
+        return byPartition;
+      },
+      {}
+    );
+    return thingsByPartition;
+  }
+);
+
+const updateRecord = <T extends string | number | symbol, K>(
+  record: Record<T, K[]>,
+  key: T,
+  value: K
+) => {
+  if (key in record) {
+    record[key].push(value);
+  } else {
+    record[key] = [value];
+  }
+};

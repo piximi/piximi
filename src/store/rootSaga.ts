@@ -4,6 +4,7 @@ import {
   watchFitClassifierSaga,
   watchPredictClassifierSaga,
 } from "store/slices/classifier";
+import { watchFitClassifierSagaNew } from "./slices/classifier/sagas/watchFitClassifierSagaNew";
 import {
   watchFitSegmenterSaga,
   watchEvaluateSegmenterSaga,
@@ -13,6 +14,7 @@ import {
 export function* rootSaga() {
   const classifierEffects = [
     fork(watchFitClassifierSaga),
+    fork(watchFitClassifierSagaNew),
     fork(watchPredictClassifierSaga),
     fork(watchEvaluateClassifierSaga),
   ];

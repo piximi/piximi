@@ -100,7 +100,7 @@ export const useClassificationModelAgain = () => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
       dispatch(
-        classifierSlice.actions.updateModelStatus({
+        classifierSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
           execSaga: true,
@@ -108,7 +108,7 @@ export const useClassificationModelAgain = () => {
       );
     } else {
       dispatch(
-        classifierSlice.actions.updateModelStatus({
+        classifierSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
           execSaga: true,
