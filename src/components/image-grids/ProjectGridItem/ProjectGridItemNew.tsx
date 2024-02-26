@@ -9,7 +9,7 @@ import {
   selectSelectedImageBorderWidth,
   selectTileSize,
 } from "store/slices/applicationSettings";
-import { selectCategoryProperty } from "store/slices/newData/selectors/selectors";
+import { selectCategoryProperty } from "store/slices/newData/selectors/reselectors";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
 import { NEW_UNKNOWN_CATEGORY_ID, Partition } from "types";

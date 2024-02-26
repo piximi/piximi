@@ -29,7 +29,7 @@ import { unregisterHotkeyView } from "store/slices/applicationSettings";
 
 import { HotkeyView, Partition } from "types";
 import { projectSlice } from "store/slices/project";
-import { selectCategoriesInView } from "store/slices/newData/selectors/selectors";
+import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 
 type GridItemActionBarProps = {
@@ -55,7 +55,7 @@ export const GridItemActionBarNew = ({
   const [categoryMenuAnchorEl, setCategoryMenuAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
-  const categories = useSelector(selectCategoriesInView);
+  const categories = useSelector(selectActiveCategories);
 
   const handleSelectAllObjects = () => {
     selectAllThings();

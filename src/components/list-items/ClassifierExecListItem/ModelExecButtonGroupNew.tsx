@@ -12,20 +12,23 @@ export const ModelExecButtonGroupNew = ({
   handleEvaluate,
   handleFit,
   modelStatus,
+  modelTrainable,
   helperText,
 }: {
   handlePredict: () => void;
   handleEvaluate: () => void;
   handleFit: () => void;
   modelStatus: ModelStatus;
+  modelTrainable: boolean;
   helperText: string;
 }) => {
   return (
     <Box width="100%" display="flex" justifyContent={"space-evenly"}>
       <TooltipButton
-        tooltipTitle={"Fit Model"}
+        tooltipTitle={modelTrainable ? "Fit Model" : "Model is inference only"}
         disableRipple
         onClick={handleFit}
+        disabled={!modelTrainable}
       >
         <ScatterPlotIcon />
       </TooltipButton>

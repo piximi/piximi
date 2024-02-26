@@ -52,7 +52,7 @@ export const SegmenterListNew = () => {
 
   return (
     <>
-      <Box>
+      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
         <ModelIOButtonGroup
           handleImportModel={onOpenImportSegmenterDialog}
           handleSaveModel={onOpenSaveSegmenterDialog}
@@ -63,6 +63,7 @@ export const SegmenterListNew = () => {
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitModelDialog}
           handlePredict={handlePredict}
+          modelTrainable={selectedModel.trainable}
           helperText={helperText}
         />
       </Box>
