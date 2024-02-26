@@ -63,7 +63,10 @@ export abstract class SequentialClassifier extends Model {
     });
   }
 
-  public loadInference(images: ImageType[], preprocessingArgs: LoadDataArgs) {
+  public loadInference<T extends Omit<ImageType, "colors">>(
+    images: T[],
+    preprocessingArgs: LoadDataArgs
+  ) {
     this._inferenceDataset = preprocessClassifier({
       images,
       ...preprocessingArgs,

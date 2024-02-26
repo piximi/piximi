@@ -315,7 +315,7 @@ const doShow = (
 //#endregion Debug stuff
 
 type PreprocessArgs = {
-  images: Array<ImageType>;
+  images: Array<Omit<ImageType, "colors">>;
   categories: Array<Category>;
   inputShape: Shape;
   preprocessOptions: PreprocessOptions;

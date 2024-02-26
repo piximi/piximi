@@ -98,17 +98,21 @@ export const dataConverter = (data: {
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
   for (const annotation of annotations as NewAnnotationType[]) {
-    annotation.kind = anCat2KindNAme[annotation.categoryId];
+    const { plane, ..._annotation } = {
+      ...annotation,
+      activePlane: annotation.plane,
+    };
+    _annotation.kind = anCat2KindNAme[_annotation.categoryId];
     let annotationName: string;
-    if (annotation.imageId in things.entities) {
-      annotationName = `${things.entities[annotation.imageId].saved.name}-${
-        annotation.kind
+    if (_annotation.imageId in things.entities) {
+      annotationName = `${things.entities[_annotation.imageId].saved.name}-${
+        _annotation.kind
       }`;
       (
-        things.entities[annotation.imageId].saved as NewImageType
-      ).containing.push(annotation.id);
+        things.entities[_annotation.imageId].saved as NewImageType
+      ).containing.push(_annotation.id);
     } else {
-      annotationName = `${annotation.kind}`;
+      annotationName = `${_annotation.kind}`;
     }
     if (annotationName in numAnnotationsOfKindPerImage) {
       annotationName += `_${numAnnotationsOfKindPerImage[annotationName]++}`;
@@ -116,9 +120,9 @@ export const dataConverter = (data: {
       numAnnotationsOfKindPerImage[annotationName] = 1;
       annotationName += "_0";
     }
-    annotation.name = annotationName;
-    annotation.categoryId = NEW_UNKNOWN_CATEGORY_ID;
-    annotation.shape = annotation.data.shape.reduce(
+    _annotation.name = annotationName;
+    _annotation.categoryId = NEW_UNKNOWN_CATEGORY_ID;
+    _annotation.shape = _annotation.data.shape.reduce(
       (shape: Shape, value: number, idx) => {
         switch (idx) {
           case 0:
@@ -140,18 +144,18 @@ export const dataConverter = (data: {
       },
       { planes: 0, height: 0, width: 0, channels: 0 }
     );
-    annotation.partition = Partition.Unassigned;
-    things.ids.push(annotation.id);
+    _annotation.partition = Partition.Unassigned;
+    things.ids.push(_annotation.id);
 
-    things.entities[annotation.id] = {
-      saved: annotation as NewAnnotationType,
+    things.entities[_annotation.id] = {
+      saved: _annotation as NewAnnotationType,
       changes: {},
     };
 
-    kinds.entities[annotation.kind].saved.containing.push(annotation.id);
+    kinds.entities[_annotation.kind].saved.containing.push(_annotation.id);
 
     categories.entities[NEW_UNKNOWN_CATEGORY_ID].saved.containing.push(
-      annotation.id
+      _annotation.id
     );
   }
 
