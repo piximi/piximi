@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 
-import { getDeferredProperty } from "store/entities/utils";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { intersection, union } from "lodash";
 
 import {
@@ -549,31 +549,70 @@ export const newDataSlice = createSlice({
         }
       }
     },
+    // Sets the category for the inference images back to Unknown
     clearPredictions(
       state,
       action: PayloadAction<{ kind: string; isPermanent?: boolean }>
     ) {
       const { isPermanent, kind } = action.payload;
+      if (!(kind in state.kinds.entities)) return;
 
-      const updates: Array<{ id: string } & Partial<NewImageType>> = [];
+      const updates: Array<
+        { id: string } & (Partial<NewImageType> | Partial<NewAnnotationType>)
+      > = [];
 
-      const thingIds = state.kinds.entities[kind]?.saved.containing ?? [];
+      const thingIds = getDeferredProperty(
+        state.kinds.entities[kind],
+        "containing"
+      );
 
       thingIds.forEach((id) => {
-        if (
-          (state.things.entities[id].changes &&
-            state.things.entities[id].changes.partition ===
-              Partition.Inference) ||
-          state.things.entities[id].saved.partition === Partition.Inference
-        ) {
+        const thing = getCompleteEntity(state.things.entities[id]);
+        if (!thing) return;
+        if (thing.partition === Partition.Inference) {
           updates.push({
             id: id as string,
             categoryId: NEW_UNKNOWN_CATEGORY_ID,
-            partition: Partition.Unassigned,
           });
         }
       });
 
+      newDataSlice.caseReducers.updateThings(state, {
+        type: "updateThings",
+        payload: {
+          updates: updates,
+          isPermanent: isPermanent,
+        },
+      });
+    },
+    acceptPredictions(
+      state,
+      action: PayloadAction<{ kind: string; isPermanent?: boolean }>
+    ) {
+      const { isPermanent, kind } = action.payload;
+      if (!(kind in state.kinds.entities)) return;
+      const thingIds = getDeferredProperty(
+        state.kinds.entities[kind],
+        "containing"
+      );
+      const updates: Array<
+        { id: string } & (Partial<NewImageType> | Partial<NewAnnotationType>)
+      > = [];
+      thingIds.forEach((id) => {
+        const thing = getCompleteEntity(state.things.entities[id]);
+        if (!thing) return;
+        const imagePartition = thing.partition;
+        const categoryId = thing.categoryId;
+        if (
+          imagePartition === Partition.Inference &&
+          categoryId !== NEW_UNKNOWN_CATEGORY_ID
+        ) {
+          updates.push({
+            id: id as string,
+            partition: Partition.Unassigned,
+          });
+        }
+      });
       newDataSlice.caseReducers.updateThings(state, {
         type: "updateThings",
         payload: {

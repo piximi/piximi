@@ -103,7 +103,6 @@ export const useClassificationModelAgain = () => {
         classifierSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
-          execSaga: true,
         })
       );
     } else {
@@ -111,7 +110,6 @@ export const useClassificationModelAgain = () => {
         classifierSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
-          execSaga: true,
         })
       );
     }

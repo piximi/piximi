@@ -52,3 +52,12 @@ export const filterObjects = <T extends object>(
 export const distinctFilter = <T>(value: T, index: number, self: T[]) => {
   return self.indexOf(value) === index;
 };
+
+export const getSubset = <T, K extends keyof T>(object: T, keys: K[]) => {
+  const subset: Record<string, (typeof object)[K]> = {};
+
+  keys.forEach((key) => {
+    subset[key as string] = object[key];
+  });
+  return subset;
+};

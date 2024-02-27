@@ -14,7 +14,7 @@ import { ConfusionMatrix } from "./ConfusionMatrixPlot";
 import { useSelector } from "react-redux";
 import { selectClassifierEvaluationResult } from "store/slices/classifier";
 import { Category } from "types";
-import { selectCreatedImageCategories } from "store/slices/data";
+import { selectActiveKnownCategories } from "store/slices/newData/selectors/reselectors";
 
 type EvaluateClassifierDialogNewProps = {
   closeDialog: () => void;
@@ -26,7 +26,7 @@ export const EvaluateClassifierDialogNew = ({
   openedDialog,
 }: EvaluateClassifierDialogNewProps) => {
   const evaluationResults = useSelector(selectClassifierEvaluationResult);
-  const categories: Category[] = useSelector(selectCreatedImageCategories);
+  const categories = useSelector(selectActiveKnownCategories);
 
   return (
     <Dialog
