@@ -67,6 +67,12 @@ export const selectActiveCategories = createSelector(
     return categoriesOfKind.map((catId) => categoriesDict[catId]);
   }
 );
+export const selectActiveKnownCategories = createSelector(
+  selectActiveCategories,
+  (activeCategories) => {
+    return activeCategories.filter((cat) => cat.id !== NEW_UNKNOWN_CATEGORY_ID);
+  }
+);
 
 export const selectActiveCategoryCount = createSelector(
   selectActiveCategories,
@@ -75,9 +81,9 @@ export const selectActiveCategoryCount = createSelector(
   }
 );
 export const selectActiveKnownCategoryCount = createSelector(
-  selectActiveCategories,
-  (activeCategories) => {
-    return activeCategories.length - 1;
+  selectActiveKnownCategories,
+  (activeKnownCategories) => {
+    return activeKnownCategories.length;
   }
 );
 
