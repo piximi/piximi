@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Clear as ClearIcon,
@@ -11,16 +11,18 @@ import {
 import { useTranslation } from "hooks";
 
 import { classifierSlice } from "store/slices/classifier";
-import { dataSlice } from "store/slices/data";
 import { Partition } from "types";
 
 import { ModelStatus } from "types/ModelType";
 import { CustomListItemButton } from "../CustomListItemButton";
 import { projectSlice } from "store/slices/project";
 import { ListItemHoldButton } from "../ListItemHoldButton";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectActiveKind } from "store/slices/project/selectors";
 
-export const PredictionListItems = () => {
+export const PredictionListItemsNew = () => {
   const dispatch = useDispatch();
+  const activeKind = useSelector(selectActiveKind);
 
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
 
@@ -29,7 +31,7 @@ export const PredictionListItems = () => {
   const toggleShowLabeledImages = () => {
     if (labeledImagesVisible) {
       dispatch(
-        projectSlice.actions.addImagePartitionFilters({
+        projectSlice.actions.addThingPartitionFilters({
           partitions: [
             Partition.Training,
             Partition.Validation,
@@ -39,8 +41,8 @@ export const PredictionListItems = () => {
       );
     } else {
       dispatch(
-        projectSlice.actions.removeImagePartitionFilters({
-          all: true,
+        projectSlice.actions.removeThingPartitionFilters({
+          partitions: "all",
         })
       );
     }
@@ -48,14 +50,19 @@ export const PredictionListItems = () => {
   };
 
   const clearPredictions = () => {
-    dispatch(dataSlice.actions.clearPredictions({ isPermanent: true }));
+    dispatch(
+      newDataSlice.actions.clearPredictions({
+        kind: activeKind,
+        isPermanent: true,
+      })
+    );
 
     if (!labeledImagesVisible) {
       setLabeledImagesVisible(true);
 
       dispatch(
-        projectSlice.actions.removeImagePartitionFilters({
-          all: true,
+        projectSlice.actions.removeThingPartitionFilters({
+          partitions: "all",
         })
       );
     }
@@ -68,16 +75,20 @@ export const PredictionListItems = () => {
     );
   };
   const acceptPredictions = () => {
-    dispatch(dataSlice.actions.acceptPredictions({ isPermanent: true }));
     dispatch(
-      classifierSlice.actions.updateModelStatus({
-        modelStatus: ModelStatus.Trained,
-        execSaga: false,
+      newDataSlice.actions.acceptPredictions({
+        kind: activeKind,
+        isPermanent: true,
       })
     );
     dispatch(
-      projectSlice.actions.removeImagePartitionFilters({
-        all: true,
+      classifierSlice.actions.updateModelStatusNew({
+        modelStatus: ModelStatus.Trained,
+      })
+    );
+    dispatch(
+      projectSlice.actions.removeThingPartitionFilters({
+        partitions: "all",
       })
     );
   };

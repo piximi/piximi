@@ -24,7 +24,6 @@ export const useClassificationModel = () => {
     dispatch(
       classifierSlice.actions.updateModelStatusNew({
         modelStatus: ModelStatus.Predicting,
-        execSaga: true,
       })
     );
   };
@@ -33,9 +32,8 @@ export const useClassificationModel = () => {
     setWaitingForResults(true);
 
     dispatch(
-      classifierSlice.actions.updateModelStatus({
+      classifierSlice.actions.updateModelStatusNew({
         modelStatus: ModelStatus.Evaluating,
-        execSaga: true,
       })
     );
   };

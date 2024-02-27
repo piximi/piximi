@@ -89,7 +89,6 @@ export const classifierSlice = createSlice({
       action: PayloadAction<{
         modelStatus: ModelStatus;
         onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
-        execSaga: boolean;
       }>
     ) {
       state.modelStatus = action.payload.modelStatus;

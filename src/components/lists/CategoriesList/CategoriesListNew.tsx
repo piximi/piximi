@@ -10,7 +10,6 @@ import { DialogWithAction } from "components/dialogs";
 
 import { HotkeyView, NEW_UNKNOWN_CATEGORY, Partition } from "types";
 import { NewCategory } from "types/Category";
-import { PredictionListItems } from "components/list-items";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { useDispatch, useSelector } from "react-redux";
 import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
@@ -27,6 +26,7 @@ import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialog
 import { selectClassifierModelStatus } from "store/slices/classifier";
 import { ModelStatus } from "types/ModelType";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { PredictionListItemsNew } from "components/list-items/PredictionListItems/PredictionListItemsNew";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
@@ -177,7 +177,7 @@ export const CategoriesListNew = () => {
           })}
         </List>
 
-        {modelStatus === ModelStatus.Suggesting && <PredictionListItems />}
+        {modelStatus === ModelStatus.Suggesting && <PredictionListItemsNew />}
         <CustomListItemButton
           icon={<AddIcon />}
           primaryText="Create Category"
