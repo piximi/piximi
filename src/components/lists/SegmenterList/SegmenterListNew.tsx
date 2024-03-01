@@ -63,7 +63,7 @@ export const SegmenterListNew = () => {
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitModelDialog}
           handlePredict={handlePredict}
-          modelTrainable={selectedModel.trainable}
+          modelTrainable={false} //until trainable segmenter available
           helperText={helperText}
         />
       </Box>

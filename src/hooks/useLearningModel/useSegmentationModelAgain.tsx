@@ -112,18 +112,16 @@ export const useSegmentationModelAgain = () => {
     setCurrentEpoch(0);
     if (modelStatus === ModelStatus.Uninitialized) {
       dispatch(
-        segmenterSlice.actions.updateModelStatus({
+        segmenterSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.InitFit,
           onEpochEnd: trainingHistoryCallback,
-          execSaga: true,
         })
       );
     } else {
       dispatch(
-        segmenterSlice.actions.updateModelStatus({
+        segmenterSlice.actions.updateModelStatusNew({
           modelStatus: ModelStatus.Training,
           onEpochEnd: trainingHistoryCallback,
-          execSaga: true,
         })
       );
     }
