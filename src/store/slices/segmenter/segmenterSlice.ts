@@ -97,6 +97,15 @@ export const segmenterSlice = createSlice({
     ) {
       state.modelStatus = action.payload.modelStatus;
     },
+    updateModelStatusNew(
+      state,
+      action: PayloadAction<{
+        modelStatus: ModelStatus;
+        onEpochEnd?: TrainingCallbacks["onEpochEnd"]; // used by fit
+      }>
+    ) {
+      state.modelStatus = action.payload.modelStatus;
+    },
     updateFitted(state, action: PayloadAction<{ history: History }>) {
       state.modelStatus = ModelStatus.Trained;
 
