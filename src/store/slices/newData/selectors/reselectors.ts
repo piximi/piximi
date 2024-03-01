@@ -204,3 +204,16 @@ const updateRecord = <T extends string | number | symbol, K>(
     record[key] = [value];
   }
 };
+
+export const selectAnnotatedImages = createSelector(
+  selectThingsByKind,
+  (thingsByKind) => {
+    const images = thingsByKind("Image");
+    return images.filter((image) => {
+      if ("containing" in image) {
+        return image.containing.length > 0;
+      }
+      return false;
+    }) as NewImageType[];
+  }
+);

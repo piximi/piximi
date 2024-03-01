@@ -5,7 +5,6 @@ import { Box } from "@mui/material";
 import { useDialog, useDialogHotkey } from "hooks";
 
 import {
-  FitSegmenterDialog,
   ImportTensorflowModelDialog,
   SaveFittedModelDialog,
 } from "components/dialogs";
@@ -15,6 +14,7 @@ import { ModelStatus, ModelTask } from "types/ModelType";
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroupNew";
 import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
+import { FitSegmenterDialogNew } from "components/dialogs/FitSegmenterDialog/FitSegmentationDialogNew";
 
 export const SegmenterListNew = () => {
   const {
@@ -80,7 +80,7 @@ export const SegmenterListNew = () => {
         onClose={onCloseSaveSegmenterDialog}
         open={openSaveSegmenterDialog}
       />
-      <FitSegmenterDialog
+      <FitSegmenterDialogNew
         openedDialog={fittingOpen}
         closeDialog={handleCloseFitModelDialog}
       />
