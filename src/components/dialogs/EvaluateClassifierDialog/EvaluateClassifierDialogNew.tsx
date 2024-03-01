@@ -1,20 +1,12 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Stack,
-  Typography,
-  Grid,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-
-import { EvaluateMetricInfoBox } from "./EvaluateMetricInfoBox";
-import { ConfusionMatrix } from "./ConfusionMatrixPlot";
+import { Dialog, DialogContent, Stack, Typography, Grid } from "@mui/material";
+import { EvaluationMetricsInfoBox } from "./EvaluationMetricsInfoBox";
+import { ConfusionMatrixNew } from "./ConfusionMatrixNew";
 import { useSelector } from "react-redux";
 import { selectClassifierEvaluationResult } from "store/slices/classifier";
 import { Category } from "types";
 import { selectActiveKnownCategories } from "store/slices/newData/selectors/reselectors";
+import { DialogTransitionSlide } from "components/dialogs";
+import { EvaluateClassifierDialogAppBarNew } from "./EvaluateClassifierAppBar";
 
 type EvaluateClassifierDialogNewProps = {
   closeDialog: () => void;
@@ -34,23 +26,10 @@ export const EvaluateClassifierDialogNew = ({
       open={openedDialog}
       fullWidth
       maxWidth="md"
-      sx={{ zIndex: 1203, height: "700px" }}
+      TransitionComponent={DialogTransitionSlide}
+      sx={{ zIndex: 1203, height: "100%" }}
     >
-      <DialogTitle sx={{ m: 0, p: 2 }}>
-        Model Evaluation
-        <IconButton
-          aria-label="close"
-          onClick={closeDialog}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+      <EvaluateClassifierDialogAppBarNew closeDialog={closeDialog} />
 
       <DialogContent>
         <Grid
@@ -59,7 +38,7 @@ export const EvaluateClassifierDialogNew = ({
           justifyContent="space-evenly"
           alignItems="flex-start"
         >
-          <ConfusionMatrix
+          <ConfusionMatrixNew
             classNames={categories.map((c: Category) => c.name)}
             confusionMatrix={evaluationResults.confusionMatrix}
           />
@@ -69,30 +48,30 @@ export const EvaluateClassifierDialogNew = ({
               Evaluation metrics:
             </Typography>
             <Stack spacing={1} direction="row">
-              <EvaluateMetricInfoBox
+              <EvaluationMetricsInfoBox
                 metric={"Accuracy"}
                 value={evaluationResults.accuracy}
                 link="https://en.wikipedia.org/wiki/Accuracy_and_precision"
               />
-              <EvaluateMetricInfoBox
+              <EvaluationMetricsInfoBox
                 metric={"Cross entropy"}
                 value={evaluationResults.crossEntropy}
                 link="https://en.wikipedia.org/wiki/Cross_entropy"
               />
             </Stack>
             <Stack spacing={1} direction="row">
-              <EvaluateMetricInfoBox
+              <EvaluationMetricsInfoBox
                 metric={"Precision"}
                 value={evaluationResults.precision}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
-              <EvaluateMetricInfoBox
+              <EvaluationMetricsInfoBox
                 metric={"Recall"}
                 value={evaluationResults.recall}
                 link="https://en.wikipedia.org/wiki/Precision_and_recall"
               />
             </Stack>
-            <EvaluateMetricInfoBox
+            <EvaluationMetricsInfoBox
               metric={"F1-score"}
               value={evaluationResults.f1Score}
               link="https://en.wikipedia.org/wiki/F-score"

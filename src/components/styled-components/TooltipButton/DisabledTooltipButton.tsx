@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 type TooltipButtonProps = ButtonProps & {
   tooltipTitle: string | ReactNode;
 };
-export const TooltipButton = ({
+export const DisabledTooltipButton = ({
   tooltipTitle,
   ...props
 }: TooltipButtonProps) => {
@@ -22,7 +22,7 @@ export const TooltipButton = ({
       disableInteractive
     >
       <span>
-        <Button {...props} />
+        <Button {...props} disabled />
       </span>
     </Tooltip>
   );

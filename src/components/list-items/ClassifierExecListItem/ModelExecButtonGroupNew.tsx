@@ -58,9 +58,8 @@ export const ModelExecButtonGroupNew = ({
 
       <TooltipButton
         tooltipTitle={
-          modelStatus === ModelStatus.Evaluating
-            ? "...evaluating"
-            : modelStatus !== ModelStatus.Trained
+          modelStatus !== ModelStatus.Trained &&
+          modelStatus !== ModelStatus.Evaluating
             ? helperText
             : "Evaluate Model"
         }
@@ -68,7 +67,15 @@ export const ModelExecButtonGroupNew = ({
         onClick={handleEvaluate}
         disabled={modelStatus !== ModelStatus.Trained}
       >
-        <AssessmentIcon />
+        {modelStatus === ModelStatus.Evaluating ? (
+          <CircularProgress
+            disableShrink
+            size={24}
+            sx={{ alignSelf: "center" }}
+          />
+        ) : (
+          <AssessmentIcon />
+        )}
       </TooltipButton>
     </Box>
   );

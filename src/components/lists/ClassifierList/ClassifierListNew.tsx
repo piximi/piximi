@@ -12,7 +12,7 @@ import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecLis
 
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
-import { EvaluateClassifierDialogNew } from "components/dialogs/EvaluateClassifierDialog/EvaluationClassifierDialogNew";
+import { EvaluateClassifierDialogNew } from "components/dialogs/EvaluateClassifierDialog/EvaluateClassifierDialogNew";
 import { HotkeyView } from "types";
 import { FitClassifierDialogNew } from "components/dialogs/FitClassifierDialog/FitClassifierDialogNew";
 
@@ -28,70 +28,75 @@ export const ClassifierListNew = () => {
     handleImportModel,
   } = useClassificationModel();
   const {
-    onClose: handleCloseEval,
-    onOpen: handleOpenEval,
-    open: evalOpen,
+    onClose: handleCloseEvaluateClassifierDialog,
+    onOpen: handleOpenEvaluateClassifierDialog,
+    open: evaluateClassifierDialogOpen,
   } = useDialog();
 
   const {
-    onClose: onCloseImportClassifierDialog,
-    onOpen: onOpenImportClassifierDialog,
-    open: openImportClassifierDialog,
+    onClose: handleCloseImportClassifierDialog,
+    onOpen: handleOpenImportClassifierDialog,
+    open: ImportClassifierDialogOpen,
   } = useDialogHotkey(HotkeyView.ImportTensorflowModelDialog);
   const {
-    onClose: onCloseSaveClassifierDialog,
-    onOpen: onOpenSaveClassifierDialog,
-    open: openSaveClassifierDialog,
+    onClose: handleCloseSaveClassifierDialog,
+    onOpen: handleOpenSaveClassifierDialog,
+    open: SaveClassifierDialogOpen,
   } = useDialog();
   const {
-    onClose: handleCloseFitModelDialog,
-    onOpen: handleOpenFitModelDialog,
-    open: fittingOpen,
+    onClose: handleCloseFitClassifierDialog,
+    onOpen: handleOpenFitClassifierDialog,
+    open: fitClassifierDialogOpen,
   } = useDialogHotkey(HotkeyView.Classifier, false);
 
   useEffect(() => {
     if (modelStatus === ModelStatus.Trained && waitingForResults) {
       setWaitingForResults(false);
-      handleOpenEval();
+      handleOpenEvaluateClassifierDialog();
     }
-  }, [modelStatus, waitingForResults, handleOpenEval, setWaitingForResults]);
+  }, [
+    modelStatus,
+    waitingForResults,
+    handleOpenEvaluateClassifierDialog,
+    setWaitingForResults,
+  ]);
 
   return (
     <>
       <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
         <ModelIOButtonGroup
-          handleImportModel={onOpenImportClassifierDialog}
-          handleSaveModel={onOpenSaveClassifierDialog}
+          handleImportModel={handleOpenImportClassifierDialog}
+          handleSaveModel={handleOpenSaveClassifierDialog}
         />
 
         <ModelExecButtonGroupNew
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}
-          handleFit={handleOpenFitModelDialog}
+          handleFit={handleOpenFitClassifierDialog}
           handlePredict={handlePredict}
           modelTrainable={selectedModel.trainable}
           helperText={helperText}
         />
       </Box>
       <ImportTensorflowModelDialog
-        onClose={onCloseImportClassifierDialog}
-        open={openImportClassifierDialog}
+        onClose={handleCloseImportClassifierDialog}
+        open={ImportClassifierDialogOpen}
         modelTask={ModelTask.Classification}
         dispatchFunction={handleImportModel}
       />
       <SaveFittedModelDialog
         model={selectedModel}
         modelStatus={modelStatus}
-        onClose={onCloseSaveClassifierDialog}
-        open={openSaveClassifierDialog}
+        onClose={handleCloseSaveClassifierDialog}
+        open={SaveClassifierDialogOpen}
       />
       <FitClassifierDialogNew
-        openedDialog={fittingOpen}
-        closeDialog={handleCloseFitModelDialog}
+        openedDialog={fitClassifierDialogOpen}
+        closeDialog={handleCloseFitClassifierDialog}
       />
       <EvaluateClassifierDialogNew
-        openedDialog={evalOpen}
-        closeDialog={handleCloseEval}
+        openedDialog={evaluateClassifierDialogOpen}
+        closeDialog={handleCloseEvaluateClassifierDialog}
       />
     </>
   );
