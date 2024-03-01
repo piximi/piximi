@@ -66,7 +66,7 @@ export const useClassificationModel = () => {
         setHelperText("Disabled during training");
         break;
       case ModelStatus.Evaluating:
-        setHelperText("Evaluating...");
+        // setHelperText("Evaluating...");
         break;
       case ModelStatus.Predicting:
         setHelperText("Predcting...");
@@ -75,7 +75,7 @@ export const useClassificationModel = () => {
         setHelperText("Accept/Reject suggested predictions first");
         break;
       default:
-        setHelperText("No Trained Model");
+      //setHelperText("No Trained Model");
     }
   }, [modelStatus]);
   return {
