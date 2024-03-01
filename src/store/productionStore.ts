@@ -26,6 +26,7 @@ import { newDataSlice } from "./slices/newData/newDataSlice";
 import { projectSlice } from "./slices/project";
 import { segmenterSlice } from "./slices/segmenter";
 import { classifierMiddleware } from "./slices/classifier/listeners/classiferListener";
+import { segmenterMiddleware } from "./slices/segmenter/listeners/segmenterListeners";
 
 const sagaMonitorConfig = {
   level: "debug", // logging level
@@ -72,6 +73,7 @@ let listenerMiddlewares: Middleware[] = [
   projectMiddleware.middleware,
   newDataMiddleware.middleware,
   classifierMiddleware.middleware,
+  segmenterMiddleware.middleware,
 ];
 
 const preloadedState: RootState = {

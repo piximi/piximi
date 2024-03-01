@@ -58,14 +58,16 @@ export const ModelExecButtonGroupNew = ({
 
       <TooltipButton
         tooltipTitle={
-          modelStatus !== ModelStatus.Trained &&
-          modelStatus !== ModelStatus.Evaluating
+          !modelTrainable
+            ? "Can't evaluate non-trainable models"
+            : modelStatus !== ModelStatus.Trained &&
+              modelStatus !== ModelStatus.Evaluating
             ? helperText
             : "Evaluate Model"
         }
         disableRipple
         onClick={handleEvaluate}
-        disabled={modelStatus !== ModelStatus.Trained}
+        disabled={modelStatus !== ModelStatus.Trained || !modelTrainable}
       >
         {modelStatus === ModelStatus.Evaluating ? (
           <CircularProgress
