@@ -374,12 +374,8 @@ export const newDataSlice = createSlice({
       }
       for (const categoryId of categoryIds) {
         if (categoryId === NEW_UNKNOWN_CATEGORY_ID) continue;
-        //TODO: update images
-        console.log(categoryId); //LOG:
         if (isPermanent) {
-          console.log(state.categories.entities[categoryId]);
           delete state.categories.entities[categoryId];
-          console.log(state.categories.entities[categoryId]); //LOG:
           mutatingFilter(state.categories.ids, (catId) => catId !== categoryId);
         } else {
           categoriesAdapter.removeOne(state.categories, categoryId);
@@ -745,8 +741,19 @@ export const newDataSlice = createSlice({
       if (!action.payload.preparedByListener) return;
       if (!("thingIds" in action.payload)) return;
       const { thingIds, disposeColorTensors, isPermanent } = action.payload;
-
-      console.log("Delete things action fired with thing ids: ", thingIds);
+      const imageChanges: Record<
+        string,
+        {
+          thingId: string;
+          updateType: "add" | "remove" | "replace";
+          contents: string[];
+        }
+      > = {};
+      const imageChangesArray: Array<{
+        thingId: string;
+        updateType: "add" | "remove" | "replace";
+        contents: string[];
+      }> = [];
 
       for (const thingId of thingIds) {
         const thing = state.things.entities[thingId];
@@ -757,6 +764,7 @@ export const newDataSlice = createSlice({
             thing as DeferredEntity<NewImageType>,
             "containing"
           );
+
           if (thingContents) {
             for (const containedThingId of thingContents) {
               const containedThing = state.things.entities[containedThingId];
@@ -775,6 +783,7 @@ export const newDataSlice = createSlice({
                   dispose(containedThing.changes as TensorContainer);
                 }
 
+                /* UPDATE KIND'S CONTAINING LIST */
                 mutatingFilter(
                   kind.saved.containing,
                   (containedId) => containedId !== containedThingId
@@ -785,6 +794,7 @@ export const newDataSlice = createSlice({
                     (containedId) => containedId !== containedThingId
                   );
                 }
+                /* UPDATE CATEGORY'S CONTAINING LIST */
                 mutatingFilter(
                   category.saved.containing,
                   (thingId) => thingId !== containedThingId
@@ -795,6 +805,8 @@ export const newDataSlice = createSlice({
                     (thingId) => thingId !== containedThingId
                   );
                 }
+
+                /* REMOVE THING */
                 delete state.things.entities[containedThingId];
                 mutatingFilter(
                   state.things.ids,
@@ -814,9 +826,25 @@ export const newDataSlice = createSlice({
               }
             }
           }
+        } else {
+          const imageId = getDeferredProperty(
+            thing as DeferredEntity<NewAnnotationType>,
+            "imageId"
+          );
+
+          if (imageId in imageChanges) {
+            imageChanges[imageId].contents.push(thingId);
+          } else {
+            imageChanges[imageId] = {
+              thingId: imageId,
+              updateType: "remove",
+              contents: [thingId],
+            };
+          }
         }
         const thingKind = getDeferredProperty(thing, "kind");
         const thingCategoryId = getDeferredProperty(thing, "categoryId");
+
         const kind = state.kinds.entities[thingKind];
         const category = state.categories.entities[thingCategoryId];
         if (isPermanent) {
@@ -824,6 +852,8 @@ export const newDataSlice = createSlice({
             dispose(thing.saved.data as TensorContainer);
             dispose(thing.changes as TensorContainer);
           }
+
+          /* UPDATE KIND'S CONTAINING LIST */
 
           mutatingFilter(
             kind.saved.containing,
@@ -835,6 +865,8 @@ export const newDataSlice = createSlice({
               (containedId) => containedId !== thingId
             );
           }
+
+          /* UPDATE CATEGORY'S CONTAINING LIST */
           mutatingFilter(
             category.saved.containing,
             (_thingId) => _thingId !== thingId
@@ -845,6 +877,8 @@ export const newDataSlice = createSlice({
               (_thingId) => _thingId !== thingId
             );
           }
+
+          /* REMOVE THING */
           delete state.things.entities[thingId];
           mutatingFilter(state.things.ids, (_thingId) => _thingId !== thingId);
         } else {
@@ -860,6 +894,16 @@ export const newDataSlice = createSlice({
           thingsAdapter.removeOne(state.things, thingId);
         }
       }
+      for (let [imageId, changes] of Object.entries(imageChanges)) {
+        if (!thingIds.includes(imageId)) {
+          imageChangesArray.push(changes);
+        }
+      }
+
+      newDataSlice.caseReducers.updateThingContents(state, {
+        type: "updateThingContents",
+        payload: { changes: imageChangesArray, isPermanent },
+      });
     },
 
     reconcile(

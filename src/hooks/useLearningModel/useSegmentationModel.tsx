@@ -21,9 +21,8 @@ export const useSegmentationModel = () => {
 
   const handlePredict = () => {
     dispatch(
-      segmenterSlice.actions.updateModelStatus({
+      segmenterSlice.actions.updateModelStatusNew({
         modelStatus: ModelStatus.Predicting,
-        execSaga: true,
       })
     );
   };

@@ -118,6 +118,9 @@ export class CocoSSD extends Segmenter {
 
     return annotations;
   }
+  public async predictNew() {
+    return [];
+  }
 
   public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._inferenceCategories) {
@@ -125,6 +128,9 @@ export class CocoSSD extends Segmenter {
     }
 
     return this._inferenceCategories.filter((cat) => catIds.includes(cat.id));
+  }
+  public inferenceKindsById(kind: string[]) {
+    return [];
   }
 
   public override dispose() {

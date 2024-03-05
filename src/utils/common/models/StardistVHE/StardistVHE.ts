@@ -149,6 +149,9 @@ export class StardistVHE extends Segmenter {
 
     return annotations;
   }
+  public async predictNew() {
+    return [];
+  }
 
   public inferenceCategoriesById(catIds: Array<string>) {
     if (!this._fgCategory) {
@@ -156,6 +159,9 @@ export class StardistVHE extends Segmenter {
     }
 
     return catIds.includes(this._fgCategory.id) ? [this._fgCategory] : [];
+  }
+  public inferenceKindsById(kind: string[]) {
+    return [];
   }
 
   public override dispose() {
