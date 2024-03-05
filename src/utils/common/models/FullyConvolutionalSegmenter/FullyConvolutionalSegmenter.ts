@@ -3,6 +3,7 @@ import { History } from "@tensorflow/tfjs";
 import { ModelTask } from "types/ModelType";
 import { Category, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
+import { Kind } from "types/Category";
 
 type LoadModelArgs = {
   simple: boolean;
@@ -36,8 +37,14 @@ export class FullyConvolutionalSegmenter extends Segmenter {
   public predict() {
     return [[]];
   }
+  public predictNew() {
+    return [];
+  }
 
   public inferenceCategoriesById(catIds: string[]): Category[] {
+    return [];
+  }
+  public inferenceKindsById(kinds: string[]): Kind[] {
     return [];
   }
 

@@ -4,21 +4,19 @@ import {
   Tensor4D,
   data as tfdata,
 } from "@tensorflow/tfjs";
-import { v4 as uuid } from "uuid";
 
 import { ModelTask } from "types/ModelType";
-import { Category, FitOptions, ImageType } from "types";
+import { FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { getImageSlice } from "utils/common/image";
-import { predictCellpose } from "./predictCellpose";
 import { Kind } from "types/Category";
+import { predictCellposeNew } from "./predictCellposeNew";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
   // if cat undefined, created from default classes
   // if defined, it should be length 1, as only a foreground class is needed
-  categories?: Array<Category>;
+  kinds?: Array<Kind>;
 };
 
 /*
@@ -28,7 +26,7 @@ type LoadInferenceDataArgs = {
  * This model is run in the cloud on BioEngine
  * https://slides.imjoy.io/?slides=https://raw.githubusercontent.com/oeway/slides/master/2022/i2k-2022-bioengine-workshop.md
  */
-export class Cellpose extends Segmenter {
+export class CellposeNew extends Segmenter {
   protected readonly _config = {
     name: "test client",
     server_url: "https://ai.imjoy.io",
@@ -37,11 +35,11 @@ export class Cellpose extends Segmenter {
 
   protected readonly _service = "triton-client";
 
-  protected _fgCategory?: Category;
+  protected _fgKind?: Kind;
 
   constructor() {
     super({
-      name: "Cellpose",
+      name: "CellposeNew",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
@@ -87,19 +85,14 @@ export class Cellpose extends Segmenter {
         preprocessingArgs.fitOptions.batchSize
       ) as tfdata.Dataset<Tensor4D>;
 
-    if (preprocessingArgs.categories) {
-      if (preprocessingArgs.categories.length !== 1)
+    if (preprocessingArgs.kinds) {
+      if (preprocessingArgs.kinds.length !== 1)
         throw Error(
           `${this.name} Model only takes a single foreground category`
         );
-      this._fgCategory = preprocessingArgs.categories[0];
-    } else if (!this._fgCategory) {
-      this._fgCategory = {
-        name: "Nucleus",
-        visible: true,
-        id: uuid(),
-        color: CATEGORY_COLORS.darkcyan,
-      };
+      this._fgKind = preprocessingArgs.kinds[0];
+    } else if (!this._fgKind) {
+      this._fgKind = { id: "Nucleus", categories: [], containing: [] };
     }
   }
 
@@ -112,6 +105,11 @@ export class Cellpose extends Segmenter {
   }
 
   public async predict() {
+    return [];
+  }
+
+  public async predictNew() {
+    console.log("predictNew");
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -120,7 +118,7 @@ export class Cellpose extends Segmenter {
       throw Error(`"${this.name}" Model's inference data not loaded`);
     }
 
-    if (!this._fgCategory) {
+    if (!this._fgKind) {
       throw Error(`"${this.name}" Model's foreground category is not loaded`);
     }
 
@@ -128,37 +126,34 @@ export class Cellpose extends Segmenter {
 
     const annotationPromises = infT.map((imTensor) => {
       // imTensor disposed in _predictOne
-      return predictCellpose(
+      return predictCellposeNew(
         imTensor,
-        this._fgCategory!.id,
+        this._fgKind!.id,
         this._service,
         this._config
       );
     });
+
+    console.log("annotationPromises: ", annotationPromises);
 
     const annotations = await Promise.all(annotationPromises);
 
     return annotations;
   }
 
-  public async predictNew() {
-    return [];
-  }
-
-  public inferenceCategoriesById(catIds: Array<string>) {
-    if (!this._fgCategory) {
-      throw Error(`"${this.name}" Model has no foreground category loaded`);
+  public inferenceKindsById(kinds: Array<string>) {
+    if (!this._fgKind) {
+      throw Error(`"${this.name}" Model has no foreground kind loaded`);
     }
 
-    return catIds.includes(this._fgCategory.id) ? [this._fgCategory] : [];
+    return kinds.includes(this._fgKind.id) ? [this._fgKind] : [];
   }
-
-  public inferenceKindsById(kind: string[]): Kind[] {
+  public inferenceCategoriesById(catIds: Array<string>) {
     return [];
   }
 
   public override dispose() {
-    this._fgCategory = undefined;
+    this._fgKind = undefined;
     super.dispose();
   }
 }

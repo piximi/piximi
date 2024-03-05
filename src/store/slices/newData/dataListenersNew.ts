@@ -82,8 +82,6 @@ startAppListening({
       });
     }
 
-    console.log("Explicit thing ids: ", explicitThingIds);
-
     for (const thingId of explicitThingIds) {
       const thing = newData.things.entities[thingId];
       if (!thing) continue;
@@ -96,18 +94,12 @@ startAppListening({
       }
     }
 
-    console.log("Implicit thing ids: ", implicitThingIds);
-
     const selectedThings = project.selectedThingIds;
-
-    console.log("Selected things: ", selectedThings);
 
     const deletedThingsToDeselect = intersection(
       [...explicitThingIds, ...implicitThingIds],
       selectedThings
     );
-
-    console.log("Things to be deselected: ", deletedThingsToDeselect);
 
     listenerAPI.dispatch(
       projectSlice.actions.deselectThings({ ids: deletedThingsToDeselect })
