@@ -6,6 +6,7 @@ import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
 import { FullyConvolutionalSegmenter } from "utils/common/models/FullyConvolutionalSegmenter/FullyConvolutionalSegmenter";
 import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
 import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
+import { CellposeNew } from "utils/common/models/Cellpose/CallposeNew";
 
 export enum ModelTask {
   Classification,
@@ -33,4 +34,5 @@ export const availableSegmenterModels: Array<Segmenter> = [
   new CocoSSD(),
   new StardistVHE(),
   new Cellpose(),
+  new CellposeNew(),
 ];
