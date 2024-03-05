@@ -9,7 +9,7 @@ import { ModelTask } from "types/ModelType";
 import { FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { getImageSlice } from "utils/common/image";
-import { Kind } from "types/Category";
+import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
 import { predictCellposeNew } from "./predictCellposeNew";
 
 type LoadInferenceDataArgs = {
@@ -92,7 +92,11 @@ export class CellposeNew extends Segmenter {
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
-      this._fgKind = { id: "Nucleus", categories: [], containing: [] };
+      this._fgKind = {
+        id: "Nucleus",
+        categories: [NEW_UNKNOWN_CATEGORY_ID],
+        containing: [],
+      };
     }
   }
 
@@ -119,7 +123,7 @@ export class CellposeNew extends Segmenter {
     }
 
     if (!this._fgKind) {
-      throw Error(`"${this.name}" Model's foreground category is not loaded`);
+      throw Error(`"${this.name}" Model's foreground kind is not loaded`);
     }
 
     const infT = await this._inferenceDataset.toArray();

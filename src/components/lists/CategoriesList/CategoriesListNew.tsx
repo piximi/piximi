@@ -155,6 +155,10 @@ export const CategoriesListNew = () => {
     }
   }, [dispatch, categoryIndex, categories]);
 
+  useEffect(() => {
+    console.log(categories);
+  }, [categories]);
+
   return (
     <>
       <List dense>

@@ -1,19 +1,18 @@
 import { GraphModel, History, LayersModel } from "@tensorflow/tfjs";
-import { v4 as uuid } from "uuid";
 
 import { ModelTask } from "types/ModelType";
-import { Category, FitOptions, ImageType } from "types";
+import { FitOptions, ImageType } from "types";
 import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { loadStardist } from "./loadStardist";
 import { preprocessStardist } from "./preprocessStardist";
-import { predictStardist } from "./predictStardist";
-import { CATEGORY_COLORS } from "utils/common/colorPalette";
+import { predictStardistNew } from "./predictStardist";
+import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
   // if cat undefined, created from default classes
   // if defined, it should be length 1, as only a foreground class is needed
-  categories?: Array<Category>;
+  kinds?: Array<Kind>;
 };
 
 /*
@@ -24,8 +23,8 @@ type LoadInferenceDataArgs = {
  * Stardist: model for object detection / instance segmentation with star-convex shapes
  * This pretrained model: meant to segment individual cell nuclei from brightfield images with H&E staining
  */
-export class StardistVHE extends Segmenter {
-  protected _fgCategory?: Category;
+export class StardistVHENew extends Segmenter {
+  protected _fgKind?: Kind;
   protected _inferenceDataDims?: Array<{
     width: number;
     height: number;
@@ -35,7 +34,7 @@ export class StardistVHE extends Segmenter {
 
   constructor() {
     super({
-      name: "StardistVHE",
+      name: "StardistVHENew",
       task: ModelTask.Segmentation,
       graph: true,
       pretrained: true,
@@ -86,18 +85,17 @@ export class StardistVHE extends Segmenter {
       this._inferenceDataDims
     );
 
-    if (preprocessingArgs.categories) {
-      if (preprocessingArgs.categories.length !== 1)
+    if (preprocessingArgs.kinds) {
+      if (preprocessingArgs.kinds.length !== 1)
         throw Error(
           `${this.name} Model only takes a single foreground category`
         );
-      this._fgCategory = preprocessingArgs.categories[0];
-    } else if (!this._fgCategory) {
-      this._fgCategory = {
-        name: "Nucleus",
-        visible: true,
-        id: uuid(),
-        color: CATEGORY_COLORS.darkcyan,
+      this._fgKind = preprocessingArgs.kinds[0];
+    } else if (!this._fgKind) {
+      this._fgKind = {
+        id: "Nucleus",
+        categories: [NEW_UNKNOWN_CATEGORY_ID],
+        containing: [],
       };
     }
   }
@@ -111,6 +109,9 @@ export class StardistVHE extends Segmenter {
   }
 
   public async predict() {
+    return [];
+  }
+  public async predictNew() {
     if (!this._model) {
       throw Error(`"${this.name}" Model not loaded`);
     }
@@ -123,8 +124,8 @@ export class StardistVHE extends Segmenter {
       throw Error(`"${this.name}" Model's inference data not loaded`);
     }
 
-    if (!this._fgCategory) {
-      throw Error(`"${this.name}" Model's foreground category is not loaded`);
+    if (!this._fgKind) {
+      throw Error(`"${this.name}" Model's foreground kind is not loaded`);
     }
 
     if (!this._inferenceDataDims) {
@@ -138,10 +139,10 @@ export class StardistVHE extends Segmenter {
     const infT = await this._inferenceDataset.toArray();
     // imTensor disposed in `predictStardist`
     const annotationsPromises = infT.map((imTensor, idx) => {
-      return predictStardist(
+      return predictStardistNew(
         graphModel,
         imTensor,
-        this._fgCategory!.id,
+        this._fgKind!.id,
         this._inferenceDataDims![idx]
       );
     });
@@ -149,24 +150,21 @@ export class StardistVHE extends Segmenter {
 
     return annotations;
   }
-  public async predictNew() {
-    return [];
-  }
 
   public inferenceCategoriesById(catIds: Array<string>) {
-    if (!this._fgCategory) {
-      throw Error(`"${this.name}" Model has no foreground category loaded`);
+    return [];
+  }
+  public inferenceKindsById(kinds: string[]) {
+    if (!this._fgKind) {
+      throw Error(`"${this.name}" Model has no foreground kind loaded`);
     }
 
-    return catIds.includes(this._fgCategory.id) ? [this._fgCategory] : [];
-  }
-  public inferenceKindsById(kind: string[]) {
-    return [];
+    return kinds.includes(this._fgKind.id) ? [this._fgKind] : [];
   }
 
   public override dispose() {
     this._inferenceDataDims = undefined;
-    this._fgCategory = undefined;
+    this._fgKind = undefined;
     super.dispose();
   }
 }

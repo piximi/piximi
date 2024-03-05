@@ -29,7 +29,7 @@ import { applicationSettingsSlice } from "store/slices/applicationSettings";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { NewAnnotationType } from "types/AnnotationType";
 import { getStackTraceFromError } from "utils";
-import { Kind } from "types/Category";
+import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
 import Image from "image-js";
 import { NewOrphanedAnnotationType } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
 
@@ -116,7 +116,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   );
   const inferenceImages = imageIds.reduce((infIms: NewImageType[], id) => {
     const image = getCompleteEntity(dataState.things.entities[id]);
-    console.log(image);
+
     if (image && "containing" in image) {
       if (image.containing.length === 0) {
         infIms.push(image);
@@ -142,6 +142,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         id: image.id,
         partition: Partition.Inference,
       })),
+      isPermanent: true,
     })
   );
 
@@ -196,16 +197,20 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       ]);
       console.log(`genertatedKinds: ${generatedKinds}`);
       listenerAPI.dispatch(
-        newDataSlice.actions.addKinds({ kinds: generatedKinds })
+        newDataSlice.actions.addKinds({
+          kinds: generatedKinds,
+          isPermanent: true,
+        })
       );
     }
     const annotations: NewAnnotationType[] = [];
-    for (const [i, annotations] of predictedAnnotations.entries()) {
+    for (const [i, _annotations] of predictedAnnotations.entries()) {
       const image = inferenceImages[i];
       const imageJsImage = await Image.load(image.src);
 
-      for (let j = 0; j < annotations.length; j++) {
-        const ann = annotations[j] as Partial<NewAnnotationType>;
+      for (let j = 0; j < _annotations.length; j++) {
+        console.log(`${i} : ${j}`);
+        const ann = _annotations[j] as Partial<NewAnnotationType>;
         const bbox = ann.boundingBox!;
         const width = bbox[2] - bbox[0];
         const height = bbox[3] - bbox[1];
@@ -236,7 +241,19 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
       }
     }
     listenerAPI.dispatch(
-      newDataSlice.actions.addThings({ things: annotations })
+      newDataSlice.actions.addThings({ things: annotations, isPermanent: true })
+    );
+    listenerAPI.dispatch(
+      newDataSlice.actions.updateCategoryContents({
+        changes: [
+          {
+            categoryId: NEW_UNKNOWN_CATEGORY_ID,
+            updateType: "add",
+            contents: annotations.map((ann) => ann.id),
+          },
+        ],
+        isPermanent: true,
+      })
     );
   } catch (error) {
     await handleError(
@@ -248,7 +265,11 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
     return;
   }
 
-  console.log("finished without error");
+  listenerAPI.dispatch(
+    segmenterSlice.actions.updateModelStatusNew({
+      modelStatus: ModelStatus.Trained,
+    })
+  );
 };
 
 async function handleError(
