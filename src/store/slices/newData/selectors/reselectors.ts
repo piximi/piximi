@@ -62,8 +62,6 @@ export const selectActiveThings = createSelector(
 export const selectActiveCategories = createSelector(
   [selectKindDictionary, selectCategoriesDictionary, selectActiveKind],
   (kindDict, categoriesDict, kind) => {
-    console.log(kind);
-    console.log(kindDict);
     const categoriesOfKind = kindDict[kind].categories;
 
     return categoriesOfKind.map((catId) => categoriesDict[catId]);

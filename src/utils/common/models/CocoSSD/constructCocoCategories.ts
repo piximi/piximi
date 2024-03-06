@@ -3,6 +3,7 @@ import COCO_CLASSES from "data/model-data/cocossd-classes";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 import { Category } from "types";
+import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
 
 export const constructCocoCategories = () => {
   const categories: Array<Category> = [];
@@ -19,4 +20,15 @@ export const constructCocoCategories = () => {
   }
 
   return categories;
+};
+
+export const constructCocoKinds = () => {
+  const cocoClasses = Object.values(COCO_CLASSES).map((cl) => cl.displayName);
+
+  const kinds: Array<Kind> = cocoClasses.map((cocoClass) => ({
+    id: cocoClass,
+    categories: [NEW_UNKNOWN_CATEGORY_ID],
+    containing: [],
+  }));
+  return kinds;
 };
