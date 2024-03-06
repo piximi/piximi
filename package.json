@@ -110,8 +110,9 @@
     "test": "react-scripts test --env=./src/utils/common/models/utils/custom-test-env.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky install; node prepare",
-    "prune-dead": "ts-prune"
+    "prepare": "husky install; node scripts/prepare",
+    "prune-dead": "ts-prune",
+    "no-console-logs": "./scripts/checkConsoleLogs.sh"
   },
   "browserslist": {
     "production": [
@@ -132,14 +133,6 @@
       "plugin:storybook/recommended"
     ],
     "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      },
       {
         "files": [
           "**/*.stories.*"

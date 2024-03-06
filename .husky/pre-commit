@@ -3,5 +3,7 @@
 
 yarn run lint-staged
 
+yarn run no-console-logs
+
 # enable for testing, run `HUSKY_DEBUG=true git commit -m "..."``
 # exit 1
