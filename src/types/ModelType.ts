@@ -5,7 +5,7 @@ import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { StardistVHE } from "utils/common/models/StardistVHE/StardistVHE";
 import { StardistVHENew } from "utils/common/models/StardistVHE/StardistVHENew";
 import { FullyConvolutionalSegmenter } from "utils/common/models/FullyConvolutionalSegmenter/FullyConvolutionalSegmenter";
-import { CocoSSD } from "utils/common/models/CocoSSD/CocoSSD";
+import { CocoSSD, CocoSSDNew } from "utils/common/models/CocoSSD/CocoSSD";
 import { Cellpose } from "utils/common/models/Cellpose/Cellpose";
 import { CellposeNew } from "utils/common/models/Cellpose/CallposeNew";
 
@@ -37,4 +37,5 @@ export const availableSegmenterModels: Array<Segmenter> = [
   new Cellpose(),
   new CellposeNew(),
   new StardistVHENew(),
+  new CocoSSDNew(),
 ];
