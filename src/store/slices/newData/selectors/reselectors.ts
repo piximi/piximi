@@ -4,14 +4,25 @@ import {
   selectKindDictionary,
   selectThingsDictionary,
 } from "./selectors";
-import { selectActiveKind } from "store/slices/project/selectors";
+import {
+  selectActiveKind,
+  selectSelectedThingIds,
+} from "store/slices/project/selectors";
 import { NEW_UNKNOWN_CATEGORY_ID, NewCategory } from "types/Category";
 import { difference, intersection } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
 import { Partition } from "types";
+import { ThingType } from "types/ThingType";
 
+export const selectActiveKindObject = createSelector(
+  selectActiveKind,
+  selectKindDictionary,
+  (activeKind, kindDict) => {
+    return kindDict[activeKind];
+  }
+);
 export const selectThingsByKind = createSelector(
   [selectKindDictionary, selectThingsDictionary],
   (kindDict, thingDict) => {
@@ -215,5 +226,30 @@ export const selectAnnotatedImages = createSelector(
       }
       return false;
     }) as NewImageType[];
+  }
+);
+
+export const selectActiveSelectedThings = createSelector(
+  selectSelectedThingIds,
+  selectActiveKindObject,
+  selectThingsDictionary,
+  (selectedThingIds, activeKind, thingDict) => {
+    if (!activeKind) return [];
+    const activeSelectedThingIds = intersection(
+      selectedThingIds,
+      activeKind.containing
+    );
+    const activeSelectedThings = activeSelectedThingIds.reduce(
+      (things: ThingType[], thingId) => {
+        const thing = thingDict[thingId];
+        if (thing) {
+          things.push(thing);
+        }
+        return things;
+      },
+      []
+    );
+
+    return activeSelectedThings;
   }
 );

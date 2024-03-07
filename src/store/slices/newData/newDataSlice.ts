@@ -674,6 +674,37 @@ export const newDataSlice = createSlice({
         }
       }
     },
+    updateThingName(
+      state,
+      action: PayloadAction<{ id: string; name: string; isPermanent: boolean }>
+    ) {
+      const { id, name, isPermanent } = action.payload;
+      const changes: Array<{ id: string; name: string }> = [{ id, name }];
+      const thing = getCompleteEntity(state.things.entities[id]);
+      if (thing) {
+        if ("containing" in thing) {
+          const containedThingIds = thing.containing;
+          containedThingIds.forEach((containedId) => {
+            const containedThing = getCompleteEntity(
+              state.things.entities[containedId]
+            );
+            if (containedThing) {
+              const containedThingName = containedThing.name;
+              if (containedThing.name.includes(thing.name)) {
+                changes.push({
+                  id: containedId,
+                  name: containedThingName.replace(thing.name, name),
+                });
+              }
+            }
+          });
+        }
+      }
+      newDataSlice.caseReducers.updateThings(state, {
+        type: "updateThings",
+        payload: { updates: changes, isPermanent },
+      });
+    },
     updateThingContents(
       state,
       action: PayloadAction<{
