@@ -2,8 +2,9 @@ import React, { ReactElement, useState } from "react";
 
 import { Badge, Drawer, ListItem, ListItemIcon, useTheme } from "@mui/material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-import { FilterOptionsNew } from "./tool-options-drawer/FilterOptions/FilterOptionsNew";
+import { FilterOptionsNew, InformationOptions } from "./tool-options-drawer";
 import { useTranslation } from "hooks";
 import { ToolOptionsDrawer } from "./tool-options-drawer/ToolOptionsDrawer/ToolOptionsDrawer";
 import { AppBarOffset } from "components/styled-components";
@@ -27,6 +28,13 @@ const imageTools: Record<string, OperationType> = {
     description: "-",
     options: <FilterOptionsNew />,
     hotkey: "F",
+  },
+  information: {
+    icon: (color) => <InfoOutlinedIcon sx={{ color: color }} />,
+    name: "information",
+    description: "-",
+    options: <InformationOptions />,
+    hotkey: "I",
   },
 };
 
@@ -76,27 +84,45 @@ export const ImageToolDrawerNew = () => {
         open={isOpen}
       >
         <AppBarOffset />
-        <TooltipCard description={<ToolHotkeyTitle toolName={t("Filters")} />}>
-          <ListItem
-            button
-            onClick={() => {
-              handleSelectTool("filters");
-            }}
-          >
-            <ListItemIcon>
-              <Badge color="primary" variant="dot" invisible={!filtersExist}>
-                <FilterAltOutlinedIcon
-                  sx={{
-                    color:
-                      activeTool === "filters"
+        {Object.values(imageTools).map((tool) => {
+          return (
+            <TooltipCard
+              key={`tool-drawer-${tool.name}`}
+              description={
+                <ToolHotkeyTitle toolName={t(tool.name.toLocaleUpperCase())} />
+              }
+            >
+              <ListItem
+                button
+                onClick={() => {
+                  handleSelectTool(tool.name);
+                }}
+              >
+                <ListItemIcon>
+                  {tool.name === "filters" ? (
+                    <Badge
+                      color="primary"
+                      variant="dot"
+                      invisible={!filtersExist}
+                    >
+                      {tool.icon(
+                        activeTool === tool.name
+                          ? theme.palette.primary.dark
+                          : theme.palette.grey[400]
+                      )}
+                    </Badge>
+                  ) : (
+                    tool.icon(
+                      activeTool === tool.name
                         ? theme.palette.primary.dark
-                        : theme.palette.grey[400],
-                  }}
-                />
-              </Badge>
-            </ListItemIcon>
-          </ListItem>
-        </TooltipCard>
+                        : theme.palette.grey[400]
+                    )
+                  )}
+                </ListItemIcon>
+              </ListItem>
+            </TooltipCard>
+          );
+        })}
       </Drawer>
     </>
   );

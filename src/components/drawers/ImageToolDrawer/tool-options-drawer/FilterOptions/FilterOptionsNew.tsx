@@ -58,12 +58,12 @@ export const FilterOptionsNew = () => {
   return (
     <Stack maxWidth="100%">
       <CategoryFilterListNew
-        header="Image Categories"
+        header="By Category"
         filteredCategories={thingFilters.categoryId ?? []}
         toggleFilter={toggleImageCategoryFilter}
       />
       <PartitionFilterListNew
-        header="Image Partitions"
+        header="By Partition"
         filteredPartitions={thingFilters.partition ?? []}
         toggleFilter={toggleThingPartition}
       />
