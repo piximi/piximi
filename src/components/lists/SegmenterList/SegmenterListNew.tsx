@@ -12,7 +12,7 @@ import {
 import { HotkeyView } from "types";
 import { ModelStatus, ModelTask } from "types/ModelType";
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
-import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroupNew";
+import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroup";
 import { useSegmentationModel } from "hooks/useLearningModel/useSegmentationModel";
 import { FitSegmenterDialogNew } from "components/dialogs/FitSegmenterDialog/FitSegmentationDialogNew";
 
@@ -58,7 +58,7 @@ export const SegmenterListNew = () => {
           handleSaveModel={onOpenSaveSegmenterDialog}
         />
 
-        <ModelExecButtonGroupNew
+        <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitModelDialog}

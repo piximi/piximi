@@ -24,7 +24,7 @@ import {
   selectProjectName,
   projectSlice,
 } from "store/slices/project";
-import { SortSelectionNew } from "components/styled-components/ImageSortSelection/SortSelectionNew";
+import { SortSelection } from "components/styled-components/ImageSortSelection/SortSelection";
 
 const minZoom = 0.6;
 const maxZoom = 4;
@@ -111,7 +111,7 @@ export const ProjectToolbarNew = () => {
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <SortSelectionNew />
+      <SortSelection />
       <Button onClick={onZoomOut}>
         <ZoomOutIcon
           sx={(theme) => ({

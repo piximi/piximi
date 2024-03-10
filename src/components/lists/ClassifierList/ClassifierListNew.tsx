@@ -8,7 +8,7 @@ import { ImportTensorflowModelDialog } from "components/dialogs";
 import { SaveFittedModelDialog } from "components/dialogs";
 
 import { ModelStatus, ModelTask } from "types/ModelType";
-import { ModelExecButtonGroupNew } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroupNew";
+import { ModelExecButtonGroup } from "components/list-items/ClassifierExecListItem/ModelExecButtonGroup";
 
 import { ModelIOButtonGroup } from "components/list-items/ModelIOButtonGroup/ModelIOButtonGroup";
 import { useClassificationModel } from "hooks/useLearningModel/useClassifierModel";
@@ -69,7 +69,7 @@ export const ClassifierListNew = () => {
           handleSaveModel={handleOpenSaveClassifierDialog}
         />
 
-        <ModelExecButtonGroupNew
+        <ModelExecButtonGroup
           modelStatus={modelStatus}
           handleEvaluate={handleEvaluate}
           handleFit={handleOpenFitClassifierDialog}
