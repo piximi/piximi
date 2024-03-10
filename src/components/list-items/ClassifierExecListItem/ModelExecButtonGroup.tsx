@@ -7,7 +7,7 @@ import { Box, CircularProgress } from "@mui/material";
 import { ModelStatus } from "types/ModelType";
 import { TooltipButton } from "components/styled-components/TooltipButton/TooltipButton";
 
-export const ModelExecButtonGroupNew = ({
+export const ModelExecButtonGroup = ({
   handlePredict,
   handleEvaluate,
   handleFit,
