@@ -1,3 +1,5 @@
+// ignore-no-logs
+
 export const logger = (
   message: string,
   level: "log" | "warn" | "error" = "log"

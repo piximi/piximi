@@ -8,7 +8,7 @@ import { projectSlice } from "store/slices/project";
 import { ThingSortKey_new } from "types/ImageSortType";
 import { selectSortTypeNew } from "store/slices/project/selectors";
 
-export const SortSelectionNew = () => {
+export const SortSelection = () => {
   const dispatch = useDispatch();
 
   const selectedSortKey = useSelector(selectSortTypeNew);
