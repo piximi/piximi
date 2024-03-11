@@ -9,7 +9,6 @@ import { Box, Typography } from "@mui/material";
 import { useHotkeys, usePointerLocation } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
 import { Cursor } from "components/styled-components";
-import { StageContext } from "../../../views/ImageViewer/ImageViewer";
 
 import { Layer } from "./Layer";
 import { Selection } from "./Selection";
@@ -34,6 +33,7 @@ import { ImageNew } from "./Image";
 import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 import { useAnnotationToolNew } from "hooks/useAnnotationTool/useAnnotationToolNew";
 import { useStageHandlersNew } from "hooks/useStageHandlers/useStageHandlersNew";
+import { StageContext } from "contexts";
 
 const normalizeFont = 1300;
 

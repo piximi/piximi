@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import { AnnotationNew } from "./Annotation";
-import { AnnotationTransformer } from "./AnnotationTransformer";
 
 import { selectSelectedAnnotationIds } from "store/slices/imageViewer";
 
@@ -11,6 +10,7 @@ import {
   selectActiveAnnotationObjectsNew,
   selectWorkingAnnotationObjectNew,
 } from "store/slices/newData/selectors/reselectors";
+import { AnnotationTransformerNew } from "./AnnotationTransformer/AnnotationTransformerNew";
 
 type AnnotationsProps = {
   annotationTool: AnnotationTool;
@@ -51,7 +51,7 @@ export const AnnotationsNew = ({ annotationTool }: AnnotationsProps) => {
           }
         })
         .map((selectedAnnotationId) => (
-          <AnnotationTransformer
+          <AnnotationTransformerNew
             key={`tr-${selectedAnnotationId}`}
             annotationId={selectedAnnotationId}
             annotationTool={annotationTool}
@@ -66,7 +66,7 @@ export const AnnotationsNew = ({ annotationTool }: AnnotationsProps) => {
             fillColor={workingAnnotationObject.fillColor}
             selected={true}
           />
-          <AnnotationTransformer
+          <AnnotationTransformerNew
             key={`tr-${workingAnnotationObject.annotation.id}`}
             annotationId={workingAnnotationObject.annotation.id}
             annotationTool={annotationTool}

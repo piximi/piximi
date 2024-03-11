@@ -31,7 +31,7 @@ import {
   RectangularSelectionIcon,
   ZoomIcon,
 } from "icons";
-import { PointerSelectionOptionsNew } from "./PointerSelectionOptions/PointerSelectionOptionsNew";
+import { PointerSelectionOptionsNew } from "./PointerSelectionOptions";
 
 type OperationType = {
   icon: ReactElement;

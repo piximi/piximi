@@ -150,7 +150,6 @@ export const usePointerToolNew = (
       !activeImageId
     )
       return;
-
     let currentAnnotation: NewDecodedAnnotationType | undefined;
 
     const overlappingAnnotationIds = getOverlappingAnnotations(
