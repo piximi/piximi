@@ -5,7 +5,7 @@ import { Divider, List } from "@mui/material";
 
 import {
   ClearAnnotationsGroup,
-  AnnotationCategoryList,
+  //AnnotationCategoryList,
 } from "components/lists";
 import { AppBarOffset, DividerHeader } from "components/styled-components";
 
@@ -15,14 +15,14 @@ import {
 } from "components/list-items";
 import { ImageViewerAppBarNew } from "components/app-bars";
 
-import { selectCreatedAnnotationCategories } from "store/slices/data";
+//import { selectCreatedAnnotationCategories } from "store/slices/data";
 
 import { BaseAppDrawer } from "../BaseAppDrawer";
 import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
 import { ImageListNew } from "components/lists/ImageList";
 
 export const ImageViewerDrawerNew = () => {
-  const createdCategories = useSelector(selectCreatedAnnotationCategories);
+  // const createdCategories = useSelector(selectCreatedAnnotationCategories);
 
   const imageViewerImages = useSelector(selectImageViewerImages);
 
@@ -49,11 +49,11 @@ export const ImageViewerDrawerNew = () => {
         Categories
       </DividerHeader>
 
-      <AnnotationCategoryList
+      {/* <AnnotationCategoryList
         createdCategories={createdCategories}
         hotkeysActive={true}
         view="ImageViewer"
-      />
+      /> */}
 
       <Divider sx={{ mt: 1 }} />
 

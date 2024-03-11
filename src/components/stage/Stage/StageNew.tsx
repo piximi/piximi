@@ -6,14 +6,14 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
 
-import { useHotkeys, useStageHandlers, usePointerLocation } from "hooks";
+import { useHotkeys, usePointerLocation } from "hooks";
 import { useAnnotationState } from "hooks/useAnnotationState";
 import { Cursor } from "components/styled-components";
 import { StageContext } from "../../../views/ImageViewer/ImageViewer";
 
 import { Layer } from "./Layer";
 import { Selection } from "./Selection";
-//import { Annotations } from "./Annotations";
+import { AnnotationsNew } from "./Annotations";
 
 import {
   selectStagePosition,
@@ -33,6 +33,7 @@ import { dimensions } from "utils/common";
 import { ImageNew } from "./Image";
 import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 import { useAnnotationToolNew } from "hooks/useAnnotationTool/useAnnotationToolNew";
+import { useStageHandlersNew } from "hooks/useStageHandlers/useStageHandlersNew";
 
 const normalizeFont = 1300;
 
@@ -79,7 +80,7 @@ export const StageNew = ({
     handleTouchMove,
     handleDblClickToZoom,
     handleZoomWheel,
-  } = useStageHandlers(
+  } = useStageHandlersNew(
     stageRef,
     annotationTool,
     positionByStage,
@@ -200,9 +201,9 @@ export const StageNew = ({
                   draggable={draggable}
                   toolType={toolType}
                 />
-                {/* {!imageIsLoading && (
-                  <Annotations annotationTool={annotationTool} />
-                )} */}
+                {!imageIsLoading && (
+                  <AnnotationsNew annotationTool={annotationTool} />
+                )}
               </Layer>
             </DndProvider>
           </StageContext.Provider>
