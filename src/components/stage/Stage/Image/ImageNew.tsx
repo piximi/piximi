@@ -3,21 +3,15 @@ import { useSelector } from "react-redux";
 import Konva from "konva";
 
 import { selectImageOrigin } from "store/slices/imageViewer";
-import {
-  selectActiveImageActivePlane,
-  selectActiveImageWidth,
-  selectActiveImageHeight,
-} from "store/slices/data";
 
+import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 import { MemoizedKonvaImage } from "./MemoizedKonvaImage";
 
-export const Image = forwardRef<
+export const ImageNew = forwardRef<
   Konva.Image,
   { stageWidth: number; stageHeight: number; images: HTMLImageElement[] }
 >(({ stageWidth, stageHeight, images }, ref) => {
-  const activePlane = useSelector(selectActiveImageActivePlane)!;
-  const width = useSelector(selectActiveImageWidth);
-  const height = useSelector(selectActiveImageHeight);
+  const activeImage = useSelector(selectActiveImage);
   const [filters] = useState<Array<any>>();
   const imagePosition = useSelector(selectImageOrigin);
   return (
@@ -25,10 +19,10 @@ export const Image = forwardRef<
       {images.map((image, idx) => (
         <MemoizedKonvaImage
           image={image}
-          height={height!}
-          width={width!}
+          height={activeImage?.shape.height!}
+          width={activeImage?.shape.width!}
           imagePosition={imagePosition!}
-          activePlane={activePlane}
+          activePlane={activeImage?.activePlane!}
           filters={filters!}
           idx={idx}
           key={idx}

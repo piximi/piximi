@@ -21,7 +21,7 @@ import {
   selectSelectedImageIds,
 } from "store/slices/project";
 import { dataSlice } from "store/slices/data";
-import { selectActiveKind } from "store/slices/project/selectors";
+import { selectActiveKindId } from "store/slices/project/selectors";
 import { CreateCategoryDialogNew } from "components/dialogs/CreateCategoryDialogNew/CreateCategoryDialogNew";
 import { selectClassifierModelStatus } from "store/slices/classifier";
 import { ModelStatus } from "types/ModelType";
@@ -31,7 +31,7 @@ import { PredictionListItemsNew } from "components/list-items/PredictionListItem
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectActiveCategories);
-  const activeKind = useSelector(selectActiveKind);
+  const activeKind = useSelector(selectActiveKindId);
   const [selectedCategory, setSelectedCategory] = useState<NewCategory>();
   const [categoryIndex, setCategoryIndex] = useState("");
 

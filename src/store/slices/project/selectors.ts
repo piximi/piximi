@@ -23,7 +23,7 @@ export const selectSortTypeNew = ({
   return project.sortType_new;
 };
 
-export const selectActiveKind = ({ project }: { project: Project }) => {
+export const selectActiveKindId = ({ project }: { project: Project }) => {
   return project.activeKind;
 };
 

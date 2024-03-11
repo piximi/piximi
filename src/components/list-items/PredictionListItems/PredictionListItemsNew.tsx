@@ -18,11 +18,11 @@ import { CustomListItemButton } from "../CustomListItemButton";
 import { projectSlice } from "store/slices/project";
 import { ListItemHoldButton } from "../ListItemHoldButton";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
-import { selectActiveKind } from "store/slices/project/selectors";
+import { selectActiveKindId } from "store/slices/project/selectors";
 
 export const PredictionListItemsNew = () => {
   const dispatch = useDispatch();
-  const activeKind = useSelector(selectActiveKind);
+  const activeKind = useSelector(selectActiveKindId);
 
   const [labeledImagesVisible, setLabeledImagesVisible] = React.useState(true);
 

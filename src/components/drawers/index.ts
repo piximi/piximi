@@ -1,4 +1,4 @@
-export { ImageViewerDrawer } from "./ImageViewerDrawer";
+export { ImageViewerDrawer, ImageViewerDrawerNew } from "./ImageViewerDrawer";
 export { HelpDrawer } from "./HelpDrawer/HelpDrawer";
 export { ProjectDrawer } from "./ProjectDrawer";
 export { ImageToolDrawer } from "./ImageToolDrawer";
