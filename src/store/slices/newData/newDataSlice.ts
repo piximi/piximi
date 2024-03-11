@@ -18,8 +18,12 @@ import { NewDataState } from "types/NewData";
 import { DeferredEntity, DeferredEntityState } from "store/entities/models";
 import { NewCategory, Kind } from "types/Category";
 import { NewImageType } from "types/ImageType";
-import { NewAnnotationType } from "types/AnnotationType";
+import {
+  NewAnnotationType,
+  NewDecodedAnnotationType,
+} from "types/AnnotationType";
 import { newReplaceDuplicateName } from "utils/common/image/imageHelper";
+import { encode } from "utils/annotator/rle/rle";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<NewCategory>();
@@ -544,6 +548,31 @@ export const newDataSlice = createSlice({
           state.things.entities[thing.id].changes = {};
         }
       }
+    },
+    addAnnotations(
+      state,
+      action: PayloadAction<{
+        annotations: Array<NewAnnotationType | NewDecodedAnnotationType>;
+        isPermanent?: boolean;
+      }>
+    ) {
+      const { annotations, isPermanent } = action.payload;
+      const encodedAnnotations: NewAnnotationType[] = [];
+      for (const annotation of annotations) {
+        if (state.things.ids.includes(annotation.id)) continue;
+
+        if (annotation.decodedMask) {
+          (annotation as NewAnnotationType).encodedMask = encode(
+            annotation.decodedMask
+          );
+          delete annotation.decodedMask;
+        }
+        encodedAnnotations.push(annotation as NewAnnotationType);
+      }
+      newDataSlice.caseReducers.addThings(state, {
+        type: "addThings",
+        payload: { things: encodedAnnotations, isPermanent },
+      });
     },
     // Sets the category for the inference images back to Unknown
     clearPredictions(

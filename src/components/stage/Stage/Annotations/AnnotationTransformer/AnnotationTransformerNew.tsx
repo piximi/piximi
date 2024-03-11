@@ -11,17 +11,10 @@ import {
   setSelectedAnnotationIds,
   selectImageOrigin,
   selectActiveAnnotationIds,
-  selectWorkingAnnotation,
   imageViewerSlice,
 } from "store/slices/imageViewer";
 
 import { annotatorSlice } from "store/slices/annotator";
-
-import {
-  dataSlice,
-  selectActiveImageHeight,
-  selectSelectedAnnotations,
-} from "store/slices/data";
 
 import useSound from "use-sound";
 
@@ -30,6 +23,11 @@ import { AnnotationModeType } from "types";
 import { AnnotationTool } from "annotator-tools";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
+import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
+import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { getCompleteEntity } from "store/entities/utils";
+import { selectActiveImage } from "store/slices/imageViewer/reselectors";
+import { selectSelectedAnnotations } from "store/slices/imageViewer/selectors/selectSelectedAnnotationIds";
 
 const buttonWidth = 65;
 const buttonHeight = 26;
@@ -45,7 +43,7 @@ type AnnotationTransformerProps = {
   annotationTool: AnnotationTool;
 };
 
-export const AnnotationTransformer = ({
+export const AnnotationTransformerNew = ({
   annotationId,
   annotationTool,
 }: AnnotationTransformerProps) => {
@@ -55,12 +53,12 @@ export const AnnotationTransformer = ({
   const [yPos, setYPos] = useState<number>(0);
 
   const activeAnnotationIds = useSelector(selectActiveAnnotationIds);
-  const workingAnnotation = useSelector(selectWorkingAnnotation);
+  const workingAnnotation = useSelector(selectWorkingAnnotationNew);
   const selectedAnnotations = useSelector(selectSelectedAnnotations);
   const activeImageId = useSelector(selectActiveImageId);
   const cursor = useSelector(selectCursor);
   const soundEnabled = useSelector(selectSoundEnabled);
-  const imageHeight = useSelector(selectActiveImageHeight);
+  const activeImage = useSelector(selectActiveImage);
   const imageOrigin = useSelector(selectImageOrigin);
 
   const trRef = useRef<Konva.Transformer | null>(null);
@@ -81,7 +79,9 @@ export const AnnotationTransformer = ({
     annotationTool.deselect();
     batch(() => {
       dispatch(
-        imageViewerSlice.actions.setWorkingAnnotation({ annotation: undefined })
+        imageViewerSlice.actions.setWorkingAnnotationNew({
+          annotation: undefined,
+        })
       );
       dispatch(
         annotatorSlice.actions.setSelectionMode({
@@ -116,25 +116,24 @@ export const AnnotationTransformer = ({
           })
         );
         dispatch(
-          dataSlice.actions.deleteAnnotations({ annotationIds: [annotationId] })
+          newDataSlice.actions.deleteThings({
+            thingIds: [annotationId],
+            disposeColorTensors: false,
+          })
         );
       } else {
         dispatch(
-          dataSlice.actions.updateAnnotations({
+          newDataSlice.actions.updateThings({
             updates: [{ id: annotationId, ...workingAnnotation.changes }],
           })
         );
       }
       if (soundEnabled) playDeleteAnnotationSoundEffect();
     } else {
+      const completeWorkingAnnotation = getCompleteEntity(workingAnnotation)!;
       dispatch(
-        dataSlice.actions.addAnnotations({
-          annotations: [
-            {
-              ...workingAnnotation.saved!,
-              ...workingAnnotation.changes,
-            },
-          ],
+        newDataSlice.actions.addAnnotations({
+          annotations: [completeWorkingAnnotation],
         })
       );
       if (soundEnabled) playCreateAnnotationSoundEffect();
@@ -160,11 +159,13 @@ export const AnnotationTransformer = ({
   };
 
   useLayoutEffect(() => {
+    const imageHeight = activeImage!.shape.height;
     if (workingAnnotation.saved) {
       const fullWorkingAnnotation = {
         ...workingAnnotation.saved,
         ...workingAnnotation.changes,
       };
+
       const newX =
         Math.max(
           fullWorkingAnnotation.boundingBox[0],
@@ -185,7 +186,7 @@ export const AnnotationTransformer = ({
   }, [
     workingAnnotation,
     selectedAnnotations.length,
-    imageHeight,
+    activeImage,
     imageOrigin,
     stageRef,
   ]);

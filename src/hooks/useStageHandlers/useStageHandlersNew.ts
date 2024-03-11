@@ -33,6 +33,7 @@ import {
 import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools";
 import { usePointerToolNew } from "hooks/usePointerTool";
 import { logger } from "utils/common/logger";
+//import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 
 const transformerClassName = "Transformer";
 const transformerButtonAttrNAme = "transformer-button";
@@ -48,7 +49,7 @@ export const useStageHandlersNew = (
   setCurrentMousePosition: () => void
 ) => {
   const selectionMode = useSelector(selectAnnotationSelectionMode);
-  //const workingAnnotationEntity = useSelector(selectWorkingAnnotation);
+  //const workingAnnotationEntity = useSelector(selectWorkingAnnotationNew);
   const dispatch = useDispatch();
   const toolType = useSelector(selectToolType);
   const selectedAnnotationsIds = useSelector(selectSelectedAnnotationIds);

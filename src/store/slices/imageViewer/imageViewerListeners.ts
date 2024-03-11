@@ -248,11 +248,13 @@ startAppListening({
         ? decodeAnnotationNew(annotation)
         : (annotation as NewDecodedAnnotationType);
     }
+    listenerAPI.unsubscribe();
     listenerAPI.dispatch(
       imageViewerSlice.actions.setWorkingAnnotationNew({
         annotation: annotationValue,
         preparedByListener: true,
       })
     );
+    listenerAPI.subscribe();
   },
 });

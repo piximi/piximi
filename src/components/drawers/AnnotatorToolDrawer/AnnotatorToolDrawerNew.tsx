@@ -38,7 +38,7 @@ import {
 } from "icons";
 import { CustomToolTip } from "../../stage/Tool/CustomToolTip";
 import { dimensions } from "utils/common";
-import { ToolOptionsDrawerNew } from "./ToolOptionsDrawer/ToolOptionsDrawerNew";
+import { ToolOptionsDrawerNew } from "./ToolOptionsDrawer";
 
 type AnnotatorToolDrawerProps = {
   optionsVisibility: boolean;
@@ -122,6 +122,7 @@ export const AnnotatorToolDrawerNew = ({
     HotkeyView.Annotator
   );
   const t = useTranslation();
+
   return (
     <>
       <ToolOptionsDrawerNew optionsVisibility={optionsVisibility} />
