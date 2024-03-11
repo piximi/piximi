@@ -1,8 +1,9 @@
 import { selectKindDictionary } from "store/slices/newData/selectors/selectors";
-import { selectActiveKind, selectSelectedThingIds } from "../selectors";
+import { selectActiveKindId, selectSelectedThingIds } from "../selectors";
 import { createSelector } from "@reduxjs/toolkit";
 import { intersection } from "lodash";
 import { Project } from "types";
+import { selectActiveThingIds } from "store/slices/newData/selectors/reselectors";
 
 export const selectSelectedThingIdsLength = ({
   project,
@@ -12,8 +13,16 @@ export const selectSelectedThingIdsLength = ({
   return project.selectedImageIds.length;
 };
 
+export const selectActiveSelectedThingIds = createSelector(
+  selectSelectedThingIds,
+  selectActiveThingIds,
+  (selectedIds, activeIds) => {
+    return intersection(activeIds, selectedIds);
+  }
+);
+
 export const selectActiveSelectedThings = createSelector(
-  selectActiveKind,
+  selectActiveKindId,
   selectSelectedThingIds,
   selectKindDictionary,
   selectSelectedThingIdsLength,

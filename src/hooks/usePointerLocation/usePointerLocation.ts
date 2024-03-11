@@ -53,35 +53,38 @@ export const usePointerLocation = (
 
     setPositionByStage(getRelativePosition(position, stageRef.current));
 
-    const absolute = {
-      x: Math.round(relative.x),
-      y: Math.round(relative.y),
-    };
+    let adjustedX: number;
+    let adjustedY: number;
+    let xOut: boolean;
+    let yOut: boolean;
 
-    if (
-      absolute.x < 0 ||
-      absolute.x > originalImage.width ||
-      absolute.y < 0 ||
-      absolute.y > originalImage.height
-    ) {
-      setOutOfBounds(true);
-      absolute.x =
-        absolute.x < 0
-          ? 0
-          : absolute.x > originalImage.width
-          ? originalImage.width
-          : absolute.x;
-      absolute.y =
-        absolute.y < 0
-          ? 0
-          : absolute.y > originalImage.height
-          ? originalImage.height
-          : absolute.y;
+    if (relative.x < 0) {
+      adjustedX = 0;
+      xOut = true;
+    } else if (relative.x > originalImage.width) {
+      adjustedX = originalImage.width;
+      xOut = true;
     } else {
-      setOutOfBounds(false);
+      adjustedX = relative.x;
+      xOut = false;
     }
 
-    setAbsolutePosition(absolute);
+    if (relative.y < 0) {
+      adjustedY = 0;
+      yOut = true;
+    } else if (relative.y > originalImage.height) {
+      adjustedY = originalImage.height;
+      yOut = true;
+    } else {
+      adjustedY = relative.y;
+      yOut = false;
+    }
+
+    relative.x = Math.round(adjustedX);
+    relative.y = Math.round(adjustedY);
+
+    setAbsolutePosition(relative);
+    setOutOfBounds(xOut || yOut);
   }, [stageRef, getRelativePosition, originalImage, imageRef]);
   useEffect(() => {
     if (!absolutePosition?.x || outOfBounds) return;

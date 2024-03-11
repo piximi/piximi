@@ -1,5 +1,5 @@
 import React from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -28,7 +28,6 @@ import { TooltipTitle } from "components/tooltips";
 import { unregisterHotkeyView } from "store/slices/applicationSettings";
 
 import { HotkeyView, Partition } from "types";
-import { projectSlice } from "store/slices/project";
 import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 
@@ -91,11 +90,7 @@ export const GridItemActionBarNew = ({
     dispatch(
       unregisterHotkeyView({ hotkeyView: HotkeyView.MainImageGridAppBar })
     );
-    batch(() => {
-      dispatch(projectSlice.actions.setSelectedImages({ ids: [] }));
-      dispatch(projectSlice.actions.setSelectedAnnotations({ ids: [] }));
-    });
-    navigate("/annotator");
+    navigate("/beta/imageviewer");
   };
 
   return (

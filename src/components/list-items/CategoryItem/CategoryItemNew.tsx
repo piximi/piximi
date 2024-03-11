@@ -11,7 +11,7 @@ import { CustomListItemButton } from "../CustomListItemButton";
 import { NewCategory } from "types/Category";
 import { useSelector } from "react-redux";
 import { selectNumThingsByCatAndKind } from "store/slices/newData/selectors/reselectors";
-import { selectActiveKind } from "store/slices/project/selectors";
+import { selectActiveKindId } from "store/slices/project/selectors";
 
 type CategoryItemProps = {
   category: NewCategory;
@@ -32,7 +32,7 @@ export const CategoryItemNew = ({
   selectCategory,
 }: CategoryItemProps) => {
   const numThings = useSelector(selectNumThingsByCatAndKind);
-  const activeKind = useSelector(selectActiveKind);
+  const activeKind = useSelector(selectActiveKindId);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     handleOpenCategoryMenu(event, category);
