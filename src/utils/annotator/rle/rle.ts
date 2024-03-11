@@ -1,4 +1,8 @@
 import { AnnotationType, DecodedAnnotationType } from "types";
+import {
+  NewAnnotationType,
+  NewDecodedAnnotationType,
+} from "types/AnnotationType";
 
 /**
  * Decode a Run-length encoded input array.
@@ -24,6 +28,21 @@ export const decode = (encoded: Array<number>): Uint8ClampedArray => {
 export const decodeAnnotation = (
   encodedAnnotation: AnnotationType
 ): DecodedAnnotationType => {
+  // TODO - serializtion: temporary measure, remove when done
+  if (!encodedAnnotation.encodedMask)
+    throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
+
+  const decodedAnnotation = {
+    ...encodedAnnotation,
+    decodedMask: Uint8Array.from(decode(encodedAnnotation.encodedMask)),
+  };
+
+  return decodedAnnotation;
+};
+
+export const decodeAnnotationNew = (
+  encodedAnnotation: NewAnnotationType
+): NewDecodedAnnotationType => {
   // TODO - serializtion: temporary measure, remove when done
   if (!encodedAnnotation.encodedMask)
     throw Error(`Annotation ${encodedAnnotation.id} has no encoded mask`);
