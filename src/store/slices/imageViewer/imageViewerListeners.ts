@@ -9,7 +9,11 @@ import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/image";
 import { decodeAnnotation } from "utils/annotator";
 import { NewImageType } from "types/ImageType";
-import { NewAnnotationType } from "types/AnnotationType";
+import {
+  NewAnnotationType,
+  NewDecodedAnnotationType,
+} from "types/AnnotationType";
+import { decodeAnnotationNew } from "utils/annotator/rle/rle";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
@@ -80,11 +84,11 @@ startAppListening({
       dataState.things.entities[newActiveImageId]
     )! as NewImageType;
 
-    // listenerAPI.dispatch(
-    //   imageViewerSlice.actions.setActiveAnnotationIds({
-    //     annotationIds: activeAnnotationIds,
-    //   })
-    // );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveAnnotationIds({
+        annotationIds: activeImage.containing,
+      })
+    );
     const renderedSrcs = await createRenderedTensor(
       activeImage.data,
       activeImage.colors,
@@ -227,5 +231,28 @@ startAppListening({
         })
       );
     }
+  },
+});
+
+startAppListening({
+  actionCreator: imageViewerSlice.actions.setWorkingAnnotationNew,
+  effect: async (action, listenerAPI) => {
+    const dataState = listenerAPI.getState().newData;
+    let annotationValue = action.payload.annotation;
+    if (typeof annotationValue === "string") {
+      const annotation = getCompleteEntity(
+        dataState.things.entities[annotationValue]
+      ) as NewAnnotationType;
+      if (!annotation) return undefined;
+      annotationValue = !annotation.decodedMask
+        ? decodeAnnotationNew(annotation)
+        : (annotation as NewDecodedAnnotationType);
+    }
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setWorkingAnnotationNew({
+        annotation: annotationValue,
+        preparedByListener: true,
+      })
+    );
   },
 });

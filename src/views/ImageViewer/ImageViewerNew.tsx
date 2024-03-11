@@ -7,7 +7,7 @@ import { AppBar, Box, CssBaseline } from "@mui/material";
 import { useUpload } from "hooks";
 
 import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
-import { AnnotatorToolDrawer, ImageViewerDrawerNew } from "components/drawers";
+import { ImageViewerDrawerNew } from "components/drawers";
 import { AlertBar } from "components/app-bars";
 
 import { StageWrapperNew } from "components/stage/StageWrapper";
@@ -25,6 +25,7 @@ import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 
 import { AlertType, HotkeyView } from "types";
 import { StageContext } from "contexts";
+import { AnnotatorToolDrawerNew } from "components/drawers/AnnotatorToolDrawer/AnnotatorToolDrawerNew";
 
 export const ImageViewerNew = () => {
   const dispatch = useDispatch();
@@ -155,7 +156,7 @@ export const ImageViewerNew = () => {
             />
           )}
 
-          <AnnotatorToolDrawer
+          <AnnotatorToolDrawerNew
             optionsVisibility={optionsVisible}
             setOptionsVisibility={setOptionsVisibile}
             persistOptions={persistOptions}

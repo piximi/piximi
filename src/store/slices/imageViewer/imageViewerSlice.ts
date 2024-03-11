@@ -8,6 +8,7 @@ import {
   ZoomToolOptionsType,
   DecodedAnnotationType,
 } from "types";
+import { NewDecodedAnnotationType } from "types/AnnotationType";
 
 import { distinctFilter, mutatingFilter } from "utils/common/helpers";
 
@@ -32,7 +33,9 @@ const initialState: ImageViewer = {
   imageOrigin: { x: 0, y: 0 },
   annotationFilters: { categoryId: [] },
   workingAnnotationId: undefined,
+
   workingAnnotation: { saved: undefined, changes: {} },
+  workingAnnotationNew: { saved: undefined, changes: {} },
   selectedAnnotationIds: [],
   selectedCategoryId: UNKNOWN_ANNOTATION_CATEGORY_ID,
   stageHeight: 1000,
@@ -216,6 +219,29 @@ export const imageViewerSlice = createSlice({
     ) {
       if (state.workingAnnotation.saved) {
         state.workingAnnotation.changes = action.payload.changes;
+      }
+    },
+    setWorkingAnnotationNew(
+      state,
+      action: PayloadAction<{
+        annotation: NewDecodedAnnotationType | string | undefined;
+        preparedByListener?: boolean;
+      }>
+    ) {
+      const { annotation, preparedByListener } = action.payload;
+      if (!preparedByListener) return;
+
+      state.workingAnnotationNew.saved = annotation as
+        | NewDecodedAnnotationType
+        | undefined;
+      state.workingAnnotationNew.changes = {};
+    },
+    updateWorkingAnnotationNew(
+      state,
+      action: PayloadAction<{ changes: Partial<NewDecodedAnnotationType> }>
+    ) {
+      if (state.workingAnnotationNew.saved) {
+        state.workingAnnotationNew.changes = action.payload.changes;
       }
     },
     setSelectedCategoryId(

@@ -86,6 +86,7 @@ export const usePointerLocation = (
     setAbsolutePosition(relative);
     setOutOfBounds(xOut || yOut);
   }, [stageRef, getRelativePosition, originalImage, imageRef]);
+
   useEffect(() => {
     if (!absolutePosition?.x || outOfBounds) return;
 
@@ -98,14 +99,11 @@ export const usePointerLocation = (
     } else {
       y = Math.min(originalImage.height - 1, absolutePosition.y);
     }
-    setPixelColor(
-      `${originalImage
-        .getPixelXY(absolutePosition.x, y)
-        .reduce((prev, next) => {
-          return prev + `${next}, `;
-        }, "")
-        .slice(0, -2)}`
-    );
+
+    const pixelColor = originalImage
+      .getPixelXY(absolutePosition.x, y)
+      .slice(0, -1);
+    setPixelColor(pixelColor.join(", "));
   }, [originalImage, absolutePosition?.x, absolutePosition?.y, outOfBounds]);
 
   return {

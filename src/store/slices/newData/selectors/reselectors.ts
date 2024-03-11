@@ -11,10 +11,21 @@ import {
 import { NEW_UNKNOWN_CATEGORY_ID, NewCategory } from "types/Category";
 import { difference, intersection } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
-import { NewAnnotationType } from "types/AnnotationType";
+import {
+  NewAnnotationType,
+  NewDecodedAnnotationType,
+} from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
-import { Partition } from "types";
+import { Partition, Shape } from "types";
 import { ThingType } from "types/ThingType";
+import { selectActiveImage } from "store/slices/imageViewer/reselectors";
+import {
+  selectActiveAnnotationIds,
+  selectWorkingAnnotation,
+} from "store/slices/imageViewer";
+import { decodeAnnotationNew } from "utils/annotator/rle/rle";
+import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
+import { getCompleteEntity } from "store/entities/utils";
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
@@ -257,5 +268,78 @@ export const selectActiveSelectedThings = createSelector(
     );
 
     return activeSelectedThings;
+  }
+);
+
+export const selectActiveAnnotationObjectsNew = createSelector(
+  selectActiveImage,
+  selectActiveAnnotationIds,
+  selectThingsDictionary,
+  selectCategoriesDictionary,
+  selectWorkingAnnotation,
+  (activeImage, activeAnnotationIds, thingDict, catDict, workingAnnotation) => {
+    if (!activeImage) return [];
+    const imageShape = activeImage.shape;
+    const activePlane = activeImage.activePlane;
+    const annotationObjects: Array<{
+      annotation: NewDecodedAnnotationType;
+      fillColor: string;
+      imageShape: Shape;
+    }> = [];
+
+    for (const annotationId of activeAnnotationIds) {
+      const annotation = thingDict[annotationId] as NewAnnotationType;
+      if (!annotation || annotationId === workingAnnotation.saved?.id) continue;
+
+      const decodedAnnotation = !annotation.decodedMask
+        ? decodeAnnotationNew(annotation)
+        : (annotation as NewDecodedAnnotationType);
+
+      if (annotation.plane === activePlane) {
+        const fillColor = catDict[annotation.categoryId].color;
+        annotationObjects.push({
+          annotation: decodedAnnotation,
+          fillColor,
+          imageShape: imageShape,
+        });
+      }
+    }
+    return annotationObjects;
+  }
+);
+
+export const selectWorkingAnnotationObjectNew = createSelector(
+  selectWorkingAnnotationNew,
+  selectActiveImage,
+  selectCategoriesDictionary,
+  (workingAnnotationEntity, activeImage, catDict) => {
+    if (!workingAnnotationEntity.saved || !activeImage) return;
+    const workingAnnotation = getCompleteEntity(
+      workingAnnotationEntity
+    ) as NewAnnotationType;
+    const annotation = !workingAnnotation.decodedMask
+      ? decodeAnnotationNew(workingAnnotation)
+      : (workingAnnotation as NewDecodedAnnotationType);
+    const fillColor = catDict[workingAnnotation.categoryId].color;
+    return {
+      annotation: annotation,
+      fillColor: fillColor,
+      imageShape: activeImage.shape,
+    };
+  }
+);
+
+export const selectActiveAnnotationsNew = createSelector(
+  [selectActiveAnnotationIds, selectThingsDictionary],
+  (annotationIds, thingsDict): Array<NewDecodedAnnotationType> => {
+    if (!annotationIds.length) return [];
+
+    return annotationIds.map((annotationId) => {
+      const annotation = thingsDict[annotationId] as NewAnnotationType;
+      const decodedAnnotation = !annotation.decodedMask
+        ? decodeAnnotationNew(annotation)
+        : (annotation as NewDecodedAnnotationType);
+      return decodedAnnotation;
+    });
   }
 );
