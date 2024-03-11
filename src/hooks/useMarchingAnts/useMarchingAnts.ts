@@ -1,5 +1,5 @@
+import { StageContext } from "contexts";
 import { useContext, useLayoutEffect, useState } from "react";
-import { StageContext } from "views/ImageViewer/ImageViewer";
 
 export const useMarchingAnts = () => {
   const [dashOffset, setDashOffset] = useState<number>(0);

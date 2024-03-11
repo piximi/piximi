@@ -19,7 +19,6 @@ import {
 
 import { useTranslation, useZoom } from "hooks";
 
-import { StageContext } from "views/ImageViewer/ImageViewer";
 import {
   setStagePosition,
   selectStageHeight,
@@ -42,6 +41,7 @@ import {
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { CustomListItem } from "components/list-items/CustomListItem";
 import { DividerHeader } from "components/styled-components";
+import { StageContext } from "contexts";
 
 //TODO: Slider
 
