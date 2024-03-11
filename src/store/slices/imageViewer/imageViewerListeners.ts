@@ -5,14 +5,101 @@ import {
   TypedAppStartListening,
 } from "types";
 import { imageViewerSlice } from "./imageViewerSlice";
-import { getDeferredProperty } from "store/entities/utils";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { createRenderedTensor } from "utils/common/image";
 import { decodeAnnotation } from "utils/annotator";
+import { NewImageType } from "types/ImageType";
+import { NewAnnotationType } from "types/AnnotationType";
 
 export const imageViewerMiddleware = createListenerMiddleware();
 const startAppListening =
   imageViewerMiddleware.startListening as TypedAppStartListening;
 
+startAppListening({
+  actionCreator: imageViewerSlice.actions.prepareImageViewer,
+  effect: (action, listenerAPI) => {
+    const selectedThingIds = action.payload.selectedThingIds;
+    const dataState = listenerAPI.getState().newData;
+
+    let imageIds: string[] = [];
+    const annotationIds: string[] = [];
+    let activeImageId: string | undefined = undefined;
+
+    selectedThingIds.forEach((thingId) => {
+      const thing = getCompleteEntity(dataState.things.entities[thingId]);
+      if (thing) {
+        if (thing.kind === "Image") {
+          imageIds.push(thingId);
+          if (!activeImageId) {
+            activeImageId = thing.id;
+          }
+        } else {
+          annotationIds.push(thingId);
+          imageIds.push((thing as NewAnnotationType).imageId);
+        }
+      }
+    });
+
+    imageIds = [...new Set(imageIds)];
+    if (imageIds.length > 0 && !activeImageId) {
+      activeImageId = imageIds[0];
+    }
+
+    listenerAPI.dispatch(imageViewerSlice.actions.setImageStack({ imageIds }));
+    // listenerAPI.dispatch(
+    //   imageViewerSlice.actions.setSelectedAnnotationIds({ annotationIds })
+    // );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveImageIdNew({
+        imageId: activeImageId,
+        prevImageId: undefined,
+      })
+    );
+  },
+});
+startAppListening({
+  actionCreator: imageViewerSlice.actions.setActiveImageIdNew,
+  effect: async (action, listenerAPI) => {
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: true })
+    );
+    const newActiveImageId = action.payload.imageId;
+    const dataState = listenerAPI.getState().newData;
+    if (!newActiveImageId) {
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setActiveImageRenderedSrcs({
+          renderedSrcs: [],
+        })
+      );
+      listenerAPI.dispatch(
+        imageViewerSlice.actions.setActiveAnnotationIds({ annotationIds: [] })
+      );
+      return;
+    }
+    const activeImage = getCompleteEntity(
+      dataState.things.entities[newActiveImageId]
+    )! as NewImageType;
+
+    // listenerAPI.dispatch(
+    //   imageViewerSlice.actions.setActiveAnnotationIds({
+    //     annotationIds: activeAnnotationIds,
+    //   })
+    // );
+    const renderedSrcs = await createRenderedTensor(
+      activeImage.data,
+      activeImage.colors,
+      activeImage.bitDepth,
+      undefined
+    );
+
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setActiveImageRenderedSrcs({ renderedSrcs })
+    );
+    listenerAPI.dispatch(
+      imageViewerSlice.actions.setImageIsLoading({ isLoading: false })
+    );
+  },
+});
 startAppListening({
   actionCreator: imageViewerSlice.actions.setActiveImageId,
   effect: async (action, listenerAPI) => {

@@ -8,7 +8,7 @@ import { DialogWithAction } from "components/dialogs";
 import { UNKNOWN_CATEGORY_NAME, HotkeyView } from "types";
 import { UpdateCategoryDialogNew } from "components/dialogs/UpdateCategoryDialog";
 import { NewCategory } from "types/Category";
-import { selectActiveKind } from "store/slices/project/selectors";
+import { selectActiveKindId } from "store/slices/project/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 
@@ -25,7 +25,7 @@ export const CategoryItemMenuNew = ({
   handleCloseCategoryMenu,
   openCategoryMenu,
 }: CategoryItemMenuProps) => {
-  const activeKind = useSelector(selectActiveKind);
+  const activeKind = useSelector(selectActiveKindId);
   const dispatch = useDispatch();
   const {
     onClose: handleCloseEditCategoryDialog,

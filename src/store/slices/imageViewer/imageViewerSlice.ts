@@ -62,6 +62,10 @@ export const imageViewerSlice = createSlice({
   name: "image-viewer",
   reducers: {
     resetImageViewer: () => initialState,
+    prepareImageViewer: (
+      state,
+      action: PayloadAction<{ selectedThingIds: string[] }>
+    ) => {},
     setImageStack(state, action: PayloadAction<{ imageIds: string[] }>) {
       state.imageStack = action.payload.imageIds;
     },
@@ -232,6 +236,16 @@ export const imageViewerSlice = createSlice({
       // reset selected annotations
       state.selectedAnnotationIds = [];
       state.workingAnnotationId = undefined;
+    },
+    setActiveImageIdNew(
+      state,
+      action: PayloadAction<{
+        imageId: string | undefined;
+        prevImageId: string | undefined;
+      }>
+    ) {
+      state.activeImageId = action.payload.imageId;
+      // reset selected annotations
     },
     setActiveImageRenderedSrcs(
       state,

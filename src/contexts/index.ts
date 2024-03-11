@@ -1,1 +1,2 @@
-export { CategoryContext } from "./CategoryContext/CategoryContext";
+export { CategoryContext } from "./CategoryContext";
+export { StageContext } from "./StageContext";

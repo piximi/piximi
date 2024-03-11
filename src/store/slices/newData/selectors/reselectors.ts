@@ -5,7 +5,7 @@ import {
   selectThingsDictionary,
 } from "./selectors";
 import {
-  selectActiveKind,
+  selectActiveKindId,
   selectSelectedThingIds,
 } from "store/slices/project/selectors";
 import { NEW_UNKNOWN_CATEGORY_ID, NewCategory } from "types/Category";
@@ -17,7 +17,7 @@ import { Partition } from "types";
 import { ThingType } from "types/ThingType";
 
 export const selectActiveKindObject = createSelector(
-  selectActiveKind,
+  selectActiveKindId,
   selectKindDictionary,
   (activeKind, kindDict) => {
     return kindDict[activeKind];
@@ -63,15 +63,21 @@ export const selectNumThingsByCatAndKind = createSelector(
   }
 );
 
-export const selectActiveThings = createSelector(
-  [selectKindDictionary, selectThingsDictionary, selectActiveKind],
-  (kindDict, thingDict, kind) => {
-    const thingsOfKind = kindDict[kind].containing;
-    return thingsOfKind.map((thingId) => thingDict[thingId]);
+export const selectActiveThingIds = createSelector(
+  selectActiveKindObject,
+  (kind) => {
+    return kind.containing;
   }
 );
+export const selectActiveThings = createSelector(
+  [selectActiveThingIds, selectThingsDictionary],
+  (activeThingIds, thingDict) => {
+    return activeThingIds.map((thingId) => thingDict[thingId]);
+  }
+);
+
 export const selectActiveCategories = createSelector(
-  [selectKindDictionary, selectCategoriesDictionary, selectActiveKind],
+  [selectKindDictionary, selectCategoriesDictionary, selectActiveKindId],
   (kindDict, categoriesDict, kind) => {
     const categoriesOfKind = kindDict[kind].categories;
 
@@ -120,7 +126,7 @@ export const selectActiveCategoryColors = createSelector(
 export const selectActiveLabeledThingsIds = createSelector(
   selectKindDictionary,
   selectCategoriesDictionary,
-  selectActiveKind,
+  selectActiveKindId,
   (kindDict, catDict, activeKind) => {
     if (!kindDict[activeKind]) return [];
     const thingsInKind = kindDict[activeKind].containing;
@@ -131,7 +137,7 @@ export const selectActiveLabeledThingsIds = createSelector(
 export const selectActiveUnlabeledThingsIds = createSelector(
   selectKindDictionary,
   selectCategoriesDictionary,
-  selectActiveKind,
+  selectActiveKindId,
   (kindDict, catDict, activeKind) => {
     if (!kindDict[activeKind]) return [];
     const thingsInKind = kindDict[activeKind].containing;

@@ -16,14 +16,14 @@ import { NewImageType } from "types/ImageType";
 import { ProjectGridItemNew } from "../ProjectGridItem/ProjectGridItemNew";
 import { useSortFunctionNew } from "hooks/useSortFunctionNew/useSortFunctionNew";
 import { GridItemActionBarNew } from "components/app-bars/GridItemActionBar/GridItemActionBarNew";
-import { selectActiveSelectedThings } from "store/slices/project/selectors/selectActiveSelectedThings";
 import { DropBox } from "components/styled-components/DropBox/DropBox";
 import {
-  selectActiveKind,
+  selectActiveKindId,
   selectThingFilters,
 } from "store/slices/project/selectors";
 import { isFiltered } from "utils/common/helpers";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
+import { selectActiveSelectedThingIds } from "store/slices/project/selectors/selectActiveSelectedThings";
 
 const max_images = 1000; //number of images from the project that we'll show
 
@@ -32,10 +32,10 @@ const max_images = 1000; //number of images from the project that we'll show
 
 export const ImageGridNew = ({ kind }: { kind: string }) => {
   const dispatch = useDispatch();
-  const activeKind = useSelector(selectActiveKind);
+  const activeKind = useSelector(selectActiveKindId);
   const things = useSelector(selectThingsOfKind)(kind);
   const thingFilters = useSelector(selectThingFilters)[kind];
-  const selectedThingIds = useSelector(selectActiveSelectedThings);
+  const selectedThingIds = useSelector(selectActiveSelectedThingIds);
   const sortFunction = useSortFunctionNew();
 
   //const { contextMenu, handleContextMenu, closeContextMenu } = useContextMenu();
@@ -84,16 +84,7 @@ export const ImageGridNew = ({ kind }: { kind: string }) => {
   );
 
   const handleOpenImageViewer = () => {
-    dispatch(
-      imageViewerSlice.actions.setImageStack({ imageIds: selectedThingIds })
-    );
-    dispatch(
-      imageViewerSlice.actions.setActiveImageId({
-        imageId: selectedThingIds.length > 0 ? selectedThingIds[0] : undefined,
-        prevImageId: undefined,
-        execSaga: true,
-      })
-    );
+    dispatch(imageViewerSlice.actions.prepareImageViewer({ selectedThingIds }));
   };
 
   //   useHotkeys("esc", () => handleDeselectAll(), HotkeyView.ProjectView, {
