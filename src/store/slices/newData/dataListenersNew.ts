@@ -1,5 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { NEW_UNKNOWN_CATEGORY_ID, TypedAppStartListening } from "types";
+import { TypedAppStartListening } from "types";
 import { newDataSlice } from "./newDataSlice";
 import { getDeferredProperty } from "store/entities/utils";
 import { intersection } from "lodash";
@@ -55,28 +55,12 @@ startAppListening({
       action.payload.ofCategories.forEach((categoryId) => {
         if (categoryId in newData.categories.entities) {
           let containedThings: string[];
-          if (categoryId === NEW_UNKNOWN_CATEGORY_ID) {
-            const kind = action.payload.activeKind!;
-            if (!newData.kinds.entities[kind]) {
-              return;
-            }
-            const containedInKind = getDeferredProperty(
-              newData.kinds.entities[kind],
-              "containing"
-            );
-            containedThings = intersection(
-              getDeferredProperty(
-                newData.categories.entities[NEW_UNKNOWN_CATEGORY_ID],
-                "containing"
-              ),
-              containedInKind
-            );
-          } else {
-            containedThings = getDeferredProperty(
-              newData.categories.entities[categoryId],
-              "containing"
-            );
-          }
+
+          containedThings = getDeferredProperty(
+            newData.categories.entities[categoryId],
+            "containing"
+          );
+
           explicitThingIds.push(...containedThings);
         }
       });

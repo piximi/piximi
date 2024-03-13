@@ -1,9 +1,12 @@
 // ignore-no-logs
 
 export const logger = (
-  message: any,
+  message: any | any[],
   level: "log" | "warn" | "error" = "log"
 ) => {
+  if (Array.isArray(message)) {
+    message = message.join("");
+  }
   switch (level) {
     case "log":
       console.log(message);

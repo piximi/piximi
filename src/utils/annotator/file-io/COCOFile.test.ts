@@ -1,5 +1,4 @@
 import { test } from "@jest/globals";
-import { v4 as uuidv4 } from "uuid";
 
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { serializeCOCOFile } from "./serializeCOCO";
@@ -16,6 +15,7 @@ import {
   selectAllImages,
 } from "store/slices/data";
 import { productionStore } from "store";
+import { generateUUID } from "utils/common/helpers";
 
 // Time 1 (T1) is pre-serialization state of piximi
 // Time 2 (T2) is piximi state, after refresh, but before deserialization
@@ -30,12 +30,12 @@ const T1T2ModifiedCats = {
   // clock
   t1: {
     ...expectedState.project.annotationCategories[1],
-    id: uuidv4(),
+    id: generateUUID(),
     color: CATEGORY_COLORS.black,
   },
   t2: {
     ...expectedState.project.annotationCategories[1],
-    id: uuidv4(),
+    id: generateUUID(),
     color: CATEGORY_COLORS.citrus,
   },
 };
@@ -43,14 +43,14 @@ const T1T2ModifiedCats = {
 const T1OnlyCat = {
   // sports ball
   ...expectedState.project.annotationCategories[2],
-  id: uuidv4(),
+  id: generateUUID(),
   color: CATEGORY_COLORS.columbiablue,
 };
 // exists only in T2
 const T2OnlyCat = {
   // sheep
   ...expectedState.project.annotationCategories[3],
-  id: uuidv4(),
+  id: generateUUID(),
   color: CATEGORY_COLORS.darkcyan,
 };
 
@@ -66,12 +66,12 @@ const im1T1: ImageType = {
   // 1clockTower.jpg
   ...expectedState.annotator.images[0],
   ...dummyImageFields,
-  id: uuidv4(),
+  id: generateUUID(),
 };
 
 const im1T2: ImageType = {
   ...im1T1,
-  id: uuidv4(),
+  id: generateUUID(),
 };
 
 // image exists T1 only
@@ -79,7 +79,7 @@ const im2T1: ImageType = {
   // 2golfer.jpg
   ...expectedState.annotator.images[1],
   ...dummyImageFields,
-  id: uuidv4(),
+  id: generateUUID(),
 };
 
 // image exists T2 only
@@ -87,7 +87,7 @@ const im3T2: ImageType = {
   // 3twoSheep.jpg
   ...expectedState.annotator.images[2],
   ...dummyImageFields,
-  id: uuidv4(),
+  id: generateUUID(),
 };
 
 // annotations exist T1 and T2
@@ -95,14 +95,14 @@ const im1AnnotationsT1: Array<AnnotationType> = [
   {
     // 1clockTower.jpg -> Unknown (backpack)
     ...expectedState.annotator.images[0].annotations[0],
-    id: uuidv4(),
+    id: generateUUID(),
     categoryId: T1T2UnmodifiedCat.id,
     imageId: im1T1.id,
   },
   {
     // 1clockTower.jpg -> clock (1)
     ...expectedState.annotator.images[0].annotations[1],
-    id: uuidv4(),
+    id: generateUUID(),
     categoryId: T1T2ModifiedCats.t1.id,
     imageId: im1T1.id,
   },
@@ -116,7 +116,7 @@ const im1AnnotationsT2: Array<AnnotationType> = [
   {
     // 1clockTower.jpg -> clock (2)
     ...expectedState.annotator.images[0].annotations[2],
-    id: uuidv4(),
+    id: generateUUID(),
     categoryId: T1T2ModifiedCats.t2.id,
     imageId: im1T2.id,
   },
@@ -131,7 +131,7 @@ const im2AnnotationsT1: Array<AnnotationType> = [
   {
     // 2golfer.jpg -> sports ball
     ...expectedState.annotator.images[1].annotations[0],
-    id: uuidv4(),
+    id: generateUUID(),
     categoryId: T1OnlyCat.id,
     imageId: im2T1.id,
   },
@@ -146,7 +146,7 @@ const im3AnnotationsT2: Array<AnnotationType> = [
   {
     // 3twoSheep.jpg -> sheep
     ...expectedState.annotator.images[2].annotations[0],
-    id: uuidv4(),
+    id: generateUUID(),
     categoryId: T2OnlyCat.id,
     imageId: im3T2.id,
   },

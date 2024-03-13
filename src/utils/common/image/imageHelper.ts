@@ -12,7 +12,6 @@ import {
   fill,
   dispose,
 } from "@tensorflow/tfjs";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   DEFAULT_COLORS,
@@ -21,6 +20,7 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { Colors } from "types/tensorflow";
+import { generateUUID } from "../helpers";
 
 /*
  ======================================
@@ -853,7 +853,7 @@ export const convertToImage = async (
     colors: colors,
     bitDepth,
     categoryId: UNKNOWN_IMAGE_CATEGORY_ID,
-    id: uuidv4(),
+    id: generateUUID(),
     name: filename,
     shape: { planes, height, width, channels },
     data: imageTensor,

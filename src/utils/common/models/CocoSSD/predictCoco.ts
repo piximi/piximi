@@ -12,7 +12,6 @@ import {
   setBackend,
   Tensor4D,
 } from "@tensorflow/tfjs";
-import { v4 as uuid4 } from "uuid";
 
 import { Category, Partition } from "types";
 import { encode } from "utils/annotator";
@@ -20,7 +19,8 @@ import {
   NewOrphanedAnnotationType,
   OrphanedAnnotationType,
 } from "../AbstractSegmenter/AbstractSegmenter";
-import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
+import { Kind } from "types/Category";
+import { generateUUID } from "utils/common/helpers";
 
 export const predictCoco = async (
   model: GraphModel,
@@ -270,7 +270,7 @@ const buildDetectedObjects = (
     annotations.push({
       boundingBox: annotationBbox,
       categoryId: category.id,
-      id: uuid4(),
+      id: generateUUID(),
       encodedMask: encode(decodedMask),
       plane: 0,
     });
@@ -321,9 +321,9 @@ const buildDetectedObjectsNew = (
 
     annotations.push({
       boundingBox: annotationBbox,
-      categoryId: NEW_UNKNOWN_CATEGORY_ID,
+      categoryId: kind.unknownCategoryId,
       kind: kind.id,
-      id: uuid4(),
+      id: generateUUID(),
       encodedMask: encode(decodedMask),
       activePlane: 0,
       partition: Partition.Unassigned,

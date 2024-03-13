@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { ListItemText, MenuItem } from "@mui/material";
 
-import { useUpload } from "hooks";
+import { useUploadNew } from "hooks";
 
 import { ImageShapeEnum, ImageShapeInfo } from "utils/common/image";
 import { ImageShapeDialogNew } from "components/dialogs/ImageShapeDialog/ImageShapeDialogNew";
@@ -24,7 +24,7 @@ export const OpenImageMenuItemNew = ({
 
   const [files, setFiles] = React.useState<FileList>();
 
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox);
+  const uploadFiles = useUploadNew(setOpenDimensionsDialogBox);
   const onOpenImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.currentTarget.files) return;
     const files: FileList = Object.assign([], event.currentTarget.files);

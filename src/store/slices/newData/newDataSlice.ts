@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
 
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 
@@ -9,14 +8,18 @@ import { intersection, union } from "lodash";
 import {
   Partition,
   PartialBy,
-  NEW_UNKNOWN_CATEGORY,
-  NEW_UNKNOWN_CATEGORY_ID,
+  // NEW_UNKNOWN_CATEGORY,
+  // NEW_UNKNOWN_CATEGORY_ID,
 } from "types";
-import { mutatingFilter } from "utils/common/helpers";
+import {
+  generateUUID,
+  isUnknownCategory,
+  mutatingFilter,
+} from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { NewDataState } from "types/NewData";
 import { DeferredEntity, DeferredEntityState } from "store/entities/models";
-import { NewCategory, Kind } from "types/Category";
+import { NewCategory, Kind, UNKNOWN_CATEGORY_NAME } from "types/Category";
 import { NewImageType } from "types/ImageType";
 import {
   NewAnnotationType,
@@ -24,6 +27,7 @@ import {
 } from "types/AnnotationType";
 import { newReplaceDuplicateName } from "utils/common/image/imageHelper";
 import { encode } from "utils/annotator/rle/rle";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/colorPalette";
 
 export const kindsAdapter = createDeferredEntityAdapter<Kind>();
 export const categoriesAdapter = createDeferredEntityAdapter<NewCategory>();
@@ -34,15 +38,7 @@ export const thingsAdapter = createDeferredEntityAdapter<
 export const initialState = (): NewDataState => {
   return {
     kinds: kindsAdapter.getInitialState(),
-    categories: categoriesAdapter.getInitialState({
-      ids: [NEW_UNKNOWN_CATEGORY_ID],
-      entities: {
-        [NEW_UNKNOWN_CATEGORY_ID]: {
-          saved: NEW_UNKNOWN_CATEGORY,
-          changes: {},
-        },
-      },
-    }),
+    categories: categoriesAdapter.getInitialState(),
     things: thingsAdapter.getInitialState(),
   };
 };
@@ -101,6 +97,7 @@ export const newDataSlice = createSlice({
       for (const kind of kinds) {
         if (state.kinds.entities[kind.id]) continue;
         if (!kind.containing) kind.containing = [];
+
         if (isPermanent) {
           state.kinds.entities[kind.id] = { saved: kind as Kind, changes: {} };
           state.kinds.ids.push(kind.id);
@@ -157,6 +154,7 @@ export const newDataSlice = createSlice({
       }>
     ) {
       const { changes, isPermanent } = action.payload;
+
       for (const { kindId, categories, updateType } of changes) {
         const previousCategories = getDeferredProperty(
           state.kinds.entities[kindId],
@@ -192,28 +190,20 @@ export const newDataSlice = createSlice({
       for (const category of categories) {
         if (state.categories.ids.includes(category.id)) continue;
 
-        let kindsToUpdate = [];
+        newDataSlice.caseReducers.updateKindCategories(state, {
+          type: "updateKindCategories",
+          payload: {
+            changes: [
+              {
+                kindId: category.kind,
+                updateType: "add",
+                categories: [category.id],
+              },
+            ],
+            isPermanent,
+          },
+        });
 
-        if (category.kind === "all") {
-          kindsToUpdate = state.kinds.ids;
-        } else {
-          kindsToUpdate.push(...category.kind);
-        }
-        kindsToUpdate.forEach((kind) =>
-          newDataSlice.caseReducers.updateKindCategories(state, {
-            type: "updateKindCategories",
-            payload: {
-              changes: [
-                {
-                  kindId: kind as string,
-                  updateType: "add",
-                  categories: [category.id],
-                },
-              ],
-              isPermanent,
-            },
-          })
-        );
         categoriesAdapter.addOne(state.categories, category);
         if (isPermanent) {
           state.categories.entities[category.id].changes = {};
@@ -239,11 +229,11 @@ export const newDataSlice = createSlice({
         kindsToUpdate.push(kind);
       }
 
-      let id = uuidv4();
+      let id = generateUUID();
       let idIsUnique = !state.categories.ids.includes(id);
 
       while (!idIsUnique) {
-        id = uuidv4();
+        id = generateUUID();
         idIsUnique = !state.categories.ids.includes(id);
       }
       if (isPermanent) {
@@ -377,7 +367,7 @@ export const newDataSlice = createSlice({
         categoryIds = state.categories.ids as string[];
       }
       for (const categoryId of categoryIds) {
-        if (categoryId === NEW_UNKNOWN_CATEGORY_ID) continue;
+        if (isUnknownCategory(categoryId)) continue;
         if (isPermanent) {
           delete state.categories.entities[categoryId];
           mutatingFilter(state.categories.ids, (catId) => catId !== categoryId);
@@ -401,7 +391,7 @@ export const newDataSlice = createSlice({
       }
 
       for (const categoryId of categoryIds) {
-        if (categoryId === NEW_UNKNOWN_CATEGORY_ID) continue;
+        if (isUnknownCategory(categoryId)) continue;
 
         newDataSlice.caseReducers.updateKindCategories(state, {
           type: "updateKindCategories",
@@ -440,7 +430,7 @@ export const newDataSlice = createSlice({
           payload: {
             changes: [
               {
-                categoryId: NEW_UNKNOWN_CATEGORY_ID,
+                categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
                 updateType: "add",
                 contents: thingsToRemove,
               },
@@ -450,7 +440,7 @@ export const newDataSlice = createSlice({
         });
         const thingUpdates = thingsToRemove.map((thing) => ({
           id: thing,
-          categoryId: NEW_UNKNOWN_CATEGORY_ID,
+          categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
         }));
 
         newDataSlice.caseReducers.updateThings(state, {
@@ -502,12 +492,33 @@ export const newDataSlice = createSlice({
               isPermanent,
             },
           });
+          const unknownCategoryId =
+            state.kinds.entities[thing.kind].saved.unknownCategoryId;
+          thing.categoryId = unknownCategoryId;
         } else {
+          const unknownCategoryId = `U-${generateUUID()}`;
+          const unknownCategory: NewCategory = {
+            id: unknownCategoryId,
+            name: UNKNOWN_CATEGORY_NAME,
+            color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+            containing: [],
+            kind: thing.kind,
+            visible: true,
+          };
+          newDataSlice.caseReducers.addCategories(state, {
+            type: "addCategories",
+            payload: { categories: [unknownCategory] },
+          });
           newDataSlice.caseReducers.addKinds(state, {
             type: "addKinds",
             payload: {
               kinds: [
-                { id: thing.kind, containing: [thing.id], categories: [] },
+                {
+                  id: thing.kind,
+                  containing: [thing.id],
+                  categories: [unknownCategoryId],
+                  unknownCategoryId,
+                },
               ],
               isPermanent,
             },
@@ -597,7 +608,7 @@ export const newDataSlice = createSlice({
         if (thing.partition === Partition.Inference) {
           updates.push({
             id: id as string,
-            categoryId: NEW_UNKNOWN_CATEGORY_ID,
+            categoryId: state.kinds.entities[kind].saved.unknownCategoryId,
           });
         }
       });
@@ -630,7 +641,7 @@ export const newDataSlice = createSlice({
         const categoryId = thing.categoryId;
         if (
           imagePartition === Partition.Inference &&
-          categoryId !== NEW_UNKNOWN_CATEGORY_ID
+          !isUnknownCategory(categoryId)
         ) {
           updates.push({
             id: id as string,
