@@ -29,9 +29,10 @@ import { applicationSettingsSlice } from "store/slices/applicationSettings";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { NewAnnotationType } from "types/AnnotationType";
 import { getStackTraceFromError } from "utils";
-import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
+import { Kind, NewCategory, UNKNOWN_CATEGORY_NAME } from "types/Category";
 import Image from "image-js";
 import { NewOrphanedAnnotationType } from "utils/common/models/AbstractSegmenter/AbstractSegmenter";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/colorPalette";
 
 export const segmenterMiddleware = createListenerMiddleware();
 
@@ -149,7 +150,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   /* PREDICT */
 
   const hasOwnKinds = model.trainable;
-  console.log(`hasOwnKinds: ${hasOwnKinds}`);
 
   try {
     model.loadInference(inferenceImages, {
@@ -169,7 +169,6 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   let predictedAnnotations: NewOrphanedAnnotationType[][];
   try {
     predictedAnnotations = await model.predictNew();
-    console.log(`predictedAnnotations: ${predictedAnnotations}`);
   } catch (error) {
     await handleError(
       "Error in running predictions",
@@ -189,27 +188,40 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         ),
       ];
 
-      console.log(`uniquePredictedKinds: ${uniquePredictedKinds}`);
-      console.log(`kinds: ${kinds}`);
       const generatedKinds = model.inferenceKindsById([
         ...kinds.map((kind) => kind.id),
         ...uniquePredictedKinds,
       ]);
-      console.log(`genertatedKinds: ${generatedKinds}`);
       listenerAPI.dispatch(
         newDataSlice.actions.addKinds({
           kinds: generatedKinds,
           isPermanent: true,
         })
       );
+
+      const newUnknownCategories = generatedKinds.map((kind) => {
+        return {
+          id: kind.unknownCategoryId,
+          name: UNKNOWN_CATEGORY_NAME,
+          color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+          containing: [],
+          kind: kind.id,
+          visible: true,
+        } as NewCategory;
+      });
+      listenerAPI.dispatch(
+        newDataSlice.actions.addCategories({
+          categories: newUnknownCategories,
+          isPermanent: true,
+        })
+      );
     }
     const annotations: NewAnnotationType[] = [];
-    for (const [i, _annotations] of predictedAnnotations.entries()) {
+    for await (const [i, _annotations] of predictedAnnotations.entries()) {
       const image = inferenceImages[i];
       const imageJsImage = await Image.load(image.src);
 
       for (let j = 0; j < _annotations.length; j++) {
-        console.log(`${i} : ${j}`);
         const ann = _annotations[j] as Partial<NewAnnotationType>;
         const bbox = ann.boundingBox!;
         const width = bbox[2] - bbox[0];
@@ -236,24 +248,11 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         ann.name = `${image.name}-${ann.kind}_${j}`;
         ann.imageId = image.id;
         ann.bitDepth = image.bitDepth;
-
         annotations.push(ann as NewAnnotationType);
       }
     }
     listenerAPI.dispatch(
       newDataSlice.actions.addThings({ things: annotations, isPermanent: true })
-    );
-    listenerAPI.dispatch(
-      newDataSlice.actions.updateCategoryContents({
-        changes: [
-          {
-            categoryId: NEW_UNKNOWN_CATEGORY_ID,
-            updateType: "add",
-            contents: annotations.map((ann) => ann.id),
-          },
-        ],
-        isPermanent: true,
-      })
     );
   } catch (error) {
     await handleError(

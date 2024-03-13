@@ -9,9 +9,8 @@ import {
   setBackend,
   getBackend,
 } from "@tensorflow/tfjs";
-import { v4 as uuid4 } from "uuid";
 
-import { NEW_UNKNOWN_CATEGORY_ID, Partition, Point } from "types";
+import { Partition, Point } from "types";
 
 import { encode, scanline, simplifyPolygon } from "utils/annotator";
 import { connectPoints } from "utils/annotator";
@@ -19,6 +18,7 @@ import {
   NewOrphanedAnnotationType,
   OrphanedAnnotationType,
 } from "../AbstractSegmenter/AbstractSegmenter";
+import { generateUUID } from "utils/common/helpers";
 
 export const computeAnnotationMaskFromPoints = (
   cropDims: { x: number; y: number; width: number; height: number },
@@ -149,7 +149,7 @@ export function generateAnnotations(
           encodedMask: encode(decodedMask),
           boundingBox: bbox,
           categoryId: categoryId,
-          id: uuid4(),
+          id: generateUUID(),
           plane: 0,
         };
 
@@ -231,6 +231,7 @@ export const predictStardist = async (
 export function generateAnnotationsNew(
   preds: number[][][],
   kindId: string,
+  unknownCategoryId: string,
   height: number,
   width: number,
   inputImDims: {
@@ -267,9 +268,9 @@ export function generateAnnotationsNew(
           encodedMask: encode(decodedMask),
           boundingBox: bbox,
           kind: kindId,
-          categoryId: NEW_UNKNOWN_CATEGORY_ID,
+          categoryId: unknownCategoryId,
           partition: Partition.Unassigned,
-          id: uuid4(),
+          id: generateUUID(),
           activePlane: 0,
         };
 
@@ -283,7 +284,8 @@ export function generateAnnotationsNew(
 export const predictStardistNew = async (
   model: GraphModel,
   imTensor: Tensor4D, // expects 1 for batchSize dim (axis 0)
-  kindId: string, // foreground (nucleus category)
+  kindId: string, // foreground (nucleus kind)
+  unknownCategoryId: string,
   inputImDims: {
     width: number;
     height: number;
@@ -312,6 +314,7 @@ export const predictStardistNew = async (
     generateAnnotationsNew(
       preds,
       kindId,
+      unknownCategoryId,
       res.shape[1], // H
       res.shape[2], // W
       inputImDims,

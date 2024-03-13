@@ -12,7 +12,8 @@ import {
 import { selectCategoryProperty } from "store/slices/newData/selectors/reselectors";
 import { NewAnnotationType } from "types/AnnotationType";
 import { NewImageType } from "types/ImageType";
-import { NEW_UNKNOWN_CATEGORY_ID, Partition } from "types";
+import { Partition } from "types";
+import { isUnknownCategory } from "utils/common/helpers";
 
 type ProjectGridItemProps = {
   selected: boolean;
@@ -98,7 +99,7 @@ export const ProjectGridItemNew = memo(
           categoryName={categoryName}
           usePredictedStyle={
             thing.partition === Partition.Inference &&
-            thing.categoryId !== NEW_UNKNOWN_CATEGORY_ID
+            !isUnknownCategory(thing.categoryId)
           }
           thing={thing}
           position={getIconPosition(

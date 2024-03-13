@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppBar, Box, CssBaseline } from "@mui/material";
 
-import { useUpload } from "hooks";
+import { useUploadNew } from "hooks";
 
 import { FallBackDialog, ImageShapeDialog } from "components/dialogs";
 import { ImageViewerDrawerNew } from "components/drawers";
@@ -39,7 +39,7 @@ export const ImageViewerNew = () => {
   });
 
   const [openDimensionsDialogBox, setOpenDimensionsDialogBox] = useState(false);
-  const uploadFiles = useUpload(setOpenDimensionsDialogBox, true);
+  const uploadFiles = useUploadNew(setOpenDimensionsDialogBox);
   const alertState = useSelector(selectAlertState);
 
   const handleClose = () => {

@@ -6,8 +6,6 @@ import {
   AlertType,
   ImageFileError,
   ImageFileType,
-  NEW_UNKNOWN_CATEGORY_ID,
-  UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 
 import { getStackTraceFromError } from "utils";
@@ -122,11 +120,7 @@ export const uploadImages = async (
           );
           imageToUpload.kind = "Image";
           imageToUpload.containing = [];
-          //HACK: Should be unecessary, fixed with implementation of project converter
-          imageToUpload.categoryId =
-            imageToUpload.categoryId === UNKNOWN_IMAGE_CATEGORY_ID
-              ? NEW_UNKNOWN_CATEGORY_ID
-              : imageToUpload.categoryId;
+
           imagesToUpload.push(imageToUpload as NewImageType);
         } catch (err) {
           const error = err as Error;
