@@ -13,7 +13,6 @@ import {
   Classifier,
   Data,
   ImageViewer,
-  NEW_UNKNOWN_CATEGORY_ID,
   Partition,
   Project,
   Segmenter,
@@ -26,11 +25,12 @@ import { AppDispatch } from "store/productionStore";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { TrainingCallbacks } from "utils/common/models/Model";
 import { ENV, enableDebugMode, History } from "@tensorflow/tfjs";
-import { getSubset } from "utils/common/helpers";
+import { getSubset, isUnknownCategory } from "utils/common/helpers";
 import { ThingType } from "types/ThingType";
 import { SimpleCNN } from "utils/common/models/SimpleCNN/SimpleCNN";
 import { MobileNet } from "utils/common/models/MobileNet/MobileNet";
 import { NewCategory } from "types/Category";
+import { logger } from "utils/common/logger";
 
 export const classifierMiddleware = createListenerMiddleware();
 
@@ -119,7 +119,7 @@ const fitListener = async (
 
   process.env.NODE_ENV !== "production" &&
     process.env.REACT_APP_LOG_LEVEL === "2" &&
-    console.log("tensorflow flags:", ENV.features);
+    logger(["tensorflow flags:", ENV.features]);
 
   const {
     classifier: classifierState,
@@ -149,7 +149,7 @@ const fitListener = async (
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
   const unknownThingIds = getDeferredProperty(
-    dataState.categories.entities[NEW_UNKNOWN_CATEGORY_ID],
+    dataState.categories.entities[activeKind.unknownCategoryId],
     "containing"
   );
   let labeledThingIds = difference(activeThingIds, unknownThingIds);
@@ -160,7 +160,7 @@ const fitListener = async (
   const categories: Array<NewCategory> = [];
   const numClasses = activeKind.categories.reduce((count, id) => {
     const category = getCompleteEntity(dataState.categories.entities[id]);
-    if (id === NEW_UNKNOWN_CATEGORY_ID || !category) return count;
+    if (isUnknownCategory(id) || !category) return count;
     categories.push(category);
     return ++count;
   }, 0);
@@ -282,15 +282,15 @@ const fitListener = async (
         console.warn("Epoch end callback not provided");
       }
       onEpochEnd = async (epoch: number, logs: any) => {
-        console.log(`Epcoch: ${epoch}`);
-        console.log(logs);
+        logger(`Epcoch: ${epoch}`);
+        logger(logs);
       };
     }
 
     var history: History = await model.train(fitOptions, { onEpochEnd });
     process.env.NODE_ENV !== "production" &&
       process.env.REACT_APP_LOG_LEVEL === "1" &&
-      console.log(history);
+      logger(history);
   } catch (error) {
     handleError(listenerAPI, error as Error, "Error training the model");
     return;
@@ -318,7 +318,7 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
   if (!activeKind) return;
   const activeThingIds = activeKind.containing;
   const activeCategoryIds = activeKind.categories.filter(
-    (id) => id !== NEW_UNKNOWN_CATEGORY_ID
+    (id) => !isUnknownCategory(id)
   );
   const activeCategories = activeCategoryIds.map(
     (id) => getCompleteEntity(dataState.categories.entities[id])!
@@ -380,9 +380,9 @@ const predictListener = async (listenerAPI: StoreListemerAPI) => {
         fitOptions,
       });
       const thingIds = inferenceThings.map((thing) => thing.id);
-      console.log("before predict");
+      logger("before predict");
       const categoryIds = await model.predict(activeCategories);
-      console.log("after predict");
+      logger("after predict");
       if (thingIds.length === categoryIds.length) {
         listenerAPI.dispatch(
           newDataSlice.actions.updateThings({
@@ -427,7 +427,7 @@ const evaluateListener = async (listenerAPI: StoreListemerAPI) => {
   const activeKind = getCompleteEntity(dataState.kinds.entities[activeKindId]);
   if (!activeKind) return;
   const activeKnownCategoryCount = activeKind.categories.reduce((count, id) => {
-    if (id !== NEW_UNKNOWN_CATEGORY_ID) {
+    if (!isUnknownCategory(id)) {
       return ++count;
     }
     return count;

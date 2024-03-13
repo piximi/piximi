@@ -24,8 +24,8 @@ export {
   UNKNOWN_ANNOTATION_CATEGORY_ID,
   UNKNOWN_ANNOTATION_CATEGORY,
   UNKNOWN_CATEGORY_NAME,
-  NEW_UNKNOWN_CATEGORY,
-  NEW_UNKNOWN_CATEGORY_ID,
+  // NEW_UNKNOWN_CATEGORY,
+  // NEW_UNKNOWN_CATEGORY_ID,
 } from "./Category";
 
 export type { ImageFileError, ImageFileType } from "./ImageFileType";

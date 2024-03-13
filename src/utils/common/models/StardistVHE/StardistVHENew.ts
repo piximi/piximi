@@ -6,7 +6,8 @@ import { Segmenter } from "../AbstractSegmenter/AbstractSegmenter";
 import { loadStardist } from "./loadStardist";
 import { preprocessStardist } from "./preprocessStardist";
 import { predictStardistNew } from "./predictStardist";
-import { Kind, NEW_UNKNOWN_CATEGORY_ID } from "types/Category";
+import { Kind } from "types/Category";
+import { generateUUID } from "utils/common/helpers";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -92,10 +93,12 @@ export class StardistVHENew extends Segmenter {
         );
       this._fgKind = preprocessingArgs.kinds[0];
     } else if (!this._fgKind) {
+      const unknownCategoryId = generateUUID({ definesUnknown: true });
       this._fgKind = {
         id: "Nucleus",
-        categories: [NEW_UNKNOWN_CATEGORY_ID],
+        categories: [unknownCategoryId],
         containing: [],
+        unknownCategoryId,
       };
     }
   }
@@ -143,6 +146,7 @@ export class StardistVHENew extends Segmenter {
         graphModel,
         imTensor,
         this._fgKind!.id,
+        this._fgKind!.unknownCategoryId,
         this._inferenceDataDims![idx]
       );
     });

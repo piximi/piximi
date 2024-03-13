@@ -8,7 +8,7 @@ import {
   selectActiveKindId,
   selectSelectedThingIds,
 } from "store/slices/project/selectors";
-import { NEW_UNKNOWN_CATEGORY_ID, NewCategory } from "types/Category";
+import { NewCategory } from "types/Category";
 import { difference, intersection } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import {
@@ -26,12 +26,37 @@ import {
 import { decodeAnnotationNew } from "utils/annotator/rle/rle";
 import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 import { getCompleteEntity } from "store/entities/utils";
+import { isUnknownCategory } from "utils/common/helpers";
 
 export const selectActiveKindObject = createSelector(
   selectActiveKindId,
   selectKindDictionary,
   (activeKind, kindDict) => {
     return kindDict[activeKind];
+  }
+);
+
+export const selectActiveUnknownCategoryId = createSelector(
+  selectActiveKindObject,
+  (activeKind) => {
+    return activeKind.unknownCategoryId;
+  }
+);
+export const selectActiveUnknownCategory = createSelector(
+  selectActiveUnknownCategoryId,
+  selectCategoriesDictionary,
+  (unknownCatId, catDict) => {
+    return catDict[unknownCatId];
+  }
+);
+export const selectUnknownCategoryByKind = createSelector(
+  selectKindDictionary,
+  selectCategoriesDictionary,
+  (kindDict, catDict) => {
+    return (kind: string) => {
+      const unknownCatId = kindDict[kind].unknownCategoryId;
+      return catDict[unknownCatId];
+    };
   }
 );
 export const selectThingsByKind = createSelector(
@@ -98,7 +123,7 @@ export const selectActiveCategories = createSelector(
 export const selectActiveKnownCategories = createSelector(
   selectActiveCategories,
   (activeCategories) => {
-    return activeCategories.filter((cat) => cat.id !== NEW_UNKNOWN_CATEGORY_ID);
+    return activeCategories.filter((cat) => !isUnknownCategory(cat.id));
   }
 );
 
@@ -135,24 +160,24 @@ export const selectActiveCategoryColors = createSelector(
 );
 
 export const selectActiveLabeledThingsIds = createSelector(
-  selectKindDictionary,
+  selectActiveKindObject,
   selectCategoriesDictionary,
-  selectActiveKindId,
-  (kindDict, catDict, activeKind) => {
-    if (!kindDict[activeKind]) return [];
-    const thingsInKind = kindDict[activeKind].containing;
-    const unknownThings = catDict[NEW_UNKNOWN_CATEGORY_ID].containing;
+  (activeKind, catDict) => {
+    if (!activeKind) return [];
+    const thingsInKind = activeKind.containing;
+    const unknownCategoryId = activeKind.unknownCategoryId;
+    const unknownThings = catDict[unknownCategoryId].containing;
     return difference(thingsInKind, unknownThings);
   }
 );
 export const selectActiveUnlabeledThingsIds = createSelector(
-  selectKindDictionary,
+  selectActiveKindObject,
   selectCategoriesDictionary,
-  selectActiveKindId,
-  (kindDict, catDict, activeKind) => {
-    if (!kindDict[activeKind]) return [];
-    const thingsInKind = kindDict[activeKind].containing;
-    const unknownThings = catDict[NEW_UNKNOWN_CATEGORY_ID].containing;
+  (activeKind, catDict) => {
+    if (!activeKind) return [];
+    const thingsInKind = activeKind.containing;
+    const unknownCategoryId = activeKind.unknownCategoryId;
+    const unknownThings = catDict[unknownCategoryId].containing;
     return intersection(thingsInKind, unknownThings);
   }
 );

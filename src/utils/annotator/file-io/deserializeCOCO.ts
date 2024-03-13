@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 import { encode, maskFromPoints } from "utils/annotator";
 
 import {
@@ -12,6 +10,8 @@ import {
   AnnotationType,
   ImageType,
 } from "types";
+import { generateUUID } from "utils/common/helpers";
+import { logger } from "utils/common/logger";
 
 /*
 We want to match incoming categories to existing categories, if their names are the same,
@@ -46,7 +46,7 @@ const reconcileCOCOCategories = (
     } else {
       // no matching category exists, create one
       const newCat = {
-        id: uuidv4(),
+        id: generateUUID(),
         name: cocoCat.name,
         visible: true,
         // keep cycling through available colors
@@ -73,7 +73,7 @@ const reconcileCOCOCategories = (
     const numUnmatched = numExisting - numMatched;
 
     numMatched !== numExisting &&
-      console.log(
+      logger(
         `Categories matched: ${numMatched}, newly created: ${numNew}, unmatched: ${numUnmatched}`
       );
   }
@@ -140,17 +140,17 @@ const reconcileImages = (
     const numAnnsKept = imModdedAnnotations.length;
 
     numImsDiscarded > 0 &&
-      console.log(
+      logger([
         `Discarded ${numImsDiscarded} / ${numImsExisting} COCO images`,
         `and ${numAnnsDiscarded} associated annotations.`,
         `Image names: ${discardedIms.map((im) => im.file_name)}`,
-        `Annotation ids: ${discardedAnnotations.map((ann) => ann.id)}`
-      );
+        `Annotation ids: ${discardedAnnotations.map((ann) => ann.id)}`,
+      ]);
     numImsModded > 0 &&
-      console.log(
+      logger([
         `Matched ${numImsModded} / ${numImsExisting} COCO images`,
-        `with ${numAnnsKept} associated annotations`
-      );
+        `with ${numAnnsKept} associated annotations`,
+      ]);
   }
 
   return { matchedIms, imModdedAnnotations };
@@ -242,7 +242,7 @@ export const deserializeCOCOFile = (
     const encodedMask = encode(decodedMask);
 
     const newAnnotation = {
-      id: uuidv4(),
+      id: generateUUID(),
       encodedMask: encodedMask,
       plane: parentIm.activePlane,
       boundingBox: bbox,
@@ -264,16 +264,16 @@ export const deserializeCOCOFile = (
     const numKept = numInFile - (numMalformed + numCrowded + numMultipart);
 
     malformed.length > 0 &&
-      console.log(
+      logger(
         `Dropped ${malformed.length} annotations with malformed polygon shapes: ${malformed}`
       );
     crowded.length > 0 &&
-      console.log(`Dropped ${crowded.length} annotations with iscrowd=1`);
+      logger(`Dropped ${crowded.length} annotations with iscrowd=1`);
     multipart.length > 0 &&
-      console.log(
+      logger(
         `Dropped ${multipart.length} annotations with multiple polygon parts`
       );
-    console.log(`Created ${numKept}/${numInFile} annotations`);
+    logger(`Created ${numKept}/${numInFile} annotations`);
   }
 
   return {

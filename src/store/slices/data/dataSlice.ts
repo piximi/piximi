@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
 
 import { createDeferredEntityAdapter } from "store/entities/create_deferred_adapter";
 
@@ -19,9 +18,10 @@ import {
   UNKNOWN_IMAGE_CATEGORY_ID,
 } from "types";
 import { ImageShapeInfo, replaceDuplicateName } from "utils/common/image";
-import { mutatingFilter } from "utils/common/helpers";
+import { generateUUID, mutatingFilter } from "utils/common/helpers";
 import { dispose, TensorContainer } from "@tensorflow/tfjs";
 import { encode } from "utils/annotator";
+import { logger } from "utils/common/logger";
 
 export const imageCategoriesAdapter = createDeferredEntityAdapter<Category>();
 export const annotationCategoriesAdapter =
@@ -133,11 +133,11 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { name, color, isPermanent } = action.payload;
-      let id = uuidv4();
+      let id = generateUUID();
       let idIsUnique = !state.imageCategories.ids.includes(id);
 
       while (!idIsUnique) {
-        id = uuidv4();
+        id = generateUUID();
         idIsUnique = !state.imageCategories.ids.includes(id);
       }
 
@@ -306,11 +306,11 @@ export const dataSlice = createSlice({
       }>
     ) {
       const { name, color, isPermanent } = action.payload;
-      let id = uuidv4();
+      let id = generateUUID();
       let idIsUnique = !state.annotationCategories.ids.includes(id);
 
       while (!idIsUnique) {
-        id = uuidv4();
+        id = generateUUID();
         idIsUnique = !state.annotationCategories.ids.includes(id);
       }
       state.annotationsByCategory[id] = [];
@@ -797,7 +797,7 @@ export const dataSlice = createSlice({
         });
       }
       if (withInvalidImageId.length) {
-        console.log(
+        logger(
           `${withInvalidImageId.length} annotations contained an invalid image id: Skipped`
         );
       }
@@ -828,7 +828,7 @@ export const dataSlice = createSlice({
         });
       }
       if (withInvalidImageId.length) {
-        console.log(
+        logger(
           `${withInvalidImageId.length} annotations contained an invalid image id: Skipped`
         );
       }

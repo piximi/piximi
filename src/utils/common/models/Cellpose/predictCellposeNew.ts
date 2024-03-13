@@ -9,18 +9,19 @@ import {
 } from "@tensorflow/tfjs";
 import { ColorModel, Image as ImageJS } from "image-js";
 import { hyphaWebsocketClient } from "imjoy-rpc";
-import { v4 as uuid } from "uuid";
 
 import { encode } from "utils/annotator";
 import { NewOrphanedAnnotationType } from "../AbstractSegmenter/AbstractSegmenter";
-import { NEW_UNKNOWN_CATEGORY_ID, Partition } from "types";
+import { Partition } from "types";
+import { generateUUID } from "utils/common/helpers";
 
 const labelToAnnotation = async (
   labelMask: Tensor1D,
   label: number,
   maskH: number,
   maskW: number,
-  kindId: string
+  kindId: string,
+  unknownCategoryId: string
 ): Promise<NewOrphanedAnnotationType> => {
   const labelFilter = tidy(() => onesLike(labelMask).mul(label));
 
@@ -83,12 +84,12 @@ const labelToAnnotation = async (
 
   return {
     kind: kindId,
-    categoryId: NEW_UNKNOWN_CATEGORY_ID,
+    categoryId: unknownCategoryId,
     boundingBox: bbox as [number, number, number, number],
     encodedMask: encode(annotationData, true),
     activePlane: 0,
     partition: Partition.Unassigned,
-    id: uuid(),
+    id: generateUUID(),
   };
 };
 
@@ -96,7 +97,8 @@ const labelMaskToAnnotation = async (
   labelMask: Tensor1D,
   maskH: number,
   maskW: number,
-  kindId: string
+  kindId: string,
+  unknownCategoryId: string
 ) => {
   const { values, indices } = unique(labelMask);
 
@@ -114,7 +116,8 @@ const labelMaskToAnnotation = async (
         label,
         maskH,
         maskW,
-        kindId
+        kindId,
+        unknownCategoryId
       );
       annotations.push(annotation);
     }
@@ -129,6 +132,7 @@ export const predictCellposeNew = async (
   // [B, H, W, C]
   imTensor: Tensor4D,
   fgKindId: string,
+  unknownCategoryId: string,
   service: string,
   serverConfig: { name: string; server_url: string; passive: boolean }
 ) => {
@@ -200,7 +204,8 @@ export const predictCellposeNew = async (
     maskTensor,
     imTensor.shape[1],
     imTensor.shape[2],
-    fgKindId
+    fgKindId,
+    unknownCategoryId
   );
 
   return annotations;

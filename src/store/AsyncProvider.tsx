@@ -1,7 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { cellPaintingAnnotations } from "data/exampleImages";
 import colorImage from "images/cell-painting.png";
-
 import { RootState } from "./rootReducer";
 import { classifierSlice } from "./slices/classifier";
 import { annotatorSlice } from "./slices/annotator";
@@ -16,15 +15,17 @@ import { Partition, SerializedFileType, Shape } from "types";
 import {
   Category,
   Kind,
-  NEW_UNKNOWN_CATEGORY,
-  NEW_UNKNOWN_CATEGORY_ID,
   NewCategory,
+  UNKNOWN_CATEGORY_NAME,
 } from "types/Category";
 import { NewAnnotationType } from "types/AnnotationType";
 import { ImageType, NewImageType } from "types/ImageType";
 import { DeferredEntityState } from "./entities";
 import { initStore } from "./productionStore";
 import { Provider } from "react-redux";
+import { UNKNOWN_IMAGE_CATEGORY_COLOR } from "utils/common/colorPalette";
+import { generateUUID } from "utils/common/helpers";
+import { logger } from "utils/common/logger";
 
 const loadState = async () => {
   const preloadedState: RootState = {
@@ -61,47 +62,73 @@ const loadState = async () => {
   const kinds: DeferredEntityState<Kind> = { ids: [], entities: {} };
 
   kinds.ids.push("Image");
+  const unknownCategoryId = generateUUID({ definesUnknown: true });
+  const unknownCategory: NewCategory = {
+    id: unknownCategoryId,
+    name: UNKNOWN_CATEGORY_NAME,
+    color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+    containing: [],
+    kind: "Image",
+    visible: true,
+  };
 
   kinds.entities["Image"] = {
     saved: {
       id: "Image",
       containing: [image.id],
-      categories: [NEW_UNKNOWN_CATEGORY_ID],
+      categories: [unknownCategoryId],
+      unknownCategoryId,
     },
     changes: {},
   };
 
   image.kind = "Image";
-  image.categoryId = NEW_UNKNOWN_CATEGORY_ID;
+  image.categoryId = unknownCategoryId;
   image.containing = annotations.map((annotation) => annotation.id);
 
   things.ids.push(image.id);
 
   things.entities[image.id] = { saved: image as NewImageType, changes: {} };
 
-  categories.ids.push(NEW_UNKNOWN_CATEGORY_ID);
-  categories.entities[NEW_UNKNOWN_CATEGORY_ID] = {
+  categories.ids.push(unknownCategoryId);
+  categories.entities[unknownCategoryId] = {
     saved: {
-      ...NEW_UNKNOWN_CATEGORY,
-      containing: [image.id, ...annotations.map((an) => an.id)],
+      ...unknownCategory,
+      containing: [image.id],
     },
     changes: {},
   };
-
   const anCat2KindNAme: Record<string, string> = {};
   for (const anCat of annotationCategories) {
     kinds.ids.push(anCat.name);
+    const unknownCategoryId = generateUUID({ definesUnknown: true });
+    const unknownCategory: NewCategory = {
+      id: unknownCategoryId,
+      name: UNKNOWN_CATEGORY_NAME,
+      color: UNKNOWN_IMAGE_CATEGORY_COLOR,
+      containing: [],
+      kind: anCat.name,
+      visible: true,
+    };
     kinds.entities[anCat.name] = {
       saved: {
         id: anCat.name,
         containing: [],
-        categories: [NEW_UNKNOWN_CATEGORY_ID],
+        categories: [unknownCategoryId],
+        unknownCategoryId,
       },
       changes: {},
     };
     anCat2KindNAme[anCat.id] = anCat.name;
+    categories.ids.push(unknownCategoryId);
+    categories.entities[unknownCategoryId] = {
+      saved: {
+        ...unknownCategory,
+        containing: [],
+      },
+      changes: {},
+    };
   }
-
   const numAnnotationsOfKindPerImage: Record<string, number> = {};
 
   for (const annotation of annotations) {
@@ -114,8 +141,10 @@ const loadState = async () => {
       numAnnotationsOfKindPerImage[annotationName] = 1;
       annotationName += "_0";
     }
+    const kind = kinds.entities[annotation.kind];
+
     annotation.name = annotationName;
-    annotation.categoryId = NEW_UNKNOWN_CATEGORY_ID;
+    annotation.categoryId = kind.saved.unknownCategoryId;
     annotation.shape = annotation.data.shape.reduce(
       (shape: Shape, value: number, idx) => {
         switch (idx) {
@@ -147,6 +176,9 @@ const loadState = async () => {
     };
 
     kinds.entities[annotation.kind].saved.containing.push(annotation.id);
+    categories.entities[annotation.categoryId].saved.containing.push(
+      annotation.id
+    );
   }
   preloadedState.newData = { kinds, categories, things };
   return preloadedState;
@@ -168,7 +200,7 @@ export const AsyncProvider = ({
         setPreloaded({ isReady: true, state });
       })
       .catch(() => {
-        console.log("Failed to load preloaded state");
+        logger("Failed to load preloaded state");
         setPreloaded({ isReady: true, state: undefined });
       });
   }, [setPreloaded]);

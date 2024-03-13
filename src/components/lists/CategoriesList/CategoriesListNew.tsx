@@ -8,11 +8,14 @@ import { useDialogHotkey, useHotkeys } from "hooks";
 
 import { DialogWithAction } from "components/dialogs";
 
-import { HotkeyView, NEW_UNKNOWN_CATEGORY, Partition } from "types";
+import { HotkeyView, Partition } from "types";
 import { NewCategory } from "types/Category";
 import { CustomListItemButton } from "components/list-items/CustomListItemButton";
 import { useDispatch, useSelector } from "react-redux";
-import { selectActiveCategories } from "store/slices/newData/selectors/reselectors";
+import {
+  selectActiveCategories,
+  selectActiveUnknownCategory,
+} from "store/slices/newData/selectors/reselectors";
 import { CategoryItemNew } from "components/list-items/CategoryItem/CategoryItemNew";
 import { CategoryItemMenuNew } from "components/menus/CategoryItemMenu/CategoryItemMenuNew";
 import {
@@ -27,10 +30,12 @@ import { selectClassifierModelStatus } from "store/slices/classifier";
 import { ModelStatus } from "types/ModelType";
 import { newDataSlice } from "store/slices/newData/newDataSlice";
 import { PredictionListItemsNew } from "components/list-items/PredictionListItems/PredictionListItemsNew";
+import { isUnknownCategory } from "utils/common/helpers";
 
 export const CategoriesListNew = () => {
   const dispatch = useDispatch();
   const categories = useSelector(selectActiveCategories);
+  const activeUnknownCategory = useSelector(selectActiveUnknownCategory);
   const activeKind = useSelector(selectActiveKindId);
   const [selectedCategory, setSelectedCategory] = useState<NewCategory>();
   const [categoryIndex, setCategoryIndex] = useState("");
@@ -139,7 +144,7 @@ export const CategoriesListNew = () => {
   );
 
   useEffect(() => {
-    const allCategories = [NEW_UNKNOWN_CATEGORY, ...categories];
+    const allCategories = categories;
     if (categoryIndex.length === 0) {
       dispatch(
         projectSlice.actions.updateHighlightedImageCategory({
@@ -167,7 +172,7 @@ export const CategoriesListNew = () => {
                 isSelected={
                   selectedCategory
                     ? selectedCategory.id === category.id
-                    : NEW_UNKNOWN_CATEGORY.id === category.id
+                    : isUnknownCategory(category.id)
                 }
                 selectCategory={selectCategory}
                 isHighlighted={highlightedCategory === category.id}
@@ -202,7 +207,7 @@ export const CategoriesListNew = () => {
 
       <CategoryItemMenuNew
         anchorElCategoryMenu={categoryMenuAnchorEl}
-        category={selectedCategory ?? NEW_UNKNOWN_CATEGORY}
+        category={selectedCategory ?? activeUnknownCategory}
         handleCloseCategoryMenu={onCloseCategoryMenu}
         openCategoryMenu={Boolean(categoryMenuAnchorEl)}
       />

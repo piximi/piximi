@@ -10,11 +10,16 @@ export type Category = {
   name: string;
   visible: boolean;
   containing?: string[];
-  kind?: string | "all";
+  kind?: string;
 };
 
 export type NewCategory = RequireField<Category, "containing" | "kind">;
-export type Kind = { id: string; containing: string[]; categories: string[] };
+export type Kind = {
+  id: string;
+  containing: string[];
+  categories: string[];
+  unknownCategoryId: string;
+};
 
 export enum CategoryType {
   ImageCategory,
@@ -25,8 +30,6 @@ export const UNKNOWN_IMAGE_CATEGORY_ID: string =
   "00000000-0000-0000-0000-000000000000";
 export const UNKNOWN_ANNOTATION_CATEGORY_ID: string =
   "00000000-0000-1111-0000-000000000000";
-export const NEW_UNKNOWN_CATEGORY_ID: string =
-  "00000000-0000-1010-0000-000000000000";
 export const UNKNOWN_CATEGORY_NAME: string = "Unknown";
 
 export const UNKNOWN_IMAGE_CATEGORY: Category = {
@@ -42,12 +45,4 @@ export const UNKNOWN_ANNOTATION_CATEGORY: Category = {
   id: UNKNOWN_ANNOTATION_CATEGORY_ID,
   name: "Unknown",
   visible: true,
-};
-export const NEW_UNKNOWN_CATEGORY: NewCategory = {
-  color: UNKNOWN_IMAGE_CATEGORY_COLOR,
-  id: NEW_UNKNOWN_CATEGORY_ID,
-  name: "Unknown",
-  containing: [],
-  visible: true,
-  kind: "all",
 };

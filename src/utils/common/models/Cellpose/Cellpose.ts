@@ -4,7 +4,6 @@ import {
   Tensor4D,
   data as tfdata,
 } from "@tensorflow/tfjs";
-import { v4 as uuid } from "uuid";
 
 import { ModelTask } from "types/ModelType";
 import { Category, FitOptions, ImageType } from "types";
@@ -13,6 +12,7 @@ import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import { getImageSlice } from "utils/common/image";
 import { predictCellpose } from "./predictCellpose";
 import { Kind } from "types/Category";
+import { generateUUID } from "utils/common/helpers";
 
 type LoadInferenceDataArgs = {
   fitOptions: FitOptions;
@@ -97,7 +97,7 @@ export class Cellpose extends Segmenter {
       this._fgCategory = {
         name: "Nucleus",
         visible: true,
-        id: uuid(),
+        id: generateUUID(),
         color: CATEGORY_COLORS.darkcyan,
       };
     }

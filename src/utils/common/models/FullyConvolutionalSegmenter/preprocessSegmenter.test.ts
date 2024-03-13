@@ -1,6 +1,5 @@
 // TODO: post PR #407, get working for segmenter
 import "@tensorflow/tfjs-node";
-import { v4 as uuid } from "uuid";
 import { preprocessSegmentationImages } from "./preprocessSegmenter";
 import {
   convertToImage,
@@ -17,6 +16,7 @@ import { FitOptions } from "types/FitOptions";
 import { CropOptions, CropSchema } from "types/CropOptions";
 import { PreprocessOptions } from "types/PreprocessOptions";
 import { AnnotationType } from "types";
+import { generateUUID } from "utils/common/helpers";
 
 //jest.setTimeout(50000);
 
@@ -69,7 +69,7 @@ const preloadedImages: Array<{
   name: string;
   mimetype: MIMEType;
   annotations: Array<AnnotationType>;
-}> = [uuid()].map((imId) => ({
+}> = [generateUUID()].map((imId) => ({
   id: imId,
   src: "/static/media/cell-painting.f118ef087853056f08e6.png",
   name: "cell-painting.png",

@@ -1,5 +1,4 @@
 import { test } from "@jest/globals";
-import { v4 as uuidv4 } from "uuid";
 
 import { productionStore } from "store";
 // import { imageViewerSlice } from "store/imageViewer";
@@ -14,6 +13,7 @@ import { CATEGORY_COLORS } from "utils/common/colorPalette";
 
 import { serializeProject } from "./serializeProject";
 import { deserializeProjectFile } from "./deserializeProject";
+import { generateUUID } from "utils/common/helpers";
 
 // Time 1 (T1) is pre-serialization state of piximi
 // Time 2 (T2) is piximi state, after refresh, but before deserialization
@@ -37,7 +37,7 @@ const dummyImFields = {
 // image exists T1 and T2
 const im1T1: ImageType = {
   ...dummyImFields,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "im1.png",
   shape: {
     planes: 1,
@@ -50,13 +50,13 @@ const im1T1: ImageType = {
 const im1T2: ImageType = {
   ...im1T1,
   // gets a new id T2
-  id: uuidv4(),
+  id: generateUUID(),
 };
 
 // image exists T1 only
 const im2T1: ImageType = {
   ...dummyImFields,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "im2.png",
   shape: {
     planes: 1,
@@ -69,7 +69,7 @@ const im2T1: ImageType = {
 // image exists T2 only
 const im3T2: ImageType = {
   ...dummyImFields,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "im3.png",
   shape: {
     planes: 1,
@@ -84,25 +84,29 @@ const T1T2UnmodifiedCat = UNKNOWN_ANNOTATION_CATEGORY;
 // name exists in both T1 and T2, but with color and id change
 const _T1T2ModifiedCat = {
   color: CATEGORY_COLORS.black,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "cat 1",
   visible: true,
 };
 const T1T2ModifiedCats = {
   t1: _T1T2ModifiedCat,
-  t2: { ..._T1T2ModifiedCat, id: uuidv4(), color: CATEGORY_COLORS.citrus },
+  t2: {
+    ..._T1T2ModifiedCat,
+    id: generateUUID(),
+    color: CATEGORY_COLORS.citrus,
+  },
 };
 // eixsts only in T1
 const T1OnlyCat = {
   color: CATEGORY_COLORS.columbiablue,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "cat 2",
   visible: false,
 };
 // exists only in T2
 const T2OnlyCat = {
   color: CATEGORY_COLORS.darkcyan,
-  id: uuidv4(),
+  id: generateUUID(),
   name: "cat 3",
   visible: true,
 };
@@ -112,7 +116,7 @@ const im1AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im1T1.id,
     categoryId: T1T2UnmodifiedCat.id, //unknown
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       40, 13, 86, 14, 85, 19, 77, 26, 72, 29, 70, 30, 68, 34, 63, 38, 59, 44,
       56, 44, 54, 47, 49, 51, 46, 57, 43, 57, 40, 63, 36, 65, 35, 65, 34, 69,
@@ -132,7 +136,7 @@ const im1AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im1T1.id,
     categoryId: T1T2ModifiedCats.t1.id, // cat 1
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       28, 7, 85, 11, 9, 7, 66, 12, 7, 8, 65, 17, 3, 12, 61, 33, 58, 37, 56, 37,
       56, 38, 54, 42, 51, 42, 49, 47, 46, 51, 41, 57, 36, 57, 35, 61, 30, 64,
@@ -153,7 +157,7 @@ const im1AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im1T1.id,
     categoryId: T1OnlyCat.id, // cat 2
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       44, 11, 76, 28, 74, 28, 73, 31, 68, 34, 66, 37, 65, 37, 64, 39, 62, 42,
       57, 45, 57, 46, 53, 49, 51, 53, 46, 56, 46, 57, 43, 59, 16, 3, 23, 63, 13,
@@ -178,7 +182,7 @@ const im1AnnotationsT2: Array<AnnotationType> = [
   {
     imageId: im1T2.id,
     categoryId: T1T2UnmodifiedCat.id, // unknown
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       28, 7, 56, 11, 45, 21, 41, 24, 38, 26, 36, 28, 35, 30, 31, 35, 28, 35, 27,
       37, 24, 40, 23, 40, 22, 41, 21, 42, 21, 43, 18, 45, 18, 45, 17, 46, 16,
@@ -201,7 +205,7 @@ const im2AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im2T1.id,
     categoryId: T1T2UnmodifiedCat.id, // unknown
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       114, 1, 66, 1, 66, 2, 65, 3, 64, 3, 64, 3, 64, 4, 64, 3, 64, 3, 64, 4, 40,
       2, 21, 4, 38, 5, 20, 5, 35, 9, 17, 7, 34, 9, 17, 7, 33, 12, 13, 11, 31,
@@ -217,7 +221,7 @@ const im2AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im2T1.id,
     categoryId: T1T2ModifiedCats.t1.id, // cat 1
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       3, 4, 8, 7, 5, 9, 3, 11, 2, 12, 1, 26, 1, 12, 2, 11, 3, 10, 3, 10, 4, 9,
       5, 8, 4, 8, 4, 6, 7, 5, 5,
@@ -228,7 +232,7 @@ const im2AnnotationsT1: Array<AnnotationType> = [
   {
     imageId: im2T1.id,
     categoryId: T1OnlyCat.id, // cat 2
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       7, 3, 9, 5, 7, 6, 7, 7, 6, 7, 9, 4, 8, 5, 7, 7, 5, 8, 4, 9, 3, 9, 3, 10,
       2, 11, 1, 11, 2, 11, 2, 10, 4, 9, 4, 8, 6, 6, 8, 3, 7,
@@ -243,7 +247,7 @@ const im3AnnotationsT2: Array<AnnotationType> = [
   {
     imageId: im3T2.id,
     categoryId: T1T2UnmodifiedCat.id, // unknown
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [4, 2, 12, 10, 3, 13, 1, 89, 1, 13, 9, 5, 11, 3, 4],
     plane: 0,
     boundingBox: [261, 311, 276, 323],
@@ -251,7 +255,7 @@ const im3AnnotationsT2: Array<AnnotationType> = [
   {
     imageId: im3T2.id,
     categoryId: T1T2ModifiedCats.t2.id, // cat 1
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       5, 5, 5, 9, 4, 10, 2, 12, 1, 12, 1, 12, 1, 11, 1, 12, 1, 39, 1, 12, 2, 10,
       4, 8, 8, 5, 9, 3, 10, 2, 4,
@@ -262,7 +266,7 @@ const im3AnnotationsT2: Array<AnnotationType> = [
   {
     imageId: im3T2.id,
     categoryId: T2OnlyCat.id, // cat 3
-    id: uuidv4(),
+    id: generateUUID(),
     encodedMask: [
       9, 2, 12, 8, 9, 10, 7, 13, 4, 16, 1, 88, 2, 15, 4, 13, 6, 10, 9, 4, 2, 3,
       5,

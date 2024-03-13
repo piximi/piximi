@@ -1,4 +1,5 @@
 import { FilterType } from "types";
+import { v4 as uuidv4 } from "uuid";
 
 export const mutatingFilter = <T>(
   array: Array<T>,
@@ -60,4 +61,19 @@ export const getSubset = <T, K extends keyof T>(object: T, keys: K[]) => {
     subset[key as string] = object[key];
   });
   return subset;
+};
+
+export const generateUUID = (options?: { definesUnknown: boolean }) => {
+  let id = uuidv4();
+  let unknownFlag: string;
+  if (options?.definesUnknown) {
+    unknownFlag = "0";
+  } else {
+    unknownFlag = "1";
+  }
+  return unknownFlag + id.slice(1);
+};
+
+export const isUnknownCategory = (categoryId: string) => {
+  return categoryId[0] === "0";
 };
