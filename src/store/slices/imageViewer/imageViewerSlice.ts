@@ -32,6 +32,7 @@ const initialState: ImageViewer = {
   activeImageRenderedSrcs: [],
   imageOrigin: { x: 0, y: 0 },
   annotationFilters: { categoryId: [] },
+  filters: { categoryId: [] },
   workingAnnotationId: undefined,
 
   workingAnnotation: { saved: undefined, changes: {} },
@@ -373,6 +374,18 @@ export const imageViewerSlice = createSlice({
       ].filter(distinctFilter);
       state.annotationFilters["categoryId"] = newFilters;
     },
+    addFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds: string[];
+      }>
+    ) {
+      const newFilters = [
+        ...state.filters["categoryId"],
+        ...action.payload.categoryIds,
+      ].filter(distinctFilter);
+      state.filters["categoryId"] = newFilters;
+    },
     removeAnnotationCategoryFilters(
       state,
       action: PayloadAction<{
@@ -387,6 +400,24 @@ export const imageViewerSlice = createSlice({
       if (action.payload.categoryIds) {
         mutatingFilter(
           state.annotationFilters["categoryId"],
+          (id) => !action.payload.categoryIds!.includes(id)
+        );
+      }
+    },
+    removeFilters(
+      state,
+      action: PayloadAction<{
+        categoryIds?: string[];
+        all?: boolean;
+      }>
+    ) {
+      if (action.payload.all) {
+        state.filters["categoryId"] = [];
+        return;
+      }
+      if (action.payload.categoryIds) {
+        mutatingFilter(
+          state.filters["categoryId"],
           (id) => !action.payload.categoryIds!.includes(id)
         );
       }

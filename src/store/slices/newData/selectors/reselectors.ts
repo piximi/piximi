@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
+  selectAllKinds,
   selectCategoriesDictionary,
   selectKindDictionary,
   selectThingsDictionary,
@@ -8,7 +9,7 @@ import {
   selectActiveKindId,
   selectSelectedThingIds,
 } from "store/slices/project/selectors";
-import { NewCategory } from "types/Category";
+import { Kind, KindWithCategories, NewCategory } from "types/Category";
 import { difference, intersection } from "lodash";
 import { CATEGORY_COLORS } from "utils/common/colorPalette";
 import {
@@ -19,10 +20,7 @@ import { NewImageType } from "types/ImageType";
 import { Partition, Shape } from "types";
 import { ThingType } from "types/ThingType";
 import { selectActiveImage } from "store/slices/imageViewer/reselectors";
-import {
-  selectActiveAnnotationIds,
-  selectWorkingAnnotation,
-} from "store/slices/imageViewer";
+import { selectActiveAnnotationIds } from "store/slices/imageViewer";
 import { decodeAnnotationNew } from "utils/annotator/rle/rle";
 import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
 import { getCompleteEntity } from "store/entities/utils";
@@ -301,8 +299,7 @@ export const selectActiveAnnotationObjectsNew = createSelector(
   selectActiveAnnotationIds,
   selectThingsDictionary,
   selectCategoriesDictionary,
-  selectWorkingAnnotation,
-  (activeImage, activeAnnotationIds, thingDict, catDict, workingAnnotation) => {
+  (activeImage, activeAnnotationIds, thingDict, catDict) => {
     if (!activeImage) return [];
     const imageShape = activeImage.shape;
     const activePlane = activeImage.activePlane;
@@ -314,7 +311,6 @@ export const selectActiveAnnotationObjectsNew = createSelector(
 
     for (const annotationId of activeAnnotationIds) {
       const annotation = thingDict[annotationId] as NewAnnotationType;
-      if (!annotation || annotationId === workingAnnotation.saved?.id) continue;
 
       const decodedAnnotation = !annotation.decodedMask
         ? decodeAnnotationNew(annotation)
@@ -367,4 +363,70 @@ export const selectActiveAnnotationsNew = createSelector(
       return decodedAnnotation;
     });
   }
+);
+
+export const selectImageViewerActiveKinds = createSelector(
+  selectActiveImage,
+  selectAllKinds,
+  (activeImage, allKinds) => {
+    if (!activeImage) return [];
+    const activeKinds: Kind[] = [];
+    const activeAnnotationIds = activeImage.containing;
+
+    allKinds.forEach((kind) => {
+      const intersect = intersection(activeAnnotationIds, kind.containing);
+      if (intersect.length > 0) {
+        activeKinds.push(kind);
+      }
+    });
+
+    return activeKinds;
+  }
+);
+
+export const selectImageViewerActiveKindsWithFullCat = createSelector(
+  selectActiveImage,
+  selectAllKinds,
+  selectCategoriesDictionary,
+  (activeImage, allKinds, catDict) => {
+    if (!activeImage) return [];
+    const activeKinds: Array<KindWithCategories> = [];
+    const activeAnnotationIds = activeImage.containing;
+
+    allKinds.forEach((kind) => {
+      const intersect = intersection(activeAnnotationIds, kind.containing);
+      if (intersect.length > 0) {
+        activeKinds.push({
+          ...kind,
+          categories: kind.categories.map((id) => catDict[id]),
+        });
+      }
+    });
+
+    return activeKinds;
+  }
+);
+
+export const selectActiveImageCategoryObjectCount = createSelector(
+  selectActiveImage,
+  selectKindDictionary,
+  (activeImage, kindDict) =>
+    (category: NewCategory, kindIfUnknown?: string) => {
+      if (!activeImage) return 0;
+
+      const objectsInImage = activeImage.containing;
+      let objectsInCategory;
+      if (kindIfUnknown) {
+        const kind = kindDict[kindIfUnknown];
+        if (!kind) return 0;
+        const objectsInKind = kind.containing;
+        const unknownObjects = category.containing;
+        objectsInCategory = intersection(objectsInKind, unknownObjects);
+      } else {
+        objectsInCategory = category.containing;
+      }
+
+      const objectsInBoth = intersection(objectsInCategory, objectsInImage);
+      return objectsInBoth.length;
+    }
 );
