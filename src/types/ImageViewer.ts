@@ -1,6 +1,7 @@
 import {
   AnnotationType,
   DecodedAnnotationType,
+  NewAnnotationType,
   NewDecodedAnnotationType,
 } from "./AnnotationType";
 import { ColorAdjustmentOptionsType } from "./ColorAdjustmentOptionsType";
@@ -15,6 +16,7 @@ export type ImageViewer = {
   activeAnnotationIds: Array<string>;
   previousImageId?: string;
   annotationFilters: Required<Pick<FilterType<AnnotationType>, "categoryId">>;
+  filters: Required<Pick<FilterType<NewAnnotationType>, "categoryId">>;
   activeImageRenderedSrcs: Array<string>;
   imageOrigin: { x: number; y: number };
   workingAnnotationId: string | undefined;

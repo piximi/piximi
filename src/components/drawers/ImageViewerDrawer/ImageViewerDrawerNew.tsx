@@ -20,6 +20,7 @@ import { ImageViewerAppBarNew } from "components/app-bars";
 import { BaseAppDrawer } from "../BaseAppDrawer";
 import { selectImageViewerImages } from "store/slices/imageViewer/reselectors";
 import { ImageListNew } from "components/lists/ImageList";
+import { ImageViewerCategoryList } from "components/lists/ImageViewerCategoryList";
 
 export const ImageViewerDrawerNew = () => {
   // const createdCategories = useSelector(selectCreatedAnnotationCategories);
@@ -46,14 +47,10 @@ export const ImageViewerDrawerNew = () => {
       <ImageListNew images={imageViewerImages} />
 
       <DividerHeader textAlign="left" typographyVariant="body2" sx={{ my: 2 }}>
-        Categories
+        Kinds
       </DividerHeader>
 
-      {/* <AnnotationCategoryList
-        createdCategories={createdCategories}
-        hotkeysActive={true}
-        view="ImageViewer"
-      /> */}
+      <ImageViewerCategoryList />
 
       <Divider sx={{ mt: 1 }} />
 

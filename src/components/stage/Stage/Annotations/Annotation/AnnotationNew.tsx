@@ -17,6 +17,7 @@ type AnnotationProps = {
   imageShape: Shape;
   fillColor: string;
   selected?: boolean;
+  isFiltered?: boolean;
 };
 
 export const AnnotationNew = ({
@@ -24,6 +25,7 @@ export const AnnotationNew = ({
   imageShape,
   fillColor,
   selected,
+  isFiltered,
 }: AnnotationProps) => {
   const annotatorRef = useRef<Konva.Image | null>(null);
   const [imageWidth] = useState<number>(imageShape.width);
@@ -114,7 +116,9 @@ export const AnnotationNew = ({
     );
   };
 
-  return (
+  return isFiltered ? (
+    <></>
+  ) : (
     <ReactKonva.Image
       ref={annotatorRef}
       id={annotation.id}
@@ -125,6 +129,7 @@ export const AnnotationNew = ({
       height={Math.round(annotation.boundingBox[3] - annotation.boundingBox[1])}
       onTransformEnd={onTransformEnd}
       strokeWidth={100}
+
       //scale={{ x: stageScale, y: stageScale }}
     />
   );

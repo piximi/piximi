@@ -20,6 +20,9 @@ export type Kind = {
   categories: string[];
   unknownCategoryId: string;
 };
+export type KindWithCategories = Omit<Kind, "categories"> & {
+  categories: NewCategory[];
+};
 
 export enum CategoryType {
   ImageCategory,
