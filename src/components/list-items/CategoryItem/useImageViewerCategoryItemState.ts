@@ -27,7 +27,6 @@ export const useImageViewerCategoryItemState = (
     dispatch(
       imageViewerSlice.actions.setSelectedCategoryId({
         selectedCategoryId: category.id,
-        execSaga: true,
       })
     );
   };

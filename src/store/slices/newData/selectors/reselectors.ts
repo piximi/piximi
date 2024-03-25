@@ -316,7 +316,10 @@ export const selectActiveAnnotationObjectsNew = createSelector(
         ? decodeAnnotationNew(annotation)
         : (annotation as NewDecodedAnnotationType);
 
-      if (annotation.plane === activePlane) {
+      if (
+        annotation.plane === activePlane ||
+        annotation.activePlane === activePlane
+      ) {
         const fillColor = catDict[annotation.categoryId].color;
         annotationObjects.push({
           annotation: decodedAnnotation,
@@ -429,4 +432,14 @@ export const selectActiveImageCategoryObjectCount = createSelector(
       const objectsInBoth = intersection(objectsInCategory, objectsInImage);
       return objectsInBoth.length;
     }
+);
+
+export const selectFirstUnknownCategory = createSelector(
+  selectAllKinds,
+  selectCategoriesDictionary,
+  (kinds, catDict) => {
+    if (kinds.length < 2) return;
+    const unknownCatId = kinds[1].unknownCategoryId;
+    return catDict[unknownCatId];
+  }
 );

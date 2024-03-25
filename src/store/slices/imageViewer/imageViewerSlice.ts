@@ -247,7 +247,7 @@ export const imageViewerSlice = createSlice({
     },
     setSelectedCategoryId(
       state,
-      action: PayloadAction<{ selectedCategoryId: string; execSaga: boolean }>
+      action: PayloadAction<{ selectedCategoryId: string }>
     ) {
       state.selectedCategoryId = action.payload.selectedCategoryId;
     },

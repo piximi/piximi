@@ -25,7 +25,7 @@ import {
   ThresholdAnnotationTool,
   SelectionTool,
   BlankAnnotationTool,
-} from "annotator-tools";
+} from "annotator-tools-new";
 import { selectActiveImage } from "store/slices/imageViewer/selectors/selectActiveImageId";
 
 export const useAnnotationToolNew = () => {

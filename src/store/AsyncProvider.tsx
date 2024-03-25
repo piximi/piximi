@@ -11,7 +11,7 @@ import { newDataSlice } from "./slices/newData/newDataSlice";
 import { projectSlice } from "./slices/project";
 import { segmenterSlice } from "./slices/segmenter";
 import { loadExampleImage } from "utils/common/image";
-import { Partition, SerializedFileType, Shape } from "types";
+import { Partition, SerializedFileType } from "types";
 import {
   Category,
   Kind,
@@ -145,28 +145,14 @@ const loadState = async () => {
 
     annotation.name = annotationName;
     annotation.categoryId = kind.saved.unknownCategoryId;
-    annotation.shape = annotation.data.shape.reduce(
-      (shape: Shape, value: number, idx) => {
-        switch (idx) {
-          case 0:
-            shape.planes = value;
-            break;
-          case 1:
-            shape.height = value;
-            break;
-          case 2:
-            shape.width = value;
-            break;
-          case 3:
-            shape.channels = value;
-            break;
-          default:
-            break;
-        }
-        return shape;
-      },
-      { planes: 0, height: 0, width: 0, channels: 0 }
-    );
+    const shapeArray = annotation.data.shape;
+    annotation.shape = {
+      planes: shapeArray[0],
+      height: shapeArray[1],
+      width: shapeArray[2],
+      channels: shapeArray[3],
+    };
+
     annotation.partition = Partition.Unassigned;
     things.ids.push(annotation.id);
 

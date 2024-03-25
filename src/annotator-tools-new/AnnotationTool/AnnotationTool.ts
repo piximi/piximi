@@ -2,12 +2,7 @@ import * as ImageJS from "image-js";
 
 import { Tool } from "../Tool";
 
-import {
-  AnnotationStateType,
-  Category,
-  Point,
-  DecodedAnnotationType,
-} from "types";
+import { AnnotationStateType, Point, Partition } from "types";
 
 import { DataArray, convertToDataArray } from "utils/common/image";
 
@@ -16,8 +11,10 @@ import {
   maskFromPoints,
 } from "utils/annotator";
 import { generateUUID } from "utils/common/helpers";
+import { PartialDecodedAnnotationType } from "types/AnnotationType";
+import { NewCategory } from "types/Category";
 
-export abstract class AnnotationTool extends Tool {
+export abstract class AnnotationToolNew extends Tool {
   /**
    * Polygon that defines the annotation area, array of (x, y) coordinates.
    */
@@ -42,7 +39,7 @@ export abstract class AnnotationTool extends Tool {
   /**
    * Annotation object of the Tool.
    */
-  annotation?: DecodedAnnotationType;
+  annotation?: PartialDecodedAnnotationType;
   anchor?: Point = undefined;
   origin?: Point = undefined;
   buffer?: Array<Point> = [];
@@ -154,7 +151,7 @@ export abstract class AnnotationTool extends Tool {
    * @param plane Index of the image plane that corresponds to the annotation.
    * @returns
    */
-  public annotate(category: Category, plane: number, imageId: string): void {
+  public annotate(category: NewCategory, plane: number, imageId: string): void {
     if (!this.boundingBox || !this.decodedMask) return;
 
     this.annotation = {
@@ -163,7 +160,8 @@ export abstract class AnnotationTool extends Tool {
       id: this.annotation ? this.annotation.id : generateUUID(),
       imageId,
       decodedMask: this.decodedMask,
-      plane: plane,
+      activePlane: plane,
+      partition: Partition.Unassigned,
     };
   }
 

@@ -30,7 +30,7 @@ import {
   AnnotationModeType,
 } from "types";
 
-import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools";
+import { AnnotationTool, ObjectAnnotationTool } from "annotator-tools-new";
 import { usePointerToolNew } from "hooks/usePointerTool";
 import { logger } from "utils/common/logger";
 //import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
@@ -80,7 +80,7 @@ export const useStageHandlersNew = (
       })
     );
     dispatch(
-      annotatorSlice.actions.setAnnotationState({
+      annotatorSlice.actions.setAnnotationStateNew({
         annotationState: AnnotationStateType.Blank,
         annotationTool,
       })

@@ -20,7 +20,7 @@ import useSound from "use-sound";
 
 import { AnnotationModeType } from "types";
 
-import { AnnotationTool } from "annotator-tools";
+import { AnnotationTool } from "annotator-tools-new";
 import createAnnotationSoundEffect from "data/sounds/pop-up-on.mp3";
 import deleteAnnotationSoundEffect from "data/sounds/pop-up-off.mp3";
 import { selectWorkingAnnotationNew } from "store/slices/imageViewer/selectors/selectWorkingAnnotation";
