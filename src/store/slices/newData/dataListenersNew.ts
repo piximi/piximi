@@ -6,6 +6,7 @@ import { intersection } from "lodash";
 import { DeferredEntity } from "store/entities/models";
 import { NewImageType } from "types/ImageType";
 import { projectSlice } from "../project";
+import { imageViewerSlice } from "../imageViewer";
 
 export const newDataMiddleware = createListenerMiddleware();
 
@@ -101,5 +102,21 @@ startAppListening({
     listenerAPI.subscribe();
 
     return;
+  },
+});
+
+startAppListening({
+  actionCreator: newDataSlice.actions.addAnnotations,
+  effect: (action, listenerAPI) => {
+    action.payload.annotations.forEach((annotation) => {
+      const imageId = annotation.imageId;
+      if (imageId === listenerAPI.getState().imageViewer.activeImageId) {
+        listenerAPI.dispatch(
+          imageViewerSlice.actions.addActiveAnnotationId({
+            annotationId: annotation.id,
+          })
+        );
+      }
+    });
   },
 });

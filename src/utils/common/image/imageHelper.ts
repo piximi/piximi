@@ -11,6 +11,7 @@ import {
   tidy,
   fill,
   dispose,
+  image as tfImage,
 } from "@tensorflow/tfjs";
 
 import {
@@ -21,6 +22,7 @@ import {
 } from "types";
 import { Colors } from "types/tensorflow";
 import { generateUUID } from "../helpers";
+import { NewImageType } from "types/ImageType";
 
 /*
  ======================================
@@ -1095,4 +1097,36 @@ export const convertToDataArray = (
     default:
       throw Error("Unrecognized bit depth");
   }
+};
+
+export const getPropertiesFromImage = async (
+  image: NewImageType,
+  annotation: { boundingBox: number[] }
+) => {
+  const renderedIm = await ImageJS.Image.load(image.src);
+  const normalizingWidth = image.shape.width - 1;
+  const normalizingHeight = image.shape.height - 1;
+  const bbox = annotation.boundingBox;
+  const x1 = bbox[0] / normalizingWidth;
+  const x2 = bbox[2] / normalizingWidth;
+  const y1 = bbox[1] / normalizingHeight;
+  const y2 = bbox[3] / normalizingHeight;
+  const box = tensor2d([[y1, x1, y2, x2]]);
+  const width = bbox[2] - bbox[0];
+  const height = bbox[3] - bbox[1];
+  const objectImage = renderedIm.crop({
+    x: Math.abs(bbox[0]),
+    y: Math.abs(bbox[1]),
+    width: Math.abs(Math.min(image.shape.width, bbox[2]) - bbox[0]),
+    height: Math.abs(Math.min(image.shape.height, bbox[3]) - bbox[1]),
+  });
+  const objSrc = objectImage.getCanvas().toDataURL();
+  const data = tfImage.cropAndResize(image.data, box, [0], [height, width]);
+
+  return {
+    data: data,
+    src: objSrc,
+    imageId: image.id,
+    boundingBox: bbox,
+  };
 };

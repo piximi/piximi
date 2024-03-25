@@ -5,7 +5,7 @@ import { AnnotationNew } from "./Annotation";
 
 import { selectSelectedAnnotationIds } from "store/slices/imageViewer";
 
-import { AnnotationTool } from "annotator-tools";
+import { AnnotationTool } from "annotator-tools-new";
 import {
   selectActiveAnnotationObjectsNew,
   selectWorkingAnnotationObjectNew,

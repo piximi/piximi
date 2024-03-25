@@ -1,1 +1,1 @@
-export { AnnotationTool } from "./AnnotationTool";
+export { AnnotationToolNew as AnnotationTool } from "./AnnotationTool";

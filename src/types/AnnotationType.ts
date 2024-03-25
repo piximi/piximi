@@ -4,6 +4,7 @@ import { SerializedAnnotationRType } from "./runtime";
 import { ThingType } from "./ThingType";
 import { NewSerializedAnnotationRType } from "./runtime/SerializedFileType";
 import { Tensor4D } from "@tensorflow/tfjs";
+import { PartialBy } from "./utility/PartialBy";
 
 export type AnnotationType = {
   id: string;
@@ -38,6 +39,10 @@ export type NewDecodedAnnotationType = Omit<
     decodedMask: DataArray;
   },
   "encodedMask"
+>;
+export type PartialDecodedAnnotationType = PartialBy<
+  NewDecodedAnnotationType,
+  "src" | "data" | "name" | "kind" | "bitDepth" | "shape"
 >;
 
 export type SerializedAnnotationType = T.TypeOf<

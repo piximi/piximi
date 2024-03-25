@@ -28,3 +28,4 @@ export const selectCategoriesDictionary = categorySelectors.selectEntities; // r
 export const selectAllCategories = categorySelectors.selectAll; // returns an array
 export const selectAllCategoryIds = categorySelectors.selectIds;
 export const selectTotalCategoryCount = categorySelectors.selectTotal;
+export const selectCategoryById = categorySelectors.selectById;

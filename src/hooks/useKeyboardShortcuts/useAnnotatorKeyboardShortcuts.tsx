@@ -101,7 +101,6 @@ export const useAnnotatorKeyboardShortcuts = ({
       dispatch(
         setSelectedCategoryId({
           selectedCategoryId: selectedCategory.id,
-          execSaga: true,
         })
       );
     },

@@ -481,7 +481,6 @@ export const newDataSlice = createSlice({
         }
 
         thing.name = updatedNamePrefix;
-
         if (state.kinds.entities[thing.kind]) {
           newDataSlice.caseReducers.updateKindContents(state, {
             type: "updateKindContents",

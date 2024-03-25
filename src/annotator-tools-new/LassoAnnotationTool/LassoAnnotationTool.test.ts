@@ -1,8 +1,9 @@
 import { test } from "@jest/globals";
 import { Image } from "image-js";
 import { LassoAnnotationTool } from "./LassoAnnotationTool";
-import { AnnotationStateType, Category } from "types";
+import { AnnotationStateType } from "types";
 import { data } from "data/test-data/annotatorToolsTestData.json";
+import { NewCategory } from "types/Category";
 
 const src = data.image;
 
@@ -101,10 +102,12 @@ test("select", async () => {
 
   operator.onMouseUp({ x: 5, y: 5 });
 
-  const category: Category = {
+  const category: NewCategory = {
     color: "#0000FF",
     id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     name: "foo",
+    containing: [],
+    kind: "",
     visible: true,
   };
 
@@ -149,10 +152,12 @@ test("deselect", async () => {
 
   operator.onMouseUp({ x: 5, y: 5 });
 
-  const category: Category = {
+  const category: NewCategory = {
     color: "#0000FF",
     id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     name: "foo",
+    containing: [],
+    kind: "",
     visible: true,
   };
 
