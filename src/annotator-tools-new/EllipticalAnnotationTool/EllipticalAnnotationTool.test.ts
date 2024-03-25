@@ -2,8 +2,9 @@ import { test } from "@jest/globals";
 import { Image } from "image-js";
 
 import { EllipticalAnnotationTool } from "./EllipticalAnnotationTool";
-import { AnnotationStateType, Category } from "types";
+import { AnnotationStateType } from "types";
 import { data } from "data/test-data/annotatorToolsTestData.json";
+import { NewCategory } from "types/Category";
 
 const src = data.image;
 
@@ -67,10 +68,12 @@ test("select", async () => {
   operator.onMouseMove({ x: 100, y: 100 });
   operator.onMouseUp({ x: 100, y: 100 });
 
-  const category: Category = {
+  const category: NewCategory = {
     color: "#0000FF",
     id: "5ed3511d-1223-4bba-a0c2-2b3897232d98",
     name: "foo",
+    containing: [],
+    kind: "",
     visible: true,
   };
   operator.annotate(category, 1, "");

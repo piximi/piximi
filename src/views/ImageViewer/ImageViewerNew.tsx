@@ -26,6 +26,8 @@ import { ImageShapeInfo, ImageShapeEnum } from "utils/common/image";
 import { AlertType, HotkeyView } from "types";
 import { StageContext } from "contexts";
 import { AnnotatorToolDrawerNew } from "components/drawers/AnnotatorToolDrawer/AnnotatorToolDrawerNew";
+import { imageViewerSlice } from "store/slices/imageViewer";
+import { selectFirstUnknownCategory } from "store/slices/newData/selectors/reselectors";
 
 export const ImageViewerNew = () => {
   const dispatch = useDispatch();
@@ -33,6 +35,7 @@ export const ImageViewerNew = () => {
   const [files, setFiles] = useState<FileList>();
   const [optionsVisible, setOptionsVisibile] = useState<boolean>(true);
   const [persistOptions, setPersistOptions] = useState<boolean>(false);
+  const selectedUnknownCategory = useSelector(selectFirstUnknownCategory);
 
   const [imageShape, setImageShape] = useState<ImageShapeInfo>({
     shape: ImageShapeEnum.InvalidImage,
@@ -95,6 +98,14 @@ export const ImageViewerNew = () => {
     },
     [dispatch]
   );
+
+  useEffect(() => {
+    dispatch(
+      imageViewerSlice.actions.setSelectedCategoryId({
+        selectedCategoryId: selectedUnknownCategory?.id ?? "",
+      })
+    );
+  }, [dispatch, selectedUnknownCategory]);
 
   useEffect(() => {
     window.addEventListener("beforeunload", onUnload);

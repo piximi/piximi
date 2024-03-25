@@ -7,7 +7,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, Typography } from "@mui/material";
 
 import { useHotkeys, usePointerLocation } from "hooks";
-import { useAnnotationState } from "hooks/useAnnotationState";
+import { useAnnotationStateNew } from "hooks/useAnnotationState";
 import { Cursor } from "components/styled-components";
 
 import { Layer } from "./Layer";
@@ -63,7 +63,7 @@ export const StageNew = ({
   const activeImage = useSelector(selectActiveImage);
 
   const { annotationTool } = useAnnotationToolNew();
-  useAnnotationState(annotationTool);
+  useAnnotationStateNew(annotationTool);
 
   const {
     absolutePosition,
