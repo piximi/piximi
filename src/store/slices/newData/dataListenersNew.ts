@@ -1,12 +1,13 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { TypedAppStartListening } from "types";
 import { newDataSlice } from "./newDataSlice";
-import { getDeferredProperty } from "store/entities/utils";
+import { getCompleteEntity, getDeferredProperty } from "store/entities/utils";
 import { intersection } from "lodash";
 import { DeferredEntity } from "store/entities/models";
 import { NewImageType } from "types/ImageType";
 import { projectSlice } from "../project";
 import { imageViewerSlice } from "../imageViewer";
+import { createRenderedTensor } from "utils/common/image";
 
 export const newDataMiddleware = createListenerMiddleware();
 
@@ -118,5 +119,70 @@ startAppListening({
         );
       }
     });
+  },
+});
+
+startAppListening({
+  actionCreator: newDataSlice.actions.updateThings,
+  effect: async (action, listenerAPI) => {
+    const { updates } = action.payload;
+    const { newData: dataState, imageViewer: imageViewerState } =
+      listenerAPI.getState();
+
+    const srcUpdates: Array<{ id: string } & Partial<NewImageType>> = [];
+    let renderedSrcs: string[] = [];
+    const numImages = updates.length;
+    let imageNumber = 1;
+    for await (const update of updates) {
+      const { id: imageId, ...changes } = update;
+      if ("colors" in changes && changes.colors) {
+        const colors = changes.colors;
+        const image = getCompleteEntity(
+          dataState.things.entities[imageId]
+        )! as NewImageType;
+
+        const colorsEditable = {
+          range: { ...colors.range },
+          visible: { ...colors.visible },
+          color: colors.color,
+        };
+        renderedSrcs = await createRenderedTensor(
+          image.data,
+          colorsEditable,
+          image.bitDepth,
+          undefined
+        );
+
+        srcUpdates.push({ id: imageId, src: renderedSrcs[image.activePlane] });
+        if (imageId === imageViewerState.activeImageId) {
+          listenerAPI.dispatch(
+            imageViewerSlice.actions.setActiveImageRenderedSrcs({
+              renderedSrcs,
+            })
+          );
+        }
+        listenerAPI.dispatch(
+          projectSlice.actions.setLoadMessage({
+            message: `Updating image ${imageNumber} of ${numImages}`,
+          })
+        );
+        imageNumber++;
+      }
+    }
+
+    if (srcUpdates.length !== 0) {
+      listenerAPI.unsubscribe();
+      listenerAPI.dispatch(
+        newDataSlice.actions.updateThings({
+          updates: srcUpdates,
+        })
+      );
+      listenerAPI.subscribe();
+    }
+    listenerAPI.dispatch(
+      projectSlice.actions.setLoadMessage({
+        message: "",
+      })
+    );
   },
 });
