@@ -9,7 +9,6 @@ import { AppBarOffset } from "components/styled-components";
 import { PenSelectionIconOptions } from "./PenSelectionIconOptions";
 import { QuickAnnotationOptions } from "./QuickAnnotationOptions";
 import { ZoomOptions } from "./ZoomOptions";
-import { ColorAdjustmentOptions } from "./ColorAdjustmentOptions";
 import { ThresholdAnnotationOptions } from "./ThresholdAnnotationOptions";
 import { InformationBox } from "./InformationBox";
 import { BaseOptions } from "./BaseOptions";
@@ -32,6 +31,7 @@ import {
   ZoomIcon,
 } from "icons";
 import { PointerSelectionOptionsNew } from "./PointerSelectionOptions";
+import { ColorAdjustmentOptions } from "./color-adjustment-options";
 
 type OperationType = {
   icon: ReactElement;
