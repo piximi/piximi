@@ -3,12 +3,16 @@ import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { annotatorSlice } from "store/slices/annotator";
 import { selectAnnotationSelectionMode } from "store/slices/annotator/selectors";
-import { selectActiveImageId } from "store/slices/imageViewer";
+import {
+  imageViewerSlice,
+  selectActiveImageId,
+} from "store/slices/imageViewer";
 import { RootState } from "store/rootReducer";
 import { AnnotationModeType, AnnotationStateType } from "types";
 import { selectCategoryById } from "store/slices/newData/selectors/selectors";
 import { selectActiveImage } from "store/slices/imageViewer/reselectors";
 import { selectSelectedIVCategoryId } from "store/slices/imageViewer/selectors/selectSelectedAnnotationCategoryId";
+import { selectFirstUnknownCategory } from "store/slices/newData/selectors/reselectors";
 
 export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
   const dispatch = useDispatch();
@@ -19,6 +23,7 @@ export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
   const selectedCategory = useSelector((state: RootState) =>
     selectCategoryById(state, selectedCategoryId!)
   );
+  const defaultSelectedCategory = useSelector(selectFirstUnknownCategory);
 
   const onAnnotating = useMemo(() => {
     const func = () => {
@@ -42,11 +47,25 @@ export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
         })
       );
       if (selectionMode !== AnnotationModeType.New) return;
-      annotationTool.annotate(
-        selectedCategory!,
-        activeImage!.activePlane,
-        activeImageId!
-      );
+      if (!selectedCategory) {
+        if (!defaultSelectedCategory) return;
+        dispatch(
+          imageViewerSlice.actions.setSelectedCategoryId({
+            selectedCategoryId: defaultSelectedCategory.id,
+          })
+        );
+        annotationTool.annotate(
+          defaultSelectedCategory,
+          activeImage!.activePlane,
+          activeImageId!
+        );
+      } else {
+        annotationTool.annotate(
+          selectedCategory,
+          activeImage!.activePlane,
+          activeImageId!
+        );
+      }
     };
     return func;
   }, [
@@ -56,6 +75,7 @@ export const useAnnotationStateNew = (annotationTool: AnnotationTool) => {
     selectionMode,
     dispatch,
     activeImageId,
+    defaultSelectedCategory,
   ]);
 
   const onDeselect = useMemo(() => {
